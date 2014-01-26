@@ -37,6 +37,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
+    'leaflet',
+    'bootstrap3',
     'dados',
 )
 
@@ -50,6 +52,8 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'AlertaDengue.urls'
+
+TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
 
 WSGI_APPLICATION = 'AlertaDengue.wsgi.application'
 
