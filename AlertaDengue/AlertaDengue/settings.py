@@ -68,6 +68,14 @@ DATABASES = {
     }
 }
 
+LEAFLET_CONFIG = {
+   # 'SPATIAL_EXTENT': (),
+    'DEFAULT_CENTER': (-22.907111, -43.231864),
+    'DEFAULT_ZOOM': 10,
+    'ATTRIBUTION_PREFIX': 'Powered by django-leaflet',
+
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 

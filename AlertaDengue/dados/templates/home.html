@@ -1,13 +1,42 @@
 {% extends 'base.html' %}
+{% block extra_head %}
+    {% load leaflet_tags %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+    <style>
+        .leaflet-container {
+            height: 100%;
+        }
+    </style>
+{% endblock %}
 
 
-{% block title %}Projeto Alerta Dengue{% endblock %}
+
+
+
+{% block title %}<br>Projeto Alerta Dengue{% endblock %}
 
 {% block content %}
+    <h1>Casos de Dengue segundo SINAN</h1>
+    {% leaflet_map "main" callback="main_map_init" %}
 
-    <div id="footer">
-      <div class="container">
-        <p class="text-muted">Place sticky footer content here.</p>
-      </div>
-    </div>
+    <script type="text/javascript">
+        function main_map_init(map, options) {
+            var dataurl = '{% url "sinan" 2010 %}';
+            // Download GeoJSON via Ajax
+            $.getJSON(dataurl, function (data) {
+                // Add GeoJSON layer
+                var geojson = L.geoJson(data, {
+                    onEachFeature: function (feature, layer) {
+                        //var markers = L.markerClusterGroup();
+                        //layer.bindPopup(feature.properties.name);
+                    }
+                });
+
+                geojson.addTo(map);
+            });
+        }
+    </script>
+
+
 {% endblock %}
