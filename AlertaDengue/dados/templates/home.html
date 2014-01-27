@@ -25,14 +25,14 @@
             var dataurl = '{% url "sinan" 2010 %}';
             // Download GeoJSON via Ajax
             $.getJSON(dataurl, function (data) {
+                //var markers = L.markerClusterGroup();
                 // Add GeoJSON layer
-                var geojson = L.geoJson(data, {
-                    onEachFeature: function (feature, layer) {
-                        //var markers = L.markerClusterGroup();
+                var geojson = L.geoJson(data, {onEachFeature: function (feature, layer) {
+                        console.write(feature.geometry.coordinates.toString())
                         //layer.bindPopup(feature.properties.name);
                     }
                 });
-
+                //L.geoJson(data).addTo(map)
                 geojson.addTo(map);
             });
         }

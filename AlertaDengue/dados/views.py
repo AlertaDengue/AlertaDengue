@@ -1,8 +1,11 @@
+# coding: utf8
 from django.shortcuts import render
 from django.views.generic.base import TemplateView, View
 from django.contrib import messages
+from django.contrib.gis.geos import Point
 from django.http import HttpResponse, StreamingHttpResponse
 from dados import models as M
+import json
 
 
 class HomePageView(TemplateView):
@@ -16,11 +19,19 @@ class HomePageView(TemplateView):
 class SinanCasesView(View):
     def get(self, request, year):
         assert int(year) in [2010, 2011, 2012, 2013]
+        cases = "{\"type\": \"FeatureCollection\", 'features': ["
         if int(year) == 2010:
-            cases = M.Dengue_2010.objects.geojson()
+            dados = M.Dengue_2010.objects.geojson()
            # print(cases[0].geojson)
         elif int(year) == 2011:
-            cases = M.Dengue_2011.objects.geojson()
+            dados = M.Dengue_2011.objects.geojson()
+        elif int(year) == 2012:
+            dados = M.Dengue_2012.objects.geojson()
+        elif int(year) == 2013:
+            dados = M.Dengue_2013.objects.geojson()
         else:
-            cases = []
-        return StreamingHttpResponse([c.geojson for c in cases])
+            dados = []
+        for c in dados:
+            cases += "{\"type\": \"feature\", \"geometry\": " + c.geojson + "},"
+        cases += "],\"properties\": {}}"
+        return HttpResponse(cases)
