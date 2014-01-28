@@ -19,7 +19,7 @@ class HomePageView(TemplateView):
 class SinanCasesView(View):
     def get(self, request, year):
         assert int(year) in [2010, 2011, 2012, 2013]
-        cases = "{\"type\": \"FeatureCollection\", 'features': ["
+        cases = "{\"type\":\"FeatureCollection\", \"features\":["
         if int(year) == 2010:
             dados = M.Dengue_2010.objects.geojson()
            # print(cases[0].geojson)
@@ -31,7 +31,8 @@ class SinanCasesView(View):
             dados = M.Dengue_2013.objects.geojson()
         else:
             dados = []
-        for c in dados:
-            cases += "{\"type\": \"feature\", \"geometry\": " + c.geojson + "},"
-        cases += "],\"properties\": {}}"
-        return HttpResponse(cases)
+        for c in dados[:10]:
+            cases += "{\"type\":\"Feature\",\"geometry\":" + c.geojson + ", \"properties\":{}},"
+        cases = cases[:-1] + "]}"
+        #json.loads(cases)
+        return HttpResponse(cases, content_type="application/json")

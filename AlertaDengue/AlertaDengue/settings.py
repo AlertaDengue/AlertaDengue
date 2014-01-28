@@ -73,6 +73,13 @@ LEAFLET_CONFIG = {
     'DEFAULT_CENTER': (-22.907111, -43.231864),
     'DEFAULT_ZOOM': 10,
     'ATTRIBUTION_PREFIX': 'Powered by django-leaflet',
+    'PLUGINS': {
+        'cluster': {
+            'js': 'js/leaflet.markercluster.js',
+            'css': ['css/MarkerCluster.css'],
+            'auto-include': True
+        }
+    }
 
 }
 

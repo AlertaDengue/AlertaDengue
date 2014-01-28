@@ -3,15 +3,13 @@
     {% load leaflet_tags %}
     {% leaflet_js %}
     {% leaflet_css %}
+    {% leaflet_js plugins="ALL" %}
     <style>
         .leaflet-container {
             height: 100%;
         }
     </style>
 {% endblock %}
-
-
-
 
 
 {% block title %}<br>Projeto Alerta Dengue{% endblock %}
@@ -24,11 +22,11 @@
         function main_map_init(map, options) {
             var dataurl = '{% url "sinan" 2010 %}';
             // Download GeoJSON via Ajax
-            $.getJSON(dataurl, function (data) {
-                //var markers = L.markerClusterGroup();
+            $.getJSON(dataurl, function(data){
+                var markers = L.MarkerClusterGroup();
+                //alert("ok")
                 // Add GeoJSON layer
                 var geojson = L.geoJson(data, {onEachFeature: function (feature, layer) {
-                        console.write(feature.geometry.coordinates.toString())
                         //layer.bindPopup(feature.properties.name);
                     }
                 });
