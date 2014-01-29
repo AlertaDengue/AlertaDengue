@@ -6,7 +6,7 @@
     {% leaflet_js plugins="ALL" %}
     <style>
         .leaflet-container {
-            height: 100%;
+            height: 600px;
         }
     </style>
 {% endblock %}
@@ -15,26 +15,75 @@
 {% block title %}<br>Projeto Alerta Dengue{% endblock %}
 
 {% block content %}
-    <h1>Casos de Dengue segundo SINAN</h1>
+    <h1>Casos de Dengue em <b id="ano">2010</b> segundo SINAN.</h1>
+    <b>Year: </b> <select id="year">
+    <option value="2010">2010</option>
+    <option value="2011">2011</option>
+    <option value="2012">2012</option>
+    <option value="2013">2013</option>
+</select><br>
+    <div id="progress"><div id="progress-bar"></div></div>
     {% leaflet_map "main" callback="main_map_init" %}
 
     <script type="text/javascript">
-        function main_map_init(map, options) {
-            var dataurl = '{% url "sinan" 2010 %}';
-            // Download GeoJSON via Ajax
-            $.getJSON(dataurl, function(data){
-                var markers = L.MarkerClusterGroup();
-                //alert("ok")
+        var case_layers = L.layerGroup();
+        var progress = document.getElementById('progress');
+        var progressBar = document.getElementById('progress-bar');
+        $("select").change(function () {
+            $(this).find("option:selected").each(function () {
+                redraw_map($("#year option:selected").val())
+            });
+        });
+        function redraw_map(year) {
+            case_layers.clearLayers();
+            var map = $(document).data('map')
+            $.getJSON("/sinan/" + year.toString(), function (data) {
+                var markers = L.markerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: true,
+                    zoomToBoundsOnClick: true, chunkedLoading: true, chunkProgress: updateProgressBar });
                 // Add GeoJSON layer
                 var geojson = L.geoJson(data, {onEachFeature: function (feature, layer) {
-                        //layer.bindPopup(feature.properties.name);
-                    }
+                    //layer.bindPopup(feature.properties.name);
+                }
                 });
-                //L.geoJson(data).addTo(map)
-                geojson.addTo(map);
+                markers.addLayer(geojson);
+                case_layers.addLayer(markers);
+                case_layers.addTo(map);
+            });
+            $("#ano").text(year.toString())
+        }
+        ;
+        function updateProgressBar(processed, total, elapsed, layersArray) {
+            if (elapsed > 1000) {
+                // if it takes more than a second to load, display the progress bar:
+                progress.style.display = 'block';
+                progressBar.style.width = Math.round(processed / total * 100) + '%';
+            }
+
+            if (processed === total) {
+                // all markers processed - hide the progress bar:
+                progress.style.display = 'none';
+            }
+        }
+        function main_map_init(map, options) {
+            $(document).data('map', map)
+            var dataurl = '{% url "sinan" 2010 %}';
+            // Download GeoJSON via Ajax
+
+            $.getJSON(dataurl, function (data) {
+                // Add GeoJSON layer
+                var geojson = L.geoJson(data, {onEachFeature: function (feature, layer) {
+                    //layer.bindPopup(feature.properties.name);
+                }
+                });
+                var markers = L.markerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: true,
+                    zoomToBoundsOnClick: true, chunkedLoading: true, chunkProgress: updateProgressBar });
+                markers.addLayer(geojson);
+                case_layers.addLayer(markers);
+                case_layers.addTo(map);
             });
         }
     </script>
 
 
 {% endblock %}
+

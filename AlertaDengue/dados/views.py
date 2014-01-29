@@ -16,6 +16,22 @@ class HomePageView(TemplateView):
         messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
         return context
 
+class AboutPageView(TemplateView):
+    template_name = 'about.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AboutPageView, self).get_context_data(**kwargs)
+        messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        return context
+
+class ContactPageView(TemplateView):
+    template_name = 'contact.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ContactPageView, self).get_context_data(**kwargs)
+        messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        return context
+
 class SinanCasesView(View):
     def get(self, request, year):
         assert int(year) in [2010, 2011, 2012, 2013]
@@ -31,7 +47,7 @@ class SinanCasesView(View):
             dados = M.Dengue_2013.objects.geojson()
         else:
             dados = []
-        for c in dados[:10]:
+        for c in dados:
             cases += "{\"type\":\"Feature\",\"geometry\":" + c.geojson + ", \"properties\":{}},"
         cases = cases[:-1] + "]}"
         #json.loads(cases)

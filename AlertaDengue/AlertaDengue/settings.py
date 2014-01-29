@@ -43,6 +43,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.gzip.GZipMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -71,12 +72,13 @@ DATABASES = {
 LEAFLET_CONFIG = {
    # 'SPATIAL_EXTENT': (),
     'DEFAULT_CENTER': (-22.907111, -43.231864),
-    'DEFAULT_ZOOM': 10,
+    'DEFAULT_ZOOM': 11,
+    'MINIMAP': True,
     'ATTRIBUTION_PREFIX': 'Powered by django-leaflet',
     'PLUGINS': {
         'cluster': {
             'js': 'js/leaflet.markercluster.js',
-            'css': ['css/MarkerCluster.css'],
+            'css': ['css/MarkerCluster.Default.css', 'css/MarkerCluster.css'],
             'auto-include': True
         }
     }
@@ -99,5 +101,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
+
+STATIC_ROOT = os.path.join(os.path.dirname(__file__), '..')  # up one level from settings.py
+STATICFILES_DIRS = (
+    os.path.abspath(os.path.join(STATIC_ROOT, 'static')),  # static is on root level
+)
 
 STATIC_URL = '/static/'

@@ -1,67 +1,60 @@
-{% extends 'my_bootstrap3_base.html' %}
-
+{% extends 'bootstrap.html' %}
 {% load bootstrap3 %}
 
 {% block bootstrap3_content %}
 
-    <!-- Wrap all page content here -->
-    <div id="wrap">
-        <!-- Fixed navbar -->
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="#">Projeto Alerta Dengue</a>
-                </div>
-                <div class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav">
-                        <li class="active"><a href="#">Home</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#contact">Contact</a></li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b
-                                    class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="#">Action</a></li>
-                                <li><a href="#">Another action</a></li>
-                                <li><a href="#">Something else here</a></li>
-                                <li class="divider"></li>
-                                <li class="dropdown-header">Nav header</li>
-                                <li><a href="#">Separated link</a></li>
-                                <li><a href="#">One more separated link</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-                <!--/.nav-collapse -->
-            </div>
-        </div>
-
-        <!-- Begin page content -->
+<!-- Wrap all page content here -->
+<div id="wrap">
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">
-
-            <div class="page-header">
-                <h1>{% block title %}(no title){% endblock %}</h1>
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Projeto Alerta Dengue</a>
             </div>
-            {% bootstrap_messages %}
-            {% block content %}
-                <p class="lead">Pin a fixed-height footer to the bottom of the viewport in desktop browsers with this
-                    custom HTML and CSS. A fixed navbar has been added within <code>#wrap</code> with <code>padding-top:
-                        60px;</code> on the <code>.container</code>.</p>
-            {% endblock %}
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="{% url "home" %}">Início</a></li>
+                    <li><a href="{% url "about" %}">Sobre o Projeto</a></li>
+                    <li><a href="{% url "contact" %}">Fale Conosco</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Acesse os Dados <b
+                                class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li class="dropdown-header">Incidência (SINAN)</li>
+                            <li><a href="{% url "sinan" 2010 %}">SINAN (2010)</a></li>
+                            <li><a href="{% url "sinan" 2011 %}">SINAN (2011)</a></li>
+                            <li><a href="{% url "sinan" 2012 %}">SINAN (2012)</a></li>
+                            <li><a href="{% url "sinan" 2013 %}">SINAN (2013)</a></li>
+                            <li class="divider"></li>
+                            <li class="dropdown-header">Nav header</li>
+                            <li><a href="#">Separated link</a></li>
+                            <li><a href="#">One more separated link</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
         </div>
     </div>
 
-        <div id="footer">
+    <!-- Begin page content -->
     <div class="container">
-        <p class="text-muted">Place sticky footer content here.</p>
+
+        <div class="page-header">
+            <h1>{% block title %}(no title){% endblock %}</h1>
+        </div>
+        {% bootstrap_messages %}
+        {% block content %}
+        <p class="lead">Pin a fixed-height footer to the bottom of the viewport in desktop browsers with this
+            custom HTML and CSS. A fixed navbar has been added within <code>#wrap</code> with <code>padding-top:
+                60px;</code> on the <code>.container</code>.</p>
+        {% endblock %}
     </div>
 </div>
-    </div>
-<script src="/"></script>
 {% endblock %}

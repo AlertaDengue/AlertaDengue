@@ -2,6 +2,7 @@
 {% load bootstrap3 %}
 <html>
   <head>
+    {% bootstrap_javascript jquery=True %}
     <title>{% block bootstrap3_title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% bootstrap_css %}
@@ -9,6 +10,11 @@
   </head>
   <body>
     {% block bootstrap3_content %}{% endblock %}
-    {% bootstrap_javascript jquery=True %}
+
+    <div id="footer">
+        <div class="container">
+            <p class="text-muted">Place sticky footer content here.</p>
+        </div>
+    </div>
   </body>
 </html>
