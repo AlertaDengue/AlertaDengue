@@ -15,7 +15,7 @@
 {% block title %}<br>Projeto Alerta Dengue{% endblock %}
 
 {% block content %}
-    <h1>Casos de Dengue em <b id="ano">2010</b> segundo SINAN.</h1>
+    <h1>Casos de Dengue no município do Rio de Janeiro, em <b id="ano">2010</b> segundo SINAN.</h1>
     <b>Year: </b> <select id="year">
     <option value="2010">2010</option>
     <option value="2011">2011</option>
@@ -37,12 +37,12 @@
         function redraw_map(year) {
             case_layers.clearLayers();
             var map = $(document).data('map')
-            $.getJSON("/sinan/" + year.toString(), function (data) {
+            $.getJSON("/sinan/" + year.toString() + "/40", function (data) {
                 var markers = L.markerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: true,
                     zoomToBoundsOnClick: true, chunkedLoading: true, chunkProgress: updateProgressBar });
                 // Add GeoJSON layer
                 var geojson = L.geoJson(data, {onEachFeature: function (feature, layer) {
-                    //layer.bindPopup(feature.properties.name);
+                    layer.bindPopup(feature.properties.data);
                 }
                 });
                 markers.addLayer(geojson);
@@ -66,7 +66,8 @@
         }
         function main_map_init(map, options) {
             $(document).data('map', map)
-            var dataurl = '{% url "sinan" 2010 %}';
+            $("#ano").text("2010")
+            var dataurl = '{% url "sinan" 2010 00%}';
             // Download GeoJSON via Ajax
 
             $.getJSON(dataurl, function (data) {
@@ -80,7 +81,6 @@
                 markers.addLayer(geojson);
                 case_layers.addLayer(markers);
                 case_layers.addTo(map);
-                $("#ano").text("2010")
             });
         }
     </script>

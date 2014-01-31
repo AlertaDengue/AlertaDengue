@@ -13,6 +13,6 @@ urlpatterns = patterns('',
     url(r'^$', HomePageView.as_view(), name='home'),
     url(r'^informacoes/$', AboutPageView.as_view(), name='about'),
     url(r'^contato/$', ContactPageView.as_view(), name='contact'),
-    url(r'^sinan/(\d{4})', SinanCasesView.as_view(), name='sinan'),
+    url(r'^sinan/(\d{4})/(\d{1,2})', SinanCasesView.as_view(), name='sinan'),
     url(r'^admin/', include(admin.site.urls)),
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
