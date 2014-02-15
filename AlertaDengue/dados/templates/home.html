@@ -78,7 +78,7 @@
                     layer.bindPopup(feature.properties.data);
                 }
                 });
-                var markers = L.markerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: true,
+                var markers = L.markerClusterGroup({ spiderfyOnMaxZoom: false, showCoverageOnHover: true,
                     zoomToBoundsOnClick: true, chunkedLoading: true, chunkProgress: updateProgressBar });
                 markers.addLayer(geojson);
                 case_layers.addLayer(markers);
