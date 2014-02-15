@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     'leaflet',
     'bootstrap3',
+    'debug_toolbar',
     'dados',
 )
 
