@@ -7,6 +7,13 @@ from django.http import HttpResponse, StreamingHttpResponse
 from dados import models as M
 import random
 import json
+import os
+import datetime
+from time import mktime
+import csv
+from collections import defaultdict
+from django.conf import settings
+
 
 
 class HomePageView(TemplateView):
@@ -15,6 +22,40 @@ class HomePageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(HomePageView, self).get_context_data(**kwargs)
         messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        series = load_series()
+        context.update({
+            'season_alert': json.dumps(series['season']),
+            'epidemia_alert': json.dumps(series['epidemia']),
+            'transmissao_alert': json.dumps(series['transmissao']),
+        })
+        return context
+
+class MapaDengueView(TemplateView):
+    template_name = 'mapadengue.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(MapaDengueView, self).get_context_data(**kwargs)
+        return context
+
+class MapaMosquitoView(TemplateView):
+    template_name = 'mapamosquito.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(MapaMosquitoView, self).get_context_data(**kwargs)
+        return context
+
+class HistoricoView(TemplateView):
+    template_name = 'historico.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(HistoricoView, self).get_context_data(**kwargs)
+        series = load_series()
+        context.update({
+            'xvalues': json.dumps(series['dia']),
+            'tweets': json.dumps(series['twits']),
+            'temp': json.dumps(series['tmin']),
+            'casos': json.dumps(series['casos']),
+        })
         return context
 
 class AboutPageView(TemplateView):
@@ -42,7 +83,7 @@ class SinanCasesView(View):
             messages.error(self.request, 'O projeto conté dados apenas dos anos 2010 a 2013.')
 
         sample = 1 if sample == 0 else sample/100.
-        print ("chegou aqui")
+        #print ("chegou aqui")
         cases = "{\"type\":\"FeatureCollection\", \"features\":["
         if int(year) == 2010:
             dados = M.Dengue_2010.objects.geojson()
@@ -58,11 +99,29 @@ class SinanCasesView(View):
 
         if len(dados) < 5500:
             sample = 1
-        print(type(dados[0].dt_notific))
-        print ("chegou aqui", sample, dados[0].dt_notific)
+        #print(type(dados[0].dt_notific))
+        #print ("chegou aqui", sample, dados[0].dt_notific)
         for c in random.sample(list(dados), int(len(dados)*sample)):
-            print(c)
+            #print(c)
             cases += "{\"type\":\"Feature\",\"geometry\":" + c.geojson + ", \"properties\":{\"data\":\""+c.dt_notific.isoformat()+"\"}},"
         cases = cases[:-1] + "]}"
         #json.loads(cases)
         return HttpResponse(cases, content_type="application/json")
+
+
+def load_series():
+    series = defaultdict(lambda: [])
+    with open(os.path.join(settings.DATA_DIR, 'dengueclimatw2010-2013.csv')) as f:
+        reader = csv.DictReader(f, delimiter=',')
+        for row in reader:
+            for k, v in row.items():
+                series[k].append(v)
+    series['dia'] = [int(mktime(datetime.datetime.strptime(d, "%d%b%Y").timetuple())) for d in series['dia']]
+    series['twits'] = [float(i) if i != "NA" else None for i in series['twits']]
+    series['tmin'] = [float(i) if i != "NA" else None for i in series['tmin']]
+    series['casos'] = [float(i) if i != "NA" else None for i in series['casos']]
+    series['season'] = [int(float(t) >= 3.7) if t != "NA" else None for t in series['t24']]
+    series['transmissao'] = [0 for rt in series['t24']]
+    series['epidemia'] = [int(t > 157 ) if t is not None else None for t in series['twits']]
+    #print(series['dia'])
+    return series
