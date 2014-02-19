@@ -15,7 +15,7 @@
 {% endblock %}
 
 
-{% block title %}<br><a href="{% url 'home' %}">Projeto Alerta Dengue</a>{% endblock %}
+{% block title %}<br><a href="{% url 'home' %}">Alerta da Dengue</a>{% endblock %}
 
 {% block content %}
     <div id="alerta-chart" style="min-width: 500px; height: 400px; margin: 10px "></div>
@@ -23,7 +23,7 @@
         $(function () {
             $('#alerta-chart').highcharts({
             chart: {
-                type: 'column'
+                type: 'spline'
             },
             title: {
                 text: 'Alertas da Dengue'
@@ -32,19 +32,37 @@
                 type: 'datetime'
                 //categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
             },
-            yAxis: {
+            tooltip: {
+                crosshairs: true,
+                shared: true
+            },
+            yAxis: [{
                 min: 0,
+                gridLineWidth: 0,
+                categories: ["Estação", "Transmissão", "Epidemia"],
                 title: {
                     text: 'Alerta'
-                },
-                stackLabels: {
-                    enabled: false,
-                    style: {
-                        fontWeight: 'bold',
-                        color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
-                    }
                 }
-            },
+            }, { //  yAxis de casos
+                        gridLineWidth: 0,
+                        type: "logarithmic",
+                        title: {
+                            text: 'Casos de Dengue',
+                            style: {
+                                color: '#D2D2C7'
+                            }
+                        },
+                        labels: {
+                            formatter: function () {
+                                return this.value + ' pessoas';
+                            },
+                            style: {
+                                color: '#D2D2C7'
+                            }
+                        },
+                        opposite: true
+                    }
+                    ],
             legend: {
                 align: 'right',
                 x: -70,
@@ -56,41 +74,49 @@
                 borderWidth: 1,
                 shadow: false
             },
-            tooltip: {
-                formatter: function() {
-                    return '<b>'+ this.x +'</b><br/>'+
-                        this.series.name +': '+ this.y +'<br/>'+
-                        'Total: '+ this.point.stackTotal;
-                }
-            },
+
             plotOptions: {
-                column: {
-                    stacking: 'normal',
-                    dataLabels: {
-                        enabled: false,
-                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
-                        style: {
-                            textShadow: '0 0 3px black, 0 0 3px black'
-                        }
+                spline: {
+                    marker: {
+                        radius: 0,
+                        lineColor: '#ffffffff',
+                        lineWidth: 0
                     }
                 }
             },
-            series: [{
+            series: [
+                {
+                color: "#D2D2C7",
+                type: "areaspline",
+                pointInterval: 7 * 24 * 3600 * 1000,
+                pointStart: Date.UTC(2009, 12, 27),
+                name: 'Casos',
+                data: {{ casos }},
+                yAxis: 1,
+                tooltip: {
+                            valueSuffix: ' casos'
+                        }
+            },
+                {
+                color: "#00ff00",
                 pointInterval: 7 * 24 * 3600 * 1000,
                 pointStart: Date.UTC(2009, 12, 27),
                 name: 'Estação de Dengue',
-                data: {{ season_alert }}
+                data: {{ season_alert|safe }}
             }, {
+                color: "#0000ff",
                 pointInterval: 7 * 24 * 3600 * 1000,
                 pointStart: Date.UTC(2009, 12, 27),
                 name: 'Transmissão Sustentada',
-                data: {{ transmissao_alert }}
+                data: {{ transmissao_alert|safe }}
             }, {
+                color: "#ff0000",
                 pointInterval: 7 * 24 * 3600 * 1000,
                 pointStart: Date.UTC(2009, 12, 27),
                 name: 'Epidemia',
-                data: {{ epidemia_alert }}
-            }]
+                data: {{ epidemia_alert|safe }}
+            }
+            ]
         });
 
         });

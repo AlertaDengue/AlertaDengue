@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+    {% load leaflet_tags %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+    {% leaflet_js plugins="ALL" %}
+    <style>
+        .leaflet-container {
+            height: 600px;
+        }
+    </style>
+    <script src="/static/js/heatmap.js"></script>
+    <script src="/static/js/heatmap-leaflet.js"></script>
+    <script src="/static/js/QuadTree.js"></script>
+
+{% endblock %}
+
+
+{% block title %}<br><a href="{% url 'home' %}">Positividade de Ovitrampas</a>{% endblock %}
+
+{% block content %}
+
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading">Ovitrampas Positivas</div>
+  <div class="panel-body">
+    <p>Modelo GAM espacial da positividade de ovitrampas no município do Rio de Janeiro.</p>
+  </div>
+
+  <img src="/static/mapa_ovitrampas.png" width="900px">
+</div>
+
+
+{% endblock %}
+

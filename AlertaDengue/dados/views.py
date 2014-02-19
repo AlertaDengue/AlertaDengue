@@ -24,9 +24,10 @@ class HomePageView(TemplateView):
         messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
         series = load_series()
         context.update({
-            'season_alert': json.dumps(series['season']),
-            'epidemia_alert': json.dumps(series['epidemia']),
-            'transmissao_alert': json.dumps(series['transmissao']),
+            'season_alert': json.dumps([{"y": 0, "marker":{"symbol":"url(/static/mosquito_peq.png)"}} if v == 1 else v for v in series['season']]),
+            'casos': json.dumps(series['casos']),
+            'epidemia_alert': json.dumps([{"y": 2, "marker":{"symbol":"url(/static/mosquito_peq.png)"}} if v == 1 else v for v in series['epidemia']]),
+            'transmissao_alert': json.dumps([{"y": 1, "marker":{"symbol":"url(/static/mosquito_peq.png)"}} if v == 1 else v for v in series['transmissao']]),
         })
         return context
 
@@ -121,7 +122,7 @@ def load_series():
     series['tmin'] = [float(i) if i != "NA" else None for i in series['tmin']]
     series['casos'] = [float(i) if i != "NA" else None for i in series['casos']]
     series['season'] = [int(float(t) >= 3.7) if t != "NA" else None for t in series['t24']]
-    series['transmissao'] = [0 for rt in series['t24']]
-    series['epidemia'] = [int(t > 157 ) if t is not None else None for t in series['twits']]
+    series['transmissao'] = [int(float(rt) > 1) if rt != "NA" else None for rt in series['Rt']]
+    series['epidemia'] = [int(t > 157) if t is not None else None for t in series['twits']]
     #print(series['dia'])
     return series
