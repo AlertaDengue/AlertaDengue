@@ -48,6 +48,7 @@
         function redraw_map(year) {
             case_layers.clearLayers();
             var map = $(document).data('map')
+            map._layersMaxZoom=13
             $.getJSON("/sinan/" + year.toString() + "/40", function (data) {
                 var markers = L.markerClusterGroup({ spiderfyOnMaxZoom: true, showCoverageOnHover: true,
                     zoomToBoundsOnClick: true, chunkedLoading: true, chunkProgress: updateProgressBar });
@@ -77,6 +78,7 @@
         }
         function main_map_init(map, options) {
             $(document).data('map', map)
+            map._layersMaxZoom=13
             $("#ano").text("2010")
             var dataurl = '{% url "sinan" 2010 00%}';
             // Download GeoJSON via Ajax
