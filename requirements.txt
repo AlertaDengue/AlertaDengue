@@ -1,6 +1,7 @@
 django
 pytz
 django-leaflet
-django-geojson
+django-debug-toolbar
 django-bootstrap3
 shapely
+django_chartit
