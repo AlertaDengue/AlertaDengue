@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -71,9 +72,10 @@ DATABASES = {
 }
 
 LEAFLET_CONFIG = {
-   # 'SPATIAL_EXTENT': (),
+    # 'SPATIAL_EXTENT': (),
     'DEFAULT_CENTER': (-22.907111, -43.231864),
     'DEFAULT_ZOOM': 11,
+    'TILES': 'http://{s}.tile.cloudmade.com/ad132e106cd246ec961bbdfbe0228fe8/997/256/{z}/{x}/{y}.png',
     'MINIMAP': True,
     'ATTRIBUTION_PREFIX': 'Powered by django-leaflet',
     'PLUGINS': {
@@ -81,6 +83,9 @@ LEAFLET_CONFIG = {
             'js': 'js/leaflet.markercluster.js',
             'css': ['css/MarkerCluster.Default.css', 'css/MarkerCluster.css'],
             'auto-include': True
+        },
+        'heatmap': {
+            'js': ['js/heatmap.js', 'js/heatmap-leaflet.js', 'js/QuadTree.js'],
         }
     }
 
@@ -107,5 +112,7 @@ STATIC_ROOT = os.path.join(os.path.dirname(__file__), '..')  # up one level from
 STATICFILES_DIRS = (
     os.path.abspath(os.path.join(STATIC_ROOT, 'static')),  # static is on root level
 )
+
+DATA_DIR = os.path.abspath(os.path.join(STATIC_ROOT, 'data'))
 
 STATIC_URL = '/static/'
