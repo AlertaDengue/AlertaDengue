@@ -50,80 +50,26 @@
 
 {% block content %}
     <br>
-    <div class="panel panel-default">
-        <div class="panel-heading"><h3 class="panel-title">Parâmetros</h3></div>
-        <div class="panel-body">
 
-            <form class="form-horizontal" role="form">
-                <div class="form-group">
-                    <label for="HorizonteInput" class="col-sm-2 control-label">Horizonte de Previsão:</label>
-
-                    <div class="col-sm-2">
-                        <input type="number" class="form-control" id="HorizonteInput" placeholder="90 dias"
-                               name="horizonte" data-toggle="tooltip" data-placement="top"
-                               title="Entre com a janela de tempo para a previsão.">
-                    </div>
-                    <label for="NotasToi" class="col-sm-2 control-label">Toi:</label>
-
-                    <div class="col-sm-2">
-                        <input type="number" class="form-control" id="NotasToi" placeholder="100" name="toi"
-                               data-toggle="tooltip" data-placement="top"
-                               title="Entre com o numero de TOIs a serem aplicados.">
-                    </div>
-                    <label for="NotasCorte" class="col-sm-2 control-label">Corte:</label>
-
-                    <div class="col-sm-2">
-                        <input type="number" class="form-control" id="NotasCorte" placeholder="100" name="corte"
-                               data-toggle="tooltip" data-placement="top" title="Entre com o número de cortes a serem realizados.">
-                    </div>
-                </div>
-                <div class=" form-group">
-                        <label for="NotasNeg" class="col-sm-2 control-label">Negativação:</label>
-
-                        <div class="col-sm-4">
-                            <input type="number" class="form-control" id="NotasNeg" placeholder="100" name="neg"
-                                   data-toggle="tooltip" data-placement="bottom" title="Entre com o número de negativações a serem realizadas.">
-                        </div>
-                        <label for=" RecInput" class="col-sm-2 control-label">Prevalência de Reclamações:</label>
-
-                            <div class="col-sm-4">
-                                <input type="number" class="form-control" id="RecInput" placeholder="30%" name="rec"
-                                       disabled data-toggle="tooltip" data-placement="bottom" title="O sistema levará em conta o número de reclamações existentes até o momento.">
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-default">Atualizar previsão</button>
-            </form>
-        </div>
-    </div>
 
     <br>
 
     <div class="alert alert-warning">
-        <strong>{{ total }}</strong> novos processos são esperados em até {{ horizonte }} dias, em decorrência da
-        aplicação das notas especificadas acima.
+        As APs indicadas em vermelho abaixo, estão em estado de alerta.
     </div>
 
     {% leaflet_map "main" callback="main_map_init" %}
 
     <script type="text/javascript">
-        $('#local').removeClass('active')
-        $('#mapa').addClass('active')
         function isInArray(el, array) {
             return (array.indexOf(el) >= 0) ? true : false;
         }
-        //Geocodigos dos municípios na área de concessão da Light
-        var area_light = [3302007, 3304557, 3302858, 3305109, 3303500, 3300456, 3300308, 3306107, 3303203, 3304144, 3306305, 3305554, 3301801, 3301702, 3302270, 3303856, 3305406,
-            3306008, 3304003, 3304409, 3300407, 3303609, 3304128, 3302809, 3303955, 3302908, 3306206, 3301207, 3303708, 3304524, 3300951];
 
-        var processos = {{ processos | safe}};
-        var municipios = L.layerGroup();
+        var aps = L.layerGroup();
         var info = L.control();
         var legend = L.control({position: 'bottomright'});
         var geojson;
-        $("#NotasNeg").val({{ neg }})
-        $("#NotasToi").val({{ toi }})
-        $("#NotasCorte").val({{ corte }})
-        $("#HorizonteInput").val({{ horizonte }})
+
 
         // get color depending on population density value
         function getColor(d) {
@@ -138,14 +84,13 @@
         }
 
         function style(feature) {
-            feature.properties.processos = processos[parseInt(feature.properties.CD_GEOCODM)];
             return {
                 weight: 2,
                 opacity: 1,
                 color: 'white',
                 dashArray: '3',
-                fillOpacity: isInArray(parseInt(feature.properties.CD_GEOCODM), area_light) ? 0.7 : 0.0,
-                fillColor: getColor(feature.properties.processos)
+                fillOpacity: 0.7,
+                fillColor: getColor(feature.properties.alerta)
             };
         }
 
@@ -156,7 +101,7 @@
                 weight: 5,
                 color: '#666',
                 dashArray: '',
-                fillOpacity: isInArray(parseInt(layer.feature.properties.CD_GEOCODM), area_light) ? 0.7 : 0.0
+                fillOpacity: 0.7
             });
 
             if (!L.Browser.ie && !L.Browser.opera) {
@@ -175,8 +120,8 @@
         function main_map_init(map, options) {
             $(document).data('map', map)
             //map._layersMaxZoom=13
-            $("#ano").text("2010")
-            var dataurl = "{% static 'rjmun.geojson' %}";
+            var dataurl = "{% static 'rio_aps.geojson' %}";
+            var casos_por_ap = {{ casos_por_ap|safe }};
 
             // control that shows state info on hover
             info.onAdd = function (map) {
@@ -186,9 +131,8 @@
             };
 
             info.update = function (props) {
-                this._div.innerHTML = '<h4>Número esperado de processos</h4>' + (props ?
-                        '<b>' + props.NM_MUNICIP + '</b><br />' + props.processos + ' processos'
-                        : 'Passe o mouse sobre um município');
+                this._div.innerHTML = '<h4>Número de casos até agora:</h4>' + (props ?
+                        '<b>' + props.casos + '</b><br />': 'Passe o mouse sobre um município');
             };
 
             info.addTo(map);
@@ -218,9 +162,9 @@
             $.getJSON(dataurl, function (data) {
                 // Add GeoJSON layer
                 geojson = L.geoJson(data, {style: style, onEachFeature: function (feature, layer) {
-                    feature.properties.processos = processos[parseInt(feature.properties.CD_GEOCODM)];
-                    layer.bindPopup(feature.properties.NM_MUNICIP + "-" + feature.properties.CD_GEOCODM + "<br>" +
-                            feature.properties.processos + " processos.");
+                    feature.properties.casos = casos_por_ap[parseInt(feature.properties.CODAPNUM)];
+                    layer.bindPopup("Área de planejamento " + feature.properties.CODAP + "<br>" +
+                            "Casos: " + feature.properties.casos);
                     layer.on({
                         mouseover: highlightFeature,
                         mouseout: resetHighlight
@@ -229,13 +173,13 @@
                 }
                 });
 
-                municipios.addLayer(geojson);
-                municipios.addTo(map);
+                aps.addLayer(geojson);
+                aps.addTo(map);
             });
 
 
             var overlayMaps = {
-                'Municípios': municipios
+                'Áreas de Planejamento': aps
             };
             var controls = L.control.layers(null, overlayMaps, {collapsed: true});
             controls.addTo(map);
