@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     # url(r'^$', 'AlertaDengue.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
     url(r'^$', HomePageView.as_view(), name='home'),
+    
     url(r'^mapadengue/$', MapaDengueView.as_view(), name='mapadengue'),
     url(r'^mapamosquito/$', MapaMosquitoView.as_view(), name='mapamosquito'),
     url(r'^historico/$', HistoricoView.as_view(), name='historico'),
