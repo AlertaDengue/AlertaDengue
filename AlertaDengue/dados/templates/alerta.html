@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+    {% load static %}
+    {% load leaflet_tags %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+    {% leaflet_js plugins="ALL" %}
+    <style>
+        .leaflet-container {
+            height: 600px;
+
+        }
+
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        .info h4 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+
+        .legend {
+            text-align: left;
+            line-height: 18px;
+            color: #555;
+        }
+
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+    </style>
+    <script src="/static/js/heatmap.js"></script>
+    <script src="/static/js/heatmap-leaflet.js"></script>
+    <script src="/static/js/QuadTree.js"></script>
+
+{% endblock %}
+
+
+{% block title %}Alerta{% endblock %}
+
+{% block content %}
+    <br>
+
+
+    <br>
+
+    <div class="alert alert-warning">
+        As APs indicadas em vermelho abaixo, estão em estado de alerta.
+    </div>
+
+    {% leaflet_map "main" callback="main_map_init" %}
+
+    <script type="text/javascript">
+        function isInArray(el, array) {
+            return (array.indexOf(el) >= 0) ? true : false;
+        }
+
+        var aps = L.layerGroup();
+        var info = L.control();
+        var legend = L.control({position: 'bottomright'});
+        var geojson;
+
+
+        // get color depending on population density value
+        function getColor(d) {
+            return d == 3 ? '#FF0000' : // Vermelho
+                    d == 2 ? '#FFA858' : // Laranja
+                            d == 1 ? '#FFFF00' : '#00FF00';
+        }
+
+        function style(feature) {
+            return {
+                weight: 2,
+                opacity: 1,
+                color: 'white',
+                dashArray: '3',
+                fillOpacity: 0.7,
+                fillColor: getColor(feature.properties.alerta)
+            };
+        }
+
+        function highlightFeature(e) {
+            var layer = e.target;
+
+            layer.setStyle({
+                weight: 5,
+                color: '#666',
+                dashArray: '',
+                fillOpacity: 0.7
+            });
+
+            if (!L.Browser.ie && !L.Browser.opera) {
+                layer.bringToFront();
+            }
+
+            info.update(layer.feature.properties);
+        }
+
+        function resetHighlight(e) {
+            geojson.resetStyle(e.target);
+            info.update();
+        }
+
+
+        function main_map_init(map, options) {
+            $(document).data('map', map)
+            //map._layersMaxZoom=13
+            var dataurl = "{% static 'rio_aps.geojson' %}";
+            var casos_por_ap = {{ casos_por_ap|safe }};
+
+            // control that shows state info on hover
+            info.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'info');
+                this.update();
+                return this._div;
+            };
+
+            info.update = function (props) {
+                this._div.innerHTML = '<h4>Número de casos até agora:</h4>' + (props ?
+                        '<b>' + props.casos + '</b><br />' : 'Passe o mouse sobre um município');
+            };
+
+            info.addTo(map);
+
+            legend.onAdd = function (map) {
+
+                var div = L.DomUtil.create('div', 'info legend'),
+                    grades = [0,1,2,3],
+                    nomes = ['Verde','Amarelo', 'Laranja','Vermelho'],
+                    labels = [],
+                    from, to;
+
+                for (var i = 0; i < grades.length; i++) {
+                    from = grades[i];
+                    to = grades[i + 1];
+
+                    labels.push(
+                            '<i style="background:' + getColor(from) + '"></i> ' +
+                                    nomes[from]);
+                }
+
+                div.innerHTML = labels.join('<br>');
+                return div;
+            };
+
+            legend.addTo(map);
+            // Download GeoJSON via Ajax
+            $.getJSON(dataurl, function (data) {
+                // Add GeoJSON layer
+                geojson = L.geoJson(data, {style: style, onEachFeature: function (feature, layer) {
+                    feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
+                    layer.bindPopup("Área de planejamento " + feature.properties.COD_AP_SMS + "<br>" +
+                            "Casos: " + feature.properties.casos);
+                    layer.on({
+                        mouseover: highlightFeature,
+                        mouseout: resetHighlight
+                    });
+
+                }
+                });
+
+                aps.addLayer(geojson);
+                aps.addTo(map);
+            });
+
+
+            var overlayMaps = {
+                'Áreas de Planejamento': aps
+            };
+            var controls = L.control.layers(null, overlayMaps, {collapsed: true});
+            controls.addTo(map);
+
+        }
+    </script>
+
+{% endblock %}

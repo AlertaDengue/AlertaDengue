@@ -19,9 +19,10 @@
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
-                        <li class="active"><a href="{% url "home" %}">Início</a></li>
+                        <li class="active"><a href="{% url "alerta" %}">Alerta</a></li>
                         <li><a href="{% url "about" %}">Sobre o Projeto</a></li>
                         <li><a href="{% url "contact" %}">Fale Conosco</a></li>
+                        {% if user.is_authenticated %}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Acesse os Dados <b
                                     class="caret"></b></a>
@@ -39,14 +40,18 @@
                                 <li class="dropdown-header">Dados Climáticos</li>
                             </ul>
                         </li>
+                        {% endif %}
                     </ul>
                 </div>
                 <!--/.nav-collapse -->
                 <ul class="nav nav-pills">
-                    <li id="alerta" class="active"><a href="{% url 'home' %}">Alerta</a></li>
+                    <li id="alerta" class="active"><a href="{% url 'alerta' %}">Alerta</a></li>
+                    {% if user.is_authenticated %}
+                    <li id="detalhes" class="active"><a href="{% url 'home' %}">Detalhes</a></li>
                     <li id="dengue"><a href="{% url 'mapadengue' %}">Mapa da Dengue</a></li>
                     <li id="vetor"><a href="{% url 'mapamosquito' %}">Mapa do Vetor</a></li>
                     <li id="historico"><a href="{% url 'historico' %}">Histórico</a></li>
+                    {% endif %}
                 </ul>
                 <script type="application/javascript">
                    // $('ul.nav.nav-pills li a').click(function () {
