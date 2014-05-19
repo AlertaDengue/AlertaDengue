@@ -19,7 +19,7 @@ class AlertaPageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
         series = load_series()
-        casos_ap = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+        casos_ap = {1.0: 0, 2.1: 0, 2.2: 0, 3.1: 0, 3.2: 0, 3.3: 0, 4.0: 0, 5.1: 0, 5.1: 0, 5.3: 0}
         messages.info(self.request, "Foram relatados {} novos casos na última Semana.".format(32))
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
