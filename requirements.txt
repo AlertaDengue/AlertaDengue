@@ -5,3 +5,4 @@ django-bootstrap3
 django-debug-toolbar
 shapely
 django_chartit
+pandas

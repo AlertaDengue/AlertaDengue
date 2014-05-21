@@ -117,6 +117,7 @@
             //map._layersMaxZoom=13
             var dataurl = "{% static 'rio_aps.geojson' %}";
             var casos_por_ap = {{ casos_por_ap|safe }};
+            var alerta = {{ alerta|safe }};
 
             // control that shows state info on hover
             info.onAdd = function (map) {
@@ -158,9 +159,11 @@
             $.getJSON(dataurl, function (data) {
                 // Add GeoJSON layer
                 geojson = L.geoJson(data, {style: style, onEachFeature: function (feature, layer) {
+                    feature.properties.alerta = alerta[feature.properties.COD_AP_SMS];
                     feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
                     layer.bindPopup("Área de planejamento " + feature.properties.COD_AP_SMS + "<br>" +
                             "Casos: " + feature.properties.casos);
+                    layer.setStyle(style(feature))
                     layer.on({
                         mouseover: highlightFeature,
                         mouseout: resetHighlight
@@ -178,6 +181,7 @@
                 'Áreas de Planejamento': aps
             };
             var controls = L.control.layers(null, overlayMaps, {collapsed: true});
+            map.dragging.disable();
             controls.addTo(map);
 
         }

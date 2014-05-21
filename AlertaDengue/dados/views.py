@@ -13,16 +13,19 @@ from time import mktime
 import csv
 from collections import defaultdict
 from django.conf import settings
+import pandas as pd
 
 class AlertaPageView(TemplateView):
     template_name = 'alerta.html'
     def get_context_data(self, **kwargs):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
-        series = load_series()
-        casos_ap = {1.0: 0, 2.1: 0, 2.2: 0, 3.1: 0, 3.2: 0, 3.3: 0, 4.0: 0, 5.1: 0, 5.2: 0, 5.3: 0}
-        messages.info(self.request, "Foram relatados {} novos casos na última Semana.".format(32))
+        alert, current = get_alert()
+        casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos']) for ap in alert.keys()}
+        alerta = {float(k.split('AP')[-1]): v.alerta.iat[-1] for k, v in alert.items()}
+        messages.info(self.request, "Foram relatados {} novos casos na última Semana.".format(sum(casos_ap.values())))
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
+            'alerta': alerta,
         })
         return context
 
@@ -118,6 +121,37 @@ class SinanCasesView(View):
         cases = cases[:-1] + "]}"
         #json.loads(cases)
         return HttpResponse(cases, content_type="application/json")
+
+def get_alert():
+    """
+    Read the data and return the alert status of all APs.
+    """
+    df = pd.read_csv(os.path.join(settings.DATA_DIR, 'Rt.csv'), header=0)
+    df.fillna(0, inplace=True)
+    last_SE = df.SE.max()
+    year = datetime.date.today().year  # Current year
+    SE = int(str(last_SE).split(str(year))[-1])  # current epidemiological week
+    current = df[df['SE'] == last_SE]  # Current status
+    print(current)
+    G = df.groupby("APS")
+    group_names = G.groups.keys()
+    alert = defaultdict(lambda: 0)
+    for ap in group_names:
+        adf = G.get_group(ap)#.tail()  # only calculates on the series tail
+        adf['At'] = 1*(adf.Rtestimado > 1)
+        adf['R2'] = pd.rolling_sum(adf.At, 2)
+        adf['R3'] = pd.rolling_sum(adf.At, 3)
+        adf['Cmed'] = G.get_group(ap).casos.median()
+        adf['alerta'] = 0
+        adf.alerta += (adf.R2 == 2) * (adf.alerta == 0)  # Tramsition from green to yellow
+        adf.alerta += (adf.R3 == 3) * (adf.alerta == 1)  # Tramsition from yellow to orange
+        adf.alerta += ((adf.R3 == 3) * (adf.casos > adf.Cmed)) * (adf.alerta == 2)  # Tramsition from orange to red
+        adf.alerta -= ((adf.R3 == 0) * (adf.casos > adf.Cmed)) * (adf.alerta == 3)  # Transition from red to orange
+        adf.alerta -= (((adf.R3 == 0) * (adf.casos < adf.Cmed)) * ((adf.alerta == 3)*2))  # Transition from red to green
+        # print(adf[-10:])
+        alert[ap] = adf
+    return alert, current
+
 
 
 def load_series():
