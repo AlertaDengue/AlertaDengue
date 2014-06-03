@@ -132,7 +132,7 @@ def get_alert():
     year = datetime.date.today().year  # Current year
     SE = int(str(last_SE).split(str(year))[-1])  # current epidemiological week
     current = df[df['SE'] == last_SE]  # Current status
-    print(current)
+    # print(current)
     G = df.groupby("APS")
     group_names = G.groups.keys()
     alert = defaultdict(lambda: 0)
@@ -148,7 +148,7 @@ def get_alert():
         adf.alerta += ((adf.R3 == 3) * (adf.casos > adf.Cmed)) * (adf.alerta == 2)  # Tramsition from orange to red
         adf.alerta -= ((adf.R3 == 0) * (adf.casos > adf.Cmed)) * (adf.alerta == 3)  # Transition from red to orange
         adf.alerta -= (((adf.R3 == 0) * (adf.casos < adf.Cmed)) * ((adf.alerta == 3)*2))  # Transition from red to green
-        # print(adf[-10:])
+        print(adf[-10:])
         alert[ap] = adf
     return alert, current
 

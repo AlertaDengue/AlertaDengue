@@ -85,7 +85,7 @@
                 color: 'white',
                 dashArray: '3',
                 fillOpacity: 0.7,
-                fillColor: getColor(feature.properties.alerta)
+                fillColor: getColor(parseInt(feature.properties.alerta))
             };
         }
 
@@ -118,6 +118,12 @@
             var dataurl = "{% static 'rio_aps.geojson' %}";
             var casos_por_ap = {{ casos_por_ap|safe }};
             var alerta = {{ alerta|safe }};
+            var recomendacoes = {
+                0: "Hora de arrumar o quintal, cobrir caixas d'água, Não deixe criadouros para o mosquito!",
+                1: "Uma vez por semana, aplique os “10 minutos Contra a dengue”!",
+                2: "Incremente seu patrulhamento de criadouros!",
+                3: "Fique atento aos sintomas da Dengue! Procure um médico caso suspeite de dengue."
+            }
 
             // control that shows state info on hover
             info.onAdd = function (map) {
@@ -137,7 +143,7 @@
 
                 var div = L.DomUtil.create('div', 'info legend'),
                     grades = [0,1,2,3],
-                    nomes = ['Verde','Amarelo', 'Laranja','Vermelho'],
+                    nomes = ['Baixa Atividade','Alerta', 'Em expansão','Alto Risco'],
                     labels = [],
                     from, to;
 
@@ -159,10 +165,12 @@
             $.getJSON(dataurl, function (data) {
                 // Add GeoJSON layer
                 geojson = L.geoJson(data, {style: style, onEachFeature: function (feature, layer) {
-                    feature.properties.alerta = alerta[feature.properties.COD_AP_SMS];
+                    feature.properties.alerta = alerta[parseFloat(feature.properties.COD_AP_SMS)];
                     feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
                     layer.bindPopup("Área de planejamento " + feature.properties.COD_AP_SMS + "<br>" +
-                            "Casos: " + feature.properties.casos);
+                            "Casos: " + feature.properties.casos + "<br><u>O que fazer</u>: " +
+                            recomendacoes[feature.properties.alerta]
+                    );
                     layer.setStyle(style(feature))
                     layer.on({
                         mouseover: highlightFeature,
