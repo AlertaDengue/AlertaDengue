@@ -46,19 +46,18 @@
 {% endblock %}
 
 
-{% block title %}Alerta{% endblock %}
+{% block title %}Alerta de Dengue no Rio de Janeiro{% endblock %}
 
 {% block content %}
     <br>
 
-
-    <br>
-
-    <div class="alert alert-warning">
+    {% comment %}<div class="alert alert-warning">
         As APs indicadas em vermelho abaixo, estão em estado de alerta.
-    </div>
+    </div>{% endcomment %}
 
     {% leaflet_map "main" callback="main_map_init" %}
+    <br>
+    <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">
 
     <script type="text/javascript">
         function isInArray(el, array) {
@@ -133,8 +132,8 @@
             };
 
             info.update = function (props) {
-                this._div.innerHTML = '<h4>Número de casos até agora:</h4>' + (props ?
-                        '<b>' + props.casos + '</b><br />' : 'Passe o mouse sobre um município');
+                this._div.innerHTML = '<h4>Número de casos na semana:</h4>' + (props ?
+                        '<b>' + props.casos + '</b><br />' : 'Passe o mouse sobre uma AP');
             };
 
             info.addTo(map);
@@ -143,7 +142,7 @@
 
                 var div = L.DomUtil.create('div', 'info legend'),
                     grades = [0,1,2,3],
-                    nomes = ['Baixa Atividade','Alerta', 'Em expansão','Alto Risco'],
+                    nomes = ['Baixo Risco','Atenção', 'Transmissão','Epidemia'],
                     labels = [],
                     from, to;
 
@@ -166,6 +165,7 @@
                 // Add GeoJSON layer
                 geojson = L.geoJson(data, {style: style, onEachFeature: function (feature, layer) {
                     feature.properties.alerta = alerta[parseFloat(feature.properties.COD_AP_SMS)];
+                    feature.properties.alerta = alerta[feature.properties.COD_AP_SMS];
                     feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
                     layer.bindPopup("Área de planejamento " + feature.properties.COD_AP_SMS + "<br>" +
                             "Casos: " + feature.properties.casos + "<br><u>O que fazer</u>: " +
@@ -190,6 +190,7 @@
             };
             var controls = L.control.layers(null, overlayMaps, {collapsed: true});
             map.dragging.disable();
+            map.scrollWheelZoom.disable();
             controls.addTo(map);
 
         }

@@ -22,10 +22,12 @@ class AlertaPageView(TemplateView):
         alert, current = get_alert()
         casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos']) for ap in alert.keys()}
         alerta = {float(k.split('AP')[-1]): v.alerta.iat[-1] for k, v in alert.items()}
-        messages.info(self.request, "Foram relatados {} novos casos na última Semana.".format(sum(casos_ap.values())))
+        semana = str(current.SE.iat[-1])[-2:]
+        messages.info(self.request, "Foram relatados {} novos casos na Semana Epidemiológica {}.".format(sum(casos_ap.values()), semana))
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
+            'semana': semana,
         })
         return context
 
@@ -142,20 +144,20 @@ def get_alert():
         # adf['At'] = 1*(adf.Rtestimado > 1)
         adf['R0'] = 1 * (pd.rolling_sum(adf.alertaRt1, 3) == 0)
         adf['R3'] = 1 * (pd.rolling_sum(adf.alertaRt1, 3) == 3)
-        adf['Cmed'] = G.get_group(ap).casos.median()
-        adf['alertaTemp'] = 1*(adf.temp > 24)
-        adf['T0'] = 1 * (pd.rolling_sum(adf.alertaTemp, 3) == 0)  # Temp was never higher than 24 for the last three weeks
-        adf['T3'] = 1 * (pd.rolling_sum(adf.alertaTemp, 3) == 3)  # Temp was higher than 24 for the last three weeks
-        adf['C0'] = 1 * (pd.rolling_sum(1*(adf.casos > adf.Cmed), 3) == 0)  # Cases were never higher than median for the last three weeks
-        adf['C3'] = 1 * (pd.rolling_sum(1*(adf.casos > adf.Cmed), 3) == 3)  # Cases were higher than median for the last three weeks
-        adf['P75_3'] = 1 * (pd.rolling_sum(adf.alertaq75, 3) == 3)  # Cases were above the 75th percent. for the last three weeks
+        # adf['Cmed'] = G.get_group(ap).casos.median()
+        #adf['alertaTemp'] = 1*(adf.temp > 24)
+        adf['T0'] = 1 * (pd.rolling_sum(adf.temp_crit, 3) == 0)  # Temp was never higher than 24 for the last three weeks
+        adf['T3'] = 1 * (pd.rolling_sum(adf.temp_crit, 3) == 3)  # Temp was higher than 24 for the last three weeks
+        adf['C0'] = 1 * (pd.rolling_sum(1*(adf.casos > adf.casos_crit), 3) == 0)  # Cases were never higher than median for the last three weeks
+        adf['C3'] = 1 * (pd.rolling_sum(1*(adf.casos > adf.casos_crit), 3) == 3)  # Cases were higher than median for the last three weeks
+        # adf['P75_3'] = 1 * (pd.rolling_sum(adf.alertaq75, 3) == 3)  # Cases were above the 75th percent. for the last three weeks
         adf['alerta'] = 0
         adf.alerta += (1 * ((adf.R3 + adf.T3) > 0)) * (adf.C3 == 0) * (adf.alerta == 0)  # Transition from green to yellow
-        adf.alerta += adf.R3 * adf.C3 * (adf.alerta == 0) * 2  # G -> O
-        adf.alerta += adf.P75_3 * (adf.alerta == 0) * 3  # G -> Red
+        adf.alerta += adf.R3 * (adf.alerta == 0) * 2  # G -> O
+        adf.alerta += adf.C3 * (adf.alerta == 0) * 3  # G -> Red
         adf.alerta += adf.R3 * adf.C3 * (adf.alerta == 1)  # Transition from yellow to orange
-        adf.alerta += adf.P75_3 * (adf.alerta == 1) * 2  # Y -> R
-        adf.alerta += adf.P75_3 * (adf.alerta == 2)  # Transition from orange to red
+        adf.alerta += adf.C3 * (adf.alerta == 1) * 2  # Y -> R
+        adf.alerta += adf.C3 * (adf.alerta == 2)  # Transition from orange to red
         ########### Check if any will step down #######
         adf.alerta -= (adf.T3 == 0) * adf.R0 * (adf.alerta == 3) * 2  # Transition from red to yellow
         adf.alerta -= adf.T0 * adf.R0 * adf.C0 * (adf.alerta == 3) * 3  # Transition from red to green
