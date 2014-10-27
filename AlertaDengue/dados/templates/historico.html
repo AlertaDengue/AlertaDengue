@@ -27,6 +27,8 @@
             $(function () {
                 $('ul.nav.nav-pills li a').parent().removeClass('active')
                 $('#historico').addClass('active')
+                var nd = new Date();
+                var tzo = nd.getTimezoneOffset();
                 // Agora as series de dados
                 var dados = {{ dados|safe }};
                 //$('#historico-chart-{{ ap }}').highcharts(
@@ -45,8 +47,8 @@
                     },
                     xAxis: [
                         {
-                            type: 'datetime'
-                            //categories: [{{ xvalues }}]
+                            type: 'datetime',
+                            //categories: dados['{{ ap }}'].dia
                         }
                     ],
                     yAxis: [
@@ -126,7 +128,7 @@
                             yAxis: 0,
                             type: 'spline',
                             pointInterval: 7 * 24 * 3600 * 1000,
-                            pointStart: new Date({{ xvalues.0 }}*1000),//Date.UTC(2009, 12, 27),
+                            pointStart: {{ xvalues.0 }}*1000 + tzo,//Date.UTC(2009, 12, 27),
                             data: dados['{{ ap }}'].tmin,
                             tooltip: {
                                 valueSuffix: ' °C'
@@ -137,7 +139,7 @@
                             type: 'spline',
                             color: '#4572A7',
                             pointInterval: 7 * 24 * 3600 * 1000,
-                            pointStart: new Date({{ xvalues.0 }}*1000),//Date.UTC(2009, 12, 27),
+                            pointStart: {{ xvalues.0 }}*1000 + tzo,//Date.UTC(2009, 12, 27),
                             yAxis: 1,
                             data: dados['{{ ap }}'].tweets,
                             marker: {
@@ -155,7 +157,7 @@
                             type: 'line',
                             yAxis: 2,
                             pointInterval: 7 * 24 * 3600 * 1000,
-                            pointStart: new Date({{ xvalues.0 }}*1000),//Date.UTC(2009, 12, 27),
+                            pointStart: {{ xvalues.0 }}*1000 + tzo,//Date.UTC(2009, 12, 27),
                             data: dados['{{ ap }}'].casos,
                             tooltip: {
                                 valueSuffix: ' pessoas'
