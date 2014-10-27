@@ -46,7 +46,7 @@
                     xAxis: [
                         {
                             type: 'datetime'
-                            //categories: []
+                            //categories: [{{ xvalues }}]
                         }
                     ],
                     yAxis: [
@@ -126,7 +126,7 @@
                             yAxis: 0,
                             type: 'spline',
                             pointInterval: 7 * 24 * 3600 * 1000,
-                            pointStart: Date.UTC(2009, 12, 27),
+                            pointStart: new Date({{ xvalues.0 }}*1000),//Date.UTC(2009, 12, 27),
                             data: dados['{{ ap }}'].tmin,
                             tooltip: {
                                 valueSuffix: ' °C'
@@ -137,7 +137,7 @@
                             type: 'spline',
                             color: '#4572A7',
                             pointInterval: 7 * 24 * 3600 * 1000,
-                            pointStart: Date.UTC(2009, 12, 27),
+                            pointStart: new Date({{ xvalues.0 }}*1000),//Date.UTC(2009, 12, 27),
                             yAxis: 1,
                             data: dados['{{ ap }}'].tweets,
                             marker: {
@@ -155,7 +155,7 @@
                             type: 'line',
                             yAxis: 2,
                             pointInterval: 7 * 24 * 3600 * 1000,
-                            pointStart: Date.UTC(2009, 12, 27),
+                            pointStart: new Date({{ xvalues.0 }}*1000),//Date.UTC(2009, 12, 27),
                             data: dados['{{ ap }}'].casos,
                             tooltip: {
                                 valueSuffix: ' pessoas'
