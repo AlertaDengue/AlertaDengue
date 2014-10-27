@@ -15,148 +15,157 @@
 {% endblock %}
 
 
-{% block title %}<br><a href="{% url 'home' %}">Séries Históricas</a>{% endblock %}
+{% block title %}Séries Históricas{% endblock %}
 
 {% block content %}
-    <h4>Os Alertas acima foram baseados nos dados abaixo</h4>
-    <div id="historico-chart" style="min-width: 500px; height: 400px; margin: 10px " data-highcharts-chart="1"></div>
+    <h4>O Alerta de Dengue e calculado usando dados que incluem os apresentados abaixo.</h4>
+    {% for ap in APS %}
+        <div id="historico-chart-{{ ap }}" style="min-width: 500px; height: 400px; margin: 10px" data-highcharts-chart="{{ forloop.counter0 }}"></div>
+    {% endfor %}
     <script type="text/javascript">
-        $(function () {
-            $('ul.nav.nav-pills li a').parent().removeClass('active')
-            $('#historico').addClass('active')
-            // Agora as series de dados
-            $('#historico-chart').highcharts({
-                chart: {
-                    zoomType: 'xy'
-                },
-                title: {
-                    text: 'Séries de dados utilizadas na construção do Alerta'
-                },
-                subtitle: {
-                    text: 'Fontes: SMS-RJ, Observatório da Dengue'
-                },
-                xAxis: [
-                    {
-                        type: 'datetime'
-                        //categories: []
-                    }
-                ],
-                yAxis: [
-                    { // Primary yAxis
-                        labels: {
-                            formatter: function () {
-                                return this.value + '°C';
-                            },
-                            style: {
-                                color: '#89A54E'
-                            }
-                        },
-                        title: {
-                            text: 'Temperatura',
-                            style: {
-                                color: '#89A54E'
-                            }
-                        },
-                        opposite: true
-
-                    },
-                    { // Secondary yAxis
-                        gridLineWidth: 1,
-                        type: "logarithmic",
-                        title: {
-                            text: 'Tweets',
-                            style: {
-                                color: '#4572A7'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return this.value + ' tweets';
-                            },
-                            style: {
-                                color: '#4572A7'
-                            }
-                        }
-
-                    },
-                    { // Tertiary yAxis
-                        gridLineWidth: 0,
-                        type: "logarithmic",
-                        title: {
-                            text: 'Casos de Dengue',
-                            style: {
-                                color: '#AA4643'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return this.value + ' pessoas';
-                            },
-                            style: {
-                                color: '#AA4643'
-                            }
-                        },
-                        opposite: true
-                    }
-                ],
-                tooltip: {
-                    shared: true
-                },
-                legend: {
-                    layout: 'vertical',
-                    align: 'left',
-                    x: 120,
-                    verticalAlign: 'top',
-                    y: 80,
-                    floating: true,
-                    backgroundColor: '#FFFFFF'
-                },
-                series: [
-                    {
-                        name: 'Temperatura',
-                        color: '#89A54E',
-                        yAxis: 0,
-                        type: 'spline',
-                        pointInterval: 7 * 24 * 3600 * 1000,
-                        pointStart: Date.UTC(2009, 12, 27),
-                        data: {{ temp }},
-                        tooltip: {
-                            valueSuffix: ' °C'
-                        }
-                    },
+        {% for ap in APS %}
+            $(function () {
+                $('ul.nav.nav-pills li a').parent().removeClass('active')
+                $('#historico').addClass('active')
+                // Agora as series de dados
+                var dados = {{ dados|safe }};
+                //$('#historico-chart-{{ ap }}').highcharts(
+                var chart{{ forloop.counter0 }} = new Highcharts.Chart(
                         {
-                        name: 'Tweets',
-                        type: 'spline',
-                        color: '#4572A7',
-                        pointInterval: 7 * 24 * 3600 * 1000,
-                        pointStart: Date.UTC(2009, 12, 27),
-                        yAxis: 1,
-                        data: {{ tweets }},
-                        marker: {
-                            enabled: false
-                        },
-                        dashStyle: 'shortdot',
-                        tooltip: {
-                            valueSuffix: ' tweets'
-                        }
 
+                    chart: {
+                        renderTo: "historico-chart-{{ ap }}",
+                        zoomType: 'xy'
                     },
-                    {
-                        name: 'Casos de Dengue',
-                        color: '#AA4643',
-                        type: 'line',
-                        yAxis: 2,
-                        pointInterval: 7 * 24 * 3600 * 1000,
-                        pointStart: Date.UTC(2009, 12, 27),
-                        data: {{ casos }},
-                        tooltip: {
-                            valueSuffix: ' pessoas'
+                    title: {
+                        text: 'Séries de dados e Alertas anteriores para {{ ap }}'
+                    },
+                    subtitle: {
+                        text: 'Fontes: SMS-RJ, Observatório da Dengue'
+                    },
+                    xAxis: [
+                        {
+                            type: 'datetime'
+                            //categories: [{{ xvalues }}]
                         }
+                    ],
+                    yAxis: [
+                        { // Primary yAxis
+                            labels: {
+                                formatter: function () {
+                                    return this.value + '°C';
+                                },
+                                style: {
+                                    color: '#89A54E'
+                                }
+                            },
+                            title: {
+                                text: 'Temperatura',
+                                style: {
+                                    color: '#89A54E'
+                                }
+                            },
+                            opposite: true
 
-                    }
-                ]
+                        },
+                        { // Secondary yAxis
+                            gridLineWidth: 1,
+                            type: "logarithmic",
+                            title: {
+                                text: 'Tweets',
+                                style: {
+                                    color: '#4572A7'
+                                }
+                            },
+                            labels: {
+                                formatter: function () {
+                                    return this.value + ' tweets';
+                                },
+                                style: {
+                                    color: '#4572A7'
+                                }
+                            }
+
+                        },
+                        { // Tertiary yAxis
+                            gridLineWidth: 0,
+                            type: "logarithmic",
+                            title: {
+                                text: 'Casos de Dengue',
+                                style: {
+                                    color: '#AA4643'
+                                }
+                            },
+                            labels: {
+                                formatter: function () {
+                                    return this.value + ' pessoas';
+                                },
+                                style: {
+                                    color: '#AA4643'
+                                }
+                            },
+                            opposite: true
+                        }
+                    ],
+                    tooltip: {
+                        shared: true
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'left',
+                        x: 120,
+                        verticalAlign: 'top',
+                        y: 80,
+                        floating: true,
+                        backgroundColor: '#FFFFFF'
+                    },
+                    series: [
+                        {
+                            name: 'Temperatura',
+                            color: '#89A54E',
+                            yAxis: 0,
+                            type: 'spline',
+                            pointInterval: 7 * 24 * 3600 * 1000,
+                            pointStart: new Date({{ xvalues.0 }}*1000),//Date.UTC(2009, 12, 27),
+                            data: dados['{{ ap }}'].tmin,
+                            tooltip: {
+                                valueSuffix: ' °C'
+                            }
+                        },
+                        {
+                            name: 'Tweets',
+                            type: 'spline',
+                            color: '#4572A7',
+                            pointInterval: 7 * 24 * 3600 * 1000,
+                            pointStart: new Date({{ xvalues.0 }}*1000),//Date.UTC(2009, 12, 27),
+                            yAxis: 1,
+                            data: dados['{{ ap }}'].tweets,
+                            marker: {
+                                enabled: false
+                            },
+                            dashStyle: 'shortdot',
+                            tooltip: {
+                                valueSuffix: ' tweets'
+                            }
+
+                        },
+                        {
+                            name: 'Casos de Dengue',
+                            color: '#AA4643',
+                            type: 'line',
+                            yAxis: 2,
+                            pointInterval: 7 * 24 * 3600 * 1000,
+                            pointStart: new Date({{ xvalues.0 }}*1000),//Date.UTC(2009, 12, 27),
+                            data: dados['{{ ap }}'].casos,
+                            tooltip: {
+                                valueSuffix: ' pessoas'
+                            }
+
+                        }
+                    ]
+                });
             });
-        });
+        {% endfor %}
     </script>
 
 
