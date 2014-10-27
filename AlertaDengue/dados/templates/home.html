@@ -19,108 +19,146 @@
 
 {% block content %}
     <br>
-    <div id="alerta-chart" style="min-width: 500px; height: 400px; margin: 10px "></div>
+    {% for ap in APS %}
+        <div id="alerta-chart-{{ ap }}" style="min-width: 500px; height: 400px; margin: 10px" data-highcharts-chart="{{ forloop.counter0 }}"></div>
+    {% endfor %}
     <script type="text/javascript">
-        $(function () {
-            $('#alerta-chart').highcharts({
-            chart: {
-                type: 'spline'
-            },
-            title: {
-                text: 'Alertas da Dengue'
-            },
-            xAxis: {
-                type: 'datetime'
-                //categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
-            },
-            tooltip: {
-                crosshairs: true,
-                shared: true
-            },
-            yAxis: [{
-                min: 0,
-                gridLineWidth: 0,
-                categories: ["Estação", "Transmissão", "Epidemia"],
-                title: {
-                    text: 'Alerta'
-                }
-            }, { //  yAxis de casos
-                        gridLineWidth: 0,
-                        type: "logarithmic",
-                        title: {
-                            text: 'Casos de Dengue',
-                            style: {
-                                color: '#D2D2C7'
-                            }
-                        },
-                        labels: {
-                            formatter: function () {
-                                return this.value + ' pessoas';
+        var nd = new Date();
+        var tzo = nd.getTimezoneOffset();
+        {% for ap in APS %}
+            var ga = {{ green_alert|safe }};
+            var ya = {{ yellow_alert|safe }};
+            var oa = {{ orange_alert|safe }};
+            var ra = {{ red_alert|safe }};
+            var casos = {{ casos|safe }};
+
+            $(function () {
+                var chart{{ forloop.counter0 }} = new Highcharts.Chart(
+                        {
+                            chart: {
+                                zoomType: 'xy',
+                                renderTo: "alerta-chart-{{ ap }}"
                             },
-                            style: {
-                                color: '#D2D2C7'
-                            }
-                        },
-                        opposite: true
-                    }
-                    ],
-            legend: {
-                align: 'right',
-                x: -70,
-                verticalAlign: 'top',
-                y: 20,
-                floating: true,
-                backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColorSolid) || 'white',
-                borderColor: '#CCC',
-                borderWidth: 1,
-                shadow: false
-            },
+                            title: {
+                                text: 'Alertas para {{ ap }}'
+                            },
+                            xAxis: {
+                                type: 'datetime'
+                            },
+                            tooltip: {
+                                crosshairs: true,
+                                shared: true
+                            },
+                            yAxis: [
+                                {
+                                    min: 0,
+                                    gridLineWidth: 0,
+                                    categories: ["Alerta", "Casos"],
+                                    title: {
+                                        text: 'Alerta'
+                                    }
+                                },
+                                { //  yAxis de casos
+                                    gridLineWidth: 0,
+                                    type: "logarithmic",
+                                    title: {
+                                        text: 'Casos de Dengue',
+                                        style: {
+                                            color: '#D2D2C7'
+                                        }
+                                    },
+                                    labels: {
+                                        formatter: function () {
+                                            return this.value + ' pessoas';
+                                        },
+                                        style: {
+                                            color: '#D2D2C7'
+                                        }
+                                    },
+                                    opposite: true
+                                }
+                            ],
+                            tooltip:{
+                                shared: true
+                            },
+                            legend: {
+                                align: 'right',
+                                x: -70,
+                                verticalAlign: 'top',
+                                y: 20,
+                                floating: true,
+                                backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColorSolid) || 'white',
+                                borderColor: '#CCC',
+                                borderWidth: 1,
+                                shadow: false
+                            },
 
-            plotOptions: {
-                spline: {
-                    marker: {
-                        radius: 0,
-                        lineColor: '#ffffffff',
-                        lineWidth: 0
-                    }
-                }
-            },
-            series: [
-                {
-                color: "#D2D2C7",
-                type: "areaspline",
-                pointInterval: 7 * 24 * 3600 * 1000,
-                pointStart: Date.UTC(2009, 12, 27),
-                name: 'Casos',
-                data: {{ casos }},
-                yAxis: 1,
-                tooltip: {
-                            valueSuffix: ' casos'
-                        }
-            },
-                {
-                color: "#00ff00",
-                pointInterval: 7 * 24 * 3600 * 1000,
-                pointStart: Date.UTC(2009, 12, 27),
-                name: 'Estação de Dengue',
-                data: {{ season_alert|safe }}
-            }, {
-                color: "#0000ff",
-                pointInterval: 7 * 24 * 3600 * 1000,
-                pointStart: Date.UTC(2009, 12, 27),
-                name: 'Transmissão Sustentada',
-                data: {{ transmissao_alert|safe }}
-            }, {
-                color: "#ff0000",
-                pointInterval: 7 * 24 * 3600 * 1000,
-                pointStart: Date.UTC(2009, 12, 27),
-                name: 'Epidemia',
-                data: {{ epidemia_alert|safe }}
-            }
-            ]
-        });
+                            plotOptions: {
+                                spline: {
+                                    marker: {
+                                        radius: 0,
+                                        lineColor: '#ffffffff',
+                                        lineWidth: 0
+                                    }
+                                }
+                            },
 
-        });
+                            series: [
+                                {
+                                    color: "#D2D2C7",
+                                    type: "spline",
+                                    pointInterval: 7 * 24 * 3600 * 1000,
+                                    pointStart: {{ xvalues.0 }} * 1000 + tzo,
+                                    name: 'Casos',
+                                    data: casos['{{ ap }}'].casos_est,
+                                    yAxis: 1,
+                                    tooltip: {
+                                    valueSuffix: ' casos'
+                                    }
+                                },{
+                                    color: "#48FD48",
+                                    type: "areaspline",
+                                    marker: {
+                                        enabled: false
+                                    },
+                                    pointInterval: (7 * 24 * 3600 * 1000),
+                                    pointStart: {{ xvalues.0 }} * 1000 + tzo,
+                                    name: 'Alerta Verde',
+                                    data: ga['{{ ap }}']
+                                },{
+                                    color: "#FBFC49",
+                                    type: "areaspline",
+                                    marker: {
+                                        enabled: false
+                                    },
+                                    pointInterval:7 * 24 * 3600 * 1000,
+                                    pointStart: {{ xvalues.0 }}*1000 + tzo,
+                                    name: 'Alerta Amarelo',
+                                    data: ya['{{ ap }}']
+                                },{
+                                    color: "#FFA858",
+                                    type: "areaspline",
+                                    marker: {
+                                        enabled: false
+                                    },
+                                    pointInterval:7 * 24 * 3600 * 1000,
+                                    pointStart: {{ xvalues.0 }}*1000 + tzo,
+                                    name: 'Alerta Laranja',
+                                    data: oa['{{ ap }}']
+                                },{
+                                    color: "#FB4949",
+                                    type: "areaspline",
+                                    marker: {
+                                        enabled: false
+                                    },
+                                    pointInterval: 7 * 24 * 3600 * 1000,
+                                    pointStart: {{ xvalues.0 }}*1000 + tzo,
+                                    name: 'Alerta Vermelho',
+                                    data: ra['{{ ap }}']
+                                }
+                        ]});
+                    });
+                {% endfor %}
     </script>
 
 

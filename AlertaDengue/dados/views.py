@@ -26,7 +26,7 @@ class AlertaPageView(TemplateView):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
         alert, current = get_alert()
         casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
-        alerta = {float(k.split('AP')[-1]): int(v)  for k, v in alert.items()}
+        alerta = {float(k.split('AP')[-1]): int(v) for k, v in alert.items()}
         semana = str(current.SE.iat[-1])[-2:]
         messages.info(self.request,
                       "Foram relatados {} novos casos na Semana Epidemiológica {}.".format(sum(casos_ap.values()),
@@ -44,19 +44,28 @@ class HomePageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(HomePageView, self).get_context_data(**kwargs)
-        messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        # messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
         series = load_series()
+        aps = list(series.keys())
+        aps.sort()
+        ga = {}
+        ya = {}
+        oa = {}
+        ra = {}
+        for k, v in series.items():
+            ga[k] = [1 if a == 0 else None for a in v['alerta']]
+            ya[k] = [1 if a == 1 else None for a in v['alerta']]
+            oa[k] = [1 if a == 2 else None for a in v['alerta']]
+            ra[k] = [1 if a == 3 else None for a in v['alerta']]
+
         context.update({
-            'season_alert': json.dumps(
-                [{"y": 0, "marker": {"symbol": "url(/static/mosquito_peq.png)"}} if v == 1 else v for v in
-                 series['season']]),
-            'casos': json.dumps(series['casos']),
-            'epidemia_alert': json.dumps(
-                [{"y": 2, "marker": {"symbol": "url(/static/mosquito_peq.png)"}} if v == 1 else v for v in
-                 series['epidemia']]),
-            'transmissao_alert': json.dumps(
-                [{"y": 1, "marker": {"symbol": "url(/static/mosquito_peq.png)"}} if v == 1 else v for v in
-                 series['transmissao']]),
+            'APS': aps,
+            'green_alert': json.dumps(ga),
+            'yellow_alert': json.dumps(ya),
+            'casos': json.dumps(series),
+            'red_alert': json.dumps(ra),
+            'orange_alert': json.dumps(oa),
+            'xvalues': series['AP1']['dia'],
         })
         return context
 
