@@ -53,7 +53,7 @@
                                 {
                                     min: 0,
                                     gridLineWidth: 0,
-                                    categories: ["Alerta", "Casos"],
+                                    //categories: ["Verde", "Casos"],
                                     title: {
                                         text: 'Alerta'
                                     }
@@ -64,7 +64,7 @@
                                     title: {
                                         text: 'Casos de Dengue',
                                         style: {
-                                            color: '#D2D2C7'
+                                            color: '#777777'
                                         }
                                     },
                                     labels: {
@@ -72,7 +72,7 @@
                                             return this.value + ' pessoas';
                                         },
                                         style: {
-                                            color: '#D2D2C7'
+                                            color: '#777777'
                                         }
                                     },
                                     opposite: true
@@ -100,24 +100,18 @@
                                         lineColor: '#ffffffff',
                                         lineWidth: 0
                                     }
+                                },
+                                column: {
+                                    pointPadding: 0,
+                                    borderWidth: 1,
+                                    groupPadding: 0
                                 }
                             },
 
                             series: [
                                 {
-                                    color: "#D2D2C7",
-                                    type: "spline",
-                                    pointInterval: 7 * 24 * 3600 * 1000,
-                                    pointStart: {{ xvalues.0 }} * 1000 + tzo,
-                                    name: 'Casos',
-                                    data: casos['{{ ap }}'].casos_est,
-                                    yAxis: 1,
-                                    tooltip: {
-                                    valueSuffix: ' casos'
-                                    }
-                                },{
                                     color: "#48FD48",
-                                    type: "areaspline",
+                                    type: "column",
                                     marker: {
                                         enabled: false
                                     },
@@ -127,7 +121,7 @@
                                     data: ga['{{ ap }}']
                                 },{
                                     color: "#FBFC49",
-                                    type: "areaspline",
+                                    type: "column",
                                     marker: {
                                         enabled: false
                                     },
@@ -137,7 +131,7 @@
                                     data: ya['{{ ap }}']
                                 },{
                                     color: "#FFA858",
-                                    type: "areaspline",
+                                    type: "column",
                                     marker: {
                                         enabled: false
                                     },
@@ -147,7 +141,7 @@
                                     data: oa['{{ ap }}']
                                 },{
                                     color: "#FB4949",
-                                    type: "areaspline",
+                                    type: "column",
                                     marker: {
                                         enabled: false
                                     },
@@ -155,7 +149,19 @@
                                     pointStart: {{ xvalues.0 }}*1000 + tzo,
                                     name: 'Alerta Vermelho',
                                     data: ra['{{ ap }}']
-                                }
+                                },
+                                {
+                                    color: "#777777",
+                                    type: "spline",
+                                    pointInterval: 7 * 24 * 3600 * 1000,
+                                    pointStart: {{ xvalues.0 }} * 1000 + tzo,
+                                    name: 'Casos',
+                                    data: casos['{{ ap }}'].casos_est,
+                                    yAxis: 1,
+                                    tooltip: {
+                                        valueSuffix: ' casos'
+                                    }
+                                },
                         ]});
                     });
                 {% endfor %}
