@@ -77,7 +77,7 @@ LEAFLET_CONFIG = {
     'DEFAULT_CENTER': (-22.907111, -43.431864),
     'DEFAULT_ZOOM': 11,
     'MAXIMUM_ZOOM': 13,
-    'TILES': 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', #'http://{s}.tile.cloudmade.com/ad132e106cd246ec961bbdfbe0228fe8/997/256/{z}/{x}/{y}.png',
+    'TILES': 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
     'MINIMAP': True,
     'ATTRIBUTION_PREFIX': 'Powered by django-leaflet',
     'PLUGINS': {

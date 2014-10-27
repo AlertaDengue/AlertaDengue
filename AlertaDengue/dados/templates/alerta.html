@@ -42,7 +42,8 @@
     <script src="/static/js/heatmap.js"></script>
     <script src="/static/js/heatmap-leaflet.js"></script>
     <script src="/static/js/QuadTree.js"></script>
-
+    <script src='/static/exp_PontosUnidadesBasicasSaudeMRJ2014wgs84.js'></script>
+    <script src="/static/js/Autolinker.min.js"></script>
 {% endblock %}
 
 
@@ -65,6 +66,7 @@
         }
 
         var aps = L.layerGroup();
+        var features = L.layerGroup();
         var info = L.control();
         var legend = L.control({position: 'bottomright'});
         var geojson;
@@ -73,7 +75,7 @@
         // get color depending on population density value
         function getColor(d) {
             return d == 3 ? '#FF0000' : // Vermelho
-                    d == 2 ? '#FFA858' : // Laranja
+                            d == 2 ? '#FFA858' : // Laranja
                             d == 1 ? '#FFFF00' : '#00FF00';
         }
 
@@ -119,10 +121,10 @@
             var alerta = {{ alerta|safe }};
             var recomendacoes = {
                 0: "Hora de arrumar o quintal, cobrir caixas d'água, Não deixe criadouros para o mosquito!",
-                1: "Uma vez por semana, aplique os “10 minutos Contra a dengue”!",
+                1: 'Uma vez por semana, aplique os “10 minutos Contra a dengue”!',
                 2: "Incremente seu patrulhamento de criadouros!",
                 3: "Fique atento aos sintomas da Dengue! Procure um médico caso suspeite de dengue."
-            }
+            };
 
             // control that shows state info on hover
             info.onAdd = function (map) {
@@ -141,17 +143,17 @@
             legend.onAdd = function (map) {
 
                 var div = L.DomUtil.create('div', 'info legend'),
-                    grades = [0,1,2,3],
-                    nomes = ['Baixo Risco','Atenção', 'Transmissão','Epidemia'],
-                    labels = [],
-                    from, to;
+                        grades = [0, 1, 2, 3],
+                        nomes = ['Baixo Risco', 'Atenção', 'Transmissão', 'Epidemia'],
+                        labels = [],
+                        from, to;
 
                 for (var i = 0; i < grades.length; i++) {
                     from = grades[i];
                     to = grades[i + 1];
 
                     labels.push(
-                            '<i style="background:' + getColor(from) + '"></i> ' +
+                                    '<i style="background:' + getColor(from) + '"></i> ' +
                                     nomes[from]);
                 }
 
@@ -160,6 +162,26 @@
             };
 
             legend.addTo(map);
+            // fetch data about health units
+            function pop_PontosUnidadesBasicasSaudeMRJ2014wgs84(feature, layer) {
+                var popupContent = '<table><tr><th scope="row">UNIDADE_ID</th><td>' + Autolinker.link(String(feature.properties.UNIDADE_ID)) + '</td></tr><tr><th scope="row">CNES</th><td>' + Autolinker.link(String(feature.properties.CNES)) + '</td></tr><tr><th scope="row">LOGRADOURO</th><td>' + Autolinker.link(String(feature.properties.LOGRADOURO)) + '</td></tr><tr><th scope="row">NUMERO</th><td>' + Autolinker.link(String(feature.properties.NUMERO)) + '</td></tr><tr><th scope="row">COMPLEMENT</th><td>' + Autolinker.link(String(feature.properties.COMPLEMENT)) + '</td></tr><tr><th scope="row">BAIRRO</th><td>' + Autolinker.link(String(feature.properties.BAIRRO)) + '</td></tr><tr><th scope="row">CEP</th><td>' + Autolinker.link(String(feature.properties.CEP)) + '</td></tr><tr><th scope="row">TELEFONE</th><td>' + Autolinker.link(String(feature.properties.TELEFONE)) + '</td></tr><tr><th scope="row">TP_UNIDADE</th><td>' + Autolinker.link(String(feature.properties.TP_UNIDADE)) + '</td></tr><tr><th scope="row">TP_GESTAO</th><td>' + Autolinker.link(String(feature.properties.TP_GESTAO)) + '</td></tr><tr><th scope="row">CLASSE_UND</th><td>' + Autolinker.link(String(feature.properties.CLASSE_UND)) + '</td></tr><tr><th scope="row">NOME_LEG</th><td>' + Autolinker.link(String(feature.properties.NOME_LEG)) + '</td></tr><tr><th scope="row">BAIRR_CNES</th><td>' + Autolinker.link(String(feature.properties.BAIRR_CNES)) + '</td></tr></table>';
+                layer.bindPopup(popupContent);
+            }
+
+            var exp_PontosUnidadesBasicasSaudeMRJ2014wgs84JSON = new L.geoJson(exp_PontosUnidadesBasicasSaudeMRJ2014wgs84, {
+                onEachFeature: pop_PontosUnidadesBasicasSaudeMRJ2014wgs84,
+                pointToLayer: function (feature, latlng) {
+                    return L.circleMarker(latlng, {
+                        radius: feature.properties.radius_qgis2leaf,
+                        fillColor: feature.properties.color_qgis2leaf,
+                        color: '#000',
+                        weight: 1,
+                        opacity: feature.properties.transp_qgis2leaf,
+                        fillOpacity: feature.properties.transp_qgis2leaf
+                    })
+                }
+            });
+            features.addLayer(exp_PontosUnidadesBasicasSaudeMRJ2014wgs84JSON)
             // Download GeoJSON via Ajax
             $.getJSON(dataurl, function (data) {
                 // Add GeoJSON layer
@@ -168,8 +190,8 @@
                     feature.properties.alerta = alerta[feature.properties.COD_AP_SMS];
                     feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
                     layer.bindPopup("Área de planejamento " + feature.properties.COD_AP_SMS + "<br>" +
-                            "Casos: " + feature.properties.casos + "<br><u>O que fazer</u>: " +
-                            recomendacoes[feature.properties.alerta]
+                                    "Casos: " + feature.properties.casos + "<br><u>O que fazer</u>: " +
+                                    recomendacoes[feature.properties.alerta]
                     );
                     layer.setStyle(style(feature))
                     layer.on({
@@ -184,9 +206,10 @@
                 aps.addTo(map);
             });
 
-
+            features.addTo(map);
             var overlayMaps = {
-                'Áreas de Planejamento': aps
+                'Áreas de Planejamento': aps,
+                'Unidades de Saúde': features
             };
             var controls = L.control.layers(null, overlayMaps, {collapsed: true});
             map.dragging.disable();

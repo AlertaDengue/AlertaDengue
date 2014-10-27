@@ -25,8 +25,8 @@ class AlertaPageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
         alert, current = get_alert()
-        casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos']) for ap in alert.keys()}
-        alerta = {float(k.split('AP')[-1]): v - 1 for k, v in alert.items()}
+        casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
+        alerta = {float(k.split('AP')[-1]): int(v)  for k, v in alert.items()}
         semana = str(current.SE.iat[-1])[-2:]
         messages.info(self.request,
                       "Foram relatados {} novos casos na Semana Epidemiológica {}.".format(sum(casos_ap.values()),
@@ -178,7 +178,7 @@ def load_series():
             G.get_group(ap).data]
         series[ap]['tweets'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).tweets]
         series[ap]['tmin'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).tmin]
-        series[ap]['casos'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).casos]
+        series[ap]['casos_est'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).casos]
         series[ap]['alerta'] = [c - 1 if not np.isnan(c) else None for c in G.get_group(ap).cor]
         # print(series['dia'])
     return series
