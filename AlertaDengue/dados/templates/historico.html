@@ -15,20 +15,26 @@
 {% endblock %}
 
 
-{% block title %}<br><a href="{% url 'home' %}">Séries Históricas</a>{% endblock %}
+{% block title %}Séries Históricas{% endblock %}
 
 {% block content %}
     <h4>O Alerta de Dengue e calculado usando dados que incluem os apresentados abaixo.</h4>
     {% for ap in APS %}
-        <div id="historico-chart-{{ ap }}" style="min-width: 500px; height: 400px; margin: 10px" data-highcharts-chart="1"></div>
-        <script type="text/javascript">
+        <div id="historico-chart-{{ ap }}" style="min-width: 500px; height: 400px; margin: 10px" data-highcharts-chart="{{ forloop.counter0 }}"></div>
+    {% endfor %}
+    <script type="text/javascript">
+        {% for ap in APS %}
             $(function () {
                 $('ul.nav.nav-pills li a').parent().removeClass('active')
                 $('#historico').addClass('active')
                 // Agora as series de dados
                 var dados = {{ dados|safe }};
-                $('#historico-chart-{{ ap }}').highcharts({
+                //$('#historico-chart-{{ ap }}').highcharts(
+                var chart{{ forloop.counter0 }} = new Highcharts.Chart(
+                        {
+
                     chart: {
+                        renderTo: "historico-chart-{{ ap }}",
                         zoomType: 'xy'
                     },
                     title: {
@@ -121,7 +127,7 @@
                             type: 'spline',
                             pointInterval: 7 * 24 * 3600 * 1000,
                             pointStart: Date.UTC(2009, 12, 27),
-                            data: dados['{{ ap }}'].tmin ,
+                            data: dados['{{ ap }}'].tmin,
                             tooltip: {
                                 valueSuffix: ' °C'
                             }
@@ -159,8 +165,9 @@
                     ]
                 });
             });
-        </script>
-    {% endfor %}
+        {% endfor %}
+    </script>
+
 
 
 {% endblock %}
