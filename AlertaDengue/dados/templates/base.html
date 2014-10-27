@@ -20,7 +20,9 @@
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
                         <li class="active"><a href="{% url "alerta" %}">Alerta</a></li>
+                        {% if user.is_authenticated %}
                         <li><a href="{% url "historico" %}">Histórico</a></li>
+                        {% endif %}
                         <li><a href="{% url "about" %}">Sobre o Projeto</a></li>
                         <li><a href="{% url "contact" %}">Fale Conosco</a></li>
                         {% if user.is_authenticated %}
