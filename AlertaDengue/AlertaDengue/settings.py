@@ -26,7 +26,7 @@ DEBUG = False
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["alerta.dengue.mat.br"]
 
 
 # Application definition
