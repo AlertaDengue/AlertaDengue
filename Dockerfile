@@ -6,7 +6,8 @@ ADD config/sources.list /etc/apt/sources.list
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update
-RUN apt-get install -y locales nginx sqlite3 libspatialite3 spatialite-bin git-core supervisor python3 python3-pip python3-setuptools python-virtualenv openssh-server
+#RUN apt-get install -y locales nginx sqlite3 libspatialite3 spatialite-bin git-core supervisor python3 python3-pip python3-setuptools python-virtualenv openssh-server
+RUN apt-get install -y locales nginx sqlite3 libspatialite5 spatialite-bin git-core supervisor python3 python3-pip python3-setuptools python-virtualenv python3-venv openssh-server python3-numpy python3-pandas
 
 # Set locale
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
@@ -31,7 +32,7 @@ RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
 RUN mkdir -p /srv/deploy/logs/
 
 # Configure virtualenv
-RUN pyvenv-3.3 --clear --system-site-packages /srv/deploy/project/
+RUN pyvenv --clear --system-site-packages /srv/deploy/project/
 ADD exec_in_virtualenv.sh /srv/deploy/exec_in_virtualenv.sh
 
 # Clone code
@@ -45,8 +46,8 @@ RUN git clone https://github.com/NAMD/AlertaDengue.git /srv/deploy/project/Alert
 RUN /srv/deploy/exec_in_virtualenv.sh pip3 install --no-clean -r /srv/deploy/project/AlertaDengue/requirements.txt
 RUN rm -r /tmp/pip_build_root/
 
-# Collect static files
-RUN /srv/deploy/exec_in_virtualenv.sh python /srv/deploy/project/AlertaDengue/AlertaDengue/manage.py collectstatic
+# Collectstatic
+RUN /srv/deploy/exec_in_virtualenv.sh /srv/deploy/project/AlertaDengue/AlertaDengue/manage.py collectstatic --noinput
 
 # Configure supervisor job
 ADD config/alerta_dengue.conf /etc/supervisor/conf.d/alerta_dengue.conf
@@ -54,11 +55,15 @@ ADD config/alerta_dengue.conf /etc/supervisor/conf.d/alerta_dengue.conf
 # Configure nginx
 ADD config/alerta_dengue_nginx.conf /etc/nginx/sites-enabled/alerta_dengue
 
+# Copy db
+ADD geodjango.db /srv/deploy/project/AlertaDengue/AlertaDengue/geodjango.db
+
+# Copy ssh keys
+RUN mkdir /root/.ssh/
+ADD authorized_keys /root/.ssh/authorized_keys
+
 # Change the permissions for the user home directory
 RUN chown -R deploy:deploy /srv/deploy/
-
-#TODO: REMOVE THIS
-RUN echo "root:password" | chpasswd
 
 EXPOSE 22 80
 CMD ["/usr/bin/supervisord", "--nodaemon"]
