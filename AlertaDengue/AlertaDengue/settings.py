@@ -110,9 +110,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
-STATIC_ROOT = os.path.join(os.path.dirname(__file__), '..')  # up one level from settings.py
+STATIC_ROOT = os.path.join(os.path.dirname(__file__), '..', 'static_files')  # up one level from settings.py
 STATICFILES_DIRS = (
-    os.path.abspath(os.path.join(STATIC_ROOT, 'static')),  # static is on root level
+    os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'static')),  # static is on root level
 )
 
 DATA_DIR = os.path.abspath(os.path.join(STATIC_ROOT, 'data'))
