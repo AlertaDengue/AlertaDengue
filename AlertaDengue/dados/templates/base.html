@@ -47,6 +47,8 @@
                                     <li><a href="{% url 'password_change' %}">Change password</a></li>
                                 </ul>
                             </li>
+                        {% else %}
+                            <li><a href="{% url "login" %}">Login</a></li>
                         {% endif %}
                     </ul>
                 </div>
