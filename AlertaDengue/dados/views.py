@@ -26,7 +26,7 @@ class AlertaPageView(TemplateView):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
         alert, current = get_alert()
         casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
-        alerta = {float(k.split('AP')[-1]): int(v) for k, v in alert.items()}
+        alerta = {float(k.split('AP')[-1]): int(v)-1 for k, v in alert.items()}
         semana = str(current.SE.iat[-1])[-2:]
         messages.info(self.request,
                       "Foram relatados {} novos casos na Semana Epidemiológica {}.".format(sum(casos_ap.values()),

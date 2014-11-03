@@ -152,11 +152,10 @@
                     from = grades[i];
                     to = grades[i + 1];
 
-                    labels.push(
-                                    '<i style="background:' + getColor(from) + '"></i> ' +
+                    labels.push('<i style="background:' + getColor(from) + '"></i> ' +
                                     nomes[from]);
                 }
-
+                labels.push('O: Unidades de Saúde');
                 div.innerHTML = labels.join('<br>');
                 return div;
             };
@@ -187,7 +186,7 @@
                 // Add GeoJSON layer
                 geojson = L.geoJson(data, {style: style, onEachFeature: function (feature, layer) {
                     feature.properties.alerta = alerta[parseFloat(feature.properties.COD_AP_SMS)];
-                    feature.properties.alerta = alerta[feature.properties.COD_AP_SMS];
+                    //feature.properties.alerta = alerta[feature.properties.COD_AP_SMS];
                     feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
                     layer.bindPopup("Área de planejamento " + feature.properties.COD_AP_SMS + "<br>" +
                                     "Casos: " + feature.properties.casos + "<br><u>O que fazer</u>: " +
