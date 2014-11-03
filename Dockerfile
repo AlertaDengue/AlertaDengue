@@ -67,6 +67,9 @@ RUN /srv/deploy/exec_in_virtualenv.sh /srv/deploy/project/AlertaDengue/AlertaDen
 RUN mkdir /root/.ssh/
 ADD authorized_keys /root/.ssh/authorized_keys
 
+RUN mkdir /srv/deploy/.ssh/
+ADD authorized_keys /srv/deploy/.ssh/authorized_keys
+
 # Change the permissions for the user home directory
 RUN chown -R deploy:deploy /srv/deploy/
 
