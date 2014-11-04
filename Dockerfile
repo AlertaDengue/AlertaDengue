@@ -10,10 +10,10 @@ RUN apt-get update
 RUN apt-get install -y locales nginx sqlite3 libspatialite5 spatialite-bin git-core supervisor python3 python3-pip python3-setuptools python-virtualenv python3-venv openssh-server python3-numpy python3-pandas
 
 # Set locale
-RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
-RUN locale-gen en_US.UTF-8
-RUN update-locale en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
+RUN echo "pt_BR.UTF-8 UTF-8" > /etc/locale.gen
+RUN locale-gen pt_BR.UTF-8
+RUN update-locale pt_BR.UTF-8
+ENV LC_ALL pt_BR.UTF-8
 
 # Configure SSHd
 #TODO: Add config file with sane configs (only publickey auth, etc) and keys
