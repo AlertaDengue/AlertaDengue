@@ -15,6 +15,9 @@ from collections import defaultdict
 from django.conf import settings
 import pandas as pd
 import numpy as np
+import locale
+
+locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
 dados_alerta = pd.read_csv(os.path.join(settings.DATA_DIR, 'alertaAPS.csv'), header=0)
 
@@ -28,9 +31,10 @@ class AlertaPageView(TemplateView):
         casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
         alerta = {float(k.split('AP')[-1]): int(v)-1 for k, v in alert.items()}
         semana = str(current.SE.iat[-1])[-2:]
+        data = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d").strftime("%d de %B de %Y")
         messages.info(self.request,
-                      "Foram relatados {} novos casos na Semana Epidemiológica {}.".format(sum(casos_ap.values()),
-                                                                                           semana))
+                      "Foram relatados {} novos casos na Semana Epidemiológica {}: Semana de {}.".format(sum(casos_ap.values()),
+                                                                                           semana, data))
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
