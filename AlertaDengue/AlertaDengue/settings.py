@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = 'v4+@ig!qk2zab+@ap8(@$*IUDHS%*&*@%)1f%1@a+^y-b5p$uex&@-h1m+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = True
 
@@ -123,3 +123,8 @@ STATIC_URL = '/static/'
 # Not having this was causing errors when running the project under wsgi:
 # https://stackoverflow.com/questions/20963856/improperlyconfigured-the-included-urlconf-project-urls-doesnt-have-any-patte/21005346#21005346
 DEBUG_TOOLBAR_PATCH_SETTINGS = False
+
+try:
+    from AlertaDengue.local_settings import *
+except ImportError:
+    pass
