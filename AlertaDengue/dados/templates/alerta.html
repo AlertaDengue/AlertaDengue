@@ -59,7 +59,7 @@
     {% leaflet_map "main" callback="main_map_init" %}
     <br>
     <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">
-
+    <p>Suspeita de um criadouro de mosquitos? <a href="http://www.1746.rio.gov.br/">Ligue para o 1746!</a></p>
     <script type="text/javascript">
         function isInArray(el, array) {
             return (array.indexOf(el) >= 0) ? true : false;
@@ -163,7 +163,7 @@
             legend.addTo(map);
             // fetch data about health units
             function pop_PontosUnidadesBasicasSaudeMRJ2014wgs84(feature, layer) {
-                var popupContent = '<table><tr><th scope="row">UNIDADE_ID</th><td>' + Autolinker.link(String(feature.properties.UNIDADE_ID)) + '</td></tr><tr><th scope="row">CNES</th><td>' + Autolinker.link(String(feature.properties.CNES)) + '</td></tr><tr><th scope="row">LOGRADOURO</th><td>' + Autolinker.link(String(feature.properties.LOGRADOURO)) + '</td></tr><tr><th scope="row">NUMERO</th><td>' + Autolinker.link(String(feature.properties.NUMERO)) + '</td></tr><tr><th scope="row">COMPLEMENT</th><td>' + Autolinker.link(String(feature.properties.COMPLEMENT)) + '</td></tr><tr><th scope="row">BAIRRO</th><td>' + Autolinker.link(String(feature.properties.BAIRRO)) + '</td></tr><tr><th scope="row">CEP</th><td>' + Autolinker.link(String(feature.properties.CEP)) + '</td></tr><tr><th scope="row">TELEFONE</th><td>' + Autolinker.link(String(feature.properties.TELEFONE)) + '</td></tr><tr><th scope="row">TP_UNIDADE</th><td>' + Autolinker.link(String(feature.properties.TP_UNIDADE)) + '</td></tr><tr><th scope="row">TP_GESTAO</th><td>' + Autolinker.link(String(feature.properties.TP_GESTAO)) + '</td></tr><tr><th scope="row">CLASSE_UND</th><td>' + Autolinker.link(String(feature.properties.CLASSE_UND)) + '</td></tr><tr><th scope="row">NOME_LEG</th><td>' + Autolinker.link(String(feature.properties.NOME_LEG)) + '</td></tr><tr><th scope="row">BAIRR_CNES</th><td>' + Autolinker.link(String(feature.properties.BAIRR_CNES)) + '</td></tr></table>';
+                var popupContent = '<table><tr><th scope="row">Nome:</th><td>' + Autolinker.link(String(feature.properties.NOME_LEG)) + '</td></tr><tr><th scope="row">Logradouro:</th><td>' + Autolinker.link(String(feature.properties.LOGRADOURO)) + '</td></tr><tr><th scope="row">Número:</th><td>' + Autolinker.link(String(feature.properties.NUMERO)) + '</td></tr><tr><th scope="row">Complemento:</th><td>' + Autolinker.link(String(feature.properties.COMPLEMENT)) + '</td></tr><tr><th scope="row">Bairro:</th><td>' + Autolinker.link(String(feature.properties.BAIRRO)) + '</td></tr><tr><th scope="row">CEP:</th><td>' + Autolinker.link(String(feature.properties.CEP)) + '</td></tr><tr><th scope="row">Telefone:</th><td>' + Autolinker.link(String(feature.properties.TELEFONE)) + '</td></tr><tr><th scope="row">Tipo:</th><td>' + Autolinker.link(String(feature.properties.TP_UNIDADE)) + '</td></tr><tr><th scope="row">Classe:</th><td>' + Autolinker.link(String(feature.properties.CLASSE_UND)) + '</td></tr></table><p><a href="http://www.rio.rj.gov.br/web/sms/onde-ser-atendido">Onde posso ser atendido?</a></p>';
                 layer.bindPopup(popupContent);
             }
 
@@ -213,8 +213,14 @@
             var controls = L.control.layers(null, overlayMaps, {collapsed: true});
             map.dragging.disable();
             map.scrollWheelZoom.disable();
+            map.touchZoom.disable();
+            map.doubleClickZoom.disable();
+            map.boxZoom.disable();
+            map.keyboard.disable();
+            $(".leaflet-control-zoom").css("visibility", "hidden");
             controls.addTo(map);
-
+map.touchZoom.disable();
+map.doubleClickZoom.disable();
         }
     </script>
 
