@@ -79,7 +79,7 @@ LEAFLET_CONFIG = {
     'MAXIMUM_ZOOM': 13,
     'TILES': 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
     'MINIMAP': True,
-    'ATTRIBUTION_PREFIX': 'Powered by django-leaflet',
+    'ATTRIBUTION_PREFIX': 'Mapa de risco do Alerta Dengue Rio',
     'PLUGINS': {
         'cluster': {
             'js': 'js/leaflet.markercluster.js',
