@@ -1,7 +1,7 @@
 # coding=utf-8
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from dados.views import HomePageView, SinanCasesView, AboutPageView, ContactPageView, MapaDengueView, MapaMosquitoView, HistoricoView, AlertaPageView
+from dados.views import HomePageView, SinanCasesView, AboutPageView, ContactPageView, MapaDengueView, MapaMosquitoView, HistoricoView, AlertaPageView, AlertaGeoJSONView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.decorators import login_required
@@ -17,6 +17,7 @@ urlpatterns = patterns('',
     url('^accounts/profile/$', RedirectView.as_view(url="/")),
     url('^accounts/', include('django.contrib.auth.urls')),
     url(r'^alerta-detalhado/$', login_required(HomePageView.as_view()), name='home'),
+    url(r'^alertageoJSON/$', login_required(AlertaGeoJSONView.as_view()), name='alerta-layer'),
     url(r'^mapadengue/$', MapaDengueView.as_view(), name='mapadengue'),
     url(r'^mapamosquito/$', MapaMosquitoView.as_view(), name='mapamosquito'),
     url(r'^historico/$', login_required(HistoricoView.as_view()), name='historico'),

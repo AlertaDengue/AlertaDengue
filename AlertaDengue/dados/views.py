@@ -15,12 +15,14 @@ from collections import defaultdict
 from django.conf import settings
 import pandas as pd
 import numpy as np
-import
+import locale
 import geojson
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
 dados_alerta = pd.read_csv(os.path.join(settings.DATA_DIR, 'alertaAPS.csv'), header=0)
+polygons = geojson.load(open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')))
+
 
 
 class AlertaPageView(TemplateView):
@@ -43,10 +45,9 @@ class AlertaPageView(TemplateView):
         })
         return context
 
-class AlertaGeoJSON(View):
+class AlertaGeoJSONView(View):
     def get(self, request, *args, **kwargs):
-        mapa = geojson.load(open('rio_aps.geojson'))
-        return mapa
+        return HttpResponse(geojson.dumps(polygons))
 
 
 
