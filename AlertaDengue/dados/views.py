@@ -15,7 +15,8 @@ from collections import defaultdict
 from django.conf import settings
 import pandas as pd
 import numpy as np
-import locale
+import
+import geojson
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
@@ -41,6 +42,12 @@ class AlertaPageView(TemplateView):
             'semana': semana,
         })
         return context
+
+class AlertaGeoJSON(View):
+    def get(self, request, *args, **kwargs):
+        mapa = geojson.load(open('rio_aps.geojson'))
+        return mapa
+
 
 
 class HomePageView(TemplateView):
