@@ -52,9 +52,9 @@
 {% block content %}
     <br>
     <div class="bs-callout bs-callout-warning">
-        <h4>Níveis de Alerta</h4>
+        <h4>Níveis de Atenção</h4>
         <p>
-            Confira no mapa abaixo os níveis de alerta em sua região da cidade:
+            As cores no mapa abaixo indicam os níveis de atenção em sua região da cidade! Ajude a controlar a Dengue, seguindo as recomendações sugeridas!
         </p>
     </div>
     {% comment %}<div class="alert alert-warning">
@@ -64,7 +64,10 @@
     {% leaflet_map "main" callback="main_map_init" %}
     <br>
     <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">
-    <p>Suspeita de um criadouro de mosquitos? <a href="http://www.1746.rio.gov.br/">Ligue para o 1746!</a></p>
+    <div class="bs-callout bs-callout-info">
+    <h4>Ajude a controlar o mosquito transmissor</h4>
+    <p>Suspeita de um criadouro de mosquitos? <a href="http://www.1746.rio.gov.br/"><img src="/static/img/1746.jpg" alt="ligue 1746" width="140px" align="bottom"></a></p>
+    </div>
     <script type="text/javascript">
         function isInArray(el, array) {
             return (array.indexOf(el) >= 0) ? true : false;
