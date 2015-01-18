@@ -15,11 +15,11 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="{% url 'alerta' %}">Alerta Dengue Rio</a>
+                    <a class="navbar-brand" href="{% url 'alerta' %}">Info Dengue Rio</a>
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
-                        <li class="active"><a href="{% url "alerta" %}">Alerta</a></li>
+                        <li class="active"><a href="{% url "alerta" %}">Mapa</a></li>
                         <li><a href="{% url "about" %}">Sobre o Projeto</a></li>
                         <li><a href="{% url "contact" %}">Fale Conosco</a></li>
                         {% if user.is_authenticated %}

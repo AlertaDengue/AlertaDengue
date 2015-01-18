@@ -36,7 +36,7 @@ class AlertaPageView(TemplateView):
         semana = str(current.SE.iat[-1])[-2:]
         data = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d").strftime("%d de %B de %Y")
         messages.info(self.request,
-                      "Foram relatados {} novos casos na Semana Epidemiológica {}: Semana de {}.".format(sum(casos_ap.values()),
+                      "Foram registrados {} novos casos na Semana Epidemiológica {}: Semana de {}.".format(sum(casos_ap.values()),
                                                                                            semana, data))
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
