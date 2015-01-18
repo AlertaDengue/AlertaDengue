@@ -6,3 +6,4 @@ django-debug-toolbar==1.2.1
 shapely
 pandas
 geojson
+gunicorn
