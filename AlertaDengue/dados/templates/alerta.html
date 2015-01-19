@@ -53,8 +53,10 @@
     <br>
     <div class="bs-callout bs-callout-warning">
         <h4>Níveis de Atenção</h4>
+
         <p>
-            As cores no mapa abaixo indicam os níveis de atenção em sua região da cidade! Ajude a controlar a Dengue, seguindo as recomendações sugeridas!
+            As cores no mapa abaixo indicam os níveis de atenção em sua região da cidade! Ajude a controlar a Dengue,
+            seguindo as recomendações sugeridas!
         </p>
     </div>
     {% comment %}<div class="alert alert-warning">
@@ -63,10 +65,12 @@
 
     {% leaflet_map "main" callback="main_map_init" %}
     <br>
-{#    <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">#}
+    {#    <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">#}
     <div class="bs-callout bs-callout-info">
-    <h4>Suspeita de um criadouro de mosquitos? </h4>
-    <p><a href="http://www.1746.rio.gov.br/"><img src="/static/img/1746.jpg" alt="ligue 1746" width="140px" align="bottom"></a></p>
+        <h4>Suspeita de um criadouro de mosquitos? </h4>
+
+        <p><a href="http://www.1746.rio.gov.br/"><img src="/static/img/1746.jpg" alt="ligue 1746" width="140px"
+                                                      align="bottom"></a></p>
     </div>
     <script type="text/javascript">
         function isInArray(el, array) {
@@ -83,7 +87,7 @@
         // get color depending on population density value
         function getColor(d) {
             return d == 3 ? '#FF0000' : // Vermelho
-                            d == 2 ? '#FFA858' : // Laranja
+                    d == 2 ? '#FFA858' : // Laranja
                             d == 1 ? '#FFFF00' : '#00FF00';
         }
 
@@ -143,7 +147,7 @@
 
             info.update = function (props) {
                 this._div.innerHTML = '<h4>Número de casos na semana:</h4>' + (props ?
-                        '<b>' + props.casos + '</b><br />' : 'Passe o mouse sobre uma AP');
+                '<b>' + props.casos + '</b><br />' : 'Passe o mouse sobre uma AP');
             };
 
             info.addTo(map);
@@ -161,7 +165,7 @@
                     to = grades[i + 1];
 
                     labels.push('<i style="background:' + getColor(from) + '"></i> ' +
-                                    nomes[from]);
+                    nomes[from]);
                 }
                 labels.push('O: Unidades de Saúde');
                 div.innerHTML = labels.join('<br>');
@@ -192,21 +196,22 @@
             // Download GeoJSON via Ajax
             $.getJSON(dataurl, function (data) {
                 // Add GeoJSON layer
-                geojson = L.geoJson(data, {style: style, onEachFeature: function (feature, layer) {
-                    feature.properties.alerta = alerta[parseFloat(feature.properties.COD_AP_SMS)];
-                    //feature.properties.alerta = alerta[feature.properties.COD_AP_SMS];
-                    feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
-                    layer.bindPopup("Área de planejamento " + feature.properties.COD_AP_SMS + "<br>" +
-                                    "Casos: " + feature.properties.casos + "<br><u>O que fazer</u>: " +
-                                    recomendacoes[feature.properties.alerta]
-                    );
-                    layer.setStyle(style(feature))
-                    layer.on({
-                        mouseover: highlightFeature,
-                        mouseout: resetHighlight
-                    });
+                geojson = L.geoJson(data, {
+                    style: style, onEachFeature: function (feature, layer) {
+                        feature.properties.alerta = alerta[parseFloat(feature.properties.COD_AP_SMS)];
+                        //feature.properties.alerta = alerta[feature.properties.COD_AP_SMS];
+                        feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
+                        layer.bindPopup("Área de planejamento " + feature.properties.COD_AP_SMS + "<br>" +
+                                "Casos: " + feature.properties.casos + "<br><u>O que fazer</u>: " +
+                                recomendacoes[feature.properties.alerta]
+                        );
+                        layer.setStyle(style(feature))
+                        layer.on({
+                            mouseover: highlightFeature,
+                            mouseout: resetHighlight
+                        });
 
-                }
+                    }
                 });
 
                 aps.addLayer(geojson);
@@ -227,8 +232,8 @@
             map.keyboard.disable();
             $(".leaflet-control-zoom").css("visibility", "hidden");
             controls.addTo(map);
-map.touchZoom.disable();
-map.doubleClickZoom.disable();
+            map.touchZoom.disable();
+            map.doubleClickZoom.disable();
         }
     </script>
 

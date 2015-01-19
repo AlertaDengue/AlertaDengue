@@ -20,7 +20,8 @@
 {% block content %}
     <br>
     {% for ap in APS %}
-        <div id="alerta-chart-{{ ap }}" style="min-width: 500px; height: 400px; margin: 10px" data-highcharts-chart="{{ forloop.counter0 }}"></div>
+        <div id="alerta-chart-{{ ap }}" style="min-width: 500px; height: 400px; margin: 10px"
+             data-highcharts-chart="{{ forloop.counter0 }}"></div>
     {% endfor %}
     <script type="text/javascript">
         var nd = new Date();
@@ -33,138 +34,178 @@
             var casos = {{ casos|safe }};
 
             $(function () {
-                var chart{{ forloop.counter0 }} = new Highcharts.Chart(
-                        {
-                            chart: {
-                                zoomType: 'xy',
-                                renderTo: "alerta-chart-{{ ap }}"
-                            },
-                            title: {
-                                text: 'Alertas para {{ ap }}'
-                            },
-                            xAxis: {
-                                type: 'datetime'
-                            },
-                            tooltip: {
-                                crosshairs: true,
-                                shared: true
-                            },
-                            yAxis: [
+                        var chart{{ forloop.counter0 }} = new Highcharts.Chart(
                                 {
-                                    min: 0,
-                                    gridLineWidth: 0,
-                                    //categories: ["Verde", "Casos"],
+                                    chart: {
+                                        zoomType: 'xy',
+                                        renderTo: "alerta-chart-{{ ap }}"
+                                    },
                                     title: {
-                                        text: 'Alerta'
-                                    }
-                                },
-                                { //  yAxis de casos
-                                    gridLineWidth: 0,
-                                    type: "logarithmic",
-                                    title: {
-                                        text: 'Casos de Dengue',
-                                        style: {
-                                            color: '#777777'
-                                        }
+                                        text: 'Alertas para {{ ap }}'
                                     },
-                                    labels: {
-                                        formatter: function () {
-                                            return this.value + ' pessoas';
-                                        },
-                                        style: {
-                                            color: '#777777'
-                                        }
+                                    xAxis: {
+                                        type: 'datetime'
                                     },
-                                    opposite: true
-                                }
-                            ],
-                            tooltip:{
-                                shared: true
-                            },
-                            legend: {
-                                align: 'right',
-                                x: -70,
-                                verticalAlign: 'top',
-                                y: 20,
-                                floating: true,
-                                backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColorSolid) || 'white',
-                                borderColor: '#CCC',
-                                borderWidth: 1,
-                                shadow: false
-                            },
-
-                            plotOptions: {
-                                spline: {
-                                    marker: {
-                                        radius: 0,
-                                        lineColor: '#ffffffff',
-                                        lineWidth: 0
-                                    }
-                                },
-                                column: {
-                                    pointPadding: 0,
-                                    borderWidth: 1,
-                                    groupPadding: 0
-                                }
-                            },
-
-                            series: [
-                                {
-                                    color: "#48FD48",
-                                    type: "column",
-                                    marker: {
-                                        enabled: false
-                                    },
-                                    pointInterval: (7 * 24 * 3600 * 1000),
-                                    pointStart: {{ xvalues.0 }} * 1000 + tzo,
-                                    name: 'Alerta Verde',
-                                    data: ga['{{ ap }}']
-                                },{
-                                    color: "#FBFC49",
-                                    type: "column",
-                                    marker: {
-                                        enabled: false
-                                    },
-                                    pointInterval:7 * 24 * 3600 * 1000,
-                                    pointStart: {{ xvalues.0 }}*1000 + tzo,
-                                    name: 'Alerta Amarelo',
-                                    data: ya['{{ ap }}']
-                                },{
-                                    color: "#FFA858",
-                                    type: "column",
-                                    marker: {
-                                        enabled: false
-                                    },
-                                    pointInterval:7 * 24 * 3600 * 1000,
-                                    pointStart: {{ xvalues.0 }}*1000 + tzo,
-                                    name: 'Alerta Laranja',
-                                    data: oa['{{ ap }}']
-                                },{
-                                    color: "#FB4949",
-                                    type: "column",
-                                    marker: {
-                                        enabled: false
-                                    },
-                                    pointInterval: 7 * 24 * 3600 * 1000,
-                                    pointStart: {{ xvalues.0 }}*1000 + tzo,
-                                    name: 'Alerta Vermelho',
-                                    data: ra['{{ ap }}']
-                                },
-                                {
-                                    color: "#777777",
-                                    type: "spline",
-                                    pointInterval: 7 * 24 * 3600 * 1000,
-                                    pointStart: {{ xvalues.0 }} * 1000 + tzo,
-                                    name: 'Casos',
-                                    data: casos['{{ ap }}'].casos_est,
-                                    yAxis: 1,
                                     tooltip: {
-                                        valueSuffix: ' casos'
-                                    }
-                                },
-                        ]});
-                    });
-                {% endfor %}
+                                        crosshairs: true,
+                                        shared: true
+                                    },
+                                    yAxis: [
+                                        {
+                                            min: 0,
+                                            gridLineWidth: 0,
+                                            //categories: ["Verde", "Casos"],
+                                            title: {
+                                                text: 'Alerta'
+                                            }
+                                        },
+                                        { //  yAxis de casos
+                                            gridLineWidth: 0,
+                                            type: "logarithmic",
+                                            title: {
+                                                text: 'Casos de Dengue',
+                                                style: {
+                                                    color: '#777777'
+                                                }
+                                            },
+                                            labels: {
+                                                formatter: function () {
+                                                    return this.value + ' pessoas';
+                                                },
+                                                style: {
+                                                    color: '#777777'
+                                                }
+                                            },
+                                            opposite: true
+                                        }
+                                    ],
+                                    tooltip: {
+                                        shared: true
+                                    },
+                                    legend: {
+                                        align: 'right',
+                                        x: -70,
+                                        verticalAlign: 'top',
+                                        y: 20,
+                                        floating: true,
+                                        backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColorSolid) || 'white',
+                                        borderColor: '#CCC',
+                                        borderWidth: 1,
+                                        shadow: false
+                                    },
+
+                                    plotOptions: {
+                                        spline: {
+                                            marker: {
+                                                radius: 0,
+                                                lineColor: '#ffffffff',
+                                                lineWidth: 0
+                                            }
+                                        },
+                                        column: {
+                                            pointPadding: 0,
+                                            borderWidth: 1,
+                                            groupPadding: 0
+                                        }
+                                    },
+
+                                    series: [
+                                        {
+                                            color: "#48FD48",
+                                            type: "column",
+                                            marker: {
+                                                enabled: false
+                                            },
+                                            pointInterval: (7 * 24 * 3600 * 1000),
+                                            pointStart: {{ xvalues.0 }} * 1000 + tzo,
+                                        name
+                        :
+                        'Alerta Verde',
+                                data
+                        :
+                        ga['{{ ap }}']
+                    }, {
+                        color: "#FBFC49",
+                        type: "column",
+                        marker: {
+                            enabled: false
+                        },
+                        pointInterval: 7 * 24 * 3600 * 1000,
+                        pointStart: {{ xvalues.0 }} * 1000 + tzo,
+                    name: 'Alerta Amarelo',
+                data: ya['{{ ap }}']
+            },{
+            color: "#FFA858",
+                    type
+        :
+            "column",
+                    marker
+        :
+            {
+                enabled: false
+            }
+        ,
+            pointInterval:7 * 24 * 3600 * 1000,
+                    pointStart
+        : {{ xvalues.0 }}*
+            1000 + tzo,
+                    name
+        :
+            'Alerta Laranja',
+                    data
+        :
+            oa['{{ ap }}']
+        },{
+            color: "#FB4949",
+                    type
+        :
+            "column",
+                    marker
+        :
+            {
+                enabled: false
+            }
+        ,
+            pointInterval: 7 * 24 * 3600 * 1000,
+                    pointStart
+        : {{ xvalues.0 }}*
+            1000 + tzo,
+                    name
+        :
+            'Alerta Vermelho',
+                    data
+        :
+            ra['{{ ap }}']
+        },
+            {
+                color: "#777777",
+                        type
+            :
+                "spline",
+                        pointInterval
+            :
+                7 * 24 * 3600 * 1000,
+                        pointStart
+            : {{ xvalues.0 }} *
+                1000 + tzo,
+                        name
+            :
+                'Casos',
+                        data
+            :
+                casos['{{ ap }}'].casos_est,
+                        yAxis
+            :
+                1,
+                        tooltip
+            :
+                {
+                    valueSuffix: ' casos'
+                }
+            },
+            ]});
+            });
+        {% endfor %}
     </script>
 
 

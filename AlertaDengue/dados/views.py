@@ -24,7 +24,6 @@ dados_alerta = pd.read_csv(os.path.join(settings.DATA_DIR, 'alertaAPS.csv'), hea
 polygons = geojson.load(open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')))
 
 
-
 class AlertaPageView(TemplateView):
     template_name = 'alerta.html'
 
@@ -32,12 +31,13 @@ class AlertaPageView(TemplateView):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
         alert, current = get_alert()
         casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
-        alerta = {float(k.split('AP')[-1]): int(v)-1 for k, v in alert.items()}
+        alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
         semana = str(current.SE.iat[-1])[-2:]
         data = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d").strftime("%d de %B de %Y")
         messages.info(self.request,
-                      "Foram registrados {} novos casos na Semana Epidemiológica {}: Semana de {}.".format(sum(casos_ap.values()),
-                                                                                           semana, data))
+                      "Foram registrados {} novos casos na Semana Epidemiológica {}: Semana de {}.".format(
+                          sum(casos_ap.values()),
+                          semana, data))
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
@@ -45,10 +45,10 @@ class AlertaPageView(TemplateView):
         })
         return context
 
+
 class AlertaGeoJSONView(View):
     def get(self, request, *args, **kwargs):
         return HttpResponse(geojson.dumps(polygons))
-
 
 
 class HomePageView(TemplateView):
@@ -157,7 +157,7 @@ class SinanCasesView(View):
 
         if len(dados) < 5500:
             sample = 1
-        #print(type(dados[0].dt_notific))
+        # print(type(dados[0].dt_notific))
         #print ("chegou aqui", sample, dados[0].dt_notific)
         for c in random.sample(list(dados), int(len(dados) * sample)):
             #print(c)
