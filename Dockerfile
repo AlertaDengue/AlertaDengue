@@ -7,7 +7,7 @@ ADD config/sources.list /etc/apt/sources.list
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update
 #RUN apt-get install -y locales nginx sqlite3 libspatialite3 spatialite-bin git-core supervisor python3 python3-pip python3-setuptools python-virtualenv openssh-server
-RUN apt-get install -y locales nginx sqlite3 libspatialite5 spatialite-bin git-core supervisor python3 python3-pip python3-setuptools python-virtualenv python3-venv openssh-server python3-numpy python3-pandas
+RUN apt-get install -y locales nginx sqlite3 libspatialite5 spatialite-bin git-core supervisor python3 python3-pip python3-setuptools python-virtualenv python3-venv openssh-server python3-numpy python3-pandas python3-shapely
 
 # Set locale
 RUN echo "pt_BR.UTF-8 UTF-8" > /etc/locale.gen
