@@ -24,7 +24,7 @@ SECRET_KEY = 'v4+@ig!qk2zab+@ap8(@$*IUDHS%*&*@%)1f%1@a+^y-b5p$uex&@-h1m+'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-TEMPLATE_DEBUG = True
+TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = ["alerta.dengue.mat.br"]
 

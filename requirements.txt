@@ -4,6 +4,6 @@ django-leaflet
 django-bootstrap3
 django-debug-toolbar==1.2.1
 shapely
-django_chartit
 pandas
+geojson
 gunicorn

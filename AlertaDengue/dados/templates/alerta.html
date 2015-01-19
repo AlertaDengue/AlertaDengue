@@ -47,19 +47,27 @@
 {% endblock %}
 
 
-{% block title %}Alerta de Dengue no Rio de Janeiro{% endblock %}
+{% block title %}Situação da Dengue no Rio de Janeiro{% endblock %}
 
 {% block content %}
     <br>
-
+    <div class="bs-callout bs-callout-warning">
+        <h4>Níveis de Atenção</h4>
+        <p>
+            As cores no mapa abaixo indicam os níveis de atenção em sua região da cidade! Ajude a controlar a Dengue, seguindo as recomendações sugeridas!
+        </p>
+    </div>
     {% comment %}<div class="alert alert-warning">
         As APs indicadas em vermelho abaixo, estão em estado de alerta.
     </div>{% endcomment %}
 
     {% leaflet_map "main" callback="main_map_init" %}
     <br>
-    <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">
-    <p>Suspeita de um criadouro de mosquitos? <a href="http://www.1746.rio.gov.br/">Ligue para o 1746!</a></p>
+{#    <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">#}
+    <div class="bs-callout bs-callout-info">
+    <h4>Suspeita de um criadouro de mosquitos? </h4>
+    <p><a href="http://www.1746.rio.gov.br/"><img src="/static/img/1746.jpg" alt="ligue 1746" width="140px" align="bottom"></a></p>
+    </div>
     <script type="text/javascript">
         function isInArray(el, array) {
             return (array.indexOf(el) >= 0) ? true : false;
@@ -120,10 +128,10 @@
             var casos_por_ap = {{ casos_por_ap|safe }};
             var alerta = {{ alerta|safe }};
             var recomendacoes = {
-                0: "Hora de arrumar o quintal, cobrir caixas d'água, Não deixe criadouros para o mosquito!",
-                1: 'Uma vez por semana, aplique os “10 minutos Contra a dengue”!',
-                2: "Incremente seu patrulhamento de criadouros!",
-                3: "Fique atento aos sintomas da Dengue! Procure um médico caso suspeite de dengue."
+                0: "Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www.riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros para o mosquito!</a>",
+                1: 'Uma vez por semana, aplique os <a href="http://www.riocontradengue.com.br/Site/Conteudo/Checklist.aspx">“10 minutos Contra a dengue”!</a>',
+                2: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.',
+                3: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.'
             };
 
             // control that shows state info on hover

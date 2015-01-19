@@ -1,11 +1,89 @@
 <!DOCTYPE html>
 {% load bootstrap3 %}
 <html>
-<head>
+  <head>
     {% bootstrap_javascript jquery=True %}
     <title>{% block bootstrap3_title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% bootstrap_css %}
+    <style>
+
+
+        .bs-callout {
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #eee;
+            border-left-width: 5px;
+            border-radius: 3px;
+        }
+
+        .bs-callout h4 {
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+        .bs-callout p:last-child {
+            margin-bottom: 0;
+        }
+
+        .bs-callout code {
+            border-radius: 3px;
+        }
+
+        .bs-callout + .bs-callout {
+            margin-top: -5px;
+        }
+
+        .bs-callout-default {
+            border-left-color: #777;
+        }
+
+        .bs-callout-default h4 {
+            color: #777;
+        }
+
+        .bs-callout-primary {
+            border-left-color: #428bca;
+        }
+
+        .bs-callout-primary h4 {
+            color: #428bca;
+        }
+
+        .bs-callout-success {
+            border-left-color: #5cb85c;
+        }
+
+        .bs-callout-success h4 {
+            color: #5cb85c;
+        }
+
+        .bs-callout-danger {
+            border-left-color: #d9534f;
+        }
+
+        .bs-callout-danger h4 {
+            color: #d9534f;
+        }
+
+        .bs-callout-warning {
+            border-left-color: #f0ad4e;
+        }
+
+        .bs-callout-warning h4 {
+            color: #f0ad4e;
+        }
+
+        .bs-callout-info {
+            border-left-color: #5bc0de;
+        }
+
+        .bs-callout-info h4 {
+            color: #5bc0de;
+        }
+
+
+    </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -13,7 +91,7 @@
 
 <div id="footer">
     <div class="container">
-        <p class="text-muted">Este projeto é uma parceria entre: <img src="/static/img/emap.jpg" alt="FGV" width="100px"
+        <p class="text-muted">Este projeto é uma parceria entre: <img src="/static/img/emap.jpg" alt="FGV" width="150px"
                                                                       title="FGV"> <img src="/static/img/fiocruz.gif"
                                                                                         alt="Fiocruz" width="100px"
                                                                                         title="Fiocruz">, <img
@@ -25,6 +103,8 @@
                                                                              width="100px" title="Pensa"></p>
     </div>
 </div>
+</body>
+
 <script>
     (function (i, s, o, g, r, a, m) {
         i['GoogleAnalyticsObject'] = r;
@@ -42,5 +122,5 @@
     ga('send', 'pageview');
 
 </script>
-</body>
+
 </html>
