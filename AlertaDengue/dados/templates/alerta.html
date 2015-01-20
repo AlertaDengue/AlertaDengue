@@ -86,9 +86,9 @@
 
         // get color depending on population density value
         function getColor(d) {
-            return d == 3 ? '#FF0000' : // Vermelho
-                    d == 2 ? '#FFA858' : // Laranja
-                            d == 1 ? '#FFFF00' : '#00FF00';
+            return d == 3 ? '#EE6F63' : // Vermelho
+                            d == 2 ? '#EED763' : // Laranja
+                            d == 1 ? '#BFEE63' : '#0D6B0D'; // amarelo  e verde
         }
 
         function style(feature) {
@@ -137,6 +137,18 @@
                 2: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.',
                 3: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.'
             };
+            var bairros = {
+            1.0: 'Centro e adjacências',
+            2.1: 'Zona Sul',
+            2.2: 'Tijuca e adjacências',
+            3.1: 'Bonsucesso e adjacências',
+            3.2: 'Meier e adjacências',
+            3.3: 'Madureira e adjacências',
+            4.0: 'Barra, Recreio e Jacarepaguá',
+            5.1: 'Bangu e adjacências',
+            5.2: 'Campo Grande e adjacências',
+            5.3: 'Santa Cruz e adjacências'
+        };
 
             // control that shows state info on hover
             info.onAdd = function (map) {
@@ -201,7 +213,7 @@
                         feature.properties.alerta = alerta[parseFloat(feature.properties.COD_AP_SMS)];
                         //feature.properties.alerta = alerta[feature.properties.COD_AP_SMS];
                         feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
-                        layer.bindPopup("Área de planejamento " + feature.properties.COD_AP_SMS + "<br>" +
+                    layer.bindPopup("<b>" + bairros[parseFloat(feature.properties.COD_AP_SMS)]+"</b>" + "<br>" +
                                 "Casos: " + feature.properties.casos + "<br><u>O que fazer</u>: " +
                                 recomendacoes[feature.properties.alerta]
                         );
