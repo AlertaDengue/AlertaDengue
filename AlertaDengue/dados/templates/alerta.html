@@ -86,9 +86,9 @@
 
         // get color depending on population density value
         function getColor(d) {
-            return d == 3 ? '#EE6F63' : // Vermelho
-                            d == 2 ? '#EED763' : // Laranja
-                            d == 1 ? '#BFEE63' : '#0D6B0D'; // amarelo  e verde
+            return d == 3 ? '#FF0205' : // Vermelho
+                            d == 2 ? '#E45205' : // Laranja
+                            d == 1 ? '#C8D20F' : '#0D6B0D'; // amarelo  e verde
         }
 
         function style(feature) {
@@ -111,6 +111,7 @@
                 dashArray: '',
                 fillOpacity: 0.7
             });
+            layer.BringToBack()
 
             if (!L.Browser.ie && !L.Browser.opera) {
                 layer.bringToFront();
@@ -226,11 +227,12 @@
                     }
                 });
 
-                aps.addLayer(geojson);
+                aps.addLayer(geojson,true);
                 aps.addTo(map);
+                features.addTo(map);
             });
 
-            features.addTo(map);
+
             var overlayMaps = {
                 'Áreas de Planejamento': aps,
                 'Unidades de Saúde': features
@@ -246,6 +248,7 @@
             controls.addTo(map);
             map.touchZoom.disable();
             map.doubleClickZoom.disable();
+
         }
     </script>
 
