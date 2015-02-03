@@ -7,9 +7,14 @@
     {% leaflet_js plugins="ALL" %}
     <style>
         .leaflet-container {
-            height: 40%;
-            width: 98%;
+            height: 80%;
+            width: 100%;
 
+        }
+
+        #main {
+            width: 100%;
+            height: 80%;
         }
 
         .info {
@@ -53,11 +58,10 @@
 {% block content %}
     <br>
     <div class="bs-callout bs-callout-warning">
-        <h4>Níveis de Atenção</h4>
+        <h4>Semana epidemiológica {{ SE }}</h4>
 
         <p>
-            As cores no mapa abaixo indicam os níveis de atenção em sua região da cidade! Ajude a controlar a Dengue,
-            seguindo as recomendações sugeridas!
+            Foram relatados {{ novos_casos }} novos casos de Dengue desde {{ data }}.
         </p>
     </div>
 
@@ -67,7 +71,9 @@
     {#    <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">#}
     <div class="row clearfix">
         <div class="col-md-4 column">
-            <span class="glyphicon glyphicon-signal" aria-hidden="true"></span><p>Níveis de Atenção</p>
+            <span class="glyphicon glyphicon-signal" aria-hidden="true"></span>
+
+            <p>Níveis de Atenção</p>
 
             <div class="panel-group" id="panelgroup">
                 <div class="panel panel-default panel-verde">
@@ -89,7 +95,8 @@
                     </div>
                     <div id="panel-element-am" class="panel-collapse collapse">
                         <div class="panel-body">
-                            Estação da Dengue. No nível amarelo, temos condições climáticas propícias à reprodução do mosquito. Mas ainda sem transmissão significativa da Doença.
+                            Estação da Dengue. No nível amarelo, temos condições climáticas propícias à reprodução do
+                            mosquito. Mas ainda sem transmissão significativa da Doença.
                         </div>
                     </div>
                 </div>
@@ -100,7 +107,8 @@
                     </div>
                     <div id="panel-element-la" class="panel-collapse collapse">
                         <div class="panel-body">
-                            Transmissão da Dengue. No nível laranja, já observamos uma incidência pronunciada da Dengue, mas ainda não podemos afirmar
+                            Transmissão da Dengue. No nível laranja, já observamos uma incidência pronunciada da Dengue,
+                            mas ainda não podemos afirmar
                             com confiança que teremos epidemia.
                         </div>
                     </div>
@@ -112,7 +120,8 @@
                     </div>
                     <div id="panel-element-vm" class="panel-collapse collapse">
                         <div class="panel-body">
-                            Epidemia. Neste nível estamos em plena epidemia. Todo o cuidado é pouco, e precisamos ficar atentos aos sintomas
+                            Epidemia. Neste nível estamos em plena epidemia. Todo o cuidado é pouco, e precisamos ficar
+                            atentos aos sintomas
                             da Dengue e procurar o médico imediatamente em caso suspeita de Dengue.
                         </div>
                     </div>
@@ -120,16 +129,21 @@
             </div>
         </div>
         <div class="col-md-4 column">
-            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><p>Novos Casos</p>
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+
+            <p>Novos Casos</p>
 
             <div class="bs-callout bs-callout-primary">
-                <p>Foram registrados <b><span class="badge">{{ novos_casos }}</span> novos casos</b> na Semana Epidemiológica {{ SE }}: Semana
+                <p>Foram registrados <b><span class="badge">{{ novos_casos }}</span> novos casos</b> na Semana
+                    Epidemiológica {{ SE }}: Semana
                     de {{ data }}.</p>
 
             </div>
         </div>
         <div class="col-md-4 column">
-            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span><p>Suspeita de um criadouro de mosquitos? </p>
+            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+
+            <p>Suspeita de um criadouro de mosquitos? </p>
 
             <div class="bs-callout bs-callout-primary">
                 <p><a href="http://www.1746.rio.gov.br/"><img src="/static/img/1746.jpg" alt="ligue 1746" width="140px"
@@ -139,6 +153,10 @@
     </div>
 
     <script type="text/javascript">
+        //$(window).on("resize", function () {
+        //  $("#main").height($(window).height() *0.6);
+        //map.invalidateSize();
+        //}).trigger("resize");
         function isInArray(el, array) {
             return (array.indexOf(el) >= 0) ? true : false;
         }
@@ -315,8 +333,18 @@
             controls.addTo(map);
             map.touchZoom.disable();
             map.doubleClickZoom.disable();
+            map.bound
+            $(window).on("resize", function () {
+                $("#main").height($(window).height() * 0.7);
+                map.invalidateSize();
+                map.fitBounds([
+                        [-23.00201188664663, -43.823089599609375],
+                        [-22.81226364538693, -43.040313720703125]
+                ]);
+            }).trigger("resize")
 
         }
+
     </script>
 
 {% endblock %}
