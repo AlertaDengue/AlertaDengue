@@ -34,14 +34,17 @@ class AlertaPageView(TemplateView):
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
         semana = str(current.SE.iat[-1])[-2:]
         data = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d").strftime("%d de %B de %Y")
-        messages.info(self.request,
-                      "Foram registrados {} novos casos na Semana Epidemiológica {}: Semana de {}.".format(
-                          sum(casos_ap.values()),
-                          semana, data))
+        # messages.info(self.request,
+        #               "Foram registrados {} novos casos na Semana Epidemiológica {}: Semana de {}.".format(
+        #                   sum(casos_ap.values()),
+        #                   semana, data))
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
             'semana': semana,
+            'novos_casos': sum(casos_ap.values()),
+            'SE': semana,
+            'data': data
         })
         return context
 

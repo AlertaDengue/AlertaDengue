@@ -60,19 +60,84 @@
             seguindo as recomendações sugeridas!
         </p>
     </div>
-    {% comment %}<div class="alert alert-warning">
-        As APs indicadas em vermelho abaixo, estão em estado de alerta.
-    </div>{% endcomment %}
+
 
     {% leaflet_map "main" callback="main_map_init" %}
     <br>
     {#    <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">#}
-    <div class="bs-callout bs-callout-info">
-        <h4>Suspeita de um criadouro de mosquitos? </h4>
+    <div class="row clearfix">
+        <div class="col-md-4 column">
+            <span class="glyphicon glyphicon-signal" aria-hidden="true"></span><p>Níveis de Atenção</p>
 
-        <p><a href="http://www.1746.rio.gov.br/"><img src="/static/img/1746.jpg" alt="ligue 1746" width="140px"
-                                                      align="bottom"></a></p>
+            <div class="panel-group" id="panelgroup">
+                <div class="panel panel-default panel-verde">
+                    <div class="panel-heading">
+                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-222790"
+                           href="#panel-element-vd">Nível Verde</a>
+                    </div>
+                    <div id="panel-element-vd" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições ideais para a
+                            reprodução do Mosquito.
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default panel-amarelo">
+                    <div class="panel-heading panel-amarelo">
+                        <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-222790"
+                           href="#panel-element-am">Nível Amarelo</a>
+                    </div>
+                    <div id="panel-element-am" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            Estação da Dengue. No nível amarelo, temos condições climáticas propícias à reprodução do mosquito. Mas ainda sem transmissão significativa da Doença.
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default panel-laranja">
+                    <div class="panel-heading">
+                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-222790"
+                           href="#panel-element-la">Nível Laranja</a>
+                    </div>
+                    <div id="panel-element-la" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            Transmissão da Dengue. No nível laranja, já observamos uma incidência pronunciada da Dengue, mas ainda não podemos afirmar
+                            com confiança que teremos epidemia.
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default panel-vermelho">
+                    <div class="panel-heading">
+                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-222790"
+                           href="#panel-element-vm">Nível Vermelho</a>
+                    </div>
+                    <div id="panel-element-vm" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            Epidemia. Neste nível estamos em plena epidemia. Todo o cuidado é pouco, e precisamos ficar atentos aos sintomas
+                            da Dengue e procurar o médico imediatamente em caso suspeita de Dengue.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 column">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><p>Novos Casos</p>
+
+            <div class="bs-callout bs-callout-primary">
+                <p>Foram registrados <b><span class="badge">{{ novos_casos }}</span> novos casos</b> na Semana Epidemiológica {{ SE }}: Semana
+                    de {{ data }}.</p>
+
+            </div>
+        </div>
+        <div class="col-md-4 column">
+            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span><p>Suspeita de um criadouro de mosquitos? </p>
+
+            <div class="bs-callout bs-callout-primary">
+                <p><a href="http://www.1746.rio.gov.br/"><img src="/static/img/1746.jpg" alt="ligue 1746" width="140px"
+                                                              align="bottom"></a></p>
+            </div>
+        </div>
     </div>
+
     <script type="text/javascript">
         function isInArray(el, array) {
             return (array.indexOf(el) >= 0) ? true : false;
@@ -88,7 +153,7 @@
         // get color depending on population density value
         function getColor(d) {
             return d == 3 ? '#FF0205' : // Vermelho
-                            d == 2 ? '#E45205' : // Laranja
+                    d == 2 ? '#E45205' : // Laranja
                             d == 1 ? '#C8D20F' : '#0D6B0D'; // amarelo  e verde
         }
 
@@ -112,13 +177,14 @@
                 dashArray: '',
                 fillOpacity: 0.7
             });
-            layer.BringToBack()
+
 
             if (!L.Browser.ie && !L.Browser.opera) {
                 layer.bringToFront();
             }
 
             info.update(layer.feature.properties);
+            layer.bringToBack()
         }
 
         function resetHighlight(e) {
@@ -140,17 +206,17 @@
                 3: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.'
             };
             var bairros = {
-            1.0: 'Centro e adjacências',
-            2.1: 'Zona Sul',
-            2.2: 'Tijuca e adjacências',
-            3.1: 'Bonsucesso e adjacências',
-            3.2: 'Meier e adjacências',
-            3.3: 'Madureira e adjacências',
-            4.0: 'Barra, Recreio e Jacarepaguá',
-            5.1: 'Bangu e adjacências',
-            5.2: 'Campo Grande e adjacências',
-            5.3: 'Santa Cruz e adjacências'
-        };
+                1.0: 'Centro e adjacências',
+                2.1: 'Zona Sul',
+                2.2: 'Tijuca e adjacências',
+                3.1: 'Bonsucesso e adjacências',
+                3.2: 'Meier e adjacências',
+                3.3: 'Madureira e adjacências',
+                4.0: 'Barra, Recreio e Jacarepaguá',
+                5.1: 'Bangu e adjacências',
+                5.2: 'Campo Grande e adjacências',
+                5.3: 'Santa Cruz e adjacências'
+            };
 
             // control that shows state info on hover
             info.onAdd = function (map) {
@@ -215,7 +281,7 @@
                         feature.properties.alerta = alerta[parseFloat(feature.properties.COD_AP_SMS)];
                         //feature.properties.alerta = alerta[feature.properties.COD_AP_SMS];
                         feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
-                    layer.bindPopup("<b>" + bairros[parseFloat(feature.properties.COD_AP_SMS)]+"</b>" + "<br>" +
+                        layer.bindPopup("<b>" + bairros[parseFloat(feature.properties.COD_AP_SMS)] + "</b>" + "<br>" +
                                 "Casos: " + feature.properties.casos + "<br><u>O que fazer</u>: " +
                                 recomendacoes[feature.properties.alerta]
                         );
@@ -228,7 +294,7 @@
                     }
                 });
 
-                aps.addLayer(geojson,true);
+                aps.addLayer(geojson, true);
                 aps.addTo(map);
                 features.addTo(map);
             });
