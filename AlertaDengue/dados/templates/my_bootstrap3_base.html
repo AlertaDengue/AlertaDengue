@@ -6,80 +6,8 @@
     <title>{% block bootstrap3_title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% bootstrap_css %}
-    <style>
-        .bs-callout {
-            padding: 20px;
-            margin: 20px 0;
-            border: 1px solid #eee;
-            border-left-width: 5px;
-            border-radius: 3px;
-        }
+    <link href="/static/css/infodengue.css" rel="stylesheet">
 
-        .bs-callout h4 {
-            margin-top: 0;
-            margin-bottom: 5px;
-        }
-
-        .bs-callout p:last-child {
-            margin-bottom: 0;
-        }
-
-        .bs-callout code {
-            border-radius: 3px;
-        }
-
-        .bs-callout + .bs-callout {
-            margin-top: -5px;
-        }
-
-        .bs-callout-default {
-            border-left-color: #777;
-        }
-
-        .bs-callout-default h4 {
-            color: #777;
-        }
-
-        .bs-callout-primary {
-            border-left-color: #428bca;
-        }
-
-        .bs-callout-primary h4 {
-            color: #428bca;
-        }
-
-        .bs-callout-success {
-            border-left-color: #5cb85c;
-        }
-
-        .bs-callout-success h4 {
-            color: #5cb85c;
-        }
-
-        .bs-callout-danger {
-            border-left-color: #d9534f;
-        }
-
-        .bs-callout-danger h4 {
-            color: #d9534f;
-        }
-
-        .bs-callout-warning {
-            border-left-color: #f0ad4e;
-        }
-
-        .bs-callout-warning h4 {
-            color: #f0ad4e;
-        }
-
-        .bs-callout-info {
-            border-left-color: #5bc0de;
-        }
-
-        .bs-callout-info h4 {
-            color: #5bc0de;
-        }
-    </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -87,16 +15,25 @@
 
 <div id="footer">
     <div class="container">
-        <p class="text-muted">Este projeto é uma parceria entre: <img src="/static/img/emap.jpg" alt="FGV" width="150px"
-                                                                      title="FGV"> <img src="/static/img/fiocruz.gif"
-                                                                                        alt="Fiocruz" width="100px"
-                                                                                        title="Fiocruz">, <img
-                src="/static/img/ufmg.jpg" alt="UFMG" width="100px" title="UFMG"> <img src="/static/img/UFPR.jpeg"
-                                                                                       alt="UFPR" width="100px"
-                                                                                       title="UFPR"> <img
-                src="/static/img/logo_sms.jpg" alt="Secretaria Municipal de Saúde do Rio de Janeiro" width="100px"
-                title="Secretaria Municipal de Saúde do Rio de Janeiro"><img src="/static/img/PENSA.jpg" alt="Pensa"
-                                                                             width="100px" title="Pensa"></p>
+        <div class="jumbotron">
+            <h2>Parceiros:</h2>
+
+            <div class="row">
+                <div class="col-md-2 column"><img src="/static/img/ufmg.jpg" alt="UFMG" width="150px" title="UFMG">
+                </div>
+                <div class="col-md-2 column"><img src="/static/img/UFPR.jpeg" alt="UFPR" width="150px" title="UFPR">
+                </div>
+                <div class="col-md-2 column"><img src="/static/img/logo_sms.jpg"
+                                                  alt="Secretaria Municipal de Saúde do Rio de Janeiro" width="150px"
+                                                  title="Secretaria Municipal de Saúde do Rio de Janeiro"></div>
+                <div class="col-md-2 column"><img src="/static/img/PENSA.jpg" alt="Pensa" width="150px" title="Pensa">
+                </div>
+                <div class="col-md-2 column"></div>
+                <div class="col-md-2 column"><img src="/static/img/1746.jpg" alt="1746" width="150px" title="1746">
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 <script>
