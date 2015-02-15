@@ -56,6 +56,7 @@
 {% block title %}Situação da Dengue no Rio de Janeiro{% endblock %}
 
 {% block content %}
+{% comment %}
     <br>
     <div class="bs-callout bs-callout-warning">
         <h4>Semana epidemiológica {{ SE }}</h4>
@@ -64,16 +65,15 @@
             Foram relatados {{ novos_casos }} novos casos de Dengue desde {{ data }}.
         </p>
     </div>
+{% endcomment %}
 
 
     {% leaflet_map "main" callback="main_map_init" %}
     <br>
     {#    <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">#}
-    <div class="row clearfix">
-        <div class="col-md-4 column">
-            <span class="glyphicon glyphicon-signal" aria-hidden="true"></span>
-
-            <p>Níveis de Atenção</p>
+    <div class="row clearfix boxrow">
+        <div class="col-md-6 column bluebox">
+            <h3><span class="glyphicon glyphicon-signal" aria-hidden="true"></span> Níveis de Atenção</h3>
 
             <div class="panel-group" id="panelgroup">
                 <div class="panel panel-default panel-verde">
@@ -128,27 +128,22 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 column">
-            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+        <div class="col-md-3 column bluebox">
+            <h3><span class="badge badge-info">{{ novos_casos }}</span> Novos Casos</h3>
 
-            <p>Novos Casos</p>
 
-            <div class="bs-callout bs-callout-primary">
-                <p>Foram registrados <b><span class="badge">{{ novos_casos }}</span> novos casos</b> na Semana
+                <p>Foram registrados <b>{{ novos_casos }} novos casos</b> na Semana
                     Epidemiológica {{ SE }}: Semana
                     de {{ data }}.</p>
 
-            </div>
+
         </div>
-        <div class="col-md-4 column">
-            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+        <div class="col-md-3 column bluebox">
+            <h3><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> Suspeita de um criadouro? </h3>
 
-            <p>Suspeita de um criadouro de mosquitos? </p>
 
-            <div class="bs-callout bs-callout-primary">
-                <p><a href="http://www.1746.rio.gov.br/"><img src="/static/img/1746.jpg" alt="ligue 1746" width="140px"
-                                                              align="bottom"></a></p>
-            </div>
+                <p>Em caso de suspeita de criadouro de mosquitos, ligue para a <a href="http://www.1746.rio.gov.br/" style="color: #FFFFFF">Central de atendimento ao cidadão 1746</a>.</p>
+
         </div>
     </div>
 
