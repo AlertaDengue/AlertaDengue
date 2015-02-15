@@ -6,6 +6,16 @@
 color: #003E7E;  /*Sets the text hover color on navbar*/
 }
 
+h1 {
+    color: #003E7E;
+}
+
+.parceiros {
+    margin-top: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
 .panel-verde {
     border-color: #519452;
     border-width: medium;
@@ -49,12 +59,22 @@ color: #003E7E;  /*Sets the text hover color on navbar*/
 
 .col-md-3.bluebox {
     width: 23%;
-
-
 }
 
 .col-md-6.bluebox {
     width: 50%;
+}
+
+.col-md-2 {
+    alignment: center;
+}
+
+.logos {
+    -webkit-filter: grayscale(100%);
+       -moz-filter: grayscale(100%);
+         -o-filter: grayscale(100%);
+        -ms-filter: grayscale(100%);
+            filter: grayscale(100%);
 }
 
 
