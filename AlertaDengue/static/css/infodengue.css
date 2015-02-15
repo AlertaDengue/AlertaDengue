@@ -43,13 +43,14 @@ color: #003E7E;  /*Sets the text hover color on navbar*/
 
 }
 .boxrow{
-    heignt: 100%;
     display: table-row;
+    overflow: hidden;
 }
 
 .col-md-3.bluebox {
     width: 23%;
-    height: 100%;
+
+
 }
 
 .col-md-6.bluebox {
