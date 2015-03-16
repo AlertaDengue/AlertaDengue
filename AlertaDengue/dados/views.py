@@ -29,7 +29,7 @@ class AlertaPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
-        alert, current = get_alert()
+        alert, current, case_series = get_alert()
         casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
         semana = str(current.SE.iat[-1])[-2:]
@@ -43,6 +43,7 @@ class AlertaPageView(TemplateView):
             'alerta': alerta,
             'semana': semana,
             'novos_casos': sum(casos_ap.values()),
+            'series_casos': case_series,
             'SE': semana,
             'data': data
         })
@@ -184,10 +185,12 @@ def get_alert():
     G = df.groupby("APS")
     group_names = G.groups.keys()
     alert = defaultdict(lambda: 0)
+    case_series = {}
     for ap in group_names:
         adf = G.get_group(ap)  # .tail()  # only calculates on the series tail
+        case_series[str(float(ap.split('AP')[-1]))] = list(adf.casos.iloc[-12:].values)
         alert[ap] = adf.cor.iloc[-1]
-    return alert, current
+    return alert, current, case_series
 
 
 def load_series():

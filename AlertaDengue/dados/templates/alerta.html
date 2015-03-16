@@ -50,6 +50,7 @@
     <script src="/static/js/QuadTree.js"></script>
     <script src='/static/exp_PontosUnidadesBasicasSaudeMRJ2014wgs84.js'></script>
     <script src="/static/js/Autolinker.min.js"></script>
+    <script src="/static/js/jquery.sparkline.min.js"></script>
 {% endblock %}
 
 {% block title %}Situação da Dengue no Rio de Janeiro{% endblock %}
@@ -209,6 +210,7 @@
             //map._layersMaxZoom=13
             var dataurl = "{% static 'rio_aps.geojson' %}";
             var casos_por_ap = {{ casos_por_ap|safe }};
+            var series_casos = {{ series_casos|safe }};
             var alerta = {{ alerta|safe }};
             var recomendacoes = {
                 0: "Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www.riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros para o mosquito!</a>",
@@ -290,10 +292,12 @@
                 geojson = L.geoJson(data, {
                     style: style, onEachFeature: function (feature, layer) {
                         feature.properties.alerta = alerta[parseFloat(feature.properties.COD_AP_SMS)];
-                        //feature.properties.alerta = alerta[feature.properties.COD_AP_SMS];
+                        feature.properties.series = series_casos[feature.properties.COD_AP_SMS];
                         feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
                         layer.bindPopup("<b>" + bairros[parseFloat(feature.properties.COD_AP_SMS)] + "</b>" + "<br>" +
-                                "Casos: " + feature.properties.casos + "<br><u>O que fazer</u>: " +
+                                "Casos: " + feature.properties.casos + "<br>Últimas semanas: <span class='inlinesparkline'>"+
+                                feature.properties.series+"</span><br>" +
+                                "<br><u>O que fazer</u>: " +
                                 recomendacoes[feature.properties.alerta]
                         );
                         layer.setStyle(style(feature))
@@ -301,10 +305,10 @@
                             mouseover: highlightFeature,
                             mouseout: resetHighlight
                         });
-
+                        $('.inlinesparkline').sparkline();
                     }
                 });
-
+                $('.inlinesparkline').sparkline();
                 aps.addLayer(geojson, true);
                 aps.addTo(map);
                 features.addTo(map);
