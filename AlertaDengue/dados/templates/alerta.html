@@ -204,6 +204,10 @@
             info.update();
         }
 
+        function renderSparkline(e){
+            $('.inlinesparkline').sparkline();
+        }
+
 
         function main_map_init(map, options) {
             $(document).data('map', map)
@@ -303,9 +307,10 @@
                         layer.setStyle(style(feature))
                         layer.on({
                             mouseover: highlightFeature,
-                            mouseout: resetHighlight
+                            mouseout: resetHighlight,
+                            popupopen: renderSparkline
                         });
-                        $('.inlinesparkline').sparkline();
+
                     }
                 });
                 $('.inlinesparkline').sparkline();
