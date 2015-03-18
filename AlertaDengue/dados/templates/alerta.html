@@ -51,12 +51,17 @@
     <script src='/static/exp_PontosUnidadesBasicasSaudeMRJ2014wgs84.js'></script>
     <script src="/static/js/Autolinker.min.js"></script>
     <script src="/static/js/jquery.sparkline.min.js"></script>
+    <style>
+        .jqstooltip {
+            box-sizing: content-box;
+        }
+    </style>
 {% endblock %}
 
 {% block title %}Situação da Dengue no Rio de Janeiro{% endblock %}
 
 {% block content %}
-{% comment %}
+    {% comment %}
     <br>
     <div class="bs-callout bs-callout-warning">
         <h4>Semana epidemiológica {{ SE }}</h4>
@@ -130,10 +135,10 @@
         <div class="col-md-3 column bluebox">
             <h3><span class="badge badge-info">{{ novos_casos }}</span> Novos Casos</h3>
 
-
-                <p>Foram registrados <b>{{ novos_casos }} novos casos</b> na Semana
-                    Epidemiológica {{ SE }}: Semana
-                    de {{ data }}.</p>
+            <p>Foram registrados <b>{{ novos_casos }} novos casos</b> na Semana
+                Epidemiológica {{ SE }}: Semana
+                de {{ data }}.</p>
+            <p>Há um ano atrás, nesta mesma semana, observamos <b>{{ last_year }}</b> casos</p>
 
 
         </div>
@@ -141,7 +146,9 @@
             <h3><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> Suspeita de um criadouro? </h3>
 
 
-                <p>Em caso de suspeita de criadouro de mosquitos, ligue para a <a href="http://www.1746.rio.gov.br/" style="color: #FFFFFF">Central de atendimento ao cidadão 1746</a>.</p>
+            <p>Em caso de suspeita de criadouro de mosquitos, ligue para a <a href="http://www.1746.rio.gov.br/"
+                                                                              style="color: #FFFFFF">Central de
+                atendimento ao cidadão 1746</a>.</p>
 
         </div>
     </div>
@@ -204,8 +211,13 @@
             info.update();
         }
 
-        function renderSparkline(e){
-            $('.inlinesparkline').sparkline();
+        function renderSparkline(e) {
+            $('.inlinesparkline').sparkline('html', {
+                type: 'line',
+                width: "14em",
+                heigth: "5em",
+                tooltipSuffix: " casos"
+            });
         }
 
 
@@ -299,8 +311,8 @@
                         feature.properties.series = series_casos[feature.properties.COD_AP_SMS];
                         feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
                         layer.bindPopup("<b>" + bairros[parseFloat(feature.properties.COD_AP_SMS)] + "</b>" + "<br>" +
-                                "Casos: " + feature.properties.casos + "<br>Últimas semanas: <span class='inlinesparkline'>"+
-                                feature.properties.series+"</span><br>" +
+                                "Casos: " + feature.properties.casos + "<br>Últimas semanas: <span class='inlinesparkline'>" +
+                                feature.properties.series + "</span><br>" +
                                 "<br><u>O que fazer</u>: " +
                                 recomendacoes[feature.properties.alerta]
                         );
@@ -313,7 +325,7 @@
 
                     }
                 });
-                $('.inlinesparkline').sparkline();
+
                 aps.addLayer(geojson, true);
                 aps.addTo(map);
                 features.addTo(map);
@@ -340,8 +352,8 @@
                 $("#main").height($(window).height() * 0.7);
                 map.invalidateSize();
                 map.fitBounds([
-                        [-23.00201188664663, -43.823089599609375],
-                        [-22.81226364538693, -43.040313720703125]
+                    [-23.00201188664663, -43.823089599609375],
+                    [-22.81226364538693, -43.040313720703125]
                 ]);
             }).trigger("resize")
 
