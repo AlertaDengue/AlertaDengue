@@ -191,7 +191,7 @@ def get_alert():
         adf = G.get_group(ap)  # .tail()  # only calculates on the series tail
         case_series[str(float(ap.split('AP')[-1]))] = list(adf.casos.iloc[-12:].values)
         alert[ap] = adf.cor.iloc[-1]
-        last_year = adf.casos.iloc[-52]
+        last_year = int(adf.casos.iloc[-52])
     return alert, current, case_series, last_year
 
 
