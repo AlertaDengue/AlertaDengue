@@ -22,7 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = 'v4+@ig!qk2zab+@ap8(@$*IUDHS%*&*@%)1f%1@a+^y-b5p$uex&@-h1m+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -77,7 +77,7 @@ LEAFLET_CONFIG = {
     'DEFAULT_CENTER': (-22.907111, -43.431864),
     'DEFAULT_ZOOM': 11,
     'MAXIMUM_ZOOM': 13,
-    'TILES': 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
+    'TILES': 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',  # 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
     'MINIMAP': False,
     'ATTRIBUTION_PREFIX': 'Mapa de risco do Info Dengue Rio - FGV-EMAp',
     'PLUGINS': {
