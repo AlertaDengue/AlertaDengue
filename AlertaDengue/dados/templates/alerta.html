@@ -5,8 +5,8 @@
     {% leaflet_js %}
     {% leaflet_css %}
     {% leaflet_js plugins="ALL" %}
-    <meta property="og:image" content="http://info.dengue.mat.br/static/img/info_dengue_rio_logo_pq.png"/>
-    <meta property="og:image:secure_url" content="https://info.dengue.mat.br/static/img/info_dengue_rio_logo_pq.png"/>
+    <meta property="og:image" content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+    <meta property="og:image:secure_url" content="https://info.dengue.mat.br/static/img/screenshot.png"/>
     <style>
         .leaflet-container {
             height: 80%;
@@ -140,6 +140,10 @@
             <p>Foram registrados <b>{{ novos_casos }} novos casos</b> na Semana
                 Epidemiológica {{ SE }}: Semana
                 de {{ data1 }} a {{ data2 }}.</p>
+                de {{ data }}.</p>
+            <h4>Últimas {{ look_back }} semanas:</h4>
+            <span class='totalsparkline'>{{ total_series }}</span>
+            <h4>Há um ano:</h4>
             <p>Há um ano atrás, nesta mesma semana, observamos <b>{{ last_year }}</b> casos</p>
 
 
@@ -160,6 +164,14 @@
         //  $("#main").height($(window).height() *0.6);
         //map.invalidateSize();
         //}).trigger("resize");
+        $('.totalsparkline').sparkline('html', {
+                type: 'bar',
+                width: "auto",
+                heigth: "auto",
+                barWidth: "15px",
+                barColor: "White",
+                tooltipSuffix: " casos"
+            });
         function isInArray(el, array) {
             return (array.indexOf(el) >= 0) ? true : false;
         }
@@ -218,6 +230,7 @@
                 type: 'bar',
                 width: "14em",
                 heigth: "5em",
+                barWidth: "9em",
                 tooltipSuffix: " casos"
             });
         }

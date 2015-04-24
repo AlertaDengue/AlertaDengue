@@ -39,6 +39,10 @@ class AlertaPageView(TemplateView):
         #               "Foram registrados {} novos casos na Semana Epidemiológica {}: Semana de {}.".format(
         #                   sum(casos_ap.values()),
         #                   semana, data))
+        total_series = np.zeros(len(case_series['4.0']))
+        for s in case_series.values():
+            total_series += np.array(s)
+        print(str(total_series.tolist())[1:-1])
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
@@ -49,6 +53,8 @@ class AlertaPageView(TemplateView):
             'data1': (quarta - datetime.timedelta(2)).strftime("%d de %B de %Y"),
             'data2': (quarta + datetime.timedelta(4)).strftime("%d de %B de %Y"),
             'last_year': last_year
+            'look_back': len(total_series),
+            'total_series': str(total_series.tolist())[1:-1]
         })
         return context
 
@@ -177,6 +183,12 @@ class SinanCasesView(View):
 def get_alert():
     """
     Read the data and return the alert status of all APs.
+    returns a tuple with the following elements:
+    - alert: dictionary with the alert status per AP
+    - current: tuple with all variables from the last SE
+    - case_series: dictionary with 12-weeks case series per AP
+    - last_year: integer representing the total number of cases 52 weeks ago.
+    :rtype : tuple
     """
     df = dados_alerta
     df.fillna(0, inplace=True)
