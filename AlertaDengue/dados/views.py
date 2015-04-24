@@ -33,7 +33,8 @@ class AlertaPageView(TemplateView):
         casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
         semana = str(current.SE.iat[-1])[-2:]
-        data = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d").strftime("%d de %B de %Y")
+        quarta = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d")
+        #data = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d").strftime("%d de %B de %Y")
         # messages.info(self.request,
         #               "Foram registrados {} novos casos na Semana Epidemiológica {}: Semana de {}.".format(
         #                   sum(casos_ap.values()),
@@ -44,8 +45,9 @@ class AlertaPageView(TemplateView):
             'semana': semana,
             'novos_casos': sum(casos_ap.values()),
             'series_casos': case_series,
-            'SE': semana,
-            'data': data,
+            'SE': int(semana),
+            'data1': (quarta - datetime.timedelta(2)).strftime("%d de %B de %Y"),
+            'data2': (quarta + datetime.timedelta(4)).strftime("%d de %B de %Y"),
             'last_year': last_year
         })
         return context
