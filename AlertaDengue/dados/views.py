@@ -52,7 +52,7 @@ class AlertaPageView(TemplateView):
             'SE': int(semana),
             'data1': (quarta - datetime.timedelta(2)).strftime("%d de %B de %Y"),
             'data2': (quarta + datetime.timedelta(4)).strftime("%d de %B de %Y"),
-            'last_year': last_year
+            'last_year': last_year,
             'look_back': len(total_series),
             'total_series': str(total_series.tolist())[1:-1]
         })
