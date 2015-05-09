@@ -180,23 +180,22 @@
         var info = L.control();
         var legend = L.control({position: 'bottomright'});
         var geojson;
-
-
-        // get color depending on population density value
-        function getColor(d) {
-            return d == 3 ? '#FF0205' : // Vermelho
-                    d == 2 ? '#E45205' : // Laranja
-                            d == 1 ? '#C8D20F' : '#0D6B0D'; // amarelo  e verde
-        }
+        var alertLevels = [
+            {name: 'Baixo Risco', color:'#0D6B0D'},
+            {name: 'Atenção', color:'#C8D20F'},
+            {name: 'Transmissão', color:'#E45205'},
+            {name: 'Epidemia',  color:'#FF0205'},
+        ];
 
         function style(feature) {
+            var i = +feature.properties.alerta || 0;
             return {
                 weight: 2,
                 opacity: 1,
                 color: 'white',
                 dashArray: '3',
                 fillOpacity: 0.7,
-                fillColor: getColor(parseInt(feature.properties.alerta))
+                fillColor: alertLevels[i].color
             };
         }
 
@@ -275,21 +274,12 @@
 
             info.addTo(map);
 
-            legend.onAdd = function (map) {
-
+            legend.onAdd = function () {
                 var div = L.DomUtil.create('div', 'info legend'),
-                        grades = [3, 2, 1, 0],
-                        nomes = ['Baixo Risco', 'Atenção', 'Transmissão', 'Epidemia'],
-                        labels = [],
-                        from, to;
+                    labels = alertLevels.map(function(alertLevel){
+                        return '<i style="background:' + alertLevel.color + '"></i> ' + alertLevel.name;
+                    }).reverse();
 
-                for (var i = 0; i < grades.length; i++) {
-                    from = grades[i];
-                    to = grades[i + 1];
-
-                    labels.push('<i style="background:' + getColor(from) + '"></i> ' +
-                    nomes[from]);
-                }
                 labels.push('O: Unidades de Saúde');
                 div.innerHTML = labels.join('<br>');
                 return div;
