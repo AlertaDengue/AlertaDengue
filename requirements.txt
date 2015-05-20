@@ -7,3 +7,4 @@ shapely
 pandas
 geojson
 gunicorn
+python-decouple==2.3
