@@ -40,7 +40,7 @@ RUN git clone https://github.com/NAMD/AlertaDengue.git /srv/deploy/project/Alert
 
 # Add our local settings. This file is not versioned because it contains
 # sensitive data (such as the SECRET_KEY).
-ADD settings.ini /srv/deploy/project/AlertaDengue/settings.ini
+ADD AlertaDengue/AlertaDengue/settings.ini /srv/deploy/project/AlertaDengue/AlertaDengue/AlertaDengue/settings.ini
 
 # Install python deps
 # We need --no-clean because of the way Docker.io's filesystem works. When pip
