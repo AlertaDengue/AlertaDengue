@@ -3,10 +3,10 @@ Portal de dados do Projeto Alerta Dengue
 
 ##Como Contribuir?
 Para criar um ambiente desenvolvimento é necessário:
-1. Crie um virtualenv;
-2. Instale as dependencias do projeto;
-3. Crie o banco de dados local;
-4. Crie um arquivo settings.ini baseado no exemplo.
+ 1. Crie um virtualenv;
+ 2. Instale as dependencias do projeto;
+ 3. Crie o banco de dados local;
+ 4. Crie um arquivo settings.ini baseado no exemplo.
 
 Se já possuir o [virtualenvwrapper](https://pypi.python.org/pypi/virtualenvwrapper) instalado, esse passo-a-passo pode ser feito através dos comandos:
 ```bash
