@@ -1,9 +1,10 @@
 django
-pytz
-django-leaflet
 django-bootstrap3
 django-debug-toolbar==1.2.1
-shapely
-pandas
+django-leaflet
 geojson
 gunicorn
+pandas
+python-decouple==2.3
+pytz
+shapely
