@@ -6,8 +6,7 @@ from django.test import TestCase
 
 class TestAlertaPageView(TestCase):
     def setUp(self):
-        self.url = reverse('alerta')
-        self.response = self.client.get(self.url)
+        self.response = self.client.get(reverse('alerta'))
 
     def test_casos_por_ap(self):
         casos_por_ap = {
@@ -47,4 +46,20 @@ class TestAlertaPageView(TestCase):
     def test_novos_casos(self):
         novos_casos = 143
         self.assertEqual(self.response.context['novos_casos'], novos_casos)
+
+    def test_series_casos(self):
+        series_casos = {
+            '5.1': [17, 25, 37, 40, 45, 66, 160, 84, 57, 6, 6, 6],
+            '5.2': [15, 20, 27, 27, 32, 51, 75, 41, 43, 7, 7, 7],
+            '5.3': [5, 2, 5, 12, 5, 8, 14, 9, 3, 1, 1, 1],
+            '1.0': [3, 6, 4, 2, 5, 3, 11, 12, 8, 0, 0, 0],
+            '4.0': [12, 15, 18, 31, 30, 46, 91, 42, 22, 6, 6, 6],
+            '3.2': [10, 5, 11, 24, 14, 19, 26, 30, 28, 4, 4, 4],
+            '3.3': [11, 14, 21, 24, 20, 57, 71, 52, 85, 32, 32, 32],
+            '3.1': [17, 16, 21, 27, 45, 38, 59, 65, 77, 23, 23, 23],
+            '2.2': [2, 15, 12, 19, 13, 16, 36, 15, 36, 3, 3, 3],
+            '2.1': [6, 15, 15, 25, 22, 34, 73, 40, 28, 15, 15, 15],
+        }
+        self.assertEqual(self.response.context['series_casos'], series_casos)
+
 
