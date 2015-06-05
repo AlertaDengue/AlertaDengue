@@ -67,4 +67,12 @@ class TestAlertaPageView(TestCase):
         SE = 20
         self.assertEqual(self.response.context['SE'], SE)
 
+    def test_data1(self):
+        data1 = '18 de maio de 2015'
+        self.assertEqual(self.response.context['data1'], data1)
+
+    def test_data2(self):
+        data2 = '24 de maio de 2015'
+        self.assertEqual(self.response.context['data2'], data2)
+
 
