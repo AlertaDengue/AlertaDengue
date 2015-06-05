@@ -44,3 +44,7 @@ class TestAlertaPageView(TestCase):
         semana = '20'
         self.assertEqual(self.response.context['semana'], semana)
 
+    def test_novos_casos(self):
+        novos_casos = 143
+        self.assertEqual(self.response.context['novos_casos'], novos_casos)
+
