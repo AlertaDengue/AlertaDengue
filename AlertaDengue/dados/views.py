@@ -42,7 +42,6 @@ class AlertaPageView(TemplateView):
         total_series = np.zeros(len(case_series['4.0']))
         for s in case_series.values():
             total_series += np.array(s)
-        print(str(total_series.tolist())[1:-1])
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
@@ -196,7 +195,6 @@ def get_alert():
     year = datetime.date.today().year  # Current year
     SE = int(str(last_SE).split(str(year))[-1])  # current epidemiological week
     current = df[df['SE'] == last_SE]  # Current status
-    print(current)
     G = df.groupby("APS")
     group_names = G.groups.keys()
     alert = defaultdict(lambda: 0)
