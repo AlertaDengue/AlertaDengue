@@ -79,4 +79,8 @@ class TestAlertaPageView(TestCase):
         last_year = 0
         self.assertEqual(self.response.context['last_year'], last_year)
 
+    def test_look_back(self):
+        look_back = 12
+        self.assertEqual(self.response.context['look_back'], look_back)
+
 
