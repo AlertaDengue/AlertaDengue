@@ -83,4 +83,7 @@ class TestAlertaPageView(TestCase):
         look_back = 12
         self.assertEqual(self.response.context['look_back'], look_back)
 
+    def test_total_series(self):
+        total_series = '98.0, 133.0, 171.0, 231.0, 231.0, 338.0, 616.0, 390.0, 387.0, 97.0, 97.0, 97.0'
+        self.assertEqual(self.response.context['total_series'], total_series)
 
