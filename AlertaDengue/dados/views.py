@@ -34,11 +34,6 @@ class AlertaPageView(TemplateView):
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
         semana = str(current.SE.iat[-1])[-2:]
         quarta = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d")
-        #data = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d").strftime("%d de %B de %Y")
-        # messages.info(self.request,
-        #               "Foram registrados {} novos casos na Semana Epidemiológica {}: Semana de {}.".format(
-        #                   sum(casos_ap.values()),
-        #                   semana, data))
         total_series = np.zeros(len(case_series['4.0']))
         for s in case_series.values():
             total_series += np.array(s)
