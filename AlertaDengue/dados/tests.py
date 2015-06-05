@@ -75,4 +75,8 @@ class TestAlertaPageView(TestCase):
         data2 = '24 de maio de 2015'
         self.assertEqual(self.response.context['data2'], data2)
 
+    def test_last_year(self):
+        last_year = 0
+        self.assertEqual(self.response.context['last_year'], last_year)
+
 
