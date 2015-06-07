@@ -39,10 +39,6 @@ class TestAlertaPageView(TestCase):
 
         self.assertEqual(self.response.context['alerta'], alerta)
 
-    def test_semana(self):
-        semana = '20'
-        self.assertEqual(self.response.context['semana'], semana)
-
     def test_novos_casos(self):
         novos_casos = 143
         self.assertEqual(self.response.context['novos_casos'], novos_casos)
@@ -63,7 +59,6 @@ class TestAlertaPageView(TestCase):
         self.assertEqual(self.response.context['series_casos'], series_casos)
 
     def test_SE(self):
-        # TODO: Remove it. It is just int(semana).
         SE = 20
         self.assertEqual(self.response.context['SE'], SE)
 

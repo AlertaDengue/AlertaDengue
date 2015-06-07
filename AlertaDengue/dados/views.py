@@ -40,7 +40,6 @@ class AlertaPageView(TemplateView):
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
-            'semana': semana,
             'novos_casos': sum(casos_ap.values()),
             'series_casos': case_series,
             'SE': int(semana),
