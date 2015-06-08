@@ -6,6 +6,7 @@ from django.test import TestCase
 
 class TestAlertaPageView(TestCase):
     def setUp(self):
+        # TODO: Create fixtures to prevent test fails in case of data changing
         self.response = self.client.get(reverse('alerta'))
 
     def test_casos_por_ap(self):
