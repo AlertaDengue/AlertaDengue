@@ -1,12 +1,14 @@
 # coding=utf-8
 import json
+import os
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 class TestAlertaPageView(TestCase):
     def setUp(self):
-        # TODO: Create fixtures to prevent test fails in case of data changing
+        settings.DATA_DIR = os.path.dirname(__file__)
         self.response = self.client.get(reverse('alerta'))
 
     def test_casos_por_ap(self):
