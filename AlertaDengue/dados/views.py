@@ -34,19 +34,12 @@ class AlertaPageView(TemplateView):
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
         semana = str(current.SE.iat[-1])[-2:]
         quarta = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d")
-        #data = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d").strftime("%d de %B de %Y")
-        # messages.info(self.request,
-        #               "Foram registrados {} novos casos na Semana Epidemiológica {}: Semana de {}.".format(
-        #                   sum(casos_ap.values()),
-        #                   semana, data))
         total_series = np.zeros(len(case_series['4.0']))
         for s in case_series.values():
             total_series += np.array(s)
-        print(str(total_series.tolist())[1:-1])
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
-            'semana': semana,
             'novos_casos': sum(casos_ap.values()),
             'series_casos': case_series,
             'SE': int(semana),
@@ -196,7 +189,6 @@ def get_alert():
     year = datetime.date.today().year  # Current year
     SE = int(str(last_SE).split(str(year))[-1])  # current epidemiological week
     current = df[df['SE'] == last_SE]  # Current status
-    print(current)
     G = df.groupby("APS")
     group_names = G.groups.keys()
     alert = defaultdict(lambda: 0)

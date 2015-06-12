@@ -63,17 +63,6 @@
 {% block title %}Situação da Dengue no Rio de Janeiro{% endblock %}
 
 {% block content %}
-    {% comment %}
-    <br>
-    <div class="bs-callout bs-callout-warning">
-        <h4>Semana epidemiológica {{ SE }}</h4>
-
-        <p>
-            Foram relatados {{ novos_casos }} novos casos de Dengue desde {{ data }}.
-        </p>
-    </div>
-{% endcomment %}
-
     {% leaflet_map "main" callback="main_map_init" %}
     <br>
     {#    <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">#}
