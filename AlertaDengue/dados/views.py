@@ -34,9 +34,7 @@ class AlertaPageView(TemplateView):
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
         semana = str(current.SE.iat[-1])[-2:]
         quarta = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d")
-        total_series = np.zeros(len(case_series['4.0']))
-        for s in case_series.values():
-            total_series += np.array(s)
+        total_series = sum(case_series.values(), np.zeros(12, int))
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
@@ -47,7 +45,7 @@ class AlertaPageView(TemplateView):
             'data2': (quarta + datetime.timedelta(4)).strftime("%d de %B de %Y"),
             'last_year': last_year,
             'look_back': len(total_series),
-            'total_series': str([int(i) for i in total_series.tolist()])[1:-1]
+            'total_series': ', '.join(map(str, total_series)),
         })
         return context
 
@@ -195,7 +193,7 @@ def get_alert():
     case_series = {}
     for ap in group_names:
         adf = G.get_group(ap)  # .tail()  # only calculates on the series tail
-        case_series[str(float(ap.split('AP')[-1]))] = [int(i) for i in list(adf.casos_est.iloc[-12:].values)]
+        case_series[str(float(ap.split('AP')[-1]))] = map(int, adf.casos_est.iloc[-12:].values)
         alert[ap] = adf.cor.iloc[-1]
         last_year = int(adf.casos.iloc[-52])
     return alert, current, case_series, last_year
