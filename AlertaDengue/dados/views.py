@@ -29,7 +29,7 @@ class AlertaPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
-        alert, current, case_series, last_year = get_alert()
+        alert, current, case_series, last_year, observed_cases = get_alert()
         casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
         semana = str(current.SE.iat[-1])[-2:]
@@ -193,12 +193,14 @@ def get_alert():
     group_names = G.groups.keys()
     alert = defaultdict(lambda: 0)
     case_series = {}
+    obs_case_series = {}
     for ap in group_names:
         adf = G.get_group(ap)  # .tail()  # only calculates on the series tail
         case_series[str(float(ap.split('AP')[-1]))] = [int(i) for i in list(adf.casos_est.iloc[-12:].values)]
+        obs_case_series[str(float(ap.split('AP')[-1]))] = [int(i) for i in list(adf.casos.iloc[-12:].values)]
         alert[ap] = adf.cor.iloc[-1]
         last_year = int(adf.casos.iloc[-52])
-    return alert, current, case_series, last_year
+    return alert, current, case_series, last_year, obs_case_series
 
 
 def load_series():
@@ -213,7 +215,8 @@ def load_series():
             G.get_group(ap).data]
         series[ap]['tweets'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).tweets]
         series[ap]['tmin'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).tmin]
-        series[ap]['casos_est'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).casos]
+        series[ap]['casos_est'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).casos_est]
+        series[ap]['casos'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).casos]
         series[ap]['alerta'] = [c - 1 if not np.isnan(c) else None for c in G.get_group(ap).cor]
         # print(series['dia'])
     return series
