@@ -34,7 +34,8 @@ class AlertaPageView(TemplateView):
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
         semana = str(current.SE.iat[-1])[-2:]
         quarta = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d")
-        total_series = sum(np.array(case_series.values()), np.zeros(12, int))
+        total_series = sum(np.array(list(case_series.values())), np.zeros(12, int))
+        total_observed_series = sum(np.array(list(observed_cases.values())), np.zeros(12, int))
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
@@ -46,6 +47,8 @@ class AlertaPageView(TemplateView):
             'last_year': last_year,
             'look_back': len(total_series),
             'total_series': ', '.join(map(str, total_series)),
+            'total_observed':  total_observed_series[-1],
+            'total_observed_series': ', '.join(map(str, total_observed_series)),
         })
         return context
 

@@ -124,11 +124,10 @@
             </div>
         </div>
         <div class="col-md-3 column bluebox">
-            <h3><span class="badge badge-info">{{ novos_casos }}</span> Novos Casos</h3>
+            <h3><span class="badge badge-info">{{ novos_casos }}</span> Casos estimados </h3>
 
-            <p>Foram registrados <b>{{ novos_casos }} novos casos</b> na Semana
-                Epidemiológica {{ SE }}: Semana
-                de {{ data1 }} a {{ data2 }}.</p>
+            <p>São estimados <b>{{ novos_casos }} novos casos</b> na Semana
+                Epidemiológica {{ SE }}: {{ data1 }} a {{ data2 }}. Com {{ total_observed }} casos notificados oficialmente até o momento</p>
             <h4>Últimas {{ look_back }} semanas:</h4>
             <span class='totalsparkline'>{{ total_series }}</span>
             <h4>Há um ano:</h4>
