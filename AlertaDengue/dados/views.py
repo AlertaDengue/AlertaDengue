@@ -29,7 +29,7 @@ class AlertaPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
-        alert, current, case_series, last_year, observed_cases = get_alert()
+        alert, current, case_series, last_year, observed_cases, min_max_est = get_alert()
         casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
         semana = str(current.SE.iat[-1])[-2:]
@@ -40,6 +40,8 @@ class AlertaPageView(TemplateView):
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
             'novos_casos': sum(casos_ap.values()),
+            'min_est': sum(i[0] for i in min_max_est.values()),
+            'max_est': sum(i[1] for i in min_max_est.values()),
             'series_casos': case_series,
             'SE': int(semana),
             'data1': (quarta - datetime.timedelta(2)).strftime("%d de %B de %Y"),
@@ -195,13 +197,15 @@ def get_alert():
     alert = defaultdict(lambda: 0)
     case_series = {}
     obs_case_series = {}
+    min_max_est = {}
     for ap in group_names:
         adf = G.get_group(ap)  # .tail()  # only calculates on the series tail
         case_series[str(float(ap.split('AP')[-1]))] = [int(v) for v in adf.casos_est.iloc[-12:].values]
         obs_case_series[str(float(ap.split('AP')[-1]))] = [int(v) for v in adf.casos.iloc[-12:].values]
         alert[ap] = adf.cor.iloc[-1]
         last_year = int(adf.casos.iloc[-52])
-    return alert, current, case_series, last_year, obs_case_series
+        min_max_est[ap] = (adf.casos_estmin.iloc[-1], adf.casos_estmax.iloc[-1])
+    return alert, current, case_series, last_year, obs_case_series, min_max_est
 
 
 def load_series():
