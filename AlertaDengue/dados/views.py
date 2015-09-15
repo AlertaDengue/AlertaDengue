@@ -29,24 +29,16 @@ class AlertaPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
-        alert, current, case_series, last_year = get_alert()
+        alert, current, case_series, last_year, observed_cases = get_alert()
         casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
         semana = str(current.SE.iat[-1])[-2:]
         quarta = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d")
-        #data = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d").strftime("%d de %B de %Y")
-        # messages.info(self.request,
-        #               "Foram registrados {} novos casos na Semana Epidemiológica {}: Semana de {}.".format(
-        #                   sum(casos_ap.values()),
-        #                   semana, data))
-        total_series = np.zeros(len(case_series['4.0']))
-        for s in case_series.values():
-            total_series += np.array(s)
-        print(str(total_series.tolist())[1:-1])
+        total_series = sum(np.array(list(case_series.values())), np.zeros(12, int))
+        total_observed_series = sum(np.array(list(observed_cases.values())), np.zeros(12, int))
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
-            'semana': semana,
             'novos_casos': sum(casos_ap.values()),
             'series_casos': case_series,
             'SE': int(semana),
@@ -54,7 +46,9 @@ class AlertaPageView(TemplateView):
             'data2': (quarta + datetime.timedelta(4)).strftime("%d de %B de %Y"),
             'last_year': last_year,
             'look_back': len(total_series),
-            'total_series': str(total_series.tolist())[1:-1]
+            'total_series': ', '.join(map(str, total_series)),
+            'total_observed':  total_observed_series[-1],
+            'total_observed_series': ', '.join(map(str, total_observed_series)),
         })
         return context
 
@@ -196,17 +190,18 @@ def get_alert():
     year = datetime.date.today().year  # Current year
     SE = int(str(last_SE).split(str(year))[-1])  # current epidemiological week
     current = df[df['SE'] == last_SE]  # Current status
-    print(current)
     G = df.groupby("APS")
     group_names = G.groups.keys()
     alert = defaultdict(lambda: 0)
     case_series = {}
+    obs_case_series = {}
     for ap in group_names:
         adf = G.get_group(ap)  # .tail()  # only calculates on the series tail
-        case_series[str(float(ap.split('AP')[-1]))] = list(adf.casos.iloc[-12:].values)
+        case_series[str(float(ap.split('AP')[-1]))] = [int(v) for v in adf.casos_est.iloc[-12:].values]
+        obs_case_series[str(float(ap.split('AP')[-1]))] = [int(v) for v in adf.casos.iloc[-12:].values]
         alert[ap] = adf.cor.iloc[-1]
         last_year = int(adf.casos.iloc[-52])
-    return alert, current, case_series, last_year
+    return alert, current, case_series, last_year, obs_case_series
 
 
 def load_series():
@@ -221,7 +216,8 @@ def load_series():
             G.get_group(ap).data]
         series[ap]['tweets'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).tweets]
         series[ap]['tmin'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).tmin]
-        series[ap]['casos_est'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).casos]
+        series[ap]['casos_est'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).casos_est]
+        series[ap]['casos'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).casos]
         series[ap]['alerta'] = [c - 1 if not np.isnan(c) else None for c in G.get_group(ap).cor]
         # print(series['dia'])
     return series

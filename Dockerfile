@@ -38,6 +38,10 @@ ADD exec_in_virtualenv.sh /srv/deploy/exec_in_virtualenv.sh
 # Clone code
 RUN git clone https://github.com/NAMD/AlertaDengue.git /srv/deploy/project/AlertaDengue
 
+# Add our local settings. This file is not versioned because it contains
+# sensitive data (such as the SECRET_KEY).
+ADD AlertaDengue/AlertaDengue/settings.ini /srv/deploy/project/AlertaDengue/AlertaDengue/AlertaDengue/settings.ini
+
 # Install python deps
 # We need --no-clean because of the way Docker.io's filesystem works. When pip
 # tries to remove the build directory, it raises an error, saying the file was

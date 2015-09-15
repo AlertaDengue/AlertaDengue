@@ -74,15 +74,15 @@
                         <!--/.nav-collapse -->
 
 
-                        {% if user.is_authenticated %}
+
                             <ul class="nav nav-pills">
                                 <li id="alerta" class="active"><a href="{% url 'alerta' %}">Alerta</a></li>
-                                <li id="detalhes" class="active"><a href="{% url 'home' %}">Detalhes</a></li>
+                                <li id="detalhes" class="active"><a href="{% url 'home' %}">Alerta Detalhado</a></li>
                                 {#                        <li id="dengue"><a href="{% url 'mapadengue' %}">Mapa da Dengue</a></li>#}
                                 {#                        <li id="vetor"><a href="{% url 'mapamosquito' %}">Mapa do Vetor</a></li>#}
-                                <li id="historico"><a href="{% url 'historico' %}">Histórico</a>
+                                <li id="historico" class="active"><a href="{% url 'historico' %}">Series Históricas</a>
                             </ul>
-                        {% endif %}
+
 
                         <script type="application/javascript">
                             // $('ul.nav.nav-pills li a').click(function () {
