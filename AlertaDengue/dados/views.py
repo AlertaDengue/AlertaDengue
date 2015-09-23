@@ -54,6 +54,37 @@ class AlertaPageView(TemplateView):
         })
         return context
 
+class AlertaPageViewMunicipio(TemplateView):
+    template_name = 'alerta.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AlertaPageViewMunicipio, self).get_context_data(**kwargs)
+        estado = context['estado']
+        municipio = context['municipio']
+        alert, current, case_series, last_year, observed_cases, min_max_est = get_alert()
+        casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
+        alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
+        semana = str(current.SE.iat[-1])[-2:]
+        quarta = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d")
+        total_series = sum(np.array(list(case_series.values())), np.zeros(12, int))
+        total_observed_series = sum(np.array(list(observed_cases.values())), np.zeros(12, int))
+        context.update({
+            'casos_por_ap': json.dumps(casos_ap),
+            'alerta': alerta,
+            'novos_casos': sum(casos_ap.values()),
+            'min_est': sum(i[0] for i in min_max_est.values()),
+            'max_est': sum(i[1] for i in min_max_est.values()),
+            'series_casos': case_series,
+            'SE': int(semana),
+            'data1': (quarta - datetime.timedelta(2)).strftime("%d de %B de %Y"),
+            'data2': (quarta + datetime.timedelta(4)).strftime("%d de %B de %Y"),
+            'last_year': last_year,
+            'look_back': len(total_series),
+            'total_series': ', '.join(map(str, total_series)),
+            'total_observed':  total_observed_series[-1],
+            'total_observed_series': ', '.join(map(str, total_observed_series)),
+        })
+        return context
 
 class AlertaGeoJSONView(View):
     def get(self, request, *args, **kwargs):
