@@ -1,7 +1,7 @@
 # coding=utf-8
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from dados.views import HomePageView, SinanCasesView, AboutPageView, ContactPageView, MapaDengueView, MapaMosquitoView, \
+from dados.views import HomePageView, SinanCasesView, AboutPageView, ContactPageView, JoininPageView, MapaDengueView, MapaMosquitoView, \
     HistoricoView, AlertaPageView, AlertaGeoJSONView, AlertaPageViewMunicipio, CityMapView
 from django.conf import settings
 from django.conf.urls.static import static
@@ -26,6 +26,7 @@ urlpatterns = patterns('',
                        url(r'^historico/$', HistoricoView.as_view(), name='historico'),
                        url(r'^informacoes/$', AboutPageView.as_view(), name='about'),
                        url(r'^contato/$', ContactPageView.as_view(), name='contact'),
+                       url(r'^participe/$', JoininPageView.as_view(), name='joinin'),
                        url(r'^sinan/(\d{4})/(\d{1,2})', SinanCasesView.as_view(), name='sinan'),
                        url(r'^admin/', include(admin.site.urls)),
 ) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

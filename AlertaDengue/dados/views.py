@@ -164,7 +164,7 @@ class AboutPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AboutPageView, self).get_context_data(**kwargs)
-        messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        #messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
         return context
 
 
@@ -173,9 +173,16 @@ class ContactPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ContactPageView, self).get_context_data(**kwargs)
-        messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        #messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
         return context
 
+class JoininPageView(TemplateView):
+    template_name = 'joinin.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(JoininPageView, self).get_context_data(**kwargs)
+        #messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        return context
 
 class SinanCasesView(View):
     def get(self, request, year, sample):
