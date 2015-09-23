@@ -59,8 +59,7 @@ class AlertaPageViewMunicipio(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AlertaPageViewMunicipio, self).get_context_data(**kwargs)
-        estado = context['estado']
-        municipio = context['municipio']
+        municipio_gc = context['geocodigo']
         alert, current, case_series, last_year, observed_cases, min_max_est = get_alert()
         casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}

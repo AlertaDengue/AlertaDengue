@@ -14,7 +14,7 @@ urlpatterns = patterns('',
                        # Examples:
                        # url(r'^$', 'AlertaDengue.views.home', name='home'),
                        # url(r'^blog/', include('blog.urls')),
-                       url(r'^alerta/(?P<estado>[a-zA-z]{2})/(?P<municipio>[\w\-]+)', AlertaPageViewMunicipio.as_view(), name='alerta_cidade'),
+                       url(r'^alerta/(?P<geocodigo>\d{7})$', AlertaPageViewMunicipio.as_view(), name='alerta_cidade'),
                        url(r'^$', AlertaPageView.as_view(), name='alerta'),
                        url('^accounts/profile/$', RedirectView.as_view(url="/")),
                        url('^accounts/', include('django.contrib.auth.urls')),
