@@ -80,7 +80,7 @@ LEAFLET_CONFIG = {
     'MAXIMUM_ZOOM': 13,
     'TILES': 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',  # 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
     'MINIMAP': False,
-    'ATTRIBUTION_PREFIX': 'Mapa de risco do Info Dengue Rio - FGV-EMAp',
+    'ATTRIBUTION_PREFIX': 'Fonte: <a href=http://info.dengue.mat.br>info.dengue.mat.br</a>',
     'PLUGINS': {
         'cluster': {
             'js': 'js/leaflet.markercluster.js',
