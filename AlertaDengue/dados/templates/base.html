@@ -13,12 +13,12 @@
                 <div class="col-md-12 column">
                     <div class="media">
                         <a class="pull-left" href="#">
-                            <img class="media-object" src="/static/img/info_dengue_rio_logo_pq.png">
+                            <img class="media-object" src="/static/img/info-dengue-logo-multicidades.png">
                         </a>
-                        <a class="pull-right" href="#">
+                        <a class="pull-right" href="http://www.procc.fiocruz.br">
                             <img class="media-object" src="/static/img/fiocruz.gif" , height="83px">
                         </a>
-                        <a class="pull-right" href="#">
+                        <a class="pull-right" href="http://emap.fgv.br">
                             <img class="media-object" src="/static/img/emap.jpg" , height="83px">
                         </a>
 
@@ -33,12 +33,12 @@
                                 <span class="icon-bar"></span>
                                 <span class="icon-bar"></span>
                             </button>
-                            <a class="navbar-brand" href="{% url 'alerta' %}">Info Dengue Rio</a>
+                            <a class="navbar-brand" href="{% url 'alerta' %}">Info Dengue</a>
                         </div>
                         <div class="collapse navbar-collapse">
                             <ul class="nav navbar-nav">
                                 <li><a href="{% url "alerta" %}">Mapa</a></li>
-                                <li><a href="{% url "about" %}">Sobre o Projeto</a></li>
+                                <li><a href="{% url "about" %}">Saiba Mais</a></li>
                                 <li><a href="{% url "contact" %}">Fale Conosco</a></li>
                                 {% if user.is_authenticated %}
                                     <li class="dropdown">
