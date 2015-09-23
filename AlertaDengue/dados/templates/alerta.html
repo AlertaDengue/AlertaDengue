@@ -275,22 +275,26 @@
             };
 
             legend.addTo(map);
+
+
             // fetch data about health units
             function pop_PontosUnidadesBasicasSaudeMRJ2014wgs84(feature, layer) {
                 var popupContent = '<table><tr><th scope="row">Nome:</th><td>' + Autolinker.link(String(feature.properties.NOME_LEG)) + '</td></tr><tr><th scope="row">Logradouro:</th><td>' + Autolinker.link(String(feature.properties.LOGRADOURO)) + '</td></tr><tr><th scope="row">Número:</th><td>' + Autolinker.link(String(feature.properties.NUMERO)) + '</td></tr><tr><th scope="row">Complemento:</th><td>' + Autolinker.link(String(feature.properties.COMPLEMENT)) + '</td></tr><tr><th scope="row">Bairro:</th><td>' + Autolinker.link(String(feature.properties.BAIRRO)) + '</td></tr><tr><th scope="row">CEP:</th><td>' + Autolinker.link(String(feature.properties.CEP)) + '</td></tr><tr><th scope="row">Telefone:</th><td>' + Autolinker.link(String(feature.properties.TELEFONE)) + '</td></tr><tr><th scope="row">Tipo:</th><td>' + Autolinker.link(String(feature.properties.TP_UNIDADE)) + '</td></tr><tr><th scope="row">Classe:</th><td>' + Autolinker.link(String(feature.properties.CLASSE_UND)) + '</td></tr></table><p><a href="http://www.rio.rj.gov.br/web/sms/onde-ser-atendido">Onde posso ser atendido?</a></p>';
                 layer.bindPopup(popupContent);
             }
 
+            var CrossIcon = L.icon({
+                iconUrl: '/static/img/32px-Red_Cross_icon.png',
+                iconSize:     [16, 16],
+                iconAnchor:   [8, 8],
+                popupAnchor:  [8, -8]
+            });
+
             var exp_PontosUnidadesBasicasSaudeMRJ2014wgs84JSON = new L.geoJson(exp_PontosUnidadesBasicasSaudeMRJ2014wgs84, {
                 onEachFeature: pop_PontosUnidadesBasicasSaudeMRJ2014wgs84,
                 pointToLayer: function (feature, latlng) {
-                    return L.circleMarker(latlng, {
-                        radius: feature.properties.radius_qgis2leaf,
-                        fillColor: feature.properties.color_qgis2leaf,
-                        color: '#000',
-                        weight: 1,
-                        opacity: feature.properties.transp_qgis2leaf,
-                        fillOpacity: feature.properties.transp_qgis2leaf
+                    return L.marker(latlng, {
+                        icon: CrossIcon
                     })
                 }
             });
