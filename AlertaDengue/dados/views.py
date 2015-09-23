@@ -17,6 +17,7 @@ import pandas as pd
 import numpy as np
 import locale
 import geojson
+from dados.maps import get_city_geojson
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
@@ -88,6 +89,11 @@ class AlertaPageViewMunicipio(TemplateView):
 class AlertaGeoJSONView(View):
     def get(self, request, *args, **kwargs):
         return HttpResponse(geojson.dumps(polygons))
+
+class CityMapView(View):
+    def get(self,request, geocodigo):
+        mapa = get_city_geojson(int(geocodigo))
+        return HttpResponse(geojson.dumps(mapa))
 
 
 class HomePageView(TemplateView):
