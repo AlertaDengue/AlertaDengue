@@ -17,6 +17,7 @@ import pandas as pd
 import numpy as np
 import locale
 import geojson
+from dados.maps import get_city_geojson
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
@@ -59,8 +60,7 @@ class AlertaPageViewMunicipio(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AlertaPageViewMunicipio, self).get_context_data(**kwargs)
-        estado = context['estado']
-        municipio = context['municipio']
+        municipio_gc = context['geocodigo']
         alert, current, case_series, last_year, observed_cases, min_max_est = get_alert()
         casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
@@ -89,6 +89,11 @@ class AlertaPageViewMunicipio(TemplateView):
 class AlertaGeoJSONView(View):
     def get(self, request, *args, **kwargs):
         return HttpResponse(geojson.dumps(polygons))
+
+class CityMapView(View):
+    def get(self,request, geocodigo):
+        mapa = get_city_geojson(int(geocodigo))
+        return HttpResponse(geojson.dumps(mapa))
 
 
 class HomePageView(TemplateView):
@@ -159,7 +164,7 @@ class AboutPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AboutPageView, self).get_context_data(**kwargs)
-        messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        #messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
         return context
 
 
@@ -168,9 +173,16 @@ class ContactPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ContactPageView, self).get_context_data(**kwargs)
-        messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        #messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
         return context
 
+class JoininPageView(TemplateView):
+    template_name = 'joinin.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(JoininPageView, self).get_context_data(**kwargs)
+        #messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        return context
 
 class SinanCasesView(View):
     def get(self, request, year, sample):

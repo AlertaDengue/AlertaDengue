@@ -94,6 +94,9 @@ LEAFLET_CONFIG = {
 
 }
 
+PSQL_DB = "dengue"
+PSQL_USER = "dengueadmin"
+PSQL_HOST = "172.16.4.27"
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
