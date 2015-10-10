@@ -13,8 +13,10 @@ def get_city_geojson(municipio):
     :param municipio: geocódigo do municipio
     :return:
     """
+    #head = '{"type": "FeatureCollection","features": [{type:}'
     cur = conn.cursor()
     cur.execute('select geojson from "Dengue_global.Municipio" where geocodigo=%s', (municipio,))
     geoj = cur.fetchone()
+    print(geoj)
     return geoj
 
