@@ -4,165 +4,244 @@
 
 
 {% block content %}
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 id="section1" class="panel-title">O Sistema de Alerta InfoDengue</h3>
-            <div class="list-group">
-				<A href="#section1">O Sistema de Alerta InfoDengue</A>
-				<A href="#section2">O Pré-Processamento de Dados e a Geração de Indicadores</A>
-				<A href="#section3">O Sistema de Cores de Notificação</A>
-				<A href="#section4">A Participação de Novos Municípios</A>
-			</div>
-        </div
-        <div class="panel-body">
-			O <b>Sistema de Alerta InfoDengue</b> visa gerar um sistema de alerta em tempo quase-real para os casos de transmissão de dengue nos 
-            municípios. A ideia principal é o acesso rápido a informação!<br><br>
-            
-            As Secretarias de Vigilância em Saúde, através da utilização das informações geradas semanalmente pelo sistema, poderiam 
-
-            tornar mais ágeis e eficazes suas tomadas de decisão quanto aos seus programas de vigilância em dengue. O sistema de
-             alerta procura remover a distância que existe entre a análise das informações sempre aplicadas ao passado, e a
-             necessidade de gerar informações em tempo quase-real para tomada de decisão. <br><br>
-
-             Para que o sistema funcione, diversas metodologias de análise são utilizadas de forma integrada, incluindo modelagem de
-             sobrevida, modelagem bayesiana, e um pipeline de coleta e processamento rápido de dados. Essa automatização integrada com
-             modelagem estatística possibilita a rápida visualização da distribuição dos casos de transmissão de dengue em um
-             município ao longo do tempo e do espaço. Os dados que alimentam o sistema são provenientes de diferentes fontes,
-             incluindo clima, redes sociais e dados oficiais de notificação.<br><br>
-
-             Além disso, o site disponibiliza informações sobre o histórico da dengue no município em diferentes formatos que podem
-             ser acessados por todos, cidadãos, estudantes, professores, pesquisadores, enfim, qualquer pessoa interessada em
-             entender como anda a situação da transmissão de dengue em seu município.<br><br>
-
-             O controle da incidência e preparação para o enfrentamento de epidemias de dengue dependem de um monitoramento eficaz
-             de sinais que pressagiem o aumento de casos e potenciais epidemias. Desta forma, é de grande importância a análise de
-             toda a informação sobre dengue gerada durante o processo de sua notificação, servindo assim como base para as decisões
-             da política de saúde dos municípios. <br><br>
-
-             <h3 class="panel-title">Como funciona </h3>
-             A dengue é difícil de prever, chega de repente. Tem ano que vem para arrasar, tem ano que mal aparece. <br><br>
-
-             O Info dengue é como um serviço de meteorologia, só que além do sol e da chuva, ele também fica de olho na dengue, no mosquito,
-             e nos murmurinhos nas redes sociais. Essas informações alimentam modelos estatísticos [link para nosso artigo] previamente
-             validados com dados históricos, que indicam a situação da dengue na cidade. <br><br>
-
-             Quando está tudo bem, o mapa está verde. O clima não está muito pra mosquito, e a dengue acontece aqui e ali.<br><br>
-
-             Porem, quando a temperatura aumenta, os mosquitos começam a se reproduzir mais rápido. O amarelo indica que está um quente
-             bom para mosquitos e é preciso prestar atenção nos criadouros. O que você pode fazer? <br><br>
-
-             Dedique 10 minutos do seu dia ao combate da dengue. Confira as dicas em:  [link]<br><br>
-
-             Quando junta muito mosquito com muitas pessoas que não tiveram dengue, é o prato perfeito para o virus da dengue se espalhar.
-             Ele passa do mosquito para a pessoa que passa para outro mosquito que passa para outra pessoa, e pronto, tem-se a transmissão
-             sustentada da dengue! A cor laranja indica essa situação. É hora de redobrar os esforços para eliminar focos de mosquito.
-             Preste também atenção nos sintomas da dengue em você, na sua família, nos seus vizinhos e amigos.
-             Se uma de cada 1000 pessoas tem dengue, então o alerta passa para o vermelho avisando que se você não teve dengue ainda,
-             o risco é grande. Todo cuidado é pouco. Preste atenção aos sintomas e busque ajuda.
-
-             A dengue é cíclica, e depois do vermelho vem o verde e todo o ciclo começa de novo. Então não se esqueça de estar sempre antenado
-              no InfoDengue. Nele, você tem como saber sobre a situação do seu bairro. Clique no mapa e saiba agora mesmo como está a dengue aí,
-              onde você está.
-
-
-             </div>
-
-
+    <div class="list-group">
+        <A href="#section1">O Sistema de Alerta InfoDengue</A>
+        <A href="#section2">O Pré-Processamento de Dados e a Geração de Indicadores</A>
+        <A href="#section3">O Sistema de Cores de Notificação</A>
+        <A href="#section4">A Participação de Novos Municípios</A>
     </div>
-{% endblock %}
+    <div class="panel-group" id="panelgroup">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 id="section1" class="panel-title">O Sistema de Alerta InfoDengue</h3>
+            </div>
+            <div class="panel-body">
+                O <b>Sistema de Alerta InfoDengue</b> visa gerar um sistema de alerta em tempo quase-real para os casos
+                de
+                transmissão de dengue nos
+                municípios. A ideia principal é o acesso rápido a informação!<br><br>
 
-{% block content %}
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 id="section2" class="panel-title">O Pré-Processamento de Dados e a Geração de Indicadores</h3>
-        </div
-        <div class="panel-body">
-			
-            A realização de uma análise preliminar dos dados de notificação de casos de dengue mostra que o tempo de atraso 
-            entre a notificação e digitação tem uma mediana de 14 dias. Para corrigir este atraso, um modelo de 
-            sobrevivência lognormal <a href="https://portal.fiocruz.br/pt-br/content/an%C3%A1lise-de-sobreviv%C3%AAncia-teoria-e-aplica%C3%A7%C3%B5es-em-sa%C3%BAde">(Carvalho et al, 2011)</a> 
-            foi ajustado aos dados e utilizado para inferir o número de casos na semana, na ausência de atraso.<br><br>
-            
-            Com a série temporal de casos corrigida para cada regional de saúde, o número reprodutivo efetivo (Rt) é calculado, 
-            de acordo com a equação 4.2 de <a href="http://rsif.royalsocietypublishing.org/content/7/43/297">Nishiura et al (2010)</a> 
-            e assumindo um intervalo serial para a dengue de 3 semanas. 
-            O Rt é basicamente uma medida da variação do número de casos e é calculado como a razão entre o número de casos em 
-            um intervalo temporal e o número de casos no intervalo anterior. Se Rt > 1, há expansão da epidemia, se Rt %3C 1, 
-            há retração. Para dar conta da incerteza nas estimativas dessa quantidade, nós calculamos o intervalo de 
-            credibilidade <a href="http://arxiv.org/pdf/1502.01236.pdf">(Coelho & Carvalho, 2015)</a> para o Rt e consideramos 
-            um evento de expansão se a probabilidade de que Rt > 1 for superior a 90%. <br><br>
-            
-            Com relação aos dados de tweets, a mesma técnica é empregada, gerando um número reprodutivo dos tweets (Rttw). 
-            Variações positivas significativas indicam um aumento de risco.<br><br>
+                As Secretarias de Vigilância em Saúde, através da utilização das informações geradas semanalmente pelo
+                sistema, poderiam
 
-            
-                  
-             </div>
-    </div>
-{% endblock %}
+                tornar mais ágeis e eficazes suas tomadas de decisão quanto aos seus programas de vigilância em dengue.
+                O
+                sistema de
+                alerta procura remover a distância que existe entre a análise das informações sempre aplicadas ao
+                passado, e
+                a
+                necessidade de gerar informações em tempo quase-real para tomada de decisão. <br><br>
 
-{% block content %}
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 id="section3" class="panel-title">O Sistema de Cores de Notificação</h3>
-        </div
-        <div class="panel-body">
-            A dengue é difícil de prever, chega de repente. Tem ano que vem para arrasar, tem ano que mal aparece. 
-            O Info dengue écomo um serviço de meteorologia, só que além do sol e da chuva, ele também fica de olho na dengue, 
-            no mosquito, e nos murmurinhos nas redes sociais. Essas informações alimentam modelos estatísticos 
-            previamente validados com dados históricos, que indicam a situação da dengue na cidade.<br><br>
-            
-            Quando está tudo bem, o mapa está <span style="background-color:green">VERDE</span>. O clima não está muito pra 
-            mosquito, e a dengue acontece aqui e ali. Porém, quando a temperatura aumenta, os mosquitos começam a se reproduzir 
-            mais rápido. O <span style="background-color:yellow">AMARELO</span> indica que está um quente bom para mosquitos e 
-            é preciso prestar atenção nos criadouros. O que você pode fazer? Dedique 10 minutos do seu dia ao combate da dengue. 
-            Confira as dicas em: <a href="http://www.riocontradengue.com.br/Site/Conteudo/Porque.aspx/">10 minutos contra a Dengue</a>  <br><br>  
-                               
-            Quando junta muito mosquito com muitas pessoas que não tiveram dengue, é o prato perfeito para o virus da dengue se 
-            espalhar. Ele passa do mosquito para a pessoa que passa para outro mosquito que passa para outra pessoa, e pronto, 
-            tem-se a transmissão sustentada da dengue! A cor <span style="background-color:orange">LARANJA</span> indica essa 
-            situação. É hora de redobrar os esforços para eliminar focos de mosquito. Preste também atenção nos sintomas da 
-            dengue em você, na sua família, nos seus vizinhos e amigos. <br><br>
-            
-            Se uma de cada 1000 pessoas em um município tem dengue, então o alerta passa para 
-            o <span style="background-color:red">VERMELHO</span> avisando que se você não teve dengue ainda, o risco é grande. 
-            Todo cuidado é pouco. Preste atenção aos sintomas e busque ajuda. A <b>DENGUE É CÍCLICA</b>, e depois do 
-            <span style="background-color:red">VERMELHO</span> vem o <span style="background-color:green">VERDE</span> e todo 
-            o ciclo começa de novo. Então não se esqueça de estar sempre antenado no <b>InfoDengue</b>. 
-            Nele, você tem como saber sobre a situação do seu bairro. Clique no <b>Mapa</b> e saiba agora mesmo como está a 
-            dengue aí, onde você está.
-             <br><br>
-            
-                       
-                   
-             </div>
-    </div>
-{% endblock %}
+                Para que o sistema funcione, diversas metodologias de análise são utilizadas de forma integrada,
+                incluindo
+                modelagem de
+                sobrevida, modelagem bayesiana, e um pipeline de coleta e processamento rápido de dados. Essa
+                automatização
+                integrada com
+                modelagem estatística possibilita a rápida visualização da distribuição dos casos de transmissão de
+                dengue
+                em um
+                município ao longo do tempo e do espaço. Os dados que alimentam o sistema são provenientes de diferentes
+                fontes,
+                incluindo clima, redes sociais e dados oficiais de notificação.<br><br>
 
-{% block content %}
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 id="section4" class="panel-title">Como Participar do Sistema de Alerta InfoDengue</h3>
-        </div
-        <div class="panel-body">
-			É muito fácil descobrir se o seu município pode participar do <b>Sistema de Alerta InfoDengue</b>. 
-			Para isso é necessário que três etapas sejam cumpridas:<br><br>
-			
-			1 - Preencher o <a href="http://goo.gl/forms/JHK3ZhZduH">formulário de adesão</a> com as informações
-			sobre o município e sobre a pessoa responsável pelos dados de dengue com quem manteremos contato;<br><br>
-			
-			2 - Para dar continuidade à análise de viabilidade de participação, vamos precisar analisar 
-			os dados de notificação de dengue (SINAN) em seu município, de 2012 até o presente. Enviaremos para você uma 
-			carta sobre o compromisso do <b>Sistema de Alerta InfoDengue</b> a respeito da utilização dos dados.
-			É importante ressaltar que não há necessidade de informação sobre a identificação dos casos.<br><br>
-			
-			3 - Se o seu município conseguiu preencher os dois requisitos anteriores, PARABÉNS! Os modelos de alerta já estarão 
-			prontos para seu município. Será elaborado e enviado um relatório contendo a análise dos dados históricos a você. 
-			Agora é hora de fazer o sistema funcionar daqui para frente. Para isso, um termo de compromisso deverá ser assinado 
-			entre o <b>Sistema de Alerta InfoDengue</b> e a Secretária Municipal de Saúde, autorizando a utilização dos dados. <br><br>
-             
-             Em caso de dúvidas, entre em contato conosco: <a href="mailto:alerta_dengue@fiocruz.br"</a> <br><br>                    
-                   
-             </div>
+                Além disso, o site disponibiliza informações sobre o histórico da dengue no município em diferentes
+                formatos
+                que podem
+                ser acessados por todos, cidadãos, estudantes, professores, pesquisadores, enfim, qualquer pessoa
+                interessada em
+                entender como anda a situação da transmissão de dengue em seu município.<br><br>
+
+                O controle da incidência e preparação para o enfrentamento de epidemias de dengue dependem de um
+                monitoramento eficaz
+                de sinais que pressagiem o aumento de casos e potenciais epidemias. Desta forma, é de grande importância
+                a
+                análise de
+                toda a informação sobre dengue gerada durante o processo de sua notificação, servindo assim como base
+                para
+                as decisões
+                da política de saúde dos municípios. <br><br>
+
+                <h3 class="panel-title">Como funciona </h3>
+                A dengue é difícil de prever, chega de repente. Tem ano que vem para arrasar, tem ano que mal aparece.
+                <br><br>
+
+                O Info dengue é como um serviço de meteorologia, só que além do sol e da chuva, ele também fica de olho
+                na
+                dengue, no mosquito,
+                e nos murmurinhos nas redes sociais. Essas informações alimentam modelos estatísticos [link para nosso
+                artigo] previamente
+                validados com dados históricos, que indicam a situação da dengue na cidade. <br><br>
+
+                Quando está tudo bem, o mapa está verde. O clima não está muito pra mosquito, e a dengue acontece aqui e
+                ali.<br><br>
+
+                Porem, quando a temperatura aumenta, os mosquitos começam a se reproduzir mais rápido. O amarelo indica
+                que
+                está um quente
+                bom para mosquitos e é preciso prestar atenção nos criadouros. O que você pode fazer? <br><br>
+
+                Dedique 10 minutos do seu dia ao combate da dengue. Confira as dicas em: [link]<br><br>
+
+                Quando junta muito mosquito com muitas pessoas que não tiveram dengue, é o prato perfeito para o virus
+                da
+                dengue se espalhar.
+                Ele passa do mosquito para a pessoa que passa para outro mosquito que passa para outra pessoa, e pronto,
+                tem-se a transmissão
+                sustentada da dengue! A cor laranja indica essa situação. É hora de redobrar os esforços para eliminar
+                focos
+                de mosquito.
+                Preste também atenção nos sintomas da dengue em você, na sua família, nos seus vizinhos e amigos.
+                Se uma de cada 1000 pessoas tem dengue, então o alerta passa para o vermelho avisando que se você não
+                teve
+                dengue ainda,
+                o risco é grande. Todo cuidado é pouco. Preste atenção aos sintomas e busque ajuda.
+
+                A dengue é cíclica, e depois do vermelho vem o verde e todo o ciclo começa de novo. Então não se esqueça
+                de
+                estar sempre antenado
+                no InfoDengue. Nele, você tem como saber sobre a situação do seu bairro. Clique no mapa e saiba agora
+                mesmo
+                como está a dengue aí,
+                onde você está.
+
+
+            </div>
+
+
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 id="section2" class="panel-title">O Pré-Processamento de Dados e a Geração de Indicadores</h3>
+            </div>
+            <div class="panel-body">
+
+                A realização de uma análise preliminar dos dados de notificação de casos de dengue mostra que o tempo de
+                atraso
+                entre a notificação e digitação tem uma mediana de 14 dias. Para corrigir este atraso, um modelo de
+                sobrevivência lognormal <a
+                    href="https://portal.fiocruz.br/pt-br/content/an%C3%A1lise-de-sobreviv%C3%AAncia-teoria-e-aplica%C3%A7%C3%B5es-em-sa%C3%BAde">(Carvalho
+                et al, 2011)</a>
+                foi ajustado aos dados e utilizado para inferir o número de casos na semana, na ausência de
+                atraso.<br><br>
+
+                Com a série temporal de casos corrigida para cada regional de saúde, o número reprodutivo efetivo (Rt) é
+                calculado,
+                de acordo com a equação 4.2 de <a href="http://rsif.royalsocietypublishing.org/content/7/43/297">Nishiura
+                et
+                al (2010)</a>
+                e assumindo um intervalo serial para a dengue de 3 semanas.
+                O Rt é basicamente uma medida da variação do número de casos e é calculado como a razão entre o número
+                de
+                casos em
+                um intervalo temporal e o número de casos no intervalo anterior. Se Rt > 1, há expansão da epidemia, se
+                Rt
+                %3C 1,
+                há retração. Para dar conta da incerteza nas estimativas dessa quantidade, nós calculamos o intervalo de
+                credibilidade <a href="http://arxiv.org/pdf/1502.01236.pdf">(Coelho & Carvalho, 2015)</a> para o Rt e
+                consideramos
+                um evento de expansão se a probabilidade de que Rt > 1 for superior a 90%. <br><br>
+
+                Com relação aos dados de tweets, a mesma técnica é empregada, gerando um número reprodutivo dos tweets
+                (Rttw).
+                Variações positivas significativas indicam um aumento de risco.<br><br>
+
+
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 id="section3" class="panel-title">O Sistema de Cores de Notificação</h3>
+            </div>
+            <div class="panel-body">
+                A dengue é difícil de prever, chega de repente. Tem ano que vem para arrasar, tem ano que mal aparece.
+                O Info dengue écomo um serviço de meteorologia, só que além do sol e da chuva, ele também fica de olho
+                na
+                dengue,
+                no mosquito, e nos murmurinhos nas redes sociais. Essas informações alimentam modelos estatísticos
+                previamente validados com dados históricos, que indicam a situação da dengue na cidade.<br><br>
+
+                Quando está tudo bem, o mapa está <span style="background-color:green">VERDE</span>. O clima não está
+                muito
+                pra
+                mosquito, e a dengue acontece aqui e ali. Porém, quando a temperatura aumenta, os mosquitos começam a se
+                reproduzir
+                mais rápido. O <span style="background-color:yellow">AMARELO</span> indica que está um quente bom para
+                mosquitos e
+                é preciso prestar atenção nos criadouros. O que você pode fazer? Dedique 10 minutos do seu dia ao
+                combate da
+                dengue.
+                Confira as dicas em: <a href="http://www.riocontradengue.com.br/Site/Conteudo/Porque.aspx/">10 minutos
+                contra a Dengue</a> <br><br>
+
+                Quando junta muito mosquito com muitas pessoas que não tiveram dengue, é o prato perfeito para o virus
+                da
+                dengue se
+                espalhar. Ele passa do mosquito para a pessoa que passa para outro mosquito que passa para outra pessoa,
+                e
+                pronto,
+                tem-se a transmissão sustentada da dengue! A cor <span style="background-color:orange">LARANJA</span>
+                indica
+                essa
+                situação. É hora de redobrar os esforços para eliminar focos de mosquito. Preste também atenção nos
+                sintomas
+                da
+                dengue em você, na sua família, nos seus vizinhos e amigos. <br><br>
+
+                Se uma de cada 1000 pessoas em um município tem dengue, então o alerta passa para
+                o <span style="background-color:red">VERMELHO</span> avisando que se você não teve dengue ainda, o risco
+                é
+                grande.
+                Todo cuidado é pouco. Preste atenção aos sintomas e busque ajuda. A <b>DENGUE É CÍCLICA</b>, e depois do
+                <span style="background-color:red">VERMELHO</span> vem o <span
+                    style="background-color:green">VERDE</span> e
+                todo
+                o ciclo começa de novo. Então não se esqueça de estar sempre antenado no <b>InfoDengue</b>.
+                Nele, você tem como saber sobre a situação do seu bairro. Clique no <b>Mapa</b> e saiba agora mesmo como
+                está a
+                dengue aí, onde você está.
+                <br><br>
+
+
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 id="section4" class="panel-title">Como Participar do Sistema de Alerta InfoDengue</h3>
+            </div>
+            <div class="panel-body">
+                É muito fácil descobrir se o seu município pode participar do <b>Sistema de Alerta InfoDengue</b>.
+                Para isso é necessário que três etapas sejam cumpridas:<br><br>
+
+                1 - Preencher o <a href="http://goo.gl/forms/JHK3ZhZduH">formulário de adesão</a> com as informações
+                sobre o município e sobre a pessoa responsável pelos dados de dengue com quem manteremos
+                contato;<br><br>
+
+                2 - Para dar continuidade à análise de viabilidade de participação, vamos precisar analisar
+                os dados de notificação de dengue (SINAN) em seu município, de 2012 até o presente. Enviaremos para você
+                uma
+                carta sobre o compromisso do <b>Sistema de Alerta InfoDengue</b> a respeito da utilização dos dados.
+                É importante ressaltar que não há necessidade de informação sobre a identificação dos casos.<br><br>
+
+                3 - Se o seu município conseguiu preencher os dois requisitos anteriores, PARABÉNS! Os modelos de alerta
+                já
+                estarão
+                prontos para seu município. Será elaborado e enviado um relatório contendo a análise dos dados
+                históricos a
+                você.
+                Agora é hora de fazer o sistema funcionar daqui para frente. Para isso, um termo de compromisso deverá
+                ser
+                assinado
+                entre o <b>Sistema de Alerta InfoDengue</b> e a Secretária Municipal de Saúde, autorizando a utilização
+                dos
+                dados. <br><br>
+
+                Em caso de dúvidas, entre em <a href="mailto:alerta_dengue@fiocruz.br">contato conosco</a>: <br><br>
+
+            </div>
+        </div>
     </div>
 {% endblock %}
