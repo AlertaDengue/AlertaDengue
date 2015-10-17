@@ -127,9 +127,11 @@
             <h3><span class="badge badge-info">{{ novos_casos }}</span> Casos estimados </h3>
 
             <p>São estimados entre <b>{{ min_est }}</b> e <b>{{ max_est }} novos casos</b> na Semana
-                Epidemiológica {{ SE }}: {{ data1 }} a {{ data2 }}. Com {{ total_observed }} casos notificados oficialmente até o momento</p>
+                Epidemiológica {{ SE }}: {{ data1 }} a {{ data2 }}. Com {{ total_observed }} casos notificados
+                oficialmente até o momento</p>
             <h4>Últimas {{ look_back }} semanas:</h4>
             <span class='totalsparkline'>{{ total_series }}</span>
+
             <p></p>
             {% comment %}<h4>Há um ano:</h4>
             <p>Há um ano atrás, nesta mesma semana, observamos <b>{{ last_year }}</b> casos</p>{% endcomment %}
@@ -153,27 +155,40 @@
         //map.invalidateSize();
         //}).trigger("resize");
         $('.totalsparkline').sparkline('html', {
-                type: 'bar',
-                width: "auto",
-                heigth: "auto",
-                barWidth: "15px",
-                barColor: "White",
-                tooltipSuffix: " casos"
-            });
+            type: 'bar',
+            width: "auto",
+            heigth: "auto",
+            barWidth: "15px",
+            barColor: "White",
+            tooltipSuffix: " casos"
+        });
         function isInArray(el, array) {
             return (array.indexOf(el) >= 0) ? true : false;
         }
+        function bestFitZoom(map) {
+            // declaring the group variable
+            var group = new L.featureGroup;
 
+            // map._layers gives all the layers of the map including main container
+            // so looping in all those layers filtering those having feature
+            $.each(map._layers, function (ml) {
+
+                    group.addLayer(this)
+            })
+
+            map.fitBounds(group.getBounds());
+        }
+        var geojson;
         var aps = L.layerGroup();
         var features = L.layerGroup();
         var info = L.control();
         var legend = L.control({position: 'bottomright'});
         var geojson;
         var alertLevels = [
-            {name: 'Baixo Risco', color:'#0D6B0D'},
-            {name: 'Atenção', color:'#C8D20F'},
-            {name: 'Transmissão', color:'#E45205'},
-            {name: 'Epidemia',  color:'#FF0205'},
+            {name: 'Baixo Risco', color: '#0D6B0D'},
+            {name: 'Atenção', color: '#C8D20F'},
+            {name: 'Transmissão', color: '#E45205'},
+            {name: 'Epidemia', color: '#FF0205'},
         ];
 
         function style(feature) {
@@ -258,16 +273,16 @@
 
             info.update = function (props) {
                 this._div.innerHTML = '<h4>Número de casos na semana:</h4>' + (props ?
-                '<b>' + props.casos + '</b><br />' : 'Passe o mouse sobre uma AP');
+                        '<b>' + props.casos + '</b><br />' : 'Passe o mouse sobre uma AP');
             };
 
             info.addTo(map);
 
             legend.onAdd = function () {
                 var div = L.DomUtil.create('div', 'info legend'),
-                    labels = alertLevels.map(function(alertLevel){
-                        return '<i style="background:' + alertLevel.color + '"></i> ' + alertLevel.name;
-                    }).reverse();
+                        labels = alertLevels.map(function (alertLevel) {
+                            return '<i style="background:' + alertLevel.color + '"></i> ' + alertLevel.name;
+                        }).reverse();
 
                 labels.push('O: Unidades de Saúde');
                 div.innerHTML = labels.join('<br>');
@@ -285,9 +300,9 @@
 
             var CrossIcon = L.icon({
                 iconUrl: '/static/img/32px-Red_Cross_icon.png',
-                iconSize:     [16, 16],
-                iconAnchor:   [8, 8],
-                popupAnchor:  [8, -8]
+                iconSize: [16, 16],
+                iconAnchor: [8, 8],
+                popupAnchor: [8, -8]
             });
 
             var exp_PontosUnidadesBasicasSaudeMRJ2014wgs84JSON = new L.geoJson(exp_PontosUnidadesBasicasSaudeMRJ2014wgs84, {
@@ -323,6 +338,7 @@
                     }
                 });
 
+
                 aps.addLayer(geojson, true);
                 aps.addTo(map);
                 features.addTo(map);
@@ -344,14 +360,11 @@
             controls.addTo(map);
             map.touchZoom.disable();
             map.doubleClickZoom.disable();
-            map.bound
+
             $(window).on("resize", function () {
                 $("#main").height($(window).height() * 0.7);
                 map.invalidateSize();
-                map.fitBounds([
-                    [-23.00201188664663, -43.823089599609375],
-                    [-22.81226364538693, -43.040313720703125]
-                ]);
+                map.fitBounds(geojson.getBounds());
             }).trigger("resize")
 
         }

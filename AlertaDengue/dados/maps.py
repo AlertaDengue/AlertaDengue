@@ -2,6 +2,7 @@ import psycopg2
 from psycopg2.extras import DictCursor
 from django.conf import settings
 import geojson
+from shapely.geometry import shape
 
 conn = psycopg2.connect("dbname='{}' user='{}' host='{}' password='aldengue'".format(settings.PSQL_DB,
                                                                                      settings.PSQL_USER,
@@ -21,10 +22,12 @@ def get_city_geojson(municipio):
     cur.execute('select geocodigo, nome, geojson, populacao, uf from "Dengue_global"."Municipio" where geocodigo=%s', (municipio,))
     datum = cur.fetchone()
     feat = geojson.loads(datum['geojson'])
+    #shapeobj = shape(feat)
     feat['type'] = 'Feature'
-    feat['properties'] = {'geocodigo': datum['geocodigo'], 'nome': datum['nome'], 'populacao': datum['populacao']}
+    feat['geometry']['type'] = 'Polygon'
+    feat['properties'] = {'geocodigo': datum['geocodigo'], 'nome': datum['nome'], 'populacao': datum['populacao'], 'bbox':None}
 
     geoj = geojson.loads(head + geojson.dumps(feat) + tail)
-    print(geoj)
+    #print(geoj)
     return geoj
 

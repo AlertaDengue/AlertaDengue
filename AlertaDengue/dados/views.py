@@ -96,7 +96,6 @@ class AlertaGeoJSONView(View):
 
 class CityMapView(View):
     def get(self, request, geocodigo):
-        print("geocódigo: ", geocodigo)
         mapa = get_city_geojson(int(geocodigo))
         return HttpResponse(geojson.dumps(mapa))
 
