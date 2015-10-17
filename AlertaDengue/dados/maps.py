@@ -24,8 +24,8 @@ def get_city_geojson(municipio):
     feat = geojson.loads(datum['geojson'])
     #shapeobj = shape(feat)
     feat['type'] = 'Feature'
-    feat['geometry']['type'] = 'Polygon'
-    feat['properties'] = {'geocodigo': datum['geocodigo'], 'nome': datum['nome'], 'populacao': datum['populacao'], 'bbox':None}
+    #feat['geometry']['type'] = 'Polygon'
+    feat['properties'] = {'geocodigo': datum['geocodigo'], 'nome': datum['nome'], 'populacao': datum['populacao']}
 
     geoj = geojson.loads(head + geojson.dumps(feat) + tail)
     #print(geoj)

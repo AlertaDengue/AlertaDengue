@@ -177,13 +177,12 @@
             })
 
             map.fitBounds(group.getBounds());
-        }
-        var geojson;
+        };
         var aps = L.layerGroup();
         var features = L.layerGroup();
         var info = L.control();
         var legend = L.control({position: 'bottomright'});
-        var geojson;
+
         var alertLevels = [
             {name: 'Baixo Risco', color: '#0D6B0D'},
             {name: 'Atenção', color: '#C8D20F'},
@@ -338,10 +337,10 @@
                     }
                 });
 
-
                 aps.addLayer(geojson, true);
                 aps.addTo(map);
                 features.addTo(map);
+                map.fitBounds(geojson.getBounds())
             });
 
 
@@ -350,21 +349,25 @@
                 'Unidades de Saúde': features
             };
             var controls = L.control.layers(null, overlayMaps, {collapsed: true});
-            map.dragging.disable();
-            map.scrollWheelZoom.disable();
+            //map.dragging.disable();
+            //map.scrollWheelZoom.disable();
             map.touchZoom.disable();
             map.doubleClickZoom.disable();
             map.boxZoom.disable();
             map.keyboard.disable();
-            $(".leaflet-control-zoom").css("visibility", "hidden");
+            //$(".leaflet-control-zoom").css("visibility", "hidden");
             controls.addTo(map);
             map.touchZoom.disable();
             map.doubleClickZoom.disable();
-
+            map.bound
             $(window).on("resize", function () {
                 $("#main").height($(window).height() * 0.7);
-                map.invalidateSize();
-                map.fitBounds(geojson.getBounds());
+                    map.invalidateSize();
+                try {
+                    map.fitBounds(geojson.getBounds());
+                }
+                catch(err) { }
+
             }).trigger("resize")
 
         }
