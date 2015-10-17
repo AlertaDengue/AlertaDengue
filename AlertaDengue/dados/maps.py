@@ -15,7 +15,7 @@ def get_city_geojson(municipio):
     """
     #head = '{"type": "FeatureCollection","features": [{type:}'
     cur = conn.cursor()
-    cur.execute('select geojson from "Dengue_global.Municipio" where geocodigo=%s', (municipio,))
+    cur.execute('select geojson from "Dengue_global"."Municipio" where geocodigo=%s', (municipio,))
     geoj = cur.fetchone()
     print(geoj)
     return geoj
