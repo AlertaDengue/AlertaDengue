@@ -50,13 +50,14 @@ class AlertaPageView(TemplateView):
             'last_year': last_year,
             'look_back': len(total_series),
             'total_series': ', '.join(map(str, total_series)),
-            'total_observed':  total_observed_series[-1],
+            'total_observed': total_observed_series[-1],
             'total_observed_series': ', '.join(map(str, total_observed_series)),
         })
         return context
 
+
 class AlertaPageViewMunicipio(TemplateView):
-    template_name = 'alerta.html'
+    template_name = 'alerta_municipio.html'
 
     def get_context_data(self, **kwargs):
         context = super(AlertaPageViewMunicipio, self).get_context_data(**kwargs)
@@ -81,17 +82,20 @@ class AlertaPageViewMunicipio(TemplateView):
             'last_year': last_year,
             'look_back': len(total_series),
             'total_series': ', '.join(map(str, total_series)),
-            'total_observed':  total_observed_series[-1],
+            'total_observed': total_observed_series[-1],
             'total_observed_series': ', '.join(map(str, total_observed_series)),
+            'geocodigo': municipio_gc,
         })
         return context
+
 
 class AlertaGeoJSONView(View):
     def get(self, request, *args, **kwargs):
         return HttpResponse(geojson.dumps(polygons))
 
+
 class CityMapView(View):
-    def get(self,request, geocodigo):
+    def get(self, request, geocodigo):
         mapa = get_city_geojson(int(geocodigo))
         return HttpResponse(geojson.dumps(mapa))
 
@@ -164,7 +168,7 @@ class AboutPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AboutPageView, self).get_context_data(**kwargs)
-        #messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        # messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
         return context
 
 
@@ -173,16 +177,18 @@ class ContactPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ContactPageView, self).get_context_data(**kwargs)
-        #messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        # messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
         return context
+
 
 class JoininPageView(TemplateView):
     template_name = 'joinin.html'
 
     def get_context_data(self, **kwargs):
         context = super(JoininPageView, self).get_context_data(**kwargs)
-        #messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        # messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
         return context
+
 
 class SinanCasesView(View):
     def get(self, request, year, sample):
@@ -210,12 +216,12 @@ class SinanCasesView(View):
         if len(dados) < 5500:
             sample = 1
         # print(type(dados[0].dt_notific))
-        #print ("chegou aqui", sample, dados[0].dt_notific)
+        # print ("chegou aqui", sample, dados[0].dt_notific)
         for c in random.sample(list(dados), int(len(dados) * sample)):
-            #print(c)
+            # print(c)
             cases += "{\"type\":\"Feature\",\"geometry\":" + c.geojson + ", \"properties\":{\"data\":\"" + c.dt_notific.isoformat() + "\"}},"
         cases = cases[:-1] + "]}"
-        #json.loads(cases)
+        # json.loads(cases)
         return HttpResponse(cases, content_type="application/json")
 
 
