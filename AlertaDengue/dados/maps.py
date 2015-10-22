@@ -1,9 +1,9 @@
 import psycopg2
 from django.conf import settings
 
-conn = psycopg2.connect("dbname='{}' user='{}' host='{}' password='aldengue'".format(settings.PSQL_DB,
-                                                                                     settings.PSQL_USER,
-                                                                                     settings.PSQL_HOST))
+# conn = psycopg2.connect("dbname='{}' user='{}' host='{}' password='aldengue'".format(settings.PSQL_DB,
+#                                                                                      settings.PSQL_USER,
+#                                                                                      settings.PSQL_HOST))
 
 
 def get_city_geojson(municipio):
