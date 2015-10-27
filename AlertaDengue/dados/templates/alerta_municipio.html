@@ -61,7 +61,7 @@
     </style>
 {% endblock %}
 
-{% block title %}Situação da Dengue no Rio de Janeiro{% endblock %}
+{% block title %}Situação da Dengue - {{ nome }}{% endblock %}
 
 {% block content %}
     {% leaflet_map "main" callback="main_map_init" %}

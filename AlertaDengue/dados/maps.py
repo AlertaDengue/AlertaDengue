@@ -31,3 +31,14 @@ def get_city_geojson(municipio):
 
     return geoj
 
+def get_city_info(geocodigo):
+    """
+    Pega os metadados do município da tabela Município.
+    :param geocodigo: geocódigo do município.
+    :return:
+    """
+    cur = conn.cursor(cursor_factory=DictCursor)
+    cur.execute('select geocodigo, nome, populacao, uf from "Dengue_global"."Municipio" where geocodigo=%s', (geocodigo,))
+    datum = cur.fetchone()
+    return datum
+
