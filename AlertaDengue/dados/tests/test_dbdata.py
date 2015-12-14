@@ -7,6 +7,7 @@ import datetime
 class TestLoadAlerta(TestCase):
     def setUp(self):
         self.series = dbdata.load_series(330330)
+
     def test_load(self):
         self.assertIsInstance(self.series, dict)
         self.assertIn('casos_est', self.series['global'].keys())
@@ -25,3 +26,13 @@ class TestLoadAlerta(TestCase):
     def test_alerta_is_between_0_and_3(self):
         self.assertEqual(max(self.series['global']['alerta']), 3)
         self.assertEqual(min(self.series['global']['alerta']), 0)
+
+    def test_get_city_alert(self):
+        alert, current, case_series, last_year, obs_case_series, min_max_est = dbdata.get_city_alert(330330)
+        self.assertIsInstance(alert, pd.np.int64)
+        self.assertIsInstance(current, pd.np.int64)
+        self.assertIsInstance(case_series, list)
+        self.assertIsInstance(last_year, pd.np.int64)
+        self.assertIsInstance(obs_case_series, list)
+        self.assertIsInstance(min_max_est, tuple)
+
