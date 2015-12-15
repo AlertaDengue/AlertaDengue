@@ -16,6 +16,9 @@ def get_city_geojson(municipio):
     :param municipio: geocódigo do municipio
     :return:
     """
+    conn = psycopg2.connect("dbname='{}' user='{}' host='{}' password='aldengue'".format(settings.PSQL_DB,
+                                                                                     settings.PSQL_USER,
+                                                                                     settings.PSQL_HOST))
     head = r'{"type": "FeatureCollection", "features":['
     tail = ']}'
     cur = conn.cursor(cursor_factory=DictCursor)
@@ -37,6 +40,9 @@ def get_city_info(geocodigo):
     :param geocodigo: geocódigo do município.
     :return:
     """
+    conn = psycopg2.connect("dbname='{}' user='{}' host='{}' password='aldengue'".format(settings.PSQL_DB,
+                                                                                     settings.PSQL_USER,
+                                                                                     settings.PSQL_HOST))
     cur = conn.cursor(cursor_factory=DictCursor)
     cur.execute('select geocodigo, nome, populacao, uf from "Dengue_global"."Municipio" where geocodigo=%s', (geocodigo,))
     datum = cur.fetchone()

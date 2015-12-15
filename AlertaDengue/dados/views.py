@@ -18,6 +18,7 @@ import numpy as np
 import locale
 import geojson
 from dados.maps import get_city_geojson, get_city_info
+from dados import dbdata
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
@@ -37,10 +38,23 @@ class AlertaPageView(TemplateView):
         quarta = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d")
         total_series = sum(np.array(list(case_series.values())), np.zeros(12, int))
         total_observed_series = sum(np.array(list(observed_cases.values())), np.zeros(12, int))
+        bairros_mrj = {
+                1.0: 'AP 1: Centro e adjacências',
+                2.1: 'AP 2.1: Zona Sul',
+                2.2: 'AP 2.2: Tijuca e adjacências',
+                3.1: 'AP 3.1: Bonsucesso e adjacências',
+                3.2: 'AP 3.2: Meier e adjacências',
+                3.3: 'AP 3.3: Madureira e adjacências',
+                4.0: 'AP 4: Barra, Recreio e Jacarepaguá',
+                5.1: 'AP 5.1: Bangu e adjacências',
+                5.2: 'AP 5.2: Campo Grande e adjacências',
+                5.3: 'AP 5.3: Santa Cruz e adjacências'
+            }
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
             'novos_casos': sum(casos_ap.values()),
+            'bairros': bairros_mrj,
             'min_est': sum(i[0] for i in min_max_est.values()),
             'max_est': sum(i[1] for i in min_max_est.values()),
             'series_casos': case_series,
@@ -62,25 +76,26 @@ class AlertaPageViewMunicipio(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AlertaPageViewMunicipio, self).get_context_data(**kwargs)
         municipio_gc = context['geocodigo']
+        if municipio_gc == 3304557:
+            redirect('AlertaPageView')
         city_info = get_city_info(municipio_gc)
-        alert, current, case_series, last_year, observed_cases, min_max_est = get_alert()
-        casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
-        alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
-        semana = str(current.SE.iat[-1])[-2:]
-        quarta = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d")
-        total_series = sum(np.array(list(case_series.values())), np.zeros(12, int))
-        total_observed_series = sum(np.array(list(observed_cases.values())), np.zeros(12, int))
+        alert, SE, case_series, last_year, observed_cases, min_max_est, dia = dbdata.get_city_alert(municipio_gc)
+        casos_ap = {municipio_gc: int(case_series[-1])}
+        bairros = {municipio_gc: city_info['nome']}
+        total_series = case_series[-12:]
+        total_observed_series = observed_cases[-12:]
         context.update({
             'nome': city_info['nome'],
             'casos_por_ap': json.dumps(casos_ap),
-            'alerta': alerta,
-            'novos_casos': sum(casos_ap.values()),
-            'min_est': sum(i[0] for i in min_max_est.values()),
-            'max_est': sum(i[1] for i in min_max_est.values()),
-            'series_casos': case_series,
-            'SE': int(semana),
-            'data1': (quarta - datetime.timedelta(2)).strftime("%d de %B de %Y"),
-            'data2': (quarta + datetime.timedelta(4)).strftime("%d de %B de %Y"),
+            'alerta': {municipio_gc: alert},
+            'novos_casos': case_series[-1],
+            'bairros': bairros,
+            'min_est': min_max_est[0],
+            'max_est': min_max_est[1],
+            'series_casos': {municipio_gc: case_series[-12:]},
+            'SE': SE,
+            'data1': (dia - datetime.timedelta(2)).strftime("%d de %B de %Y"),
+            'data2': (dia + datetime.timedelta(4)).strftime("%d de %B de %Y"),
             'last_year': last_year,
             'look_back': len(total_series),
             'total_series': ', '.join(map(str, total_series)),

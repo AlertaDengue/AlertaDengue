@@ -11,12 +11,10 @@ import numpy as np
 from collections import defaultdict
 import datetime
 from time import mktime
-settings.configure()
+
 
 
 conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
-
-
 
 
 def load_series(cidade, doenca='dengue'):
@@ -26,11 +24,15 @@ def load_series(cidade, doenca='dengue'):
     :param doenca: dengue|chik|zika
     :return: dictionary
     """
+    ap = str(cidade)
+    cidade = int(str(cidade)[:-1])
     dados_alerta = pd.read_sql_query('select * from "Municipio"."Historico_alerta" where municipio_geocodigo={}'.format(cidade), conexao, 'id', parse_dates=True)
+    if len(dados_alerta) == 0:
+        raise NameError("Não foi possível obter os dados do Banco")
 
     # tweets = pd.read_sql_query('select * from "Municipio"."Tweet" where "Municipio_geocodigo"={}'.format(cidade), parse_dates=True)
     series = defaultdict(lambda: defaultdict(lambda: []))
-    ap = 'global'
+
     series[ap]['dia'] = dados_alerta.data_iniSE.tolist()
     # series[ap]['tweets'] = [float(i) if not np.isnan(i) else None for i in tweets.numero]
     # series[ap]['tmin'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).tmin]
@@ -38,9 +40,11 @@ def load_series(cidade, doenca='dengue'):
     series[ap]['casos_est'] = dados_alerta.casos_est.astype(int).tolist()
     series[ap]['casos_est_max'] = dados_alerta.casos_est_max.astype(int).tolist()
     series[ap]['casos'] = dados_alerta.casos.astype(int).tolist()
-    series[ap]['alerta'] = (dados_alerta.nivel.astype(int)-1).tolist()
+    series[ap]['alerta'] = (dados_alerta.nivel.astype(int)-1).tolist()  # (1,4)->(0,3)
+    series[ap]['SE'] = (dados_alerta.SE.astype(int)).tolist()
     # print(series['dia'])
     return series
+
 
 def get_city_alert(cidade, doenca='dengue'):
     """
@@ -50,10 +54,34 @@ def get_city_alert(cidade, doenca='dengue'):
     :return: tupla
     """
     series = load_series(cidade, doenca)
-    alert = series['global']['alerta'][-1]
-    current = series['global']['casos_est'][-1]
-    case_series = series['global']['casos_est']
-    obs_case_series = series['global']['casos']
-    last_year = series['global']['casos'][-52]
-    min_max_est = (series['global']['casos_est_min'][-1], series['global']['casos_est_max'][-1])
-    return alert, current, case_series, last_year, obs_case_series, min_max_est
+    alert = series[str(cidade)]['alerta'][-1]
+    SE = series[str(cidade)]['SE'][-1]
+    case_series = series[str(cidade)]['casos_est']
+    obs_case_series = series[str(cidade)]['casos']
+    last_year = series[str(cidade)]['casos'][-52]
+    min_max_est = (series[str(cidade)]['casos_est_min'][-1], series[str(cidade)]['casos_est_max'][-1])
+    dia = series[str(cidade)]['dia'][-1]
+    return alert, SE, case_series, last_year, obs_case_series, min_max_est, dia
+
+
+def calculate_digit(dig):
+    """
+    Calcula o digito verificador do geocódigo de município
+    :param dig: geocódigo com 6 dígitos
+    :return: dígito verificador
+    """
+    peso = [1, 2, 1, 2, 1, 2, 0]
+    soma = 0
+    dig = str(dig)
+    for i in range(6):
+        valor = int(dig[i]) * peso[i]
+        soma += sum([int(d) for d in str(valor)]) if valor > 9 else valor
+    dv = 0 if soma % 10 == 0 else (10 - (soma % 10))
+    return dv
+
+
+def add_dv(geocodigo):
+    if len(str(geocodigo)) == 7:
+        return geocodigo
+    else:
+        return int(str(geocodigo) + str(calculate_digit(geocodigo)))

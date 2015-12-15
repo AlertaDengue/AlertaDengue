@@ -175,11 +175,12 @@
             // so looping in all those layers filtering those having feature
             $.each(map._layers, function (ml) {
 
-                    group.addLayer(this)
+                group.addLayer(this)
             })
 
             map.fitBounds(group.getBounds());
-        };
+        }
+        ;
         var aps = L.layerGroup();
         var features = L.layerGroup();
         var info = L.control();
@@ -252,18 +253,7 @@
                 2: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.',
                 3: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.'
             };
-            bairros = {
-                1.0: 'AP 1: Centro e adjacências',
-                2.1: 'AP 2.1: Zona Sul',
-                2.2: 'AP 2.2: Tijuca e adjacências',
-                3.1: 'AP 3.1: Bonsucesso e adjacências',
-                3.2: 'AP 3.2: Meier e adjacências',
-                3.3: 'AP 3.3: Madureira e adjacências',
-                4.0: 'AP 4: Barra, Recreio e Jacarepaguá',
-                5.1: 'AP 5.1: Bangu e adjacências',
-                5.2: 'AP 5.2: Campo Grande e adjacências',
-                5.3: 'AP 5.3: Santa Cruz e adjacências'
-            };
+            bairros = {{ bairros|safe }};
 
             // control that shows state info on hover
             info.onAdd = function (map) {
@@ -319,7 +309,6 @@
             load_map_layer(dataurl, map);
 
 
-
             var overlayMaps = {
                 'Áreas de Planejamento': aps,
                 'Unidades de Saúde': features
@@ -338,11 +327,12 @@
 
             $(window).on("resize", function () {
                 $("#main").height($(window).height() * 0.7);
-                    map.invalidateSize();
+                map.invalidateSize();
                 try {
                     map.fitBounds(geojson.getBounds());
                 }
-                catch(err) { }
+                catch (err) {
+                }
 
             }).trigger("resize")
 
