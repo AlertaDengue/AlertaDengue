@@ -2,6 +2,7 @@
 {% block extra_head %}
     {% load static %}
     {% load leaflet_tags %}
+    {% load series %}
     {% leaflet_js %}
     {% leaflet_css %}
     {% leaflet_js plugins="ALL" %}
@@ -64,6 +65,7 @@
 {% block title %}Situação da Dengue - {{ nome }}{% endblock %}
 
 {% block content %}
+    <div id="historico-chart-" style="min-width: 500px; height: 400px; margin: 10px" data-highcharts-chart="0"></div>
     {% leaflet_map "main" callback="main_map_init" %}
     <br>
     {#    <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">#}
