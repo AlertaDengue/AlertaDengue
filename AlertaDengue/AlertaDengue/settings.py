@@ -25,7 +25,6 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = ["alerta.dengue.mat.br", "info.dengue.mat.br"]
 
@@ -42,7 +41,7 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     'leaflet',
     'bootstrap3',
-    'debug_toolbar',
+    # 'debug_toolbar',
     'dados',
 )
 
@@ -58,9 +57,26 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'AlertaDengue.urls'
 
-TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
+
 
 WSGI_APPLICATION = 'AlertaDengue.wsgi.application'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'OPTIONS': {'context_processors': ["django.contrib.auth.context_processors.auth",
+                                            "django.template.context_processors.debug",
+                                            "django.template.context_processors.i18n",
+                                            "django.template.context_processors.media",
+                                            "django.template.context_processors.static",
+                                            "django.template.context_processors.tz",
+                                            "django.contrib.messages.context_processors.messages"],
+                    }
+    },
+]
+
 
 
 # Database
@@ -110,6 +126,8 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+
 
 
 # Static files (CSS, JavaScript, Images)

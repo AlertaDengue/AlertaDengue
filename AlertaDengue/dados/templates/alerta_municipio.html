@@ -54,6 +54,9 @@
     <script src='/static/exp_PontosUnidadesBasicasSaudeMRJ2014wgs84.js'></script>
     <script src="/static/js/Autolinker.min.js"></script>
     <script src="/static/js/jquery.sparkline.min.js"></script>
+    <script src="/static/js/highcharts.js"></script>
+    <script src="/static/js/highcharts-more.js"></script>
+    <script src="/static/js/modules/exporting.js"></script>
     <script src="/static/js/infodengue.js"></script>
     <style>
         .jqstooltip {
@@ -65,7 +68,7 @@
 {% block title %}Situação da Dengue - {{ nome }}{% endblock %}
 
 {% block content %}
-    <div id="historico-chart-" style="min-width: 500px; height: 400px; margin: 10px" data-highcharts-chart="0"></div>
+    {% alerta_series %}
     {% leaflet_map "main" callback="main_map_init" %}
     <br>
     {#    <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">#}

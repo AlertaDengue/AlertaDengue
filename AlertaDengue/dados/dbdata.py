@@ -43,7 +43,8 @@ def load_series(cidade, doenca='dengue'):
     series[ap]['alerta'] = (dados_alerta.nivel.astype(int)-1).tolist()  # (1,4)->(0,3)
     series[ap]['SE'] = (dados_alerta.SE.astype(int)).tolist()
     # print(series['dia'])
-    return series
+    series[ap] = dict(series[ap])
+    return dict(series)
 
 
 def get_city_alert(cidade, doenca='dengue'):
