@@ -82,7 +82,7 @@ $(function () {
         series: [
             {
                 name: 'Casos Notificados de Dengue',
-                type: 'areaspline',
+                type: 'spline',
                 animation: true,
                 color: '#4572A7',
                 pointInterval: 7 * 24 * 3600 * 1000,
@@ -97,6 +97,62 @@ $(function () {
                     valueSuffix: ' casos'
                 }
 
+            },
+
+            {
+                name: 'Alerta Vermelho',
+                color: '#FB4949',
+                type: 'area',
+                animation: true,
+                yAxis: 0,
+                pointInterval: 7 * 24 * 3600 * 1000,
+                pointStart: {{ start }}*1000 + tzo,
+                data: {{ vermelho }},
+                tooltip: {
+                    enabled: false
+                }
+
+            },
+            {
+                name: 'Alerta laranja',
+                color: '#FFA858',
+                type: 'area',
+                animation: true,
+                yAxis: 0,
+                pointInterval: 7 * 24 * 3600 * 1000,
+                pointStart: {{ start }}*1000 + tzo,
+                data: {{ laranja }},
+                tooltip: {
+                    enabled: false
+                }
+
+            },
+            {
+                name: 'Alerta Amarelo',
+                color: '#FBFC49',
+                type: 'area',
+                animation: true,
+                yAxis: 0,
+                pointInterval: 7 * 24 * 3600 * 1000,
+                pointStart: {{ start }}*1000 + tzo,
+                data: {{ amarelo }},
+                tooltip: {
+                    enabled: false
+                }
+
+            },
+            {
+                name: 'Alerta verde',
+                color: '#48FD48',
+                type: 'area',
+                animation: true,
+                yAxis: 0,
+                pointInterval: 7 * 24 * 3600 * 1000,
+                pointStart: {{ start }}*1000 + tzo,
+                data: {{ verde }},
+                tooltip: {
+                    enabled: false
+                }
             },
             {
                 name: 'Casos Estimados de Dengue',
