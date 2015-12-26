@@ -7,7 +7,7 @@ $(function () {
     // Agora as series de dados
     var dados = {{ dados|safe }};
 
-    var chart = new Highcharts.Chart(
+    var chart =  Highcharts.stockChart(
             {
 
         chart: {
@@ -102,7 +102,7 @@ $(function () {
             {
                 name: 'Alerta Vermelho',
                 color: '#FB4949',
-                type: 'area',
+                type: 'areaspline',
                 animation: true,
                 yAxis: 0,
                 pointInterval: 7 * 24 * 3600 * 1000,
@@ -116,7 +116,7 @@ $(function () {
             {
                 name: 'Alerta laranja',
                 color: '#FFA858',
-                type: 'area',
+                type: 'areaspline',
                 animation: true,
                 yAxis: 0,
                 pointInterval: 7 * 24 * 3600 * 1000,
@@ -130,7 +130,7 @@ $(function () {
             {
                 name: 'Alerta Amarelo',
                 color: '#FBFC49',
-                type: 'area',
+                type: 'areaspline',
                 animation: true,
                 yAxis: 0,
                 pointInterval: 7 * 24 * 3600 * 1000,
@@ -144,7 +144,7 @@ $(function () {
             {
                 name: 'Alerta verde',
                 color: '#48FD48',
-                type: 'area',
+                type: 'areaspline',
                 animation: true,
                 yAxis: 0,
                 pointInterval: 7 * 24 * 3600 * 1000,
@@ -157,7 +157,7 @@ $(function () {
             {
                 name: 'Casos Estimados de Dengue',
                 color: '#AA4643',
-                type: 'line',
+                type: 'spline',
                 animation: true,
                 yAxis: 0,
                 pointInterval: 7 * 24 * 3600 * 1000,
