@@ -38,3 +38,12 @@ class TestLoadAlerta(TestCase):
         self.assertIsInstance(min_max_est, tuple)
         self.assertIsInstance(dia, datetime.date)
 
+
+class TestMunicipio(TestCase):
+    def test_get_active_cities(self):
+        muns = dbdata.get_active_cities()
+        self.assertIsInstance(muns, list)
+        self.assertGreater(len(muns), 0)
+        self.assertIn((3303302, 'Niterói'), muns)
+
+

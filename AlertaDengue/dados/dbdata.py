@@ -13,8 +13,18 @@ import datetime
 from time import mktime
 
 
-
-conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
+def get_active_cities():
+    conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
+    # sql = 'SELECT DISTINCT municipio_geocodigo, nome from "Municipio"."Historico_alerta" LEFT JOIN "Dengue_global"."Municipio" on municipio_geocodigo = geocodigo'
+    sql = 'SELECT DISTINCT municipio_geocodigo from "Municipio"."Historico_alerta"'
+    result = conexao.execute(sql)
+    municipio_gcs = [add_dv(rec['municipio_geocodigo']) for rec in result]
+    municipios = []
+    for gc in municipio_gcs:
+        res =conexao.execute('SELECT nome from "Dengue_global"."Municipio" where geocodigo={}'.format(gc))
+        municipios.append((gc, res.fetchone()['nome']))
+    # conexao.close()
+    return municipios
 
 
 def load_series(cidade, doenca='dengue'):
@@ -24,6 +34,7 @@ def load_series(cidade, doenca='dengue'):
     :param doenca: dengue|chik|zika
     :return: dictionary
     """
+    conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
     ap = str(cidade)
     cidade = int(str(cidade)[:-1])
     dados_alerta = pd.read_sql_query('select * from "Municipio"."Historico_alerta" where municipio_geocodigo={}'.format(cidade), conexao, 'id', parse_dates=True)
@@ -44,6 +55,7 @@ def load_series(cidade, doenca='dengue'):
     series[ap]['SE'] = (dados_alerta.SE.astype(int)).tolist()
     # print(series['dia'])
     series[ap] = dict(series[ap])
+    conexao.close()
     return dict(series)
 
 
@@ -82,6 +94,10 @@ def calculate_digit(dig):
 
 
 def add_dv(geocodigo):
+    """
+    Retorna o geocóodigo do município adicionando o digito verificador,, se necessário.
+    :param geocodigo: geocóodigo com 6 ou 7 dígitos
+    """
     if len(str(geocodigo)) == 7:
         return geocodigo
     else:

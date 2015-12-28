@@ -26,6 +26,11 @@ dados_alerta = pd.read_csv(os.path.join(settings.DATA_DIR, 'alertaAPS.csv'), hea
 polygons = geojson.load(open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')))
 
 
+class AlertaMainView(TemplateView):
+    template_name = 'main.html'
+    def get_context_data(self, **kwargs):
+        municipios =
+
 class AlertaPageView(TemplateView):
     template_name = 'alerta.html'
 
