@@ -29,7 +29,7 @@ polygons = geojson.load(open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps
 class AlertaMainView(TemplateView):
     template_name = 'main.html'
     def get_context_data(self, **kwargs):
-        municipios =
+        municipios = dbdata.get_active_cities()
 
 class AlertaPageView(TemplateView):
     template_name = 'alerta.html'

@@ -55,7 +55,7 @@ def load_series(cidade, doenca='dengue'):
     series[ap]['SE'] = (dados_alerta.SE.astype(int)).tolist()
     # print(series['dia'])
     series[ap] = dict(series[ap])
-    conexao.close()
+    # conexao.close()
     return dict(series)
 
 

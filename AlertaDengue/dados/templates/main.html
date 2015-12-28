@@ -48,113 +48,18 @@
             opacity: 0.7;
         }
     </style>
-{#    <script src="/static/js/heatmap.js"></script>#}
-{#    <script src="/static/js/heatmap-leaflet.js"></script>#}
-{#    <script src="/static/js/QuadTree.js"></script>#}
-    <script src='/static/exp_PontosUnidadesBasicasSaudeMRJ2014wgs84.js'></script>
     <script src="/static/js/Autolinker.min.js"></script>
     <script src="/static/js/jquery.sparkline.min.js"></script>
-{#    <script src="/static/js/highcharts.js"></script>#}
-{#    <script src="/static/js/highcharts-more.js"></script>#}
     <script src="/static/js/highstock.js"></script>
     <script src="/static/js/modules/exporting.js"></script>
     <script src="/static/js/infodengue.js"></script>
-    <style>
-        .jqstooltip {
-            box-sizing: content-box;
-        }
-    </style>
-{% endblock %}
 
-{% block title %}Situação da Dengue - {{ nome }}{% endblock %}
+{% endblock %}
+{% block title %}Situação da Dengue - Brasil {% endblock %}
 
 {% block content %}
-    {% alerta_series %}
+    {% total_series %}
     {% leaflet_map "main" callback="main_map_init" %}
-    <br>
-    {#    <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">#}
-    <div class="row clearfix boxrow">
-        <div class="col-md-6 column bluebox">
-            <h3><span class="glyphicon glyphicon-signal" aria-hidden="true"></span> Níveis de Atenção</h3>
-
-            <div class="panel-group" id="panelgroup">
-                <div class="panel panel-default panel-verde">
-                    <div class="panel-heading">
-                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-222790"
-                           href="#panel-element-vd">Nível Verde</a>
-                    </div>
-                    <div id="panel-element-vd" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições ideais para a
-                            reprodução do Mosquito.
-                        </div>
-                    </div>
-                </div>
-                <div class="panel panel-default panel-amarelo">
-                    <div class="panel-heading panel-amarelo">
-                        <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-222790"
-                           href="#panel-element-am">Nível Amarelo</a>
-                    </div>
-                    <div id="panel-element-am" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            Estação da Dengue. No nível amarelo, temos condições climáticas propícias à reprodução do
-                            mosquito. Mas ainda sem transmissão significativa da Doença.
-                        </div>
-                    </div>
-                </div>
-                <div class="panel panel-default panel-laranja">
-                    <div class="panel-heading">
-                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-222790"
-                           href="#panel-element-la">Nível Laranja</a>
-                    </div>
-                    <div id="panel-element-la" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            Transmissão da Dengue. No nível laranja, já observamos uma incidência pronunciada da Dengue,
-                            mas ainda não podemos afirmar
-                            com confiança que teremos epidemia.
-                        </div>
-                    </div>
-                </div>
-                <div class="panel panel-default panel-vermelho">
-                    <div class="panel-heading">
-                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-222790"
-                           href="#panel-element-vm">Nível Vermelho</a>
-                    </div>
-                    <div id="panel-element-vm" class="panel-collapse collapse">
-                        <div class="panel-body">
-                            Epidemia. Neste nível estamos em plena epidemia. Todo o cuidado é pouco, e precisamos ficar
-                            atentos aos sintomas
-                            da Dengue e procurar o médico imediatamente em caso suspeita de Dengue.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 column bluebox">
-            <h3><span class="badge badge-info">{{ novos_casos }}</span> Casos estimados </h3>
-
-            <p>São estimados entre <b>{{ min_est }}</b> e <b>{{ max_est }} novos casos</b> na Semana
-                Epidemiológica {{ SE }}: {{ data1 }} a {{ data2 }}. Com {{ total_observed }} casos notificados
-                oficialmente até o momento</p>
-            <h4>Últimas {{ look_back }} semanas:</h4>
-            <span class='totalsparkline'>{{ total_series }}</span>
-
-            <p></p>
-            {% comment %}<h4>Há um ano:</h4>
-            <p>Há um ano atrás, nesta mesma semana, observamos <b>{{ last_year }}</b> casos</p>{% endcomment %}
-
-
-        </div>
-        <div class="col-md-3 column bluebox">
-            <h3><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> Suspeita de um criadouro? </h3>
-
-
-            <p>Em caso de suspeita de criadouro de mosquitos, ligue para a <a href="http://www.1746.rio.gov.br/"
-                                                                              style="color: #FFFFFF">Central de
-                atendimento ao cidadão 1746</a>.</p>
-
-        </div>
-    </div>
 
     <script type="text/javascript">
         var casos_por_ap;

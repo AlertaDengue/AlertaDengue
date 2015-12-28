@@ -22,3 +22,8 @@ def alerta_series(context):
             'laranja': json.dumps(oa),
             'vermelho': json.dumps(ra),
             }
+
+
+@register.inclusion_tag("total_series.html", takes_context=True)
+def total_series(context):
+    return {}
