@@ -13,7 +13,11 @@ import datetime
 from time import mktime
 
 
-def get_active_cities():
+def get_all_active_cities():
+    """
+    Fetch from the database a list on names of active cities
+    :return: list of names
+    """
     conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
     # sql = 'SELECT DISTINCT municipio_geocodigo, nome from "Municipio"."Historico_alerta" LEFT JOIN "Dengue_global"."Municipio" on municipio_geocodigo = geocodigo'
     sql = 'SELECT DISTINCT municipio_geocodigo from "Municipio"."Historico_alerta"'
@@ -26,6 +30,16 @@ def get_active_cities():
     # conexao.close()
     return municipios
 
+def get_city(query):
+    """
+    Fetch city geocode, name and state from the database, matching the sbustring query
+    :param query: substring of the city
+    :return: list of dictionaries
+    """
+    conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
+    sql = 'SELECT geocodigo, nome from "Dengue_global"."Municipio" WHERE nome ilike(\'%{}%\')'.format(query)
+    result = conexao.execute(sql)
+    return result.fetchall()
 
 def load_series(cidade, doenca='dengue'):
     """

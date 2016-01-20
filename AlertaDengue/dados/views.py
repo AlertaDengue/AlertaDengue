@@ -29,7 +29,15 @@ polygons = geojson.load(open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps
 class AlertaMainView(TemplateView):
     template_name = 'main.html'
     def get_context_data(self, **kwargs):
-        municipios = dbdata.get_active_cities()
+        municipios = dbdata.get_all_active_cities()
+
+def get_municipio(request):
+    results = []
+    q = request.GET['q']
+    muns = Movie.objects.filter(title__icontains = q)
+    results = [ {movie.id: movie.name} for movie in movies ]
+    data = json.dumps(results)
+    return HttpResponse(data, content_type = 'application/json')
 
 class AlertaPageView(TemplateView):
     template_name = 'alerta.html'
