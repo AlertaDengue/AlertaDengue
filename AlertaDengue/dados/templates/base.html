@@ -2,7 +2,17 @@
 {% load bootstrap3 %}
 
 {% block bootstrap3_content %}
+    <style>
+    .tt-hint {
+        font-size: 18px;
+        line-height: 1.33;
+    }
 
+    .twitter-typeahead .tt-query, .twitter-typeahead .tt-hint {
+        height: 45px;
+        padding: 10px 16px;
+    }
+    </style>
     <!-- Wrap all page content here -->
     <div id="wrap">
     <div class="view">
@@ -42,7 +52,9 @@
                                 <li><a href="{% url "contact" %}">Fale Conosco</a></li>
                                 <li><a href="{% url "joinin" %}">Participe</a></li>
                                 <li style="overflow: visible">
-                                    vla
+                                    <div id="remote" class="twitter-typeahead" style="overflow-y: auto; max-height: 150px; overflow: visible">
+            <input type="text" class="form-control input-lg twitter-typeahead tt-dropdown-menu" placeholder="Encontre um município..." name="q" style="position: relative"></input>
+
                                 </li>
 
                                 {% if user.is_authenticated %}
@@ -99,9 +111,6 @@
                     </div>
                 </div>
             </div>
-        <h3>Municípios monitorados:</h3>
-        <div id="remote" class="twitter-typeahead" style="overflow-y: auto; max-height: 150px">
-            <input type="text" class="form-control input-lg typeahead tt-dropdown-menu" placeholder="Encontre um município..." name="q"></input>
         </div>
         </div>
 
@@ -117,7 +126,7 @@
                     }
                 });
             citiesDisplay.initialize();
-            $('#remote .typeahead').typeahead({
+            $('#remote .twitter-typeahead').typeahead({
                 hint: true,
                 minLength: 1,
                 highlight: true},
