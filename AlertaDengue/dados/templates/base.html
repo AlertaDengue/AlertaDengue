@@ -41,7 +41,10 @@
                                 <li><a href="{% url "about" %}">Saiba Mais</a></li>
                                 <li><a href="{% url "contact" %}">Fale Conosco</a></li>
                                 <li><a href="{% url "joinin" %}">Participe</a></li>
-                                <li><input id="searchBox" type="text" class="form-control input-lg typeahead" placeholder="Encontre um município..." name="q"></input></li>
+                                <li style="overflow: visible">
+                                    vla
+                                </li>
+
                                 {% if user.is_authenticated %}
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Acesse os Dados <b
@@ -73,6 +76,7 @@
                                 {% endif %}
                             </ul>
                         </div>
+
                         <!--/.nav-collapse -->
 
 
@@ -95,7 +99,35 @@
                     </div>
                 </div>
             </div>
+        <h3>Municípios monitorados:</h3>
+        <div id="remote" class="twitter-typeahead" style="overflow-y: auto; max-height: 150px">
+            <input type="text" class="form-control input-lg typeahead tt-dropdown-menu" placeholder="Encontre um município..." name="q"></input>
         </div>
+        </div>
+
+        <script type="application/javascript">
+            var citiesDisplay = new Bloodhound({
+                    datumTokenizer: Bloodhound.tokenizers.whitespace,
+                    queryTokenizer: Bloodhound.tokenizers.whitespace,
+                    remote: {
+                        url: "{% url 'get_city' %}",
+                        replace: function(url, query) {
+                            return url + "?q=" + query;
+                        }
+                    }
+                });
+            citiesDisplay.initialize();
+            $('#remote .typeahead').typeahead({
+                hint: true,
+                minLength: 1,
+                highlight: true},
+                {name: 'cities-display',
+                display: function(sugg){
+                    return sugg.nome+' - '+sugg.uf
+                },
+                source: citiesDisplay,
+            });
+        </script>
         <!-- Begin page content -->
 
         <div class="container">

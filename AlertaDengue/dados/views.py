@@ -32,12 +32,10 @@ class AlertaMainView(TemplateView):
         municipios = dbdata.get_all_active_cities()
 
 def get_municipio(request):
-    results = []
     q = request.GET['q']
-    muns = Movie.objects.filter(title__icontains = q)
-    results = [ {movie.id: movie.name} for movie in movies ]
-    data = json.dumps(results)
-    return HttpResponse(data, content_type = 'application/json')
+    muns = dbdata.get_city(q)
+    data = json.dumps([{'geocodigo':g, 'nome':n, 'uf':u} for g,n,u in muns])
+    return HttpResponse(data, content_type='application/json')
 
 class AlertaPageView(TemplateView):
     template_name = 'alerta.html'

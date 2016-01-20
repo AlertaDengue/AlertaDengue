@@ -37,8 +37,9 @@ def get_city(query):
     :return: list of dictionaries
     """
     conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
-    sql = 'SELECT geocodigo, nome from "Dengue_global"."Municipio" WHERE nome ilike(\'%{}%\')'.format(query)
-    result = conexao.execute(sql)
+    sql = 'SELECT geocodigo, nome, uf from "Dengue_global"."Municipio" WHERE nome ilike(%s);'
+    result = conexao.execute(sql, ('%'+query+'%',))
+
     return result.fetchall()
 
 def load_series(cidade, doenca='dengue'):

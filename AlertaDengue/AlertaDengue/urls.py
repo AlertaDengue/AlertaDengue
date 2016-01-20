@@ -3,7 +3,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from dados.views import HomePageView, SinanCasesView, AboutPageView, ContactPageView, JoininPageView, MapaDengueView, \
     MapaMosquitoView, \
-    HistoricoView, AlertaPageView, AlertaGeoJSONView, AlertaPageViewMunicipio, CityMapView
+    HistoricoView, AlertaPageView, AlertaGeoJSONView, AlertaPageViewMunicipio, CityMapView, get_municipio
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.decorators import login_required
@@ -22,6 +22,7 @@ urlpatterns = [#'',
                url(r'^alerta-detalhado/$', HomePageView.as_view(), name='home'),
                url(r'^alertageoJSON/$', login_required(AlertaGeoJSONView.as_view()), name='alerta-layer'),
                url(r'^geojson/(?P<geocodigo>\d{7})/$', CityMapView.as_view(), name='mapa'),
+               url(r'^getcity/$', get_municipio, name='get_city'),
                url(r'^mapadengue/$', MapaDengueView.as_view(), name='mapadengue'),
                url(r'^mapamosquito/$', MapaMosquitoView.as_view(), name='mapamosquito'),
                url(r'^historico/$', HistoricoView.as_view(), name='historico'),
