@@ -136,6 +136,10 @@
                 },
                 source: citiesDisplay,
             });
+            $('#remote').bind('typeahead:select', function(ev, suggestion){
+                //alert(suggestion.geocodigo);
+                window.location.href = '/alerta/'+suggestion.geocodigo.toString()
+            });
         </script>
         <!-- Begin page content -->
 
