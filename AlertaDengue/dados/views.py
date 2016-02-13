@@ -29,14 +29,17 @@ polygons = geojson.load(open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps
 
 class AlertaMainView(TemplateView):
     template_name = 'main.html'
+
     def get_context_data(self, **kwargs):
         municipios = dbdata.get_all_active_cities()
+
 
 def get_municipio(request):
     q = request.GET['q']
     muns = dbdata.get_city(q)
-    data = json.dumps([{'geocodigo':g, 'nome':n, 'uf':u} for g,n,u in muns])
+    data = json.dumps([{'geocodigo': g, 'nome': n, 'uf': u} for g, n, u in muns])
     return HttpResponse(data, content_type='application/json')
+
 
 class AlertaPageView(TemplateView):
     template_name = 'alerta.html'
@@ -51,17 +54,17 @@ class AlertaPageView(TemplateView):
         total_series = sum(np.array(list(case_series.values())), np.zeros(12, int))
         total_observed_series = sum(np.array(list(observed_cases.values())), np.zeros(12, int))
         bairros_mrj = {
-                1.0: 'AP 1: Centro e adjacências',
-                2.1: 'AP 2.1: Zona Sul',
-                2.2: 'AP 2.2: Tijuca e adjacências',
-                3.1: 'AP 3.1: Bonsucesso e adjacências',
-                3.2: 'AP 3.2: Meier e adjacências',
-                3.3: 'AP 3.3: Madureira e adjacências',
-                4.0: 'AP 4: Barra, Recreio e Jacarepaguá',
-                5.1: 'AP 5.1: Bangu e adjacências',
-                5.2: 'AP 5.2: Campo Grande e adjacências',
-                5.3: 'AP 5.3: Santa Cruz e adjacências'
-            }
+            1.0: 'AP 1: Centro e adjacências',
+            2.1: 'AP 2.1: Zona Sul',
+            2.2: 'AP 2.2: Tijuca e adjacências',
+            3.1: 'AP 3.1: Bonsucesso e adjacências',
+            3.2: 'AP 3.2: Meier e adjacências',
+            3.3: 'AP 3.3: Madureira e adjacências',
+            4.0: 'AP 4: Barra, Recreio e Jacarepaguá',
+            5.1: 'AP 5.1: Bangu e adjacências',
+            5.2: 'AP 5.2: Campo Grande e adjacências',
+            5.3: 'AP 5.3: Santa Cruz e adjacências'
+        }
         context.update({
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
@@ -129,11 +132,11 @@ class CityMapView(View):
         return HttpResponse(geojson.dumps(mapa))
 
 
-class HomePageView(TemplateView):
-    template_name = 'home.html'
+class DetailsPageView(TemplateView):
+    template_name = 'details.html'
 
     def get_context_data(self, **kwargs):
-        context = super(HomePageView, self).get_context_data(**kwargs)
+        context = super(DetailsPageView, self).get_context_data(**kwargs)
         # messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
         series = load_series()
         aps = list(series.keys())

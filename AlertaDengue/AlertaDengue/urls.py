@@ -1,9 +1,10 @@
 # coding=utf-8
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from dados.views import HomePageView, SinanCasesView, AboutPageView, ContactPageView, JoininPageView, MapaDengueView, \
+from dados.views import DetailsPageView, SinanCasesView, AboutPageView, ContactPageView, JoininPageView, MapaDengueView, \
     MapaMosquitoView, \
-    HistoricoView, AlertaPageView, AlertaGeoJSONView, AlertaPageViewMunicipio, CityMapView, get_municipio
+    HistoricoView, AlertaPageView, AlertaGeoJSONView, AlertaPageViewMunicipio, CityMapView, get_municipio, \
+    AlertaMainView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.decorators import login_required
@@ -16,10 +17,10 @@ urlpatterns = [#'',
                # url(r'^$', 'AlertaDengue.views.home', name='home'),
                # url(r'^blog/', include('blog.urls')),
                url(r'^alerta/(?P<geocodigo>\d{7})/$', AlertaPageViewMunicipio.as_view(), name='alerta_cidade'),
-               url(r'^$', AlertaPageView.as_view(), name='alerta'),
+               url(r'^$', AlertaMainView.as_view(), name='main'),
                url('^accounts/profile/$', RedirectView.as_view(url="/")),
                url('^accounts/', include('django.contrib.auth.urls')),
-               url(r'^alerta-detalhado/$', HomePageView.as_view(), name='home'),
+               url(r'^alerta-detalhado/$', DetailsPageView.as_view(), name='home'),
                url(r'^alertageoJSON/$', login_required(AlertaGeoJSONView.as_view()), name='alerta-layer'),
                url(r'^geojson/(?P<geocodigo>\d{7})/$', CityMapView.as_view(), name='mapa'),
                url(r'^getcity/$', get_municipio, name='get_city'),

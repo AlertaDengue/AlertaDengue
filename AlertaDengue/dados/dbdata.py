@@ -36,7 +36,7 @@ def get_alerta_mrj():
     :return: pandas dataframe
     """
     conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
-    dados_alerta = pd.read_sql_table('"Municipio".alerta_mrj', conexao, index_col='id')
+    dados_alerta = pd.read_sql_query('select * from "Municipio".alerta_mrj;', conexao, index_col='id')
     return dados_alerta
 
 def get_city(query):
