@@ -30,6 +30,15 @@ def get_all_active_cities():
     # conexao.close()
     return municipios
 
+def get_alerta_mrj():
+    """
+    Fetch the alert table for the city of Rio de janeiro
+    :return: pandas dataframe
+    """
+    conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
+    dados_alerta = pd.read_sql_table('"Municipio".alerta_mrj', conexao, index_col='id')
+    return dados_alerta
+
 def get_city(query):
     """
     Fetch city geocode, name and state from the database, matching the sbustring query

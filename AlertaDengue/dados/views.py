@@ -22,7 +22,8 @@ from dados import dbdata
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
-dados_alerta = pd.read_csv(os.path.join(settings.DATA_DIR, 'alertaAPS.csv'), header=0)
+# dados_alerta = pd.read_csv(os.path.join(settings.DATA_DIR, 'alertaAPS.csv'), header=0)
+dados_alerta = dbdata.get_alerta_mrj()
 polygons = geojson.load(open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')))
 
 
