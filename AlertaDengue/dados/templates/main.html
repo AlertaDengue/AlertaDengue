@@ -62,11 +62,10 @@
     {% leaflet_map "main" callback="main_map_init" %}
 
     <script type="text/javascript">
-        var casos_por_ap;
         var series_casos;
         var alerta;
         var recomendacoes;
-        var bairros;
+        var geocodigos = {{ geocodigos }};
         $('.totalsparkline').sparkline('html', {
             type: 'bar',
             width: "auto",
@@ -92,7 +91,7 @@
             map.fitBounds(group.getBounds());
         }
         ;
-        var aps = L.layerGroup();
+        var municipios = L.featureGroup();
         var features = L.layerGroup();
         var info = L.control();
         var legend = L.control({position: 'bottomright'});
@@ -154,17 +153,15 @@
         function main_map_init(map, options) {
             $(document).data('map', map)
             //map._layersMaxZoom=13
-            var dataurl = "{% url "mapa" geocodigo %}";
-            casos_por_ap = {{ casos_por_ap|safe }};
-            series_casos = {{ series_casos|safe }};
-            alerta = {{ alerta|safe }};
+
+
             recomendacoes = {
                 0: "Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www.riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros para o mosquito!</a>",
                 1: 'Uma vez por semana, aplique os <a href="http://www.riocontradengue.com.br/Site/Conteudo/Checklist.aspx">“10 minutos Contra a dengue”!</a>',
                 2: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.',
                 3: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.'
             };
-            bairros = {{ bairros|safe }};
+
 
             // control that shows state info on hover
             info.onAdd = function (map) {
@@ -193,36 +190,27 @@
 
             legend.addTo(map);
 
+            function fill_details(feature, layer){
 
-            // fetch data about health units
-            function pop_PontosUnidadesBasicasSaudeMRJ2014wgs84(feature, layer) {
-                var popupContent = '<table><tr><th scope="row">Nome:</th><td>' + Autolinker.link(String(feature.properties.NOME_LEG)) + '</td></tr><tr><th scope="row">Logradouro:</th><td>' + Autolinker.link(String(feature.properties.LOGRADOURO)) + '</td></tr><tr><th scope="row">Número:</th><td>' + Autolinker.link(String(feature.properties.NUMERO)) + '</td></tr><tr><th scope="row">Complemento:</th><td>' + Autolinker.link(String(feature.properties.COMPLEMENT)) + '</td></tr><tr><th scope="row">Bairro:</th><td>' + Autolinker.link(String(feature.properties.BAIRRO)) + '</td></tr><tr><th scope="row">CEP:</th><td>' + Autolinker.link(String(feature.properties.CEP)) + '</td></tr><tr><th scope="row">Telefone:</th><td>' + Autolinker.link(String(feature.properties.TELEFONE)) + '</td></tr><tr><th scope="row">Tipo:</th><td>' + Autolinker.link(String(feature.properties.TP_UNIDADE)) + '</td></tr><tr><th scope="row">Classe:</th><td>' + Autolinker.link(String(feature.properties.CLASSE_UND)) + '</td></tr></table><p><a href="http://www.rio.rj.gov.br/web/sms/onde-ser-atendido">Onde posso ser atendido?</a></p>';
-                layer.bindPopup(popupContent);
-            }
+            };
 
-            var CrossIcon = L.icon({
-                iconUrl: '/static/img/32px-Red_Cross_icon.png',
-                iconSize: [16, 16],
-                iconAnchor: [8, 8],
-                popupAnchor: [8, -8]
-            });
+            for (var i=0; i< geocodigos.length; i++){
+                var gc = geocodigos[i];
+                $.getJSON('/geojson/'+gc.toString(), function(data){
+                    geojson = L.geoJson(data, {style: style, onEachFeature: fill_details});
+                    municipios.addLayer(geojson, true);
+                });
 
-            var exp_PontosUnidadesBasicasSaudeMRJ2014wgs84JSON = new L.geoJson(exp_PontosUnidadesBasicasSaudeMRJ2014wgs84, {
-                onEachFeature: pop_PontosUnidadesBasicasSaudeMRJ2014wgs84,
-                pointToLayer: function (feature, latlng) {
-                    return L.marker(latlng, {
-                        icon: CrossIcon
-                    })
-                }
-            });
-            features.addLayer(exp_PontosUnidadesBasicasSaudeMRJ2014wgs84JSON)
-            // Download GeoJSON via Ajax
-            load_map_layer(dataurl, map);
+            };
+            municipios.addTo(map);
+            map.fitBounds(municipios.getBounds());
+
+
+
 
 
             var overlayMaps = {
-                'Áreas de Planejamento': aps,
-                'Unidades de Saúde': features
+                'Municípios': municipios
             };
             var controls = L.control.layers(null, overlayMaps, {collapsed: true});
             //map.dragging.disable();
@@ -240,7 +228,7 @@
                 $("#main").height($(window).height() * 0.7);
                 map.invalidateSize();
                 try {
-                    map.fitBounds(geojson.getBounds());
+                    map.fitBounds(municipios.getBounds());
                 }
                 catch (err) {
                 }

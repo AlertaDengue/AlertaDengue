@@ -31,7 +31,15 @@ class AlertaMainView(TemplateView):
     template_name = 'main.html'
 
     def get_context_data(self, **kwargs):
-        municipios = dbdata.get_all_active_cities()
+        context = super(AlertaMainView, self).get_context_data(**kwargs)
+        municipios, geocodigos = dbdata.get_all_active_cities()
+
+        context.update({
+            'municipios': municipios,
+            'geocodigos': geocodigos,
+        })
+        return context
+
 
 
 def get_municipio(request):

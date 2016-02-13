@@ -28,7 +28,7 @@ def get_all_active_cities():
         res =conexao.execute('SELECT nome from "Dengue_global"."Municipio" where geocodigo={}'.format(gc))
         municipios.append((gc, res.fetchone()['nome']))
     # conexao.close()
-    return municipios
+    return municipios, municipio_gcs
 
 def get_alerta_mrj():
     """
