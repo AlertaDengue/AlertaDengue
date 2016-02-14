@@ -66,7 +66,7 @@ def load_series(cidade, doenca='dengue'):
     conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
     ap = str(cidade)
     cidade = add_dv(int(str(cidade)[:-1]))
-    dados_alerta = pd.read_sql_query('select * from "Municipio"."Historico_alerta" where municipio_geocodigo={}'.format(cidade), conexao, 'id', parse_dates=True)
+    dados_alerta = pd.read_sql_query('select * from "Municipio"."Historico_alerta" where municipio_geocodigo={} ORDER BY "data_iniSE" ASC'.format(cidade), conexao, 'id', parse_dates=True)
     if len(dados_alerta) == 0:
         raise NameError("Não foi possível obter os dados do Banco para cidade {}".format(cidade))
 
