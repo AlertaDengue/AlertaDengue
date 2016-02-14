@@ -11,12 +11,17 @@ import numpy as np
 from collections import defaultdict
 import datetime
 from time import mktime
+from functools import lru_cache
 
+CID10 = {'dengue': 'A90',
+         'zika': 'U06',
+         'chikungunya': 'A92'
+         }
 
 def get_all_active_cities():
     """
     Fetch from the database a list on names of active cities
-    :return: list of names
+    :return: list of tuples (geocode,name)
     """
     conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
     # sql = 'SELECT DISTINCT municipio_geocodigo, nome from "Municipio"."Historico_alerta" LEFT JOIN "Dengue_global"."Municipio" on municipio_geocodigo = geocodigo'
@@ -28,7 +33,7 @@ def get_all_active_cities():
         res =conexao.execute('SELECT nome from "Dengue_global"."Municipio" where geocodigo={}'.format(gc))
         municipios.append((gc, res.fetchone()['nome']))
     # conexao.close()
-    return municipios, municipio_gcs
+    return municipios
 
 def get_alerta_mrj():
     """
@@ -60,21 +65,20 @@ def load_series(cidade, doenca='dengue'):
     """
     conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
     ap = str(cidade)
-    cidade = int(str(cidade)[:-1])
+    cidade = add_dv(int(str(cidade)[:-1]))
     dados_alerta = pd.read_sql_query('select * from "Municipio"."Historico_alerta" where municipio_geocodigo={}'.format(cidade), conexao, 'id', parse_dates=True)
     if len(dados_alerta) == 0:
-        raise NameError("Não foi possível obter os dados do Banco")
+        raise NameError("Não foi possível obter os dados do Banco para cidade {}".format(cidade))
 
     # tweets = pd.read_sql_query('select * from "Municipio"."Tweet" where "Municipio_geocodigo"={}'.format(cidade), parse_dates=True)
     series = defaultdict(lambda: defaultdict(lambda: []))
-
     series[ap]['dia'] = dados_alerta.data_iniSE.tolist()
     # series[ap]['tweets'] = [float(i) if not np.isnan(i) else None for i in tweets.numero]
     # series[ap]['tmin'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).tmin]
-    series[ap]['casos_est_min'] = dados_alerta.casos_est_min.astype(int).tolist()
-    series[ap]['casos_est'] = dados_alerta.casos_est.astype(int).tolist()
-    series[ap]['casos_est_max'] = dados_alerta.casos_est_max.astype(int).tolist()
-    series[ap]['casos'] = dados_alerta.casos.astype(int).tolist()
+    series[ap]['casos_est_min'] = np.nan_to_num(dados_alerta.casos_est_min).astype(int).tolist()
+    series[ap]['casos_est'] = np.nan_to_num(dados_alerta.casos_est).astype(int).tolist()
+    series[ap]['casos_est_max'] = np.nan_to_num(dados_alerta.casos_est_max).astype(int).tolist()
+    series[ap]['casos'] = np.nan_to_num(dados_alerta.casos).astype(int).tolist()
     series[ap]['alerta'] = (dados_alerta.nivel.astype(int)-1).tolist()  # (1,4)->(0,3)
     series[ap]['SE'] = (dados_alerta.SE.astype(int)).tolist()
     # print(series['dia'])

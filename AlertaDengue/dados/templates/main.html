@@ -10,7 +10,7 @@
     <meta property="og:image:secure_url" content="https://info.dengue.mat.br/static/img/screenshot.png"/>
     <style>
         .leaflet-container {
-            height: 80%;
+            height: 100%;
             width: 100%;
 
         }
@@ -58,12 +58,13 @@
 {% block title %}Situação da Dengue - Brasil {% endblock %}
 
 {% block content %}
-{#    {% total_series %}#}
+    {% total_series %}
     {% leaflet_map "main" callback="main_map_init" %}
 
     <script type="text/javascript">
-        var series_casos;
-        var alerta;
+        var mundict = {{ mundict|safe }}
+        var series_casos = {{ case_series|safe }};
+        var alerta = {{ alerta|safe }};
         var recomendacoes;
         var geocodigos = {{ geocodigos }};
         $('.totalsparkline').sparkline('html', {
@@ -88,7 +89,7 @@
                 group.addLayer(this)
             })
 
-            map.fitBounds(group.getBounds());
+           map.fitBounds(group.getBounds());
         }
         ;
         var municipios = L.featureGroup();
@@ -172,7 +173,7 @@
 
             info.update = function (props) {
                 this._div.innerHTML = '<h4>Número de casos na semana:</h4>' + (props ?
-                        '<b>' + props.casos + '</b><br />' : 'Passe o mouse sobre o mapa');
+                        '<b>'+ props.nome + ':' + props.casos + '</b><br />' : 'Passe o mouse sobre o mapa');
             };
 
             info.addTo(map);
@@ -191,6 +192,23 @@
             legend.addTo(map);
 
             function fill_details(feature, layer){
+                codigo = parseInt(feature.properties.geocodigo);
+                feature.properties.alerta = alerta[codigo];
+                feature.properties.series = series_casos[codigo];
+                feature.properties.casos = series_casos[codigo][series_casos[codigo].length -1];
+                layer.bindPopup("<b>" + mundict[codigo] + "</b>" + "<br>" +
+                "Casos: " + feature.properties.casos + "<br>Últimas semanas: <span class='inlinesparkline'>" +
+                feature.properties.series + "</span><br>" +
+                "<br>" +
+                "<a href=/alerta/"+codigo.toString()+"/><u>Mais detalhes</u></a>"
+                );
+                layer.setStyle(style(feature))
+                layer.on({
+                    mouseover: highlightFeature,
+                    mouseout: resetHighlight,
+                    popupopen: renderSparkline
+                });
+
 
             };
 

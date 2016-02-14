@@ -26,4 +26,12 @@ def alerta_series(context):
 
 @register.inclusion_tag("total_series.html", takes_context=True)
 def total_series(context):
-    return {}
+    gc = context['geocodigos'][0]
+    dados = load_series(gc)
+    dias = dados[str(gc)]['dia']
+    tempo = [int(mktime(d.timetuple())) for d in dias]
+    return {
+        'tempo': tempo,
+        'start': tempo[0],
+        'total': context['total']
+    }

@@ -32,14 +32,25 @@ class AlertaMainView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AlertaMainView, self).get_context_data(**kwargs)
-        municipios, geocodigos = dbdata.get_all_active_cities()
-
+        mundict = dict(dbdata.get_all_active_cities())
+        municipios, geocodigos = list(mundict.values()), list(mundict.keys())
+        alerta = {}
+        case_series = {}
+        total = np.zeros(52, dtype=int)
+        for gc in geocodigos:
+            dados = dbdata.get_city_alert(gc, 'dengue')
+            alerta[gc] = int(dados[0])
+            case_series[gc] = dados[2][-12:]
+            total += dados[2][-52:]
         context.update({
+            'mundict': json.dumps(mundict),
             'municipios': municipios,
             'geocodigos': geocodigos,
+            'alerta': json.dumps(alerta),
+            'case_series': json.dumps(case_series),
+            'total': json.dumps(total.tolist()),
         })
         return context
-
 
 
 def get_municipio(request):
