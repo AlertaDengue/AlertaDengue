@@ -196,7 +196,7 @@
 
             for (var i=0; i< geocodigos.length; i++){
                 var gc = geocodigos[i];
-                $.getJSON('/geojson/'+gc.toString(), function(data){
+                $.getJSON('/geojson/'+gc.toString()+'/', function(data){
                     geojson = L.geoJson(data, {style: style, onEachFeature: fill_details});
                     municipios.addLayer(geojson, true);
                 });
