@@ -28,8 +28,11 @@ def alerta_series(context):
 def total_series(context):
     gc = context['geocodigos'][0]
     dados = load_series(gc)
-    dias = dados[str(gc)]['dia'][-12:]
+    dias = dados[str(gc)]['dia'][-52:]
+
     tempo = [int(mktime(d.timetuple())) for d in dias]
+    print(dias)
+    print(tempo)
     return {
         'tempo': tempo,
         'start': tempo[0],
