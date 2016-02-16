@@ -14,7 +14,7 @@ admin.autodiscover()
 
 urlpatterns = [#'',
                # Examples:
-               # url(r'^$', 'AlertaDengue.views.home', name='home'),
+               url(r'^alerta/rio/$', AlertaPageView.as_view(), name='mrj'),
                # url(r'^blog/', include('blog.urls')),
                url(r'^alerta/(?P<geocodigo>\d{7})/$', AlertaPageViewMunicipio.as_view(), name='alerta_cidade'),
                url(r'^$', AlertaMainView.as_view(), name='main'),

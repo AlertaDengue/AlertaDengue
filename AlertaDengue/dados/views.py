@@ -66,10 +66,10 @@ class AlertaPageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
         alert, current, case_series, last_year, observed_cases, min_max_est = get_alert()
-        casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
+        casos_ap = {float(ap.split('AP')[-1]): int(current[current.aps == ap]['casos_est']) for ap in alert.keys()}
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
-        semana = str(current.SE.iat[-1])[-2:]
-        quarta = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d")
+        semana = str(current.se.iat[-1])[-2:]
+        quarta = current.data.iat[-1]
         total_series = sum(np.array(list(case_series.values())), np.zeros(12, int))
         total_observed_series = sum(np.array(list(observed_cases.values())), np.zeros(12, int))
         bairros_mrj = {
@@ -107,11 +107,25 @@ class AlertaPageView(TemplateView):
 class AlertaPageViewMunicipio(TemplateView):
     template_name = 'alerta_municipio.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        context = super(AlertaPageViewMunicipio, self).get_context_data(**kwargs)
+        municipio_gc = kwargs['geocodigo']
+        if int(municipio_gc) == 3304557: # Rio de Janeiro
+            return redirect('mrj', permanent=True, *args, **kwargs)
+        return super(AlertaPageViewMunicipio, self).dispatch(request, *args, **kwargs)
+
+    # def get(self, request, *args, **kwargs):
+    #     municipio_gc = kwargs['geocodigo']
+    #     if int(municipio_gc) == 3304557: # Rio de Janeiro
+    #         return redirect('/alerta/rio/', permanent=True, *args, **kwargs)
+    #     return super(AlertaPageViewMunicipio, self).dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super(AlertaPageViewMunicipio, self).get_context_data(**kwargs)
         municipio_gc = context['geocodigo']
-        if municipio_gc == 3304557:
-            redirect('AlertaPageView')
+        if int(municipio_gc) == 3304557: # Rio de Janeiro
+            args = tuple([])
+            return redirect('/alerta/rio/', permanent=False, *args, **kwargs)
         city_info = get_city_info(municipio_gc)
         alert, SE, case_series, last_year, observed_cases, min_max_est, dia = dbdata.get_city_alert(municipio_gc)
         casos_ap = {municipio_gc: int(case_series[-1])}
@@ -288,11 +302,11 @@ def get_alert():
     """
     df = dados_alerta
     df.fillna(0, inplace=True)
-    last_SE = df.SE.max()  # Last epidemiological week
+    last_SE = df.se.max()  # Last epidemiological week
     year = datetime.date.today().year  # Current year
     SE = int(str(last_SE).split(str(year))[-1])  # current epidemiological week
-    current = df[df['SE'] == last_SE]  # Current status
-    G = df.groupby("APS")
+    current = df[df['se'] == last_SE]  # Current status
+    G = df.groupby("aps")
     group_names = G.groups.keys()
     alert = defaultdict(lambda: 0)
     case_series = {}
@@ -302,7 +316,7 @@ def get_alert():
         adf = G.get_group(ap)  # .tail()  # only calculates on the series tail
         case_series[str(float(ap.split('AP')[-1]))] = [int(v) for v in adf.casos_est.iloc[-12:].values]
         obs_case_series[str(float(ap.split('AP')[-1]))] = [int(v) for v in adf.casos.iloc[-12:].values]
-        alert[ap] = adf.cor.iloc[-1]
+        alert[ap] = adf.nivel.iloc[-1]
         last_year = int(adf.casos.iloc[-52])
         min_max_est[ap] = (adf.casos_estmin.iloc[-1], adf.casos_estmax.iloc[-1])
     return alert, current, case_series, last_year, obs_case_series, min_max_est
