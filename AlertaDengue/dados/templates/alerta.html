@@ -2,6 +2,7 @@
 {% block extra_head %}
     {% load static %}
     {% load leaflet_tags %}
+    {% load series %}
     {% leaflet_js %}
     {% leaflet_css %}
     {% leaflet_js plugins="ALL" %}
@@ -53,6 +54,8 @@
     <script src='/static/exp_PontosUnidadesBasicasSaudeMRJ2014wgs84.js'></script>
     <script src="/static/js/Autolinker.min.js"></script>
     <script src="/static/js/jquery.sparkline.min.js"></script>
+    <script src="/static/js/highstock.js"></script>
+    <script src="/static/js/modules/exporting.js"></script>
     <style>
         .jqstooltip {
             box-sizing: content-box;
@@ -60,9 +63,10 @@
     </style>
 {% endblock %}
 
-{% block title %}Situação da Dengue no Rio de Janeiro{% endblock %}
+{% block title %}Situação da Dengue no Rio de Janeiro em {{ data2 }}{% endblock %}
 
 {% block content %}
+    {% alerta_series %}
     {% leaflet_map "main" callback="main_map_init" %}
     <br>
     {#    <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">#}
@@ -171,7 +175,7 @@
         var geojson;
         var alertLevels = [
             {name: 'Baixo Risco', color:'#0D6B0D'},
-            {name: 'Atenção', color:'#C8D20F'},
+            {name: 'Atenção', color:'#FBFC75'},
             {name: 'Transmissão', color:'#E45205'},
             {name: 'Epidemia',  color:'#FF0205'},
         ];

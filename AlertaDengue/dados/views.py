@@ -85,6 +85,8 @@ class AlertaPageView(TemplateView):
             5.3: 'AP 5.3: Santa Cruz e adjacências'
         }
         context.update({
+            'geocodigo': "3304557",
+            'nome': "Rio de Janeiro",
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
             'novos_casos': sum(casos_ap.values()),
@@ -111,21 +113,12 @@ class AlertaPageViewMunicipio(TemplateView):
         context = super(AlertaPageViewMunicipio, self).get_context_data(**kwargs)
         municipio_gc = kwargs['geocodigo']
         if int(municipio_gc) == 3304557: # Rio de Janeiro
-            return redirect('mrj', permanent=True, *args, **kwargs)
+            return redirect('mrj', permanent=True)
         return super(AlertaPageViewMunicipio, self).dispatch(request, *args, **kwargs)
-
-    # def get(self, request, *args, **kwargs):
-    #     municipio_gc = kwargs['geocodigo']
-    #     if int(municipio_gc) == 3304557: # Rio de Janeiro
-    #         return redirect('/alerta/rio/', permanent=True, *args, **kwargs)
-    #     return super(AlertaPageViewMunicipio, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(AlertaPageViewMunicipio, self).get_context_data(**kwargs)
         municipio_gc = context['geocodigo']
-        if int(municipio_gc) == 3304557: # Rio de Janeiro
-            args = tuple([])
-            return redirect('/alerta/rio/', permanent=False, *args, **kwargs)
         city_info = get_city_info(municipio_gc)
         alert, SE, case_series, last_year, observed_cases, min_max_est, dia = dbdata.get_city_alert(municipio_gc)
         casos_ap = {municipio_gc: int(case_series[-1])}
