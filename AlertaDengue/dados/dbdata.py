@@ -46,12 +46,14 @@ def get_alerta_mrj():
 
 def get_city(query):
     """
-    Fetch city geocode, name and state from the database, matching the sbustring query
+    Fetch city geocode, name and state from the database, matching the substring query
     :param query: substring of the city
     :return: list of dictionaries
     """
     conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
-    sql = 'SELECT geocodigo, nome, uf from "Dengue_global"."Municipio" WHERE nome ilike(%s);'
+    sql = 'SELECT distinct municipio_geocodigo, nome, uf from "Municipio"."Historico_alerta" inner JOIN' \
+          ' "Dengue_global"."Municipio" on "Historico_alerta".municipio_geocodigo="Municipio".geocodigo ' \
+          'WHERE nome ilike(%s);'
     result = conexao.execute(sql, ('%'+query+'%',))
 
     return result.fetchall()
