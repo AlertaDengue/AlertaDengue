@@ -23,7 +23,7 @@ def get_all_active_cities():
     Fetch from the database a list on names of active cities
     :return: list of tuples (geocode,name)
     """
-    conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
+    conexao = create_engine("postgresql://{}:{}@{}/{}".format(settings.PSQL_USER, settings.PSQL_PASSWORD, settings.PSQL_HOST, settings.PSQL_DB))
     # sql = 'SELECT DISTINCT municipio_geocodigo, nome from "Municipio"."Historico_alerta" LEFT JOIN "Dengue_global"."Municipio" on municipio_geocodigo = geocodigo'
     sql = 'SELECT DISTINCT municipio_geocodigo from "Municipio"."Historico_alerta"'
     result = conexao.execute(sql)
@@ -40,7 +40,7 @@ def get_alerta_mrj():
     Fetch the alert table for the city of Rio de janeiro
     :return: pandas dataframe
     """
-    conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
+    conexao = create_engine("postgresql://{}:{}@{}/{}".format(settings.PSQL_USER, settings.PSQL_PASSWORD, settings.PSQL_HOST, settings.PSQL_DB))
     dados_alerta = pd.read_sql_query('select * from "Municipio".alerta_mrj;', conexao, index_col='id')
     return dados_alerta
 
@@ -50,7 +50,7 @@ def get_city(query):
     :param query: substring of the city
     :return: list of dictionaries
     """
-    conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
+    conexao = create_engine("postgresql://{}:{}@{}/{}".format(settings.PSQL_USER, settings.PSQL_PASSWORD, settings.PSQL_HOST, settings.PSQL_DB))
     sql = 'SELECT distinct municipio_geocodigo, nome, uf from "Municipio"."Historico_alerta" inner JOIN' \
           ' "Dengue_global"."Municipio" on "Historico_alerta".municipio_geocodigo="Municipio".geocodigo ' \
           'WHERE nome ilike(%s);'
@@ -65,7 +65,7 @@ def load_series(cidade, doenca='dengue'):
     :param doenca: dengue|chik|zika
     :return: dictionary
     """
-    conexao = create_engine("postgresql://{}:{}@{}/{}".format('dengueadmin', 'aldengue', 'localhost', 'dengue'))
+    conexao = create_engine("postgresql://{}:{}@{}/{}".format(settings.PSQL_USER, settings.PSQL_PASSWORD, settings.PSQL_HOST, settings.PSQL_DB))
     ap = str(cidade)
     cidade = add_dv(int(str(cidade)[:-1]))
     dados_alerta = pd.read_sql_query('select * from "Municipio"."Historico_alerta" where municipio_geocodigo={} ORDER BY "data_iniSE" ASC'.format(cidade), conexao, 'id', parse_dates=True)
