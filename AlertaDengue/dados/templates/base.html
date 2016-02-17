@@ -7,6 +7,10 @@
         font-size: 18px;
         line-height: 1.33;
     }
+    #remote .tt-dropdown-menu {
+          max-height: 150px;
+          overflow-y: auto;
+    }
 
     .twitter-typeahead .tt-query, .twitter-typeahead .tt-hint {
         height: 45px;
@@ -53,7 +57,7 @@
                                 <li><a href="{% url "joinin" %}">Participe</a></li>
                                 <li style="overflow: visible">
                                     <div id="remote" class="twitter-typeahead" style="overflow-y: auto; max-height: 150px; overflow: visible">
-            <input type="text" class="form-control input-lg twitter-typeahead tt-dropdown-menu" placeholder="Encontre um município..." name="q" style="position: relative"></input>
+            <input type="text" class="form-control input-lg typeahead twitter-typeahead tt-dropdown-menu" placeholder="Encontre um município..." name="q" style="position: relative"></input>
 
                                 </li>
 
