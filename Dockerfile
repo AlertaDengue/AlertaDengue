@@ -59,14 +59,6 @@ ADD config/alerta_dengue.conf /etc/supervisor/conf.d/alerta_dengue.conf
 # Configure nginx
 ADD config/alerta_dengue_nginx.conf /etc/nginx/sites-enabled/alerta_dengue
 
-# Copy db
-ADD geodjango.db /srv/deploy/project/AlertaDengue/AlertaDengue/geodjango.db
-
-# Copy user information...
-ADD users.json /srv/deploy/project/AlertaDengue/AlertaDengue/users.json
-# ... and load it
-RUN /srv/deploy/exec_in_virtualenv.sh /srv/deploy/project/AlertaDengue/AlertaDengue/manage.py loaddata /srv/deploy/project/AlertaDengue/AlertaDengue/users.json
-
 # Copy ssh keys
 RUN mkdir /root/.ssh/
 ADD authorized_keys /root/.ssh/authorized_keys
