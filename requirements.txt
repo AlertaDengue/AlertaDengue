@@ -9,4 +9,3 @@ pytz
 shapely
 psycopg2
 sqlalchemy
-
