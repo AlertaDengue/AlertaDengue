@@ -41,7 +41,6 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     'leaflet',
     'bootstrap3',
-    # 'debug_toolbar',
     'dados',
 )
 
@@ -143,10 +142,6 @@ STATICFILES_DIRS = (
 DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, 'data'))
 
 STATIC_URL = '/static/'
-
-# Not having this was causing errors when running the project under wsgi:
-# https://stackoverflow.com/questions/20963856/improperlyconfigured-the-included-urlconf-project-urls-doesnt-have-any-patte/21005346#21005346
-DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 try:
     from AlertaDengue.local_settings import *
