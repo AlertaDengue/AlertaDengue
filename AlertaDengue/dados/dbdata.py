@@ -24,16 +24,10 @@ def get_all_active_cities():
     :return: list of tuples (geocode,name)
     """
     conexao = create_engine("postgresql://{}:{}@{}/{}".format(settings.PSQL_USER, settings.PSQL_PASSWORD, settings.PSQL_HOST, settings.PSQL_DB))
-    # sql = 'SELECT DISTINCT municipio_geocodigo, nome from "Municipio"."Historico_alerta" LEFT JOIN "Dengue_global"."Municipio" on municipio_geocodigo = geocodigo'
-    sql = 'SELECT DISTINCT municipio_geocodigo from "Municipio"."Historico_alerta"'
-    result = conexao.execute(sql)
-    municipio_gcs = [add_dv(rec['municipio_geocodigo']) for rec in result]
-    municipios = []
-    for gc in municipio_gcs:
-        res =conexao.execute('SELECT nome from "Dengue_global"."Municipio" where geocodigo={}'.format(gc))
-        municipios.append((gc, res.fetchone()['nome']))
-    # conexao.close()
-    return municipios
+    res = conexao.execute('SELECT DISTINCT municipio_geocodigo, nome FROM'
+        '"Municipio"."Historico_alerta" INNER JOIN "Dengue_global"."Municipio" ON'
+        '"Historico_alerta".municipio_geocodigo = "Municipio".geocodigo;')
+    return res.fetchall()
 
 def get_alerta_mrj():
     """
