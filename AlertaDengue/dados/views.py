@@ -40,7 +40,7 @@ class AlertaMainView(TemplateView):
         for gc in geocodigos:
             dados = dbdata.get_city_alert(gc, 'dengue')
             alerta[gc] = int(dados[0])
-            case_series[gc] = dados[2][-12:]
+            case_series[str(gc)] = list(map(int, dados[2][-12:]))
             total += dados[2][-52:]
         context.update({
             'mundict': json.dumps(mundict),
