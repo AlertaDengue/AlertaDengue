@@ -36,7 +36,7 @@ RUN pyvenv --clear --system-site-packages /srv/deploy/project/
 ADD exec_in_virtualenv.sh /srv/deploy/exec_in_virtualenv.sh
 
 # Clone code
-RUN git clone https://github.com/NAMD/AlertaDengue.git /srv/deploy/project/AlertaDengue
+RUN git clone https://github.com/AlertaDengue/AlertaDengue.git /srv/deploy/project/AlertaDengue
 
 # Add our local settings. This file is not versioned because it contains
 # sensitive data (such as the SECRET_KEY).
