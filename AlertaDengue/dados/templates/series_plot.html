@@ -80,18 +80,15 @@ $(function () {
             backgroundColor: '#FFFFFF'
         },
         series: [
-            {
-                name: 'Casos Notificados de Dengue',
+                {
+                name: 'Casos Estimados de Dengue',
+                color: '#AA4643',
                 type: 'spline',
                 animation: true,
-                color: '#4572A7',
+                yAxis: 0,
                 pointInterval: 7 * 24 * 3600 * 1000,
                 pointStart: {{ start }}*1000 + tzo,
-                yAxis: 0,
-                data: dados.casos,
-                marker: {
-                    enabled: false
-                },
+                data: dados.casos_est,
                 dashStyle: 'shortdot',
                 tooltip: {
                     valueSuffix: ' casos'
@@ -155,14 +152,17 @@ $(function () {
                 }
             },
             {
-                name: 'Casos Estimados de Dengue',
-                color: '#AA4643',
+                name: 'Casos Notificados de Dengue',
                 type: 'spline',
                 animation: true,
-                yAxis: 0,
+                color: '#4572A7',
                 pointInterval: 7 * 24 * 3600 * 1000,
                 pointStart: {{ start }}*1000 + tzo,
-                data: dados.casos_est,
+                yAxis: 0,
+                data: dados.casos,
+                marker: {
+                    enabled: false
+                },
                 tooltip: {
                     valueSuffix: ' casos'
                 }
