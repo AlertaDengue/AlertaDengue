@@ -91,8 +91,8 @@ DATABASES = {
 
 LEAFLET_CONFIG = {
     # 'SPATIAL_EXTENT': (),
-    'DEFAULT_CENTER': (-22.907111, -43.431864),
-    'DEFAULT_ZOOM': 11,
+    'DEFAULT_CENTER': (-22.907000, -43.431000),
+    'DEFAULT_ZOOM': 8,
     'MAXIMUM_ZOOM': 13,
     'TILES': 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',  # 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
     'MINIMAP': False,

@@ -66,6 +66,8 @@
         var series_casos = {{ case_series|safe }};
         var alerta = {{ alerta|safe }};
         var recomendacoes;
+        var global_bounds = L.latLngBounds(L.latLng(-22.907500, -43.431500), L.latLng(-22.907000, -43.431000));
+        var municipios = L.featureGroup();
         var geocodigos = {{ geocodigos }};
         $('.totalsparkline').sparkline('html', {
             type: 'bar',
@@ -92,7 +94,7 @@
            map.fitBounds(group.getBounds());
         }
         ;
-        var municipios = L.featureGroup();
+
         var features = L.layerGroup();
         var info = L.control();
         var legend = L.control({position: 'bottomright'});
@@ -216,12 +218,14 @@
                 var gc = geocodigos[i];
                 $.getJSON('/geojson/'+gc.toString()+'/', function(data){
                     geojson = L.geoJson(data, {style: style, onEachFeature: fill_details});
+                    global_bounds.extend(geojson.getBounds())
                     municipios.addLayer(geojson, true);
+                    map.fitBounds(global_bounds);
                 });
 
             };
             municipios.addTo(map);
-            map.fitBounds(municipios.getBounds());
+            map.fitBounds(global_bounds);
 
 
 
@@ -246,7 +250,7 @@
                 $("#main").height($(window).height() * 0.7);
                 map.invalidateSize();
                 try {
-                    map.fitBounds(municipios.getBounds());
+                    map.fitBounds(global_bounds);
                 }
                 catch (err) {
                 }
