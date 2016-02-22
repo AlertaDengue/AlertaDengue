@@ -5,6 +5,7 @@ from dados.views import DetailsPageView, SinanCasesView, AboutPageView, ContactP
     MapaMosquitoView, \
     HistoricoView, AlertaPageView, AlertaGeoJSONView, AlertaPageViewMunicipio, CityMapView, get_municipio, \
     AlertaMainView
+from django.views.decorators.cache import cache_page
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.decorators import login_required
@@ -17,7 +18,8 @@ urlpatterns = [#'',
                url(r'^alerta/rio/$', AlertaPageView.as_view(), name='mrj'),
                # url(r'^blog/', include('blog.urls')),
                url(r'^alerta/(?P<geocodigo>\d{7})/$', AlertaPageViewMunicipio.as_view(), name='alerta_cidade'),
-               url(r'^$', AlertaMainView.as_view(), name='main'),
+               # Cache the main page for a day
+               url(r'^$', cache_page(24 * 60 * 60)(AlertaMainView.as_view()), name='main'),
                url('^accounts/profile/$', RedirectView.as_view(url="/")),
                url('^accounts/', include('django.contrib.auth.urls')),
                url(r'^alerta-detalhado/$', DetailsPageView.as_view(), name='home'),

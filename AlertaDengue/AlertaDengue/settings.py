@@ -89,6 +89,16 @@ DATABASES = {
     }
 }
 
+MEMCACHED_HOST = config('MEMCACHED_HOST', '127.0.0.1')
+MEMCACHED_PORT = config('MEMCACHED_PORT', '11211')
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '{}:{}'.format(MEMCACHED_HOST, MEMCACHED_PORT),
+    }
+}
+
 LEAFLET_CONFIG = {
     # 'SPATIAL_EXTENT': (),
     'DEFAULT_CENTER': (-22.907000, -43.431000),

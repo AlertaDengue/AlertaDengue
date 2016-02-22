@@ -9,3 +9,4 @@ pytz
 shapely
 psycopg2
 sqlalchemy
+python-memcached
