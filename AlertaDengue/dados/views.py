@@ -17,11 +17,47 @@ import pandas as pd
 import numpy as np
 import locale
 import geojson
+from dados.maps import get_city_geojson, get_city_info
+from dados import dbdata
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
-dados_alerta = pd.read_csv(os.path.join(settings.DATA_DIR, 'alertaAPS.csv'), header=0)
+# dados_alerta = pd.read_csv(os.path.join(settings.DATA_DIR, 'alertaAPS.csv'), header=0)
+dados_alerta = dbdata.get_alerta_mrj()
 polygons = geojson.load(open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')))
+
+
+class AlertaMainView(TemplateView):
+    template_name = 'main.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AlertaMainView, self).get_context_data(**kwargs)
+        mundict = dict(dbdata.get_all_active_cities())
+        municipios, geocodigos = list(mundict.values()), list(mundict.keys())
+        alerta = {}
+        case_series = {}
+        total = np.zeros(52, dtype=int)
+        for gc in geocodigos:
+            dados = dbdata.get_city_alert(gc, 'dengue')
+            alerta[gc] = int(dados[0])
+            case_series[str(gc)] = list(map(int, dados[2][-12:]))
+            total += dados[2][-52:]
+        context.update({
+            'mundict': json.dumps(mundict),
+            'municipios': municipios,
+            'geocodigos': geocodigos,
+            'alerta': json.dumps(alerta),
+            'case_series': json.dumps(case_series),
+            'total': json.dumps(total.tolist()),
+        })
+        return context
+
+
+def get_municipio(request):
+    q = request.GET['q']
+    muns = dbdata.get_city(q)
+    data = json.dumps([{'geocodigo': g, 'nome': n, 'uf': u} for g, n, u in muns])
+    return HttpResponse(data, content_type='application/json')
 
 
 class AlertaPageView(TemplateView):
@@ -30,16 +66,31 @@ class AlertaPageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
         alert, current, case_series, last_year, observed_cases, min_max_est = get_alert()
-        casos_ap = {float(ap.split('AP')[-1]): int(current[current.APS == ap]['casos_est']) for ap in alert.keys()}
+        casos_ap = {float(ap.split('AP')[-1]): int(current[current.aps == ap]['casos_est']) for ap in alert.keys()}
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
-        semana = str(current.SE.iat[-1])[-2:]
-        quarta = datetime.datetime.strptime(current.data.iat[-1], "%Y-%m-%d")
+        semana = str(current.se.iat[-1])[-2:]
+        quarta = current.data.iat[-1]
         total_series = sum(np.array(list(case_series.values())), np.zeros(12, int))
         total_observed_series = sum(np.array(list(observed_cases.values())), np.zeros(12, int))
+        bairros_mrj = {
+            1.0: 'AP 1: Centro e adjacências',
+            2.1: 'AP 2.1: Zona Sul',
+            2.2: 'AP 2.2: Tijuca e adjacências',
+            3.1: 'AP 3.1: Bonsucesso e adjacências',
+            3.2: 'AP 3.2: Meier e adjacências',
+            3.3: 'AP 3.3: Madureira e adjacências',
+            4.0: 'AP 4: Barra, Recreio e Jacarepaguá',
+            5.1: 'AP 5.1: Bangu e adjacências',
+            5.2: 'AP 5.2: Campo Grande e adjacências',
+            5.3: 'AP 5.3: Santa Cruz e adjacências'
+        }
         context.update({
+            'geocodigo': "3304557",
+            'nome': "Rio de Janeiro",
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
             'novos_casos': sum(casos_ap.values()),
+            'bairros': bairros_mrj,
             'min_est': sum(i[0] for i in min_max_est.values()),
             'max_est': sum(i[1] for i in min_max_est.values()),
             'series_casos': case_series,
@@ -49,8 +100,49 @@ class AlertaPageView(TemplateView):
             'last_year': last_year,
             'look_back': len(total_series),
             'total_series': ', '.join(map(str, total_series)),
-            'total_observed':  total_observed_series[-1],
+            'total_observed': total_observed_series[-1],
             'total_observed_series': ', '.join(map(str, total_observed_series)),
+        })
+        return context
+
+
+class AlertaPageViewMunicipio(TemplateView):
+    template_name = 'alerta_municipio.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        context = super(AlertaPageViewMunicipio, self).get_context_data(**kwargs)
+        municipio_gc = kwargs['geocodigo']
+        if int(municipio_gc) == 3304557: # Rio de Janeiro
+            return redirect('mrj', permanent=True)
+        return super(AlertaPageViewMunicipio, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(AlertaPageViewMunicipio, self).get_context_data(**kwargs)
+        municipio_gc = context['geocodigo']
+        city_info = get_city_info(municipio_gc)
+        alert, SE, case_series, last_year, observed_cases, min_max_est, dia = dbdata.get_city_alert(municipio_gc)
+        casos_ap = {municipio_gc: int(case_series[-1])}
+        bairros = {municipio_gc: city_info['nome']}
+        total_series = case_series[-12:]
+        total_observed_series = observed_cases[-12:]
+        context.update({
+            'nome': city_info['nome'],
+            'casos_por_ap': json.dumps(casos_ap),
+            'alerta': {municipio_gc: alert},
+            'novos_casos': case_series[-1],
+            'bairros': bairros,
+            'min_est': min_max_est[0],
+            'max_est': min_max_est[1],
+            'series_casos': {municipio_gc: case_series[-12:]},
+            'SE': SE,
+            'data1': (dia - datetime.timedelta(2)).strftime("%d de %B de %Y"),
+            'data2': (dia + datetime.timedelta(4)).strftime("%d de %B de %Y"),
+            'last_year': last_year,
+            'look_back': len(total_series),
+            'total_series': ', '.join(map(str, total_series)),
+            'total_observed': total_observed_series[-1],
+            'total_observed_series': ', '.join(map(str, total_observed_series)),
+            'geocodigo': municipio_gc,
         })
         return context
 
@@ -60,11 +152,17 @@ class AlertaGeoJSONView(View):
         return HttpResponse(geojson.dumps(polygons))
 
 
-class HomePageView(TemplateView):
-    template_name = 'home.html'
+class CityMapView(View):
+    def get(self, request, geocodigo):
+        mapa = get_city_geojson(int(geocodigo))
+        return HttpResponse(geojson.dumps(mapa))
+
+
+class DetailsPageView(TemplateView):
+    template_name = 'details.html'
 
     def get_context_data(self, **kwargs):
-        context = super(HomePageView, self).get_context_data(**kwargs)
+        context = super(DetailsPageView, self).get_context_data(**kwargs)
         # messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
         series = load_series()
         aps = list(series.keys())
@@ -128,7 +226,7 @@ class AboutPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AboutPageView, self).get_context_data(**kwargs)
-        messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        # messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
         return context
 
 
@@ -137,7 +235,16 @@ class ContactPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ContactPageView, self).get_context_data(**kwargs)
-        messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        # messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        return context
+
+
+class JoininPageView(TemplateView):
+    template_name = 'joinin.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(JoininPageView, self).get_context_data(**kwargs)
+        # messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
         return context
 
 
@@ -167,12 +274,12 @@ class SinanCasesView(View):
         if len(dados) < 5500:
             sample = 1
         # print(type(dados[0].dt_notific))
-        #print ("chegou aqui", sample, dados[0].dt_notific)
+        # print ("chegou aqui", sample, dados[0].dt_notific)
         for c in random.sample(list(dados), int(len(dados) * sample)):
-            #print(c)
+            # print(c)
             cases += "{\"type\":\"Feature\",\"geometry\":" + c.geojson + ", \"properties\":{\"data\":\"" + c.dt_notific.isoformat() + "\"}},"
         cases = cases[:-1] + "]}"
-        #json.loads(cases)
+        # json.loads(cases)
         return HttpResponse(cases, content_type="application/json")
 
 
@@ -188,11 +295,11 @@ def get_alert():
     """
     df = dados_alerta
     df.fillna(0, inplace=True)
-    last_SE = df.SE.max()  # Last epidemiological week
+    last_SE = df.se.max()  # Last epidemiological week
     year = datetime.date.today().year  # Current year
     SE = int(str(last_SE).split(str(year))[-1])  # current epidemiological week
-    current = df[df['SE'] == last_SE]  # Current status
-    G = df.groupby("APS")
+    current = df[df['se'] == last_SE]  # Current status
+    G = df.groupby("aps")
     group_names = G.groups.keys()
     alert = defaultdict(lambda: 0)
     case_series = {}
@@ -202,7 +309,7 @@ def get_alert():
         adf = G.get_group(ap)  # .tail()  # only calculates on the series tail
         case_series[str(float(ap.split('AP')[-1]))] = [int(v) for v in adf.casos_est.iloc[-12:].values]
         obs_case_series[str(float(ap.split('AP')[-1]))] = [int(v) for v in adf.casos.iloc[-12:].values]
-        alert[ap] = adf.cor.iloc[-1]
+        alert[ap] = adf.nivel.iloc[-1]
         last_year = int(adf.casos.iloc[-52])
         min_max_est[ap] = (adf.casos_estmin.iloc[-1], adf.casos_estmax.iloc[-1])
     return alert, current, case_series, last_year, obs_case_series, min_max_est

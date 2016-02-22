@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from decouple import config
+from decouple import config, Csv
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -25,9 +25,9 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = ["alerta.dengue.mat.br", "info.dengue.mat.br"]
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 
 # Application definition
@@ -42,7 +42,6 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     'leaflet',
     'bootstrap3',
-    'debug_toolbar',
     'dados',
 )
 
@@ -58,9 +57,26 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'AlertaDengue.urls'
 
-TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
+
 
 WSGI_APPLICATION = 'AlertaDengue.wsgi.application'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'OPTIONS': {'context_processors': ["django.contrib.auth.context_processors.auth",
+                                            "django.template.context_processors.debug",
+                                            "django.template.context_processors.i18n",
+                                            "django.template.context_processors.media",
+                                            "django.template.context_processors.static",
+                                            "django.template.context_processors.tz",
+                                            "django.contrib.messages.context_processors.messages"],
+                    }
+    },
+]
+
 
 
 # Database
@@ -73,14 +89,24 @@ DATABASES = {
     }
 }
 
+MEMCACHED_HOST = config('MEMCACHED_HOST', '127.0.0.1')
+MEMCACHED_PORT = config('MEMCACHED_PORT', '11211')
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '{}:{}'.format(MEMCACHED_HOST, MEMCACHED_PORT),
+    }
+}
+
 LEAFLET_CONFIG = {
     # 'SPATIAL_EXTENT': (),
-    'DEFAULT_CENTER': (-22.907111, -43.431864),
-    'DEFAULT_ZOOM': 11,
+    'DEFAULT_CENTER': (-22.907000, -43.431000),
+    'DEFAULT_ZOOM': 8,
     'MAXIMUM_ZOOM': 13,
     'TILES': 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',  # 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
     'MINIMAP': False,
-    'ATTRIBUTION_PREFIX': 'Mapa de risco do Info Dengue Rio - FGV-EMAp',
+    'ATTRIBUTION_PREFIX': 'Fonte: <a href=http://info.dengue.mat.br>info.dengue.mat.br</a>',
     'PLUGINS': {
         'cluster': {
             'js': 'js/leaflet.markercluster.js',
@@ -93,6 +119,11 @@ LEAFLET_CONFIG = {
     }
 
 }
+
+PSQL_DB = config('PSQL_DB', default="dengue")
+PSQL_USER = config('PSQL_USER', default="dengueadmin")
+PSQL_HOST = config('PSQL_HOST', default="localhost")
+PSQL_PASSWORD = config('PSQL_PASSWORD')
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -108,6 +139,8 @@ USE_L10N = True
 USE_TZ = True
 
 
+APPEND_SLASH = True
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 CURRENT_DIR = os.path.join(os.path.dirname(__file__), '..')
@@ -120,10 +153,6 @@ STATICFILES_DIRS = (
 DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, 'data'))
 
 STATIC_URL = '/static/'
-
-# Not having this was causing errors when running the project under wsgi:
-# https://stackoverflow.com/questions/20963856/improperlyconfigured-the-included-urlconf-project-urls-doesnt-have-any-patte/21005346#21005346
-DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 try:
     from AlertaDengue.local_settings import *

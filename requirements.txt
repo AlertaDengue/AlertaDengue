@@ -1,6 +1,5 @@
 django
 django-bootstrap3
-django-debug-toolbar==1.2.1
 django-leaflet
 geojson
 gunicorn
@@ -8,3 +7,6 @@ pandas
 python-decouple==2.3
 pytz
 shapely
+psycopg2
+sqlalchemy
+python-memcached

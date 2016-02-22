@@ -1,0 +1,86 @@
+<div id="historico-chart" style="min-width: 500px; height: 400px; margin: 10px" data-highcharts-chart="0"></div>
+<script type="application/ecmascript">
+$(function () {
+
+    var nd = new Date();
+    var tzo = nd.getTimezoneOffset();
+    // Agora as series de dados
+    var dados = {{ total|safe }};
+
+    var chart =  Highcharts.stockChart(
+            {
+
+        chart: {
+            renderTo: "historico-chart",
+            zoomType: 'xy'
+        },
+        title: {
+            text: 'Total de casos nos municípios monitorados'
+        },
+        subtitle: {
+            text: 'Fontes: SMS-RJ, Observatório da Dengue'
+        },
+        xAxis: [
+            {
+                type: 'date',
+            }
+        ],
+        yAxis: [
+
+            { // first yAxis
+                gridLineWidth: 1,
+                //type: "linear",
+                title: {
+                    text: 'Pessoas',
+                    style: {
+                        color: '#4572A7'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return this.value + ' casos';
+                    },
+                    style: {
+                        color: '#4572A7'
+                    }
+                }
+
+            },
+
+        ],
+        tooltip: {
+            shared: true
+        },
+        legend: {
+            enabled: true,
+            layout: 'vertical',
+            align: 'left',
+            x: 120,
+            verticalAlign: 'top',
+            y: 80,
+            floating: true,
+            backgroundColor: '#FFFFFF'
+        },
+        series: [
+            {
+                name: 'Total de casos de Dengue',
+                type: 'spline',
+                animation: true,
+                color: '#4572A7',
+                pointInterval: 7 * 24 * 3600 * 1000,
+                pointStart: {{ start }}*1000 + tzo,
+                yAxis: 0,
+                data: dados,
+                marker: {
+                    enabled: false
+                },
+                dashStyle: 'Solid',
+                tooltip: {
+                    valueSuffix: ' casos'
+                }
+            }
+        ]
+    });
+});
+
+</script>

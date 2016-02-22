@@ -1,0 +1,176 @@
+<div id="historico-chart" style="min-width: 500px; height: 400px; margin: 10px" data-highcharts-chart="0"></div>
+<script type="application/ecmascript">
+$(function () {
+
+    var nd = new Date();
+    var tzo = nd.getTimezoneOffset();
+    // Agora as series de dados
+    var dados = {{ dados|safe }};
+
+    var chart =  Highcharts.stockChart(
+            {
+
+        chart: {
+            renderTo: "historico-chart",
+            zoomType: 'xy'
+        },
+        title: {
+            text: 'Séries de dados e Alertas anteriores para {{ nome }}'
+        },
+        subtitle: {
+            text: 'Fontes: SMS-RJ, Observatório da Dengue'
+        },
+        xAxis: [
+            {
+                type: 'datetime',
+                //categories: dados['{{ nome }}'].dia
+            }
+        ],
+        yAxis: [
+
+            { // first yAxis
+                gridLineWidth: 1,
+                //type: "linear",
+                title: {
+                    text: 'Pessoas',
+                    style: {
+                        color: '#4572A7'
+                    }
+                },
+                labels: {
+                    formatter: function () {
+                        return this.value + ' casos';
+                    },
+                    style: {
+                        color: '#4572A7'
+                    }
+                }
+
+            },
+{#            { // second yAxis#}
+{#                gridLineWidth: 0,#}
+{#                //type: "linear",#}
+{#                title: {#}
+{#                    text: 'Casos Estimados',#}
+{#                    style: {#}
+{#                        color: '#AA4643'#}
+{#                    }#}
+{#                },#}
+{#                labels: {#}
+{#                    formatter: function () {#}
+{#                        return this.value + ' casos';#}
+{#                    },#}
+{#                    style: {#}
+{#                        color: '#AA4643'#}
+{#                    }#}
+{#                },#}
+{#                opposite: true#}
+{#            }#}
+        ],
+        tooltip: {
+            shared: true
+        },
+        legend: {
+            enabled: true,
+            layout: 'vertical',
+            align: 'left',
+            x: 120,
+            verticalAlign: 'top',
+            y: 80,
+            floating: true,
+            backgroundColor: '#FFFFFF'
+        },
+        series: [
+                {
+                name: 'Casos Estimados de Dengue',
+                color: '#AA4643',
+                type: 'spline',
+                animation: true,
+                yAxis: 0,
+                pointInterval: 7 * 24 * 3600 * 1000,
+                pointStart: {{ start }}*1000 + tzo,
+                data: dados.casos_est,
+                dashStyle: 'shortdot',
+                tooltip: {
+                    valueSuffix: ' casos'
+                }
+
+            },
+
+            {
+                name: 'Alerta Vermelho',
+                color: '#FB4949',
+                type: 'areaspline',
+                animation: true,
+                yAxis: 0,
+                pointInterval: 7 * 24 * 3600 * 1000,
+                pointStart: {{ start }}*1000 + tzo,
+                data: {{ vermelho }},
+                tooltip: {
+                    enabled: false
+                }
+
+            },
+            {
+                name: 'Alerta laranja',
+                color: '#FFA858',
+                type: 'areaspline',
+                animation: true,
+                yAxis: 0,
+                pointInterval: 7 * 24 * 3600 * 1000,
+                pointStart: {{ start }}*1000 + tzo,
+                data: {{ laranja }},
+                tooltip: {
+                    enabled: false
+                }
+
+            },
+            {
+                name: 'Alerta Amarelo',
+                color: '#FBFC49',
+                type: 'areaspline',
+                animation: true,
+                yAxis: 0,
+                pointInterval: 7 * 24 * 3600 * 1000,
+                pointStart: {{ start }}*1000 + tzo,
+                data: {{ amarelo }},
+                tooltip: {
+                    enabled: false
+                }
+
+            },
+            {
+                name: 'Alerta verde',
+                color: '#48FD48',
+                type: 'areaspline',
+                animation: true,
+                yAxis: 0,
+                pointInterval: 7 * 24 * 3600 * 1000,
+                pointStart: {{ start }}*1000 + tzo,
+                data: {{ verde }},
+                tooltip: {
+                    enabled: false
+                }
+            },
+            {
+                name: 'Casos Notificados de Dengue',
+                type: 'spline',
+                animation: true,
+                color: '#4572A7',
+                pointInterval: 7 * 24 * 3600 * 1000,
+                pointStart: {{ start }}*1000 + tzo,
+                yAxis: 0,
+                data: dados.casos,
+                marker: {
+                    enabled: false
+                },
+                tooltip: {
+                    valueSuffix: ' casos'
+                }
+
+            }
+        ]
+    });
+});
+
+</script>

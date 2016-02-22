@@ -119,91 +119,51 @@
                                             },
                                             pointInterval: (7 * 24 * 3600 * 1000),
                                             pointStart: {{ xvalues.0 }} * 1000 + tzo,
-                                        name
-                        :
-                        'Alerta Verde',
-                                data
-                        :
-                        ga['{{ ap }}']
-                    }, {
-                        color: "#FBFC49",
-                        type: "column",
-                        marker: {
-                            enabled: false
-                        },
-                        pointInterval: 7 * 24 * 3600 * 1000,
-                        pointStart: {{ xvalues.0 }} * 1000 + tzo,
-                    name: 'Alerta Amarelo',
-                data: ya['{{ ap }}']
-            },{
-            color: "#FFA858",
-                    type
-        :
-            "column",
-                    marker
-        :
-            {
-                enabled: false
-            }
-        ,
-            pointInterval:7 * 24 * 3600 * 1000,
-                    pointStart
-        : {{ xvalues.0 }}*
-            1000 + tzo,
-                    name
-        :
-            'Alerta Laranja',
-                    data
-        :
-            oa['{{ ap }}']
-        },{
-            color: "#FB4949",
-                    type
-        :
-            "column",
-                    marker
-        :
-            {
-                enabled: false
-            }
-        ,
-            pointInterval: 7 * 24 * 3600 * 1000,
-                    pointStart
-        : {{ xvalues.0 }}*
-            1000 + tzo,
-                    name
-        :
-            'Alerta Vermelho',
-                    data
-        :
-            ra['{{ ap }}']
-        },
-            {
-                color: "#777777",
-                        type
-            :
-                "spline",
-                        pointInterval
-            :
-                7 * 24 * 3600 * 1000,
-                        pointStart
-            : {{ xvalues.0 }} *
-                1000 + tzo,
-                        name
-            :
-                'Casos',
-                        data
-            :
-                casos['{{ ap }}'].casos_est,
-                        yAxis
-            :
-                1,
-                        tooltip
-            :
-                {
-                    valueSuffix: ' casos'
-                }
-            },
+                                            name: 'Alerta Verde',
+                                            data: ga['{{ ap }}']
+                                    }, {
+                                        color: "#FBFC49",
+                                        type: "column",
+                                        marker: {
+                                            enabled: false
+                                        },
+                                        pointInterval: 7 * 24 * 3600 * 1000,
+                                        pointStart: {{ xvalues.0 }} * 1000 + tzo,
+                                    name: 'Alerta Amarelo',
+                                    data: ya['{{ ap }}']
+                                },{
+                                    color: "#FFA858",
+                                    type: "column",
+                                    marker: {
+                                            enabled: false
+                                            },
+                                    pointInterval:7 * 24 * 3600 * 1000,
+                                    pointStart: {{ xvalues.0 }}*1000 + tzo,
+                                    name: Alerta Laranja',
+                                    data: oa['{{ ap }}']
+                                },{
+                                    color: "#FB4949",
+                                    type: "column",
+                                    marker: {
+                                            enabled: false
+                                            },
+                                    pointInterval: 7 * 24 * 3600 * 1000,
+                                    pointStart: {{ xvalues.0 }}*1000 + tzo,
+                                    name: 'Alerta Vermelho',
+                                    data: ra['{{ ap }}']
+                                },
+                                    {
+                                    color: "#777777",
+                                    type: "spline",
+                                    pointInterval: 7 * 24 * 3600 * 1000,
+                                    pointStart: {{ xvalues.0 }} *1000 + tzo,
+                                    name: 'Casos',
+                                    data: casos['{{ ap }}'].casos_est,
+                                    yAxis: 1,
+                                    tooltip: {
+                                                valueSuffix: ' casos'
+                                            }
+                                    },
             ]});
             });
         {% endfor %}
