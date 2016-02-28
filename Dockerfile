@@ -7,7 +7,7 @@ ADD config/sources.list /etc/apt/sources.list
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update
 #RUN apt-get install -y locales nginx sqlite3 libspatialite3 spatialite-bin git-core supervisor python3 python3-pip python3-setuptools python-virtualenv openssh-server
-RUN apt-get install -y locales nginx sqlite3 libspatialite5 spatialite-bin git-core supervisor python3 python3-pip python3-setuptools python-virtualenv python3-venv openssh-server python3-numpy python3-pandas python3-shapely postgresql libpq-dev
+RUN apt-get install -y locales nginx sqlite3 libspatialite5 spatialite-bin git-core supervisor python3 python3-pip python3-setuptools python-virtualenv python3-venv openssh-server python3-numpy python3-pandas python3-shapely postgresql libpq-dev memcached
 
 # Set locale
 RUN echo "pt_BR.UTF-8 UTF-8" > /etc/locale.gen
@@ -26,6 +26,9 @@ ADD config/sshd.conf /etc/supervisor/conf.d/sshd.conf
 ADD config/nginx.conf /etc/supervisor/conf.d/nginx.conf
 RUN rm /etc/nginx/sites-enabled/default
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
+
+# Configure Memcached
+ADD config/memcached.conf /etc/supervisor/conf.d/memcached.conf
 
 # Create deploy user
 RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
