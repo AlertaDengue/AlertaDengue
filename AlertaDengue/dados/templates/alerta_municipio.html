@@ -69,7 +69,13 @@
 {% block title %}Situação da Dengue - {{ nome }} em {{ data2 }}{% endblock %}
 
 {% block content %}
-    <h3>Chance de alerta <span class="label label-warning">laranja</span> ou <span class="label label-danger">vermelho</span> na próxima semana: {{ prt1|floatformat }}%</h3>
+    <div class="panel panel-default">
+      <div class="panel-body">
+          <h3><b>População:</b> {{ populacao }} habitantes.</h3>
+          <h3><b>Incidência estimada:</b> {{ incidencia|floatformat }} por 100 mil habitantes.</h3>
+          <h3><b>Chance de alerta <span class="label label-warning">laranja</span> ou <span class="label label-danger">vermelho</span> na próxima semana:</b> {{ prt1|floatformat }}%</h3>
+      </div>
+    </div>
     {% alerta_series %}
     {% leaflet_map "main" callback="main_map_init" %}
     <br>

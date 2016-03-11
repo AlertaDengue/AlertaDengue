@@ -127,6 +127,8 @@ class AlertaPageViewMunicipio(TemplateView):
         total_observed_series = observed_cases[-12:]
         context.update({
             'nome': city_info['nome'],
+            'populacao': city_info['populacao'],
+            'incidencia': (case_series[-1]/city_info['populacao']) * 100000, #casos/100000
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': {municipio_gc: alert},
             'prt1': prt1*100,
