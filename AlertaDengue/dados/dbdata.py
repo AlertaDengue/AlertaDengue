@@ -77,6 +77,7 @@ def load_series(cidade, doenca='dengue'):
     series[ap]['casos'] = np.nan_to_num(dados_alerta.casos).astype(int).tolist()
     series[ap]['alerta'] = (dados_alerta.nivel.astype(int)-1).tolist()  # (1,4)->(0,3)
     series[ap]['SE'] = (dados_alerta.SE.astype(int)).tolist()
+    series[ap]['prt1'] = dados_alerta.p_rt1.astype(float).tolist()
     # print(series['dia'])
     series[ap] = dict(series[ap])
     # conexao.close()
@@ -98,7 +99,8 @@ def get_city_alert(cidade, doenca='dengue'):
     last_year = series[str(cidade)]['casos'][-52]
     min_max_est = (series[str(cidade)]['casos_est_min'][-1], series[str(cidade)]['casos_est_max'][-1])
     dia = series[str(cidade)]['dia'][-1]
-    return alert, SE, case_series, last_year, obs_case_series, min_max_est, dia
+    prt1 = np.mean(series[str(cidade)]['prt1'][-3:])
+    return alert, SE, case_series, last_year, obs_case_series, min_max_est, dia, prt1
 
 
 def calculate_digit(dig):

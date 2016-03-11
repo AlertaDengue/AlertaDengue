@@ -174,7 +174,7 @@
             };
 
             info.update = function (props) {
-                this._div.innerHTML = '<h4>Número de casos na semana:</h4>' + (props ?
+                this._div.innerHTML = '<h4>Número de casos estimados na semana:</h4>' + (props ?
                         '<b>'+ props.nome + ':' + props.casos + '</b><br />' : 'Passe o mouse sobre o mapa');
             };
 
@@ -199,7 +199,7 @@
                 feature.properties.series = series_casos[codigo];
                 feature.properties.casos = series_casos[codigo][series_casos[codigo].length -1];
                 layer.bindPopup("<b>" + mundict[codigo] + "</b>" + "<br>" +
-                "Casos: " + feature.properties.casos + "<br>Últimas semanas: <span class='inlinesparkline'>" +
+                "Casos estimados: " + feature.properties.casos + "<br>Últimas semanas: <span class='inlinesparkline'>" +
                 feature.properties.series + "</span><br>" +
                 "<br>" +
                 "<a href=/alerta/"+codigo.toString()+"/><u>Mais detalhes</u></a>"

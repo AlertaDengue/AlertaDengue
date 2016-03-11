@@ -120,7 +120,7 @@ class AlertaPageViewMunicipio(TemplateView):
         context = super(AlertaPageViewMunicipio, self).get_context_data(**kwargs)
         municipio_gc = context['geocodigo']
         city_info = get_city_info(municipio_gc)
-        alert, SE, case_series, last_year, observed_cases, min_max_est, dia = dbdata.get_city_alert(municipio_gc)
+        alert, SE, case_series, last_year, observed_cases, min_max_est, dia, prt1 = dbdata.get_city_alert(municipio_gc)
         casos_ap = {municipio_gc: int(case_series[-1])}
         bairros = {municipio_gc: city_info['nome']}
         total_series = case_series[-12:]
@@ -129,6 +129,7 @@ class AlertaPageViewMunicipio(TemplateView):
             'nome': city_info['nome'],
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': {municipio_gc: alert},
+            'prt1': prt1,
             'novos_casos': case_series[-1],
             'bairros': bairros,
             'min_est': min_max_est[0],
