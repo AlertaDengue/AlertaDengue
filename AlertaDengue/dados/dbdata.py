@@ -3,7 +3,6 @@ Este módulo contem funções para interagir com o banco principal do projeto
  Alertadengue.
 """
 
-import psycopg2
 from sqlalchemy import create_engine
 from django.conf import settings
 import pandas as pd

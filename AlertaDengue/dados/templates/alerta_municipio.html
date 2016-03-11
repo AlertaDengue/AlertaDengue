@@ -69,6 +69,7 @@
 {% block title %}Situação da Dengue - {{ nome }} em {{ data2 }}{% endblock %}
 
 {% block content %}
+    <h3>Chance de alerta <span class="label label-warning">laranja</span> ou <span class="label label-danger">vermelho</span> na próxima semana: {{ prt1|floatformat }}%</h3>
     {% alerta_series %}
     {% leaflet_map "main" callback="main_map_init" %}
     <br>
@@ -269,7 +270,7 @@
             };
 
             info.update = function (props) {
-                this._div.innerHTML = '<h4>Número de casos na semana:</h4>' + (props ?
+                this._div.innerHTML = '<h4>Número de casos estimados na semana:</h4>' + (props ?
                         '<b>' + props.casos + '</b><br />' : 'Passe o mouse sobre o mapa');
             };
 

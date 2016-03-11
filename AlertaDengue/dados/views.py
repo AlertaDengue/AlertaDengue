@@ -129,7 +129,7 @@ class AlertaPageViewMunicipio(TemplateView):
             'nome': city_info['nome'],
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': {municipio_gc: alert},
-            'prt1': prt1,
+            'prt1': prt1*100,
             'novos_casos': case_series[-1],
             'bairros': bairros,
             'min_est': min_max_est[0],

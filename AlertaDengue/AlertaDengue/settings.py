@@ -123,7 +123,7 @@ LEAFLET_CONFIG = {
 PSQL_DB = config('PSQL_DB', default="dengue")
 PSQL_USER = config('PSQL_USER', default="dengueadmin")
 PSQL_HOST = config('PSQL_HOST', default="localhost")
-PSQL_PASSWORD = config('PSQL_PASSWORD')
+PSQL_PASSWORD = "aldengue"#config('PSQL_PASSWORD')
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
