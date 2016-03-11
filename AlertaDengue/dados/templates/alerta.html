@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block extra_head %}
     {% load static %}
+    {% load humanize %}
     {% load leaflet_tags %}
     {% load series %}
     {% leaflet_js %}
@@ -66,6 +67,13 @@
 {% block title %}Situação da Dengue no Rio de Janeiro em {{ data2 }}{% endblock %}
 
 {% block content %}
+    <div class="panel panel-default">
+      <div class="panel-body">
+          <h3><b>População:</b> {{ populacao|intword }} de habitantes.</h3>
+          <h3><b>Incidência estimada:</b> {{ incidencia|floatformat }} por 100 mil habitantes.</h3>
+{#          <h3><b>Chance de alerta <span class="label label-warning">laranja</span> ou <span class="label label-danger">vermelho</span> na próxima semana:</b> {{ prt1|floatformat }}%</h3>#}
+      </div>
+    </div>
     {% alerta_series %}
     {% leaflet_map "main" callback="main_map_init" %}
     <br>

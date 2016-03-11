@@ -70,6 +70,7 @@ class AlertaPageView(TemplateView):
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
         semana = str(current.se.iat[-1])[-2:]
         quarta = current.data.iat[-1]
+        city_info = get_city_info("3304557")
         total_series = sum(np.array(list(case_series.values())), np.zeros(12, int))
         total_observed_series = sum(np.array(list(observed_cases.values())), np.zeros(12, int))
         bairros_mrj = {
@@ -87,6 +88,8 @@ class AlertaPageView(TemplateView):
         context.update({
             'geocodigo': "3304557",
             'nome': "Rio de Janeiro",
+            'populacao': city_info['populacao'],
+            'incidencia': (total_observed_series[-1]/city_info['populacao']) * 100000, #casos/100000
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
             'novos_casos': sum(casos_ap.values()),
