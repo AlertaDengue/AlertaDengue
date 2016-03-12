@@ -9,15 +9,17 @@ import json
 def alerta_series(context):
     dados = load_series(context['geocodigo'])[context['geocodigo']]
     dados['dia'] = [int(mktime(d.timetuple())) for d in dados['dia']]
+         dados['dia'] = [int(mktime(d.timetuple())) for d in dados['dia']]
+     int_or_none  = lambda x: None if x is None else int(x)
 
     ga = [int(c) if a == 0 else None for a, c in zip(dados['alerta'], dados['casos'])]
-    ga = [dados['casos'][n] if i is None and ga[n-1] is not None else i for n, i in enumerate(ga)]
+    ga = [int_or_none(dados['casos'][n]) if i is None and ga[n-1] is not None else int_or_none(i) for n, i in enumerate(ga)]
     ya = [int(c) if a == 1 else None for a, c in zip(dados['alerta'], dados['casos'])]
-    ya = [dados['casos'][n] if i is None and ya[n-1] is not None else i for n, i in enumerate(ya)]
+    ya = [int_or_none(dados['casos'][n]) if i is None and ya[n-1] is not None else int_or_none(i) for n, i in enumerate(ya)]
     oa = [int(c) if a == 2 else None for a, c in zip(dados['alerta'], dados['casos'])]
-    oa = [dados['casos'][n] if i is None and oa[n-1] is not None else i for n, i in enumerate(oa)]
+    oa = [int_or_none(dados['casos'][n]) if i is None and oa[n-1] is not None else int_or_none(i) for n, i in enumerate(oa)]
     ra = [int(c) if a == 3 else None for a, c in zip(dados['alerta'], dados['casos'])]
-    ra = [dados['casos'][n] if i is None and ra[n-1] is not None else i for n, i in enumerate(ra)]
+    ra = [int_or_none(dados['casos'][n]) if i is None and ra[n-1] is not None else int_or_none(i) for n, i in enumerate(ra)]
     return {'nome': context['nome'],
             'dados': dados,
             'start': dados['dia'][0],
