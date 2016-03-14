@@ -105,7 +105,7 @@ LEAFLET_CONFIG = {
     'DEFAULT_CENTER': (-22.907000, -43.431000),
     'DEFAULT_ZOOM': 8,
     'MAXIMUM_ZOOM': 13,
-    'TILES': 'https://cartocdn_{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',  # 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
+    'TILES': 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',  # 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
     'MINIMAP': False,
     'ATTRIBUTION_PREFIX': 'Fonte: <a href=http://info.dengue.mat.br>info.dengue.mat.br</a>',
     'PLUGINS': {
