@@ -19,7 +19,7 @@ urlpatterns = [#'',
                # url(r'^blog/', include('blog.urls')),
                url(r'^alerta/(?P<geocodigo>\d{7})/$', AlertaPageViewMunicipio.as_view(), name='alerta_cidade'),
                # Cache the main page for a day
-               url(r'^$', cache_page(24 * 60 * 60)(AlertaMainView.as_view()), name='main'),
+               url(r'^$', cache_page(1 * 60 * 60)(AlertaMainView.as_view()), name='main'),
                url('^accounts/profile/$', RedirectView.as_view(url="/")),
                url('^accounts/', include('django.contrib.auth.urls')),
                url(r'^alerta-detalhado/$', DetailsPageView.as_view(), name='home'),
