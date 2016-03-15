@@ -69,7 +69,7 @@ class AlertaPageView(TemplateView):
         casos_ap = {float(ap.split('AP')[-1]): int(current[current.aps == ap]['casos_est']) for ap in alert.keys()}
         alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
         semana = str(current.se.iat[-1])[-2:]
-        quarta = current.data.iat[-1]
+        segunda = current.data.iat[-1]
         city_info = get_city_info("3304557")
         total_series = sum(np.array(list(case_series.values())), np.zeros(12, int))
         total_observed_series = sum(np.array(list(observed_cases.values())), np.zeros(12, int))
@@ -98,8 +98,8 @@ class AlertaPageView(TemplateView):
             'max_est': sum(i[1] for i in min_max_est.values()),
             'series_casos': case_series,
             'SE': int(semana),
-            'data1': (quarta - datetime.timedelta(2)).strftime("%d de %B de %Y"),
-            'data2': (quarta + datetime.timedelta(4)).strftime("%d de %B de %Y"),
+            'data1': segunda.strftime("%d de %B de %Y"),
+            'data2': (segunda + datetime.timedelta(6)).strftime("%d de %B de %Y"),
             'last_year': last_year,
             'look_back': len(total_series),
             'total_series': ', '.join(map(str, total_series)),
