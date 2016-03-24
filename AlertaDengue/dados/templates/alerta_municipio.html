@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block extra_head %}
     {% load static %}
     {% load humanize %}
@@ -67,14 +68,14 @@
     </style>
 {% endblock %}
 
-{% block title %}Situação da Dengue - {{ nome }} em {{ data2 }}{% endblock %}
+{% block title %}{% blocktrans %}Situação da Dengue - {{ nome }} em {{ data2 }}{% endblocktrans %}{% endblock %}
 
 {% block content %}
     <div class="panel panel-default">
       <div class="panel-body">
-          <h3><b>População:</b> {{ populacao|intcomma }} habitantes.</h3>
-          <h3><b>Incidência estimada:</b> {{ incidencia|floatformat }} por 100 mil habitantes.</h3>
-          <h3><b>Chance de alerta <span class="label label-warning">laranja</span> ou <span class="label label-danger">vermelho</span> na próxima semana:</b> {{ prt1|floatformat }}%</h3>
+          <h3>{% blocktrans %}<b>População:</b> {{ populacao|intcomma }} habitantes.{% endblocktrans %}</h3>
+          <h3>{% blocktrans %}<b>Incidência estimada:</b> {{ incidencia|floatformat }} por 100 mil habitantes.{% endblocktrans %}</h3>
+          <h3>{% blocktrans %}<b>Chance de alerta <span class="label label-warning">laranja</span> ou <span class="label label-danger">vermelho</span> na próxima semana:</b> {{ prt1|floatformat }}%{% endblocktrans %}</h3>
       </div>
     </div>
     {% alerta_series %}
@@ -89,62 +90,62 @@
                 <div class="panel panel-default panel-verde">
                     <div class="panel-heading">
                         <a class="panel-title" data-toggle="collapse" data-parent="#panel-222790"
-                           href="#panel-element-vd">Nível Verde</a>
+                           href="#panel-element-vd">{% trans "Nível Verde" %}</a>
                     </div>
                     <div id="panel-element-vd" class="panel-collapse collapse">
                         <div class="panel-body">
-                            Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições ideais para a
-                            reprodução do Mosquito.
+                            {% trans "Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições ideais para a
+                            reprodução do Mosquito." %}
                         </div>
                     </div>
                 </div>
                 <div class="panel panel-default panel-amarelo">
                     <div class="panel-heading panel-amarelo">
                         <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-222790"
-                           href="#panel-element-am">Nível Amarelo</a>
+                           href="#panel-element-am">{% trans "Nível Amarelo" %}</a>
                     </div>
                     <div id="panel-element-am" class="panel-collapse collapse">
                         <div class="panel-body">
-                            Estação da Dengue. No nível amarelo, temos condições climáticas propícias à reprodução do
-                            mosquito. Mas ainda sem transmissão significativa da Doença.
+                            {% trans "Estação da Dengue. No nível amarelo, temos condições climáticas propícias à reprodução do
+                            mosquito. Mas ainda sem transmissão significativa da Doença." %}
                         </div>
                     </div>
                 </div>
                 <div class="panel panel-default panel-laranja">
                     <div class="panel-heading">
                         <a class="panel-title" data-toggle="collapse" data-parent="#panel-222790"
-                           href="#panel-element-la">Nível Laranja</a>
+                           href="#panel-element-la">{% trans "Nível Laranja" %}</a>
                     </div>
                     <div id="panel-element-la" class="panel-collapse collapse">
                         <div class="panel-body">
-                            Transmissão da Dengue. No nível laranja, já observamos uma incidência pronunciada da Dengue,
+                            {% trans "Transmissão da Dengue. No nível laranja, já observamos uma incidência pronunciada da Dengue,
                             mas ainda não podemos afirmar
-                            com confiança que teremos epidemia.
+                            com confiança que teremos epidemia." %}
                         </div>
                     </div>
                 </div>
                 <div class="panel panel-default panel-vermelho">
                     <div class="panel-heading">
                         <a class="panel-title" data-toggle="collapse" data-parent="#panel-222790"
-                           href="#panel-element-vm">Nível Vermelho</a>
+                           href="#panel-element-vm">{% trans "Nível Vermelho" %}</a>
                     </div>
                     <div id="panel-element-vm" class="panel-collapse collapse">
                         <div class="panel-body">
-                            Epidemia. Neste nível estamos em plena epidemia. Todo o cuidado é pouco, e precisamos ficar
+                            {% trans "Epidemia. Neste nível estamos em plena epidemia. Todo o cuidado é pouco, e precisamos ficar
                             atentos aos sintomas
-                            da Dengue e procurar o médico imediatamente em caso suspeita de Dengue.
+                            da Dengue e procurar o médico imediatamente em caso suspeita de Dengue." %}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3 column bluebox">
-            <h3><span class="badge badge-info">{{ novos_casos }}</span> Casos estimados </h3>
+            <h3><span class="badge badge-info">{{ novos_casos }}</span>{% trans " Casos estimados " %}</h3>
 
-            <p>São estimados entre <b>{{ min_est }}</b> e <b>{{ max_est }} novos casos</b> na Semana
+            <p>{% blocktrans %}São estimados entre <b>{{ min_est }}</b> e <b>{{ max_est }} novos casos</b> na Semana
                 Epidemiológica {{ SE }}: {{ data1 }} a {{ data2 }}. Com {{ total_observed }} casos notificados
-                oficialmente até o momento</p>
-            <h4>Últimas {{ look_back }} semanas:</h4>
+                oficialmente até o momento {% endblocktrans %}</p>
+            <h4>{% blocktrans %}Últimas {{ look_back }} semanas:{% endblocktrans %}</h4>
             <span class='totalsparkline'>{{ total_series }}</span>
 
             <p></p>
@@ -157,9 +158,9 @@
             <h3><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> Suspeita de um criadouro? </h3>
 
 
-            <p>Em caso de suspeita de criadouro de mosquitos, ligue para a <a href="http://www.1746.rio.gov.br/"
+            <p>{% blocktrans %}Em caso de suspeita de criadouro de mosquitos, ligue para a <a href="http://www.1746.rio.gov.br/"
                                                                               style="color: #FFFFFF">Central de
-                atendimento ao cidadão 1746</a>.</p>
+               atendimento ao cidadão 1746</a>.{% endblocktrans %}</p>
 
         </div>
     </div>

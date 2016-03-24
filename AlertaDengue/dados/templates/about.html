@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
 {% block title %}Saiba mais sobre:{% endblock %}
 
@@ -9,9 +10,10 @@
 
         <div class="panel-heading">
 
-            <h3 id="section1" class="panel-title">O Sistema de Alerta InfoDengue</h3>
+            <h3 id="section1" class="panel-title">{% trans "O Sistema de Alerta InfoDengue" %}</h3>
         </div>
         <div class="panel-body">
+            {% blocktrans %}
             O <b>Sistema Info Dengue</b> visa gerar um sistema de alerta em tempo quase-real para os casos de
             transmissão de dengue nos municípios.
             A ideia principal é o acesso rápido a informação! <br><br>
@@ -42,11 +44,13 @@
             aumento de casos e potenciais epidemias. Desta forma, é de grande importância a análise de toda a informação
             sobre dengue gerada durante o processo
             de sua notificação, servindo assim como base para as decisões da política de saúde dos municípios. <br><br>
+            {% endblocktrans %}
         </div>
         <div class="panel-heading">
-            <h3 id="section2" class="panel-title">O Sistema de Cores de Notificação </h3>
+            <h3 id="section2" class="panel-title">{% trans "O Sistema de Cores de Notificação " %}</h3>
         </div>
         <div class="panel-body">
+            {% blocktrans %}
             A dengue é difícil de prever, chega de repente. Tem ano que vem para arrasar, tem ano que mal aparece.
             O Info dengue é como um serviço de meteorologia, só que além do sol e da chuva, ele também fica de olho na
             dengue,
@@ -83,11 +87,13 @@
             e todo o ciclo começa de novo. Então não se esqueça de estar sempre antenado no <b>InfoDengue</b>. Nele,
             você tem como saber sobre a situação do
             seu bairro. Clique no <b>Mapa</b> e saiba agora mesmo como está a dengue aí, onde você está. <br><br>
+            {% endblocktrans %}
         </div>
         <div class="panel-heading">
-            <h3 id="section3" class="panel-title">O Pré-Processamento de Dados e a Geração de Indicadores</h3>
+            <h3 id="section3" class="panel-title">{% trans "O Pré-Processamento de Dados e a Geração de Indicadores" %}</h3>
         </div>
         <div class="panel-body">
+            {% blocktrans %}
             A realização de uma análise preliminar dos dados de notificação de casos de dengue mostra que o tempo de
             atraso entre a notificação e digitação tem
             uma mediana de 14 dias. Para corrigir este atraso, um modelo de sobrevivência lognormal
@@ -110,11 +116,13 @@
             Com relação aos dados de tweets, a mesma técnica é empregada, gerando um número reprodutivo dos tweets
             (Rttw).
             Variações positivas significativas indicam um aumento de risco.<br><br>
+            {% endblocktrans %}
         </div>
         <div class="panel-heading">
-            <h3 id="section4" class="panel-title">Como Participar do Sistema de Alerta InfoDengue</h3>
+            <h3 id="section4" class="panel-title">{% trans "Como Participar do Sistema de Alerta InfoDengue" %}</h3>
         </div>
         <div class="panel-body">
+            {% blocktrans %}
             É muito fácil descobrir se o seu município pode participar do <b>Sistema de Alerta InfoDengue</b>.
             Para isso é necessário que três etapas sejam cumpridas:<br><br>
 
@@ -136,6 +144,7 @@
             dados. <br><br>
 
             Em caso de dúvidas, entre em contato <a href="mailto:alerta_dengue@fiocruz.br">conosco</a>:  <br><br>
+            {% endblocktrans %}
         </div>
     </div>
     </div>
