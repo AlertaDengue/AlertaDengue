@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-30 13:21-0300\n"
+"POT-Creation-Date: 2016-03-31 17:05-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -225,19 +225,6 @@ msgid ""
 "            "
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta.html:73
-#, python-format
-msgid "<b>População:</b> %(populacao|intword)s de habitantes."
-msgstr ""
-
-#: AlertaDengue/dados/templates/alerta.html:74
-#: AlertaDengue/dados/templates/alerta_municipio.html:77
-#, python-format
-msgid ""
-"<b>Incidência estimada:</b> %(incidencia|floatformat)s por 100 mil "
-"habitantes."
-msgstr ""
-
 #: AlertaDengue/dados/templates/alerta.html:90
 #: AlertaDengue/dados/templates/alerta_municipio.html:93
 msgid "Nível Verde"
@@ -263,21 +250,6 @@ msgstr ""
 msgid " Casos estimados "
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta.html:142
-#, python-format
-msgid ""
-"São estimados entre <b>%(min_est)s</b> e <b>%(max_est)s novos casos</b> na "
-"Semana\n"
-"                Epidemiológica %(SE)s: %(data1)s a %(data2)s. Com "
-"%(total_observed)s casos notificados oficialmente até o momento"
-msgstr ""
-
-#: AlertaDengue/dados/templates/alerta.html:144
-#: AlertaDengue/dados/templates/alerta_municipio.html:148
-#, python-format
-msgid "Últimas %(look_back)s semanas:"
-msgstr ""
-
 #: AlertaDengue/dados/templates/alerta.html:154
 msgid " Suspeita de um criadouro? "
 msgstr ""
@@ -290,34 +262,6 @@ msgid ""
 "                                                                              style="
 "\"color: #FFFFFF\">Central de\n"
 "               atendimento ao cidadão 1746</a>."
-msgstr ""
-
-#: AlertaDengue/dados/templates/alerta_municipio.html:71
-#, python-format
-msgid "Situação da Dengue - %(nome)s em %(data2)s"
-msgstr ""
-
-#: AlertaDengue/dados/templates/alerta_municipio.html:76
-#, python-format
-msgid "<b>População:</b> %(populacao|intcomma)s habitantes."
-msgstr ""
-
-#: AlertaDengue/dados/templates/alerta_municipio.html:78
-#, python-format
-msgid ""
-"<b>Chance de alerta <span class=\"label label-warning\">laranja</span> ou "
-"<span class=\"label label-danger\">vermelho</span> na próxima semana:</b> "
-"%(prt1|floatformat)s%%"
-msgstr ""
-
-#: AlertaDengue/dados/templates/alerta_municipio.html:145
-#, python-format
-msgid ""
-"São estimados entre <b>%(min_est)s</b> e <b>%(max_est)s novos casos</b> na "
-"Semana\n"
-"                Epidemiológica %(SE)s: %(data1)s a %(data2)s. Com "
-"%(total_observed)s casos notificados\n"
-"                oficialmente até o momento "
 msgstr ""
 
 #: AlertaDengue/dados/templates/base.html:55

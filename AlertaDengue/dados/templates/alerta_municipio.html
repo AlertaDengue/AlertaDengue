@@ -68,14 +68,14 @@
     </style>
 {% endblock %}
 
-{% block title %}{% blocktrans %}Situação da Dengue - {{ nome }} em {{ data2 }}{% endblocktrans %}{% endblock %}
+{% block title %}{% trans Situação da Dengue - %}{{ nome }}{% trans  em %}{{ data2 }}{% endblock %}
 
 {% block content %}
     <div class="panel panel-default">
       <div class="panel-body">
-          <h3>{% blocktrans %}<b>População:</b> {{ populacao|intcomma }} habitantes.{% endblocktrans %}</h3>
-          <h3>{% blocktrans %}<b>Incidência estimada:</b> {{ incidencia|floatformat }} por 100 mil habitantes.{% endblocktrans %}</h3>
-          <h3>{% blocktrans %}<b>Chance de alerta <span class="label label-warning">laranja</span> ou <span class="label label-danger">vermelho</span> na próxima semana:</b> {{ prt1|floatformat }}%{% endblocktrans %}</h3>
+          <h3>{% trans <b>População:</b> %}{{ populacao|intcomma }}{% trans habitantes. %}</h3>
+          <h3>{% trans <b>Incidência estimada:</b> %} {{ incidencia|floatformat }}{% trans por 100 mil habitantes. %}</h3>
+          <h3>{% trans <b>Chance de alerta <span class="label label-warning">laranja</span> ou <span class="label label-danger">vermelho</span> na próxima semana:</b> %}{{ prt1|floatformat }}%</h3>
       </div>
     </div>
     {% alerta_series %}
@@ -142,10 +142,10 @@
         <div class="col-md-3 column bluebox">
             <h3><span class="badge badge-info">{{ novos_casos }}</span>{% trans " Casos estimados " %}</h3>
 
-            <p>{% blocktrans %}São estimados entre <b>{{ min_est }}</b> e <b>{{ max_est }} novos casos</b> na Semana
-                Epidemiológica {{ SE }}: {{ data1 }} a {{ data2 }}. Com {{ total_observed }} casos notificados
-                oficialmente até o momento {% endblocktrans %}</p>
-            <h4>{% blocktrans %}Últimas {{ look_back }} semanas:{% endblocktrans %}</h4>
+            <p>{% trans São estimados entre <b> %}{{ min_est }}</b>{% trans e %} <b>{{ max_est }}{% trans  novos casos</b> na Semana
+                Epidemiológica %}{{ SE }}: {{ data1 }} - {{ data2 }}.{% trans  Com %}{{ total_observed }} {% trans casos notificados
+                oficialmente até o momento  %}</p>
+            <h4>{% trans Últimas %}{{ look_back }}{% trans semanas: %}</h4>
             <span class='totalsparkline'>{{ total_series }}</span>
 
             <p></p>
