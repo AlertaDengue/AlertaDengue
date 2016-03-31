@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-31 17:05-0300\n"
+"POT-Creation-Date: 2016-03-31 18:12-0300\n"
 "PO-Revision-Date: 2016-03-31 10:28-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -398,6 +398,25 @@ msgstr ""
 "            If you have further questions, please contact  <a "
 "href=\"mailto:alerta_dengue@fiocruz.br\">us </a>: <br>"
 
+#: AlertaDengue/dados/templates/alerta.html:68
+#| msgid "Situação da Dengue - Municípios monitorados "
+msgid " Situação da Dengue no Rio de Janeiro em "
+msgstr "Dengue Situation in Rio de Janeiro at "
+
+#: AlertaDengue/dados/templates/alerta.html:73
+#, python-format
+msgid "<b>População:</b>%(populacao|intword)s de habitantes."
+msgstr "<b>Population:</b>%(populacao|intword)s of inhabitants."
+
+#: AlertaDengue/dados/templates/alerta.html:74
+#, python-format
+msgid ""
+"<b>Incidência estimada:</b> %(incidencia|floatformat)s  por 100 mil "
+"habitantes. "
+msgstr ""
+"<b>Estimated Incidence:</b> %(incidencia|floatformat)s per 100 thousand "
+"inhabitants. "
+
 #: AlertaDengue/dados/templates/alerta.html:90
 #: AlertaDengue/dados/templates/alerta_municipio.html:93
 msgid "Nível Verde"
@@ -422,6 +441,24 @@ msgstr "Red Level"
 #: AlertaDengue/dados/templates/alerta_municipio.html:143
 msgid " Casos estimados "
 msgstr "Estimated cases"
+
+#: AlertaDengue/dados/templates/alerta.html:142
+#, python-format
+msgid ""
+" São estimados entre <b>%(min_est)s</b> e <b>%(max_est)s  novos casos</b> na "
+"Semana\n"
+"                Epidemiológica %(SE)s: %(data1)s  a %(data2)s. Com "
+"%(total_observed)scasos notificados oficialmente até o momento "
+msgstr ""
+" We estimate between <b>%(min_est)s</b> and <b>%(max_est)s  new cases</b> on "
+"week\n"
+"                 %(SE)s: %(data1)s to %(data2)s. With %(total_observed)s "
+"officially notified cases so far "
+
+#: AlertaDengue/dados/templates/alerta.html:144
+#, python-format
+msgid " Últimas %(look_back)s semanas: "
+msgstr " Previous %(look_back)s weeks: "
 
 #: AlertaDengue/dados/templates/alerta.html:154
 msgid " Suspeita de um criadouro? "
