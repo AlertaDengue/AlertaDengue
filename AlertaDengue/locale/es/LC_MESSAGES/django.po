@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-31 18:12-0300\n"
+"POT-Creation-Date: 2016-04-01 10:48-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,14 +68,16 @@ msgid ""
 "            sobre dengue gerada durante o processo\n"
 "            de sua notificação, servindo assim como base para as decisões da "
 "política de saúde dos municípios. <br><br>\n"
+"                <a href=\"http://biorxiv.org/content/"
+"early/2016/03/29/046193\" >Mais Detalhes...</a>\n"
 "            "
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:50
+#: AlertaDengue/dados/templates/about.html:51
 msgid "O Sistema de Cores de Notificação "
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:53
+#: AlertaDengue/dados/templates/about.html:54
 msgid ""
 "\n"
 "            A dengue é difícil de prever, chega de repente. Tem ano que vem "
@@ -136,11 +138,11 @@ msgid ""
 "            "
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:93
+#: AlertaDengue/dados/templates/about.html:94
 msgid "O Pré-Processamento de Dados e a Geração de Indicadores"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:96
+#: AlertaDengue/dados/templates/about.html:97
 #, python-format
 msgid ""
 "\n"
@@ -182,11 +184,11 @@ msgid ""
 "            "
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:122
+#: AlertaDengue/dados/templates/about.html:123
 msgid "Como Participar do Sistema de Alerta InfoDengue"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:125
+#: AlertaDengue/dados/templates/about.html:126
 msgid ""
 "\n"
 "            É muito fácil descobrir se o seu município pode participar do "
@@ -247,22 +249,22 @@ msgid "Nível Verde"
 msgstr ""
 
 #: AlertaDengue/dados/templates/alerta.html:102
-#: AlertaDengue/dados/templates/alerta_municipio.html:105
+#: AlertaDengue/dados/templates/alerta_municipio.html:104
 msgid "Nível Amarelo"
 msgstr ""
 
 #: AlertaDengue/dados/templates/alerta.html:114
-#: AlertaDengue/dados/templates/alerta_municipio.html:117
+#: AlertaDengue/dados/templates/alerta_municipio.html:116
 msgid "Nível Laranja"
 msgstr ""
 
 #: AlertaDengue/dados/templates/alerta.html:127
-#: AlertaDengue/dados/templates/alerta_municipio.html:130
+#: AlertaDengue/dados/templates/alerta_municipio.html:129
 msgid "Nível Vermelho"
 msgstr ""
 
 #: AlertaDengue/dados/templates/alerta.html:140
-#: AlertaDengue/dados/templates/alerta_municipio.html:143
+#: AlertaDengue/dados/templates/alerta_municipio.html:142
 msgid " Casos estimados "
 msgstr ""
 
@@ -276,6 +278,7 @@ msgid ""
 msgstr ""
 
 #: AlertaDengue/dados/templates/alerta.html:144
+#: AlertaDengue/dados/templates/alerta_municipio.html:147
 #, python-format
 msgid " Últimas %(look_back)s semanas: "
 msgstr ""
@@ -285,13 +288,52 @@ msgid " Suspeita de um criadouro? "
 msgstr ""
 
 #: AlertaDengue/dados/templates/alerta.html:157
-#: AlertaDengue/dados/templates/alerta_municipio.html:162
+#: AlertaDengue/dados/templates/alerta_municipio.html:161
 msgid ""
 "Em caso de suspeita de criadouro de mosquitos, ligue para a <a href=\"http://"
 "www.1746.rio.gov.br/\"\n"
 "                                                                              style="
 "\"color: #FFFFFF\">Central de\n"
 "               atendimento ao cidadão 1746</a>."
+msgstr ""
+
+#: AlertaDengue/dados/templates/alerta_municipio.html:71
+#, python-format
+msgid " Situação da Dengue - %(nome)s em %(data2)s "
+msgstr ""
+
+#: AlertaDengue/dados/templates/alerta_municipio.html:76
+#, python-format
+msgid " <b>População:</b> %(populacao)s habitantes. "
+msgstr ""
+
+#: AlertaDengue/dados/templates/alerta_municipio.html:77
+#, python-format
+msgid " <b>Incidência estimada:</b>  %(incidencia)s por 100 mil habitantes. "
+msgstr ""
+
+#: AlertaDengue/dados/templates/alerta_municipio.html:78
+#, python-format
+msgid ""
+"<b>Chance de alerta <span class=\"label label-warning\">laranja</span> ou "
+"<span class=\"label label-danger\">vermelho</span> na próxima semana:</b> "
+"%(prt1|floatformat)s%%"
+msgstr ""
+
+#: AlertaDengue/dados/templates/alerta_municipio.html:97
+msgid ""
+"Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições "
+"ideais para a reprodução do Mosquito."
+msgstr ""
+
+#: AlertaDengue/dados/templates/alerta_municipio.html:144
+#, python-format
+msgid ""
+" São estimados entre <b> %(min_est)s</b> e <b>%(max_est)s  novos casos</b> "
+"na Semana\n"
+"                Epidemiológica %(SE)s: %(data1)s - %(data2)s. Com "
+"%(total_observed)s  casos notificados\n"
+"                oficialmente até o momento  "
 msgstr ""
 
 #: AlertaDengue/dados/templates/base.html:55
