@@ -73,8 +73,8 @@
 {% block content %}
     <div class="panel panel-default">
       <div class="panel-body">
-          <h3>{% blocktrans %} <b>População:</b> {{ populacao }} habitantes. {% endblocktrans %}</h3>
-          <h3>{% blocktrans %} <b>Incidência estimada:</b>  {{ incidencia }} por 100 mil habitantes. {% endblocktrans %}</h3>
+          <h3>{% blocktrans with populacao=populacao|intcomma %} <b>População:</b> {{ populacao }} habitantes. {% endblocktrans %}</h3>
+          <h3>{% blocktrans with incidencia=incidencia|floatformat %} <b>Incidência estimada:</b>  {{ incidencia }} por 100 mil habitantes. {% endblocktrans %}</h3>
           <h3>{% blocktrans with prt=prt1|floatformat %}<b>Chance de alerta <span class="label label-warning">laranja</span> ou <span class="label label-danger">vermelho</span> na próxima semana:</b> {{ prt }}%{% endblocktrans %}</h3>
       </div>
     </div>
