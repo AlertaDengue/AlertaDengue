@@ -10,3 +10,4 @@ shapely
 psycopg2
 sqlalchemy
 python3-memcached
+django-makemessages-xgettext

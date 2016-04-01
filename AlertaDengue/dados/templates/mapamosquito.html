@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block extra_head %}
     {% load leaflet_tags %}
     {% leaflet_js %}
@@ -16,15 +17,15 @@
 {% endblock %}
 
 
-{% block title %}<br><a href="{% url 'home' %}">Positividade de Ovitrampas</a>{% endblock %}
+{% block title %}<br><a href="{% url 'home' %}">{% trans "Positividade de Ovitrampas" %}</a>{% endblock %}
 
 {% block content %}
 
 <div class="panel panel-default">
   <!-- Default panel contents -->
-  <div class="panel-heading">Ovitrampas Positivas</div>
+  <div class="panel-heading">{% trans "Ovitrampas Positivas" %}</div>
   <div class="panel-body">
-    <p>Modelo GAM espacial da positividade de ovitrampas no município do Rio de Janeiro.</p>
+    <p>{% trans "Modelo GAM espacial da positividade de ovitrampas no município do Rio de Janeiro." %}</p>
   </div>
 
   <img src="/static/mapa_ovitrampas.png" width="900px">

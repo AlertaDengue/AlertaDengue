@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block extra_head %}
     {% load static %}
     {% load leaflet_tags %}
@@ -55,7 +56,7 @@
     <script src="/static/js/infodengue.js"></script>
 
 {% endblock %}
-{% block title %}Situação da Dengue - Municípios monitorados {% endblock %}
+{% block title %}{% trans "Situação da Dengue - Municípios monitorados " %}{% endblock %}
 
 {% block content %}
     {% total_series %}
