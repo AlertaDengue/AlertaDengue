@@ -56,7 +56,7 @@
     <script src="/static/js/infodengue.js"></script>
 
 {% endblock %}
-{% block title %}{% trans "Situação da Dengue - Municípios monitorados " %}{% endblock %}
+{% block title %}{% blocktrans %}Situação da Dengue - {{ num_mun }} Municípios monitorados {% endblocktrans %}{% endblock %}
 
 {% block content %}
     {% total_series %}

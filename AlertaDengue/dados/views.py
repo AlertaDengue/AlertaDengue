@@ -44,6 +44,7 @@ class AlertaMainView(TemplateView):
             total += dados[2][-52:]
         context.update({
             'mundict': json.dumps(mundict),
+            'num_mun': len(mundict),
             'municipios': municipios,
             'geocodigos': geocodigos,
             'alerta': json.dumps(alerta),
@@ -326,7 +327,7 @@ def load_series():
     Monta as séries para visualização no site
     """
     series = defaultdict(lambda: defaultdict(lambda: []))
-    G = dados_alerta.groupby("APS")
+    G = dados_alerta.groupby("aps")
     for ap in G.groups.keys():
         series[ap]['dia'] = [
             int(mktime(datetime.datetime.strptime(d, "%Y-%m-%d").timetuple())) if isinstance(d, str) else None for d in
