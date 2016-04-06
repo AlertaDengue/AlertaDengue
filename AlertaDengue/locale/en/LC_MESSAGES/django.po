@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-01 16:57-0300\n"
+"POT-Creation-Date: 2016-04-06 14:58-0300\n"
 "PO-Revision-Date: 2016-03-31 10:28-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -458,14 +458,11 @@ msgstr "Dengue Situation in Rio de Janeiro at "
 
 #: AlertaDengue/dados/templates/alerta.html:73
 #, python-format
-#| msgid " <b>População:</b> %(populacao)s habitantes. "
 msgid "<b>População:</b> %(pop)s de habitantes."
 msgstr "<b>Population:</b>%(pop)s of inhabitants."
 
 #: AlertaDengue/dados/templates/alerta.html:74
 #, python-format
-#| msgid ""
-#| " <b>Incidência estimada:</b>  %(incidencia)s por 100 mil habitantes. "
 msgid "<b>Incidência estimada:</b> %(incid)s  por 100 mil habitantes. "
 msgstr "<b>Estimated Incidence:</b> %(incid)s per 100 thousand inhabitants. "
 
@@ -548,10 +545,6 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/alerta_municipio.html:78
 #, python-format
-#| msgid ""
-#| "<b>Chance de alerta <span class=\"label label-warning\">laranja</span> ou "
-#| "<span class=\"label label-danger\">vermelho</span> na próxima semana:</b> "
-#| "%(prt1|floatformat)s%%"
 msgid ""
 "<b>Chance de alerta <span class=\"label label-warning\">laranja</span> ou "
 "<span class=\"label label-danger\">vermelho</span> na próxima semana:</b> "
@@ -825,8 +818,10 @@ msgid ""
 msgstr "Want to know more? Get in touch with us: alerta_dengue@fiocruz.br"
 
 #: AlertaDengue/dados/templates/main.html:59
-msgid "Situação da Dengue - Municípios monitorados "
-msgstr "Dengue Situation - Monitored cities "
+#, python-format
+#| msgid "Situação da Dengue - Municípios monitorados "
+msgid "Situação da Dengue - %(num_mun)s Municípios monitorados "
+msgstr "Dengue Situation - %(num_mun)s Monitored cities "
 
 #: AlertaDengue/dados/templates/mapadengue.html:20
 msgid "Mapa de Casos"
