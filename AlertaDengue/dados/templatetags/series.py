@@ -2,13 +2,14 @@ from django import template
 from dados.dbdata import load_series
 register = template.Library()
 from time import mktime
+from datetime import timedelta
 import json
 
 
 @register.inclusion_tag("series_plot.html", takes_context=True)
 def alerta_series(context):
     dados = load_series(context['geocodigo'])[context['geocodigo']]
-    dados['dia'] = [int(mktime(d.timetuple())) for d in dados['dia']]
+    dados['dia'] = [int(mktime((d + timedelta(7)).timetuple())) for d in dados['dia']]
     int_or_none  = lambda x: None if x is None else int(x)
 
     ga = [int(c) if a == 0 else None for a, c in zip(dados['alerta'], dados['casos'])]
@@ -35,9 +36,9 @@ def total_series(context):
     dados = load_series(gc)
     dias = dados[str(gc)]['dia'][-52:]
 
-    tempo = [int(mktime(d.timetuple())) for d in dias]
-    print(dias)
-    print(tempo)
+    tempo = [int(mktime((d + timedelta(7)).timetuple())) for d in dias]
+    # print(dias)
+    # print(tempo)
     return {
         'tempo': tempo,
         'start': tempo[0],
