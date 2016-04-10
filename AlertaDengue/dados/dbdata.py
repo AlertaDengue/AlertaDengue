@@ -5,6 +5,7 @@ Este módulo contem funções para interagir com o banco principal do projeto
 
 from sqlalchemy import create_engine
 from django.conf import settings
+from django.core.cache import cache
 import pandas as pd
 import numpy as np
 from collections import defaultdict
@@ -22,11 +23,17 @@ def get_all_active_cities():
     Fetch from the database a list on names of active cities
     :return: list of tuples (geocode,name)
     """
-    conexao = create_engine("postgresql://{}:{}@{}/{}".format(settings.PSQL_USER, settings.PSQL_PASSWORD, settings.PSQL_HOST, settings.PSQL_DB))
-    res = conexao.execute('SELECT DISTINCT municipio_geocodigo, nome FROM'
-        '"Municipio"."Historico_alerta" INNER JOIN "Dengue_global"."Municipio" ON'
-        '"Historico_alerta".municipio_geocodigo = "Municipio".geocodigo;')
-    return res.fetchall()
+    res = cache.get('get_all_active_cities')
+
+    if res is None:
+        conexao = create_engine("postgresql://{}:{}@{}/{}".format(settings.PSQL_USER, settings.PSQL_PASSWORD, settings.PSQL_HOST, settings.PSQL_DB))
+        res = conexao.execute('SELECT DISTINCT municipio_geocodigo, nome FROM'
+            '"Municipio"."Historico_alerta" INNER JOIN "Dengue_global"."Municipio" ON'
+            '"Historico_alerta".municipio_geocodigo = "Municipio".geocodigo;')
+        cache.set('get_all_active_cities', res.fetchall(),
+                settings.QUERY_CACHE_TIMEOUT)
+
+    return res
 
 def get_alerta_mrj():
     """
@@ -58,29 +65,35 @@ def load_series(cidade, doenca='dengue'):
     :param doenca: dengue|chik|zika
     :return: dictionary
     """
-    conexao = create_engine("postgresql://{}:{}@{}/{}".format(settings.PSQL_USER, settings.PSQL_PASSWORD, settings.PSQL_HOST, settings.PSQL_DB))
-    ap = str(cidade)
-    cidade = add_dv(int(str(cidade)[:-1]))
-    dados_alerta = pd.read_sql_query('select * from "Municipio"."Historico_alerta" where municipio_geocodigo={} ORDER BY "data_iniSE" ASC'.format(cidade), conexao, 'id', parse_dates=True)
-    if len(dados_alerta) == 0:
-        raise NameError("Não foi possível obter os dados do Banco para cidade {}".format(cidade))
+    cache_key = 'load_series-{}-{}'.format(cidade, doenca)
+    result = cache.get(cache_key)
+    if result is None:
+        conexao = create_engine("postgresql://{}:{}@{}/{}".format(settings.PSQL_USER, settings.PSQL_PASSWORD, settings.PSQL_HOST, settings.PSQL_DB))
+        ap = str(cidade)
+        cidade = add_dv(int(str(cidade)[:-1]))
+        dados_alerta = pd.read_sql_query('select * from "Municipio"."Historico_alerta" where municipio_geocodigo={} ORDER BY "data_iniSE" ASC'.format(cidade), conexao, 'id', parse_dates=True)
+        if len(dados_alerta) == 0:
+            raise NameError("Não foi possível obter os dados do Banco para cidade {}".format(cidade))
 
-    # tweets = pd.read_sql_query('select * from "Municipio"."Tweet" where "Municipio_geocodigo"={}'.format(cidade), parse_dates=True)
-    series = defaultdict(lambda: defaultdict(lambda: []))
-    series[ap]['dia'] = dados_alerta.data_iniSE.tolist()
-    # series[ap]['tweets'] = [float(i) if not np.isnan(i) else None for i in tweets.numero]
-    # series[ap]['tmin'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).tmin]
-    series[ap]['casos_est_min'] = np.nan_to_num(dados_alerta.casos_est_min).astype(int).tolist()
-    series[ap]['casos_est'] = np.nan_to_num(dados_alerta.casos_est).astype(int).tolist()
-    series[ap]['casos_est_max'] = np.nan_to_num(dados_alerta.casos_est_max).astype(int).tolist()
-    series[ap]['casos'] = np.nan_to_num(dados_alerta.casos).astype(int).tolist()
-    series[ap]['alerta'] = (dados_alerta.nivel.astype(int)-1).tolist()  # (1,4)->(0,3)
-    series[ap]['SE'] = (dados_alerta.SE.astype(int)).tolist()
-    series[ap]['prt1'] = dados_alerta.p_rt1.astype(float).tolist()
-    # print(series['dia'])
-    series[ap] = dict(series[ap])
-    # conexao.close()
-    return dict(series)
+        # tweets = pd.read_sql_query('select * from "Municipio"."Tweet" where "Municipio_geocodigo"={}'.format(cidade), parse_dates=True)
+        series = defaultdict(lambda: defaultdict(lambda: []))
+        series[ap]['dia'] = dados_alerta.data_iniSE.tolist()
+        # series[ap]['tweets'] = [float(i) if not np.isnan(i) else None for i in tweets.numero]
+        # series[ap]['tmin'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).tmin]
+        series[ap]['casos_est_min'] = np.nan_to_num(dados_alerta.casos_est_min).astype(int).tolist()
+        series[ap]['casos_est'] = np.nan_to_num(dados_alerta.casos_est).astype(int).tolist()
+        series[ap]['casos_est_max'] = np.nan_to_num(dados_alerta.casos_est_max).astype(int).tolist()
+        series[ap]['casos'] = np.nan_to_num(dados_alerta.casos).astype(int).tolist()
+        series[ap]['alerta'] = (dados_alerta.nivel.astype(int)-1).tolist()  # (1,4)->(0,3)
+        series[ap]['SE'] = (dados_alerta.SE.astype(int)).tolist()
+        series[ap]['prt1'] = dados_alerta.p_rt1.astype(float).tolist()
+        # print(series['dia'])
+        series[ap] = dict(series[ap])
+        # conexao.close()
+        result = dict(series)
+        cache.set(cache_key, result, settings.QUERY_CACHE_TIMEOUT)
+
+    return result
 
 
 def get_city_alert(cidade, doenca='dengue'):
