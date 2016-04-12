@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-06 14:58-0300\n"
+"POT-Creation-Date: 2016-04-12 11:41-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -524,6 +524,14 @@ msgstr ""
 msgid " Secretaria de estado de Saúde do Rio de Janeiro"
 msgstr ""
 
+#: AlertaDengue/dados/templates/contact.html:49
+msgid ""
+" Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta "
+"Info Dengue?\n"
+"                Entre em contato <a href=\"mailto:alerta_dengue@fiocruz.br"
+"\">conosco</a>."
+msgstr ""
+
 #: AlertaDengue/dados/templates/details.html:20
 msgid "Alerta Dengue Rio"
 msgstr ""
@@ -582,6 +590,10 @@ msgstr ""
 msgid ""
 "Modelo GAM espacial da positividade de ovitrampas no município do Rio de "
 "Janeiro."
+msgstr ""
+
+#: AlertaDengue/dados/templates/my_bootstrap3_base.html:20
+msgid "Parceiros"
 msgstr ""
 
 #: AlertaDengue/templates/registration/login.html:17
