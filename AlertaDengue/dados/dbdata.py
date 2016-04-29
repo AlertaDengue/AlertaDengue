@@ -30,8 +30,8 @@ def get_all_active_cities():
         res = conexao.execute('SELECT DISTINCT municipio_geocodigo, nome FROM'
             '"Municipio"."Historico_alerta" INNER JOIN "Dengue_global"."Municipio" ON'
             '"Historico_alerta".municipio_geocodigo = "Municipio".geocodigo;')
-        cache.set('get_all_active_cities', res.fetchall(),
-                settings.QUERY_CACHE_TIMEOUT)
+        res = res.fetchall()
+        cache.set('get_all_active_cities', res, settings.QUERY_CACHE_TIMEOUT)
 
     return res
 
