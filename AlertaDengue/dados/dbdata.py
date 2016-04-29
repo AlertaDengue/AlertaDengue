@@ -54,9 +54,28 @@ def get_city(query):
     sql = 'SELECT distinct municipio_geocodigo, nome, uf from "Municipio"."Historico_alerta" inner JOIN' \
           ' "Dengue_global"."Municipio" on "Historico_alerta".municipio_geocodigo="Municipio".geocodigo ' \
           'WHERE nome ilike(%s);'
+
     result = conexao.execute(sql, ('%'+query+'%',))
 
     return result.fetchall()
+
+def get_series_by_UF(doenca='dengue'):
+    """
+    Get the incidence series from the database aggregated (sum) by state
+    :param UF: substring of the name of the state
+    :param doenca: cid 10 code for the disease
+    :return:
+    """
+    conexao = create_engine(
+        "postgresql://{}:{}@{}/{}".format(settings.PSQL_USER, settings.PSQL_PASSWORD, settings.PSQL_HOST,
+                                          settings.PSQL_DB))
+    sql = 'SELECT uf, "data_iniSE", sum(casos) casos_s, sum(casos_est) casos_est_s from "Municipio"."Historico_alerta" inner JOIN "Dengue_global"."Municipio"
+    on "Historico_alerta".municipio_geocodigo="Municipio".geocodigo GROUP BY "data_iniSE",uf ORDER BY uf, "data_iniSE" ASC;'
+    series = defaultdict(lambda: defaultdict(lambda: []))
+    result = conexao.execute(sql)
+    for uf,data, casos, casos_est in result.fetchall():
+        series[uf][data] = {'casos':casos, 'casos_est': casos_est}
+    return series
 
 def load_series(cidade, doenca='dengue'):
     """
