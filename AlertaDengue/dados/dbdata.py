@@ -66,8 +66,8 @@ def get_series_by_UF(doenca='dengue'):
     :param doenca: cid 10 code for the disease
     :return: Dataframe with the series in long format
     """
-    res = cache.get('get_series_by_UF')
-    if res is None:
+    series = cache.get('get_series_by_UF')
+    if series is None:
         conexao = create_engine(
             "postgresql://{}:{}@{}/{}".format(settings.PSQL_USER, settings.PSQL_PASSWORD, settings.PSQL_HOST,
                                               settings.PSQL_DB))
