@@ -64,17 +64,20 @@ def get_series_by_UF(doenca='dengue'):
     Get the incidence series from the database aggregated (sum) by state
     :param UF: substring of the name of the state
     :param doenca: cid 10 code for the disease
-    :return:
+    :return: Dataframe with the series in long format
     """
-    conexao = create_engine(
-        "postgresql://{}:{}@{}/{}".format(settings.PSQL_USER, settings.PSQL_PASSWORD, settings.PSQL_HOST,
-                                          settings.PSQL_DB))
-    sql = 'SELECT uf, "data_iniSE", sum(casos) casos_s, sum(casos_est) casos_est_s from "Municipio"."Historico_alerta" inner JOIN "Dengue_global"."Municipio"
-    on "Historico_alerta".municipio_geocodigo="Municipio".geocodigo GROUP BY "data_iniSE",uf ORDER BY uf, "data_iniSE" ASC;'
-    series = defaultdict(lambda: defaultdict(lambda: []))
-    result = conexao.execute(sql)
-    for uf,data, casos, casos_est in result.fetchall():
-        series[uf][data] = {'casos':casos, 'casos_est': casos_est}
+    res = cache.get('get_series_by_UF')
+    if res is None:
+        conexao = create_engine(
+            "postgresql://{}:{}@{}/{}".format(settings.PSQL_USER, settings.PSQL_PASSWORD, settings.PSQL_HOST,
+                                              settings.PSQL_DB))
+        series = pd.read_sql('SELECT uf, "data_iniSE" as data, sum(casos) casos_s, sum(casos_est) casos_est_s from \
+                             "Municipio"."Historico_alerta" inner JOIN "Dengue_global"."Municipio" \
+                              on "Historico_alerta".municipio_geocodigo="Municipio".geocodigo  \
+                             GROUP BY "data_iniSE", uf ORDER BY uf, "data_iniSE" ASC;', conexao, parse_dates=True)
+        cache.set('get_series_by_UF', series, settings.QUERY_CACHE_TIMEOUT)
+
+
     return series
 
 def load_series(cidade, doenca='dengue'):

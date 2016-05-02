@@ -1,8 +1,9 @@
 from django import template
-from dados.dbdata import load_series
+from dados.dbdata import load_series, get_series_by_UF
 register = template.Library()
 from time import mktime
 from datetime import timedelta
+from datetime import date
 import json
 
 
@@ -33,14 +34,21 @@ def alerta_series(context):
 @register.inclusion_tag("total_series.html", takes_context=True)
 def total_series(context):
     gc = context['geocodigos'][0]
-    dados = load_series(gc)
-    dias = dados[str(gc)]['dia'][-52:]
+    series = get_series_by_UF()
+    ufs = list(set(series.uf.tolist()))
+    start = series.data.max() - timedelta(weeks=51)  # 51 weeks to get the end of the SE
+    start = int(mktime(start.timetuple()))
+    casos = {}
+    casos_est = {}
+    for uf in ufs:
+        datas = [int(mktime(d.timetuple()))*1000 for d in series[series.uf == uf].data[-52:]]
+        casos[uf] = [list(t) for t in zip(datas, series[series.uf == uf].casos_s[-52:].astype('int').tolist())]
+        casos_est[uf] = [list(t) for t in zip(datas, series[series.uf == uf].casos_est_s[-52:].astype('int').tolist())]
 
-    tempo = [int(mktime((d + timedelta(7)).timetuple())) for d in dias]
-    # print(dias)
-    # print(tempo)
+    # print(casos)
     return {
-        'tempo': tempo,
-        'start': tempo[0],
-        'total': context['total']
+        'ufs': ufs,
+        'start': start,
+        'series': casos,
+        'series_est': casos_est
     }
