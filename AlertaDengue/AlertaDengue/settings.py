@@ -132,6 +132,8 @@ PSQL_PASSWORD = "aldengue"#config('PSQL_PASSWORD')
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
 LANGUAGE_CODE = 'pt-br'
+LANGUAGES = (('pt-br', 'Português'),
+             ('en-us', 'english'))
 
 TIME_ZONE = 'UTC'
 

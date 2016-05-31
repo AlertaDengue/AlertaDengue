@@ -1,8 +1,11 @@
 {% extends 'base.html' %}
-{% load i18n %}
+
+
 {% block extra_head %}
     {% load static %}
-    {% load humanize %}
+    {% load staticfiles %}
+    {% load humanize i18n%}
+    {% load i18n %}
     {% load leaflet_tags %}
     {% load series %}
     {% leaflet_js %}
