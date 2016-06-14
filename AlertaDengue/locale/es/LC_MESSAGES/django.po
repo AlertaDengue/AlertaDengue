@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-12 11:41-0300\n"
+"POT-Creation-Date: 2016-06-14 03:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,14 +18,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: AlertaDengue/dados/templates/about.html:13
+#: AlertaDengue/dados/templates/about.html:4
+msgid "Saiba mais:"
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:10
 msgid "O Sistema de Alerta InfoDengue"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:16
+#: AlertaDengue/dados/templates/about.html:13
 msgid ""
 "\n"
-"            O <b>Sistema Info Dengue</b> visa gerar um sistema de alerta em "
+"            O <b>Sistema InfoDengue</b> visa gerar um sistema de alerta em "
 "tempo quase-real para os casos de\n"
 "            transmissão de dengue nos municípios.\n"
 "            A ideia principal é o acesso rápido a informação! <br><br>\n"
@@ -73,11 +77,11 @@ msgid ""
 "            "
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:51
+#: AlertaDengue/dados/templates/about.html:48
 msgid "O Sistema de Cores de Notificação "
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:54
+#: AlertaDengue/dados/templates/about.html:51
 msgid ""
 "\n"
 "            A dengue é difícil de prever, chega de repente. Tem ano que vem "
@@ -138,11 +142,11 @@ msgid ""
 "            "
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:94
+#: AlertaDengue/dados/templates/about.html:91
 msgid "O Pré-Processamento de Dados e a Geração de Indicadores"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:97
+#: AlertaDengue/dados/templates/about.html:94
 #, python-format
 msgid ""
 "\n"
@@ -184,49 +188,6 @@ msgid ""
 "            "
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:123
-msgid "Como Participar do Sistema de Alerta InfoDengue"
-msgstr ""
-
-#: AlertaDengue/dados/templates/about.html:126
-msgid ""
-"\n"
-"            É muito fácil descobrir se o seu município pode participar do "
-"<b>Sistema de Alerta InfoDengue</b>.\n"
-"            Para isso é necessário que três etapas sejam cumpridas:<br><br>\n"
-"\n"
-"            1 - Preencher o <a href=\"http://goo.gl/forms/JHK3ZhZduH"
-"\">formulário de adesão</a> com as informações\n"
-"            sobre o município e sobre a pessoa responsável pelos dados de "
-"dengue com quem manteremos contato;<br><br>\n"
-"\n"
-"            2 - Para dar continuidade à análise de viabilidade de "
-"participação, vamos precisar analisar\n"
-"            os dados de notificação de dengue (SINAN) em seu município, de "
-"2012 até o presente. Enviaremos para você uma\n"
-"            carta sobre o compromisso do <b>Sistema de Alerta InfoDengue</b> "
-"a respeito da utilização dos dados.\n"
-"            É importante ressaltar que não há necessidade de informação "
-"sobre a identificação dos casos.<br><br>\n"
-"\n"
-"            3 - Se o seu município conseguiu preencher os dois requisitos "
-"anteriores, PARABÉNS! Os modelos de alerta já\n"
-"            estarão\n"
-"            prontos para seu município. Será elaborado e enviado um "
-"relatório contendo a análise dos dados históricos a\n"
-"            você.\n"
-"            Agora é hora de fazer o sistema funcionar daqui para frente. "
-"Para isso, um termo de compromisso deverá ser\n"
-"            assinado\n"
-"            entre o <b>Sistema de Alerta InfoDengue</b> e a Secretária "
-"Municipal de Saúde, autorizando a utilização dos\n"
-"            dados. <br><br>\n"
-"\n"
-"            Em caso de dúvidas, entre em contato <a href=\"mailto:"
-"alerta_dengue@fiocruz.br\">conosco</a>:  <br><br>\n"
-"            "
-msgstr ""
-
 #: AlertaDengue/dados/templates/alerta.html:68
 msgid " Situação da Dengue no Rio de Janeiro em "
 msgstr ""
@@ -242,27 +203,27 @@ msgid "<b>Incidência estimada:</b> %(incid)s  por 100 mil habitantes. "
 msgstr ""
 
 #: AlertaDengue/dados/templates/alerta.html:90
-#: AlertaDengue/dados/templates/alerta_municipio.html:93
+#: AlertaDengue/dados/templates/alerta_municipio.html:96
 msgid "Nível Verde"
 msgstr ""
 
 #: AlertaDengue/dados/templates/alerta.html:102
-#: AlertaDengue/dados/templates/alerta_municipio.html:104
+#: AlertaDengue/dados/templates/alerta_municipio.html:107
 msgid "Nível Amarelo"
 msgstr ""
 
 #: AlertaDengue/dados/templates/alerta.html:114
-#: AlertaDengue/dados/templates/alerta_municipio.html:116
+#: AlertaDengue/dados/templates/alerta_municipio.html:119
 msgid "Nível Laranja"
 msgstr ""
 
 #: AlertaDengue/dados/templates/alerta.html:127
-#: AlertaDengue/dados/templates/alerta_municipio.html:129
+#: AlertaDengue/dados/templates/alerta_municipio.html:132
 msgid "Nível Vermelho"
 msgstr ""
 
 #: AlertaDengue/dados/templates/alerta.html:140
-#: AlertaDengue/dados/templates/alerta_municipio.html:142
+#: AlertaDengue/dados/templates/alerta_municipio.html:145
 msgid " Casos estimados "
 msgstr ""
 
@@ -276,7 +237,7 @@ msgid ""
 msgstr ""
 
 #: AlertaDengue/dados/templates/alerta.html:144
-#: AlertaDengue/dados/templates/alerta_municipio.html:147
+#: AlertaDengue/dados/templates/alerta_municipio.html:150
 #, python-format
 msgid " Últimas %(look_back)s semanas: "
 msgstr ""
@@ -286,7 +247,7 @@ msgid " Suspeita de um criadouro? "
 msgstr ""
 
 #: AlertaDengue/dados/templates/alerta.html:157
-#: AlertaDengue/dados/templates/alerta_municipio.html:161
+#: AlertaDengue/dados/templates/alerta_municipio.html:164
 msgid ""
 "Em caso de suspeita de criadouro de mosquitos, ligue para a <a href=\"http://"
 "www.1746.rio.gov.br/\"\n"
@@ -295,22 +256,22 @@ msgid ""
 "               atendimento ao cidadão 1746</a>."
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta_municipio.html:71
+#: AlertaDengue/dados/templates/alerta_municipio.html:74
 #, python-format
 msgid " Situação da Dengue - %(nome)s em %(data2)s "
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta_municipio.html:76
+#: AlertaDengue/dados/templates/alerta_municipio.html:79
 #, python-format
 msgid " <b>População:</b> %(populacao)s habitantes. "
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta_municipio.html:77
+#: AlertaDengue/dados/templates/alerta_municipio.html:80
 #, python-format
 msgid " <b>Incidência estimada:</b>  %(incidencia)s por 100 mil habitantes. "
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta_municipio.html:78
+#: AlertaDengue/dados/templates/alerta_municipio.html:81
 #, python-format
 msgid ""
 "<b>Chance de alerta <span class=\"label label-warning\">laranja</span> ou "
@@ -318,13 +279,13 @@ msgid ""
 "%(prt)s%%"
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta_municipio.html:97
+#: AlertaDengue/dados/templates/alerta_municipio.html:100
 msgid ""
 "Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições "
 "ideais para a reprodução do Mosquito."
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta_municipio.html:144
+#: AlertaDengue/dados/templates/alerta_municipio.html:147
 #, python-format
 msgid ""
 " São estimados entre <b> %(min_est)s</b> e <b>%(max_est)s  novos casos</b> "
@@ -546,19 +507,43 @@ msgstr ""
 msgid "Como participar do InfoDengue"
 msgstr ""
 
-#: AlertaDengue/dados/templates/joinin.html:15
+#: AlertaDengue/dados/templates/joinin.html:10
 msgid ""
-"Preencha seus dados abaixo e entraremos em contato em no máximo 2 semanas."
-msgstr ""
-
-#: AlertaDengue/dados/templates/joinin.html:17
-msgid "Formulário"
-msgstr ""
-
-#: AlertaDengue/dados/templates/joinin.html:19
-msgid ""
-"Você quer saber mais detalhes? Entre em contato conosco: "
-"alerta_dengue@fiocruz.br"
+"\n"
+"            É muito fácil descobrir se o seu município pode participar do "
+"<b>Sistema de Alerta InfoDengue</b>.\n"
+"            Para isso é necessário que três etapas sejam cumpridas:<br><br>\n"
+"\n"
+"            1 - Preencher o <a href=\"http://goo.gl/forms/JHK3ZhZduH"
+"\">formulário de adesão</a> com as informações\n"
+"            sobre o município e sobre a pessoa responsável pelos dados de "
+"dengue com quem manteremos contato;<br><br>\n"
+"\n"
+"            2 - Para dar continuidade à análise de viabilidade de "
+"participação, vamos precisar analisar\n"
+"            os dados de notificação de dengue (SINAN) em seu município, de "
+"2012 até o presente. Enviaremos para você uma\n"
+"            carta sobre o compromisso do <b>Sistema de Alerta InfoDengue</b> "
+"a respeito da utilização dos dados.\n"
+"            É importante ressaltar que não há necessidade de informação "
+"sobre a identificação dos casos.<br><br>\n"
+"\n"
+"            3 - Se o seu município conseguiu preencher os dois requisitos "
+"anteriores, PARABÉNS! Os modelos de alerta já\n"
+"            estarão\n"
+"            prontos para seu município. Será elaborado e enviado um "
+"relatório contendo a análise dos dados históricos a\n"
+"            você.\n"
+"            Agora é hora de fazer o sistema funcionar daqui para frente. "
+"Para isso, um termo de compromisso deverá ser\n"
+"            assinado\n"
+"            entre o <b>Sistema de Alerta InfoDengue</b> e a Secretária "
+"Municipal de Saúde, autorizando a utilização dos\n"
+"            dados. <br><br>\n"
+"\n"
+"            Em caso de dúvidas, entre em contato <a href=\"mailto:"
+"alerta_dengue@fiocruz.br\">conosco</a>:  <br><br>\n"
+"            "
 msgstr ""
 
 #: AlertaDengue/dados/templates/main.html:59
@@ -592,7 +577,7 @@ msgid ""
 "Janeiro."
 msgstr ""
 
-#: AlertaDengue/dados/templates/my_bootstrap3_base.html:20
+#: AlertaDengue/dados/templates/my_bootstrap3_base.html:21
 msgid "Parceiros"
 msgstr ""
 
