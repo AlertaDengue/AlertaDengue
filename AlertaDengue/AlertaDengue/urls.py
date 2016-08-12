@@ -1,6 +1,7 @@
 # coding=utf-8
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
+from django.views.decorators.cache import cache_page
 from dados.views import DetailsPageView, SinanCasesView, AboutPageView, ContactPageView, JoininPageView, MapaDengueView, \
     MapaMosquitoView, \
     HistoricoView, AlertaPageView, AlertaGeoJSONView, AlertaPageViewMunicipio, CityMapView, get_municipio, \
@@ -22,7 +23,7 @@ urlpatterns = [#'',
                url('^accounts/', include('django.contrib.auth.urls')),
                url(r'^alerta-detalhado/$', DetailsPageView.as_view(), name='home'),
                url(r'^alertageoJSON/$', login_required(AlertaGeoJSONView.as_view()), name='alerta-layer'),
-               url(r'^geojson/(?P<geocodigo>\d{7})/$', CityMapView.as_view(), name='mapa'),
+               url(r'^geojson/(?P<geocodigo>\d{7})/$', cache_page(60*60*24)(CityMapView.as_view()), name='mapa'),
                url(r'^getcity/$', get_municipio, name='get_city'),
                url(r'^mapadengue/$', MapaDengueView.as_view(), name='mapadengue'),
                url(r'^mapamosquito/$', MapaMosquitoView.as_view(), name='mapamosquito'),
