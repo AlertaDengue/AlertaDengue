@@ -27,9 +27,8 @@ def get_all_active_cities():
 
     if res is None:
         conexao = create_engine("postgresql://{}:{}@{}/{}".format(settings.PSQL_USER, settings.PSQL_PASSWORD, settings.PSQL_HOST, settings.PSQL_DB))
-        res = conexao.execute('SELECT DISTINCT municipio_geocodigo, nome FROM'
-            '"Municipio"."Historico_alerta" INNER JOIN "Dengue_global"."Municipio" ON'
-            '"Historico_alerta".municipio_geocodigo = "Municipio".geocodigo;')
+        res = conexao.execute('SELECT DISTINCT municipio_geocodigo, municipio_nome FROM'
+            '"Municipio"."Historico_alerta";')
         res = res.fetchall()
         cache.set('get_all_active_cities', res, settings.QUERY_CACHE_TIMEOUT)
 
@@ -71,10 +70,7 @@ def get_series_by_UF(doenca='dengue'):
         conexao = create_engine(
             "postgresql://{}:{}@{}/{}".format(settings.PSQL_USER, settings.PSQL_PASSWORD, settings.PSQL_HOST,
                                               settings.PSQL_DB))
-        series = pd.read_sql('SELECT uf, "data_iniSE" as data, sum(casos) casos_s, sum(casos_est) casos_est_s from \
-                             "Municipio"."Historico_alerta" inner JOIN "Dengue_global"."Municipio" \
-                              on "Historico_alerta".municipio_geocodigo="Municipio".geocodigo  \
-                             GROUP BY "data_iniSE", uf ORDER BY uf, "data_iniSE" ASC;', conexao, parse_dates=True)
+        series = pd.read_sql('select * from uf_total_view;', conexao, parse_dates=True)
         cache.set('get_series_by_UF', series, settings.QUERY_CACHE_TIMEOUT)
 
 
