@@ -1,4 +1,4 @@
-django==1.9
+django
 django-bootstrap3
 django-leaflet
 geojson
