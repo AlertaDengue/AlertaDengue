@@ -1,3 +1,4 @@
 from django.contrib import admin
+from dbf.models import DBF
 
-# Register your models here.
+admin.site.register(DBF)
