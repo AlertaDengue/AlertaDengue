@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'leaflet',
     'bootstrap3',
     'dados',
+    'dbf.apps.DbfConfig'
 )
 
 MIDDLEWARE_CLASSES = (
