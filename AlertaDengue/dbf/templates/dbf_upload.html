@@ -2,13 +2,40 @@
 {% load i18n %}
 {% load bootstrap3 %}
 
+{% block extra_head %}
+    <script src="/static/js/jquery-ui.min.js"></script>
+    <script>
+        $(document).ready( function() {
+            $("#id_export_date").datepicker({dateFormat: "yy-mm-dd"});
+        });
+    </script>
+    <style>
+        .ui-datepicker {
+            background-color: #FFF;
+            border: 1px solid gray;
+            border-radius: 10px;
+            padding: 10px;
+        }
+        .ui-datepicker-next {
+            float: right;
+        }
+        .ui-datepicker-title {
+            padding: 10px;
+            text-align: center;
+        }
+        .ui-datepicker-calendar th {
+            padding: 4px;
+        }
+    </style>
+{% endblock %}
+
 {% block title %}Envio de dados atualizados do SINAN{% endblock %}
 
 {% block content %}
-    <div class="panel panel-default">
+    <div class="panel panel-default col-xs-4">
         <div class="panel-body">
             <p>Envie aqui os dados atualizados do SINAN</p>
-            <form method="POST" enctype="multipart/form-data" action="{% url "dbf:upload" %}" class="form">
+            <form method="POST" enctype="multipart/form-data" action="{% url "dbf:upload" %}">
                 {% csrf_token %}
                 {% bootstrap_form form %}
                 {% buttons %}
