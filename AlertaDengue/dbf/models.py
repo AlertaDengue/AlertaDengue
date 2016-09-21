@@ -17,3 +17,6 @@ class DBF(models.Model):
         if self.notification_year > date.today().year:
             raise ValidationError({"notification_year": _("Notification year "
             "cannot be greater than current year")})
+
+    def __str__(self):
+        return "{} - {}".format(self.file, self.notification_year)
