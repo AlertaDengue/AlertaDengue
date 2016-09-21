@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -19,3 +20,10 @@ class DBFModelTest(TestCase):
         )
         with self.assertRaises(ValidationError):
             dbf.clean()
+
+class DBFUploadViewTest(TestCase):
+
+    def test_requires_login(self):
+        response = self.client.get(reverse('dbf:upload'))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/accounts/login/', response.url)
