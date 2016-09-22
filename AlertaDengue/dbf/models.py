@@ -7,6 +7,11 @@ from datetime import date
 def current_year():
     return date.today().year
 
+def is_valid_dbf(dbf_file):
+    # This is a placeholder for now. We will bring the validation functionality
+    # from `load_sinan.py` to this function.
+    return True
+
 class DBF(models.Model):
     file = models.FileField()
     uploaded_at = models.DateTimeField(auto_now_add=True)
@@ -17,6 +22,9 @@ class DBF(models.Model):
         if self.notification_year > date.today().year:
             raise ValidationError({"notification_year": _("Notification year "
             "cannot be greater than current year")})
+
+        if not is_valid_dbf(self.file):
+            raise ValidationError({"file": _("Invalid DBF file")})
 
     def __str__(self):
         return "{} - {}".format(self.file, self.notification_year)
