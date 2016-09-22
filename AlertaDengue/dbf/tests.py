@@ -55,6 +55,36 @@ class DBFUploadViewTest(TestCase):
         self.assertIn('form', response.context)
         self.assertEqual(response.context['form'].Meta.model, DBF)
 
+    def test_context_has_last_uploaded_files(self):
+        self.client.login(username="user", password="user")
+        fake_file = StringIO("Invalid dbf")
+        dbf = DBF.objects.create(
+            uploaded_by=User.objects.get(username="user"),
+            file=InMemoryUploadedFile(fake_file, 'file', 'file.dbf',
+            'application/dbf', 4, 'utf-8'),
+            export_date=date.today(),
+            notification_year=date.today().year
+        )
+        response = self.client.get(reverse('dbf:upload'))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('last_uploaded', response.context)
+        self.assertIn(dbf, response.context['last_uploaded'])
+
+    def test_context_doens_not_include_files_uploaded_by_other_user(self):
+        self.client.login(username="user", password="user")
+        fake_file = StringIO("Invalid dbf")
+        dbf = DBF.objects.create(
+            uploaded_by=User.objects.get(username="admin"),
+            file=InMemoryUploadedFile(fake_file, 'file', 'file.dbf',
+            'application/dbf', 4, 'utf-8'),
+            export_date=date.today(),
+            notification_year=date.today().year
+        )
+        response = self.client.get(reverse('dbf:upload'))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('last_uploaded', response.context)
+        self.assertNotIn(dbf, response.context['last_uploaded'])
+
     def test_redirects_to_success_url_when_form_is_valid(self):
         self.client.login(username="user", password="user")
         _file = StringIO("42")

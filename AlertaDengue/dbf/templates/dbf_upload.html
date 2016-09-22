@@ -45,5 +45,15 @@
                 {% endbuttons %}
             </form>
         </div>
+        <div>
+            <div class="panel-body">
+                <p>{% trans "Ultimos arquivos enviados:" %}</p>
+                <ul>
+                {% for upload in last_uploaded %}
+                    <li>{{ upload }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
     </div>
 {% endblock %}
