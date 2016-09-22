@@ -13,6 +13,7 @@ def is_valid_dbf(dbf_file):
     return True
 
 class DBF(models.Model):
+    uploaded_by = models.ForeignKey('auth.User')
     file = models.FileField()
     uploaded_at = models.DateTimeField(auto_now_add=True)
     export_date = models.DateField()
