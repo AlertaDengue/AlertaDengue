@@ -61,3 +61,5 @@ class DBFUploadViewTest(TestCase):
             "notification_year": date.today().year
         }
         response = self.client.post(reverse('dbf:upload'), data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("dbf:upload_successful"))
