@@ -12,3 +12,4 @@ sqlalchemy
 python3-memcached
 django-makemessages-xgettext
 mock
+dbfread
