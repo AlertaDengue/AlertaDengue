@@ -40,7 +40,7 @@ class DBFUploadViewTest(TestCase):
         self.assertIn('last_uploaded', response.context)
         self.assertIn(dbf, response.context['last_uploaded'])
 
-    def test_context_doens_not_include_files_uploaded_by_other_user(self):
+    def test_context_does_not_include_files_uploaded_by_other_user(self):
         self.client.login(username="user", password="user")
         fake_file = StringIO("Invalid dbf")
         dbf = DBF.objects.create(
