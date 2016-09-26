@@ -4,13 +4,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from datetime import date
 
+from dbf.validation import is_valid_dbf
+
 def current_year():
     return date.today().year
-
-def is_valid_dbf(dbf_file):
-    # This is a placeholder for now. We will bring the validation functionality
-    # from `load_sinan.py` to this function.
-    return True
 
 class DBF(models.Model):
     uploaded_by = models.ForeignKey('auth.User')
