@@ -23,7 +23,7 @@ class DBFValidationTest(TestCase):
                 uploaded_by=User.objects.all()[0],
                 file=File(fp, name=filename),
                 export_date=date.today(),
-                notification_year=date.today().year + 1
+                notification_year=date.today().year,
             )
         return dbf.file
 
