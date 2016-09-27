@@ -37,3 +37,13 @@ class DBFValidationTest(TestCase):
         invalid_file = self._get_file_from_filename("invalid.dbf")
         with self.assertRaises(ValidationError):
             is_valid_dbf(invalid_file)
+
+    def test_dbf_without_an_expected_column_raises_ValidationError(self):
+        """
+        If the file does not have all columns we expect in a SINAN file, we
+        should raise an error.
+        """
+
+        missing_column_file = self._get_file_from_filename("missing_nu_ano.dbf")
+        with self.assertRaises(ValidationError):
+            is_valid_dbf(missing_column_file)
