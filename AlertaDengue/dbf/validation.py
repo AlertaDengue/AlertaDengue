@@ -21,7 +21,7 @@ expected_fields = [
     u'CS_SEXO'
 ]
 
-def is_valid_dbf(dbf_file):
+def is_valid_dbf(dbf_file, notification_year):
     try:
         dbf = dbfread.DBF(dbf_file.path)
     except struct.error:
@@ -33,5 +33,9 @@ def is_valid_dbf(dbf_file):
             raise ValidationError({"file": _("This file does not contain {}, "
                 "which is expected to be present in a valid SINAN "
                 "file".format(field))})
+
+    if any((record['DT_NOTIFIC'].year != notification_year for record in dbf.records)):
+        raise ValidationError({"file": _("There are notifications in this file "
+            "incompatible with the informed notification year")})
 
     return True

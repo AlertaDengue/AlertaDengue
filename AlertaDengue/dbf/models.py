@@ -21,7 +21,7 @@ class DBF(models.Model):
             raise ValidationError({"notification_year": _("Notification year "
             "cannot be greater than current year")})
 
-        if not is_valid_dbf(self.file):
+        if not is_valid_dbf(self.file, self.notification_year):
             raise ValidationError({"file": _("Invalid DBF file")})
 
     def __str__(self):

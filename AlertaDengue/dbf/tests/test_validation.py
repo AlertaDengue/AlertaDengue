@@ -29,14 +29,14 @@ class DBFValidationTest(TestCase):
 
     def test_valid_dbf_returns_true(self):
         valid_file = self._get_file_from_filename("simple.dbf")
-        self.assertTrue(is_valid_dbf(valid_file))
+        self.assertTrue(is_valid_dbf(valid_file, 2016))
 
     def test_invalid_dbf_raises_ValidationError(self):
         """If the file is not in dbf format, we should raise an error."""
 
         invalid_file = self._get_file_from_filename("invalid.dbf")
         with self.assertRaises(ValidationError):
-            is_valid_dbf(invalid_file)
+            is_valid_dbf(invalid_file, 2016)
 
     def test_dbf_without_an_expected_column_raises_ValidationError(self):
         """
@@ -46,4 +46,28 @@ class DBFValidationTest(TestCase):
 
         missing_column_file = self._get_file_from_filename("missing_nu_ano.dbf")
         with self.assertRaises(ValidationError):
-            is_valid_dbf(missing_column_file)
+            is_valid_dbf(missing_column_file, 2016)
+
+    def test_dbf_with_records_from_year_other_than_the_one_specified_raises_ValidationError(self):
+        """
+        If the file has records pointing to an year other than the one
+        specified we should also raise a ValidationError.
+        """
+
+        missing_column_file = self._get_file_from_filename("simple.dbf")
+        notification_year = 2015
+
+        with self.assertRaises(ValidationError):
+            is_valid_dbf(missing_column_file, notification_year)
+
+    def test_dbf_with_mixed_notification_years_raises_ValidationError(self):
+        """
+        The notification year validation should be triggered even if some of
+        the data is poiting to the correct year
+        """
+
+        missing_column_file = self._get_file_from_filename("mixed_notification_years.dbf")
+        notification_year = 2015
+
+        with self.assertRaises(ValidationError):
+            is_valid_dbf(missing_column_file, notification_year)
