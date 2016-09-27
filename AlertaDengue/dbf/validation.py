@@ -36,6 +36,8 @@ def is_valid_dbf(dbf_file, notification_year):
 
     if any((record['DT_NOTIFIC'].year != notification_year for record in dbf.records)):
         raise ValidationError({"file": _("There are notifications in this file "
-            "incompatible with the informed notification year")})
+            "incompatible with the informed notification year"),
+            "notification_year": _("Make sure this notification year is the one "
+                "for all the records in the file.")})
 
     return True
