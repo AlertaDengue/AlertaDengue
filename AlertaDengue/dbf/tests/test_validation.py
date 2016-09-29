@@ -4,11 +4,11 @@ from django.core.files import File
 from django.test import TestCase
 
 from datetime import date
+import datetime
 import os
 
 from dbf.models import DBF
 from dbf.validation import is_valid_dbf
-
 
 __all__ = ["DBFValidationTest"]
 
@@ -71,3 +71,25 @@ class DBFValidationTest(TestCase):
 
         with self.assertRaises(ValidationError):
             is_valid_dbf(missing_column_file, notification_year)
+
+    def test_can_receive_file_with_name_that_does_not_exist(self):
+        """
+        This is a regression test. We had an error because we were testing this
+        function with data that was already saved to disk. In the upload
+        process, what happens is more similiar to what is happening in this
+        test: the instance exists, but was never saved to disk, so calling
+        `dbf.file.path` would return a path that had no file there (because the
+        save process was not complete yet).
+        """
+        inexistent_filename = "{}.dbf".format(datetime.datetime.now())
+        with open(os.path.join(TEST_DATA_DIR, "simple.dbf"), "rb") as fp:
+            # Instead of using ".objects.create()" we only instantiate the file.
+            # This will trigger the error when calling dbf.clean() on an
+            # unsaved instance.
+            dbf = DBF(
+                uploaded_by=User.objects.all()[0],
+                file=File(fp, name=inexistent_filename),
+                export_date=date.today(),
+                notification_year=date.today().year
+            )
+            self.assertTrue(is_valid_dbf(dbf.file, dbf.notification_year))

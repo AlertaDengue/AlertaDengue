@@ -1,8 +1,13 @@
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
-import dbfread
+from contextlib import contextmanager
+import datetime
+import os
 import struct
+from tempfile import NamedTemporaryFile
+
+import dbfread
 
 expected_fields = [
     u'NU_ANO',
@@ -21,23 +26,36 @@ expected_fields = [
     u'CS_SEXO'
 ]
 
-def is_valid_dbf(dbf_file, notification_year):
+@contextmanager
+def get_namedtempfile_from_data(data):
+    tempfile = NamedTemporaryFile(delete=False)
+    tempfile.write(data)
+    tempfile.seek(0)
+    tempfile.close()
     try:
-        dbf = dbfread.DBF(dbf_file.path)
-    except struct.error:
-        raise ValidationError({"file": _("This file does not look like a valid "
-            "DBF file")})
+        yield tempfile.name
+    finally:
+        os.unlink(tempfile.name)
 
-    for field in expected_fields:
-        if field not in dbf.field_names:
-            raise ValidationError({"file": _("This file does not contain {}, "
-                "which is expected to be present in a valid SINAN "
-                "file".format(field))})
 
-    if any((record['DT_NOTIFIC'].year != notification_year for record in dbf.records)):
-        raise ValidationError({"file": _("There are notifications in this file "
-            "incompatible with the informed notification year"),
-            "notification_year": _("Make sure this notification year is the one "
-                "for all the records in the file.")})
+def is_valid_dbf(dbf_file, notification_year):
+    with get_namedtempfile_from_data(dbf_file.read()) as tempfilename:
+        try:
+            dbf = dbfread.DBF(tempfilename)
+        except struct.error:
+            raise ValidationError({"file": _("This file does not look like a valid "
+                "DBF file")})
 
-    return True
+        for field in expected_fields:
+            if field not in dbf.field_names:
+                raise ValidationError({"file": _("This file does not contain {}, "
+                    "which is expected to be present in a valid SINAN "
+                    "file".format(field))})
+
+        if any((record['DT_NOTIFIC'].year != notification_year for record in dbf.records)):
+            raise ValidationError({"file": _("There are notifications in this file "
+                "incompatible with the informed notification year"),
+                "notification_year": _("Make sure this notification year is the one "
+                    "for all the records in the file.")})
+
+        return True
