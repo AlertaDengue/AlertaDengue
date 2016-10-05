@@ -13,3 +13,5 @@ python3-memcached
 django-makemessages-xgettext
 mock
 dbfread
+dj-database-url==0.3.0
+gdal

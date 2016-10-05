@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from decouple import config, Csv
+from dj_database_url import parse as db_url
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -86,11 +87,11 @@ TEMPLATES = [
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
-        'NAME': os.path.join(BASE_DIR, 'geodjango.db'),
-    }
+    'default': config('DATABASE_URL', default='sqlite:///geodjango.db', cast=db_url)
 }
+
+if DATABASES['default']['ENGINE'] == 'django.db.backends.postgresql_psycopg2':
+    DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
 MEMCACHED_HOST = config('MEMCACHED_HOST', '127.0.0.1')
 MEMCACHED_PORT = config('MEMCACHED_PORT', '11211')
