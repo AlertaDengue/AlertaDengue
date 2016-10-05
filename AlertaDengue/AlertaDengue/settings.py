@@ -164,6 +164,8 @@ DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, 'data'))
 
 STATIC_URL = '/static/'
 
+MEDIA_ROOT = config('MEDIA_ROOT', default='')
+
 try:
     from AlertaDengue.local_settings import *
 except ImportError:
