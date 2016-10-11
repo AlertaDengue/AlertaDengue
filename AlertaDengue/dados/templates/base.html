@@ -63,6 +63,7 @@
                                 </li>
 
                                 {% if user.is_authenticated %}
+                                    <li><a href="{% url "dbf:upload" %}">{% trans "Envie dados atualizados" %}</a></li>
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Acesse os Dados <b
                                                 class="caret"></b></a>
