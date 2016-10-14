@@ -166,6 +166,13 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = config('MEDIA_ROOT', default='')
 
+EMAIL_BACKEND = config('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+
+if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
+    EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = config('EMAIL_CONFIG', default='example_host,25,username,password', cast=Csv())
+    EMAIL_PORT = int(EMAIL_PORT)
+    EMAIL_USE_TLS = True
+
 try:
     from AlertaDengue.local_settings import *
 except ImportError:
