@@ -1,8 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.files.base import File
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import FormView
 
 from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
 
@@ -13,8 +15,7 @@ class UploadSuccessful(LoginRequiredMixin, TemplateView):
     template_name = "upload_successful.html"
 
 
-class Upload(LoginRequiredMixin, CreateView):
-    model = DBF
+class Upload(LoginRequiredMixin, FormView):
     form_class = DBFForm
     template_name = "dbf_upload.html"
     success_url = reverse_lazy("dbf:upload_successful")
@@ -22,6 +23,21 @@ class Upload(LoginRequiredMixin, CreateView):
     def post(self, request, *args, **kwargs):
         self.request.POST['uploaded_by'] = request.user.id
         return super(Upload, self).post(self.request, *args, **kwargs)
+
+    def form_valid(self, form):
+        chunked_upload = DBFChunkedUpload.objects.get(
+            id=form.cleaned_data['chunked_upload_id'],
+            user=self.request.user
+        )
+        uploaded_file = File(chunked_upload.file, form.cleaned_data['filename'])
+        dbf = DBF.objects.create(
+            uploaded_by=self.request.user,
+            file=uploaded_file,
+            export_date=form.cleaned_data['export_date'],
+            notification_year=form.cleaned_data['notification_year']
+        )
+        return super(Upload, self).form_valid(form)
+
 
     def get_context_data(self, **kwargs):
         kwargs['last_uploaded'] = DBF.objects.filter(uploaded_by=self.request.user)[:5]

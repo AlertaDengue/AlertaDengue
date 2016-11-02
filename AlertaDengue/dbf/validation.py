@@ -43,12 +43,13 @@ def is_valid_dbf(dbf_file, notification_year):
         try:
             dbf = dbfread.DBF(tempfilename, encoding="iso-8859-1")
         except struct.error:
-            raise ValidationError({"file": _("This file does not look like a valid "
+            raise ValidationError({"filename": _("This file does not look like a valid "
                 "DBF file")})
+
 
         for field in expected_fields:
             if field not in dbf.field_names:
-                raise ValidationError({"file": _("This file does not contain {}, "
+                raise ValidationError({"filename": _("This file does not contain {}, "
                     "which is expected to be present in a valid SINAN "
                     "file".format(field))})
 

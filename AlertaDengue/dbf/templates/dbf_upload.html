@@ -112,13 +112,13 @@
                     dataType: "json",
                     success: function(data) {
                       $("#messages").append($('<p>').text(JSON.stringify(data)));
-		      //TODO: set hidden field to match chunked upload file id.
+		      $("#id_chunked_upload_id").val(data.chunked_upload_id);
+		      $("#id_filename").val(data.filename);
                     }
                   });
                 },
               });
             </script>
-            {% comment %}
             <form method="POST" enctype="multipart/form-data" action="{% url "dbf:upload" %}">
                 {% csrf_token %}
                 {% bootstrap_form form %}
@@ -128,7 +128,6 @@
                     </button>
                 {% endbuttons %}
             </form>
-            {% endcomment %}
         </div>
         <div>
             <div class="panel-body">
