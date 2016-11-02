@@ -41,7 +41,7 @@ def get_namedtempfile_from_data(data):
 def is_valid_dbf(dbf_file, notification_year):
     with get_namedtempfile_from_data(dbf_file.read()) as tempfilename:
         try:
-            dbf = dbfread.DBF(tempfilename)
+            dbf = dbfread.DBF(tempfilename, encoding="iso-8859-1")
         except struct.error:
             raise ValidationError({"file": _("This file does not look like a valid "
                 "DBF file")})
