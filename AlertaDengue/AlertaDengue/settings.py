@@ -44,6 +44,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'leaflet',
     'bootstrap3',
+    'chunked_upload',
     'dados',
     'dbf.apps.DbfConfig'
 )
