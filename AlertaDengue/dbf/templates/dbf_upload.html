@@ -41,19 +41,36 @@
 {% block title %}Envio de dados atualizados do SINAN{% endblock %}
 
 {% block content %}
-    <div class="panel panel-default col-xs-4">
+    <div class="panel panel-default col-xs-6">
         <div class="panel-body">
-            <p>Envie aqui os dados atualizados do SINAN</p>
-            {% csrf_token %}
-            <input id="chunked_upload" type="file" name="the_file">
-
-            <p id="progress"></p>
-            <div id="messages"></div>
+          <p>Envie aqui os dados atualizados do SINAN</p>
+	  <form>
+	    <div class="form-group">
+              {% csrf_token %}
+              <input id="chunked_upload" type="file" name="the_file">
+	    </div>
+	    <div class="form-group">
+	      <label id="filename_display" style="display: none;">
+		<span></span>
+	      </label>
+	      <div class="progress" style="display: none;">
+		<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+		  <span></span>
+		</div>
+	      </div>
+	    </div>
+	  </form>
 
             <script type="text/javascript">
               var md5 = "",
                   csrf = $("input[name='csrfmiddlewaretoken']")[0].value,
                   form_data = [{"name": "csrfmiddlewaretoken", "value": csrf}];
+	      function update_progress_bar(progress){
+		  $(".progress").show();
+	          $(".progress-bar").attr("style", "width: " + progress + "%");
+		  $(".progress-bar").attr("aria-value-now", progress );
+		  $(".progress-bar>span").text(progress + "%");
+	      }
               function calculate_md5(file, chunk_size) {
                 var slice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
                     chunks = chunks = Math.ceil(file.size / chunk_size),
@@ -89,6 +106,9 @@
                   form_data.splice(1);
                   calculate_md5(data.files[0], 100000);  // Again, chunks of 100 kB
                   data.submit();
+		  console.log(data.files[0].name);
+		  $("#filename_display").show();
+		  $("#filename_display>span").text("Uploading " + data.files[0].name + "...");
                 },
                 chunkdone: function (e, data) { // Called after uploading each chunk
                   if (form_data.length < 2) {
@@ -96,9 +116,8 @@
                       {"name": "upload_id", "value": data.result.upload_id}
                     );
                   }
-                  $("#messages").append($('<p>').text(JSON.stringify(data.result)));
                   var progress = parseInt(data.loaded / data.total * 100.0, 10);
-                  $("#progress").text(Array(progress).join("=") + "> " + progress + "%");
+                  update_progress_bar(progress);
                 },
                 done: function (e, data) { // Called when the file has completely uploaded
                   $.ajax({
@@ -111,9 +130,12 @@
                     },
                     dataType: "json",
                     success: function(data) {
-                      $("#messages").append($('<p>').text(JSON.stringify(data)));
 		      $("#id_chunked_upload_id").val(data.chunked_upload_id);
 		      $("#id_filename").val(data.filename);
+		      $("#submit_button").removeAttr("disabled");
+		      // Make sure we show a complete progress bar (for consistency in small files)
+		      update_progress_bar(100);
+		      $("#filename_display>span").text(data.filename + " ready.");
                     }
                   });
                 },
@@ -123,7 +145,7 @@
                 {% csrf_token %}
                 {% bootstrap_form form %}
                 {% buttons %}
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" id="submit_button" class="btn btn-primary" disabled="disabled">
                         {% trans "Enviar" %}
                     </button>
                 {% endbuttons %}
