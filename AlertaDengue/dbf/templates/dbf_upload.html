@@ -106,7 +106,6 @@
                   form_data.splice(1);
                   calculate_md5(data.files[0], 100000);  // Again, chunks of 100 kB
                   data.submit();
-		  console.log(data.files[0].name);
 		  $("#filename_display").show();
 		  $("#filename_display>span").text("Uploading " + data.files[0].name + "...");
                 },
