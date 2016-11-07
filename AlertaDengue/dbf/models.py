@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from datetime import date
+from chunked_upload.models import ChunkedUpload
 
 from dbf.validation import is_valid_dbf
 
@@ -26,3 +27,13 @@ class DBF(models.Model):
 
     def __str__(self):
         return "{} - {}".format(self.file, self.notification_year)
+
+class DBFChunkedUpload(ChunkedUpload):
+    """
+    For now we need to create our own subclass of ChunkedUpload
+    because the chunked_upload package does not provide migrations.
+    As soon as
+    https://github.com/juliomalegria/django-chunked-upload/pull/21 is
+    merged, we can remove this.
+    """
+    pass
