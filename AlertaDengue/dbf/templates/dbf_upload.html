@@ -7,6 +7,28 @@
     <script>
         $(document).ready( function() {
             $("#id_export_date").datepicker({dateFormat: "yy-mm-dd"});
+            window.form_has_changed = false;
+	    var ask_confirmation = function() {
+	        return window.form_has_changed;
+	    };
+
+            window.addEventListener("beforeunload", function (e) {
+	        // from https://stackoverflow.com/questions/7317273/warn-user-before-leaving-web-page-with-unsaved-changes
+                if (!ask_confirmation()) {
+                    return undefined;
+                }
+
+                var confirmationMessage = 'Existem alterações no formulário. Se você sair agora '
+                                        + 'todas as alterações serão perdidas.';
+
+                (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+                return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+            });
+            $("#submit_button").click(function(e) {
+	        // If the user clicks submit, we should let the request through.
+	        // we need this because the 'beforeunload' event is triggered on a form POST
+	        window.form_has_changed = false;
+	    });
         });
     </script>
     <style>
@@ -109,6 +131,7 @@
 		  // If there were errors on a previous form
 		  // submission, changing the file should clear them;
 		  $("form>.alert").hide();
+                  window.form_has_changed = true;
                 },
                 chunkdone: function (e, data) { // Called after uploading each chunk
                   if (form_data.length < 2) {
