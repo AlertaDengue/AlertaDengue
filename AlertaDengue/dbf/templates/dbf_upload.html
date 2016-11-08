@@ -106,6 +106,9 @@
                   data.submit();
 		  $("#filename_display").show();
 		  $("#filename_display>span").text("Uploading " + data.files[0].name + "...");
+		  // If there were errors on a previous form
+		  // submission, changing the file should clear them;
+		  $("form>.alert").hide();
                 },
                 chunkdone: function (e, data) { // Called after uploading each chunk
                   if (form_data.length < 2) {
