@@ -11,8 +11,8 @@ class DBFForm(forms.Form):
     uploaded_by = forms.ModelChoiceField(queryset=User.objects.all(), widget=forms.HiddenInput())
     chunked_upload_id = forms.IntegerField(required=False, widget=forms.HiddenInput())
     filename = forms.CharField(required=False, widget=forms.HiddenInput())
-    export_date = forms.DateField()
-    notification_year = forms.IntegerField()
+    export_date = forms.DateField(label=_("Data da exportação"))
+    notification_year = forms.IntegerField(label=_("Ano de notificação"))
 
     def clean(self):
         cleaned_data = super(DBFForm, self).clean()
