@@ -43,20 +43,21 @@ def is_valid_dbf(dbf_file, notification_year):
         try:
             dbf = dbfread.DBF(tempfilename, encoding="iso-8859-1")
         except struct.error:
-            raise ValidationError({"filename": _("This file does not look like a valid "
-                "DBF file")})
+            raise ValidationError({"filename": _("Este arquivo não parece um DBF válido ")})
 
 
         for field in expected_fields:
             if field not in dbf.field_names:
-                raise ValidationError({"filename": _("This file does not contain {}, "
-                    "which is expected to be present in a valid SINAN "
-                    "file".format(field))})
+                raise ValidationError({"filename": _("Este arquivo não contém {}, "
+                    "que é esperado em um arquivo válido do SINAM.".format(field))})
 
         if any((record['DT_NOTIFIC'].year != notification_year for record in dbf.records)):
             raise ValidationError( _("There are notifications in this file "
                 "incompatible with the informed notification year. "
                 "Make sure this notification year is the same for all the "
                 "records in the file."))
-
+            raise ValidationError( _("Existem nesse arquivo notificações "
+                "incompatíveis com o ano de notificação informado. "
+                "Por favor, tenha certeza de que o ano de notificação é o mesmo "
+                "para todos os registros no arquivo."))
         return True

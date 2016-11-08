@@ -41,7 +41,7 @@
 {% block content %}
     <div class="panel panel-default col-xs-6">
         <div class="panel-body">
-          <p>Envie aqui os dados atualizados do SINAN</p>
+          <p>{% trans "Envie aqui os dados atualizados do SINAN" %}</p>
 	  <form>
 	    <div class="form-group">
               {% csrf_token %}
@@ -105,7 +105,7 @@
                   calculate_md5(data.files[0], 100000);  // Again, chunks of 100 kB
                   data.submit();
 		  $("#filename_display").show();
-		  $("#filename_display>span").text("Uploading " + data.files[0].name + "...");
+		  $("#filename_display>span").text("Enviando " + data.files[0].name + "...");
 		  // If there were errors on a previous form
 		  // submission, changing the file should clear them;
 		  $("form>.alert").hide();
@@ -135,7 +135,7 @@
 		      $("#submit_button").removeAttr("disabled");
 		      // Make sure we show a complete progress bar (for consistency in small files)
 		      update_progress_bar(100);
-		      $("#filename_display>span").text(data.filename + " ready.");
+		      $("#filename_display>span").html(data.filename + " pronto para ser enviado. <br />Preencha os dados abaixo e clique em 'Enviar' para importar os dados.");
                     }
                   });
                 },

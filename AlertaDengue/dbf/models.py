@@ -19,11 +19,11 @@ class DBF(models.Model):
 
     def clean(self):
         if self.notification_year > date.today().year:
-            raise ValidationError({"notification_year": _("Notification year "
-            "cannot be greater than current year")})
+            raise ValidationError({"notification_year": _("O ano de notificação "
+                        "não pode ser maior do que o ano atual")})
 
         if not is_valid_dbf(self.file, self.notification_year):
-            raise ValidationError({"file": _("Invalid DBF file")})
+            raise ValidationError({"file": _("Arquivo DBF inválido")})
 
     def __str__(self):
         return "{} - {}".format(self.file, self.notification_year)

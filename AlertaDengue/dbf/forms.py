@@ -24,8 +24,8 @@ class DBFForm(forms.Form):
         try:
             uploaded_file = DBFChunkedUpload.objects.get(id=chunked_upload_id, user=user)
         except DBF.DoesNotExist:
-            raise ValidationError("It looks like there was an error during the file upload. "
-                    "Please try again.")
+            raise ValidationError(_("Houve um erro durante o envio do arquivo. "
+                    "Por favor, tente novamente."))
         # This might be a performance problem for really large DBFs
         is_valid_dbf(uploaded_file.file, cleaned_data['notification_year'])
         return cleaned_data
