@@ -40,7 +40,8 @@ class Upload(LoginRequiredMixin, FormView):
 
 
     def get_context_data(self, **kwargs):
-        kwargs['last_uploaded'] = DBF.objects.filter(uploaded_by=self.request.user)[:5]
+        kwargs['last_uploaded'] = DBF.objects.filter(
+            uploaded_by=self.request.user).order_by("-uploaded_at")[:5]
         return super(Upload, self).get_context_data(**kwargs)
 
 
