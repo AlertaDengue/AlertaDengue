@@ -16,6 +16,11 @@ from dbf.forms import DBFForm
 class UploadSuccessful(LoginRequiredMixin, TemplateView):
     template_name = "upload_successful.html"
 
+    def get_context_data(self, **kwargs):
+        kwargs['last_uploaded'] = DBF.objects.filter(
+            uploaded_by=self.request.user).order_by("-uploaded_at")[:5]
+        return super(UploadSuccessful, self).get_context_data(**kwargs)
+
 
 class Upload(LoginRequiredMixin, FormView):
     form_class = DBFForm
