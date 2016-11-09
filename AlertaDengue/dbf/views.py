@@ -1,8 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
 from django.core.files.base import File
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.urls import reverse_lazy
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
@@ -36,6 +38,10 @@ class Upload(LoginRequiredMixin, FormView):
             export_date=form.cleaned_data['export_date'],
             notification_year=form.cleaned_data['notification_year']
         )
+        success_message = _("O arquivo {} exportado em {:%d/%m/%Y} com notificações do ano {} "
+                            "foi enviado com sucesso.".format(
+                                dbf.file.name, dbf.export_date, dbf.notification_year))
+        messages.success(self.request, success_message)
         return super(Upload, self).form_valid(form)
 
 
