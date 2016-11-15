@@ -49,7 +49,7 @@ def is_valid_dbf(dbf_file, notification_year):
         for field in expected_fields:
             if field not in dbf.field_names:
                 raise ValidationError({"filename": _("Este arquivo não contém {}, "
-                    "que é esperado em um arquivo válido do SINAM.".format(field))})
+                    "que é esperado em um arquivo válido do SINAN.".format(field))})
 
         if any((record['DT_NOTIFIC'].year != notification_year for record in dbf.records)):
             raise ValidationError( _("Existem nesse arquivo notificações "
