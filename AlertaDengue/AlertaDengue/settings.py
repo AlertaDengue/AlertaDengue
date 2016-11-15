@@ -40,7 +40,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',
     'django.contrib.humanize',
     'leaflet',
     'bootstrap3',
@@ -90,9 +89,6 @@ TEMPLATES = [
 DATABASES = {
     'default': config('DATABASE_URL', default='sqlite:///geodjango.db', cast=db_url)
 }
-
-if DATABASES['default']['ENGINE'] == 'django.db.backends.postgresql_psycopg2':
-    DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
 MEMCACHED_HOST = config('MEMCACHED_HOST', '127.0.0.1')
 MEMCACHED_PORT = config('MEMCACHED_PORT', '11211')
