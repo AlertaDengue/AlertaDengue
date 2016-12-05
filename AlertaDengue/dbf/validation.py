@@ -26,6 +26,13 @@ expected_fields = [
     u'CS_SEXO'
 ]
 
+expected_date_fields = [
+    u'DT_SIN_PRI',
+    u'DT_NOTIFIC',
+    u'DT_DIGITA',
+    u'DT_NASC',
+]
+
 @contextmanager
 def get_namedtempfile_from_data(data):
     tempfile = NamedTemporaryFile(delete=False)
@@ -45,6 +52,10 @@ def is_valid_dbf(dbf_file, notification_year):
         except struct.error:
             raise ValidationError({"filename": _("Este arquivo não parece um DBF válido ")})
 
+        for field in dbf.fields:
+            if field.name in expected_date_fields and field.type != 'D':
+                raise ValidationError({"filename": _("Espera-se que o campo {} seja "
+                    "do tipo 'D' (data), mas o tipo do campo neste arquivo é '{}'.".format(field.name, field.type))})
 
         for field in expected_fields:
             if field not in dbf.field_names:

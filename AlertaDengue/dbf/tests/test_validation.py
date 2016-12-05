@@ -93,3 +93,15 @@ class DBFValidationTest(TestCase):
                 notification_year=date.today().year
             )
             self.assertTrue(is_valid_dbf(dbf.file, dbf.notification_year))
+
+    def test_dbf_with_wrong_date_datatypes_raises_ValidationError(self):
+        """
+        The notification year validation should be triggered even if some of
+        the data is poiting to the correct year
+        """
+
+        wrong_data_type_file = self._get_file_from_filename("wrong_date_datatype.dbf")
+        notification_year = 2015
+
+        with self.assertRaises(ValidationError):
+            is_valid_dbf(wrong_data_type_file, notification_year)
