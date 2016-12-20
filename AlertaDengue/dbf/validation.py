@@ -62,9 +62,4 @@ def is_valid_dbf(dbf_file, notification_year):
                 raise ValidationError({"filename": _("Este arquivo não contém {}, "
                     "que é esperado em um arquivo válido do SINAM.".format(field))})
 
-        if any((record['DT_NOTIFIC'].year != notification_year for record in dbf.records)):
-            raise ValidationError( _("Existem nesse arquivo notificações "
-                "incompatíveis com o ano de notificação informado. "
-                "Por favor, tenha certeza de que o ano de notificação é o mesmo "
-                "para todos os registros no arquivo."))
         return True

@@ -48,30 +48,6 @@ class DBFValidationTest(TestCase):
         with self.assertRaises(ValidationError):
             is_valid_dbf(missing_column_file, 2016)
 
-    def test_dbf_with_records_from_year_other_than_the_one_specified_raises_ValidationError(self):
-        """
-        If the file has records pointing to an year other than the one
-        specified we should also raise a ValidationError.
-        """
-
-        missing_column_file = self._get_file_from_filename("simple.dbf")
-        notification_year = 2015
-
-        with self.assertRaises(ValidationError):
-            is_valid_dbf(missing_column_file, notification_year)
-
-    def test_dbf_with_mixed_notification_years_raises_ValidationError(self):
-        """
-        The notification year validation should be triggered even if some of
-        the data is poiting to the correct year
-        """
-
-        missing_column_file = self._get_file_from_filename("mixed_notification_years.dbf")
-        notification_year = 2015
-
-        with self.assertRaises(ValidationError):
-            is_valid_dbf(missing_column_file, notification_year)
-
     def test_can_receive_file_with_name_that_does_not_exist(self):
         """
         This is a regression test. We had an error because we were testing this
