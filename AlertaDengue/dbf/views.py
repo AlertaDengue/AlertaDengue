@@ -44,8 +44,11 @@ class Upload(LoginRequiredMixin, FormView):
             notification_year=form.cleaned_data['notification_year']
         )
         success_message = _("O arquivo {} exportado em {:%d/%m/%Y} com notificações do ano {} "
-                            "foi enviado com sucesso.".format(
-                                dbf.file.name, dbf.export_date, dbf.notification_year))
+                            "foi enviado com sucesso. Você será informado "
+                            "por email ({}) assim que o processo de "
+                            "importação for finalizado, ".format(
+                                dbf.file.name, dbf.export_date,
+                                dbf.notification_year, self.request.user.email))
         messages.success(self.request, success_message)
         return super(Upload, self).form_valid(form)
 
