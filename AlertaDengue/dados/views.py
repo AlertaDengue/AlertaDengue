@@ -1,53 +1,95 @@
 # coding: utf-8
+from dados.maps import get_city_geojson, get_city_info
+from dados import dbdata
+from dados import models as M
 from django.shortcuts import render, redirect
 from django.views.generic.base import TemplateView, View
 from django.contrib import messages
-from django.contrib.gis.geos import Point
+# from django.contrib.gis.geos import Point
 from django.http import HttpResponse, StreamingHttpResponse
-from dados import models as M
+from time import mktime
+from collections import defaultdict
+from django.conf import settings
+from sqlalchemy import create_engine
+
 import random
 import json
 import os
 import datetime
-from time import mktime
-import csv
-from collections import defaultdict
-from django.conf import settings
-import pandas as pd
+# import csv
+# import pandas as pd
 import numpy as np
 import locale
 import geojson
-from dados.maps import get_city_geojson, get_city_info
-from dados import dbdata
+import time
+import psycopg2
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
-# dados_alerta = pd.read_csv(os.path.join(settings.DATA_DIR, 'alertaAPS.csv'), header=0)
 dados_alerta = dbdata.get_alerta_mrj()
-polygons = geojson.load(open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')))
+
+with open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')) as f:
+    polygons = geojson.load(f)
 
 
 class AlertaMainView(TemplateView):
     template_name = 'main.html'
 
+    conexao = create_engine(
+        "postgresql://{}:{}@{}/{}".format(
+            settings.PSQL_USER,
+            settings.PSQL_PASSWORD,
+            settings.PSQL_HOST,
+            settings.PSQL_DB))
+
     def get_context_data(self, **kwargs):
         context = super(AlertaMainView, self).get_context_data(**kwargs)
         mundict = dict(dbdata.get_all_active_cities())
         municipios, geocodigos = list(mundict.values()), list(mundict.keys())
-        alerta = {}
+        # alerta = {}
         case_series = {}
         total = np.zeros(52, dtype=int)
-        for gc in geocodigos:
-            dados = dbdata.get_city_alert(gc, 'dengue')
-            alerta[gc] = int(dados[0])
-            case_series[str(gc)] = list(map(int, dados[2][-12:]))
-            total += dados[2][-52:]
+        COUNTER = 0
+
+        conexao = create_engine(
+            "postgresql://{}:{}@{}/{}".format(
+                settings.PSQL_USER,
+                settings.PSQL_PASSWORD,
+                settings.PSQL_HOST,
+                settings.PSQL_DB))
+
+        t0 = time.time()
+
+        results = dbdata.load_serie_city(
+            geocodigos, 'dengue', conexao
+        )
+
+        for gc, _case_series, in results.items():
+            print('>>>', end=' ')
+
+            # dados = dbdata.get_city_alert(gc, 'dengue')
+            # alerta[gc] = int(dados[0])
+            # case_series[str(gc)] = list(map(int, dados[2][-12:]))
+            # total += dados[2][-52:]
+
+            # _case_series = dbdata.load_serie_city(
+            #     geocodigos, 'dengue', conexao
+            # )
+            #_case_series = series[str(gc)]['casos_est']
+            case_series[str(gc)] = _case_series['casos_est'][-12:]
+            total += _case_series['casos_est'][-52:]
+
+            COUNTER += 1
+            print(COUNTER)
+
+        print('<<<', time.time() - t0)
+
         context.update({
-            'mundict': json.dumps(mundict),
+            # 'mundict': json.dumps(mundict),
             'num_mun': len(mundict),
-            'municipios': municipios,
+            # 'municipios': municipios,
             'geocodigos': geocodigos,
-            'alerta': json.dumps(alerta),
+            # 'alerta': json.dumps(alerta),
             'case_series': json.dumps(case_series),
             'total': json.dumps(total.tolist()),
         })
@@ -57,7 +99,9 @@ class AlertaMainView(TemplateView):
 def get_municipio(request):
     q = request.GET['q']
     muns = dbdata.get_city(q)
-    data = json.dumps([{'geocodigo': g, 'nome': n, 'uf': u} for g, n, u in muns])
+    data = json.dumps([
+        {'geocodigo': g, 'nome': n, 'uf': u} for g, n, u in muns
+    ])
     return HttpResponse(data, content_type='application/json')
 
 
@@ -66,14 +110,26 @@ class AlertaPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
-        alert, current, case_series, last_year, observed_cases, min_max_est = get_alert()
-        casos_ap = {float(ap.split('AP')[-1]): int(current[current.aps == ap]['casos_est']) for ap in alert.keys()}
-        alerta = {float(k.split('AP')[-1]): int(v) - 1 for k, v in alert.items()}
+        alert, current, case_series, last_year, observed_cases, min_max_est = \
+            get_alert()
+        casos_ap = {
+            float(ap.split('AP')[-1]):
+                int(current[current.aps == ap]['casos_est'])
+            for ap in alert.keys()
+        }
+        alerta = {
+            float(k.split('AP')[-1]): int(v) - 1
+            for k, v in alert.items()
+        }
         semana = str(current.se.iat[-1])[-2:]
         segunda = current.data.iat[-1]
         city_info = get_city_info("3304557")
-        total_series = sum(np.array(list(case_series.values())), np.zeros(12, int))
-        total_observed_series = sum(np.array(list(observed_cases.values())), np.zeros(12, int))
+        total_series = sum(
+            np.array(list(case_series.values())), np.zeros(12, int)
+        )
+        total_observed_series = sum(
+            np.array(list(observed_cases.values())), np.zeros(12, int)
+        )
         bairros_mrj = {
             1.0: 'AP 1: Centro e adjacências',
             2.1: 'AP 2.1: Zona Sul',
@@ -90,7 +146,9 @@ class AlertaPageView(TemplateView):
             'geocodigo': "3304557",
             'nome': "Rio de Janeiro",
             'populacao': city_info['populacao'],
-            'incidencia': (total_observed_series[-1]/city_info['populacao']) * 100000, #casos/100000
+            'incidencia': (
+                              total_observed_series[-1] / city_info['populacao']
+                          ) * 100000,  # casos/100000
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
             'novos_casos': sum(casos_ap.values()),
@@ -100,7 +158,9 @@ class AlertaPageView(TemplateView):
             'series_casos': case_series,
             'SE': int(semana),
             'data1': segunda.strftime("%d de %B de %Y"),
-            'data2': (segunda + datetime.timedelta(6)).strftime("%d de %B de %Y"),
+            'data2': (
+                segunda + datetime.timedelta(6)
+            ).strftime("%d de %B de %Y"),
             'last_year': last_year,
             'look_back': len(total_series),
             'total_series': ', '.join(map(str, total_series)),
@@ -114,17 +174,25 @@ class AlertaPageViewMunicipio(TemplateView):
     template_name = 'alerta_municipio.html'
 
     def dispatch(self, request, *args, **kwargs):
-        context = super(AlertaPageViewMunicipio, self).get_context_data(**kwargs)
+        context = super(AlertaPageViewMunicipio, self) \
+            .get_context_data(**kwargs)
         municipio_gc = kwargs['geocodigo']
-        if int(municipio_gc) == 3304557: # Rio de Janeiro
+
+        if int(municipio_gc) == 3304557:  # Rio de Janeiro
             return redirect('mrj', permanent=True)
-        return super(AlertaPageViewMunicipio, self).dispatch(request, *args, **kwargs)
+
+        return super(AlertaPageViewMunicipio, self) \
+            .dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(AlertaPageViewMunicipio, self).get_context_data(**kwargs)
+        context = super(AlertaPageViewMunicipio, self) \
+            .get_context_data(**kwargs)
         municipio_gc = context['geocodigo']
         city_info = get_city_info(municipio_gc)
-        alert, SE, case_series, last_year, observed_cases, min_max_est, dia, prt1 = dbdata.get_city_alert(municipio_gc)
+        (
+            alert, SE, case_series, last_year,
+            observed_cases, min_max_est, dia, prt1
+        ) = dbdata.get_city_alert(municipio_gc)
         casos_ap = {municipio_gc: int(case_series[-1])}
         bairros = {municipio_gc: city_info['nome']}
         total_series = case_series[-12:]
@@ -132,10 +200,12 @@ class AlertaPageViewMunicipio(TemplateView):
         context.update({
             'nome': city_info['nome'],
             'populacao': city_info['populacao'],
-            'incidencia': (case_series[-1]/city_info['populacao']) * 100000, #casos/100000
+            'incidencia': (
+                case_series[-1] / city_info['populacao']
+            ) * 100000,  # casos/100000
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': {municipio_gc: alert},
-            'prt1': prt1*100,
+            'prt1': prt1 * 100,
             'novos_casos': case_series[-1],
             'bairros': bairros,
             'min_est': min_max_est[0],
@@ -170,7 +240,8 @@ class DetailsPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(DetailsPageView, self).get_context_data(**kwargs)
-        # messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        # messages.info(
+        #   self.request, 'O site do projeto Alerta Dengue está em construção.')
         series = load_series()
         aps = list(series.keys())
         aps.sort()
@@ -233,7 +304,8 @@ class AboutPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AboutPageView, self).get_context_data(**kwargs)
-        # messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        # messages.info(
+        #   self.request, 'O site do projeto Alerta Dengue está em construção.')
         return context
 
 
@@ -242,7 +314,8 @@ class ContactPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ContactPageView, self).get_context_data(**kwargs)
-        # messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        # messages.info(
+        #   self.request, 'O site do projeto Alerta Dengue está em construção.')
         return context
 
 
@@ -251,7 +324,8 @@ class JoininPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(JoininPageView, self).get_context_data(**kwargs)
-        # messages.info(self.request, 'O site do projeto Alerta Dengue está em construção.')
+        # messages.info(
+        #   self.request, 'O site do projeto Alerta Dengue está em construção.')
         return context
 
 
@@ -261,7 +335,10 @@ class SinanCasesView(View):
         try:
             assert int(year) in [2010, 2011, 2012, 2013]
         except AssertionError:
-            messages.error(self.request, 'O projeto conté dados apenas dos anos 2010 a 2013.')
+            messages.error(
+                self.request,
+                'O projeto conté dados apenas dos anos 2010 a 2013.'
+            )
 
         sample = 1 if sample == 0 else sample / 100.
         # print ("chegou aqui")
@@ -284,7 +361,11 @@ class SinanCasesView(View):
         # print ("chegou aqui", sample, dados[0].dt_notific)
         for c in random.sample(list(dados), int(len(dados) * sample)):
             # print(c)
-            cases += "{\"type\":\"Feature\",\"geometry\":" + c.geojson + ", \"properties\":{\"data\":\"" + c.dt_notific.isoformat() + "\"}},"
+            cases += (
+                "{\"type\":\"Feature\",\"geometry\":" + c.geojson +
+                ", \"properties\":{\"data\":\"" + c.dt_notific.isoformat() +
+                "\"}},"
+            )
         cases = cases[:-1] + "]}"
         # json.loads(cases)
         return HttpResponse(cases, content_type="application/json")
@@ -312,10 +393,15 @@ def get_alert():
     case_series = {}
     obs_case_series = {}
     min_max_est = {}
+
     for ap in group_names:
         adf = G.get_group(ap)  # .tail()  # only calculates on the series tail
-        case_series[str(float(ap.split('AP')[-1]))] = [int(v) for v in adf.casos_est.iloc[-12:].values]
-        obs_case_series[str(float(ap.split('AP')[-1]))] = [int(v) for v in adf.casos.iloc[-12:].values]
+        case_series[str(float(ap.split('AP')[-1]))] = [
+            int(v) for v in adf.casos_est.iloc[-12:].values
+            ]
+        obs_case_series[str(float(ap.split('AP')[-1]))] = [
+            int(v) for v in adf.casos.iloc[-12:].values
+            ]
         alert[ap] = adf.nivel.iloc[-1]
         last_year = int(adf.casos.iloc[-52])
         min_max_est[ap] = (adf.casos_estmin.iloc[-1], adf.casos_estmax.iloc[-1])
@@ -330,22 +416,38 @@ def load_series():
     G = dados_alerta.groupby("aps")
     for ap in G.groups.keys():
         series[ap]['dia'] = [
-            int(mktime(datetime.datetime.strptime(d, "%Y-%m-%d").timetuple())) if isinstance(d, str) else None for d in
-            G.get_group(ap).data]
-        series[ap]['tweets'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).tweets]
-        series[ap]['tmin'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).tmin]
-        series[ap]['casos_est'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).casos_est]
-        series[ap]['casos'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).casos]
-        series[ap]['alerta'] = [c - 1 if not np.isnan(c) else None for c in G.get_group(ap).cor]
-        # print(series['dia'])
+            int(mktime(datetime.datetime.strptime(d, "%Y-%m-%d").timetuple()))
+            if isinstance(d, str) else None
+            for d in G.get_group(ap).data
+        ]
+        series[ap]['tweets'] = [
+            float(i) if not np.isnan(i) else None
+            for i in G.get_group(ap).tweets
+        ]
+        series[ap]['tmin'] = [
+            float(i) if not np.isnan(i) else None
+            for i in G.get_group(ap).tmin
+        ]
+        series[ap]['casos_est'] = [
+            float(i) if not np.isnan(i) else None
+            for i in G.get_group(ap).casos_est
+        ]
+        series[ap]['casos'] = [
+            float(i) if not np.isnan(i) else None
+            for i in G.get_group(ap).casos
+        ]
+        series[ap]['alerta'] = [
+            c - 1 if not np.isnan(c) else None
+            for c in G.get_group(ap).cor
+        ]
     return series
 
-
-def get_global_series(col, group):
-    series = group[col].groups.items()
-    ssum = None
-    for g, ser in group[col].items():
-        if ssum is None:
-            ssum = np.array(ser)
-        else:
-            ssum += np.array(ser)
+#
+# def get_global_series(col, group):
+#     series = group[col].groups.items()
+#     ssum = None
+#     for g, ser in group[col].items():
+#         if ssum is None:
+#             ssum = np.array(ser)
+#         else:
+#             ssum += np.array(ser)

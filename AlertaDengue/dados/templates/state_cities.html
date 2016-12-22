@@ -1,0 +1,265 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block extra_head %}
+    {% load static %}
+    {% load leaflet_tags %}
+    {% load series %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+    {% leaflet_js plugins="ALL" %}
+    <meta property="og:image" content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+    <meta property="og:image:secure_url" content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+    <style>
+        .leaflet-container {
+            height: 400px;
+            width: 100%;
+
+        }
+
+        #main {
+            width: 100%;
+            height: 400px;
+        }
+
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        .info h4 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+
+        .legend {
+            text-align: left;
+            line-height: 18px;
+            color: #555;
+        }
+
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+    </style>
+    <script src="/static/js/Autolinker.min.js"></script>
+    <script src="/static/js/jquery.sparkline.min.js"></script>
+    <script src="/static/js/highstock.js"></script>
+    <script src="/static/js/modules/exporting.js"></script>
+    <script src="/static/js/infodengue.js"></script>
+
+{% endblock %}
+{% block title %}{% blocktrans %}Situação da Dengue - {{ num_mun }} Municípios monitorados {% endblocktrans %}{% endblock %}
+
+{% block content %}
+    {% total_series %}
+    {% leaflet_map "main" callback="main_map_init" %}
+
+    <script type="text/javascript">
+        var mundict = {{ mundict|safe }}
+        var series_casos = {{ case_series|safe }};
+        var alerta = {{ alerta|safe }};
+        var recomendacoes;
+        var global_bounds = L.latLngBounds(L.latLng(-22.907500, -43.431500), L.latLng(-22.907000, -43.431000));
+        var municipios = L.featureGroup();
+        var geocodigos = {{ geocodigos }};
+        $('.totalsparkline').sparkline('html', {
+            type: 'bar',
+            width: "auto",
+            heigth: "auto",
+            barWidth: "15px",
+            barColor: "White",
+            tooltipSuffix: " casos"
+        });
+        function isInArray(el, array) {
+            return (array.indexOf(el) >= 0) ? true : false;
+        }
+        function bestFitZoom(map) {
+            // declaring the group variable
+            var group = new L.featureGroup;
+
+            // map._layers gives all the layers of the map including main container
+            // so looping in all those layers filtering those having feature
+            $.each(map._layers, function (ml) {
+
+                group.addLayer(this)
+            })
+
+           map.fitBounds(group.getBounds());
+        }
+        ;
+
+        var features = L.layerGroup();
+        var info = L.control();
+        var legend = L.control({position: 'bottomright'});
+
+        var alertLevels = [
+            {name: 'Baixo Risco', color: '#0D6B0D'},
+            {name: 'Atenção', color: '#C8D20F'},
+            {name: 'Transmissão', color: '#E45205'},
+            {name: 'Epidemia', color: '#FF0205'},
+        ];
+
+        function style(feature) {
+            var i = +feature.properties.alerta || 0;
+            return {
+                weight: 2,
+                opacity: 1,
+                color: 'white',
+                dashArray: '3',
+                fillOpacity: 0.7,
+                fillColor: alertLevels[i].color
+            };
+        }
+
+        function highlightFeature(e) {
+            var layer = e.target;
+
+            layer.setStyle({
+                weight: 5,
+                color: '#666',
+                dashArray: '',
+                fillOpacity: 0.7
+            });
+
+
+            if (!L.Browser.ie && !L.Browser.opera) {
+                layer.bringToFront();
+            }
+
+            info.update(layer.feature.properties);
+            layer.bringToBack()
+        }
+
+        function resetHighlight(e) {
+            geojson.resetStyle(e.target);
+            info.update();
+        }
+
+        function renderSparkline(e) {
+            $('.inlinesparkline').sparkline('html', {
+                type: 'bar',
+                width: "14em",
+                heigth: "5em",
+                barWidth: "9em",
+                tooltipSuffix: " casos"
+            });
+        }
+
+
+        function main_map_init(map, options) {
+            $(document).data('map', map)
+            //map._layersMaxZoom=13
+
+
+            recomendacoes = {
+                0: "Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www.riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros para o mosquito!</a>",
+                1: 'Uma vez por semana, aplique os <a href="http://www.riocontradengue.com.br/Site/Conteudo/Checklist.aspx">“10 minutos Contra a dengue”!</a>',
+                2: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.',
+                3: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.'
+            };
+
+
+            // control that shows state info on hover
+            info.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'info');
+                this.update();
+                return this._div;
+            };
+
+            info.update = function (props) {
+                this._div.innerHTML = '<h4>Número de casos estimados na semana:</h4>' + (props ?
+                        '<b>'+ props.nome + ':' + props.casos + '</b><br />' : 'Passe o mouse sobre o mapa');
+            };
+
+            info.addTo(map);
+
+            legend.onAdd = function () {
+                var div = L.DomUtil.create('div', 'info legend'),
+                        labels = alertLevels.map(function (alertLevel) {
+                            return '<i style="background:' + alertLevel.color + '"></i> ' + alertLevel.name;
+                        }).reverse();
+
+                labels.push('O: Unidades de Saúde');
+                div.innerHTML = labels.join('<br>');
+                return div;
+            };
+
+            legend.addTo(map);
+
+            function fill_details(feature, layer){
+                codigo = parseInt(feature.properties.geocodigo);
+                feature.properties.alerta = alerta[codigo];
+                feature.properties.series = series_casos[codigo];
+                feature.properties.casos = series_casos[codigo][series_casos[codigo].length -1];
+                layer.bindPopup("<b>" + mundict[codigo] + "</b>" + "<br>" +
+                "Casos estimados: " + feature.properties.casos + "<br>Últimas semanas: <span class='inlinesparkline'>" +
+                feature.properties.series + "</span><br>" +
+                "<br>" +
+                "<a href=/alerta/"+codigo.toString()+"/><u>Mais detalhes</u></a>"
+                );
+                layer.setStyle(style(feature))
+                layer.on({
+                    mouseover: highlightFeature,
+                    mouseout: resetHighlight,
+                    popupopen: renderSparkline
+                });
+
+
+            };
+
+            for (var i=0; i< geocodigos.length; i++){
+                var gc = geocodigos[i];
+                $.getJSON('/geojson/'+gc.toString()+'/', function(data){
+                    geojson = L.geoJson(data, {style: style, onEachFeature: fill_details});
+                    global_bounds.extend(geojson.getBounds())
+                    municipios.addLayer(geojson, true);
+                    map.fitBounds(global_bounds);
+                });
+
+            };
+            municipios.addTo(map);
+            map.fitBounds(global_bounds);
+
+
+
+
+
+            var overlayMaps = {
+                'Municípios': municipios
+            };
+            var controls = L.control.layers(null, overlayMaps, {collapsed: true});
+            //map.dragging.disable();
+            //map.scrollWheelZoom.disable();
+            map.touchZoom.disable();
+            map.doubleClickZoom.disable();
+            map.boxZoom.disable();
+            map.keyboard.disable();
+            //$(".leaflet-control-zoom").css("visibility", "hidden");
+            controls.addTo(map);
+            map.touchZoom.disable();
+            map.doubleClickZoom.disable();
+
+            $(window).on("resize", function () {
+                $("#main").height($(window).height() * 0.7);
+                map.invalidateSize();
+                try {
+                    map.fitBounds(global_bounds);
+                }
+                catch (err) {
+                }
+
+            }).trigger("resize")
+
+        }
+
+    </script>
+
+{% endblock %}
