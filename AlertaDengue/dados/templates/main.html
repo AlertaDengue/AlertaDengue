@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
 {% block extra_head %}
-    {% load static %}
     {% load series %}
     <meta property="og:image" content="http://info.dengue.mat.br/static/img/screenshot.png"/>
     <meta property="og:image:secure_url" content="https://info.dengue.mat.br/static/img/screenshot.png"/>
@@ -58,5 +58,101 @@
 {% endblocktrans %}{% endblock %}
 
 {% block content %}
-    {% total_series %}
+    <div class="container-fluid">
+        <!-- chart-plot:begin -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="chart-wrapper">
+                  <div class="chart-title">
+                      <h2>Total de casos nos municípios monitorados</h2>
+                  </div>
+                  <div class="chart-stage">
+                    {% total_series %}
+                  </div>
+                  <!--
+                  <div class="chart-notes">
+                    This is a sample text region to describe this chart.
+                  </div>
+                  -->
+                </div>
+              </div>
+        </div>
+        <!-- chart-plot:end -->
+
+        <!-- chart-states:begin -->
+        <div class="row card">
+            {% for state in states %}
+            <div class="col-sm-4">
+                <div class="chart-wrapper">
+                    <div class="chart-title">
+                        <h2>{{state}}</h2>
+                    </div>
+                    <div class="chart-stage">
+                        <div class="row vertical-align">
+                            <div class="col-sm-8">
+                                Municípios participantes:
+                            </div>
+                            <div class="col-sm-4 card-indicator-value">
+                                <h2>569</h2>
+                            </div>
+                        </div>
+
+                        <div class="row vertical-align">
+                            <div class="col-sm-8">
+                                Total de casos notificado e estimados na semana:
+                            </div>
+
+                            <div class="col-sm-4 card-indicator-value">
+                                <h2>569</h2>
+                            </div>
+                        </div>
+
+                        <div class="row vertical-align">
+                            <div class="col-sm-8">
+                                Previsão de casos para as próximas semanas:
+                            </div>
+
+                            <div class="col-sm-4 card-indicator-value">
+                                <h2>569</h2>
+                            </div>
+                        </div>
+
+                        <div class="row vertical-align">
+                            <div class="col-sm-8">
+                                Total de casos notificado e estimados na semana:
+                            </div>
+
+                            <div class="col-sm-4 card-indicator-value">
+                                <h2>569</h2>
+                            </div>
+                        </div>
+
+                        <div class="row vertical-align">
+                            <div class="col-sm-8">
+                                Variação em relação à semana anterior:
+                            </div>
+
+                            <div class="col-sm-4 card-indicator-value">
+                                <h2>569</h2>
+                            </div>
+                        </div>
+
+                        <div class="row vertical-align">
+                            <div class="col-sm-12">
+                                <a href="#">Clique aqui para ver mais detalhes.</a>
+                            </div>
+                        </div>
+
+                    </div>
+                  <!--
+                  <div class="chart-notes">
+                    This is a sample text region to describe this chart.
+                  </div>
+                  -->
+                </div>
+              </div>
+            {% endfor %}
+        </div>
+        <!-- chart-states:end -->
+    </div>
 {% endblock %}

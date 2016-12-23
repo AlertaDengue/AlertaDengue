@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 {% load bootstrap3 %}
 {% load i18n %}
+{% load static %}
 <html>
 <head>
     {% bootstrap_javascript jquery=True %}
@@ -10,6 +11,47 @@
     <link href="/static/css/infodengue.css" rel="stylesheet">
     <script src="/static/js/bloodhound.min.js"></script>
     <script src="/static/js/typeahead.bundle.min.js"></script>
+
+    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}"
+          type="image/x-icon">
+    <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+
+    <link rel="stylesheet" type="text/css"
+          href="{% static 'libs/dashboards/css/keen-static.css' %}"/>
+    <link rel="stylesheet" type="text/css"
+          href="{% static 'libs/dashboards/css/keen-dashboards.css' %}"/>
+
+    <style>
+        .chart-wrapper {
+            background: #efefef;
+        }
+
+        .page-header {
+            margin-top: 0;
+        }
+
+        .card * {
+            font-weight: bold;
+        }
+
+        .card-indicator-value, .card-indicator-value *{
+            color: #ff9900;
+            text-align: right!important;
+        }
+
+        .vertical-align {
+          display: flex;
+          flex-direction: row;
+          margin-bottom: 10px;
+        }
+
+        .vertical-align > [class^="col-"],
+        .vertical-align > [class*=" col-"] {
+          display: flex;
+          align-items: center;     /* Align the flex-items vertically */
+        }
+    </style>
+
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -17,26 +59,45 @@
 
 <div id="footer">
     <div class="container">
-        <div class="jumbotron parceiros">
-            <h2>{% trans "Parceiros" %}</h2>
-
-            <div class="row clearfix">
-                <div class="col-md-2 column"><img src="/static/img/ufmg.jpg" alt="UFMG" width="120px" title="UFMG" class="logos">
-                </div>
-                <div class="col-md-2 column"><img src="/static/img/UFPR.jpeg" alt="UFPR" width="120px" title="UFPR" class="logos">
-                </div>
-                <div class="col-md-2 column"><img src="/static/img/logo_sms.jpg"
-                                                  alt="Secretaria Municipal de Saúde do Rio de Janeiro" width="150px"
-                                                  title="Secretaria Municipal de Saúde do Rio de Janeiro" class="logos">
-                </div>
-                <div class="col-md-2 column">
-                    <img src="/static/img/ses-rj-2015.png" alt="SES", width="120px" title="Secretaria de Estado de Saúde" class="logos">
-                </div>
-                <div class="col-md-2 column"></div>
-                <div class="col-md-2 column"><img src="/static/img/1746.jpg" alt="1746" width="120px" title="1746" class="logos">
-                </div>
+        <div class="row">
+            <div class="chart-wrapper">
+                  <div class="chart-title">
+                      <h2>{% trans "Parceiros" %}</h2>
+                  </div>
+                  <div class="chart-stage">
+                      <div class="row clearfix">
+                          <div class="col-md-2 column">
+                              <img src="/static/img/ufmg.jpg" alt="UFMG"
+                                   width="120px"
+                                   title="UFMG" class="logos">
+                          </div>
+                          <div class="col-md-2 column">
+                              <img src="/static/img/UFPR.jpeg" alt="UFPR"
+                                   width="120px"
+                                   title="UFPR" class="logos">
+                          </div>
+                          <div class="col-md-2 column">
+                              <img src="/static/img/logo_sms.jpg"
+                                   alt="Secretaria Municipal de Saúde do Rio de Janeiro"
+                                   width="150px"
+                                   title="Secretaria Municipal de Saúde do Rio de Janeiro"
+                                   class="logos">
+                          </div>
+                          <div class="col-md-2 column">
+                              <img src="/static/img/ses-rj-2015.png" alt="SES" ,
+                                   width="120px"
+                                   title="Secretaria de Estado de Saúde"
+                                   class="logos">
+                          </div>
+                          <div class="col-md-2 column"></div>
+                          <div class="col-md-2 column">
+                              <img src="/static/img/1746.jpg" alt="1746"
+                                   width="120px"
+                                   title="1746" class="logos">
+                          </div>
+                      </div>
+                  </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -56,8 +117,14 @@
     ga('create', 'UA-58700914-1', 'auto');
     ga('send', 'pageview');
 
+
 </script>
 </body>
 
+<!-- Keen IOness -->
+<script type="text/javascript"
+        src="{% static 'libs/keen-js/keen.min.js' %}"></script>
+<script type="text/javascript"
+        src="{% static 'libs/dashboards/js/meta.js' %}"></script>
 
 </html>

@@ -49,7 +49,6 @@ class AlertaMainView(TemplateView):
         # alerta = {}
         case_series = {}
         total = np.zeros(52, dtype=int)
-        COUNTER = 0
 
         conexao = create_engine(
             "postgresql://{}:{}@{}/{}".format(
@@ -65,24 +64,17 @@ class AlertaMainView(TemplateView):
         )
 
         for gc, _case_series, in results.items():
-            print('>>>', end=' ')
-
             # dados = dbdata.get_city_alert(gc, 'dengue')
             # alerta[gc] = int(dados[0])
             # case_series[str(gc)] = list(map(int, dados[2][-12:]))
             # total += dados[2][-52:]
 
             # _case_series = dbdata.load_serie_city(
-            #     geocodigos, 'dengue', conexao
+            #     geocodigos, 'dengue', con1xao
             # )
             #_case_series = series[str(gc)]['casos_est']
             case_series[str(gc)] = _case_series['casos_est'][-12:]
             total += _case_series['casos_est'][-52:]
-
-            COUNTER += 1
-            print(COUNTER)
-
-        print('<<<', time.time() - t0)
 
         context.update({
             # 'mundict': json.dumps(mundict),
@@ -92,6 +84,7 @@ class AlertaMainView(TemplateView):
             # 'alerta': json.dumps(alerta),
             'case_series': json.dumps(case_series),
             'total': json.dumps(total.tolist()),
+            'states': ['Rio de Janeiro', 'Paraná', 'Espírito Santos']
         })
         return context
 
