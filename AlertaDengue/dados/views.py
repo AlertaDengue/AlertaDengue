@@ -35,46 +35,55 @@ with open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')) as f:
 class AlertaMainView(TemplateView):
     template_name = 'main.html'
 
-    conexao = create_engine(
-        "postgresql://{}:{}@{}/{}".format(
-            settings.PSQL_USER,
-            settings.PSQL_PASSWORD,
-            settings.PSQL_HOST,
-            settings.PSQL_DB))
-
     def get_context_data(self, **kwargs):
         context = super(AlertaMainView, self).get_context_data(**kwargs)
         mundict = dict(dbdata.get_all_active_cities())
         municipios, geocodigos = list(mundict.values()), list(mundict.keys())
+
+        # today
+        today = datetime.datetime.today()
+        se2 = str(today.isocalendar()[0])
+        se2 += str(today.isocalendar()[1]).rjust(2, '0')
+
+        # 7 days ago
+        last_week = today - datetime.timedelta(days=0, weeks=1)
+        se1 = str(last_week.isocalendar()[0])
+        se1 += str(last_week.isocalendar()[1]).rjust(2, '0')
+
         # alerta = {}
         case_series = {}
         total = np.zeros(52, dtype=int)
+        ufs = ['Rio de Janeiro', 'Paraná', 'Espírito Santo']
 
-        conexao = create_engine(
-            "postgresql://{}:{}@{}/{}".format(
-                settings.PSQL_USER,
-                settings.PSQL_PASSWORD,
-                settings.PSQL_HOST,
-                settings.PSQL_DB))
-
-        t0 = time.time()
+        conexao = dbdata.create_connection()
 
         results = dbdata.load_serie_city(
             geocodigos, 'dengue', conexao
         )
 
+        # series
         for gc, _case_series, in results.items():
-            # dados = dbdata.get_city_alert(gc, 'dengue')
-            # alerta[gc] = int(dados[0])
-            # case_series[str(gc)] = list(map(int, dados[2][-12:]))
-            # total += dados[2][-52:]
-
-            # _case_series = dbdata.load_serie_city(
-            #     geocodigos, 'dengue', con1xao
-            # )
-            #_case_series = series[str(gc)]['casos_est']
             case_series[str(gc)] = _case_series['casos_est'][-12:]
             total += _case_series['casos_est'][-52:]
+
+        count_cities = {}
+        current_week = {}
+        estimated_cases_next_week = {}
+        variation_to_current_week = {}
+        for uf in ufs:
+            # Municípios participantes
+            count_cities[uf] = dbdata.count_cities_by_state(uf, conexao)
+            # Total de casos notificado e estimados na semana
+            current_week[uf] = dbdata.count_cases_by_uf(
+                uf, se2, conexao
+            ).iloc[0].to_dict()
+            # Previsão de casos para as próximas semanas
+            estimated_cases_next_week[uf] = current_week[uf]['casos']
+            # Variação em relação à semana anterior
+            variation_to_current_week[uf] = (
+                current_week[uf]['casos'] -
+                dbdata.count_cases_by_uf(uf, se1, conexao).loc[0, 'casos']
+            )
 
         context.update({
             # 'mundict': json.dumps(mundict),
@@ -84,7 +93,11 @@ class AlertaMainView(TemplateView):
             # 'alerta': json.dumps(alerta),
             'case_series': json.dumps(case_series),
             'total': json.dumps(total.tolist()),
-            'states': ['Rio de Janeiro', 'Paraná', 'Espírito Santos']
+            'states': ufs,
+            'count_cities': count_cities,
+            'current_week': current_week,
+            'estimated_cases_next_week': estimated_cases_next_week,
+            'variation_to_current_week': variation_to_current_week
         })
         return context
 
@@ -334,11 +347,9 @@ class SinanCasesView(View):
             )
 
         sample = 1 if sample == 0 else sample / 100.
-        # print ("chegou aqui")
         cases = "{\"type\":\"FeatureCollection\", \"features\":["
         if int(year) == 2010:
             dados = M.Dengue_2010.objects.geojson()
-            # print(cases[0].geojson)
         elif int(year) == 2011:
             dados = M.Dengue_2011.objects.geojson()
         elif int(year) == 2012:
@@ -350,10 +361,7 @@ class SinanCasesView(View):
 
         if len(dados) < 5500:
             sample = 1
-        # print(type(dados[0].dt_notific))
-        # print ("chegou aqui", sample, dados[0].dt_notific)
         for c in random.sample(list(dados), int(len(dados) * sample)):
-            # print(c)
             cases += (
                 "{\"type\":\"Feature\",\"geometry\":" + c.geojson +
                 ", \"properties\":{\"data\":\"" + c.dt_notific.isoformat() +

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load static %}
+{% load lookup %}
 {% block extra_head %}
     {% load series %}
     <meta property="og:image" content="http://info.dengue.mat.br/static/img/screenshot.png"/>
@@ -81,11 +82,11 @@
 
         <!-- chart-states:begin -->
         <div class="row card">
-            {% for state in states %}
+            {% for uf in states %}
             <div class="col-sm-4">
                 <div class="chart-wrapper">
                     <div class="chart-title">
-                        <h2>{{state}}</h2>
+                        <h2>{{uf}}</h2>
                     </div>
                     <div class="chart-stage">
                         <div class="row vertical-align">
@@ -93,7 +94,7 @@
                                 Municípios participantes:
                             </div>
                             <div class="col-sm-4 card-indicator-value">
-                                <h2>569</h2>
+                                <h2>{{count_cities|lookup:uf}}</h2>
                             </div>
                         </div>
 
@@ -103,7 +104,9 @@
                             </div>
 
                             <div class="col-sm-4 card-indicator-value">
-                                <h2>569</h2>
+                                <h2>{{current_week|lookup:uf|lookup:'casos'}} /
+                                    {{current_week|lookup:uf|lookup:'casos_est'}}
+                                </h2>
                             </div>
                         </div>
 
@@ -113,17 +116,7 @@
                             </div>
 
                             <div class="col-sm-4 card-indicator-value">
-                                <h2>569</h2>
-                            </div>
-                        </div>
-
-                        <div class="row vertical-align">
-                            <div class="col-sm-8">
-                                Total de casos notificado e estimados na semana:
-                            </div>
-
-                            <div class="col-sm-4 card-indicator-value">
-                                <h2>569</h2>
+                                <h2>{{estimated_cases_next_week|lookup:uf}}</h2>
                             </div>
                         </div>
 
@@ -133,7 +126,7 @@
                             </div>
 
                             <div class="col-sm-4 card-indicator-value">
-                                <h2>569</h2>
+                                <h2>{{variation_to_current_week|lookup:uf}}</h2>
                             </div>
                         </div>
 

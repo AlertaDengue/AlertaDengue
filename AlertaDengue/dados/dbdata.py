@@ -126,13 +126,10 @@ def load_series(cidade, doenca='dengue', conexao=None):
         ap = str(cidade)
         cidade = add_dv(int(str(cidade)[:-1]))
 
-        t = time.time()
-        print('>> 1:', end=' ')
         dados_alerta = pd.read_sql_query((
             'select * from "Municipio"."Historico_alerta" ' +
             'where municipio_geocodigo={} ORDER BY "data_iniSE" ASC'
         ).format(cidade), conexao, 'id', parse_dates=True)
-        print(time.time() - t)
 
         if len(dados_alerta) == 0:
             raise NameError((
@@ -159,10 +156,7 @@ def load_series(cidade, doenca='dengue', conexao=None):
         # conexao.close()
         result = dict(series)
 
-        t = time.time()
-        print('>> 2:', end=' ')
         cache.set(cache_key, result, settings.QUERY_CACHE_TIMEOUT)
-        print(time.time() - t)
 
     return result
 
@@ -191,28 +185,19 @@ def load_serie_city(geocodigos, doenca='dengue', conexao=None):
             cidades.append(add_dv(int(ap[:-1])))
             _geocodigos[cidades[-1]] = cidade
 
-    if conexao is None:
-        conexao = create_engine(
-            "postgresql://{}:{}@{}/{}".format(
-                settings.PSQL_USER,
-                settings.PSQL_PASSWORD,
-                settings.PSQL_HOST,
-                settings.PSQL_DB))
-
-    t = time.time()
-    print('>> 1:', end=' ')
-
-    sql = (
-        'SELECT id, municipio_geocodigo, casos_est FROM "Municipio"."Historico_alerta" ' +
-        'WHERE municipio_geocodigo IN (' +
-        ('{},'*len(cidades))[:-1] +
-        ') ORDER BY municipio_geocodigo ASC, "data_iniSE" ASC'
-    ).format(*cidades)
+    sql = ('''
+    SELECT
+        id, municipio_geocodigo, casos_est, casos,
+        "data_iniSE", casos_est_min, casos_est_max,
+        nivel, "SE", p_rt1
+    FROM "Municipio"."Historico_alerta"
+    WHERE municipio_geocodigo IN (''' + ('{},'*len(cidades))[:-1] + ''')
+    ORDER BY municipio_geocodigo ASC, "data_iniSE" ASC
+    ''').format(*cidades)
 
     dados_alerta = pd.read_sql_query(
         sql, conexao, 'id', parse_dates=True
     )
-    print(time.time() - t)
 
     if len(dados_alerta) == 0:
         raise NameError(
@@ -222,19 +207,27 @@ def load_serie_city(geocodigos, doenca='dengue', conexao=None):
     series = defaultdict(lambda: defaultdict(lambda: []))
     for k, v in _geocodigos.items():
         ap = str(ap)
+        mask = dados_alerta.municipio_geocodigo == k
+        series[ap]['dia'] = dados_alerta[mask].data_iniSE.tolist()
+        series[ap]['casos_est_min'] = np.nan_to_num(
+            dados_alerta[mask].casos_est_min).astype(int).tolist()
         series[ap]['casos_est'] = np.nan_to_num(
-            dados_alerta[
-                dados_alerta.municipio_geocodigo == k
-            ].casos_est
+            dados_alerta[mask].casos_est
         ).astype(int).tolist()
+        series[ap]['casos_est_max'] = np.nan_to_num(
+            dados_alerta[mask].casos_est_max).astype(int).tolist()
+        series[ap]['casos'] = np.nan_to_num(
+            dados_alerta[mask].casos
+        ).astype(int).tolist()
+        series[ap]['alerta'] = (
+            dados_alerta[mask].nivel.astype(int) - 1
+        ).tolist()  # (1,4)->(0,3)
+        series[ap]['SE'] = (dados_alerta[mask].SE.astype(int)).tolist()
+        series[ap]['prt1'] = dados_alerta[mask].p_rt1.astype(float).tolist()
         series[ap] = dict(series[ap])
-    # conexao.close()
     result = dict(series)
 
-    t = time.time()
-    print('>> 2:', end=' ')
     cache.set(cache_key, result, settings.QUERY_CACHE_TIMEOUT)
-    print(time.time() - t)
 
     return series
 
@@ -292,3 +285,63 @@ def add_dv(geocodigo):
         return geocodigo
     else:
         return int(str(geocodigo) + str(calculate_digit(geocodigo)))
+
+
+def create_connection():
+    """
+    Retorna um sqlalchemy engine com a conexão com o banco.
+
+    :return: sqlalchemy engine
+
+    """
+    return create_engine(
+        "postgresql://{}:{}@{}/{}".format(
+            settings.PSQL_USER,
+            settings.PSQL_PASSWORD,
+            settings.PSQL_HOST,
+            settings.PSQL_DB))
+
+
+def count_cities_by_state(uf, connection):
+    """
+    Returna contagem de cidades participantes por estado
+
+    :param uf: nome do estado
+    :param connection: sqlalchemy engine
+    :return: dataframe
+    """
+
+    sql = '''
+    SELECT COALESCE(COUNT(municipio_geocodigo), 0) AS count
+    FROM (
+        SELECT DISTINCT municipio_geocodigo
+        FROM "Municipio"."Historico_alerta") AS alerta
+    INNER JOIN "Dengue_global"."Municipio" AS municipio
+      ON alerta.municipio_geocodigo = municipio.geocodigo
+    WHERE uf='%s'
+    ''' % uf
+
+    return int(pd.read_sql(sql, connection)['count'])
+
+
+def count_cases_by_uf(uf, se, connection):
+    """
+    Returna contagem de cidades participantes por estado
+
+    :param uf: nome do estado
+    :param se: número do ano e semana (no ano), ex: 201503
+    :param connection: sqlalchemy engine
+    :return: dataframe
+    """
+    sql = '''
+    SELECT
+        COALESCE(SUM(casos), 0) AS casos,
+        COALESCE(SUM(casos_est), 0) AS casos_est
+    FROM "Municipio"."Historico_alerta" AS alerta
+    INNER JOIN "Dengue_global"."Municipio" AS municipio
+      ON alerta.municipio_geocodigo = municipio.geocodigo
+    WHERE uf='%s' AND "SE" = '%s'
+    ''' % (uf, se)
+
+    return pd.read_sql(sql, connection).astype(int)
+
