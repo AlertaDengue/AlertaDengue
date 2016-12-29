@@ -10,3 +10,4 @@ settings.ini
 /AlertaDengue/geodjango.db
 pip-selfcheck.json
 /shapely
+/share/
