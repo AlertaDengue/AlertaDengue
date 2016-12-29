@@ -2,12 +2,14 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.decorators.cache import cache_page
-from dados.views import DetailsPageView, SinanCasesView, AboutPageView, \
-    ContactPageView, JoininPageView, MapaDengueView, \
-    MapaMosquitoView, \
-    HistoricoView, AlertaPageView, AlertaGeoJSONView, AlertaPageViewMunicipio, \
-    CityMapView, get_municipio, \
-    AlertaMainView
+from dados.views import (
+    DetailsPageView, SinanCasesView, AboutPageView,
+    ContactPageView, JoininPageView, MapaDengueView,
+    MapaMosquitoView,
+    HistoricoView, AlertaPageView, AlertaGeoJSONView, AlertaPageViewMunicipio,
+    CityMapView, get_municipio,
+    AlertaMainView, AlertaStateView
+)
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.decorators import login_required
@@ -18,6 +20,7 @@ admin.autodiscover()
 urlpatterns = [
     # '',
     # Examples:
+    url(r'^alerta/(?P<state>PR|RJ|ES)/$', AlertaStateView.as_view(), name='alerta_uf'),
     url(r'^alerta/rio/$', AlertaPageView.as_view(), name='mrj'),
     # url(r'^blog/', include('blog.urls')),
     url(r'^alerta/(?P<geocodigo>\d{7})/$',

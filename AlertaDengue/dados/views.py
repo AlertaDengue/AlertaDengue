@@ -45,10 +45,6 @@ class AlertaMainView(TemplateView):
         se1 = str(last_week.isocalendar()[0])
         se1 += str(last_week.isocalendar()[1]).rjust(2, '0')
 
-        se1 = '201636'
-        se2 = '201637'
-
-        # alerta = {}
         case_series = {}
         total = np.zeros(52, dtype=int)
         ufs = ['Rio de Janeiro', 'Paraná', 'Espírito Santo']
@@ -446,3 +442,20 @@ def load_series():
             for c in G.get_group(ap).cor
         ]
     return series
+
+
+class AlertaStateView(TemplateView):
+    template_name = 'state_cities.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AlertaStateView, self).get_context_data(**kwargs)
+
+        sigla = {
+            'RJ': 'Rio de Janeiro',
+            'PR': 'Paraná',
+            'ES': 'Espírito Santo'
+        }
+
+
+        context.update({'state': sigla[context['state']]})
+        return context

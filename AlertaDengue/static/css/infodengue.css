@@ -212,3 +212,11 @@ h1 {
   display: flex;
   align-items: center;     /* Align the flex-items vertically */
 }
+
+.bluebox > h3 {
+    color: white!important;
+}
+
+.content-inline * {
+    display: inline!important;
+}
