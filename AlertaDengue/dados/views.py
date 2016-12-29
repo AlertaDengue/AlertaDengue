@@ -54,10 +54,15 @@ class AlertaMainView(TemplateView):
         case_series = {}
         total = np.zeros(52, dtype=int)
         ufs = ['Rio de Janeiro', 'Paraná', 'Espírito Santo']
+        sigla = {
+            'Rio de Janeiro': 'RJ',
+            'Paraná': 'PR',
+            'Espírito Santo': 'ES'
+        }
 
         conexao = dbdata.create_connection()
 
-        results = dbdata.load_serie_city(
+        results = dbdata.load_serie_cities(
             geocodigos, 'dengue', conexao
         )
 
@@ -97,7 +102,8 @@ class AlertaMainView(TemplateView):
             'count_cities': count_cities,
             'current_week': current_week,
             'estimated_cases_next_week': estimated_cases_next_week,
-            'variation_to_current_week': variation_to_current_week
+            'variation_to_current_week': variation_to_current_week,
+            'sigla': sigla
         })
         return context
 

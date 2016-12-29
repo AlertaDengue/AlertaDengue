@@ -161,7 +161,7 @@ def load_series(cidade, doenca='dengue', conexao=None):
     return result
 
 
-def load_serie_city(geocodigos, doenca='dengue', conexao=None):
+def load_serie_cities(geocodigos, doenca='dengue', conexao=None):
     """
     Monta as séries do alerta para visualização no site
     :param cidade: geocodigo da cidade desejada
@@ -174,6 +174,7 @@ def load_serie_city(geocodigos, doenca='dengue', conexao=None):
     cidades = []
 
     for cidade in geocodigos:
+        """
         cache_key = 'load_series-{}-{}'.format(cidade, doenca)
         _result = cache.get(cache_key)
         ap = str(cidade)
@@ -184,6 +185,11 @@ def load_serie_city(geocodigos, doenca='dengue', conexao=None):
         else:
             cidades.append(add_dv(int(ap[:-1])))
             _geocodigos[cidades[-1]] = cidade
+        """
+        ap = str(cidade)
+        aps.append(ap)
+        cidades.append(add_dv(int(ap[:-1])))
+        _geocodigos[cidades[-1]] = cidade
 
     sql = ('''
     SELECT
@@ -227,7 +233,7 @@ def load_serie_city(geocodigos, doenca='dengue', conexao=None):
         series[ap] = dict(series[ap])
     result = dict(series)
 
-    cache.set(cache_key, result, settings.QUERY_CACHE_TIMEOUT)
+    # cache.set(cache_key, result, settings.QUERY_CACHE_TIMEOUT)
 
     return series
 

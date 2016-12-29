@@ -36,7 +36,7 @@ h3 {
   margin: 0 15px 0 0;
   width: 150px;
 }
-
+/*
 .navbar-toggle {
   background-color: rgba(255,255,255,.25);
 }
@@ -48,6 +48,7 @@ h3 {
 .navbar-nav {
   margin: 5px 0 0;
 }
+
 .navbar-nav > li > a {
   font-size: 15px;
   font-weight: 200;
@@ -71,7 +72,7 @@ h3 {
 }
 .navbar-collapse {
   box-shadow: none;
-}
+} */
 
 .masthead {
   background-color: #00afd7;

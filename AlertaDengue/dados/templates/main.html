@@ -4,8 +4,10 @@
 {% load lookup %}
 {% block extra_head %}
     {% load series %}
-    <meta property="og:image" content="http://info.dengue.mat.br/static/img/screenshot.png"/>
-    <meta property="og:image:secure_url" content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+    <meta property="og:image"
+          content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+    <meta property="og:image:secure_url"
+          content="https://info.dengue.mat.br/static/img/screenshot.png"/>
     <style>
         .leaflet-container {
             height: 400px;
@@ -132,7 +134,9 @@
 
                         <div class="row vertical-align">
                             <div class="col-sm-12">
-                                <a href="#">Clique aqui para ver mais detalhes.</a>
+                                <a href="/alerta/{{sigla|lookup:uf}}">
+                                    Clique aqui para ver mais detalhes.
+                                </a>
                             </div>
                         </div>
 

@@ -68,12 +68,16 @@
                                         {% trans "Fale Conosco" %}</a></li>
                                     <li><a href="{% url 'joinin' %}">
                                         {% trans "Participe" %}</a></li>
-<!--
                                     <li style="overflow: visible">
-                                        <div id="remote" class="twitter-typeahead" style="overflow-y: auto; max-height: 150px; overflow: visible">
-                                        <input type="text" class="form-control input-lg typeahead twitter-typeahead tt-dropdown-menu" placeholder="Encontre um município..." name="q" style="position: relative"></input>
+                                        <div id="remote" class="twitter-typeahead"
+                                             style="overflow-y: auto; max-height: 150px; overflow: visible">
+                                            <input type="text"
+                                                   class="form-control input-lg typeahead twitter-typeahead tt-dropdown-menu"
+                                                   placeholder="Encontre um município..."
+                                                   name="q"
+                                                   style="position: relative" />
+                                        </div>
                                     </li>
--->
                                     {% if user.is_authenticated %}
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle"
