@@ -21,37 +21,6 @@
     <link rel="stylesheet" type="text/css"
           href="{% static 'libs/dashboards/css/keen-dashboards.css' %}"/>
 
-    <style>
-        .chart-wrapper {
-            background: #efefef;
-        }
-
-        .page-header {
-            margin-top: 0;
-        }
-
-        .card * {
-            font-weight: bold;
-        }
-
-        .card-indicator-value, .card-indicator-value *{
-            color: #ff9900;
-            text-align: right!important;
-        }
-
-        .vertical-align {
-          display: flex;
-          flex-direction: row;
-          margin-bottom: 10px;
-        }
-
-        .vertical-align > [class^="col-"],
-        .vertical-align > [class*=" col-"] {
-          display: flex;
-          align-items: center;     /* Align the flex-items vertically */
-        }
-    </style>
-
     {% block extra_head %}{% endblock %}
 </head>
 <body>

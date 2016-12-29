@@ -162,6 +162,6 @@ STATIC_URL = '/static/'
 SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
 
 try:
-    from AlertaDengue.local_settings import *
+    from AlertaDengue.local_settings import *  # noqa
 except ImportError:
     pass

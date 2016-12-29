@@ -1,5 +1,5 @@
 # coding=utf-8
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.decorators.cache import cache_page
 from dados.views import DetailsPageView, SinanCasesView, AboutPageView, \

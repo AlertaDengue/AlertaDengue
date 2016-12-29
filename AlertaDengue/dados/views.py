@@ -45,6 +45,9 @@ class AlertaMainView(TemplateView):
         se1 = str(last_week.isocalendar()[0])
         se1 += str(last_week.isocalendar()[1]).rjust(2, '0')
 
+        se1 = '201636'
+        se2 = '201637'
+
         # alerta = {}
         case_series = {}
         total = np.zeros(52, dtype=int)
@@ -72,7 +75,7 @@ class AlertaMainView(TemplateView):
         variation_to_current_week = {}
         for uf in ufs:
             # Municípios participantes
-            count_cities[uf] = dbdata.count_cities_by_state(uf, conexao)
+            count_cities[uf] = dbdata.count_cities_by_uf(uf, conexao)
             # Total de casos notificado e estimados na semana
             current_week[uf] = dbdata.count_cases_by_uf(
                 uf, se2, conexao
@@ -81,9 +84,8 @@ class AlertaMainView(TemplateView):
             estimated_cases_next_week[uf] = current_week[uf]['casos']
             # Variação em relação à semana anterior
             variation_to_current_week[uf] = (
-                current_week[uf]['casos'] -
-                dbdata.count_cases_by_uf(uf, se1, conexao).loc[0, 'casos']
-            )
+                dbdata.count_cases_week_variation_by_uf(uf, se1, se2, conexao)
+            ).loc[0, 'casos']
 
         context.update({
             # 'mundict': json.dumps(mundict),
@@ -444,13 +446,3 @@ def load_series():
             for c in G.get_group(ap).cor
         ]
     return series
-
-#
-# def get_global_series(col, group):
-#     series = group[col].groups.items()
-#     ssum = None
-#     for g, ser in group[col].items():
-#         if ssum is None:
-#             ssum = np.array(ser)
-#         else:
-#             ssum += np.array(ser)
