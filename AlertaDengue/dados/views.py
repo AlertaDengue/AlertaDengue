@@ -2,27 +2,21 @@
 from dados.maps import get_city_geojson, get_city_info
 from dados import dbdata
 from dados import models as M
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.views.generic.base import TemplateView, View
 from django.contrib import messages
-# from django.contrib.gis.geos import Point
-from django.http import HttpResponse, StreamingHttpResponse
+from django.http import HttpResponse
 from time import mktime
 from collections import defaultdict
 from django.conf import settings
-from sqlalchemy import create_engine
 
 import random
 import json
 import os
 import datetime
-# import csv
-# import pandas as pd
 import numpy as np
 import locale
 import geojson
-import time
-import psycopg2
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
@@ -39,6 +33,7 @@ class AlertaMainView(TemplateView):
         context = super(AlertaMainView, self).get_context_data(**kwargs)
         mundict = dict(dbdata.get_all_active_cities())
         municipios, geocodigos = list(mundict.values()), list(mundict.keys())
+        del municipios
 
         # today
         today = datetime.datetime.today()
@@ -186,7 +181,7 @@ class AlertaPageViewMunicipio(TemplateView):
     template_name = 'alerta_municipio.html'
 
     def dispatch(self, request, *args, **kwargs):
-        context = super(AlertaPageViewMunicipio, self) \
+        super(AlertaPageViewMunicipio, self) \
             .get_context_data(**kwargs)
         municipio_gc = kwargs['geocodigo']
 
@@ -391,8 +386,9 @@ def get_alert():
     df = dados_alerta
     df.fillna(0, inplace=True)
     last_SE = df.se.max()  # Last epidemiological week
-    year = datetime.date.today().year  # Current year
-    SE = int(str(last_SE).split(str(year))[-1])  # current epidemiological week
+    # year = datetime.date.today().year  # Current year
+    # current epidemiological week
+    # SE = int(str(last_SE).split(str(year))[-1])
     current = df[df['se'] == last_SE]  # Current status
     G = df.groupby("aps")
     group_names = G.groups.keys()
@@ -405,10 +401,10 @@ def get_alert():
         adf = G.get_group(ap)  # .tail()  # only calculates on the series tail
         case_series[str(float(ap.split('AP')[-1]))] = [
             int(v) for v in adf.casos_est.iloc[-12:].values
-            ]
+        ]
         obs_case_series[str(float(ap.split('AP')[-1]))] = [
             int(v) for v in adf.casos.iloc[-12:].values
-            ]
+        ]
         alert[ap] = adf.nivel.iloc[-1]
         last_year = int(adf.casos.iloc[-52])
         min_max_est[ap] = (adf.casos_estmin.iloc[-1], adf.casos_estmax.iloc[-1])

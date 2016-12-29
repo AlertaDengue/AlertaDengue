@@ -4,7 +4,6 @@ from dados.dbdata import load_series, get_series_by_UF
 register = template.Library()
 from time import mktime
 from datetime import timedelta
-from datetime import date
 import json
 
 
@@ -62,7 +61,7 @@ def alerta_series(context):
 
 @register.inclusion_tag("total_series.html", takes_context=True)
 def total_series(context):
-    gc = context['geocodigos'][0]
+    # gc = context['geocodigos'][0]
     series = get_series_by_UF()
     ufs = list(set(series.uf.tolist()))
     # 51 weeks to get the end of the SE

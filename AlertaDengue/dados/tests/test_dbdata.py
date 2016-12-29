@@ -1,6 +1,5 @@
 from unittest import TestCase
 from dados import dbdata
-import pandas as pd
 import datetime
 
 

@@ -10,7 +10,6 @@ from collections import defaultdict
 
 import pandas as pd
 import numpy as np
-import time
 
 CID10 = {
     'dengue': 'A90',
@@ -174,7 +173,6 @@ def load_serie_cities(geocodigos, doenca='dengue', conexao=None):
     cidades = []
 
     for cidade in geocodigos:
-        """
         cache_key = 'load_series-{}-{}'.format(cidade, doenca)
         _result = cache.get(cache_key)
         ap = str(cidade)
@@ -185,11 +183,6 @@ def load_serie_cities(geocodigos, doenca='dengue', conexao=None):
         else:
             cidades.append(add_dv(int(ap[:-1])))
             _geocodigos[cidades[-1]] = cidade
-        """
-        ap = str(cidade)
-        aps.append(ap)
-        cidades.append(add_dv(int(ap[:-1])))
-        _geocodigos[cidades[-1]] = cidade
 
     sql = ('''
     SELECT
@@ -233,7 +226,7 @@ def load_serie_cities(geocodigos, doenca='dengue', conexao=None):
         series[ap] = dict(series[ap])
     result = dict(series)
 
-    # cache.set(cache_key, result, settings.QUERY_CACHE_TIMEOUT)
+    cache.set(cache_key, result, settings.QUERY_CACHE_TIMEOUT)
 
     return series
 
