@@ -456,6 +456,23 @@ class AlertaStateView(TemplateView):
             'ES': 'Espírito Santo'
         }
 
+        map_center = {
+            'RJ': [-22.187, -43.176],
+            'PR': [-25.006, -51.833],
+            'ES': [-20.015, -40.803],
+        }
 
-        context.update({'state': sigla[context['state']]})
+        map_zoom = {
+            'RJ': 6,
+            'PR': 5,
+            'ES': 6,
+        }
+
+        context.update({
+            'state_abv': context['state'],
+            'state': sigla[context['state']],
+            'map_center': map_center[context['state']],
+            'map_zoom': map_zoom[context['state']]
+        })
         return context
+

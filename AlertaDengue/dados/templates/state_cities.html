@@ -1,28 +1,33 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
+{% load lookup %}
 {% block extra_head %}
-    {% load static %}
     {% load leaflet_tags %}
-    {% load series %}
     {% load alert_state %}
     {% leaflet_js %}
     {% leaflet_css %}
     {% leaflet_js plugins="ALL" %}
-    <meta property="og:image" content="http://info.dengue.mat.br/static/img/screenshot.png"/>
-    <meta property="og:image:secure_url" content="https://info.dengue.mat.br/static/img/screenshot.png"/>
-    <style>
 
-    </style>
-    <script src="/static/js/Autolinker.min.js"></script>
-    <script src="/static/js/jquery.sparkline.min.js"></script>
-    <script src="/static/js/highstock.js"></script>
-    <script src="/static/js/modules/exporting.js"></script>
-    <script src="/static/js/infodengue.js"></script>
+    <meta property="og:image"
+          content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+    <meta property="og:image:secure_url"
+          content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+    <script src="/static/js/Autolinker.min.js" type="text/javascript"></script>
+    <script src="/static/js/jquery.sparkline.min.js"
+            type="text/javascript"></script>
+    <script src="/static/js/highstock.js"
+            type="text/javascript"></script>
+    <script src="/static/js/modules/exporting.js"
+            type="text/javascript"></script>
+    <script src="/static/js/infodengue.js"
+            type="text/javascript"></script>
 
 {% endblock %}
 {% block title %}{{state}}{% endblock %}
 
 {% block content %}
+
 <div class="container-fluid">
     <!-- chart-plot:begin -->
     <div class="row">
@@ -30,17 +35,9 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="chart-wrapper">
-                      <div class="chart-title content-inline">
-                          <h2>Tipo Doença</h2>
-                      </div>
                       <div class="chart-stage">
                           {% disease_chart %}
                       </div>
-                      <!--
-                      <div class="chart-notes">
-                        This is a sample text region to describe this chart.
-                      </div>
-                      -->
                     </div>
                 </div>
             </div>
@@ -48,17 +45,9 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="chart-wrapper">
-                      <div class="chart-title content-inline">
-                          <h2>Mapa</h2>
-                      </div>
                       <div class="chart-stage">
                           {% map_chart %}
                       </div>
-                      <!--
-                      <div class="chart-notes">
-                        This is a sample text region to describe this chart.
-                      </div>
-                      -->
                     </div>
                 </div>
             </div>
@@ -69,18 +58,13 @@
                 <div class="col-sm-12">
                     <div class="chart-wrapper">
                       <div class="chart-title content-inline">
-                          <h2>X</h2> casos selecionados de
-                          <h2>Total</h2>
+                          <h2>1</h2> casos selecionados de
+                          <h2>2</h2>
                       </div>
                       <div class="chart-stage">
                           Filtro 1, Filtro 2, Filtro 3
-                          <a href="">Limpar filtro</a>
+                          <a href="/alerta/{{state_abv}}/">Limpar filtro</a>
                       </div>
-                      <!--
-                      <div class="chart-notes">
-                        This is a sample text region to describe this chart.
-                      </div>
-                      -->
                     </div>
                 </div>
             </div>
@@ -88,17 +72,9 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="chart-wrapper">
-                      <div class="chart-title content-inline">
-                          <h2>Data do diagnóstico</h2>
-                      </div>
                       <div class="chart-stage">
                           {% date_chart %}
                       </div>
-                      <!--
-                      <div class="chart-notes">
-                        This is a sample text region to describe this chart.
-                      </div>
-                      -->
                     </div>
                 </div>
             </div>
@@ -106,17 +82,9 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="chart-wrapper">
-                      <div class="chart-title content-inline">
-                          <h2>Idade</h2>
-                      </div>
                       <div class="chart-stage">
                           {% age_chart %}
                       </div>
-                      <!--
-                      <div class="chart-notes">
-                        This is a sample text region to describe this chart.
-                      </div>
-                      -->
                     </div>
                 </div>
             </div>
@@ -124,25 +92,13 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="chart-wrapper">
-                      <div class="chart-title content-inline">
-                          <h2>G&ecirc;nero</h2>
-                      </div>
                       <div class="chart-stage">
                           {% gender_chart %}
                       </div>
-                      <!--
-                      <div class="chart-notes">
-                        This is a sample text region to describe this chart.
-                      </div>
-                      -->
                     </div>
                 </div>
             </div>
-
         </div>
-<script>
-
-</script>
     </div>
 </div>
 {% endblock %}

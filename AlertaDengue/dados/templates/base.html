@@ -3,8 +3,8 @@
 {% load bootstrap3 %}
 {% load i18n %}
 
-{% block bootstrap3_content %}
-<style>
+{% block header_extra_base%}
+<style type="text/css">
     .tt-hint {
         font-size: 18px;
         line-height: 1.33;
@@ -20,7 +20,9 @@
     }
 
 </style>
+{% endblock %}
 
+{% block bootstrap3_content %}
 <!-- Wrap all page content here -->
 <div id="wrap">
     <div class="view">
@@ -31,16 +33,18 @@
                     <div class="media">
                         <a class="pull-left" href="/">
                             <img class="media-object"
-                                 src="/static/img/info-dengue-logo-multicidades.png">
+                                 src="/static/img/info-dengue-logo-multicidades.png"
+                                 alt="INFO-DENGUE">
                         </a>
                         <a class="pull-right"
                            href="http://www.procc.fiocruz.br">
                             <img class="media-object"
-                                 src="/static/img/fiocruz.gif" height="83px">
+                                 src="/static/img/fiocruz.gif" height="83px"
+                                 alt="FIOCRUZ">
                         </a>
                         <a class="pull-right" href="http://emap.fgv.br">
                             <img class="media-object" src="/static/img/emap.jpg"
-                                 height="83px">
+                                 height="83px" alt="EMAP">
                         </a>
 
                     </div>
