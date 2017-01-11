@@ -2,7 +2,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic.base import TemplateView, View
 from django.contrib import messages
-from django.contrib.gis.geos import Point
 from django.http import HttpResponse, StreamingHttpResponse
 from dados import models as M
 import random

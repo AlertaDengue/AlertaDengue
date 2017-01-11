@@ -60,6 +60,6 @@ def is_valid_dbf(dbf_file, notification_year):
         for field in expected_fields:
             if field not in dbf.field_names:
                 raise ValidationError({"filename": _("Este arquivo não contém {}, "
-                    "que é esperado em um arquivo válido do SINAM.".format(field))})
+                    "que é esperado em um arquivo válido do SINAN.".format(field))})
 
         return True
