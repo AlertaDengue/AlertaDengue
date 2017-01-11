@@ -5,3 +5,11 @@ local_settings.py
 .idea/*
 settings.ini
 *.sw[po]
+/bin
+/include
+/lib
+/AlertaDengue/geodjango.db
+pip-selfcheck.json
+/shapely
+/share
+.ipynb_checkpoints
