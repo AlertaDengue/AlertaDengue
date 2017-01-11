@@ -13,3 +13,4 @@ pip-selfcheck.json
 /shapely
 /share
 .ipynb_checkpoints
+geodjango.db
