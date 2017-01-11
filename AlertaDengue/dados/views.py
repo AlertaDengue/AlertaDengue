@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from django.views.generic.base import TemplateView, View
 from django.contrib import messages
 from django.conf import settings
-from django.http import HttpResponse, StreamingHttpResponse
+from django.http import HttpResponse
 from time import mktime
 from collections import defaultdict
 
