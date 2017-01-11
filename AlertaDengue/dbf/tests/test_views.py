@@ -7,7 +7,8 @@ from datetime import date
 from io import StringIO
 import os
 
-from dbf.models import DBF
+from dbf.models import DBF, DBFChunkedUpload
+from dbf.forms import DBFForm
 
 __all__ = ["DBFUploadViewTest"]
 
@@ -37,7 +38,7 @@ class DBFUploadViewTest(TestCase):
         response = self.client.get(reverse('dbf:upload'))
         self.assertEqual(response.status_code, 200)
         self.assertIn('form', response.context)
-        self.assertEqual(response.context['form'].Meta.model, DBF)
+        self.assertIsInstance(response.context['form'], DBFForm)
 
     def test_context_has_last_uploaded_files(self):
         self.client.login(username="user", password="user")
@@ -68,10 +69,18 @@ class DBFUploadViewTest(TestCase):
     def test_redirects_to_success_url_when_form_is_valid(self):
         self.client.login(username="user", password="user")
         with open(os.path.join(TEST_DATA_DIR, "simple.dbf"), "rb") as fp:
+            chunked_upload = DBFChunkedUpload.objects.create(
+                id=1,
+                file=File(fp, name='cool_file'),
+                filename="cool_file",
+                user=User.objects.get(username="user"),
+            )
+            fp.seek(0)
             data = {
                 "file": fp,
                 "export_date": date.today(),
-                "notification_year": date.today().year
+                "notification_year": date.today().year,
+                "chunked_upload_id": 1,
             }
             response = self.client.post(reverse('dbf:upload'), data)
         self.assertEqual(response.status_code, 302)
@@ -80,13 +89,24 @@ class DBFUploadViewTest(TestCase):
     def test_cannot_create_file_for_other_user(self):
         self.client.login(username="user", password="user")
         self.assertEqual(len(DBF.objects.all()), 0)
+
+        regular_user = User.objects.get(username="user")
+        admin = User.objects.get(username="admin")
+
         with open(os.path.join(TEST_DATA_DIR, "simple.dbf"), "rb") as fp:
-            admin = User.objects.get(username="admin")
+            chunked_upload = DBFChunkedUpload.objects.create(
+                id=1,
+                file=File(fp, name='cool_file'),
+                filename="cool_file",
+                user=regular_user,
+            )
+            fp.seek(0)
             data = {
                 "uploaded_by": admin.id,
                 "file": fp,
                 "export_date": date.today(),
-                "notification_year": date.today().year
+                "notification_year": date.today().year,
+                "chunked_upload_id": 1,
             }
             response = self.client.post(reverse('dbf:upload'), data)
         # The object was created ...
