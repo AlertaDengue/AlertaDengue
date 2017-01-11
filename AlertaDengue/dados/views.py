@@ -5,10 +5,10 @@ from dados import models as M
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView, View
 from django.contrib import messages
-from django.http import HttpResponse
+from django.conf import settings
+from django.http import HttpResponse, StreamingHttpResponse
 from time import mktime
 from collections import defaultdict
-from django.conf import settings
 
 import random
 import json

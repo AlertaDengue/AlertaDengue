@@ -4,6 +4,7 @@
 local_settings.py
 .idea/*
 settings.ini
+*.sw[po]
 /bin
 /include
 /lib

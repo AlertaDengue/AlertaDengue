@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block extra_head %}
+    <script src="/static/js/jquery-ui.min.js"></script>
+    <script>
+        $(document).ready( function() {
+            $("#id_export_date").datepicker({dateFormat: "yy-mm-dd"});
+            window.form_has_changed = false;
+	    var ask_confirmation = function() {
+	        return window.form_has_changed;
+	    };
+
+            window.addEventListener("beforeunload", function (e) {
+	        // from https://stackoverflow.com/questions/7317273/warn-user-before-leaving-web-page-with-unsaved-changes
+                if (!ask_confirmation()) {
+                    return undefined;
+                }
+
+                var confirmationMessage = 'Existem alterações no formulário. Se você sair agora '
+                                        + 'todas as alterações serão perdidas.';
+
+                (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+                return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+            });
+            $("#submit_button").click(function(e) {
+	        // If the user clicks submit, we should let the request through.
+	        // we need this because the 'beforeunload' event is triggered on a form POST
+	        window.form_has_changed = false;
+	    });
+        });
+    </script>
+    <style>
+        .ui-datepicker {
+            background-color: #FFF;
+            border: 1px solid gray;
+            border-radius: 10px;
+            padding: 10px;
+        }
+        .ui-datepicker-next {
+            float: right;
+        }
+        .ui-datepicker-title {
+            padding: 10px;
+            text-align: center;
+        }
+        .ui-datepicker-calendar th {
+            padding: 4px;
+        }
+    </style>
+
+    <!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+    <script src="/static/js/jquery.iframe-transport.js"></script>
+    <!-- The basic File Upload plugin -->
+    <script src="/static/js/jquery.fileupload.js"></script>
+    <!-- Calculate md5 -->
+    <script src="/static/js/spark-md5.js"></script>
+{% endblock %}
+
+{% block title %}Envio de dados atualizados do SINAN{% endblock %}
+
+{% block content %}
+    <div class="panel panel-default col-xs-6">
+        <div class="panel-body">
+          <p>{% trans "Envie aqui os dados atualizados do SINAN" %}</p>
+	  <form>
+	    <div class="form-group">
+              {% csrf_token %}
+              <input id="chunked_upload" type="file" name="the_file">
+	    </div>
+	    <div class="form-group">
+	      <label id="filename_display" style="display: none;">
+		<span></span>
+	      </label>
+	      <div class="progress" style="display: none;">
+		<div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+		  <span></span>
+		</div>
+	      </div>
+	    </div>
+	  </form>
+
+            <script type="text/javascript">
+              var md5 = "",
+                  csrf = $("input[name='csrfmiddlewaretoken']")[0].value,
+                  form_data = [{"name": "csrfmiddlewaretoken", "value": csrf}];
+	      function update_progress_bar(progress){
+		  $(".progress").show();
+	          $(".progress-bar").attr("style", "width: " + progress + "%");
+		  $(".progress-bar").attr("aria-value-now", progress );
+		  $(".progress-bar>span").text(progress + "%");
+	      }
+              function calculate_md5(file, chunk_size) {
+                var slice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
+                    chunks = chunks = Math.ceil(file.size / chunk_size),
+                    current_chunk = 0,
+                    spark = new SparkMD5.ArrayBuffer();
+                function onload(e) {
+                  spark.append(e.target.result);  // append chunk
+                  current_chunk++;
+                  if (current_chunk < chunks) {
+                    read_next_chunk();
+                  } else {
+                    md5 = spark.end();
+                  }
+                };
+                function read_next_chunk() {
+                  var reader = new FileReader();
+                  reader.onload = onload;
+                  var start = current_chunk * chunk_size,
+                      end = Math.min(start + chunk_size, file.size);
+                  reader.readAsArrayBuffer(slice.call(file, start, end));
+                };
+                read_next_chunk();
+              }
+              $("#chunked_upload").fileupload({
+                url: "{% url 'dbf:api_chunked_upload' %}",
+                dataType: "json",
+                maxChunkSize: 100000, // Chunks of 100 kB
+                formData: form_data,
+                add: function(e, data) { // Called before starting upload
+                  $("#messages").empty();
+                  // If this is the second file you're uploading we need to remove the
+                  // old upload_id and just keep the csrftoken (which is always first).
+                  form_data.splice(1);
+                  calculate_md5(data.files[0], 100000);  // Again, chunks of 100 kB
+                  data.submit();
+		  $("#filename_display").show();
+		  $("#filename_display>span").text("Enviando " + data.files[0].name + "...");
+		  // If there were errors on a previous form
+		  // submission, changing the file should clear them;
+		  $("form>.alert").hide();
+                  window.form_has_changed = true;
+                },
+                chunkdone: function (e, data) { // Called after uploading each chunk
+                  if (form_data.length < 2) {
+                    form_data.push(
+                      {"name": "upload_id", "value": data.result.upload_id}
+                    );
+                  }
+                  var progress = parseInt(data.loaded / data.total * 100.0, 10);
+                  update_progress_bar(progress);
+                },
+                done: function (e, data) { // Called when the file has completely uploaded
+                  $.ajax({
+                    type: "POST",
+                    url: "{% url 'dbf:api_chunked_upload_complete' %}",
+                    data: {
+                      csrfmiddlewaretoken: csrf,
+                      upload_id: data.result.upload_id,
+                      md5: md5
+                    },
+                    dataType: "json",
+                    success: function(data) {
+		      $("#id_chunked_upload_id").val(data.chunked_upload_id);
+		      $("#id_filename").val(data.filename);
+		      $("#submit_button").removeAttr("disabled");
+		      // Make sure we show a complete progress bar (for consistency in small files)
+		      update_progress_bar(100);
+		      $("#filename_display>span").html(data.filename + " pronto para ser enviado. <br />Preencha os dados abaixo e clique em 'Enviar' para importar os dados.");
+                    }
+                  });
+                },
+              });
+            </script>
+            <form method="POST" enctype="multipart/form-data" action="{% url "dbf:upload" %}">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                {% buttons %}
+                    <button type="submit" id="submit_button" class="btn btn-primary" disabled="disabled">
+                        {% trans "Enviar" %}
+                    </button>
+                {% endbuttons %}
+            </form>
+        </div>
+        <div>
+            <div class="panel-body">
+                <p>{% trans "Ultimos arquivos enviados:" %}</p>
+                <ul>
+                {% for upload in last_uploaded %}
+                    <li>{{ upload }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from decouple import config, Csv
+from dj_database_url import parse as db_url
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -23,6 +24,10 @@ SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
+
+ADMINS = (
+    config('ADMIN', cast=Csv())
+)
 
 ALLOWED_HOSTS = ["alerta.dengue.mat.br", "info.dengue.mat.br"]
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
@@ -36,11 +41,12 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',
     'django.contrib.humanize',
     'leaflet',
     'bootstrap3',
+    'chunked_upload',
     'dados',
+    'dbf.apps.DbfConfig'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -79,10 +85,7 @@ TEMPLATES = [
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
-        'NAME': os.path.join(BASE_DIR, 'geodjango.db'),
-    }
+    'default': config('DATABASE_URL', default='sqlite:///geodjango.db', cast=db_url)
 }
 
 MEMCACHED_HOST = config('MEMCACHED_HOST', '127.0.0.1')
@@ -160,6 +163,15 @@ DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, 'data'))
 STATIC_URL = '/static/'
 
 SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
+
+MEDIA_ROOT = config('MEDIA_ROOT', default='')
+
+EMAIL_BACKEND = config('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+
+if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
+    EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = config('EMAIL_CONFIG', default='example_host,25,username,password', cast=Csv())
+    EMAIL_PORT = int(EMAIL_PORT)
+    EMAIL_USE_TLS = True
 
 try:
     from AlertaDengue.local_settings import *  # noqa
