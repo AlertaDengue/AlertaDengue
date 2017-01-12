@@ -438,4 +438,3 @@ def tail_estimated_cases(geo_ids, n=12, conn=None):
         k: v.casos_est.values.tolist()
         for k, v in df_case_series.groupby(by='municipio_geocodigo')
     }
-

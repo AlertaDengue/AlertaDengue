@@ -83,7 +83,8 @@ class AlertaMainView(TemplateView):
             variation_to_current_week[st_name] = (
                 dbdata.count_cases_week_variation_by_uf(
                     st_name, se1, se2, conn
-            )).loc[0, 'casos']
+                )
+            ).loc[0, 'casos']
 
         context.update({
             # 'mundict': json.dumps(mundict),
