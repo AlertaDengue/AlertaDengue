@@ -26,9 +26,14 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-ADMINS = (
-    config('ADMIN', cast=Csv())
-)
+def read_admins(value):
+    # ADMIN in settings.ini should be in the format:
+    # admin 1, admin1@example.org; admin 2, admin2@example.org
+    if value == '':
+        return tuple()
+    return tuple(tuple(v.split(',')) for v in value.split(';'))
+
+ADMINS = config('ADMINS', cast=read_admins, default='')
 
 ALLOWED_HOSTS = ["alerta.dengue.mat.br", "info.dengue.mat.br"]
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
