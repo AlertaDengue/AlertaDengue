@@ -259,6 +259,41 @@ def get_city_alert(cidade, doenca='dengue'):
     )
 
 
+def get_cities_alert_by_state(state_name, doenca='dengue', conn=None):
+    """
+    Retorna vários indicadores de alerta a nível da cidade.
+    :param cidade: geocódigo
+    :param doenca: dengue|chik|zika
+    :return: tupla
+    """
+    alert = pd.read_sql_query('''
+    SELECT
+        hist_alert.id,
+        hist_alert.municipio_geocodigo,
+        municipio.nome,
+        hist_alert."data_iniSE",
+        (hist_alert.nivel-1) AS level_alert
+    FROM
+        "Municipio"."Historico_alerta" AS hist_alert
+        INNER JOIN (
+            SELECT geocodigo, MAX("data_iniSE") AS "data_iniSE"
+            FROM
+                "Municipio"."Historico_alerta" AS alerta
+                INNER JOIN "Dengue_global"."Municipio" AS municipio
+                    ON alerta.municipio_geocodigo = municipio.geocodigo
+            WHERE uf='{}'
+            GROUP BY geocodigo
+        ) AS recent_alert ON (
+            recent_alert.geocodigo=hist_alert.municipio_geocodigo
+            AND recent_alert."data_iniSE"=hist_alert."data_iniSE"
+        ) INNER JOIN "Dengue_global"."Municipio" AS municipio ON (
+            hist_alert.municipio_geocodigo = municipio.geocodigo
+        )
+    '''.format(state_name), conn, 'id', parse_dates=True)
+
+    return alert
+
+
 def calculate_digit(dig):
     """
     Calcula o digito verificador do geocódigo de município
@@ -375,4 +410,3 @@ def count_cases_week_variation_by_uf(uf, se1, se2, connection):
     ''' % (se2, se1, uf)
 
     return pd.read_sql(sql, connection).astype(int)
-

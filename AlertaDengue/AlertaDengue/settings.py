@@ -69,15 +69,16 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'APP_DIRS': True,
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'OPTIONS': {'context_processors': [
-            "django.contrib.auth.context_processors.auth",
-            "django.template.context_processors.debug",
-            "django.template.context_processors.i18n",
-            "django.template.context_processors.media",
-            "django.template.context_processors.static",
-            "django.template.context_processors.tz",
-            "django.contrib.messages.context_processors.messages"],
-                    }
+        'OPTIONS': {
+            'context_processors': [
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.debug",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
+                "django.contrib.messages.context_processors.messages"],
+        }
     },
 ]
 
@@ -85,7 +86,8 @@ TEMPLATES = [
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
 DATABASES = {
-    'default': config('DATABASE_URL', default='sqlite:///geodjango.db', cast=db_url)
+    'default': config('DATABASE_URL', default='sqlite:///geodjango.db',
+                      cast=db_url)
 }
 
 MEMCACHED_HOST = config('MEMCACHED_HOST', '127.0.0.1')
@@ -162,14 +164,15 @@ DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, 'data'))
 
 STATIC_URL = '/static/'
 
-SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
-
 MEDIA_ROOT = config('MEDIA_ROOT', default='')
 
-EMAIL_BACKEND = config('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_BACKEND = config('EMAIL_BACKEND',
+                       'django.core.mail.backends.smtp.EmailBackend')
 
 if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
-    EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = config('EMAIL_CONFIG', default='example_host,25,username,password', cast=Csv())
+    EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = config(
+        'EMAIL_CONFIG', default='example_host,25,username,password',
+        cast=Csv())
     EMAIL_PORT = int(EMAIL_PORT)
     EMAIL_USE_TLS = True
 
