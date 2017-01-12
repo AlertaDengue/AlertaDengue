@@ -29,8 +29,8 @@ with open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')) as f:
 class AlertaMainView(TemplateView):
     template_name = 'main.html'
 
-    _ufs = ['Rio de Janeiro', 'Paraná', 'Espírito Santo']
-    _sigla = {
+    _state_names = ['Rio de Janeiro', 'Paraná', 'Espírito Santo']
+    _state_initials = {
         'Rio de Janeiro': 'RJ',
         'Paraná': 'PR',
         'Espírito Santo': 'ES'
@@ -54,10 +54,10 @@ class AlertaMainView(TemplateView):
         case_series = {}
         total = np.zeros(52, dtype=int)
 
-        conexao = dbdata.create_connection()
+        conn = dbdata.create_connection()
 
         results = dbdata.load_serie_cities(
-            geocodigos, 'dengue', conexao
+            geocodigos, 'dengue', conn
         )
 
         # series
@@ -70,19 +70,20 @@ class AlertaMainView(TemplateView):
         estimated_cases_next_week = {}
         variation_to_current_week = {}
 
-        for uf in self._ufs:
+        for st_name in self._state_names:
             # Municípios participantes
-            count_cities[uf] = dbdata.count_cities_by_uf(uf, conexao)
+            count_cities[st_name] = dbdata.count_cities_by_uf(st_name, conn)
             # Total de casos notificado e estimados na semana
-            current_week[uf] = dbdata.count_cases_by_uf(
-                uf, se2, conexao
+            current_week[st_name] = dbdata.count_cases_by_uf(
+                st_name, se2, conn
             ).iloc[0].to_dict()
             # Previsão de casos para as próximas semanas
-            estimated_cases_next_week[uf] = current_week[uf]['casos']
+            estimated_cases_next_week[st_name] = current_week[st_name]['casos']
             # Variação em relação à semana anterior
-            variation_to_current_week[uf] = (
-                dbdata.count_cases_week_variation_by_uf(uf, se1, se2, conexao)
-            ).loc[0, 'casos']
+            variation_to_current_week[st_name] = (
+                dbdata.count_cases_week_variation_by_uf(
+                    st_name, se1, se2, conn
+            )).loc[0, 'casos']
 
         context.update({
             # 'mundict': json.dumps(mundict),
@@ -92,12 +93,12 @@ class AlertaMainView(TemplateView):
             # 'alerta': json.dumps(alerta),
             'case_series': json.dumps(case_series),
             'total': json.dumps(total.tolist()),
-            'states': self._ufs,
+            'states': self._state_names,
             'count_cities': count_cities,
             'current_week': current_week,
             'estimated_cases_next_week': estimated_cases_next_week,
             'variation_to_current_week': variation_to_current_week,
-            'sigla': self._sigla
+            'state_initials': self._state_initials
         })
         return context
 
@@ -467,7 +468,7 @@ class AlertaStateView(TemplateView):
         'ES': [-20.015, -40.803]}
     _map_zoom = {
         'RJ': 6,
-        'PR': 5,
+        'PR': 6,
         'ES': 6}
 
     def get_context_data(self, **kwargs):
@@ -480,10 +481,14 @@ class AlertaStateView(TemplateView):
         )
 
         mun_dict = dict(cities_alert[['municipio_geocodigo', 'nome']].values)
+
         geo_ids = list(mun_dict.keys())
+
         alerts = dict(
             cities_alert[['municipio_geocodigo', 'level_alert']].values
         )
+
+        case_series = dbdata.tail_estimated_cases(geo_ids, 12, conn)
 
         context.update({
             'state_abv': context['state'],
@@ -492,6 +497,7 @@ class AlertaStateView(TemplateView):
             'map_zoom': self._map_zoom[context['state']],
             'mun_dict': mun_dict,
             'geo_ids': geo_ids,
-            'alerts_level': alerts
+            'alerts_level': alerts,
+            'case_series': case_series
         })
         return context

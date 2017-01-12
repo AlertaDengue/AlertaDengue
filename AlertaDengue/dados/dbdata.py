@@ -104,7 +104,7 @@ def get_series_by_UF(doenca='dengue'):
     return series
 
 
-def load_series(cidade, doenca='dengue', conexao=None):
+def load_series(cidade, doenca='dengue', conn=None):
     """
     Monta as séries do alerta para visualização no site
     :param cidade: geocodigo da cidade desejada
@@ -114,8 +114,8 @@ def load_series(cidade, doenca='dengue', conexao=None):
     cache_key = 'load_series-{}-{}'.format(cidade, doenca)
     result = cache.get(cache_key)
     if result is None:
-        if conexao is None:
-            conexao = create_engine(
+        if conn is None:
+            conn = create_engine(
                 "postgresql://{}:{}@{}/{}".format(
                     settings.PSQL_USER,
                     settings.PSQL_PASSWORD,
@@ -128,7 +128,7 @@ def load_series(cidade, doenca='dengue', conexao=None):
         dados_alerta = pd.read_sql_query((
             'select * from "Municipio"."Historico_alerta" ' +
             'where municipio_geocodigo={} ORDER BY "data_iniSE" ASC'
-        ).format(cidade), conexao, 'id', parse_dates=True)
+        ).format(cidade), conn, 'id', parse_dates=True)
 
         if len(dados_alerta) == 0:
             raise NameError((
@@ -410,3 +410,32 @@ def count_cases_week_variation_by_uf(uf, se1, se2, connection):
     ''' % (se2, se1, uf)
 
     return pd.read_sql(sql, connection).astype(int)
+
+
+def tail_estimated_cases(geo_ids, n=12, conn=None):
+    """
+
+    :param geo_ids: list of city geo ids
+    :param n: the last n estimated cases
+    :param conn: connection
+    :return: dict
+    """
+
+    sql_template = '''(
+    SELECT municipio_geocodigo, "data_iniSE", casos_est, id
+    FROM "Municipio"."Historico_alerta"
+    WHERE municipio_geocodigo={}
+    ORDER BY "data_iniSE" DESC
+    LIMIT ''' + str(n) + ')'
+
+    sql = ' UNION '.join([
+        sql_template.format(gid) for gid in geo_ids
+    ]) + ' ORDER BY municipio_geocodigo, "data_iniSE"'
+
+    df_case_series = pd.read_sql(sql, conn, 'id')
+
+    return {
+        k: v.casos_est.values.tolist()
+        for k, v in df_case_series.groupby(by='municipio_geocodigo')
+    }
+

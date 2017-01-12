@@ -24,6 +24,47 @@
     <script src="/static/js/infodengue.js"
             type="text/javascript"></script>
 
+    <style type="text/css">
+        #main {
+            width: 100%;
+            height: 400px;
+        }
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        .info h6 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+        .legend {
+            text-align: left;
+            line-height: 18px;
+            color: #555;
+        }
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+
+        #disease-chart {
+            height: 100px;
+        }
+        #age-chart,
+        #gender-chart,
+        #date-chart{
+            height: 133px;
+        }
+    </style>
+
 {% endblock %}
 {% block title %}{{state}}{% endblock %}
 
@@ -32,7 +73,7 @@
 <div class="container-fluid">
     <!-- chart-plot:begin -->
     <div class="row">
-        <div class="col-sm-4">
+        <div class="col-sm-5">
             <div class="row">
                 <div class="col-sm-12">
                     <div class="chart-wrapper">
@@ -54,7 +95,7 @@
             </div>
         </div>
 
-        <div class="col-sm-8">
+        <div class="col-sm-7">
             <div class="row">
                 <div class="col-sm-12">
                     <div class="chart-wrapper">
