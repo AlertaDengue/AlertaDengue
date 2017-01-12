@@ -59,7 +59,7 @@ def get_city_info(geocodigo):
     cur.execute(
         '''
         select geocodigo, nome, populacao, uf
-        from "Dengue_global"."Municipio" where geocodigo=%s'
+        from "Dengue_global"."Municipio" where geocodigo=%s
         ''', (geocodigo,)
     )
     datum = cur.fetchone()

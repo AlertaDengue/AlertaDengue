@@ -84,7 +84,7 @@
 
         <!-- chart-states:begin -->
         <div class="row card">
-            {% for uf in states %}
+            {% for state_name in states %}
             <div class="col-sm-4">
                 <div class="chart-wrapper">
                     <div class="chart-title">
@@ -96,7 +96,7 @@
                                 Municípios participantes:
                             </div>
                             <div class="col-sm-4 card-indicator-value">
-                                <h2>{{count_cities|lookup:uf}}</h2>
+                                <h2>{{count_cities|lookup:state_name}}</h2>
                             </div>
                         </div>
 
@@ -106,8 +106,8 @@
                             </div>
 
                             <div class="col-sm-4 card-indicator-value">
-                                <h2>{{current_week|lookup:uf|lookup:'casos'}} /
-                                    {{current_week|lookup:uf|lookup:'casos_est'}}
+                                <h2>{{current_week|lookup:state_name|lookup:'casos'}} /
+                                    {{current_week|lookup:state_name|lookup:'casos_est'}}
                                 </h2>
                             </div>
                         </div>
@@ -118,7 +118,7 @@
                             </div>
 
                             <div class="col-sm-4 card-indicator-value">
-                                <h2>{{estimated_cases_next_week|lookup:uf}}</h2>
+                                <h2>{{estimated_cases_next_week|lookup:state_name}}</h2>
                             </div>
                         </div>
 
@@ -128,13 +128,13 @@
                             </div>
 
                             <div class="col-sm-4 card-indicator-value">
-                                <h2>{{variation_to_current_week|lookup:uf}}</h2>
+                                <h2>{{variation_to_current_week|lookup:state_name}}</h2>
                             </div>
                         </div>
 
                         <div class="row vertical-align">
                             <div class="col-sm-12">
-                                <a href="/alerta/{{sigla|lookup:uf}}">
+                                <a href="/alerta/{{state_initials|lookup:state_name}}">
                                     Clique aqui para ver mais detalhes.
                                 </a>
                             </div>

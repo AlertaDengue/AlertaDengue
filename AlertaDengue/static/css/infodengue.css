@@ -220,3 +220,7 @@ h1 {
 .content-inline * {
     display: inline!important;
 }
+
+#footer {
+    margin-top: 10px;
+}

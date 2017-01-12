@@ -1,37 +1,21 @@
-<div id="map"></div>
 {% load leaflet_tags %}
+{% load lookup %}
 
 {% leaflet_map "main" callback="main_map_init" %}
 
 <script type="text/javascript">
-    var mun_dict = {{ mun_dict|safe }};
-    var alerta = {{ alerts_level|safe }};
-    var recomendacoes;
-    var global_bounds = L.latLngBounds(L.latLng(-22.907500, -43.431500), L.latLng(-22.907000, -43.431000));
-    var municipios = L.featureGroup();
-    var geocodigos = {{ geo_ids }};
-    $('.totalsparkline').sparkline('html', {
-        type: 'bar',
-        width: "auto",
-        heigth: "auto",
-        barWidth: "15px",
-        barColor: "White",
-        tooltipSuffix: " casos"
-    });
     function isInArray(el, array) {
         return (array.indexOf(el) >= 0) ? true : false;
     }
-    function bestFitZoom(map) {
-        // declaring the group variable
-        var group = new L.featureGroup;
-        // map._layers gives all the layers of the map including main container
-        // so looping in all those layers filtering those having feature
-        $.each(map._layers, function (ml) {
-            group.addLayer(this)
-        })
-       map.fitBounds(group.getBounds());
-    }
-    ;
+
+    var mun_dict = {{ mun_dict|safe }};
+    var alerta = {{ alerts_level|safe }};
+    var case_series = {{ case_series|safe }};
+    var recomendacoes;
+
+    var municipios = L.featureGroup();
+    var geo_ids = {{ geo_ids }};
+
     var features = L.layerGroup();
     var info = L.control();
     var legend = L.control({position: 'bottomright'});
@@ -41,6 +25,16 @@
         {name: 'Transmissão', color: '#E45205'},
         {name: 'Epidemia', color: '#FF0205'},
     ];
+
+    $('.totalsparkline').sparkline('html', {
+        type: 'bar',
+        width: "auto",
+        heigth: "auto",
+        barWidth: "15px",
+        barColor: "White",
+        tooltipSuffix: " casos"
+    });
+
     function style(feature) {
         var i = +feature.properties.alerta || 0;
         return {
@@ -52,6 +46,7 @@
             fillColor: alertLevels[i].color
         };
     }
+
     function highlightFeature(e) {
         var layer = e.target;
         layer.setStyle({
@@ -66,10 +61,12 @@
         info.update(layer.feature.properties);
         layer.bringToBack()
     }
+
     function resetHighlight(e) {
         geojson.resetStyle(e.target);
         info.update();
     }
+
     function renderSparkline(e) {
         $('.inlinesparkline').sparkline('html', {
             type: 'bar',
@@ -79,46 +76,79 @@
             tooltipSuffix: " casos"
         });
     }
+
     function main_map_init(map, options) {
-        $(document).data('map', map)
+        $(document).data('map', map);
+
+        map.setView(
+            new L.latLng(
+                {{map_center|lookup:0|safe}}, {{map_center|lookup:1|safe}}
+            ), {{map_zoom}}
+        );
+
         //map._layersMaxZoom=13
         recomendacoes = {
-            0: "Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www.riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros para o mosquito!</a>",
-            1: 'Uma vez por semana, aplique os <a href="http://www.riocontradengue.com.br/Site/Conteudo/Checklist.aspx">“10 minutos Contra a dengue”!</a>',
-            2: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.',
-            3: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.'
+            0: "Hora de arrumar o quintal, cobrir caixas d'água, <a " +
+               "href='http://www.riocontradengue.rj.gov.br/Site/Conteudo" +
+               "/Eliminar.aspx'>Não deixe criadouros para o mosquito!</a>",
+            1: 'Uma vez por semana, aplique os <a href="http://www.' +
+               'riocontradengue.com.br/Site/Conteudo/Checklist.aspx">' +
+               '“10 minutos Contra a dengue”!</a>',
+            2: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site' +
+               '/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!' +
+               '</a> Procure um médico caso suspeite de dengue.',
+            3: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site' +
+               '/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!' +
+               '</a> Procure um médico caso suspeite de dengue.'
         };
+
         // control that shows state info on hover
         info.onAdd = function (map) {
             this._div = L.DomUtil.create('div', 'info');
             this.update();
             return this._div;
         };
+
         info.update = function (props) {
-            this._div.innerHTML = '<h4>Número de casos estimados na semana:</h4>' + (props ?
-                    '<b>'+ props.nome + ':' + props.casos + '</b><br />' : 'Passe o mouse sobre o mapa');
+            this._div.innerHTML = '' +
+                '<h6>Número de casos estimados na semana:</h6>' +
+                (props ?
+                 '<b>'+ props.nome + ':' + props.casos + '</b><br />' :
+                 'Passe o mouse sobre o mapa');
         };
+
         info.addTo(map);
+
         legend.onAdd = function () {
             var div = L.DomUtil.create('div', 'info legend'),
                     labels = alertLevels.map(function (alertLevel) {
-                        return '<i style="background:' + alertLevel.color + '"></i> ' + alertLevel.name;
+                        return '<i style="background:' + alertLevel.color +
+                            '"></i> ' + alertLevel.name;
                     }).reverse();
             labels.push('O: Unidades de Saúde');
             div.innerHTML = labels.join('<br>');
             return div;
         };
+
         legend.addTo(map);
+
         function fill_details(feature, layer){
-            codigo = parseInt(feature.properties.geocodigo);
-            feature.properties.alerta = alerta[codigo];
-            feature.properties.series = series_casos[codigo];
-            feature.properties.casos = series_casos[codigo][series_casos[codigo].length -1];
-            layer.bindPopup("<b>" + mundict[codigo] + "</b>" + "<br>" +
-            "Casos estimados: " + feature.properties.casos + "<br>Últimas semanas: <span class='inlinesparkline'>" +
-            feature.properties.series + "</span><br>" +
-            "<br>" +
-            "<a href=/alerta/"+codigo.toString()+"/><u>Mais detalhes</u></a>"
+            geo_id = parseInt(feature.properties.geocodigo);
+
+            feature.properties.alerta = alerta[geo_id];
+            feature.properties.series = case_series[geo_id];
+            feature.properties.casos = (
+                case_series[geo_id][case_series[geo_id].length -1]
+            );
+
+            layer.bindPopup(
+                "<b>" + mun_dict[geo_id] + "</b>" + "<br>" +
+                "Casos estimados: " + feature.properties.casos +
+                "<br>Últimas semanas: <span class='inlinesparkline'>" +
+                feature.properties.series + "</span><br>" +
+                "<br>" +
+                "<a href=/alerta/" + geo_id.toString() +
+                "/><u>Mais detalhes</u></a>"
             );
             layer.setStyle(style(feature))
             layer.on({
@@ -127,39 +157,33 @@
                 popupopen: renderSparkline
             });
         };
-        for (var i=0; i< geocodigos.length; i++){
-            var gc = geocodigos[i];
-            $.getJSON('/geojson/'+gc.toString()+'/', function(data){
-                geojson = L.geoJson(data, {style: style, onEachFeature: fill_details});
-                global_bounds.extend(geojson.getBounds())
+
+        for (var i=0; i < geo_ids.length; i++){
+            var gc = geo_ids[i];
+            $.getJSON('/geojson/' + gc.toString() + '/', function(data){
+                geojson = L.geoJson(
+                    data, {style: style, onEachFeature: fill_details}
+                );
                 municipios.addLayer(geojson, true);
-                map.fitBounds(global_bounds);
             });
         };
+
         municipios.addTo(map);
-        map.fitBounds(global_bounds);
+
         var overlayMaps = {
             'Municípios': municipios
         };
+
         var controls = L.control.layers(null, overlayMaps, {collapsed: true});
-        //map.dragging.disable();
-        //map.scrollWheelZoom.disable();
+
+        controls.addTo(map);
+
         map.touchZoom.disable();
         map.doubleClickZoom.disable();
         map.boxZoom.disable();
         map.keyboard.disable();
-        //$(".leaflet-control-zoom").css("visibility", "hidden");
-        controls.addTo(map);
         map.touchZoom.disable();
         map.doubleClickZoom.disable();
-        $(window).on("resize", function () {
-            $("#main").height($(window).height() * 0.7);
-            map.invalidateSize();
-            try {
-                map.fitBounds(global_bounds);
-            }
-            catch (err) {
-            }
-        }).trigger("resize")
+
     }
 </script>
