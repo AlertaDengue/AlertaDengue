@@ -1,0 +1,44 @@
+<div id="gender-chart"
+     style="height:100px"></div>
+<script type="application/javascript">
+// Create the chart
+$(document).ready(function () {
+    $('#gender-chart').highcharts({
+        chart: {
+            type: 'column',
+            spacingBottom: 0,
+            spacingTop: 0,
+            spacingLeft: 0,
+            spacingRight: 0
+        },
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: 'Distribuição por gênero'
+        },
+        xAxis: {
+            categories: ['Jane', 'John', 'Joe', 'Jack', 'jim']
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Casos'
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        credits: {
+            enabled: false
+        },
+        tooltip: {
+            shared: true
+        },
+        series: [{
+            name: 'Miles',
+            data: [2.4, 3.8, 6.1, 5.3, 4.1]
+        }]
+    });
+});
+</script>

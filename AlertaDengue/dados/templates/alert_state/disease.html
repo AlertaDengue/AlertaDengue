@@ -1,0 +1,43 @@
+<div id="disease-chart"
+     style="height:100px"></div>
+<script type="application/javascript">
+$(document).ready(function () {
+    Highcharts.chart('disease-chart', {
+        chart: {
+            type: 'column',
+            spacingBottom: 0,
+            spacingTop: 0,
+            spacingLeft: 0,
+            spacingRight: 0
+        },
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: 'Distribuição por doença'
+        },
+        xAxis: {
+            categories: ['Jane', 'John', 'Joe', 'Jack', 'jim']
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Casos'
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        credits: {
+            enabled: false
+        },
+        tooltip: {
+            shared: true
+        },
+        series: [{
+            name: 'Apples',
+            data: [5, 3, 8, 2, 4]
+        }]
+    });
+});
+</script>

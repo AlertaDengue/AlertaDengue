@@ -5,10 +5,10 @@ from dados import models as M
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView, View
 from django.contrib import messages
+from django.conf import settings
 from django.http import HttpResponse
 from time import mktime
 from collections import defaultdict
-from django.conf import settings
 
 import random
 import json
@@ -29,11 +29,17 @@ with open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')) as f:
 class AlertaMainView(TemplateView):
     template_name = 'main.html'
 
+    _ufs = ['Rio de Janeiro', 'Paraná', 'Espírito Santo']
+    _sigla = {
+        'Rio de Janeiro': 'RJ',
+        'Paraná': 'PR',
+        'Espírito Santo': 'ES'
+    }
+
     def get_context_data(self, **kwargs):
         context = super(AlertaMainView, self).get_context_data(**kwargs)
         mundict = dict(dbdata.get_all_active_cities())
         municipios, geocodigos = list(mundict.values()), list(mundict.keys())
-        del municipios
 
         # today
         today = datetime.datetime.today()
@@ -45,15 +51,8 @@ class AlertaMainView(TemplateView):
         se1 = str(last_week.isocalendar()[0])
         se1 += str(last_week.isocalendar()[1]).rjust(2, '0')
 
-        # alerta = {}
         case_series = {}
         total = np.zeros(52, dtype=int)
-        ufs = ['Rio de Janeiro', 'Paraná', 'Espírito Santo']
-        sigla = {
-            'Rio de Janeiro': 'RJ',
-            'Paraná': 'PR',
-            'Espírito Santo': 'ES'
-        }
 
         conexao = dbdata.create_connection()
 
@@ -70,9 +69,10 @@ class AlertaMainView(TemplateView):
         current_week = {}
         estimated_cases_next_week = {}
         variation_to_current_week = {}
-        for uf in ufs:
+
+        for uf in self._ufs:
             # Municípios participantes
-            count_cities[uf] = dbdata.count_cities_by_state(uf, conexao)
+            count_cities[uf] = dbdata.count_cities_by_uf(uf, conexao)
             # Total de casos notificado e estimados na semana
             current_week[uf] = dbdata.count_cases_by_uf(
                 uf, se2, conexao
@@ -81,9 +81,8 @@ class AlertaMainView(TemplateView):
             estimated_cases_next_week[uf] = current_week[uf]['casos']
             # Variação em relação à semana anterior
             variation_to_current_week[uf] = (
-                current_week[uf]['casos'] -
-                dbdata.count_cases_by_uf(uf, se1, conexao).loc[0, 'casos']
-            )
+                dbdata.count_cases_week_variation_by_uf(uf, se1, se2, conexao)
+            ).loc[0, 'casos']
 
         context.update({
             # 'mundict': json.dumps(mundict),
@@ -93,12 +92,12 @@ class AlertaMainView(TemplateView):
             # 'alerta': json.dumps(alerta),
             'case_series': json.dumps(case_series),
             'total': json.dumps(total.tolist()),
-            'states': ufs,
+            'states': self._ufs,
             'count_cities': count_cities,
             'current_week': current_week,
             'estimated_cases_next_week': estimated_cases_next_week,
             'variation_to_current_week': variation_to_current_week,
-            'sigla': sigla
+            'sigla': self._sigla
         })
         return context
 
@@ -154,8 +153,8 @@ class AlertaPageView(TemplateView):
             'nome': "Rio de Janeiro",
             'populacao': city_info['populacao'],
             'incidencia': (
-                              total_observed_series[-1] / city_info['populacao']
-                          ) * 100000,  # casos/100000
+                total_observed_series[-1] / city_info['populacao']
+            ) * 100000,  # casos/100000
             'casos_por_ap': json.dumps(casos_ap),
             'alerta': alerta,
             'novos_casos': sum(casos_ap.values()),
@@ -172,7 +171,8 @@ class AlertaPageView(TemplateView):
             'look_back': len(total_series),
             'total_series': ', '.join(map(str, total_series)),
             'total_observed': total_observed_series[-1],
-            'total_observed_series': ', '.join(map(str, total_observed_series)),
+            'total_observed_series': ', '.join(
+                map(str, total_observed_series)),
         })
         return context
 
@@ -225,7 +225,8 @@ class AlertaPageViewMunicipio(TemplateView):
             'look_back': len(total_series),
             'total_series': ', '.join(map(str, total_series)),
             'total_observed': total_observed_series[-1],
-            'total_observed_series': ', '.join(map(str, total_observed_series)),
+            'total_observed_series': ', '.join(
+                map(str, total_observed_series)),
             'geocodigo': municipio_gc,
         })
         return context
@@ -248,7 +249,8 @@ class DetailsPageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(DetailsPageView, self).get_context_data(**kwargs)
         # messages.info(
-        #   self.request, 'O site do projeto Alerta Dengue está em construção.')
+        #   self.request,
+        #   'O site do projeto Alerta Dengue está em construção.')
         series = load_series()
         aps = list(series.keys())
         aps.sort()
@@ -312,7 +314,8 @@ class AboutPageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AboutPageView, self).get_context_data(**kwargs)
         # messages.info(
-        #   self.request, 'O site do projeto Alerta Dengue está em construção.')
+        #   self.request,
+        #   'O site do projeto Alerta Dengue está em construção.')
         return context
 
 
@@ -322,7 +325,8 @@ class ContactPageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ContactPageView, self).get_context_data(**kwargs)
         # messages.info(
-        #   self.request, 'O site do projeto Alerta Dengue está em construção.')
+        #   self.request,
+        #   'O site do projeto Alerta Dengue está em construção.')
         return context
 
 
@@ -332,7 +336,8 @@ class JoininPageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(JoininPageView, self).get_context_data(**kwargs)
         # messages.info(
-        #   self.request, 'O site do projeto Alerta Dengue está em construção.')
+        #   self.request,
+        #   'O site do projeto Alerta Dengue está em construção.')
         return context
 
 
@@ -407,7 +412,10 @@ def get_alert():
         ]
         alert[ap] = adf.nivel.iloc[-1]
         last_year = int(adf.casos.iloc[-52])
-        min_max_est[ap] = (adf.casos_estmin.iloc[-1], adf.casos_estmax.iloc[-1])
+        min_max_est[ap] = (
+            adf.casos_estmin.iloc[-1],
+            adf.casos_estmax.iloc[-1]
+        )
     return alert, current, case_series, last_year, obs_case_series, min_max_est
 
 
@@ -445,12 +453,45 @@ def load_series():
         ]
     return series
 
-#
-# def get_global_series(col, group):
-#     series = group[col].groups.items()
-#     ssum = None
-#     for g, ser in group[col].items():
-#         if ssum is None:
-#             ssum = np.array(ser)
-#         else:
-#             ssum += np.array(ser)
+
+class AlertaStateView(TemplateView):
+    template_name = 'state_cities.html'
+
+    _state_name = {
+        'RJ': 'Rio de Janeiro',
+        'PR': 'Paraná',
+        'ES': 'Espírito Santo'}
+    _map_center = {
+        'RJ': [-22.187, -43.176],
+        'PR': [-25.006, -51.833],
+        'ES': [-20.015, -40.803]}
+    _map_zoom = {
+        'RJ': 6,
+        'PR': 5,
+        'ES': 6}
+
+    def get_context_data(self, **kwargs):
+        context = super(AlertaStateView, self).get_context_data(**kwargs)
+
+        conn = dbdata.create_connection()
+
+        cities_alert = dbdata.get_cities_alert_by_state(
+            self._state_name[context['state']], conn=conn
+        )
+
+        mun_dict = dict(cities_alert[['municipio_geocodigo', 'nome']].values)
+        geo_ids = list(mun_dict.keys())
+        alerts = dict(
+            cities_alert[['municipio_geocodigo', 'level_alert']].values
+        )
+
+        context.update({
+            'state_abv': context['state'],
+            'state': self._state_name[context['state']],
+            'map_center': self._map_center[context['state']],
+            'map_zoom': self._map_zoom[context['state']],
+            'mun_dict': mun_dict,
+            'geo_ids': geo_ids,
+            'alerts_level': alerts
+        })
+        return context

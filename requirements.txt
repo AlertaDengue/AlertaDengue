@@ -1,4 +1,4 @@
-django==1.9
+django
 django-bootstrap3
 django-leaflet
 geojson
@@ -11,3 +11,7 @@ psycopg2
 sqlalchemy
 python3-memcached
 django-makemessages-xgettext
+mock
+dbfread
+dj-database-url==0.3.0
+django-chunked-upload

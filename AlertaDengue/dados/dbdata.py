@@ -184,6 +184,9 @@ def load_serie_cities(geocodigos, doenca='dengue', conexao=None):
             cidades.append(add_dv(int(ap[:-1])))
             _geocodigos[cidades[-1]] = cidade
 
+    if not cidades:
+        return result
+
     sql = ('''
     SELECT
         id, municipio_geocodigo, casos_est, casos,
@@ -205,7 +208,7 @@ def load_serie_cities(geocodigos, doenca='dengue', conexao=None):
 
     series = defaultdict(lambda: defaultdict(lambda: []))
     for k, v in _geocodigos.items():
-        ap = str(ap)
+        ap = str(v)
         mask = dados_alerta.municipio_geocodigo == k
         series[ap]['dia'] = dados_alerta[mask].data_iniSE.tolist()
         series[ap]['casos_est_min'] = np.nan_to_num(
@@ -224,9 +227,9 @@ def load_serie_cities(geocodigos, doenca='dengue', conexao=None):
         series[ap]['SE'] = (dados_alerta[mask].SE.astype(int)).tolist()
         series[ap]['prt1'] = dados_alerta[mask].p_rt1.astype(float).tolist()
         series[ap] = dict(series[ap])
-    result = dict(series)
 
-    cache.set(cache_key, result, settings.QUERY_CACHE_TIMEOUT)
+        cache_key = 'load_series-{}-{}'.format(ap, doenca)
+        cache.set(cache_key, {ap: series[ap]}, settings.QUERY_CACHE_TIMEOUT)
 
     return series
 
@@ -254,6 +257,41 @@ def get_city_alert(cidade, doenca='dengue'):
         alert, SE, case_series, last_year,
         obs_case_series, min_max_est, dia, prt1
     )
+
+
+def get_cities_alert_by_state(state_name, doenca='dengue', conn=None):
+    """
+    Retorna vários indicadores de alerta a nível da cidade.
+    :param cidade: geocódigo
+    :param doenca: dengue|chik|zika
+    :return: tupla
+    """
+    alert = pd.read_sql_query('''
+    SELECT
+        hist_alert.id,
+        hist_alert.municipio_geocodigo,
+        municipio.nome,
+        hist_alert."data_iniSE",
+        (hist_alert.nivel-1) AS level_alert
+    FROM
+        "Municipio"."Historico_alerta" AS hist_alert
+        INNER JOIN (
+            SELECT geocodigo, MAX("data_iniSE") AS "data_iniSE"
+            FROM
+                "Municipio"."Historico_alerta" AS alerta
+                INNER JOIN "Dengue_global"."Municipio" AS municipio
+                    ON alerta.municipio_geocodigo = municipio.geocodigo
+            WHERE uf='{}'
+            GROUP BY geocodigo
+        ) AS recent_alert ON (
+            recent_alert.geocodigo=hist_alert.municipio_geocodigo
+            AND recent_alert."data_iniSE"=hist_alert."data_iniSE"
+        ) INNER JOIN "Dengue_global"."Municipio" AS municipio ON (
+            hist_alert.municipio_geocodigo = municipio.geocodigo
+        )
+    '''.format(state_name), conn, 'id', parse_dates=True)
+
+    return alert
 
 
 def calculate_digit(dig):
@@ -301,15 +339,14 @@ def create_connection():
             settings.PSQL_DB))
 
 
-def count_cities_by_state(uf, connection):
+def count_cities_by_uf(uf, connection):
     """
     Returna contagem de cidades participantes por estado
 
-    :param uf: nome do estado
+    :param uf: uf a ser consultada
     :param connection: sqlalchemy engine
     :return: dataframe
     """
-
     sql = '''
     SELECT COALESCE(COUNT(municipio_geocodigo), 0) AS count
     FROM (
@@ -320,27 +357,56 @@ def count_cities_by_state(uf, connection):
     WHERE uf='%s'
     ''' % uf
 
-    return int(pd.read_sql(sql, connection)['count'])
+    return pd.read_sql(sql, connection).astype(int).iloc[0]['count']
 
 
 def count_cases_by_uf(uf, se, connection):
     """
     Returna contagem de cidades participantes por estado
 
-    :param uf: nome do estado
+    :param uf: uf a ser consultada
     :param se: número do ano e semana (no ano), ex: 201503
     :param connection: sqlalchemy engine
     :return: dataframe
     """
+
     sql = '''
-    SELECT
-        COALESCE(SUM(casos), 0) AS casos,
-        COALESCE(SUM(casos_est), 0) AS casos_est
-    FROM "Municipio"."Historico_alerta" AS alerta
-    INNER JOIN "Dengue_global"."Municipio" AS municipio
-      ON alerta.municipio_geocodigo = municipio.geocodigo
-    WHERE uf='%s' AND "SE" = '%s'
-    ''' % (uf, se)
+        SELECT
+            COALESCE(SUM(casos), 0) AS casos,
+            COALESCE(SUM(casos_est), 0) AS casos_est
+        FROM "Municipio"."Historico_alerta" AS alerta
+        INNER JOIN "Dengue_global"."Municipio" AS municipio
+          ON alerta.municipio_geocodigo = municipio.geocodigo
+        WHERE uf='%s' AND "SE" = %s
+        ''' % (uf, se)
 
     return pd.read_sql(sql, connection).astype(int)
 
+
+def count_cases_week_variation_by_uf(uf, se1, se2, connection):
+    """
+    Returna contagem de cidades participantes por estado
+
+    :param uf: uf a ser consutado
+    :param se: número do ano e semana (no ano), ex: 201503
+    :param connection: sqlalchemy engine
+    :return: dataframe
+    """
+
+    sql = '''
+    SELECT
+        COALESCE(SUM(alerta.casos)-SUM(alerta_passado.casos), 0) AS casos,
+        COALESCE(SUM(alerta.casos_est)-SUM(alerta_passado.casos_est), 0)
+            AS casos_est
+    FROM "Municipio"."Historico_alerta" AS alerta
+    INNER JOIN "Municipio"."Historico_alerta" AS alerta_passado
+      ON (
+        alerta.municipio_geocodigo = alerta_passado.municipio_geocodigo
+        AND alerta."SE"=%s
+        AND alerta_passado."SE"=%s)
+    INNER JOIN "Dengue_global"."Municipio" AS municipio
+      ON alerta.municipio_geocodigo = municipio.geocodigo
+    WHERE uf ='%s'
+    ''' % (se2, se1, uf)
+
+    return pd.read_sql(sql, connection).astype(int)

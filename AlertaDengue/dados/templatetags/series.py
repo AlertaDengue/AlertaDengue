@@ -1,10 +1,16 @@
+from datetime import timedelta
 from django import template
+from time import mktime
+
 from dados.dbdata import load_series, get_series_by_UF
 
-register = template.Library()
-from time import mktime
-from datetime import timedelta
 import json
+
+register = template.Library()
+
+
+def int_or_none(x):
+    return None if x is None else int(x)
 
 
 @register.inclusion_tag("series_plot.html", takes_context=True)
@@ -13,7 +19,6 @@ def alerta_series(context):
     dados['dia'] = [
         int(mktime((d + timedelta(7)).timetuple()))
         for d in dados['dia']]
-    int_or_none = lambda x: None if x is None else int(x)
 
     # green alert
     ga = [
@@ -21,7 +26,7 @@ def alerta_series(context):
         for a, c in zip(dados['alerta'], dados['casos'])]
     ga = [
         int_or_none(dados['casos'][n])
-        if i is None and ga[ n - 1] is not None else int_or_none(i)
+        if i is None and ga[n - 1] is not None else int_or_none(i)
         for n, i in enumerate(ga)]
     # yellow alert
     ya = [
@@ -71,22 +76,23 @@ def total_series(context):
     casos_est = {}
 
     for uf in ufs:
+        series_uf = series[series.uf == uf]
         datas = [
             int(mktime(d.timetuple())) * 1000
-            for d in series[series.uf == uf].data[-52:]
+            for d in series_uf.data[-52:]
         ]
         casos[uf] = [
             list(t)
             for t in zip(
                 datas,
-                series[series.uf == uf].casos_s[-52:].astype('int').tolist()
+                series_uf.casos_s[-52:].astype('int').tolist()
             )
         ]
         casos_est[uf] = [
             list(t)
             for t in zip(
                 datas,
-                series[series.uf == uf].casos_est_s[-52:].astype('int').tolist()
+                series_uf.casos_est_s[-52:].astype('int').tolist()
             )
         ]
 

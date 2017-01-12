@@ -4,6 +4,7 @@
 local_settings.py
 .idea/*
 settings.ini
+*.sw[po]
 /bin
 /include
 /lib
@@ -11,3 +12,7 @@ settings.ini
 pip-selfcheck.json
 /shapely
 /share
+.ipynb_checkpoints
+geodjango.db
+*.dbf
+chunked_uploads
