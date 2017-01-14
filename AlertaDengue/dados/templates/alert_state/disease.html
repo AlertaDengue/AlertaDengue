@@ -1,7 +1,12 @@
-<div id="disease-chart"></div>
+<div id="disease-chart" style="height:200px"></div>
+
 <script type="application/javascript">
 $(document).ready(function () {
     Highcharts.chart('disease-chart', {
+        data: {
+            csv: `{{disease_dist}}`,
+        },
+
         chart: {
             type: 'column',
             spacingBottom: 0,
@@ -14,9 +19,6 @@ $(document).ready(function () {
         },
         subtitle: {
             text: 'Distribuição por doença'
-        },
-        xAxis: {
-            categories: ['Jane', 'John', 'Joe', 'Jack', 'jim']
         },
         yAxis: {
             min: 0,
@@ -33,10 +35,6 @@ $(document).ready(function () {
         tooltip: {
             shared: true
         },
-        series: [{
-            name: 'Apples',
-            data: [5, 3, 8, 2, 4]
-        }]
     });
 });
 </script>

@@ -4,20 +4,20 @@ $(document).ready(function () {
     // Create the chart
     Highcharts.chart('date-chart', {
         chart: {
-            type: 'column',
+            type: 'line',
             spacingBottom: 0,
             spacingTop: 0,
             spacingLeft: 0,
             spacingRight: 0
+        },
+        data: {
+            csv: `{{date_dist}}`
         },
         title: {
             text: ''
         },
         subtitle: {
             text: 'Distribuição por data'
-        },
-        xAxis: {
-            categories: ['Jane', 'John', 'Joe', 'Jack', 'jim']
         },
         yAxis: {
             min: 0,
@@ -33,11 +33,7 @@ $(document).ready(function () {
         },
         tooltip: {
             shared: true
-        },
-        series: [{
-            name: 'Miles',
-            data: [2.4, 3.8, 6.1, 5.3, 4.1]
-        }]
+        }
     });
 });
 

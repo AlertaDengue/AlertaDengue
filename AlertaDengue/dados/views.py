@@ -10,6 +10,7 @@ from django.http import HttpResponse
 from time import mktime
 from collections import defaultdict
 
+import pandas as pd
 import random
 import json
 import os
@@ -489,7 +490,9 @@ class AlertaStateView(TemplateView):
             cities_alert[['municipio_geocodigo', 'level_alert']].values
         )
 
-        case_series = dbdata.tail_estimated_cases(geo_ids, 12, conn)
+        filters_description = ', '.join([])
+        total_reg = 20
+        total_reg_filter = 10
 
         context.update({
             'state_abv': context['state'],
@@ -499,6 +502,59 @@ class AlertaStateView(TemplateView):
             'mun_dict': mun_dict,
             'geo_ids': geo_ids,
             'alerts_level': alerts,
-            'case_series': case_series
+            'case_series': dbdata.tail_estimated_cases(geo_ids, 12, conn),
+            'age_dist': self.get_age_dist(),
+            'disease_dist': self.get_disease_dist(conn),
+            'gender_dist': self.get_gender_dist(),
+            'date_dist': self.get_date_dist(),
+            'filters_description': filters_description,
+            'total_reg': total_reg,
+            'total_reg_filter': total_reg_filter
         })
         return context
+
+    def get_disease_dist(self, conn):
+        sql = '''
+        SELECT * FROM "Dengue_global"."CID10"
+        WHERE codigo IN ({})
+        '''.format(','.join(["'{}'".format(k) for k in dbdata.CID10.values()]))
+
+        df_cid10 = pd.read_sql(sql, conn, 'codigo')
+
+        # disease_names = df_cid10['nome'].values.tolist()
+
+        disease_names = ['Dengue', 'Chicungunha']
+
+        return 'Categories' + pd.DataFrame({
+            k: np.random.randint(1, 100, 1) for k in
+            disease_names
+        }).T.to_csv()
+
+    def get_age_dist(self):
+        ages_range = [
+            '0-4', '5-9', '10-19', '20-29',
+            '30-39', '40-49', '50-59', '60+'
+        ]
+
+        return 'Categories' + pd.DataFrame({
+            age: np.random.randint(1, 100, 1) for age in
+            ages_range
+        }).T.to_csv()
+
+    def get_gender_dist(self):
+        gender_range = ['female', 'male']
+
+        return 'Categories' + pd.DataFrame({
+            gender: np.random.randint(1, 100, 1) for
+            gender in gender_range
+        }).T.to_csv()
+
+    def get_date_dist(self):
+        date_range = pd.date_range('1/1/2016', periods=12, freq='w')
+
+        df_date = pd.DataFrame({
+            date: np.random.randint(1, 100, 1) for date
+            in date_range
+        }).T
+
+        return 'Categories' + df_date.rename(columns={0: 'cases'}).to_csv()
