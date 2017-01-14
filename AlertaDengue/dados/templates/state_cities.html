@@ -17,10 +17,15 @@
     <script src="/static/js/Autolinker.min.js" type="text/javascript"></script>
     <script src="/static/js/jquery.sparkline.min.js"
             type="text/javascript"></script>
+    <!--
     <script src="/static/js/highstock.js"
             type="text/javascript"></script>
     <script src="/static/js/modules/exporting.js"
             type="text/javascript"></script>
+    -->
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/modules/data.js"></script>
+
     <script src="/static/js/infodengue.js"
             type="text/javascript"></script>
 
@@ -100,12 +105,16 @@
                 <div class="col-sm-12">
                     <div class="chart-wrapper">
                       <div class="chart-title content-inline">
-                          <h2>1</h2> casos selecionados de
-                          <h2>2</h2>
+                          <h2>{{ total_reg_filter }}</h2> casos selecionados de
+                          <h2>{{ total_reg }}</h2>
                       </div>
                       <div class="chart-stage">
-                          Filtro 1, Filtro 2, Filtro 3
+                          {{ filters_description }}
+                          {% if filters %}
                           <a href="/alerta/{{state_abv}}/">Limpar filtro</a>
+                          {% else %}
+                          Nenhum filtro informado
+                          {% endif %}
                       </div>
                     </div>
                 </div>
