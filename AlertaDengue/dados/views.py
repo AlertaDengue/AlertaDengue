@@ -473,7 +473,25 @@ class AlertaStateView(TemplateView):
         'PR': 6,
         'ES': 6}
 
+    def _get(self, param, default=None):
+        """
+
+        :param param:
+        :param default:
+        :return:
+        """
+        return (
+            self.request.GET[param]
+            if param in self.request.GET else
+            default
+        )
+
     def get_context_data(self, **kwargs):
+        """
+
+        :param kwargs:
+        :return:
+        """
         context = super(AlertaStateView, self).get_context_data(**kwargs)
 
         conn = dbdata.create_connection()
@@ -490,7 +508,36 @@ class AlertaStateView(TemplateView):
             cities_alert[['municipio_geocodigo', 'level_alert']].values
         )
 
-        filters_description = ', '.join([])
+        initial_date = self._get('initial_date')
+        final_date = self._get('final_date')
+        disease = self._get('disease')
+        gender = self._get('gender')
+        age = self._get('age')
+
+        filters_list = []
+
+        if initial_date:
+            if final_date:
+                filters_list.append(
+                    'Período {} a {}'.format(initial_date, final_date)
+                )
+            else:
+                filters_list.append(
+                    'Período a partir de {}'.format(initial_date)
+                )
+        elif final_date:
+            filters_list.append('Período até{}'.format(final_date))
+
+        if disease:
+            filters_list.append('{}'.format(disease))
+
+        if age:
+            filters_list.append('{} anos'.format(age))
+
+        if gender:
+            filters_list.append('{}'.format(gender))
+
+        filters_description = ', '.join(filters_list)
         total_reg = 20
         total_reg_filter = 10
 
@@ -502,6 +549,7 @@ class AlertaStateView(TemplateView):
             'mun_dict': mun_dict,
             'geo_ids': geo_ids,
             'alerts_level': alerts,
+            # estimated cases is used to show a chart of the last 12 events
             'case_series': dbdata.tail_estimated_cases(geo_ids, 12, conn),
             'age_dist': self.get_age_dist(),
             'disease_dist': self.get_disease_dist(conn),
@@ -509,7 +557,12 @@ class AlertaStateView(TemplateView):
             'date_dist': self.get_date_dist(),
             'filters_description': filters_description,
             'total_reg': total_reg,
-            'total_reg_filter': total_reg_filter
+            'total_reg_filter': total_reg_filter,
+            'initial_date': initial_date,
+            'final_date': final_date,
+            'disease': disease,
+            'gender': gender,
+            'age': age
         })
         return context
 
@@ -528,7 +581,7 @@ class AlertaStateView(TemplateView):
         return 'Categories' + pd.DataFrame({
             k: np.random.randint(1, 100, 1) for k in
             disease_names
-        }).T.to_csv()
+        }, index=['Casos']).T.to_csv()
 
     def get_age_dist(self):
         ages_range = [
@@ -539,15 +592,15 @@ class AlertaStateView(TemplateView):
         return 'Categories' + pd.DataFrame({
             age: np.random.randint(1, 100, 1) for age in
             ages_range
-        }).T.to_csv()
+        }, index=['Casos']).T.to_csv()
 
     def get_gender_dist(self):
-        gender_range = ['female', 'male']
+        gender_range = ['Mulher', 'Homem']
 
         return 'Categories' + pd.DataFrame({
             gender: np.random.randint(1, 100, 1) for
             gender in gender_range
-        }).T.to_csv()
+        }, index=['Casos']).T.to_csv()
 
     def get_date_dist(self):
         date_range = pd.date_range('1/1/2016', periods=12, freq='w')
@@ -555,6 +608,6 @@ class AlertaStateView(TemplateView):
         df_date = pd.DataFrame({
             date: np.random.randint(1, 100, 1) for date
             in date_range
-        }).T
+        }, index=['Casos']).T
 
         return 'Categories' + df_date.rename(columns={0: 'cases'}).to_csv()

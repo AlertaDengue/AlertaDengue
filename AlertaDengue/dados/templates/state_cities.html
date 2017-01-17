@@ -61,12 +61,16 @@
         }
 
         #disease-chart {
-            height: 100px;
+            height: 200px;
         }
+
+        #date-chart {
+            height: 175px;
+        }
+
         #age-chart,
-        #gender-chart,
-        #date-chart{
-            height: 133px;
+        #gender-chart{
+            height: 110px;
         }
     </style>
 
@@ -74,6 +78,19 @@
 {% block title %}{{state}}{% endblock %}
 
 {% block content %}
+
+<form id="formFilters">
+    <input type="hidden"
+           id="initial_date" name="initial_date" value="{{initial_date}}"/>
+    <input type="hidden"
+           id="final_date" name="final_date" value="{{final_date}}"/>
+    <input type="hidden"
+           id="disease" name="disease" value="{{disease}}"/>
+    <input type="hidden"
+           id="gender" name="gender" value="{{gender}}"/>
+    <input type="hidden"
+           id="age" name="age" value="{{age}}"/>
+</form>
 
 <div class="container-fluid">
     <!-- chart-plot:begin -->
@@ -109,12 +126,14 @@
                           <h2>{{ total_reg }}</h2>
                       </div>
                       <div class="chart-stage">
-                          {{ filters_description }}
-                          {% if filters %}
-                          <a href="/alerta/{{state_abv}}/">Limpar filtro</a>
-                          {% else %}
-                          Nenhum filtro informado
-                          {% endif %}
+                          <small>
+                              {{ filters_description }}
+                              {% if not filters_description == '' %}
+                              <a href="/alerta/{{state_abv}}/">Limpar filtro</a>
+                              {% else %}
+                              Nenhum filtro informado
+                              {% endif %}
+                          </small>
                       </div>
                     </div>
                 </div>

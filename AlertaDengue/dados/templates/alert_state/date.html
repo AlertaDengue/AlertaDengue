@@ -2,16 +2,31 @@
 <script type="application/javascript">
 $(document).ready(function () {
     // Create the chart
-    Highcharts.chart('date-chart', {
+    Highcharts.stockChart('date-chart', {
         chart: {
             type: 'line',
             spacingBottom: 0,
             spacingTop: 0,
             spacingLeft: 0,
-            spacingRight: 0
+            spacingRight: 0,
+
+            events: {
+                selection: function(event) {
+                    console.log(
+                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', event.xAxis[0].min),
+                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', event.xAxis[0].max)
+                    );
+                }
+            },
         },
         data: {
             csv: `{{date_dist}}`
+        },
+        rangeSelector: {
+            enabled: false
+        },
+        xAxis: {
+
         },
         title: {
             text: ''
