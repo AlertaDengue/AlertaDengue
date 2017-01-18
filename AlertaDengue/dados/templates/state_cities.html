@@ -142,6 +142,12 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="chart-wrapper">
+                      <div class="chart-title content-inline">
+                          <input type="button" id="filter_date"
+                                 value="Aplicar filtro"
+                                 onclick="sendPeriodSelected()"
+                          />
+                      </div>
                       <div class="chart-stage">
                           {% date_chart %}
                       </div>

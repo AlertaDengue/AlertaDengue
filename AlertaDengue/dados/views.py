@@ -554,15 +554,16 @@ class AlertaStateView(TemplateView):
             'age_dist': self.get_age_dist(),
             'disease_dist': self.get_disease_dist(conn),
             'gender_dist': self.get_gender_dist(),
-            'date_dist': self.get_date_dist(),
+            'date_dist':
+                self.get_date_dist(conn, self._state_name[context['state']]),
             'filters_description': filters_description,
             'total_reg': total_reg,
             'total_reg_filter': total_reg_filter,
-            'initial_date': initial_date,
-            'final_date': final_date,
-            'disease': disease,
-            'gender': gender,
-            'age': age
+            'initial_date': initial_date if initial_date else '',
+            'final_date': final_date if final_date else '',
+            'disease': disease if disease else '',
+            'gender': gender if gender else '',
+            'age': age if age else ''
         })
         return context
 
@@ -602,7 +603,8 @@ class AlertaStateView(TemplateView):
             gender in gender_range
         }, index=['Casos']).T.to_csv()
 
-    def get_date_dist(self):
+    def get_date_dist(self, conn, uf):
+        """
         date_range = pd.date_range('1/1/2016', periods=12, freq='w')
 
         df_date = pd.DataFrame({
@@ -611,3 +613,23 @@ class AlertaStateView(TemplateView):
         }, index=['Casos']).T
 
         return 'Categories' + df_date.rename(columns={0: 'cases'}).to_csv()
+        """
+
+        sql = '''
+        SELECT
+            "data_iniSE",
+            SUM(casos) AS Casos
+        FROM "Municipio"."Historico_alerta" AS alerta
+        INNER JOIN "Dengue_global"."Municipio" AS municipio
+            ON alerta.municipio_geocodigo = municipio.geocodigo
+        WHERE uf='{}'
+        GROUP BY "data_iniSE"
+        ORDER BY "data_iniSE"
+        '''.format(uf)
+
+        df_alert_period = pd.read_sql(sql, conn, index_col='data_iniSE')
+        df_alert_period.index.rename('Categories', inplace=True)
+
+        df_alert_period.to_csv('/tmp/data.csv')
+
+        return df_alert_period.to_csv()

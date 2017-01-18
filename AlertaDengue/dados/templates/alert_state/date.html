@@ -1,8 +1,10 @@
 <div id="date-chart" class="chart-default"></div>
 <script type="application/javascript">
+var date_chart;
+
 $(document).ready(function () {
     // Create the chart
-    Highcharts.stockChart('date-chart', {
+    date_chart = Highcharts.stockChart('date-chart', {
         chart: {
             type: 'line',
             spacingBottom: 0,
@@ -32,7 +34,7 @@ $(document).ready(function () {
             text: ''
         },
         subtitle: {
-            text: 'Distribuição por data'
+            text: 'Distribuição por data <input type="buttom" value="teste"/>'
         },
         yAxis: {
             min: 0,
@@ -50,6 +52,25 @@ $(document).ready(function () {
             shared: true
         }
     });
+
+    var start = $('#initial_date').val().replace(/-/g, '.');
+    var end = $('#final_date').val().replace(/-/g, '.');
+
+    if (start != '' && end != '') {
+        date_chart.xAxis[0].setExtremes(
+            Date.parse(start), Date.parse(end)
+        );
+    }
 });
+
+function sendPeriodSelected() {
+    var extremes = date_chart.xAxis[0].getExtremes(),
+        start = new Date(extremes.min),
+        end   = new Date(extremes.max);
+
+    $('#initial_date').val(Highcharts.dateFormat('%Y-%m-%d', start));
+    $('#final_date').val(Highcharts.dateFormat('%Y-%m-%d', end));
+    $('#formFilters').submit();
+}
 
 </script>
