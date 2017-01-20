@@ -61,19 +61,46 @@
         }
 
         #disease-chart {
-            height: 100px;
+            height: 200px;
         }
+
+        #date-chart {
+            height: 175px;
+        }
+
         #age-chart,
-        #gender-chart,
-        #date-chart{
-            height: 133px;
+        #gender-chart{
+            height: 110px;
         }
     </style>
+
+    <script type="text/javascript">
+        function removeFilter(fieldName1, fieldName2) {
+            $('#' + fieldName1).val('');
+            if (fieldName2 != undefined) {
+                $('#' + fieldName2).val('');
+            }
+            $('#formFilters').submit();
+        }
+    </script>
 
 {% endblock %}
 {% block title %}{{state}}{% endblock %}
 
 {% block content %}
+
+<form id="formFilters">
+    <input type="hidden"
+           id="initial_date" name="initial_date" value="{{initial_date}}"/>
+    <input type="hidden"
+           id="final_date" name="final_date" value="{{final_date}}"/>
+    <input type="hidden"
+           id="disease" name="disease" value="{{disease}}"/>
+    <input type="hidden"
+           id="gender" name="gender" value="{{gender}}"/>
+    <input type="hidden"
+           id="age" name="age" value="{{age}}"/>
+</form>
 
 <div class="container-fluid">
     <!-- chart-plot:begin -->
@@ -109,12 +136,14 @@
                           <h2>{{ total_reg }}</h2>
                       </div>
                       <div class="chart-stage">
-                          {{ filters_description }}
-                          {% if filters %}
-                          <a href="/alerta/{{state_abv}}/">Limpar filtro</a>
-                          {% else %}
-                          Nenhum filtro informado
-                          {% endif %}
+                          <small>
+                              {{ filters_description | safe}}
+                              {% if not filters_description == '' %}
+                              | <a href="/alerta/{{state_abv}}/">Limpar filtros</a>
+                              {% else %}
+                              Nenhum filtro informado
+                              {% endif %}
+                          </small>
                       </div>
                     </div>
                 </div>
@@ -123,6 +152,12 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="chart-wrapper">
+                      <div class="chart-title content-inline">
+                          <input type="button" id="filter_date"
+                                 value="Aplicar filtro"
+                                 onclick="sendPeriodSelected()"
+                          />
+                      </div>
                       <div class="chart-stage">
                           {% date_chart %}
                       </div>

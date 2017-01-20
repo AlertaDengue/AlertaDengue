@@ -1,10 +1,27 @@
-<div id="disease-chart" style="height:200px"></div>
+<div id="disease-chart" style="height:100px"></div>
 
 <script type="application/javascript">
 $(document).ready(function () {
     Highcharts.chart('disease-chart', {
         data: {
             csv: `{{disease_dist}}`,
+        },
+
+        plotOptions: {
+            series: {
+                cursor: 'pointer',
+                allowPointSelect: true,
+            },
+            column: {
+                point: {
+                    events: {
+                        click: function(e) {
+                            $('#disease').val(this.name);
+                            $('#formFilters').submit();
+                        }
+                    }
+                }
+            }
         },
 
         chart: {
@@ -34,7 +51,7 @@ $(document).ready(function () {
         },
         tooltip: {
             shared: true
-        },
+        }
     });
 });
 </script>

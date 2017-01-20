@@ -13,6 +13,24 @@ $(document).ready(function () {
         data: {
             csv: `{{gender_dist}}`
         },
+
+        plotOptions: {
+            series: {
+                cursor: 'pointer',
+                allowPointSelect: true,
+            },
+            column: {
+                point: {
+                    events: {
+                        click: function(e) {
+                            $('#gender').val(this.name);
+                            $('#formFilters').submit();
+                        }
+                    }
+                }
+            }
+        },
+
         title: {
             text: ''
         },
