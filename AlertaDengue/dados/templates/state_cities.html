@@ -74,6 +74,16 @@
         }
     </style>
 
+    <script type="text/javascript">
+        function removeFilter(fieldName1, fieldName2) {
+            $('#' + fieldName1).val('');
+            if (fieldName2 != undefined) {
+                $('#' + fieldName2).val('');
+            }
+            $('#formFilters').submit();
+        }
+    </script>
+
 {% endblock %}
 {% block title %}{{state}}{% endblock %}
 
@@ -127,9 +137,9 @@
                       </div>
                       <div class="chart-stage">
                           <small>
-                              {{ filters_description }}
+                              {{ filters_description | safe}}
                               {% if not filters_description == '' %}
-                              <a href="/alerta/{{state_abv}}/">Limpar filtro</a>
+                              | <a href="/alerta/{{state_abv}}/">Limpar filtros</a>
                               {% else %}
                               Nenhum filtro informado
                               {% endif %}
