@@ -541,6 +541,8 @@ class AlertaStateView(TemplateView):
         total_reg = 20
         total_reg_filter = 10
 
+        filter_args = dict(conn=conn, uf=self._state_name[context['state']])
+
         context.update({
             'state_abv': context['state'],
             'state': self._state_name[context['state']],
@@ -551,11 +553,10 @@ class AlertaStateView(TemplateView):
             'alerts_level': alerts,
             # estimated cases is used to show a chart of the last 12 events
             'case_series': dbdata.tail_estimated_cases(geo_ids, 12, conn),
-            'age_dist': self.get_age_dist(),
-            'disease_dist': self.get_disease_dist(conn),
-            'gender_dist': self.get_gender_dist(),
-            'date_dist':
-                self.get_date_dist(conn, self._state_name[context['state']]),
+            'age_dist': self.get_age_dist(**filter_args),
+            'disease_dist': self.get_disease_dist(**filter_args),
+            'gender_dist': self.get_gender_dist(**filter_args),
+            'date_dist': self.get_date_dist(**filter_args),
             'filters_description': filters_description,
             'total_reg': total_reg,
             'total_reg_filter': total_reg_filter,
@@ -567,41 +568,87 @@ class AlertaStateView(TemplateView):
         })
         return context
 
-    def get_disease_dist(self, conn):
+    def get_disease_dist(self, conn, uf):
+        cids = ["'{}'".format(k) for k in dbdata.CID10.values()]
+
         sql = '''
         SELECT * FROM "Dengue_global"."CID10"
         WHERE codigo IN ({})
-        '''.format(','.join(["'{}'".format(k) for k in dbdata.CID10.values()]))
+        '''.format(','.join(cids))
 
         df_cid10 = pd.read_sql(sql, conn, 'codigo')
 
-        # disease_names = df_cid10['nome'].values.tolist()
+        sql = '''
+        SELECT
+            COALESCE(cid10.nome, 'Não informado') AS nome,
+            count(id) AS casos
+        FROM
+            "Municipio"."Notificacao" AS notif
+            INNER JOIN "Dengue_global"."Municipio" AS municipio
+              ON notif.municipio_geocodigo = municipio.geocodigo
+            LEFT JOIN "Dengue_global"."CID10" AS cid10
+              ON notif.cid10_codigo=cid10.codigo
+        WHERE uf='{}' AND cid10.codigo IN ({})
+        GROUP BY cid10.nome;
+        '''.format(uf, ','.join(cids))
 
-        disease_names = ['Dengue', 'Chicungunha']
+        df_disease_dist = pd.read_sql(sql, conn)
 
-        return 'Categories' + pd.DataFrame({
-            k: np.random.randint(1, 100, 1) for k in
-            disease_names
-        }, index=['Casos']).T.to_csv()
+        dfs = [df_disease_dist]
 
-    def get_age_dist(self):
-        ages_range = [
-            '0-4', '5-9', '10-19', '20-29',
-            '30-39', '40-49', '50-59', '60+'
-        ]
+        for k in df_cid10.nome.values:
+            if not k in df_disease_dist.nome.values:
+                dfs.append(pd.DataFrame({'nome': [k], 'casos': [0]}))
 
-        return 'Categories' + pd.DataFrame({
-            age: np.random.randint(1, 100, 1) for age in
-            ages_range
-        }, index=['Casos']).T.to_csv()
+        return pd.concat(dfs).set_index('nome', drop=True).to_csv()
 
-    def get_gender_dist(self):
-        gender_range = ['Mulher', 'Homem']
+    def get_age_dist(self, conn, uf):
+        sql = '''
+        SELECT age, count(age) AS cases
+        FROM (
+            SELECT
+                CASE
+                WHEN nu_idade_n BETWEEN 4000 AND 4004 THEN '00-04 anos'
+                WHEN nu_idade_n BETWEEN 4005 AND 4009 THEN '05-09 anos'
+                WHEN nu_idade_n BETWEEN 4010 AND 4019 THEN '10-19 anos'
+                WHEN nu_idade_n BETWEEN 4020 AND 4029 THEN '20-29 anos'
+                WHEN nu_idade_n BETWEEN 4030 AND 4039 THEN '30-39 anos'
+                WHEN nu_idade_n BETWEEN 4040 AND 4049 THEN '40-49 anos'
+                WHEN nu_idade_n BETWEEN 4050 AND 4059 THEN '50-59 anos'
+                WHEN nu_idade_n >=4060 THEN '60+ anos'
+                ELSE 'Não informado'
+                END AS age
+            FROM
+                "Municipio"."Notificacao" AS notif
+                INNER JOIN "Dengue_global"."Municipio" AS municipio
+                  ON notif.municipio_geocodigo = municipio.geocodigo
+            WHERE uf='{}'
+        ) AS TB
+        GROUP BY age
+        ORDER BY age
+        '''.format(uf)
 
-        return 'Categories' + pd.DataFrame({
-            gender: np.random.randint(1, 100, 1) for
-            gender in gender_range
-        }, index=['Casos']).T.to_csv()
+        return pd.read_sql(sql, conn, 'age').to_csv()
+
+    def get_gender_dist(self, conn, uf):
+        sql = '''
+        SELECT
+            (CASE COALESCE(cs_sexo, 'Não informado')
+             WHEN 'M' THEN 'Homem'
+             WHEN 'F' THEN 'Mulher'
+             ELSE 'Não informado'
+             END
+            ) AS gender,
+            COUNT(id) AS casos
+        FROM
+            "Municipio"."Notificacao" AS notif
+            INNER JOIN "Dengue_global"."Municipio" AS municipio
+              ON notif.municipio_geocodigo = municipio.geocodigo
+        WHERE uf='{}'
+        GROUP BY cs_sexo;
+        '''.format(uf)
+
+        return pd.read_sql(sql, conn, 'gender').to_csv()
 
     def get_date_dist(self, conn, uf):
         """
