@@ -472,6 +472,18 @@ class AlertaStateView(TemplateView):
         'RJ': 6,
         'PR': 6,
         'ES': 6}
+    _age_field = '''
+    CASE
+    WHEN nu_idade_n <= 4004 THEN '00-04 anos'
+    WHEN nu_idade_n BETWEEN 4005 AND 4009 THEN '05-09 anos'
+    WHEN nu_idade_n BETWEEN 4010 AND 4019 THEN '10-19 anos'
+    WHEN nu_idade_n BETWEEN 4020 AND 4029 THEN '20-29 anos'
+    WHEN nu_idade_n BETWEEN 4030 AND 4039 THEN '30-39 anos'
+    WHEN nu_idade_n BETWEEN 4040 AND 4049 THEN '40-49 anos'
+    WHEN nu_idade_n BETWEEN 4050 AND 4059 THEN '50-59 anos'
+    WHEN nu_idade_n >=4060 THEN '60+ anos'
+    ELSE NULL
+    END AS age'''
 
     def _get(self, param, default=None):
         """
@@ -487,6 +499,16 @@ class AlertaStateView(TemplateView):
         )
 
         return result if result else default
+
+    def _process_filter(self, data_filter, exception_key):
+        """
+
+        :param data_filter:
+        :param exception_key:
+        :return:
+        """
+        _f = [v for k, v in data_filter if not k == exception_key]
+        return ' AND '.join(filter(lambda x: x, _f))
 
     def get_context_data(self, **kwargs):
         """
@@ -560,21 +582,25 @@ class AlertaStateView(TemplateView):
         if gender:
             filters_list.append('Gênero: {} {}'.format(gender, link_gender))
 
-        filters_description = ', '.join(filters_list)
-        total_reg = 20
-        total_reg_filter = 10
-
         uf = self._state_name[context['state']]
 
-        dist_filters = " uf='{}' AND ".format(uf) + ' AND '.join(filter(
-            lambda x: x, [
-                '1=1',
-                self._get_gender_filter(gender),
-                self._get_disease_filter(conn, disease),
-                self._get_age_filter(age),
-                self._get_period_filter(initial_date, final_date)
-            ]
-        ))
+        filters_description = ', '.join(filters_list)
+
+        dist_filters = [
+            ('uf', "uf='{}'".format(uf)),
+            ('gender', self._get_gender_filter(gender)),
+            ('disease', self._get_disease_filter(conn, disease)),
+            ('age', self._get_age_filter(age)),
+            ('period', self._get_period_filter(initial_date, final_date))
+        ]
+
+        age_dist = self.get_age_dist(conn, dist_filters)
+        disease_dist = self.get_disease_dist(conn, dist_filters)
+        gender_dist = self.get_gender_dist(conn, dist_filters)
+        date_dist = self.get_date_dist(conn, dist_filters)
+
+        total_reg = self.get_total_rows(conn, uf)
+        total_reg_filter = disease_dist.casos.sum()
 
         context.update({
             'state_abv': context['state'],
@@ -587,10 +613,10 @@ class AlertaStateView(TemplateView):
             # estimated cases is used to show a chart of the last 12 events
             'case_series': dbdata.tail_estimated_cases(geo_ids, 12, conn),
             # dist csv data
-            'age_dist': self.get_age_dist(conn, dist_filters),
-            'disease_dist': self.get_disease_dist(conn, dist_filters),
-            'gender_dist': self.get_gender_dist(conn, dist_filters),
-            'date_dist': self.get_date_dist(conn, dist_filters),
+            'age_dist': age_dist.to_csv(),
+            'disease_dist': disease_dist.to_csv(),
+            'gender_dist': gender_dist.to_csv(),
+            'date_dist': date_dist.to_csv(),
             # page information
             'filters_description': filters_description,
             'total_reg': total_reg,
@@ -605,26 +631,26 @@ class AlertaStateView(TemplateView):
 
     def _get_gender_filter(self, gender):
         return (
-            '' if gender is None else
-            'cs_sexo {} '.format(
-                '=\'F\' ' if gender.lower() == 'mulher' else
-                '=\'M\' ' if gender.lower() == 'homem' else
-                'IS NULL '
-            )
+            "cs_sexo IN ('F', 'M')" if gender is None else
+            "cs_sexo IN ({})".format(','.join([
+                "'F'" if _gender == 'mulher' else
+                "'M'" if _gender == 'homem' else
+                None for _gender in gender.lower().split(',')
+            ]))
         )
 
     def _get_age_filter(self, age):
         return (
-            '' if age is None else
-            'age {} '.format(
-                'IS NULL ' if age.lower() == 'não informado' else
-                "='{}'".format(age)
+            'age IS NOT NULL'
+            if age is None else
+            "age IN ({})".format(
+                ','.join(["'{}'".format(_age) for _age in age.split(',')])
             )
         )
 
     def _get_period_filter(self, initial_date=None, final_date=None):
-        return (
-            '' if not initial_date and not final_date else
+        return "dt_notific >= (current_date - interval '1 year') AND " + (
+            '1=1' if not initial_date and not final_date else
             'dt_notific {} '.format(
                 ">= '{}'".format(initial_date) if not final_date else
                 "<= '{}'".format(final_date) if not initial_date else
@@ -634,44 +660,67 @@ class AlertaStateView(TemplateView):
 
     def _get_disease_filter(self, conn, disease):
         if disease is None:
-            return ''
-        if disease.lower() == 'não informado':
-            return 'cid10_codigo IS NULL'
+            return 'cid10_codigo IS NOT NULL'
 
         sql = '''
         SELECT codigo FROM "Dengue_global"."CID10"
-        WHERE nome = '{}'
-        '''.format(disease)
+        WHERE nome IN ({})
+        '''.format(','.join(
+            ["'{}'".format(_disease) for _disease in disease.split(',')]
+        ))
 
         df_cid10 = pd.read_sql(sql, conn)
 
         return (
             '' if df_cid10.empty else
-            'cid10_codigo=\'{}\' '.format(df_cid10.codigo.values[0])
+            'cid10_codigo IN ({})'.format(','.join([
+                "'{}'".format(cid) for cid in df_cid10.codigo.values
+            ]))
         )
+
+    def get_total_rows(self, conn, uf):
+        clean_filters = " uf='{}' AND ".format(uf) + ' AND '.join(filter(
+            lambda x: x, [
+                '1=1',
+                self._get_gender_filter(None),
+                self._get_disease_filter(conn, None),
+                self._get_age_filter(None),
+                self._get_period_filter(None, None)
+            ]
+        ))
+
+        sql = '''
+            SELECT
+                count(id) AS casos
+            FROM (
+                SELECT
+                    *,
+                    {}
+                FROM
+                    "Municipio"."Notificacao" AS notif
+                    INNER JOIN "Dengue_global"."Municipio" AS municipio
+                      ON notif.municipio_geocodigo = municipio.geocodigo
+            ) AS tb
+            WHERE {}
+            '''.format(self._age_field, clean_filters)
+
+        df = pd.read_sql(sql, conn)
+        return int(df.casos[0])
 
     def get_disease_dist(
             self, conn, dist_filters
     ):
+        _dist_filters = self._process_filter(dist_filters, 'disease')
+
         sql = '''
         SELECT
-            COALESCE(cid10_nome, 'Não informado') AS nome,
+            COALESCE(cid10_nome, NULL) AS nome,
             count(id) AS casos
         FROM (
             SELECT
                 *,
                 cid10.nome AS cid10_nome,
-                CASE
-                WHEN nu_idade_n BETWEEN 4000 AND 4004 THEN '00-04 anos'
-                WHEN nu_idade_n BETWEEN 4005 AND 4009 THEN '05-09 anos'
-                WHEN nu_idade_n BETWEEN 4010 AND 4019 THEN '10-19 anos'
-                WHEN nu_idade_n BETWEEN 4020 AND 4029 THEN '20-29 anos'
-                WHEN nu_idade_n BETWEEN 4030 AND 4039 THEN '30-39 anos'
-                WHEN nu_idade_n BETWEEN 4040 AND 4049 THEN '40-49 anos'
-                WHEN nu_idade_n BETWEEN 4050 AND 4059 THEN '50-59 anos'
-                WHEN nu_idade_n >=4060 THEN '60+ anos'
-                ELSE 'Não informado'
-                END AS age
+                {}
             FROM
                 "Municipio"."Notificacao" AS notif
                 INNER JOIN "Dengue_global"."Municipio" AS municipio
@@ -681,31 +730,23 @@ class AlertaStateView(TemplateView):
         ) AS tb
         WHERE {}
         GROUP BY cid10_nome;
-        '''.format(dist_filters)
+        '''.format(self._age_field, _dist_filters)
 
         df_disease_dist = pd.read_sql(sql, conn)
 
-        return df_disease_dist.set_index('nome', drop=True).to_csv()
+        return df_disease_dist.set_index('nome', drop=True)
 
     def get_age_dist(self, conn, dist_filters):
+        _dist_filters = self._process_filter(dist_filters, 'age')
+
         sql = '''
         SELECT
             age,
-            count(age) AS cases
+            count(age) AS casos
         FROM (
             SELECT
                 *,
-                CASE
-                WHEN nu_idade_n BETWEEN 4000 AND 4004 THEN '00-04 anos'
-                WHEN nu_idade_n BETWEEN 4005 AND 4009 THEN '05-09 anos'
-                WHEN nu_idade_n BETWEEN 4010 AND 4019 THEN '10-19 anos'
-                WHEN nu_idade_n BETWEEN 4020 AND 4029 THEN '20-29 anos'
-                WHEN nu_idade_n BETWEEN 4030 AND 4039 THEN '30-39 anos'
-                WHEN nu_idade_n BETWEEN 4040 AND 4049 THEN '40-49 anos'
-                WHEN nu_idade_n BETWEEN 4050 AND 4059 THEN '50-59 anos'
-                WHEN nu_idade_n >=4060 THEN '60+ anos'
-                ELSE 'Não informado'
-                END AS age
+                {}
             FROM
                 "Municipio"."Notificacao" AS notif
                 INNER JOIN "Dengue_global"."Municipio" AS municipio
@@ -714,62 +755,46 @@ class AlertaStateView(TemplateView):
         WHERE {}
         GROUP BY age
         ORDER BY age
-        '''.format(dist_filters)
+        '''.format(self._age_field, _dist_filters)
 
-        return pd.read_sql(sql, conn, 'age').to_csv()
+        return pd.read_sql(sql, conn, 'age')
 
     def get_gender_dist(self, conn, dist_filters):
+        _dist_filters = self._process_filter(dist_filters, 'gender')
+
         sql = '''
         SELECT
-            (CASE COALESCE(cs_sexo, 'Não informado')
+            (CASE COALESCE(cs_sexo, NULL)
              WHEN 'M' THEN 'Homem'
              WHEN 'F' THEN 'Mulher'
-             ELSE 'Não informado'
+             ELSE NULL
              END
             ) AS gender,
             COUNT(id) AS casos
         FROM (
             SELECT *,
-                CASE
-                WHEN nu_idade_n BETWEEN 4000 AND 4004 THEN '00-04 anos'
-                WHEN nu_idade_n BETWEEN 4005 AND 4009 THEN '05-09 anos'
-                WHEN nu_idade_n BETWEEN 4010 AND 4019 THEN '10-19 anos'
-                WHEN nu_idade_n BETWEEN 4020 AND 4029 THEN '20-29 anos'
-                WHEN nu_idade_n BETWEEN 4030 AND 4039 THEN '30-39 anos'
-                WHEN nu_idade_n BETWEEN 4040 AND 4049 THEN '40-49 anos'
-                WHEN nu_idade_n BETWEEN 4050 AND 4059 THEN '50-59 anos'
-                WHEN nu_idade_n >=4060 THEN '60+ anos'
-                ELSE 'Não informado'
-                END AS age
+                {}
             FROM
                 "Municipio"."Notificacao" AS notif
                 INNER JOIN "Dengue_global"."Municipio" AS municipio
                   ON notif.municipio_geocodigo = municipio.geocodigo
         ) AS tb
-        WHERE {}
+        WHERE {} AND cs_sexo IN ('F', 'M')
         GROUP BY cs_sexo;
-        '''.format(dist_filters)
+        '''.format(self._age_field, _dist_filters)
 
-        return pd.read_sql(sql, conn, 'gender').to_csv()
+        return pd.read_sql(sql, conn, 'gender')
 
     def get_date_dist(self, conn, dist_filters):
+        _dist_filters = self._process_filter(dist_filters, 'period')
+
         sql = '''
         SELECT
             dt_notific,
             count(dt_notific) AS Casos
         FROM (
             SELECT *,
-                CASE
-                WHEN nu_idade_n BETWEEN 4000 AND 4004 THEN '00-04 anos'
-                WHEN nu_idade_n BETWEEN 4005 AND 4009 THEN '05-09 anos'
-                WHEN nu_idade_n BETWEEN 4010 AND 4019 THEN '10-19 anos'
-                WHEN nu_idade_n BETWEEN 4020 AND 4029 THEN '20-29 anos'
-                WHEN nu_idade_n BETWEEN 4030 AND 4039 THEN '30-39 anos'
-                WHEN nu_idade_n BETWEEN 4040 AND 4049 THEN '40-49 anos'
-                WHEN nu_idade_n BETWEEN 4050 AND 4059 THEN '50-59 anos'
-                WHEN nu_idade_n >=4060 THEN '60+ anos'
-                ELSE 'Não informado'
-                END AS age
+                {}
             FROM
                 "Municipio"."Notificacao" AS notif
                 INNER JOIN "Dengue_global"."Municipio" AS municipio
@@ -778,11 +803,11 @@ class AlertaStateView(TemplateView):
         WHERE {}
         GROUP BY "dt_notific"
         ORDER BY "dt_notific"
-        '''.format(dist_filters)
+        '''.format(self._age_field, _dist_filters)
 
         df_alert_period = pd.read_sql(sql, conn, index_col='dt_notific')
         df_alert_period.index.rename('Categories', inplace=True)
 
         df_alert_period.to_csv('/tmp/data.csv')
 
-        return df_alert_period.to_csv()
+        return df_alert_period
