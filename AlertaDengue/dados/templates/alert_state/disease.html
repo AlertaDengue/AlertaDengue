@@ -11,16 +11,28 @@ $(document).ready(function () {
             series: {
                 cursor: 'pointer',
                 allowPointSelect: true,
-            },
-            column: {
                 point: {
                     events: {
-                        click: function(e) {
-                            $('#disease').val(this.name);
+                        select: function(e) {
+                            var result = $('#disease').val() == '' ?
+                                [] : $('#disease').val().split(',');
+
+                            if (result.indexOf(this.name) == -1) {
+                                result.push(this.name);
+                            } else {
+                                result = result.filter(
+                                    (x,i) => i !== result.indexOf(this.name)
+                                );
+                            }
+
+                            $('#disease').val(result.join());
                             $('#formFilters').submit();
                         }
                     }
                 }
+            },
+            column: {
+
             }
         },
 
