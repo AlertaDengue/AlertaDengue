@@ -1,6 +1,26 @@
 <div id="age-chart" class="chart-default"></div>
 <script type="application/javascript">
 var age_chart;
+var age_chart_load = false;
+
+function age_selection(event) {
+    if (!age_chart_load) {
+        return;
+    }
+    var result = $('#age').val() == '' ?
+        [] : $('#age').val().split(',');
+
+    if (result.indexOf(this.name) == -1) {
+        result.push(this.name);
+    } else {
+        result = result.filter(
+            (x,i) => i !== result.indexOf(this.name)
+        );
+    }
+
+    $('#age').val(result.join());
+    $('#formFilters').submit();
+}
 
 $(document).ready(function () {
     // Create the chart
@@ -18,25 +38,21 @@ $(document).ready(function () {
 
         plotOptions: {
             series: {
-                cursor: 'pointer',
-                allowPointSelect: true,
+                cursor: 'pointer',color: '#dfdfdf',
+               // allowPointSelect: true,
+                states: {
+                    select: {
+                        color: '#112C51'
+                    }
+                },
                 point: {
                     events: {
-                        select: function(e) {
-                            var result = $('#age').val() == '' ?
-                                [] : $('#age').val().split(',');
-
-                            if (result.indexOf(this.name) == -1) {
-                                result.push(this.name);
-                            } else {
-                                result = result.filter(
-                                    (x,i) => i !== result.indexOf(this.name)
-                                );
-                            }
-
-                            $('#age').val(result.join());
-                            $('#formFilters').submit();
+                        click: function(event){
+                            //this.slice(null);
+                            this.select(null, true);
                         },
+                        select: age_selection,
+                        unselect: age_selection
                     }
                 }
             },
@@ -67,6 +83,31 @@ $(document).ready(function () {
             shared: true
         }
     });
+
+    var result = $('#age').val() == '' ?
+        [] : $('#age').val().split(',');
+
+    var new_age_filter = [];
+
+    for (j in age_chart.series[0].data) {
+        for (i in result) {
+            if (age_chart.series[0].data[j].name == result[i]) {
+                age_chart.series[0].data[j].select(true, true);
+            }
+        }
+
+        if (result.length == 0) {
+            age_chart.series[0].data[j].select(true, true);
+            new_age_filter.push(age_chart.series[0].data[j].name);
+        }
+    }
+
+    if (result.length == 0 && new_age_filter.length > 0) {
+        $('#age').val(new_age_filter.join());
+    }
+
+    age_chart_load = true;
+
 });
 
 </script>
