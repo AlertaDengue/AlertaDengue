@@ -1,8 +1,30 @@
 <div id="disease-chart" style="height:100px"></div>
 
 <script type="application/javascript">
+var disease_chart;
+var disease_chart_load = false;
+
+function disease_selection(e) {
+    if (!disease_chart_load) {
+        return;
+    }
+    var result = $('#disease').val() == '' ?
+        [] : $('#disease').val().split(',');
+
+    if (result.indexOf(this.name) == -1) {
+        result.push(this.name);
+    } else {
+        result = result.filter(
+            (x,i) => i !== result.indexOf(this.name)
+        );
+    }
+
+    $('#disease').val(result.join());
+    $('#formFilters').submit();
+}
+
 $(document).ready(function () {
-    Highcharts.chart('disease-chart', {
+    disease_chart = Highcharts.chart('disease-chart', {
         data: {
             csv: `{{disease_dist}}`,
         },
@@ -10,29 +32,23 @@ $(document).ready(function () {
         plotOptions: {
             series: {
                 cursor: 'pointer',
-                allowPointSelect: true,
+                color: '#dfdfdf',
+               // allowPointSelect: true,
+                states: {
+                    select: {
+                        color: '#112C51'
+                    }
+                },
                 point: {
                     events: {
-                        select: function(e) {
-                            var result = $('#disease').val() == '' ?
-                                [] : $('#disease').val().split(',');
-
-                            if (result.indexOf(this.name) == -1) {
-                                result.push(this.name);
-                            } else {
-                                result = result.filter(
-                                    (x,i) => i !== result.indexOf(this.name)
-                                );
-                            }
-
-                            $('#disease').val(result.join());
-                            $('#formFilters').submit();
-                        }
+                        click: function(event){
+                            //this.slice(null);
+                            this.select(null, true);
+                        },
+                        select: disease_selection,
+                        unselect: disease_selection
                     }
                 }
-            },
-            column: {
-
             }
         },
 
@@ -65,5 +81,29 @@ $(document).ready(function () {
             shared: true
         }
     });
+
+    var result = $('#disease').val() == '' ?
+        [] : $('#disease').val().split(',');
+
+    var new_disease_filter = [];
+
+    for (j in disease_chart.series[0].data) {
+        for (i in result) {
+            if (disease_chart.series[0].data[j].name == result[i]) {
+                disease_chart.series[0].data[j].select(true, true);
+            }
+        }
+
+        if (result.length == 0) {
+            disease_chart.series[0].data[j].select(true, true);
+            new_disease_filter.push(disease_chart.series[0].data[j].name);
+        }
+    }
+
+    if (result.length == 0 && new_disease_filter.length > 0) {
+        $('#disease').val(new_disease_filter.join());
+    }
+
+    disease_chart_load = true;
 });
 </script>

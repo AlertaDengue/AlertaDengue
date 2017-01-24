@@ -2,6 +2,26 @@
 <script type="application/javascript">
 // Create the chart
 var gender_chart;
+var gender_chart_load = false;
+
+function gender_selection(e) {
+    if (!gender_chart_load) {
+        return;
+    }
+    var result = $('#gender').val() == '' ?
+        [] : $('#gender').val().split(',');
+
+    if (result.indexOf(this.name) == -1) {
+        result.push(this.name);
+    } else {
+        result = result.filter(
+            (x,i) => i !== result.indexOf(this.name)
+        );
+    }
+
+    $('#gender').val(result.join());
+    $('#formFilters').submit();
+}
 
 $(document).ready(function () {
     gender_chart = Highcharts.chart('gender-chart', {
@@ -19,24 +39,21 @@ $(document).ready(function () {
         plotOptions: {
             series: {
                 cursor: 'pointer',
-                allowPointSelect: true,
+                color: '#dfdfdf',
+               // allowPointSelect: true,
+                states: {
+                    select: {
+                        color: '#112C51'
+                    }
+                },
                 point: {
                     events: {
-                        select: function(e) {
-                            var result = $('#gender').val() == '' ?
-                                [] : $('#gender').val().split(',');
-
-                            if (result.indexOf(this.name) == -1) {
-                                result.push(this.name);
-                            } else {
-                                result = result.filter(
-                                    (x,i) => i !== result.indexOf(this.name)
-                                );
-                            }
-
-                            $('#gender').val(result.join());
-                            $('#formFilters').submit();
-                        }
+                        click: function(event){
+                            //this.slice(null);
+                            this.select(null, true);
+                        },
+                        select: gender_selection,
+                        unselect: gender_selection
                     }
                 }
             },
@@ -67,5 +84,29 @@ $(document).ready(function () {
             shared: true
         }
     });
+
+    var result = $('#gender').val() == '' ?
+        [] : $('#gender').val().split(',');
+
+    var new_gender_filter = [];
+
+    for (j in gender_chart.series[0].data) {
+        for (i in result) {
+            if (gender_chart.series[0].data[j].name == result[i]) {
+                gender_chart.series[0].data[j].select(true, true);
+            }
+        }
+
+        if (result.length == 0) {
+            gender_chart.series[0].data[j].select(true, true);
+            new_gender_filter.push(gender_chart.series[0].data[j].name);
+        }
+    }
+
+    if (result.length == 0 && new_gender_filter.length > 0) {
+        $('#gender').val(new_gender_filter.join());
+    }
+
+    gender_chart_load = true;
 });
 </script>
