@@ -14,6 +14,7 @@ import pandas as pd
 import random
 import json
 import os
+import sys
 import datetime
 import numpy as np
 import locale
@@ -242,8 +243,16 @@ class AlertaGeoJSONView(View):
 
 class CityMapView(View):
     def get(self, request, geocodigo):
-        mapa = get_city_geojson(int(geocodigo))
-        return HttpResponse(geojson.dumps(mapa))
+        f_name = os.path.join(settings.DATA_DIR, 'geojson', geocodigo)
+
+        if os.path.isfile(f_name):
+            with open(f_name) as f:
+                geojson_city = f.read()
+        else:
+            geojson_city = geojson.dumps(get_city_geojson(int(geocodigo)))
+            with open(f_name, 'w') as f:
+                f.write(geojson_city)
+        return HttpResponse(geojson_city)
 
 
 class DetailsPageView(TemplateView):
@@ -790,10 +799,13 @@ class AlertaStateView(TemplateView):
 
         sql = '''
         SELECT
-            dt_notific,
-            count(dt_notific) AS Casos
+            dt_week,
+            count(dt_week) AS Casos
         FROM (
             SELECT *,
+                dt_notific - CAST(
+                    CONCAT(CAST(EXTRACT(DOW FROM dt_notific) AS VARCHAR), 'DAY'
+                ) AS INTERVAL) AS dt_week,
                 {}
             FROM
                 "Municipio"."Notificacao" AS notif
@@ -801,11 +813,11 @@ class AlertaStateView(TemplateView):
                     ON notif.municipio_geocodigo = municipio.geocodigo
         ) AS tb
         WHERE {}
-        GROUP BY "dt_notific"
-        ORDER BY "dt_notific"
+        GROUP BY dt_week
+        ORDER BY dt_week
         '''.format(self._age_field, _dist_filters)
 
-        df_alert_period = pd.read_sql(sql, conn, index_col='dt_notific')
+        df_alert_period = pd.read_sql(sql, conn, index_col='dt_week')
         df_alert_period.index.rename('Categories', inplace=True)
 
         df_alert_period.to_csv('/tmp/data.csv')
