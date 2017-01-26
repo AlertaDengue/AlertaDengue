@@ -14,7 +14,6 @@ import pandas as pd
 import random
 import json
 import os
-import sys
 import datetime
 import numpy as np
 import locale
@@ -243,16 +242,7 @@ class AlertaGeoJSONView(View):
 
 class CityMapView(View):
     def get(self, request, geocodigo):
-        f_name = os.path.join(settings.DATA_DIR, 'geojson', geocodigo)
-
-        if os.path.isfile(f_name):
-            with open(f_name) as f:
-                geojson_city = f.read()
-        else:
-            geojson_city = geojson.dumps(get_city_geojson(int(geocodigo)))
-            with open(f_name, 'w') as f:
-                f.write(geojson_city)
-        return HttpResponse(geojson_city)
+        return geojson.dumps(get_city_geojson(int(geocodigo)))
 
 
 class DetailsPageView(TemplateView):
