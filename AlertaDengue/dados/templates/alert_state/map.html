@@ -38,23 +38,36 @@
     function style(feature) {
         var i = +feature.properties.alerta || 0;
         return {
-            weight: 2,
+            weight: 1,
             opacity: 1,
             color: 'white',
             dashArray: '3',
-            fillOpacity: 0.7,
+            fillOpacity: 0.6,
+            fillColor: alertLevels[i].color
+        };
+    }
+
+    function selected_style(feature) {
+        var i = +feature.properties.alerta || 0;
+        return {
+            weight: 3,
+            opacity: 1,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.8,
             fillColor: alertLevels[i].color
         };
     }
 
     function highlightFeature(e) {
         var layer = e.target;
+        /*
         layer.setStyle({
             weight: 5,
             color: '#666',
             dashArray: '',
             fillOpacity: 0.7
-        });
+        });*/
         if (!L.Browser.ie && !L.Browser.opera) {
             layer.bringToFront();
         }
@@ -63,7 +76,7 @@
     }
 
     function resetHighlight(e) {
-        geojson.resetStyle(e.target);
+        //geojson.resetStyle(e.target);
         info.update();
     }
 
@@ -141,7 +154,7 @@
                 case_series[geo_id][case_series[geo_id].length -1]
             );
 
-            layer.bindPopup(
+            /*layer.bindPopup(
                 "<b>" + mun_dict[geo_id] + "</b>" + "<br>" +
                 "Casos estimados: " + feature.properties.casos +
                 "<br>Últimas semanas: <span class='inlinesparkline'>" +
@@ -149,18 +162,20 @@
                 "<br>" +
                 "<a href=/alerta/" + geo_id.toString() +
                 "/><u>Mais detalhes</u></a>"
-            );
+            );*/
+
             layer.setStyle(style(feature))
             layer.on({
                 mouseover: highlightFeature,
                 mouseout: resetHighlight,
-                popupopen: renderSparkline
+                popupopen: renderSparkline,
+                click: function(){layer.setStyle(selected_style(feature))}
             });
         };
 
         for (var i=0; i < geo_ids.length; i++){
             var gc = geo_ids[i];
-            $.getJSON('/geojson/' + gc.toString() + '/', function(data){
+            $.getJSON('/static/geojson/' + gc.toString() + '/', function(data){
                 geojson = L.geoJson(
                     data, {style: style, onEachFeature: fill_details}
                 );
