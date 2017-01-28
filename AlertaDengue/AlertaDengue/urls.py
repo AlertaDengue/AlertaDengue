@@ -8,7 +8,7 @@ from dados.views import (
     MapaMosquitoView,
     HistoricoView, AlertaPageView, AlertaGeoJSONView, AlertaPageViewMunicipio,
     CityMapView, get_municipio,
-    AlertaMainView, AlertaStateView
+    AlertaMainView, AlertaStateView, NotificacaoCSV_View
 )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -32,9 +32,9 @@ urlpatterns = [
     url('^accounts/', include('django.contrib.auth.urls')),
     url(r'^alerta-detalhado/$', DetailsPageView.as_view(), name='home'),
     url(r'^alertageoJSON/$',
-      login_required(AlertaGeoJSONView.as_view()), name='alerta-layer'),
+        login_required(AlertaGeoJSONView.as_view()), name='alerta-layer'),
     url(r'^geojson/(?P<geocodigo>\d{7})/$',
-      cache_page(60 * 60 * 24)(CityMapView.as_view()), name='mapa'),
+        cache_page(60 * 60 * 24)(CityMapView.as_view()), name='mapa'),
     url(r'^getcity/$', get_municipio, name='get_city'),
     url(r'^mapadengue/$', MapaDengueView.as_view(), name='mapadengue'),
     url(r'^mapamosquito/$', MapaMosquitoView.as_view(), name='mapamosquito'),
@@ -45,4 +45,6 @@ urlpatterns = [
     url(r'^sinan/(\d{4})/(\d{1,2})', SinanCasesView.as_view(), name='sinan'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^dbf/', include(dbf.urls)),
+    url(r'^csv/notif_last12/(?P<initials_state>PR|RJ|ES)$', NotificacaoCSV_View.as_view(),
+        name='notificaocao_last12')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

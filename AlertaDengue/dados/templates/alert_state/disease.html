@@ -4,31 +4,48 @@
 var disease_chart;
 var disease_chart_load = false;
 
-function disease_selection(e) {
-    if (!disease_chart_load) {
-        return;
-    }
-    var result = $('#disease').val() == '' ?
-        [] : $('#disease').val().split(',');
+function plot_chart_disease(){
+    var _values = [];
+    var _columns_name = disease_chart.xAxis[0].categories;
+    var _counter = new Array(_columns_name.length).fill(0);
 
-    if (result.indexOf(this.name) == -1) {
-        result.push(this.name);
-    } else {
-        result = result.filter(
-            (x,i) => i !== result.indexOf(this.name)
-        );
+    // filter
+    var _data = data.filter(function(d) {
+        return filter_age(d) && filter_gender(d)
+    });
+
+    // grouping
+    var dataCount = d3.nest()
+        .key(function(d) { return d.disease; })
+        .rollup(function(v) { return v.length; })
+        .entries(_data);
+
+    // counter to chart plotting
+    for (i in dataCount) {
+        for (j in _columns_name) {
+            if (dataCount[i].key == _columns_name[j]) {
+                _counter[j] = dataCount[i].value;
+            }
+        }
     }
 
-    $('#disease').val(result.join());
-    $('#formFilters').submit();
+    // set data
+    disease_chart.series[0].setData(_counter);
+
+    // selection
+    var result = disease_chart.getSelectedPoints().map(function(d){
+        return d.category
+    });
+
+    if (result.length == 0) {
+        for (j in disease_chart.series[0].data) {
+            disease_chart.series[0].data[j].select(true, true);
+        }
+    }
 }
 
 $(document).ready(function () {
     disease_chart = Highcharts.chart('disease-chart', {
-        data: {
-            csv: `{{disease_dist}}`,
-        },
-
         plotOptions: {
             series: {
                 cursor: 'pointer',
@@ -44,9 +61,8 @@ $(document).ready(function () {
                         click: function(event){
                             //this.slice(null);
                             this.select(null, true);
+                            plots_refresh();
                         },
-                        select: disease_selection,
-                        unselect: disease_selection
                     }
                 }
             }
@@ -71,6 +87,9 @@ $(document).ready(function () {
                 text: 'Casos'
             }
         },
+        xAxis: {
+            categories: ['Dengue [dengue clássico]']
+        },
         legend: {
             enabled: false
         },
@@ -79,31 +98,12 @@ $(document).ready(function () {
         },
         tooltip: {
             shared: true
-        }
+        },
+        series: [{
+            'name': 'casos',
+            'data': [0]
+        }]
+
     });
-
-    var result = $('#disease').val() == '' ?
-        [] : $('#disease').val().split(',');
-
-    var new_disease_filter = [];
-
-    for (j in disease_chart.series[0].data) {
-        for (i in result) {
-            if (disease_chart.series[0].data[j].name == result[i]) {
-                disease_chart.series[0].data[j].select(true, true);
-            }
-        }
-
-        if (result.length == 0) {
-            disease_chart.series[0].data[j].select(true, true);
-            new_disease_filter.push(disease_chart.series[0].data[j].name);
-        }
-    }
-
-    if (result.length == 0 && new_disease_filter.length > 0) {
-        $('#disease').val(new_disease_filter.join());
-    }
-
-    disease_chart_load = true;
 });
 </script>

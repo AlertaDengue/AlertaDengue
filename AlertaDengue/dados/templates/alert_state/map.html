@@ -72,6 +72,9 @@
             layer.bringToFront();
         }
         info.update(layer.feature.properties);
+
+        renderSparkline(e);
+
         layer.bringToBack()
     }
 
@@ -154,7 +157,7 @@
                 case_series[geo_id][case_series[geo_id].length -1]
             );
 
-            /*layer.bindPopup(
+            layer.bindPopup(
                 "<b>" + mun_dict[geo_id] + "</b>" + "<br>" +
                 "Casos estimados: " + feature.properties.casos +
                 "<br>Últimas semanas: <span class='inlinesparkline'>" +
@@ -162,7 +165,7 @@
                 "<br>" +
                 "<a href=/alerta/" + geo_id.toString() +
                 "/><u>Mais detalhes</u></a>"
-            );*/
+            );
 
             layer.setStyle(style(feature))
             layer.on({
@@ -175,7 +178,7 @@
 
         for (var i=0; i < geo_ids.length; i++){
             var gc = geo_ids[i];
-            $.getJSON('/static/geojson/' + gc.toString() + '/', function(data){
+            $.getJSON('/static/geojson/' + gc.toString() + '.json', function(data){
                 geojson = L.geoJson(
                     data, {style: style, onEachFeature: fill_details}
                 );

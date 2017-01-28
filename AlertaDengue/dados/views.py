@@ -585,22 +585,6 @@ class AlertaStateView(TemplateView):
 
         filters_description = ', '.join(filters_list)
 
-        dist_filters = [
-            ('uf', "uf='{}'".format(uf)),
-            ('gender', self._get_gender_filter(gender)),
-            ('disease', self._get_disease_filter(conn, disease)),
-            ('age', self._get_age_filter(age)),
-            ('period', self._get_period_filter(initial_date, final_date))
-        ]
-
-        age_dist = self.get_age_dist(conn, dist_filters)
-        disease_dist = self.get_disease_dist(conn, dist_filters)
-        gender_dist = self.get_gender_dist(conn, dist_filters)
-        date_dist = self.get_date_dist(conn, dist_filters)
-
-        total_reg = self.get_total_rows(conn, uf)
-        total_reg_filter = disease_dist.casos.sum()
-
         context.update({
             'state_abv': context['state'],
             'state': self._state_name[context['state']],
@@ -612,14 +596,8 @@ class AlertaStateView(TemplateView):
             # estimated cases is used to show a chart of the last 12 events
             'case_series': dbdata.tail_estimated_cases(geo_ids, 12, conn),
             # dist csv data
-            'age_dist': age_dist.to_csv(),
-            'disease_dist': disease_dist.to_csv(),
-            'gender_dist': gender_dist.to_csv(),
-            'date_dist': date_dist.to_csv(),
             # page information
             'filters_description': filters_description,
-            'total_reg': total_reg,
-            'total_reg_filter': total_reg_filter,
             'initial_date': initial_date if initial_date else '',
             'final_date': final_date if final_date else '',
             'disease': disease if disease else '',
@@ -813,3 +791,68 @@ class AlertaStateView(TemplateView):
         df_alert_period.to_csv('/tmp/data.csv')
 
         return df_alert_period
+
+
+class NotificacaoCSV_View(View):
+    _state_name = {
+        'RJ': 'Rio de Janeiro',
+        'PR': 'Paraná',
+        'ES': 'Espírito Santo'}
+
+    def get(self, request, initials_state):
+        """
+
+        :param kwargs:
+        :return:
+        """
+        conn = dbdata.create_connection()
+
+        uf = self._state_name[initials_state]
+
+        sql = '''
+        SELECT
+            id,
+            (CASE COALESCE(cs_sexo, NULL)
+             WHEN 'M' THEN 'Homem'
+             WHEN 'F' THEN 'Mulher'
+             ELSE NULL
+             END
+            ) AS gender,
+
+            (CASE
+             WHEN nu_idade_n <= 4004 THEN '00-04 anos'
+             WHEN nu_idade_n BETWEEN 4005 AND 4009 THEN '05-09 anos'
+             WHEN nu_idade_n BETWEEN 4010 AND 4019 THEN '10-19 anos'
+             WHEN nu_idade_n BETWEEN 4020 AND 4029 THEN '20-29 anos'
+             WHEN nu_idade_n BETWEEN 4030 AND 4039 THEN '30-39 anos'
+             WHEN nu_idade_n BETWEEN 4040 AND 4049 THEN '40-49 anos'
+             WHEN nu_idade_n BETWEEN 4050 AND 4059 THEN '50-59 anos'
+             WHEN nu_idade_n >=4060 THEN '60+ anos'
+             ELSE NULL
+             END
+            )AS age,
+
+            dt_notific - CAST(
+                CONCAT(CAST(EXTRACT(DOW FROM dt_notific) AS VARCHAR), 'DAY'
+            ) AS INTERVAL) AS dt_week,
+
+            cid10.nome AS disease
+        FROM
+            "Municipio"."Notificacao" AS notif
+                INNER JOIN "Dengue_global"."Municipio" AS municipio
+                  ON notif.municipio_geocodigo = municipio.geocodigo
+            INNER JOIN "Dengue_global"."CID10" AS cid10
+                  ON notif.cid10_codigo=cid10.codigo
+        WHERE
+            uf='{}'
+            AND dt_notific > NOW() - INTERVAL '1 YEAR'
+            AND cid10.nome IS NOT NULL
+            AND nu_idade_n IS NOT NULL
+            AND cs_sexo IS NOT NULL
+        ORDER BY
+            dt_notific
+        '''.format(uf)
+
+        df = pd.read_sql(sql, conn, 'id')
+        print(df)
+        return HttpResponse(df.to_csv(), content_type="text/plain")
