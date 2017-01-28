@@ -2,25 +2,45 @@
 <script type="application/javascript">
 // Create the chart
 var gender_chart;
-var gender_chart_load = false;
 
-function gender_selection(e) {
-    if (!gender_chart_load) {
-        return;
+function plot_chart_gender(){
+    var _values = [];
+    var _columns_name = gender_chart.xAxis[0].categories;
+    var _counter = new Array(_columns_name.length).fill(0);
+
+    // filter
+    var _data = data.filter(function(d) {
+        return filter_age(d) && filter_disease(d)
+    });
+
+    // grouping
+    var dataCount = d3.nest()
+        .key(function(d) { return d.gender; })
+        .rollup(function(v) { return v.length; })
+        .entries(_data);
+
+    // counter to chart plotting
+    for (i in dataCount) {
+        for (j in _columns_name) {
+            if (dataCount[i].key == _columns_name[j]) {
+                _counter[j] = dataCount[i].value;
+            }
+        }
     }
-    var result = $('#gender').val() == '' ?
-        [] : $('#gender').val().split(',');
 
-    if (result.indexOf(this.name) == -1) {
-        result.push(this.name);
-    } else {
-        result = result.filter(
-            (x,i) => i !== result.indexOf(this.name)
-        );
+    // set data
+    gender_chart.series[0].setData(_counter);
+
+    // gender selection
+    var result = gender_chart.getSelectedPoints().map(function(d){
+        return d.category
+    });
+
+    if (result.length == 0) {
+        for (j in gender_chart.series[0].data) {
+            gender_chart.series[0].data[j].select(true, true);
+        }
     }
-
-    $('#gender').val(result.join());
-    $('#formFilters').submit();
 }
 
 $(document).ready(function () {
@@ -31,9 +51,6 @@ $(document).ready(function () {
             spacingTop: 0,
             spacingLeft: 0,
             spacingRight: 0
-        },
-        data: {
-            csv: `{{gender_dist}}`
         },
 
         plotOptions: {
@@ -51,15 +68,11 @@ $(document).ready(function () {
                         click: function(event){
                             //this.slice(null);
                             this.select(null, true);
-                        },
-                        select: gender_selection,
-                        unselect: gender_selection
+                            plots_refresh();
+                        }
                     }
-                }
+                },
             },
-            column: {
-
-            }
         },
 
         title: {
@@ -74,6 +87,9 @@ $(document).ready(function () {
                 text: 'Casos'
             }
         },
+        xAxis: {
+            categories: ['Mulher', 'Homem'],
+        },
         legend: {
             enabled: false
         },
@@ -82,31 +98,11 @@ $(document).ready(function () {
         },
         tooltip: {
             shared: true
-        }
+        },
+        series: [{
+            "name": "casos",
+            "data": [0, 0]
+        }]
     });
-
-    var result = $('#gender').val() == '' ?
-        [] : $('#gender').val().split(',');
-
-    var new_gender_filter = [];
-
-    for (j in gender_chart.series[0].data) {
-        for (i in result) {
-            if (gender_chart.series[0].data[j].name == result[i]) {
-                gender_chart.series[0].data[j].select(true, true);
-            }
-        }
-
-        if (result.length == 0) {
-            gender_chart.series[0].data[j].select(true, true);
-            new_gender_filter.push(gender_chart.series[0].data[j].name);
-        }
-    }
-
-    if (result.length == 0 && new_gender_filter.length > 0) {
-        $('#gender').val(new_gender_filter.join());
-    }
-
-    gender_chart_load = true;
 });
 </script>

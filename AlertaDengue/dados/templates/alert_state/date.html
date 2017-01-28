@@ -2,6 +2,42 @@
 <script type="application/javascript">
 var date_chart;
 
+function plot_chart_date(){
+    var _values = [];
+    var extremes = date_chart.xAxis[0].getExtremes(),
+        start = new Date(extremes.min),
+        end   = new Date(extremes.max);
+
+    var parser = d3.timeParse('%Y-%m-%d');
+    var format = d3.timeFormat('%Y-%m-%d');
+
+    // filter
+    var _data = _.cloneDeep(data).filter(function(d) {
+        return filter_age(d) && filter_gender(d) && filter_disease(d)
+    });
+
+    _data.map(function(d){
+        d.dt_week = format(d.dt_week);
+        return d;
+    });
+
+    // grouping
+    var dataCount = d3.nest()
+        .key(function(d) { return d.dt_week; })
+        .rollup(function(v) { return v.length; })
+        .entries(_data);
+
+    // counter to chart plotting
+    for (i in dataCount) {
+        dt = parser(dataCount[i].key);
+        dt_utc = Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate());
+        _values.push([dt_utc, dataCount[i].value]);
+    }
+
+    // set data
+    date_chart.series[0].setData(_values);
+}
+
 $(document).ready(function () {
     // Create the chart
     date_chart = Highcharts.stockChart('date-chart', {
@@ -21,14 +57,14 @@ $(document).ready(function () {
                 }
             },
         },
-        data: {
-            csv: `{{date_dist}}`
-        },
         rangeSelector: {
             enabled: false
         },
         xAxis: {
-
+            type: 'date',
+            labels: {
+                format: '{value:%b}'
+            }
         },
         title: {
             text: ''
@@ -50,27 +86,12 @@ $(document).ready(function () {
         },
         tooltip: {
             shared: true
-        }
+        },
+        series: [{
+            'name': 'casos',
+            'data': []
+        }]
     });
 
-    var start = $('#initial_date').val().replace(/-/g, '.');
-    var end = $('#final_date').val().replace(/-/g, '.');
-
-    if (start != '' && end != '') {
-        date_chart.xAxis[0].setExtremes(
-            Date.parse(start), Date.parse(end)
-        );
-    }
 });
-
-function sendPeriodSelected() {
-    var extremes = date_chart.xAxis[0].getExtremes(),
-        start = new Date(extremes.min),
-        end   = new Date(extremes.max);
-
-    $('#initial_date').val(Highcharts.dateFormat('%Y-%m-%d', start));
-    $('#final_date').val(Highcharts.dateFormat('%Y-%m-%d', end));
-    $('#formFilters').submit();
-}
-
 </script>
