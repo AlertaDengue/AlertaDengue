@@ -7,6 +7,10 @@ from dbfread import DBF
 import logging
 import sys
 
+from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
+
+
 logger = logging.getLogger('Load_SINAN')
 
 field_map = {
@@ -75,8 +79,12 @@ class Sinan:
             self.tabela["ID_MUNICIP"] = self.tabela.ID_MN_RESI
             del self.tabela['ID_MN_RESI']
         self._parse_date_cols()
-        if not self.time_span[0].year == self.ano and self.time_span[1].year == self.ano:
-            logger.error("O Banco contém notificações incompatíveis com o ano declarado!")
+        if not (self.time_span[0].year == self.ano and self.time_span[1].year == self.ano):
+            raise ValidationError(_("Existem nesse arquivo notificações "
+                "incompatíveis com o ano de notificação informado. "
+                "Por favor, tenha certeza de que o ano de notificação é o mesmo "
+                "para todos os registros no arquivo e de que este foi o ano "
+                "informado no momento do envio."))
 
     def _parse_date_cols(self):
         print("Formatando as datas...")
@@ -147,7 +155,7 @@ class Sinan:
 
 
 from django.conf import settings
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 
 class Command(BaseCommand):
@@ -165,6 +173,9 @@ class Command(BaseCommand):
         parser.add_argument("ano")
 
     def handle(self, *args, **options):
-        sinan = Sinan(options["filename"], options["ano"])
-        conn = psycopg2.connect(**self.db_config)
-        sinan.save_to_pgsql(conn)
+        try:
+            sinan = Sinan(options["filename"], options["ano"])
+            conn = psycopg2.connect(**self.db_config)
+            sinan.save_to_pgsql(conn)
+        except ValidationError as e:
+            raise CommandError("Arquivo inválido: {}".format(e.message))
