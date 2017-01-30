@@ -170,7 +170,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("filename")
-        parser.add_argument("ano")
+        parser.add_argument("ano", type=int)
 
     def handle(self, *args, **options):
         try:
