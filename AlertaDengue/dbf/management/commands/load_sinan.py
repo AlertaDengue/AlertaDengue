@@ -7,8 +7,11 @@ from dbfread import DBF
 import logging
 import sys
 
+from django.conf import settings
+from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+
 
 
 logger = logging.getLogger('Load_SINAN')
@@ -58,6 +61,13 @@ class Sinan:
     """
     Introspecta arquivo DBF do SINAN preparando-o para inserção em outro banco.
     """
+
+    db_config = {
+        'database': settings.PSQL_DB,
+        'user': settings.PSQL_USER,
+        'password': settings.PSQL_PASSWORD,
+        'host': settings.PSQL_HOST,
+    }
 
     def __init__(self, dbf_fname, ano, encoding="iso=8859-1"):
         """
@@ -114,7 +124,11 @@ class Sinan:
             if field_map[nm] not in self.tabela.columns:
                 self.tabela[field_map[nm]] = None
 
-    def save_to_pgsql(self, connection, table_name='"Municipio"."Notificacao"'):
+    def _get_postgres_connection(self):
+        return psycopg2.connect(**self.db_config)
+
+    def save_to_pgsql(self, table_name='"Municipio"."Notificacao"'):
+        connection = self._get_postgres_connection()
         print("Escrevendo no PostgreSQL...")
         ano = self.time_span[1].year if self.time_span[0] == self.time_span[1] else self.ano
         geoclist_sql = ",".join([str(gc) for gc in self.geocodigos])
@@ -153,20 +167,8 @@ class Sinan:
             connection.commit()
 
 
-
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
-
-
 class Command(BaseCommand):
     help = "Imports SINAN DBF into the database"
-
-    db_config = {
-        'database': settings.PSQL_DB,
-        'user': settings.PSQL_USER,
-        'password': settings.PSQL_PASSWORD,
-        'host': settings.PSQL_HOST,
-    }
 
     def add_arguments(self, parser):
         parser.add_argument("filename")
@@ -175,7 +177,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             sinan = Sinan(options["filename"], options["ano"])
-            conn = psycopg2.connect(**self.db_config)
-            sinan.save_to_pgsql(conn)
+            sinan.save_to_pgsql()
         except ValidationError as e:
             raise CommandError("Arquivo inválido: {}".format(e.message))
