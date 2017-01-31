@@ -1,8 +1,5 @@
 FROM debian:jessie
 
-# Install system packages
-# the 'debian' base image is having problems with the repositories, so we'll just use the one we know is working.
-ADD config/sources.list /etc/apt/sources.list
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update
