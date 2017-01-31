@@ -6,20 +6,13 @@ ADD config/sources.list /etc/apt/sources.list
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update
-RUN apt-get install -y locales nginx sqlite3 libspatialite5 spatialite-bin git-core supervisor python3 python3-pip python3-setuptools python-virtualenv python3-venv openssh-server python3-numpy python3-pandas python3-shapely postgresql libpq-dev memcached
+RUN apt-get install -q -y locales nginx sqlite3 libspatialite5 spatialite-bin git-core supervisor python3 python3-pip python3-setuptools python-virtualenv python3-venv python3-numpy python3-pandas python3-shapely postgresql libpq-dev memcached
 
 # Set locale
 RUN echo "pt_BR.UTF-8 UTF-8" > /etc/locale.gen
 RUN locale-gen pt_BR.UTF-8
 RUN update-locale pt_BR.UTF-8
 ENV LC_ALL pt_BR.UTF-8
-
-# Configure SSHd
-#TODO: Add config file with sane configs (only publickey auth, etc) and keys
-RUN mkdir -p /var/run/sshd
-# https://stackoverflow.com/questions/18173889/cannot-access-centos-sshd-on-docker/18374381#18374381
-RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
-ADD config/sshd.conf /etc/supervisor/conf.d/sshd.conf
 
 # Configure nginx
 ADD config/nginx.conf /etc/supervisor/conf.d/nginx.conf
@@ -63,15 +56,8 @@ ADD config/alerta_dengue.conf /etc/supervisor/conf.d/alerta_dengue.conf
 # Configure nginx
 ADD config/alerta_dengue_nginx.conf /etc/nginx/sites-enabled/alerta_dengue
 
-# Copy ssh keys
-RUN mkdir /root/.ssh/
-ADD authorized_keys /root/.ssh/authorized_keys
-
-RUN mkdir /srv/deploy/.ssh/
-ADD authorized_keys /srv/deploy/.ssh/authorized_keys
-
 # Change the permissions for the user home directory
 RUN chown -R deploy:deploy /srv/deploy/
 
-EXPOSE 22 80
+EXPOSE 80
 CMD ["/usr/bin/supervisord", "--nodaemon"]
