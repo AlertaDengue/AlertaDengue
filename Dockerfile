@@ -1,7 +1,5 @@
 FROM debian:jessie
 
-
-ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update
 RUN apt-get install -q -y locales nginx sqlite3 libspatialite5 spatialite-bin git-core supervisor python3 python3-pip python3-setuptools python-virtualenv python3-venv python3-numpy python3-pandas python3-shapely postgresql libpq-dev memcached
 
