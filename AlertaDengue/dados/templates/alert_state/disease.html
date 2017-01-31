@@ -11,7 +11,7 @@ function plot_chart_disease(){
 
     // filter
     var _data = data.filter(function(d) {
-        return filter_age(d) && filter_gender(d)
+        return filter_age(d) && filter_gender(d) && filter_date(d)
     });
 
     // grouping

@@ -85,6 +85,11 @@
         // Browser
        var data;
        var initial_load = true;
+       var _filter_age;
+       var _filter_date_start;
+       var _filter_date_end;
+       var _filter_disease;
+       var _filter_gender;
 
         function removeFilter(fieldName1, fieldName2) {
             $('#' + fieldName1).val('');
@@ -95,24 +100,25 @@
         }
 
         function filter_age(d) {
-            _filter = age_chart.getSelectedPoints().map(function(d){
-                return d.category
-            });
-            return _filter.some(x => x == d.age) || _filter.length == 0;
+            return _filter_age.some(x => x == d.age) ||
+                _filter_age.length == 0;
+        }
+
+        function filter_date(d) {
+            return _filter_date_start == null || (
+                d.dt_week >= _filter_date_start &&
+                d.dt_week <= _filter_date_end
+            );
         }
 
         function filter_disease(d) {
-            _filter = disease_chart.getSelectedPoints().map(function(d){
-                return d.category
-            });
-            return _filter.some(x => x == d.disease) || _filter.length == 0;
+            return _filter_disease.some(x => x == d.disease) ||
+                _filter_disease.length == 0;
         }
 
         function filter_gender(d) {
-            _filter = gender_chart.getSelectedPoints().map(function(d){
-                return d.category
-            });
-            return _filter.some(x => x == d.gender) || _filter.length == 0;
+            return _filter_gender.some(x => x == d.gender) ||
+                _filter_gender.length == 0;
         }
 
         function plots_refresh() {
@@ -120,6 +126,28 @@
         }
 
         function _plots_refresh() {
+            _filter_age = age_chart.getSelectedPoints().map(function(d){
+                return d.category
+            });
+
+            var extremes = date_chart.xAxis[0].getExtremes();
+
+            _filter_date_start = extremes.min != undefined ?
+                new Date(extremes.min) : null;
+            _filter_date_end = extremes.max != undefined ?
+                new Date(extremes.max) : null;
+
+            //console.log(_filter_date_start);
+            //console.log(_filter_date_end);
+
+            _filter_gender = gender_chart.getSelectedPoints().map(function(d){
+                return d.category
+            });
+
+            _filter_disease = disease_chart.getSelectedPoints().map(function(d){
+                return d.category
+            });
+
             plot_chart_disease();
             plot_chart_age();
             plot_chart_gender();
@@ -213,7 +241,7 @@
                       <div class="chart-title content-inline">
                           <input type="button" id="filter_date"
                                  value="Aplicar filtro por período"
-                                 onclick="sendPeriodSelected()"
+                                 onclick="plots_refresh()"
                           />
                       </div>
                       <div class="chart-stage">
