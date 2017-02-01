@@ -126,19 +126,31 @@
         }
 
         function _plots_refresh() {
+            var extremes = date_chart.xAxis[0].getExtremes();
+
+            // filters definition
             _filter_age = age_chart.getSelectedPoints().map(function(d){
                 return d.category
             });
-
-            var extremes = date_chart.xAxis[0].getExtremes();
 
             _filter_date_start = extremes.min != undefined ?
                 new Date(extremes.min) : null;
             _filter_date_end = extremes.max != undefined ?
                 new Date(extremes.max) : null;
 
-            //console.log(_filter_date_start);
-            //console.log(_filter_date_end);
+            if (_filter_date_start != null) {
+                _filter_date_start.setUTCHours(0);
+                _filter_date_start.setUTCMinutes(0);
+                _filter_date_start.setUTCSeconds(0);
+                _filter_date_start.setUTCMilliseconds(0);
+            }
+
+            if (_filter_date_end != null) {
+                _filter_date_end.setUTCHours(23);
+                _filter_date_end.setUTCMinutes(59);
+                _filter_date_end.setUTCSeconds(59);
+                _filter_date_end.setUTCMilliseconds(59);
+            }
 
             _filter_gender = gender_chart.getSelectedPoints().map(function(d){
                 return d.category
@@ -152,6 +164,14 @@
             plot_chart_age();
             plot_chart_gender();
             plot_chart_date();
+
+            // all filters
+            var _data = data.filter(function(d) {
+                return filter_age(d) && filter_gender(d) &&
+                    filter_date(d) && filter_disease(d);
+            });
+
+            $('#selected_cases_num').text(_data.length);
         }
 
         $(document).ready(function(){
@@ -167,6 +187,8 @@
                     var parser = d3.timeParse("%Y-%m-%d");
 
                     data = _data;
+
+                    $('#total_cases_num').text(data.length);
 
                     // convert dt_week string to date
                     data.map(function(d){

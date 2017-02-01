@@ -848,11 +848,10 @@ class NotificacaoCSV_View(View):
             AND dt_notific > NOW() - INTERVAL '1 YEAR'
             AND cid10.nome IS NOT NULL
             AND nu_idade_n IS NOT NULL
-            AND cs_sexo IS NOT NULL
+            AND cs_sexo IN ('M', 'F')
         ORDER BY
             dt_notific
         '''.format(uf)
 
         df = pd.read_sql(sql, conn, 'id')
-        print(df)
         return HttpResponse(df.to_csv(), content_type="text/plain")
