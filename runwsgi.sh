@@ -1,7 +1,7 @@
 #!/bin/bash
 DEPLOY_HOME="/srv/deploy"
 NUM_WORKERS=4
-WSGI_HOST="127.0.0.1"
+WSGI_HOST="0.0.0.0"
 WSGI_PORT="8000"
 ERRLOG="$DEPLOY_HOME/logs/wsgi_server.err"
 ACCESS_LOG="$DEPLOY_HOME/logs/wsgi_server.access"

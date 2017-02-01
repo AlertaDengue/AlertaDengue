@@ -16,3 +16,4 @@ dbfread
 dj-database-url==0.3.0
 django-chunked-upload
 celery
+dj-static
