@@ -8,7 +8,8 @@ function plot_chart_age() {
     var _counter = new Array(_columns_name.length).fill(0);
 
     var _data = data.filter(function(d) {
-        return filter_gender(d) && filter_date(d)  && filter_disease(d)
+        return filter_gender(d) && filter_date(d) &&
+            filter_disease(d) && filter_city(d)
     });
 
     var dataCount = d3.nest()

@@ -33,8 +33,14 @@
     <script src="/static/libs/lodash/lodash.min.js"
             type="text/javascript"></script>
 
+    <script src="/static/libs/bootstrap-select/bootstrap-select.min.js"
+            type="text/javascript"></script>
+
     <script src="/static/js/infodengue.js"
             type="text/javascript"></script>
+
+    <link href="/static/libs/bootstrap-select/bootstrap-select.min.css"
+            type="text/css" rel="stylesheet" />
 
     <style type="text/css">
         #main {
@@ -83,21 +89,14 @@
 
     <script type="text/javascript">
         // Browser
-       var data;
-       var initial_load = true;
-       var _filter_age;
-       var _filter_date_start;
-       var _filter_date_end;
-       var _filter_disease;
-       var _filter_gender;
-
-        function removeFilter(fieldName1, fieldName2) {
-            $('#' + fieldName1).val('');
-            if (fieldName2 != undefined) {
-                $('#' + fieldName2).val('');
-            }
-            $('#formFilters').submit();
-        }
+        var data;
+        var initial_load = true;
+        var _filter_age;
+        var _filter_date_start;
+        var _filter_date_end;
+        var _filter_disease;
+        var _filter_gender;
+        var _filter_city;
 
         function filter_age(d) {
             return _filter_age.some(x => x == d.age) ||
@@ -119,6 +118,11 @@
         function filter_gender(d) {
             return _filter_gender.some(x => x == d.gender) ||
                 _filter_gender.length == 0;
+        }
+
+        function filter_city(d) {
+            return _filter_city.some(x => x == d.geo_id) ||
+                _filter_city.length == 0;
         }
 
         function plots_refresh() {
@@ -160,6 +164,11 @@
                 return d.category
             });
 
+            _filter_city = [];
+            $('#cities option:selected').each(function(){
+                _filter_city.push(parseInt(this.value));
+            });
+
             plot_chart_disease();
             plot_chart_age();
             plot_chart_gender();
@@ -168,7 +177,8 @@
             // all filters
             var _data = data.filter(function(d) {
                 return filter_age(d) && filter_gender(d) &&
-                    filter_date(d) && filter_disease(d);
+                    filter_date(d) && filter_disease(d) &&
+                    filter_city(d);
             });
 
             $('#selected_cases_num').text(_data.length);
@@ -236,10 +246,25 @@
 
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="chart-wrapper">
-                      <div class="chart-stage">
-                          {% map_chart %}
-                      </div>
+                    <div class="chart-wrapper" style="z-index:1001; position: relative;">
+
+                            <select id="cities"
+                                    class="selectpicker"
+                                    data-live-search="true"
+                                    data-actions-box="true"
+                                    multiple
+                            >
+                                {% for k in mun_dict_ordered %}
+                                <option value="{{k}}" selected="selected"
+                                  >{{mun_dict_ordered|lookup:k}}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="button" value="Aplicar seleção"
+                                onclick="apply_cities_selection();"/>
+
+                    </div>
+                    <div class="chart-stage">
+                        {% map_chart %}
                     </div>
                 </div>
             </div>

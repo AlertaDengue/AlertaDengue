@@ -10,7 +10,8 @@ function plot_chart_gender(){
 
     // filter
     var _data = data.filter(function(d) {
-        return filter_age(d) && filter_date(d) && filter_disease(d)
+        return filter_age(d) && filter_date(d) &&
+            filter_disease(d) && filter_city(d)
     });
 
     // grouping
