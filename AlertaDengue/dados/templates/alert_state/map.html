@@ -35,6 +35,35 @@
         tooltipSuffix: " casos"
     });
 
+    function select_switch(feature) {
+        var geo_id = feature.properties.geocodigo;
+        var result;
+
+        console.log('#cities option[value=' + geo_id + ']');
+
+        if (_filter_city.some(x => x == geo_id)) {
+            $('#cities option[value=' + geo_id + ']').prop('selected', false);
+            result = {
+                weight: 1,
+                fillOpacity: 0.6,
+            };
+        } else {
+            $('#cities option[value=' + geo_id + ']').prop('selected', true);
+            result = {
+                weight: 2,
+                fillOpacity: 0.9,
+            };
+        }
+
+        $('#cities').change();
+
+        _filter_city = [];
+        $('#cities option:selected').each(function(){
+            _filter_city.push(parseInt(this.value));
+        });
+        return result;
+    }
+
     function style(feature) {
         var i = +feature.properties.alerta || 0;
         return {
@@ -50,7 +79,7 @@
     function selected_style(feature) {
         var i = +feature.properties.alerta || 0;
         return {
-            weight: 3,
+            weight: 2,
             opacity: 1,
             color: 'white',
             dashArray: '3',
@@ -167,12 +196,15 @@
                 "/><u>Mais detalhes</u></a>"
             );
 
-            layer.setStyle(style(feature))
+            layer.setStyle(selected_style(feature))
             layer.on({
                 mouseover: highlightFeature,
                 mouseout: resetHighlight,
                 popupopen: renderSparkline,
-                click: function(){layer.setStyle(selected_style(feature))}
+                click: function(){
+                    layer.setStyle(select_switch(feature));
+                    plots_refresh();
+                }
             });
         };
 
@@ -180,7 +212,7 @@
             var gc = geo_ids[i];
             $.getJSON('/static/geojson/' + gc.toString() + '.json', function(data){
                 geojson = L.geoJson(
-                    data, {style: style, onEachFeature: fill_details}
+                    data, {style: selected_style, onEachFeature: fill_details}
                 );
                 municipios.addLayer(geojson, true);
             });
@@ -203,5 +235,32 @@
         map.touchZoom.disable();
         map.doubleClickZoom.disable();
 
+    }
+
+    function apply_cities_selection() {
+        _filter_city = [];
+        $('#cities option:selected').each(function(){
+            _filter_city.push(parseInt(this.value));
+        });
+
+        municipios.eachLayer(function (layer) {
+            for (i in layer._layers) {
+                features = layer._layers[i].feature;
+
+                if (_filter_city.indexOf(features.properties.geocodigo) >= 0) {
+                    layer._layers[i].setStyle({
+                        weight: 2,
+                        fillOpacity: 0.9,
+                    });
+                } else {
+                    layer._layers[i].setStyle({
+                        weight: 1,
+                        fillOpacity: 0.6,
+                    });
+                }
+          }
+        });
+
+        plots_refresh();
     }
 </script>

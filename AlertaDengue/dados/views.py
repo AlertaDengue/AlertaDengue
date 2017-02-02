@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.conf import settings
 from django.http import HttpResponse
 from time import mktime
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 import pandas as pd
 import random
@@ -525,65 +525,18 @@ class AlertaStateView(TemplateView):
 
         mun_dict = dict(cities_alert[['municipio_geocodigo', 'nome']].values)
 
+        mun_dict_ordered = OrderedDict(
+            sorted(
+                cities_alert[['municipio_geocodigo', 'nome']].values,
+                key=lambda d: d[1]
+            )
+        )
+
         geo_ids = list(mun_dict.keys())
 
         alerts = dict(
             cities_alert[['municipio_geocodigo', 'level_alert']].values
         )
-
-        initial_date = self._get('initial_date')
-        final_date = self._get('final_date')
-        disease = self._get('disease')
-        gender = self._get('gender')
-        age = self._get('age')
-
-        filters_list = []
-
-        link_dt = '''
-        <a href="#" onclick="removeFilter('initial_date', 'final_date');">[x]</a>
-        '''
-        link_disease = '''
-        <a href="#" onclick="removeFilter('disease');">[x]</a>
-        '''
-        link_age = '''
-        <a href="#" onclick="removeFilter('age');">[x]</a>
-        '''
-        link_gender = '''
-        <a href="#" onclick="removeFilter('gender');">[x]</a>
-        '''
-
-        if initial_date:
-            if final_date:
-                filters_list.append(
-                    'Período {} a {} {}'.format(
-                        initial_date, final_date, link_dt
-                    )
-                )
-            else:
-                filters_list.append(
-                    'Período a partir de {} {}'.format(initial_date, link_dt)
-                )
-        elif final_date:
-            filters_list.append('Período até {} {}'.format(
-                final_date, link_dt)
-            )
-
-        if disease:
-            filters_list.append(
-                'Tipo de Doença: {} {}'.format(disease, link_disease)
-            )
-
-        if age:
-            filters_list.append('Faixa etária (anos): {} {}'.format(
-                age, link_age)
-            )
-
-        if gender:
-            filters_list.append('Gênero: {} {}'.format(gender, link_gender))
-
-        uf = self._state_name[context['state']]
-
-        filters_description = ', '.join(filters_list)
 
         context.update({
             'state_abv': context['state'],
@@ -591,21 +544,17 @@ class AlertaStateView(TemplateView):
             'map_center': self._map_center[context['state']],
             'map_zoom': self._map_zoom[context['state']],
             'mun_dict': mun_dict,
+            'mun_dict_ordered': mun_dict_ordered,
             'geo_ids': geo_ids,
             'alerts_level': alerts,
             # estimated cases is used to show a chart of the last 12 events
             'case_series': dbdata.tail_estimated_cases(geo_ids, 12, conn),
             # dist csv data
             # page information
-            'filters_description': filters_description,
-            'initial_date': initial_date if initial_date else '',
-            'final_date': final_date if final_date else '',
-            'disease': disease if disease else '',
-            'gender': gender if gender else '',
-            'age': age if age else ''
         })
         return context
 
+"""
     def _get_gender_filter(self, gender):
         return (
             "cs_sexo IN ('F', 'M')" if gender is None else
@@ -791,7 +740,7 @@ class AlertaStateView(TemplateView):
         df_alert_period.to_csv('/tmp/data.csv')
 
         return df_alert_period
-
+"""
 
 class NotificacaoCSV_View(View):
     _state_name = {
@@ -836,7 +785,8 @@ class NotificacaoCSV_View(View):
                 CONCAT(CAST(EXTRACT(DOW FROM dt_notific) AS VARCHAR), 'DAY'
             ) AS INTERVAL) AS dt_week,
 
-            cid10.nome AS disease
+            cid10.nome AS disease,
+            municipio_geocodigo as geo_id
         FROM
             "Municipio"."Notificacao" AS notif
                 INNER JOIN "Dengue_global"."Municipio" AS municipio
@@ -848,11 +798,10 @@ class NotificacaoCSV_View(View):
             AND dt_notific > NOW() - INTERVAL '1 YEAR'
             AND cid10.nome IS NOT NULL
             AND nu_idade_n IS NOT NULL
-            AND cs_sexo IS NOT NULL
+            AND cs_sexo IN ('M', 'F')
         ORDER BY
             dt_notific
         '''.format(uf)
 
         df = pd.read_sql(sql, conn, 'id')
-        print(df)
         return HttpResponse(df.to_csv(), content_type="text/plain")
