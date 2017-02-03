@@ -183,3 +183,5 @@ try:
     from AlertaDengue.local_settings import *
 except ImportError:
     pass
+
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=None)
