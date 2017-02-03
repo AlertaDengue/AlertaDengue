@@ -1,0 +1,10 @@
+version: "2"
+services:
+    web:
+        build: .
+        ports:
+            - 8000:8000
+        env_file:
+            - .env
+        volumes:
+            - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT

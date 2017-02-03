@@ -4,4 +4,5 @@
 local_settings.py
 .idea/*
 settings.ini
+.env
 *.sw[po]

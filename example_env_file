@@ -1,5 +1,5 @@
-[settings]
 ALLOWED_HOSTS=alerta.dengue.mat.br,info.dengue.mat.br
 SECRET_KEY=my-secret-key
 DEBUG=True
 PSQL_PASSWORD=super-secret-password
+DOCKER_HOST_MEDIA_ROOT=/home/user/infodengue/MEDIA_ROOT
