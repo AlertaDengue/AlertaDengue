@@ -16,12 +16,8 @@ ADD config/memcached.conf /etc/supervisor/conf.d/memcached.conf
 RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
 RUN mkdir -p /srv/deploy/logs/
 
-# Clone code
-RUN git clone https://github.com/AlertaDengue/AlertaDengue.git /srv/deploy/AlertaDengue
-
-# Add our local settings. This file is not versioned because it contains
-# sensitive data (such as the SECRET_KEY).
-ADD AlertaDengue/AlertaDengue/settings.ini /srv/deploy/AlertaDengue/AlertaDengue/AlertaDengue/settings.ini
+# Send code to the container
+ADD . /srv/deploy/AlertaDengue
 
 # Install python deps
 RUN pip3 install -r /srv/deploy/AlertaDengue/requirements.txt
