@@ -17,5 +17,4 @@ services:
             - MEMCACHED_HOST=memcache
         volumes:
             - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
-            - ${DOCKER_HOST_LOGS_DIR}:/srv/deploy/logs/
         restart: always
