@@ -6,3 +6,4 @@ local_settings.py
 settings.ini
 .env
 *.sw[po]
+docker_shared_files
