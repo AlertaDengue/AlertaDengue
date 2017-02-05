@@ -2,4 +2,5 @@ ALLOWED_HOSTS=alerta.dengue.mat.br,info.dengue.mat.br
 SECRET_KEY=my-secret-key
 DEBUG=True
 PSQL_PASSWORD=super-secret-password
-DOCKER_HOST_SHARED_DIR=/home/user/infodengue/docker_shared_files
+DOCKER_HOST_MEDIA_ROOT=/home/user/infodengue/docker_shared_files
+DOCKER_HOST_LOGS_DIR=/tmp/alerta_dengue_logs
