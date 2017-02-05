@@ -8,3 +8,4 @@ services:
             - .env
         volumes:
             - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+        restart: always
