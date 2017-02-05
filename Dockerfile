@@ -15,18 +15,19 @@ RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
 # Send code to the container
 ADD . /srv/deploy/AlertaDengue
 
+WORKDIR /srv/deploy/AlertaDengue/AlertaDengue
+
 # Install python deps
-RUN pip3 install -r /srv/deploy/AlertaDengue/requirements.txt
+RUN pip3 install -r ../requirements.txt
 
 # Collectstatic
-RUN /srv/deploy/AlertaDengue/AlertaDengue/manage.py collectstatic --noinput
+RUN python3 manage.py collectstatic --noinput
 
-RUN /srv/deploy/AlertaDengue/AlertaDengue/manage.py migrate --run-syncdb --noinput
+RUN python3 manage.py migrate --run-syncdb --noinput
 
 # Change the permissions for the user home directory
 RUN chown -R deploy:deploy /srv/deploy/
 
 EXPOSE 8000
-WORKDIR /srv/deploy/AlertaDengue/AlertaDengue
 USER deploy
 CMD ["/srv/deploy/AlertaDengue/runwsgi.sh"]
