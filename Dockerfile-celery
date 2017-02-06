@@ -1,0 +1,29 @@
+FROM debian:testing
+
+RUN apt-get update
+RUN apt-get install -q -y python3 python3-pip python3-setuptools python3-numpy python3-pandas libpq-dev
+
+# Create deploy user
+RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
+
+
+# Add and install requirements.txt before we send the code so we don't have to
+# install everything again whenever any file in this directory changes (this
+# helps build the container a *lot* faster by using the cache.
+ADD requirements.txt /tmp/requirements.txt
+
+RUN pip3 install -r /tmp/requirements.txt
+
+# Send code to the container
+ADD . /srv/deploy/AlertaDengue
+
+WORKDIR /srv/deploy/AlertaDengue/AlertaDengue
+
+# Change the permissions for the user home directory
+RUN chown -R deploy:deploy /srv/deploy/
+
+RUN pip3 install celery
+
+USER deploy
+
+CMD ["/srv/deploy/AlertaDengue/run_celery_worker.sh"]

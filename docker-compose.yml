@@ -15,6 +15,23 @@ services:
             - .env
         environment:
             - MEMCACHED_HOST=memcache
+            - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
         volumes:
             - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
         restart: always
+
+    rabbitmq:
+        image: rabbitmq:3
+        hostname: rabbitmq
+        restart: always
+
+    celery-worker:
+        build:
+            context: "."
+            dockerfile: "Dockerfile-celery"
+        env_file:
+            - .env
+        environment:
+            - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+        volumes:
+            - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
