@@ -6,7 +6,6 @@ gunicorn
 pandas
 python-decouple==2.3
 pytz
-shapely
 psycopg2
 sqlalchemy
 python3-memcached
