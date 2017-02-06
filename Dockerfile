@@ -12,13 +12,17 @@ ENV LC_ALL pt_BR.UTF-8
 # Create deploy user
 RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
 
+# Add and install requirements.txt before we send the code so we don't have to
+# install everything again whenever any file in this directory changes (this
+# helps build the container a *lot* faster by using the cache.
+ADD requirements.txt /tmp/requirements.txt
+
+RUN pip3 install -r /tmp/requirements.txt
+
 # Send code to the container
 ADD . /srv/deploy/AlertaDengue
 
 WORKDIR /srv/deploy/AlertaDengue/AlertaDengue
-
-# Install python deps
-RUN pip3 install -r ../requirements.txt
 
 # Collectstatic
 RUN python3 manage.py collectstatic --noinput
