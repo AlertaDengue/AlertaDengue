@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:testing
 
 RUN apt-get update
 RUN apt-get install -q -y locales python3 python3-pip python3-setuptools python3-numpy python3-pandas libpq-dev
