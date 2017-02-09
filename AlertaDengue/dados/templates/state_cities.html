@@ -130,7 +130,14 @@
         }
 
         function _plots_refresh() {
+            //console.log('Starting ...');
+            //var start = performance.now();
             var extremes = date_chart.xAxis[0].getExtremes();
+
+            if (data == undefined || data == null) {
+                alert('Não existe dados para o período informado.');
+                return;
+            }
 
             // filters definition
             _filter_age = age_chart.getSelectedPoints().map(function(d){
@@ -182,6 +189,8 @@
             });
 
             $('#selected_cases_num').text(_data.length);
+
+            //console.log((performance.now() - start)/1000);
         }
 
         $(document).ready(function(){

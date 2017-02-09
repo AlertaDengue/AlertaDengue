@@ -12,10 +12,10 @@ function plot_chart_date(){
     var format = d3.timeFormat('%Y-%m-%d');
 
     // filter
-    var _data = _.cloneDeep(data).filter(function(d) {
+    var _data = _.cloneDeep(data.filter(function(d) {
         return filter_age(d) && filter_gender(d) &&
             filter_disease(d) && filter_city(d)
-    });
+    }));
 
     _data.map(function(d){
         d.dt_week = format(d.dt_week);
