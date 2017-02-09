@@ -56,6 +56,9 @@ INSTALLED_APPS = (
     'dbf.apps.DbfConfig'
 )
 
+if DEBUG:
+    INSTALLED_APPS += ('django_extensions',)
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -68,8 +71,6 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'AlertaDengue.urls'
-
-
 
 WSGI_APPLICATION = 'AlertaDengue.wsgi.application'
 
