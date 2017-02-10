@@ -52,10 +52,12 @@ ADD AlertaDengue/AlertaDengue/settings.ini /srv/deploy/project/AlertaDengue/Aler
 RUN /srv/deploy/exec_in_virtualenv.sh pip3 install --no-clean -r /srv/deploy/project/AlertaDengue/requirements.txt
 RUN rm -r /tmp/pip_build_root/
 
+# Migrate
+RUN /srv/deploy/exec_in_virtualenv.sh /srv/deploy/project/AlertaDengue/AlertaDengue/manage.py migrate --run-syncdb --noinput
+RUN /srv/deploy/exec_in_virtualenv.sh /srv/deploy/project/AlertaDengue/AlertaDengue/manage.py sync_geojson
+
 # Collectstatic
 RUN /srv/deploy/exec_in_virtualenv.sh /srv/deploy/project/AlertaDengue/AlertaDengue/manage.py collectstatic --noinput
-
-RUN /srv/deploy/exec_in_virtualenv.sh /srv/deploy/project/AlertaDengue/AlertaDengue/manage.py migrate --run-syncdb --noinput
 
 # Configure supervisor job
 ADD config/alerta_dengue.conf /etc/supervisor/conf.d/alerta_dengue.conf
