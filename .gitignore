@@ -9,7 +9,7 @@ settings.ini
 /include
 /lib
 /AlertaDengue/geodjango.db
-/AlertaDengue/static/geojson/*.json
+/AlertaDengue/static_files/*
 pip-selfcheck.json
 /shapely
 /share

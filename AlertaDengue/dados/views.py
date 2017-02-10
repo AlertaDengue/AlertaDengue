@@ -804,4 +804,7 @@ class NotificacaoCSV_View(View):
         '''.format(uf)
 
         df = pd.read_sql(sql, conn, 'id')
-        return HttpResponse(df.to_csv(), content_type="text/plain")
+        return HttpResponse(
+            df.to_csv(date_format='%Y-%m-%d'),
+            content_type="text/plain"
+        )

@@ -12,10 +12,19 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         geo_ids = list(dict(dbdata.get_all_active_cities()).keys())
 
+        if not os.path.exists(settings.STATIC_ROOT):
+            os.makedirs(settings.STATIC_ROOT)
+
+        f_path = os.path.join(
+            os.path.abspath(settings.STATIC_ROOT),
+            'geojson'
+        )
+
+        if not os.path.exists(f_path):
+            os.makedirs(f_path)
+
         for geo_id in geo_ids:
-            f_name = os.path.join(
-                settings.STATICFILES_DIRS[0], 'geojson', '%s.json' % geo_id
-            )
+            f_name = os.path.join(f_path, '%s.json' % geo_id)
 
             geojson_city = geojson.dumps(
                 maps.get_city_geojson(int(geo_id))
