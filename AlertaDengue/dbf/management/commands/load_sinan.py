@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 
 from dbf.sinan import Sinan
