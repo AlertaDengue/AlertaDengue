@@ -93,7 +93,9 @@ class AlertaMainView(TemplateView):
             # 'municipios': municipios,
             'geocodigos': geocodigos,
             # 'alerta': json.dumps(alerta),
-            'case_series': json.dumps(case_series),
+            'case_series': json.dumps({
+                k: list(map(int, v)) for k, v in case_series.items()
+            }),
             'total': json.dumps(total.tolist()),
             'states': self._state_names,
             'count_cities': count_cities,
@@ -804,4 +806,7 @@ class NotificacaoCSV_View(View):
         '''.format(uf)
 
         df = pd.read_sql(sql, conn, 'id')
-        return HttpResponse(df.to_csv(), content_type="text/plain")
+        return HttpResponse(
+            df.to_csv(date_format='%Y-%m-%d'),
+            content_type="text/plain"
+        )

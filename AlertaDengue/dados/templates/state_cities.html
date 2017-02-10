@@ -201,7 +201,7 @@
             });
 
             d3.csv(
-                'http://localhost:8000/csv/notif_last12/{{state_abv}}',
+                '/csv/notif_last12/{{state_abv}}',
                 function(_data) {
                     var parser = d3.timeParse("%Y-%m-%d");
 
