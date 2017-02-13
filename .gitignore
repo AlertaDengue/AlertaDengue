@@ -4,4 +4,6 @@
 local_settings.py
 .idea/*
 settings.ini
+.env
 *.sw[po]
+docker_shared_files

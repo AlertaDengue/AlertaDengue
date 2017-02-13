@@ -1,0 +1,9 @@
+O arquivo {{ dbf.file }} enviado em {{ dbf.uploaded_at|date:"d/m/Y" }} com notificações do ano {{ dbf.notification_year }} não pôde ser importado.
+
+
+O erro encontrado foi o seguinte:
+
+"{{ error_message }}"
+
+
+Por favor verifique o arquivo e tente enviá-lo novamente.

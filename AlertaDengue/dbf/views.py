@@ -12,6 +12,7 @@ from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
 
 from dbf.models import DBF, DBFChunkedUpload
 from dbf.forms import DBFForm
+from dbf.tasks import import_dbf_to_database
 
 class UploadSuccessful(LoginRequiredMixin, TemplateView):
     template_name = "upload_successful.html"
@@ -43,6 +44,7 @@ class Upload(LoginRequiredMixin, FormView):
             export_date=form.cleaned_data['export_date'],
             notification_year=form.cleaned_data['notification_year']
         )
+        import_dbf_to_database.delay(dbf.id)
         success_message = _("O arquivo {} exportado em {:%d/%m/%Y} com notificações do ano {} "
                             "foi enviado com sucesso. Você será informado "
                             "por email ({}) assim que o processo de "

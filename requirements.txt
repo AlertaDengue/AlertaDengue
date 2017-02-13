@@ -6,7 +6,6 @@ gunicorn
 pandas
 python-decouple==2.3
 pytz
-shapely
 psycopg2
 sqlalchemy
 python3-memcached
@@ -15,3 +14,5 @@ mock
 dbfread
 dj-database-url==0.3.0
 django-chunked-upload
+celery
+dj-static

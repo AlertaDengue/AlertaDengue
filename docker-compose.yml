@@ -1,0 +1,37 @@
+version: "2"
+services:
+    memcache:
+        image: memcached:latest
+        hostname: memcached
+        ports:
+            - 11212:11211
+        restart: always
+
+    web:
+        build: .
+        ports:
+            - 8000:8000
+        env_file:
+            - .env
+        environment:
+            - MEMCACHED_HOST=memcache
+            - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+        volumes:
+            - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+        restart: always
+
+    rabbitmq:
+        image: rabbitmq:3
+        hostname: rabbitmq
+        restart: always
+
+    celery-worker:
+        build:
+            context: "."
+            dockerfile: "Dockerfile-celery"
+        env_file:
+            - .env
+        environment:
+            - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+        volumes:
+            - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT

@@ -172,6 +172,7 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = config('MEDIA_ROOT', default='')
 
 EMAIL_BACKEND = config('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_FROM_ADDRESS = config('EMAIL_FROM_ADDRESS', 'no-reply@info.dengue.mat.br')
 
 if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
     EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = config('EMAIL_CONFIG', default='example_host,25,username,password', cast=Csv())
@@ -182,3 +183,5 @@ try:
     from AlertaDengue.local_settings import *
 except ImportError:
     pass
+
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=None)
