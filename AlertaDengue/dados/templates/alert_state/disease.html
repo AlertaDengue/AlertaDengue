@@ -8,6 +8,11 @@ function plot_chart_disease(){
     var _values = [];
     var _columns_name = disease_chart.xAxis[0].categories;
     var _counter = new Array(_columns_name.length).fill(0);
+    var _num_selected = 0;
+
+    var categories_selected = disease_chart.getSelectedPoints().map(function(d){
+        return d.category
+    });
 
     // filter
     var _data = data.filter(function(d) {
@@ -21,11 +26,26 @@ function plot_chart_disease(){
         .rollup(function(v) { return v.length; })
         .entries(_data);
 
+    // select all if nothing is selected
+    if (categories_selected.length == 0) {
+        for (j in disease_chart.series[0].data) {
+            disease_chart.series[0].data[j].select(true, true);
+        }
+    }
+
+    categories_selected = disease_chart.getSelectedPoints().map(function(d){
+        return d.category
+    });
+
     // counter to chart plotting
     for (i in dataCount) {
         for (j in _columns_name) {
             if (dataCount[i].key == _columns_name[j]) {
                 _counter[j] = dataCount[i].value;
+
+                if (categories_selected.indexOf(dataCount[i].key) >= 0) {
+                    _num_selected += _counter[j];
+                }
             }
         }
     }
@@ -33,16 +53,7 @@ function plot_chart_disease(){
     // set data
     disease_chart.series[0].setData(_counter);
 
-    // selection
-    var result = disease_chart.getSelectedPoints().map(function(d){
-        return d.category
-    });
-
-    if (result.length == 0) {
-        for (j in disease_chart.series[0].data) {
-            disease_chart.series[0].data[j].select(true, true);
-        }
-    }
+    $('#selected_cases_num').text(_num_selected);
 }
 
 $(document).ready(function () {
@@ -62,7 +73,7 @@ $(document).ready(function () {
                         click: function(event){
                             //this.slice(null);
                             this.select(null, true);
-                            plots_refresh();
+                            plots_refresh('disease');
                         },
                     }
                 }

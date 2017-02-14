@@ -18,3 +18,5 @@ pip-selfcheck.json
 geodjango.db
 *.dbf
 chunked_uploads
+authorized_keys
+Dockerfile-dev
