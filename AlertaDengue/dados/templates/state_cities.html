@@ -91,6 +91,7 @@
         // Browser
         var data;
         var initial_load = true;
+        var state_abv = '{{state_abv}}';
         var ignore_chart = false;
         var _filter_age;
         var _filter_date_start;
@@ -182,7 +183,7 @@
 
             if (ignore_chart != 'disease') plot_chart_disease();
             if (ignore_chart != 'age') plot_chart_age();
-            if (ignore_chart != 'gender') plot_chart_gender();
+            if (ignore_chart != 'gender') plot_chart_gender(state_abv);
             if (ignore_chart != 'date') plot_chart_date();
 
             ignore_chart = '';

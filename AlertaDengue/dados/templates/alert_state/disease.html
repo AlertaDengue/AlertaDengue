@@ -4,7 +4,7 @@
 var disease_chart;
 var disease_chart_load = false;
 
-function plot_chart_disease(){
+function _plot_chart_disease(){
     var _values = [];
     var _columns_name = disease_chart.xAxis[0].categories;
     var _counter = new Array(_columns_name.length).fill(0);
@@ -54,6 +54,51 @@ function plot_chart_disease(){
     disease_chart.series[0].setData(_counter);
 
     $('#selected_cases_num').text(_num_selected);
+}
+
+
+function plot_chart_disease(){
+    var _values = [];
+    var _columns_name = disease_chart.xAxis[0].categories;
+    var _counter = new Array(_columns_name.length).fill(0);
+    var _num_selected = 0;
+
+    var categories_selected = disease_chart.getSelectedPoints().map(function(d){
+        return d.category
+    });
+
+    // select all if nothing is selected
+    if (categories_selected.length == 0) {
+        for (j in disease_chart.series[0].data) {
+            disease_chart.series[0].data[j].select(true, true);
+        }
+    }
+
+    categories_selected = disease_chart.getSelectedPoints().map(function(d){
+        return d.category
+    });
+
+    var url = '/csv/notif_reduced/' + state_abv + '?chart-type=disease';
+
+    d3.csv(url, function(data){
+        for (i in data) {
+            for (j in _columns_name) {
+                if (data[i].category == _columns_name[j]) {
+                    _counter[j] = parseInt(data[i].casos);
+
+                    if (categories_selected.indexOf(data[i].category) >= 0) {
+                        _num_selected += _counter[j];
+                    }
+                }
+            }
+        }
+
+        // set data
+        disease_chart.series[0].setData(_counter);
+
+        // show selected numbers
+        $('#selected_cases_num').text(_num_selected);
+    });
 }
 
 $(document).ready(function () {

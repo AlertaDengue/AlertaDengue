@@ -486,31 +486,6 @@ class AlertaStateView(TemplateView):
     ELSE NULL
     END AS age'''
 
-    def _get(self, param, default=None):
-        """
-
-        :param param:
-        :param default:
-        :return:
-        """
-        result = (
-            self.request.GET[param]
-            if param in self.request.GET else
-            default
-        )
-
-        return result if result else default
-
-    def _process_filter(self, data_filter, exception_key):
-        """
-
-        :param data_filter:
-        :param exception_key:
-        :return:
-        """
-        _f = [v for k, v in data_filter if not k == exception_key]
-        return ' AND '.join(filter(lambda x: x, _f))
-
     def get_context_data(self, **kwargs):
         """
 
@@ -556,7 +531,171 @@ class AlertaStateView(TemplateView):
         })
         return context
 
-"""
+
+class NotificacaoCSV_View(View):
+    _state_name = {
+        'RJ': 'Rio de Janeiro',
+        'PR': 'Paraná',
+        'ES': 'Espírito Santo'}
+
+    def get(self, request, initials_state):
+        """
+
+        :param kwargs:
+        :return:
+        """
+        conn = dbdata.create_connection()
+
+        uf = self._state_name[initials_state]
+
+        sql = '''
+        SELECT
+            id,
+            (CASE COALESCE(cs_sexo, NULL)
+             WHEN 'M' THEN 'Homem'
+             WHEN 'F' THEN 'Mulher'
+             ELSE NULL
+             END
+            ) AS gender,
+
+            (CASE
+             WHEN nu_idade_n <= 4004 THEN '00-04 anos'
+             WHEN nu_idade_n BETWEEN 4005 AND 4009 THEN '05-09 anos'
+             WHEN nu_idade_n BETWEEN 4010 AND 4019 THEN '10-19 anos'
+             WHEN nu_idade_n BETWEEN 4020 AND 4029 THEN '20-29 anos'
+             WHEN nu_idade_n BETWEEN 4030 AND 4039 THEN '30-39 anos'
+             WHEN nu_idade_n BETWEEN 4040 AND 4049 THEN '40-49 anos'
+             WHEN nu_idade_n BETWEEN 4050 AND 4059 THEN '50-59 anos'
+             WHEN nu_idade_n >=4060 THEN '60+ anos'
+             ELSE NULL
+             END
+            )AS age,
+
+            dt_notific - CAST(
+                CONCAT(CAST(EXTRACT(DOW FROM dt_notific) AS VARCHAR), 'DAY'
+            ) AS INTERVAL) AS dt_week,
+
+            cid10.nome AS disease,
+            municipio_geocodigo as geo_id
+        FROM
+            "Municipio"."Notificacao" AS notif
+                INNER JOIN "Dengue_global"."Municipio" AS municipio
+                  ON notif.municipio_geocodigo = municipio.geocodigo
+            INNER JOIN "Dengue_global"."CID10" AS cid10
+                  ON notif.cid10_codigo=cid10.codigo
+        WHERE
+            uf='{}'
+            AND dt_notific > NOW() - INTERVAL '1 YEAR'
+            AND cid10.nome IS NOT NULL
+            AND nu_idade_n IS NOT NULL
+            AND cs_sexo IN ('M', 'F')
+        ORDER BY
+            dt_notific
+        '''.format(uf)
+
+        df = pd.read_sql(sql, conn, 'id')
+        return HttpResponse(
+            df.to_csv(date_format='%Y-%m-%d'),
+            content_type="text/plain"
+        )
+
+
+class NotificationReducedCSV_View(View):
+    _state_name = {
+        'RJ': 'Rio de Janeiro',
+        'PR': 'Paraná',
+        'ES': 'Espírito Santo'}
+
+    _age_field = '''
+        CASE
+        WHEN nu_idade_n <= 4004 THEN '00-04 anos'
+        WHEN nu_idade_n BETWEEN 4005 AND 4009 THEN '05-09 anos'
+        WHEN nu_idade_n BETWEEN 4010 AND 4019 THEN '10-19 anos'
+        WHEN nu_idade_n BETWEEN 4020 AND 4029 THEN '20-29 anos'
+        WHEN nu_idade_n BETWEEN 4030 AND 4039 THEN '30-39 anos'
+        WHEN nu_idade_n BETWEEN 4040 AND 4049 THEN '40-49 anos'
+        WHEN nu_idade_n BETWEEN 4050 AND 4059 THEN '50-59 anos'
+        WHEN nu_idade_n >=4060 THEN '60+ anos'
+        ELSE NULL
+        END AS age'''
+
+    request = None
+
+    def _get(self, param, default=None):
+        """
+
+        :param param:
+        :param default:
+        :return:
+        """
+        result = (
+            self.request.GET[param]
+            if param in self.request.GET else
+            default
+        )
+
+        return result if result else default
+
+    def _process_filter(self, data_filter, exception_key):
+        """
+
+        :param data_filter:
+        :param exception_key:
+        :return:
+        """
+        _f = [v for k, v in data_filter if not k == exception_key]
+        return ' AND '.join(filter(lambda x: x, _f))
+
+    def get(self, request, initials_state):
+        """
+
+        :param kwargs:
+        :return:
+        """
+        self.request = request
+
+        conn = dbdata.create_connection()
+
+        uf = self._state_name[initials_state]
+
+        chart_type = self._get('chart-type')
+        disease_values = self._get('diseases')
+        age_values = self._get('ages')
+        gender_values = self._get('genders')
+        initial_date = self._get('initial-date')
+        final_date = self._get('final-date')
+
+        dist_filters = [
+            ('uf', "uf='%s'" % uf),
+            ('disease', self._get_disease_filter(
+                conn=conn, disease=disease_values
+            )),
+            ('gender',  self._get_gender_filter(gender=gender_values)),
+            ('age', self._get_age_filter(age=age_values)),
+            ('date', self._get_period_filter(
+                initial_date=initial_date, final_date=final_date
+            )),
+        ]
+
+        if chart_type == 'disease':
+            result = self.get_disease_dist(
+                conn=conn, dist_filters=dist_filters
+            ).to_csv()
+        elif chart_type == 'age':
+            result = self.get_age_dist(
+                conn=conn, dist_filters=dist_filters
+            ).to_csv()
+        elif chart_type == 'gender':
+            result = self.get_gender_dist(
+                conn=conn, dist_filters=dist_filters
+            ).to_csv()
+        elif chart_type == 'period':
+            result = self.get_period_dist(
+                conn=conn, dist_filters=dist_filters
+            ).to_csv(date_format='%Y-%m-%d')
+
+        return HttpResponse(result, content_type="text/plain")
+
     def _get_gender_filter(self, gender):
         return (
             "cs_sexo IN ('F', 'M')" if gender is None else
@@ -642,7 +781,7 @@ class AlertaStateView(TemplateView):
 
         sql = '''
         SELECT
-            COALESCE(cid10_nome, NULL) AS nome,
+            COALESCE(cid10_nome, NULL) AS category,
             count(id) AS casos
         FROM (
             SELECT
@@ -662,14 +801,14 @@ class AlertaStateView(TemplateView):
 
         df_disease_dist = pd.read_sql(sql, conn)
 
-        return df_disease_dist.set_index('nome', drop=True)
+        return df_disease_dist.set_index('category', drop=True)
 
     def get_age_dist(self, conn, dist_filters):
         _dist_filters = self._process_filter(dist_filters, 'age')
 
         sql = '''
         SELECT
-            age,
+            age AS category,
             count(age) AS casos
         FROM (
             SELECT
@@ -685,7 +824,7 @@ class AlertaStateView(TemplateView):
         ORDER BY age
         '''.format(self._age_field, _dist_filters)
 
-        return pd.read_sql(sql, conn, 'age')
+        return pd.read_sql(sql, conn, 'category')
 
     def get_gender_dist(self, conn, dist_filters):
         _dist_filters = self._process_filter(dist_filters, 'gender')
@@ -697,7 +836,7 @@ class AlertaStateView(TemplateView):
              WHEN 'F' THEN 'Mulher'
              ELSE NULL
              END
-            ) AS gender,
+            ) AS category,
             COUNT(id) AS casos
         FROM (
             SELECT *,
@@ -711,9 +850,9 @@ class AlertaStateView(TemplateView):
         GROUP BY cs_sexo;
         '''.format(self._age_field, _dist_filters)
 
-        return pd.read_sql(sql, conn, 'gender')
+        return pd.read_sql(sql, conn, 'category')
 
-    def get_date_dist(self, conn, dist_filters):
+    def get_period_dist(self, conn, dist_filters):
         _dist_filters = self._process_filter(dist_filters, 'period')
 
         sql = '''
@@ -737,76 +876,6 @@ class AlertaStateView(TemplateView):
         '''.format(self._age_field, _dist_filters)
 
         df_alert_period = pd.read_sql(sql, conn, index_col='dt_week')
-        df_alert_period.index.rename('Categories', inplace=True)
-
-        df_alert_period.to_csv('/tmp/data.csv')
+        df_alert_period.index.rename('category', inplace=True)
 
         return df_alert_period
-"""
-
-class NotificacaoCSV_View(View):
-    _state_name = {
-        'RJ': 'Rio de Janeiro',
-        'PR': 'Paraná',
-        'ES': 'Espírito Santo'}
-
-    def get(self, request, initials_state):
-        """
-
-        :param kwargs:
-        :return:
-        """
-        conn = dbdata.create_connection()
-
-        uf = self._state_name[initials_state]
-
-        sql = '''
-        SELECT
-            id,
-            (CASE COALESCE(cs_sexo, NULL)
-             WHEN 'M' THEN 'Homem'
-             WHEN 'F' THEN 'Mulher'
-             ELSE NULL
-             END
-            ) AS gender,
-
-            (CASE
-             WHEN nu_idade_n <= 4004 THEN '00-04 anos'
-             WHEN nu_idade_n BETWEEN 4005 AND 4009 THEN '05-09 anos'
-             WHEN nu_idade_n BETWEEN 4010 AND 4019 THEN '10-19 anos'
-             WHEN nu_idade_n BETWEEN 4020 AND 4029 THEN '20-29 anos'
-             WHEN nu_idade_n BETWEEN 4030 AND 4039 THEN '30-39 anos'
-             WHEN nu_idade_n BETWEEN 4040 AND 4049 THEN '40-49 anos'
-             WHEN nu_idade_n BETWEEN 4050 AND 4059 THEN '50-59 anos'
-             WHEN nu_idade_n >=4060 THEN '60+ anos'
-             ELSE NULL
-             END
-            )AS age,
-
-            dt_notific - CAST(
-                CONCAT(CAST(EXTRACT(DOW FROM dt_notific) AS VARCHAR), 'DAY'
-            ) AS INTERVAL) AS dt_week,
-
-            cid10.nome AS disease,
-            municipio_geocodigo as geo_id
-        FROM
-            "Municipio"."Notificacao" AS notif
-                INNER JOIN "Dengue_global"."Municipio" AS municipio
-                  ON notif.municipio_geocodigo = municipio.geocodigo
-            INNER JOIN "Dengue_global"."CID10" AS cid10
-                  ON notif.cid10_codigo=cid10.codigo
-        WHERE
-            uf='{}'
-            AND dt_notific > NOW() - INTERVAL '1 YEAR'
-            AND cid10.nome IS NOT NULL
-            AND nu_idade_n IS NOT NULL
-            AND cs_sexo IN ('M', 'F')
-        ORDER BY
-            dt_notific
-        '''.format(uf)
-
-        df = pd.read_sql(sql, conn, 'id')
-        return HttpResponse(
-            df.to_csv(date_format='%Y-%m-%d'),
-            content_type="text/plain"
-        )

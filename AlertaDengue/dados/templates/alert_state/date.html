@@ -10,6 +10,31 @@ function plot_chart_date(){
 
     var parser = d3.timeParse('%Y-%m-%d');
     var format = d3.timeFormat('%Y-%m-%d');
+    var url = '/csv/notif_reduced/' + state_abv + '?chart-type=period';
+
+    d3.csv(url, function(data){
+        for (i in data) {
+            if (data[i].category == undefined) {
+                continue;
+            }
+            dt = parser(data[i].category);
+            dt_utc = Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate());
+            _values.push([dt_utc, parseInt(data[i].casos)]);
+        }
+
+        // set data
+        date_chart.series[0].setData(_values);
+    });
+}
+
+function _plot_chart_date(){
+    var _values = [];
+    var extremes = date_chart.xAxis[0].getExtremes(),
+        start = new Date(extremes.min),
+        end   = new Date(extremes.max);
+
+    var parser = d3.timeParse('%Y-%m-%d');
+    var format = d3.timeFormat('%Y-%m-%d');
 
     // filter
     var _data = _.cloneDeep(data.filter(function(d) {
@@ -37,6 +62,7 @@ function plot_chart_date(){
 
     // set data
     date_chart.series[0].setData(_values);
+    console.log(_values);
 }
 
 $(document).ready(function () {
