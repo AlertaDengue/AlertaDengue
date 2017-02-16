@@ -49,7 +49,7 @@ urlpatterns = [
     url(r'^csv/notif_last12/(?P<initials_state>PR|RJ|ES)$',
         NotificacaoCSV_View.as_view(),
         name='notificaocao_last12'),
-    url(r'^csv/notif_reduced/(?P<initials_state>PR|RJ|ES)$',
+    url(r'^csv/notif_reduced$',
         NotificationReducedCSV_View.as_view(),
         name='notif_reduced')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

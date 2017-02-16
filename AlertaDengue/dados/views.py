@@ -636,7 +636,7 @@ class NotificationReducedCSV_View(View):
 
         return result if result else default
 
-    def _process_filter(self, data_filter, exception_key):
+    def _process_filter(self, data_filter, exception_key=''):
         """
 
         :param data_filter:
@@ -646,7 +646,7 @@ class NotificationReducedCSV_View(View):
         _f = [v for k, v in data_filter if not k == exception_key]
         return ' AND '.join(filter(lambda x: x, _f))
 
-    def get(self, request, initials_state):
+    def get(self, request):
         """
 
         :param kwargs:
@@ -656,23 +656,30 @@ class NotificationReducedCSV_View(View):
 
         conn = dbdata.create_connection()
 
-        uf = self._state_name[initials_state]
-
-        chart_type = self._get('chart-type')
+        state_abv = self._get('state_abv')
+        chart_type = self._get('chart_type')
         disease_values = self._get('diseases')
         age_values = self._get('ages')
         gender_values = self._get('genders')
-        initial_date = self._get('initial-date')
-        final_date = self._get('final-date')
+        city_values = self._get('cities')
+        initial_date = self._get('initial_date')
+        final_date = self._get('final_date')
+
+        uf = self._state_name[state_abv]
 
         dist_filters = [
             ('uf', "uf='%s'" % uf),
+            ('', self._get_disease_filter(conn, None)),  # min filter
+            ('', self._get_gender_filter(None)),  # min filter
+            ('', self._get_period_filter(None)),  # min filter
+            ('', self._get_age_filter(None)),  # min filter
             ('disease', self._get_disease_filter(
                 conn=conn, disease=disease_values
             )),
             ('gender',  self._get_gender_filter(gender=gender_values)),
             ('age', self._get_age_filter(age=age_values)),
-            ('date', self._get_period_filter(
+            ('cities', self._get_city_filter(city=city_values)),
+            ('period', self._get_period_filter(
                 initial_date=initial_date, final_date=final_date
             )),
         ]
@@ -693,6 +700,12 @@ class NotificationReducedCSV_View(View):
             result = self.get_period_dist(
                 conn=conn, dist_filters=dist_filters
             ).to_csv(date_format='%Y-%m-%d')
+        elif chart_type == 'total_cases':
+            result = self.get_total_rows(conn=conn, uf=uf).to_csv()
+        elif chart_type == 'selected_cases':
+            result = self.get_selected_rows(
+                conn=conn, dist_filters=dist_filters
+            ).to_csv()
 
         return HttpResponse(result, content_type="text/plain")
 
@@ -704,6 +717,12 @@ class NotificationReducedCSV_View(View):
                 "'M'" if _gender == 'homem' else
                 None for _gender in gender.lower().split(',')
             ]))
+        )
+
+    def _get_city_filter(self, city):
+        return (
+            '' if city is None else
+            'municipio_geocodigo IN(%s)' % city
         )
 
     def _get_age_filter(self, age):
@@ -771,8 +790,29 @@ class NotificationReducedCSV_View(View):
             WHERE {}
             '''.format(self._age_field, clean_filters)
 
-        df = pd.read_sql(sql, conn)
-        return int(df.casos[0])
+        return pd.read_sql(sql, conn, 'casos')
+
+    def get_selected_rows(self, conn, dist_filters):
+        _dist_filters = self._process_filter(dist_filters)
+
+        sql = '''
+            SELECT
+                count(id) AS casos
+            FROM (
+                SELECT
+                    *,
+                    {}
+                FROM
+                    "Municipio"."Notificacao" AS notif
+                    INNER JOIN "Dengue_global"."Municipio" AS municipio
+                      ON notif.municipio_geocodigo = municipio.geocodigo
+            ) AS tb
+            WHERE {}
+            '''.format(self._age_field, _dist_filters)
+
+        print(sql)
+
+        return pd.read_sql(sql, conn, 'casos')
 
     def get_disease_dist(
             self, conn, dist_filters
@@ -850,10 +890,13 @@ class NotificationReducedCSV_View(View):
         GROUP BY cs_sexo;
         '''.format(self._age_field, _dist_filters)
 
+        print(sql)
+
         return pd.read_sql(sql, conn, 'category')
 
     def get_period_dist(self, conn, dist_filters):
         _dist_filters = self._process_filter(dist_filters, 'period')
+        _dist_filters += ' AND {}'.format(self._get_period_filter())
 
         sql = '''
         SELECT

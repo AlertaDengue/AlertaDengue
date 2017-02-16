@@ -139,6 +139,14 @@
             var start = performance.now();
             var extremes = date_chart.xAxis[0].getExtremes();
 
+            var filters = '&state_abv=' + state_abv +
+                get_ages_selected() +
+                get_genders_selected() +
+                get_diseases_selected() +
+                get_period_selected() +
+                get_cities_selected();
+
+            /*
             if (data == undefined || data == null) {
                 alert('Não existe dados para o período informado.');
                 return;
@@ -179,12 +187,24 @@
             _filter_city = [];
             $('#cities option:selected').each(function(){
                 _filter_city.push(parseInt(this.value));
+            });*/
+
+            if (ignore_chart != 'disease') plot_chart_disease(filters);
+            if (ignore_chart != 'age') plot_chart_age(filters);
+            if (ignore_chart != 'gender') plot_chart_gender(filters);
+            if (ignore_chart != 'date') plot_chart_date(filters);
+
+            d3.csv(
+                '/csv/notif_reduced?chart_type=total_cases&state_abv=' + state_abv,
+                function(data){
+                    $('#total_cases_num').text(data[0].casos);
             });
 
-            if (ignore_chart != 'disease') plot_chart_disease();
-            if (ignore_chart != 'age') plot_chart_age();
-            if (ignore_chart != 'gender') plot_chart_gender(state_abv);
-            if (ignore_chart != 'date') plot_chart_date();
+            d3.csv(
+                '/csv/notif_reduced?chart_type=selected_cases' + filters,
+                function(data){
+                    $('#selected_cases_num').text(data[0].casos);
+            });
 
             ignore_chart = '';
 
@@ -198,6 +218,7 @@
                 $('#pleaseWaitWindow').modal('hide');
             });
 
+            /*
             d3.csv(
                 '/csv/notif_last12/{{state_abv}}',
                 function(_data) {
@@ -215,7 +236,9 @@
 
                     plots_refresh();
                 }
-            );
+            );*/
+
+            plots_refresh();
         });
     </script>
 

@@ -2,15 +2,26 @@
 <script type="application/javascript">
 var date_chart;
 
-function plot_chart_date(){
-    var _values = [];
+function get_period_selected() {
     var extremes = date_chart.xAxis[0].getExtremes(),
         start = new Date(extremes.min),
         end   = new Date(extremes.max);
 
+    if (extremes.min == undefined || extremes.min == null) {
+        return '';
+    }
+
+    end.setDate(end.getDate() + 6);
+
+    return '&initial_date=' + start.toISOString().slice(0,10) +
+        '&final_date=' + end.toISOString().slice(0,10);
+}
+
+function plot_chart_date(filters){
+    var _values = [];
     var parser = d3.timeParse('%Y-%m-%d');
     var format = d3.timeFormat('%Y-%m-%d');
-    var url = '/csv/notif_reduced/' + state_abv + '?chart-type=period';
+    var url = '/csv/notif_reduced?' + filters + '&chart_type=period';;
 
     d3.csv(url, function(data){
         for (i in data) {

@@ -56,12 +56,7 @@ function _plot_chart_gender(){
     $('#selected_cases_num').text(_num_selected);
 }
 
-function plot_chart_gender(state_abv){
-    var _values = [];
-    var _columns_name = gender_chart.xAxis[0].categories;
-    var _counter = new Array(_columns_name.length).fill(0);
-    var _num_selected = 0;
-
+function get_genders_selected() {
     // categories selection
     var categories_selected = gender_chart.getSelectedPoints().map(function(d){
         return d.category
@@ -73,26 +68,29 @@ function plot_chart_gender(state_abv){
         }
     }
 
-    var url = '/csv/notif_reduced/' + state_abv + '?chart-type=gender';
+    return '&genders=' + categories_selected.join(',');
+}
+
+function plot_chart_gender(filters){
+    var _values = [];
+    var _columns_name = gender_chart.xAxis[0].categories;
+    var _counter = new Array(_columns_name.length).fill(0);
+    var _num_selected = 0;
+
+    var url = '/csv/notif_reduced?' + filters + '&chart_type=gender' +
+        filters;
 
     d3.csv(url, function(data){
         for (i in data) {
             for (j in _columns_name) {
                 if (data[i].category == _columns_name[j]) {
                     _counter[j] = parseInt(data[i].casos);
-
-                    if (categories_selected.indexOf(data[i].category) >= 0) {
-                        _num_selected += _counter[j];
-                    }
                 }
             }
         }
 
         // set data
         gender_chart.series[0].setData(_counter);
-
-        // show selected numbers
-        $('#selected_cases_num').text(_num_selected);
     });
 }
 
