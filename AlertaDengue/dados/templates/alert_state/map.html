@@ -35,6 +35,19 @@
         tooltipSuffix: " casos"
     });
 
+    function get_cities_selected() {
+        var _filter_city = [];
+        $('#cities option:selected').each(function(){
+            _filter_city.push(parseInt(this.value));
+        });
+
+        if (_filter_city.length == 0) {
+            return '';
+        }
+
+        return '&cities=' + _filter_city.join(',');
+    }
+
     function select_switch(feature) {
         var geo_id = feature.properties.geocodigo;
         var result;

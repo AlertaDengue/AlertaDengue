@@ -91,6 +91,8 @@
         // Browser
         var data;
         var initial_load = true;
+        var state_abv = '{{state_abv}}';
+        var ignore_chart = false;
         var _filter_age;
         var _filter_date_start;
         var _filter_date_end;
@@ -125,15 +127,26 @@
                 _filter_city.length == 0;
         }
 
-        function plots_refresh() {
+        function plots_refresh(_ignore_chart) {
+            if (_ignore_chart != undefined) {
+                ignore_chart = _ignore_chart;
+            }
             $('#pleaseWaitWindow').modal('show');
         }
 
         function _plots_refresh() {
-            //console.log('Starting ...');
-            //var start = performance.now();
+            console.log('Starting ...');
+            var start = performance.now();
             var extremes = date_chart.xAxis[0].getExtremes();
 
+            var filters = '&state_abv=' + state_abv +
+                get_ages_selected() +
+                get_genders_selected() +
+                get_diseases_selected() +
+                get_period_selected() +
+                get_cities_selected();
+
+            /*
             if (data == undefined || data == null) {
                 alert('Não existe dados para o período informado.');
                 return;
@@ -174,23 +187,28 @@
             _filter_city = [];
             $('#cities option:selected').each(function(){
                 _filter_city.push(parseInt(this.value));
+            });*/
+
+            if (ignore_chart != 'disease') plot_chart_disease(filters);
+            if (ignore_chart != 'age') plot_chart_age(filters);
+            if (ignore_chart != 'gender') plot_chart_gender(filters);
+            if (ignore_chart != 'date') plot_chart_date(filters);
+
+            d3.csv(
+                '/csv/notif_reduced?chart_type=total_cases&state_abv=' + state_abv,
+                function(data){
+                    $('#total_cases_num').text(data[0].casos);
             });
 
-            plot_chart_disease();
-            plot_chart_age();
-            plot_chart_gender();
-            plot_chart_date();
-
-            // all filters
-            var _data = data.filter(function(d) {
-                return filter_age(d) && filter_gender(d) &&
-                    filter_date(d) && filter_disease(d) &&
-                    filter_city(d);
+            d3.csv(
+                '/csv/notif_reduced?chart_type=selected_cases' + filters,
+                function(data){
+                    $('#selected_cases_num').text(data[0].casos);
             });
 
-            $('#selected_cases_num').text(_data.length);
+            ignore_chart = '';
 
-            //console.log((performance.now() - start)/1000);
+            console.log((performance.now() - start)/1000);
         }
 
         $(document).ready(function(){
@@ -200,6 +218,7 @@
                 $('#pleaseWaitWindow').modal('hide');
             });
 
+            /*
             d3.csv(
                 '/csv/notif_last12/{{state_abv}}',
                 function(_data) {
@@ -217,7 +236,9 @@
 
                     plots_refresh();
                 }
-            );
+            );*/
+
+            plots_refresh();
         });
     </script>
 
@@ -297,7 +318,7 @@
                       <div class="chart-title content-inline">
                           <input type="button" id="filter_date"
                                  value="Aplicar filtro por período"
-                                 onclick="plots_refresh()"
+                                 onclick="plots_refresh('date')"
                           />
                       </div>
                       <div class="chart-stage">

@@ -3,10 +3,16 @@
 // Create the chart
 var gender_chart;
 
-function plot_chart_gender(){
+function _plot_chart_gender(){
     var _values = [];
     var _columns_name = gender_chart.xAxis[0].categories;
     var _counter = new Array(_columns_name.length).fill(0);
+    var _num_selected = 0;
+
+    // gender selection
+    var categories_selected = gender_chart.getSelectedPoints().map(function(d){
+        return d.category
+    });
 
     // filter
     var _data = data.filter(function(d) {
@@ -20,11 +26,25 @@ function plot_chart_gender(){
         .rollup(function(v) { return v.length; })
         .entries(_data);
 
+    if (categories_selected.length == 0) {
+        for (j in gender_chart.series[0].data) {
+            gender_chart.series[0].data[j].select(true, true);
+        }
+    }
+
+    categories_selected = gender_chart.getSelectedPoints().map(function(d){
+        return d.category
+    });
+
     // counter to chart plotting
     for (i in dataCount) {
         for (j in _columns_name) {
             if (dataCount[i].key == _columns_name[j]) {
                 _counter[j] = dataCount[i].value;
+
+                if (categories_selected.indexOf(dataCount[i].key) >= 0) {
+                    _num_selected += _counter[j];
+                }
             }
         }
     }
@@ -32,17 +52,48 @@ function plot_chart_gender(){
     // set data
     gender_chart.series[0].setData(_counter);
 
-    // gender selection
-    var result = gender_chart.getSelectedPoints().map(function(d){
+    // show selected numbers
+    $('#selected_cases_num').text(_num_selected);
+}
+
+function get_genders_selected() {
+    // categories selection
+    var categories_selected = gender_chart.getSelectedPoints().map(function(d){
         return d.category
     });
 
-    if (result.length == 0) {
+    if (categories_selected.length == 0) {
         for (j in gender_chart.series[0].data) {
             gender_chart.series[0].data[j].select(true, true);
         }
     }
+
+    return '&genders=' + categories_selected.join(',');
 }
+
+function plot_chart_gender(filters){
+    var _values = [];
+    var _columns_name = gender_chart.xAxis[0].categories;
+    var _counter = new Array(_columns_name.length).fill(0);
+    var _num_selected = 0;
+
+    var url = '/csv/notif_reduced?' + filters + '&chart_type=gender' +
+        filters;
+
+    d3.csv(url, function(data){
+        for (i in data) {
+            for (j in _columns_name) {
+                if (data[i].category == _columns_name[j]) {
+                    _counter[j] = parseInt(data[i].casos);
+                }
+            }
+        }
+
+        // set data
+        gender_chart.series[0].setData(_counter);
+    });
+}
+
 
 $(document).ready(function () {
     gender_chart = Highcharts.chart('gender-chart', {
@@ -69,7 +120,7 @@ $(document).ready(function () {
                         click: function(event){
                             //this.slice(null);
                             this.select(null, true);
-                            plots_refresh();
+                            plots_refresh('gender');
                         }
                     }
                 },

@@ -2,7 +2,7 @@
 <script type="application/javascript">
 var age_chart;
 
-function plot_chart_age() {
+function _plot_chart_age() {
     var _values = [];
     var _columns_name = age_chart.xAxis[0].categories;
     var _counter = new Array(_columns_name.length).fill(0);
@@ -38,6 +38,41 @@ function plot_chart_age() {
     }
 }
 
+function get_ages_selected() {
+    // categories selection
+    var categories_selected = age_chart.getSelectedPoints().map(function(d){
+        return d.category
+    });
+
+    if (categories_selected.length == 0) {
+        for (j in age_chart.series[0].data) {
+            age_chart.series[0].data[j].select(true, true);
+        }
+    }
+
+    return '&ages=' + categories_selected.join(',');
+}
+
+function plot_chart_age(filters) {
+    var _values = [];
+    var _columns_name = age_chart.xAxis[0].categories;
+    var _counter = new Array(_columns_name.length).fill(0);
+    var url = '/csv/notif_reduced?' + filters + '&chart_type=age';
+
+    d3.csv(url, function(data){
+        for (i in data) {
+            for (j in _columns_name) {
+                if (data[i].category == _columns_name[j]) {
+                    _counter[j] = parseInt(data[i].casos);
+                }
+            }
+        }
+
+        // set data
+        age_chart.series[0].setData(_counter);
+    });
+}
+
 $(document).ready(function () {
     // Create the chart
     age_chart = Highcharts.chart('age-chart', {
@@ -63,7 +98,7 @@ $(document).ready(function () {
                         click: function(event){
                             //this.slice(null);
                             this.select(null, true);
-                            plots_refresh();
+                            plots_refresh('age');
                         }
                     }
                 }
