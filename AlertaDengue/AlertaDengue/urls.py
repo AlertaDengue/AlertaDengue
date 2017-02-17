@@ -8,8 +8,7 @@ from dados.views import (
     MapaMosquitoView,
     HistoricoView, AlertaPageView, AlertaGeoJSONView, AlertaPageViewMunicipio,
     CityMapView, get_municipio,
-    AlertaMainView, AlertaStateView, NotificacaoCSV_View,
-    NotificationReducedCSV_View
+    AlertaMainView, AlertaStateView, NotificationReducedCSV_View
 )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -46,9 +45,6 @@ urlpatterns = [
     url(r'^sinan/(\d{4})/(\d{1,2})', SinanCasesView.as_view(), name='sinan'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^dbf/', include(dbf.urls)),
-    url(r'^csv/notif_last12/(?P<initials_state>PR|RJ|ES)$',
-        NotificacaoCSV_View.as_view(),
-        name='notificaocao_last12'),
     url(r'^csv/notif_reduced$',
         NotificationReducedCSV_View.as_view(),
         name='notif_reduced')
