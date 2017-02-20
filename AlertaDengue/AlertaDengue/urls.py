@@ -8,7 +8,8 @@ from dados.views import (
     MapaMosquitoView,
     HistoricoView, AlertaPageView, AlertaGeoJSONView, AlertaPageViewMunicipio,
     CityMapView, get_municipio,
-    AlertaMainView, AlertaStateView, NotificationReducedCSV_View
+    AlertaMainView, AlertaStateView, NotificationReducedCSV_View,
+    PartnersPageView
 )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -42,6 +43,7 @@ urlpatterns = [
     url(r'^informacoes/$', AboutPageView.as_view(), name='about'),
     url(r'^contato/$', ContactPageView.as_view(), name='contact'),
     url(r'^participe/$', JoininPageView.as_view(), name='joinin'),
+    url(r'^partners/$', PartnersPageView.as_view(), name='partners'),
     url(r'^sinan/(\d{4})/(\d{1,2})', SinanCasesView.as_view(), name='sinan'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^dbf/', include(dbf.urls)),

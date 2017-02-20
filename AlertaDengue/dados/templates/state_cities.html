@@ -146,48 +146,7 @@
                 get_period_selected() +
                 get_cities_selected();
 
-            /*
-            if (data == undefined || data == null) {
-                alert('Não existe dados para o período informado.');
-                return;
-            }
-
-            // filters definition
-            _filter_age = age_chart.getSelectedPoints().map(function(d){
-                return d.category
-            });
-
-            _filter_date_start = extremes.min != undefined ?
-                new Date(extremes.min) : null;
-            _filter_date_end = extremes.max != undefined ?
-                new Date(extremes.max) : null;
-
-            if (_filter_date_start != null) {
-                _filter_date_start.setUTCHours(0);
-                _filter_date_start.setUTCMinutes(0);
-                _filter_date_start.setUTCSeconds(0);
-                _filter_date_start.setUTCMilliseconds(0);
-            }
-
-            if (_filter_date_end != null) {
-                _filter_date_end.setUTCHours(23);
-                _filter_date_end.setUTCMinutes(59);
-                _filter_date_end.setUTCSeconds(59);
-                _filter_date_end.setUTCMilliseconds(59);
-            }
-
-            _filter_gender = gender_chart.getSelectedPoints().map(function(d){
-                return d.category
-            });
-
-            _filter_disease = disease_chart.getSelectedPoints().map(function(d){
-                return d.category
-            });
-
-            _filter_city = [];
-            $('#cities option:selected').each(function(){
-                _filter_city.push(parseInt(this.value));
-            });*/
+            console.log(filters);
 
             if (ignore_chart != 'disease') plot_chart_disease(filters);
             if (ignore_chart != 'age') plot_chart_age(filters);
@@ -247,19 +206,6 @@
 
 {% block content %}
 
-<form id="formFilters">
-    <input type="hidden"
-           id="initial_date" name="initial_date" value="{{initial_date}}"/>
-    <input type="hidden"
-           id="final_date" name="final_date" value="{{final_date}}"/>
-    <input type="hidden"
-           id="disease" name="disease" value="{{disease}}"/>
-    <input type="hidden"
-           id="gender" name="gender" value="{{gender}}"/>
-    <input type="hidden"
-           id="age" name="age" value="{{age}}"/>
-</form>
-
 <div class="container-fluid">
     <!-- chart-plot:begin -->
     <div class="row">
@@ -279,7 +225,7 @@
                     <div class="chart-wrapper" style="z-index:1001; position: relative;">
 
                             <select id="cities"
-                                    class="selectpicker"
+                                        class="selectpicker"
                                     data-live-search="true"
                                     data-actions-box="true"
                                     multiple

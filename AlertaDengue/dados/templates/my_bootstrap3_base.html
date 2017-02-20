@@ -26,50 +26,7 @@
 <body>
 {% block bootstrap3_content %}{% endblock %}
 
-<div id="footer">
-    <div class="container">
-        <div class="row">
-            <div class="chart-wrapper">
-                  <div class="chart-title">
-                      <h2>{% trans "Parceiros" %}</h2>
-                  </div>
-                  <div class="chart-stage">
-                      <div class="row clearfix">
-                          <div class="col-md-2 column">
-                              <img src="/static/img/ufmg.jpg" alt="UFMG"
-                                   width="120px"
-                                   title="UFMG" class="logos">
-                          </div>
-                          <div class="col-md-2 column">
-                              <img src="/static/img/UFPR.jpeg" alt="UFPR"
-                                   width="120px"
-                                   title="UFPR" class="logos">
-                          </div>
-                          <div class="col-md-2 column">
-                              <img src="/static/img/logo_sms.jpg"
-                                   alt="Secretaria Municipal de Saúde do Rio de Janeiro"
-                                   width="150px"
-                                   title="Secretaria Municipal de Saúde do Rio de Janeiro"
-                                   class="logos">
-                          </div>
-                          <div class="col-md-2 column">
-                              <img src="/static/img/ses-rj-2015.png" alt="SES" ,
-                                   width="120px"
-                                   title="Secretaria de Estado de Saúde"
-                                   class="logos">
-                          </div>
-                          <div class="col-md-2 column"></div>
-                          <div class="col-md-2 column">
-                              <img src="/static/img/1746.jpg" alt="1746"
-                                   width="120px"
-                                   title="1746" class="logos">
-                          </div>
-                      </div>
-                  </div>
-            </div>
-        </div>
-    </div>
-</div>
+<div id="footer">&nbsp;</div>
 <script>
     (function (i, s, o, g, r, a, m) {
         i['GoogleAnalyticsObject'] = r;
@@ -86,27 +43,29 @@
     ga('create', 'UA-58700914-1', 'auto');
     ga('send', 'pageview');
 
-    Highcharts.setOptions({
-        lang: {
-            months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
-            shortMonths: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-            weekdays: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
-            loading: ['Atualizando o gráfico...aguarde'],
-            contextButtonTitle: 'Exportar gráfico',
-            decimalPoint: ',',
-            thousandsSep: '.',
-            downloadJPEG: 'Baixar imagem JPEG',
-            downloadPDF: 'Baixar arquivo PDF',
-            downloadPNG: 'Baixar imagem PNG',
-            downloadSVG: 'Baixar vetor SVG',
-            printChart: 'Imprimir gráfico',
-            rangeSelectorFrom: 'De',
-            rangeSelectorTo: 'Para',
-            rangeSelectorZoom: 'Zoom',
-            resetZoom: 'Limpar Zoom',
-            resetZoomTitle: 'Voltar Zoom para nível 1:1',
-        }
-    });
+    if (typeof Highcharts != 'undefined') {
+        Highcharts.setOptions({
+            lang: {
+                months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                shortMonths: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                weekdays: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+                loading: ['Atualizando o gráfico...aguarde'],
+                contextButtonTitle: 'Exportar gráfico',
+                decimalPoint: ',',
+                thousandsSep: '.',
+                downloadJPEG: 'Baixar imagem JPEG',
+                downloadPDF: 'Baixar arquivo PDF',
+                downloadPNG: 'Baixar imagem PNG',
+                downloadSVG: 'Baixar vetor SVG',
+                printChart: 'Imprimir gráfico',
+                rangeSelectorFrom: 'De',
+                rangeSelectorTo: 'Para',
+                rangeSelectorZoom: 'Zoom',
+                resetZoom: 'Limpar Zoom',
+                resetZoomTitle: 'Voltar Zoom para nível 1:1',
+            }
+        });
+    }
 
 </script>
 

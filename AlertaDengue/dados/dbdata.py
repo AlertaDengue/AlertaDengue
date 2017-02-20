@@ -442,17 +442,17 @@ def tail_estimated_cases(geo_ids, n=12, conn=None):
 
 class NotificationQueries:
     _age_field = '''
-            CASE
-            WHEN nu_idade_n <= 4004 THEN '00-04 anos'
-            WHEN nu_idade_n BETWEEN 4005 AND 4009 THEN '05-09 anos'
-            WHEN nu_idade_n BETWEEN 4010 AND 4019 THEN '10-19 anos'
-            WHEN nu_idade_n BETWEEN 4020 AND 4029 THEN '20-29 anos'
-            WHEN nu_idade_n BETWEEN 4030 AND 4039 THEN '30-39 anos'
-            WHEN nu_idade_n BETWEEN 4040 AND 4049 THEN '40-49 anos'
-            WHEN nu_idade_n BETWEEN 4050 AND 4059 THEN '50-59 anos'
-            WHEN nu_idade_n >=4060 THEN '60+ anos'
-            ELSE NULL
-            END AS age'''
+        CASE
+        WHEN nu_idade_n <= 4004 THEN '00-04 anos'
+        WHEN nu_idade_n BETWEEN 4005 AND 4009 THEN '05-09 anos'
+        WHEN nu_idade_n BETWEEN 4010 AND 4019 THEN '10-19 anos'
+        WHEN nu_idade_n BETWEEN 4020 AND 4029 THEN '20-29 anos'
+        WHEN nu_idade_n BETWEEN 4030 AND 4039 THEN '30-39 anos'
+        WHEN nu_idade_n BETWEEN 4040 AND 4049 THEN '40-49 anos'
+        WHEN nu_idade_n BETWEEN 4050 AND 4059 THEN '50-59 anos'
+        WHEN nu_idade_n >=4060 THEN '60+ anos'
+        ELSE NULL
+        END AS age'''
     conn = None
     dist_filters = None
 
@@ -524,13 +524,15 @@ class NotificationQueries:
         :param age:
         :return:
         """
-        return (
-            'age IS NOT NULL'
-            if age is None else
-            "age IN ({})".format(
-                ','.join(["'{}'".format(_age) for _age in age.split(',')])
-            )
-        )
+
+        if age is None:
+            return 'age IS NOT NULL'
+
+        _age = [
+            "'{}'".format(_age.replace('  ', '+ '))
+            for _age in age.split(',')
+        ]
+        return "age IN ({})".format(','.join(_age))
 
     def _get_period_filter(self, initial_date=None, final_date=None):
         """
@@ -539,7 +541,12 @@ class NotificationQueries:
         :param final_date:
         :return:
         """
-        return "dt_notific >= (current_date - interval '1 year') AND " + (
+        common_filter = '''
+        dt_notific >= (CURRENT_DATE - INTERVAL '1 YEAR') - CAST(CONCAT(CAST(
+          EXTRACT(DOW FROM (CURRENT_DATE-INTERVAL '1 YEAR')) AS VARCHAR),'DAY'
+        ) AS INTERVAL) AND
+        '''
+        return common_filter + (
             '1=1' if not initial_date and not final_date else
             'dt_notific {} '.format(
                 ">= '{}'".format(initial_date) if not final_date else
@@ -629,6 +636,7 @@ class NotificationQueries:
             ) AS tb
             WHERE {}
             '''.format(self._age_field, _dist_filters)
+        print(sql)
         return pd.read_sql(sql, self.conn, 'casos')
 
     def get_disease_dist(self):
@@ -742,5 +750,41 @@ class NotificationQueries:
 
         df_alert_period = pd.read_sql(sql, self.conn, index_col='dt_week')
         df_alert_period.index.rename('category', inplace=True)
+
+        sql = '''
+        SELECT
+          (CURRENT_DATE - INTERVAL '1 YEAR') - CAST(CONCAT(CAST(
+           EXTRACT(DOW FROM (CURRENT_DATE-INTERVAL '1 YEAR')) AS VARCHAR),'DAY'
+          ) AS INTERVAL) AS dt_week_start,
+          CURRENT_DATE - CAST(CONCAT(CAST(
+            EXTRACT(DOW FROM CURRENT_DATE) AS VARCHAR), 'DAY'
+          ) AS INTERVAL) AS dt_week_end
+        '''
+
+        df_period_bounds = pd.read_sql(sql, self.conn)
+
+        if not df_period_bounds.dt_week_start[0] in df_alert_period.index:
+            df = pd.DataFrame({
+                'category': [df_period_bounds.dt_week_start[0]],
+                'casos': [0]
+            })
+
+            df = df.set_index('category')
+
+            df_alert_period = pd.concat([
+                df, df_alert_period
+            ])
+
+        if not df_period_bounds.dt_week_end[0] in df_alert_period.index:
+            df = pd.DataFrame({
+                'category': [df_period_bounds.dt_week_end[0]],
+                'casos': [0]
+            })
+
+            df = df.set_index('category')
+
+            df_alert_period = pd.concat([
+                df_alert_period, df
+            ])
 
         return df_alert_period

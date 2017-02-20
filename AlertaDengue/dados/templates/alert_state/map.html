@@ -17,7 +17,7 @@
     var geo_ids = {{ geo_ids }};
 
     var features = L.layerGroup();
-    var info = L.control();
+    //var info = L.control();
     var legend = L.control({position: 'bottomright'});
     var alertLevels = [
         {name: 'Baixo Risco', color: '#0D6B0D'},
@@ -36,7 +36,7 @@
     });
 
     function get_cities_selected() {
-        var _filter_city = [];
+        _filter_city = [];
         $('#cities option:selected').each(function(){
             _filter_city.push(parseInt(this.value));
         });
@@ -52,13 +52,13 @@
         var geo_id = feature.properties.geocodigo;
         var result;
 
-        console.log('#cities option[value=' + geo_id + ']');
+        get_cities_selected();
 
-        if (_filter_city.some(x => x == geo_id)) {
-            $('#cities option[value=' + geo_id + ']').prop('selected', false);
+        if (_filter_city.indexOf(geo_id) >= 0) {
+            $('#cities option[value=' + geo_id + ']').removeAttr('selected');
             result = {
                 weight: 1,
-                fillOpacity: 0.6,
+                fillOpacity: 0.2,
             };
         } else {
             $('#cities option[value=' + geo_id + ']').prop('selected', true);
@@ -68,12 +68,11 @@
             };
         }
 
-        $('#cities').change();
+        $('#cities').selectpicker('refresh');
 
         _filter_city = [];
-        $('#cities option:selected').each(function(){
-            _filter_city.push(parseInt(this.value));
-        });
+        get_cities_selected();
+
         return result;
     }
 
@@ -113,7 +112,7 @@
         if (!L.Browser.ie && !L.Browser.opera) {
             layer.bringToFront();
         }
-        info.update(layer.feature.properties);
+        //info.update(layer.feature.properties);
 
         renderSparkline(e);
 
@@ -122,7 +121,7 @@
 
     function resetHighlight(e) {
         //geojson.resetStyle(e.target);
-        info.update();
+        //info.update();
     }
 
     function renderSparkline(e) {
@@ -161,21 +160,22 @@
         };
 
         // control that shows state info on hover
-        info.onAdd = function (map) {
+
+        /*info.onAdd = function (map) {
             this._div = L.DomUtil.create('div', 'info');
             this.update();
             return this._div;
-        };
+        };*/
 
-        info.update = function (props) {
+        /*info.update = function (props) {
             this._div.innerHTML = '' +
                 '<h6>Número de casos estimados na semana:</h6>' +
                 (props ?
                  '<b>'+ props.nome + ':' + props.casos + '</b><br />' :
                  'Passe o mouse sobre o mapa');
-        };
+        };*/
 
-        info.addTo(map);
+        //info.addTo(map);
 
         legend.onAdd = function () {
             var div = L.DomUtil.create('div', 'info legend'),
@@ -199,7 +199,7 @@
                 case_series[geo_id][case_series[geo_id].length -1]
             );
 
-            layer.bindPopup(
+            /*layer.bindPopup(
                 "<b>" + mun_dict[geo_id] + "</b>" + "<br>" +
                 "Casos estimados: " + feature.properties.casos +
                 "<br>Últimas semanas: <span class='inlinesparkline'>" +
@@ -207,13 +207,13 @@
                 "<br>" +
                 "<a href=/alerta/" + geo_id.toString() +
                 "/><u>Mais detalhes</u></a>"
-            );
+            );*/
 
             layer.setStyle(selected_style(feature))
             layer.on({
                 mouseover: highlightFeature,
                 mouseout: resetHighlight,
-                popupopen: renderSparkline,
+                //popupopen: renderSparkline,
                 click: function(){
                     layer.setStyle(select_switch(feature));
                     plots_refresh();
