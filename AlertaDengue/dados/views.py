@@ -585,3 +585,11 @@ class NotificationReducedCSV_View(View):
             result = notifQuery.get_selected_rows().to_csv()
 
         return HttpResponse(result, content_type="text/plain")
+
+
+class PartnersPageView(TemplateView):
+    template_name = 'partners.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(PartnersPageView, self).get_context_data(**kwargs)
+        return context
