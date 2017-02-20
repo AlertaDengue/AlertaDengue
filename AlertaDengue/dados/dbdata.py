@@ -438,3 +438,309 @@ def tail_estimated_cases(geo_ids, n=12, conn=None):
         k: v.casos_est.values.tolist()
         for k, v in df_case_series.groupby(by='municipio_geocodigo')
     }
+
+
+class NotificationQueries:
+    _age_field = '''
+            CASE
+            WHEN nu_idade_n <= 4004 THEN '00-04 anos'
+            WHEN nu_idade_n BETWEEN 4005 AND 4009 THEN '05-09 anos'
+            WHEN nu_idade_n BETWEEN 4010 AND 4019 THEN '10-19 anos'
+            WHEN nu_idade_n BETWEEN 4020 AND 4029 THEN '20-29 anos'
+            WHEN nu_idade_n BETWEEN 4030 AND 4039 THEN '30-39 anos'
+            WHEN nu_idade_n BETWEEN 4040 AND 4049 THEN '40-49 anos'
+            WHEN nu_idade_n BETWEEN 4050 AND 4059 THEN '50-59 anos'
+            WHEN nu_idade_n >=4060 THEN '60+ anos'
+            ELSE NULL
+            END AS age'''
+    conn = None
+    dist_filters = None
+
+    def __init__(
+        self, conn, uf, disease_values, age_values, gender_values,
+        city_values, initial_date, final_date
+    ):
+        """
+
+        :param conn:
+        """
+        self.conn = conn
+        self.uf = uf
+
+        self.dist_filters = [
+            ('uf', "uf='%s'" % uf),
+            ('', self._get_disease_filter(None)),  # min filter
+            ('', self._get_gender_filter(None)),  # min filter
+            ('', self._get_period_filter(None)),  # min filter
+            ('', self._get_age_filter(None)),  # min filter
+            ('disease', self._get_disease_filter(disease_values)),
+            ('gender', self._get_gender_filter(gender_values)),
+            ('age', self._get_age_filter(age_values)),
+            ('cities', self._get_city_filter(city_values)),
+            ('period', self._get_period_filter(
+                initial_date, final_date
+            )),
+        ]
+
+    def _process_filter(self, data_filter, exception_key=''):
+        """
+
+        :param data_filter:
+        :param exception_key:
+        :return:
+        """
+        _f = [v for k, v in data_filter if not k == exception_key]
+        return ' AND '.join(filter(lambda x: x, _f))
+
+    def _get_gender_filter(self, gender):
+        """
+
+        :param gender:
+        :return:
+        """
+        return (
+            "cs_sexo IN ('F', 'M')" if gender is None else
+            "cs_sexo IN ({})".format(','.join([
+                "'F'" if _gender == 'mulher' else
+                "'M'" if _gender == 'homem' else
+                None for _gender in gender.lower().split(',')
+            ]))
+        )
+
+    def _get_city_filter(self, city):
+        """
+
+        :param city:
+        :return:
+        """
+        return (
+            '' if city is None else
+            'municipio_geocodigo IN(%s)' % city
+        )
+
+    def _get_age_filter(self, age):
+        """
+
+        :param age:
+        :return:
+        """
+        return (
+            'age IS NOT NULL'
+            if age is None else
+            "age IN ({})".format(
+                ','.join(["'{}'".format(_age) for _age in age.split(',')])
+            )
+        )
+
+    def _get_period_filter(self, initial_date=None, final_date=None):
+        """
+
+        :param initial_date:
+        :param final_date:
+        :return:
+        """
+        return "dt_notific >= (current_date - interval '1 year') AND " + (
+            '1=1' if not initial_date and not final_date else
+            'dt_notific {} '.format(
+                ">= '{}'".format(initial_date) if not final_date else
+                "<= '{}'".format(final_date) if not initial_date else
+                " BETWEEN '{}' AND '{}'".format(initial_date, final_date)
+            )
+        )
+
+    def _get_disease_filter(self, disease):
+        """
+
+        :param disease:
+        :return:
+        """
+        if disease is None:
+            return 'cid10_codigo IS NOT NULL'
+
+        sql = '''
+        SELECT codigo FROM "Dengue_global"."CID10"
+        WHERE nome IN ({})
+        '''.format(','.join(
+            ["'{}'".format(_disease) for _disease in disease.split(',')]
+        ))
+
+        df_cid10 = pd.read_sql(sql, self.conn)
+
+        return (
+            '' if df_cid10.empty else
+            'cid10_codigo IN ({})'.format(','.join([
+                "'{}'".format(cid) for cid in df_cid10.codigo.values
+            ]))
+        )
+
+    def get_total_rows(self):
+        """
+
+        :param uf:
+        :return:
+        """
+        _filt = filter(
+            lambda x: x, [
+                '1=1',
+                self._get_gender_filter(None),
+                self._get_disease_filter(None),
+                self._get_age_filter(None),
+                self._get_period_filter(None, None)
+            ]
+        )
+
+        clean_filters = " uf='{}' AND ".format(self.uf) + ' AND '.join(_filt)
+
+        sql = '''
+            SELECT
+                count(id) AS casos
+            FROM (
+                SELECT
+                    *,
+                    {}
+                FROM
+                    "Municipio"."Notificacao" AS notif
+                    INNER JOIN "Dengue_global"."Municipio" AS municipio
+                      ON notif.municipio_geocodigo = municipio.geocodigo
+            ) AS tb
+            WHERE {}
+            '''.format(self._age_field, clean_filters)
+
+        return pd.read_sql(sql, self.conn, 'casos')
+
+    def get_selected_rows(self):
+        """
+
+        :return:
+        """
+        _dist_filters = self._process_filter(self.dist_filters)
+
+        sql = '''
+            SELECT
+                count(id) AS casos
+            FROM (
+                SELECT
+                    *,
+                    {}
+                FROM
+                    "Municipio"."Notificacao" AS notif
+                    INNER JOIN "Dengue_global"."Municipio" AS municipio
+                      ON notif.municipio_geocodigo = municipio.geocodigo
+            ) AS tb
+            WHERE {}
+            '''.format(self._age_field, _dist_filters)
+        return pd.read_sql(sql, self.conn, 'casos')
+
+    def get_disease_dist(self):
+        """
+
+        :return:
+        """
+        _dist_filters = self._process_filter(self.dist_filters, 'disease')
+
+        sql = '''
+        SELECT
+            COALESCE(cid10_nome, NULL) AS category,
+            count(id) AS casos
+        FROM (
+            SELECT
+                *,
+                cid10.nome AS cid10_nome,
+                {}
+            FROM
+                "Municipio"."Notificacao" AS notif
+                INNER JOIN "Dengue_global"."Municipio" AS municipio
+                  ON notif.municipio_geocodigo = municipio.geocodigo
+                LEFT JOIN "Dengue_global"."CID10" AS cid10
+                  ON notif.cid10_codigo=cid10.codigo
+        ) AS tb
+        WHERE {}
+        GROUP BY cid10_nome;
+        '''.format(self._age_field, _dist_filters)
+
+        df_disease_dist = pd.read_sql(sql, self.conn)
+
+        return df_disease_dist.set_index('category', drop=True)
+
+    def get_age_dist(self):
+        """
+
+        :param dist_filters:
+        :return:
+        """
+        _dist_filters = self._process_filter(self.dist_filters, 'age')
+
+        sql = '''
+        SELECT
+            age AS category,
+            count(age) AS casos
+        FROM (
+            SELECT
+                *,
+                {}
+            FROM
+                "Municipio"."Notificacao" AS notif
+                INNER JOIN "Dengue_global"."Municipio" AS municipio
+                  ON notif.municipio_geocodigo = municipio.geocodigo
+        ) AS tb
+        WHERE {}
+        GROUP BY age
+        ORDER BY age
+        '''.format(self._age_field, _dist_filters)
+
+        return pd.read_sql(sql, self.conn, 'category')
+
+    def get_gender_dist(self):
+        _dist_filters = self._process_filter(self.dist_filters, 'gender')
+
+        sql = '''
+        SELECT
+            (CASE COALESCE(cs_sexo, NULL)
+             WHEN 'M' THEN 'Homem'
+             WHEN 'F' THEN 'Mulher'
+             ELSE NULL
+             END
+            ) AS category,
+            COUNT(id) AS casos
+        FROM (
+            SELECT *,
+                {}
+            FROM
+                "Municipio"."Notificacao" AS notif
+                INNER JOIN "Dengue_global"."Municipio" AS municipio
+                  ON notif.municipio_geocodigo = municipio.geocodigo
+        ) AS tb
+        WHERE {} AND cs_sexo IN ('F', 'M')
+        GROUP BY cs_sexo;
+        '''.format(self._age_field, _dist_filters)
+
+        return pd.read_sql(sql, self.conn, 'category')
+
+    def get_period_dist(self):
+        _dist_filters = self._process_filter(self.dist_filters, 'period')
+        _dist_filters += ' AND {}'.format(self._get_period_filter())
+
+        sql = '''
+        SELECT
+            dt_week,
+            count(dt_week) AS Casos
+        FROM (
+            SELECT *,
+                dt_notific - CAST(
+                    CONCAT(CAST(EXTRACT(DOW FROM dt_notific) AS VARCHAR), 'DAY'
+                ) AS INTERVAL) AS dt_week,
+                {}
+            FROM
+                "Municipio"."Notificacao" AS notif
+                INNER JOIN "Dengue_global"."Municipio" AS municipio
+                    ON notif.municipio_geocodigo = municipio.geocodigo
+        ) AS tb
+        WHERE {}
+        GROUP BY dt_week
+        ORDER BY dt_week
+        '''.format(self._age_field, _dist_filters)
+
+        df_alert_period = pd.read_sql(sql, self.conn, index_col='dt_week')
+        df_alert_period.index.rename('category', inplace=True)
+
+        return df_alert_period
