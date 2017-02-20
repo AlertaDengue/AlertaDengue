@@ -44,10 +44,7 @@ class Upload(LoginRequiredMixin, FormView):
             export_date=form.cleaned_data['export_date'],
             notification_year=form.cleaned_data['notification_year']
         )
-        #XXX: This is disabled while
-        # https://github.com/AlertaDengue/AlertaDengueCaptura/issues/24 is not
-        # fixed. It should come back as soon as that is fixed.
-        #import_dbf_to_database.delay(dbf.id)
+        import_dbf_to_database.delay(dbf.id)
         success_message = _("O arquivo {} exportado em {:%d/%m/%Y} com notificações do ano {} "
                             "foi enviado com sucesso. Você será informado "
                             "por email ({}) assim que o processo de "
