@@ -2,42 +2,6 @@
 <script type="application/javascript">
 var age_chart;
 
-function _plot_chart_age() {
-    var _values = [];
-    var _columns_name = age_chart.xAxis[0].categories;
-    var _counter = new Array(_columns_name.length).fill(0);
-
-    var _data = data.filter(function(d) {
-        return filter_gender(d) && filter_date(d) &&
-            filter_disease(d) && filter_city(d)
-    });
-
-    var dataCount = d3.nest()
-        .key(function(d) { return d.age; })
-        .rollup(function(v) { return v.length; })
-        .entries(_data);
-
-    for (i in dataCount) {
-        for (j in _columns_name) {
-            if (dataCount[i].key == _columns_name[j]) {
-                _counter[j] = dataCount[i].value;
-            }
-        }
-    }
-
-    age_chart.series[0].setData(_counter);
-
-    var result = age_chart.getSelectedPoints().map(function(d){
-        return d.category
-    });
-
-    if (result.length == 0) {
-        for (j in age_chart.series[0].data) {
-            age_chart.series[0].data[j].select(true, true);
-        }
-    }
-}
-
 function get_ages_selected() {
     // categories selection
     var categories_selected = age_chart.getSelectedPoints().map(function(d){
@@ -47,6 +11,7 @@ function get_ages_selected() {
     if (categories_selected.length == 0) {
         for (j in age_chart.series[0].data) {
             age_chart.series[0].data[j].select(true, true);
+            age_chart.series[1].data[j].select(true, true);
         }
     }
 
@@ -56,20 +21,32 @@ function get_ages_selected() {
 function plot_chart_age(filters) {
     var _values = [];
     var _columns_name = age_chart.xAxis[0].categories;
-    var _counter = new Array(_columns_name.length).fill(0);
+    var _counter_female = new Array(_columns_name.length).fill(0);
+    var _counter_male = new Array(_columns_name.length).fill(0);
     var url = '/csv/notif_reduced?' + filters + '&chart_type=age';
 
-    d3.csv(url, function(data){
-        for (i in data) {
-            for (j in _columns_name) {
-                if (data[i].category == _columns_name[j]) {
-                    _counter[j] = parseInt(data[i].casos);
+    d3.csv(url + '_male', function(data_male){
+        d3.csv(url + '_female', function(data_female){
+            for (i in data_male) {
+                for (j in _columns_name) {
+                    if (data_male[i].category == _columns_name[j]) {
+                        _counter_male[j] = parseInt(data_male[i].casos);
+                    }
                 }
             }
-        }
 
-        // set data
-        age_chart.series[0].setData(_counter);
+            for (i in data_female) {
+                for (j in _columns_name) {
+                    if (data_female[i].category == _columns_name[j]) {
+                        _counter_female[j] = parseInt(data_female[i].casos);
+                    }
+                }
+            }
+
+            // set data
+            age_chart.series[0].setData(_counter_male);
+            age_chart.series[1].setData(_counter_female);
+        });
     });
 }
 
@@ -85,24 +62,37 @@ $(document).ready(function () {
         },
 
         plotOptions: {
-            series: {
-                cursor: 'pointer',color: '#dfdfdf',
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: false,
+                    //color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                    style: {
+                        fontWeight: 'bold',
+                    }
+                },
+                cursor: 'pointer',
+                color: '#dfdfdf',
                // allowPointSelect: true,
                 states: {
                     select: {
-                        color: '#112C51'
+                        color: '#112C51',
+                        borderColor: '#ffffff'
                     }
                 },
                 point: {
                     events: {
                         click: function(event){
+                            i = event.point.index;
                             //this.slice(null);
-                            this.select(null, true);
+                            //this.select(null, true);
+                            age_chart.series[0].data[i].select(null, true);
+                            age_chart.series[1].data[i].select(null, true);
                             plots_refresh('age');
                         }
                     }
                 }
-            },
+            }
         },
 
         title: {
@@ -133,10 +123,15 @@ $(document).ready(function () {
             shared: true
         },
 
-        series: [{
-            "name": "casos",
-            "data": [0, 0, 0, 0, 0, 0, 0, 0]
-        }]
+        series: [
+            {
+                "name": "Homem (casos)",
+                "data": [0, 0, 0, 0, 0, 0, 0, 0]
+            }, {
+                "name": "Mulher (casos)",
+                "data": [0, 0, 0, 0, 0, 0, 0, 0]
+            }
+        ]
     });
 });
 

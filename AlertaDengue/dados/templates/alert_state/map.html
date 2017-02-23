@@ -17,7 +17,7 @@
     var geo_ids = {{ geo_ids }};
 
     var features = L.layerGroup();
-    //var info = L.control();
+    var info = L.control();
     var legend = L.control({position: 'bottomright'});
     var alertLevels = [
         {name: 'Baixo Risco', color: '#0D6B0D'},
@@ -112,7 +112,7 @@
         if (!L.Browser.ie && !L.Browser.opera) {
             layer.bringToFront();
         }
-        //info.update(layer.feature.properties);
+        info.update(layer.feature.properties);
 
         renderSparkline(e);
 
@@ -121,7 +121,7 @@
 
     function resetHighlight(e) {
         //geojson.resetStyle(e.target);
-        //info.update();
+        info.update();
     }
 
     function renderSparkline(e) {
@@ -161,21 +161,21 @@
 
         // control that shows state info on hover
 
-        /*info.onAdd = function (map) {
+        info.onAdd = function (map) {
             this._div = L.DomUtil.create('div', 'info');
             this.update();
             return this._div;
-        };*/
+        };
 
-        /*info.update = function (props) {
+        info.update = function (props) {
             this._div.innerHTML = '' +
                 '<h6>Número de casos estimados na semana:</h6>' +
                 (props ?
                  '<b>'+ props.nome + ':' + props.casos + '</b><br />' :
                  'Passe o mouse sobre o mapa');
-        };*/
+        };
 
-        //info.addTo(map);
+        info.addTo(map);
 
         legend.onAdd = function () {
             var div = L.DomUtil.create('div', 'info legend'),

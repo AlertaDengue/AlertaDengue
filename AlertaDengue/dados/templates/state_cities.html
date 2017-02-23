@@ -135,7 +135,7 @@
         }
 
         function _plots_refresh() {
-            console.log('Starting ...');
+            //console.log('Starting ...');
             var start = performance.now();
             var extremes = date_chart.xAxis[0].getExtremes();
 
@@ -145,8 +145,6 @@
                 get_diseases_selected() +
                 get_period_selected() +
                 get_cities_selected();
-
-            console.log(filters);
 
             if (ignore_chart != 'disease') plot_chart_disease(filters);
             if (ignore_chart != 'age') plot_chart_age(filters);
@@ -167,7 +165,7 @@
 
             ignore_chart = '';
 
-            console.log((performance.now() - start)/1000);
+            //console.log((performance.now() - start)/1000);
         }
 
         $(document).ready(function(){
