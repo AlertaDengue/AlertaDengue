@@ -4,58 +4,6 @@
 var disease_chart;
 var disease_chart_load = false;
 
-function _plot_chart_disease(){
-    var _values = [];
-    var _columns_name = disease_chart.xAxis[0].categories;
-    var _counter = new Array(_columns_name.length).fill(0);
-    var _num_selected = 0;
-
-    var categories_selected = disease_chart.getSelectedPoints().map(function(d){
-        return d.category
-    });
-
-    // filter
-    var _data = data.filter(function(d) {
-        return filter_age(d) && filter_gender(d) &&
-            filter_date(d) && filter_city(d)
-    });
-
-    // grouping
-    var dataCount = d3.nest()
-        .key(function(d) { return d.disease; })
-        .rollup(function(v) { return v.length; })
-        .entries(_data);
-
-    // select all if nothing is selected
-    if (categories_selected.length == 0) {
-        for (j in disease_chart.series[0].data) {
-            disease_chart.series[0].data[j].select(true, true);
-        }
-    }
-
-    categories_selected = disease_chart.getSelectedPoints().map(function(d){
-        return d.category
-    });
-
-    // counter to chart plotting
-    for (i in dataCount) {
-        for (j in _columns_name) {
-            if (dataCount[i].key == _columns_name[j]) {
-                _counter[j] = dataCount[i].value;
-
-                if (categories_selected.indexOf(dataCount[i].key) >= 0) {
-                    _num_selected += _counter[j];
-                }
-            }
-        }
-    }
-
-    // set data
-    disease_chart.series[0].setData(_counter);
-
-    $('#selected_cases_num').text(_num_selected);
-}
-
 function get_diseases_selected() {
     // categories selection
     var categories_selected = disease_chart.getSelectedPoints().map(function(d){

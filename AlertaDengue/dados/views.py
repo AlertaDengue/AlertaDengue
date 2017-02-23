@@ -571,8 +571,10 @@ class NotificationReducedCSV_View(View):
 
         if chart_type == 'disease':
             result = notifQuery.get_disease_dist().to_csv()
-        elif chart_type == 'age':
-            result = notifQuery.get_age_dist().to_csv()
+        elif chart_type == 'age_male':
+            result = notifQuery.get_age_male_dist().to_csv()
+        elif chart_type == 'age_female':
+            result = notifQuery.get_age_female_dist().to_csv()
         elif chart_type == 'gender':
             result = notifQuery.get_gender_dist().to_csv()
         elif chart_type == 'period':
