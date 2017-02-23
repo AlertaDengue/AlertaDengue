@@ -11,3 +11,6 @@ settings.ini
 pip-selfcheck.json
 /shapely
 /share/
+.env
+*.sw[po]
+docker_shared_files

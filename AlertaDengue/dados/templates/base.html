@@ -63,22 +63,7 @@
                                 </li>
 
                                 {% if user.is_authenticated %}
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Acesse os Dados <b
-                                                class="caret"></b></a>
-                                        <ul class="dropdown-menu">
-                                            <li class="dropdown-header">{% trans "Incidência (SINAN)" %}</li>
-                                            <li><a href="{% url "sinan" 2010 00 %}">{% trans "SINAN (2010)" %}</a></li>
-                                            <li><a href="{% url "sinan" 2011 00 %}">{% trans "SINAN (2011)" %}</a></li>
-                                            <li><a href="{% url "sinan" 2012 00 %}">{% trans "SINAN (2012)" %}</a></li>
-                                            <li><a href="{% url "sinan" 2013 00 %}">{% trans "SINAN (2013)" %}</a></li>
-                                            <li class="divider"></li> <li class="dropdown-header">{% trans "Dados Entomológicos" %}</li>
-                                            <li><a href="#">{% trans "Ovitrampas" %}</a></li>
-                                            <li><a href="#">{% trans "LIRAa" %}</a></li>
-                                            <li class="divider"></li>
-                                            <li class="dropdown-header">{% trans "Dados Climáticos" %}</li>
-                                        </ul>
-                                    </li>
+                                    <li><a href="{% url "dbf:upload" %}">{% trans "Envie dados atualizados" %}</a></li>
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans "Account " %}<b
                                                 class="caret"></b></a>

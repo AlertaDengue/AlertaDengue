@@ -1,5 +1,5 @@
 # coding=utf-8
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.decorators.cache import cache_page
 from dados.views import DetailsPageView, SinanCasesView, AboutPageView, ContactPageView, JoininPageView, MapaDengueView, \
@@ -10,6 +10,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.decorators import login_required
 from django.views.generic import RedirectView
+import dbf.urls
 
 admin.autodiscover()
 
@@ -33,4 +34,5 @@ urlpatterns = [#'',
                url(r'^participe/$', JoininPageView.as_view(), name='joinin'),
                url(r'^sinan/(\d{4})/(\d{1,2})', SinanCasesView.as_view(), name='sinan'),
                url(r'^admin/', include(admin.site.urls)),
+               url(r'^dbf/', include(dbf.urls)),
                ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

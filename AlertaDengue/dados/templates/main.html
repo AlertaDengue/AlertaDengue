@@ -215,22 +215,20 @@
 
             };
 
+            var last_city_geocodigo = geocodigos[geocodigos.length - 1]
             for (var i=0; i< geocodigos.length; i++){
                 var gc = geocodigos[i];
                 $.getJSON('/geojson/'+gc.toString()+'/', function(data){
                     geojson = L.geoJson(data, {style: style, onEachFeature: fill_details});
                     global_bounds.extend(geojson.getBounds())
                     municipios.addLayer(geojson, true);
-                    map.fitBounds(global_bounds);
+                    if (data.features[0].properties.geocodigo == last_city_geocodigo) {
+                        map.fitBounds(global_bounds);
+                    }
                 });
-
             };
+
             municipios.addTo(map);
-            map.fitBounds(global_bounds);
-
-
-
-
 
             var overlayMaps = {
                 'Municípios': municipios
@@ -258,6 +256,15 @@
 
             }).trigger("resize")
 
+
+            // These are the bound we have with RJ, ES and PR
+            // Since we shouldn't add more cities before the redesign, these
+            // should center the map before the last geojson is loaded
+            var reasonable_bounds = L.latLngBounds(
+                    L.latLng(-17.891944639567996, -28.8359076292382),
+                    L.latLng(-26.717122007927195, -54.61930463781249)
+            );
+            map.fitBounds(reasonable_bounds);
         }
 
     </script>

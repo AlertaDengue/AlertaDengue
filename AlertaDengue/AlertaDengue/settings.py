@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from decouple import config, Csv
+from dj_database_url import parse as db_url
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -25,6 +26,14 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
+def read_admins(value):
+    # ADMIN in settings.ini should be in the format:
+    # admin 1, admin1@example.org; admin 2, admin2@example.org
+    if value == '':
+        return tuple()
+    return tuple(tuple(v.split(',')) for v in value.split(';'))
+
+ADMINS = config('ADMINS', cast=read_admins, default='')
 
 ALLOWED_HOSTS = ["alerta.dengue.mat.br", "info.dengue.mat.br"]
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
@@ -39,11 +48,12 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',
     'django.contrib.humanize',
     'leaflet',
     'bootstrap3',
+    'chunked_upload',
     'dados',
+    'dbf.apps.DbfConfig'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -85,15 +95,12 @@ TEMPLATES = [
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
-        'NAME': os.path.join(BASE_DIR, 'geodjango.db'),
-    }
+    'default': config('DATABASE_URL', default='sqlite:///geodjango.db', cast=db_url)
 }
 
 MEMCACHED_HOST = config('MEMCACHED_HOST', '127.0.0.1')
 MEMCACHED_PORT = config('MEMCACHED_PORT', '11211')
-QUERY_CACHE_TIMEOUT = 60 * 60
+QUERY_CACHE_TIMEOUT = config('QUERY_CACHE_TIMEOUT', 60 * 60, cast=int)
 
 CACHES = {
     'default': {
@@ -162,7 +169,19 @@ DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, 'data'))
 
 STATIC_URL = '/static/'
 
+MEDIA_ROOT = config('MEDIA_ROOT', default='')
+
+EMAIL_BACKEND = config('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_FROM_ADDRESS = config('EMAIL_FROM_ADDRESS', 'no-reply@info.dengue.mat.br')
+
+if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
+    EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = config('EMAIL_CONFIG', default='example_host,25,username,password', cast=Csv())
+    EMAIL_PORT = int(EMAIL_PORT)
+    EMAIL_USE_TLS = True
+
 try:
     from AlertaDengue.local_settings import *
 except ImportError:
     pass
+
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=None)

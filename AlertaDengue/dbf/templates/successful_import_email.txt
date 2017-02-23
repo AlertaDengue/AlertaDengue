@@ -1,0 +1,4 @@
+
+O arquivo {{ dbf.file }} enviado em {{ dbf.uploaded_at|date:"d/m/Y" }} com notificações do ano {{ dbf.notification_year }} foi importado com sucesso.
+
+
