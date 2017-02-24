@@ -1,0 +1,138 @@
+<div id="age-chart" class="chart-default"></div>
+<script type="application/javascript">
+var age_chart;
+
+function get_ages_selected() {
+    // categories selection
+    var categories_selected = age_chart.getSelectedPoints().map(function(d){
+        return d.category
+    });
+
+    if (categories_selected.length == 0) {
+        for (j in age_chart.series[0].data) {
+            age_chart.series[0].data[j].select(true, true);
+            age_chart.series[1].data[j].select(true, true);
+        }
+    }
+
+    return '&ages=' + categories_selected.join(',');
+}
+
+function plot_chart_age(filters) {
+    var _values = [];
+    var _columns_name = age_chart.xAxis[0].categories;
+    var _counter_female = new Array(_columns_name.length).fill(0);
+    var _counter_male = new Array(_columns_name.length).fill(0);
+    var url = '/csv/notif_reduced?' + filters + '&chart_type=age';
+
+    d3.csv(url + '_male', function(data_male){
+        d3.csv(url + '_female', function(data_female){
+            for (i in data_male) {
+                for (j in _columns_name) {
+                    if (data_male[i].category == _columns_name[j]) {
+                        _counter_male[j] = parseInt(data_male[i].casos);
+                    }
+                }
+            }
+
+            for (i in data_female) {
+                for (j in _columns_name) {
+                    if (data_female[i].category == _columns_name[j]) {
+                        _counter_female[j] = parseInt(data_female[i].casos);
+                    }
+                }
+            }
+
+            // set data
+            age_chart.series[0].setData(_counter_male);
+            age_chart.series[1].setData(_counter_female);
+        });
+    });
+}
+
+$(document).ready(function () {
+    // Create the chart
+    age_chart = Highcharts.chart('age-chart', {
+        chart: {
+            type: 'column',
+            spacingBottom: 0,
+            spacingTop: 0,
+            spacingLeft: 0,
+            spacingRight: 0
+        },
+
+        plotOptions: {
+            column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: false,
+                    //color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                    style: {
+                        fontWeight: 'bold',
+                    }
+                },
+                cursor: 'pointer',
+                color: '#dfdfdf',
+               // allowPointSelect: true,
+                states: {
+                    select: {
+                        color: '#112C51',
+                        borderColor: '#ffffff'
+                    }
+                },
+                point: {
+                    events: {
+                        click: function(event){
+                            i = event.point.index;
+                            //this.slice(null);
+                            //this.select(null, true);
+                            age_chart.series[0].data[i].select(null, true);
+                            age_chart.series[1].data[i].select(null, true);
+                            plots_refresh('age');
+                        }
+                    }
+                }
+            }
+        },
+
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: 'Distribuição por Idade'
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Casos'
+            }
+        },
+        xAxis: {
+            categories: [
+                '00-04 anos', '05-09 anos', '10-19 anos', '20-29 anos',
+                '30-39 anos', '40-49 anos', '50-59 anos', '60+ anos'
+            ]
+        },
+        legend: {
+            enabled: false
+        },
+        credits: {
+            enabled: false
+        },
+        tooltip: {
+            shared: true
+        },
+
+        series: [
+            {
+                "name": "Homem (casos)",
+                "data": [0, 0, 0, 0, 0, 0, 0, 0]
+            }, {
+                "name": "Mulher (casos)",
+                "data": [0, 0, 0, 0, 0, 0, 0, 0]
+            }
+        ]
+    });
+});
+
+</script>

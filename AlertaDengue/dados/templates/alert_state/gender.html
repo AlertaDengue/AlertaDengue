@@ -1,0 +1,107 @@
+<div id="gender-chart"></div>
+<script type="application/javascript">
+// Create the chart
+var gender_chart;
+
+function get_genders_selected() {
+    // categories selection
+    var categories_selected = gender_chart.getSelectedPoints().map(function(d){
+        return d.category
+    });
+
+    if (categories_selected.length == 0) {
+        for (j in gender_chart.series[0].data) {
+            gender_chart.series[0].data[j].select(true, true);
+        }
+    }
+
+    return '&genders=' + categories_selected.join(',');
+}
+
+function plot_chart_gender(filters){
+    var _values = [];
+    var _columns_name = gender_chart.xAxis[0].categories;
+    var _counter = new Array(_columns_name.length).fill(0);
+    var _num_selected = 0;
+
+    var url = '/csv/notif_reduced?' + filters + '&chart_type=gender' +
+        filters;
+
+    d3.csv(url, function(data){
+        for (i in data) {
+            for (j in _columns_name) {
+                if (data[i].category == _columns_name[j]) {
+                    _counter[j] = parseInt(data[i].casos);
+                }
+            }
+        }
+
+        // set data
+        gender_chart.series[0].setData(_counter);
+    });
+}
+
+
+$(document).ready(function () {
+    gender_chart = Highcharts.chart('gender-chart', {
+        chart: {
+            type: 'column',
+            spacingBottom: 0,
+            spacingTop: 0,
+            spacingLeft: 0,
+            spacingRight: 0
+        },
+
+        plotOptions: {
+            series: {
+                cursor: 'pointer',
+                color: '#dfdfdf',
+               // allowPointSelect: true,
+                states: {
+                    select: {
+                        color: '#112C51'
+                    }
+                },
+                point: {
+                    events: {
+                        click: function(event){
+                            //this.slice(null);
+                            this.select(null, true);
+                            plots_refresh('gender');
+                        }
+                    }
+                },
+            },
+        },
+
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: 'Distribuição por gênero'
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Casos'
+            }
+        },
+        xAxis: {
+            categories: ['Mulher', 'Homem'],
+        },
+        legend: {
+            enabled: false
+        },
+        credits: {
+            enabled: false
+        },
+        tooltip: {
+            shared: true
+        },
+        series: [{
+            "name": "casos",
+            "data": [0, 0]
+        }]
+    });
+});
+</script>

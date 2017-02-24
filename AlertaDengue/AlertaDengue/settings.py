@@ -69,8 +69,6 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'AlertaDengue.urls'
 
-
-
 WSGI_APPLICATION = 'AlertaDengue.wsgi.application'
 
 TEMPLATES = [

@@ -1,0 +1,109 @@
+<div id="disease-chart" style="height:100px"></div>
+
+<script type="application/javascript">
+var disease_chart;
+var disease_chart_load = false;
+
+function get_diseases_selected() {
+    // categories selection
+    var categories_selected = disease_chart.getSelectedPoints().map(function(d){
+        return d.category
+    });
+
+    if (categories_selected.length == 0) {
+        for (j in disease_chart.series[0].data) {
+            disease_chart.series[0].data[j].select(true, true);
+        }
+    }
+
+    return '&diseases=' + categories_selected.join(',');
+}
+
+function plot_chart_disease(filters){
+    var _values = [];
+    var _columns_name = disease_chart.xAxis[0].categories;
+    var _counter = new Array(_columns_name.length).fill(0);
+
+    var categories_selected = disease_chart.getSelectedPoints().map(function(d){
+        return d.category
+    });
+
+    var url = '/csv/notif_reduced?' + filters + '&chart_type=disease';
+
+    d3.csv(url, function(data){
+        for (i in data) {
+            for (j in _columns_name) {
+                if (data[i].category == _columns_name[j]) {
+                    _counter[j] = parseInt(data[i].casos);
+                }
+            }
+        }
+
+        // set data
+        disease_chart.series[0].setData(_counter);
+    });
+}
+
+$(document).ready(function () {
+    disease_chart = Highcharts.chart('disease-chart', {
+        plotOptions: {
+            series: {
+                cursor: 'pointer',
+                color: '#dfdfdf',
+               // allowPointSelect: true,
+                states: {
+                    select: {
+                        color: '#112C51'
+                    }
+                },
+                point: {
+                    events: {
+                        click: function(event){
+                            //this.slice(null);
+                            this.select(null, true);
+                            plots_refresh('disease');
+                        },
+                    }
+                }
+            }
+        },
+
+        chart: {
+            type: 'column',
+            spacingBottom: 0,
+            spacingTop: 0,
+            spacingLeft: 0,
+            spacingRight: 0
+        },
+        title: {
+            text: ''
+        },
+        subtitle: {
+            text: 'Distribuição por doença'
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Casos'
+            }
+        },
+        xAxis: {
+            categories: ['Dengue [dengue clássico]']
+        },
+        legend: {
+            enabled: false
+        },
+        credits: {
+            enabled: false
+        },
+        tooltip: {
+            shared: true
+        },
+        series: [{
+            'name': 'casos',
+            'data': [0]
+        }]
+
+    });
+});
+</script>

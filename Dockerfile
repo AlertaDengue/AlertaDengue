@@ -24,10 +24,12 @@ ADD . /srv/deploy/AlertaDengue
 
 WORKDIR /srv/deploy/AlertaDengue/AlertaDengue
 
+# Migrate
+RUN python3 manage.py migrate --run-syncdb --noinputa
+RUN python3 manage.py sync_geojson
+
 # Collectstatic
 RUN python3 manage.py collectstatic --noinput
-
-RUN python3 manage.py migrate --run-syncdb --noinput
 
 # Change the permissions for the user home directory
 RUN chown -R deploy:deploy /srv/deploy/
