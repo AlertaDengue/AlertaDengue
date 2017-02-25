@@ -18,6 +18,13 @@ CID10 = {
 }
 
 
+db_engine = create_engine("postgresql://{}:{}@{}/{}".format(
+    settings.PSQL_USER,
+    settings.PSQL_PASSWORD,
+    settings.PSQL_HOST,
+    settings.PSQL_DB
+))
+
 def get_all_active_cities():
     """
     Fetch from the database a list on names of active cities
@@ -26,18 +33,11 @@ def get_all_active_cities():
     res = cache.get('get_all_active_cities')
 
     if res is None:
-        conexao = create_engine(
-            "postgresql://{}:{}@{}/{}".format(
-                settings.PSQL_USER,
-                settings.PSQL_PASSWORD,
-                settings.PSQL_HOST,
-                settings.PSQL_DB))
-        res = conexao.execute(
-            'SELECT DISTINCT municipio_geocodigo, municipio_nome FROM'
-            '"Municipio"."Historico_alerta";')
-        res = res.fetchall()
-        cache.set('get_all_active_cities', res, settings.QUERY_CACHE_TIMEOUT)
-
+        with db_engine.connect() as conexao:
+            res = conexao.execute('SELECT DISTINCT municipio_geocodigo, municipio_nome FROM'
+                '"Municipio"."Historico_alerta";')
+            res = res.fetchall()
+            cache.set('get_all_active_cities', res, settings.QUERY_CACHE_TIMEOUT)
     return res
 
 
@@ -46,14 +46,8 @@ def get_alerta_mrj():
     Fetch the alert table for the city of Rio de janeiro
     :return: pandas dataframe
     """
-    conexao = create_engine(
-        "postgresql://{}:{}@{}/{}".format(
-            settings.PSQL_USER,
-            settings.PSQL_PASSWORD,
-            settings.PSQL_HOST, settings.PSQL_DB))
-    dados_alerta = pd.read_sql_query(
-        'select * from "Municipio".alerta_mrj;', conexao, index_col='id'
-    )
+    with db_engine.connect() as conexao:
+        dados_alerta = pd.read_sql_query('select * from "Municipio".alerta_mrj;', conexao, index_col='id')
     return dados_alerta
 
 
@@ -64,20 +58,12 @@ def get_city(query):
     :param query: substring of the city
     :return: list of dictionaries
     """
-    conexao = create_engine(
-        "postgresql://{}:{}@{}/{}".format(
-            settings.PSQL_USER,
-            settings.PSQL_PASSWORD,
-            settings.PSQL_HOST, settings.PSQL_DB))
-    sql = (
-        'SELECT distinct municipio_geocodigo, nome, uf ' +
-        'from "Municipio"."Historico_alerta" inner JOIN' +
-        ' "Dengue_global"."Municipio" on ' +
-        '"Historico_alerta".municipio_geocodigo="Municipio".geocodigo ' +
-        'WHERE nome ilike(%s);'
-    )
+    with db_engine.connect() as conexao:
+        sql = 'SELECT distinct municipio_geocodigo, nome, uf from "Municipio"."Historico_alerta" inner JOIN' \
+              ' "Dengue_global"."Municipio" on "Historico_alerta".municipio_geocodigo="Municipio".geocodigo ' \
+              'WHERE nome ilike(%s);'
 
-    result = conexao.execute(sql, ('%' + query + '%',))
+        result = conexao.execute(sql, ('%'+query+'%',))
 
     return result.fetchall()
 
@@ -91,15 +77,9 @@ def get_series_by_UF(doenca='dengue'):
     """
     series = cache.get('get_series_by_UF')
     if series is None:
-        conexao = create_engine(
-            "postgresql://{}:{}@{}/{}".format(
-                settings.PSQL_USER,
-                settings.PSQL_PASSWORD,
-                settings.PSQL_HOST,
-                settings.PSQL_DB))
-        series = pd.read_sql(
-            'select * from uf_total_view;', conexao, parse_dates=True)
-        cache.set('get_series_by_UF', series, settings.QUERY_CACHE_TIMEOUT)
+        with db_engine.connect() as conexao:
+            series = pd.read_sql('select * from uf_total_view;', conexao, parse_dates=True)
+            cache.set('get_series_by_UF', series, settings.QUERY_CACHE_TIMEOUT)
 
     return series
 
@@ -114,48 +94,29 @@ def load_series(cidade, doenca='dengue', conn=None):
     cache_key = 'load_series-{}-{}'.format(cidade, doenca)
     result = cache.get(cache_key)
     if result is None:
-        if conn is None:
-            conn = create_engine(
-                "postgresql://{}:{}@{}/{}".format(
-                    settings.PSQL_USER,
-                    settings.PSQL_PASSWORD,
-                    settings.PSQL_HOST,
-                    settings.PSQL_DB))
+        with db_engine.connect() as conexao:
+            ap = str(cidade)
+            cidade = add_dv(int(str(cidade)[:-1]))
+            dados_alerta = pd.read_sql_query('select * from "Municipio"."Historico_alerta" where municipio_geocodigo={} ORDER BY "data_iniSE" ASC'.format(cidade), conexao, 'id', parse_dates=True)
+            if len(dados_alerta) == 0:
+                raise NameError("Não foi possível obter os dados do Banco para cidade {}".format(cidade))
 
-        ap = str(cidade)
-        cidade = add_dv(int(str(cidade)[:-1]))
-
-        dados_alerta = pd.read_sql_query((
-            'select * from "Municipio"."Historico_alerta" ' +
-            'where municipio_geocodigo={} ORDER BY "data_iniSE" ASC'
-        ).format(cidade), conn, 'id', parse_dates=True)
-
-        if len(dados_alerta) == 0:
-            raise NameError((
-                "Não foi possível obter os dados " +
-                "do Banco para cidade {}"
-            ).format(cidade))
-
-        series = defaultdict(lambda: defaultdict(lambda: []))
-        series[ap]['dia'] = dados_alerta.data_iniSE.tolist()
-        series[ap]['casos_est_min'] = np.nan_to_num(
-            dados_alerta.casos_est_min).astype(int).tolist()
-        series[ap]['casos_est'] = np.nan_to_num(dados_alerta.casos_est).astype(
-            int).tolist()
-        series[ap]['casos_est_max'] = np.nan_to_num(
-            dados_alerta.casos_est_max).astype(int).tolist()
-        series[ap]['casos'] = np.nan_to_num(dados_alerta.casos).astype(
-            int).tolist()
-        series[ap]['alerta'] = (
-            dados_alerta.nivel.astype(int) - 1
-        ).tolist()  # (1,4)->(0,3)
-        series[ap]['SE'] = (dados_alerta.SE.astype(int)).tolist()
-        series[ap]['prt1'] = dados_alerta.p_rt1.astype(float).tolist()
-        series[ap] = dict(series[ap])
-        # conexao.close()
-        result = dict(series)
-
-        cache.set(cache_key, result, settings.QUERY_CACHE_TIMEOUT)
+            # tweets = pd.read_sql_query('select * from "Municipio"."Tweet" where "Municipio_geocodigo"={}'.format(cidade), parse_dates=True)
+            series = defaultdict(lambda: defaultdict(lambda: []))
+            series[ap]['dia'] = dados_alerta.data_iniSE.tolist()
+            # series[ap]['tweets'] = [float(i) if not np.isnan(i) else None for i in tweets.numero]
+            # series[ap]['tmin'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).tmin]
+            series[ap]['casos_est_min'] = np.nan_to_num(dados_alerta.casos_est_min).astype(int).tolist()
+            series[ap]['casos_est'] = np.nan_to_num(dados_alerta.casos_est).astype(int).tolist()
+            series[ap]['casos_est_max'] = np.nan_to_num(dados_alerta.casos_est_max).astype(int).tolist()
+            series[ap]['casos'] = np.nan_to_num(dados_alerta.casos).astype(int).tolist()
+            series[ap]['alerta'] = (dados_alerta.nivel.astype(int)-1).tolist()  # (1,4)->(0,3)
+            series[ap]['SE'] = (dados_alerta.SE.astype(int)).tolist()
+            series[ap]['prt1'] = dados_alerta.p_rt1.astype(float).tolist()
+            series[ap] = dict(series[ap])
+            # conexao.close()
+            result = dict(series)
+            cache.set(cache_key, result, settings.QUERY_CACHE_TIMEOUT)
 
     return result
 
@@ -561,22 +522,11 @@ class NotificationQueries:
         :param disease:
         :return:
         """
-        if disease is None:
-            return 'cid10_codigo IS NOT NULL'
-
-        sql = '''
-        SELECT codigo FROM "Dengue_global"."CID10"
-        WHERE nome IN ({})
-        '''.format(','.join(
-            ["'{}'".format(_disease) for _disease in disease.split(',')]
-        ))
-
-        df_cid10 = pd.read_sql(sql, self.conn)
-
         return (
-            '' if df_cid10.empty else
+            'cid10_codigo IS NOT NULL' if disease is None else
             'cid10_codigo IN ({})'.format(','.join([
-                "'{}'".format(cid) for cid in df_cid10.codigo.values
+                "'{}'".format(CID10[cid.lower()])
+                for cid in disease.split(',')
             ]))
         )
 
@@ -636,7 +586,6 @@ class NotificationQueries:
             ) AS tb
             WHERE {}
             '''.format(self._age_field, _dist_filters)
-        print(sql)
         return pd.read_sql(sql, self.conn, 'casos')
 
     def get_disease_dist(self):
@@ -667,6 +616,12 @@ class NotificationQueries:
         '''.format(self._age_field, _dist_filters)
 
         df_disease_dist = pd.read_sql(sql, self.conn)
+
+        df_disease_dist.category = (
+            df_disease_dist.category.replace(
+                'Dengue [dengue clássico]', 'Dengue'
+            )
+        )
 
         return df_disease_dist.set_index('category', drop=True)
 

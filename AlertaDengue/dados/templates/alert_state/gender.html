@@ -2,6 +2,7 @@
 <script type="application/javascript">
 // Create the chart
 var gender_chart;
+var gender_categories = ['Mulher', 'Homem'];
 
 function get_genders_selected() {
     // categories selection
@@ -9,9 +10,14 @@ function get_genders_selected() {
         return d.category
     });
 
+    // inverted select
+    categories_selected = gender_categories.filter(
+        n => categories_selected.indexOf(n) < 0
+    );
+
     if (categories_selected.length == 0) {
         for (j in gender_chart.series[0].data) {
-            gender_chart.series[0].data[j].select(true, true);
+            gender_chart.series[0].data[j].select(false, true);
         }
     }
 
@@ -55,13 +61,9 @@ $(document).ready(function () {
         plotOptions: {
             series: {
                 cursor: 'pointer',
-                color: '#dfdfdf',
+                colorByPoint: true,
                // allowPointSelect: true,
-                states: {
-                    select: {
-                        color: '#112C51'
-                    }
-                },
+                colors: ['#E41B17', '#112C51'],
                 point: {
                     events: {
                         click: function(event){
@@ -69,6 +71,14 @@ $(document).ready(function () {
                             this.select(null, true);
                             plots_refresh('gender');
                         }
+                    }
+                },
+
+                states: {
+                    select: {
+                        //color: '#112C51',
+                        color: '#dfdfdf',
+                        borderColor: '#ffffff'
                     }
                 },
             },
@@ -87,7 +97,7 @@ $(document).ready(function () {
             }
         },
         xAxis: {
-            categories: ['Mulher', 'Homem'],
+            categories: gender_categories,
         },
         legend: {
             enabled: false
@@ -99,7 +109,7 @@ $(document).ready(function () {
             shared: true
         },
         series: [{
-            "name": "casos",
+            "name": "Casos",
             "data": [0, 0]
         }]
     });
