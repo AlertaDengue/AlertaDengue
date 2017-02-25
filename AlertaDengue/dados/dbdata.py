@@ -113,7 +113,6 @@ def load_series(cidade, doenca='dengue', conn=None):
             series[ap]['alerta'] = (dados_alerta.nivel.astype(int)-1).tolist()  # (1,4)->(0,3)
             series[ap]['SE'] = (dados_alerta.SE.astype(int)).tolist()
             series[ap]['prt1'] = dados_alerta.p_rt1.astype(float).tolist()
-            # print(series['dia'])
             series[ap] = dict(series[ap])
             # conexao.close()
             result = dict(series)
@@ -523,22 +522,11 @@ class NotificationQueries:
         :param disease:
         :return:
         """
-        if disease is None:
-            return 'cid10_codigo IS NOT NULL'
-
-        sql = '''
-        SELECT codigo FROM "Dengue_global"."CID10"
-        WHERE nome IN ({})
-        '''.format(','.join(
-            ["'{}'".format(_disease) for _disease in disease.split(',')]
-        ))
-
-        df_cid10 = pd.read_sql(sql, self.conn)
-
         return (
-            '' if df_cid10.empty else
+            'cid10_codigo IS NOT NULL' if disease is None else
             'cid10_codigo IN ({})'.format(','.join([
-                "'{}'".format(cid) for cid in df_cid10.codigo.values
+                "'{}'".format(CID10[cid.lower()])
+                for cid in disease.split(',')
             ]))
         )
 
@@ -598,7 +586,6 @@ class NotificationQueries:
             ) AS tb
             WHERE {}
             '''.format(self._age_field, _dist_filters)
-        print(sql)
         return pd.read_sql(sql, self.conn, 'casos')
 
     def get_disease_dist(self):
@@ -629,6 +616,12 @@ class NotificationQueries:
         '''.format(self._age_field, _dist_filters)
 
         df_disease_dist = pd.read_sql(sql, self.conn)
+
+        df_disease_dist.category = (
+            df_disease_dist.category.replace(
+                'Dengue [dengue clássico]', 'Dengue'
+            )
+        )
 
         return df_disease_dist.set_index('category', drop=True)
 

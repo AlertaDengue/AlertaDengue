@@ -1,12 +1,21 @@
 <div id="age-chart" class="chart-default"></div>
 <script type="application/javascript">
 var age_chart;
+var age_categories = [
+    '00-04 anos', '05-09 anos', '10-19 anos', '20-29 anos',
+    '30-39 anos', '40-49 anos', '50-59 anos', '60+ anos'
+]
 
 function get_ages_selected() {
     // categories selection
     var categories_selected = age_chart.getSelectedPoints().map(function(d){
         return d.category
     });
+
+    // inverted select
+    categories_selected = age_categories.filter(
+        n => categories_selected.indexOf(n) < 0
+    );
 
     if (categories_selected.length == 0) {
         for (j in age_chart.series[0].data) {
@@ -72,14 +81,7 @@ $(document).ready(function () {
                     }
                 },
                 cursor: 'pointer',
-                color: '#dfdfdf',
-               // allowPointSelect: true,
-                states: {
-                    select: {
-                        color: '#112C51',
-                        borderColor: '#ffffff'
-                    }
-                },
+                //color: '#dfdfdf',
                 point: {
                     events: {
                         click: function(event){
@@ -108,10 +110,7 @@ $(document).ready(function () {
             }
         },
         xAxis: {
-            categories: [
-                '00-04 anos', '05-09 anos', '10-19 anos', '20-29 anos',
-                '30-39 anos', '40-49 anos', '50-59 anos', '60+ anos'
-            ]
+            categories: age_categories
         },
         legend: {
             enabled: false
@@ -126,10 +125,24 @@ $(document).ready(function () {
         series: [
             {
                 "name": "Homem (casos)",
-                "data": [0, 0, 0, 0, 0, 0, 0, 0]
+                "data": [0, 0, 0, 0, 0, 0, 0, 0],
+                color: '#112C51',
+                states: {
+                    select: {
+                        color: '#dfdfdf',
+                        borderColor: '#ffffff'
+                    }
+                },
             }, {
                 "name": "Mulher (casos)",
-                "data": [0, 0, 0, 0, 0, 0, 0, 0]
+                "data": [0, 0, 0, 0, 0, 0, 0, 0],
+                color: '#E41B17',
+                states: {
+                    select: {
+                        color: '#dfdfdf',
+                        borderColor: '#ffffff'
+                    }
+                },
             }
         ]
     });
