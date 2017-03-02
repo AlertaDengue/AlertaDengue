@@ -414,18 +414,16 @@ class NotificationQueries:
         WHEN nu_idade_n >=4060 THEN '60+ anos'
         ELSE NULL
         END AS age'''
-    conn = None
     dist_filters = None
 
     def __init__(
-        self, conn, uf, disease_values, age_values, gender_values,
+        self, uf, disease_values, age_values, gender_values,
         city_values, initial_date, final_date
     ):
         """
 
         :param conn:
         """
-        self.conn = conn
         self.uf = uf
 
         self.dist_filters = [
@@ -563,7 +561,8 @@ class NotificationQueries:
             WHERE {}
             '''.format(self._age_field, clean_filters)
 
-        return pd.read_sql(sql, self.conn, 'casos')
+        with db_engine.connect() as conn:
+            return pd.read_sql(sql, conn, 'casos')
 
     def get_selected_rows(self):
         """
@@ -586,7 +585,9 @@ class NotificationQueries:
             ) AS tb
             WHERE {}
             '''.format(self._age_field, _dist_filters)
-        return pd.read_sql(sql, self.conn, 'casos')
+
+        with db_engine.connect() as conn:
+            return pd.read_sql(sql, conn, 'casos')
 
     def get_disease_dist(self):
         """
@@ -615,7 +616,8 @@ class NotificationQueries:
         GROUP BY cid10_nome;
         '''.format(self._age_field, _dist_filters)
 
-        df_disease_dist = pd.read_sql(sql, self.conn)
+        with db_engine.connect() as conn:
+            df_disease_dist = pd.read_sql(sql, conn)
 
         df_disease_dist.category = (
             df_disease_dist.category.replace(
@@ -651,7 +653,8 @@ class NotificationQueries:
         ORDER BY age
         '''.format(self._age_field, _dist_filters)
 
-        return pd.read_sql(sql, self.conn, 'category')
+        with db_engine.connect() as conn:
+            return pd.read_sql(sql, conn, 'category')
 
     def get_age_male_dist(self):
         """
@@ -679,7 +682,8 @@ class NotificationQueries:
         ORDER BY age
         '''.format(self._age_field, _dist_filters)
 
-        return pd.read_sql(sql, self.conn, 'category')
+        with db_engine.connect() as conn:
+            return pd.read_sql(sql, conn, 'category')
 
     def get_age_female_dist(self):
         """
@@ -707,7 +711,8 @@ class NotificationQueries:
         ORDER BY age
         '''.format(self._age_field, _dist_filters)
 
-        return pd.read_sql(sql, self.conn, 'category')
+        with db_engine.connect() as conn:
+            return pd.read_sql(sql, conn, 'category')
 
     def get_gender_dist(self):
         _dist_filters = self._process_filter(self.dist_filters, 'gender')
@@ -733,7 +738,31 @@ class NotificationQueries:
         GROUP BY cs_sexo;
         '''.format(self._age_field, _dist_filters)
 
-        return pd.read_sql(sql, self.conn, 'category')
+        with db_engine.connect() as conn:
+            return pd.read_sql(sql, conn, 'category')
+
+    def get_epiyears(self, state_name):
+        sql = '''
+        SELECT
+          ano_notif,
+          se_notif,
+          COUNT(se_notif) AS casos
+        FROM
+          "Municipio"."Notificacao" AS notif
+          INNER JOIN "Dengue_global"."Municipio" AS municipio
+            ON notif.municipio_geocodigo = municipio.geocodigo
+        WHERE uf='{}'
+        GROUP BY ano_notif, se_notif
+        ORDER BY ano_notif, se_notif
+        '''.format(state_name)
+
+        with db_engine.connect() as conn:
+            df = pd.read_sql(sql, conn)
+
+        return pd.crosstab(
+            df['ano_notif'], df['se_notif'], df['casos'], aggfunc=sum
+        ).T
+
 
     def get_period_dist(self):
         _dist_filters = self._process_filter(self.dist_filters, 'period')
@@ -759,7 +788,9 @@ class NotificationQueries:
         ORDER BY dt_week
         '''.format(self._age_field, _dist_filters)
 
-        df_alert_period = pd.read_sql(sql, self.conn, index_col='dt_week')
+        with db_engine.connect() as conn:
+            df_alert_period = pd.read_sql(sql, conn, index_col='dt_week')
+
         df_alert_period.index.rename('category', inplace=True)
 
         sql = '''
@@ -772,7 +803,8 @@ class NotificationQueries:
           ) AS INTERVAL) AS dt_week_end
         '''
 
-        df_period_bounds = pd.read_sql(sql, self.conn)
+        with db_engine.connect() as conn:
+            df_period_bounds = pd.read_sql(sql, conn)
 
         if not df_period_bounds.dt_week_start[0] in df_alert_period.index:
             df = pd.DataFrame({

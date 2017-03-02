@@ -47,6 +47,7 @@
             width: 100%;
             height: 400px;
         }
+
         .info {
             padding: 6px 8px;
             font: 14px/16px Arial, Helvetica, sans-serif;
@@ -56,15 +57,17 @@
             border-radius: 5px;
         }
 
-        .info h6 {
+        .info h4, .info h6 {
             margin: 0 0 5px;
             color: #777;
         }
+
         .legend {
             text-align: left;
             line-height: 18px;
             color: #555;
         }
+
         .legend i {
             width: 18px;
             height: 18px;
@@ -290,6 +293,16 @@
                       </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div>&nbsp;</div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="chart-wrapper">
+              <div class="chart-stage">
+                  {% epiyears_chart %}
+              </div>
             </div>
         </div>
     </div>

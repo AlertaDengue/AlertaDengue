@@ -552,14 +552,11 @@ class NotificationReducedCSV_View(View):
         """
         self.request = request
 
-        conn = dbdata.create_connection()
-
         uf = self._state_name[self._get('state_abv')]
 
         chart_type = self._get('chart_type')
 
         notifQuery = dbdata.NotificationQueries(
-            conn=conn,
             uf=uf,
             disease_values=self._get('diseases'),
             age_values=self._get('ages'),
@@ -581,6 +578,8 @@ class NotificationReducedCSV_View(View):
             result = notifQuery.get_period_dist().to_csv(
                 date_format='%Y-%m-%d'
             )
+        elif chart_type == 'epiyears':
+            result = notifQuery.get_epiyears(uf).to_csv()
         elif chart_type == 'total_cases':
             result = notifQuery.get_total_rows().to_csv()
         elif chart_type == 'selected_cases':
