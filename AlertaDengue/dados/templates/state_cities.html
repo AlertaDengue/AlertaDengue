@@ -30,6 +30,9 @@
     <script src="/static/libs/d3/d3-time-format.v2.min.js"
             type="text/javascript"></script>
 
+    <script src="/static/libs/d3/d3-queue.v3.min.js"
+            type="text/javascript"></script>
+
     <script src="/static/libs/lodash/lodash.min.js"
             type="text/javascript"></script>
 
@@ -96,39 +99,6 @@
         var initial_load = true;
         var state_abv = '{{state_abv}}';
         var ignore_chart = false;
-        var _filter_age;
-        var _filter_date_start;
-        var _filter_date_end;
-        var _filter_disease;
-        var _filter_gender;
-        var _filter_city;
-
-        function filter_age(d) {
-            return _filter_age.some(x => x == d.age) ||
-                _filter_age.length == 0;
-        }
-
-        function filter_date(d) {
-            return _filter_date_start == null || (
-                d.dt_week >= _filter_date_start &&
-                d.dt_week <= _filter_date_end
-            );
-        }
-
-        function filter_disease(d) {
-            return _filter_disease.some(x => x == d.disease) ||
-                _filter_disease.length == 0;
-        }
-
-        function filter_gender(d) {
-            return _filter_gender.some(x => x == d.gender) ||
-                _filter_gender.length == 0;
-        }
-
-        function filter_city(d) {
-            return _filter_city.some(x => x == d.geo_id) ||
-                _filter_city.length == 0;
-        }
 
         function plots_refresh(_ignore_chart) {
             if (_ignore_chart != undefined) {
@@ -137,58 +107,62 @@
             $('#pleaseWaitWindow').modal('show');
         }
 
-        function show_numbers_display(filters) {
-            if (filters == undefined) {
-                filters = '&state_abv=' + state_abv;
-            }
-
-            d3.csv(
-                '/csv/notif_reduced?chart_type=total_cases&state_abv=' + state_abv,
-                function(data){
-                    $('#total_cases_num').text(data[0].casos);
-            });
-
-            d3.csv(
-                '/csv/notif_reduced?chart_type=selected_cases' + filters,
-                function(data){
-                    $('#selected_cases_num').text(data[0].casos);
-            });
-        }
-
         function _plots_refresh() {
-            //console.log('Starting ...');
-            var start = performance.now();
-            var extremes = date_chart.xAxis[0].getExtremes();
-
-            var filters = '&state_abv=' + state_abv +
+            var url = '/csv/notif_reduced?&state_abv=' + state_abv +
                 get_ages_selected() +
                 get_genders_selected() +
                 get_diseases_selected() +
                 get_period_selected() +
-                get_cities_selected();
+                get_cities_selected() + '&chart_type=';
 
-            if (ignore_chart != 'disease') plot_chart_disease(filters);
-            if (ignore_chart != 'age') plot_chart_age(filters);
-            if (ignore_chart != 'gender') plot_chart_gender(filters);
-            if (ignore_chart != 'date') plot_chart_date(filters);
+            var url_short = '/csv/notif_reduced' +
+                '?state_abv=' + state_abv +
+                '&chart_type=';
 
-            show_numbers_display(filters);
+            d3.queue()
+                .defer(d3.csv, url+'disease')
+                .defer(d3.csv, url+'age_male')
+                .defer(d3.csv, url+'age_female')
+                .defer(d3.csv, url+'gender')
+                .defer(d3.csv, url+'period')
+                .await(function(
+                    error, data_disease, data_age_male, data_age_female,
+                    data_gender, data_period
+                ){
+                    //console.log('Starting ...');
+                    //var start = performance.now();
+                    var format = d3.timeFormat('%d/%m//%Y');
+                    var extremes = date_chart.xAxis[0].getExtremes(),
+                        start = format(new Date(extremes.min)),
+                        end   = format(new Date(extremes.max));
 
-            ignore_chart = '';
+                    if (ignore_chart != 'disease')
+                        plot_chart_disease(data_disease);
+                    if (ignore_chart != 'age')
+                        plot_chart_age(data_age_male, data_age_female);
+                    if (ignore_chart != 'gender')
+                        plot_chart_gender(data_gender);
+                    if (ignore_chart != 'date')
+                        plot_chart_date(data_period);
 
-            //console.log((performance.now() - start)/1000);
+                    $('#filter-display').text(
+                        ' Casos de ' + _get_diseases_selected().join(', ') +
+                        ' entre ' + start + ' e ' + end + ',' +
+                        ' sexo: ' + _get_genders_selected().join(', ') + ',' +
+                        ' idades: ' + _get_ages_selected().join(', ')
+                    );
+
+                    ignore_chart = '';
+
+                    //console.log((performance.now() - start)/1000);
+                    $('#pleaseWaitWindow').modal('hide');
+                });
         }
 
         $(document).ready(function(){
-            //$('#pleaseWaitWindow').modal('show');
             $('#pleaseWaitWindow').on('shown.bs.modal', function (e) {
                 _plots_refresh();
-                $('#pleaseWaitWindow').modal('hide');
             });
-
-            show_numbers_display();
-
-            //plots_refresh();
         });
     </script>
 
@@ -214,11 +188,12 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="chart-wrapper" style="z-index:1001; position: relative;">
-                            Selecione municipio(s) para visualização:
-                            <br/>
                             <select id="cities"
                                     class="selectpicker"
                                     data-live-search="true"
+                                    data-title="Selecione municipio(s)"
+                                    data-actions-box="true"
+                                    data-selected-text-format="static"
                                     multiple
                             >
                                 {% for k in mun_dict_ordered %}
@@ -226,8 +201,11 @@
                                   >{{mun_dict_ordered|lookup:k}}</option>
                                 {% endfor %}
                             </select>
-                            <input type="button" value="Aplicar seleção"
-                                onclick="apply_cities_selection();"/>
+                            <input type="button"
+                                   value="Aplicar seleção"
+                                   onclick="apply_cities_selection();"
+                                   title="Após alterar a seleção das cidades do filtro, clique no botão <Aplicar Seleção>."
+                            />
 
                     </div>
                     <div class="chart-stage">
@@ -242,8 +220,8 @@
                 <div class="col-sm-12">
                     <div class="chart-wrapper">
                       <div class="chart-title content-inline">
-                          <h2 id="selected_cases_num">0</h2> casos selecionados de
-                          <h2 id="total_cases_num">0</h2>
+                          <strong>Descrição de filtro:</strong>
+                          <span id="filter-display"></span>
                       </div>
                     </div>
                 </div>
@@ -252,12 +230,6 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="chart-wrapper">
-                      <div class="chart-title content-inline">
-                          <input type="button" id="filter_date"
-                                 value="Aplicar filtro por período"
-                                 onclick="plots_refresh('date')"
-                          />
-                      </div>
                       <div class="chart-stage">
                           {% date_chart %}
                       </div>

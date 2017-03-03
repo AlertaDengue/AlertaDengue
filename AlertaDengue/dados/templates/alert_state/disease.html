@@ -33,24 +33,19 @@ function get_diseases_selected() {
     return '&diseases=' + _get_diseases_selected().join(',');
 }
 
-function plot_chart_disease(filters){
-    var _values = [];
+function plot_chart_disease(data){
     var _counter = new Array(disease_categories.length).fill(0);
 
-    var url = '/csv/notif_reduced?' + filters + '&chart_type=disease';
-
-    d3.csv(url, function(data){
-        for (i in data) {
-            for (j in disease_categories) {
-                if (data[i].category == disease_categories[j]) {
-                    _counter[j] = parseInt(data[i].casos);
-                }
+    for (i in data) {
+        for (j in disease_categories) {
+            if (data[i].category == disease_categories[j]) {
+                _counter[j] = parseInt(data[i].casos);
             }
         }
+    }
 
-        // set data
-        disease_chart.series[0].setData(_counter);
-    });
+    // set data
+    disease_chart.series[0].setData(_counter);
 }
 
 $(document).ready(function () {
@@ -115,7 +110,11 @@ $(document).ready(function () {
                 enabled: false
             },
             tooltip: {
-                shared: true
+                shared: true,
+                useHTML: true,
+                //headerFormat: '<b>{point.key}</b><br/>',
+                footerFormat: '<small>**Clique na categoria (coluna) para <br/>' +
+                    'alterar seleção de filtro.</small>',
             },
             /*series: [{
                 'name': 'casos',

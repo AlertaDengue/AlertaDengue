@@ -2,7 +2,7 @@
 <script type="application/javascript">
 var date_chart;
 
-function get_period_selected() {
+function _get_period_selected() {
     var extremes = date_chart.xAxis[0].getExtremes(),
         start = new Date(extremes.min),
         end   = new Date(extremes.max);
@@ -13,29 +13,33 @@ function get_period_selected() {
 
     end.setDate(end.getDate() + 6);
 
-    return '&initial_date=' + start.toISOString().slice(0,10) +
-        '&final_date=' + end.toISOString().slice(0,10);
+    return [
+        start.toISOString().slice(0,10),
+        end.toISOString().slice(0,10)
+    ];
 }
 
-function plot_chart_date(filters){
+function get_period_selected() {
+    var period = _get_period_selected();
+    return '&initial_date=' + period[0] + '&final_date=' + period[1];
+}
+
+function plot_chart_date(data){
     var _values = [];
     var parser = d3.timeParse('%Y-%m-%d');
     var format = d3.timeFormat('%Y-%m-%d');
-    var url = '/csv/notif_reduced?' + filters + '&chart_type=period';;
 
-    d3.csv(url, function(data){
-        for (i in data) {
-            if (data[i].category == undefined) {
-                continue;
-            }
-            dt = parser(data[i].category);
-            dt_utc = Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate());
-            _values.push([dt_utc, parseInt(data[i].casos)]);
+    for (i in data) {
+        if (data[i].category == undefined) {
+            continue;
         }
+        dt = parser(data[i].category);
+        dt_utc = Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate());
+        _values.push([dt_utc, parseInt(data[i].casos)]);
+    }
 
-        // set data
-        date_chart.series[0].setData(_values);
-    });
+    // set data
+    date_chart.series[0].setData(_values);
 }
 
 $(document).ready(function () {
@@ -50,24 +54,29 @@ $(document).ready(function () {
                 spacingTop: 0,
                 spacingLeft: 0,
                 spacingRight: 0,
-
-                events: {
-                    selection: function(event) {
-                        console.log(
-                            Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', event.xAxis[0].min),
-                            Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', event.xAxis[0].max)
-                        );
-                    }
-                },
             },
             rangeSelector: {
                 enabled: false
+            },
+            navigator : {
+                adaptToUpdatedData: false,
+                series : {
+                    data : data
+                }
+            },
+            scrollbar: {
+                liveRedraw: false
             },
             xAxis: {
                 type: 'date',
                 labels: {
                     format: '{value:%b}'
-                }
+                },
+                events: {
+                    afterSetExtremes: function afterSetExtremes(e) {
+                        plots_refresh('date');
+                    }
+                },
             },
             title: {
                 text: ''
@@ -88,7 +97,10 @@ $(document).ready(function () {
                 enabled: false
             },
             tooltip: {
-                shared: true
+                shared: true,
+                useHTML: true,
+                footerFormat: '<small>**Para alterar o zoom do gráfico,<br/>' +
+                    'utilize os controles da parte inferior.</small>',
             },
             /*series: [{
                 'name': 'casos',

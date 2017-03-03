@@ -658,6 +658,41 @@ class NotificationQueries:
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn, 'category')
 
+    def get_age_gender_dist(self):
+        """
+
+        :param dist_filters:
+        :return:
+        """
+        _dist_filters = self._process_filter(self.dist_filters, 'age')
+
+        sql = '''
+        SELECT
+            age AS category,
+            --count(age) AS casos
+            COUNT(is_female) AS "Mulher",
+            COUNT(is_male) AS "Homem"
+        FROM (
+            SELECT
+                *,
+                CASE WHEN cs_sexo='F' THEN 1 END AS is_female,
+                CASE WHEN cs_sexo='M' THEN 1 END AS is_male,
+                {}
+            FROM
+                "Municipio"."Notificacao" AS notif
+                INNER JOIN "Dengue_global"."Municipio" AS municipio
+                  ON notif.municipio_geocodigo = municipio.geocodigo
+        ) AS tb
+        WHERE {}
+        GROUP BY age
+        ORDER BY age
+        '''.format(self._age_field, _dist_filters)
+
+        print(sql)
+
+        with db_engine.connect() as conn:
+            return pd.read_sql(sql, conn, 'category')
+
     def get_age_male_dist(self):
         """
 

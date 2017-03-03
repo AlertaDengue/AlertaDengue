@@ -7,6 +7,7 @@
     function isInArray(el, array) {
         return (array.indexOf(el) >= 0) ? true : false;
     }
+    var _filter_city;
 
     var mun_dict = {{ mun_dict|safe }};
     var alerta = {{ alerts_level|safe }};
@@ -181,7 +182,7 @@
             var div = L.DomUtil.create('div', 'info legend'),
                     labels = alertLevels.map(function (alertLevel) {
                         return '<i style="background:' + alertLevel.color +
-                            '"></i> ' + alertLevel.name;
+                            ';clear: both;"></i> ' + alertLevel.name;
                     }).reverse();
             labels.push('O: Unidades de Saúde');
             div.innerHTML = labels.join('<br/>');

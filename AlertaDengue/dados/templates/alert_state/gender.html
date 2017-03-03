@@ -30,25 +30,19 @@ function get_genders_selected() {
     return '&genders=' + _get_genders_selected().join(',');
 }
 
-function plot_chart_gender(filters){
-    var _values = [];
+function plot_chart_gender(data){
     var _counter = new Array(gender_categories.length).fill(0);
-    var _num_selected = 0;
 
-    var url = '/csv/notif_reduced?' + filters + '&chart_type=gender';
-
-    d3.csv(url, function(data){
-        for (i in data) {
-            for (j in gender_categories) {
-                if (data[i].category == gender_categories[j]) {
-                    _counter[j] = parseInt(data[i].casos);
-                }
+    for (i in data) {
+        for (j in gender_categories) {
+            if (data[i].category == gender_categories[j]) {
+                _counter[j] = parseInt(data[i].casos);
             }
         }
+    }
 
-        // set data
-        gender_chart.series[0].setData(_counter);
-    });
+    // set data
+    gender_chart.series[0].setData(_counter);
 }
 
 
@@ -119,7 +113,11 @@ $(document).ready(function () {
                 enabled: false
             },
             tooltip: {
-                shared: true
+                shared: true,
+                useHTML: true,
+                //headerFormat: '<b>{point.key}</b><br/>',
+                footerFormat: '<small>**Clique na categoria (coluna) para <br/>' +
+                    'alterar seleção de filtro.</small>',
             },
             /*series: [{
                 "name": "Casos",
