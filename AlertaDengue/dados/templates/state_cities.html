@@ -137,6 +137,24 @@
             $('#pleaseWaitWindow').modal('show');
         }
 
+        function show_numbers_display(filters) {
+            if (filters == undefined) {
+                filters = '&state_abv=' + state_abv;
+            }
+
+            d3.csv(
+                '/csv/notif_reduced?chart_type=total_cases&state_abv=' + state_abv,
+                function(data){
+                    $('#total_cases_num').text(data[0].casos);
+            });
+
+            d3.csv(
+                '/csv/notif_reduced?chart_type=selected_cases' + filters,
+                function(data){
+                    $('#selected_cases_num').text(data[0].casos);
+            });
+        }
+
         function _plots_refresh() {
             //console.log('Starting ...');
             var start = performance.now();
@@ -154,17 +172,7 @@
             if (ignore_chart != 'gender') plot_chart_gender(filters);
             if (ignore_chart != 'date') plot_chart_date(filters);
 
-            d3.csv(
-                '/csv/notif_reduced?chart_type=total_cases&state_abv=' + state_abv,
-                function(data){
-                    $('#total_cases_num').text(data[0].casos);
-            });
-
-            d3.csv(
-                '/csv/notif_reduced?chart_type=selected_cases' + filters,
-                function(data){
-                    $('#selected_cases_num').text(data[0].casos);
-            });
+            show_numbers_display(filters);
 
             ignore_chart = '';
 
@@ -178,27 +186,9 @@
                 $('#pleaseWaitWindow').modal('hide');
             });
 
-            /*
-            d3.csv(
-                '/csv/notif_last12/{{state_abv}}',
-                function(_data) {
-                    var parser = d3.timeParse("%Y-%m-%d");
+            show_numbers_display();
 
-                    data = _data;
-
-                    $('#total_cases_num').text(data.length);
-
-                    // convert dt_week string to date
-                    data.map(function(d){
-                        d.dt_week = parser(d.dt_week);
-                        return d;
-                    });
-
-                    plots_refresh();
-                }
-            );*/
-
-            plots_refresh();
+            //plots_refresh();
         });
     </script>
 

@@ -14,9 +14,8 @@ import numpy as np
 CID10 = {
     'dengue': 'A90',
     'zika': 'U06',
-    'chikungunya': 'A92'
+    'chikungunya': 'A920'
 }
-
 
 db_engine = create_engine("postgresql://{}:{}@{}/{}".format(
     settings.PSQL_USER,
@@ -596,6 +595,15 @@ class NotificationQueries:
         """
         _dist_filters = self._process_filter(self.dist_filters, 'disease')
 
+        disease_label = ' CASE '
+
+        for cid_label, cid_id in CID10.items():
+            disease_label += " WHEN cid10.codigo='{}' THEN '{}' \n".format(
+                cid_id, cid_label.title()
+            )
+
+        disease_label += ' ELSE cid10.codigo END AS cid10_nome '
+
         sql = '''
         SELECT
             COALESCE(cid10_nome, NULL) AS category,
@@ -603,27 +611,21 @@ class NotificationQueries:
         FROM (
             SELECT
                 *,
-                cid10.nome AS cid10_nome,
+                {},
                 {}
             FROM
                 "Municipio"."Notificacao" AS notif
                 INNER JOIN "Dengue_global"."Municipio" AS municipio
                   ON notif.municipio_geocodigo = municipio.geocodigo
                 LEFT JOIN "Dengue_global"."CID10" AS cid10
-                  ON notif.cid10_codigo=cid10.codigo
+                  ON REPLACE(notif.cid10_codigo, '.', '')=cid10.codigo
         ) AS tb
         WHERE {}
         GROUP BY cid10_nome;
-        '''.format(self._age_field, _dist_filters)
+        '''.format(disease_label, self._age_field, _dist_filters)
 
         with db_engine.connect() as conn:
             df_disease_dist = pd.read_sql(sql, conn)
-
-        df_disease_dist.category = (
-            df_disease_dist.category.replace(
-                'Dengue [dengue clássico]', 'Dengue'
-            )
-        )
 
         return df_disease_dist.set_index('category', drop=True)
 
@@ -762,7 +764,6 @@ class NotificationQueries:
         return pd.crosstab(
             df['ano_notif'], df['se_notif'], df['casos'], aggfunc=sum
         ).T
-
 
     def get_period_dist(self):
         _dist_filters = self._process_filter(self.dist_filters, 'period')
