@@ -2,12 +2,12 @@
 <script type="application/javascript">
 // Create the chart
 var gender_chart;
-var gender_categories = ['Mulher', 'Homem'];
+var gender_categories;
 
-function get_genders_selected() {
+function _get_genders_selected() {
     // categories selection
     var categories_selected = gender_chart.getSelectedPoints().map(function(d){
-        return d.category
+        return d.name
     });
 
     // inverted select
@@ -17,101 +17,116 @@ function get_genders_selected() {
 
     if (categories_selected.length == 0) {
         for (j in gender_chart.series[0].data) {
+            // inverted select
             gender_chart.series[0].data[j].select(false, true);
         }
     }
 
-    return '&genders=' + categories_selected.join(',');
+    return categories_selected;
 }
 
-function plot_chart_gender(filters){
-    var _values = [];
-    var _columns_name = gender_chart.xAxis[0].categories;
-    var _counter = new Array(_columns_name.length).fill(0);
-    var _num_selected = 0;
+function get_genders_selected() {
+    // categories selection
+    return '&genders=' + _get_genders_selected().join(',');
+}
 
-    var url = '/csv/notif_reduced?' + filters + '&chart_type=gender' +
-        filters;
+function plot_chart_gender(data){
+    var _counter = new Array(gender_categories.length).fill(0);
 
-    d3.csv(url, function(data){
-        for (i in data) {
-            for (j in _columns_name) {
-                if (data[i].category == _columns_name[j]) {
-                    _counter[j] = parseInt(data[i].casos);
-                }
+    for (i in data) {
+        for (j in gender_categories) {
+            if (data[i].category == gender_categories[j]) {
+                _counter[j] = parseInt(data[i].casos);
             }
         }
+    }
 
-        // set data
-        gender_chart.series[0].setData(_counter);
-    });
+    // set data
+    gender_chart.series[0].setData(_counter);
 }
 
 
 $(document).ready(function () {
-    gender_chart = Highcharts.chart('gender-chart', {
-        chart: {
-            type: 'column',
-            spacingBottom: 0,
-            spacingTop: 0,
-            spacingLeft: 0,
-            spacingRight: 0
-        },
+    var url = '/csv/notif_reduced?chart_type=gender&state_abv=' + state_abv;
 
-        plotOptions: {
-            series: {
-                cursor: 'pointer',
-                colorByPoint: true,
-               // allowPointSelect: true,
-                colors: ['#E41B17', '#112C51'],
-                point: {
-                    events: {
-                        click: function(event){
-                            //this.slice(null);
-                            this.select(null, true);
-                            plots_refresh('gender');
+    $.get(url, function(csv) {
+        gender_chart = Highcharts.chart('gender-chart', {
+            chart: {
+                type: 'column',
+                spacingBottom: 0,
+                spacingTop: 0,
+                spacingLeft: 0,
+                spacingRight: 0,
+                events: {
+                    load: function(event) {
+                        //When is chart ready?
+                        gender_categories = this.series[0].data.map(x => x.name);
+                    }
+                }
+            },
+
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    colorByPoint: true,
+                   // allowPointSelect: true,
+                    colors: ['#E41B17', '#112C51'],
+                    point: {
+                        events: {
+                            click: function(event){
+                                //this.slice(null);
+                                this.select(null, true);
+                                plots_refresh('gender');
+                            }
                         }
-                    }
-                },
+                    },
 
-                states: {
-                    select: {
-                        //color: '#112C51',
-                        color: '#dfdfdf',
-                        borderColor: '#ffffff'
-                    }
+                    states: {
+                        select: {
+                            //color: '#112C51',
+                            color: '#dfdfdf',
+                            borderColor: '#ffffff'
+                        }
+                    },
                 },
             },
-        },
 
-        title: {
-            text: ''
-        },
-        subtitle: {
-            text: 'Distribuição por gênero'
-        },
-        yAxis: {
-            min: 0,
             title: {
-                text: 'Casos'
-            }
-        },
-        xAxis: {
-            categories: gender_categories,
-        },
-        legend: {
-            enabled: false
-        },
-        credits: {
-            enabled: false
-        },
-        tooltip: {
-            shared: true
-        },
-        series: [{
-            "name": "Casos",
-            "data": [0, 0]
-        }]
+                text: ''
+            },
+            subtitle: {
+                text: 'Distribuição por gênero'
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Casos'
+                }
+            },
+            xAxis: {
+                categories: gender_categories,
+            },
+            legend: {
+                enabled: false
+            },
+            credits: {
+                enabled: false
+            },
+            tooltip: {
+                shared: true,
+                useHTML: true,
+                //headerFormat: '<b>{point.key}</b><br/>',
+                footerFormat: '<small>**Clique na categoria (coluna) para <br/>' +
+                    'alterar seleção de filtro.</small>',
+            },
+            /*series: [{
+                "name": "Casos",
+                "data": [0, 0]
+            }]*/
+            data: {
+                csv: csv
+            },
+        });
     });
 });
 </script>

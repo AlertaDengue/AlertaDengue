@@ -3,107 +3,127 @@
 <script type="application/javascript">
 var disease_chart;
 var disease_chart_load = false;
+var disease_categories;
 
-function get_diseases_selected() {
+function _get_diseases_selected() {
     // categories selection
+    if (disease_chart==undefined) {
+        return [];
+    }
     var categories_selected = disease_chart.getSelectedPoints().map(function(d){
-        return d.category
+        return d.name;
     });
+
+    // inverted select
+    categories_selected = disease_categories.filter(
+        n => categories_selected.indexOf(n) < 0
+    );
 
     if (categories_selected.length == 0) {
         for (j in disease_chart.series[0].data) {
-            disease_chart.series[0].data[j].select(true, true);
+            // inverted select
+            disease_chart.series[0].data[j].select(false, true);
         }
     }
 
-    return '&diseases=' + categories_selected.join(',');
+    return categories_selected;
 }
 
-function plot_chart_disease(filters){
-    var _values = [];
-    var _columns_name = disease_chart.xAxis[0].categories;
-    var _counter = new Array(_columns_name.length).fill(0);
+function get_diseases_selected() {
+    return '&diseases=' + _get_diseases_selected().join(',');
+}
 
-    var categories_selected = disease_chart.getSelectedPoints().map(function(d){
-        return d.category
-    });
+function plot_chart_disease(data){
+    var _counter = new Array(disease_categories.length).fill(0);
 
-    var url = '/csv/notif_reduced?' + filters + '&chart_type=disease';
-
-    d3.csv(url, function(data){
-        for (i in data) {
-            for (j in _columns_name) {
-                if (data[i].category == _columns_name[j]) {
-                    _counter[j] = parseInt(data[i].casos);
-                }
+    for (i in data) {
+        for (j in disease_categories) {
+            if (data[i].category == disease_categories[j]) {
+                _counter[j] = parseInt(data[i].casos);
             }
         }
+    }
 
-        // set data
-        disease_chart.series[0].setData(_counter);
-    });
+    // set data
+    disease_chart.series[0].setData(_counter);
 }
 
 $(document).ready(function () {
-    disease_chart = Highcharts.chart('disease-chart', {
-        plotOptions: {
-            series: {
-                cursor: 'pointer',
-                color: '#dfdfdf',
-               // allowPointSelect: true,
-                states: {
-                    select: {
-                        color: '#112C51'
-                    }
-                },
-                point: {
-                    events: {
-                        click: function(event){
-                            //this.slice(null);
-                            this.select(null, true);
-                            plots_refresh('disease');
-                        },
+    var url = '/csv/notif_reduced?chart_type=disease&state_abv=' + state_abv;
+
+    $.get(url, function(csv) {
+        disease_chart = Highcharts.chart('disease-chart', {
+            chart: {
+                type: 'column',
+                spacingBottom: 0,
+                spacingTop: 0,
+                spacingLeft: 0,
+                spacingRight: 0,
+                events: {
+                    load: function(event) {
+                        //When is chart ready?
+                        disease_categories = this.series[0].data.map(x => x.name);
                     }
                 }
-            }
-        },
-
-        chart: {
-            type: 'column',
-            spacingBottom: 0,
-            spacingTop: 0,
-            spacingLeft: 0,
-            spacingRight: 0
-        },
-        title: {
-            text: ''
-        },
-        subtitle: {
-            text: 'Casos notificados no Período'
-        },
-        yAxis: {
-            min: 0,
+            },
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    color: '#112C51',
+                   // allowPointSelect: true,
+                    states: {
+                        select: {
+                            color: '#dfdfdf',
+                            borderColor: '#ffffff'
+                        }
+                    },
+                    point: {
+                        events: {
+                            click: function(event){
+                                //this.slice(null);
+                                this.select(null, true);
+                                plots_refresh('disease');
+                            },
+                        }
+                    }
+                }
+            },
             title: {
-                text: 'Casos'
-            }
-        },
-        xAxis: {
-            categories: ['Dengue']
-        },
-        legend: {
-            enabled: false
-        },
-        credits: {
-            enabled: false
-        },
-        tooltip: {
-            shared: true
-        },
-        series: [{
-            'name': 'casos',
-            'data': [0]
-        }]
-
+                text: ''
+            },
+            subtitle: {
+                text: 'Casos notificados no Período'
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Casos'
+                }
+            },
+            xAxis: {
+                //categories: ['Dengue']
+            },
+            legend: {
+                enabled: false
+            },
+            credits: {
+                enabled: false
+            },
+            tooltip: {
+                shared: true,
+                useHTML: true,
+                //headerFormat: '<b>{point.key}</b><br/>',
+                footerFormat: '<small>**Clique na categoria (coluna) para <br/>' +
+                    'alterar seleção de filtro.</small>',
+            },
+            /*series: [{
+                'name': 'casos',
+                'data': [0]
+            }]*/
+            data: {
+                csv: csv
+            },
+        });
     });
 });
 </script>
