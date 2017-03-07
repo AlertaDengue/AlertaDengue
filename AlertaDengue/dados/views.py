@@ -10,7 +10,6 @@ from django.http import HttpResponse
 from time import mktime
 from collections import defaultdict, OrderedDict
 
-import pandas as pd
 import random
 import json
 import os
@@ -22,6 +21,7 @@ import geojson
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
 dados_alerta = dbdata.get_alerta_mrj()
+dados_alerta_chik = dbdata.get_alerta_mrj_chik()
 
 with open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')) as f:
     polygons = geojson.load(f)
@@ -55,11 +55,9 @@ class AlertaMainView(TemplateView):
         case_series = {}
         total = np.zeros(52, dtype=int)
 
-        conn = dbdata.create_connection()
+        results = dbdata.load_serie_cities(geocodigos, 'dengue')
 
-        results = dbdata.load_serie_cities(
-            geocodigos, 'dengue', conn
-        )
+        notif_resume = dbdata.NotificationResume
 
         # series
         for gc, _case_series, in results.items():
@@ -73,17 +71,17 @@ class AlertaMainView(TemplateView):
 
         for st_name in self._state_names:
             # Municípios participantes
-            count_cities[st_name] = dbdata.count_cities_by_uf(st_name, conn)
+            count_cities[st_name] = notif_resume.count_cities_by_uf(st_name)
             # Total de casos notificado e estimados na semana
-            current_week[st_name] = dbdata.count_cases_by_uf(
-                st_name, se2, conn
+            current_week[st_name] = notif_resume.count_cases_by_uf(
+                st_name, se2
             ).iloc[0].to_dict()
             # Previsão de casos para as próximas semanas
             estimated_cases_next_week[st_name] = current_week[st_name]['casos']
             # Variação em relação à semana anterior
             variation_to_current_week[st_name] = (
-                dbdata.count_cases_week_variation_by_uf(
-                    st_name, se1, se2, conn
+                notif_resume.count_cases_week_variation_by_uf(
+                    st_name, se1, se2
                 )
             ).loc[0, 'casos']
 
@@ -121,26 +119,18 @@ class AlertaPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
-        alert, current, case_series, last_year, observed_cases, min_max_est = \
-            get_alert()
-        casos_ap = {
-            float(ap.split('AP')[-1]):
-                int(current[current.aps == ap]['casos_est'])
-            for ap in alert.keys()
-        }
-        alerta = {
-            float(k.split('AP')[-1]): int(v) - 1
-            for k, v in alert.items()
-        }
-        semana = str(current.se.iat[-1])[-2:]
-        segunda = current.data.iat[-1]
-        city_info = get_city_info("3304557")
-        total_series = sum(
-            np.array(list(case_series.values())), np.zeros(12, int)
+
+        disease_code = (
+            'dengue' if 'disease' not in context['view'].request.GET else
+            context['view'].request.GET['disease']
         )
-        total_observed_series = sum(
-            np.array(list(observed_cases.values())), np.zeros(12, int)
+
+        disease_label = (
+            'Dengue' if disease_code == 'dengue' else
+            'Chikungunya' if disease_code == 'chik' else
+            None
         )
+
         bairros_mrj = {
             1.0: 'AP 1: Centro e adjacências',
             2.1: 'AP 2.1: Zona Sul',
@@ -153,6 +143,38 @@ class AlertaPageView(TemplateView):
             5.2: 'AP 5.2: Campo Grande e adjacências',
             5.3: 'AP 5.3: Santa Cruz e adjacências'
         }
+
+        alert, current, case_series, last_year, observed_cases, min_max_est = \
+            get_alert(disease_code)
+
+        if alert:
+            casos_ap = {
+                float(ap.split('AP')[-1]):
+                    int(current[current.aps == ap]['casos_est'])
+                for ap in alert.keys()
+            }
+            alerta = {
+                float(k.split('AP')[-1]): int(v) - 1
+                for k, v in alert.items()
+            }
+            semana = str(current.se.iat[-1])[-2:]
+            segunda = current.data.iat[-1]
+            city_info = get_city_info("3304557")
+            total_series = sum(
+                np.array(list(case_series.values())), np.zeros(12, int)
+            )
+            total_observed_series = sum(
+                np.array(list(observed_cases.values())), np.zeros(12, int)
+            )
+        else:
+            casos_ap = {}
+            alerta = {}
+            semana = 0
+            segunda = datetime.datetime.now() - datetime.timedelta(7)
+            city_info = get_city_info("3304557")
+            total_series = [0]
+            total_observed_series = [0]
+
         context.update({
             'geocodigo': "3304557",
             'nome': "Rio de Janeiro",
@@ -178,6 +200,8 @@ class AlertaPageView(TemplateView):
             'total_observed': total_observed_series[-1],
             'total_observed_series': ', '.join(
                 map(str, total_observed_series)),
+            'disease_label': disease_label,
+            'disease_code': disease_code
         })
         return context
 
@@ -199,16 +223,38 @@ class AlertaPageViewMunicipio(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AlertaPageViewMunicipio, self) \
             .get_context_data(**kwargs)
+
+        disease_code = (
+            'dengue' if 'disease' not in context['view'].request.GET else
+            context['view'].request.GET['disease']
+        )
+
+        disease_label = (
+            'Dengue' if disease_code == 'dengue' else
+            'Chikungunya' if disease_code == 'chik' else
+            None
+        )
+
         municipio_gc = context['geocodigo']
+
         city_info = get_city_info(municipio_gc)
+
         (
             alert, SE, case_series, last_year,
             observed_cases, min_max_est, dia, prt1
-        ) = dbdata.get_city_alert(municipio_gc)
-        casos_ap = {municipio_gc: int(case_series[-1])}
-        bairros = {municipio_gc: city_info['nome']}
-        total_series = case_series[-12:]
-        total_observed_series = observed_cases[-12:]
+        ) = dbdata.get_city_alert(municipio_gc, disease_code)
+
+        if alert:
+            casos_ap = {municipio_gc: int(case_series[-1])}
+            bairros = {municipio_gc: city_info['nome']}
+            total_series = case_series[-12:]
+            total_observed_series = observed_cases[-12:]
+        else:
+            casos_ap = {}
+            bairros = {}
+            total_series = [0]
+            total_observed_series = [0]
+
         context.update({
             'nome': city_info['nome'],
             'populacao': city_info['populacao'],
@@ -233,6 +279,8 @@ class AlertaPageViewMunicipio(TemplateView):
             'total_observed_series': ', '.join(
                 map(str, total_observed_series)),
             'geocodigo': municipio_gc,
+            'disease_label': disease_label,
+            'disease_code': disease_code
         })
         return context
 
@@ -382,7 +430,7 @@ class SinanCasesView(View):
         return HttpResponse(cases, content_type="application/json")
 
 
-def get_alert():
+def get_alert(disease='dengue'):
     """
     Read the data and return the alert status of all APs.
     returns a tuple with the following elements:
@@ -392,7 +440,12 @@ def get_alert():
     - last_year: integer representing the total number of cases 52 weeks ago.
     :rtype : tuple
     """
-    df = dados_alerta
+    df = (
+        dados_alerta if disease == 'dengue' else
+        dados_alerta_chik if disease == 'chik' else
+        None
+    )
+
     df.fillna(0, inplace=True)
     last_SE = df.se.max()  # Last epidemiological week
     # year = datetime.date.today().year  # Current year
@@ -405,6 +458,7 @@ def get_alert():
     case_series = {}
     obs_case_series = {}
     min_max_est = {}
+    last_year = None
 
     for ap in group_names:
         adf = G.get_group(ap)  # .tail()  # only calculates on the series tail
@@ -482,10 +536,8 @@ class AlertaStateView(TemplateView):
         """
         context = super(AlertaStateView, self).get_context_data(**kwargs)
 
-        conn = dbdata.create_connection()
-
-        cities_alert = dbdata.get_cities_alert_by_state(
-            self._state_name[context['state']], conn=conn
+        cities_alert = dbdata.NotificationResume.get_cities_alert_by_state(
+            self._state_name[context['state']]
         )
 
         mun_dict = dict(cities_alert[['municipio_geocodigo', 'nome']].values)
@@ -514,7 +566,9 @@ class AlertaStateView(TemplateView):
             'alerts_level': alerts,
             # estimated cases is used to show a chart of the last 12 events
             # todo: check its necessity
-            'case_series': dbdata.tail_estimated_cases(geo_ids, 12, conn),
+            'case_series': dbdata.NotificationResume.tail_estimated_cases(
+                geo_ids, 12
+            ),
             # dist csv data
             # page information
         })

@@ -224,3 +224,7 @@ h1 {
 #footer {
     margin-top: 10px;
 }
+
+.legend i {
+    clear: both;
+}

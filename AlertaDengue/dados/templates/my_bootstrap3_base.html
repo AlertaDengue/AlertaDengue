@@ -65,6 +65,14 @@
                 resetZoomTitle: 'Voltar Zoom para nível 1:1',
             }
         });
+
+        function hideZoomBar(chart) {
+            chart.rangeSelector.zoomText.hide();
+            $.each(chart.rangeSelector.buttons, function () {
+                this.hide();
+            });
+            $(chart.rangeSelector.divRelative).hide();
+        };
     }
 
 </script>

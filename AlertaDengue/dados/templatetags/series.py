@@ -15,7 +15,26 @@ def int_or_none(x):
 
 @register.inclusion_tag("series_plot.html", takes_context=True)
 def alerta_series(context):
-    dados = load_series(context['geocodigo'])[context['geocodigo']]
+    disease = (
+        'dengue' if 'disease_code' not in context else
+        context['disease_code']
+    )
+
+    dados = load_series(
+        context['geocodigo'], disease
+    )[context['geocodigo']]
+
+    if dados is None:
+        return {
+            'nome': context['nome'],
+            'dados': {},
+            'start': {},
+            'verde': {},
+            'amarelo': {},
+            'laranja': {},
+            'vermelho': {},
+        }
+
     dados['dia'] = [
         int(mktime((d + timedelta(7)).timetuple()))
         for d in dados['dia']]
