@@ -85,12 +85,17 @@ def alerta_series(context):
 
 @register.inclusion_tag("total_series.html", takes_context=True)
 def total_series_dengue(context):
-    return total_series(context, disease='dengue')
+    _context = total_series(context, disease='dengue')
+    _context.update({'disease_label': 'Dengue'})
+    return _context
 
 
 @register.inclusion_tag("total_series.html", takes_context=True)
 def total_series_chik(context):
-    return total_series(context, disease='chik')
+    _context = total_series(context, disease='chik')
+    _context.update({'disease_label': 'Chikungunya'})
+    return _context
+
 
 
 def total_series(context, disease):

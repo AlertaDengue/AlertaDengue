@@ -321,9 +321,10 @@ class NotificationResume:
             SELECT
                 COALESCE(SUM(casos), 0) AS casos,
                 COALESCE(SUM(casos_est), 0) AS casos_est
-            FROM "Municipio"."Historico_alerta" AS alerta
-            INNER JOIN "Dengue_global"."Municipio" AS municipio
-              ON alerta.municipio_geocodigo = municipio.geocodigo
+            FROM
+                "Municipio".historico_casos AS dengue
+                INNER JOIN "Dengue_global"."Municipio" AS city
+                    ON dengue.municipio_geocodigo = city.geocodigo
             WHERE uf='%s' AND "SE" = %s
             ''' % (uf, se)
 
@@ -346,8 +347,8 @@ class NotificationResume:
             COALESCE(SUM(alerta.casos)-SUM(alerta_passado.casos), 0) AS casos,
             COALESCE(SUM(alerta.casos_est)-SUM(alerta_passado.casos_est), 0)
                 AS casos_est
-        FROM "Municipio"."Historico_alerta" AS alerta
-        INNER JOIN "Municipio"."Historico_alerta" AS alerta_passado
+        FROM "Municipio".historico_casos AS alerta
+        INNER JOIN "Municipio".historico_casos AS alerta_passado
           ON (
             alerta.municipio_geocodigo = alerta_passado.municipio_geocodigo
             AND alerta."SE"=%s
@@ -370,26 +371,30 @@ class NotificationResume:
         """
 
         sql_template = '''(
-        SELECT municipio_geocodigo, "data_iniSE", casos_est, id
-        FROM "Municipio"."Historico_alerta"
-        WHERE municipio_geocodigo={}
-        ORDER BY "data_iniSE" DESC
+        SELECT
+            municipio_geocodigo, "data_iniSE", casos_est
+        FROM
+            "Municipio".historico_casos
+        WHERE
+            municipio_geocodigo={}
+        ORDER BY
+            "data_iniSE" DESC
         LIMIT ''' + str(n) + ')'
 
         sql = ' UNION '.join([
-                                 sql_template.format(gid) for gid in geo_ids
-                                 ]) + ' ORDER BY municipio_geocodigo, "data_iniSE"'
+            sql_template.format(gid) for gid in geo_ids
+        ]) + ' ORDER BY municipio_geocodigo, "data_iniSE"'
 
         with db_engine.connect() as conn:
-            df_case_series = pd.read_sql(sql, conn, 'id')
+            df_case_series = pd.read_sql(sql, conn)
 
         return {
             k: v.casos_est.values.tolist()
             for k, v in df_case_series.groupby(by='municipio_geocodigo')
-            }
+        }
 
     @staticmethod
-    def get_cities_alert_by_state(state_name, doenca='dengue', conn=None):
+    def get_cities_alert_by_state(state_name, doenca='dengue'):
         """
         Retorna vários indicadores de alerta a nível da cidade.
         :param cidade: geocódigo
