@@ -57,26 +57,32 @@
 {% endblock %}
 
 {% block title %}{% blocktrans %}
-  Situação da Dengue - {{ num_mun }} Municípios monitorados 
+  Situação Epidemiológica - {{ num_mun }} Municípios monitorados
 {% endblocktrans %}{% endblock %}
 
 {% block content %}
     <div class="container-fluid">
         <!-- chart-plot:begin -->
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-6">
                 <div class="chart-wrapper">
                   <div class="chart-title">
-                      <h2>Total de casos nos municípios monitorados</h2>
+                      <h2>Casos de Dengue nos municípios monitorados</h2>
                   </div>
                   <div class="chart-stage">
-                    {% total_series %}
+                    {% total_series_dengue %}
                   </div>
-                  <!--
-                  <div class="chart-notes">
-                    This is a sample text region to describe this chart.
+                </div>
+              </div>
+
+              <div class="col-sm-6">
+                <div class="chart-wrapper">
+                  <div class="chart-title">
+                      <h2>Casos de Chikungunya nos municípios monitorados</h2>
                   </div>
-                  -->
+                  <div class="chart-stage">
+                    {% total_series_chik %}
+                  </div>
                 </div>
               </div>
         </div>

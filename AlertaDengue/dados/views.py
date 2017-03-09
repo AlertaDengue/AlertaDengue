@@ -53,7 +53,7 @@ class AlertaMainView(TemplateView):
         se1 += str(last_week.isocalendar()[1]).rjust(2, '0')
 
         case_series = {}
-        total = np.zeros(52, dtype=int)
+        #total = np.zeros(52, dtype=int)
 
         results = dbdata.load_serie_cities(geocodigos, 'dengue')
 
@@ -62,7 +62,7 @@ class AlertaMainView(TemplateView):
         # series
         for gc, _case_series, in results.items():
             case_series[str(gc)] = _case_series['casos_est'][-12:]
-            total += _case_series['casos_est'][-52:]
+            #total += _case_series['casos_est'][-52:]
 
         count_cities = {}
         current_week = {}
@@ -94,7 +94,7 @@ class AlertaMainView(TemplateView):
             'case_series': json.dumps({
                 k: list(map(int, v)) for k, v in case_series.items()
             }),
-            'total': json.dumps(total.tolist()),
+            #'total': json.dumps(total.tolist()),
             'states': self._state_names,
             'count_cities': count_cities,
             'current_week': current_week,

@@ -78,18 +78,25 @@ def get_city(query):
     return result.fetchall()
 
 
-def get_series_by_UF(doenca='dengue'):
+def get_series_by_UF(disease='dengue'):
     """
     Get the incidence series from the database aggregated (sum) by state
     :param UF: substring of the name of the state
-    :param doenca: cid 10 code for the disease
+    :param disease: cid 10 code for the disease
     :return: Dataframe with the series in long format
     """
-    series = cache.get('get_series_by_UF')
+    cache_id = 'get_series_by_UF-{}'.format(disease)
+    series = cache.get(cache_id)
+
+    _disease = '' if disease == 'dengue' else '_' + disease
+
     if series is None:
         with db_engine.connect() as conexao:
-            series = pd.read_sql('select * from uf_total_view;', conexao, parse_dates=True)
-            cache.set('get_series_by_UF', series, settings.QUERY_CACHE_TIMEOUT)
+            series = pd.read_sql(
+                'select * from uf_total{}_view;'.format(_disease),
+                conexao, parse_dates=True
+            )
+            cache.set(cache_id, series, settings.QUERY_CACHE_TIMEOUT)
 
     return series
 

@@ -84,9 +84,18 @@ def alerta_series(context):
 
 
 @register.inclusion_tag("total_series.html", takes_context=True)
-def total_series(context):
+def total_series_dengue(context):
+    return total_series(context, disease='dengue')
+
+
+@register.inclusion_tag("total_series.html", takes_context=True)
+def total_series_chik(context):
+    return total_series(context, disease='chik')
+
+
+def total_series(context, disease):
     # gc = context['geocodigos'][0]
-    series = get_series_by_UF()
+    series = get_series_by_UF(disease)
     ufs = list(set(series.uf.tolist()))
     # 51 weeks to get the end of the SE
     start = series.data.max() - timedelta(weeks=51)
@@ -119,5 +128,6 @@ def total_series(context):
         'ufs': ufs,
         'start': start,
         'series': casos,
-        'series_est': casos_est
+        'series_est': casos_est,
+        'disease': disease
     }
