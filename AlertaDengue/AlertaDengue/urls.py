@@ -13,16 +13,23 @@ from dados.views import (
 )
 from django.conf import settings
 from django.conf.urls.static import static
+from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.views.generic import RedirectView
 import dbf.urls
 
 admin.autodiscover()
 
+
+def redirect_alerta_dengue(request, state):
+    return redirect('alerta_uf', state=state, disease='dengue')
+
+
 urlpatterns = [
     # '',
     # Examples:
-    url(r'^alerta/(?P<state>PR|RJ|ES)/$',
+    url(r'^alerta/(?P<state>PR|RJ|ES)/$', redirect_alerta_dengue),
+    url(r'^alerta/(?P<state>PR|RJ|ES)/(?P<disease>dengue|chikungunya)$',
         AlertaStateView.as_view(), name='alerta_uf'),
     url(r'^alerta/rio/$', AlertaPageView.as_view(), name='mrj'),
     # url(r'^blog/', include('blog.urls')),

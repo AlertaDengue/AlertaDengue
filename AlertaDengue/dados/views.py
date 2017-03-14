@@ -544,7 +544,7 @@ class AlertaStateView(TemplateView):
         context = super(AlertaStateView, self).get_context_data(**kwargs)
 
         cities_alert = dbdata.NotificationResume.get_cities_alert_by_state(
-            self._state_name[context['state']], context['state']
+            self._state_name[context['state']], context['disease']
         )
 
         mun_dict = dict(cities_alert[['municipio_geocodigo', 'nome']].values)
@@ -576,8 +576,7 @@ class AlertaStateView(TemplateView):
             'case_series': dbdata.NotificationResume.tail_estimated_cases(
                 geo_ids, 12
             ),
-            # dist csv data
-            # page information
+            'disease_label': context['disease'].title()
         })
         return context
 

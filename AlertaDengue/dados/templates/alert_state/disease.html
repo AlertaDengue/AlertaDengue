@@ -5,6 +5,19 @@ var disease_chart;
 var disease_chart_load = false;
 var disease_categories;
 
+function _select_disease() {
+    for (j in disease_chart.series[0].data) {
+        if (disease_chart.series[0].data[j].name == '{{disease_label}}') {
+            // inverted select
+            disease_chart.series[0].data[j].select(false, true);
+            console.log('true', disease_chart.series[0].data[j].name);
+        } else {
+            disease_chart.series[0].data[j].select(true, true);
+            console.log('false', disease_chart.series[0].data[j].name);
+        }
+    }
+}
+
 function _get_diseases_selected() {
     // categories selection
     if (disease_chart==undefined) {
@@ -20,10 +33,7 @@ function _get_diseases_selected() {
     );
 
     if (categories_selected.length == 0) {
-        for (j in disease_chart.series[0].data) {
-            // inverted select
-            disease_chart.series[0].data[j].select(false, true);
-        }
+        _select_disease();
     }
 
     return categories_selected;
@@ -81,8 +91,11 @@ $(document).ready(function () {
                         events: {
                             click: function(event){
                                 //this.slice(null);
-                                this.select(null, true);
-                                plots_refresh('disease');
+                                //this.select(true, false);
+                                //plots_refresh('disease');
+                                if (this.name != '{{disease_label}}') {
+                                    window.location.href = './' + this.name.toLowerCase();
+                                }
                             },
                         }
                     }
@@ -114,7 +127,8 @@ $(document).ready(function () {
                 useHTML: true,
                 //headerFormat: '<b>{point.key}</b><br/>',
                 footerFormat: '<small>**Clique na categoria (coluna) para <br/>' +
-                    'alterar seleção de filtro.</small>',
+                    'alterar seleção de filtro. A escolha da doença <br/>' +
+                    'implica no recarregamento da página.</small>',
             },
             /*series: [{
                 'name': 'casos',
@@ -124,6 +138,8 @@ $(document).ready(function () {
                 csv: csv
             },
         });
+
+        _select_disease();
     });
 });
 </script>

@@ -47,7 +47,9 @@ function plot_chart_gender(data){
 
 
 $(document).ready(function () {
-    var url = '/csv/notif_reduced?chart_type=gender&state_abv=' + state_abv;
+    var url = '/csv/notif_reduced?chart_type=gender' +
+        '&diseases={{disease_label}}' +
+        '&state_abv=' + state_abv;
 
     $.get(url, function(csv) {
         gender_chart = Highcharts.chart('gender-chart', {

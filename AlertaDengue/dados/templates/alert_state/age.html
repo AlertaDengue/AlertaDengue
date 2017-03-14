@@ -55,7 +55,9 @@ function plot_chart_age(data_male, data_female) {
 
 $(document).ready(function () {
     // Create the chart
-    var url = '/csv/notif_reduced?chart_type=age_gender&state_abv=' + state_abv;
+    var url = '/csv/notif_reduced?chart_type=age_gender' +
+        '&diseases={{disease_label}}' +
+        '&state_abv=' + state_abv;
 
     $.get(url, function(csv) {
         age_chart = Highcharts.chart('age-chart', {

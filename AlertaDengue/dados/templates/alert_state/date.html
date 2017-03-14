@@ -44,7 +44,9 @@ function plot_chart_date(data){
 
 $(document).ready(function () {
     // Create the chart
-    var url = '/csv/notif_reduced?chart_type=period&state_abv=' + state_abv;
+    var url = '/csv/notif_reduced?chart_type=period' +
+        '&diseases={{disease_label}}' +
+        '&state_abv=' + state_abv;
 
     $.get(url, function(csv) {
         date_chart = Highcharts.stockChart('date-chart', {
