@@ -68,6 +68,7 @@ class AlertaMainView(TemplateView):
         current_week = {}
         estimated_cases_next_week = {}
         variation_to_current_week = {}
+        variation_4_weeks = {}
 
         for st_name in self._state_names:
             # Municípios participantes
@@ -84,6 +85,9 @@ class AlertaMainView(TemplateView):
                     st_name, se1, se2
                 )
             ).loc[0, 'casos']
+            variation_4_weeks[st_name] = int((
+                notif_resume.get_4_weeks_variation(st_name)
+            ).loc[0, 'casos'])
 
         context.update({
             # 'mundict': json.dumps(mundict),
@@ -100,8 +104,11 @@ class AlertaMainView(TemplateView):
             'current_week': current_week,
             'estimated_cases_next_week': estimated_cases_next_week,
             'variation_to_current_week': variation_to_current_week,
+            'variation_4_weeks': variation_4_weeks,
             'state_initials': self._state_initials
+
         })
+
         return context
 
 
@@ -537,7 +544,7 @@ class AlertaStateView(TemplateView):
         context = super(AlertaStateView, self).get_context_data(**kwargs)
 
         cities_alert = dbdata.NotificationResume.get_cities_alert_by_state(
-            self._state_name[context['state']]
+            self._state_name[context['state']], context['state']
         )
 
         mun_dict = dict(cities_alert[['municipio_geocodigo', 'nome']].values)

@@ -336,6 +336,9 @@ class NotificationResume:
         """
         Returna contagem de cidades participantes por estado
 
+        AND alerta."SE"=(select epi_week(NOW()::DATE))
+        AND alerta_passado."SE"=(select epi_week(NOW()::DATE-7))
+
         :param uf: uf a ser consutado
         :param se1: número do ano e semana (no ano), ex: 201503
         :param se2: número do ano e semana (no ano), ex: 201503
@@ -394,13 +397,21 @@ class NotificationResume:
         }
 
     @staticmethod
-    def get_cities_alert_by_state(state_name, doenca='dengue'):
+    def get_cities_alert_by_state(state_name, disease='dengue'):
         """
         Retorna vários indicadores de alerta a nível da cidade.
-        :param cidade: geocódigo
-        :param doenca: dengue|chik|zika
+
+        :param state_name: State name
+        :param disease: dengue|chik|zika
         :return: tupla
         """
+
+        _disease = (
+            '' if disease == 'dengue' else
+            '_chik' if disease == 'chikungunya' else
+            ''
+        )
+
         sql = '''
         SELECT
             hist_alert.id,
@@ -409,14 +420,14 @@ class NotificationResume:
             hist_alert."data_iniSE",
             (hist_alert.nivel-1) AS level_alert
         FROM
-            "Municipio"."Historico_alerta" AS hist_alert
+            "Municipio"."Historico_alerta{0}" AS hist_alert
             INNER JOIN (
                 SELECT geocodigo, MAX("data_iniSE") AS "data_iniSE"
                 FROM
-                    "Municipio"."Historico_alerta" AS alerta
+                    "Municipio"."Historico_alerta{0}" AS alerta
                     INNER JOIN "Dengue_global"."Municipio" AS municipio
                         ON alerta.municipio_geocodigo = municipio.geocodigo
-                WHERE uf='{}'
+                WHERE uf='{1}'
                 GROUP BY geocodigo
             ) AS recent_alert ON (
                 recent_alert.geocodigo=hist_alert.municipio_geocodigo
@@ -424,10 +435,54 @@ class NotificationResume:
             ) INNER JOIN "Dengue_global"."Municipio" AS municipio ON (
                 hist_alert.municipio_geocodigo = municipio.geocodigo
             )
-        '''.format(state_name)
+        '''.format(_disease, state_name)
 
         with db_engine.connect() as conn:
             return pd.read_sql_query(sql, conn, 'id', parse_dates=True)
+
+    @staticmethod
+    def get_4_weeks_variation(state_name):
+        sql = '''
+        SELECT
+            casos_corrente-casos_passado AS casos,
+            casos_est_corrente-casos_est_passado AS casos_est
+        FROM
+            (SELECT
+            COALESCE(SUM(alerta.casos), 0) AS casos_corrente,
+            COALESCE(SUM(alerta.casos_est), 0) AS casos_est_corrente
+            FROM "Municipio".historico_casos AS alerta
+            INNER JOIN "Dengue_global"."Municipio" AS municipio
+                ON alerta.municipio_geocodigo = municipio.geocodigo
+                    AND uf ='%(state_name)s'
+            WHERE
+                alerta."SE" IN (
+                    SELECT epi_week(NOW()::DATE)
+                    UNION SELECT epi_week(NOW()::DATE-7*1)
+                    UNION SELECT epi_week(NOW()::DATE-7*2)
+                    UNION SELECT epi_week(NOW()::DATE-7*3)
+                )
+            ) AS tb_casos
+            INNER JOIN (
+                SELECT
+                COALESCE(SUM(alerta.casos), 0) AS casos_passado,
+                COALESCE(SUM(alerta.casos_est), 0) AS casos_est_passado
+                FROM "Municipio".historico_casos AS alerta
+                INNER JOIN "Dengue_global"."Municipio" AS municipio
+                    ON alerta.municipio_geocodigo = municipio.geocodigo
+                      AND uf ='%(state_name)s'
+            WHERE
+                alerta."SE" IN (
+                    SELECT epi_week(NOW()::DATE-7*52)
+                    UNION SELECT epi_week(NOW()::DATE-7*53)
+                    UNION SELECT epi_week(NOW()::DATE-7*54)
+                    UNION SELECT epi_week(NOW()::DATE-7*55)
+                )
+            ) AS tb_casos_passado
+            ON (1=1)
+        ''' % {'state_name': state_name}
+
+        with db_engine.connect() as conn:
+            return pd.read_sql_query(sql, conn, parse_dates=True)
 
 
 class NotificationQueries:
@@ -717,8 +772,6 @@ class NotificationQueries:
         GROUP BY age
         ORDER BY age
         '''.format(self._age_field, _dist_filters)
-
-        print(sql)
 
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn, 'category')

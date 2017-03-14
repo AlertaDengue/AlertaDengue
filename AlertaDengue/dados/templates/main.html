@@ -133,6 +133,17 @@
                         </div>
 
                         <div class="row vertical-align">
+                            <div class="col-sm-8">
+                                 Variação da quadrissemana atual em relação à
+                                 quadrissemana do último ano:
+                            </div>
+
+                            <div class="col-sm-4 card-indicator-value">
+                                <h2>{{variation_4_weeks|lookup:state_name}}</h2>
+                            </div>
+                        </div>
+
+                        <div class="row vertical-align">
                             <div class="col-sm-12">
                                 <a href="/alerta/{{state_initials|lookup:state_name}}">
                                     Clique aqui para ver mais detalhes.
