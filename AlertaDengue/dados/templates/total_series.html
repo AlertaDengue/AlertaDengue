@@ -1,22 +1,21 @@
-<div id="historico-chart"
-     style="min-width: 500px; height: 400px; margin: 10px"
-     data-highcharts-chart="0">
+<div id="historico-chart_{{disease}}"
+     style="height: 400px; margin: 10px">
 </div>
 
 <script type="application/ecmascript">
 $(function () {
-    var nd = new Date();
-    var tzo = nd.getTimezoneOffset();
+    //var nd_{{disease}} = new Date();
+    //var tzo_{{disease}} = nd_{{disease}}.getTimezoneOffset();
     // Agora as series de dados
-    var dados = {{ series_est |safe }};
+    var dados_{{disease}} = {{ series_est |safe }};
 
-    var chart = Highcharts.stockChart({
+    var chart_{{disease}} = Highcharts.stockChart({
         chart: {
-            renderTo: "historico-chart",
+            renderTo: "historico-chart_{{disease}}",
             zoomType: 'xy'
         },
         title: {
-            text: 'Total de casos nos municípios monitorados'
+            text: 'Casos de {{disease_label}} nos municípios monitorados'
         },
         xAxis: [{
             type: 'date',
@@ -59,10 +58,10 @@ $(function () {
                 type: 'spline',
                 animation: true,
                 //color: '#4572A7',
-{#                                pointInterval: 7 * 24 * 3600 * 1000,#}
-{#                                pointStart: {{ start }} * 1000 + tzo,#}
+{#              pointInterval: 7 * 24 * 3600 * 1000,#}
+{#              pointStart: {{ start }} * 1000 + tzo_{{disease}},#}
                 yAxis: 0,
-                data: dados["{{ uf }}"],
+                data: dados_{{disease}}["{{ uf }}"],
                 marker: {enabled: true},
                 dashStyle: 'Solid',
                 tooltip: { valueSuffix: ' casos estimados' }
@@ -70,6 +69,8 @@ $(function () {
         {% endfor %}
         ]
     });
+
+    hideZoomBar(chart_{{disease}});
 });
 
 </script>

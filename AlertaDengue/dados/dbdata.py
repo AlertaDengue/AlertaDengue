@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 from django.conf import settings
 from django.core.cache import cache
 from collections import defaultdict
+from datetime import datetime
 
 import pandas as pd
 import numpy as np
@@ -45,9 +46,19 @@ def get_alerta_mrj():
     Fetch the alert table for the city of Rio de janeiro
     :return: pandas dataframe
     """
+    sql = 'select * from "Municipio".alerta_mrj;'
     with db_engine.connect() as conexao:
-        dados_alerta = pd.read_sql_query('select * from "Municipio".alerta_mrj;', conexao, index_col='id')
-    return dados_alerta
+        return pd.read_sql_query(sql, conexao, index_col='id')
+
+
+def get_alerta_mrj_chik():
+    """
+    Fetch the alert table for the city of Rio de janeiro
+    :return: pandas dataframe
+    """
+    sql = 'select * from "Municipio".alerta_mrj_chik;'
+    with db_engine.connect() as conexao:
+        return pd.read_sql_query(sql, conexao, index_col='id')
 
 
 def get_city(query):
@@ -67,38 +78,55 @@ def get_city(query):
     return result.fetchall()
 
 
-def get_series_by_UF(doenca='dengue'):
+def get_series_by_UF(disease='dengue'):
     """
     Get the incidence series from the database aggregated (sum) by state
     :param UF: substring of the name of the state
-    :param doenca: cid 10 code for the disease
+    :param disease: cid 10 code for the disease
     :return: Dataframe with the series in long format
     """
-    series = cache.get('get_series_by_UF')
+    cache_id = 'get_series_by_UF-{}'.format(disease)
+    series = cache.get(cache_id)
+
+    _disease = '' if disease == 'dengue' else '_' + disease
+
     if series is None:
         with db_engine.connect() as conexao:
-            series = pd.read_sql('select * from uf_total_view;', conexao, parse_dates=True)
-            cache.set('get_series_by_UF', series, settings.QUERY_CACHE_TIMEOUT)
+            series = pd.read_sql(
+                'select * from uf_total{}_view;'.format(_disease),
+                conexao, parse_dates=True
+            )
+            cache.set(cache_id, series, settings.QUERY_CACHE_TIMEOUT)
 
     return series
 
 
-def load_series(cidade, doenca='dengue', conn=None):
+def load_series(cidade, disease='dengue'):
     """
     Monta as séries do alerta para visualização no site
     :param cidade: geocodigo da cidade desejada
-    :param doenca: dengue|chik|zika
+    :param disease: dengue|chik|zika
     :return: dictionary
     """
-    cache_key = 'load_series-{}-{}'.format(cidade, doenca)
+    cache_key = 'load_series-{}-{}'.format(cidade, disease)
     result = cache.get(cache_key)
     if result is None:
-        with db_engine.connect() as conexao:
+        with db_engine.connect() as conn:
             ap = str(cidade)
             cidade = add_dv(int(str(cidade)[:-1]))
-            dados_alerta = pd.read_sql_query('select * from "Municipio"."Historico_alerta" where municipio_geocodigo={} ORDER BY "data_iniSE" ASC'.format(cidade), conexao, 'id', parse_dates=True)
+
+            table_name = (
+                'Historico_alerta' if disease == 'dengue' else
+                'Historico_alerta_chik'
+            )
+
+            dados_alerta = pd.read_sql_query((
+                ' SELECT * FROM "Municipio"."{}"' +
+                ' WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC'
+            ).format(table_name, cidade), conn, 'id', parse_dates=True)
+
             if len(dados_alerta) == 0:
-                raise NameError("Não foi possível obter os dados do Banco para cidade {}".format(cidade))
+                return {ap: None}
 
             # tweets = pd.read_sql_query('select * from "Municipio"."Tweet" where "Municipio_geocodigo"={}'.format(cidade), parse_dates=True)
             series = defaultdict(lambda: defaultdict(lambda: []))
@@ -120,7 +148,7 @@ def load_series(cidade, doenca='dengue', conn=None):
     return result
 
 
-def load_serie_cities(geocodigos, doenca='dengue', conexao=None):
+def load_serie_cities(geocodigos, doenca='dengue'):
     """
     Monta as séries do alerta para visualização no site
     :param cidade: geocodigo da cidade desejada
@@ -157,9 +185,10 @@ def load_serie_cities(geocodigos, doenca='dengue', conexao=None):
     ORDER BY municipio_geocodigo ASC, "data_iniSE" ASC
     ''').format(*cidades)
 
-    dados_alerta = pd.read_sql_query(
-        sql, conexao, 'id', parse_dates=True
-    )
+    with db_engine.connect() as conn:
+        dados_alerta = pd.read_sql_query(
+            sql, conn, 'id', parse_dates=True
+        )
 
     if len(dados_alerta) == 0:
         raise NameError(
@@ -194,14 +223,21 @@ def load_serie_cities(geocodigos, doenca='dengue', conexao=None):
     return series
 
 
-def get_city_alert(cidade, doenca='dengue'):
+def get_city_alert(cidade, disease='dengue'):
     """
     Retorna vários indicadores de alerta a nível da cidade.
     :param cidade: geocódigo
     :param doenca: dengue|chik|zika
     :return: tupla
     """
-    series = load_series(cidade, doenca)
+    series = load_series(cidade, disease)
+
+    if series[str(cidade)] is None:
+        return (
+            [], None, [0], 0,
+            [0], [0, 0], datetime.now(), 0
+        )
+
     alert = series[str(cidade)]['alerta'][-1]
     SE = series[str(cidade)]['SE'][-1]
     case_series = series[str(cidade)]['casos_est']
@@ -217,41 +253,6 @@ def get_city_alert(cidade, doenca='dengue'):
         alert, SE, case_series, last_year,
         obs_case_series, min_max_est, dia, prt1
     )
-
-
-def get_cities_alert_by_state(state_name, doenca='dengue', conn=None):
-    """
-    Retorna vários indicadores de alerta a nível da cidade.
-    :param cidade: geocódigo
-    :param doenca: dengue|chik|zika
-    :return: tupla
-    """
-    alert = pd.read_sql_query('''
-    SELECT
-        hist_alert.id,
-        hist_alert.municipio_geocodigo,
-        municipio.nome,
-        hist_alert."data_iniSE",
-        (hist_alert.nivel-1) AS level_alert
-    FROM
-        "Municipio"."Historico_alerta" AS hist_alert
-        INNER JOIN (
-            SELECT geocodigo, MAX("data_iniSE") AS "data_iniSE"
-            FROM
-                "Municipio"."Historico_alerta" AS alerta
-                INNER JOIN "Dengue_global"."Municipio" AS municipio
-                    ON alerta.municipio_geocodigo = municipio.geocodigo
-            WHERE uf='{}'
-            GROUP BY geocodigo
-        ) AS recent_alert ON (
-            recent_alert.geocodigo=hist_alert.municipio_geocodigo
-            AND recent_alert."data_iniSE"=hist_alert."data_iniSE"
-        ) INNER JOIN "Dengue_global"."Municipio" AS municipio ON (
-            hist_alert.municipio_geocodigo = municipio.geocodigo
-        )
-    '''.format(state_name), conn, 'id', parse_dates=True)
-
-    return alert
 
 
 def calculate_digit(dig):
@@ -284,120 +285,204 @@ def add_dv(geocodigo):
         return int(str(geocodigo) + str(calculate_digit(geocodigo)))
 
 
-def create_connection():
-    """
-    Retorna um sqlalchemy engine com a conexão com o banco.
+class NotificationResume:
+    @staticmethod
+    def count_cities_by_uf(uf):
+        """
+        Returna contagem de cidades participantes por estado
 
-    :return: sqlalchemy engine
-
-    """
-    return create_engine(
-        "postgresql://{}:{}@{}/{}".format(
-            settings.PSQL_USER,
-            settings.PSQL_PASSWORD,
-            settings.PSQL_HOST,
-            settings.PSQL_DB))
-
-
-def count_cities_by_uf(uf, connection):
-    """
-    Returna contagem de cidades participantes por estado
-
-    :param uf: uf a ser consultada
-    :param connection: sqlalchemy engine
-    :return: dataframe
-    """
-    sql = '''
-    SELECT COALESCE(COUNT(municipio_geocodigo), 0) AS count
-    FROM (
-        SELECT DISTINCT municipio_geocodigo
-        FROM "Municipio"."Historico_alerta") AS alerta
-    INNER JOIN "Dengue_global"."Municipio" AS municipio
-      ON alerta.municipio_geocodigo = municipio.geocodigo
-    WHERE uf='%s'
-    ''' % uf
-
-    return pd.read_sql(sql, connection).astype(int).iloc[0]['count']
-
-
-def count_cases_by_uf(uf, se, connection):
-    """
-    Returna contagem de cidades participantes por estado
-
-    :param uf: uf a ser consultada
-    :param se: número do ano e semana (no ano), ex: 201503
-    :param connection: sqlalchemy engine
-    :return: dataframe
-    """
-
-    sql = '''
-        SELECT
-            COALESCE(SUM(casos), 0) AS casos,
-            COALESCE(SUM(casos_est), 0) AS casos_est
-        FROM "Municipio"."Historico_alerta" AS alerta
+        :param uf: uf a ser consultada
+        :return: dataframe
+        """
+        sql = '''
+        SELECT COALESCE(COUNT(municipio_geocodigo), 0) AS count
+        FROM (
+            SELECT DISTINCT municipio_geocodigo
+            FROM "Municipio"."Historico_alerta") AS alerta
         INNER JOIN "Dengue_global"."Municipio" AS municipio
           ON alerta.municipio_geocodigo = municipio.geocodigo
-        WHERE uf='%s' AND "SE" = %s
-        ''' % (uf, se)
+        WHERE uf='%s'
+        ''' % uf
 
-    return pd.read_sql(sql, connection).astype(int)
+        with db_engine.connect() as conn:
+            return pd.read_sql(sql, conn).astype(int).iloc[0]['count']
 
+    @staticmethod
+    def count_cases_by_uf(uf, se):
+        """
+        Returna contagem de cidades participantes por estado
 
-def count_cases_week_variation_by_uf(uf, se1, se2, connection):
-    """
-    Returna contagem de cidades participantes por estado
+        :param uf: uf a ser consultada
+        :param se: número do ano e semana (no ano), ex: 201503
+        :return: dataframe
+        """
 
-    :param uf: uf a ser consutado
-    :param se: número do ano e semana (no ano), ex: 201503
-    :param connection: sqlalchemy engine
-    :return: dataframe
-    """
+        sql = '''
+            SELECT
+                COALESCE(SUM(casos), 0) AS casos,
+                COALESCE(SUM(casos_est), 0) AS casos_est
+            FROM
+                "Municipio".historico_casos AS dengue
+                INNER JOIN "Dengue_global"."Municipio" AS city
+                    ON dengue.municipio_geocodigo = city.geocodigo
+            WHERE uf='%s' AND "SE" = %s
+            ''' % (uf, se)
 
-    sql = '''
-    SELECT
-        COALESCE(SUM(alerta.casos)-SUM(alerta_passado.casos), 0) AS casos,
-        COALESCE(SUM(alerta.casos_est)-SUM(alerta_passado.casos_est), 0)
-            AS casos_est
-    FROM "Municipio"."Historico_alerta" AS alerta
-    INNER JOIN "Municipio"."Historico_alerta" AS alerta_passado
-      ON (
-        alerta.municipio_geocodigo = alerta_passado.municipio_geocodigo
-        AND alerta."SE"=%s
-        AND alerta_passado."SE"=%s)
-    INNER JOIN "Dengue_global"."Municipio" AS municipio
-      ON alerta.municipio_geocodigo = municipio.geocodigo
-    WHERE uf ='%s'
-    ''' % (se2, se1, uf)
+        with db_engine.connect() as conn:
+            return pd.read_sql(sql, conn).astype(int)
 
-    return pd.read_sql(sql, connection).astype(int)
+    @staticmethod
+    def count_cases_week_variation_by_uf(uf, se1, se2):
+        """
+        Returna contagem de cidades participantes por estado
 
+        AND alerta."SE"=(select epi_week(NOW()::DATE))
+        AND alerta_passado."SE"=(select epi_week(NOW()::DATE-7))
 
-def tail_estimated_cases(geo_ids, n=12, conn=None):
-    """
+        :param uf: uf a ser consutado
+        :param se1: número do ano e semana (no ano), ex: 201503
+        :param se2: número do ano e semana (no ano), ex: 201503
+        :return: dataframe
+        """
 
-    :param geo_ids: list of city geo ids
-    :param n: the last n estimated cases
-    :param conn: connection
-    :return: dict
-    """
+        sql = '''
+        SELECT
+            COALESCE(SUM(alerta.casos)-SUM(alerta_passado.casos), 0) AS casos,
+            COALESCE(SUM(alerta.casos_est)-SUM(alerta_passado.casos_est), 0)
+                AS casos_est
+        FROM "Municipio".historico_casos AS alerta
+        INNER JOIN "Municipio".historico_casos AS alerta_passado
+          ON (
+            alerta.municipio_geocodigo = alerta_passado.municipio_geocodigo
+            AND alerta."SE"=%s
+            AND alerta_passado."SE"=%s)
+        INNER JOIN "Dengue_global"."Municipio" AS municipio
+          ON alerta.municipio_geocodigo = municipio.geocodigo
+        WHERE uf ='%s'
+        ''' % (se2, se1, uf)
 
-    sql_template = '''(
-    SELECT municipio_geocodigo, "data_iniSE", casos_est, id
-    FROM "Municipio"."Historico_alerta"
-    WHERE municipio_geocodigo={}
-    ORDER BY "data_iniSE" DESC
-    LIMIT ''' + str(n) + ')'
+        with db_engine.connect() as conn:
+            return pd.read_sql(sql, conn).astype(int)
 
-    sql = ' UNION '.join([
-        sql_template.format(gid) for gid in geo_ids
-    ]) + ' ORDER BY municipio_geocodigo, "data_iniSE"'
+    @staticmethod
+    def tail_estimated_cases(geo_ids, n=12):
+        """
 
-    df_case_series = pd.read_sql(sql, conn, 'id')
+        :param geo_ids: list of city geo ids
+        :param n: the last n estimated cases
+        :return: dict
+        """
 
-    return {
-        k: v.casos_est.values.tolist()
-        for k, v in df_case_series.groupby(by='municipio_geocodigo')
-    }
+        sql_template = '''(
+        SELECT
+            municipio_geocodigo, "data_iniSE", casos_est
+        FROM
+            "Municipio".historico_casos
+        WHERE
+            municipio_geocodigo={}
+        ORDER BY
+            "data_iniSE" DESC
+        LIMIT ''' + str(n) + ')'
+
+        sql = ' UNION '.join([
+            sql_template.format(gid) for gid in geo_ids
+        ]) + ' ORDER BY municipio_geocodigo, "data_iniSE"'
+
+        with db_engine.connect() as conn:
+            df_case_series = pd.read_sql(sql, conn)
+
+        return {
+            k: v.casos_est.values.tolist()
+            for k, v in df_case_series.groupby(by='municipio_geocodigo')
+        }
+
+    @staticmethod
+    def get_cities_alert_by_state(state_name, disease='dengue'):
+        """
+        Retorna vários indicadores de alerta a nível da cidade.
+
+        :param state_name: State name
+        :param disease: dengue|chik|zika
+        :return: tupla
+        """
+
+        _disease = (
+            '' if disease == 'dengue' else
+            '_chik' if disease == 'chikungunya' else
+            ''
+        )
+
+        sql = '''
+        SELECT
+            hist_alert.id,
+            hist_alert.municipio_geocodigo,
+            municipio.nome,
+            hist_alert."data_iniSE",
+            (hist_alert.nivel-1) AS level_alert
+        FROM
+            "Municipio"."Historico_alerta{0}" AS hist_alert
+            INNER JOIN (
+                SELECT geocodigo, MAX("data_iniSE") AS "data_iniSE"
+                FROM
+                    "Municipio"."Historico_alerta{0}" AS alerta
+                    INNER JOIN "Dengue_global"."Municipio" AS municipio
+                        ON alerta.municipio_geocodigo = municipio.geocodigo
+                WHERE uf='{1}'
+                GROUP BY geocodigo
+            ) AS recent_alert ON (
+                recent_alert.geocodigo=hist_alert.municipio_geocodigo
+                AND recent_alert."data_iniSE"=hist_alert."data_iniSE"
+            ) INNER JOIN "Dengue_global"."Municipio" AS municipio ON (
+                hist_alert.municipio_geocodigo = municipio.geocodigo
+            )
+        '''.format(_disease, state_name)
+
+        with db_engine.connect() as conn:
+            return pd.read_sql_query(sql, conn, 'id', parse_dates=True)
+
+    @staticmethod
+    def get_4_weeks_variation(state_name):
+        sql = '''
+        SELECT
+            casos_corrente-casos_passado AS casos,
+            casos_est_corrente-casos_est_passado AS casos_est
+        FROM
+            (SELECT
+            COALESCE(SUM(alerta.casos), 0) AS casos_corrente,
+            COALESCE(SUM(alerta.casos_est), 0) AS casos_est_corrente
+            FROM "Municipio".historico_casos AS alerta
+            INNER JOIN "Dengue_global"."Municipio" AS municipio
+                ON alerta.municipio_geocodigo = municipio.geocodigo
+                    AND uf ='%(state_name)s'
+            WHERE
+                alerta."SE" IN (
+                    SELECT epi_week(NOW()::DATE)
+                    UNION SELECT epi_week(NOW()::DATE-7*1)
+                    UNION SELECT epi_week(NOW()::DATE-7*2)
+                    UNION SELECT epi_week(NOW()::DATE-7*3)
+                )
+            ) AS tb_casos
+            INNER JOIN (
+                SELECT
+                COALESCE(SUM(alerta.casos), 0) AS casos_passado,
+                COALESCE(SUM(alerta.casos_est), 0) AS casos_est_passado
+                FROM "Municipio".historico_casos AS alerta
+                INNER JOIN "Dengue_global"."Municipio" AS municipio
+                    ON alerta.municipio_geocodigo = municipio.geocodigo
+                      AND uf ='%(state_name)s'
+            WHERE
+                alerta."SE" IN (
+                    SELECT epi_week(NOW()::DATE-7*52)
+                    UNION SELECT epi_week(NOW()::DATE-7*53)
+                    UNION SELECT epi_week(NOW()::DATE-7*54)
+                    UNION SELECT epi_week(NOW()::DATE-7*55)
+                )
+            ) AS tb_casos_passado
+            ON (1=1)
+        ''' % {'state_name': state_name}
+
+        with db_engine.connect() as conn:
+            return pd.read_sql_query(sql, conn, parse_dates=True)
 
 
 class NotificationQueries:
@@ -687,8 +772,6 @@ class NotificationQueries:
         GROUP BY age
         ORDER BY age
         '''.format(self._age_field, _dist_filters)
-
-        print(sql)
 
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn, 'category')

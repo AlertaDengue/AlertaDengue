@@ -182,7 +182,7 @@
             var div = L.DomUtil.create('div', 'info legend'),
                     labels = alertLevels.map(function (alertLevel) {
                         return '<i style="background:' + alertLevel.color +
-                            ';clear: both;"></i> ' + alertLevel.name;
+                            ';"></i> ' + alertLevel.name;
                     }).reverse();
             labels.push('O: Unidades de Saúde');
             div.innerHTML = labels.join('<br/>');

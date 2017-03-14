@@ -15,7 +15,26 @@ def int_or_none(x):
 
 @register.inclusion_tag("series_plot.html", takes_context=True)
 def alerta_series(context):
-    dados = load_series(context['geocodigo'])[context['geocodigo']]
+    disease = (
+        'dengue' if 'disease_code' not in context else
+        context['disease_code']
+    )
+
+    dados = load_series(
+        context['geocodigo'], disease
+    )[context['geocodigo']]
+
+    if dados is None:
+        return {
+            'nome': context['nome'],
+            'dados': {},
+            'start': {},
+            'verde': {},
+            'amarelo': {},
+            'laranja': {},
+            'vermelho': {},
+        }
+
     dados['dia'] = [
         int(mktime((d + timedelta(7)).timetuple()))
         for d in dados['dia']]
@@ -65,9 +84,23 @@ def alerta_series(context):
 
 
 @register.inclusion_tag("total_series.html", takes_context=True)
-def total_series(context):
+def total_series_dengue(context):
+    _context = total_series(context, disease='dengue')
+    _context.update({'disease_label': 'Dengue'})
+    return _context
+
+
+@register.inclusion_tag("total_series.html", takes_context=True)
+def total_series_chik(context):
+    _context = total_series(context, disease='chik')
+    _context.update({'disease_label': 'Chikungunya'})
+    return _context
+
+
+
+def total_series(context, disease):
     # gc = context['geocodigos'][0]
-    series = get_series_by_UF()
+    series = get_series_by_UF(disease)
     ufs = list(set(series.uf.tolist()))
     # 51 weeks to get the end of the SE
     start = series.data.max() - timedelta(weeks=51)
@@ -100,5 +133,6 @@ def total_series(context):
         'ufs': ufs,
         'start': start,
         'series': casos,
-        'series_est': casos_est
+        'series_est': casos_est,
+        'disease': disease
     }

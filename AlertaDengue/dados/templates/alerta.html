@@ -65,9 +65,32 @@
     </style>
 {% endblock %}
 
-{% block title %}{% blocktrans %} Situação da Dengue no Rio de Janeiro em {% endblocktrans %}{{ data2 }}{% endblock %}
+{% block title %}
+    {% blocktrans %}
+        Situação da {{disease_label}} no Rio de Janeiro em
+    {% endblocktrans %}
+    {{ data2 }}
+{% endblock %}
 
 {% block content %}
+    <div class="panel panel-default" style="padding: 20px;">
+        Selecione a doença a ser visualizada:
+        <input id="disease-dengue"
+               type="radio" name="disease" value="dengue"
+               {% if disease_code == 'dengue' %}
+               checked="checked"
+               {% endif %}
+               onchange="window.location.href='./?disease=dengue'"
+        /> Dengue |
+        <input id="disease-chik"
+               type="radio" name="disease" value="chik"
+               {% if disease_code == 'chik' %}
+               checked="checked"
+               {% endif %}
+               onchange="window.location.href='./?disease=chik'"
+        /> Chikungunya
+    </div>
+
     <div class="panel panel-default">
       <div class="panel-body">
           <h3> {% blocktrans with pop=populacao|intword %}<b>População:</b> {{ pop }} de habitantes.{% endblocktrans %}</h3>
@@ -91,8 +114,11 @@
                     </div>
                     <div id="panel-element-vd" class="panel-collapse collapse">
                         <div class="panel-body">
-                            {% trans "Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições ideais para a
-                            reprodução do Mosquito." %}
+                            {% blocktrans %}
+                            "Sem Risco. Quando o mapa está verde, não existe
+                            transmissão e nem condições ideais para a
+                            reprodução do Mosquito."
+                            {% endblocktrans %}
                         </div>
                     </div>
                 </div>
@@ -103,8 +129,12 @@
                     </div>
                     <div id="panel-element-am" class="panel-collapse collapse">
                         <div class="panel-body">
-                            {% trans "Estação da Dengue. No nível amarelo, temos condições climáticas propícias à reprodução do
-                            mosquito. Mas ainda sem transmissão significativa da Doença." %}
+                            {% blocktrans %}
+                            "Estação da Dengue. No nível amarelo, temos
+                            condições climáticas propícias à reprodução do
+                            mosquito. Mas ainda sem transmissão
+                            significativa da Doença."
+                            {% endblocktrans %}
                         </div>
                     </div>
                 </div>
@@ -115,9 +145,12 @@
                     </div>
                     <div id="panel-element-la" class="panel-collapse collapse">
                         <div class="panel-body">
-                            {% trans "Transmissão da Dengue. No nível laranja, já observamos uma incidência pronunciada da Dengue,
+                            {% blocktrans %}
+                            "Transmissão da Dengue. No nível laranja, já
+                            observamos uma incidência pronunciada da Dengue,
                             mas ainda não podemos afirmar
-                            com confiança que teremos epidemia." %}
+                            com confiança que teremos epidemia."
+                            {% endblocktrans %}
                         </div>
                     </div>
                 </div>
@@ -128,9 +161,12 @@
                     </div>
                     <div id="panel-element-vm" class="panel-collapse collapse">
                         <div class="panel-body">
-                            {% trans "Epidemia. Neste nível estamos em plena epidemia. Todo o cuidado é pouco, e precisamos ficar
-                            atentos aos sintomas
-                            da Dengue e procurar o médico imediatamente em caso suspeita de Dengue." %}
+                            {% blocktrans %}"Epidemia. Neste nível estamos em
+                            plena epidemia. Todo o cuidado é pouco, e
+                            precisamos ficar atentos aos sintomas da Dengue e
+                            procurar o médico imediatamente em caso suspeita
+                            de Dengue."
+                            {% endblocktrans %}
                         </div>
                     </div>
                 </div>
@@ -140,7 +176,7 @@
             <h3><span class="badge badge-info">{{ novos_casos }}</span>{% trans " Casos estimados " %}</h3>
 
             <p>{% blocktrans %} São estimados entre <b>{{ min_est }}</b> e <b>{{ max_est }}  novos casos</b> na Semana
-                Epidemiológica {{ SE }}: {{ data1 }}  a {{ data2 }}. Com {{ total_observed }}casos notificados oficialmente até o momento {% endblocktrans %}</p>
+                Epidemiológica {{ SE }}: {{ data1 }}  a {{ data2 }}. Com {{ total_observed }} casos notificados oficialmente até o momento {% endblocktrans %}</p>
             <h4>{% blocktrans %} Últimas {{ look_back }} semanas: {% endblocktrans %}</h4>
             <span class='totalsparkline'>{{ total_series }}</span>
             <p></p>
@@ -199,7 +235,7 @@
                 fillOpacity: 0.7,
                 fillColor: alertLevels[i].color
             };
-        }get_city
+        };
 
         function highlightFeature(e) {
             var layer = e.target;
