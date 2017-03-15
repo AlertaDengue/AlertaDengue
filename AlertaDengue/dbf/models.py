@@ -16,6 +16,7 @@ class DBF(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     export_date = models.DateField()
     notification_year = models.IntegerField(default=current_year)
+    state_abbreviation = models.CharField(max_length=2, null=True)
 
     def clean(self):
         if self.notification_year > date.today().year:
@@ -27,6 +28,7 @@ class DBF(models.Model):
 
     def __str__(self):
         return "{} - {}".format(self.file, self.notification_year)
+
 
 class DBFChunkedUpload(ChunkedUpload):
     """
