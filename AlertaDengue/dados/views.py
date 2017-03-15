@@ -2,6 +2,7 @@
 from dados.maps import get_city_geojson, get_city_info
 from dados import dbdata
 from dados import models as M
+from dbf.models import DBF
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView, View
 from django.contrib import messages
@@ -562,6 +563,13 @@ class AlertaStateView(TemplateView):
             cities_alert[['municipio_geocodigo', 'level_alert']].values
         )
 
+        dbf = DBF.objects.order_by('export_date').last()
+
+        if dbf is None:
+            last_update = 'desconhecida'
+        else:
+            last_update = dbf.export_date.data
+
         context.update({
             'state_abv': context['state'],
             'state': self._state_name[context['state']],
@@ -576,7 +584,8 @@ class AlertaStateView(TemplateView):
             'case_series': dbdata.NotificationResume.tail_estimated_cases(
                 geo_ids, 12
             ),
-            'disease_label': context['disease'].title()
+            'disease_label': context['disease'].title(),
+            'last_update': last_update
         })
         return context
 
