@@ -13,6 +13,19 @@ class DBFForm(forms.Form):
     filename = forms.CharField(required=False, widget=forms.HiddenInput())
     export_date = forms.DateField(label=_("Data da exportação"))
     notification_year = forms.IntegerField(label=_("Ano de notificação"))
+    state_abbreviation = forms.ChoiceField(choices=(
+        (None, ''), ('AC', 'Acre'), ('AL', 'Alagoas'), ('AP', 'Amapá'),
+        ('AM', 'Amazonas'),
+        ('BA', 'Bahia'), ('CE', 'Ceará'), ('DF', 'Distrito Federal'),
+        ('ES', 'Espírito Santo'), ('GO', 'Goiás'), ('MA', 'Maranhão'),
+        ('MT', 'Mato Grosso'), ('MS', 'Mato Grosso do Sul'),
+        ('MG', 'Minas Gerais'), ('PA', 'Pará'), ('PB', 'Paraíba'),
+        ('PR', 'Paraná'), ('PE', 'Pernambuco'), ('PI', 'Piauí'),
+        ('RJ', 'Rio de Janeiro'), ('RN', 'Rio Grande do Norte'),
+        ('RS', 'Rio Grande do Sul'), ('RO', 'Rondônia'), ('RR', 'Roraima'),
+        ('SC', 'Santa Catarina'), ('SP', 'São Paulo'), ('SE', 'Sergipe'),
+        ('TO', 'Tocantins')
+    ), required=False, label=_("U.F."))
 
     def clean(self):
         cleaned_data = super(DBFForm, self).clean()
