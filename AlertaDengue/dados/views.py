@@ -563,12 +563,14 @@ class AlertaStateView(TemplateView):
             cities_alert[['municipio_geocodigo', 'level_alert']].values
         )
 
-        dbf = DBF.objects.order_by('export_date').last()
+        dbf = DBF.objects.filter(
+            state_abbreviation=context['state']
+        ).order_by('export_date').last()
 
         if dbf is None:
             last_update = 'desconhecida'
         else:
-            last_update = dbf.export_date.data
+            last_update = dbf.export_date
 
         context.update({
             'state_abv': context['state'],
