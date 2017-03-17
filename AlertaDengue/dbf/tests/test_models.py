@@ -24,7 +24,8 @@ class DBFModelTest(TestCase):
                 uploaded_by=User.objects.all()[0],
                 file=File(fp, name="simple.dbf"),
                 export_date=date.today(),
-                notification_year=date.today().year + 1
+                notification_year=date.today().year + 1,
+                state_abbreviation='RJ'
             )
             with self.assertRaises(ValidationError):
                 dbf.clean()
@@ -37,7 +38,8 @@ class DBFModelTest(TestCase):
                 uploaded_by=User.objects.all()[0],
                 file=File(fp, name="invalid.dbf"),
                 export_date=date.today(),
-                notification_year=date.today().year
+                notification_year=date.today().year,
+                state_abbreviation='RJ'
             )
             with self.assertRaises(ValidationError):
                 dbf.clean()
