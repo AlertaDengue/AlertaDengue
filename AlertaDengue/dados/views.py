@@ -128,14 +128,11 @@ class AlertaPageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
 
-        disease_code = (
-            'dengue' if 'disease' not in context['view'].request.GET else
-            context['view'].request.GET['disease']
-        )
+        disease_code = context['disease']
 
         disease_label = (
             'Dengue' if disease_code == 'dengue' else
-            'Chikungunya' if disease_code == 'chik' else
+            'Chikungunya' if disease_code == 'chikungunya' else
             None
         )
 
@@ -232,14 +229,11 @@ class AlertaPageViewMunicipio(TemplateView):
         context = super(AlertaPageViewMunicipio, self) \
             .get_context_data(**kwargs)
 
-        disease_code = (
-            'dengue' if 'disease' not in context['view'].request.GET else
-            context['view'].request.GET['disease']
-        )
+        disease_code = context['disease']
 
         disease_label = (
             'Dengue' if disease_code == 'dengue' else
-            'Chikungunya' if disease_code == 'chik' else
+            'Chikungunya' if disease_code == 'chikungunya' else
             None
         )
 
@@ -448,11 +442,15 @@ def get_alert(disease='dengue'):
     - last_year: integer representing the total number of cases 52 weeks ago.
     :rtype : tuple
     """
+    # dados_alerta and dados_alert_chick are global variables
     df = (
         dados_alerta if disease == 'dengue' else
-        dados_alerta_chik if disease == 'chik' else
+        dados_alerta_chik if disease == 'chikungunya' else
         None
     )
+
+    if df is None:
+        raise Exception('Doença não cadastrada.')
 
     df.fillna(0, inplace=True)
     last_SE = df.se.max()  # Last epidemiological week

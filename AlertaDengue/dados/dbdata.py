@@ -105,7 +105,7 @@ def load_series(cidade, disease='dengue'):
     """
     Monta as séries do alerta para visualização no site
     :param cidade: geocodigo da cidade desejada
-    :param disease: dengue|chik|zika
+    :param disease: dengue|chikungunya|zika
     :return: dictionary
     """
     cache_key = 'load_series-{}-{}'.format(cidade, disease)
@@ -117,7 +117,8 @@ def load_series(cidade, disease='dengue'):
 
             table_name = (
                 'Historico_alerta' if disease == 'dengue' else
-                'Historico_alerta_chik'
+                'Historico_alerta_chik' if disease == 'chikungunya' else
+                None
             )
 
             dados_alerta = pd.read_sql_query((
@@ -227,7 +228,7 @@ def get_city_alert(cidade, disease='dengue'):
     """
     Retorna vários indicadores de alerta a nível da cidade.
     :param cidade: geocódigo
-    :param doenca: dengue|chik|zika
+    :param doenca: dengue|chikungunya|zika
     :return: tupla
     """
     series = load_series(cidade, disease)

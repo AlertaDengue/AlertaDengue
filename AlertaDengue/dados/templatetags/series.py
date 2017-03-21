@@ -97,7 +97,6 @@ def total_series_chik(context):
     return _context
 
 
-
 def total_series(context, disease):
     # gc = context['geocodigos'][0]
     series = get_series_by_UF(disease)
