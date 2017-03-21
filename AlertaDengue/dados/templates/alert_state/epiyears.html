@@ -4,7 +4,8 @@ var epiyears_chart;
 
 $(document).ready(function () {
     // Create the chart
-    var url = '/csv/notif_reduced?state_abv=' + state_abv + '&chart_type=epiyears';
+    var url = '/csv/notif_reduced?state_abv=' + state_abv +
+        '&chart_type=epiyears&disease={{disease}}';
 
     $.get(url, function(csv) {
         epiyears_chart = Highcharts.chart('epiyears-chart', {

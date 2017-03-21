@@ -82,13 +82,17 @@ def get_series_by_UF(disease='dengue'):
     """
     Get the incidence series from the database aggregated (sum) by state
     :param UF: substring of the name of the state
-    :param disease: cid 10 code for the disease
+    :param disease: dengue|chikungunya|zika
     :return: Dataframe with the series in long format
     """
     cache_id = 'get_series_by_UF-{}'.format(disease)
     series = cache.get(cache_id)
 
-    _disease = '' if disease == 'dengue' else '_' + disease
+    _disease = (
+        '' if disease == 'dengue' else
+        '_chik' if disease == 'chikungunya' else
+        ''
+    )
 
     if series is None:
         with db_engine.connect() as conexao:
@@ -374,6 +378,9 @@ class NotificationResume:
         :return: dict
         """
 
+        if len(geo_ids) < 1:
+            raise Exception('GEO id list should have at least 1 code.')
+
         sql_template = '''(
         SELECT
             municipio_geocodigo, "data_iniSE", casos_est
@@ -403,7 +410,7 @@ class NotificationResume:
         Retorna vários indicadores de alerta a nível da cidade.
 
         :param state_name: State name
-        :param disease: dengue|chik|zika
+        :param disease: dengue|chikungunya|zika
         :return: tupla
         """
 
@@ -449,12 +456,12 @@ class NotificationResume:
             casos_est_corrente-casos_est_passado AS casos_est
         FROM
             (SELECT
-            COALESCE(SUM(alerta.casos), 0) AS casos_corrente,
-            COALESCE(SUM(alerta.casos_est), 0) AS casos_est_corrente
+                COALESCE(SUM(alerta.casos), 0) AS casos_corrente,
+                COALESCE(SUM(alerta.casos_est), 0) AS casos_est_corrente
             FROM "Municipio".historico_casos AS alerta
-            INNER JOIN "Dengue_global"."Municipio" AS municipio
-                ON alerta.municipio_geocodigo = municipio.geocodigo
-                    AND uf ='%(state_name)s'
+                INNER JOIN "Dengue_global"."Municipio" AS municipio
+                    ON alerta.municipio_geocodigo = municipio.geocodigo
+                        AND uf ='%(state_name)s'
             WHERE
                 alerta."SE" IN (
                     SELECT epi_week(NOW()::DATE)
@@ -465,21 +472,21 @@ class NotificationResume:
             ) AS tb_casos
             INNER JOIN (
                 SELECT
-                COALESCE(SUM(alerta.casos), 0) AS casos_passado,
-                COALESCE(SUM(alerta.casos_est), 0) AS casos_est_passado
+                    COALESCE(SUM(alerta.casos), 0) AS casos_passado,
+                    COALESCE(SUM(alerta.casos_est), 0) AS casos_est_passado
                 FROM "Municipio".historico_casos AS alerta
-                INNER JOIN "Dengue_global"."Municipio" AS municipio
-                    ON alerta.municipio_geocodigo = municipio.geocodigo
-                      AND uf ='%(state_name)s'
-            WHERE
-                alerta."SE" IN (
-                    SELECT epi_week(NOW()::DATE-7*52)
-                    UNION SELECT epi_week(NOW()::DATE-7*53)
-                    UNION SELECT epi_week(NOW()::DATE-7*54)
-                    UNION SELECT epi_week(NOW()::DATE-7*55)
-                )
+                    INNER JOIN "Dengue_global"."Municipio" AS municipio
+                        ON alerta.municipio_geocodigo = municipio.geocodigo
+                          AND uf ='%(state_name)s'
+                WHERE
+                    alerta."SE" IN (
+                        SELECT epi_week(NOW()::DATE-7*52)
+                        UNION SELECT epi_week(NOW()::DATE-7*53)
+                        UNION SELECT epi_week(NOW()::DATE-7*54)
+                        UNION SELECT epi_week(NOW()::DATE-7*55)
+                    )
             ) AS tb_casos_passado
-            ON (1=1)
+                ON (1=1)
         ''' % {'state_name': state_name}
 
         with db_engine.connect() as conn:
@@ -862,7 +869,19 @@ class NotificationQueries:
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn, 'category')
 
-    def get_epiyears(self, state_name):
+    def get_epiyears(self, state_name, disease=None):
+        """
+
+        :param state_name:
+        :param disease: dengue|chikungunya|zika
+        :return:
+
+        """
+        disease_filter = ''
+
+        if disease is not None:
+            disease_filter = " AND cid10_codigo='%s'" % CID10[disease]
+
         sql = '''
         SELECT
           ano_notif,
@@ -872,10 +891,10 @@ class NotificationQueries:
           "Municipio"."Notificacao" AS notif
           INNER JOIN "Dengue_global"."Municipio" AS municipio
             ON notif.municipio_geocodigo = municipio.geocodigo
-        WHERE uf='{}'
+        WHERE uf='{}' {}
         GROUP BY ano_notif, se_notif
         ORDER BY ano_notif, se_notif
-        '''.format(state_name)
+        '''.format(state_name, disease_filter)
 
         with db_engine.connect() as conn:
             df = pd.read_sql(sql, conn)

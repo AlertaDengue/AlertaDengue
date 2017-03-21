@@ -570,6 +570,15 @@ class AlertaStateView(TemplateView):
         else:
             last_update = dbf.export_date
 
+        if len(geo_ids) > 0:
+            cases_series_last_12 = (
+                dbdata.NotificationResume.tail_estimated_cases(
+                    geo_ids, 12
+                )
+            )
+        else:
+            cases_series_last_12 = []
+
         context.update({
             'state_abv': context['state'],
             'state': self._state_name[context['state']],
@@ -580,10 +589,7 @@ class AlertaStateView(TemplateView):
             'geo_ids': geo_ids,
             'alerts_level': alerts,
             # estimated cases is used to show a chart of the last 12 events
-            # todo: check its necessity
-            'case_series': dbdata.NotificationResume.tail_estimated_cases(
-                geo_ids, 12
-            ),
+            'case_series': cases_series_last_12,
             'disease_label': context['disease'].title(),
             'last_update': last_update
         })
@@ -652,7 +658,8 @@ class NotificationReducedCSV_View(View):
                 date_format='%Y-%m-%d'
             )
         elif chart_type == 'epiyears':
-            result = notifQuery.get_epiyears(uf).to_csv()
+            # just filter by one disease
+            result = notifQuery.get_epiyears(uf, self._get('disease')).to_csv()
         elif chart_type == 'total_cases':
             result = notifQuery.get_total_rows().to_csv()
         elif chart_type == 'selected_cases':
