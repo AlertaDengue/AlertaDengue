@@ -220,7 +220,7 @@ class AlertaPageViewMunicipio(TemplateView):
         municipio_gc = kwargs['geocodigo']
 
         if int(municipio_gc) == 3304557:  # Rio de Janeiro
-            return redirect('mrj', permanent=True)
+            return redirect('mrj', disease='dengue', permanent=True)
 
         return super(AlertaPageViewMunicipio, self) \
             .dispatch(request, *args, **kwargs)
@@ -246,7 +246,10 @@ class AlertaPageViewMunicipio(TemplateView):
             observed_cases, min_max_est, dia, prt1
         ) = dbdata.get_city_alert(municipio_gc, disease_code)
 
-        if alert:
+        for x in dbdata.get_city_alert(municipio_gc, disease_code):
+            print(x)
+
+        if alert is not None:
             casos_ap = {municipio_gc: int(case_series[-1])}
             bairros = {municipio_gc: city_info['nome']}
             total_series = case_series[-12:]

@@ -81,7 +81,7 @@
                checked="checked"
                {% endif %}
                onchange="window.location.href='./dengue'"
-        /> Dengue |
+        /> Dengue
         <input id="disease-chik"
                type="radio" name="disease" value="chik"
                {% if disease_code == 'chikungunya' %}
@@ -306,8 +306,10 @@
             };
 
             info.update = function (props) {
-                this._div.innerHTML = '<h4>Número de casos na semana:</h4>' + (props ?
-                '<b>' + props.casos + '</b><br />' : 'Passe o mouse sobre uma AP');
+                this._div.innerHTML = '<h4>Número de casos na semana:</h4>' + (
+                    props ?
+                        '<b>' + ( props.casos ? props.casos : 0) + '</b><br />' :
+                        'Passe o mouse sobre uma AP');
             };
 
             info.addTo(map);

@@ -25,6 +25,16 @@ db_engine = create_engine("postgresql://{}:{}@{}/{}".format(
     settings.PSQL_DB
 ))
 
+
+def _nan_to_num_int_list(v):
+    """
+
+    :param v: numpy.array
+    :return: list
+    """
+    return np.nan_to_num(v).astype(int).tolist()
+
+
 def get_all_active_cities():
     """
     Fetch from the database a list on names of active cities
@@ -114,6 +124,7 @@ def load_series(cidade, disease='dengue'):
     """
     cache_key = 'load_series-{}-{}'.format(cidade, disease)
     result = cache.get(cache_key)
+
     if result is None:
         with db_engine.connect() as conn:
             ap = str(cidade)
@@ -133,19 +144,34 @@ def load_series(cidade, disease='dengue'):
             if len(dados_alerta) == 0:
                 return {ap: None}
 
-            # tweets = pd.read_sql_query('select * from "Municipio"."Tweet" where "Municipio_geocodigo"={}'.format(cidade), parse_dates=True)
+            # tweets = pd.read_sql_query('select * from "Municipio"."Tweet"
+            # where "Municipio_geocodigo"={}'.format(cidade), parse_dates=True)
             series = defaultdict(lambda: defaultdict(lambda: []))
             series[ap]['dia'] = dados_alerta.data_iniSE.tolist()
-            # series[ap]['tweets'] = [float(i) if not np.isnan(i) else None for i in tweets.numero]
-            # series[ap]['tmin'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).tmin]
-            series[ap]['casos_est_min'] = np.nan_to_num(dados_alerta.casos_est_min).astype(int).tolist()
-            series[ap]['casos_est'] = np.nan_to_num(dados_alerta.casos_est).astype(int).tolist()
-            series[ap]['casos_est_max'] = np.nan_to_num(dados_alerta.casos_est_max).astype(int).tolist()
-            series[ap]['casos'] = np.nan_to_num(dados_alerta.casos).astype(int).tolist()
-            series[ap]['alerta'] = (dados_alerta.nivel.astype(int)-1).tolist()  # (1,4)->(0,3)
+            # series[ap]['tweets'] = [float(i) if not np.isnan(i) else
+            # None for i in tweets.numero]
+            # series[ap]['tmin'] = [float(i) if not np.isnan(i) else
+            # None for i in G.get_group(ap).tmin]
+
+            series[ap]['casos_est_min'] = _nan_to_num_int_list(
+                dados_alerta.casos_est_min
+            )
+
+            series[ap]['casos_est'] = _nan_to_num_int_list(
+                dados_alerta.casos_est
+            )
+
+            series[ap]['casos_est_max'] = _nan_to_num_int_list(
+                dados_alerta.casos_est_max
+            )
+
+            series[ap]['casos'] = _nan_to_num_int_list(dados_alerta.casos)
+            # (1,4)->(0,3)
+            series[ap]['alerta'] = (dados_alerta.nivel.astype(int)-1).tolist()
             series[ap]['SE'] = (dados_alerta.SE.astype(int)).tolist()
             series[ap]['prt1'] = dados_alerta.p_rt1.astype(float).tolist()
             series[ap] = dict(series[ap])
+
             # conexao.close()
             result = dict(series)
             cache.set(cache_key, result, settings.QUERY_CACHE_TIMEOUT)
@@ -233,26 +259,28 @@ def get_city_alert(cidade, disease='dengue'):
     Retorna vários indicadores de alerta a nível da cidade.
     :param cidade: geocódigo
     :param doenca: dengue|chikungunya|zika
-    :return: tupla
+    :return: tuple -> alert, SE, case_series, last_year,
+        obs_case_series, min_max_est, dia, prt1
     """
     series = load_series(cidade, disease)
+    series_city = series[str(cidade)]
 
-    if series[str(cidade)] is None:
+    if series_city is None:
         return (
             [], None, [0], 0,
             [0], [0, 0], datetime.now(), 0
         )
 
-    alert = series[str(cidade)]['alerta'][-1]
-    SE = series[str(cidade)]['SE'][-1]
-    case_series = series[str(cidade)]['casos_est']
-    obs_case_series = series[str(cidade)]['casos']
-    last_year = series[str(cidade)]['casos'][-52]
+    alert = series_city['alerta'][-1]
+    SE = series_city['SE'][-1]
+    case_series = series_city['casos_est']
+    last_year = series_city['casos'][-52]
+    obs_case_series = series_city['casos']
     min_max_est = (
-        series[str(cidade)]['casos_est_min'][-1],
-        series[str(cidade)]['casos_est_max'][-1])
-    dia = series[str(cidade)]['dia'][-1]
-    prt1 = np.mean(series[str(cidade)]['prt1'][-3:])
+        series_city['casos_est_min'][-1],
+        series_city['casos_est_max'][-1])
+    dia = series_city['dia'][-1]
+    prt1 = np.mean(series_city['prt1'][-3:])
 
     return (
         alert, SE, case_series, last_year,
