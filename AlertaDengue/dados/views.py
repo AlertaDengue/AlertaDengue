@@ -128,14 +128,11 @@ class AlertaPageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
 
-        disease_code = (
-            'dengue' if 'disease' not in context['view'].request.GET else
-            context['view'].request.GET['disease']
-        )
+        disease_code = context['disease']
 
         disease_label = (
             'Dengue' if disease_code == 'dengue' else
-            'Chikungunya' if disease_code == 'chik' else
+            'Chikungunya' if disease_code == 'chikungunya' else
             None
         )
 
@@ -223,7 +220,7 @@ class AlertaPageViewMunicipio(TemplateView):
         municipio_gc = kwargs['geocodigo']
 
         if int(municipio_gc) == 3304557:  # Rio de Janeiro
-            return redirect('mrj', permanent=True)
+            return redirect('mrj', disease='dengue', permanent=True)
 
         return super(AlertaPageViewMunicipio, self) \
             .dispatch(request, *args, **kwargs)
@@ -232,14 +229,11 @@ class AlertaPageViewMunicipio(TemplateView):
         context = super(AlertaPageViewMunicipio, self) \
             .get_context_data(**kwargs)
 
-        disease_code = (
-            'dengue' if 'disease' not in context['view'].request.GET else
-            context['view'].request.GET['disease']
-        )
+        disease_code = context['disease']
 
         disease_label = (
             'Dengue' if disease_code == 'dengue' else
-            'Chikungunya' if disease_code == 'chik' else
+            'Chikungunya' if disease_code == 'chikungunya' else
             None
         )
 
@@ -252,7 +246,10 @@ class AlertaPageViewMunicipio(TemplateView):
             observed_cases, min_max_est, dia, prt1
         ) = dbdata.get_city_alert(municipio_gc, disease_code)
 
-        if alert:
+        for x in dbdata.get_city_alert(municipio_gc, disease_code):
+            print(x)
+
+        if alert is not None:
             casos_ap = {municipio_gc: int(case_series[-1])}
             bairros = {municipio_gc: city_info['nome']}
             total_series = case_series[-12:]
@@ -448,11 +445,15 @@ def get_alert(disease='dengue'):
     - last_year: integer representing the total number of cases 52 weeks ago.
     :rtype : tuple
     """
+    # dados_alerta and dados_alert_chick are global variables
     df = (
         dados_alerta if disease == 'dengue' else
-        dados_alerta_chik if disease == 'chik' else
+        dados_alerta_chik if disease == 'chikungunya' else
         None
     )
+
+    if df is None:
+        raise Exception('Doença não cadastrada.')
 
     df.fillna(0, inplace=True)
     last_SE = df.se.max()  # Last epidemiological week
@@ -572,6 +573,15 @@ class AlertaStateView(TemplateView):
         else:
             last_update = dbf.export_date
 
+        if len(geo_ids) > 0:
+            cases_series_last_12 = (
+                dbdata.NotificationResume.tail_estimated_cases(
+                    geo_ids, 12
+                )
+            )
+        else:
+            cases_series_last_12 = []
+
         context.update({
             'state_abv': context['state'],
             'state': self._state_name[context['state']],
@@ -582,10 +592,7 @@ class AlertaStateView(TemplateView):
             'geo_ids': geo_ids,
             'alerts_level': alerts,
             # estimated cases is used to show a chart of the last 12 events
-            # todo: check its necessity
-            'case_series': dbdata.NotificationResume.tail_estimated_cases(
-                geo_ids, 12
-            ),
+            'case_series': cases_series_last_12,
             'disease_label': context['disease'].title(),
             'last_update': last_update
         })
@@ -654,7 +661,8 @@ class NotificationReducedCSV_View(View):
                 date_format='%Y-%m-%d'
             )
         elif chart_type == 'epiyears':
-            result = notifQuery.get_epiyears(uf).to_csv()
+            # just filter by one disease
+            result = notifQuery.get_epiyears(uf, self._get('disease')).to_csv()
         elif chart_type == 'total_cases':
             result = notifQuery.get_total_rows().to_csv()
         elif chart_type == 'selected_cases':

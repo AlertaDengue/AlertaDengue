@@ -85,14 +85,14 @@
                {% if disease_code == 'dengue' %}
                checked="checked"
                {% endif %}
-               onchange="window.location.href='./?disease=dengue'"
-        /> Dengue |
+               onchange="window.location.href='./dengue'"
+        /> Dengue
         <input id="disease-chik"
                type="radio" name="disease" value="chik"
-               {% if disease_code == 'chik' %}
+               {% if disease_code == 'chikungunya' %}
                checked="checked"
                {% endif %}
-               onchange="window.location.href='./?disease=chik'"
+               onchange="window.location.href='./chikungunya'"
         /> Chikungunya
     </div>
     <div class="panel panel-default">

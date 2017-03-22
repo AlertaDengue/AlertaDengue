@@ -92,13 +92,18 @@ def total_series_dengue(context):
 
 @register.inclusion_tag("total_series.html", takes_context=True)
 def total_series_chik(context):
-    _context = total_series(context, disease='chik')
+    _context = total_series(context, disease='chikungunya')
     _context.update({'disease_label': 'Chikungunya'})
     return _context
 
 
-
 def total_series(context, disease):
+    '''
+
+    :param context:
+    :param disease: dengue|chikungunya|zika
+    :return:
+    '''
     # gc = context['geocodigos'][0]
     series = get_series_by_UF(disease)
     ufs = list(set(series.uf.tolist()))

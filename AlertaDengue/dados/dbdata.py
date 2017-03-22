@@ -25,6 +25,16 @@ db_engine = create_engine("postgresql://{}:{}@{}/{}".format(
     settings.PSQL_DB
 ))
 
+
+def _nan_to_num_int_list(v):
+    """
+
+    :param v: numpy.array
+    :return: list
+    """
+    return np.nan_to_num(v).astype(int).tolist()
+
+
 def get_all_active_cities():
     """
     Fetch from the database a list on names of active cities
@@ -82,13 +92,17 @@ def get_series_by_UF(disease='dengue'):
     """
     Get the incidence series from the database aggregated (sum) by state
     :param UF: substring of the name of the state
-    :param disease: cid 10 code for the disease
+    :param disease: dengue|chikungunya|zika
     :return: Dataframe with the series in long format
     """
     cache_id = 'get_series_by_UF-{}'.format(disease)
     series = cache.get(cache_id)
 
-    _disease = '' if disease == 'dengue' else '_' + disease
+    _disease = (
+        '' if disease == 'dengue' else
+        '_chik' if disease == 'chikungunya' else
+        ''
+    )
 
     if series is None:
         with db_engine.connect() as conexao:
@@ -105,11 +119,12 @@ def load_series(cidade, disease='dengue'):
     """
     Monta as séries do alerta para visualização no site
     :param cidade: geocodigo da cidade desejada
-    :param disease: dengue|chik|zika
+    :param disease: dengue|chikungunya|zika
     :return: dictionary
     """
     cache_key = 'load_series-{}-{}'.format(cidade, disease)
     result = cache.get(cache_key)
+
     if result is None:
         with db_engine.connect() as conn:
             ap = str(cidade)
@@ -117,7 +132,8 @@ def load_series(cidade, disease='dengue'):
 
             table_name = (
                 'Historico_alerta' if disease == 'dengue' else
-                'Historico_alerta_chik'
+                'Historico_alerta_chik' if disease == 'chikungunya' else
+                None
             )
 
             dados_alerta = pd.read_sql_query((
@@ -128,19 +144,34 @@ def load_series(cidade, disease='dengue'):
             if len(dados_alerta) == 0:
                 return {ap: None}
 
-            # tweets = pd.read_sql_query('select * from "Municipio"."Tweet" where "Municipio_geocodigo"={}'.format(cidade), parse_dates=True)
+            # tweets = pd.read_sql_query('select * from "Municipio"."Tweet"
+            # where "Municipio_geocodigo"={}'.format(cidade), parse_dates=True)
             series = defaultdict(lambda: defaultdict(lambda: []))
             series[ap]['dia'] = dados_alerta.data_iniSE.tolist()
-            # series[ap]['tweets'] = [float(i) if not np.isnan(i) else None for i in tweets.numero]
-            # series[ap]['tmin'] = [float(i) if not np.isnan(i) else None for i in G.get_group(ap).tmin]
-            series[ap]['casos_est_min'] = np.nan_to_num(dados_alerta.casos_est_min).astype(int).tolist()
-            series[ap]['casos_est'] = np.nan_to_num(dados_alerta.casos_est).astype(int).tolist()
-            series[ap]['casos_est_max'] = np.nan_to_num(dados_alerta.casos_est_max).astype(int).tolist()
-            series[ap]['casos'] = np.nan_to_num(dados_alerta.casos).astype(int).tolist()
-            series[ap]['alerta'] = (dados_alerta.nivel.astype(int)-1).tolist()  # (1,4)->(0,3)
+            # series[ap]['tweets'] = [float(i) if not np.isnan(i) else
+            # None for i in tweets.numero]
+            # series[ap]['tmin'] = [float(i) if not np.isnan(i) else
+            # None for i in G.get_group(ap).tmin]
+
+            series[ap]['casos_est_min'] = _nan_to_num_int_list(
+                dados_alerta.casos_est_min
+            )
+
+            series[ap]['casos_est'] = _nan_to_num_int_list(
+                dados_alerta.casos_est
+            )
+
+            series[ap]['casos_est_max'] = _nan_to_num_int_list(
+                dados_alerta.casos_est_max
+            )
+
+            series[ap]['casos'] = _nan_to_num_int_list(dados_alerta.casos)
+            # (1,4)->(0,3)
+            series[ap]['alerta'] = (dados_alerta.nivel.astype(int)-1).tolist()
             series[ap]['SE'] = (dados_alerta.SE.astype(int)).tolist()
             series[ap]['prt1'] = dados_alerta.p_rt1.astype(float).tolist()
             series[ap] = dict(series[ap])
+
             # conexao.close()
             result = dict(series)
             cache.set(cache_key, result, settings.QUERY_CACHE_TIMEOUT)
@@ -227,27 +258,29 @@ def get_city_alert(cidade, disease='dengue'):
     """
     Retorna vários indicadores de alerta a nível da cidade.
     :param cidade: geocódigo
-    :param doenca: dengue|chik|zika
-    :return: tupla
+    :param doenca: dengue|chikungunya|zika
+    :return: tuple -> alert, SE, case_series, last_year,
+        obs_case_series, min_max_est, dia, prt1
     """
     series = load_series(cidade, disease)
+    series_city = series[str(cidade)]
 
-    if series[str(cidade)] is None:
+    if series_city is None:
         return (
             [], None, [0], 0,
             [0], [0, 0], datetime.now(), 0
         )
 
-    alert = series[str(cidade)]['alerta'][-1]
-    SE = series[str(cidade)]['SE'][-1]
-    case_series = series[str(cidade)]['casos_est']
-    obs_case_series = series[str(cidade)]['casos']
-    last_year = series[str(cidade)]['casos'][-52]
+    alert = series_city['alerta'][-1]
+    SE = series_city['SE'][-1]
+    case_series = series_city['casos_est']
+    last_year = series_city['casos'][-52]
+    obs_case_series = series_city['casos']
     min_max_est = (
-        series[str(cidade)]['casos_est_min'][-1],
-        series[str(cidade)]['casos_est_max'][-1])
-    dia = series[str(cidade)]['dia'][-1]
-    prt1 = np.mean(series[str(cidade)]['prt1'][-3:])
+        series_city['casos_est_min'][-1],
+        series_city['casos_est_max'][-1])
+    dia = series_city['dia'][-1]
+    prt1 = np.mean(series_city['prt1'][-3:])
 
     return (
         alert, SE, case_series, last_year,
@@ -373,6 +406,9 @@ class NotificationResume:
         :return: dict
         """
 
+        if len(geo_ids) < 1:
+            raise Exception('GEO id list should have at least 1 code.')
+
         sql_template = '''(
         SELECT
             municipio_geocodigo, "data_iniSE", casos_est
@@ -402,7 +438,7 @@ class NotificationResume:
         Retorna vários indicadores de alerta a nível da cidade.
 
         :param state_name: State name
-        :param disease: dengue|chik|zika
+        :param disease: dengue|chikungunya|zika
         :return: tupla
         """
 
@@ -448,12 +484,12 @@ class NotificationResume:
             casos_est_corrente-casos_est_passado AS casos_est
         FROM
             (SELECT
-            COALESCE(SUM(alerta.casos), 0) AS casos_corrente,
-            COALESCE(SUM(alerta.casos_est), 0) AS casos_est_corrente
+                COALESCE(SUM(alerta.casos), 0) AS casos_corrente,
+                COALESCE(SUM(alerta.casos_est), 0) AS casos_est_corrente
             FROM "Municipio".historico_casos AS alerta
-            INNER JOIN "Dengue_global"."Municipio" AS municipio
-                ON alerta.municipio_geocodigo = municipio.geocodigo
-                    AND uf ='%(state_name)s'
+                INNER JOIN "Dengue_global"."Municipio" AS municipio
+                    ON alerta.municipio_geocodigo = municipio.geocodigo
+                        AND uf ='%(state_name)s'
             WHERE
                 alerta."SE" IN (
                     SELECT epi_week(NOW()::DATE)
@@ -464,21 +500,21 @@ class NotificationResume:
             ) AS tb_casos
             INNER JOIN (
                 SELECT
-                COALESCE(SUM(alerta.casos), 0) AS casos_passado,
-                COALESCE(SUM(alerta.casos_est), 0) AS casos_est_passado
+                    COALESCE(SUM(alerta.casos), 0) AS casos_passado,
+                    COALESCE(SUM(alerta.casos_est), 0) AS casos_est_passado
                 FROM "Municipio".historico_casos AS alerta
-                INNER JOIN "Dengue_global"."Municipio" AS municipio
-                    ON alerta.municipio_geocodigo = municipio.geocodigo
-                      AND uf ='%(state_name)s'
-            WHERE
-                alerta."SE" IN (
-                    SELECT epi_week(NOW()::DATE-7*52)
-                    UNION SELECT epi_week(NOW()::DATE-7*53)
-                    UNION SELECT epi_week(NOW()::DATE-7*54)
-                    UNION SELECT epi_week(NOW()::DATE-7*55)
-                )
+                    INNER JOIN "Dengue_global"."Municipio" AS municipio
+                        ON alerta.municipio_geocodigo = municipio.geocodigo
+                          AND uf ='%(state_name)s'
+                WHERE
+                    alerta."SE" IN (
+                        SELECT epi_week(NOW()::DATE-7*52)
+                        UNION SELECT epi_week(NOW()::DATE-7*53)
+                        UNION SELECT epi_week(NOW()::DATE-7*54)
+                        UNION SELECT epi_week(NOW()::DATE-7*55)
+                    )
             ) AS tb_casos_passado
-            ON (1=1)
+                ON (1=1)
         ''' % {'state_name': state_name}
 
         with db_engine.connect() as conn:
@@ -861,7 +897,19 @@ class NotificationQueries:
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn, 'category')
 
-    def get_epiyears(self, state_name):
+    def get_epiyears(self, state_name, disease=None):
+        """
+
+        :param state_name:
+        :param disease: dengue|chikungunya|zika
+        :return:
+
+        """
+        disease_filter = ''
+
+        if disease is not None:
+            disease_filter = " AND cid10_codigo='%s'" % CID10[disease]
+
         sql = '''
         SELECT
           ano_notif,
@@ -871,10 +919,10 @@ class NotificationQueries:
           "Municipio"."Notificacao" AS notif
           INNER JOIN "Dengue_global"."Municipio" AS municipio
             ON notif.municipio_geocodigo = municipio.geocodigo
-        WHERE uf='{}'
+        WHERE uf='{}' {}
         GROUP BY ano_notif, se_notif
         ORDER BY ano_notif, se_notif
-        '''.format(state_name)
+        '''.format(state_name, disease_filter)
 
         with db_engine.connect() as conn:
             df = pd.read_sql(sql, conn)

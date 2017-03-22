@@ -7,7 +7,7 @@
 CREATE OR REPLACE FUNCTION epi_week(IN dt date) RETURNS INTEGER
 AS $$
 
-DECLARE epiyear INTEGER; 
+DECLARE epiyear INTEGER;
 DECLARE epiend DATE;
 DECLARE epistart DATE;
 DECLARE epi_dow INTEGER;
@@ -40,24 +40,24 @@ BEGIN
         epistart = epistart + CAST(CAST(7-epi_dow AS VARCHAR) || ' DAY' AS INTERVAL);
     END IF;
 
-    -- If current date is before its year first epiweek, 
+    -- If current date is before its year first epiweek,
     -- then our base year is the previous one
     IF dt < epistart THEN
-	epiyear = epiyear-1;
+    epiyear = epiyear-1;
 
-	epistart = CONCAT(CAST(epiyear AS VARCHAR), '-01-01')::DATE;
+    epistart = CONCAT(CAST(epiyear AS VARCHAR), '-01-01')::DATE;
         epi_dow = EXTRACT(DOW FROM epistart);
 
         -- First epiday
         IF epi_dow < 4 THEN
-	    epistart = epistart - CAST(CAST(epi_dow AS VARCHAR) || ' DAY' AS INTERVAL);
+        epistart = epistart - CAST(CAST(epi_dow AS VARCHAR) || ' DAY' AS INTERVAL);
         ELSE
             epistart = epistart + CAST(CAST(7-epi_dow AS VARCHAR) || ' DAY' AS INTERVAL);
         END IF;
     END IF;
     --epiweek = int(((x - epistart)/7).days) + 1
     epiweek = ((dt - epistart)/7)+1;
-    raise notice '%', ((dt - epistart)/7)+1;
+    --raise notice '%', ((dt - epistart)/7)+1;
 
     RETURN epiyear*100 + epiweek;
 END;
