@@ -106,6 +106,16 @@ def total_series(context, disease):
     '''
     # gc = context['geocodigos'][0]
     series = get_series_by_UF(disease)
+
+    if series.empty:
+        return {
+            'ufs': [],
+            'start': None,
+            'series': {},
+            'series_est': {},
+            'disease': disease
+        }
+
     ufs = list(set(series.uf.tolist()))
     # 51 weeks to get the end of the SE
     start = series.data.max() - timedelta(weeks=51)
