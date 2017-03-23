@@ -7,7 +7,8 @@ from sqlalchemy import create_engine
 from django.conf import settings
 from django.core.cache import cache
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
+from dados.episem import episem
 
 import pandas as pd
 import numpy as np
@@ -33,6 +34,10 @@ def _nan_to_num_int_list(v):
     :return: list
     """
     return np.nan_to_num(v).astype(int).tolist()
+
+
+def _episem(dt):
+    return episem(dt, sep='')
 
 
 def get_all_active_cities():
@@ -477,7 +482,13 @@ class NotificationResume:
             return pd.read_sql_query(sql, conn, 'id', parse_dates=True)
 
     @staticmethod
-    def get_4_weeks_variation(state_name):
+    def get_4_weeks_variation(state_name, current_date):
+        # for variation_4_weeks
+        se_current_year_1 = _episem(current_date)
+        se_current_year_2 = _episem(current_date - timedelta(days=0, weeks=3))
+        se_last_year_1 = _episem(current_date - timedelta(days=0, weeks=52))
+        se_last_year_2 = _episem(current_date - timedelta(days=0, weeks=55))
+
         sql = '''
         SELECT
             casos_corrente-casos_passado AS casos,
@@ -491,12 +502,8 @@ class NotificationResume:
                     ON alerta.municipio_geocodigo = municipio.geocodigo
                         AND uf ='%(state_name)s'
             WHERE
-                alerta."SE" IN (
-                    SELECT epi_week(NOW()::DATE)
-                    UNION SELECT epi_week(NOW()::DATE-7*1)
-                    UNION SELECT epi_week(NOW()::DATE-7*2)
-                    UNION SELECT epi_week(NOW()::DATE-7*3)
-                )
+                alerta."SE" <= %(se_current_year_1)s
+                AND alerta."SE" >= %(se_current_year_2)s
             ) AS tb_casos
             INNER JOIN (
                 SELECT
@@ -507,15 +514,17 @@ class NotificationResume:
                         ON alerta.municipio_geocodigo = municipio.geocodigo
                           AND uf ='%(state_name)s'
                 WHERE
-                    alerta."SE" IN (
-                        SELECT epi_week(NOW()::DATE-7*52)
-                        UNION SELECT epi_week(NOW()::DATE-7*53)
-                        UNION SELECT epi_week(NOW()::DATE-7*54)
-                        UNION SELECT epi_week(NOW()::DATE-7*55)
-                    )
+                    alerta."SE" <= %(se_last_year_1)s
+                AND alerta."SE" >= %(se_last_year_2)s
             ) AS tb_casos_passado
                 ON (1=1)
-        ''' % {'state_name': state_name}
+        ''' % {
+            'state_name': state_name,
+            'se_current_year_1': se_current_year_1,
+            'se_current_year_2': se_current_year_2,
+            'se_last_year_1': se_last_year_1,
+            'se_last_year_2': se_last_year_2,
+        }
 
         with db_engine.connect() as conn:
             return pd.read_sql_query(sql, conn, parse_dates=True)
