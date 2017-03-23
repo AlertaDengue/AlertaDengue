@@ -2,6 +2,7 @@
 from dados.maps import get_city_geojson, get_city_info
 from dados import dbdata
 from dados import models as M
+from dados.episem import episem
 from dbf.models import DBF
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView, View
@@ -45,16 +46,12 @@ class AlertaMainView(TemplateView):
 
         # today
         today = datetime.datetime.today()
-        se2 = str(today.isocalendar()[0])
-        se2 += str(today.isocalendar()[1]).rjust(2, '0')
-
+        se2 = episem(today, sep='')
         # 7 days ago
         last_week = today - datetime.timedelta(days=0, weeks=1)
-        se1 = str(last_week.isocalendar()[0])
-        se1 += str(last_week.isocalendar()[1]).rjust(2, '0')
+        se1 = episem(last_week, sep='')
 
         case_series = {}
-        #total = np.zeros(52, dtype=int)
 
         results = dbdata.load_serie_cities(geocodigos, 'dengue')
 
@@ -63,7 +60,6 @@ class AlertaMainView(TemplateView):
         # series
         for gc, _case_series, in results.items():
             case_series[str(gc)] = _case_series['casos_est'][-12:]
-            #total += _case_series['casos_est'][-52:]
 
         count_cities = {}
         current_week = {}
@@ -87,7 +83,7 @@ class AlertaMainView(TemplateView):
                 )
             ).loc[0, 'casos']
             variation_4_weeks[st_name] = int((
-                notif_resume.get_4_weeks_variation(st_name)
+                notif_resume.get_4_weeks_variation(st_name, today)
             ).loc[0, 'casos'])
 
         context.update({
