@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
+from django.core.mail import send_mass_mail
 from django.template.loader import render_to_string
 from celery import shared_task
 
@@ -14,8 +14,11 @@ def send_success_email(dbf):
     body = render_to_string("successful_import_email.txt",
             context={"dbf": dbf})
 
-    send_mail(subject, body, settings.EMAIL_FROM_ADDRESS,
-                [dbf.uploaded_by.email])
+    message_data = (
+        (subject, body, settings.EMAIL_FROM_ADDRESS, [dbf.uploaded_by.email]),
+        (subject, body, settings.EMAIL_FROM_ADDRESS, [settings.INFODENGUE_TEAM_EMAIL])
+    )
+    send_mass_mail(message_data)
 
 def send_failure_email(dbf, message):
     subject = "[InfoDengue] Falha ao importar DBF enviado em {:%d/%m/%Y}".format(
@@ -23,8 +26,11 @@ def send_failure_email(dbf, message):
     body = render_to_string("failed_import_email.txt",
             context={"dbf": dbf, "error_message": message})
 
-    send_mail(subject, body, settings.EMAIL_FROM_ADDRESS,
-                [dbf.uploaded_by.email])
+    message_data = (
+        (subject, body, settings.EMAIL_FROM_ADDRESS, [dbf.uploaded_by.email]),
+        (subject, body, settings.EMAIL_FROM_ADDRESS, [settings.INFODENGUE_TEAM_EMAIL])
+    )
+    send_mass_mail(message_data)
 
 
 @shared_task
