@@ -1,6 +1,4 @@
 {% extends 'base.html' %}
-
-
 {% block extra_head %}
     {% load static %}
     {% load staticfiles %}
@@ -11,8 +9,10 @@
     {% leaflet_js %}
     {% leaflet_css %}
     {% leaflet_js plugins="ALL" %}
-    <meta property="og:image" content="http://info.dengue.mat.br/static/img/screenshot.png"/>
-    <meta property="og:image:secure_url" content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+    <meta property="og:image"
+          content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+    <meta property="og:image:secure_url"
+          content="https://info.dengue.mat.br/static/img/screenshot.png"/>
     <style>
         .leaflet-container {
             height: 80%;
@@ -71,9 +71,30 @@
     </style>
 {% endblock %}
 
-{% block title %}{% blocktrans %} Situação da Dengue - {{ nome }} em {{ data2 }} {% endblocktrans %}{% endblock %}
+{% block title %}
+    {% blocktrans %}
+        Situação da {{disease_label}} - {{ nome }} em {{ data2 }}
+    {% endblocktrans %}
+{% endblock %}
 
 {% block content %}
+    <div class="panel panel-default" style="padding: 20px;">
+        Selecione a doença a ser visualizada:
+        <input id="disease-dengue"
+               type="radio" name="disease" value="dengue"
+               {% if disease_code == 'dengue' %}
+               checked="checked"
+               {% endif %}
+               onchange="window.location.href='./dengue'"
+        /> Dengue
+        <input id="disease-chik"
+               type="radio" name="disease" value="chik"
+               {% if disease_code == 'chikungunya' %}
+               checked="checked"
+               {% endif %}
+               onchange="window.location.href='./chikungunya'"
+        /> Chikungunya
+    </div>
     <div class="panel panel-default">
       <div class="panel-body">
           <h3>{% blocktrans with populacao=populacao|intcomma %} <b>População:</b> {{ populacao }} habitantes. {% endblocktrans %}</h3>
@@ -260,7 +281,8 @@
         function main_map_init(map, options) {
             $(document).data('map', map)
             //map._layersMaxZoom=13
-            var dataurl = "{% url "mapa" geocodigo %}";
+            //var dataurl = "{% url "mapa" geocodigo %}";
+            var dataurl = '/static/geojson/{{geocodigo}}.json'
             casos_por_ap = {{ casos_por_ap|safe }};
             series_casos = {{ series_casos|safe }};
             alerta = {{ alerta|safe }};
