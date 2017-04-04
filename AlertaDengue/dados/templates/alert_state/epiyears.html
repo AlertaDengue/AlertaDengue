@@ -56,7 +56,8 @@ $(document).ready(function () {
             plotOptions: {
                 line: { /* or spline, area, series, areaspline etc.*/
                     marker: {
-                       enabled: false
+                       enabled: true,
+                       radius: 0
                     }
                 }
             }
@@ -64,6 +65,7 @@ $(document).ready(function () {
 
         var n = epiyears_chart.colorCounter-1;
         var color_value, _r, _g, _b;
+
         for (var i=0; i<n; i++) {
             color_value = epiyears_chart.series[i].color;
             _r = parseInt(color_value.substr(1, 2), 16);
@@ -73,6 +75,11 @@ $(document).ready(function () {
             color_value = 'rgba(' + _r + ',' + _g + ',' + _b + ',0.3)';
             epiyears_chart.series[i].update({color: color_value});
         }
+
+        epiyears_chart.series[n].update({
+            lineWidth: 3,
+            marker: { symbol: 'circle', radius: 4}
+        });
     });
 });
 </script>
