@@ -325,22 +325,30 @@ def add_dv(geocodigo):
 
 class NotificationResume:
     @staticmethod
-    def count_cities_by_uf(uf):
+    def count_cities_by_uf(uf, disease='dengue'):
         """
         Returna contagem de cidades participantes por estado
 
         :param uf: uf a ser consultada
+        :param disease: dengue|chikungunya
         :return: dataframe
         """
+
+        table_name = (
+            'Historico_alerta' if disease == 'dengue' else
+            'Historico_alerta_chik' if disease == 'chikungunya' else
+            ''  # will raise an error
+        )
+
         sql = '''
         SELECT COALESCE(COUNT(municipio_geocodigo), 0) AS count
         FROM (
             SELECT DISTINCT municipio_geocodigo
-            FROM "Municipio"."Historico_alerta") AS alerta
+            FROM "Municipio"."%s") AS alerta
         INNER JOIN "Dengue_global"."Municipio" AS municipio
           ON alerta.municipio_geocodigo = municipio.geocodigo
         WHERE uf='%s'
-        ''' % uf
+        ''' % (table_name, uf)
 
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn).astype(int).iloc[0]['count']

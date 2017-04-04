@@ -10,10 +10,8 @@ function _select_disease() {
         if (disease_chart.series[0].data[j].name == '{{disease_label}}') {
             // inverted select
             disease_chart.series[0].data[j].select(false, true);
-            console.log('true', disease_chart.series[0].data[j].name);
         } else {
             disease_chart.series[0].data[j].select(true, true);
-            console.log('false', disease_chart.series[0].data[j].name);
         }
     }
 }
