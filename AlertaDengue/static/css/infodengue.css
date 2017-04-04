@@ -228,3 +228,7 @@ h1 {
 .legend i {
     clear: both;
 }
+
+.btn-primary {
+    background-color: rgb(51, 122, 183);
+}
