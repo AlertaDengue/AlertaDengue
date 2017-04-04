@@ -105,7 +105,10 @@ def total_series(context, disease):
     :return:
     '''
     # gc = context['geocodigos'][0]
-    series = get_series_by_UF(disease)
+    series = (
+        get_series_by_UF(disease) if 'case_series' not in context else
+        context['case_series'][disease]
+    )
 
     if series.empty:
         return {

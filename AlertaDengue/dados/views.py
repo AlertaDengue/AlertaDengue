@@ -41,33 +41,80 @@ class AlertaMainView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AlertaMainView, self).get_context_data(**kwargs)
-        mundict = dict(dbdata.get_all_active_cities())
-        municipios, geocodigos = list(mundict.values()), list(mundict.keys())
+
+        diseases = ('dengue', 'chikungunya')
 
         # today
+        last_se = {}
+        penultimate_se = {}
+
         today = datetime.datetime.today()
         se2 = episem(today, sep='')
         # 7 days ago
         last_week = today - datetime.timedelta(days=0, weeks=1)
         se1 = episem(last_week, sep='')
 
-        case_series = {}
+        case_series = defaultdict(dict)
+        case_series_state = defaultdict(dict)
 
-        results = dbdata.load_serie_cities(geocodigos, 'dengue')
+        count_cities = defaultdict(dict)
+        current_week = defaultdict(dict)
+        estimated_cases_next_week = defaultdict(dict)
+        variation_to_current_week = defaultdict(dict)
+        variation_4_weeks = defaultdict(dict)
+        v1_week_fixed = defaultdict(dict)
+        v1_4week_fixed = defaultdict(dict)
 
         notif_resume = dbdata.NotificationResume
 
-        # series
-        for gc, _case_series, in results.items():
-            case_series[str(gc)] = _case_series['casos_est'][-12:]
+        for d in diseases:
+            # mundict = dict(dbdata.get_all_active_cities())
+            # municipios, geocodigos = list(mundict.values()), list(mundict.keys())
+            # results[d] = dbdata.load_serie_cities(geocodigos, d)
+            case_series[d] = dbdata.get_series_by_UF(d)
 
-        count_cities = {}
-        current_week = {}
-        estimated_cases_next_week = {}
-        variation_to_current_week = {}
-        variation_4_weeks = {}
 
+            for s in self._state_names:
+                df = case_series[d]  # alias
+                cases = df[df.uf == s].casos_s.values
+                # cases estimation
+                cases_est = df[df.uf == s].casos_est_s.values
+
+                case_series_state[d][s] = cases[:-52]
+
+                count_cities[d][s] = notif_resume.count_cities_by_uf(s, d)
+                current_week[d][s] = {
+                    'casos': cases[-1] if cases.size else 0,
+                    'casos_est': cases_est[-1] if cases_est.size else 0
+                }
+                estimated_cases_next_week[d][s] = 'Em breve'
+                v1 = cases[-2] if cases.size else 0
+                v2 = cases[-1] if cases_est.size else 0
+
+                v1_week_fixed[d][s] = v1 == 0 and v2 != 0
+
+                variation_to_current_week[d][s] = round(
+                    0 if v1 == v2 == 0 else
+                    ((v2 - v1) / 1) * 100 if v1 == 0 else
+                    ((v2-v1)/v1)*100, 2
+                )
+
+                if cases.size < 55:
+                    variation_4_weeks[d][s] = 0
+                else:
+                    v1 = cases[-4:-1].sum()
+                    v2 = cases[-55:-52].sum()
+
+                    v1_4week_fixed[d][s] = v1 == 0 and v2 != 0
+
+                    variation_4_weeks[d][s] = round(
+                        0 if v1 == v2 == 0 else
+                        ((v2 - v1) / 1) * 100 if v1 == 0 else
+                        ((v2-v1)/v1)*100, 2
+                    )
+        '''
         for st_name in self._state_names:
+            print(case_series)
             # Municípios participantes
             count_cities[st_name] = notif_resume.count_cities_by_uf(st_name)
             # Total de casos notificado e estimados na semana
@@ -77,6 +124,7 @@ class AlertaMainView(TemplateView):
             # Previsão de casos para as próximas semanas
             estimated_cases_next_week[st_name] = current_week[st_name]['casos']
             # Variação em relação à semana anterior
+            # ((v2-v1)/v1)*100
             variation_to_current_week[st_name] = (
                 notif_resume.count_cases_week_variation_by_uf(
                     st_name, se1, se2
@@ -85,16 +133,17 @@ class AlertaMainView(TemplateView):
             variation_4_weeks[st_name] = int((
                 notif_resume.get_4_weeks_variation(st_name, today)
             ).loc[0, 'casos'])
+            
+        '''
 
         context.update({
             # 'mundict': json.dumps(mundict),
-            'num_mun': len(mundict),
+            # 'num_mun': len(mundict),
             # 'municipios': municipios,
-            'geocodigos': geocodigos,
+            # 'geocodigos': geocodigos,
             # 'alerta': json.dumps(alerta),
-            'case_series': json.dumps({
-                k: list(map(int, v)) for k, v in case_series.items()
-            }),
+            'diseases': diseases,
+            'case_series': case_series,
             #'total': json.dumps(total.tolist()),
             'states': self._state_names,
             'count_cities': count_cities,
