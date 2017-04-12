@@ -127,7 +127,12 @@ def load_series(cidade, disease='dengue'):
     :param disease: dengue|chikungunya|zika
     :return: dictionary
     """
-    cache_key = 'load_series-{}-{}'.format(cidade, disease)
+    code_rj = 3304557  # Rio de Janeiro
+
+    if disease == 'chikungunya' and cidade == 3304557:
+        cache_key = 'load_series-alert-{}-{}'.format(cidade, disease)
+    else:
+        cache_key = 'load_series-{}-{}'.format(cidade, disease)
     result = cache.get(cache_key)
 
     if result is None:
@@ -135,16 +140,32 @@ def load_series(cidade, disease='dengue'):
             ap = str(cidade)
             cidade = add_dv(int(str(cidade)[:-1]))
 
-            table_name = (
-                'Historico_alerta' if disease == 'dengue' else
-                'Historico_alerta_chik' if disease == 'chikungunya' else
-                None
-            )
+            if disease == 'chikungunya' and cidade == 3304557:
+                dados_alerta = pd.read_sql_query(('''
+                    SELECT 
+                      data AS "data_iniSE",
+                      SUM(casos_estmin) AS casos_est_min,
+                      SUM(casos_est) as casos_est,
+                      SUM(casos_estmax) AS casos_est_max,
+                      SUM(casos) AS casos,
+                      SUM(0) AS nivel,
+                      se AS "SE",
+                      SUM(prt1) AS p_rt1
+                    FROM "Municipio".alerta_mrj_chik
+                    GROUP BY "data_iniSE", "SE"
+                    ORDER BY "data_iniSE" ASC
+                '''), conn, parse_dates=True)
+            else:
+                table_name = (
+                    'Historico_alerta' if disease == 'dengue' else
+                    'Historico_alerta_chik' if disease == 'chikungunya' else
+                    None
+                )
 
-            dados_alerta = pd.read_sql_query((
-                ' SELECT * FROM "Municipio"."{}"' +
-                ' WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC'
-            ).format(table_name, cidade), conn, 'id', parse_dates=True)
+                dados_alerta = pd.read_sql_query((
+                    ' SELECT * FROM "Municipio"."{}"' +
+                    ' WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC'
+                ).format(table_name, cidade), conn, 'id', parse_dates=True)
 
             if len(dados_alerta) == 0:
                 return {ap: None}
