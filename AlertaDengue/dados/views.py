@@ -44,15 +44,25 @@ class AlertaMainView(TemplateView):
 
         diseases = ('dengue', 'chikungunya')
 
+        sql = '''
+        SELECT COUNT(*) AS n_alerts 
+        FROM "Municipio"."Historico_alerta_chik"
+        '''
+
+        import pandas as pd
+        n_alerts_chik = (
+            pd.read_sql_query(sql, dbdata.db_engine).loc[0, 'n_alerts']
+        )
+
         # today
         last_se = {}
         penultimate_se = {}
 
-        today = datetime.datetime.today()
-        se2 = episem(today, sep='')
+        # today = datetime.datetime.today()
+        # se2 = episem(today, sep='')
         # 7 days ago
-        last_week = today - datetime.timedelta(days=0, weeks=1)
-        se1 = episem(last_week, sep='')
+        # last_week = today - datetime.timedelta(days=0, weeks=1)
+        # se1 = episem(last_week, sep='')
 
         case_series = defaultdict(dict)
         case_series_state = defaultdict(dict)
@@ -73,7 +83,6 @@ class AlertaMainView(TemplateView):
             # results[d] = dbdata.load_serie_cities(geocodigos, d)
             case_series[d] = dbdata.get_series_by_UF(d)
 
-
             for s in self._state_names:
                 df = case_series[d]  # alias
                 cases = df[df.uf == s].casos_s.values
@@ -88,8 +97,9 @@ class AlertaMainView(TemplateView):
                     'casos_est': cases_est[-1] if cases_est.size else 0
                 }
                 estimated_cases_next_week[d][s] = 'Em breve'
-                v1 = cases[-2] if cases.size else 0
-                v2 = cases[-1] if cases_est.size else 0
+                v1 = cases_est[-2] if cases_est.size else 0
+                v2 = cases_est[-1] if cases_est.size else 0
+                print(s, d, v1, v2, sep='\t')
 
                 v1_week_fixed[d][s] = v1 == 0 and v2 != 0
 
@@ -99,11 +109,11 @@ class AlertaMainView(TemplateView):
                     ((v2-v1)/v1)*100, 2
                 )
 
-                if cases.size < 55:
+                if cases_est.size < 55:
                     variation_4_weeks[d][s] = 0
                 else:
-                    v1 = cases[-4:-1].sum()
-                    v2 = cases[-55:-52].sum()
+                    v2 = cases_est[-4:-1].sum()
+                    v1 = cases_est[-55:-52].sum()
 
                     v1_4week_fixed[d][s] = v1 == 0 and v2 != 0
 
@@ -151,8 +161,8 @@ class AlertaMainView(TemplateView):
             'estimated_cases_next_week': estimated_cases_next_week,
             'variation_to_current_week': variation_to_current_week,
             'variation_4_weeks': variation_4_weeks,
-            'state_initials': self._state_initials
-
+            'state_initials': self._state_initials,
+            'n_alerts_chik': n_alerts_chik
         })
 
         return context
@@ -168,6 +178,9 @@ def get_municipio(request):
 
 
 class AlertaPageView(TemplateView):
+    """
+    Rio de Janeiro Alert View
+    """
     template_name = 'alerta.html'
 
     def get_context_data(self, **kwargs):

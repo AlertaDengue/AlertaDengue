@@ -50,6 +50,7 @@
 
         .table-card td, .table-card th {
             padding: 10px;
+            font-size: 12px;
         }
     </style>
     <script src="/static/js/Autolinker.min.js"></script>
@@ -68,21 +69,27 @@
     <div class="container-fluid">
         <!-- chart-plot:begin -->
         <div class="row">
-            <div class="col-sm-6">
+            <div {% if n_alerts_chik > 0 %}
+                class="col-sm-6"
+                {% else %}
+                class="col-sm-12"
+                {% endif %}
+            >
                 <div class="chart-wrapper">
                   <div class="chart-stage">
                     {% total_series_dengue %}
                   </div>
                 </div>
-              </div>
-
-              <div class="col-sm-6">
+            </div>
+            {% if n_alerts_chik > 0 %}
+            <div class="col-sm-6">
                 <div class="chart-wrapper">
                   <div class="chart-stage">
                     {% total_series_chik %}
                   </div>
                 </div>
-              </div>
+            </div>
+            {% endif %}
         </div>
         <!-- chart-plot:end -->
 
@@ -130,16 +137,45 @@
                                     <tr>
                                         <th>Variação em relação à semana anterior:</th>
                                         {% for disease in diseases %}
-                                        <td class="card-indicator-value">
-                                            <span>{{variation_to_current_week|lookup:disease|lookup:state_name}}%</span></td>
+                                        <td class="">
+                                            {% if variation_to_current_week|lookup:disease|lookup:state_name > 0%}
+                                                <span class="badge alert-danger">
+                                                    {{variation_to_current_week|lookup:disease|lookup:state_name}}%
+                                                    &uarr;
+                                                </span>
+                                            {% elif variation_to_current_week|lookup:disease|lookup:state_name < 0 %}
+                                                <span class="badge alert-success">
+                                                    {{variation_to_current_week|lookup:disease|lookup:state_name}}%
+                                                    &darr;
+                                                </span>
+                                            {% else %}
+                                                <span class="badge alert-warning">
+                                                    {{variation_to_current_week|lookup:disease|lookup:state_name}}%
+                                                </span>
+                                            {% endif %}
+                                        </td>
                                         {% endfor %}
                                     </tr>
                                     <tr>
                                         <th>Variação da quadrissemana atual em relação à
                                             quadrissemana do último ano:</th>
                                         {% for disease in diseases %}
-                                        <td class="card-indicator-value">
-                                            <span>{{variation_4_weeks|lookup:disease|lookup:state_name}}%</span>
+                                        <td class="">
+                                            {% if variation_4_weeks|lookup:disease|lookup:state_name > 0%}
+                                                <span class="badge alert-danger">
+                                                    {{variation_4_weeks|lookup:disease|lookup:state_name}}%
+                                                    &uarr;
+                                                </span>
+                                            {% elif variation_4_weeks|lookup:disease|lookup:state_name < 0 %}
+                                                <span class="badge alert-success">
+                                                    {{variation_4_weeks|lookup:disease|lookup:state_name}}%
+                                                    &darr;
+                                                </span>
+                                            {% else %}
+                                                <span class="badge alert-warning">
+                                                    {{variation_4_weeks|lookup:disease|lookup:state_name}}%
+                                                </span>
+                                            {% endif %}
                                         </td>
                                         {% endfor %}
                                     </tr>
