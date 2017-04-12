@@ -29,6 +29,13 @@ with open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')) as f:
     polygons = geojson.load(f)
 
 
+def variation_p(v1, v2):
+    return round(
+        0 if v1 == v2 == 0 else
+        ((v2 - v1) / 1) * 100 if v1 == 0 else
+        ((v2 - v1) / v1) * 100, 2
+    )
+
 class AlertaMainView(TemplateView):
     template_name = 'main.html'
 
@@ -81,15 +88,24 @@ class AlertaMainView(TemplateView):
             # mundict = dict(dbdata.get_all_active_cities())
             # municipios, geocodigos = list(mundict.values()), list(mundict.keys())
             # results[d] = dbdata.load_serie_cities(geocodigos, d)
+
             case_series[d] = dbdata.get_series_by_UF(d)
 
             for s in self._state_names:
                 df = case_series[d]  # alias
-                cases = df[df.uf == s].casos_s.values
+                df_state = df[df.uf == s]
+                cases = df_state.casos_s.values
+
                 # cases estimation
-                cases_est = df[df.uf == s].casos_est_s.values
+                cases_est = df_state.casos_est_s.values
 
                 case_series_state[d][s] = cases[:-52]
+
+                if d == 'dengue':
+                    if not df_state.empty:
+                        last_se[s] = df_state.tail(1).data.iloc[0]
+                    else:
+                        last_se[s] = ''
 
                 count_cities[d][s] = notif_resume.count_cities_by_uf(s, d)
                 current_week[d][s] = {
@@ -99,15 +115,10 @@ class AlertaMainView(TemplateView):
                 estimated_cases_next_week[d][s] = 'Em breve'
                 v1 = cases_est[-2] if cases_est.size else 0
                 v2 = cases_est[-1] if cases_est.size else 0
-                print(s, d, v1, v2, sep='\t')
 
                 v1_week_fixed[d][s] = v1 == 0 and v2 != 0
 
-                variation_to_current_week[d][s] = round(
-                    0 if v1 == v2 == 0 else
-                    ((v2 - v1) / 1) * 100 if v1 == 0 else
-                    ((v2-v1)/v1)*100, 2
-                )
+                variation_to_current_week[d][s] = variation_p(v1, v2)
 
                 if cases_est.size < 55:
                     variation_4_weeks[d][s] = 0
@@ -117,11 +128,7 @@ class AlertaMainView(TemplateView):
 
                     v1_4week_fixed[d][s] = v1 == 0 and v2 != 0
 
-                    variation_4_weeks[d][s] = round(
-                        0 if v1 == v2 == 0 else
-                        ((v2 - v1) / 1) * 100 if v1 == 0 else
-                        ((v2-v1)/v1)*100, 2
-                    )
+                    variation_4_weeks[d][s] = variation_p(v1, v2)
         '''
         for st_name in self._state_names:
             print(case_series)
@@ -162,7 +169,8 @@ class AlertaMainView(TemplateView):
             'variation_to_current_week': variation_to_current_week,
             'variation_4_weeks': variation_4_weeks,
             'state_initials': self._state_initials,
-            'n_alerts_chik': n_alerts_chik
+            'n_alerts_chik': n_alerts_chik,
+            'last_se': last_se
         })
 
         return context
