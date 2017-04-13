@@ -148,7 +148,7 @@ def load_series(cidade, disease='dengue'):
                       SUM(casos_est) as casos_est,
                       SUM(casos_estmax) AS casos_est_max,
                       SUM(casos) AS casos,
-                      SUM(0) AS nivel,
+                      MAX(nivel) AS nivel,
                       se AS "SE",
                       SUM(prt1) AS p_rt1
                     FROM "Municipio".alerta_mrj_chik
