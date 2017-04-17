@@ -36,6 +36,7 @@ def variation_p(v1, v2):
         ((v2 - v1) / v1) * 100, 2
     )
 
+
 class AlertaMainView(TemplateView):
     template_name = 'main.html'
 
@@ -51,15 +52,7 @@ class AlertaMainView(TemplateView):
 
         diseases = ('dengue', 'chikungunya')
 
-        sql = '''
-        SELECT COUNT(*) AS n_alerts 
-        FROM "Municipio"."Historico_alerta_chik"
-        '''
-
-        import pandas as pd
-        n_alerts_chik = (
-            pd.read_sql_query(sql, dbdata.db_engine).loc[0, 'n_alerts']
-        )
+        n_alerts_chik = dbdata.get_n_chik_alerts()
 
         # today
         last_se = {}
@@ -131,7 +124,8 @@ class AlertaMainView(TemplateView):
                     variation_4_weeks[d][s] = variation_p(v1, v2)
         '''
         for st_name in self._state_names:
-            print(case_series)
+            print
+            (case_series)
             # Municípios participantes
             count_cities[st_name] = notif_resume.count_cities_by_uf(st_name)
             # Total de casos notificado e estimados na semana
@@ -231,9 +225,11 @@ class AlertaPageView(TemplateView):
             semana = str(current.se.iat[-1])[-2:]
             segunda = current.data.iat[-1]
             city_info = get_city_info("3304557")
+            # estimated cases
             total_series = sum(
                 np.array(list(case_series.values())), np.zeros(12, int)
             )
+            # observed cases
             total_observed_series = sum(
                 np.array(list(observed_cases.values())), np.zeros(12, int)
             )
@@ -258,7 +254,9 @@ class AlertaPageView(TemplateView):
             'novos_casos': sum(casos_ap.values()),
             'bairros': bairros_mrj,
             'min_est': sum(i[0] for i in min_max_est.values()),
+            # 'min_est': sum(current.casos_estmin.values),
             'max_est': sum(i[1] for i in min_max_est.values()),
+            # 'max_est': sum(current.casos_estmax.values),
             'series_casos': case_series,
             'SE': int(semana),
             'data1': segunda.strftime("%d de %B de %Y"),
@@ -311,9 +309,6 @@ class AlertaPageViewMunicipio(TemplateView):
             alert, SE, case_series, last_year,
             observed_cases, min_max_est, dia, prt1
         ) = dbdata.get_city_alert(municipio_gc, disease_code)
-
-        for x in dbdata.get_city_alert(municipio_gc, disease_code):
-            print(x)
 
         if alert is not None:
             casos_ap = {municipio_gc: int(case_series[-1])}
@@ -509,6 +504,8 @@ def get_alert(disease='dengue'):
     - current: tuple with all variables from the last SE
     - case_series: dictionary with 12-weeks case series per AP
     - last_year: integer representing the total number of cases 52 weeks ago.
+    - obs_case_series
+    - min_max_est
     :rtype : tuple
     """
     # dados_alerta and dados_alert_chick are global variables
@@ -521,26 +518,32 @@ def get_alert(disease='dengue'):
     if df is None:
         raise Exception('Doença não cadastrada.')
 
+    df = df.copy()
     df.fillna(0, inplace=True)
+
     last_SE = df.se.max()  # Last epidemiological week
     # year = datetime.date.today().year  # Current year
     # current epidemiological week
     # SE = int(str(last_SE).split(str(year))[-1])
     current = df[df['se'] == last_SE]  # Current status
+
     G = df.groupby("aps")
-    group_names = G.groups.keys()
     alert = defaultdict(lambda: 0)
-    case_series = {}
+    case_series = {}  # estimated
     obs_case_series = {}
     min_max_est = {}
     last_year = None
 
-    for ap in group_names:
-        adf = G.get_group(ap)  # .tail()  # only calculates on the series tail
-        case_series[str(float(ap.split('AP')[-1]))] = [
+    for ap in G.groups.keys():
+        # .tail()  # only calculates on the series tail
+        adf = G.get_group(ap).sort_values('data')
+        
+        k = str(float(ap.split('AP')[-1]))
+
+        case_series[k] = [
             int(v) for v in adf.casos_est.iloc[-12:].values
         ]
-        obs_case_series[str(float(ap.split('AP')[-1]))] = [
+        obs_case_series[k] = [
             int(v) for v in adf.casos.iloc[-12:].values
         ]
         alert[ap] = adf.nivel.iloc[-1]
@@ -549,6 +552,7 @@ def get_alert(disease='dengue'):
             adf.casos_estmin.iloc[-1],
             adf.casos_estmax.iloc[-1]
         )
+
     return alert, current, case_series, last_year, obs_case_series, min_max_est
 
 
