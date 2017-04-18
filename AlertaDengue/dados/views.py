@@ -537,7 +537,7 @@ def get_alert(disease='dengue'):
     for ap in G.groups.keys():
         # .tail()  # only calculates on the series tail
         adf = G.get_group(ap).sort_values('data')
-        
+
         k = str(float(ap.split('AP')[-1]))
 
         case_series[k] = [

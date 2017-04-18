@@ -36,8 +36,8 @@ def alerta_series(context):
         }
 
     dados['dia'] = [
-        int(mktime((d + timedelta(7)).timetuple()))
-        for d in dados['dia']]
+        int(mktime(d.timetuple())) for d in dados['dia']
+    ]
 
     # green alert
     ga = [
