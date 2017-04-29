@@ -1,3 +1,4 @@
+{% load i18n %}
 <div id="disease-chart" style="height:100px"></div>
 
 <script type="application/javascript">
@@ -103,12 +104,12 @@ $(document).ready(function () {
                 text: ''
             },
             subtitle: {
-                text: 'Casos notificados no Período'
+                text: '{% blocktrans %}Casos notificados no Período{% endblocktrans %}'
             },
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Casos'
+                    text: '{% blocktrans %}Casos{% endblocktrans %}'
                 }
             },
             xAxis: {
@@ -124,9 +125,7 @@ $(document).ready(function () {
                 shared: true,
                 useHTML: true,
                 //headerFormat: '<b>{point.key}</b><br/>',
-                footerFormat: '<small>**Clique na categoria (coluna) para <br/>' +
-                    'alterar seleção de filtro. A escolha da doença <br/>' +
-                    'implica no recarregamento da página.</small>',
+                footerFormat: '<small>**{% blocktrans %}Clique na categoria (coluna) para <br/>alterar seleção de filtro. A escolha da doença <br/>implica no recarregamento da página.{% endblocktrans %}</small>',
             },
             /*series: [{
                 'name': 'casos',

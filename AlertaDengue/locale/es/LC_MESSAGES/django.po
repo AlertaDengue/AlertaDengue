@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-14 03:25+0000\n"
+"POT-Creation-Date: 2017-04-29 02:21-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,15 +18,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: AlertaDengue/dados/templates/about.html:4
+#: dados/templates/about.html:4
 msgid "Saiba mais:"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:10
+#: dados/templates/about.html:10
 msgid "O Sistema de Alerta InfoDengue"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:13
+#: dados/templates/about.html:13
 msgid ""
 "\n"
 "            O <b>Sistema InfoDengue</b> visa gerar um sistema de alerta em "
@@ -77,11 +77,11 @@ msgid ""
 "            "
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:48
+#: dados/templates/about.html:48
 msgid "O Sistema de Cores de Notificação "
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:51
+#: dados/templates/about.html:51
 msgid ""
 "\n"
 "            A dengue é difícil de prever, chega de repente. Tem ano que vem "
@@ -142,11 +142,11 @@ msgid ""
 "            "
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:91
+#: dados/templates/about.html:91
 msgid "O Pré-Processamento de Dados e a Geração de Indicadores"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:94
+#: dados/templates/about.html:94
 #, python-format
 msgid ""
 "\n"
@@ -188,66 +188,200 @@ msgid ""
 "            "
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta.html:68
-msgid " Situação da Dengue no Rio de Janeiro em "
+#: dados/templates/alert_state/age.html:110
+msgid "Distribuição por Idade"
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta.html:73
+#: dados/templates/alert_state/age.html:115
+#: dados/templates/alert_state/date.html:93
+#: dados/templates/alert_state/disease.html:112
+#: dados/templates/alert_state/epiyears.html:39
+#: dados/templates/alert_state/gender.html:106
+#: dados/templates/total_series.html:28
+msgid "Casos"
+msgstr ""
+
+#: dados/templates/alert_state/age.html:131
+#: dados/templates/alert_state/gender.html:122
+msgid "Clique na categoria (coluna) para <br/>alterar seleção de filtro."
+msgstr ""
+
+#: dados/templates/alert_state/date.html:88
+msgid "Casos por semana"
+msgstr ""
+
+#: dados/templates/alert_state/date.html:105
+msgid ""
+"Para alterar o zoom do gráfico,<br/>utilize os controles da parte inferior."
+msgstr ""
+
+#: dados/templates/alert_state/disease.html:107
+msgid "Casos notificados no Período"
+msgstr ""
+
+#: dados/templates/alert_state/disease.html:128
+msgid ""
+"Clique na categoria (coluna) para <br/>alterar seleção de filtro. A escolha "
+"da doença <br/>implica no recarregamento da página."
+msgstr ""
+
+#: dados/templates/alert_state/epiyears.html:27
+msgid "Semana"
+msgstr ""
+
+#: dados/templates/alert_state/epiyears.html:34
+msgid "Casos por semanas epidemiológicas"
+msgstr ""
+
+#: dados/templates/alert_state/gender.html:101
+msgid "Distribuição por gênero"
+msgstr ""
+
+#: dados/templates/alert_state/map.html:25
+msgid "Baixo Risco"
+msgstr ""
+
+#: dados/templates/alert_state/map.html:26
+msgid "Atenção"
+msgstr ""
+
+#: dados/templates/alert_state/map.html:27
+msgid "Transmissão"
+msgstr ""
+
+#: dados/templates/alert_state/map.html:28
+msgid "Epidemia"
+msgstr ""
+
+#: dados/templates/alert_state/map.html:174
+msgid "Número de casos estimados na semana"
+msgstr ""
+
+#: dados/templates/alert_state/map.html:177
+msgid "Passe o mouse sobre o mapa"
+msgstr ""
+
+#: dados/templates/alert_state/map.html:188
+msgid "Unidades de Saúde"
+msgstr ""
+
+#: dados/templates/alert_state/map.html:206
+msgid "Casos estimados"
+msgstr ""
+
+#: dados/templates/alert_state/map.html:207
+msgid "Últimas semanas"
+msgstr ""
+
+#: dados/templates/alert_state/map.html:211
+msgid "Mais detalhes"
+msgstr ""
+
+#: dados/templates/alerta.html:69
+#, python-format
+msgid "Situação da %(disease_label)s no Rio de Janeiro em %(data2)s"
+msgstr ""
+
+#: dados/templates/alerta.html:74
+msgid "Selecione a doença a ser visualizada:"
+msgstr ""
+
+#: dados/templates/alerta.html:93
 #, python-format
 msgid "<b>População:</b> %(pop)s de habitantes."
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta.html:74
+#: dados/templates/alerta.html:94
 #, python-format
 msgid "<b>Incidência estimada:</b> %(incid)s  por 100 mil habitantes. "
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta.html:90
-#: AlertaDengue/dados/templates/alerta_municipio.html:96
+#: dados/templates/alerta.html:105
+msgid "Níveis de Atenção"
+msgstr ""
+
+#: dados/templates/alerta.html:111 dados/templates/alerta_municipio.html:117
 msgid "Nível Verde"
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta.html:102
-#: AlertaDengue/dados/templates/alerta_municipio.html:107
+#: dados/templates/alerta.html:115
+msgid ""
+"\n"
+"                            \"Sem Risco. Quando o mapa está verde, não "
+"existe\n"
+"                            transmissão e nem condições ideais para a\n"
+"                            reprodução do Mosquito.\"\n"
+"                            "
+msgstr ""
+
+#: dados/templates/alerta.html:126 dados/templates/alerta_municipio.html:128
 msgid "Nível Amarelo"
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta.html:114
-#: AlertaDengue/dados/templates/alerta_municipio.html:119
+#: dados/templates/alerta.html:130
+msgid ""
+"\n"
+"                            \"Estação da Dengue. No nível amarelo, temos\n"
+"                            condições climáticas propícias à reprodução do\n"
+"                            mosquito. Mas ainda sem transmissão\n"
+"                            significativa da Doença.\"\n"
+"                            "
+msgstr ""
+
+#: dados/templates/alerta.html:142 dados/templates/alerta_municipio.html:140
 msgid "Nível Laranja"
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta.html:127
-#: AlertaDengue/dados/templates/alerta_municipio.html:132
+#: dados/templates/alerta.html:146
+msgid ""
+"\n"
+"                            \"Transmissão da Dengue. No nível laranja, já\n"
+"                            observamos uma incidência pronunciada da "
+"Dengue,\n"
+"                            mas ainda não podemos afirmar\n"
+"                            com confiança que teremos epidemia.\"\n"
+"                            "
+msgstr ""
+
+#: dados/templates/alerta.html:158 dados/templates/alerta_municipio.html:153
 msgid "Nível Vermelho"
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta.html:140
-#: AlertaDengue/dados/templates/alerta_municipio.html:145
+#: dados/templates/alerta.html:162
+msgid ""
+"\"Epidemia. Neste nível estamos em\n"
+"                            plena epidemia. Todo o cuidado é pouco, e\n"
+"                            precisamos ficar atentos aos sintomas da Dengue "
+"e\n"
+"                            procurar o médico imediatamente em caso "
+"suspeita\n"
+"                            de Dengue.\"\n"
+"                            "
+msgstr ""
+
+#: dados/templates/alerta.html:174 dados/templates/alerta_municipio.html:166
 msgid " Casos estimados "
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta.html:142
+#: dados/templates/alerta.html:176
 #, python-format
 msgid ""
 " São estimados entre <b>%(min_est)s</b> e <b>%(max_est)s  novos casos</b> na "
 "Semana\n"
 "                Epidemiológica %(SE)s: %(data1)s  a %(data2)s. Com "
-"%(total_observed)scasos notificados oficialmente até o momento "
+"%(total_observed)s casos notificados oficialmente até o momento "
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta.html:144
-#: AlertaDengue/dados/templates/alerta_municipio.html:150
+#: dados/templates/alerta.html:178 dados/templates/alerta_municipio.html:171
 #, python-format
 msgid " Últimas %(look_back)s semanas: "
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta.html:154
+#: dados/templates/alerta.html:188
 msgid " Suspeita de um criadouro? "
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta.html:157
-#: AlertaDengue/dados/templates/alerta_municipio.html:164
+#: dados/templates/alerta.html:191 dados/templates/alerta_municipio.html:185
 msgid ""
 "Em caso de suspeita de criadouro de mosquitos, ligue para a <a href=\"http://"
 "www.1746.rio.gov.br/\"\n"
@@ -256,22 +390,25 @@ msgid ""
 "               atendimento ao cidadão 1746</a>."
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta_municipio.html:74
+#: dados/templates/alerta_municipio.html:75
 #, python-format
-msgid " Situação da Dengue - %(nome)s em %(data2)s "
+msgid ""
+"\n"
+"        Situação da %(disease_label)s - %(nome)s em %(data2)s\n"
+"    "
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta_municipio.html:79
+#: dados/templates/alerta_municipio.html:100
 #, python-format
 msgid " <b>População:</b> %(populacao)s habitantes. "
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta_municipio.html:80
+#: dados/templates/alerta_municipio.html:101
 #, python-format
 msgid " <b>Incidência estimada:</b>  %(incidencia)s por 100 mil habitantes. "
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta_municipio.html:81
+#: dados/templates/alerta_municipio.html:102
 #, python-format
 msgid ""
 "<b>Chance de alerta <span class=\"label label-warning\">laranja</span> ou "
@@ -279,13 +416,13 @@ msgid ""
 "%(prt)s%%"
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta_municipio.html:100
+#: dados/templates/alerta_municipio.html:121
 msgid ""
 "Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições "
 "ideais para a reprodução do Mosquito."
 msgstr ""
 
-#: AlertaDengue/dados/templates/alerta_municipio.html:147
+#: dados/templates/alerta_municipio.html:168
 #, python-format
 msgid ""
 " São estimados entre <b> %(min_est)s</b> e <b>%(max_est)s  novos casos</b> "
@@ -295,88 +432,65 @@ msgid ""
 "                oficialmente até o momento  "
 msgstr ""
 
-#: AlertaDengue/dados/templates/base.html:55
+#: dados/templates/base.html:68
 msgid "Início"
 msgstr ""
 
-#: AlertaDengue/dados/templates/base.html:56
+#: dados/templates/base.html:70
 msgid "Saiba Mais"
 msgstr ""
 
-#: AlertaDengue/dados/templates/base.html:57
+#: dados/templates/base.html:72
 msgid "Fale Conosco"
 msgstr ""
 
-#: AlertaDengue/dados/templates/base.html:58
+#: dados/templates/base.html:74
 msgid "Participe"
 msgstr ""
 
-#: AlertaDengue/dados/templates/base.html:70
-msgid "Incidência (SINAN)"
+#: dados/templates/base.html:76
+msgid "Parceiros"
 msgstr ""
 
-#: AlertaDengue/dados/templates/base.html:71
-msgid "SINAN (2010)"
+#: dados/templates/base.html:82
+msgid "Encontre um município"
 msgstr ""
 
-#: AlertaDengue/dados/templates/base.html:72
-msgid "SINAN (2011)"
+#: dados/templates/base.html:89
+msgid "Envie dados atualizados"
 msgstr ""
 
-#: AlertaDengue/dados/templates/base.html:73
-msgid "SINAN (2012)"
-msgstr ""
-
-#: AlertaDengue/dados/templates/base.html:74
-msgid "SINAN (2013)"
-msgstr ""
-
-#: AlertaDengue/dados/templates/base.html:75
-msgid "Dados Entomológicos"
-msgstr ""
-
-#: AlertaDengue/dados/templates/base.html:76
-msgid "Ovitrampas"
-msgstr ""
-
-#: AlertaDengue/dados/templates/base.html:77
-msgid "LIRAa"
-msgstr ""
-
-#: AlertaDengue/dados/templates/base.html:79
-msgid "Dados Climáticos"
-msgstr ""
-
-#: AlertaDengue/dados/templates/base.html:83
+#: dados/templates/base.html:94
 msgid "Account "
 msgstr ""
 
-#: AlertaDengue/dados/templates/base.html:86
+#: dados/templates/base.html:99
 msgid "Logout"
 msgstr ""
 
-#: AlertaDengue/dados/templates/base.html:87
+#: dados/templates/base.html:102
 msgid "Change password"
 msgstr ""
 
-#: AlertaDengue/dados/templates/base.html:91
+#: dados/templates/base.html:108
 msgid "Login"
 msgstr ""
 
-#: AlertaDengue/dados/templates/base.html:157
+#: dados/templates/base.html:170
 msgid ""
-"Pin a fixed-height footer to the bottom of the viewport in desktop browsers "
-"with this\n"
-"                    custom HTML and CSS. A fixed navbar has been added "
-"within <code>#wrap</code> with <code>padding-top:\n"
-"                        60px;</code> on the <code>.container</code>."
+"Pin a fixed-height footer to the bottom\n"
+"            of the viewport in desktop browsers with this\n"
+"            custom HTML and CSS. A fixed navbar has been added within "
+"<code>#wrap</code>\n"
+"            with <code>padding-top:\n"
+"                60px;</code> on the <code>.container</code>."
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:9
+#: dados/templates/contact.html:9
 msgid "Equipe"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:13
+#: dados/templates/contact.html:13
 msgid ""
 "\n"
 "            O Sistema de Alerta Info Dengue é desenvolvido graças a parceria "
@@ -385,107 +499,107 @@ msgid ""
 "            "
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:17
+#: dados/templates/contact.html:17
 msgid "Coordenação Geral:"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:19
+#: dados/templates/contact.html:19
 msgid ""
 " Flávio Codeço Coelho: Professor Associado - Escola de Matemática Aplicada/"
 "FGV,"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:20
+#: dados/templates/contact.html:20
 msgid ""
 " Oswaldo Gonçalves Cruz: Pesquisador Titular - Programa de Computação "
 "Científica/Fiocruz,"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:21
+#: dados/templates/contact.html:21
 msgid ""
 " Cláudia Torres Codeço: Pesquisadora Titular - Programa de Computação "
 "Científica/Fiocruz"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:23
+#: dados/templates/contact.html:23
 msgid "Gestão do Projeto:"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:25
+#: dados/templates/contact.html:25
 msgid ""
 "Thais Riback: Pesquisadora Colaboradora - Programa de Computação Científica/"
 "Fiocruz"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:27
+#: dados/templates/contact.html:27
 msgid "Desenvolvimento:"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:29
+#: dados/templates/contact.html:29
 msgid " Flávio Amieiro: Sys Admin e Desenvolvedor - InfoDengue"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:30
+#: dados/templates/contact.html:30
 msgid " Israel Teixeira: Desenvolvedor - InfoDengue"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:31
+#: dados/templates/contact.html:31
 msgid ""
 " Marcelo Gomes: Pesquisador Visitante - Programa de Computação Científica/"
 "Fiocruz"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:33
+#: dados/templates/contact.html:33
 msgid "Colaboradores:"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:35
+#: dados/templates/contact.html:35
 msgid ""
 " Wagner Meira: Professor Titular – Departamento de Ciência da Computação/UFMG"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:36
+#: dados/templates/contact.html:36
 msgid " Walter dos Santos Filho: Observatório da Dengue/UFMG"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:37
+#: dados/templates/contact.html:37
 msgid ""
 " Magda Clara Vieira da Costa Ribeiro: Professora Adjunta – Instituto de "
 "Biociências/UFPR"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:38
+#: dados/templates/contact.html:38
 msgid " Jean Carlos dos Santos Barrado: Doutorando – ENSP/Fiocruz"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:39
+#: dados/templates/contact.html:39
 msgid ""
 " Cláudia Brandelero Rizzi: Professora - Curso de Ciência da Computação/"
 "UNIOESTE"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:40
+#: dados/templates/contact.html:40
 msgid ""
 " Carolin Degener: Pós-Doutoranda – Programa de Computação Científica/Fiocruz"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:42
+#: dados/templates/contact.html:42
 msgid "Apoio:"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:44
+#: dados/templates/contact.html:44
 msgid "Observatório da Dengue"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:45
+#: dados/templates/contact.html:45
 msgid "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:46
+#: dados/templates/contact.html:46
 msgid " Secretaria de estado de Saúde do Rio de Janeiro"
 msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:49
+#: dados/templates/contact.html:49
 msgid ""
 " Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta "
 "Info Dengue?\n"
@@ -493,21 +607,28 @@ msgid ""
 "\">conosco</a>."
 msgstr ""
 
-#: AlertaDengue/dados/templates/details.html:20
+#: dados/templates/dashboard_cities.html:56
+#, python-format
+msgid ""
+"\n"
+"  Situação da Dengue - %(num_mun)s Municípios monitorados \n"
+msgstr ""
+
+#: dados/templates/details.html:20
 msgid "Alerta Dengue Rio"
 msgstr ""
 
-#: AlertaDengue/dados/templates/historico.html:22
+#: dados/templates/historico.html:22
 msgid ""
 "O Alerta de Dengue e calculado usando dados que incluem os apresentados "
 "abaixo."
 msgstr ""
 
-#: AlertaDengue/dados/templates/joinin.html:4
+#: dados/templates/joinin.html:4
 msgid "Como participar do InfoDengue"
 msgstr ""
 
-#: AlertaDengue/dados/templates/joinin.html:10
+#: dados/templates/joinin.html:10
 msgid ""
 "\n"
 "            É muito fácil descobrir se o seu município pode participar do "
@@ -546,57 +667,252 @@ msgid ""
 "            "
 msgstr ""
 
-#: AlertaDengue/dados/templates/main.html:59
+#: dados/templates/main.html:65
 #, python-format
-msgid "Situação da Dengue - %(num_mun)s Municípios monitorados "
+msgid "Situação Epidemiológica - %(num_mun)s Municípios monitorados"
 msgstr ""
 
-#: AlertaDengue/dados/templates/mapadengue.html:20
+#: dados/templates/main.html:108 dados/templates/state_cities.html:177
+msgid "Última atualização"
+msgstr ""
+
+#: dados/templates/main.html:119
+msgid "Municípios participantes"
+msgstr ""
+
+#: dados/templates/main.html:126
+msgid "Total de casos notificado / estimados na semana"
+msgstr ""
+
+#: dados/templates/main.html:135
+msgid "Previsão de casos para as próximas semanas"
+msgstr ""
+
+#: dados/templates/main.html:142
+msgid "Variação em relação à semana anterior"
+msgstr ""
+
+#: dados/templates/main.html:164
+msgid ""
+"Variação da quadrissemana atual em relação à quadrissemana do último ano"
+msgstr ""
+
+#: dados/templates/main.html:195
+msgid "Clique aqui para ver mais detalhes"
+msgstr ""
+
+#: dados/templates/mapadengue.html:20
 msgid "Mapa de Casos"
 msgstr ""
 
-#: AlertaDengue/dados/templates/mapadengue.html:27
+#: dados/templates/mapadengue.html:27
 msgid "Casos de Dengue no município do Rio de Janeiro, em <b id="
 msgstr ""
 
-#: AlertaDengue/dados/templates/mapadengue.html:28
+#: dados/templates/mapadengue.html:28
 msgid "Year: "
 msgstr ""
 
-#: AlertaDengue/dados/templates/mapamosquito.html:20
+#: dados/templates/mapamosquito.html:20
 msgid "Positividade de Ovitrampas"
 msgstr ""
 
-#: AlertaDengue/dados/templates/mapamosquito.html:26
+#: dados/templates/mapamosquito.html:26
 msgid "Ovitrampas Positivas"
 msgstr ""
 
-#: AlertaDengue/dados/templates/mapamosquito.html:28
+#: dados/templates/mapamosquito.html:28
 msgid ""
 "Modelo GAM espacial da positividade de ovitrampas no município do Rio de "
 "Janeiro."
 msgstr ""
 
-#: AlertaDengue/dados/templates/my_bootstrap3_base.html:21
-msgid "Parceiros"
+#: dados/templates/my_bootstrap3_base.html:48
+msgid "linguagem"
 msgstr ""
 
-#: AlertaDengue/templates/registration/login.html:17
+#: dados/templates/series_plot.html:19
+#, python-format
+msgid "Séries de dados e Alertas anteriores para %(nome)s"
+msgstr ""
+
+#: dados/templates/series_plot.html:33
+msgid "Pessoas"
+msgstr ""
+
+#: dados/templates/series_plot.html:40 dados/templates/series_plot.html:166
+msgid "casos"
+msgstr ""
+
+#: dados/templates/series_plot.html:83
+#, python-format
+msgid "Casos Estimados de %(disease_label)s"
+msgstr ""
+
+#: dados/templates/series_plot.html:99
+msgid "Alerta Vermelho"
+msgstr ""
+
+#: dados/templates/series_plot.html:113
+msgid "Alerta laranja"
+msgstr ""
+
+#: dados/templates/series_plot.html:127
+msgid "Alerta Amarelo"
+msgstr ""
+
+#: dados/templates/series_plot.html:141
+msgid "Alerta verde"
+msgstr ""
+
+#: dados/templates/series_plot.html:154
+#, python-format
+msgid "Casos Notificados de %(disease_label)s"
+msgstr ""
+
+#: dados/templates/state_cities.html:198
+msgid "Selecione municipio(s)"
+msgstr ""
+
+#: dados/templates/state_cities.html:209
+msgid "Aplicar seleção"
+msgstr ""
+
+#: dados/templates/state_cities.html:211
+msgid ""
+"Após alterar a seleção das cidades do filtro, clique no botão <Aplicar "
+"Seleção>."
+msgstr ""
+
+#: dados/templates/state_cities.html:227
+msgid "Descrição de filtro"
+msgstr ""
+
+#: dados/templates/state_cities.html:285
+msgid "Por favor, aguarde."
+msgstr ""
+
+#: dados/templates/total_series.html:19
+#, python-format
+msgid "Casos Estimados de %(disease_label)s nos municípios monitorados"
+msgstr ""
+
+#: dados/templates/total_series.html:68
+msgid "casos estimados"
+msgstr ""
+
+#: dados/views.py:110
+msgid "Em breve"
+msgstr ""
+
+#: dados/views.py:644
+msgid "desconhecida"
+msgstr ""
+
+#: dbf/forms.py:18
+msgid "Data da exportação"
+msgstr ""
+
+#: dbf/forms.py:19
+msgid "Ano de notificação"
+msgstr ""
+
+#: dbf/forms.py:22
+msgid "U.F."
+msgstr ""
+
+#: dbf/forms.py:38
+msgid "Houve um erro durante o envio do arquivo. Por favor, tente novamente."
+msgstr ""
+
+#: dbf/models.py:57
+msgid "O ano de notificação não pode ser maior do que o ano atual"
+msgstr ""
+
+#: dbf/models.py:61
+msgid "Arquivo DBF inválido"
+msgstr ""
+
+#: dbf/sinan.py:91
+msgid ""
+"Existem nesse arquivo notificações incompatíveis com o ano de notificação "
+"informado. Por favor, tenha certeza de que o ano de notificação é o mesmo "
+"para todos os registros no arquivo e de que este foi o ano informado no "
+"momento do envio."
+msgstr ""
+
+#: dbf/templates/dbf_upload.html:66
+msgid "Envie aqui os dados atualizados do SINAN"
+msgstr ""
+
+#: dbf/templates/dbf_upload.html:172
+msgid "Enviar"
+msgstr ""
+
+#: dbf/templates/dbf_upload.html:179 dbf/templates/upload_successful.html:10
+msgid "Ultimos arquivos enviados:"
+msgstr ""
+
+#: dbf/templates/upload_successful.html:5
+msgid "Dados do SINAN recebidos"
+msgstr ""
+
+#: dbf/validation.py:53
+msgid "Este arquivo não parece um DBF válido "
+msgstr ""
+
+#: dbf/validation.py:57
+msgid ""
+"Espera-se que o campo {} seja do tipo 'D' (data), mas o tipo do campo neste "
+"arquivo é '{}'."
+msgstr ""
+
+#: dbf/validation.py:62
+msgid ""
+"Este arquivo não contém {}, que é esperado em um arquivo válido do SINAN."
+msgstr ""
+
+#: dbf/views.py:49
+msgid ""
+"O arquivo {} exportado em {:%d/%m/%Y} com notificações do ano {} foi enviado "
+"com sucesso. Você será informado por email ({}) assim que o processo de "
+"importação for finalizado, "
+msgstr ""
+
+#: templates/registration/login.html:17
 msgid "Please correct the error below."
 msgstr ""
 
-#: AlertaDengue/templates/registration/login.html:17
+#: templates/registration/login.html:17
 msgid "Please correct the errors below."
 msgstr ""
 
-#: AlertaDengue/templates/registration/login.html:37
+#: templates/registration/login.html:37
 msgid "Password:"
 msgstr ""
 
-#: AlertaDengue/templates/registration/login.html:43
+#: templates/registration/login.html:41
 msgid "Forgotten your password or username?"
 msgstr ""
 
-#: AlertaDengue/templates/registration/login.html:47
+#: templates/registration/login.html:44
 msgid "Log in"
+msgstr ""
+
+#: templates/registration/password_reset_email.html:2
+msgid ""
+"Voce está recebendo esse e-mail por que pediu que sua senha no InfoDengue "
+"fosse redefinida."
+msgstr ""
+
+#: templates/registration/password_reset_email.html:4
+msgid "Por favor, visite a página a seguir e escolha uma nova senha:"
+msgstr ""
+
+#: templates/registration/password_reset_email.html:8
+msgid "Seu nome de usuário, caso você tenha esquecido, é:"
+msgstr ""
+
+#: templates/registration/password_reset_email.html:10
+msgid "Obrigado por usar o InfoDengue"
 msgstr ""

@@ -4,6 +4,8 @@ from dados import dbdata
 from dados import models as M
 from dados.episem import episem
 from dbf.models import DBF
+
+from django.utils.translation import gettext
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView, View
 from django.contrib import messages
@@ -77,11 +79,11 @@ class AlertaMainView(TemplateView):
 
         notif_resume = dbdata.NotificationResume
 
-        for d in diseases:
-            # mundict = dict(dbdata.get_all_active_cities())
-            # municipios, geocodigos = list(mundict.values()), list(mundict.keys())
-            # results[d] = dbdata.load_serie_cities(geocodigos, d)
+        mundict = dict(dbdata.get_all_active_cities())
+        # municipios, geocodigos = list(mundict.values()), list(mundict.keys())
+        # results[d] = dbdata.load_serie_cities(geocodigos, d)
 
+        for d in diseases:
             case_series[d] = dbdata.get_series_by_UF(d)
 
             for s in self._state_names:
@@ -105,7 +107,7 @@ class AlertaMainView(TemplateView):
                     'casos': cases[-1] if cases.size else 0,
                     'casos_est': cases_est[-1] if cases_est.size else 0
                 }
-                estimated_cases_next_week[d][s] = 'Em breve'
+                estimated_cases_next_week[d][s] = gettext('Em breve')
                 v1 = cases_est[-2] if cases_est.size else 0
                 v2 = cases_est[-1] if cases_est.size else 0
 
@@ -149,7 +151,7 @@ class AlertaMainView(TemplateView):
 
         context.update({
             # 'mundict': json.dumps(mundict),
-            # 'num_mun': len(mundict),
+            'num_mun': len(mundict),
             # 'municipios': municipios,
             # 'geocodigos': geocodigos,
             # 'alerta': json.dumps(alerta),
@@ -639,7 +641,7 @@ class AlertaStateView(TemplateView):
         ).order_by('export_date').last()
 
         if dbf is None:
-            last_update = 'desconhecida'
+            last_update = gettext('desconhecida')
         else:
             last_update = dbf.export_date
 

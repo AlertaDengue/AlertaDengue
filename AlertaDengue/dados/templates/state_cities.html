@@ -174,7 +174,7 @@
 <div class="container-fluid">
     <!-- chart-plot:begin -->
     <div class="row">
-        <small>Última atualização: {{last_update}}</small>
+        <small>{% blocktrans %}Última atualização{% endblocktrans %}: {{last_update}}</small>
         <br/> &nbsp;
     </div>
     <div class="row">
@@ -195,7 +195,7 @@
                             <select id="cities"
                                     class="selectpicker"
                                     data-live-search="true"
-                                    data-title="Selecione municipio(s)"
+                                    data-title="{% blocktrans %}Selecione municipio(s){% endblocktrans %}"
                                     data-actions-box="true"
                                     data-selected-text-format="static"
                                     multiple
@@ -206,9 +206,9 @@
                                 {% endfor %}
                             </select>
                             <input type="button"
-                                   value="Aplicar seleção"
+                                   value="{% blocktrans %}Aplicar seleção{% endblocktrans %}"
                                    onclick="apply_cities_selection();"
-                                   title="Após alterar a seleção das cidades do filtro, clique no botão <Aplicar Seleção>."
+                                   title="{% blocktrans %}Após alterar a seleção das cidades do filtro, clique no botão <Aplicar Seleção>.{% endblocktrans %}"
                             />
 
                     </div>
@@ -224,7 +224,7 @@
                 <div class="col-sm-12">
                     <div class="chart-wrapper">
                       <div class="chart-title content-inline">
-                          <strong>Descrição de filtro:</strong>
+                          <strong>{% blocktrans %}Descrição de filtro{% endblocktrans %}:</strong>
                           <span id="filter-display"></span>
                       </div>
                     </div>
@@ -282,7 +282,7 @@
             <div class="modal-header">
                 <h4 class="modal-title">
                     <span class="glyphicon glyphicon-time">
-                    </span> Por favor, aguarde.
+                    </span> {% blocktrans %}Por favor, aguarde.{% endblocktrans %}
                  </h4>
             </div>
             <div class="modal-body">

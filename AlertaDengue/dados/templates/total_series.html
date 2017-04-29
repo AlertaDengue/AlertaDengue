@@ -1,3 +1,4 @@
+{% load i18n %}
 <div id="historico-chart_{{disease}}"
      style="height: 400px; margin: 10px">
 </div>
@@ -15,7 +16,7 @@ $(function () {
             zoomType: 'xy'
         },
         title: {
-            text: 'Casos Estimados de {{disease_label}} nos municípios monitorados'
+            text: '{% blocktrans %}Casos Estimados de {{disease_label}} nos municípios monitorados{% endblocktrans %}'
         },
         xAxis: [{
             type: 'date',
@@ -24,7 +25,7 @@ $(function () {
             gridLineWidth: 1,
             //type: "linear",
             title: {
-                text: 'Casos',
+                text: '{% blocktrans %}Casos{% endblocktrans %}',
                 style: {
                     color: '#4572A7'
                 }
@@ -64,7 +65,7 @@ $(function () {
                 data: dados_{{disease}}["{{ uf }}"],
                 marker: {enabled: true},
                 dashStyle: 'Solid',
-                tooltip: { valueSuffix: ' casos estimados' }
+                tooltip: { valueSuffix: ' {% blocktrans %}casos estimados{% endblocktrans %}' }
             },
         {% endfor %}
         ]

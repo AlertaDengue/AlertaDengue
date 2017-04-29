@@ -61,9 +61,9 @@
 
 {% endblock %}
 
-{% block title %}{% blocktrans %}
-  Situação Epidemiológica - {{ num_mun }} Municípios monitorados
-{% endblocktrans %}{% endblock %}
+{% block title %}
+  {% blocktrans %}Situação Epidemiológica - {{ num_mun }} Municípios monitorados{% endblocktrans %}
+{% endblock %}
 
 {% block content %}
     <div class="container-fluid">
@@ -105,7 +105,8 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <small style="color:#888888;">
-                                    Última atualização: {{last_se|lookup:state_name}}
+                                    {% blocktrans %}Última atualização{% endblocktrans %}:
+                                    {{last_se|lookup:state_name}}
                                 </small>
                                 <table class="table-card">
                                     <tr>
@@ -115,14 +116,14 @@
                                         {% endfor %}
                                     </tr>
                                     <tr>
-                                        <th>Municípios participantes:</th>
+                                        <th>{% blocktrans %}Municípios participantes{% endblocktrans %}:</th>
                                         {% for disease in diseases %}
                                         <td class="card-indicator-value">
                                             <span>{{count_cities|lookup:disease|lookup:state_name}}</span></td>
                                         {% endfor %}
                                     </tr>
                                     <tr>
-                                        <th>Total de casos notificado / estimados na semana</th>
+                                        <th>{% blocktrans %}Total de casos notificado / estimados na semana{% endblocktrans %}:</th>
                                         {% for disease in diseases %}
                                         <td class="card-indicator-value">
                                             <span>{{current_week|lookup:disease|lookup:state_name|lookup:'casos'}} /
@@ -131,14 +132,14 @@
                                         {% endfor %}
                                     </tr>
                                     <tr>
-                                        <th>Previsão de casos para as próximas semanas:</th>
+                                        <th>{% blocktrans %}Previsão de casos para as próximas semanas{% endblocktrans %}:</th>
                                         {% for disease in diseases %}
                                         <td class="card-indicator-value">
                                             <span>{{estimated_cases_next_week|lookup:disease|lookup:state_name}}</span></td>
                                         {% endfor %}
                                     </tr>
                                     <tr>
-                                        <th>Variação em relação à semana anterior:</th>
+                                        <th>{% blocktrans %}Variação em relação à semana anterior{% endblocktrans %}:</th>
                                         {% for disease in diseases %}
                                         <td class="">
                                             {% if variation_to_current_week|lookup:disease|lookup:state_name > 0%}
@@ -160,8 +161,7 @@
                                         {% endfor %}
                                     </tr>
                                     <tr>
-                                        <th>Variação da quadrissemana atual em relação à
-                                            quadrissemana do último ano:</th>
+                                        <th>{% blocktrans %}Variação da quadrissemana atual em relação à quadrissemana do último ano{% endblocktrans %}:</th>
                                         {% for disease in diseases %}
                                         <td class="">
                                             {% if variation_4_weeks|lookup:disease|lookup:state_name > 0%}
@@ -192,7 +192,7 @@
                         <div class="row vertical-align">
                             <div class="col-sm-12" style="font-size:12px;">
                                 <a href="/alerta/{{state_initials|lookup:state_name}}">
-                                    Clique aqui para ver mais detalhes.
+                                    {% blocktrans %}Clique aqui para ver mais detalhes{% endblocktrans %}.
                                 </a>
                             </div>
                         </div>
