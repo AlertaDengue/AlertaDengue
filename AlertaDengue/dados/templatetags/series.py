@@ -33,11 +33,12 @@ def alerta_series(context):
             'amarelo': {},
             'laranja': {},
             'vermelho': {},
+            'disease_label': context['disease_label']
         }
 
     dados['dia'] = [
-        int(mktime((d + timedelta(7)).timetuple()))
-        for d in dados['dia']]
+        int(mktime(d.timetuple())) for d in dados['dia']
+    ]
 
     # green alert
     ga = [
@@ -80,6 +81,7 @@ def alerta_series(context):
         'amarelo': json.dumps(ya),
         'laranja': json.dumps(oa),
         'vermelho': json.dumps(ra),
+        'disease_label': context['disease_label']
     }
 
 

@@ -127,12 +127,7 @@ def load_series(cidade, disease='dengue'):
     :param disease: dengue|chikungunya|zika
     :return: dictionary
     """
-    code_rj = 3304557  # Rio de Janeiro
-
-    if disease == 'chikungunya' and cidade == 3304557:
-        cache_key = 'load_series-alert-{}-{}'.format(cidade, disease)
-    else:
-        cache_key = 'load_series-{}-{}'.format(cidade, disease)
+    cache_key = 'load_series-{}-{}'.format(cidade, disease)
     result = cache.get(cache_key)
 
     if result is None:
@@ -140,7 +135,13 @@ def load_series(cidade, disease='dengue'):
             ap = str(cidade)
             cidade = add_dv(int(str(cidade)[:-1]))
 
-            if disease == 'chikungunya' and cidade == 3304557:
+            if cidade == 3304557:  # RJ city
+                table_name = (
+                    'alerta_mrj' if disease == 'dengue' else
+                    'alerta_mrj_chik' if disease == 'chikungunya' else
+                    None
+                )
+
                 dados_alerta = pd.read_sql_query(('''
                     SELECT 
                       data AS "data_iniSE",
@@ -151,10 +152,10 @@ def load_series(cidade, disease='dengue'):
                       MAX(nivel) AS nivel,
                       se AS "SE",
                       SUM(prt1) AS p_rt1
-                    FROM "Municipio".alerta_mrj_chik
+                    FROM "Municipio".{}
                     GROUP BY "data_iniSE", "SE"
                     ORDER BY "data_iniSE" ASC
-                '''), conn, parse_dates=True)
+                '''.format(table_name)), conn, parse_dates=True)
             else:
                 table_name = (
                     'Historico_alerta' if disease == 'dengue' else
@@ -1036,3 +1037,15 @@ class NotificationQueries:
             ])
 
         return df_alert_period
+
+
+def get_n_chik_alerts():
+    """
+    
+    :return: int 
+    """
+    sql = '''
+    SELECT COUNT(*) AS n_alerts 
+    FROM "Municipio"."Historico_alerta_chik"
+    '''
+    return pd.read_sql_query(sql, db_engine).loc[0, 'n_alerts']

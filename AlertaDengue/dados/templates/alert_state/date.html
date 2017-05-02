@@ -1,3 +1,4 @@
+{% load i18n %}
 <div id="date-chart" class="chart-default"></div>
 <script type="application/javascript">
 var date_chart;
@@ -84,12 +85,12 @@ $(document).ready(function () {
                 text: ''
             },
             subtitle: {
-                text: 'Casos por semana'
+                text: '{% blocktrans %}Casos por semana{% endblocktrans %}'
             },
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Casos'
+                    text: '{% blocktrans %}Casos{% endblocktrans %}'
                 }
             },
             legend: {
@@ -101,8 +102,7 @@ $(document).ready(function () {
             tooltip: {
                 shared: true,
                 useHTML: true,
-                footerFormat: '<small>**Para alterar o zoom do gráfico,<br/>' +
-                    'utilize os controles da parte inferior.</small>',
+                footerFormat: '<small>**{% blocktrans %}Para alterar o zoom do gráfico,<br/>utilize os controles da parte inferior.{% endblocktrans %}</small>',
             },
             /*series: [{
                 'name': 'casos',

@@ -1,3 +1,4 @@
+{% load i18n %}
 <div id="age-chart" class="chart-default"></div>
 <script type="application/javascript">
 var age_chart;
@@ -106,12 +107,12 @@ $(document).ready(function () {
                 text: ''
             },
             subtitle: {
-                text: 'Distribuição por Idade'
+                text: '{% blocktrans %}Distribuição por Idade{% endblocktrans %}'
             },
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Casos'
+                    text: '{% blocktrans %}Casos{% endblocktrans %}'
                 }
             },
             xAxis: {
@@ -127,8 +128,7 @@ $(document).ready(function () {
                 shared: true,
                 useHTML: true,
                 //headerFormat: '<b>{point.key}</b><br/>',
-                footerFormat: '<small>**Clique na categoria (coluna) para <br/>' +
-                    'alterar seleção de filtro.</small>',
+                footerFormat: '<small>**{% blocktrans %}Clique na categoria (coluna) para <br/>alterar seleção de filtro.{% endblocktrans %}</small>',
             },
             series: [
                 {

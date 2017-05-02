@@ -1,3 +1,4 @@
+{% load i18n %}
 <div id="gender-chart"></div>
 <script type="application/javascript">
 // Create the chart
@@ -97,12 +98,12 @@ $(document).ready(function () {
                 text: ''
             },
             subtitle: {
-                text: 'Distribuição por gênero'
+                text: '{% blocktrans %}Distribuição por gênero{% endblocktrans %}'
             },
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Casos'
+                    text: '{% blocktrans %}Casos{% endblocktrans %}'
                 }
             },
             xAxis: {
@@ -118,8 +119,7 @@ $(document).ready(function () {
                 shared: true,
                 useHTML: true,
                 //headerFormat: '<b>{point.key}</b><br/>',
-                footerFormat: '<small>**Clique na categoria (coluna) para <br/>' +
-                    'alterar seleção de filtro.</small>',
+                footerFormat: '<small>**{% blocktrans %}Clique na categoria (coluna) para <br/>alterar seleção de filtro.{% endblocktrans %}</small>',
             },
             /*series: [{
                 "name": "Casos",

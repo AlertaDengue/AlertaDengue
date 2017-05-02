@@ -1,3 +1,4 @@
+{% load i18n %}
 <div id="historico-chart" style="min-width: 500px; height: 400px; margin: 10px" data-highcharts-chart="0"></div>
 <script type="application/ecmascript">
 $(function () {
@@ -15,7 +16,7 @@ $(function () {
             zoomType: 'xy'
         },
         title: {
-            text: 'Séries de dados e Alertas anteriores para {{ nome }}'
+            text: '{% blocktrans %}Séries de dados e Alertas anteriores para {{ nome }}{% endblocktrans %}'
         },
         xAxis: [
             {
@@ -29,14 +30,14 @@ $(function () {
                 gridLineWidth: 1,
                 //type: "linear",
                 title: {
-                    text: 'Pessoas',
+                    text: '{% blocktrans %}Pessoas{% endblocktrans %}',
                     style: {
                         color: '#4572A7'
                     }
                 },
                 labels: {
                     formatter: function () {
-                        return this.value + ' casos';
+                        return this.value + ' {% blocktrans %}casos{% endblocktrans %}';
                     },
                     style: {
                         color: '#4572A7'
@@ -79,7 +80,7 @@ $(function () {
         },
         series: [
                 {
-                name: 'Casos Estimados de Dengue',
+                name: '{% blocktrans %}Casos Estimados de {{disease_label}}{% endblocktrans %}',
                 color: '#AA4643',
                 type: 'spline',
                 animation: true,
@@ -89,13 +90,13 @@ $(function () {
                 data: dados.casos_est,
                 dashStyle: 'shortdot',
                 tooltip: {
-                    valueSuffix: ' casos'
+                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
                 }
 
             },
 
             {
-                name: 'Alerta Vermelho',
+                name: '{% blocktrans %}Alerta Vermelho{% endblocktrans %}',
                 color: '#FB4949',
                 type: 'areaspline',
                 animation: true,
@@ -104,12 +105,13 @@ $(function () {
                 pointStart: {{ start }}*1000 + tzo,
                 data: {{ vermelho }},
                 tooltip: {
-                    enabled: false
+                    enabled: false,
+                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
                 }
 
             },
             {
-                name: 'Alerta laranja',
+                name: '{% blocktrans %}Alerta laranja{% endblocktrans %}',
                 color: '#FFA858',
                 type: 'areaspline',
                 animation: true,
@@ -118,12 +120,13 @@ $(function () {
                 pointStart: {{ start }}*1000 + tzo,
                 data: {{ laranja }},
                 tooltip: {
-                    enabled: false
+                    enabled: false,
+                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
                 }
 
             },
             {
-                name: 'Alerta Amarelo',
+                name: '{% blocktrans %}Alerta Amarelo{% endblocktrans %}',
                 color: '#FBFC49',
                 type: 'areaspline',
                 animation: true,
@@ -132,12 +135,13 @@ $(function () {
                 pointStart: {{ start }}*1000 + tzo,
                 data: {{ amarelo }},
                 tooltip: {
-                    enabled: false
+                    enabled: false,
+                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
                 }
 
             },
             {
-                name: 'Alerta verde',
+                name: '{% blocktrans %}Alerta verde{% endblocktrans %}',
                 color: '#48FD48',
                 type: 'areaspline',
                 animation: true,
@@ -146,11 +150,12 @@ $(function () {
                 pointStart: {{ start }}*1000 + tzo,
                 data: {{ verde }},
                 tooltip: {
-                    enabled: false
+                    enabled: false,
+                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
                 }
             },
             {
-                name: 'Casos Notificados de Dengue',
+                name: '{% blocktrans %}Casos Notificados de {{disease_label}}{% endblocktrans %}',
                 type: 'spline',
                 animation: true,
                 color: '#4572A7',
@@ -162,7 +167,7 @@ $(function () {
                     enabled: false
                 },
                 tooltip: {
-                    valueSuffix: ' casos'
+                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
                 }
 
             }

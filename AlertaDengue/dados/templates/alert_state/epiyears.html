@@ -1,3 +1,4 @@
+{% load i18n %}
 <div id="epiyears-chart" class="chart-default"></div>
 <script type="application/javascript">
 var epiyears_chart;
@@ -23,19 +24,19 @@ $(document).ready(function () {
             xAxis: {
                 //type: 'date',
                 title: {
-                    text: 'Semana'
+                    text: '{% blocktrans %}Semana{% endblocktrans %}'
                 }
             },
             title: {
                 text: ''
             },
             subtitle: {
-                text: 'Casos por semanas epidemiológicas'
+                text: '{% blocktrans %}Casos por semanas epidemiológicas{% endblocktrans %}'
             },
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'Casos'
+                    text: '{% blocktrans %}Casos{% endblocktrans %}'
                 }
             },
             legend: {
