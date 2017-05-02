@@ -90,7 +90,7 @@ $(function () {
                 data: dados.casos_est,
                 dashStyle: 'shortdot',
                 tooltip: {
-                    valueSuffix: ' casos'
+                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
                 }
 
             },
@@ -105,7 +105,8 @@ $(function () {
                 pointStart: {{ start }}*1000 + tzo,
                 data: {{ vermelho }},
                 tooltip: {
-                    enabled: false
+                    enabled: false,
+                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
                 }
 
             },
@@ -119,7 +120,8 @@ $(function () {
                 pointStart: {{ start }}*1000 + tzo,
                 data: {{ laranja }},
                 tooltip: {
-                    enabled: false
+                    enabled: false,
+                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
                 }
 
             },
@@ -133,7 +135,8 @@ $(function () {
                 pointStart: {{ start }}*1000 + tzo,
                 data: {{ amarelo }},
                 tooltip: {
-                    enabled: false
+                    enabled: false,
+                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
                 }
 
             },
@@ -147,7 +150,8 @@ $(function () {
                 pointStart: {{ start }}*1000 + tzo,
                 data: {{ verde }},
                 tooltip: {
-                    enabled: false
+                    enabled: false,
+                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
                 }
             },
             {

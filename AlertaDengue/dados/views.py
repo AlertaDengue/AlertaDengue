@@ -264,7 +264,7 @@ class AlertaPageView(TemplateView):
             'data1': segunda.strftime("%d de %B de %Y"),
             'data2': (
                 segunda + datetime.timedelta(6)
-            ).strftime("%d de %B de %Y"),
+            ),  # .strftime("%d de %B de %Y")
             'last_year': last_year,
             'look_back': len(total_series),
             'total_series': ', '.join(map(str, total_series)),
@@ -339,7 +339,8 @@ class AlertaPageViewMunicipio(TemplateView):
             'series_casos': {municipio_gc: case_series[-12:]},
             'SE': SE,
             'data1': dia.strftime("%d de %B de %Y"),
-            'data2': (dia + datetime.timedelta(6)).strftime("%d de %B de %Y"),
+            # .strftime("%d de %B de %Y")
+            'data2': (dia + datetime.timedelta(6)),
             'last_year': last_year,
             'look_back': len(total_series),
             'total_series': ', '.join(map(str, total_series)),

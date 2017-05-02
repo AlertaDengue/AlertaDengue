@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-29 02:21-0300\n"
+"POT-Creation-Date: 2017-05-02 16:29-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -196,7 +196,7 @@ msgstr ""
 #: dados/templates/alert_state/date.html:93
 #: dados/templates/alert_state/disease.html:112
 #: dados/templates/alert_state/epiyears.html:39
-#: dados/templates/alert_state/gender.html:106
+#: dados/templates/alert_state/gender.html:106 dados/templates/alerta.html:337
 #: dados/templates/total_series.html:28
 msgid "Casos"
 msgstr ""
@@ -237,39 +237,48 @@ msgstr ""
 msgid "Distribuição por gênero"
 msgstr ""
 
-#: dados/templates/alert_state/map.html:25
+#: dados/templates/alert_state/map.html:25 dados/templates/alerta.html:197
+#: dados/templates/alerta_municipio.html:216
 msgid "Baixo Risco"
 msgstr ""
 
-#: dados/templates/alert_state/map.html:26
+#: dados/templates/alert_state/map.html:26 dados/templates/alerta.html:198
+#: dados/templates/alerta_municipio.html:217
 msgid "Atenção"
 msgstr ""
 
-#: dados/templates/alert_state/map.html:27
+#: dados/templates/alert_state/map.html:27 dados/templates/alerta.html:199
+#: dados/templates/alerta_municipio.html:218
 msgid "Transmissão"
 msgstr ""
 
-#: dados/templates/alert_state/map.html:28
+#: dados/templates/alert_state/map.html:28 dados/templates/alerta.html:200
+#: dados/templates/alerta_municipio.html:219
 msgid "Epidemia"
 msgstr ""
 
 #: dados/templates/alert_state/map.html:174
+#: dados/templates/alerta_municipio.html:293
 msgid "Número de casos estimados na semana"
 msgstr ""
 
 #: dados/templates/alert_state/map.html:177
+#: dados/templates/alerta_municipio.html:294
 msgid "Passe o mouse sobre o mapa"
 msgstr ""
 
-#: dados/templates/alert_state/map.html:188
+#: dados/templates/alert_state/map.html:188 dados/templates/alerta.html:298
+#: dados/templates/alerta.html:360 dados/templates/alerta_municipio.html:305
+#: dados/templates/alerta_municipio.html:341
 msgid "Unidades de Saúde"
 msgstr ""
 
-#: dados/templates/alert_state/map.html:206
+#: dados/templates/alert_state/map.html:206 dados/templates/alerta.html:157
+#: dados/templates/alerta_municipio.html:161
 msgid "Casos estimados"
 msgstr ""
 
-#: dados/templates/alert_state/map.html:207
+#: dados/templates/alert_state/map.html:207 dados/templates/alerta.html:337
 msgid "Últimas semanas"
 msgstr ""
 
@@ -282,7 +291,7 @@ msgstr ""
 msgid "Situação da %(disease_label)s no Rio de Janeiro em %(data2)s"
 msgstr ""
 
-#: dados/templates/alerta.html:74
+#: dados/templates/alerta.html:74 dados/templates/alerta_municipio.html:80
 msgid "Selecione a doença a ser visualizada:"
 msgstr ""
 
@@ -296,119 +305,143 @@ msgstr ""
 msgid "<b>Incidência estimada:</b> %(incid)s  por 100 mil habitantes. "
 msgstr ""
 
-#: dados/templates/alerta.html:105
+#: dados/templates/alerta.html:105 dados/templates/alerta_municipio.html:110
 msgid "Níveis de Atenção"
 msgstr ""
 
-#: dados/templates/alerta.html:111 dados/templates/alerta_municipio.html:117
+#: dados/templates/alerta.html:111 dados/templates/alerta_municipio.html:116
 msgid "Nível Verde"
 msgstr ""
 
-#: dados/templates/alerta.html:115
+#: dados/templates/alerta.html:115 dados/templates/alerta_municipio.html:120
 msgid ""
-"\n"
-"                            \"Sem Risco. Quando o mapa está verde, não "
-"existe\n"
-"                            transmissão e nem condições ideais para a\n"
-"                            reprodução do Mosquito.\"\n"
-"                            "
+"Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições "
+"ideais para a reprodução do Mosquito."
 msgstr ""
 
-#: dados/templates/alerta.html:126 dados/templates/alerta_municipio.html:128
+#: dados/templates/alerta.html:122 dados/templates/alerta_municipio.html:127
 msgid "Nível Amarelo"
 msgstr ""
 
-#: dados/templates/alerta.html:130
+#: dados/templates/alerta.html:126 dados/templates/alerta_municipio.html:131
+#, python-format
 msgid ""
-"\n"
-"                            \"Estação da Dengue. No nível amarelo, temos\n"
-"                            condições climáticas propícias à reprodução do\n"
-"                            mosquito. Mas ainda sem transmissão\n"
-"                            significativa da Doença.\"\n"
-"                            "
+"Estação da %(disease_label)s. No nível amarelo, temos condições climáticas "
+"propícias à reprodução do mosquito. Mas ainda sem transmissão significativa "
+"da Doença."
 msgstr ""
 
-#: dados/templates/alerta.html:142 dados/templates/alerta_municipio.html:140
+#: dados/templates/alerta.html:133 dados/templates/alerta_municipio.html:138
 msgid "Nível Laranja"
 msgstr ""
 
-#: dados/templates/alerta.html:146
+#: dados/templates/alerta.html:137 dados/templates/alerta_municipio.html:142
+#, python-format
 msgid ""
-"\n"
-"                            \"Transmissão da Dengue. No nível laranja, já\n"
-"                            observamos uma incidência pronunciada da "
-"Dengue,\n"
-"                            mas ainda não podemos afirmar\n"
-"                            com confiança que teremos epidemia.\"\n"
-"                            "
+"Transmissão de %(disease_label)s. No nível laranja, já observamos uma "
+"incidência pronunciada da %(disease_label)s, mas ainda não podemos afirmar "
+"com confiança que teremos epidemia."
 msgstr ""
 
-#: dados/templates/alerta.html:158 dados/templates/alerta_municipio.html:153
+#: dados/templates/alerta.html:144 dados/templates/alerta_municipio.html:149
 msgid "Nível Vermelho"
 msgstr ""
 
-#: dados/templates/alerta.html:162
-msgid ""
-"\"Epidemia. Neste nível estamos em\n"
-"                            plena epidemia. Todo o cuidado é pouco, e\n"
-"                            precisamos ficar atentos aos sintomas da Dengue "
-"e\n"
-"                            procurar o médico imediatamente em caso "
-"suspeita\n"
-"                            de Dengue.\"\n"
-"                            "
-msgstr ""
-
-#: dados/templates/alerta.html:174 dados/templates/alerta_municipio.html:166
-msgid " Casos estimados "
-msgstr ""
-
-#: dados/templates/alerta.html:176
+#: dados/templates/alerta.html:148 dados/templates/alerta_municipio.html:153
 #, python-format
 msgid ""
-" São estimados entre <b>%(min_est)s</b> e <b>%(max_est)s  novos casos</b> na "
-"Semana\n"
-"                Epidemiológica %(SE)s: %(data1)s  a %(data2)s. Com "
-"%(total_observed)s casos notificados oficialmente até o momento "
+"Epidemia. Neste nível estamos em plena epidemia. Todo o cuidado é pouco, e "
+"precisamos ficar atentos aos sintomas da %(disease_label)s e procurar o "
+"médico imediatamente em caso suspeita de %(disease_label)s."
 msgstr ""
 
-#: dados/templates/alerta.html:178 dados/templates/alerta_municipio.html:171
+#: dados/templates/alerta.html:159
+#, python-format
+msgid ""
+" São estimados entre <b>%(min_est)s</b> e <b>%(max_est)s novos casos</b> na "
+"Semana Epidemiológica %(SE)s: %(data1)s  a %(data2)s. Com %(total_observed)s "
+"casos notificados oficialmente até o momento"
+msgstr ""
+
+#: dados/templates/alerta.html:160 dados/templates/alerta_municipio.html:164
 #, python-format
 msgid " Últimas %(look_back)s semanas: "
 msgstr ""
 
-#: dados/templates/alerta.html:188
-msgid " Suspeita de um criadouro? "
+#: dados/templates/alerta.html:169 dados/templates/alerta_municipio.html:174
+msgid "Suspeita de um criadouro?"
 msgstr ""
 
-#: dados/templates/alerta.html:191 dados/templates/alerta_municipio.html:185
+#: dados/templates/alerta.html:170 dados/templates/alerta_municipio.html:175
 msgid ""
 "Em caso de suspeita de criadouro de mosquitos, ligue para a <a href=\"http://"
-"www.1746.rio.gov.br/\"\n"
-"                                                                              style="
-"\"color: #FFFFFF\">Central de\n"
-"               atendimento ao cidadão 1746</a>."
+"www.1746.rio.gov.br/\" style=\"color: #FFFFFF\">Central de atendimento ao "
+"cidadão 1746</a>."
+msgstr ""
+
+#: dados/templates/alerta.html:185 dados/templates/alerta.html:245
+#: dados/templates/alerta_municipio.html:264
+#: dados/templates/series_plot.html:40 dados/templates/series_plot.html:93
+#: dados/templates/series_plot.html:109 dados/templates/series_plot.html:124
+#: dados/templates/series_plot.html:139 dados/templates/series_plot.html:154
+#: dados/templates/series_plot.html:170
+msgid "casos"
+msgstr ""
+
+#: dados/templates/alerta.html:258 dados/templates/alerta_municipio.html:278
+msgid ""
+"Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www."
+"riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros "
+"para o mosquito!</a>"
+msgstr ""
+
+#: dados/templates/alerta.html:259 dados/templates/alerta_municipio.html:279
+msgid ""
+"Uma vez por semana, aplique os <a href=\"http://www.riocontradengue.com.br/"
+"Site/Conteudo/Checklist.aspx\">“10 minutos Contra a dengue”!</a>"
+msgstr ""
+
+#: dados/templates/alerta.html:260 dados/templates/alerta.html:261
+#: dados/templates/alerta_municipio.html:280
+#: dados/templates/alerta_municipio.html:281
+msgid ""
+"Fique <a href=\"http://www.riocontradengue.rj.gov.br/Site/Conteudo/"
+"FiqueAtento.aspx\">atento aos sintomas da Dengue!</a> Procure um médico caso "
+"suspeite de dengue."
+msgstr ""
+
+#: dados/templates/alerta.html:284
+msgid "Número de casos na semana"
+msgstr ""
+
+#: dados/templates/alerta.html:287
+msgid "Passe o mouse sobre uma AP"
+msgstr ""
+
+#: dados/templates/alerta.html:339
+msgid "O que fazer"
+msgstr ""
+
+#: dados/templates/alerta.html:359 dados/templates/alerta_municipio.html:340
+msgid "Áreas de Planejamento"
 msgstr ""
 
 #: dados/templates/alerta_municipio.html:75
 #, python-format
-msgid ""
-"\n"
-"        Situação da %(disease_label)s - %(nome)s em %(data2)s\n"
-"    "
+msgid "Situação da %(disease_label)s - %(nome)s em %(data2)s"
 msgstr ""
 
-#: dados/templates/alerta_municipio.html:100
+#: dados/templates/alerta_municipio.html:98
 #, python-format
 msgid " <b>População:</b> %(populacao)s habitantes. "
 msgstr ""
 
-#: dados/templates/alerta_municipio.html:101
+#: dados/templates/alerta_municipio.html:99
 #, python-format
 msgid " <b>Incidência estimada:</b>  %(incidencia)s por 100 mil habitantes. "
 msgstr ""
 
-#: dados/templates/alerta_municipio.html:102
+#: dados/templates/alerta_municipio.html:100
 #, python-format
 msgid ""
 "<b>Chance de alerta <span class=\"label label-warning\">laranja</span> ou "
@@ -416,20 +449,12 @@ msgid ""
 "%(prt)s%%"
 msgstr ""
 
-#: dados/templates/alerta_municipio.html:121
-msgid ""
-"Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições "
-"ideais para a reprodução do Mosquito."
-msgstr ""
-
-#: dados/templates/alerta_municipio.html:168
+#: dados/templates/alerta_municipio.html:163
 #, python-format
 msgid ""
 " São estimados entre <b> %(min_est)s</b> e <b>%(max_est)s  novos casos</b> "
-"na Semana\n"
-"                Epidemiológica %(SE)s: %(data1)s - %(data2)s. Com "
-"%(total_observed)s  casos notificados\n"
-"                oficialmente até o momento  "
+"na Semana Epidemiológica %(SE)s: %(data1)s - %(data2)s. Com "
+"%(total_observed)s casos notificados oficialmente até o momento"
 msgstr ""
 
 #: dados/templates/base.html:68
@@ -740,10 +765,6 @@ msgstr ""
 msgid "Pessoas"
 msgstr ""
 
-#: dados/templates/series_plot.html:40 dados/templates/series_plot.html:166
-msgid "casos"
-msgstr ""
-
 #: dados/templates/series_plot.html:83
 #, python-format
 msgid "Casos Estimados de %(disease_label)s"
@@ -753,19 +774,19 @@ msgstr ""
 msgid "Alerta Vermelho"
 msgstr ""
 
-#: dados/templates/series_plot.html:113
+#: dados/templates/series_plot.html:114
 msgid "Alerta laranja"
 msgstr ""
 
-#: dados/templates/series_plot.html:127
+#: dados/templates/series_plot.html:129
 msgid "Alerta Amarelo"
 msgstr ""
 
-#: dados/templates/series_plot.html:141
+#: dados/templates/series_plot.html:144
 msgid "Alerta verde"
 msgstr ""
 
-#: dados/templates/series_plot.html:154
+#: dados/templates/series_plot.html:158
 #, python-format
 msgid "Casos Notificados de %(disease_label)s"
 msgstr ""
@@ -805,7 +826,7 @@ msgstr ""
 msgid "Em breve"
 msgstr ""
 
-#: dados/views.py:644
+#: dados/views.py:645
 msgid "desconhecida"
 msgstr ""
 

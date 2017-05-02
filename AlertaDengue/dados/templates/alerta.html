@@ -112,11 +112,7 @@
                     </div>
                     <div id="panel-element-vd" class="panel-collapse collapse">
                         <div class="panel-body">
-                            {% blocktrans %}
-                            "Sem Risco. Quando o mapa está verde, não existe
-                            transmissão e nem condições ideais para a
-                            reprodução do Mosquito."
-                            {% endblocktrans %}
+                            {% blocktrans %}Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições ideais para a reprodução do Mosquito.{% endblocktrans %}
                         </div>
                     </div>
                 </div>
@@ -127,12 +123,7 @@
                     </div>
                     <div id="panel-element-am" class="panel-collapse collapse">
                         <div class="panel-body">
-                            {% blocktrans %}
-                            "Estação da Dengue. No nível amarelo, temos
-                            condições climáticas propícias à reprodução do
-                            mosquito. Mas ainda sem transmissão
-                            significativa da Doença."
-                            {% endblocktrans %}
+                            {% blocktrans %}Estação da {{disease_label}}. No nível amarelo, temos condições climáticas propícias à reprodução do mosquito. Mas ainda sem transmissão significativa da Doença.{% endblocktrans %}
                         </div>
                     </div>
                 </div>
@@ -143,12 +134,7 @@
                     </div>
                     <div id="panel-element-la" class="panel-collapse collapse">
                         <div class="panel-body">
-                            {% blocktrans %}
-                            "Transmissão da Dengue. No nível laranja, já
-                            observamos uma incidência pronunciada da Dengue,
-                            mas ainda não podemos afirmar
-                            com confiança que teremos epidemia."
-                            {% endblocktrans %}
+                            {% blocktrans %}Transmissão de {{disease_label}}. No nível laranja, já observamos uma incidência pronunciada da {{disease_label}}, mas ainda não podemos afirmar com confiança que teremos epidemia.{% endblocktrans %}
                         </div>
                     </div>
                 </div>
@@ -159,38 +145,28 @@
                     </div>
                     <div id="panel-element-vm" class="panel-collapse collapse">
                         <div class="panel-body">
-                            {% blocktrans %}"Epidemia. Neste nível estamos em
-                            plena epidemia. Todo o cuidado é pouco, e
-                            precisamos ficar atentos aos sintomas da Dengue e
-                            procurar o médico imediatamente em caso suspeita
-                            de Dengue."
-                            {% endblocktrans %}
+                            {% blocktrans %}Epidemia. Neste nível estamos em plena epidemia. Todo o cuidado é pouco, e precisamos ficar atentos aos sintomas da {{disease_label}} e procurar o médico imediatamente em caso suspeita de {{disease_label}}.{% endblocktrans %}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 column bluebox">
-            <h3><span class="badge badge-info">{{ novos_casos }}</span>{% trans " Casos estimados " %}</h3>
 
-            <p>{% blocktrans %} São estimados entre <b>{{ min_est }}</b> e <b>{{ max_est }}  novos casos</b> na Semana
-                Epidemiológica {{ SE }}: {{ data1 }}  a {{ data2 }}. Com {{ total_observed }} casos notificados oficialmente até o momento {% endblocktrans %}</p>
+        <div class="col-md-3 column bluebox">
+            <h3><span class="badge badge-info">{{ novos_casos }}</span>
+                {% trans "Casos estimados" %}</h3>
+
+            <p>{% blocktrans %} São estimados entre <b>{{ min_est }}</b> e <b>{{ max_est }} novos casos</b> na Semana Epidemiológica {{ SE }}: {{ data1 }}  a {{ data2 }}. Com {{ total_observed }} casos notificados oficialmente até o momento{% endblocktrans %}</p>
             <h4>{% blocktrans %} Últimas {{ look_back }} semanas: {% endblocktrans %}</h4>
             <span class='totalsparkline'>{{ total_series }}</span>
             <p></p>
             {% comment %}<h4>Há um ano:</h4>
             <p>Há um ano atrás, nesta mesma semana, observamos <b>{{ last_year }}</b> casos</p>{% endcomment %}
-
-
         </div>
+
         <div class="col-md-3 column bluebox">
-            <h3><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>{% trans " Suspeita de um criadouro? " %}</h3>
-
-
-            <p>{% blocktrans %}Em caso de suspeita de criadouro de mosquitos, ligue para a <a href="http://www.1746.rio.gov.br/"
-                                                                              style="color: #FFFFFF">Central de
-               atendimento ao cidadão 1746</a>.{% endblocktrans %}</p>
-
+            <h3><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {% blocktrans %}Suspeita de um criadouro?{% endblocktrans %}</h3>
+            <p>{% blocktrans %}Em caso de suspeita de criadouro de mosquitos, ligue para a <a href="http://www.1746.rio.gov.br/" style="color: #FFFFFF">Central de atendimento ao cidadão 1746</a>.{% endblocktrans %}</p>
         </div>
     </div>
 
@@ -205,7 +181,7 @@
                 heigth: "auto",
                 barWidth: "15px",
                 barColor: "White",
-                tooltipSuffix: " casos"
+                tooltipSuffix: " {% blocktrans %}casos{% endblocktrans %}"
             });
         function isInArray(el, array) {
             return (array.indexOf(el) >= 0) ? true : false;
@@ -217,10 +193,10 @@
         var legend = L.control({position: 'bottomright'});
         var geojson;
         var alertLevels = [
-            {name: 'Baixo Risco', color:'#0D6B0D'},
-            {name: 'Atenção', color:'#FBFC75'},
-            {name: 'Transmissão', color:'#E45205'},
-            {name: 'Epidemia',  color:'#FF0205'},
+            {name: '{% blocktrans %}Baixo Risco{% endblocktrans %}', color:'#0D6B0D'},
+            {name: '{% blocktrans %}Atenção{% endblocktrans %}', color:'#FBFC75'},
+            {name: '{% blocktrans %}Transmissão{% endblocktrans %}', color:'#E45205'},
+            {name: '{% blocktrans %}Epidemia{% endblocktrans %}',  color:'#FF0205'},
         ];
 
         function style(feature) {
@@ -265,7 +241,7 @@
                 width: "14em",
                 heigth: "5em",
                 barWidth: "9em",
-                tooltipSuffix: " casos"
+                tooltipSuffix: " {% blocktrans %}casos{% endblocktrans %}"
             });
         }
 
@@ -278,10 +254,10 @@
             var series_casos = {{ series_casos|safe }};
             var alerta = {{ alerta|safe }};
             var recomendacoes = {
-                0: "Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www.riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros para o mosquito!</a>",
-                1: 'Uma vez por semana, aplique os <a href="http://www.riocontradengue.com.br/Site/Conteudo/Checklist.aspx">“10 minutos Contra a dengue”!</a>',
-                2: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.',
-                3: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.'
+                0: "{% blocktrans %}Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www.riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros para o mosquito!</a>{% endblocktrans %}",
+                1: '{% blocktrans %}Uma vez por semana, aplique os <a href="http://www.riocontradengue.com.br/Site/Conteudo/Checklist.aspx">“10 minutos Contra a dengue”!</a>{% endblocktrans %}',
+                2: '{% blocktrans %}Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.{% endblocktrans %}',
+                3: '{% blocktrans %}Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.{% endblocktrans %}'
             };
             var bairros = {
                 1.0: 'AP 1: Centro e adjacências',
@@ -304,10 +280,10 @@
             };
 
             info.update = function (props) {
-                this._div.innerHTML = '<h4>Número de casos na semana:</h4>' + (
+                this._div.innerHTML = '<h4>{% blocktrans %}Número de casos na semana{% endblocktrans %}:</h4>' + (
                     props ?
                         '<b>' + ( props.casos ? props.casos : 0) + '</b><br />' :
-                        'Passe o mouse sobre uma AP');
+                        '{% blocktrans %}Passe o mouse sobre uma AP{% endblocktrans %}');
             };
 
             info.addTo(map);
@@ -318,7 +294,7 @@
                         return '<i style="background:' + alertLevel.color + '"></i> ' + alertLevel.name;
                     }).reverse();
 
-                labels.push('O: Unidades de Saúde');
+                labels.push('O: {% blocktrans %}Unidades de Saúde{% endblocktrans %}');
                 div.innerHTML = labels.join('<br>');
                 return div;
             };
@@ -357,9 +333,9 @@
                         feature.properties.series = series_casos[feature.properties.COD_AP_SMS];
                         feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
                         layer.bindPopup("<b>" + bairros[parseFloat(feature.properties.COD_AP_SMS)] + "</b>" + "<br>" +
-                                "Casos: " + feature.properties.casos + "<br>Últimas semanas: <span class='inlinesparkline'>" +
+                                "{% blocktrans %}Casos{% endblocktrans %}: " + feature.properties.casos + "<br/>{% blocktrans %}Últimas semanas{% endblocktrans %}: <span class='inlinesparkline'>" +
                                 feature.properties.series + "</span><br>" +
-                                "<br><u>O que fazer</u>: " +
+                                "<br><u>{% blocktrans %}O que fazer{% endblocktrans %}</u>: " +
                                 recomendacoes[feature.properties.alerta]
                         );
                         layer.setStyle(style(feature))
@@ -379,8 +355,8 @@
 
 
             var overlayMaps = {
-                'Áreas de Planejamento': aps,
-                'Unidades de Saúde': features
+                '{% blocktrans %}Áreas de Planejamento{% endblocktrans %}': aps,
+                '{% blocktrans %}Unidades de Saúde{% endblocktrans %}': features
             };
             var controls = L.control.layers(null, overlayMaps, {collapsed: true});
             map.dragging.disable();
