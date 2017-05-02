@@ -27,7 +27,7 @@ class DBFForm(forms.Form):
         ('RS', 'Rio Grande do Sul'), ('RO', 'Rondônia'), ('RR', 'Roraima'),
         ('SC', 'Santa Catarina'), ('SP', 'São Paulo'), ('SE', 'Sergipe'),
         ('TO', 'Tocantins')
-    ), required=False, label=_("U.F."))
+    ), label=_("U.F."))
 
     def clean(self):
         cleaned_data = super(DBFForm, self).clean()
