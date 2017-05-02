@@ -171,6 +171,8 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = config('MEDIA_ROOT', default='')
 
+IMPORTED_FILES_DIR = config('IMPORTED_FILES_DIR', default=MEDIA_ROOT)
+
 EMAIL_BACKEND = config('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_FROM_ADDRESS = config('EMAIL_FROM_ADDRESS', 'no-reply@info.dengue.mat.br')
 INFODENGUE_TEAM_EMAIL = config('INFODENGUE_TEAM_EMAIL',
