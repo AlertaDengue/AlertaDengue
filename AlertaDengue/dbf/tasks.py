@@ -1,3 +1,6 @@
+import os
+import shutil
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mass_mail
@@ -33,6 +36,13 @@ def send_failure_email(dbf, message):
     send_mass_mail(message_data)
 
 
+def copy_file_to_final_destination(dbf):
+    new_filename = "{}_{}_{}.dbf".format(dbf.state_abbreviation, dbf.export_date, dbf.notification_year)
+    src = dbf.file.path
+    dest = os.path.join(settings.IMPORTED_FILES_DIR, new_filename)
+    shutil.copy(src, dest)
+
+
 @shared_task
 def import_dbf_to_database(dbf_id):
     dbf = DBF.objects.get(id=dbf_id)
@@ -42,5 +52,6 @@ def import_dbf_to_database(dbf_id):
         sinan = Sinan(dbf.file.path, dbf.notification_year)
         sinan.save_to_pgsql()
         send_success_email(dbf)
+        copy_file_to_final_destination(dbf)
     except ValidationError as exc:
         send_failure_email(dbf, exc.message)
