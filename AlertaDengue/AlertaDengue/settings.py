@@ -187,3 +187,9 @@ except ImportError:
     pass
 
 CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=None)
+
+BOOTSTRAP3 = {
+    'form_renderers': {
+        'default': 'dbf.forms.FormRendererWithHiddenFieldErrors',
+    }
+}

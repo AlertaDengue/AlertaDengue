@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
+from bootstrap3.renderers import FormRenderer
+
 from dbf.models import DBF, DBFChunkedUpload
 from dbf.validation import is_valid_dbf
 
@@ -29,3 +31,13 @@ class DBFForm(forms.Form):
         # This might be a performance problem for really large DBFs
         is_valid_dbf(uploaded_file.file, cleaned_data['notification_year'])
         return cleaned_data
+
+
+class FormRendererWithHiddenFieldErrors(FormRenderer):
+
+    def get_fields_errors(self):
+        form_errors = []
+        for field in self.form:
+            if field.errors:
+                form_errors += field.errors
+        return form_errors
