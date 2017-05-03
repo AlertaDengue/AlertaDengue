@@ -182,3 +182,53 @@ h1 {
        -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
             box-shadow: 0 5px 10px rgba(0,0,0,.2);
 }
+
+
+.chart-wrapper {
+    //background: #efefef;
+}
+
+.page-header {
+    margin-top: 0;
+}
+
+.card * {
+    font-weight: bold;
+}
+
+.card-indicator-value, .card-indicator-value *{
+    color: #ff9900;
+    text-align: left!important;
+}
+
+.vertical-align {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 10px;
+}
+
+.vertical-align > [class^="col-"],
+.vertical-align > [class*=" col-"] {
+  display: flex;
+  align-items: center;     /* Align the flex-items vertically */
+}
+
+.bluebox > h3 {
+    color: white!important;
+}
+
+.content-inline * {
+    display: inline!important;
+}
+
+#footer {
+    margin-top: 10px;
+}
+
+.legend i {
+    clear: both;
+}
+
+.btn-primary {
+    background-color: rgb(51, 122, 183);
+}

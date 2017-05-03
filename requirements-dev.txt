@@ -1,0 +1,7 @@
+jupyter
+jupyter_contrib_nbextensions
+eralchemy
+matplotlib
+PILLOW
+django-extensions
+werkzeug

@@ -1,0 +1,300 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load lookup %}
+
+{% block extra_head %}
+    {% load leaflet_tags %}
+    {% load alert_state %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+    {% leaflet_js plugins="ALL" %}
+
+    <meta property="og:image"
+          content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+    <meta property="og:image:secure_url"
+          content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+    <script src="/static/js/Autolinker.min.js" type="text/javascript"></script>
+    <script src="/static/js/jquery.sparkline.min.js"
+            type="text/javascript"></script>
+    <script src="/static/libs/highstock/code/highstock.js"
+            type="text/javascript"></script>
+    <script src="/static/libs/highstock/code/modules/exporting.js"
+            type="text/javascript"></script>
+    <script src="/static/libs/highstock/code/modules/data.js"
+            type="text/javascript"></script>
+
+    <script src="/static/libs/d3/d3.v4.min.js"
+            type="text/javascript"></script>
+
+    <script src="/static/libs/d3/d3-time-format.v2.min.js"
+            type="text/javascript"></script>
+
+    <script src="/static/libs/d3/d3-queue.v3.min.js"
+            type="text/javascript"></script>
+
+    <script src="/static/libs/lodash/lodash.min.js"
+            type="text/javascript"></script>
+
+    <script src="/static/libs/bootstrap-select/bootstrap-select.min.js"
+            type="text/javascript"></script>
+
+    <script src="/static/js/infodengue.js"
+            type="text/javascript"></script>
+
+    <link href="/static/libs/bootstrap-select/bootstrap-select.min.css"
+            type="text/css" rel="stylesheet" />
+
+    <style type="text/css">
+        #main {
+            width: 100%;
+            height: 400px;
+        }
+
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        .info h4, .info h6 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+
+        .legend {
+            text-align: left;
+            line-height: 18px;
+            color: #555;
+        }
+
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+
+        #disease-chart {
+            height: 200px;
+        }
+
+        #date-chart {
+            height: 175px;
+        }
+
+        #age-chart,
+        #gender-chart{
+            height: 110px;
+        }
+    </style>
+
+    <script type="text/javascript">
+        // Browser
+        var data;
+        var initial_load = true;
+        var state_abv = '{{state_abv}}';
+        var ignore_chart = false;
+
+        function plots_refresh(_ignore_chart) {
+            if (_ignore_chart != undefined) {
+                ignore_chart = _ignore_chart;
+            }
+            $('#pleaseWaitWindow').modal('show');
+        }
+
+        function _plots_refresh() {
+            var url = '/csv/notif_reduced?&state_abv=' + state_abv +
+                get_ages_selected() +
+                get_genders_selected() +
+                get_diseases_selected() +
+                get_period_selected() +
+                get_cities_selected() + '&chart_type=';
+
+            var url_short = '/csv/notif_reduced' +
+                '?state_abv=' + state_abv +
+                '&chart_type=';
+
+            d3.queue()
+                .defer(d3.csv, url+'disease')
+                .defer(d3.csv, url+'age_male')
+                .defer(d3.csv, url+'age_female')
+                .defer(d3.csv, url+'gender')
+                .defer(d3.csv, url+'period')
+                .await(function(
+                    error, data_disease, data_age_male, data_age_female,
+                    data_gender, data_period
+                ){
+                    //console.log('Starting ...');
+                    //var start = performance.now();
+                    var format = d3.timeFormat('%d/%m//%Y');
+                    var extremes = date_chart.xAxis[0].getExtremes(),
+                        start = format(new Date(extremes.min)),
+                        end   = format(new Date(extremes.max));
+
+                    if (ignore_chart != 'disease')
+                        plot_chart_disease(data_disease);
+                    if (ignore_chart != 'age')
+                        plot_chart_age(data_age_male, data_age_female);
+                    if (ignore_chart != 'gender')
+                        plot_chart_gender(data_gender);
+                    if (ignore_chart != 'date')
+                        plot_chart_date(data_period);
+
+                    $('#filter-display').text(
+                        ' Casos de ' + _get_diseases_selected().join(', ') +
+                        ' entre ' + start + ' e ' + end + ',' +
+                        ' sexo: ' + _get_genders_selected().join(', ') + ',' +
+                        ' idades: ' + _get_ages_selected().join(', ')
+                    );
+
+                    ignore_chart = '';
+
+                    //console.log((performance.now() - start)/1000);
+                    $('#pleaseWaitWindow').modal('hide');
+                });
+        }
+
+        $(document).ready(function(){
+            $('#pleaseWaitWindow').on('shown.bs.modal', function (e) {
+                _plots_refresh();
+            });
+        });
+    </script>
+
+{% endblock %}
+{% block title %}{{state}}{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <!-- chart-plot:begin -->
+    <div class="row">
+        <small>{% blocktrans %}Última atualização{% endblocktrans %}: {{last_update}}</small>
+        <br/> &nbsp;
+    </div>
+    <div class="row">
+        <div class="col-sm-5">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="chart-wrapper">
+                      <div class="chart-stage">
+                          {% disease_chart %}
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="chart-wrapper" style="z-index:1001; position: relative;">
+                            <select id="cities"
+                                    class="selectpicker"
+                                    data-live-search="true"
+                                    data-title="{% blocktrans %}Selecione municipio(s){% endblocktrans %}"
+                                    data-actions-box="true"
+                                    data-selected-text-format="static"
+                                    multiple
+                            >
+                                {% for k in mun_dict_ordered %}
+                                <option value="{{k}}" selected="selected"
+                                  >{{mun_dict_ordered|lookup:k}}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="button"
+                                   value="{% blocktrans %}Aplicar seleção{% endblocktrans %}"
+                                   onclick="apply_cities_selection();"
+                                   title="{% blocktrans %}Após alterar a seleção das cidades do filtro, clique no botão <Aplicar Seleção>.{% endblocktrans %}"
+                            />
+
+                    </div>
+                    <div class="chart-stage">
+                        {% map_chart %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-7">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="chart-wrapper">
+                      <div class="chart-title content-inline">
+                          <strong>{% blocktrans %}Descrição de filtro{% endblocktrans %}:</strong>
+                          <span id="filter-display"></span>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="chart-wrapper">
+                      <div class="chart-stage">
+                          {% date_chart %}
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="chart-wrapper">
+                      <div class="chart-stage">
+                          {% age_chart %}
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="chart-wrapper">
+                      <div class="chart-stage">
+                          {% gender_chart %}
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>&nbsp;</div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="chart-wrapper">
+              <div class="chart-stage">
+                  {% epiyears_chart %}
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Start here-->
+<div class="modal fade bs-example-modal-sm" id="pleaseWaitWindow" tabindex="-1"
+    role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <span class="glyphicon glyphicon-time">
+                    </span> {% blocktrans %}Por favor, aguarde.{% endblocktrans %}
+                 </h4>
+            </div>
+            <div class="modal-body">
+                <div class="progress">
+                    <div class="progress-bar progress-bar-info
+                    progress-bar-striped active"
+                    style="width: 100%">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal ends Here -->
+{% endblock %}

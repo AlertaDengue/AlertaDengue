@@ -1,0 +1,134 @@
+{% load i18n %}
+<div id="gender-chart"></div>
+<script type="application/javascript">
+// Create the chart
+var gender_chart;
+var gender_categories;
+
+function _get_genders_selected() {
+    // categories selection
+    var categories_selected = gender_chart.getSelectedPoints().map(function(d){
+        return d.name
+    });
+
+    // inverted select
+    categories_selected = gender_categories.filter(
+        n => categories_selected.indexOf(n) < 0
+    );
+
+    if (categories_selected.length == 0) {
+        for (j in gender_chart.series[0].data) {
+            // inverted select
+            gender_chart.series[0].data[j].select(false, true);
+        }
+    }
+
+    return categories_selected;
+}
+
+function get_genders_selected() {
+    // categories selection
+    return '&genders=' + _get_genders_selected().join(',');
+}
+
+function plot_chart_gender(data){
+    var _counter = new Array(gender_categories.length).fill(0);
+
+    for (i in data) {
+        for (j in gender_categories) {
+            if (data[i].category == gender_categories[j]) {
+                _counter[j] = parseInt(data[i].casos);
+            }
+        }
+    }
+
+    // set data
+    gender_chart.series[0].setData(_counter);
+}
+
+
+$(document).ready(function () {
+    var url = '/csv/notif_reduced?chart_type=gender' +
+        '&diseases={{disease_label}}' +
+        '&state_abv=' + state_abv;
+
+    $.get(url, function(csv) {
+        gender_chart = Highcharts.chart('gender-chart', {
+            chart: {
+                type: 'column',
+                spacingBottom: 0,
+                spacingTop: 0,
+                spacingLeft: 0,
+                spacingRight: 0,
+                events: {
+                    load: function(event) {
+                        //When is chart ready?
+                        gender_categories = this.series[0].data.map(x => x.name);
+                    }
+                }
+            },
+
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    colorByPoint: true,
+                   // allowPointSelect: true,
+                    colors: ['#E41B17', '#112C51'],
+                    point: {
+                        events: {
+                            click: function(event){
+                                //this.slice(null);
+                                this.select(null, true);
+                                plots_refresh('gender');
+                            }
+                        }
+                    },
+
+                    states: {
+                        select: {
+                            //color: '#112C51',
+                            color: '#dfdfdf',
+                            borderColor: '#ffffff'
+                        }
+                    },
+                },
+            },
+
+            title: {
+                text: ''
+            },
+            subtitle: {
+                text: '{% blocktrans %}Distribuição por gênero{% endblocktrans %}'
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: '{% blocktrans %}Casos{% endblocktrans %}'
+                }
+            },
+            xAxis: {
+                categories: gender_categories,
+            },
+            legend: {
+                enabled: false
+            },
+            credits: {
+                enabled: false
+            },
+            tooltip: {
+                shared: true,
+                useHTML: true,
+                //headerFormat: '<b>{point.key}</b><br/>',
+                footerFormat: '<small>**{% blocktrans %}Clique na categoria (coluna) para <br/>alterar seleção de filtro.{% endblocktrans %}</small>',
+            },
+            /*series: [{
+                "name": "Casos",
+                "data": [0, 0]
+            }]*/
+            data: {
+                csv: csv
+            },
+        });
+    });
+});
+</script>

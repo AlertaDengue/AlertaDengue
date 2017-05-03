@@ -1,86 +1,77 @@
-<div id="historico-chart" style="min-width: 500px; height: 400px; margin: 10px" data-highcharts-chart="0"></div>
+{% load i18n %}
+<div id="historico-chart_{{disease}}"
+     style="height: 400px; margin: 10px">
+</div>
+
 <script type="application/ecmascript">
-    $(function () {
+$(function () {
+    //var nd_{{disease}} = new Date();
+    //var tzo_{{disease}} = nd_{{disease}}.getTimezoneOffset();
+    // Agora as series de dados
+    var dados_{{disease}} = {{ series_est |safe }};
 
-        var nd = new Date();
-        var tzo = nd.getTimezoneOffset();
-        // Agora as series de dados
-        var dados = {{ series_est |safe }};
-
-        var chart = Highcharts.stockChart(
-                {
-
-                    chart: {
-                        renderTo: "historico-chart",
-                        zoomType: 'xy'
-                    },
-                    title: {
-                        text: 'Total de casos nos municípios monitorados'
-                    },
-                    xAxis: [
-                        {
-                            type: 'date',
-                        }
-                    ],
-                    yAxis: [
-
-                        { // first yAxis
-                            gridLineWidth: 1,
-                            //type: "linear",
-                            title: {
-                                text: 'Casos',
-                                style: {
-                                    color: '#4572A7'
-                                }
-                            },
-                            labels: {
-                                formatter: function () {
-                                    return this.value;// + ' casos';
-                                },
-                                style: {
-                                    color: '#4572A7'
-                                }
-                            }
-
-                        },
-
-                    ],
-                    tooltip: {
-                        shared: true
-                    },
-                    legend: {
-                        enabled: true,
-                        layout: 'vertical',
-                        align: 'left',
-                        x: 120,
-                        verticalAlign: 'top',
-                        y: 80,
-                        floating: true,
-                        backgroundColor: '#FFFFFF'
-                    },
-                    series: [
-                        {% for uf in ufs %}
-                            {
-                                name: '{{ uf }}',
-                                type: 'spline',
-                                animation: true,
-                                //color: '#4572A7',
-{#                                pointInterval: 7 * 24 * 3600 * 1000,#}
-{#                                pointStart: {{ start }} * 1000 + tzo,#}
-                            yAxis: 0,
-                                data: dados["{{ uf }}"],
-                                marker: {
-                            enabled: true
-                        },
-                            dashStyle: 'Solid',
-                                    tooltip: {
-                            valueSuffix: ' casos estimados'
-                        }
-                            },
-                        {% endfor %}
+    var chart_{{disease}} = Highcharts.stockChart({
+        chart: {
+            renderTo: "historico-chart_{{disease}}",
+            zoomType: 'xy'
+        },
+        title: {
+            text: '{% blocktrans %}Casos Estimados de {{disease_label}} nos municípios monitorados{% endblocktrans %}'
+        },
+        xAxis: [{
+            type: 'date',
+        }],
+        yAxis: [{ // first yAxis
+            gridLineWidth: 1,
+            //type: "linear",
+            title: {
+                text: '{% blocktrans %}Casos{% endblocktrans %}',
+                style: {
+                    color: '#4572A7'
+                }
+            },
+            labels: {
+                formatter: function () {
+                    return this.value;// + ' casos';
+                },
+                style: {
+                    color: '#4572A7'
+                }
+            }
+        }],
+        tooltip: {
+            shared: true
+        },
+        legend: {
+            enabled: true,
+            layout: 'vertical',
+            align: 'left',
+            x: 120,
+            verticalAlign: 'top',
+            y: 80,
+            floating: true,
+            backgroundColor: '#FFFFFF'
+        },
+        series: [
+        {% for uf in ufs %}
+            {
+                name: '{{ uf }}',
+                type: 'spline',
+                animation: true,
+                //color: '#4572A7',
+{#              pointInterval: 7 * 24 * 3600 * 1000,#}
+{#              pointStart: {{ start }} * 1000 + tzo_{{disease}},#}
+                yAxis: 0,
+                data: dados_{{disease}}["{{ uf }}"],
+                marker: {enabled: true},
+                dashStyle: 'Solid',
+                tooltip: { valueSuffix: ' {% blocktrans %}casos estimados{% endblocktrans %}' }
+            },
+        {% endfor %}
         ]
-    })
-        ;
     });
+
+    hideZoomBar(chart_{{disease}});
+});
 
 </script>

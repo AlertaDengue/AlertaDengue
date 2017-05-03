@@ -81,6 +81,7 @@ class DBFUploadViewTest(TestCase):
                 "export_date": date.today(),
                 "notification_year": date.today().year,
                 "chunked_upload_id": 1,
+                "state_abbreviation": "RJ",
             }
             response = self.client.post(reverse('dbf:upload'), data)
         self.assertEqual(response.status_code, 302)
@@ -107,6 +108,7 @@ class DBFUploadViewTest(TestCase):
                 "export_date": date.today(),
                 "notification_year": date.today().year,
                 "chunked_upload_id": 1,
+                "state_abbreviation": "RJ",
             }
             response = self.client.post(reverse('dbf:upload'), data)
         # The object was created ...

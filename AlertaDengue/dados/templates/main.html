@@ -1,14 +1,13 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
+{% load lookup %}
 {% block extra_head %}
-    {% load static %}
-    {% load leaflet_tags %}
     {% load series %}
-    {% leaflet_js %}
-    {% leaflet_css %}
-    {% leaflet_js plugins="ALL" %}
-    <meta property="og:image" content="http://info.dengue.mat.br/static/img/screenshot.png"/>
-    <meta property="og:image:secure_url" content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+    <meta property="og:image"
+          content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+    <meta property="og:image:secure_url"
+          content="https://info.dengue.mat.br/static/img/screenshot.png"/>
     <style>
         .leaflet-container {
             height: 400px;
@@ -48,6 +47,11 @@
             margin-right: 8px;
             opacity: 0.7;
         }
+
+        .table-card td, .table-card th {
+            padding: 10px;
+            font-size: 12px;
+        }
     </style>
     <script src="/static/js/Autolinker.min.js"></script>
     <script src="/static/js/jquery.sparkline.min.js"></script>
@@ -56,217 +60,154 @@
     <script src="/static/js/infodengue.js"></script>
 
 {% endblock %}
-{% block title %}{% blocktrans %}Situação da Dengue - {{ num_mun }} Municípios monitorados {% endblocktrans %}{% endblock %}
+
+{% block title %}
+  {% blocktrans %}Situação Epidemiológica - {{ num_mun }} Municípios monitorados{% endblocktrans %}
+{% endblock %}
 
 {% block content %}
-    {% total_series %}
-    {% leaflet_map "main" callback="main_map_init" %}
+    <div class="container-fluid">
+        <!-- chart-plot:begin -->
+        <div class="row">
+            <div {% if n_alerts_chik > 0 %}
+                class="col-sm-6"
+                {% else %}
+                class="col-sm-12"
+                {% endif %}
+            >
+                <div class="chart-wrapper">
+                  <div class="chart-stage">
+                    {% total_series_dengue %}
+                  </div>
+                </div>
+            </div>
+            {% if n_alerts_chik > 0 %}
+            <div class="col-sm-6">
+                <div class="chart-wrapper">
+                  <div class="chart-stage">
+                    {% total_series_chik %}
+                  </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <!-- chart-plot:end -->
 
-    <script type="text/javascript">
-        var mundict = {{ mundict|safe }}
-        var series_casos = {{ case_series|safe }};
-        var alerta = {{ alerta|safe }};
-        var recomendacoes;
-        var global_bounds = L.latLngBounds(L.latLng(-22.907500, -43.431500), L.latLng(-22.907000, -43.431000));
-        var municipios = L.featureGroup();
-        var geocodigos = {{ geocodigos }};
-        $('.totalsparkline').sparkline('html', {
-            type: 'bar',
-            width: "auto",
-            heigth: "auto",
-            barWidth: "15px",
-            barColor: "White",
-            tooltipSuffix: " casos"
-        });
-        function isInArray(el, array) {
-            return (array.indexOf(el) >= 0) ? true : false;
-        }
-        function bestFitZoom(map) {
-            // declaring the group variable
-            var group = new L.featureGroup;
+        <!-- chart-states:begin -->
+        <div class="row card">
+            {% for state_name in states %}
+            <div class="col-sm-4">
+                <div class="chart-wrapper">
+                    <div class="chart-title">
+                        <h2>{{state_name}}</h2>
+                    </div>
+                    <div class="chart-stage">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <small style="color:#888888;">
+                                    {% blocktrans %}Última atualização{% endblocktrans %}:
+                                    {{last_se|lookup:state_name}}
+                                </small>
+                                <table class="table-card">
+                                    <tr>
+                                        <th></th>
+                                        {% for disease in diseases %}
+                                        <th style="text-transform:capitalize;">{{disease}}</th>
+                                        {% endfor %}
+                                    </tr>
+                                    <tr>
+                                        <th>{% blocktrans %}Municípios participantes{% endblocktrans %}:</th>
+                                        {% for disease in diseases %}
+                                        <td class="card-indicator-value">
+                                            <span>{{count_cities|lookup:disease|lookup:state_name}}</span></td>
+                                        {% endfor %}
+                                    </tr>
+                                    <tr>
+                                        <th>{% blocktrans %}Total de casos notificado / estimados na semana{% endblocktrans %}:</th>
+                                        {% for disease in diseases %}
+                                        <td class="card-indicator-value">
+                                            <span>{{current_week|lookup:disease|lookup:state_name|lookup:'casos'}} /
+                                            {{current_week|lookup:disease|lookup:state_name|lookup:'casos_est'}}
+                                        </span></td>
+                                        {% endfor %}
+                                    </tr>
+                                    <tr>
+                                        <th>{% blocktrans %}Previsão de casos para as próximas semanas{% endblocktrans %}:</th>
+                                        {% for disease in diseases %}
+                                        <td class="card-indicator-value">
+                                            <span>{{estimated_cases_next_week|lookup:disease|lookup:state_name}}</span></td>
+                                        {% endfor %}
+                                    </tr>
+                                    <tr>
+                                        <th>{% blocktrans %}Variação em relação à semana anterior{% endblocktrans %}:</th>
+                                        {% for disease in diseases %}
+                                        <td class="">
+                                            {% if variation_to_current_week|lookup:disease|lookup:state_name > 0%}
+                                                <span class="badge alert-danger">
+                                                    {{variation_to_current_week|lookup:disease|lookup:state_name}}%
+                                                    &uarr;
+                                                </span>
+                                            {% elif variation_to_current_week|lookup:disease|lookup:state_name < 0 %}
+                                                <span class="badge alert-success">
+                                                    {{variation_to_current_week|lookup:disease|lookup:state_name}}%
+                                                    &darr;
+                                                </span>
+                                            {% else %}
+                                                <span class="badge alert-warning">
+                                                    {{variation_to_current_week|lookup:disease|lookup:state_name}}%
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        {% endfor %}
+                                    </tr>
+                                    <tr>
+                                        <th>{% blocktrans %}Variação da quadrissemana atual em relação à quadrissemana do último ano{% endblocktrans %}:</th>
+                                        {% for disease in diseases %}
+                                        <td class="">
+                                            {% if variation_4_weeks|lookup:disease|lookup:state_name > 0%}
+                                                <span class="badge alert-danger">
+                                                    {{variation_4_weeks|lookup:disease|lookup:state_name}}%
+                                                    &uarr;
+                                                </span>
+                                            {% elif variation_4_weeks|lookup:disease|lookup:state_name < 0 %}
+                                                <span class="badge alert-success">
+                                                    {{variation_4_weeks|lookup:disease|lookup:state_name}}%
+                                                    &darr;
+                                                </span>
+                                            {% else %}
+                                                <span class="badge alert-warning">
+                                                    {{variation_4_weeks|lookup:disease|lookup:state_name}}%
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        {% endfor %}
+                                    </tr>
+                                    <tr>
+                                        <th></th>
+                                        <td></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row vertical-align">
+                            <div class="col-sm-12" style="font-size:12px;">
+                                <a href="/alerta/{{state_initials|lookup:state_name}}">
+                                    {% blocktrans %}Clique aqui para ver mais detalhes{% endblocktrans %}.
+                                </a>
+                            </div>
+                        </div>
 
-            // map._layers gives all the layers of the map including main container
-            // so looping in all those layers filtering those having feature
-            $.each(map._layers, function (ml) {
-
-                group.addLayer(this)
-            })
-
-           map.fitBounds(group.getBounds());
-        }
-        ;
-
-        var features = L.layerGroup();
-        var info = L.control();
-        var legend = L.control({position: 'bottomright'});
-
-        var alertLevels = [
-            {name: 'Baixo Risco', color: '#0D6B0D'},
-            {name: 'Atenção', color: '#C8D20F'},
-            {name: 'Transmissão', color: '#E45205'},
-            {name: 'Epidemia', color: '#FF0205'},
-        ];
-
-        function style(feature) {
-            var i = +feature.properties.alerta || 0;
-            return {
-                weight: 2,
-                opacity: 1,
-                color: 'white',
-                dashArray: '3',
-                fillOpacity: 0.7,
-                fillColor: alertLevels[i].color
-            };
-        }
-
-        function highlightFeature(e) {
-            var layer = e.target;
-
-            layer.setStyle({
-                weight: 5,
-                color: '#666',
-                dashArray: '',
-                fillOpacity: 0.7
-            });
-
-
-            if (!L.Browser.ie && !L.Browser.opera) {
-                layer.bringToFront();
-            }
-
-            info.update(layer.feature.properties);
-            layer.bringToBack()
-        }
-
-        function resetHighlight(e) {
-            geojson.resetStyle(e.target);
-            info.update();
-        }
-
-        function renderSparkline(e) {
-            $('.inlinesparkline').sparkline('html', {
-                type: 'bar',
-                width: "14em",
-                heigth: "5em",
-                barWidth: "9em",
-                tooltipSuffix: " casos"
-            });
-        }
-
-
-        function main_map_init(map, options) {
-            $(document).data('map', map)
-            //map._layersMaxZoom=13
-
-
-            recomendacoes = {
-                0: "Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www.riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros para o mosquito!</a>",
-                1: 'Uma vez por semana, aplique os <a href="http://www.riocontradengue.com.br/Site/Conteudo/Checklist.aspx">“10 minutos Contra a dengue”!</a>',
-                2: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.',
-                3: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.'
-            };
-
-
-            // control that shows state info on hover
-            info.onAdd = function (map) {
-                this._div = L.DomUtil.create('div', 'info');
-                this.update();
-                return this._div;
-            };
-
-            info.update = function (props) {
-                this._div.innerHTML = '<h4>Número de casos estimados na semana:</h4>' + (props ?
-                        '<b>'+ props.nome + ':' + props.casos + '</b><br />' : 'Passe o mouse sobre o mapa');
-            };
-
-            info.addTo(map);
-
-            legend.onAdd = function () {
-                var div = L.DomUtil.create('div', 'info legend'),
-                        labels = alertLevels.map(function (alertLevel) {
-                            return '<i style="background:' + alertLevel.color + '"></i> ' + alertLevel.name;
-                        }).reverse();
-
-                labels.push('O: Unidades de Saúde');
-                div.innerHTML = labels.join('<br>');
-                return div;
-            };
-
-            legend.addTo(map);
-
-            function fill_details(feature, layer){
-                codigo = parseInt(feature.properties.geocodigo);
-                feature.properties.alerta = alerta[codigo];
-                feature.properties.series = series_casos[codigo];
-                feature.properties.casos = series_casos[codigo][series_casos[codigo].length -1];
-                layer.bindPopup("<b>" + mundict[codigo] + "</b>" + "<br>" +
-                "Casos estimados: " + feature.properties.casos + "<br>Últimas semanas: <span class='inlinesparkline'>" +
-                feature.properties.series + "</span><br>" +
-                "<br>" +
-                "<a href=/alerta/"+codigo.toString()+"/><u>Mais detalhes</u></a>"
-                );
-                layer.setStyle(style(feature))
-                layer.on({
-                    mouseover: highlightFeature,
-                    mouseout: resetHighlight,
-                    popupopen: renderSparkline
-                });
-
-
-            };
-
-            var last_city_geocodigo = geocodigos[geocodigos.length - 1]
-            for (var i=0; i< geocodigos.length; i++){
-                var gc = geocodigos[i];
-                $.getJSON('/geojson/'+gc.toString()+'/', function(data){
-                    geojson = L.geoJson(data, {style: style, onEachFeature: fill_details});
-                    global_bounds.extend(geojson.getBounds())
-                    municipios.addLayer(geojson, true);
-                    if (data.features[0].properties.geocodigo == last_city_geocodigo) {
-                        map.fitBounds(global_bounds);
-                    }
-                });
-            };
-
-            municipios.addTo(map);
-
-            var overlayMaps = {
-                'Municípios': municipios
-            };
-            var controls = L.control.layers(null, overlayMaps, {collapsed: true});
-            //map.dragging.disable();
-            //map.scrollWheelZoom.disable();
-            map.touchZoom.disable();
-            map.doubleClickZoom.disable();
-            map.boxZoom.disable();
-            map.keyboard.disable();
-            //$(".leaflet-control-zoom").css("visibility", "hidden");
-            controls.addTo(map);
-            map.touchZoom.disable();
-            map.doubleClickZoom.disable();
-
-            $(window).on("resize", function () {
-                $("#main").height($(window).height() * 0.7);
-                map.invalidateSize();
-                try {
-                    map.fitBounds(global_bounds);
-                }
-                catch (err) {
-                }
-
-            }).trigger("resize")
-
-
-            // These are the bound we have with RJ, ES and PR
-            // Since we shouldn't add more cities before the redesign, these
-            // should center the map before the last geojson is loaded
-            var reasonable_bounds = L.latLngBounds(
-                    L.latLng(-17.891944639567996, -28.8359076292382),
-                    L.latLng(-26.717122007927195, -54.61930463781249)
-            );
-            map.fitBounds(reasonable_bounds);
-        }
-
-    </script>
+                    </div>
+                  <!--
+                  <div class="chart-notes">
+                    This is a sample text region to describe this chart.
+                  </div>
+                  -->
+                </div>
+              </div>
+            {% endfor %}
+        </div>
+        <!-- chart-states:end -->
+    </div>
 
 {% endblock %}
