@@ -1,12 +1,19 @@
+{% load i18n %}
 <div id="age-chart" class="chart-default"></div>
 <script type="application/javascript">
 var age_chart;
+var age_categories;
 
-function get_ages_selected() {
+function _get_ages_selected() {
     // categories selection
     var categories_selected = age_chart.getSelectedPoints().map(function(d){
         return d.category
     });
+
+    // inverted select
+    categories_selected = age_categories.filter(
+        n => categories_selected.indexOf(n) < 0
+    );
 
     if (categories_selected.length == 0) {
         for (j in age_chart.series[0].data) {
@@ -15,123 +22,141 @@ function get_ages_selected() {
         }
     }
 
-    return '&ages=' + categories_selected.join(',');
+    return categories_selected;
 }
 
-function plot_chart_age(filters) {
-    var _values = [];
-    var _columns_name = age_chart.xAxis[0].categories;
-    var _counter_female = new Array(_columns_name.length).fill(0);
-    var _counter_male = new Array(_columns_name.length).fill(0);
-    var url = '/csv/notif_reduced?' + filters + '&chart_type=age';
+function get_ages_selected() {
+    return '&ages=' + _get_ages_selected().join(',');
+}
 
-    d3.csv(url + '_male', function(data_male){
-        d3.csv(url + '_female', function(data_female){
-            for (i in data_male) {
-                for (j in _columns_name) {
-                    if (data_male[i].category == _columns_name[j]) {
-                        _counter_male[j] = parseInt(data_male[i].casos);
-                    }
-                }
+function plot_chart_age(data_male, data_female) {
+    var _counter_female = new Array(age_categories.length).fill(0);
+    var _counter_male = new Array(age_categories.length).fill(0);
+
+    for (i in data_male) {
+        for (j in age_categories) {
+            if (data_male[i].category == age_categories[j]) {
+                _counter_male[j] = parseInt(data_male[i].casos);
             }
+        }
+    }
 
-            for (i in data_female) {
-                for (j in _columns_name) {
-                    if (data_female[i].category == _columns_name[j]) {
-                        _counter_female[j] = parseInt(data_female[i].casos);
-                    }
-                }
+    for (i in data_female) {
+        for (j in age_categories) {
+            if (data_female[i].category == age_categories[j]) {
+                _counter_female[j] = parseInt(data_female[i].casos);
             }
+        }
+    }
 
-            // set data
-            age_chart.series[0].setData(_counter_male);
-            age_chart.series[1].setData(_counter_female);
-        });
-    });
+    // set data
+    age_chart.series[0].setData(_counter_female);
+    age_chart.series[1].setData(_counter_male);
 }
 
 $(document).ready(function () {
     // Create the chart
-    age_chart = Highcharts.chart('age-chart', {
-        chart: {
-            type: 'column',
-            spacingBottom: 0,
-            spacingTop: 0,
-            spacingLeft: 0,
-            spacingRight: 0
-        },
+    var url = '/csv/notif_reduced?chart_type=age_gender' +
+        '&diseases={{disease_label}}' +
+        '&state_abv=' + state_abv;
 
-        plotOptions: {
-            column: {
-                stacking: 'normal',
-                dataLabels: {
-                    enabled: false,
-                    //color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
-                    style: {
-                        fontWeight: 'bold',
+    $.get(url, function(csv) {
+        age_chart = Highcharts.chart('age-chart', {
+            chart: {
+                type: 'column',
+                spacingBottom: 0,
+                spacingTop: 0,
+                spacingLeft: 0,
+                spacingRight: 0,
+                events: {
+                    load: function(event) {
+                        //When is chart ready?
+                        age_categories = this.series[0].data.map(x => x.name);
                     }
-                },
-                cursor: 'pointer',
-                color: '#dfdfdf',
-               // allowPointSelect: true,
-                states: {
-                    select: {
-                        color: '#112C51',
-                        borderColor: '#ffffff'
-                    }
-                },
-                point: {
-                    events: {
-                        click: function(event){
-                            i = event.point.index;
-                            //this.slice(null);
-                            //this.select(null, true);
-                            age_chart.series[0].data[i].select(null, true);
-                            age_chart.series[1].data[i].select(null, true);
-                            plots_refresh('age');
+                }
+            },
+
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: false,
+                        //color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                        style: {
+                            fontWeight: 'bold',
+                        }
+                    },
+                    cursor: 'pointer',
+                    //color: '#dfdfdf',
+                    point: {
+                        events: {
+                            click: function(event){
+                                i = event.point.index;
+                                //this.slice(null);
+                                //this.select(null, true);
+                                age_chart.series[0].data[i].select(null, true);
+                                age_chart.series[1].data[i].select(null, true);
+                                plots_refresh('age');
+                            }
                         }
                     }
                 }
-            }
-        },
+            },
 
-        title: {
-            text: ''
-        },
-        subtitle: {
-            text: 'Distribuição por Idade'
-        },
-        yAxis: {
-            min: 0,
             title: {
-                text: 'Casos'
-            }
-        },
-        xAxis: {
-            categories: [
-                '00-04 anos', '05-09 anos', '10-19 anos', '20-29 anos',
-                '30-39 anos', '40-49 anos', '50-59 anos', '60+ anos'
-            ]
-        },
-        legend: {
-            enabled: false
-        },
-        credits: {
-            enabled: false
-        },
-        tooltip: {
-            shared: true
-        },
-
-        series: [
-            {
-                "name": "Homem (casos)",
-                "data": [0, 0, 0, 0, 0, 0, 0, 0]
-            }, {
-                "name": "Mulher (casos)",
-                "data": [0, 0, 0, 0, 0, 0, 0, 0]
-            }
-        ]
+                text: ''
+            },
+            subtitle: {
+                text: '{% blocktrans %}Distribuição por Idade{% endblocktrans %}'
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: '{% blocktrans %}Casos{% endblocktrans %}'
+                }
+            },
+            xAxis: {
+                categories: age_categories
+            },
+            legend: {
+                enabled: false
+            },
+            credits: {
+                enabled: false
+            },
+            tooltip: {
+                shared: true,
+                useHTML: true,
+                //headerFormat: '<b>{point.key}</b><br/>',
+                footerFormat: '<small>**{% blocktrans %}Clique na categoria (coluna) para <br/>alterar seleção de filtro.{% endblocktrans %}</small>',
+            },
+            series: [
+                {
+                    //"name": "Mulher (casos)",
+                    //"data": [0, 0, 0, 0, 0, 0, 0, 0],
+                    color: '#E41B17',
+                    states: {
+                        select: {
+                            color: '#dfdfdf',
+                            borderColor: '#ffffff'
+                        }
+                    },
+                }, {
+                    //"name": "Homem (casos)",
+                    //"data": [0, 0, 0, 0, 0, 0, 0, 0],
+                    color: '#112C51',
+                    states: {
+                        select: {
+                            color: '#dfdfdf',
+                            borderColor: '#ffffff'
+                        }
+                    },
+                }
+            ],
+            data: {
+                csv: csv
+            },
+        });
     });
 });
 

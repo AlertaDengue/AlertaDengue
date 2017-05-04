@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load leaflet_tags %}
 {% load lookup %}
 
@@ -7,6 +8,7 @@
     function isInArray(el, array) {
         return (array.indexOf(el) >= 0) ? true : false;
     }
+    var _filter_city;
 
     var mun_dict = {{ mun_dict|safe }};
     var alerta = {{ alerts_level|safe }};
@@ -20,10 +22,10 @@
     var info = L.control();
     var legend = L.control({position: 'bottomright'});
     var alertLevels = [
-        {name: 'Baixo Risco', color: '#0D6B0D'},
-        {name: 'Atenção', color: '#C8D20F'},
-        {name: 'Transmissão', color: '#E45205'},
-        {name: 'Epidemia', color: '#FF0205'},
+        {name: '{% blocktrans %}Baixo Risco{% endblocktrans %}', color: '#0D6B0D'},
+        {name: '{% blocktrans %}Atenção{% endblocktrans %}', color: '#C8D20F'},
+        {name: '{% blocktrans %}Transmissão{% endblocktrans %}', color: '#E45205'},
+        {name: '{% blocktrans %}Epidemia{% endblocktrans %}', color: '#FF0205'},
     ];
 
     $('.totalsparkline').sparkline('html', {
@@ -80,10 +82,10 @@
         var i = +feature.properties.alerta || 0;
         return {
             weight: 1,
-            opacity: 1,
+            opacity: 0.9,
             color: 'white',
             dashArray: '3',
-            fillOpacity: 0.6,
+            fillOpacity: 0.9,
             fillColor: alertLevels[i].color
         };
     }
@@ -92,10 +94,10 @@
         var i = +feature.properties.alerta || 0;
         return {
             weight: 2,
-            opacity: 1,
+            opacity: 0.9,
             color: 'white',
             dashArray: '3',
-            fillOpacity: 0.8,
+            fillOpacity: 0.9,
             fillColor: alertLevels[i].color
         };
     }
@@ -169,10 +171,10 @@
 
         info.update = function (props) {
             this._div.innerHTML = '' +
-                '<h6>Número de casos estimados na semana:</h6>' +
+                '<h6>{% blocktrans %}Número de casos estimados na semana{% endblocktrans %}:</h6>' +
                 (props ?
                  '<b>'+ props.nome + ':' + props.casos + '</b><br />' :
-                 'Passe o mouse sobre o mapa');
+                 '{% blocktrans %}Passe o mouse sobre o mapa{% endblocktrans %}');
         };
 
         info.addTo(map);
@@ -181,10 +183,10 @@
             var div = L.DomUtil.create('div', 'info legend'),
                     labels = alertLevels.map(function (alertLevel) {
                         return '<i style="background:' + alertLevel.color +
-                            '"></i> ' + alertLevel.name;
+                            ';"></i> ' + alertLevel.name;
                     }).reverse();
-            labels.push('O: Unidades de Saúde');
-            div.innerHTML = labels.join('<br>');
+            labels.push('O: {% blocktrans %}Unidades de Saúde{% endblocktrans %}');
+            div.innerHTML = labels.join('<br/>');
             return div;
         };
 
@@ -201,12 +203,12 @@
 
             /*layer.bindPopup(
                 "<b>" + mun_dict[geo_id] + "</b>" + "<br>" +
-                "Casos estimados: " + feature.properties.casos +
-                "<br>Últimas semanas: <span class='inlinesparkline'>" +
+                "{% blocktrans %}Casos estimados{% endblocktrans %}: " + feature.properties.casos +
+                "<br>{% blocktrans %}Últimas semanas{% endblocktrans %}: <span class='inlinesparkline'>" +
                 feature.properties.series + "</span><br>" +
                 "<br>" +
                 "<a href=/alerta/" + geo_id.toString() +
-                "/><u>Mais detalhes</u></a>"
+                "/><u>{% blocktrans %}Mais detalhes{% endblocktrans %}</u></a>"
             );*/
 
             layer.setStyle(selected_style(feature))
@@ -268,7 +270,7 @@
                 } else {
                     layer._layers[i].setStyle({
                         weight: 1,
-                        fillOpacity: 0.6,
+                        fillOpacity: 0.2,
                     });
                 }
           }

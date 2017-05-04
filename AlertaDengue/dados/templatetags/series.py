@@ -15,10 +15,30 @@ def int_or_none(x):
 
 @register.inclusion_tag("series_plot.html", takes_context=True)
 def alerta_series(context):
-    dados = load_series(context['geocodigo'])[context['geocodigo']]
+    disease = (
+        'dengue' if 'disease_code' not in context else
+        context['disease_code']
+    )
+
+    dados = load_series(
+        context['geocodigo'], disease
+    )[context['geocodigo']]
+
+    if dados is None:
+        return {
+            'nome': context['nome'],
+            'dados': {},
+            'start': {},
+            'verde': {},
+            'amarelo': {},
+            'laranja': {},
+            'vermelho': {},
+            'disease_label': context['disease_label']
+        }
+
     dados['dia'] = [
-        int(mktime((d + timedelta(7)).timetuple()))
-        for d in dados['dia']]
+        int(mktime(d.timetuple())) for d in dados['dia']
+    ]
 
     # green alert
     ga = [
@@ -61,13 +81,46 @@ def alerta_series(context):
         'amarelo': json.dumps(ya),
         'laranja': json.dumps(oa),
         'vermelho': json.dumps(ra),
+        'disease_label': context['disease_label']
     }
 
 
 @register.inclusion_tag("total_series.html", takes_context=True)
-def total_series(context):
+def total_series_dengue(context):
+    _context = total_series(context, disease='dengue')
+    _context.update({'disease_label': 'Dengue'})
+    return _context
+
+
+@register.inclusion_tag("total_series.html", takes_context=True)
+def total_series_chik(context):
+    _context = total_series(context, disease='chikungunya')
+    _context.update({'disease_label': 'Chikungunya'})
+    return _context
+
+
+def total_series(context, disease):
+    '''
+
+    :param context:
+    :param disease: dengue|chikungunya|zika
+    :return:
+    '''
     # gc = context['geocodigos'][0]
-    series = get_series_by_UF()
+    series = (
+        get_series_by_UF(disease) if 'case_series' not in context else
+        context['case_series'][disease]
+    )
+
+    if series.empty:
+        return {
+            'ufs': [],
+            'start': None,
+            'series': {},
+            'series_est': {},
+            'disease': disease
+        }
+
     ufs = list(set(series.uf.tolist()))
     # 51 weeks to get the end of the SE
     start = series.data.max() - timedelta(weeks=51)
@@ -100,5 +153,6 @@ def total_series(context):
         'ufs': ufs,
         'start': start,
         'series': casos,
-        'series_est': casos_est
+        'series_est': casos_est,
+        'disease': disease
     }

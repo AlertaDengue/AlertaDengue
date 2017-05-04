@@ -169,6 +169,8 @@ STATIC_URL = '/static/'
 
 MEDIA_ROOT = config('MEDIA_ROOT', default='')
 
+IMPORTED_FILES_DIR = config('IMPORTED_FILES_DIR', default=MEDIA_ROOT)
+
 EMAIL_BACKEND = config('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_FROM_ADDRESS = config('EMAIL_FROM_ADDRESS', 'no-reply@info.dengue.mat.br')
 INFODENGUE_TEAM_EMAIL = config('INFODENGUE_TEAM_EMAIL',
@@ -179,9 +181,31 @@ if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
     EMAIL_PORT = int(EMAIL_PORT)
     EMAIL_USE_TLS = True
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'null': {
+            'class': 'logging.NullHandler',
+        },
+    },
+    'loggers': {
+        'django.security.DisallowedHost': {
+            'handlers': ['null'],
+            'propagate': False,
+        },
+    },
+}
+
 try:
     from AlertaDengue.local_settings import *
 except ImportError:
     pass
 
 CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=None)
+
+BOOTSTRAP3 = {
+    'form_renderers': {
+        'default': 'dbf.forms.FormRendererWithHiddenFieldErrors',
+    }
+}

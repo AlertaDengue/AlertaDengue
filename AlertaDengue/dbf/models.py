@@ -10,12 +10,47 @@ from dbf.validation import is_valid_dbf
 def current_year():
     return date.today().year
 
+
 class DBF(models.Model):
+    STATE_ABBREVIATION_CHOICES = (
+        (None, ''),
+        ('AC', 'Acre'),
+        ('AL', 'Alagoas'),
+        ('AP', 'Amapá'),
+        ('AM', 'Amazonas'),
+        ('BA', 'Bahia'),
+        ('CE', 'Ceará'),
+        ('DF', 'Distrito Federal'),
+        ('ES', 'Espírito Santo'),
+        ('GO', 'Goiás'),
+        ('MA', 'Maranhão'),
+        ('MT', 'Mato Grosso'),
+        ('MS', 'Mato Grosso do Sul'),
+        ('MG', 'Minas Gerais'),
+        ('PA', 'Pará'),
+        ('PB', 'Paraíba'),
+        ('PR', 'Paraná'),
+        ('PE', 'Pernambuco'),
+        ('PI', 'Piauí'),
+        ('RJ', 'Rio de Janeiro'),
+        ('RN', 'Rio Grande do Norte'),
+        ('RS', 'Rio Grande do Sul'),
+        ('RO', 'Rondônia'),
+        ('RR', 'Roraima'),
+        ('SC', 'Santa Catarina'),
+        ('SP', 'São Paulo'),
+        ('SE', 'Sergipe'),
+        ('TO', 'Tocantins')
+    )
+
     uploaded_by = models.ForeignKey('auth.User')
     file = models.FileField()
     uploaded_at = models.DateTimeField(auto_now_add=True)
     export_date = models.DateField()
     notification_year = models.IntegerField(default=current_year)
+    state_abbreviation = models.CharField(
+        max_length=2, null=True, choices=STATE_ABBREVIATION_CHOICES
+    )
 
     def clean(self):
         if self.notification_year > date.today().year:
@@ -27,6 +62,7 @@ class DBF(models.Model):
 
     def __str__(self):
         return "{} - {}".format(self.file, self.notification_year)
+
 
 class DBFChunkedUpload(ChunkedUpload):
     """

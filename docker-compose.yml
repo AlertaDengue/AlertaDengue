@@ -35,3 +35,5 @@ services:
             - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
         volumes:
             - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+            - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+        restart: always

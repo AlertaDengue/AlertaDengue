@@ -29,7 +29,9 @@ class Upload(LoginRequiredMixin, FormView):
     success_url = reverse_lazy("dbf:upload_successful")
 
     def post(self, request, *args, **kwargs):
-        self.request.POST['uploaded_by'] = request.user.id
+        mutable_POST = self.request.POST.copy()
+        mutable_POST['uploaded_by'] = request.user.id
+        self.request.POST = mutable_POST
         return super(Upload, self).post(self.request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -42,7 +44,8 @@ class Upload(LoginRequiredMixin, FormView):
             uploaded_by=self.request.user,
             file=uploaded_file,
             export_date=form.cleaned_data['export_date'],
-            notification_year=form.cleaned_data['notification_year']
+            notification_year=form.cleaned_data['notification_year'],
+            state_abbreviation=form.cleaned_data['state_abbreviation']
         )
         import_dbf_to_database.delay(dbf.id)
         success_message = _("O arquivo {} exportado em {:%d/%m/%Y} com notificações do ano {} "

@@ -26,3 +26,8 @@ def map_chart(context):
 @register.inclusion_tag('alert_state/date.html', takes_context=True)
 def date_chart(context):
     return context
+
+
+@register.inclusion_tag('alert_state/epiyears.html', takes_context=True)
+def epiyears_chart(context):
+    return context

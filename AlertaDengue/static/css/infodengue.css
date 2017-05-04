@@ -185,7 +185,7 @@ h1 {
 
 
 .chart-wrapper {
-    background: #efefef;
+    //background: #efefef;
 }
 
 .page-header {
@@ -223,4 +223,12 @@ h1 {
 
 #footer {
     margin-top: 10px;
+}
+
+.legend i {
+    clear: both;
+}
+
+.btn-primary {
+    background-color: rgb(51, 122, 183);
 }
