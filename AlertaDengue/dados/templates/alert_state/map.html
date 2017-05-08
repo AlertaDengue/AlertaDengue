@@ -196,10 +196,16 @@
             geo_id = parseInt(feature.properties.geocodigo);
 
             feature.properties.alerta = alerta[geo_id];
-            feature.properties.series = case_series[geo_id];
-            feature.properties.casos = (
-                case_series[geo_id][case_series[geo_id].length -1]
-            );
+
+            if (Object.keys(case_series).length > 0) {
+                feature.properties.series = case_series[geo_id];
+                feature.properties.casos = (
+                    case_series[geo_id][case_series[geo_id].length -1]
+                );
+            } else {
+                feature.properties.series = [];
+                feature.properties.casos = null;
+            }
 
             /*layer.bindPopup(
                 "<b>" + mun_dict[geo_id] + "</b>" + "<br>" +
