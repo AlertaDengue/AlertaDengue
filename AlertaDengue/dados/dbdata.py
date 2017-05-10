@@ -76,6 +76,32 @@ def get_alerta_mrj_chik():
         return pd.read_sql_query(sql, conexao, index_col='id')
 
 
+def get_last_alert(geo_id, disease):
+    """
+    
+    :param geo_id: 
+    :param disease: 
+    :return: 
+    """
+
+    table_name = (
+        'Historico_alerta' if disease == 'dengue' else
+        'Historico_alerta_chik' if disease == 'chikungunya' else
+        None
+    )
+
+    sql = '''
+    SELECT nivel
+    FROM "Municipio"."%s"
+    WHERE municipio_geocodigo=%s  and "SE" < 201701
+    ORDER BY "data_iniSE" DESC
+    LIMIT 1
+    ''' % (table_name, geo_id)
+
+    with db_engine.connect() as conn:
+        return pd.read_sql_query(sql, conn)
+
+
 def get_city(query):
     """
     Fetch city geocode, name and state from the database,
