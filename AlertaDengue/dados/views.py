@@ -618,24 +618,37 @@ class AlertaStateView(TemplateView):
         """
         context = super(AlertaStateView, self).get_context_data(**kwargs)
 
+        series_data_rj = None
+
         cities_alert = dbdata.NotificationResume.get_cities_alert_by_state(
             self._state_name[context['state']], context['disease']
         )
 
-        mun_dict = dict(cities_alert[['municipio_geocodigo', 'nome']].values)
-
-        mun_dict_ordered = OrderedDict(
-            sorted(
-                cities_alert[['municipio_geocodigo', 'nome']].values,
-                key=lambda d: d[1]
-            )
-        )
-
-        geo_ids = list(mun_dict.keys())
-
         alerts = dict(
             cities_alert[['municipio_geocodigo', 'level_alert']].values
         )
+
+        mun_dict = dict(cities_alert[['municipio_geocodigo', 'nome']].values)
+        is_just_rj = False
+
+        if (
+            not mun_dict and
+            context['state'] == 'RJ' and
+            context['disease'] == 'chikungunya'
+        ):
+            geo_id_rj = 3304557
+            mun_dict = {geo_id_rj: 'Rio de Janeiro'}
+            series_data_rj = dbdata.load_series(
+                geo_id_rj, 'chikungunya'
+            )['3304557']
+            alerts = {str(geo_id_rj): series_data_rj['alerta'][-1]}
+            is_just_rj = True
+
+        mun_dict_ordered = OrderedDict(
+            sorted(mun_dict.items(), key=lambda v: v[1])
+        )
+
+        geo_ids = list(mun_dict.keys())
 
         dbf = DBF.objects.filter(
             state_abbreviation=context['state']
@@ -647,13 +660,18 @@ class AlertaStateView(TemplateView):
             last_update = dbf.export_date
 
         if len(geo_ids) > 0:
-            cases_series_last_12 = (
-                dbdata.NotificationResume.tail_estimated_cases(
-                    geo_ids, 12
+            if not is_just_rj:
+                cases_series_last_12 = (
+                    dbdata.NotificationResume.tail_estimated_cases(
+                        geo_ids, 12
+                    )
                 )
-            )
+            else:
+                cases_series_last_12 = {
+                    geo_id_rj: series_data_rj['casos_est']
+                }
         else:
-            cases_series_last_12 = []
+            cases_series_last_12 = {}
 
         context.update({
             'state_abv': context['state'],

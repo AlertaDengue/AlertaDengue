@@ -29,7 +29,9 @@ class Upload(LoginRequiredMixin, FormView):
     success_url = reverse_lazy("dbf:upload_successful")
 
     def post(self, request, *args, **kwargs):
-        self.request.POST['uploaded_by'] = request.user.id
+        mutable_POST = self.request.POST.copy()
+        mutable_POST['uploaded_by'] = request.user.id
+        self.request.POST = mutable_POST
         return super(Upload, self).post(self.request, *args, **kwargs)
 
     def form_valid(self, form):
