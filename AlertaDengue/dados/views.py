@@ -848,7 +848,7 @@ class GeoTiffView(View):
             result, content_type='application/force-download'
         )
         response['Content-Disposition'] = (
-            'attachment; filename=%s.geotiff' % geocode
+            'attachment; filename=%s.tiff' % geocode
         )
 
         return response

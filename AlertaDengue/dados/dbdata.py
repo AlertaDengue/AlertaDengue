@@ -93,7 +93,7 @@ def get_last_alert(geo_id, disease):
     sql = '''
     SELECT nivel
     FROM "Municipio"."%s"
-    WHERE municipio_geocodigo=%s  and "SE" < 201701
+    WHERE municipio_geocodigo=%s
     ORDER BY "data_iniSE" DESC
     LIMIT 1
     ''' % (table_name, geo_id)
