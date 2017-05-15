@@ -1,7 +1,7 @@
 FROM debian:testing
 
 RUN apt-get update
-RUN apt-get install -q -y locales python3 python3-pip python3-setuptools python3-numpy python3-pandas libpq-dev
+RUN apt-get install -q -y locales python3 python3-pip python3-setuptools python3-numpy python3-pandas libpq-dev python3-gdal
 
 # Set locale
 RUN echo "pt_BR.UTF-8 UTF-8" > /etc/locale.gen
