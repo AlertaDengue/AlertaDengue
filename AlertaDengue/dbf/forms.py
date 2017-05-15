@@ -22,6 +22,7 @@ class DBFForm(forms.Form):
     state_abbreviation = forms.ChoiceField(
         choices=DBF.STATE_ABBREVIATION_CHOICES, label=_("U.F.")
     )
+    municipio = forms.CharField(label=_("Nome do município (opcional)"),  required=False)
 
     def clean(self):
         cleaned_data = super(DBFForm, self).clean()

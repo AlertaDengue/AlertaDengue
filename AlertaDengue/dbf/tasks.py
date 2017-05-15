@@ -37,7 +37,7 @@ def send_failure_email(dbf, message):
 
 
 def copy_file_to_final_destination(dbf):
-    new_filename = "{}_{}_{}.dbf".format(dbf.state_abbreviation, dbf.export_date, dbf.notification_year)
+    new_filename = "{}_{}_{}_{}.dbf".format(dbf.state_abbreviation, dbf.municipio, dbf.export_date, dbf.notification_year)
     src = dbf.file.path
     dest = os.path.join(settings.IMPORTED_FILES_DIR, new_filename)
     shutil.copy(src, dest)
