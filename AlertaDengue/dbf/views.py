@@ -45,7 +45,8 @@ class Upload(LoginRequiredMixin, FormView):
             file=uploaded_file,
             export_date=form.cleaned_data['export_date'],
             notification_year=form.cleaned_data['notification_year'],
-            state_abbreviation=form.cleaned_data['state_abbreviation']
+            state_abbreviation=form.cleaned_data['state_abbreviation'],
+            municipio=form.cleaned_data['municipio']
         )
         import_dbf_to_database.delay(dbf.id)
         success_message = _("O arquivo {} exportado em {:%d/%m/%Y} com notificações do ano {} "
