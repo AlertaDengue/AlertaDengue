@@ -9,7 +9,7 @@ from dados.views import (
     HistoricoView, AlertaPageView, AlertaGeoJSONView, AlertaPageViewMunicipio,
     CityMapView, get_municipio,
     AlertaMainView, AlertaStateView, NotificationReducedCSV_View,
-    PartnersPageView
+    PartnersPageView, GeoTiffView
 )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -73,5 +73,7 @@ urlpatterns = [
     url(r'^dbf/', include(dbf.urls)),
     url(r'^csv/notif_reduced$',
         NotificationReducedCSV_View.as_view(),
-        name='notif_reduced')
+        name='notif_reduced'),
+    url(r'^geotiff/%s/%s/$' % (__geocode, __disease),
+        GeoTiffView.as_view(), name='geotiff'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

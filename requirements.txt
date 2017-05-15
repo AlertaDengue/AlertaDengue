@@ -3,6 +3,7 @@ django-bootstrap3
 django-leaflet
 geojson
 gunicorn
+numpy
 pandas
 python-decouple==2.3
 pytz
@@ -16,3 +17,6 @@ dj-database-url==0.3.0
 django-chunked-upload
 celery
 dj-static
+fiona
+rasterio
+geopy

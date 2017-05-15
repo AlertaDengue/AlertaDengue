@@ -20,6 +20,7 @@ docker_shared_files
 /AlertaDengue/geodjango.db
 /AlertaDengue/static_files/*
 /AlertaDengue/static/geojson/*.json
+/AlertaDengue/static/shapefile/*
 pip-selfcheck.json
 /shapely
 /share
