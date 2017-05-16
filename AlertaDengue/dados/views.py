@@ -1,8 +1,9 @@
 # coding: utf-8
+from rasterio.features import rasterize
+from rasterio.transform import from_origin
 from dados.maps import get_city_geojson, get_city_info
 from dados import dbdata
 from dados import models as M
-from dados.episem import episem
 from dbf.models import DBF
 
 from django.utils.translation import gettext
@@ -14,6 +15,7 @@ from django.http import HttpResponse
 from time import mktime
 from collections import defaultdict, OrderedDict
 
+import geopy.distance
 import random
 import json
 import os
@@ -21,6 +23,14 @@ import datetime
 import numpy as np
 import locale
 import geojson
+import fiona
+import rasterio
+
+
+def hex_to_rgb(value):
+    value = value.lstrip('#')
+    lv = len(value)
+    return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
@@ -37,6 +47,98 @@ def variation_p(v1, v2):
         ((v2 - v1) / 1) * 100 if v1 == 0 else
         ((v2 - v1) / v1) * 100, 2
     )
+
+
+def get_alert(disease='dengue'):
+    """
+    Read the data and return the alert status of all APs.
+    returns a tuple with the following elements:
+    - alert: dictionary with the alert status per AP
+    - current: tuple with all variables from the last SE
+    - case_series: dictionary with 12-weeks case series per AP
+    - last_year: integer representing the total number of cases 52 weeks ago.
+    - obs_case_series
+    - min_max_est
+    :rtype : tuple
+    """
+    # dados_alerta and dados_alert_chick are global variables
+    df = (
+        dados_alerta if disease == 'dengue' else
+        dados_alerta_chik if disease == 'chikungunya' else
+        None
+    )
+
+    if df is None:
+        raise Exception('Doença não cadastrada.')
+
+    df = df.copy()
+    df.fillna(0, inplace=True)
+
+    last_SE = df.se.max()  # Last epidemiological week
+    current = df[df['se'] == last_SE]  # Current status
+
+    G = df.groupby("aps")
+    alert = defaultdict(lambda: 0)
+    case_series = {}  # estimated
+    obs_case_series = {}
+    min_max_est = {}
+    last_year = None
+
+    for ap in G.groups.keys():
+        # .tail()  # only calculates on the series tail
+        adf = G.get_group(ap).sort_values('data')
+
+        k = str(float(ap.split('AP')[-1]))
+
+        case_series[k] = [
+            int(v) for v in adf.casos_est.iloc[-12:].values
+        ]
+        obs_case_series[k] = [
+            int(v) for v in adf.casos.iloc[-12:].values
+        ]
+        alert[ap] = adf.nivel.iloc[-1]
+        last_year = int(adf.casos.iloc[-52])
+        min_max_est[ap] = (
+            adf.casos_estmin.iloc[-1],
+            adf.casos_estmax.iloc[-1]
+        )
+
+    return alert, current, case_series, last_year, obs_case_series, min_max_est
+
+
+def load_series():
+    """
+    Monta as séries para visualização no site
+    """
+    series = defaultdict(lambda: defaultdict(lambda: []))
+    G = dados_alerta.groupby("aps")
+    for ap in G.groups.keys():
+        series[ap]['dia'] = [
+            int(mktime(datetime.datetime.strptime(d, "%Y-%m-%d").timetuple()))
+            if isinstance(d, str) else None
+            for d in G.get_group(ap).data
+        ]
+        series[ap]['tweets'] = [
+            float(i) if not np.isnan(i) else None
+            for i in G.get_group(ap).tweets
+        ]
+        series[ap]['tmin'] = [
+            float(i) if not np.isnan(i) else None
+            for i in G.get_group(ap).tmin
+        ]
+        series[ap]['casos_est'] = [
+            float(i) if not np.isnan(i) else None
+            for i in G.get_group(ap).casos_est
+        ]
+        series[ap]['casos'] = [
+            float(i) if not np.isnan(i) else None
+            for i in G.get_group(ap).casos
+        ]
+        series[ap]['alerta'] = [
+            c - 1 if not np.isnan(c) else None
+            for c in G.get_group(ap).cor
+        ]
+    return series
 
 
 class AlertaMainView(TemplateView):
@@ -58,13 +160,6 @@ class AlertaMainView(TemplateView):
 
         # today
         last_se = {}
-        penultimate_se = {}
-
-        # today = datetime.datetime.today()
-        # se2 = episem(today, sep='')
-        # 7 days ago
-        # last_week = today - datetime.timedelta(days=0, weeks=1)
-        # se1 = episem(last_week, sep='')
 
         case_series = defaultdict(dict)
         case_series_state = defaultdict(dict)
@@ -124,30 +219,6 @@ class AlertaMainView(TemplateView):
                     v1_4week_fixed[d][s] = v1 == 0 and v2 != 0
 
                     variation_4_weeks[d][s] = variation_p(v1, v2)
-        '''
-        for st_name in self._state_names:
-            print
-            (case_series)
-            # Municípios participantes
-            count_cities[st_name] = notif_resume.count_cities_by_uf(st_name)
-            # Total de casos notificado e estimados na semana
-            current_week[st_name] = notif_resume.count_cases_by_uf(
-                st_name, se2
-            ).iloc[0].to_dict()
-            # Previsão de casos para as próximas semanas
-            estimated_cases_next_week[st_name] = current_week[st_name]['casos']
-            # Variação em relação à semana anterior
-            # ((v2-v1)/v1)*100
-            variation_to_current_week[st_name] = (
-                notif_resume.count_cases_week_variation_by_uf(
-                    st_name, se1, se2
-                )
-            ).loc[0, 'casos']
-            variation_4_weeks[st_name] = int((
-                notif_resume.get_4_weeks_variation(st_name, today)
-            ).loc[0, 'casos'])
-            
-        '''
 
         context.update({
             # 'mundict': json.dumps(mundict),
@@ -499,100 +570,6 @@ class SinanCasesView(View):
         return HttpResponse(cases, content_type="application/json")
 
 
-def get_alert(disease='dengue'):
-    """
-    Read the data and return the alert status of all APs.
-    returns a tuple with the following elements:
-    - alert: dictionary with the alert status per AP
-    - current: tuple with all variables from the last SE
-    - case_series: dictionary with 12-weeks case series per AP
-    - last_year: integer representing the total number of cases 52 weeks ago.
-    - obs_case_series
-    - min_max_est
-    :rtype : tuple
-    """
-    # dados_alerta and dados_alert_chick are global variables
-    df = (
-        dados_alerta if disease == 'dengue' else
-        dados_alerta_chik if disease == 'chikungunya' else
-        None
-    )
-
-    if df is None:
-        raise Exception('Doença não cadastrada.')
-
-    df = df.copy()
-    df.fillna(0, inplace=True)
-
-    last_SE = df.se.max()  # Last epidemiological week
-    # year = datetime.date.today().year  # Current year
-    # current epidemiological week
-    # SE = int(str(last_SE).split(str(year))[-1])
-    current = df[df['se'] == last_SE]  # Current status
-
-    G = df.groupby("aps")
-    alert = defaultdict(lambda: 0)
-    case_series = {}  # estimated
-    obs_case_series = {}
-    min_max_est = {}
-    last_year = None
-
-    for ap in G.groups.keys():
-        # .tail()  # only calculates on the series tail
-        adf = G.get_group(ap).sort_values('data')
-
-        k = str(float(ap.split('AP')[-1]))
-
-        case_series[k] = [
-            int(v) for v in adf.casos_est.iloc[-12:].values
-        ]
-        obs_case_series[k] = [
-            int(v) for v in adf.casos.iloc[-12:].values
-        ]
-        alert[ap] = adf.nivel.iloc[-1]
-        last_year = int(adf.casos.iloc[-52])
-        min_max_est[ap] = (
-            adf.casos_estmin.iloc[-1],
-            adf.casos_estmax.iloc[-1]
-        )
-
-    return alert, current, case_series, last_year, obs_case_series, min_max_est
-
-
-def load_series():
-    """
-    Monta as séries para visualização no site
-    """
-    series = defaultdict(lambda: defaultdict(lambda: []))
-    G = dados_alerta.groupby("aps")
-    for ap in G.groups.keys():
-        series[ap]['dia'] = [
-            int(mktime(datetime.datetime.strptime(d, "%Y-%m-%d").timetuple()))
-            if isinstance(d, str) else None
-            for d in G.get_group(ap).data
-        ]
-        series[ap]['tweets'] = [
-            float(i) if not np.isnan(i) else None
-            for i in G.get_group(ap).tweets
-        ]
-        series[ap]['tmin'] = [
-            float(i) if not np.isnan(i) else None
-            for i in G.get_group(ap).tmin
-        ]
-        series[ap]['casos_est'] = [
-            float(i) if not np.isnan(i) else None
-            for i in G.get_group(ap).casos_est
-        ]
-        series[ap]['casos'] = [
-            float(i) if not np.isnan(i) else None
-            for i in G.get_group(ap).casos
-        ]
-        series[ap]['alerta'] = [
-            c - 1 if not np.isnan(c) else None
-            for c in G.get_group(ap).cor
-        ]
-    return series
-
 
 class AlertaStateView(TemplateView):
     template_name = 'state_cities.html'
@@ -760,6 +737,121 @@ class NotificationReducedCSV_View(View):
             result = notifQuery.get_selected_rows().to_csv()
 
         return HttpResponse(result, content_type="text/plain")
+
+
+class GeoTiffView(View):
+    """
+    
+    """
+    def get(self, request, geocodigo, disease):
+        """
+
+        :param kwargs:
+        :return:
+        
+        """
+        geocode = geocodigo
+
+        # load shapefile
+        for path in (settings.STATIC_ROOT, settings.STATICFILES_DIRS[0]):
+            if not os.path.isdir(path):
+                continue
+            shp_path = os.path.join(path, 'shapefile')
+
+        shp = fiona.open(os.path.join(shp_path, '%s.shp' % geocode))
+
+        # get coordinates
+        coords_1 = shp.bounds[1], shp.bounds[0]
+
+        # coordinate 2 to get height
+        coords_2 = shp.bounds[3], shp.bounds[0]
+
+        height = geopy.distance.vincenty(coords_1, coords_2).km
+        # coordinate 2 to get width
+        coords_2 = shp.bounds[1], shp.bounds[2]
+
+        width = geopy.distance.vincenty(coords_1, coords_2).km
+
+        res_x = (shp.bounds[2] - shp.bounds[0]) / width
+        res_y = (shp.bounds[3] - shp.bounds[1]) / height
+
+        out_shape = int(height), int(width)
+
+        transform = from_origin(
+            shp.bounds[0] - res_x / 2,
+            shp.bounds[3] + res_y / 2,
+            res_x, res_y
+        )
+
+        df_level = dbdata.get_last_alert(geocode, disease)
+
+        level = (
+            0 if df_level.empty else
+            0 if not (1 <= df_level.nivel[0] <= 4) else
+            df_level.nivel[0]
+        )
+
+        color_list = [
+            '#cccccc',  # gray
+            '#00ff00',  # green
+            '#ffff00',  # yellow
+            '#ff9900',  # orange
+            '#ff0000',  # red
+        ]
+
+        rgb_values = hex_to_rgb(color_list[level])
+
+        shapes = [
+            [(geometry['geometry'], color)]
+            for k, geometry in shp.items()
+            for color in rgb_values
+        ]
+
+        # creates raster file
+        dtype = rasterio.float64
+        fill = np.nan
+
+        raster_args = dict(
+            out_shape=out_shape,
+            fill=fill,
+            transform=transform,
+            dtype=dtype,
+            all_touched=True
+        )
+
+        rasters = [rasterize(shape, **raster_args) for shape in shapes]
+        geotiff_path = '/tmp/%s.tif' % geocode
+
+        with rasterio.open(
+            fp=geotiff_path,
+            mode='w',
+            crs=shp.crs,
+            driver='GTiff',
+            profile='GeoTIFF',
+            dtype=dtype,
+            count=3,
+            width=width,
+            height=height,
+            nodata=np.nan,
+            transform=transform,
+            photometric='RGB'
+        ) as dst:
+            for i in range(1, 4):
+                dst.write_band(i, rasters[i - 1])
+
+        with open(geotiff_path, 'rb') as f:
+            result = f.read()
+
+        os.remove(geotiff_path)
+
+        response = HttpResponse(
+            result, content_type='application/force-download'
+        )
+        response['Content-Disposition'] = (
+            'attachment; filename=%s.tiff' % geocode
+        )
+
+        return response
 
 
 class PartnersPageView(TemplateView):
