@@ -25,7 +25,7 @@ WORKDIR /srv/deploy/AlertaDengue/AlertaDengue
 
 # Migrate
 RUN python3 manage.py migrate --run-syncdb --noinput
-RUN python3 manage.py sync_geojson
+RUN python3 manage.py sync_geofiles
 
 # Collectstatic
 RUN python3 manage.py collectstatic --noinput
