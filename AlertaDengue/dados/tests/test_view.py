@@ -10,7 +10,7 @@ import os
 class TestAlertaPageView(TestCase):
     def setUp(self):
         settings.DATA_DIR = os.path.dirname(__file__)
-        self.response = self.client.get(reverse('mrj'))
+        self.response = self.client.get(reverse('mrj', args=['dengue']))
 
     @skip
     def test_casos_por_ap(self):
