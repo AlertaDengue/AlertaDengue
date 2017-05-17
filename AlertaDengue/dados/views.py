@@ -823,7 +823,7 @@ class GeoTiffView(View):
         geotiff_path = '/tmp/%s.tif' % geocode
 
         with rasterio.open(
-            fp=geotiff_path,
+            geotiff_path,
             mode='w',
             crs=shp.crs,
             driver='GTiff',
