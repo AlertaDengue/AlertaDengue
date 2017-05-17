@@ -73,5 +73,5 @@ urlpatterns = [
     url(r'^geotiff/%s/%s/$' % (__geocode, __disease),
         GeoTiffView.as_view(), name='geotiff'),
     url(r'^geojson/%s/%s/$' % (__geocode, __disease),
-        GeoJsonView.as_view(), name='geotiff'),
+        GeoJsonView.as_view(), name='geojson'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
