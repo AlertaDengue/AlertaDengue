@@ -23,13 +23,6 @@ ADD AlertaDengue /srv/deploy/AlertaDengue
 
 WORKDIR /srv/deploy/AlertaDengue
 
-# Migrate
-RUN python3 manage.py migrate --run-syncdb --noinput
-RUN python3 manage.py sync_geofiles
-
-# Collectstatic
-RUN python3 manage.py collectstatic --noinput
-
 # Change the permissions for the user home directory
 RUN chown -R deploy:deploy /srv/deploy/
 
