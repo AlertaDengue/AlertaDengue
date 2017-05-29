@@ -19,9 +19,9 @@ ADD requirements.txt /tmp/requirements.txt
 RUN pip3 install -r /tmp/requirements.txt
 
 # Send code to the container
-ADD . /srv/deploy/AlertaDengue
+ADD AlertaDengue /srv/deploy/AlertaDengue
 
-WORKDIR /srv/deploy/AlertaDengue/AlertaDengue
+WORKDIR /srv/deploy/AlertaDengue
 
 # Migrate
 RUN python3 manage.py migrate --run-syncdb --noinput
