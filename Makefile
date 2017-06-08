@@ -1,5 +1,5 @@
-compose_cmd = sudo docker-compose
-staging_compose_cmd = sudo docker-compose -p infodengue_staging -f docker-compose.yml -f staging-compose.yml
+compose_cmd = docker-compose
+staging_compose_cmd = docker-compose -p infodengue_staging -f docker-compose.yml -f staging-compose.yml
 
 build:
 	$(compose_cmd) build
