@@ -20,6 +20,8 @@ services:
         - PSQL_HOST=staging_db
       volumes:
         - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+      ports:
+        - 8001:8000
       depends_on:
         - staging_db
         - rabbitmq
