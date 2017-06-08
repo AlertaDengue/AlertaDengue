@@ -1,0 +1,41 @@
+version: "2"
+services:
+    staging_db:
+      image: postgres:9.5
+      build:
+        context: "."
+        dockerfile: "Dockerfile-postgres"
+      env_file:
+        - .env
+      hostname: staging_db
+      volumes:
+        - ${STAGING_DATA_DIR}:/var/lib/postgresql/data
+      restart: always
+
+    web:
+      environment:
+        - MEMCACHED_HOST=memcache
+        - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+        - DATABASE_URL = postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:5432/infodengue
+        - PSQL_HOST=staging_db
+      volumes:
+        - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+      depends_on:
+        - staging_db
+        - rabbitmq
+        - memcache
+      restart: always
+
+    celery-worker:
+      environment:
+        - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+        - DATABASE_URL = postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:5432/infodengue
+        - PSQL_HOST=staging_db
+      volumes:
+        - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+        - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      depends_on:
+        - staging_db
+        - rabbitmq
+        - memcache
+      restart: always
