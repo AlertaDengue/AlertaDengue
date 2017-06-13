@@ -1,5 +1,16 @@
 version: "2"
 services:
+    staging_memcache:
+      image: memcached:latest
+      hostname: staging_memcache
+      ports: []
+      restart: always
+
+    staging_rabbitmq:
+      image: rabbitmq:3
+      hostname: staging_rabbitmq
+      restart: always
+
     staging_db:
       image: postgres:9.5
       build:
@@ -12,25 +23,33 @@ services:
         - ${STAGING_DATA_DIR}:/var/lib/postgresql/data
       restart: always
 
-    web:
+    staging_web:
+      build: .
+      env_file:
+        - .env
+      ports:
+        - 8001:8000
       environment:
-        - MEMCACHED_HOST=memcache
-        - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+        - MEMCACHED_HOST=staging_memcache
+        - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
         - DATABASE_URL = postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:5432/infodengue
         - PSQL_HOST=staging_db
       volumes:
         - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
-      ports:
-        - 8001:8000
       depends_on:
         - staging_db
-        - rabbitmq
-        - memcache
+        - staging_rabbitmq
+        - staging_memcache
       restart: always
 
-    celery-worker:
+    staging_celery-worker:
+      build:
+        context: "."
+        dockerfile: "Dockerfile-celery"
+      env_file:
+        - .env
       environment:
-        - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+        - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
         - DATABASE_URL = postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:5432/infodengue
         - PSQL_HOST=staging_db
       volumes:
@@ -38,6 +57,6 @@ services:
         - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
       depends_on:
         - staging_db
-        - rabbitmq
-        - memcache
+        - staging_rabbitmq
+        - staging_memcache
       restart: always
