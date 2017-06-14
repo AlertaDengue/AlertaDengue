@@ -28,7 +28,7 @@ services:
       env_file:
         - .env
       ports:
-        - 8001:8000
+        - 8080:8000
       environment:
         - MEMCACHED_HOST=staging_memcache
         - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
