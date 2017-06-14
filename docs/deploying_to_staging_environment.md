@@ -12,5 +12,5 @@ to set the following environment variables in your local `.env` file
 * `STAGING_DATA_DIR` - this is where the db container will keep the postgres data directory
 
 
-After that, all you need to do is `make deploy_stage` and
+After that, all you need to do is `make deploy_staging` and
 docker-compose will build all the images and run them.
