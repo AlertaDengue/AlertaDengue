@@ -22,3 +22,7 @@ deploy_staging: build_staging
 
 stop_staging:
 	$(staging_compose_cmd) stop
+
+clean_staging:
+	$(staging_compose_cmd) stop
+	$(staging_compose_cmd) rm
