@@ -1,7 +1,6 @@
 # coding: utf-8
-from rasterio.features import rasterize
-from rasterio.transform import from_origin
 from dados.maps import get_city_geojson, get_city_info
+from dados.geotiff import convert_from_shapefile
 from dados import dbdata
 from dados import models as M
 from dbf.models import DBF
@@ -15,22 +14,15 @@ from django.http import HttpResponse
 from time import mktime
 from collections import defaultdict, OrderedDict
 
-import geopy.distance
+import io
 import random
+import fiona
 import json
 import os
 import datetime
 import numpy as np
 import locale
 import geojson
-import fiona
-import rasterio
-
-
-def hex_to_rgb(value):
-    value = value.lstrip('#')
-    lv = len(value)
-    return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
@@ -39,6 +31,42 @@ dados_alerta_chik = dbdata.get_alerta_mrj_chik()
 
 with open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')) as f:
     polygons = geojson.load(f)
+
+
+def hex_to_rgb(value):
+    value = value.lstrip('#')
+    lv = len(value)
+    return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
+
+
+def get_last_color_alert(geocode, disease, color_type='rgb'):
+    """
+
+    :param geocode: 
+    :param disease:
+    :param color_type: rba|hex
+    :return: 
+    """
+    df_level = dbdata.get_last_alert(geocode, disease)
+
+    level = (
+        0 if df_level.empty else
+        0 if not (1 <= df_level.nivel[0] <= 4) else
+        df_level.nivel[0]
+    )
+
+    color_list = [
+        '#cccccc',  # gray
+        '#00ff00',  # green
+        '#ffff00',  # yellow
+        '#ff9900',  # orange
+        '#ff0000',  # red
+    ]
+
+    if color_type == 'hex':
+        return color_list[level]
+
+    return hex_to_rgb(color_list[level])
 
 
 def variation_p(v1, v2):
@@ -430,11 +458,6 @@ class AlertaGeoJSONView(View):
         return HttpResponse(geojson.dumps(polygons))
 
 
-class CityMapView(View):
-    def get(self, request, geocodigo):
-        return geojson.dumps(get_city_geojson(int(geocodigo)))
-
-
 class DetailsPageView(TemplateView):
     template_name = 'details.html'
 
@@ -760,95 +783,56 @@ class GeoTiffView(View):
 
         shp = fiona.open(os.path.join(shp_path, '%s.shp' % geocode))
 
-        # get coordinates
-        coords_1 = shp.bounds[1], shp.bounds[0]
-
-        # coordinate 2 to get height
-        coords_2 = shp.bounds[3], shp.bounds[0]
-
-        height = geopy.distance.vincenty(coords_1, coords_2).km
-        # coordinate 2 to get width
-        coords_2 = shp.bounds[1], shp.bounds[2]
-
-        width = geopy.distance.vincenty(coords_1, coords_2).km
-
-        res_x = (shp.bounds[2] - shp.bounds[0]) / width
-        res_y = (shp.bounds[3] - shp.bounds[1]) / height
-
-        out_shape = int(height), int(width)
-
-        transform = from_origin(
-            shp.bounds[0] - res_x / 2,
-            shp.bounds[3] + res_y / 2,
-            res_x, res_y
+        result = convert_from_shapefile(
+            shapefile=shp,
+            rgb_color=get_last_color_alert(geocode, disease)
         )
-
-        df_level = dbdata.get_last_alert(geocode, disease)
-
-        level = (
-            0 if df_level.empty else
-            0 if not (1 <= df_level.nivel[0] <= 4) else
-            df_level.nivel[0]
-        )
-
-        color_list = [
-            '#cccccc',  # gray
-            '#00ff00',  # green
-            '#ffff00',  # yellow
-            '#ff9900',  # orange
-            '#ff0000',  # red
-        ]
-
-        rgb_values = hex_to_rgb(color_list[level])
-
-        shapes = [
-            [(geometry['geometry'], color)]
-            for k, geometry in shp.items()
-            for color in rgb_values
-        ]
-
-        # creates raster file
-        dtype = rasterio.float64
-        fill = np.nan
-
-        raster_args = dict(
-            out_shape=out_shape,
-            fill=fill,
-            transform=transform,
-            dtype=dtype,
-            all_touched=True
-        )
-
-        rasters = [rasterize(shape, **raster_args) for shape in shapes]
-        geotiff_path = '/tmp/%s.tif' % geocode
-
-        with rasterio.open(
-            fp=geotiff_path,
-            mode='w',
-            crs=shp.crs,
-            driver='GTiff',
-            profile='GeoTIFF',
-            dtype=dtype,
-            count=3,
-            width=width,
-            height=height,
-            nodata=np.nan,
-            transform=transform,
-            photometric='RGB'
-        ) as dst:
-            for i in range(1, 4):
-                dst.write_band(i, rasters[i - 1])
-
-        with open(geotiff_path, 'rb') as f:
-            result = f.read()
-
-        os.remove(geotiff_path)
 
         response = HttpResponse(
             result, content_type='application/force-download'
         )
+
         response['Content-Disposition'] = (
             'attachment; filename=%s.tiff' % geocode
+        )
+
+        return response
+
+
+class GeoJsonView(View):
+    """
+
+    """
+
+    def get(self, request, geocodigo, disease):
+        """
+
+        :param kwargs:
+        :return:
+
+        """
+        geocode = geocodigo
+
+        # load shapefile
+        for path in (settings.STATIC_ROOT, settings.STATICFILES_DIRS[0]):
+            if not os.path.isdir(path):
+                continue
+            geojson_path = os.path.join(path, 'geojson', '%s.json' % geocode)
+
+        hex_color = get_last_color_alert(geocode, disease, color_type='hex')
+
+        with open(geojson_path) as f:
+            geojson_data = geojson.load(f)
+
+        geojson_data['features'][0]['properties']['fill'] = hex_color
+        result = geojson.dumps(geojson_data)
+
+        response = HttpResponse(
+            result, content_type='application/force-download'
+        )
+
+        response['Content-Disposition'] = (
+            'attachment; filename=%s.json' % geocode
         )
 
         return response

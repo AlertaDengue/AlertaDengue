@@ -51,6 +51,7 @@ class DBF(models.Model):
     state_abbreviation = models.CharField(
         max_length=2, null=True, choices=STATE_ABBREVIATION_CHOICES
     )
+    municipio = models.CharField(max_length=255, blank=True, default="")
 
     def clean(self):
         if self.notification_year > date.today().year:

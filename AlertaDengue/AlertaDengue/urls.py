@@ -5,11 +5,9 @@ from django.views.decorators.cache import cache_page
 from dados.views import (
     DetailsPageView, SinanCasesView, AboutPageView,
     ContactPageView, JoininPageView, MapaDengueView,
-    MapaMosquitoView,
-    HistoricoView, AlertaPageView, AlertaGeoJSONView, AlertaPageViewMunicipio,
-    CityMapView, get_municipio,
-    AlertaMainView, AlertaStateView, NotificationReducedCSV_View,
-    PartnersPageView, GeoTiffView
+    MapaMosquitoView, HistoricoView, AlertaPageView, AlertaGeoJSONView,
+    AlertaPageViewMunicipio, get_municipio, AlertaMainView, AlertaStateView,
+    NotificationReducedCSV_View, PartnersPageView, GeoTiffView, GeoJsonView
 )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -58,8 +56,6 @@ urlpatterns = [
     url(r'^alerta-detalhado/$', DetailsPageView.as_view(), name='home'),
     url(r'^alertageoJSON/$',
         login_required(AlertaGeoJSONView.as_view()), name='alerta-layer'),
-    url(r'^geojson/%s/$' % __geocode,
-        cache_page(60 * 60 * 24)(CityMapView.as_view()), name='mapa'),
     url(r'^getcity/$', get_municipio, name='get_city'),
     url(r'^mapadengue/$', MapaDengueView.as_view(), name='mapadengue'),
     url(r'^mapamosquito/$', MapaMosquitoView.as_view(), name='mapamosquito'),
@@ -76,4 +72,6 @@ urlpatterns = [
         name='notif_reduced'),
     url(r'^geotiff/%s/%s/$' % (__geocode, __disease),
         GeoTiffView.as_view(), name='geotiff'),
+    url(r'^geojson/%s/%s/$' % (__geocode, __disease),
+        GeoJsonView.as_view(), name='geojson'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
