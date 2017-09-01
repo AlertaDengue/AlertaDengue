@@ -4,10 +4,11 @@ from django.conf import settings
 import geojson
 
 conn = psycopg2.connect(
-    "dbname='{}' user='{}' host='{}' password='aldengue'".format(
+    "dbname='{}' user='{}' host='{}' password='{}'".format(
         settings.PSQL_DB,
         settings.PSQL_USER,
-        settings.PSQL_HOST))
+        settings.PSQL_HOST,
+        settings.PSQL_PASSWORD))
 
 
 def get_city_geojson(municipio):
