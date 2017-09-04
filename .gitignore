@@ -30,3 +30,4 @@ geodjango.db
 chunked_uploads
 authorized_keys
 Dockerfile-dev
+/dev_dump/

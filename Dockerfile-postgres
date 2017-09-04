@@ -1,0 +1,6 @@
+FROM postgres:9.5
+
+RUN apt-get update && apt-get install -q -y postgresql-9.5-postgis-scripts
+
+ADD postgres_setup /docker-entrypoint-initdb.d
+ADD dev_dumps /dumps
