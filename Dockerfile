@@ -19,16 +19,9 @@ ADD requirements.txt /tmp/requirements.txt
 RUN pip3 install -r /tmp/requirements.txt
 
 # Send code to the container
-ADD . /srv/deploy/AlertaDengue
+ADD AlertaDengue /srv/deploy/AlertaDengue
 
-WORKDIR /srv/deploy/AlertaDengue/AlertaDengue
-
-# Migrate
-RUN python3 manage.py migrate --run-syncdb --noinput
-RUN python3 manage.py sync_geofiles
-
-# Collectstatic
-RUN python3 manage.py collectstatic --noinput
+WORKDIR /srv/deploy/AlertaDengue
 
 # Change the permissions for the user home directory
 RUN chown -R deploy:deploy /srv/deploy/
