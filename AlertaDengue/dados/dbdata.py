@@ -15,7 +15,7 @@ import numpy as np
 
 CID10 = {
     'dengue': 'A90',
-    'zika': 'U06',
+    'zika': 'A928',
     'chikungunya': 'A920'
 }
 
