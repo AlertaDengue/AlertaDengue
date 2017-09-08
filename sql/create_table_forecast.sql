@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS "Municipio".forecast (
-    epiweek SMALLINT NOT NULL,
+    epiweek INT NOT NULL,
     geoid INT NOT NULL,
     cases INT NOT NULL,
     model_id VARCHAR(128) NOT NULL,
