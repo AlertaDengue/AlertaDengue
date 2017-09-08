@@ -49,10 +49,13 @@ def get_all_active_cities():
 
     if res is None:
         with db_engine.connect() as conexao:
-            res = conexao.execute('SELECT DISTINCT municipio_geocodigo, municipio_nome FROM'
-                '"Municipio"."Historico_alerta";')
+            res = conexao.execute(
+                ' SELECT DISTINCT municipio_geocodigo, municipio_nome'
+                ' FROM "Municipio"."Historico_alerta";')
             res = res.fetchall()
-            cache.set('get_all_active_cities', res, settings.QUERY_CACHE_TIMEOUT)
+            cache.set(
+                'get_all_active_cities', res, settings.QUERY_CACHE_TIMEOUT
+            )
     return res
 
 
@@ -110,9 +113,13 @@ def get_city(query):
     :return: list of dictionaries
     """
     with db_engine.connect() as conexao:
-        sql = 'SELECT distinct municipio_geocodigo, nome, uf from "Municipio"."Historico_alerta" inner JOIN' \
-              ' "Dengue_global"."Municipio" on "Historico_alerta".municipio_geocodigo="Municipio".geocodigo ' \
-              'WHERE nome ilike(%s);'
+        sql = (
+            ' SELECT distinct municipio_geocodigo, nome, uf' +
+            ' FROM "Municipio"."Historico_alerta" AS alert' +
+            '  INNER JOIN "Dengue_global"."Municipio" AS city' +
+            '  ON alert.municipio_geocodigo=city.geocodigo' +
+            ' WHERE nome ilike(%s);'
+        )
 
         result = conexao.execute(sql, ('%'+query+'%',))
 
@@ -161,6 +168,33 @@ def load_series(cidade, disease='dengue'):
             ap = str(cidade)
             cidade = add_dv(int(str(cidade)[:-1]))
 
+            sql_join = '''
+                SELECT 
+                    (CASE 
+                     WHEN tb_cases."data_iniSE" IS NOT NULL 
+                       THEN tb_cases."data_iniSE" 
+                     ELSE forecast.init_date_epiweek
+                     END
+                    ) AS "data_iniSE",
+                    tb_cases.casos_est_min,
+                    tb_cases.casos_est,
+                    tb_cases.casos_est_max,
+                    tb_cases.casos,
+                    tb_cases.nivel,
+                    (CASE 
+                     WHEN tb_cases."SE" IS NOT NULL THEN tb_cases."SE" 
+                     ELSE forecast.epiweek
+                     END
+                    ) AS "SE",
+                    tb_cases.p_rt1,
+                    forecast.cases AS forecast_cases 
+                FROM
+                    (%s) AS tb_cases FULL OUTER JOIN "Municipio".forecast
+                      ON (tb_cases."SE" = forecast.epiweek)
+                ORDER BY "data_iniSE" ASC
+            
+            '''
+
             if cidade == 3304557:  # RJ city
                 table_name = (
                     'alerta_mrj' if disease == 'dengue' else
@@ -168,20 +202,23 @@ def load_series(cidade, disease='dengue'):
                     None
                 )
 
-                dados_alerta = pd.read_sql_query(('''
-                    SELECT 
-                      data AS "data_iniSE",
-                      SUM(casos_estmin) AS casos_est_min,
-                      SUM(casos_est) as casos_est,
-                      SUM(casos_estmax) AS casos_est_max,
-                      SUM(casos) AS casos,
-                      MAX(nivel) AS nivel,
-                      se AS "SE",
-                      SUM(prt1) AS p_rt1
-                    FROM "Municipio".{}
-                    GROUP BY "data_iniSE", "SE"
-                    ORDER BY "data_iniSE" ASC
-                '''.format(table_name)), conn, parse_dates=True)
+                dados_alerta = pd.read_sql_query(
+                    (sql_join % '''
+                        SELECT 
+                           data AS "data_iniSE",
+                           SUM(casos_estmin) AS casos_est_min,
+                           SUM(casos_est) as casos_est,
+                           SUM(casos_estmax) AS casos_est_max,
+                           SUM(casos) AS casos,
+                           MAX(nivel) AS nivel,
+                           se AS "SE",
+                           SUM(prt1) AS p_rt1
+                         FROM "Municipio".{}
+                         GROUP BY "data_iniSE", "SE"
+                    '''.format(table_name)),
+                    conn, parse_dates=True
+                )
+
             else:
                 table_name = (
                     'Historico_alerta' if disease == 'dengue' else
@@ -189,10 +226,13 @@ def load_series(cidade, disease='dengue'):
                     None
                 )
 
-                dados_alerta = pd.read_sql_query((
-                    ' SELECT * FROM "Municipio"."{}"' +
-                    ' WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC'
-                ).format(table_name, cidade), conn, 'id', parse_dates=True)
+                dados_alerta = pd.read_sql_query(
+                    (sql_join % ''' 
+                     SELECT * FROM "Municipio"."{}"
+                     WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC
+                     ''').format(table_name, cidade),
+                    conn, 'id', parse_dates=True
+                )
 
             if len(dados_alerta) == 0:
                 return {ap: None}
@@ -220,9 +260,11 @@ def load_series(cidade, disease='dengue'):
 
             series[ap]['casos'] = _nan_to_num_int_list(dados_alerta.casos)
             # (1,4)->(0,3)
-            series[ap]['alerta'] = (dados_alerta.nivel.astype(int)-1).tolist()
+            series[ap]['alerta'] = (dados_alerta.nivel.fillna(1).astype(int)-1).tolist()
             series[ap]['SE'] = (dados_alerta.SE.astype(int)).tolist()
             series[ap]['prt1'] = dados_alerta.p_rt1.astype(float).tolist()
+            # series[ap]['forecast_cases'] = forecast.cases.astype(float).tolist()
+            series[ap]['forecast_cases'] = dados_alerta.forecast_cases.astype(float).tolist()
             series[ap] = dict(series[ap])
 
             # conexao.close()
