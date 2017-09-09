@@ -5,6 +5,8 @@ $(function () {
 
     var nd = new Date();
     var tzo = nd.getTimezoneOffset();
+    var nan = null; // to prevent some problem with nan
+
     // Agora as series de dados
     var dados = {{ dados|safe }};
 
@@ -79,7 +81,7 @@ $(function () {
             backgroundColor: '#FFFFFF'
         },
         series: [
-                {
+            {
                 name: '{% blocktrans %}Casos Estimados de {{disease_label}}{% endblocktrans %}',
                 color: '#AA4643',
                 type: 'spline',
@@ -88,6 +90,22 @@ $(function () {
                 pointInterval: 7 * 24 * 3600 * 1000,
                 pointStart: {{ start }}*1000 + tzo,
                 data: dados.casos_est,
+                dashStyle: 'shortdot',
+                tooltip: {
+                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
+                }
+
+            },
+
+            {
+                name: '{% blocktrans %}Casos Previstos de {{disease_label}}{% endblocktrans %}',
+                color: '#AAAA43',
+                type: 'spline',
+                animation: true,
+                yAxis: 0,
+                pointInterval: 7 * 24 * 3600 * 1000,
+                pointStart: {{ start }}*1000 + tzo,
+                data: dados.forecast_cases,
                 dashStyle: 'shortdot',
                 tooltip: {
                     valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'

@@ -1,13 +1,5 @@
-import psycopg2
-from psycopg2.extras import DictCursor
-from django.conf import settings
+from .dbdata import db_engine
 import geojson
-
-conn = psycopg2.connect(
-    "dbname='{}' user='{}' host='{}' password='aldengue'".format(
-        settings.PSQL_DB,
-        settings.PSQL_USER,
-        settings.PSQL_HOST))
 
 
 def get_city_geojson(municipio):
@@ -16,31 +8,26 @@ def get_city_geojson(municipio):
     :param municipio: geocódigo do municipio
     :return:
     """
-    conn = psycopg2.connect(
-        "dbname='{}' user='{}' host='{}' password='aldengue'".format(
-            settings.PSQL_DB,
-            settings.PSQL_USER,
-            settings.PSQL_HOST))
-    head = r'{"type": "FeatureCollection", "features":['
-    tail = ']}'
-    cur = conn.cursor(cursor_factory=DictCursor)
-    cur.execute(
-        '''
-        select geocodigo, nome, geojson, populacao, uf
-        from "Dengue_global"."Municipio" where geocodigo=%s
-        ''', (municipio,)
-    )
-    datum = cur.fetchone()
-    feat = geojson.loads(datum['geojson'])
+    with db_engine.connect() as conn:
+        head = r'{"type": "FeatureCollection", "features":['
+        tail = ']}'
 
-    feat['type'] = 'Feature'
+        res = conn.execute(
+            '''
+            select geocodigo, nome, geojson, populacao, uf
+            from "Dengue_global"."Municipio" where geocodigo=%s
+            ''', (municipio,)
+        )
+        datum = dict(res.fetchone().items())
+        feat = geojson.loads(datum['geojson'])
 
-    feat['properties'] = {'geocodigo': datum['geocodigo'],
-                          'nome': datum['nome'],
-                          'populacao': datum['populacao']}
+        feat['type'] = 'Feature'
 
-    geoj = geojson.loads(head + geojson.dumps(feat) + tail)
-    conn.close()
+        feat['properties'] = {'geocodigo': datum['geocodigo'],
+                              'nome': datum['nome'],
+                              'populacao': datum['populacao']}
+
+        geoj = geojson.loads(head + geojson.dumps(feat) + tail)
     return geoj
 
 
@@ -50,18 +37,12 @@ def get_city_info(geocodigo):
     :param geocodigo: geocódigo do município.
     :return:
     """
-    conn = psycopg2.connect(
-        "dbname='{}' user='{}' host='{}' password='aldengue'".format(
-            settings.PSQL_DB,
-            settings.PSQL_USER,
-            settings.PSQL_HOST))
-    cur = conn.cursor(cursor_factory=DictCursor)
-    cur.execute(
-        '''
-        select geocodigo, nome, populacao, uf
-        from "Dengue_global"."Municipio" where geocodigo=%s
-        ''', (geocodigo,)
-    )
-    datum = cur.fetchone()
-    conn.close()
+    with db_engine.connect() as conn:
+        res = conn.execute(
+            '''
+            select geocodigo, nome, populacao, uf
+            from "Dengue_global"."Municipio" where geocodigo=%s
+            ''', (geocodigo,)
+        )
+        datum = dict(res.fetchone().items())
     return datum
