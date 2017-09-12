@@ -33,7 +33,10 @@ def _nan_to_num_int_list(v):
     :param v: numpy.array
     :return: list
     """
-    return np.nan_to_num(v).astype(int).tolist()
+    try:
+        return np.nan_to_num(v.fillna(0)).astype(int).tolist()
+    except:
+        return np.nan_to_num(v).astype(int).tolist()
 
 
 def _episem(dt):
@@ -231,7 +234,7 @@ def load_series(cidade, disease='dengue'):
                      SELECT * FROM "Municipio"."{}"
                      WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC
                      ''').format(table_name, cidade),
-                    conn, 'id', parse_dates=True
+                    conn, parse_dates=True
                 )
 
             if len(dados_alerta) == 0:
