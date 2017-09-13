@@ -9,7 +9,7 @@ python-decouple==2.3
 pytz
 psycopg2
 sqlalchemy
-python3-memcached
+python-memcached
 django-makemessages-xgettext
 mock
 dbfread
