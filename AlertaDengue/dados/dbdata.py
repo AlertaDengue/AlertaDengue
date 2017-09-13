@@ -15,7 +15,6 @@ import numpy as np
 
 CID10 = {
     'dengue': 'A90',
-    'zika': 'U06',
     'chikungunya': 'A920'
 }
 
@@ -705,8 +704,9 @@ class NotificationQueries:
         :param disease:
         :return:
         """
+        _diseases = ','.join(["'%s'" % cid for cid in CID10.values()])
         return (
-            'cid10_codigo IS NOT NULL' if disease is None else
+            'cid10_codigo IN (%s)' % _diseases if disease is None else
             'cid10_codigo IN ({})'.format(','.join([
                 "'{}'".format(CID10[cid.lower()])
                 for cid in disease.split(',')
