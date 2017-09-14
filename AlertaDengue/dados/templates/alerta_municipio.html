@@ -268,7 +268,7 @@
         function main_map_init(map, options) {
             $(document).data('map', map)
             //map._layersMaxZoom=13
-            //var dataurl = "{% url "mapa" geocodigo %}";
+            {#//var dataurl = "{% url "mapa" geocodigo %}";#}
             var dataurl = '/static/geojson/{{geocodigo}}.json'
             casos_por_ap = {{ casos_por_ap|safe }};
             series_casos = {{ series_casos|safe }};
