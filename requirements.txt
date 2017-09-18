@@ -5,7 +5,7 @@ geojson
 gunicorn
 numpy
 pandas
-python-decouple==2.3
+python-decouple
 pytz
 psycopg2
 sqlalchemy
@@ -13,7 +13,7 @@ python-memcached
 django-makemessages-xgettext
 mock
 dbfread
-dj-database-url==0.3.0
+dj-database-url
 django-chunked-upload
 celery
 dj-static
