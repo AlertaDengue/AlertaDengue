@@ -4,6 +4,12 @@
 var age_chart;
 var age_categories;
 
+function age_click_bar(i) {
+    age_chart.series[0].data[i].select(null, true);
+    age_chart.series[1].data[i].select(null, true);
+    plots_refresh('age');
+}
+
 function _get_ages_selected() {
     // categories selection
     var categories_selected = age_chart.getSelectedPoints().map(function(d){
@@ -157,7 +163,11 @@ $(document).ready(function () {
                 csv: csv
             },
         });
-    });
-});
+
+        $('#age-chart .highcharts-xaxis-labels text').on('click', function () {
+            age_click_bar($(this).index());
+        });
+    }); // get
+}); // ready
 
 </script>
