@@ -5,6 +5,11 @@
 var gender_chart;
 var gender_categories;
 
+function gender_click_bar(i) {
+    gender_chart.series[0].data[i].select(null, true);
+    plots_refresh('gender');
+}
+
 function _get_genders_selected() {
     // categories selection
     var categories_selected = gender_chart.getSelectedPoints().map(function(d){
@@ -78,8 +83,8 @@ $(document).ready(function () {
                         events: {
                             click: function(event){
                                 //this.slice(null);
-                                this.select(null, true);
-                                plots_refresh('gender');
+                                i = event.point.index;
+                                gender_click_bar(i);
                             }
                         }
                     },
@@ -129,6 +134,10 @@ $(document).ready(function () {
                 csv: csv
             },
         });
-    });
-});
+
+        $('#gender-chart .highcharts-xaxis-labels text').on('click', function () {
+            gender_click_bar($(this).index());
+        });
+    }); // get
+}); // ready
 </script>

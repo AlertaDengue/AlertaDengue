@@ -28,6 +28,7 @@ def get_city_geojson(municipio):
                               'populacao': datum['populacao']}
 
         geoj = geojson.loads(head + geojson.dumps(feat) + tail)
+
     return geoj
 
 
@@ -45,4 +46,5 @@ def get_city_info(geocodigo):
             ''', (geocodigo,)
         )
         datum = dict(res.fetchone().items())
+
     return datum
