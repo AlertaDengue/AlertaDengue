@@ -7,7 +7,7 @@ var age_categories;
 function _get_ages_selected() {
     // categories selection
     var categories_selected = age_chart.getSelectedPoints().map(function(d){
-        return d.category
+        return d.name
     });
 
     // inverted select
