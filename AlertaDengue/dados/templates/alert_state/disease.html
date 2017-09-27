@@ -6,6 +6,13 @@ var disease_chart;
 var disease_chart_load = false;
 var disease_categories;
 
+function disease_click_bar(name) {
+    if (name != '{{disease_label}}') {
+        window.location.href = './' + name.toLowerCase();
+    }
+}
+
+
 function _select_disease() {
     for (j in disease_chart.series[0].data) {
         if (disease_chart.series[0].data[j].name == '{{disease_label}}') {
@@ -92,9 +99,7 @@ $(document).ready(function () {
                                 //this.slice(null);
                                 //this.select(true, false);
                                 //plots_refresh('disease');
-                                if (this.name != '{{disease_label}}') {
-                                    window.location.href = './' + this.name.toLowerCase();
-                                }
+                                disease_click_bar(this.name);
                             },
                         }
                     }
@@ -137,6 +142,10 @@ $(document).ready(function () {
         });
 
         _select_disease();
+
+        $('#disease-chart .highcharts-xaxis-labels text').on('click', function () {
+            disease_click_bar($(this).text());
+        });
     });
 });
 </script>

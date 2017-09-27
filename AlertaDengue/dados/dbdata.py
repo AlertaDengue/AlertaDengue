@@ -15,7 +15,7 @@ import numpy as np
 
 CID10 = {
     'dengue': 'A90',
-    'zika': 'A928',
+    # 'zika': 'A928',
     'chikungunya': 'A920'
 }
 
@@ -41,6 +41,21 @@ def _nan_to_num_int_list(v):
 
 def _episem(dt):
     return episem(dt, sep='')
+
+
+def get_city_name_by_id(geoid: int):
+    """
+
+    :param geoid:
+    :return:
+    """
+    with db_engine.connect() as conexao:
+        res = conexao.execute('''
+            SELECT nome
+            FROM "Dengue_global"."Municipio"
+            WHERE geocodigo=%s;
+        ''' % geoid)
+        return res.fetchone()[0]
 
 
 def get_all_active_cities():
@@ -750,8 +765,9 @@ class NotificationQueries:
         :param disease:
         :return:
         """
+        _diseases = ','.join(["'%s'" % cid for cid in CID10.values()])
         return (
-            'cid10_codigo IS NOT NULL' if disease is None else
+            'cid10_codigo IN (%s)' % _diseases if disease is None else
             'cid10_codigo IN ({})'.format(','.join([
                 "'{}'".format(CID10[cid.lower()])
                 for cid in disease.split(',')
