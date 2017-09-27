@@ -43,6 +43,21 @@ def _episem(dt):
     return episem(dt, sep='')
 
 
+def get_city_name_by_id(geoid: int):
+    """
+
+    :param geoid:
+    :return:
+    """
+    with db_engine.connect() as conexao:
+        res = conexao.execute('''
+            SELECT nome
+            FROM "Dengue_global"."Municipio"
+            WHERE geocodigo=%s;
+        ''' % geoid)
+        return res.fetchone()[0]
+
+
 def get_all_active_cities():
     """
     Fetch from the database a list on names of active cities
