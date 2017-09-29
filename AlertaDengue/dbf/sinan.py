@@ -155,6 +155,10 @@ class Sinan(object):
                 row[7] = None if not row[7] else int(row[7])  # bairro_bairro_id
                 row[8] = None if row[8] == '' else add_dv(int(row[8]))  # municipio_geocodigo
                 row[9] = int(row[9])  # nu_notific
+                if row[10] is None:
+                    raise ValidationError(_("Existem nesse arquivo notificações "
+                                            "que não incluem a coluna ID_AGRAVO."))
+
                 row[11] = None if (isinstance(row[11], pd.tslib.NaTType) or row[11] is None) else date.fromordinal(row[11].to_datetime().toordinal())  # dt_nasc
                 row[13] = None if not row[13] else int(row[13])  # nu_idade_n
                 cursor.execute(insert_sql, row)
