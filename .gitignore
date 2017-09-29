@@ -26,7 +26,6 @@ pip-selfcheck.json
 /share
 .ipynb_checkpoints
 geodjango.db
-*.dbf
 chunked_uploads
 authorized_keys
 Dockerfile-dev
