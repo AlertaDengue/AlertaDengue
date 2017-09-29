@@ -31,3 +31,6 @@ chunked_uploads
 authorized_keys
 Dockerfile-dev
 /dev_dump/
+build
+AlertaDengue.egg-info
+dist
