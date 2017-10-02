@@ -5,7 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 from datetime import date
 from chunked_upload.models import ChunkedUpload
 
-from dbf.validation import is_valid_dbf
+from .validation import is_valid_dbf
+
 
 def current_year():
     return date.today().year

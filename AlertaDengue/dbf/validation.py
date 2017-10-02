@@ -1,12 +1,10 @@
+from contextlib import contextmanager
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
-
-from contextlib import contextmanager
-import datetime
-import os
-import struct
 from tempfile import NamedTemporaryFile
 
+import os
+import struct
 import dbfread
 
 expected_fields = [

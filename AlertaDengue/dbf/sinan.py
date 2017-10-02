@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
-import pandas as pd
-import psycopg2
-from datetime import datetime, date
+from datetime import date
 from psycopg2.extras import DictCursor
 from dbfread import DBF
-import logging
-import sys
-
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+
+import pandas as pd
+import psycopg2
+import logging
 
 
 logger = logging.getLogger('Load_SINAN')

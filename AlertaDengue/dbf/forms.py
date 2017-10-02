@@ -5,8 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from bootstrap3.renderers import FormRenderer
 
-from dbf.models import DBF, DBFChunkedUpload
-from dbf.validation import is_valid_dbf
+from .models import DBF, DBFChunkedUpload
+from .validation import is_valid_dbf
 
 
 class DBFForm(forms.Form):
@@ -22,7 +22,9 @@ class DBFForm(forms.Form):
     state_abbreviation = forms.ChoiceField(
         choices=DBF.STATE_ABBREVIATION_CHOICES, label=_("U.F.")
     )
-    municipio = forms.CharField(label=_("Nome do município (opcional)"),  required=False)
+    municipio = forms.CharField(
+        label=_("Nome do município (opcional)"),  required=False
+    )
 
     def clean(self):
         cleaned_data = super(DBFForm, self).clean()

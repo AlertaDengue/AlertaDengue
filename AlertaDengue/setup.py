@@ -49,10 +49,10 @@ def list_dir(pathname=PATH_ROOT, dir_name=''):
 
     return ['.%s' % r[size:] for r in result]
 
-with open('README.md') as readme_file:
+with open('../README.md') as readme_file:
     readme = readme_file.read()
 
-with open('HISTORY.md') as history_file:
+with open('../HISTORY.md') as history_file:
     history = history_file.read()
 
 install_reqs = parse_requirements('requirements.txt', session=PipSession())

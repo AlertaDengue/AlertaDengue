@@ -1,10 +1,5 @@
 # coding: utf-8
-from dados.maps import get_city_geojson, get_city_info
-from dados.geotiff import convert_from_shapefile
-from dados import dbdata
-from dados import models as M
-from dbf.models import DBF
-
+from django.apps import apps
 from django.utils.translation import gettext
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView, View
@@ -13,8 +8,11 @@ from django.conf import settings
 from django.http import HttpResponse
 from time import mktime
 from collections import defaultdict, OrderedDict
+# local
+from . import dbdata, models as M
+from .maps import get_city_info
+from .geotiff import convert_from_shapefile
 
-import io
 import random
 import fiona
 import json
@@ -23,6 +21,10 @@ import datetime
 import numpy as np
 import locale
 import geojson
+
+# from dbf.models import DBF  # noqa
+DBF = apps.get_model('dbf', 'DBF')
+
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
