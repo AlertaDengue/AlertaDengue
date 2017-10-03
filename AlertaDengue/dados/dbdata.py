@@ -14,6 +14,9 @@ from .episem import episem
 import pandas as pd
 import numpy as np
 
+# rio de janeiro city geoid
+MRJ_GEOID = 3304557
+
 CID10 = {
     'dengue': 'A90',
     # 'zika': 'A928',
@@ -172,7 +175,7 @@ def get_series_by_UF(disease='dengue'):
     return series
 
 
-def load_series(cidade, disease: str='dengue', epiweek: int=None):
+def load_series(cidade, disease: str='dengue', epiweek: int=0):
     """
     Monta as séries do alerta para visualização no site
     :param cidade: geocodigo da cidade desejada
@@ -247,7 +250,7 @@ def load_cases_without_forecast(geoid: int, disease):
     :return:
     """
     with db_engine.connect() as conn:
-        if geoid == 3304557:  # RJ city
+        if geoid == MRJ_GEOID:  # RJ city
             table_name = (
                 'alerta_mrj' if disease == 'dengue' else
                 'alerta_mrj_chik' if disease == 'chikungunya' else
@@ -320,6 +323,39 @@ def load_cases_with_forecast(geoid: int, disease: str, epiweek: int):
     with db_engine.connect() as conn:
         df_forecast_model = pd.read_sql(sql, con=conn)
 
+    if geoid == MRJ_GEOID:  # RJ city
+        table_name = (
+            'alerta_mrj' if disease == 'dengue' else
+            'alerta_mrj_chik' if disease == 'chikungunya' else
+            None
+        )
+
+        sql_alert = '''
+        SELECT 
+           data AS "data_iniSE",
+           SUM(casos_estmin) AS casos_est_min,
+           SUM(casos_est) as casos_est,
+           SUM(casos_estmax) AS casos_est_max,
+           SUM(casos) AS casos,
+           MAX(nivel) AS nivel,
+           se AS "SE",
+           SUM(prt1) AS p_rt1
+        FROM "Municipio".{}
+        GROUP BY "data_iniSE", "SE"
+        '''.format(table_name)
+
+    else:
+        table_name = (
+            'Historico_alerta' if disease == 'dengue' else
+            'Historico_alerta_chik' if disease == 'chikungunya' else
+            None
+        )
+
+        sql_alert = ''' 
+        SELECT * FROM "Municipio"."{}"
+        WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC
+        '''.format(table_name, geoid)
+
     sql = """
     SELECT 
         (CASE 
@@ -343,18 +379,7 @@ def load_cases_with_forecast(geoid: int, disease: str, epiweek: int):
         tb_cases.p_rt1
         %(forecast_models_cases)s
     FROM
-        (SELECT 
-           data AS "data_iniSE",
-           SUM(casos_estmin) AS casos_est_min,
-           SUM(casos_est) as casos_est,
-           SUM(casos_estmax) AS casos_est_max,
-           SUM(casos) AS casos,
-           MAX(nivel) AS nivel,
-           se AS "SE",
-           SUM(prt1) AS p_rt1
-         FROM "Municipio".alerta_mrj
-         GROUP BY "data_iniSE", "SE"
-        ) AS tb_cases %(forecast_models_joins)s
+        (%(sql_alert)s) AS tb_cases %(forecast_models_joins)s
     ORDER BY "data_iniSE" ASC
     """
 
@@ -364,16 +389,29 @@ def load_cases_with_forecast(geoid: int, disease: str, epiweek: int):
         epiweek, 
         init_date_epiweek,
         cases AS forecast_%(model_name)s_cases
-      FROM "Municipio".forecast
+      FROM 
+        "Municipio".forecast
+        INNER JOIN "Municipio".forecast_model
+          ON (
+            forecast.forecast_model_id = forecast_model.id
+            AND forecast_model.active=TRUE
+          )
+        INNER JOIN "Municipio".forecast_city
+          ON (
+            forecast_city.geoid = forecast.geoid
+            AND forecast.forecast_model_id = forecast_city.forecast_model_id
+            AND forecast_city.active=TRUE
+          )
       WHERE
         cid10='%(cid10)s'
-        AND geoid=%(geoid)s
+        AND forecast.geoid=%(geoid)s
         AND published_date='%(published_date)s'
-        AND forecast_model_id=%(model_id)s
+        AND forecast.forecast_model_id=%(model_id)s
     ) AS forecast%(model_id)s ON (
       tb_cases."SE" = forecast%(model_id)s.epiweek 
     )
     '''
+
     forecast_date_ini_epiweek = ''
     forecast_models_cases = ''
     forecast_models_joins = ''
@@ -419,7 +457,8 @@ def load_cases_with_forecast(geoid: int, disease: str, epiweek: int):
         'forecast_models_joins': forecast_models_joins,
         'forecast_models_cases': forecast_models_cases,
         'forecast_date_ini_epiweek': forecast_date_ini_epiweek,
-        'forecast_epiweek': forecast_epiweek
+        'forecast_epiweek': forecast_epiweek,
+        'sql_alert': sql_alert
     }
 
     with db_engine.connect() as conn:

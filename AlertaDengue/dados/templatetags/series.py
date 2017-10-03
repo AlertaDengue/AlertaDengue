@@ -75,13 +75,18 @@ def alerta_series(context):
         if i is None and ra[n - 1] is not None else int_or_none(i)
         for n, i in enumerate(ra)]
 
-    k_forecast = [
+    forecast_models_keys = [
         k for k in dados.keys()
         if k.startswith('forecast_')
     ]
 
+    forecast_models_title = [
+        (k, k.replace('forecast_', '').replace('_cases', '').title())
+        for k in forecast_models_keys
+    ]
+
     forecast_data = {
-        k: json.dumps(dados[k]) for k in k_forecast
+        k: json.dumps(dados[k]) for k in forecast_models_keys
     }
 
     result = {
@@ -93,7 +98,7 @@ def alerta_series(context):
         'laranja': json.dumps(oa),
         'vermelho': json.dumps(ra),
         'disease_label': context['disease_label'],
-        'forecast_models': k_forecast
+        'forecast_models': forecast_models_title
     }
 
     result.update(forecast_data)

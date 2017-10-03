@@ -97,17 +97,17 @@ $(function () {
 
             },
 
-            {% for forecast_model in forecast_models %}
+            {% for k, title in forecast_models %}
 
             {
-                name: '{% blocktrans %}{{forecast_model}} de {{disease_label}}{% endblocktrans %}',
+                name: '{% blocktrans %}Casos previstos de {{disease_label}} ({{title}}){% endblocktrans %}',
                 //color: '#AAAA43',
                 type: 'spline',
                 animation: true,
                 yAxis: 0,
                 pointInterval: 7 * 24 * 3600 * 1000,
                 pointStart: {{ start }}*1000 + tzo,
-                data: dados.{{forecast_model}},
+                data: dados.{{k}},
                 dashStyle: 'shortdot',
                 tooltip: {
                     valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'

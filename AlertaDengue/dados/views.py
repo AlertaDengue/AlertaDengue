@@ -26,11 +26,12 @@ import geojson
 
 DBF = apps.get_model('dbf', 'DBF')
 
-
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
 dados_alerta = dbdata.get_alerta_mrj()
 dados_alerta_chik = dbdata.get_alerta_mrj_chik()
+
+MRJ_GEOID = 3304557
 
 with open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')) as f:
     polygons = geojson.load(f)
@@ -356,7 +357,6 @@ class AlertaMRJPageView(TemplateView, _GetView):
             }
             semana = str(current.se.iat[-1])[-2:]
             segunda = current.data.iat[-1]
-            city_info = get_city_info("3304557")
             # estimated cases
             total_series = sum(
                 np.array(list(case_series.values())), np.zeros(12, int)
@@ -370,12 +370,14 @@ class AlertaMRJPageView(TemplateView, _GetView):
             alerta = {}
             semana = 0
             segunda = datetime.datetime.now() - datetime.timedelta(7)
-            city_info = get_city_info("3304557")
             total_series = [0]
             total_observed_series = [0]
 
+        _MRJ_GEOID = str(MRJ_GEOID)
+        city_info = get_city_info(_MRJ_GEOID)
+
         context.update({
-            'geocodigo': "3304557",
+            'geocodigo': _MRJ_GEOID,
             'nome': "Rio de Janeiro",
             'populacao': city_info['populacao'],
             'incidencia': (
@@ -419,7 +421,7 @@ class AlertaMunicipioPageView(TemplateView, _GetView):
 
         municipio_gc = kwargs['geocodigo']
 
-        if int(municipio_gc) == 3304557:  # Rio de Janeiro
+        if int(municipio_gc) == MRJ_GEOID:  # Rio de Janeiro
             return redirect('mrj', disease='dengue', permanent=True)
 
         return super(
@@ -616,11 +618,11 @@ class AlertaStateView(TemplateView):
             context['state'] == 'RJ' and
             context['disease'] == 'chikungunya'
         ):
-            geo_id_rj = 3304557
+            geo_id_rj = MRJ_GEOID
             mun_dict = {geo_id_rj: 'Rio de Janeiro'}
             series_data_rj = dbdata.load_series(
                 geo_id_rj, 'chikungunya'
-            )['3304557']
+            )[str(MRJ_GEOID)]
             alerts = {str(geo_id_rj): series_data_rj['alerta'][-1]}
             is_just_rj = True
 
