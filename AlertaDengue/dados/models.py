@@ -29,7 +29,7 @@ class ForecastCity(models.Model):
     active BOOL NOT NULL,
 
     """
-    geoid = models.IntegerField(null=False, primary_key=True)
+    geoid = models.IntegerField(null=False)
     active = models.BooleanField(null=False, default=True)
     forecast_model = models.ForeignKey('dados.ForecastModel')
 
