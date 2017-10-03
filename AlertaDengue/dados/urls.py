@@ -5,11 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import RedirectView
 # local
 from .views import (
-    DetailsPageView, SinanCasesView, AboutPageView,
-    ContactPageView, JoininPageView, MapaDengueView,
-    MapaMosquitoView, HistoricoView, AlertaMRJPageView, AlertaGeoJSONView,
-    AlertaPageViewMunicipio, get_municipio, AlertaMainView, AlertaStateView,
-    NotificationReducedCSV_View, PartnersPageView, GeoTiffView, GeoJsonView
+    DetailsPageView, SinanCasesView, AlertaMRJPageView,
+    AlertaGeoJSONView, AlertaMunicipioPageView, get_municipio, AlertaMainView,
+    AlertaStateView, NotificationReducedCSV_View, GeoTiffView, GeoJsonView
 )
 
 
@@ -44,7 +42,7 @@ urlpatterns = [
     # url(r'^blog/', include('blog.urls')),
     url(r'^alerta/%s/$' % __geocode, redirect_alert_city_dengue),
     url(r'^alerta/%s/%s$' % (__geocode, __disease),
-        AlertaPageViewMunicipio.as_view(), name='alerta_cidade'),
+        AlertaMunicipioPageView.as_view(), name='alerta_cidade'),
     url(r'^$', AlertaMainView.as_view(), name='main'),
     url('^accounts/profile/$', RedirectView.as_view(url="/")),
     url('^accounts/', include('django.contrib.auth.urls')),
@@ -52,13 +50,6 @@ urlpatterns = [
     url(r'^alertageoJSON/$',
         login_required(AlertaGeoJSONView.as_view()), name='alerta-layer'),
     url(r'^getcity/$', get_municipio, name='get_city'),
-    url(r'^mapadengue/$', MapaDengueView.as_view(), name='mapadengue'),
-    url(r'^mapamosquito/$', MapaMosquitoView.as_view(), name='mapamosquito'),
-    url(r'^historico/$', HistoricoView.as_view(), name='historico'),
-    url(r'^informacoes/$', AboutPageView.as_view(), name='about'),
-    url(r'^contato/$', ContactPageView.as_view(), name='contact'),
-    url(r'^participe/$', JoininPageView.as_view(), name='joinin'),
-    url(r'^partners/$', PartnersPageView.as_view(), name='partners'),
     url(r'^sinan/(\d{4})/(\d{1,2})', SinanCasesView.as_view(), name='sinan'),
     url(r'^csv/notif_reduced$',
         NotificationReducedCSV_View.as_view(),
