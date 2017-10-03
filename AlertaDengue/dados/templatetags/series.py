@@ -21,7 +21,7 @@ def alerta_series(context):
     )
 
     dados = load_series(
-        context['geocodigo'], disease
+        context['geocodigo'], disease, context['epiweek']
     )[context['geocodigo']]
 
     if dados is None:

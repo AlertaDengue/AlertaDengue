@@ -8,8 +8,11 @@
     {% leaflet_js %}
     {% leaflet_css %}
     {% leaflet_js plugins="ALL" %}
-    <meta property="og:image" content="http://info.dengue.mat.br/static/img/screenshot.png"/>
-    <meta property="og:image:secure_url" content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+    <meta property="og:image"
+          content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+    <meta property="og:image:secure_url"
+          content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+
     <style>
         .leaflet-container {
             height: 80%;
@@ -94,6 +97,22 @@
           <h3> {% blocktrans with incid=incidencia|floatformat %}<b>Incidência estimada:</b> {{ incid }}  por 100 mil habitantes. {% endblocktrans %}</h3>
 {#          <h3><b>Chance de alerta <span class="label label-warning">laranja</span> ou <span class="label label-danger">vermelho</span> na próxima semana:</b> {{ prt1|floatformat }}%</h3>#}
       </div>
+    </div>
+    <div>
+        <form id="form_date_forecast_ref" method="get">
+            <label for="ref">
+                {% blocktrans %}Data de referência da previsão{% endblocktrans %}
+            </label>
+            <input id="ref" name="ref" type="date"/>
+            <script>
+            $(document).ready(function(){
+                $('#ref').val('{{date_forecast_ref}}');
+                $('#ref').on('change', function() {
+                    form_date_forecast_ref.submit();
+                });
+            })
+            </script>
+        </form>
     </div>
     {% alerta_series %}
     {% leaflet_map "main" callback="main_map_init" %}

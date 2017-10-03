@@ -10,6 +10,7 @@ from time import mktime
 from collections import defaultdict, OrderedDict
 # local
 from . import dbdata, models as M
+from .episem import episem
 from .maps import get_city_info
 from .geotiff import convert_from_shapefile
 
@@ -22,7 +23,7 @@ import numpy as np
 import locale
 import geojson
 
-# from dbf.models import DBF  # noqa
+
 DBF = apps.get_model('dbf', 'DBF')
 
 
@@ -288,6 +289,21 @@ class AlertaPageView(TemplateView):
     """
     template_name = 'alerta.html'
 
+    def _get(self, param, default=None):
+        """
+
+        :param param:
+        :param default:
+        :return:
+        """
+        result = (
+            self.request.GET[param]
+            if param in self.request.GET else
+            default
+        )
+
+        return result if result else default
+
     def get_context_data(self, **kwargs):
         context = super(AlertaPageView, self).get_context_data(**kwargs)
 
@@ -311,6 +327,14 @@ class AlertaPageView(TemplateView):
             5.2: 'AP 5.2: Campo Grande e adjacências',
             5.3: 'AP 5.3: Santa Cruz e adjacências'
         }
+
+        # forecast epiweek reference
+        date_forecast_ref = self._get(
+            'ref',
+            datetime.datetime.now().strftime('%Y-%m-%d')
+        )
+
+        epiweek = episem(date_forecast_ref).replace('W', '')
 
         alert, current, case_series, last_year, observed_cases, min_max_est = \
             get_alert(disease_code)
@@ -373,7 +397,9 @@ class AlertaPageView(TemplateView):
             'total_observed_series': ', '.join(
                 map(str, total_observed_series)),
             'disease_label': disease_label,
-            'disease_code': disease_code
+            'disease_code': disease_code,
+            'date_forecast_ref': date_forecast_ref,
+            'epiweek': epiweek
         })
         return context
 
@@ -593,7 +619,6 @@ class SinanCasesView(View):
         cases = cases[:-1] + "]}"
         # json.loads(cases)
         return HttpResponse(cases, content_type="application/json")
-
 
 
 class AlertaStateView(TemplateView):

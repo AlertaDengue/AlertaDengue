@@ -1,8 +1,8 @@
 """
 Este módulo contem funções para interagir com o banco principal do projeto
  Alertadengue.
-"""
 
+"""
 from sqlalchemy import create_engine
 from django.conf import settings
 from django.core.cache import cache
@@ -172,11 +172,12 @@ def get_series_by_UF(disease='dengue'):
     return series
 
 
-def load_series(cidade, disease='dengue'):
+def load_series(cidade, disease: str='dengue', epiweek: int=None):
     """
     Monta as séries do alerta para visualização no site
     :param cidade: geocodigo da cidade desejada
     :param disease: dengue|chikungunya|zika
+    :param epiweek:
     :return: dictionary
     """
     cache_key = 'load_series-{}-{}'.format(cidade, disease)
@@ -185,8 +186,8 @@ def load_series(cidade, disease='dengue'):
     if result is None:
         ap = str(cidade)
 
-        dados_alerta = load_cases_without_forecast(
-            geoid=cidade, disease=disease
+        dados_alerta = load_cases_with_forecast(
+            geoid=cidade, disease=disease, epiweek=epiweek
         )
 
         if len(dados_alerta) == 0:
@@ -225,10 +226,10 @@ def load_series(cidade, disease='dengue'):
         ]
 
         if k_forecast:
-            # TODO: fix it
-            series[ap]['forecast_cases'] = (
-                dados_alerta.forecast_cases.astype(float).tolist()
-            )
+            for k in k_forecast:
+                series[ap][k] = (
+                    dados_alerta[k].astype(float).tolist()
+                )
 
         series[ap] = dict(series[ap])
 
@@ -290,6 +291,7 @@ def load_cases_with_forecast(geoid: int, disease: str, epiweek: int):
 
     :param geoid:
     :param disease:
+    :param epiweek:
     :return:
     """
 
@@ -391,27 +393,27 @@ def load_cases_with_forecast(geoid: int, disease: str, epiweek: int):
             'model_id': row.forecast_model_id
         })
         # forecast models join sql
-        forecast_models_joins += sql_forecast_by_model % (forecast_config)
+        forecast_models_joins += sql_forecast_by_model % forecast_config
 
         # forecast date ini selection
         forecast_date_ini_epiweek += '''
         WHEN forecast%(model_id)s.init_date_epiweek IS NOT NULL 
            THEN forecast%(model_id)s.init_date_epiweek
-        ''' % (forecast_config)
+        ''' % forecast_config
 
         # forecast epiweek selection
         forecast_epiweek += '''
         WHEN forecast%(model_id)s.epiweek IS NOT NULL 
            THEN forecast%(model_id)s.epiweek
-        ''' % (forecast_config)
+        ''' % forecast_config
 
         # forecast models cases selection
         forecast_models_cases += (
-            ',forecast_%(model_name)s_cases' % (forecast_config)
+            ',forecast_%(model_name)s_cases' % forecast_config
         )
 
     if forecast_models_cases == '':
-        forecast_models_cases = '1'
+        forecast_models_cases = ',1'
 
     sql = sql % {
         'forecast_models_joins': forecast_models_joins,
@@ -421,12 +423,9 @@ def load_cases_with_forecast(geoid: int, disease: str, epiweek: int):
     }
 
     with db_engine.connect() as conn:
-        df = pd.read_sql(sql, con=conn, index_col='data_iniSE')
+        df = pd.read_sql(sql, con=conn, parse_dates=True)
 
-    k = ['casos', 'casos_est_min', 'casos_est_max', 'casos_est']
-    k += [c for c in df.keys() if c.startswith('forecast')]
-
-    df = df[k]
+    return df
 
 
 def load_serie_cities(geocodigos, doenca='dengue'):
