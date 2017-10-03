@@ -26,10 +26,11 @@ CREATE TABLE IF NOT EXISTS "Municipio".forecast (
 );
 
 CREATE TABLE IF NOT EXISTS "Municipio".forecast_city (
+    id SERIAL PRIMARY KEY,
     geoid INT NOT NULL,
     forecast_model_id INT,
     active BOOL NOT NULL,
-    PRIMARY KEY (geoid, forecast_model_id),
+    UNIQUE (geoid, forecast_model_id),
     FOREIGN KEY(forecast_model_id) REFERENCES "Municipio".forecast_model(id),
     FOREIGN KEY(geoid) REFERENCES "Dengue_global"."Municipio"(geocodigo)
 );
