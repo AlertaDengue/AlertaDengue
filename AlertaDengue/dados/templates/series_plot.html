@@ -97,21 +97,24 @@ $(function () {
 
             },
 
+            {% for forecast_model in forecast_models %}
+
             {
-                name: '{% blocktrans %}Casos Previstos de {{disease_label}}{% endblocktrans %}',
-                color: '#AAAA43',
+                name: '{% blocktrans %}{{forecast_model}} de {{disease_label}}{% endblocktrans %}',
+                //color: '#AAAA43',
                 type: 'spline',
                 animation: true,
                 yAxis: 0,
                 pointInterval: 7 * 24 * 3600 * 1000,
                 pointStart: {{ start }}*1000 + tzo,
-                data: dados.forecast_cases,
+                data: dados.{{forecast_model}},
                 dashStyle: 'shortdot',
                 tooltip: {
                     valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
                 }
 
             },
+            {% endfor %}
 
             {
                 name: '{% blocktrans %}Alerta Vermelho{% endblocktrans %}',

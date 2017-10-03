@@ -3,7 +3,7 @@
 {% load bootstrap3 %}
 
 {% block extra_head %}
-    <script src="/static/js/jquery-ui.min.js"></script>
+    <script src="/static/libs/jquery/jquery-ui.min.js"></script>
     <script>
         $(document).ready( function() {
             $("#id_export_date").datepicker({dateFormat: "yy-mm-dd"});
@@ -51,9 +51,9 @@
     </style>
 
     <!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
-    <script src="/static/js/jquery.iframe-transport.js"></script>
+    <script src="/static/libs/jquery/jquery.iframe-transport.js"></script>
     <!-- The basic File Upload plugin -->
-    <script src="/static/js/jquery.fileupload.js"></script>
+    <script src="/static/libs/jquery/jquery.fileupload.js"></script>
     <!-- Calculate md5 -->
     <script src="/static/js/spark-md5.js"></script>
 {% endblock %}

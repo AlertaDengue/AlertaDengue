@@ -2,7 +2,7 @@ from datetime import timedelta
 from django import template
 from time import mktime
 
-from dados.dbdata import load_series, get_series_by_UF
+from ..dbdata import load_series, get_series_by_UF
 
 import json
 
@@ -20,8 +20,10 @@ def alerta_series(context):
         context['disease_code']
     )
 
+    epiweek = context['epiweek'] if 'epiweek' in context else 0
+
     dados = load_series(
-        context['geocodigo'], disease, context['epiweek']
+        context['geocodigo'], disease, epiweek
     )[context['geocodigo']]
 
     if dados is None:
@@ -73,7 +75,16 @@ def alerta_series(context):
         if i is None and ra[n - 1] is not None else int_or_none(i)
         for n, i in enumerate(ra)]
 
-    return {
+    k_forecast = [
+        k for k in dados.keys()
+        if k.startswith('forecast_')
+    ]
+
+    forecast_data = {
+        k: json.dumps(dados[k]) for k in k_forecast
+    }
+
+    result = {
         'nome': context['nome'],
         'dados': dados,
         'start': dados['dia'][0],
@@ -81,8 +92,13 @@ def alerta_series(context):
         'amarelo': json.dumps(ya),
         'laranja': json.dumps(oa),
         'vermelho': json.dumps(ra),
-        'disease_label': context['disease_label']
+        'disease_label': context['disease_label'],
+        'forecast_models': k_forecast
     }
+
+    result.update(forecast_data)
+
+    return result
 
 
 @register.inclusion_tag("total_series.html", takes_context=True)

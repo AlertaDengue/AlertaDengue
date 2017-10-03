@@ -58,7 +58,7 @@
 {#    <script src="/static/js/QuadTree.js"></script>#}
     <script src='/static/exp_PontosUnidadesBasicasSaudeMRJ2014wgs84.js'></script>
     <script src="/static/js/Autolinker.min.js"></script>
-    <script src="/static/js/jquery.sparkline.min.js"></script>
+    <script src="/static/libs/jquery/jquery.sparkline.min.js"></script>
 {#    <script src="/static/js/highcharts.js"></script>#}
 {#    <script src="/static/js/highcharts-more.js"></script>#}
     <script src="/static/js/highstock.js"></script>
@@ -99,6 +99,22 @@
           <h3>{% blocktrans with incidencia=incidencia|floatformat %} <b>Incidência estimada:</b>  {{ incidencia }} por 100 mil habitantes. {% endblocktrans %}</h3>
           <h3>{% blocktrans with prt=prt1|floatformat %}<b>Chance de alerta <span class="label label-warning">laranja</span> ou <span class="label label-danger">vermelho</span> na próxima semana:</b> {{ prt }}%{% endblocktrans %}</h3>
       </div>
+    </div>
+    <div>
+        <form id="form_date_forecast_ref" method="get">
+            <label for="ref">
+                {% blocktrans %}Data de referência da previsão{% endblocktrans %}
+            </label>
+            <input id="ref" name="ref" type="date"/>
+            <script>
+            $(document).ready(function(){
+                $('#ref').val('{{date_forecast_ref}}');
+                $('#ref').on('change', function() {
+                    form_date_forecast_ref.submit();
+                });
+            })
+            </script>
+        </form>
     </div>
     {% alerta_series %}
     {% leaflet_map "main" callback="main_map_init" %}
