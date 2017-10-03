@@ -14,7 +14,7 @@ RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
 # Add and install requirements.txt before we send the code so we don't have to
 # install everything again whenever any file in this directory changes (this
 # helps build the container a *lot* faster by using the cache.
-ADD requirements.txt /tmp/requirements.txt
+ADD AlertaDengue/requirements.txt /tmp/requirements.txt
 
 RUN pip3 install -r /tmp/requirements.txt
 
