@@ -14,8 +14,8 @@ from .episem import episem
 import pandas as pd
 import numpy as np
 
-# rio de janeiro city geoid
-MRJ_GEOID = 3304557
+# rio de janeiro city geocode
+MRJ_GEOCODE = 3304557
 
 CID10 = {
     'dengue': 'A90',
@@ -47,10 +47,10 @@ def _episem(dt):
     return episem(dt, sep='')
 
 
-def get_city_name_by_id(geoid: int):
+def get_city_name_by_id(geocode: int):
     """
 
-    :param geoid:
+    :param geocode:
     :return:
     """
     with db_engine.connect() as conn:
@@ -58,7 +58,7 @@ def get_city_name_by_id(geoid: int):
             SELECT nome
             FROM "Dengue_global"."Municipio"
             WHERE geocodigo=%s;
-        ''' % geoid)
+        ''' % geocode)
         return res.fetchone()[0]
 
 
@@ -103,10 +103,10 @@ def get_alerta_mrj_chik():
 
 def get_last_alert(geo_id, disease):
     """
-    
-    :param geo_id: 
-    :param disease: 
-    :return: 
+
+    :param geo_id:
+    :param disease:
+    :return:
     """
 
     table_name = (
@@ -202,7 +202,7 @@ def load_series(cidade, disease: str='dengue', epiweek: int=0):
         ap = str(cidade)
 
         dados_alerta = Forecast.load_cases(
-            geoid=cidade, disease=disease, epiweek=epiweek
+            geocode=cidade, disease=disease, epiweek=epiweek
         )
 
         if len(dados_alerta) == 0:
@@ -254,15 +254,15 @@ def load_series(cidade, disease: str='dengue', epiweek: int=0):
     return result
 
 
-def load_cases_without_forecast(geoid: int, disease):
+def load_cases_without_forecast(geocode: int, disease):
     """
 
-    :param geoid:
+    :param geocode:
     :param disease:
     :return:
     """
     with db_engine.connect() as conn:
-        if geoid == MRJ_GEOID:  # RJ city
+        if geocode == MRJ_GEOCODE:  # RJ city
             table_name = (
                 'alerta_mrj' if disease == 'dengue' else
                 'alerta_mrj_chik' if disease == 'chikungunya' else
@@ -295,7 +295,7 @@ def load_cases_without_forecast(geoid: int, disease):
             data_alert = pd.read_sql_query(''' 
                 SELECT * FROM "Municipio"."{}"
                 WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC
-                '''.format(table_name, geoid),
+                '''.format(table_name, geocode),
                 conn, parse_dates=True
             )
     return data_alert
@@ -1137,10 +1137,10 @@ class NotificationQueries:
 
 class Forecast:
     @staticmethod
-    def get_min_max_date(geoid: int, cid10: str) -> (str, str):
+    def get_min_max_date(geocode: int, cid10: str) -> (str, str):
         """
 
-        :param geoid:
+        :param geocode:
         :param cid10:
         :return: tuple with min and max date (str) from the forecasts
 
@@ -1152,20 +1152,20 @@ class Forecast:
         FROM 
           "Municipio".forecast AS f
           INNER JOIN "Municipio".forecast_city AS fc
-            ON (f.geoid = fc.geoid AND fc.active=TRUE)
+            ON (f.geocode = fc.geocode AND fc.active=TRUE)
           INNER JOIN "Municipio".forecast_model AS fm
             ON (fc.forecast_model_id = fm.id AND fm.active = TRUE)
-        WHERE f.geoid={} AND cid10='{}'
-        '''.format(geoid, cid10)
+        WHERE f.geocode={} AND cid10='{}'
+        '''.format(geocode, cid10)
 
         values = pd.read_sql_query(sql, db_engine).values.flat
         return values[0], values[1]
 
     @staticmethod
-    def load_cases(geoid: int, disease: str, epiweek: int):
+    def load_cases(geocode: int, disease: str, epiweek: int):
         """
 
-        :param geoid:
+        :param geocode:
         :param disease:
         :param epiweek:
         :return:
@@ -1188,15 +1188,15 @@ class Forecast:
             )
         WHERE
           cid10 = '%s'
-          AND geoid = %s
+          AND geocode = %s
           AND epiweek = %s
         ORDER BY forecast_model_id, published_date DESC
-        ''' % (cid10, geoid, epiweek)
+        ''' % (cid10, geocode, epiweek)
 
         with db_engine.connect() as conn:
             df_forecast_model = pd.read_sql(sql, con=conn)
 
-        if geoid == MRJ_GEOID:  # RJ city
+        if geocode == MRJ_GEOCODE:  # RJ city
             table_name = (
                 'alerta_mrj' if disease == 'dengue' else
                 'alerta_mrj_chik' if disease == 'chikungunya' else
@@ -1227,7 +1227,7 @@ class Forecast:
             sql_alert = ''' 
             SELECT * FROM "Municipio"."{}"
             WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC
-            '''.format(table_name, geoid)
+            '''.format(table_name, geocode)
 
         sql = """
         SELECT 
@@ -1271,13 +1271,13 @@ class Forecast:
               )
             INNER JOIN "Municipio".forecast_city
               ON (
-                forecast_city.geoid = forecast.geoid
+                forecast_city.geocode = forecast.geocode
                 AND forecast.forecast_model_id = forecast_city.forecast_model_id
                 AND forecast_city.active=TRUE
               )
           WHERE
             cid10='%(cid10)s'
-            AND forecast.geoid=%(geoid)s
+            AND forecast.geocode=%(geocode)s
             AND published_date='%(published_date)s'
             AND forecast.forecast_model_id=%(model_id)s
         ) AS forecast%(model_id)s ON (
@@ -1290,7 +1290,7 @@ class Forecast:
         forecast_models_joins = ''
         forecast_epiweek = ''
         forecast_config = {
-            'geoid': geoid,
+            'geocode': geocode,
             'cid10': cid10,
             'published_date': None,
             'model_name': None,

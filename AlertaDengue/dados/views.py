@@ -10,7 +10,7 @@ from time import mktime
 from collections import defaultdict, OrderedDict
 # local
 from . import dbdata, models as M
-from .dbdata import Forecast, MRJ_GEOID, CID10
+from .dbdata import Forecast, MRJ_GEOCODE, CID10
 from .episem import episem
 from .maps import get_city_info
 from .geotiff import convert_from_shapefile
@@ -335,7 +335,7 @@ class AlertaMRJPageView(TemplateView, _GetMethod):
 
         # forecast epiweek reference
         forecast_date_min, forecast_date_max = Forecast.get_min_max_date(
-            geoid=MRJ_GEOID, cid10=CID10[disease_code]
+            geocode=MRJ_GEOCODE, cid10=CID10[disease_code]
         )
 
         forecast_date_ref = self._get(
@@ -375,11 +375,11 @@ class AlertaMRJPageView(TemplateView, _GetMethod):
             total_series = [0]
             total_observed_series = [0]
 
-        _MRJ_GEOID = str(MRJ_GEOID)
-        city_info = get_city_info(_MRJ_GEOID)
+        _MRJ_GEOCODE = str(MRJ_GEOCODE)
+        city_info = get_city_info(_MRJ_GEOCODE)
 
         context.update({
-            'geocodigo': _MRJ_GEOID,
+            'geocodigo': _MRJ_GEOCODE,
             'nome': "Rio de Janeiro",
             'populacao': city_info['populacao'],
             'incidencia': (
@@ -425,7 +425,7 @@ class AlertaMunicipioPageView(TemplateView, _GetMethod):
 
         municipio_gc = kwargs['geocodigo']
 
-        if int(municipio_gc) == MRJ_GEOID:  # Rio de Janeiro
+        if int(municipio_gc) == MRJ_GEOCODE:  # Rio de Janeiro
             return redirect('mrj', disease='dengue', permanent=True)
 
         return super(
@@ -444,13 +444,13 @@ class AlertaMunicipioPageView(TemplateView, _GetMethod):
             None
         )
 
-        geoid = context['geocodigo']
+        geocode = context['geocodigo']
 
-        city_info = get_city_info(geoid)
+        city_info = get_city_info(geocode)
 
         # forecast epiweek reference
         forecast_date_min, forecast_date_max = Forecast.get_min_max_date(
-            geoid=geoid, cid10=CID10[disease_code]
+            geocode=geocode, cid10=CID10[disease_code]
         )
 
         forecast_date_ref = self._get(
@@ -462,11 +462,11 @@ class AlertaMunicipioPageView(TemplateView, _GetMethod):
         (
             alert, SE, case_series, last_year,
             observed_cases, min_max_est, dia, prt1
-        ) = dbdata.get_city_alert(geoid, disease_code)
+        ) = dbdata.get_city_alert(geocode, disease_code)
 
         if alert is not None:
-            casos_ap = {geoid: int(case_series[-1])}
-            bairros = {geoid: city_info['nome']}
+            casos_ap = {geocode: int(case_series[-1])}
+            bairros = {geocode: city_info['nome']}
             total_series = case_series[-12:]
             total_observed_series = observed_cases[-12:]
         else:
@@ -482,13 +482,13 @@ class AlertaMunicipioPageView(TemplateView, _GetMethod):
                 case_series[-1] / city_info['populacao']
             ) * 100000,  # casos/100000
             'casos_por_ap': json.dumps(casos_ap),
-            'alerta': {geoid: alert},
+            'alerta': {geocode: alert},
             'prt1': prt1 * 100,
             'novos_casos': case_series[-1],
             'bairros': bairros,
             'min_est': min_max_est[0],
             'max_est': min_max_est[1],
-            'series_casos': {geoid: case_series[-12:]},
+            'series_casos': {geocode: case_series[-12:]},
             'SE': SE,
             'data1': dia.strftime("%d de %B de %Y"),
             # .strftime("%d de %B de %Y")
@@ -499,7 +499,7 @@ class AlertaMunicipioPageView(TemplateView, _GetMethod):
             'total_observed': total_observed_series[-1],
             'total_observed_series': ', '.join(
                 map(str, total_observed_series)),
-            'geocodigo': geoid,
+            'geocodigo': geocode,
             'disease_label': disease_label,
             'disease_code': disease_code,
             'forecast_date_ref': forecast_date_ref,
@@ -627,11 +627,11 @@ class AlertaStateView(TemplateView):
             context['state'] == 'RJ' and
             context['disease'] == 'chikungunya'
         ):
-            geo_id_rj = MRJ_GEOID
+            geo_id_rj = MRJ_GEOCODE
             mun_dict = {geo_id_rj: 'Rio de Janeiro'}
             series_data_rj = dbdata.load_series(
                 geo_id_rj, 'chikungunya'
-            )[str(MRJ_GEOID)]
+            )[str(MRJ_GEOCODE)]
             alerts = {str(geo_id_rj): series_data_rj['alerta'][-1]}
             is_just_rj = True
 
