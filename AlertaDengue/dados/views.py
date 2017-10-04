@@ -10,6 +10,7 @@ from time import mktime
 from collections import defaultdict, OrderedDict
 # local
 from . import dbdata, models as M
+from .dbdata import Forecast, MRJ_GEOID, CID10
 from .episem import episem
 from .maps import get_city_info
 from .geotiff import convert_from_shapefile
@@ -30,8 +31,6 @@ locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
 dados_alerta = dbdata.get_alerta_mrj()
 dados_alerta_chik = dbdata.get_alerta_mrj_chik()
-
-MRJ_GEOID = 3304557
 
 with open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')) as f:
     polygons = geojson.load(f)
@@ -182,7 +181,7 @@ def load_series():
     return series
 
 
-class _GetView:
+class _GetMethod:
     """
 
     """
@@ -304,7 +303,7 @@ class AlertaMainView(TemplateView):
         return context
 
 
-class AlertaMRJPageView(TemplateView, _GetView):
+class AlertaMRJPageView(TemplateView, _GetMethod):
     """
     Rio de Janeiro Alert View
     """
@@ -335,12 +334,15 @@ class AlertaMRJPageView(TemplateView, _GetView):
         }
 
         # forecast epiweek reference
-        date_forecast_ref = self._get(
-            'ref',
-            datetime.datetime.now().strftime('%Y-%m-%d')
+        forecast_date_min, forecast_date_max = Forecast.get_min_max_date(
+            geoid=MRJ_GEOID, cid10=CID10[disease_code]
         )
 
-        epiweek = episem(date_forecast_ref).replace('W', '')
+        forecast_date_ref = self._get(
+            'ref', forecast_date_max
+        )
+
+        epiweek = episem(forecast_date_ref).replace('W', '')
 
         alert, current, case_series, last_year, observed_cases, min_max_est = \
             get_alert(disease_code)
@@ -405,13 +407,15 @@ class AlertaMRJPageView(TemplateView, _GetView):
                 map(str, total_observed_series)),
             'disease_label': disease_label,
             'disease_code': disease_code,
-            'date_forecast_ref': date_forecast_ref,
+            'forecast_date_ref': forecast_date_ref,
+            'forecast_date_min': forecast_date_min,
+            'forecast_date_max': forecast_date_max,
             'epiweek': epiweek
         })
         return context
 
 
-class AlertaMunicipioPageView(TemplateView, _GetView):
+class AlertaMunicipioPageView(TemplateView, _GetMethod):
     template_name = 'alerta_municipio.html'
 
     def dispatch(self, request, *args, **kwargs):
@@ -440,26 +444,29 @@ class AlertaMunicipioPageView(TemplateView, _GetView):
             None
         )
 
-        municipio_gc = context['geocodigo']
+        geoid = context['geocodigo']
 
-        city_info = get_city_info(municipio_gc)
+        city_info = get_city_info(geoid)
 
         # forecast epiweek reference
-        date_forecast_ref = self._get(
-            'ref',
-            datetime.datetime.now().strftime('%Y-%m-%d')
+        forecast_date_min, forecast_date_max = Forecast.get_min_max_date(
+            geoid=geoid, cid10=CID10[disease_code]
         )
 
-        epiweek = episem(date_forecast_ref).replace('W', '')
+        forecast_date_ref = self._get(
+            'ref', forecast_date_max
+        )
+
+        epiweek = episem(forecast_date_ref).replace('W', '')
 
         (
             alert, SE, case_series, last_year,
             observed_cases, min_max_est, dia, prt1
-        ) = dbdata.get_city_alert(municipio_gc, disease_code)
+        ) = dbdata.get_city_alert(geoid, disease_code)
 
         if alert is not None:
-            casos_ap = {municipio_gc: int(case_series[-1])}
-            bairros = {municipio_gc: city_info['nome']}
+            casos_ap = {geoid: int(case_series[-1])}
+            bairros = {geoid: city_info['nome']}
             total_series = case_series[-12:]
             total_observed_series = observed_cases[-12:]
         else:
@@ -475,13 +482,13 @@ class AlertaMunicipioPageView(TemplateView, _GetView):
                 case_series[-1] / city_info['populacao']
             ) * 100000,  # casos/100000
             'casos_por_ap': json.dumps(casos_ap),
-            'alerta': {municipio_gc: alert},
+            'alerta': {geoid: alert},
             'prt1': prt1 * 100,
             'novos_casos': case_series[-1],
             'bairros': bairros,
             'min_est': min_max_est[0],
             'max_est': min_max_est[1],
-            'series_casos': {municipio_gc: case_series[-12:]},
+            'series_casos': {geoid: case_series[-12:]},
             'SE': SE,
             'data1': dia.strftime("%d de %B de %Y"),
             # .strftime("%d de %B de %Y")
@@ -492,10 +499,12 @@ class AlertaMunicipioPageView(TemplateView, _GetView):
             'total_observed': total_observed_series[-1],
             'total_observed_series': ', '.join(
                 map(str, total_observed_series)),
-            'geocodigo': municipio_gc,
+            'geocodigo': geoid,
             'disease_label': disease_label,
             'disease_code': disease_code,
-            'date_forecast_ref': date_forecast_ref,
+            'forecast_date_ref': forecast_date_ref,
+            'forecast_date_min': forecast_date_min,
+            'forecast_date_max': forecast_date_max,
             'epiweek': epiweek
         })
         return context
@@ -672,7 +681,7 @@ class AlertaStateView(TemplateView):
         return context
 
 
-class NotificationReducedCSV_View(View, _GetView):
+class NotificationReducedCSV_View(View, _GetMethod):
     _state_name = {
         'RJ': 'Rio de Janeiro',
         'PR': 'Paraná',

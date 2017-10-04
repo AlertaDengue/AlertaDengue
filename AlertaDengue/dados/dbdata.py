@@ -175,6 +175,18 @@ def get_series_by_UF(disease='dengue'):
     return series
 
 
+def get_n_chik_alerts():
+    """
+
+    :return: int
+    """
+    sql = '''
+    SELECT COUNT(*) AS n_alerts 
+    FROM "Municipio"."Historico_alerta_chik"
+    '''
+    return pd.read_sql_query(sql, db_engine).loc[0, 'n_alerts']
+
+
 def load_series(cidade, disease: str='dengue', epiweek: int=0):
     """
     Monta as séries do alerta para visualização no site
@@ -189,7 +201,7 @@ def load_series(cidade, disease: str='dengue', epiweek: int=0):
     if result is None:
         ap = str(cidade)
 
-        dados_alerta = load_cases_with_forecast(
+        dados_alerta = Forecast.load_cases(
             geoid=cidade, disease=disease, epiweek=epiweek
         )
 
@@ -287,184 +299,6 @@ def load_cases_without_forecast(geoid: int, disease):
                 conn, parse_dates=True
             )
     return data_alert
-
-
-def load_cases_with_forecast(geoid: int, disease: str, epiweek: int):
-    """
-
-    :param geoid:
-    :param disease:
-    :param epiweek:
-    :return:
-    """
-
-    # sql settings
-    cid10 = CID10[disease]
-
-    sql = '''
-    SELECT DISTINCT ON (forecast.forecast_model_id)
-      forecast.forecast_model_id, 
-      forecast_model.name AS forecast_model_name,
-      forecast.published_date
-    FROM 
-      "Municipio".forecast 
-      INNER JOIN "Municipio".forecast_model
-        ON (
-          "Municipio".forecast.forecast_model_id =  
-          "Municipio".forecast_model.id
-        )
-    WHERE
-      cid10 = '%s'
-      AND geoid = %s
-      AND epiweek = %s
-    ORDER BY forecast_model_id, published_date DESC
-    ''' % (cid10, geoid, epiweek)
-
-    with db_engine.connect() as conn:
-        df_forecast_model = pd.read_sql(sql, con=conn)
-
-    if geoid == MRJ_GEOID:  # RJ city
-        table_name = (
-            'alerta_mrj' if disease == 'dengue' else
-            'alerta_mrj_chik' if disease == 'chikungunya' else
-            None
-        )
-
-        sql_alert = '''
-        SELECT 
-           data AS "data_iniSE",
-           SUM(casos_estmin) AS casos_est_min,
-           SUM(casos_est) as casos_est,
-           SUM(casos_estmax) AS casos_est_max,
-           SUM(casos) AS casos,
-           MAX(nivel) AS nivel,
-           se AS "SE",
-           SUM(prt1) AS p_rt1
-        FROM "Municipio".{}
-        GROUP BY "data_iniSE", "SE"
-        '''.format(table_name)
-
-    else:
-        table_name = (
-            'Historico_alerta' if disease == 'dengue' else
-            'Historico_alerta_chik' if disease == 'chikungunya' else
-            None
-        )
-
-        sql_alert = ''' 
-        SELECT * FROM "Municipio"."{}"
-        WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC
-        '''.format(table_name, geoid)
-
-    sql = """
-    SELECT 
-        (CASE 
-         WHEN tb_cases."data_iniSE" IS NOT NULL 
-           THEN tb_cases."data_iniSE" 
-         %(forecast_date_ini_epiweek)s
-         ELSE NULL
-         END
-        ) AS "data_iniSE",
-        tb_cases.casos_est_min,
-        tb_cases.casos_est,
-        tb_cases.casos_est_max,
-        tb_cases.casos,
-        tb_cases.nivel,
-        (CASE 
-         WHEN tb_cases."SE" IS NOT NULL THEN tb_cases."SE" 
-         %(forecast_epiweek)s
-         ELSE NULL
-         END
-        ) AS "SE",
-        tb_cases.p_rt1
-        %(forecast_models_cases)s
-    FROM
-        (%(sql_alert)s) AS tb_cases %(forecast_models_joins)s
-    ORDER BY "data_iniSE" ASC
-    """
-
-    sql_forecast_by_model = '''
-    FULL OUTER JOIN (
-      SELECT 
-        epiweek, 
-        init_date_epiweek,
-        cases AS forecast_%(model_name)s_cases
-      FROM 
-        "Municipio".forecast
-        INNER JOIN "Municipio".forecast_model
-          ON (
-            forecast.forecast_model_id = forecast_model.id
-            AND forecast_model.active=TRUE
-          )
-        INNER JOIN "Municipio".forecast_city
-          ON (
-            forecast_city.geoid = forecast.geoid
-            AND forecast.forecast_model_id = forecast_city.forecast_model_id
-            AND forecast_city.active=TRUE
-          )
-      WHERE
-        cid10='%(cid10)s'
-        AND forecast.geoid=%(geoid)s
-        AND published_date='%(published_date)s'
-        AND forecast.forecast_model_id=%(model_id)s
-    ) AS forecast%(model_id)s ON (
-      tb_cases."SE" = forecast%(model_id)s.epiweek 
-    )
-    '''
-
-    forecast_date_ini_epiweek = ''
-    forecast_models_cases = ''
-    forecast_models_joins = ''
-    forecast_epiweek = ''
-    forecast_config = {
-        'geoid': geoid,
-        'cid10': cid10,
-        'published_date': None,
-        'model_name': None,
-        'model_id': None
-    }
-
-    for i, row in df_forecast_model.iterrows():
-        forecast_config.update({
-            'published_date': row.published_date,
-            'model_name': row.forecast_model_name,
-            'model_id': row.forecast_model_id
-        })
-        # forecast models join sql
-        forecast_models_joins += sql_forecast_by_model % forecast_config
-
-        # forecast date ini selection
-        forecast_date_ini_epiweek += '''
-        WHEN forecast%(model_id)s.init_date_epiweek IS NOT NULL 
-           THEN forecast%(model_id)s.init_date_epiweek
-        ''' % forecast_config
-
-        # forecast epiweek selection
-        forecast_epiweek += '''
-        WHEN forecast%(model_id)s.epiweek IS NOT NULL 
-           THEN forecast%(model_id)s.epiweek
-        ''' % forecast_config
-
-        # forecast models cases selection
-        forecast_models_cases += (
-            ',forecast_%(model_name)s_cases' % forecast_config
-        )
-
-    if forecast_models_cases == '':
-        forecast_models_cases = ',1'
-
-    sql = sql % {
-        'forecast_models_joins': forecast_models_joins,
-        'forecast_models_cases': forecast_models_cases,
-        'forecast_date_ini_epiweek': forecast_date_ini_epiweek,
-        'forecast_epiweek': forecast_epiweek,
-        'sql_alert': sql_alert
-    }
-
-    with db_engine.connect() as conn:
-        df = pd.read_sql(sql, con=conn, parse_dates=True)
-
-    return df
 
 
 def load_serie_cities(geocodigos, doenca='dengue'):
@@ -1301,13 +1135,204 @@ class NotificationQueries:
         return df_alert_period
 
 
-def get_n_chik_alerts():
-    """
-    
-    :return: int 
-    """
-    sql = '''
-    SELECT COUNT(*) AS n_alerts 
-    FROM "Municipio"."Historico_alerta_chik"
-    '''
-    return pd.read_sql_query(sql, db_engine).loc[0, 'n_alerts']
+class Forecast:
+    @staticmethod
+    def get_min_max_date(geoid: int, cid10: str) -> (str, str):
+        """
+
+        :param geoid:
+        :param cid10:
+        :return: tuple with min and max date (str) from the forecasts
+
+        """
+        sql = '''
+        SELECT 
+          TO_CHAR(MIN(init_date_epiweek), 'YYYY-MM-DD') AS epiweek_min,
+          TO_CHAR(MAX(init_date_epiweek), 'YYYY-MM-DD') AS epiweek_max
+        FROM 
+          "Municipio".forecast AS f
+          INNER JOIN "Municipio".forecast_city AS fc
+            ON (f.geoid = fc.geoid AND fc.active=TRUE)
+          INNER JOIN "Municipio".forecast_model AS fm
+            ON (fc.forecast_model_id = fm.id AND fm.active = TRUE)
+        WHERE f.geoid={} AND cid10='{}'
+        '''.format(geoid, cid10)
+
+        values = pd.read_sql_query(sql, db_engine).values.flat
+        return values[0], values[1]
+
+    @staticmethod
+    def load_cases(geoid: int, disease: str, epiweek: int):
+        """
+
+        :param geoid:
+        :param disease:
+        :param epiweek:
+        :return:
+        """
+
+        # sql settings
+        cid10 = CID10[disease]
+
+        sql = '''
+        SELECT DISTINCT ON (forecast.forecast_model_id)
+          forecast.forecast_model_id, 
+          forecast_model.name AS forecast_model_name,
+          forecast.published_date
+        FROM 
+          "Municipio".forecast 
+          INNER JOIN "Municipio".forecast_model
+            ON (
+              "Municipio".forecast.forecast_model_id =  
+              "Municipio".forecast_model.id
+            )
+        WHERE
+          cid10 = '%s'
+          AND geoid = %s
+          AND epiweek = %s
+        ORDER BY forecast_model_id, published_date DESC
+        ''' % (cid10, geoid, epiweek)
+
+        with db_engine.connect() as conn:
+            df_forecast_model = pd.read_sql(sql, con=conn)
+
+        if geoid == MRJ_GEOID:  # RJ city
+            table_name = (
+                'alerta_mrj' if disease == 'dengue' else
+                'alerta_mrj_chik' if disease == 'chikungunya' else
+                None
+            )
+
+            sql_alert = '''
+            SELECT 
+               data AS "data_iniSE",
+               SUM(casos_estmin) AS casos_est_min,
+               SUM(casos_est) as casos_est,
+               SUM(casos_estmax) AS casos_est_max,
+               SUM(casos) AS casos,
+               MAX(nivel) AS nivel,
+               se AS "SE",
+               SUM(prt1) AS p_rt1
+            FROM "Municipio".{}
+            GROUP BY "data_iniSE", "SE"
+            '''.format(table_name)
+
+        else:
+            table_name = (
+                'Historico_alerta' if disease == 'dengue' else
+                'Historico_alerta_chik' if disease == 'chikungunya' else
+                None
+            )
+
+            sql_alert = ''' 
+            SELECT * FROM "Municipio"."{}"
+            WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC
+            '''.format(table_name, geoid)
+
+        sql = """
+        SELECT 
+            (CASE 
+             WHEN tb_cases."data_iniSE" IS NOT NULL 
+               THEN tb_cases."data_iniSE" 
+             %(forecast_date_ini_epiweek)s
+             ELSE NULL
+             END
+            ) AS "data_iniSE",
+            tb_cases.casos_est_min,
+            tb_cases.casos_est,
+            tb_cases.casos_est_max,
+            tb_cases.casos,
+            tb_cases.nivel,
+            (CASE 
+             WHEN tb_cases."SE" IS NOT NULL THEN tb_cases."SE" 
+             %(forecast_epiweek)s
+             ELSE NULL
+             END
+            ) AS "SE",
+            tb_cases.p_rt1
+            %(forecast_models_cases)s
+        FROM
+            (%(sql_alert)s) AS tb_cases %(forecast_models_joins)s
+        ORDER BY "data_iniSE" ASC
+        """
+
+        sql_forecast_by_model = '''
+        FULL OUTER JOIN (
+          SELECT 
+            epiweek, 
+            init_date_epiweek,
+            cases AS forecast_%(model_name)s_cases
+          FROM 
+            "Municipio".forecast
+            INNER JOIN "Municipio".forecast_model
+              ON (
+                forecast.forecast_model_id = forecast_model.id
+                AND forecast_model.active=TRUE
+              )
+            INNER JOIN "Municipio".forecast_city
+              ON (
+                forecast_city.geoid = forecast.geoid
+                AND forecast.forecast_model_id = forecast_city.forecast_model_id
+                AND forecast_city.active=TRUE
+              )
+          WHERE
+            cid10='%(cid10)s'
+            AND forecast.geoid=%(geoid)s
+            AND published_date='%(published_date)s'
+            AND forecast.forecast_model_id=%(model_id)s
+        ) AS forecast%(model_id)s ON (
+          tb_cases."SE" = forecast%(model_id)s.epiweek 
+        )
+        '''
+
+        forecast_date_ini_epiweek = ''
+        forecast_models_cases = ''
+        forecast_models_joins = ''
+        forecast_epiweek = ''
+        forecast_config = {
+            'geoid': geoid,
+            'cid10': cid10,
+            'published_date': None,
+            'model_name': None,
+            'model_id': None
+        }
+
+        for i, row in df_forecast_model.iterrows():
+            forecast_config.update({
+                'published_date': row.published_date,
+                'model_name': row.forecast_model_name,
+                'model_id': row.forecast_model_id
+            })
+            # forecast models join sql
+            forecast_models_joins += sql_forecast_by_model % forecast_config
+
+            # forecast date ini selection
+            forecast_date_ini_epiweek += '''
+            WHEN forecast%(model_id)s.init_date_epiweek IS NOT NULL 
+               THEN forecast%(model_id)s.init_date_epiweek
+            ''' % forecast_config
+
+            # forecast epiweek selection
+            forecast_epiweek += '''
+            WHEN forecast%(model_id)s.epiweek IS NOT NULL 
+               THEN forecast%(model_id)s.epiweek
+            ''' % forecast_config
+
+            # forecast models cases selection
+            forecast_models_cases += (
+                ',forecast_%(model_name)s_cases' % forecast_config
+            )
+
+        if forecast_models_cases == '':
+            forecast_models_cases = ',1'
+
+        sql = sql % {
+            'forecast_models_joins': forecast_models_joins,
+            'forecast_models_cases': forecast_models_cases,
+            'forecast_date_ini_epiweek': forecast_date_ini_epiweek,
+            'forecast_epiweek': forecast_epiweek,
+            'sql_alert': sql_alert
+        }
+
+        with db_engine.connect() as conn:
+            return pd.read_sql(sql, con=conn, parse_dates=True)

@@ -99,16 +99,18 @@
       </div>
     </div>
     <div>
-        <form id="form_date_forecast_ref" method="get">
+        <form id="form_forecast_date_ref" method="get">
             <label for="ref">
                 {% blocktrans %}Data de referência da previsão{% endblocktrans %}
             </label>
             <input id="ref" name="ref" type="date"/>
             <script>
             $(document).ready(function(){
-                $('#ref').val('{{date_forecast_ref}}');
+                $('#ref').val('{{forecast_date_ref}}');
+                $('#ref').attr('min', '{{forecast_date_min}}');
+                $('#ref').attr('max', '{{forecast_date_max}}');
                 $('#ref').on('change', function() {
-                    form_date_forecast_ref.submit();
+                    form_forecast_date_ref.submit();
                 });
             })
             </script>
