@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "Municipio".forecast_model (
     id SERIAL PRIMARY KEY,
     name VARCHAR(128) NOT NULL,
-    total_weeks SMALLINT NOT NULL,
+    weeks SMALLINT NOT NULL,
     commit_id CHAR(7) NOT NULL,
     active BOOL NOT NULL
 );
