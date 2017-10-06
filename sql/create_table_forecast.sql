@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS "Municipio".forecast_model (
 
 CREATE TABLE IF NOT EXISTS "Municipio".forecast (
     epiweek INT NOT NULL,
-    geoid INT NOT NULL,
+    geocode INT NOT NULL,
     cid10 character varying(5) NOT NULL,
     forecast_model_id INT,
     published_date date NOT NULL,
@@ -16,21 +16,21 @@ CREATE TABLE IF NOT EXISTS "Municipio".forecast (
     cases INT NOT NULL,
 
     PRIMARY KEY (
-      epiweek, geoid, cid10, forecast_model_id, published_date
+      epiweek, geocode, cid10, forecast_model_id, published_date
     ),
     FOREIGN KEY(forecast_model_id)
       REFERENCES "Municipio".forecast_model(id),
-    FOREIGN KEY(geoid)
+    FOREIGN KEY(geocode)
       REFERENCES "Dengue_global"."Municipio"(geocodigo),
     FOREIGN KEY(cid10) REFERENCES "Dengue_global"."CID10"(codigo)
 );
 
 CREATE TABLE IF NOT EXISTS "Municipio".forecast_city (
     id SERIAL PRIMARY KEY,
-    geoid INT NOT NULL,
+    geocode INT NOT NULL,
     forecast_model_id INT,
     active BOOL NOT NULL,
-    UNIQUE (geoid, forecast_model_id),
+    UNIQUE (geocode, forecast_model_id),
     FOREIGN KEY(forecast_model_id) REFERENCES "Municipio".forecast_model(id),
-    FOREIGN KEY(geoid) REFERENCES "Dengue_global"."Municipio"(geocodigo)
+    FOREIGN KEY(geocode) REFERENCES "Dengue_global"."Municipio"(geocodigo)
 );
