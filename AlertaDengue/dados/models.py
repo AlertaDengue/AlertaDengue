@@ -30,6 +30,7 @@ class ForecastModel(models.Model):
 
     class Meta:
         db_table = 'Municipio\".\"forecast_model'
+        app_label = 'dados'
 
     def __str__(self):
         return self.name
@@ -54,6 +55,7 @@ class ForecastCity(models.Model):
 
     class Meta:
         db_table = 'Municipio\".\"forecast_city'
+        app_label = 'dados'
         verbose_name_plural = "forecast cities"
         unique_together = (('geocode', 'forecast_model'),)
 

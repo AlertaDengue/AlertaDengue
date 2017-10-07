@@ -65,6 +65,9 @@ class DBF(models.Model):
     def __str__(self):
         return "{} - {}".format(self.file, self.notification_year)
 
+    class Meta:
+        app_label = 'dbf'
+
 
 class DBFChunkedUpload(ChunkedUpload):
     """

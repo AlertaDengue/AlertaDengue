@@ -54,7 +54,8 @@ INSTALLED_APPS = (
     'bootstrap3',
     'chunked_upload',
     'dados',
-    'dbf.apps.DbfConfig'
+    'dbf.apps.DbfConfig',
+    'manager.router'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -133,6 +134,31 @@ PSQL_DB = config('PSQL_DB', default="dengue")
 PSQL_USER = config('PSQL_USER', default="dengueadmin")
 PSQL_HOST = config('PSQL_HOST', default="localhost")
 PSQL_PASSWORD = config('PSQL_PASSWORD')
+
+DATABASE_ROUTERS = ['manager.router.DatabaseAppsRouter']
+DATABASE_APPS_MAPPING = {
+    'dados': 'dengue',
+    'dbf': 'infodengue'
+}
+
+DATABASES.update({
+    'dengue': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': PSQL_DB,
+        'USER': PSQL_USER,
+        'PASSWORD': PSQL_PASSWORD,
+        'HOST': PSQL_HOST,
+        'PORT': ''
+    },
+    'infodengue': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'infodengue',
+        'USER': PSQL_USER,
+        'PASSWORD': PSQL_PASSWORD,
+        'HOST': PSQL_HOST,
+        'PORT': ''
+    },
+})
 
 
 # Internationalization
