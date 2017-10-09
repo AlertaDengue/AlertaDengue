@@ -95,7 +95,9 @@ TEMPLATES = [
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
 DATABASES = {
-    'default': config('DATABASE_URL', default='sqlite:///geodjango.db', cast=db_url)
+    'default': config(
+        'DATABASE_URL', default='sqlite:///geodjango.db', cast=db_url
+    )
 }
 
 MEMCACHED_HOST = config('MEMCACHED_HOST', '127.0.0.1')
@@ -138,7 +140,7 @@ PSQL_PASSWORD = config('PSQL_PASSWORD')
 DATABASE_ROUTERS = ['manager.router.DatabaseAppsRouter']
 DATABASE_APPS_MAPPING = {
     'dados': 'dengue',
-    'dbf': 'infodengue'
+    'dbf': 'default'
 }
 
 DATABASES.update({
@@ -149,15 +151,7 @@ DATABASES.update({
         'PASSWORD': PSQL_PASSWORD,
         'HOST': PSQL_HOST,
         'PORT': ''
-    },
-    'infodengue': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'infodengue',
-        'USER': PSQL_USER,
-        'PASSWORD': PSQL_PASSWORD,
-        'HOST': PSQL_HOST,
-        'PORT': ''
-    },
+    }
 })
 
 
