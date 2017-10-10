@@ -12,7 +12,6 @@ services:
       restart: always
 
     staging_db:
-      image: postgres:9.5
       build:
         context: "."
         dockerfile: "Dockerfile-postgres"

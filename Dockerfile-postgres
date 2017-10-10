@@ -1,6 +1,6 @@
-FROM postgres:9.5
+FROM postgres:9.6
 
-RUN apt-get update && apt-get install -q -y postgresql-9.5-postgis-scripts
+RUN apt-get update && apt-get install -q -y postgresql-9.6-postgis-scripts
 
 ADD postgres_setup /docker-entrypoint-initdb.d
 ADD dev_dumps /dumps
