@@ -38,13 +38,14 @@ class ForecastModel(models.Model):
 
 class ForecastCity(models.Model):
     """
-    geoid INT NOT NULL,
+    city/geocode INT NOT NULL,
     forecast_model_id INT,
     active BOOL NOT NULL,
 
     """
-    geocode = models.IntegerField(
-        null=False, help_text=_('Código do Município')
+    city = models.ForeignKey(
+        'dados.City', db_column='geocode', null=False,
+        help_text=_('Código do Município')
     )
     active = models.BooleanField(
         null=False, default=True, help_text=_('Está Ativo?')
@@ -57,11 +58,32 @@ class ForecastCity(models.Model):
         db_table = 'Municipio\".\"forecast_city'
         app_label = 'dados'
         verbose_name_plural = "forecast cities"
-        unique_together = (('geocode', 'forecast_model'),)
+        unique_together = (('city', 'forecast_model'),)
 
     def __str__(self):
-        return '{} - {}'.format(
-            get_city_name_by_id(self.geocode),
-            self.forecast_model
-        )
+        return '{} - {}'.format(self.city, self.forecast_model)
 
+
+class City(models.Model):
+    """
+    geocode INT NOT NULL,
+    forecast_model_id INT,
+    active BOOL NOT NULL,
+
+    """
+    geocode = models.IntegerField(
+        db_column='geocodigo', null=False, primary_key=True,
+        help_text=_('Código do Município')
+    )
+    name = models.CharField(
+        db_column='nome', null=False, max_length=128,
+        help_text=_('Nome do municipio')
+    )
+
+    class Meta:
+        db_table = 'Dengue_global\".\"Municipio'
+        app_label = 'dados'
+        verbose_name_plural = "cities"
+
+    def __str__(self):
+        return self.name

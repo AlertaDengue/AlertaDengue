@@ -218,6 +218,10 @@ LOGGING = {
     },
 }
 
+MIGRATION_MODULES = {
+    'dados': None
+}
+
 try:
     from AlertaDengue.local_settings import *
 except ImportError:
