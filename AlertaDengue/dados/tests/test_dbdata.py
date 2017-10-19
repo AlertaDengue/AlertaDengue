@@ -1,5 +1,5 @@
 from unittest import TestCase
-from dados import dbdata
+from .. import dbdata
 import datetime
 
 

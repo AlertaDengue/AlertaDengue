@@ -1,5 +1,5 @@
 from unittest import TestCase
-from dados import maps
+from .. import maps
 
 
 class TestMaps(TestCase):

@@ -14,6 +14,15 @@ import os
 from decouple import config, Csv
 from dj_database_url import parse as db_url
 
+
+def read_admins(value):
+    # ADMIN in settings.ini should be in the format:
+    # admin 1, admin1@example.org; admin 2, admin2@example.org
+    if value == '':
+        return tuple()
+    return tuple(tuple(v.split(',')) for v in value.split(';'))
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -25,13 +34,6 @@ SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
-
-def read_admins(value):
-    # ADMIN in settings.ini should be in the format:
-    # admin 1, admin1@example.org; admin 2, admin2@example.org
-    if value == '':
-        return tuple()
-    return tuple(tuple(v.split(',')) for v in value.split(';'))
 
 ADMINS = config('ADMINS', cast=read_admins, default='')
 
@@ -88,8 +90,6 @@ TEMPLATES = [
                     }
     },
 ]
-
-
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
@@ -223,7 +223,7 @@ MIGRATION_MODULES = {
 }
 
 try:
-    from AlertaDengue.local_settings import *
+    from .local_settings import *
 except ImportError:
     pass
 
