@@ -73,7 +73,7 @@ def episem(x, sep='W', out='YW'):
             return '%02d' % week
 
     if type(x) != datetime.datetime:
-        if str(x) == '' or (type(x) != str and np.isnan(x)):
+        if str(x) == '' or x is None or (type(x) != str and np.isnan(x)):
             return None
         x = datetime.datetime.strptime(x, '%Y-%m-%d')
 

@@ -201,9 +201,14 @@ def load_series(cidade, disease: str='dengue', epiweek: int=0):
     if result is None:
         ap = str(cidade)
 
-        dados_alerta = Forecast.load_cases(
-            geocode=cidade, disease=disease, epiweek=epiweek
-        )
+        if epiweek is not None:
+            dados_alerta = Forecast.load_cases(
+                geocode=cidade, disease=disease, epiweek=epiweek
+            )
+        else:
+            dados_alerta = load_cases_without_forecast(
+                geocode=cidade, disease=disease
+            )
 
         if len(dados_alerta) == 0:
             return {ap: None}

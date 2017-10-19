@@ -342,21 +342,30 @@ class AlertaMRJPageView(TemplateView, _GetMethod):
             'ref', forecast_date_max
         )
 
-        epiweek = episem(forecast_date_ref).replace('W', '')
+        if forecast_date_ref is None:
+            epiweek = None
+        else:
+            epiweek = episem(forecast_date_ref).replace('W', '')
 
         alert, current, case_series, last_year, observed_cases, min_max_est = \
             get_alert(disease_code)
 
         if alert:
-            casos_ap = {
-                float(ap.split('AP')[-1]):
-                    int(current[current.aps == ap]['casos_est'])
-                for ap in alert.keys()
-            }
-            alerta = {
-                float(k.split('AP')[-1]): int(v) - 1
-                for k, v in alert.items()
-            }
+            casos_ap = {}
+            alerta = {}
+
+            for ap, v in alert.items():
+                if ap not in current.aps:
+                    continue
+                
+                _ap = float(ap.split('AP')[-1])
+
+                mask = (current.aps == ap)
+                _v = int(current[mask]['casos_est'].values.astype(int)[0])
+
+                casos_ap.update({_ap: _v})
+                alerta.update({_ap: int(v) - 1})
+
             semana = str(current.se.iat[-1])[-2:]
             segunda = current.data.iat[-1]
             # estimated cases
