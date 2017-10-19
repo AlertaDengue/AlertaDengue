@@ -7,6 +7,7 @@ from pip.download import PipSession
 from glob import glob
 
 import os
+import subprocess
 import sys
 
 PATH_ROOT = os.getcwd()
@@ -32,8 +33,8 @@ except ImportError:
 
 def get_version():
     """Obtain the version number"""
-    import imp
-    mod = imp.load_source(
+    import importlib
+    mod = importlib.load_source(
         'version', os.path.join('AlertaDengue', 'version.py')
     )
     return mod.__version__
@@ -48,6 +49,7 @@ def list_dir(pathname=PATH_ROOT, dir_name=''):
     size = len(pathname)
 
     return ['.%s' % r[size:] for r in result]
+
 
 with open('../README.md') as readme_file:
     readme = readme_file.read()

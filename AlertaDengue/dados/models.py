@@ -1,7 +1,5 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-#local
-from .dbdata import get_city_name_by_id
 
 
 class ForecastModel(models.Model):
