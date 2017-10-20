@@ -46,10 +46,8 @@ class DatabaseAppsRouter(object):
         return None
 
     def allow_migrate(self, db, app_label, **hints):
-        allow = False
+        allow = True
         if app_label in settings.MIGRATION_MODULES:
             if settings.MIGRATION_MODULES[app_label] is None:
                 allow = False
-            else:
-                allow = True
         return allow
