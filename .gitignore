@@ -29,3 +29,5 @@ geodjango.db
 chunked_uploads
 authorized_keys
 Dockerfile-dev
+*.dbf
+*.egg-info
