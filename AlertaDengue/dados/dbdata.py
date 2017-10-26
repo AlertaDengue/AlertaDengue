@@ -18,6 +18,14 @@ CID10 = {
     'chikungunya': 'A920'
 }
 
+STATE_NAME = {
+    'CE': 'Ceará',
+    'ES': 'Espírito Santo',
+    'MG': 'Minas Gerais',
+    'PR': 'Paraná',
+    'RJ': 'Rio de Janeiro'
+}
+
 db_engine = create_engine("postgresql://{}:{}@{}/{}".format(
     settings.PSQL_USER,
     settings.PSQL_PASSWORD,

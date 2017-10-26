@@ -144,12 +144,8 @@ def load_series():
 class AlertaMainView(TemplateView):
     template_name = 'main.html'
 
-    _state_names = ['Rio de Janeiro', 'Paraná', 'Espírito Santo']
-    _state_initials = {
-        'Rio de Janeiro': 'RJ',
-        'Paraná': 'PR',
-        'Espírito Santo': 'ES'
-    }
+    _state_names = sorted(dbdata.STATE_NAME.values())
+    _state_initials = {v: k for k, v in dbdata.STATE_NAME.items()}
 
     def get_context_data(self, **kwargs):
         context = super(AlertaMainView, self).get_context_data(**kwargs)
@@ -570,22 +566,25 @@ class SinanCasesView(View):
         return HttpResponse(cases, content_type="application/json")
 
 
-
 class AlertaStateView(TemplateView):
     template_name = 'state_cities.html'
 
-    _state_name = {
-        'RJ': 'Rio de Janeiro',
-        'PR': 'Paraná',
-        'ES': 'Espírito Santo'}
+    _state_name = dbdata.STATE_NAME
+
     _map_center = {
+        'CE': [-20.015, -40.803],
+        'ES': [-20.015, -40.803],
+        'MG': [-20.015, -40.803],
         'RJ': [-22.187, -43.176],
-        'PR': [-25.006, -51.833],
-        'ES': [-20.015, -40.803]}
+        'PR': [-25.006, -51.833]
+    }
     _map_zoom = {
-        'RJ': 6,
+        'CE': 6,
+        'ES': 6,
+        'MG': 6,
         'PR': 6,
-        'ES': 6}
+        'RJ': 6
+    }
 
     def get_context_data(self, **kwargs):
         """
@@ -668,10 +667,7 @@ class AlertaStateView(TemplateView):
 
 
 class NotificationReducedCSV_View(View):
-    _state_name = {
-        'RJ': 'Rio de Janeiro',
-        'PR': 'Paraná',
-        'ES': 'Espírito Santo'}
+    _state_name = dbdata.STATE_NAME
 
     request = None
 
