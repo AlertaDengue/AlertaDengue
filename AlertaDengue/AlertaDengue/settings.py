@@ -150,7 +150,7 @@ DATABASE_ROUTERS = [
 ]
 DATABASE_APPS_MAPPING = {
     'dados': 'dengue',
-    'forecast': 'dengue',
+    'forecast': 'forecast',
     'dbf': 'default'
 }
 
@@ -159,6 +159,14 @@ DATABASES.update({
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': PSQL_DB,
         'USER': PSQL_USER,
+        'PASSWORD': PSQL_PASSWORD,
+        'HOST': PSQL_HOST,
+        'PORT': ''
+    },
+    'forecast': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': PSQL_DB,
+        'USER': 'forecast',
         'PASSWORD': PSQL_PASSWORD,
         'HOST': PSQL_HOST,
         'PORT': ''
