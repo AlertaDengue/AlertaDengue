@@ -23,6 +23,14 @@ CID10 = {
     'chikungunya': 'A920'
 }
 
+STATE_NAME = {
+    'CE': 'Ceará',
+    'ES': 'Espírito Santo',
+    'MG': 'Minas Gerais',
+    'PR': 'Paraná',
+    'RJ': 'Rio de Janeiro'
+}
+
 db_engine = create_engine("postgresql://{}:{}@{}/{}".format(
     settings.PSQL_USER,
     settings.PSQL_PASSWORD,
@@ -1155,10 +1163,10 @@ class Forecast:
           TO_CHAR(MIN(init_date_epiweek), 'YYYY-MM-DD') AS epiweek_min,
           TO_CHAR(MAX(init_date_epiweek), 'YYYY-MM-DD') AS epiweek_max
         FROM 
-          "Municipio".forecast AS f
-          INNER JOIN "Municipio".forecast_city AS fc
+          forecast.forecast_cases AS f
+          INNER JOIN forecast.forecast_city AS fc
             ON (f.geocode = fc.geocode AND fc.active=TRUE)
-          INNER JOIN "Municipio".forecast_model AS fm
+          INNER JOIN forecast.forecast_model AS fm
             ON (fc.forecast_model_id = fm.id AND fm.active = TRUE)
         WHERE f.geocode={} AND cid10='{}'
         '''.format(geocode, cid10)
@@ -1180,16 +1188,16 @@ class Forecast:
         cid10 = CID10[disease]
 
         sql = '''
-        SELECT DISTINCT ON (forecast.forecast_model_id)
-          forecast.forecast_model_id, 
+        SELECT DISTINCT ON (forecast_cases.forecast_model_id)
+          forecast_cases.forecast_model_id, 
           forecast_model.name AS forecast_model_name,
-          forecast.published_date
+          forecast_cases.published_date
         FROM 
-          "Municipio".forecast 
-          INNER JOIN "Municipio".forecast_model
+          forecast.forecast_cases
+          INNER JOIN forecast.forecast_model
             ON (
-              "Municipio".forecast.forecast_model_id =  
-              "Municipio".forecast_model.id
+              forecast_cases.forecast_model_id =  
+              forecast_model.id
             )
         WHERE
           cid10 = '%s'
@@ -1268,23 +1276,24 @@ class Forecast:
             init_date_epiweek,
             cases AS forecast_%(model_name)s_cases
           FROM 
-            "Municipio".forecast
-            INNER JOIN "Municipio".forecast_model
+            forecast.forecast_cases
+            INNER JOIN forecast.forecast_model
               ON (
-                forecast.forecast_model_id = forecast_model.id
+                forecast_cases.forecast_model_id = forecast_model.id
                 AND forecast_model.active=TRUE
               )
-            INNER JOIN "Municipio".forecast_city
+            INNER JOIN forecast.forecast_city
               ON (
-                forecast_city.geocode = forecast.geocode
-                AND forecast.forecast_model_id = forecast_city.forecast_model_id
+                forecast_city.geocode = forecast_cases.geocode
+                AND forecast_cases.forecast_model_id = 
+                  forecast_city.forecast_model_id
                 AND forecast_city.active=TRUE
               )
           WHERE
             cid10='%(cid10)s'
-            AND forecast.geocode=%(geocode)s
+            AND forecast_cases.geocode=%(geocode)s
             AND published_date='%(published_date)s'
-            AND forecast.forecast_model_id=%(model_id)s
+            AND forecast_cases.forecast_model_id=%(model_id)s
         ) AS forecast%(model_id)s ON (
           tb_cases."SE" = forecast%(model_id)s.epiweek 
         )

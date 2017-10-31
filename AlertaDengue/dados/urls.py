@@ -28,7 +28,7 @@ def redirect_alert_city_dengue(request, geocodigo):
 
 
 __disease = '(?P<disease>dengue|chikungunya)'
-__state = '(?P<state>PR|RJ|ES)'
+__state = '(?P<state>CE|ES|MG|PR|RJ)'
 __geocode = '(?P<geocodigo>\d{7})'
 
 urlpatterns = [
@@ -38,7 +38,8 @@ urlpatterns = [
     url(r'^alerta/%s/%s$' % (__state, __disease),
         AlertaStateView.as_view(), name='alerta_uf'),
     url(r'^alerta/rio/$', redirect_alert_rio_dengue),
-    url(r'^alerta/rio/%s$' % __disease, AlertaMRJPageView.as_view(), name='mrj'),
+    url(r'^alerta/rio/%s$' % __disease,
+        AlertaMRJPageView.as_view(), name='mrj'),
     # url(r'^blog/', include('blog.urls')),
     url(r'^alerta/%s/$' % __geocode, redirect_alert_city_dengue),
     url(r'^alerta/%s/%s$' % (__geocode, __disease),

@@ -1,4 +1,6 @@
 {% load i18n %}
+
+{% if dados|length != 0 %}
 <div id="historico-chart" style="min-width: 500px; height: 400px; margin: 10px" data-highcharts-chart="0"></div>
 <script type="application/ecmascript">
 $(function () {
@@ -199,3 +201,4 @@ $(function () {
 });
 
 </script>
+{% endif %}

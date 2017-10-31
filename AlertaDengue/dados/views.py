@@ -45,10 +45,10 @@ def hex_to_rgb(value):
 def get_last_color_alert(geocode, disease, color_type='rgb'):
     """
 
-    :param geocode: 
+    :param geocode:
     :param disease:
     :param color_type: rba|hex
-    :return: 
+    :return:
     """
     df_level = dbdata.get_last_alert(geocode, disease)
 
@@ -204,12 +204,8 @@ class _GetMethod:
 class AlertaMainView(TemplateView):
     template_name = 'main.html'
 
-    _state_names = ['Rio de Janeiro', 'Paraná', 'Espírito Santo']
-    _state_initials = {
-        'Rio de Janeiro': 'RJ',
-        'Paraná': 'PR',
-        'Espírito Santo': 'ES'
-    }
+    _state_names = sorted(dbdata.STATE_NAME.values())
+    _state_initials = {v: k for k, v in dbdata.STATE_NAME.items()}
 
     def get_context_data(self, **kwargs):
         context = super(AlertaMainView, self).get_context_data(**kwargs)
@@ -303,7 +299,11 @@ class AlertaMainView(TemplateView):
         return context
 
 
-class AlertaMRJPageView(TemplateView, _GetMethod):
+class AlertCityPageBaseView(TemplateView, _GetMethod):
+    pass
+
+
+class AlertaMRJPageView(AlertCityPageBaseView):
     """
     Rio de Janeiro Alert View
     """
@@ -333,14 +333,16 @@ class AlertaMRJPageView(TemplateView, _GetMethod):
             5.3: 'AP 5.3: Santa Cruz e adjacências'
         }
 
+        geocode = str(MRJ_GEOCODE)
+
+        city_info = get_city_info(geocode)
+
         # forecast epiweek reference
         forecast_date_min, forecast_date_max = Forecast.get_min_max_date(
-            geocode=MRJ_GEOCODE, cid10=CID10[disease_code]
+            geocode=geocode, cid10=CID10[disease_code]
         )
 
-        forecast_date_ref = self._get(
-            'ref', forecast_date_max
-        )
+        forecast_date_ref = self._get('ref', forecast_date_max)
 
         if forecast_date_ref is None:
             epiweek = None
@@ -357,7 +359,7 @@ class AlertaMRJPageView(TemplateView, _GetMethod):
             for ap, v in alert.items():
                 if ap not in current.aps:
                     continue
-                
+
                 _ap = float(ap.split('AP')[-1])
 
                 mask = (current.aps == ap)
@@ -384,12 +386,9 @@ class AlertaMRJPageView(TemplateView, _GetMethod):
             total_series = [0]
             total_observed_series = [0]
 
-        _MRJ_GEOCODE = str(MRJ_GEOCODE)
-        city_info = get_city_info(_MRJ_GEOCODE)
-
         context.update({
-            'geocodigo': _MRJ_GEOCODE,
-            'nome': "Rio de Janeiro",
+            'geocodigo': geocode,
+            'nome': city_info['nome'],
             'populacao': city_info['populacao'],
             'incidencia': (
                 total_observed_series[-1] / city_info['populacao']
@@ -424,7 +423,7 @@ class AlertaMRJPageView(TemplateView, _GetMethod):
         return context
 
 
-class AlertaMunicipioPageView(TemplateView, _GetMethod):
+class AlertaMunicipioPageView(AlertCityPageBaseView):
     template_name = 'alerta_municipio.html'
 
     def dispatch(self, request, *args, **kwargs):
@@ -432,9 +431,9 @@ class AlertaMunicipioPageView(TemplateView, _GetMethod):
             AlertaMunicipioPageView, self
         ).get_context_data(**kwargs)
 
-        municipio_gc = kwargs['geocodigo']
+        geocode = kwargs['geocodigo']
 
-        if int(municipio_gc) == MRJ_GEOCODE:  # Rio de Janeiro
+        if int(geocode) == MRJ_GEOCODE:  # Rio de Janeiro
             return redirect('mrj', disease='dengue', permanent=True)
 
         return super(
@@ -466,7 +465,10 @@ class AlertaMunicipioPageView(TemplateView, _GetMethod):
             'ref', forecast_date_max
         )
 
-        epiweek = episem(forecast_date_ref).replace('W', '')
+        if forecast_date_ref is None:
+            epiweek = None
+        else:
+            epiweek = episem(forecast_date_ref).replace('W', '')
 
         (
             alert, SE, case_series, last_year,
@@ -597,18 +599,22 @@ class SinanCasesView(View):
 class AlertaStateView(TemplateView):
     template_name = 'state_cities.html'
 
-    _state_name = {
-        'RJ': 'Rio de Janeiro',
-        'PR': 'Paraná',
-        'ES': 'Espírito Santo'}
+    _state_name = dbdata.STATE_NAME
+
     _map_center = {
-        'RJ': [-22.187, -43.176],
+        'CE': [-05.069, -39.397],
+        'ES': [-20.015, -40.803],
+        'MG': [-18.542, -44.319],
         'PR': [-25.006, -51.833],
-        'ES': [-20.015, -40.803]}
+        'RJ': [-22.187, -43.176]
+    }
     _map_zoom = {
-        'RJ': 6,
+        'CE': 6,
+        'ES': 6,
+        'MG': 6,
         'PR': 6,
-        'ES': 6}
+        'RJ': 6
+    }
 
     def get_context_data(self, **kwargs):
         """
@@ -691,10 +697,7 @@ class AlertaStateView(TemplateView):
 
 
 class NotificationReducedCSV_View(View, _GetMethod):
-    _state_name = {
-        'RJ': 'Rio de Janeiro',
-        'PR': 'Paraná',
-        'ES': 'Espírito Santo'}
+    _state_name = dbdata.STATE_NAME
 
     request = None
 

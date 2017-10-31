@@ -26,11 +26,11 @@ pip-selfcheck.json
 /share
 .ipynb_checkpoints
 geodjango.db
-*.dbf
 chunked_uploads
 authorized_keys
 Dockerfile-dev
+*.dbf
+*.egg-info
 /dev_dump/
-build
-AlertaDengue.egg-info
-dist
+/dist/
+/build/

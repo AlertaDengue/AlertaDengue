@@ -124,7 +124,7 @@ class Sinan(object):
     def _get_postgres_connection(self):
         return psycopg2.connect(**self.db_config)
 
-    def save_to_pgsql(self, table_name='"Municipio"."Notificacao"'):
+    def save_to_pgsql(self, table_name='"Municipio"."Notificacao"', default_cid=None):
         connection = self._get_postgres_connection()
         print("Escrevendo no PostgreSQL...")
         ano = self.time_span[1].year if self.time_span[0] == self.time_span[1] else self.ano
@@ -154,8 +154,14 @@ class Sinan(object):
                 row[7] = None if not row[7] else int(row[7])  # bairro_bairro_id
                 row[8] = None if row[8] == '' else add_dv(int(row[8]))  # municipio_geocodigo
                 row[9] = int(row[9])  # nu_notific
-                row[11] = None if isinstance(row[11], pd.tslib.NaTType) else date.fromordinal(
-                    row[11].to_datetime().toordinal())  # dt_nasc
+                if row[10] is None:
+                    if default_cid is None:
+                        raise ValidationError(_("Existem nesse arquivo notificações "
+                                                "que não incluem a coluna ID_AGRAVO."))
+                    else:
+                        row[10] = default_cid
+
+                row[11] = None if (isinstance(row[11], pd.tslib.NaTType) or row[11] is None) else date.fromordinal(row[11].to_datetime().toordinal())  # dt_nasc
                 row[13] = None if not row[13] else int(row[13])  # nu_idade_n
                 cursor.execute(insert_sql, row)
                 if (i % 1000 == 0) and (i > 0):

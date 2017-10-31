@@ -192,8 +192,12 @@ h1 {
     margin-top: 0;
 }
 
-.card * {
+.card-deck * {
     font-weight: bold;
+}
+
+.card-deck {
+    padding: 20px;
 }
 
 .card-indicator-value, .card-indicator-value *{

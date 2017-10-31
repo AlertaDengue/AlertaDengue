@@ -56,6 +56,7 @@ INSTALLED_APPS = (
     'bootstrap3',
     'chunked_upload',
     'dados',
+    'forecast',
     'dbf.apps.DbfConfig',
     'manager.router'
 )
@@ -75,21 +76,22 @@ ROOT_URLCONF = 'AlertaDengue.urls'
 
 WSGI_APPLICATION = 'AlertaDengue.wsgi.application'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'APP_DIRS': True,
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'OPTIONS': {'context_processors': ["django.contrib.auth.context_processors.auth",
-                                            "django.template.context_processors.debug",
-                                            "django.template.context_processors.i18n",
-                                            "django.template.context_processors.media",
-                                            "django.template.context_processors.static",
-                                            "django.template.context_processors.tz",
-                                            "django.contrib.messages.context_processors.messages"],
-                    }
-    },
-]
+TEMPLATES = [{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'APP_DIRS': True,
+    'DIRS': [os.path.join(BASE_DIR, 'templates')],
+    'OPTIONS': {
+        'context_processors': [
+            "django.contrib.auth.context_processors.auth",
+            "django.template.context_processors.debug",
+            "django.template.context_processors.i18n",
+            "django.template.context_processors.media",
+            "django.template.context_processors.static",
+            "django.template.context_processors.tz",
+            "django.contrib.messages.context_processors.messages"
+        ],
+    }
+}]
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
@@ -116,9 +118,11 @@ LEAFLET_CONFIG = {
     'DEFAULT_CENTER': (-22.907000, -43.431000),
     'DEFAULT_ZOOM': 8,
     'MAXIMUM_ZOOM': 13,
-    'TILES': 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',  # 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
+    # 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
+    'TILES': 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
     'MINIMAP': False,
-    'ATTRIBUTION_PREFIX': 'Fonte: <a href=http://info.dengue.mat.br>info.dengue.mat.br</a>',
+    'ATTRIBUTION_PREFIX':
+        'Fonte: <a href=http://info.dengue.mat.br>info.dengue.mat.br</a>',
     'PLUGINS': {
         'cluster': {
             'js': 'js/leaflet.markercluster.js',
@@ -126,10 +130,14 @@ LEAFLET_CONFIG = {
             'auto-include': True
         },
         'heatmap': {
-            'js': ['js/heatmap.js', 'js/heatmap-leaflet.js', 'js/QuadTree.js'],
+            'js': [
+                'libs/heatmap/heatmap.js',
+                'libs/heatmap/leaflet-heatmap.js',
+                'js/QuadTree.js'
+            ],
         }
-    }
-
+    },
+    'RESET_VIEW': False
 }
 
 PSQL_DB = config('PSQL_DB', default="dengue")
@@ -137,9 +145,12 @@ PSQL_USER = config('PSQL_USER', default="dengueadmin")
 PSQL_HOST = config('PSQL_HOST', default="localhost")
 PSQL_PASSWORD = config('PSQL_PASSWORD')
 
-DATABASE_ROUTERS = ['manager.router.DatabaseAppsRouter']
+DATABASE_ROUTERS = [
+    'manager.router.DatabaseAppsRouter'
+]
 DATABASE_APPS_MAPPING = {
     'dados': 'dengue',
+    'forecast': 'dengue',
     'dbf': 'default'
 }
 
@@ -154,6 +165,9 @@ DATABASES.update({
     }
 })
 
+MIGRATION_MODULES = {
+    'dados': None
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -216,10 +230,6 @@ LOGGING = {
             'propagate': False,
         },
     },
-}
-
-MIGRATION_MODULES = {
-    'dados': None
 }
 
 try:
