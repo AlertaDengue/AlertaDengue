@@ -4,28 +4,44 @@
 {% load i18n %}
 {% load static %}
 
-{% block info_panel %}
-    <h3> {% blocktrans with populacao=populacao|intword %}<b>População:</b> {{ populacao }} de habitantes.{% endblocktrans %}</h3>
-    <h3> {% blocktrans with incidencia=incidencia|floatformat %}<b>Incidência estimada:</b> {{ incidencia }}  por 100 mil habitantes. {% endblocktrans %}</h3>
+{% block alert_js%}
+
+function load_map_layer(
+    dataurl, alerta, series_casos, casos_por_ap, bairros, map
+) {
+    // Download GeoJSON via Ajax
+    $.getJSON(dataurl, function (data) {
+        // Add GeoJSON layer
+        geojson = L.geoJson(data, {
+            style: style, onEachFeature: function (feature, layer) {
+                feature.properties.alerta = alerta[parseFloat(feature.properties.COD_AP_SMS)];
+                feature.properties.series = series_casos[feature.properties.COD_AP_SMS];
+                feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
+                layer.bindPopup("<b>" + bairros[parseFloat(feature.properties.COD_AP_SMS)] + "</b>" + "<br>" +
+                        "{% blocktrans %}Casos{% endblocktrans %}: " + feature.properties.casos + "<br/>{% blocktrans %}Últimas semanas{% endblocktrans %}: <span class='inlinesparkline'>" +
+                        feature.properties.series + "</span><br>" +
+                        "<br><u>{% blocktrans %}O que fazer{% endblocktrans %}</u>: " +
+                        recomendacoes[feature.properties.alerta]
+                );
+                layer.setStyle(style(feature))
+                layer.on({
+                    mouseover: highlightFeature,
+                    mouseout: resetHighlight,
+                    popupopen: renderSparkline
+                });
+
+            }
+        });
+
+        aps.addLayer(geojson, true);
+        aps.addTo(map);
+        features.addTo(map);
+    });
+
+}
 {% endblock %}
 
-
-{% block alert_js %}
-
-var dataurl = "{% static 'rio_aps.geojson' %}";
-
-var bairros = {
-    1.0: 'AP 1: Centro e adjacências',
-    2.1: 'AP 2.1: Zona Sul',
-    2.2: 'AP 2.2: Tijuca e adjacências',
-    3.1: 'AP 3.1: Bonsucesso e adjacências',
-    3.2: 'AP 3.2: Meier e adjacências',
-    3.3: 'AP 3.3: Madureira e adjacências',
-    4.0: 'AP 4: Barra, Recreio e Jacarepaguá',
-    5.1: 'AP 5.1: Bangu e adjacências',
-    5.2: 'AP 5.2: Campo Grande e adjacências',
-    5.3: 'AP 5.3: Santa Cruz e adjacências'
-};
+{% block alert_js_main_init %}
 
 info.update = function (props) {
     this._div.innerHTML = '<h4>{% blocktrans %}Número de casos na semana{% endblocktrans %}:</h4>' + (
@@ -34,44 +50,9 @@ info.update = function (props) {
             '{% blocktrans %}Passe o mouse sobre uma AP{% endblocktrans %}');
 };
 
-info.addTo(map);
-
-// Download GeoJSON via Ajax
-$.getJSON(dataurl, function (data) {
-    // Add GeoJSON layer
-    geojson = L.geoJson(data, {
-        style: style, onEachFeature: function (feature, layer) {
-            feature.properties.alerta = alerta[parseFloat(feature.properties.COD_AP_SMS)];
-            feature.properties.series = series_casos[feature.properties.COD_AP_SMS];
-            feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
-            layer.bindPopup("<b>" + bairros[parseFloat(feature.properties.COD_AP_SMS)] + "</b>" + "<br>" +
-                    "{% blocktrans %}Casos{% endblocktrans %}: " + feature.properties.casos + "<br/>{% blocktrans %}Últimas semanas{% endblocktrans %}: <span class='inlinesparkline'>" +
-                    feature.properties.series + "</span><br>" +
-                    "<br><u>{% blocktrans %}O que fazer{% endblocktrans %}</u>: " +
-                    recomendacoes[feature.properties.alerta]
-            );
-            layer.setStyle(style(feature))
-            layer.on({
-                mouseover: highlightFeature,
-                mouseout: resetHighlight,
-                popupopen: renderSparkline
-            });
-
-        }
-    });
-
-    aps.addLayer(geojson, true);
-    aps.addTo(map);
-    features.addTo(map);
-});
-
-$(window).on("resize", function () {
-    $("#main").height($(window).height() * 0.7);
-    map.invalidateSize();
-    map.fitBounds([
-        [-23.00201188664663, -43.823089599609375],
-        [-22.81226364538693, -43.040313720703125]
-    ]);
-}).trigger("resize")
+get_map_bounds = function() {return [
+    [-23.00201188664663, -43.823089599609375],
+    [-22.81226364538693, -43.040313720703125]
+];};
 
 {% endblock %}

@@ -4,35 +4,20 @@
 {% load i18n %}
 {% load static %}
 
-{% block info_panel %}
-  <h3>{% blocktrans with populacao=populacao|intcomma %} <b>População:</b> {{ populacao }} habitantes. {% endblocktrans %}</h3>
-  <h3>{% blocktrans with incidencia=incidencia|floatformat %} <b>Incidência estimada:</b>  {{ incidencia }} por 100 mil habitantes. {% endblocktrans %}</h3>
-  <h3>{% blocktrans with prt=prt1|floatformat %}<b>Chance de alerta <span class="label label-warning">laranja</span> ou <span class="label label-danger">vermelho</span> na próxima semana:</b> {{ prt }}%{% endblocktrans %}</h3>
-
+{% block alert_js %}
+dataurl ;
 {% endblock %}
 
-{% block alert_js %}
-var dataurl = '/static/geojson/{{geocodigo}}.json'
+{% block info_panel %}
+  <h3>{% blocktrans with prt=prt1|floatformat %}<b>Chance de alerta <span class="label label-warning">laranja</span> ou <span class="label label-danger">vermelho</span> na próxima semana:</b> {{ prt }}%{% endblocktrans %}</h3>
+{% endblock %}
 
-bairros = {{ bairros|safe }};
-
+{% block alert_js_main_init %}
 info.update = function (props) {
     this._div.innerHTML = '<h4>{% blocktrans %}Número de casos estimados na semana{% endblocktrans %}:</h4>' + (props ?
             '<b>' + props.casos + '</b><br />' : '{% blocktrans %}Passe o mouse sobre o mapa{% endblocktrans %}');
 };
 
-info.addTo(map);
+get_map_bounds = function() {return geojson.getBounds();};
 
-load_map_layer(dataurl, map);
-
-$(window).on("resize", function () {
-    $("#main").height($(window).height() * 0.7);
-    map.invalidateSize();
-    try {
-        map.fitBounds(geojson.getBounds());
-    }
-    catch (err) {
-    }
-
-}).trigger("resize")
 {% endblock %}

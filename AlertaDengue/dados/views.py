@@ -387,7 +387,8 @@ class AlertaMRJPageView(AlertCityPageBaseView):
             total_observed_series = [0]
 
         context.update({
-            'geocodigo': geocode,
+            'geocodigo': geocode,  # legacy
+            'geocode': geocode,
             'nome': city_info['nome'],
             'populacao': city_info['populacao'],
             'incidencia': (
@@ -418,7 +419,8 @@ class AlertaMRJPageView(AlertCityPageBaseView):
             'forecast_date_ref': forecast_date_ref,
             'forecast_date_min': forecast_date_min,
             'forecast_date_max': forecast_date_max,
-            'epiweek': epiweek
+            'epiweek': epiweek,
+            'geojson_url': '/static/rio_aps.geojson'
         })
         return context
 
@@ -487,6 +489,8 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
             total_observed_series = [0]
 
         context.update({
+            'geocodigo': geocode, # legacy
+            'geocode': geocode,
             'nome': city_info['nome'],
             'populacao': city_info['populacao'],
             'incidencia': (
@@ -510,13 +514,13 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
             'total_observed': total_observed_series[-1],
             'total_observed_series': ', '.join(
                 map(str, total_observed_series)),
-            'geocodigo': geocode,
             'disease_label': disease_label,
             'disease_code': disease_code,
             'forecast_date_ref': forecast_date_ref,
             'forecast_date_min': forecast_date_min,
             'forecast_date_max': forecast_date_max,
-            'epiweek': epiweek
+            'epiweek': epiweek,
+            'geojson_url': '/static/geojson/%s.json' % geocode
         })
         return context
 

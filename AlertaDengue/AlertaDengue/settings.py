@@ -149,13 +149,13 @@ DATABASE_ROUTERS = [
     'manager.router.DatabaseAppsRouter'
 ]
 DATABASE_APPS_MAPPING = {
-    'dados': 'dengue',
+    'dados': 'dados',
     'forecast': 'forecast',
     'dbf': 'default'
 }
 
 DATABASES.update({
-    'dengue': {
+    'dados': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': PSQL_DB,
         'USER': PSQL_USER,

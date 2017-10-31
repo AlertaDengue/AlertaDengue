@@ -16,38 +16,50 @@ class DatabaseAppsRouter(object):
 
     def db_for_read(self, model, **hints):
         """"Point all read operations to the specific database."""
+        db = None
         if model._meta.app_label in settings.DATABASE_APPS_MAPPING:
-            return settings.DATABASE_APPS_MAPPING[model._meta.app_label]
-        return None
+            db = settings.DATABASE_APPS_MAPPING[model._meta.app_label]
+        return db
  
     def db_for_write(self, model, **hints):
         """Point all write operations to the specific database."""
+        db = None
         if model._meta.app_label in settings.DATABASE_APPS_MAPPING:
-            return settings.DATABASE_APPS_MAPPING[model._meta.app_label]
-        return None
+            db = settings.DATABASE_APPS_MAPPING[model._meta.app_label]
+        return db
  
     def allow_relation(self, obj1, obj2, **hints):
         """Allow any relation between apps that use the same database."""
         db_obj1 = settings.DATABASE_APPS_MAPPING.get(obj1._meta.app_label)
         db_obj2 = settings.DATABASE_APPS_MAPPING.get(obj2._meta.app_label)
+
+        allow = None
+
         if db_obj1 and db_obj2:
-            if db_obj1 == db_obj2:
-                return True
-            else:
-                return False
-        return None
+            allow = True if db_obj1 == db_obj2 else False
+
+        return allow
  
     def allow_syncdb(self, db, model):
         """Make sure that apps only appear in the related database."""
-        if db in settings.DATABASE_APPS_MAPPING.values():
-            return settings.DATABASE_APPS_MAPPING.get(model._meta.app_label) == db
-        elif model._meta.app_label in settings.DATABASE_APPS_MAPPING:
-            return False
-        return None
+        allow = None
+        apps_mapping = settings.DATABASE_APPS_MAPPING  # alias
+
+        if db in apps_mapping.values():
+            allow = apps_mapping.get(model._meta.app_label) == db
+        elif model._meta.app_label in apps_mapping:
+            allow = False
+        return allow
 
     def allow_migrate(self, db, app_label, **hints):
+        apps_mapping = settings.DATABASE_APPS_MAPPING  # alias
         allow = True
-        if app_label in settings.MIGRATION_MODULES:
+
+        if db in apps_mapping.values() and app_label in apps_mapping:
+            allow = apps_mapping[app_label] == db
+
+        if allow and app_label in settings.MIGRATION_MODULES:
             if settings.MIGRATION_MODULES[app_label] is None:
                 allow = False
+        print(db, app_label, allow)
         return allow
