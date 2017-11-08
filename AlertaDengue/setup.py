@@ -34,9 +34,9 @@ except ImportError:
 def get_version():
     """Obtain the version number"""
     import importlib
-    mod = importlib.load_source(
+    mod = importlib.machinery.SourceFileLoader(
         'version', os.path.join('AlertaDengue', 'version.py')
-    )
+    ).load_module()
     return mod.__version__
 
 

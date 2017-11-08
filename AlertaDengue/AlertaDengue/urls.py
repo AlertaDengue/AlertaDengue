@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^dbf/', include('dbf.urls')),
+    url(r'^forecast/', include('forecast.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

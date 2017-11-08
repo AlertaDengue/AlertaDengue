@@ -240,15 +240,17 @@ LOGGING = {
     },
 }
 
-try:
-    from .local_settings import *
-except ImportError:
-    pass
 
 CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=None)
+CELERY_TASK_ALWAYS_EAGER = config('CELERY_TASK_ALWAYS_EAGER', default=False)
 
 BOOTSTRAP3 = {
     'form_renderers': {
         'default': 'dbf.forms.FormRendererWithHiddenFieldErrors',
     }
 }
+
+try:
+    from .local_settings import *
+except ImportError:
+    pass

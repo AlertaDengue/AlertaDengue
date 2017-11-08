@@ -3,7 +3,6 @@ from django.core.urlresolvers import reverse
 from django.core.files.base import File
 from django.test import TestCase
 from datetime import date
-from unittest import skip
 # local
 from ..models import DBF, DBFChunkedUpload
 from ..forms import DBFForm
@@ -68,7 +67,6 @@ class DBFUploadViewTest(TestCase):
         self.assertIn('last_uploaded', response.context)
         self.assertNotIn(dbf, response.context['last_uploaded'])
 
-    @skip
     def test_redirects_to_success_url_when_form_is_valid(self):
         self.client.login(username="user", password="user")
         with open(os.path.join(TEST_DATA_DIR, "simple.dbf"), "rb") as fp:
@@ -90,7 +88,6 @@ class DBFUploadViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("dbf:upload_successful"))
 
-    @skip
     def test_cannot_create_file_for_other_user(self):
         self.client.login(username="user", password="user")
         self.assertEqual(len(DBF.objects.all()), 0)

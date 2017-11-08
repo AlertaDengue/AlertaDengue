@@ -1,1 +1,1 @@
-from .version import __version__
+from .AlertaDengue.version import __version__
