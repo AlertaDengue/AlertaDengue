@@ -1,10 +1,14 @@
 {% load i18n %}
+
+{% if dados|length != 0 %}
 <div id="historico-chart" style="min-width: 500px; height: 400px; margin: 10px" data-highcharts-chart="0"></div>
 <script type="application/ecmascript">
 $(function () {
 
     var nd = new Date();
     var tzo = nd.getTimezoneOffset();
+    var nan = null; // to prevent some problem with nan
+
     // Agora as series de dados
     var dados = {{ dados|safe }};
 
@@ -79,7 +83,7 @@ $(function () {
             backgroundColor: '#FFFFFF'
         },
         series: [
-                {
+            {
                 name: '{% blocktrans %}Casos Estimados de {{disease_label}}{% endblocktrans %}',
                 color: '#AA4643',
                 type: 'spline',
@@ -94,6 +98,25 @@ $(function () {
                 }
 
             },
+
+            {% for k, title in forecast_models %}
+
+            {
+                name: '{% blocktrans %}Casos previstos de {{disease_label}} ({{title}}){% endblocktrans %}',
+                //color: '#AAAA43',
+                type: 'spline',
+                animation: true,
+                yAxis: 0,
+                pointInterval: 7 * 24 * 3600 * 1000,
+                pointStart: {{ start }}*1000 + tzo,
+                data: dados.{{k}},
+                dashStyle: 'shortdot',
+                tooltip: {
+                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
+                }
+
+            },
+            {% endfor %}
 
             {
                 name: '{% blocktrans %}Alerta Vermelho{% endblocktrans %}',
@@ -178,3 +201,4 @@ $(function () {
 });
 
 </script>
+{% endif %}

@@ -1,14 +1,14 @@
-import os
-import shutil
-
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mass_mail
 from django.template.loader import render_to_string
 from celery import shared_task
 
-from dbf.models import DBF
-from dbf.sinan import Sinan
+from .models import DBF
+from .sinan import Sinan
+
+import os
+import shutil
 
 
 def send_success_email(dbf):

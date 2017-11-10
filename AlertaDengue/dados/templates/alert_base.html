@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+
+{% load humanize i18n%}
+{% load i18n %}
+{% load static %}
+{% load staticfiles %}
+
+{% block extra_head %}
+    {% load leaflet_tags %}
+    {% load series %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+    {% leaflet_js plugins="ALL" %}
+    <meta property="og:image"
+          content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+    <meta property="og:image:secure_url"
+          content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+
+    <style>
+        .leaflet-container {
+            height: 80%;
+            width: 100%;
+
+        }
+
+        #main {
+            width: 100%;
+            height: 80%;
+        }
+
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+        }
+
+        .info h4 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+
+        .legend {
+            text-align: left;
+            line-height: 18px;
+            color: #555;
+        }
+
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+    </style>
+    <script src='/static/exp_PontosUnidadesBasicasSaudeMRJ2014wgs84.js'></script>
+    <script src="/static/js/Autolinker.min.js"></script>
+    <script src="/static/libs/jquery/jquery.sparkline.min.js"></script>
+    <script src="/static/libs/highstock/code/highstock.js"></script>
+    <script src="/static/libs/highstock/code/modules/exporting.js"></script>
+    <script src="/static/js/infodengue.js"></script>
+    <style>
+        .jqstooltip {
+            box-sizing: content-box;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}
+    {% blocktrans %}Situação da {{disease_label}} - {{ nome }} em {{ data2 }}{% endblocktrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="panel panel-default" style="padding: 20px;">
+        {% blocktrans %}Selecione a doença a ser visualizada:{% endblocktrans %}
+        <input id="disease-dengue"
+               type="radio" name="disease" value="dengue"
+               {% if disease_code == 'dengue' %}
+               checked="checked"
+               {% endif %}
+               onchange="window.location.href='./dengue'"
+        /> Dengue
+        <input id="disease-chik"
+               type="radio" name="disease" value="chik"
+               {% if disease_code == 'chikungunya' %}
+               checked="checked"
+               {% endif %}
+               onchange="window.location.href='./chikungunya'"
+        /> Chikungunya
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <h3>{% blocktrans with populacao=populacao|intword %}<b>População:</b> {{ populacao }} de habitantes.{% endblocktrans %}</h3>
+            <h3>{% blocktrans with incidencia=incidencia|floatformat %}<b>Incidência estimada:</b> {{ incidencia }} por 100 mil habitantes. {% endblocktrans %}</h3>
+            {% block info_panel%}{% endblock %}
+        </div>
+    </div>
+
+    {% if forecast_date_ref != None %}
+    <div>
+        <form id="form_forecast_date_ref" method="get">
+            <label for="ref">
+                {% blocktrans %}Data de referência da previsão{% endblocktrans %}
+            </label>
+            <input id="ref" name="ref" type="date"/>
+            <script>
+            $(document).ready(function(){
+                $('#ref').val('{{forecast_date_ref}}');
+                $('#ref').attr('min', '{{forecast_date_min}}');
+                $('#ref').attr('max', '{{forecast_date_max}}');
+                $('#ref').on('change', function() {
+                    form_forecast_date_ref.submit();
+                });
+            })
+            </script>
+        </form>
+    </div>
+    {% endif %}
+
+    {% alerta_series %}
+
+    {% leaflet_map "main" callback="main_map_init" %}
+    <br>
+    {#    <img src="/static/codigocores.jpg" alt="Cores do Alerta" width="1140px">#}
+    <div class="row clearfix boxrow">
+        <div class="col-md-6 column bluebox">
+            <h3><span class="glyphicon glyphicon-signal" aria-hidden="true"></span>
+                {% blocktrans %}Níveis de Atenção{% endblocktrans %}</h3>
+
+            <div class="panel-group" id="panelgroup">
+                <div class="panel panel-default panel-verde">
+                    <div class="panel-heading">
+                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-222790"
+                           href="#panel-element-vd">{% trans "Nível Verde" %}</a>
+                    </div>
+                    <div id="panel-element-vd" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            {% blocktrans %}Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições ideais para a reprodução do Mosquito.{% endblocktrans %}
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default panel-amarelo">
+                    <div class="panel-heading panel-amarelo">
+                        <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-222790"
+                           href="#panel-element-am">{% trans "Nível Amarelo" %}</a>
+                    </div>
+                    <div id="panel-element-am" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            {% blocktrans %}Estação da {{disease_label}}. No nível amarelo, temos condições climáticas propícias à reprodução do mosquito. Mas ainda sem transmissão significativa da Doença.{% endblocktrans %}
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default panel-laranja">
+                    <div class="panel-heading">
+                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-222790"
+                           href="#panel-element-la">{% trans "Nível Laranja" %}</a>
+                    </div>
+                    <div id="panel-element-la" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            {% blocktrans %}Transmissão de {{disease_label}}. No nível laranja, já observamos uma incidência pronunciada da {{disease_label}}, mas ainda não podemos afirmar com confiança que teremos epidemia.{% endblocktrans %}
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default panel-vermelho">
+                    <div class="panel-heading">
+                        <a class="panel-title" data-toggle="collapse" data-parent="#panel-222790"
+                           href="#panel-element-vm">{% trans "Nível Vermelho" %}</a>
+                    </div>
+                    <div id="panel-element-vm" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            {% blocktrans %}Epidemia. Neste nível estamos em plena epidemia. Todo o cuidado é pouco, e precisamos ficar atentos aos sintomas da {{disease_label}} e procurar o médico imediatamente em caso suspeita de {{disease_label}}.{% endblocktrans %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 column bluebox">
+            <h3><span class="badge badge-info">{{ novos_casos }}</span>
+                {% trans "Casos estimados" %}</h3>
+
+            <p>{% blocktrans %} São estimados entre <b>{{ min_est }}</b> e <b>{{ max_est }} novos casos</b> na Semana Epidemiológica {{ SE }}: {{ data1 }}  a {{ data2 }}. Com {{ total_observed }} casos notificados oficialmente até o momento{% endblocktrans %}</p>
+            <h4>{% blocktrans %} Últimas {{ look_back }} semanas: {% endblocktrans %}</h4>
+            <span class='totalsparkline'>{{ total_series }}</span>
+
+            <p></p>
+            {% comment %}<h4>Há um ano:</h4>
+            <p>Há um ano atrás, nesta mesma semana, observamos <b>{{ last_year }}</b> casos</p>{% endcomment %}
+        </div>
+
+        <div class="col-md-3 column bluebox">
+            <h3><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {% blocktrans %}Suspeita de um criadouro?{% endblocktrans %}</h3>
+            <p>{% blocktrans %}Em caso de suspeita de criadouro de mosquitos, ligue para a <a href="http://www.1746.rio.gov.br/" style="color: #FFFFFF">Central de atendimento ao cidadão 1746</a>.{% endblocktrans %}</p>
+        </div>
+    </div>
+
+    <script>
+    var geocode = "{{geocode}}";
+    var casos_por_ap = {{ casos_por_ap|safe }};
+    var series_casos = {{ series_casos|safe }};
+    var alerta = {{ alerta|safe }};
+    var recomendacoes = {
+        0: "{% blocktrans %}Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www.riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros para o mosquito!</a>{% endblocktrans %}",
+        1: '{% blocktrans %}Uma vez por semana, aplique os <a href="http://www.riocontradengue.com.br/Site/Conteudo/Checklist.aspx">“10 minutos Contra a dengue”!</a>{% endblocktrans %}',
+        2: '{% blocktrans %}Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.{% endblocktrans %}',
+        3: '{% blocktrans %}Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.{% endblocktrans %}'
+    };
+
+    var bairros = {{ bairros|safe }};
+
+    var aps = L.layerGroup();
+    var features = L.layerGroup();
+    var info = L.control();
+    var legend = L.control({position: 'bottomright'});
+
+    // @override this
+    var dataurl = '{{geojson_url}}';
+
+    var alertLevels = [
+        {name: '{% blocktrans %}Baixo Risco{% endblocktrans %}', color: '#0D6B0D'},
+        {name: '{% blocktrans %}Atenção{% endblocktrans %}', color: '#FBFC75'},
+        {name: '{% blocktrans %}Transmissão{% endblocktrans %}', color: '#E45205'},
+        {name: '{% blocktrans %}Epidemia{% endblocktrans %}', color: '#FF0205'},
+    ];
+
+    $('.totalsparkline').sparkline('html', {
+        type: 'bar',
+        width: "auto",
+        heigth: "auto",
+        barWidth: "15px",
+        barColor: "White",
+        tooltipSuffix: " {% blocktrans %}casos{% endblocktrans %}"
+    });
+
+    function isInArray(el, array) {
+        return (array.indexOf(el) >= 0) ? true : false;
+    }
+
+    function bestFitZoom(map) {
+        // declaring the group variable
+        var group = new L.featureGroup;
+        // map._layers gives all the layers of the map including main container
+        // so looping in all those layers filtering those having feature
+        $.each(map._layers, function (ml) { group.addLayer(this) })
+        map.fitBounds(group.getBounds());
+    }
+
+    function style(feature) {
+        var i = +feature.properties.alerta || 0;
+        return {
+            weight: 2,
+            opacity: 1,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.7,
+            fillColor: alertLevels[i].color
+        };
+    }
+
+    function highlightFeature(e) {
+        var layer = e.target;
+
+        layer.setStyle({
+            weight: 5,
+            color: '#666',
+            dashArray: '',
+            fillOpacity: 0.7
+        });
+
+
+        if (!L.Browser.ie && !L.Browser.opera) {
+            layer.bringToFront();
+        }
+
+        info.update(layer.feature.properties);
+        layer.bringToBack()
+    }
+
+    function resetHighlight(e) {
+        geojson.resetStyle(e.target);
+        info.update();
+    }
+
+    function renderSparkline(e) {
+        $('.inlinesparkline').sparkline('html', {
+            type: 'bar',
+            width: "14em",
+            heigth: "5em",
+            barWidth: "9em",
+            tooltipSuffix: " {% blocktrans %}casos{% endblocktrans %}"
+        });
+    }
+
+    function apply_map_settings(map) {
+        //map.dragging.disable();
+        //map.scrollWheelZoom.disable();
+        map.touchZoom.disable();
+        map.doubleClickZoom.disable();
+        map.boxZoom.disable();
+        map.keyboard.disable();
+        map.touchZoom.disable();
+        map.doubleClickZoom.disable();
+        //$(".leaflet-control-zoom").css("visibility", "hidden");
+    }
+
+    {% block alert_js %}{% endblock %}
+
+    function main_map_init(map, options) {
+        $(document).data('map', map)
+
+        // control that shows state info on hover
+        info.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info');
+            this.update();
+            return this._div;
+        };
+
+        legend.onAdd = function () {
+            var div = L.DomUtil.create('div', 'info legend'),
+                labels = alertLevels.map(function(alertLevel){
+                    return '<i style="background:' + alertLevel.color + '"></i> ' + alertLevel.name;
+                }).reverse();
+
+            labels.push('O: {% blocktrans %}Unidades de Saúde{% endblocktrans %}');
+            div.innerHTML = labels.join('<br>');
+            return div;
+        };
+
+        legend.addTo(map);
+
+        // fetch data about health units
+        function pop_PontosUnidadesBasicasSaudeMRJ2014wgs84(feature, layer) {
+            var popupContent = '<table><tr><th scope="row">Nome:</th><td>' + Autolinker.link(String(feature.properties.NOME_LEG)) + '</td></tr><tr><th scope="row">Logradouro:</th><td>' + Autolinker.link(String(feature.properties.LOGRADOURO)) + '</td></tr><tr><th scope="row">Número:</th><td>' + Autolinker.link(String(feature.properties.NUMERO)) + '</td></tr><tr><th scope="row">Complemento:</th><td>' + Autolinker.link(String(feature.properties.COMPLEMENT)) + '</td></tr><tr><th scope="row">Bairro:</th><td>' + Autolinker.link(String(feature.properties.BAIRRO)) + '</td></tr><tr><th scope="row">CEP:</th><td>' + Autolinker.link(String(feature.properties.CEP)) + '</td></tr><tr><th scope="row">Telefone:</th><td>' + Autolinker.link(String(feature.properties.TELEFONE)) + '</td></tr><tr><th scope="row">Tipo:</th><td>' + Autolinker.link(String(feature.properties.TP_UNIDADE)) + '</td></tr><tr><th scope="row">Classe:</th><td>' + Autolinker.link(String(feature.properties.CLASSE_UND)) + '</td></tr></table><p><a href="http://www.rio.rj.gov.br/web/sms/onde-ser-atendido">Onde posso ser atendido?</a></p>';
+            layer.bindPopup(popupContent);
+        }
+
+        var CrossIcon = L.icon({
+            iconUrl: '/static/img/32px-Red_Cross_icon.png',
+            iconSize:     [16, 16],
+            iconAnchor:   [8, 8],
+            popupAnchor:  [8, -8]
+        });
+
+        var exp_PontosUnidadesBasicasSaudeMRJ2014wgs84JSON = new L.geoJson(exp_PontosUnidadesBasicasSaudeMRJ2014wgs84, {
+            onEachFeature: pop_PontosUnidadesBasicasSaudeMRJ2014wgs84,
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {
+                    icon: CrossIcon
+                })
+            }
+        });
+
+        features.addLayer(exp_PontosUnidadesBasicasSaudeMRJ2014wgs84JSON)
+
+        // @override at alert_js_main_init
+        var map_bounds = [];
+
+        {% block alert_js_main_init %}{% endblock %}
+
+        if (geocode == '3304557') {
+            // override by alert_mrj
+            load_map_layer(dataurl, alerta, series_casos, casos_por_ap, bairros, map);
+        } else {
+            load_map_layer(dataurl, map);
+        }
+
+        info.addTo(map);
+
+        var overlayMaps = {
+            '{% blocktrans %}Áreas de Planejamento{% endblocktrans %}': aps,
+            '{% blocktrans %}Unidades de Saúde{% endblocktrans %}': features
+        };
+        var controls = L.control.layers(null, overlayMaps, {collapsed: true});
+
+        apply_map_settings(map);
+
+        controls.addTo(map);
+
+        $(window).on("resize", function () {
+            $("#main").height($(window).height() * 0.7);
+            map.invalidateSize();
+            try {
+                map.fitBounds(get_map_bounds());
+            } catch (err) {}
+        }).trigger("resize")
+
+    }
+
+    </script>
+
+{% endblock %}

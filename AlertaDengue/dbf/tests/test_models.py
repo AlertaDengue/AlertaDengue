@@ -2,17 +2,18 @@ from django.contrib.auth.models import User
 from django.core.files.base import File
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-
 from datetime import date
 from io import StringIO
 from mock import patch
-import os
+# local
+from ..models import DBF
 
-from dbf.models import DBF
+import os
 
 __all__ = ["DBFModelTest"]
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "data/")
+
 
 class DBFModelTest(TestCase):
     fixtures = ['users']

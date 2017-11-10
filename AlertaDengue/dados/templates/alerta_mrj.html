@@ -1,0 +1,58 @@
+{% extends 'alert_base.html' %}
+
+{% load humanize i18n%}
+{% load i18n %}
+{% load static %}
+
+{% block alert_js%}
+
+function load_map_layer(
+    dataurl, alerta, series_casos, casos_por_ap, bairros, map
+) {
+    // Download GeoJSON via Ajax
+    $.getJSON(dataurl, function (data) {
+        // Add GeoJSON layer
+        geojson = L.geoJson(data, {
+            style: style, onEachFeature: function (feature, layer) {
+                feature.properties.alerta = alerta[parseFloat(feature.properties.COD_AP_SMS)];
+                feature.properties.series = series_casos[feature.properties.COD_AP_SMS];
+                feature.properties.casos = casos_por_ap[feature.properties.COD_AP_SMS];
+                layer.bindPopup("<b>" + bairros[parseFloat(feature.properties.COD_AP_SMS)] + "</b>" + "<br>" +
+                        "{% blocktrans %}Casos{% endblocktrans %}: " + feature.properties.casos + "<br/>{% blocktrans %}Últimas semanas{% endblocktrans %}: <span class='inlinesparkline'>" +
+                        feature.properties.series + "</span><br>" +
+                        "<br><u>{% blocktrans %}O que fazer{% endblocktrans %}</u>: " +
+                        recomendacoes[feature.properties.alerta]
+                );
+                layer.setStyle(style(feature))
+                layer.on({
+                    mouseover: highlightFeature,
+                    mouseout: resetHighlight,
+                    popupopen: renderSparkline
+                });
+
+            }
+        });
+
+        aps.addLayer(geojson, true);
+        aps.addTo(map);
+        features.addTo(map);
+    });
+
+}
+{% endblock %}
+
+{% block alert_js_main_init %}
+
+info.update = function (props) {
+    this._div.innerHTML = '<h4>{% blocktrans %}Número de casos na semana{% endblocktrans %}:</h4>' + (
+        props ?
+            '<b>' + ( props.casos ? props.casos : 0) + '</b><br />' :
+            '{% blocktrans %}Passe o mouse sobre uma AP{% endblocktrans %}');
+};
+
+get_map_bounds = function() {return [
+    [-23.00201188664663, -43.823089599609375],
+    [-22.81226364538693, -43.040313720703125]
+];};
+
+{% endblock %}

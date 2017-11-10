@@ -64,7 +64,7 @@
                             </div>
                             <div class="collapse navbar-collapse">
                                 <ul class="nav navbar-nav">
-                                    <li><a href="{% url 'main' %}">
+                                    <li><a href="{% url 'dados:main' %}">
                                         {% trans "Início" %}</a></li>
                                     <li><a href="{% url 'about' %}">
                                         {% trans "Saiba Mais" %}</a></li>
@@ -136,7 +136,7 @@
                     datumTokenizer: Bloodhound.tokenizers.whitespace,
                     queryTokenizer: Bloodhound.tokenizers.whitespace,
                     remote: {
-                        url: "{% url 'get_city' %}",
+                        url: "{% url 'dados:get_city' %}",
                         replace: function(url, query) {
                             return url + "?q=" + query;
                         }

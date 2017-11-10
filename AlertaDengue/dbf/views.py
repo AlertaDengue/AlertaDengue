@@ -1,8 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.core.files.base import File
-from django.core.exceptions import ValidationError
-from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView
@@ -10,9 +8,10 @@ from django.views.generic.edit import FormView
 
 from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
 
-from dbf.models import DBF, DBFChunkedUpload
-from dbf.forms import DBFForm
-from dbf.tasks import import_dbf_to_database
+from .models import DBF, DBFChunkedUpload
+from .forms import DBFForm
+from .tasks import import_dbf_to_database
+
 
 class UploadSuccessful(LoginRequiredMixin, TemplateView):
     template_name = "upload_successful.html"

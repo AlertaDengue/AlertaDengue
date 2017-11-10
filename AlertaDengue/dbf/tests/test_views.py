@@ -2,20 +2,21 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.core.files.base import File
 from django.test import TestCase
-
 from datetime import date
-from io import StringIO
+# local
+from ..models import DBF, DBFChunkedUpload
+from ..forms import DBFForm
+
 import os
 
-from dbf.models import DBF, DBFChunkedUpload
-from dbf.forms import DBFForm
 
 __all__ = ["DBFUploadViewTest"]
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "data/")
 
+
 class DBFUploadViewTest(TestCase):
-    fixtures = ['users']
+    fixtures = ['AlertaDengue/dbf/fixtures/users.json']
 
     def _create_dbf_from_test_data(self, uploaded_by, filename, export_date,
             notification_year):

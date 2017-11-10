@@ -1,11 +1,5 @@
 # coding: utf-8
-from rasterio.features import rasterize
-from rasterio.transform import from_origin
-from dados.maps import get_city_geojson, get_city_info
-from dados import dbdata
-from dados import models as M
-from dbf.models import DBF
-
+from django.apps import apps
 from django.utils.translation import gettext
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView, View
@@ -14,23 +8,24 @@ from django.conf import settings
 from django.http import HttpResponse
 from time import mktime
 from collections import defaultdict, OrderedDict
+# local
+from . import dbdata, models as M
+from .dbdata import Forecast, MRJ_GEOCODE, CID10
+from .episem import episem
+from .maps import get_city_info
+from .geotiff import convert_from_shapefile
 
-import geopy.distance
 import random
+import fiona
 import json
 import os
 import datetime
 import numpy as np
 import locale
 import geojson
-import fiona
-import rasterio
 
 
-def hex_to_rgb(value):
-    value = value.lstrip('#')
-    lv = len(value)
-    return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
+DBF = apps.get_model('dbf', 'DBF')
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
@@ -39,6 +34,42 @@ dados_alerta_chik = dbdata.get_alerta_mrj_chik()
 
 with open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')) as f:
     polygons = geojson.load(f)
+
+
+def hex_to_rgb(value):
+    value = value.lstrip('#')
+    lv = len(value)
+    return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
+
+
+def get_last_color_alert(geocode, disease, color_type='rgb'):
+    """
+
+    :param geocode:
+    :param disease:
+    :param color_type: rba|hex
+    :return:
+    """
+    df_level = dbdata.get_last_alert(geocode, disease)
+
+    level = (
+        0 if df_level.empty else
+        0 if not (1 <= df_level.nivel[0] <= 4) else
+        df_level.nivel[0]
+    )
+
+    color_list = [
+        '#cccccc',  # gray
+        '#00ff00',  # green
+        '#ffff00',  # yellow
+        '#ff9900',  # orange
+        '#ff0000',  # red
+    ]
+
+    if color_type == 'hex':
+        return color_list[level]
+
+    return hex_to_rgb(color_list[level])
 
 
 def variation_p(v1, v2):
@@ -106,6 +137,15 @@ def get_alert(disease='dengue'):
     return alert, current, case_series, last_year, obs_case_series, min_max_est
 
 
+def get_municipio(request):
+    q = request.GET['q']
+    muns = dbdata.get_city(q)
+    data = json.dumps([
+        {'geocodigo': g, 'nome': n, 'uf': u} for g, n, u in muns
+    ])
+    return HttpResponse(data, content_type='application/json')
+
+
 def load_series():
     """
     Monta as séries para visualização no site
@@ -139,6 +179,26 @@ def load_series():
             for c in G.get_group(ap).cor
         ]
     return series
+
+
+class _GetMethod:
+    """
+
+    """
+    def _get(self, param, default=None):
+        """
+
+        :param param:
+        :param default:
+        :return:
+        """
+        result = (
+            self.request.GET[param]
+            if param in self.request.GET else
+            default
+        )
+
+        return result if result else default
 
 
 class AlertaMainView(TemplateView):
@@ -239,23 +299,18 @@ class AlertaMainView(TemplateView):
         return context
 
 
-def get_municipio(request):
-    q = request.GET['q']
-    muns = dbdata.get_city(q)
-    data = json.dumps([
-        {'geocodigo': g, 'nome': n, 'uf': u} for g, n, u in muns
-    ])
-    return HttpResponse(data, content_type='application/json')
+class AlertCityPageBaseView(TemplateView, _GetMethod):
+    pass
 
 
-class AlertaPageView(TemplateView):
+class AlertaMRJPageView(AlertCityPageBaseView):
     """
     Rio de Janeiro Alert View
     """
-    template_name = 'alerta.html'
+    template_name = 'alerta_mrj.html'
 
     def get_context_data(self, **kwargs):
-        context = super(AlertaPageView, self).get_context_data(**kwargs)
+        context = super(AlertaMRJPageView, self).get_context_data(**kwargs)
 
         disease_code = context['disease']
 
@@ -278,22 +333,43 @@ class AlertaPageView(TemplateView):
             5.3: 'AP 5.3: Santa Cruz e adjacências'
         }
 
+        geocode = str(MRJ_GEOCODE)
+
+        city_info = get_city_info(geocode)
+
+        # forecast epiweek reference
+        forecast_date_min, forecast_date_max = Forecast.get_min_max_date(
+            geocode=geocode, cid10=CID10[disease_code]
+        )
+
+        forecast_date_ref = self._get('ref', forecast_date_max)
+
+        if forecast_date_ref is None:
+            epiweek = None
+        else:
+            epiweek = episem(forecast_date_ref).replace('W', '')
+
         alert, current, case_series, last_year, observed_cases, min_max_est = \
             get_alert(disease_code)
 
         if alert:
-            casos_ap = {
-                float(ap.split('AP')[-1]):
-                    int(current[current.aps == ap]['casos_est'])
-                for ap in alert.keys()
-            }
-            alerta = {
-                float(k.split('AP')[-1]): int(v) - 1
-                for k, v in alert.items()
-            }
+            casos_ap = {}
+            alerta = {}
+
+            for ap, v in alert.items():
+                if ap not in current.aps:
+                    continue
+
+                _ap = float(ap.split('AP')[-1])
+
+                mask = (current.aps == ap)
+                _v = int(current[mask]['casos_est'].values.astype(int)[0])
+
+                casos_ap.update({_ap: _v})
+                alerta.update({_ap: int(v) - 1})
+
             semana = str(current.se.iat[-1])[-2:]
             segunda = current.data.iat[-1]
-            city_info = get_city_info("3304557")
             # estimated cases
             total_series = sum(
                 np.array(list(case_series.values())), np.zeros(12, int)
@@ -307,13 +383,13 @@ class AlertaPageView(TemplateView):
             alerta = {}
             semana = 0
             segunda = datetime.datetime.now() - datetime.timedelta(7)
-            city_info = get_city_info("3304557")
             total_series = [0]
             total_observed_series = [0]
 
         context.update({
-            'geocodigo': "3304557",
-            'nome': "Rio de Janeiro",
+            'geocodigo': geocode,  # legacy
+            'geocode': geocode,
+            'nome': city_info['nome'],
             'populacao': city_info['populacao'],
             'incidencia': (
                 total_observed_series[-1] / city_info['populacao']
@@ -339,27 +415,35 @@ class AlertaPageView(TemplateView):
             'total_observed_series': ', '.join(
                 map(str, total_observed_series)),
             'disease_label': disease_label,
-            'disease_code': disease_code
+            'disease_code': disease_code,
+            'forecast_date_ref': forecast_date_ref,
+            'forecast_date_min': forecast_date_min,
+            'forecast_date_max': forecast_date_max,
+            'epiweek': epiweek,
+            'geojson_url': '/static/rio_aps.geojson'
         })
         return context
 
 
-class AlertaPageViewMunicipio(TemplateView):
+class AlertaMunicipioPageView(AlertCityPageBaseView):
     template_name = 'alerta_municipio.html'
 
     def dispatch(self, request, *args, **kwargs):
-        super(AlertaPageViewMunicipio, self) \
-            .get_context_data(**kwargs)
-        municipio_gc = kwargs['geocodigo']
+        super(
+            AlertaMunicipioPageView, self
+        ).get_context_data(**kwargs)
 
-        if int(municipio_gc) == 3304557:  # Rio de Janeiro
-            return redirect('mrj', disease='dengue', permanent=True)
+        geocode = kwargs['geocodigo']
 
-        return super(AlertaPageViewMunicipio, self) \
-            .dispatch(request, *args, **kwargs)
+        if int(geocode) == MRJ_GEOCODE:  # Rio de Janeiro
+            return redirect('dados:mrj', disease='dengue', permanent=True)
+
+        return super(
+            AlertaMunicipioPageView, self
+        ).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(AlertaPageViewMunicipio, self) \
+        context = super(AlertaMunicipioPageView, self) \
             .get_context_data(**kwargs)
 
         disease_code = context['disease']
@@ -370,18 +454,32 @@ class AlertaPageViewMunicipio(TemplateView):
             None
         )
 
-        municipio_gc = context['geocodigo']
+        geocode = context['geocodigo']
 
-        city_info = get_city_info(municipio_gc)
+        city_info = get_city_info(geocode)
+
+        # forecast epiweek reference
+        forecast_date_min, forecast_date_max = Forecast.get_min_max_date(
+            geocode=geocode, cid10=CID10[disease_code]
+        )
+
+        forecast_date_ref = self._get(
+            'ref', forecast_date_max
+        )
+
+        if forecast_date_ref is None:
+            epiweek = None
+        else:
+            epiweek = episem(forecast_date_ref).replace('W', '')
 
         (
             alert, SE, case_series, last_year,
             observed_cases, min_max_est, dia, prt1
-        ) = dbdata.get_city_alert(municipio_gc, disease_code)
+        ) = dbdata.get_city_alert(geocode, disease_code)
 
         if alert is not None:
-            casos_ap = {municipio_gc: int(case_series[-1])}
-            bairros = {municipio_gc: city_info['nome']}
+            casos_ap = {geocode: int(case_series[-1])}
+            bairros = {geocode: city_info['nome']}
             total_series = case_series[-12:]
             total_observed_series = observed_cases[-12:]
         else:
@@ -391,19 +489,21 @@ class AlertaPageViewMunicipio(TemplateView):
             total_observed_series = [0]
 
         context.update({
+            'geocodigo': geocode, # legacy
+            'geocode': geocode,
             'nome': city_info['nome'],
             'populacao': city_info['populacao'],
             'incidencia': (
                 case_series[-1] / city_info['populacao']
             ) * 100000,  # casos/100000
             'casos_por_ap': json.dumps(casos_ap),
-            'alerta': {municipio_gc: alert},
+            'alerta': {geocode: alert},
             'prt1': prt1 * 100,
             'novos_casos': case_series[-1],
             'bairros': bairros,
             'min_est': min_max_est[0],
             'max_est': min_max_est[1],
-            'series_casos': {municipio_gc: case_series[-12:]},
+            'series_casos': {geocode: case_series[-12:]},
             'SE': SE,
             'data1': dia.strftime("%d de %B de %Y"),
             # .strftime("%d de %B de %Y")
@@ -414,9 +514,13 @@ class AlertaPageViewMunicipio(TemplateView):
             'total_observed': total_observed_series[-1],
             'total_observed_series': ', '.join(
                 map(str, total_observed_series)),
-            'geocodigo': municipio_gc,
             'disease_label': disease_label,
-            'disease_code': disease_code
+            'disease_code': disease_code,
+            'forecast_date_ref': forecast_date_ref,
+            'forecast_date_min': forecast_date_min,
+            'forecast_date_max': forecast_date_max,
+            'epiweek': epiweek,
+            'geojson_url': '/static/geojson/%s.json' % geocode
         })
         return context
 
@@ -424,11 +528,6 @@ class AlertaPageViewMunicipio(TemplateView):
 class AlertaGeoJSONView(View):
     def get(self, request, *args, **kwargs):
         return HttpResponse(geojson.dumps(polygons))
-
-
-class CityMapView(View):
-    def get(self, request, geocodigo):
-        return geojson.dumps(get_city_geojson(int(geocodigo)))
 
 
 class DetailsPageView(TemplateView):
@@ -461,71 +560,6 @@ class DetailsPageView(TemplateView):
             'orange_alert': json.dumps(oa),
             'xvalues': series['AP1']['dia'],
         })
-        return context
-
-
-class MapaDengueView(TemplateView):
-    template_name = 'mapadengue.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(MapaDengueView, self).get_context_data(**kwargs)
-        return context
-
-
-class MapaMosquitoView(TemplateView):
-    template_name = 'mapamosquito.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(MapaMosquitoView, self).get_context_data(**kwargs)
-        return context
-
-
-class HistoricoView(TemplateView):
-    template_name = 'historico.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(HistoricoView, self).get_context_data(**kwargs)
-        series = load_series()
-        aps = list(series.keys())
-        aps.sort()
-        context.update({
-            'APS': aps,
-            'xvalues': series['AP1']['dia'],
-            'dados': json.dumps(series)
-        })
-        return context
-
-
-class AboutPageView(TemplateView):
-    template_name = 'about.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(AboutPageView, self).get_context_data(**kwargs)
-        # messages.info(
-        #   self.request,
-        #   'O site do projeto Alerta Dengue está em construção.')
-        return context
-
-
-class ContactPageView(TemplateView):
-    template_name = 'contact.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(ContactPageView, self).get_context_data(**kwargs)
-        # messages.info(
-        #   self.request,
-        #   'O site do projeto Alerta Dengue está em construção.')
-        return context
-
-
-class JoininPageView(TemplateView):
-    template_name = 'joinin.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(JoininPageView, self).get_context_data(**kwargs)
-        # messages.info(
-        #   self.request,
-        #   'O site do projeto Alerta Dengue está em construção.')
         return context
 
 
@@ -612,11 +646,11 @@ class AlertaStateView(TemplateView):
             context['state'] == 'RJ' and
             context['disease'] == 'chikungunya'
         ):
-            geo_id_rj = 3304557
+            geo_id_rj = MRJ_GEOCODE
             mun_dict = {geo_id_rj: 'Rio de Janeiro'}
             series_data_rj = dbdata.load_series(
                 geo_id_rj, 'chikungunya'
-            )['3304557']
+            )[str(MRJ_GEOCODE)]
             alerts = {str(geo_id_rj): series_data_rj['alerta'][-1]}
             is_just_rj = True
 
@@ -666,25 +700,10 @@ class AlertaStateView(TemplateView):
         return context
 
 
-class NotificationReducedCSV_View(View):
+class NotificationReducedCSV_View(View, _GetMethod):
     _state_name = dbdata.STATE_NAME
 
     request = None
-
-    def _get(self, param, default=None):
-        """
-
-        :param param:
-        :param default:
-        :return:
-        """
-        result = (
-            self.request.GET[param]
-            if param in self.request.GET else
-            default
-        )
-
-        return result if result else default
 
     def get(self, request):
         """
@@ -756,93 +775,15 @@ class GeoTiffView(View):
 
         shp = fiona.open(os.path.join(shp_path, '%s.shp' % geocode))
 
-        # get coordinates
-        coords_1 = shp.bounds[1], shp.bounds[0]
-
-        # coordinate 2 to get height
-        coords_2 = shp.bounds[3], shp.bounds[0]
-
-        height = geopy.distance.vincenty(coords_1, coords_2).km
-        # coordinate 2 to get width
-        coords_2 = shp.bounds[1], shp.bounds[2]
-
-        width = geopy.distance.vincenty(coords_1, coords_2).km
-
-        res_x = (shp.bounds[2] - shp.bounds[0]) / width
-        res_y = (shp.bounds[3] - shp.bounds[1]) / height
-
-        out_shape = int(height), int(width)
-
-        transform = from_origin(
-            shp.bounds[0] - res_x / 2,
-            shp.bounds[3] + res_y / 2,
-            res_x, res_y
+        result = convert_from_shapefile(
+            shapefile=shp,
+            rgb_color=get_last_color_alert(geocode, disease)
         )
-
-        df_level = dbdata.get_last_alert(geocode, disease)
-
-        level = (
-            0 if df_level.empty else
-            0 if not (1 <= df_level.nivel[0] <= 4) else
-            df_level.nivel[0]
-        )
-
-        color_list = [
-            '#cccccc',  # gray
-            '#00ff00',  # green
-            '#ffff00',  # yellow
-            '#ff9900',  # orange
-            '#ff0000',  # red
-        ]
-
-        rgb_values = hex_to_rgb(color_list[level])
-
-        shapes = [
-            [(geometry['geometry'], color)]
-            for k, geometry in shp.items()
-            for color in rgb_values
-        ]
-
-        # creates raster file
-        dtype = rasterio.float64
-        fill = np.nan
-
-        raster_args = dict(
-            out_shape=out_shape,
-            fill=fill,
-            transform=transform,
-            dtype=dtype,
-            all_touched=True
-        )
-
-        rasters = [rasterize(shape, **raster_args) for shape in shapes]
-        geotiff_path = '/tmp/%s.tif' % geocode
-
-        with rasterio.open(
-            geotiff_path,
-            mode='w',
-            crs=shp.crs,
-            driver='GTiff',
-            profile='GeoTIFF',
-            dtype=dtype,
-            count=3,
-            width=width,
-            height=height,
-            nodata=np.nan,
-            transform=transform,
-            photometric='RGB'
-        ) as dst:
-            for i in range(1, 4):
-                dst.write_band(i, rasters[i - 1])
-
-        with open(geotiff_path, 'rb') as f:
-            result = f.read()
-
-        os.remove(geotiff_path)
 
         response = HttpResponse(
             result, content_type='application/force-download'
         )
+
         response['Content-Disposition'] = (
             'attachment; filename=%s.tiff' % geocode
         )
@@ -850,9 +791,40 @@ class GeoTiffView(View):
         return response
 
 
-class PartnersPageView(TemplateView):
-    template_name = 'partners.html'
+class GeoJsonView(View):
+    """
 
-    def get_context_data(self, **kwargs):
-        context = super(PartnersPageView, self).get_context_data(**kwargs)
-        return context
+    """
+
+    def get(self, request, geocodigo, disease):
+        """
+
+        :param kwargs:
+        :return:
+
+        """
+        geocode = geocodigo
+
+        # load shapefile
+        for path in (settings.STATIC_ROOT, settings.STATICFILES_DIRS[0]):
+            if not os.path.isdir(path):
+                continue
+            geojson_path = os.path.join(path, 'geojson', '%s.json' % geocode)
+
+        hex_color = get_last_color_alert(geocode, disease, color_type='hex')
+
+        with open(geojson_path) as f:
+            geojson_data = geojson.load(f)
+
+        geojson_data['features'][0]['properties']['fill'] = hex_color
+        result = geojson.dumps(geojson_data)
+
+        response = HttpResponse(
+            result, content_type='application/force-download'
+        )
+
+        response['Content-Disposition'] = (
+            'attachment; filename=%s.json' % geocode
+        )
+
+        return response

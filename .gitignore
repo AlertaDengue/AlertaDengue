@@ -31,3 +31,6 @@ authorized_keys
 Dockerfile-dev
 *.dbf
 *.egg-info
+/dev_dump/
+/dist/
+/build/

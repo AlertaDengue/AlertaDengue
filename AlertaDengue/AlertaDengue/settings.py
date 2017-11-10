@@ -14,6 +14,15 @@ import os
 from decouple import config, Csv
 from dj_database_url import parse as db_url
 
+
+def read_admins(value):
+    # ADMIN in settings.ini should be in the format:
+    # admin 1, admin1@example.org; admin 2, admin2@example.org
+    if value == '':
+        return tuple()
+    return tuple(tuple(v.split(',')) for v in value.split(';'))
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -26,13 +35,6 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-def read_admins(value):
-    # ADMIN in settings.ini should be in the format:
-    # admin 1, admin1@example.org; admin 2, admin2@example.org
-    if value == '':
-        return tuple()
-    return tuple(tuple(v.split(',')) for v in value.split(';'))
-
 ADMINS = config('ADMINS', cast=read_admins, default='')
 
 ALLOWED_HOSTS = ["alerta.dengue.mat.br", "info.dengue.mat.br"]
@@ -43,6 +45,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 
 INSTALLED_APPS = (
     'django.contrib.admin',
+    'django.contrib.admindocs',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -53,7 +56,9 @@ INSTALLED_APPS = (
     'bootstrap3',
     'chunked_upload',
     'dados',
-    'dbf.apps.DbfConfig'
+    'forecast',
+    'dbf.apps.DbfConfig',
+    'manager.router'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -71,29 +76,30 @@ ROOT_URLCONF = 'AlertaDengue.urls'
 
 WSGI_APPLICATION = 'AlertaDengue.wsgi.application'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'APP_DIRS': True,
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'OPTIONS': {'context_processors': ["django.contrib.auth.context_processors.auth",
-                                            "django.template.context_processors.debug",
-                                            "django.template.context_processors.i18n",
-                                            "django.template.context_processors.media",
-                                            "django.template.context_processors.static",
-                                            "django.template.context_processors.tz",
-                                            "django.contrib.messages.context_processors.messages"],
-                    }
-    },
-]
-
-
+TEMPLATES = [{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'APP_DIRS': True,
+    'DIRS': [os.path.join(BASE_DIR, 'templates')],
+    'OPTIONS': {
+        'context_processors': [
+            "django.contrib.auth.context_processors.auth",
+            "django.template.context_processors.debug",
+            "django.template.context_processors.i18n",
+            "django.template.context_processors.media",
+            "django.template.context_processors.static",
+            "django.template.context_processors.tz",
+            "django.contrib.messages.context_processors.messages"
+        ],
+    }
+}]
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
 DATABASES = {
-    'default': config('DATABASE_URL', default='sqlite:///geodjango.db', cast=db_url)
+    'default': config(
+        'DATABASE_URL', default='sqlite:///geodjango.db', cast=db_url
+    )
 }
 
 MEMCACHED_HOST = config('MEMCACHED_HOST', '127.0.0.1')
@@ -112,9 +118,11 @@ LEAFLET_CONFIG = {
     'DEFAULT_CENTER': (-22.907000, -43.431000),
     'DEFAULT_ZOOM': 8,
     'MAXIMUM_ZOOM': 13,
-    'TILES': 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',  # 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
+    # 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
+    'TILES': 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
     'MINIMAP': False,
-    'ATTRIBUTION_PREFIX': 'Fonte: <a href=http://info.dengue.mat.br>info.dengue.mat.br</a>',
+    'ATTRIBUTION_PREFIX':
+        'Fonte: <a href=http://info.dengue.mat.br>info.dengue.mat.br</a>',
     'PLUGINS': {
         'cluster': {
             'js': 'js/leaflet.markercluster.js',
@@ -122,10 +130,14 @@ LEAFLET_CONFIG = {
             'auto-include': True
         },
         'heatmap': {
-            'js': ['js/heatmap.js', 'js/heatmap-leaflet.js', 'js/QuadTree.js'],
+            'js': [
+                'libs/heatmap/heatmap.js',
+                'libs/heatmap/leaflet-heatmap.js',
+                'js/QuadTree.js'
+            ],
         }
-    }
-
+    },
+    'RESET_VIEW': False
 }
 
 PSQL_DB = config('PSQL_DB', default="dengue")
@@ -133,6 +145,37 @@ PSQL_USER = config('PSQL_USER', default="dengueadmin")
 PSQL_HOST = config('PSQL_HOST', default="localhost")
 PSQL_PASSWORD = config('PSQL_PASSWORD')
 
+DATABASE_ROUTERS = [
+    'manager.router.DatabaseAppsRouter'
+]
+DATABASE_APPS_MAPPING = {
+    'dados': 'dados',
+    'forecast': 'forecast',
+    'dbf': 'default'
+}
+
+DATABASES.update({
+    'dados': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': PSQL_DB,
+        'USER': PSQL_USER,
+        'PASSWORD': PSQL_PASSWORD,
+        'HOST': PSQL_HOST,
+        'PORT': ''
+    },
+    'forecast': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': PSQL_DB,
+        'USER': 'forecast',
+        'PASSWORD': PSQL_PASSWORD,
+        'HOST': PSQL_HOST,
+        'PORT': ''
+    }
+})
+
+MIGRATION_MODULES = {
+    'dados': None
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -197,15 +240,17 @@ LOGGING = {
     },
 }
 
-try:
-    from AlertaDengue.local_settings import *
-except ImportError:
-    pass
 
 CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=None)
+CELERY_TASK_ALWAYS_EAGER = config('CELERY_TASK_ALWAYS_EAGER', default=False)
 
 BOOTSTRAP3 = {
     'form_renderers': {
         'default': 'dbf.forms.FormRendererWithHiddenFieldErrors',
     }
 }
+
+try:
+    from .local_settings import *
+except ImportError:
+    pass
