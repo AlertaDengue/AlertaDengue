@@ -4,12 +4,12 @@ Este módulo contem funções para interagir com o banco principal do projeto
 
 """
 from sqlalchemy import create_engine
-from django.conf import settings
 from django.core.cache import cache
 from collections import defaultdict
 from datetime import datetime, timedelta
 # local
 from .episem import episem
+from . import settings
 
 import pandas as pd
 import numpy as np

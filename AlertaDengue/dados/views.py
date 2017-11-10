@@ -436,7 +436,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
         geocode = kwargs['geocodigo']
 
         if int(geocode) == MRJ_GEOCODE:  # Rio de Janeiro
-            return redirect('mrj', disease='dengue', permanent=True)
+            return redirect('dados:mrj', disease='dengue', permanent=True)
 
         return super(
             AlertaMunicipioPageView, self
