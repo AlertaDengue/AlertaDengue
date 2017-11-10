@@ -1,8 +1,8 @@
 try:
-    from django.conf import settings
-except:
     # to be used externally (such as notebooks science)
     from AlertaDengue.AlertaDengue import settings
+except:
+    from django.conf import settings
 
 PSQL_DB = settings.PSQL_DB
 PSQL_HOST = settings.PSQL_HOST
