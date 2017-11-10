@@ -16,7 +16,7 @@ TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "data/")
 
 
 class DBFUploadViewTest(TestCase):
-    fixtures = ['users']
+    fixtures = ['AlertaDengue/dbf/fixtures/users.json']
 
     def _create_dbf_from_test_data(self, uploaded_by, filename, export_date,
             notification_year):
