@@ -55,6 +55,9 @@ class DatabaseAppsRouter(object):
         apps_mapping = settings.DATABASE_APPS_MAPPING  # alias
         allow = True
 
+        if 'target_db' in hints:
+            return db == hints['target_db']
+
         if db in apps_mapping.values() and app_label in apps_mapping:
             allow = apps_mapping[app_label] == db
 

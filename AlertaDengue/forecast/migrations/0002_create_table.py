@@ -132,7 +132,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.SeparateDatabaseAndState(
-            database_operations=[migrations.RunPython(forwards)],
+            database_operations=[migrations.RunPython(forwards, hints={'target_db': 'forecast'})],
             state_operations=state_operations,
         )
     ]
