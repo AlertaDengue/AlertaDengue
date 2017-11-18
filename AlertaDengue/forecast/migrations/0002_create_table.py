@@ -82,6 +82,8 @@ class Migration(migrations.Migration):
         migrations.SeparateDatabaseAndState(
             database_operations=[
                 migrations.RunSQL('''
+                    CREATE SCHEMA IF NOT EXISTS "forecast";
+
                     CREATE TABLE IF NOT EXISTS "forecast".forecast_model (
                         id SERIAL PRIMARY KEY,
                         name VARCHAR(128) NOT NULL,
