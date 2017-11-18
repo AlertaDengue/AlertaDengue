@@ -6,59 +6,6 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
-def forwards(apps, schema_editor):
-    """
-
-    :param apps:
-    :param schema_editor:
-    :return:
-    """
-
-    if not schema_editor.connection.alias == 'forecast':
-        return
-
-    return migrations.RunSQL('''
-    CREATE TABLE IF NOT EXISTS "forecast".forecast_model (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(128) NOT NULL,
-        weeks SMALLINT NOT NULL,
-        commit_id CHAR(7) NOT NULL,
-        active BOOL NOT NULL
-    );
-
-    CREATE TABLE IF NOT EXISTS "forecast".forecast_cases (
-        id SERIAL PRIMARY KEY,
-        epiweek INT NOT NULL,
-        geocode INT NOT NULL,
-        cid10 character varying(5) NOT NULL,
-        forecast_model_id INT,
-        published_date date NOT NULL,
-        init_date_epiweek date NOT NULL,
-        cases INT NOT NULL,
-
-        UNIQUE (
-          epiweek, geocode, cid10, forecast_model_id, published_date
-        ),
-        FOREIGN KEY(forecast_model_id)
-          REFERENCES "forecast".forecast_model(id),
-        FOREIGN KEY(geocode)
-          REFERENCES "Dengue_global"."Municipio"(geocodigo),
-        FOREIGN KEY(cid10) REFERENCES "Dengue_global"."CID10"(codigo)
-    );
-
-    CREATE TABLE IF NOT EXISTS "forecast".forecast_city (
-        id SERIAL PRIMARY KEY,
-        geocode INT NOT NULL,
-        forecast_model_id INT,
-        active BOOL NOT NULL,
-        UNIQUE (geocode, forecast_model_id),
-        FOREIGN KEY(forecast_model_id) REFERENCES "forecast".forecast_model(id),
-        FOREIGN KEY(geocode) REFERENCES "Dengue_global"."Municipio"(geocodigo)
-    );
-    '''
-    )
-
-
 class Migration(migrations.Migration):
 
     initial = True
@@ -130,9 +77,52 @@ class Migration(migrations.Migration):
         ),
     ]
 
+
     operations = [
         migrations.SeparateDatabaseAndState(
-            database_operations=[migrations.RunPython(forwards, hints={'target_db': 'forecast'})],
+            database_operations=[
+                migrations.RunSQL('''
+                    CREATE TABLE IF NOT EXISTS "forecast".forecast_model (
+                        id SERIAL PRIMARY KEY,
+                        name VARCHAR(128) NOT NULL,
+                        weeks SMALLINT NOT NULL,
+                        commit_id CHAR(7) NOT NULL,
+                        active BOOL NOT NULL
+                    );
+
+                    CREATE TABLE IF NOT EXISTS "forecast".forecast_cases (
+                        id SERIAL PRIMARY KEY,
+                        epiweek INT NOT NULL,
+                        geocode INT NOT NULL,
+                        cid10 character varying(5) NOT NULL,
+                        forecast_model_id INT,
+                        published_date date NOT NULL,
+                        init_date_epiweek date NOT NULL,
+                        cases INT NOT NULL,
+
+                        UNIQUE (
+                          epiweek, geocode, cid10, forecast_model_id, published_date
+                        ),
+                        FOREIGN KEY(forecast_model_id)
+                          REFERENCES "forecast".forecast_model(id),
+                        FOREIGN KEY(geocode)
+                          REFERENCES "Dengue_global"."Municipio"(geocodigo),
+                        FOREIGN KEY(cid10) REFERENCES "Dengue_global"."CID10"(codigo)
+                    );
+
+                    CREATE TABLE IF NOT EXISTS "forecast".forecast_city (
+                        id SERIAL PRIMARY KEY,
+                        geocode INT NOT NULL,
+                        forecast_model_id INT,
+                        active BOOL NOT NULL,
+                        UNIQUE (geocode, forecast_model_id),
+                        FOREIGN KEY(forecast_model_id) REFERENCES "forecast".forecast_model(id),
+                        FOREIGN KEY(geocode) REFERENCES "Dengue_global"."Municipio"(geocodigo)
+                    );
+                    ''',
+                    hints={'target_db': 'forecast'}
+                )
+            ],
             state_operations=state_operations,
         )
     ]
