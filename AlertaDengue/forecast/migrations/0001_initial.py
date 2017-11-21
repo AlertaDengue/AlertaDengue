@@ -5,21 +5,33 @@ from __future__ import unicode_literals
 from django.db import migrations
 
 
-def forwards(apps, schema_editor):
-    """
-
-    :param apps:
-    :param schema_editor:
-    :return:
-    """
-    if not schema_editor.connection.alias == 'forecast':
-        return
-
-    return migrations.RunSQL('CREATE SCHEMA IF NOT EXISTS forecast')
-
-
 class Migration(migrations.Migration):
-
     operations = [
-        migrations.RunPython(forwards),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunSQL('''
+                    CREATE SCHEMA IF NOT EXISTS "Dengue_global";
+                    
+                    CREATE TABLE IF NOT EXISTS "Dengue_global"."Municipio"
+                    (
+                      geocodigo integer NOT NULL,
+                      nome character varying(128) NOT NULL,
+                      geojson text NOT NULL,
+                      populacao bigint NOT NULL,
+                      uf character varying(20) NOT NULL,
+                      CONSTRAINT "Municipio_pk" PRIMARY KEY (geocodigo)
+                    );
+                    
+                    CREATE TABLE IF NOT EXISTS "Dengue_global"."CID10"
+                    (
+                      nome character varying(512) NOT NULL,
+                      codigo character varying(5) NOT NULL,
+                      CONSTRAINT "CID10_pk" PRIMARY KEY (codigo)
+                    );
+                    
+                    
+                ''', hints={'target_db': 'forecast'}
+                )
+            ],
+        )
     ]
