@@ -7,7 +7,7 @@ class ForecastModelTest(TestCase):
     multi_db = True
 
     @classmethod
-    def setUpClass(cls):
+    def setUpTestData(cls):
         ForecastModel.objects.create(
             name='Model1', weeks=3, commit_id='1234567', active=True
         )
