@@ -244,6 +244,10 @@ LOGGING = {
 CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=None)
 CELERY_TASK_ALWAYS_EAGER = config('CELERY_TASK_ALWAYS_EAGER', default=False)
 
+MAPSERVER_URL = config(
+    'MAPSERVER_URL', default='http://localhost:80'
+)
+
 BOOTSTRAP3 = {
     'form_renderers': {
         'default': 'dbf.forms.FormRendererWithHiddenFieldErrors',
