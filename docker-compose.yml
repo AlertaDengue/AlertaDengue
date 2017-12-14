@@ -46,7 +46,7 @@ services:
         env_file:
             - .env
         volumes:
-            - $(pwd)/mapfiles:/maps:ro
-            - $(pwd)/AlertaDengue/static/shapefile:/shapefiles:ro
-            - $(pwd)/tiffs:/tiffs:ro
+            - ${DOCKER_HOST_MAPFILES_DIR}:/maps:ro
+            - ${DOCKER_HOST_SHAPEFILES_DIR}:/shapefiles:ro
+            - ${DOCKER_HOST_TIFFS_DIR}:/tiffs:ro
         restart: always
