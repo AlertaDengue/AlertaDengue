@@ -52,12 +52,12 @@ def is_valid_dbf(dbf_file, notification_year):
 
         for field in dbf.fields:
             if field.name in expected_date_fields and field.type != 'D':
-                raise ValidationError({"filename": _("Espera-se que o campo {} seja "
+                raise ValidationError({"__all__": _("Espera-se que o campo {} seja "
                     "do tipo 'D' (data), mas o tipo do campo neste arquivo é '{}'.".format(field.name, field.type))})
 
         for field in expected_fields:
             if field not in dbf.field_names:
-                raise ValidationError({"filename": _("Este arquivo não contém {}, "
+                raise ValidationError({"__all__": _("Este arquivo não contém {}, "
                     "que é esperado em um arquivo válido do SINAN.".format(field))})
 
         return True
