@@ -65,24 +65,29 @@
   {% blocktrans %}Situação Epidemiológica - {{ num_mun }} Municípios monitorados{% endblocktrans %}
 {% endblock %}
 
+{% set cols = '4' %}
+{% if n_alerts_chik > 0 and n_alerts_zika > 0 %}
+{%   cols = '4' %}
+{% elif n_alerts_chik > 0 or n_alerts_zika > 0 %}
+{%   cols = '3' %}
+{% else %}
+{%   cols = '6' %}
+{% endif %}
+
 {% block content %}
     <div class="container-fluid">
         <!-- chart-plot:begin -->
         <div class="row">
-            <div {% if n_alerts_chik > 0 %}
-                class="col-sm-6"
-                {% else %}
-                class="col-sm-12"
-                {% endif %}
-            >
+            <div class="col-sm-{{cols}}">
                 <div class="chart-wrapper">
                   <div class="chart-stage">
                     {% total_series_dengue %}
                   </div>
                 </div>
             </div>
+
             {% if n_alerts_chik > 0 %}
-            <div class="col-sm-6">
+            <div class="col-sm-{{cols}}">
                 <div class="chart-wrapper">
                   <div class="chart-stage">
                     {% total_series_chik %}
@@ -90,13 +95,24 @@
                 </div>
             </div>
             {% endif %}
+
+            {% if n_alerts_zika > 0 %}
+            <div class="col-sm-{{cols}}">
+                <div class="chart-wrapper">
+                  <div class="chart-stage">
+                    {% total_series_zika %}
+                  </div>
+                </div>
+            </div>
+            {% endif %}
+
         </div>
         <!-- chart-plot:end -->
 
         <!-- chart-states:begin -->
         <div class="row card-deck">
             {% for state_name in states %}
-            <div class="col-sm-4 card">
+            <div class="col-sm-{{cols}} card">
                 <div class="chart-wrapper">
                     <div class="chart-title">
                         <h2>{{state_name}}</h2>

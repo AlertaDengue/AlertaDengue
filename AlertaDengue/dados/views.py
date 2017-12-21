@@ -31,9 +31,19 @@ locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
 dados_alerta = dbdata.get_alerta_mrj()
 dados_alerta_chik = dbdata.get_alerta_mrj_chik()
+dados_alerta_chik = dbdata.get_alerta_mrj_zika()
 
 with open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')) as f:
     polygons = geojson.load(f)
+
+
+def _get_disease_label(disease_code: str) -> str:
+    return (
+        'Dengue' if disease_code == 'dengue' else
+        'Chikungunya' if disease_code == 'chikungunya' else
+        'Zika' if disease_code == 'zika' else
+        None
+    )
 
 
 def hex_to_rgb(value):
@@ -210,9 +220,10 @@ class AlertaMainView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AlertaMainView, self).get_context_data(**kwargs)
 
-        diseases = ('dengue', 'chikungunya')
+        diseases = tuple(dbdata.CID10.keys())
 
         n_alerts_chik = dbdata.get_n_chik_alerts()
+        n_alerts_zika = dbdata.get_n_zika_alerts()
 
         # today
         last_se = {}
@@ -293,6 +304,7 @@ class AlertaMainView(TemplateView):
             'variation_4_weeks': variation_4_weeks,
             'state_initials': self._state_initials,
             'n_alerts_chik': n_alerts_chik,
+            'n_alerts_zika': n_alerts_zika,
             'last_se': last_se
         })
 
@@ -314,11 +326,7 @@ class AlertaMRJPageView(AlertCityPageBaseView):
 
         disease_code = context['disease']
 
-        disease_label = (
-            'Dengue' if disease_code == 'dengue' else
-            'Chikungunya' if disease_code == 'chikungunya' else
-            None
-        )
+        disease_label = _get_disease_label(disease_code)
 
         bairros_mrj = {
             1.0: 'AP 1: Centro e adjacências',
@@ -448,11 +456,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
 
         disease_code = context['disease']
 
-        disease_label = (
-            'Dengue' if disease_code == 'dengue' else
-            'Chikungunya' if disease_code == 'chikungunya' else
-            None
-        )
+        disease_label = _get_disease_label(disease_code)
 
         geocode = context['geocodigo']
 
