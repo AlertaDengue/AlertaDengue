@@ -141,11 +141,7 @@ def get_last_alert(geo_id, disease):
     :return:
     """
 
-    table_name = (
-        'Historico_alerta' if disease == 'dengue' else
-        'Historico_alerta_chik' if disease == 'chikungunya' else
-        None
-    )
+    table_name = 'Historico_alerta' + _get_disease_suffix(disease)
 
     sql = '''
     SELECT nivel
@@ -806,8 +802,10 @@ class NotificationQueries:
         """
         _diseases = ','.join(["'%s'" % cid for cid in CID10.values()])
         return (
-            'cid10_codigo IN (%s)' % _diseases if disease is None else
-            'cid10_codigo IN ({})'.format(','.join([
+            "REPLACE(cid10_codigo, '.', '') IN (%s)" % (
+                _diseases
+            ) if disease is None else
+            "REPLACE(cid10_codigo, '.', '') IN ({})".format(','.join([
                 "'{}'".format(CID10[cid.lower()])
                 for cid in disease.split(',')
             ]))
@@ -1073,7 +1071,9 @@ class NotificationQueries:
         disease_filter = ''
 
         if disease is not None:
-            disease_filter = " AND cid10_codigo='%s'" % CID10[disease]
+            disease_filter = (
+                " AND REPLACE(cid10_codigo, '.', '')='%s'" % CID10[disease]
+            )
 
         sql = '''
         SELECT
@@ -1227,11 +1227,7 @@ class Forecast:
             df_forecast_model = pd.read_sql(sql, con=conn)
 
         if geocode == MRJ_GEOCODE:  # RJ city
-            table_name = (
-                'alerta_mrj' if disease == 'dengue' else
-                'alerta_mrj_chik' if disease == 'chikungunya' else
-                None
-            )
+            table_name = 'alerta_mrj' + _get_disease_suffix(disease)
 
             sql_alert = '''
             SELECT 
@@ -1248,11 +1244,7 @@ class Forecast:
             '''.format(table_name)
 
         else:
-            table_name = (
-                'Historico_alerta' if disease == 'dengue' else
-                'Historico_alerta_chik' if disease == 'chikungunya' else
-                None
-            )
+            table_name = 'Historico_alerta' + _get_disease_suffix(disease)
 
             sql_alert = ''' 
             SELECT * FROM "Municipio"."{}"
