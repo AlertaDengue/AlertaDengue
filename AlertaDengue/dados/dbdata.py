@@ -64,7 +64,7 @@ def _get_disease_suffix(disease: str):
     return (
         '' if disease == 'dengue' else
         '_chik' if disease == 'chikungunya' else
-        '_zika' if disease == 'chikungunya' else
+        '_zika' if disease == 'zika' else
         ''
     )
 
@@ -194,6 +194,7 @@ def get_series_by_UF(disease='dengue'):
 
     if series is None:
         with db_engine.connect() as conn:
+            print('select * from uf_total{}_view;'.format(_disease), disease)
             series = pd.read_sql(
                 'select * from uf_total{}_view;'.format(_disease),
                 conn, parse_dates=True
@@ -327,11 +328,7 @@ def load_cases_without_forecast(geocode: int, disease):
             )
 
         else:
-            table_name = (
-                'Historico_alerta' if disease == 'dengue' else
-                'Historico_alerta_chik' if disease == 'chikungunya' else
-                None
-            )
+            table_name = 'Historico_alerta' + _get_disease_suffix(disease)
 
             data_alert = pd.read_sql_query(''' 
                 SELECT * FROM "Municipio"."{}"
@@ -488,7 +485,7 @@ class NotificationResume:
         Returna contagem de cidades participantes por estado
 
         :param uf: uf a ser consultada
-        :param disease: dengue|chikungunya
+        :param disease: dengue|chikungunya|zika
         :return: dataframe
         """
 

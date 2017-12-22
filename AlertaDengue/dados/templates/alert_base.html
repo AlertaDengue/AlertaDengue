@@ -90,6 +90,14 @@
                {% endif %}
                onchange="window.location.href='./chikungunya'"
         /> Chikungunya
+
+        <input id="disease-zika"
+               type="radio" name="disease" value="zika"
+               {% if disease_code == 'zika' %}
+               checked="checked"
+               {% endif %}
+               onchange="window.location.href='./zika'"
+        /> Zika
     </div>
 
     <div class="panel panel-default">

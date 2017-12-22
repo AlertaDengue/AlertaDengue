@@ -31,7 +31,7 @@ locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
 dados_alerta = dbdata.get_alerta_mrj()
 dados_alerta_chik = dbdata.get_alerta_mrj_chik()
-dados_alerta_chik = dbdata.get_alerta_mrj_zika()
+dados_alerta_zika = dbdata.get_alerta_mrj_zika()
 
 with open(os.path.join(settings.STATICFILES_DIRS[0], 'rio_aps.geojson')) as f:
     polygons = geojson.load(f)
@@ -106,6 +106,7 @@ def get_alert(disease='dengue'):
     df = (
         dados_alerta if disease == 'dengue' else
         dados_alerta_chik if disease == 'chikungunya' else
+        dados_alerta_zika if disease == 'zika' else
         None
     )
 
@@ -287,6 +288,20 @@ class AlertaMainView(TemplateView):
 
                     variation_4_weeks[d][s] = variation_p(v1, v2)
 
+
+        if n_alerts_chik > 0 and n_alerts_zika > 0:
+            chart_cols = 4
+            # card_cols = 6
+        elif n_alerts_chik > 0 or n_alerts_zika > 0:
+            chart_cols = 6
+            # card_cols = 3
+        else:
+            chart_cols = 12
+            # card_cols = 4
+
+        # cheating
+        card_cols = 6
+
         context.update({
             # 'mundict': json.dumps(mundict),
             'num_mun': len(mundict),
@@ -305,7 +320,9 @@ class AlertaMainView(TemplateView):
             'state_initials': self._state_initials,
             'n_alerts_chik': n_alerts_chik,
             'n_alerts_zika': n_alerts_zika,
-            'last_se': last_se
+            'last_se': last_se,
+            'card_cols': card_cols,
+            'chart_cols': chart_cols
         })
 
         return context

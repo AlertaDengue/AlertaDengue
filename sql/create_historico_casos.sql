@@ -1,4 +1,6 @@
-﻿CREATE OR REPLACE VIEW "Municipio".historico_casos AS 
+﻿DROP MATERIALIZED VIEW IF EXISTS "Municipio".historico_casos;
+
+CREATE MATERIALIZED VIEW "Municipio".historico_casos AS 
 
 SELECT 
     dengue."data_iniSE",
