@@ -1,0 +1,78 @@
+MAP
+    # The geographic extent (the rectangular area covered by the map) is
+    # defined by the keyword EXTENT. The rectangular area is specified by
+    # the coordinates of the opposite corners (the lower left and the upper
+    # right). These are coordinates of the southwest and the northeast corners
+    # EX:
+    # EXTENT -125.00 20.00 -65.00 50.00
+    # The geographic extent stretches from 125° west, 20° north to 65° west,
+    # 50° north.
+
+    CONFIG 'ON_MISSING_DATA' 'IGNORE'
+    CONFIG 'PROJ_LIB' './conf/'
+    CONFIG      "MS_ERRORFILE" "%(ms_error_path)s"
+    CONFIG      "CPL_DEBUG" "ON"
+    CONFIG      "PROJ_DEBUG" "ON"
+    DEBUG       5
+
+    NAME        "MAP_%(mapfile_name)s"
+
+    IMAGETYPE   png
+    IMAGECOLOR  0 0 0
+    MAXSIZE     4000
+    SIZE        800 800
+    UNITS       meters
+    EXTENT %(extent)s
+
+    OUTPUTFORMAT
+      NAME      "png"
+      DRIVER    AGG/PNG
+      MIMETYPE  "image/png"
+      IMAGEMODE RGBA
+      EXTENSION "png"
+      FORMATOPTION "GAMMA=0.75"
+    END
+
+    OUTPUTFORMAT
+      NAME "GTiff"
+      DRIVER GDAL/GTiff
+      MIMETYPE "image/tiff"
+      IMAGEMODE RGBA
+      EXTENSION "tiff"
+      FORMATOPTION 'ATTACHMENT=%(mapfile_name)s.tiff'
+    END
+
+    OUTPUTFORMAT
+      NAME kml
+      DRIVER "KML"
+      MIMETYPE "application/vnd.google-earth.kml+xml"
+      IMAGEMODE RGBA
+      EXTENSION "kml"
+      FORMATOPTION 'ATTACHMENT=%(mapfile_name)s.kml'
+    END
+
+    PROJECTION
+        "init=%(crs_proj)s"
+    END
+
+    WEB
+      METADATA
+        "wms_title" "Alerta %(disease_title)s"
+        "wms_onlineresource" "%(ms_cgi_path)s"
+        "wms_enable_request" "*"
+        "wms_srs" "%(wms_srs)s EPSG:4326 EPSG:3857"
+        "labelcache_map_edge_buffer" "-10"
+        # "wms_feature_info_mime_type" "text/html"
+        # "wms_format" "image/png"
+      END
+
+      IMAGEPATH '/tmp/map/%(disease)s/'
+      IMAGEURL '/mapimg/%(disease)s/'
+
+    END
+
+    SHAPEPATH '%(shp_path)s/'
+
+%(include_layers)s
+
+END

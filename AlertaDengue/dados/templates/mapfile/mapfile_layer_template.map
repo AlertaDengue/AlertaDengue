@@ -1,0 +1,29 @@
+LAYER
+    NAME         "%(layer_name)s"
+    DATA         "%(geocode)s"
+    STATUS       ON
+    TYPE         POLYGON
+    # OFFSITE      0 0 0
+
+    TEMPLATE "conf/template.html"
+
+    PROJECTION
+      "init=%(crs_proj)s"
+    END
+
+    METADATA
+      "wms_title" "%(city_name)s"
+      "wms_srs" "%(wms_srs)s EPSG:3857"
+      "wms_include_items" "all"
+    END
+
+    COMPOSITE
+        OPACITY 60
+    END # COMPOSITE
+
+    CLASS
+        STYLE
+            COLOR '%(rgb)s'
+        END
+    END
+END

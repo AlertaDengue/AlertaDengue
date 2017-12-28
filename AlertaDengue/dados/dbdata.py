@@ -31,6 +31,8 @@ STATE_NAME = {
     'RJ': 'Rio de Janeiro'
 }
 
+STATE_INITIAL = dict(zip(STATE_NAME.keys(), STATE_NAME.values()))
+
 db_engine = create_engine("postgresql://{}:{}@{}/{}".format(
     settings.PSQL_USER,
     settings.PSQL_PASSWORD,
