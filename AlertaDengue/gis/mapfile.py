@@ -59,22 +59,9 @@ def transform_boundaries(bounds: np.array, proj_from, proj_to):
 
 
 class MapFile:
-    path = {
-        'shapefile_dir': SHAPEFILE_PATH,
-        'local_mapfile_dir': MAPFILE_PATH,
-        'mapserver_error': MAPSERVER_LOG_PATH,
-        'mapserver_cgi': MAPSERVER_URL + '?map=map.map&',
-        'mapserver_shapefile_dir': '/shapefiles',
-        'mapserver_mapfile_dir': '/maps',
-    }
-
+    path = {}
     map_config = {}
     mapfile_name = None
-
-    # Getting general info geo from Brazil
-    gdf_country = gpd.GeoDataFrame.from_file(
-        os.path.join(path['shapefile_dir'], '%s.shp' % 'UFEBRASIL')
-    )
 
     # http://all-geo.org/volcan01010/2012/11/change-coordinates-with-pyproj/
     # LatLon with WGS84 datum used by GPS units and Google Earth
@@ -84,12 +71,7 @@ class MapFile:
     }
 
     # boundaries in epsg:2154
-    bounds = transform_boundaries(
-        bounds=extract_boundaries(gdf_country),
-        proj_from=projections['grs80'],
-        proj_to=projections['wgs84']
-    )
-
+    bounds = (0, 0, 0, 0)
     extent_country = stringfy_boundaries(bounds=bounds, sep=' ')
 
     crs_proj_country = 'epsg:2154'
@@ -98,16 +80,42 @@ class MapFile:
     layer_height = 400
     layers = []
 
-    templates = {
-        'map': '',
-        'layer': ''
-    }
+    templates = {'map': '', 'layer': ''}
 
     def __init__(self, **kwargs):
+        """
+
+        :param kwargs:
+        """
         if kwargs:
             for kw, values in kwargs.items():
                 setattr(self, kw, values)
 
+        # configuration
+        self.path.update({
+            'shapefile_dir': SHAPEFILE_PATH,
+            'local_mapfile_dir': MAPFILE_PATH,
+            'mapserver_error': MAPSERVER_LOG_PATH,
+            'mapserver_cgi': MAPSERVER_URL + '?map=map.map&',
+            'mapserver_shapefile_dir': '/shapefiles',
+            'mapserver_mapfile_dir': '/maps'
+        })
+
+        # Getting general info geo from Brazil
+        gdf_country = gpd.GeoDataFrame.from_file(
+            os.path.join(self.path['shapefile_dir'], '%s.shp' % 'UFEBRASIL')
+        )
+
+        # boundaries in epsg:2154
+        self.bounds = transform_boundaries(
+            bounds=extract_boundaries(gdf_country),
+            proj_from=self.projections['grs80'],
+            proj_to=self.projections['wgs84']
+        )
+
+        self.extent_country = stringfy_boundaries(bounds=self.bounds, sep=' ')
+
+    def prepare_folders(self):
         # check if mapserver folder exists
         if not os.path.exists(self.path['local_mapfile_dir']):
             os.mkdir(self.path['local_mapfile_dir'])
@@ -125,6 +133,7 @@ class MapFile:
             sh.cp('-R', conf_dir, self.path['local_mapfile_dir'])
 
     def create_files(self):
+        self.prepare_folders()
         self.create_layers()
         self.create_map()
 
@@ -168,6 +177,8 @@ class MapFileAlert(MapFile):
     disease = None
 
     def __init__(self, disease, **kwargs):
+        super(MapFileAlert, self).__init__(**kwargs)
+
         self.disease = disease
 
         self.templates.update({
@@ -221,8 +232,6 @@ class MapFileAlert(MapFile):
             'datetime': '%s' % datetime.now(),
             'file_path': mapfile_path
         })
-
-        super(MapFileAlert, self).__init__(**kwargs)
 
     def create_layer(self, layer_conf):
         """
