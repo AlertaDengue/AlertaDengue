@@ -59,9 +59,16 @@ def transform_boundaries(bounds: np.array, proj_from, proj_to):
 
 
 class MapFile:
-    path = {}
+    """
+
+    """
+    layers = []
     map_config = {}
+    path = {}
+    templates = {}
+
     mapfile_name = None
+    layer_height = 400
 
     # http://all-geo.org/volcan01010/2012/11/change-coordinates-with-pyproj/
     # LatLon with WGS84 datum used by GPS units and Google Earth
@@ -69,18 +76,12 @@ class MapFile:
         'wgs84': pyproj.Proj("+init=EPSG:4326"),
         'grs80': pyproj.Proj("+init=EPSG:2154")
     }
+    crs_proj_country = 'epsg:2154'
+    wms_srs_country = crs_proj_country.upper()
 
     # boundaries in epsg:2154
     bounds = (0, 0, 0, 0)
     extent_country = stringfy_boundaries(bounds=bounds, sep=' ')
-
-    crs_proj_country = 'epsg:2154'
-    wms_srs_country = crs_proj_country.upper()
-
-    layer_height = 400
-    layers = []
-
-    templates = {'map': '', 'layer': ''}
 
     def __init__(self, **kwargs):
         """
@@ -92,14 +93,16 @@ class MapFile:
                 setattr(self, kw, values)
 
         # configuration
-        self.path.update({
+        self.layers = []
+        self.templates = {'map': '', 'layer': ''}
+        self.path = {
             'shapefile_dir': SHAPEFILE_PATH,
             'local_mapfile_dir': MAPFILE_PATH,
             'mapserver_error': MAPSERVER_LOG_PATH,
             'mapserver_cgi': MAPSERVER_URL + '?map=map.map&',
             'mapserver_shapefile_dir': '/shapefiles',
             'mapserver_mapfile_dir': '/maps'
-        })
+        }
 
         # Getting general info geo from Brazil
         gdf_country = gpd.GeoDataFrame.from_file(
@@ -141,7 +144,7 @@ class MapFile:
         pass
 
     def create_layers(self):
-        self.create_layer({})
+        self.create_layer(None)
 
     def create_map(self):
         pass
@@ -163,7 +166,7 @@ class MapFile:
         :param layer_conf:
         :return:
         """
-        self.layers += self.templates['include_layer'] % layer_conf
+        self.layers.append(self.templates['include_layer'] % layer_conf)
 
 
 class MapFileAlert(MapFile):
@@ -185,17 +188,17 @@ class MapFileAlert(MapFile):
             'map': get_template_content('map.map'),
             'layer': get_template_content('layer_alert.map'),
             'url': (
-                    settings.MAPSERVER_URL + '?' +
-                    'map=/maps/alert/%(disease)s.map&' +
-                    'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&' +
-                    'STYLES=&CRS=%(crs_url)s&BBOX=%(bbox)s&' +
-                    'WIDTH=%(width)s&HEIGHT=%(height)s&FORMAT=%%(format)s&' +
-                    'LAYERS=%(layer_name)s'
+                settings.MAPSERVER_URL + '?' +
+                'map=/maps/alert/%(disease)s.map&' +
+                'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&' +
+                'STYLES=&CRS=%(crs_url)s&BBOX=%(bbox)s&' +
+                'WIDTH=%(width)s&HEIGHT=%(height)s&FORMAT=%%(format)s&' +
+                'LAYERS=%(layer_name)s'
             ),
             'include_layer': (
-                    '  INCLUDE "layers/%(include_disease)s/' +
-                    '%(include_layer_name)s"  # ' +
-                    '%(include_city_name)s\n'
+                '  INCLUDE "layers/%(include_disease)s/' +
+                '%(include_layer_name)s"  # ' +
+                '%(include_city_name)s'
             )
         })
 
@@ -277,7 +280,6 @@ class MapFileAlert(MapFile):
         cities = {}
         alerts = {}
 
-        # layers by state
         for state_name in STATE_INITIAL.values():
             with db_engine.connect() as conn:
                 sql = sql_template % state_name
@@ -346,7 +348,7 @@ class MapFileAlert(MapFile):
 
         :return:
         """
-        self.map_config['include_layers'] = ''.join(self.layers),
+        self.map_config['include_layers'] = '\n'.join(self.layers)
         self.generate(
             template=self.templates['map'],
             parameters=self.map_config,
