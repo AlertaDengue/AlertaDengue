@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from dados.mapserver_utils import generate_alert_mapfiles
+from gis.mapfile import generate_alert_mapfiles
 
 
 class Command(BaseCommand):

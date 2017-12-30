@@ -24,7 +24,7 @@ def read_admins(value):
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
+PARENT_BASE_DIR = os.path.dirname(BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -56,6 +56,7 @@ INSTALLED_APPS = (
     'bootstrap3',
     'chunked_upload',
     'dados',
+    'gis',
     'forecast',
     'dbf.apps.DbfConfig',
     'manager.router'
@@ -261,12 +262,22 @@ MAPSERVER_LOG_PATH = config(
     'MAPSERVER_LOG_PATH', default='/var/log/mapserver.log'
 )
 
-SHAPEFILE_PATH = '%s/static/shapefile' % BASE_DIR
-MAPFILE_PATH = '%s/mapfiles/%%s' % os.path.dirname(BASE_DIR)
 
-GTIFFS_PATH = config(
-    'GTIFFS_PATH', default=os.path.join(BASE_DIR, 'tiffs')
+SHAPEFILE_PATH = '%s/static/shapefile' % BASE_DIR
+MAPFILE_PATH = '%s/mapfiles/%%s' % PARENT_BASE_DIR
+
+RASTER_PATH = config(
+    'RASTER_PATH', default=os.path.join(PARENT_BASE_DIR, 'tiffs')
 )
+
+RASTER_METEROLOGICAL_DATA_RANGE = {
+    'ndvi': (-2000.0, +10000.0),
+    'lst_day_1km': (0.0, 20000.0),
+    'lst_night_1km': (-30.0, 30.0),
+    'relative_humidity_2m_above_ground': (0.0, 100.0),
+    'specific_humidity_2m_above_ground': (0.0, 1.0),
+    'precipitation': (0, 200.0)
+}
 
 BOOTSTRAP3 = {
     'form_renderers': {

@@ -13,7 +13,7 @@ from . import dbdata, models as M
 from .dbdata import Forecast, MRJ_GEOCODE, CID10
 from .episem import episem
 from .maps import get_city_info
-from .geotiff import convert_from_shapefile
+from gis.geotiff import convert_from_shapefile
 
 import random
 import fiona
