@@ -69,8 +69,7 @@ class MapFile:
     }
 
     map_config = {}
-
-    mapfile_name = '%s.map'
+    mapfile_name = None
 
     # Getting general info geo from Brazil
     gdf_country = gpd.GeoDataFrame.from_file(
@@ -108,6 +107,10 @@ class MapFile:
         if kwargs:
             for kw, values in kwargs.items():
                 setattr(self, kw, values)
+
+        # check if mapserver folder exists
+        if not os.path.exists(self.path['local_mapfile_dir']):
+            os.mkdir(self.path['local_mapfile_dir'])
 
         # check if mapserver conf folder exists
         mapserver_conf_dir_path = os.path.join(
@@ -172,7 +175,7 @@ class MapFileAlert(MapFile):
             'layer': get_template_content('layer_alert.map'),
             'url': (
                     settings.MAPSERVER_URL + '?' +
-                    'map=/maps/dengue.map&' +
+                    'map=/maps/alert/%(disease)s.map&' +
                     'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&' +
                     'STYLES=&CRS=%(crs_url)s&BBOX=%(bbox)s&' +
                     'WIDTH=%(width)s&HEIGHT=%(height)s&FORMAT=%%(format)s&' +
@@ -185,7 +188,15 @@ class MapFileAlert(MapFile):
             )
         })
 
-        mapfile_name = self.mapfile_name % self.disease
+        self.path['local_mapfile_dir'] = os.path.join(
+            self.path['local_mapfile_dir'], 'alert'
+        )
+
+        self.path['mapserver_mapfile_dir'] = os.path.join(
+            self.path['mapserver_mapfile_dir'], 'alert'
+        )
+
+        mapfile_name = '%s.map' % self.disease
         mapfile_path = os.path.join(
             self.path['local_mapfile_dir'], mapfile_name
         )
@@ -332,3 +343,44 @@ class MapFileAlert(MapFile):
             parameters=self.map_config,
             output_file_path=self.map_config['file_path']
         )
+
+
+class MapFileMeteorological(MapFile):
+    cities = {}
+    state_initials = STATE_INITIAL
+
+    def __init__(self):
+        pass
+
+    def prepare_rasters_by_cities(self):
+        pass
+
+    def create_layers(self):
+        data_range = RASTER_METEROLOGICAL_DATA_RANGE
+
+        geocode = 1
+        rasters = {}
+        city_name = ''
+
+        for raster_name, src in rasters.items():
+            raster_file_name = '%s_%s' % (geocode, raster_name)
+            layer_name = '%s.map' % geocode
+
+            raster_title = get_key_from_file_name(raster_name, False)
+            raster_key = raster_title.lower()
+
+            vmin = data_range[raster_key][0]
+            vmax = data_range[raster_key][1]
+
+            layer_conf = {
+                'geocode': geocode,
+                'city_name': city_name.upper().replace(' ', '_'),
+                'layer_name': layer_name,
+                'rgb': '#FF9900',
+                'wms_srs': self.wms_srs,
+                'crs_proj': self.crs_proj,
+                'raster_path': raster_file_name,
+                'vmin': vmin,
+                'vmax': vmax,
+                'raster_title': raster_title
+            }

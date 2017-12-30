@@ -64,7 +64,7 @@ class TestMapFile(TestCase):
 
         np.testing.assert_allclose(bounds_to, bounds_assert, atol=0.00000001)
 
-    def test_MapFile(self):
+    def test_MapFileAlert(self):
         """
 
         :return:
@@ -72,6 +72,15 @@ class TestMapFile(TestCase):
         for disease in CID10.keys():
             mf = mapfile.MapFileAlert(disease)
             mf.create_files()
+
+    def test_MapFileMeteorological(self):
+        """
+
+        :return:
+        """
+        # mf = mapfile.MapFileMeteorological()
+        # mf.create_files()
+        pass
 
 
 if __name__ == '__main__':
