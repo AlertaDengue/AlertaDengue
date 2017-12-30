@@ -1,7 +1,7 @@
 from django.test import TestCase
 # local
 from .. import mapfile
-from .. import settings
+from dados.dbdata import CID10
 
 import numpy as np
 import os
@@ -69,7 +69,9 @@ class TestMapFile(TestCase):
 
         :return:
         """
-        mapfile.MapFileAlert().create_files()
+        for disease in CID10.keys():
+            mf = mapfile.MapFileAlert(disease)
+            mf.create_files()
 
 
 if __name__ == '__main__':

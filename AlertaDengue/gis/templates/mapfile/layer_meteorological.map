@@ -1,4 +1,5 @@
 LAYER
+    # %(datetime)s
     NAME         "%(city_name)s"
     DATA         "%(raster_path)s"
     STATUS       DEFAULT # ON

@@ -175,7 +175,8 @@ DATABASES.update({
 })
 
 MIGRATION_MODULES = {
-    'dados': None
+    'dados': None,
+    'gis': None
 }
 
 # Internationalization
@@ -264,7 +265,9 @@ MAPSERVER_LOG_PATH = config(
 
 
 SHAPEFILE_PATH = '%s/static/shapefile' % BASE_DIR
-MAPFILE_PATH = '%s/mapfiles/%%s' % PARENT_BASE_DIR
+MAPFILE_PATH = config(
+    'MAPFILE_PATH', default='%s/mapfiles' % PARENT_BASE_DIR
+)
 
 RASTER_PATH = config(
     'RASTER_PATH', default=os.path.join(PARENT_BASE_DIR, 'tiffs')
