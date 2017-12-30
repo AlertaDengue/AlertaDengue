@@ -1,4 +1,5 @@
 from datetime import datetime
+from glob import glob
 # local
 from dados.dbdata import STATE_INITIAL, CID10, db_engine
 from dados.dbdata import NotificationResume as notif
@@ -94,9 +95,26 @@ class MapFile:
 
         # configuration
         self.layers = []
-        self.templates = {'map': '', 'layer': ''}
+        self.templates = {
+            'map': get_template_content('map.map'),
+            'layer': '',
+            'url': (
+                    settings.MAPSERVER_URL + '?' +
+                    'map=/maps/%(type)s/%(map_class)s.map&' +
+                    'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&' +
+                    'STYLES=&CRS=%(crs_url)s&BBOX=%(bbox)s&' +
+                    'WIDTH=%(width)s&HEIGHT=%(height)s&FORMAT=%%(format)s&' +
+                    'LAYERS=%(layer_name)s'
+            ),
+            'include_layer': (
+                    '  INCLUDE "layers/%(include_map_class)s/' +
+                    '%(include_layer_filename)s"  # ' +
+                    '%(include_layer_name)s'
+            )
+        }
         self.path = {
             'shapefile_dir': SHAPEFILE_PATH,
+            'raster_dir': RASTER_PATH,
             'local_mapfile_dir': MAPFILE_PATH,
             'mapserver_error': MAPSERVER_LOG_PATH,
             'mapserver_cgi': MAPSERVER_URL + '?map=map.map&',
@@ -118,6 +136,9 @@ class MapFile:
 
         self.extent_country = stringfy_boundaries(bounds=self.bounds, sep=' ')
 
+    def prepare_images(self):
+        pass
+
     def prepare_folders(self):
         # check if mapserver folder exists
         if not os.path.exists(self.path['local_mapfile_dir']):
@@ -137,6 +158,7 @@ class MapFile:
 
     def create_files(self):
         self.prepare_folders()
+        self.prepare_images()
         self.create_layers()
         self.create_map()
 
@@ -177,40 +199,30 @@ class MapFileAlert(MapFile):
         '#FF0000',
     ]
 
-    disease = None
+    map_class = None
 
-    def __init__(self, disease, **kwargs):
+    def __init__(self, map_class, **kwargs):
         super(MapFileAlert, self).__init__(**kwargs)
 
-        self.disease = disease
+        self.map_class = map_class
+        self.map_config['type'] = 'alert'
+        self.map_config['map_class'] = map_class
 
         self.templates.update({
-            'map': get_template_content('map.map'),
-            'layer': get_template_content('layer_alert.map'),
-            'url': (
-                settings.MAPSERVER_URL + '?' +
-                'map=/maps/alert/%(disease)s.map&' +
-                'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&' +
-                'STYLES=&CRS=%(crs_url)s&BBOX=%(bbox)s&' +
-                'WIDTH=%(width)s&HEIGHT=%(height)s&FORMAT=%%(format)s&' +
-                'LAYERS=%(layer_name)s'
+            'layer': get_template_content(
+                'layer_%s.map' % self.map_config['type']
             ),
-            'include_layer': (
-                '  INCLUDE "layers/%(include_disease)s/' +
-                '%(include_layer_name)s"  # ' +
-                '%(include_city_name)s'
-            )
         })
 
         self.path['local_mapfile_dir'] = os.path.join(
-            self.path['local_mapfile_dir'], 'alert'
+            self.path['local_mapfile_dir'], self.map_config['type']
         )
 
         self.path['mapserver_mapfile_dir'] = os.path.join(
-            self.path['mapserver_mapfile_dir'], 'alert'
+            self.path['mapserver_mapfile_dir'], self.map_config['type']
         )
 
-        mapfile_name = '%s.map' % self.disease
+        mapfile_name = '%s.map' % self.map_class
         mapfile_path = os.path.join(
             self.path['local_mapfile_dir'], mapfile_name
         )
@@ -227,11 +239,11 @@ class MapFileAlert(MapFile):
             'cgi_path': self.path['mapserver_cgi'],
             'shape_dir_path': self.path['mapserver_shapefile_dir'],
             'extent': self.extent_country,
-            'name': 'INFO_DENGUE_%s' % self.disease,
+            'name': 'INFO_DENGUE_%s' % self.map_class,
             'wms_srs': self.wms_srs_country,
             'crs_proj': self.crs_proj_country,
-            'disease': self.disease,
-            'disease_title': self.disease.title(),
+            'map_class': self.map_class,
+            'map_class_title': self.map_class.title(),
             'datetime': '%s' % datetime.now(),
             'file_path': mapfile_path
         })
@@ -241,21 +253,21 @@ class MapFileAlert(MapFile):
 
         :return:
         """
-        layer_path_disease = os.path.join(
-            self.path['local_mapfile_dir'], 'layers', self.disease
+        layer_path_map_class = os.path.join(
+            self.path['local_mapfile_dir'], 'layers', self.map_class
         )
 
-        if not os.path.exists(layer_path_disease):
-            os.makedirs(layer_path_disease)
+        if not os.path.exists(layer_path_map_class):
+            os.makedirs(layer_path_map_class)
 
         # layer_content = self.layer_template % layer_conf
         layer_conf['name'] = '%s.map' % layer_conf['geocode']
-        layer_path = os.path.join(layer_path_disease, layer_conf['name'])
+        layer_path = os.path.join(layer_path_map_class, layer_conf['name'])
 
         layer_conf.update({
-            'include_disease': self.disease,
-            'include_layer_name': layer_conf['name'],
-            'include_city_name': layer_conf['city_name'],
+            'include_map_class': self.map_class,
+            'include_layer_filename': layer_conf['name'],
+            'include_layer_name': layer_conf['city_name'],
             'datetime': '%s' % datetime.now()
         })
 
@@ -287,7 +299,7 @@ class MapFileAlert(MapFile):
                 cities.update(dict(result))
 
             cities_alert = notif.get_cities_alert_by_state(
-                state_name, self.disease
+                state_name, self.map_class
             )
 
             alerts.update(dict(
@@ -323,7 +335,7 @@ class MapFileAlert(MapFile):
             layer_name = city_name.upper().replace(' ', '_')
 
             layer_conf = {
-                'disease': self.disease,
+                'map_class': self.map_class,
                 'geocode': geocode,
                 'city_name': city_name,
                 'layer_name': layer_name,
@@ -357,14 +369,76 @@ class MapFileAlert(MapFile):
 
 
 class MapFileMeteorological(MapFile):
-    cities = {}
-    state_initials = STATE_INITIAL
+    meteorological_class = None
 
-    def __init__(self):
-        pass
+    def __init__(self, map_class, **kwargs):
+        super(MapFileMeteorological, self).__init__(**kwargs)
+        self.map_config['type'] = 'meteorological'
+        self.map_class = map_class
 
-    def prepare_rasters_by_cities(self):
-        pass
+        self.templates.update({
+            'layer': get_template_content(
+                'layer_%s.map' % self.map_config['type']
+            ),
+        })
+
+        self.path['local_mapfile_dir'] = os.path.join(
+            self.path['local_mapfile_dir'], self.map_config['type']
+        )
+
+        self.path['mapserver_mapfile_dir'] = os.path.join(
+            self.path['mapserver_mapfile_dir'], self.map_config['type']
+        )
+
+        mapfile_name = '%s.map' % self.map_class
+        mapfile_path = os.path.join(
+            self.path['local_mapfile_dir'], mapfile_name
+        )
+
+        ms_mapfile_path = os.path.join(
+            self.path['mapserver_mapfile_dir'], mapfile_name
+        )
+        self.path['mapserver_cgi'] = (
+                MAPSERVER_URL + ('?map=%s.map&' % ms_mapfile_path)
+        )
+
+        self.map_config.update({
+            'error_path': self.path['mapserver_error'],
+            'cgi_path': self.path['mapserver_cgi'],
+            'shape_dir_path': self.path['mapserver_shapefile_dir'],
+            'extent': self.extent_country,
+            'name': 'INFO_DENGUE_%s' % self.map_class,
+            'wms_srs': self.wms_srs_country,
+            'crs_proj': self.crs_proj_country,
+            'map_class': self.map_class,
+            'map_class_title': self.map_class.title(),
+            'datetime': '%s' % datetime.now(),
+            'file_path': mapfile_path
+        })
+
+    def prepare_images(self):
+        """
+
+        :return:
+        """
+        for k, data_range in RASTER_METEROLOGICAL_DATA_RANGE.items():
+            path_search = os.path.join(
+                self.path['raster_dir'],
+                'meteorological', 'country', k, '*'
+            )
+
+            for raster_file_path in glob(path_search):
+                raster_name = raster_file_path.split(os.sep)[-1]
+
+                if not raster_name[-3:] == 'tif':
+                    continue
+
+                raster_key = get_key_from_file_name(raster_name)
+
+                vmin = data_range[0]
+                vmax = data_range[1]
+
+                print(raster_key, vmin, vmax)
 
     def create_layers(self):
         data_range = RASTER_METEROLOGICAL_DATA_RANGE

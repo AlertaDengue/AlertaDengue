@@ -2,7 +2,7 @@ from django.test import TestCase
 # local
 from .. import mapfile
 from dados.dbdata import CID10
-
+from unittest import skip
 import numpy as np
 import os
 import pyproj
@@ -64,6 +64,7 @@ class TestMapFile(TestCase):
 
         np.testing.assert_allclose(bounds_to, bounds_assert, atol=0.00000001)
 
+    @skip
     def test_MapFileAlert(self):
         """
 
@@ -78,9 +79,9 @@ class TestMapFile(TestCase):
 
         :return:
         """
-        # mf = mapfile.MapFileMeteorological()
+        mf = mapfile.MapFileMeteorological()
+        mf.prepare_images()
         # mf.create_files()
-        pass
 
 
 if __name__ == '__main__':
