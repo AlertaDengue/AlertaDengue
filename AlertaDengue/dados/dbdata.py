@@ -71,6 +71,25 @@ def _get_disease_suffix(disease: str):
     )
 
 
+def get_cities() -> dict:
+    """
+    Get a list of cities from available states with code and name pairs
+    :return:
+    """
+    with db_engine.connect() as conn:
+        state_names = [
+            "'%s'" % state_name for state_name in STATE_NAME.values()
+        ]
+
+        sql = '''
+            SELECT geocodigo, nome
+            FROM "Dengue_global"."Municipio"
+            WHERE uf IN(%s)
+            ''' % ','.join(state_names)
+
+        return dict(conn.execute(sql).fetchall())
+
+
 def get_city_name_by_id(geocode: int):
     """
 

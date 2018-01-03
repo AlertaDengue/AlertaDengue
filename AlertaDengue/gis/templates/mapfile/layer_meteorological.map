@@ -1,7 +1,7 @@
 LAYER
-    # %(datetime)s
-    NAME         "%(city_name)s"
-    DATA         "%(raster_path)s"
+    # %(date_time)s
+    NAME         "%(name)s"
+    DATA         "%(geocode)s/%(data_name)s"
     STATUS       DEFAULT # ON
     TYPE         RASTER
     OFFSITE      0 0 0
@@ -13,7 +13,7 @@ LAYER
     END
 
     METADATA
-      "wms_title" "%(city_name)s"
+      "wms_title" "%(title)s"
       "wms_srs" "%(wms_srs)s EPSG:3857"
       "wms_include_items" "all"
     END

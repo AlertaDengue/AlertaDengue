@@ -1,11 +1,16 @@
 from datetime import datetime
 from glob import glob
 # local
-from dados.dbdata import STATE_INITIAL, CID10, db_engine
-from dados.dbdata import NotificationResume as notif
+from dados.dbdata import (
+    STATE_INITIAL, db_engine, get_cities,
+    NotificationResume as notif
+)
 
 from .geodf import extract_boundaries
-from .geotiff import get_key_from_file_name, get_date_from_file_name
+from .geotiff import (
+    get_key_from_file_name, get_date_from_file_name,
+    mask_raster_with_shapefile
+)
 from .settings import *
 
 import geopandas as gpd
@@ -99,17 +104,15 @@ class MapFile:
             'map': get_template_content('map.map'),
             'layer': '',
             'url': (
-                    settings.MAPSERVER_URL + '?' +
-                    'map=/maps/%(type)s/%(map_class)s.map&' +
-                    'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&' +
-                    'STYLES=&CRS=%(crs_url)s&BBOX=%(bbox)s&' +
-                    'WIDTH=%(width)s&HEIGHT=%(height)s&FORMAT=%%(format)s&' +
-                    'LAYERS=%(layer_name)s'
+                settings.MAPSERVER_URL + '?' +
+                'map=/maps/%(map_type)s/%(map_class)s.map&' +
+                'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&' +
+                'STYLES=&CRS=%(crs_url)s&BBOX=%(bbox)s&' +
+                'WIDTH=%(width)s&HEIGHT=%(height)s&FORMAT=%%(format)s&' +
+                'LAYERS=%(layer_name)s'
             ),
             'include_layer': (
-                    '  INCLUDE "layers/%(include_map_class)s/' +
-                    '%(include_layer_filename)s"  # ' +
-                    '%(include_layer_name)s'
+                '  INCLUDE "layers/%(map_class)s/%(file_name)s"  # %(title)s'
             )
         }
         self.path = {
@@ -162,14 +165,31 @@ class MapFile:
         self.create_layers()
         self.create_map()
 
-    def create_layer(self, layer_config: dict):
-        pass
+    def create_layer(self, layer_conf: dict):
+        if not os.path.exists(layer_conf['dir_path']):
+            os.makedirs(layer_conf['dir_path'])
+
+        layer_path = os.path.join(
+            layer_conf['dir_path'], layer_conf['file_name']
+        )
+
+        self.include_layer(layer_conf)
+        self.generate(
+            template=self.templates['layer'],
+            parameters=layer_conf,
+            output_file_path=layer_path
+        )
 
     def create_layers(self):
         self.create_layer(None)
 
     def create_map(self):
-        pass
+        self.map_config['include_layers'] = '\n'.join(self.layers)
+        self.generate(
+            template=self.templates['map'],
+            parameters=self.map_config,
+            output_file_path=self.map_config['file_path']
+        )
 
     def generate(self, template: str, parameters: dict, output_file_path: str):
         """
@@ -205,21 +225,21 @@ class MapFileAlert(MapFile):
         super(MapFileAlert, self).__init__(**kwargs)
 
         self.map_class = map_class
-        self.map_config['type'] = 'alert'
+        self.map_config['map_type'] = 'alert'
         self.map_config['map_class'] = map_class
 
         self.templates.update({
             'layer': get_template_content(
-                'layer_%s.map' % self.map_config['type']
+                'layer_%s.map' % self.map_config['map_type']
             ),
         })
 
         self.path['local_mapfile_dir'] = os.path.join(
-            self.path['local_mapfile_dir'], self.map_config['type']
+            self.path['local_mapfile_dir'], self.map_config['map_type']
         )
 
         self.path['mapserver_mapfile_dir'] = os.path.join(
-            self.path['mapserver_mapfile_dir'], self.map_config['type']
+            self.path['mapserver_mapfile_dir'], self.map_config['map_type']
         )
 
         mapfile_name = '%s.map' % self.map_class
@@ -231,52 +251,24 @@ class MapFileAlert(MapFile):
             self.path['mapserver_mapfile_dir'], mapfile_name
         )
         self.path['mapserver_cgi'] = (
-            MAPSERVER_URL + ('?map=%s.map&' % ms_mapfile_path)
+            MAPSERVER_URL + ('?map=%s&' % ms_mapfile_path)
         )
 
         self.map_config.update({
+            'map_class': self.map_class,
+            'title': self.map_class.title(),
+            'name': 'INFO_DENGUE_%s' % self.map_class,
+            'date_time': '%s' % datetime.now(),
+            # paths
             'error_path': self.path['mapserver_error'],
             'cgi_path': self.path['mapserver_cgi'],
             'shape_dir_path': self.path['mapserver_shapefile_dir'],
+            # projections and extensions
+            'file_path': mapfile_path,
             'extent': self.extent_country,
-            'name': 'INFO_DENGUE_%s' % self.map_class,
             'wms_srs': self.wms_srs_country,
             'crs_proj': self.crs_proj_country,
-            'map_class': self.map_class,
-            'map_class_title': self.map_class.title(),
-            'datetime': '%s' % datetime.now(),
-            'file_path': mapfile_path
         })
-
-    def create_layer(self, layer_conf):
-        """
-
-        :return:
-        """
-        layer_path_map_class = os.path.join(
-            self.path['local_mapfile_dir'], 'layers', self.map_class
-        )
-
-        if not os.path.exists(layer_path_map_class):
-            os.makedirs(layer_path_map_class)
-
-        # layer_content = self.layer_template % layer_conf
-        layer_conf['name'] = '%s.map' % layer_conf['geocode']
-        layer_path = os.path.join(layer_path_map_class, layer_conf['name'])
-
-        layer_conf.update({
-            'include_map_class': self.map_class,
-            'include_layer_filename': layer_conf['name'],
-            'include_layer_name': layer_conf['city_name'],
-            'datetime': '%s' % datetime.now()
-        })
-
-        self.include_layer(layer_conf)
-        self.generate(
-            template=self.templates['layer'],
-            parameters=layer_conf,
-            output_file_path=layer_path
-        )
 
     def create_layers(self):
         """
@@ -335,11 +327,14 @@ class MapFileAlert(MapFile):
             layer_name = city_name.upper().replace(' ', '_')
 
             layer_conf = {
+                # general information
                 'map_class': self.map_class,
                 'geocode': geocode,
-                'city_name': city_name,
-                'layer_name': layer_name,
+                'title': city_name,
+                'name': layer_name,
                 'rgb': alert_color,
+                'date_time': '%s' % datetime.now(),
+                # projections and extensions
                 'wms_srs': wms_srs,
                 'crs_proj': crs_proj,
                 'crs_url': (
@@ -350,44 +345,41 @@ class MapFileAlert(MapFile):
                 'bbox': layer_bbox,
                 'width': layer_width,
                 'height': self.layer_height,
-                'datetime': '%s' % datetime.now()
+                # paths
+                'file_name': '%s.map' % geocode,
+                'dir_path': os.path.join(
+                    self.path['local_mapfile_dir'],
+                    'layers', self.map_class
+                )
             }
 
             self.create_layer(layer_conf)
 
-    def create_map(self):
-        """
-
-        :return:
-        """
-        self.map_config['include_layers'] = '\n'.join(self.layers)
-        self.generate(
-            template=self.templates['map'],
-            parameters=self.map_config,
-            output_file_path=self.map_config['file_path']
-        )
-
 
 class MapFileMeteorological(MapFile):
-    meteorological_class = None
+    """
 
-    def __init__(self, map_class, **kwargs):
+    """
+    def __init__(
+        self, map_class: str, date_start: datetime=None, **kwargs
+    ):
         super(MapFileMeteorological, self).__init__(**kwargs)
-        self.map_config['type'] = 'meteorological'
+        self.map_config['map_type'] = 'meteorological'
         self.map_class = map_class
+        self.date_start = date_start
 
         self.templates.update({
             'layer': get_template_content(
-                'layer_%s.map' % self.map_config['type']
+                'layer_%s.map' % self.map_config['map_type']
             ),
         })
 
         self.path['local_mapfile_dir'] = os.path.join(
-            self.path['local_mapfile_dir'], self.map_config['type']
+            self.path['local_mapfile_dir'], self.map_config['map_type']
         )
 
         self.path['mapserver_mapfile_dir'] = os.path.join(
-            self.path['mapserver_mapfile_dir'], self.map_config['type']
+            self.path['mapserver_mapfile_dir'], self.map_config['map_type']
         )
 
         mapfile_name = '%s.map' % self.map_class
@@ -399,73 +391,143 @@ class MapFileMeteorological(MapFile):
             self.path['mapserver_mapfile_dir'], mapfile_name
         )
         self.path['mapserver_cgi'] = (
-                MAPSERVER_URL + ('?map=%s.map&' % ms_mapfile_path)
+                MAPSERVER_URL + ('?map=%s&' % ms_mapfile_path)
+        )
+        self.path['mapserver_shapefile_dir'] = os.path.join(
+            os.sep, 'tiffs', 'meteorological', 'city', self.map_class
         )
 
         self.map_config.update({
+            # general information
+            'name': 'INFO_DENGUE_%s' % self.map_class.upper(),
+            'map_class': self.map_class,
+            'title': self.map_class.upper(),
+            'date_time': '%s' % datetime.now(),
+            # projections and extensions
+            'extent': self.extent_country,
+            'wms_srs': self.wms_srs_country,
+            'crs_proj': self.crs_proj_country,
+            # paths
+            'file_path': mapfile_path,
             'error_path': self.path['mapserver_error'],
             'cgi_path': self.path['mapserver_cgi'],
             'shape_dir_path': self.path['mapserver_shapefile_dir'],
-            'extent': self.extent_country,
-            'name': 'INFO_DENGUE_%s' % self.map_class,
-            'wms_srs': self.wms_srs_country,
-            'crs_proj': self.crs_proj_country,
-            'map_class': self.map_class,
-            'map_class_title': self.map_class.title(),
-            'datetime': '%s' % datetime.now(),
-            'file_path': mapfile_path
         })
 
     def prepare_images(self):
         """
+        Create raster images by city using as mask a shapefile and background
+        a raster file of the whole country.
+
+        Each city can have raster file for datetime regards the datetime from
+        the original file (whole country).
 
         :return:
         """
-        for k, data_range in RASTER_METEROLOGICAL_DATA_RANGE.items():
-            path_search = os.path.join(
-                self.path['raster_dir'],
-                'meteorological', 'country', k, '*'
-            )
+        path_search = os.path.join(
+            self.path['raster_dir'],
+            'meteorological', 'country', self.map_class, '*'
+        )
 
-            for raster_file_path in glob(path_search):
-                raster_name = raster_file_path.split(os.sep)[-1]
+        for raster_input_file_path in glob(path_search, recursive=True):
+            raster_name = raster_input_file_path.split(os.sep)[-1]
 
-                if not raster_name[-3:] == 'tif':
+            # filter by tiff format
+            if not raster_name[-3:] == 'tif':
+                continue
+
+            # filter by date
+            raster_date = get_date_from_file_name(raster_name)
+            if self.date_start is not None and raster_date < self.date_start:
+                continue
+
+            for geocode, city_name in get_cities().items():
+                shapefile_path = os.path.join(
+                    SHAPEFILE_PATH, '%s.shp' % geocode
+                )
+
+                raster_output_dir_path = os.path.join(
+                    RASTER_PATH, 'meteorological', 'city', self.map_class,
+                    str(geocode)
+                )
+
+                # create output path if not exists
+                if not os.path.exists(raster_output_dir_path):
+                    os.mkdir(raster_output_dir_path)
+
+                raster_output_file_path = os.path.join(
+                    raster_output_dir_path,
+                    '%s.tif' % raster_date.strftime('%Y%m%d')
+                )
+
+                # filter if shapefile exists
+                if not os.path.exists(shapefile_path):
                     continue
 
-                raster_key = get_key_from_file_name(raster_name)
-
-                vmin = data_range[0]
-                vmax = data_range[1]
-
-                print(raster_key, vmin, vmax)
+                # apply mask on raster using shapefile by city
+                mask_raster_with_shapefile(
+                    shapefile_path=shapefile_path,
+                    raster_input_file_path=raster_input_file_path,
+                    raster_output_file_path=raster_output_file_path
+                )
 
     def create_layers(self):
-        data_range = RASTER_METEROLOGICAL_DATA_RANGE
+        data_range = RASTER_METEROLOGICAL_DATA_RANGE[self.map_class]
 
-        geocode = 1
-        rasters = {}
-        city_name = ''
+        # get a list with geo codes and city names from available states
+        for geocode, city_name in get_cities().items():
+            raster_name = None
+            raster_date = None
 
-        for raster_name, src in rasters.items():
-            raster_file_name = '%s_%s' % (geocode, raster_name)
-            layer_name = '%s.map' % geocode
+            # check the last raster file available by city
+            raster_dir_path = os.path.join(
+                RASTER_PATH, 'meteorological', 'city', self.map_class,
+                str(geocode),
+            )
+            search_path = os.path.join(
+                raster_dir_path, '*'
+            )
 
-            raster_title = get_key_from_file_name(raster_name, False)
-            raster_key = raster_title.lower()
+            for raster_file_path in glob(search_path, recursive=True):
+                # filter by tiff format
+                if not raster_file_path[-3:] == 'tif':
+                    continue
+                _raster_name = raster_file_path.split(os.sep)[-1]
+                _raster_date = datetime.strptime(_raster_name, '%Y%m%d.tif')
 
-            vmin = data_range[raster_key][0]
-            vmax = data_range[raster_key][1]
+                if raster_date is None or raster_date < _raster_date:
+                    raster_name = _raster_name
+                    raster_date = _raster_date
+
+            # skip if no file found
+            if raster_name is None:
+                continue
+
+            # layer configuration definition
+            layer_name = city_name.upper().replace(' ', '_')
+            layer_title = city_name.title()
+            vmin, vmax = data_range
 
             layer_conf = {
+                # general information
+                'map_class': self.map_class,
                 'geocode': geocode,
-                'city_name': city_name.upper().replace(' ', '_'),
-                'layer_name': layer_name,
+                'name': layer_name,
                 'rgb': '#FF9900',
-                'wms_srs': self.wms_srs,
-                'crs_proj': self.crs_proj,
-                'raster_path': raster_file_name,
+                'title': layer_title,
+                'date_time': str(datetime.now()),
+                # projection and data range
+                'wms_srs': self.map_config['wms_srs'],
+                'crs_proj': self.map_config['crs_proj'],
                 'vmin': vmin,
                 'vmax': vmax,
-                'raster_title': raster_title
+                # path
+                'file_name': '%s.map' % geocode,
+                'data_name': '%s.tif' % raster_date.strftime('%Y%m%d'),
+                'dir_path': os.path.join(
+                    self.path['local_mapfile_dir'],
+                    'layers', self.map_class
+                )
             }
+
+            self.create_layer(layer_conf)

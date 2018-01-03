@@ -1,8 +1,10 @@
 from django.test import TestCase
+from datetime import datetime
 # local
 from .. import mapfile
-from dados.dbdata import CID10
-from unittest import skip
+from ..settings import RASTER_METEROLOGICAL_DATA_RANGE
+from dados.dbdata import CID10, get_cities
+
 import numpy as np
 import os
 import pyproj
@@ -64,14 +66,13 @@ class TestMapFile(TestCase):
 
         np.testing.assert_allclose(bounds_to, bounds_assert, atol=0.00000001)
 
-    @skip
     def test_MapFileAlert(self):
         """
 
         :return:
         """
         for disease in CID10.keys():
-            mf = mapfile.MapFileAlert(disease)
+            mf = mapfile.MapFileAlert(map_class=disease)
             mf.create_files()
 
     def test_MapFileMeteorological(self):
@@ -79,9 +80,13 @@ class TestMapFile(TestCase):
 
         :return:
         """
-        mf = mapfile.MapFileMeteorological()
-        mf.prepare_images()
-        # mf.create_files()
+        date_start = datetime.strptime('2017-01-01', '%Y-%m-%d')
+
+        for c in RASTER_METEROLOGICAL_DATA_RANGE:
+            mf = mapfile.MapFileMeteorological(
+                map_class=c, date_start=date_start
+            )
+            mf.create_files()
 
 
 if __name__ == '__main__':
