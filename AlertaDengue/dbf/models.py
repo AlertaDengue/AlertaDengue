@@ -44,7 +44,7 @@ class DBF(models.Model):
         ('TO', 'Tocantins')
     )
 
-    uploaded_by = models.ForeignKey('auth.User')
+    uploaded_by = models.ForeignKey('auth.User',on_delete=models.DO_NOTHING)
     file = models.FileField()
     uploaded_at = models.DateTimeField(auto_now_add=True)
     export_date = models.DateField()

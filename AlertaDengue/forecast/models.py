@@ -55,14 +55,14 @@ class ForecastCity(models.Model):
     """
     city = models.ForeignKey(
         'dados.City', db_column='geocode', null=False,
-        help_text=_('Código do Município')
+        help_text=_('Código do Município'), on_delete=models.DO_NOTHING
     )
     active = models.BooleanField(
         null=False, default=True, help_text=_('Está Ativo?')
     )
     forecast_model = models.ForeignKey(
         'forecast.ForecastModel', db_column='forecast_model_id',
-        help_text=_('Modelo de Previsão'),
+        help_text=_('Modelo de Previsão'), on_delete=models.DO_NOTHING
     )
 
     class Meta:
@@ -100,15 +100,16 @@ class ForecastCases(models.Model):
     )
     city = models.ForeignKey(
         'dados.City', db_column='geocode', null=False,
-        help_text=_('Cidade')
+        help_text=_('Cidade'), on_delete=models.DO_NOTHING
     )
     cid10 = models.ForeignKey(
         'dados.CID10', db_column='cid10', null=False,
-        help_text=_('Doença')
+        help_text=_('Doença'), on_delete=models.DO_NOTHING
     )
     forecast_model = models.ForeignKey(
         'forecast.ForecastModel', db_column='forecast_model_id',
         null=False, help_text=_('Modelo de Previsão'),
+        on_delete=models.DO_NOTHING
     )
     published_date = models.DateField(
         db_column='published_date', null=False,

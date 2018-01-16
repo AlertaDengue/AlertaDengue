@@ -73,6 +73,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+# django 2
+MIDDLEWARE = MIDDLEWARE_CLASSES
+
 ROOT_URLCONF = 'AlertaDengue.urls'
 
 WSGI_APPLICATION = 'AlertaDengue.wsgi.application'

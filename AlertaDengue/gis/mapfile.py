@@ -126,6 +126,7 @@ class MapFile:
         }
 
         # Getting general info geo from Brazil
+        """
         gdf_country = gpd.GeoDataFrame.from_file(
             os.path.join(self.path['shapefile_dir'], '%s.shp' % 'UFEBRASIL')
         )
@@ -136,6 +137,8 @@ class MapFile:
             proj_from=self.projections['grs80'],
             proj_to=self.projections['wgs84']
         )
+        """
+        self.bounds = [-1.36352984, -5.98409199, -1.36326239, -5.98383341]
 
         self.extent_country = stringfy_boundaries(bounds=self.bounds, sep=' ')
 

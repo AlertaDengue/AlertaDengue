@@ -34,13 +34,13 @@ __geocode = '(?P<geocodigo>\d{7})'
 
 urlpatterns = [
     url(r'^$', AlertaMainView.as_view(), name='main'),
-    url(r'^alerta/%s/$' % __state, redirect_alerta_dengue),
+    url(r'^alerta/%s[/]?$' % __state, redirect_alerta_dengue),
     url(r'^alerta/%s/%s$' % (__state, __disease),
         AlertaStateView.as_view(), name='alerta_uf'),
     url(r'^alerta/rio/$', redirect_alert_rio_dengue),
     url(r'^alerta/rio/%s$' % __disease,
         AlertaMRJPageView.as_view(), name='mrj'),
-    url(r'^alerta/%s/$' % __geocode, redirect_alert_city_dengue),
+    url(r'^alerta/%s[/]?$' % __geocode, redirect_alert_city_dengue),
     url(r'^alerta/%s/%s$' % (__geocode, __disease),
         AlertaMunicipioPageView.as_view(), name='alerta_cidade'),
     url(r'^alerta-detalhado/$', DetailsPageView.as_view(), name='home'),

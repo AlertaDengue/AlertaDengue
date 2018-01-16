@@ -1,8 +1,14 @@
 # coding=utf-8
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.test import TestCase
 from unittest import skip
+
+try:
+    from django.urls import reverse  # django 2
+except ModuleNotFoundError:
+    # django old version
+    from django.core.urlresolvers import reverse
+
 import json
 import os
 
