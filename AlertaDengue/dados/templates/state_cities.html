@@ -108,14 +108,14 @@
         }
 
         function _plots_refresh() {
-            var url = '/csv/notif_reduced?&state_abv=' + state_abv +
+            var url = '/api/notif_reduced?&state_abv=' + state_abv +
                 get_ages_selected() +
                 get_genders_selected() +
                 get_diseases_selected() +
                 get_period_selected() +
                 get_cities_selected() + '&chart_type=';
 
-            var url_short = '/csv/notif_reduced' +
+            var url_short = '/api/notif_reduced' +
                 '?state_abv=' + state_abv +
                 '&chart_type=';
 

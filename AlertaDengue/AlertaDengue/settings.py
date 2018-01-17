@@ -59,6 +59,7 @@ INSTALLED_APPS = (
     'gis',
     'forecast',
     'dbf.apps.DbfConfig',
+    'api',
     'manager.router'
 )
 
