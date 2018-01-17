@@ -19,8 +19,8 @@ MRJ_GEOCODE = 3304557
 
 CID10 = {
     'dengue': 'A90',
-    # 'zika': 'A928',
-    'chikungunya': 'A920'
+    'chikungunya': 'A920',
+    'zika': 'A928'
 }
 
 STATE_NAME = {
@@ -30,6 +30,8 @@ STATE_NAME = {
     'PR': 'Paraná',
     'RJ': 'Rio de Janeiro'
 }
+
+STATE_INITIAL = dict(zip(STATE_NAME.keys(), STATE_NAME.values()))
 
 db_engine = create_engine("postgresql://{}:{}@{}/{}".format(
     settings.PSQL_USER,
@@ -53,6 +55,39 @@ def _nan_to_num_int_list(v):
 
 def _episem(dt):
     return episem(dt, sep='')
+
+
+def _get_disease_suffix(disease: str):
+    """
+
+    :param disease:
+    :return:
+    """
+    return (
+        '' if disease == 'dengue' else
+        '_chik' if disease == 'chikungunya' else
+        '_zika' if disease == 'zika' else
+        ''
+    )
+
+
+def get_cities() -> dict:
+    """
+    Get a list of cities from available states with code and name pairs
+    :return:
+    """
+    with db_engine.connect() as conn:
+        state_names = [
+            "'%s'" % state_name for state_name in STATE_NAME.values()
+        ]
+
+        sql = '''
+            SELECT geocodigo, nome
+            FROM "Dengue_global"."Municipio"
+            WHERE uf IN(%s)
+            ''' % ','.join(state_names)
+
+        return dict(conn.execute(sql).fetchall())
 
 
 def get_city_name_by_id(geocode: int):
@@ -109,6 +144,16 @@ def get_alerta_mrj_chik():
         return pd.read_sql_query(sql, conexao, index_col='id')
 
 
+def get_alerta_mrj_zika():
+    """
+    Fetch the alert table for the city of Rio de janeiro
+    :return: pandas dataframe
+    """
+    sql = 'select * from "Municipio".alerta_mrj_zika;'
+    with db_engine.connect() as conexao:
+        return pd.read_sql_query(sql, conexao, index_col='id')
+
+
 def get_last_alert(geo_id, disease):
     """
 
@@ -117,11 +162,7 @@ def get_last_alert(geo_id, disease):
     :return:
     """
 
-    table_name = (
-        'Historico_alerta' if disease == 'dengue' else
-        'Historico_alerta_chik' if disease == 'chikungunya' else
-        None
-    )
+    table_name = 'Historico_alerta' + _get_disease_suffix(disease)
 
     sql = '''
     SELECT nivel
@@ -166,14 +207,11 @@ def get_series_by_UF(disease='dengue'):
     cache_id = 'get_series_by_UF-{}'.format(disease)
     series = cache.get(cache_id)
 
-    _disease = (
-        '' if disease == 'dengue' else
-        '_chik' if disease == 'chikungunya' else
-        ''
-    )
+    _disease = _get_disease_suffix(disease)
 
     if series is None:
         with db_engine.connect() as conn:
+            print('select * from uf_total{}_view;'.format(_disease), disease)
             series = pd.read_sql(
                 'select * from uf_total{}_view;'.format(_disease),
                 conn, parse_dates=True
@@ -191,6 +229,18 @@ def get_n_chik_alerts():
     sql = '''
     SELECT COUNT(*) AS n_alerts 
     FROM "Municipio"."Historico_alerta_chik"
+    '''
+    return pd.read_sql_query(sql, db_engine).loc[0, 'n_alerts']
+
+
+def get_n_zika_alerts():
+    """
+
+    :return: int
+    """
+    sql = '''
+    SELECT COUNT(*) AS n_alerts 
+    FROM "Municipio"."Historico_alerta_zika"
     '''
     return pd.read_sql_query(sql, db_engine).loc[0, 'n_alerts']
 
@@ -276,11 +326,7 @@ def load_cases_without_forecast(geocode: int, disease):
     """
     with db_engine.connect() as conn:
         if geocode == MRJ_GEOCODE:  # RJ city
-            table_name = (
-                'alerta_mrj' if disease == 'dengue' else
-                'alerta_mrj_chik' if disease == 'chikungunya' else
-                None
-            )
+            table_name = 'alerta' + _get_disease_suffix(disease)
 
             data_alert = pd.read_sql_query('''
                 SELECT 
@@ -299,11 +345,7 @@ def load_cases_without_forecast(geocode: int, disease):
             )
 
         else:
-            table_name = (
-                'Historico_alerta' if disease == 'dengue' else
-                'Historico_alerta_chik' if disease == 'chikungunya' else
-                None
-            )
+            table_name = 'Historico_alerta' + _get_disease_suffix(disease)
 
             data_alert = pd.read_sql_query(''' 
                 SELECT * FROM "Municipio"."{}"
@@ -460,15 +502,11 @@ class NotificationResume:
         Returna contagem de cidades participantes por estado
 
         :param uf: uf a ser consultada
-        :param disease: dengue|chikungunya
+        :param disease: dengue|chikungunya|zika
         :return: dataframe
         """
 
-        table_name = (
-            'Historico_alerta' if disease == 'dengue' else
-            'Historico_alerta_chik' if disease == 'chikungunya' else
-            ''  # will raise an error
-        )
+        table_name = 'Historico_alerta' + _get_disease_suffix(disease)
 
         sql = '''
         SELECT COALESCE(COUNT(municipio_geocodigo), 0) AS count
@@ -585,11 +623,7 @@ class NotificationResume:
         :return: tupla
         """
 
-        _disease = (
-            '' if disease == 'dengue' else
-            '_chik' if disease == 'chikungunya' else
-            ''
-        )
+        _disease = _get_disease_suffix(disease)
 
         sql = '''
         SELECT
@@ -789,8 +823,10 @@ class NotificationQueries:
         """
         _diseases = ','.join(["'%s'" % cid for cid in CID10.values()])
         return (
-            'cid10_codigo IN (%s)' % _diseases if disease is None else
-            'cid10_codigo IN ({})'.format(','.join([
+            "REPLACE(cid10_codigo, '.', '') IN (%s)" % (
+                _diseases
+            ) if disease is None else
+            "REPLACE(cid10_codigo, '.', '') IN ({})".format(','.join([
                 "'{}'".format(CID10[cid.lower()])
                 for cid in disease.split(',')
             ]))
@@ -1056,7 +1092,9 @@ class NotificationQueries:
         disease_filter = ''
 
         if disease is not None:
-            disease_filter = " AND cid10_codigo='%s'" % CID10[disease]
+            disease_filter = (
+                " AND REPLACE(cid10_codigo, '.', '')='%s'" % CID10[disease]
+            )
 
         sql = '''
         SELECT
@@ -1210,11 +1248,7 @@ class Forecast:
             df_forecast_model = pd.read_sql(sql, con=conn)
 
         if geocode == MRJ_GEOCODE:  # RJ city
-            table_name = (
-                'alerta_mrj' if disease == 'dengue' else
-                'alerta_mrj_chik' if disease == 'chikungunya' else
-                None
-            )
+            table_name = 'alerta_mrj' + _get_disease_suffix(disease)
 
             sql_alert = '''
             SELECT 
@@ -1231,11 +1265,7 @@ class Forecast:
             '''.format(table_name)
 
         else:
-            table_name = (
-                'Historico_alerta' if disease == 'dengue' else
-                'Historico_alerta_chik' if disease == 'chikungunya' else
-                None
-            )
+            table_name = 'Historico_alerta' + _get_disease_suffix(disease)
 
             sql_alert = ''' 
             SELECT * FROM "Municipio"."{}"

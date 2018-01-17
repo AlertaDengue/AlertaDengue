@@ -24,7 +24,7 @@ def read_admins(value):
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
+PARENT_BASE_DIR = os.path.dirname(BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -56,6 +56,7 @@ INSTALLED_APPS = (
     'bootstrap3',
     'chunked_upload',
     'dados',
+    'gis',
     'forecast',
     'dbf.apps.DbfConfig',
     'manager.router'
@@ -71,6 +72,9 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+# django 2
+MIDDLEWARE = MIDDLEWARE_CLASSES
 
 ROOT_URLCONF = 'AlertaDengue.urls'
 
@@ -174,7 +178,8 @@ DATABASES.update({
 })
 
 MIGRATION_MODULES = {
-    'dados': None
+    'dados': None,
+    'gis': None
 }
 
 # Internationalization
@@ -201,9 +206,11 @@ APPEND_SLASH = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 CURRENT_DIR = os.path.join(os.path.dirname(__file__), '..')
 
-STATIC_ROOT = os.path.join(CURRENT_DIR, 'static_files')  # up one level from settings.py
+# up one level from settings.py
+STATIC_ROOT = os.path.join(CURRENT_DIR, 'static_files')
+# static is on root level
 STATICFILES_DIRS = (
-    os.path.abspath(os.path.join(CURRENT_DIR, 'static')),  # static is on root level
+    os.path.abspath(os.path.join(CURRENT_DIR, 'static')),
 )
 
 DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, 'data'))
@@ -214,13 +221,20 @@ MEDIA_ROOT = config('MEDIA_ROOT', default='')
 
 IMPORTED_FILES_DIR = config('IMPORTED_FILES_DIR', default=MEDIA_ROOT)
 
-EMAIL_BACKEND = config('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-EMAIL_FROM_ADDRESS = config('EMAIL_FROM_ADDRESS', 'no-reply@info.dengue.mat.br')
+EMAIL_BACKEND = config(
+    'EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend'
+)
+EMAIL_FROM_ADDRESS = config(
+    'EMAIL_FROM_ADDRESS', 'no-reply@info.dengue.mat.br'
+)
 INFODENGUE_TEAM_EMAIL = config('INFODENGUE_TEAM_EMAIL',
         'infodengue@info.dengue.mat.br')
 
 if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
-    EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = config('EMAIL_CONFIG', default='example_host,25,username,password', cast=Csv())
+    EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = config(
+        'EMAIL_CONFIG', default='example_host,25,username,password',
+        cast=Csv()
+    )
     EMAIL_PORT = int(EMAIL_PORT)
     EMAIL_USE_TLS = True
 
@@ -247,6 +261,29 @@ CELERY_TASK_ALWAYS_EAGER = config('CELERY_TASK_ALWAYS_EAGER', default=False)
 MAPSERVER_URL = config(
     'MAPSERVER_URL', default='http://localhost:80'
 )
+
+MAPSERVER_LOG_PATH = config(
+    'MAPSERVER_LOG_PATH', default='/var/log/mapserver.log'
+)
+
+
+SHAPEFILE_PATH = '%s/static/shapefile' % BASE_DIR
+MAPFILE_PATH = config(
+    'MAPFILE_PATH', default='%s/mapfiles' % PARENT_BASE_DIR
+)
+
+RASTER_PATH = config(
+    'RASTER_PATH', default=os.path.join(PARENT_BASE_DIR, 'tiffs')
+)
+
+RASTER_METEROLOGICAL_DATA_RANGE = {
+    'ndvi': (-2000.0, +10000.0),
+    'lst_day_1km': (0.0, 20000.0),
+    'lst_night_1km': (-30.0, 30.0),
+    'relative_humidity_2m_above_ground': (0.0, 100.0),
+    'specific_humidity_2m_above_ground': (0.0, 1.0),
+    'precipitation': (0, 200.0)
+}
 
 BOOTSTRAP3 = {
     'form_renderers': {

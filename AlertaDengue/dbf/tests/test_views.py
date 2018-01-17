@@ -1,7 +1,13 @@
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.core.files.base import File
 from django.test import TestCase
+
+try:
+    from django.urls import reverse  # django 2
+except ModuleNotFoundError:
+    # django old version
+    from django.core.urlresolvers import reverse
+
 from datetime import date
 # local
 from ..models import DBF, DBFChunkedUpload

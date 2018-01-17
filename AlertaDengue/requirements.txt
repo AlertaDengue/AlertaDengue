@@ -21,3 +21,5 @@ gdal
 fiona
 rasterio
 geopy
+geopandas
+sh

@@ -120,6 +120,13 @@ def total_series_chik(context):
     return _context
 
 
+@register.inclusion_tag("total_series.html", takes_context=True)
+def total_series_zika(context):
+    _context = total_series(context, disease='zika')
+    _context.update({'disease_label': 'Zika'})
+    return _context
+
+
 def total_series(context, disease):
     '''
 
