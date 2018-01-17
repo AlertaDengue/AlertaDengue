@@ -180,7 +180,8 @@ DATABASES.update({
 
 MIGRATION_MODULES = {
     'dados': None,
-    'gis': None
+    'gis': None,
+    'api': None
 }
 
 # Internationalization

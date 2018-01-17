@@ -288,7 +288,6 @@ class AlertaMainView(TemplateView):
 
                     variation_4_weeks[d][s] = variation_p(v1, v2)
 
-
         if n_alerts_chik > 0 and n_alerts_zika > 0:
             chart_cols = 4
             # card_cols = 6

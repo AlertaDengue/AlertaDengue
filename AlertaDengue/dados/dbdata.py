@@ -57,7 +57,7 @@ def _episem(dt):
     return episem(dt, sep='')
 
 
-def _get_disease_suffix(disease: str):
+def get_disease_suffix(disease: str):
     """
 
     :param disease:
@@ -162,7 +162,7 @@ def get_last_alert(geo_id, disease):
     :return:
     """
 
-    table_name = 'Historico_alerta' + _get_disease_suffix(disease)
+    table_name = 'Historico_alerta' + get_disease_suffix(disease)
 
     sql = '''
     SELECT nivel
@@ -207,7 +207,7 @@ def get_series_by_UF(disease='dengue'):
     cache_id = 'get_series_by_UF-{}'.format(disease)
     series = cache.get(cache_id)
 
-    _disease = _get_disease_suffix(disease)
+    _disease = get_disease_suffix(disease)
 
     if series is None:
         with db_engine.connect() as conn:
@@ -326,7 +326,7 @@ def load_cases_without_forecast(geocode: int, disease):
     """
     with db_engine.connect() as conn:
         if geocode == MRJ_GEOCODE:  # RJ city
-            table_name = 'alerta' + _get_disease_suffix(disease)
+            table_name = 'alerta' + get_disease_suffix(disease)
 
             data_alert = pd.read_sql_query('''
                 SELECT 
@@ -345,7 +345,7 @@ def load_cases_without_forecast(geocode: int, disease):
             )
 
         else:
-            table_name = 'Historico_alerta' + _get_disease_suffix(disease)
+            table_name = 'Historico_alerta' + get_disease_suffix(disease)
 
             data_alert = pd.read_sql_query(''' 
                 SELECT * FROM "Municipio"."{}"
@@ -506,7 +506,7 @@ class NotificationResume:
         :return: dataframe
         """
 
-        table_name = 'Historico_alerta' + _get_disease_suffix(disease)
+        table_name = 'Historico_alerta' + get_disease_suffix(disease)
 
         sql = '''
         SELECT COALESCE(COUNT(municipio_geocodigo), 0) AS count
@@ -623,7 +623,7 @@ class NotificationResume:
         :return: tupla
         """
 
-        _disease = _get_disease_suffix(disease)
+        _disease = get_disease_suffix(disease)
 
         sql = '''
         SELECT
@@ -764,7 +764,7 @@ class Forecast:
             df_forecast_model = pd.read_sql(sql, con=conn)
 
         if geocode == MRJ_GEOCODE:  # RJ city
-            table_name = 'alerta_mrj' + _get_disease_suffix(disease)
+            table_name = 'alerta_mrj' + get_disease_suffix(disease)
 
             sql_alert = '''
             SELECT 
@@ -781,7 +781,7 @@ class Forecast:
             '''.format(table_name)
 
         else:
-            table_name = 'Historico_alerta' + _get_disease_suffix(disease)
+            table_name = 'Historico_alerta' + get_disease_suffix(disease)
 
             sql_alert = ''' 
             SELECT * FROM "Municipio"."{}"

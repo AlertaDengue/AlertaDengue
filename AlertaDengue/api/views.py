@@ -1,21 +1,25 @@
+from datetime import datetime
 from django.http import HttpResponse
 from django.views.generic.base import View
 
 # local
-from .db import NotificationQueries, STATE_NAME
+from .db import NotificationQueries, STATE_NAME, AlertCity
 
 
 class _GetMethod:
     """
 
     """
-    def _get(self, param, default=None):
+    def _get(self, param, default=None, error_message=None):
         """
 
         :param param:
         :param default:
         :return:
         """
+        if error_message is not None and param not in self.request.GET:
+            raise Exception(error_message)
+
         result = (
             self.request.GET[param]
             if param in self.request.GET else
@@ -86,5 +90,42 @@ class NotificationReducedCSV_View(View, _GetMethod):
 
 
 class AlertCityRJView(View, _GetMethod):
+    """
+
+    """
+    request = None
+
     def get(self, request):
-        pass
+        self.request = request
+        format = ''
+
+        try:
+            disease = self._get('disease', error_message='Disease sent is empty.').lower()
+            format = self._get('format', error_message='Format sent is empty.').lower()
+            ew_start = int(self._get('ew_start', error_message='Epidemic start week sent is empty.'))
+            ew_end = int(self._get('ew_end', error_message='Epidemic end week sent is empty.'))
+            e_year = int(self._get('e_year', error_message='Epidemic year sent is empty.'))
+
+            if format not in ['csv', 'json']:
+                raise Exception('The output format available are: `csv` or `json`.')
+
+            ew_start = e_year*100 + ew_start
+            ew_end = e_year*100 + ew_end
+
+            df = AlertCity.get_data_mrj(
+                disease=disease, ew_start=ew_start, ew_end=ew_end
+            )
+
+            if format == 'json':
+                result = df.to_json(orient='records')
+            else:
+                result = df.to_csv(index=False)
+        except Exception as e:
+            if format == 'json':
+                result = '{"error_message": "%s"}' % e
+            else:
+                result = '[EE] error_message: %s' % e
+
+        content_type = 'application/json' if format == 'json' else 'text/plain'
+
+        return HttpResponse(result, content_type=content_type)
