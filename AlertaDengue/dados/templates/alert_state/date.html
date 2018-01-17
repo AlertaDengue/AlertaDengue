@@ -45,7 +45,7 @@ function plot_chart_date(data){
 
 $(document).ready(function () {
     // Create the chart
-    var url = '/csv/notif_reduced?chart_type=period' +
+    var url = '/api/notif_reduced?chart_type=period' +
         '&diseases={{disease_label}}' +
         '&state_abv=' + state_abv;
 

@@ -65,7 +65,7 @@ function plot_chart_disease(data){
 }
 
 $(document).ready(function () {
-    var url = '/csv/notif_reduced?chart_type=disease&state_abv=' + state_abv;
+    var url = '/api/notif_reduced?chart_type=disease&state_abv=' + state_abv;
 
     $.get(url, function(csv) {
         disease_chart = Highcharts.chart('disease-chart', {
