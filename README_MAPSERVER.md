@@ -24,13 +24,12 @@ RASTER_PATH
   |    |    |- ...
 ```
 
--------------------------------------------------------------------------------
+```
 Note 1: 12345678 was used as a geocode.
+```
 
--------------------------------------------------------------------------------
-
--------------------------------------------------------------------------------
-Note 2: The folder named with class image name (e.g. lst_day_1km), 
+```
+Note 2: The folder named with class image name (e.g. lst_day_1km),
 should be written with lower case. Example:
 
 * lst_day_1km
@@ -39,7 +38,7 @@ should be written with lower case. Example:
 * precipitation
 * relative_humidity_2m_above_ground
 * specific_humidity_2m_above_ground
--------------------------------------------------------------------------------
+```
 
 
 ## Generating meteorological geotiffs, alert and meteorological mapfiles
@@ -64,7 +63,7 @@ date as name (e.g. 20170101.tif)
 To build the MapServer Docker image, type (at the project root directory):
 
 ```sh
-docker build --file Dockerfile-mapserver .
+docker build -t alertadengue/mapserver --file Dockerfile-mapserver .
 ```
 
 If you want to use docker-compose, you need to set the following variables:
@@ -80,7 +79,7 @@ You can create and run this MapServer instance using:
 docker run -v /var/www/mapserver/mapfiles:/maps:ro \
     -v $(pwd)/AlertaDengue/static/shapefile:/shapefiles:ro \
     -v /var/www/mapserver/tiffs:/tiffs:ro \
-    -v /var/mapserver/log/:/maplog/ \
-    -it --name mapserver mapserve
+    -v /var/www/mapserver/log/:/maplog/ \
+    -it --name mapserver alertadengue/mapserver
 ```
 

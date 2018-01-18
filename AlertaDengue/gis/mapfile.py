@@ -8,7 +8,7 @@ from dados.dbdata import (
 
 from .geodf import extract_boundaries
 from .geotiff import (
-    get_key_from_file_name, get_date_from_file_name,
+    get_date_from_file_name,
     mask_raster_with_shapefile
 )
 from .settings import *
@@ -456,7 +456,7 @@ class MapFileMeteorological(MapFile):
 
                 # create output path if not exists
                 if not os.path.exists(raster_output_dir_path):
-                    os.mkdir(raster_output_dir_path)
+                    os.makedirs(raster_output_dir_path, exist_ok=True)
 
                 raster_output_file_path = os.path.join(
                     raster_output_dir_path,
