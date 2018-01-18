@@ -11,6 +11,7 @@ Define these settings variables (AlertaDengue/settings.ini):
 
 The raster files are structures as bellow:
 
+```txt
 RASTER_PATH
   |- meteorological
   |    |- country
@@ -21,10 +22,11 @@ RASTER_PATH
   |    |    |   |- 12345678
   |    |    |   |- ...
   |    |    |- ...
-
+```
 
 -------------------------------------------------------------------------------
 Note 1: 12345678 was used as a geocode.
+
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -38,6 +40,7 @@ should be written with lower case. Example:
 * relative_humidity_2m_above_ground
 * specific_humidity_2m_above_ground
 -------------------------------------------------------------------------------
+
 
 ## Generating meteorological geotiffs, alert and meteorological mapfiles
 
@@ -74,6 +77,10 @@ If you want to use docker-compose, you need to set the following variables:
 You can create and run this MapServer instance using:
 
 ```sh
-docker run -v /var/www/mapserver/mapfiles:/maps:ro -v $(pwd)/AlertaDengue/static/shapefile:/shapefiles:ro -v /var/www/mapserver/tiffs:/tiffs:ro -v /var/mapserver/log/:/maplog/ -it --name mapserver mapserve
+docker run -v /var/www/mapserver/mapfiles:/maps:ro \
+    -v $(pwd)/AlertaDengue/static/shapefile:/shapefiles:ro \
+    -v /var/www/mapserver/tiffs:/tiffs:ro \
+    -v /var/mapserver/log/:/maplog/ \
+    -it --name mapserver mapserve
 ```
 
