@@ -3,14 +3,14 @@ from django.http import HttpResponse
 from django.views.generic.base import View
 
 # local
-from .db import NotificationQueries, STATE_NAME, AlertCity
+from .db import NotificationQueries, STATE_NAME, AlertCity, MRJ_GEOCODE
 
 
 class _GetMethod:
     """
 
     """
-    def _get(self, param, default=None, error_message=None):
+    def _get(self, param, default=None, cast=None, error_message=None):
         """
 
         :param param:
@@ -26,7 +26,7 @@ class _GetMethod:
             default
         )
 
-        return result if result else default
+        return result if cast is None or result is None else cast(result)
 
 
 
@@ -89,7 +89,7 @@ class NotificationReducedCSV_View(View, _GetMethod):
         return HttpResponse(result, content_type="text/plain")
 
 
-class AlertCityRJView(View, _GetMethod):
+class AlertCityView(View, _GetMethod):
     """
 
     """
@@ -101,10 +101,19 @@ class AlertCityRJView(View, _GetMethod):
 
         try:
             disease = self._get('disease', error_message='Disease sent is empty.').lower()
+            geocode = self._get(
+                'geocode', cast=int, error_message='GEO-Code sent is empty.'
+            )
             format = self._get('format', error_message='Format sent is empty.').lower()
-            ew_start = int(self._get('ew_start', error_message='Epidemic start week sent is empty.'))
-            ew_end = int(self._get('ew_end', error_message='Epidemic end week sent is empty.'))
-            e_year = int(self._get('e_year', error_message='Epidemic year sent is empty.'))
+            ew_start = self._get(
+                'ew_start', cast=int, error_message='Epidemic start week sent is empty.'
+            )
+            ew_end = self._get(
+                'ew_end', cast=int, error_message='Epidemic end week sent is empty.'
+            )
+            e_year = self._get(
+                'e_year', cast=int, error_message='Epidemic year sent is empty.'
+            )
 
             if format not in ['csv', 'json']:
                 raise Exception('The output format available are: `csv` or `json`.')
@@ -112,9 +121,17 @@ class AlertCityRJView(View, _GetMethod):
             ew_start = e_year*100 + ew_start
             ew_end = e_year*100 + ew_end
 
-            df = AlertCity.get_data_mrj(
-                disease=disease, ew_start=ew_start, ew_end=ew_end
-            )
+            if geocode == MRJ_GEOCODE:
+                df = AlertCity.search_rj(
+                    disease=disease, ew_start=ew_start, ew_end=ew_end
+                )
+            else:
+                df = AlertCity.search(
+                    geocode=geocode, disease=disease, ew_start=ew_start, ew_end=ew_end
+                )
+                # change all keys to lower case
+                df.drop(columns=['municipio_geocodigo', 'municipio_nome'], inplace=True)
+                df.rename(columns={k: k.lower() for k in df.keys()}, inplace=True)
 
             if format == 'json':
                 result = df.to_json(orient='records')

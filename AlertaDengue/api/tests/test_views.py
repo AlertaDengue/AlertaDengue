@@ -9,6 +9,7 @@ except ModuleNotFoundError:
 
 # local
 from .. import settings
+from ..db import MRJ_GEOCODE
 
 import django
 import io
@@ -34,11 +35,13 @@ class TestApiView(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-    def test_alert_mrj(self):
+    def test_alert_rj(self):
+        geocode = MRJ_GEOCODE
         # test epidemic start week missing
         response = self.client.get(
-            reverse('api:alert_city_rj'), {
+            reverse('api:alertcity'), {
                 'disease': 'dengue',
+                'geocode': geocode,
                 'format': 'json'
             }
         )
@@ -48,24 +51,77 @@ class TestApiView(TestCase):
 
         # test json format
         response = self.client.get(
-            reverse('api:alert_city_rj'), {
+            reverse('api:alertcity'), {
                 'disease': 'dengue',
+                'geocode': geocode,
                 'format': 'json',
-                'ew_start': '1',
-                'ew_end': '50',
-                'e_year': '2017'
+                'ew_start': 1,
+                'ew_end': 50,
+                'e_year': 2017
             }
         )
         self.assertEqual(response.status_code, 200)
         result = response.json()
+
+        assert 'error_message' not in result
 
         for r in result:
             assert 201701 <= r['se'] <= 201750
 
         # test csv format
         response = self.client.get(
-            reverse('api:alert_city_rj'), {
+            reverse('api:alertcity'), {
                 'disease': 'dengue',
+                'geocode': geocode,
+                'format': 'csv',
+                'ew_start': '1',
+                'ew_end': '50',
+                'e_year': '2017'
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        buffer = io.BytesIO(response.content)
+        df = pd.read_csv(buffer)
+        assert all(201701 <= df['se']) and all(df['se'] <= 201750)
+
+    def test_alert_curitiba(self):
+        geocode = 4106902
+        # test epidemic start week missing
+        response = self.client.get(
+            reverse('api:alertcity'), {
+                'disease': 'dengue',
+                'geocode': geocode,
+                'format': 'json'
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        result = response.json()
+        assert result['error_message'] == 'Epidemic start week sent is empty.'
+
+        # test json format
+        response = self.client.get(
+            reverse('api:alertcity'), {
+                'disease': 'dengue',
+                'geocode': geocode,
+                'format': 'json',
+                'ew_start': 1,
+                'ew_end': 50,
+                'e_year': 2017
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        result = response.json()
+
+        assert 'error_message' not in result
+
+        for r in result:
+            assert 201701 <= r['se'] <= 201750
+
+        # test csv format
+        response = self.client.get(
+            reverse('api:alertcity'), {
+                'disease': 'dengue',
+                'geocode': geocode,
                 'format': 'csv',
                 'ew_start': '1',
                 'ew_end': '50',

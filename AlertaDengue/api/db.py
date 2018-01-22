@@ -1,8 +1,7 @@
-from datetime import datetime
 from sqlalchemy import create_engine
 # local
 from . import settings
-from dados.dbdata import CID10, STATE_NAME, get_disease_suffix
+from dados.dbdata import CID10, STATE_NAME, get_disease_suffix, MRJ_GEOCODE
 
 import pandas as pd
 
@@ -501,7 +500,7 @@ class NotificationQueries:
 
 class AlertCity:
     @staticmethod
-    def get_data_mrj(disease: str, ew_start: int, ew_end:int):
+    def search_rj(disease: str, ew_start: int, ew_end:int):
         """
 
         :param disease:
@@ -519,6 +518,30 @@ class AlertCity:
         FROM "Municipio".alerta_mrj%s 
         WHERE se BETWEEN %s AND %s
         ''' % (get_disease_suffix(disease), ew_start, ew_end)
+
+        with db_engine.connect() as conn:
+            return pd.read_sql(sql, conn)
+
+    @staticmethod
+    def search(disease: str, geocode: int, ew_start: int, ew_end: int):
+        """
+
+        :param disease:
+        :param geocode:
+        :param ew_start:
+        :param ew_end:
+        :return:
+        """
+        if disease not in CID10.keys():
+            raise Exception(
+                'The diseases available are: %s.' % ', '.join('`%s`' % k for k in CID10.keys())
+            )
+
+        sql = '''
+            SELECT *
+            FROM "Municipio"."Historico_alerta%s" 
+            WHERE municipio_geocodigo=%s AND "SE" BETWEEN %s AND %s
+            ''' % (get_disease_suffix(disease), geocode, ew_start, ew_end)
 
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn)
