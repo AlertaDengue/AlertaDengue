@@ -79,7 +79,8 @@ You can create and run this MapServer instance using:
 docker run -v /var/www/mapserver/mapfiles:/maps:ro \
     -v $(pwd)/AlertaDengue/static/shapefile:/shapefiles:ro \
     -v /var/www/mapserver/tiffs:/tiffs:ro \
-    -v /var/www/mapserver/log/:/maplog/ \
+    -v /var/www/mapserver/log/:/var/log/mapserver \
     -it --name mapserver alertadengue/mapserver
 ```
 
+Before you run your container, create a error.log file on your mapserver/log folder with 777 permission mode.
