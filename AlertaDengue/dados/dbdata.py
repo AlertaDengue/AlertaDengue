@@ -603,7 +603,10 @@ class NotificationResume:
 
         sql = ' UNION '.join([
             sql_template.format(gid) for gid in geo_ids
-        ]) + ' ORDER BY municipio_geocodigo, "data_iniSE"'
+        ])
+
+        if len(geo_ids) > 1:
+            sql += ' ORDER BY municipio_geocodigo, "data_iniSE"'
 
         with db_engine.connect() as conn:
             df_case_series = pd.read_sql(sql, conn)
