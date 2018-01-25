@@ -37,3 +37,17 @@ services:
             - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
             - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
         restart: always
+
+    mapserver:
+        build:
+            context: "."
+            dockerfile: "Dockerfile-mapserver"
+        ports:
+            - 7000:80
+        env_file:
+            - .env
+        volumes:
+            - ${DOCKER_HOST_MAPFILES_DIR}:/maps:ro
+            - ${DOCKER_HOST_SHAPEFILES_DIR}:/shapefiles:ro
+            - ${DOCKER_HOST_TIFFS_DIR}:/tiffs:ro
+        restart: always

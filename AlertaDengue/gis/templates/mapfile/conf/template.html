@@ -1,0 +1,66 @@
+<!-- MapServer Template -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+       "http://www.w3.org/TR/html4/transitional.dtd">
+<html>
+  <head>
+    <title>MapServer Template Sample</title>
+  </head>
+
+  <body>
+    MapServer Template Sample<br>
+
+    <!-- The central form the application is based on. -->
+    <form method="GET" action="[program]">
+
+    <!-- CGI MapServer applications are server stateless in principle,
+         all information must be "stored" in the client. This includes
+         some basic settings as below.
+         The example is based on the pan and zoom test suite:
+         http://maps.dnr.state.mn.us/mapserver_demos/tests36/           -->
+      <input type="hidden" name="map" value="[map]">
+      <input type="hidden" name="imgext" value="[mapext]">
+      <input type="hidden" name="imgxy" value="149.5 199.5">
+      <input type="hidden" name="program" value="[program]">
+      <input type="hidden" name="htmlroot" value="[htmlroot]">
+      <input type="hidden" name="map_web" value="[map_web]">
+
+      <!-- A table for minimal page formatting. -->
+      <table border=0 cellpadding=5>
+      <tr>
+        <!-- First column: Map and scale bar -->
+        <td align=center>
+          <!-- The map -->
+          <input type="image" name="img" src="[img]"
+                 style="border:0;width:300;height:400">
+          <br>
+          <!-- The scale bar-->
+          <img src="[scalebar]" alt="Scale Bar">
+        </td>
+
+        <!-- Second column: Zoom direction, Legend and Reference -->
+        <td valign=top>
+          <!-- Zoom direction -->
+          <b>Map Controls</b><br>
+          Set your zoom option:<br>
+          <select name="zoom" size="1">
+            <option value="2" [zoom_2_select]> Zoom in 2 times
+            <option value="1"  [zoom_1_select]> Recenter Map
+            <option value="-2" [zoom_-2_select]> Zoom out 2 times
+          </select>
+          <br>
+
+          <!-- Legend -->
+          <b>Legend</b><br>
+          <img src="[legend]" alt="Legend"><br><br><br><br>
+
+          <!-- Reference map -->
+         <input type="image" name="ref" src="[ref]"
+                style="border:0;width:150;height:150">
+        </td>
+      </tr>
+      </table>
+
+    </form>
+
+  </body>
+</html>

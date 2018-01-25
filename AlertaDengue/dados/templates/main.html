@@ -69,20 +69,16 @@
     <div class="container-fluid">
         <!-- chart-plot:begin -->
         <div class="row">
-            <div {% if n_alerts_chik > 0 %}
-                class="col-sm-6"
-                {% else %}
-                class="col-sm-12"
-                {% endif %}
-            >
+            <div class="col-sm-{{chart_cols}}">
                 <div class="chart-wrapper">
                   <div class="chart-stage">
                     {% total_series_dengue %}
                   </div>
                 </div>
             </div>
+
             {% if n_alerts_chik > 0 %}
-            <div class="col-sm-6">
+            <div class="col-sm-{{chart_cols}}">
                 <div class="chart-wrapper">
                   <div class="chart-stage">
                     {% total_series_chik %}
@@ -90,13 +86,24 @@
                 </div>
             </div>
             {% endif %}
+
+            {% if n_alerts_zika > 0 %}
+            <div class="col-sm-{{chart_cols}}">
+                <div class="chart-wrapper">
+                  <div class="chart-stage">
+                    {% total_series_zika %}
+                  </div>
+                </div>
+            </div>
+            {% endif %}
+
         </div>
         <!-- chart-plot:end -->
 
         <!-- chart-states:begin -->
         <div class="row card-deck">
             {% for state_name in states %}
-            <div class="col-sm-4 card">
+            <div class="col-sm-{{card_cols}} card">
                 <div class="chart-wrapper">
                     <div class="chart-title">
                         <h2>{{state_name}}</h2>

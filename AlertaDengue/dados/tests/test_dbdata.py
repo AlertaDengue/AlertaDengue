@@ -14,6 +14,14 @@ class TestLoadAlerta(TestCase):
         self.assertIn('casos', self.series[str(self.cidade)].keys())
         self.assertGreater(len(self.series), 0)
 
+    def test_get_cities(self):
+        """
+
+        :return:
+        """
+        cities = dbdata.get_cities()
+        assert cities[3304557] == 'Rio de Janeiro'
+
     def test_casos_are_ints(self):
         self.assertIsInstance(
             self.series[str(self.cidade)]['casos'][0],

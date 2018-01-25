@@ -12,6 +12,12 @@ from .views import (
 
 admin.autodiscover()
 
+try:
+    url_admin = url(r'^admin/', admin.site.urls)  # django 2
+except:
+    url_admin = url(r'^admin/', include(admin.site.urls))  # django old version
+
+
 urlpatterns = [
     # local
     url(r'^mapadengue/$', MapaDengueView.as_view(), name='mapadengue'),
@@ -25,6 +31,7 @@ urlpatterns = [
     # apps
     url(r'', include('dados.urls')),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+    url_admin,
     url(r'^dbf/', include('dbf.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+

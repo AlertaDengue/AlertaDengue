@@ -1,10 +1,8 @@
-FROM FROM camptocamp/mapserver
+FROM geodata/mapserver
 
-COPY mapfiles/*.map /etc/mapserver/
-COPY mapfiles/*.sh mapfiles/*.env /docker-entrypoint.d/
-
-RUN apt-get install git
-
+RUN apt-get update && \
+    apt-get install locales && \
+    apt-get clean
 
 # Set locale
 RUN echo "pt_BR.UTF-8 UTF-8" > /etc/locale.gen
@@ -12,8 +10,7 @@ RUN locale-gen pt_BR.UTF-8
 RUN update-locale pt_BR.UTF-8
 ENV LC_ALL pt_BR.UTF-8
 
-# Create deploy dir
-RUN mkdir /srv/deploy/
-RUN git clone https://github.com/solutionsmapgears/Scribe  /srv/deploy/
+RUN touch /var/log/mapserver.log && \
+    chown www-data /var/log/mapserver.log
 
-EXPOSE 9000
+EXPOSE 80

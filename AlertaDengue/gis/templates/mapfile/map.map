@@ -1,0 +1,71 @@
+MAP
+    # %(date_time)s
+
+    CONFIG 'ON_MISSING_DATA' 'IGNORE'
+    CONFIG 'PROJ_LIB' './conf/'
+    CONFIG "MS_ERRORFILE" "%(error_path)s"
+    CONFIG "CPL_DEBUG" "ON"
+    CONFIG "PROJ_DEBUG" "ON"
+    DEBUG  5
+
+    NAME        "MAP_%(name)s"
+
+    IMAGETYPE   png
+    IMAGECOLOR  0 0 0
+    MAXSIZE     4000
+    SIZE        800 800
+    UNITS       meters
+    EXTENT %(extent)s
+
+    OUTPUTFORMAT
+      NAME      "png"
+      DRIVER    AGG/PNG
+      MIMETYPE  "image/png"
+      IMAGEMODE RGBA
+      EXTENSION "png"
+      FORMATOPTION "GAMMA=0.75"
+    END
+
+    OUTPUTFORMAT
+      NAME "GTiff"
+      DRIVER GDAL/GTiff
+      MIMETYPE "image/tiff"
+      IMAGEMODE RGBA
+      EXTENSION "tiff"
+      FORMATOPTION 'ATTACHMENT=%(name)s.tiff'
+    END
+
+    OUTPUTFORMAT
+      NAME kml
+      DRIVER "KML"
+      MIMETYPE "application/vnd.google-earth.kml+xml"
+      IMAGEMODE RGBA
+      EXTENSION "kml"
+      FORMATOPTION 'ATTACHMENT=%(name)s.kml'
+    END
+
+    PROJECTION
+        "init=%(crs_proj)s"
+    END
+
+    WEB
+      METADATA
+        "wms_title" "Alerta %(title)s"
+        "wms_onlineresource" "%(cgi_path)s"
+        "wms_enable_request" "*"
+        "wms_srs" "%(wms_srs)s EPSG:4326 EPSG:3857"
+        "labelcache_map_edge_buffer" "-10"
+        # "wms_feature_info_mime_type" "text/html"
+        # "wms_format" "image/png"
+      END
+
+      IMAGEPATH '/tmp/map/%(map_class)s/'
+      IMAGEURL '/mapimg/%(map_class)s/'
+
+    END
+
+    SHAPEPATH '%(shape_dir_path)s/'
+
+%(include_layers)s
+
+END
