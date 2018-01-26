@@ -7,6 +7,8 @@ from ... import mapfile
 from ...settings import RASTER_METEROLOGICAL_DATA_RANGE
 from dados.dbdata import CID10
 
+import os
+
 
 class Command(BaseCommand):
     help = 'Generate map files'
@@ -34,12 +36,16 @@ class Command(BaseCommand):
             mf.create_files()
 
     def handle(self, *args, **options):
-        _date_start = input(
+        str_date_start = input(
             'Type the initial date of the the raster' +
             ' files to process (Y-m-d): '
         )
-        date_start = datetime.strptime(_date_start, '%Y-%m-%d')
-        print('Start date "%s" defined.' % date_start)
+
+        if str_date_start:
+            date_start = datetime.strptime(str_date_start, '%Y-%m-%d')
+            print('Start date "%s" defined.' % date_start)
+        else:
+            date_start = None
 
         print('\nGenerating mapfiles alert')
         self.generate_mapfiles_alert()

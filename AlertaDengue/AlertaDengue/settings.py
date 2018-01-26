@@ -287,6 +287,10 @@ RASTER_METEROLOGICAL_DATA_RANGE = {
     'precipitation': (0, 200.0)
 }
 
+RASTER_METEROLOGICAL_FACTOR_INCREASE = config(
+    'RASTER_METEROLOGICAL_FACTOR_INCREASE', default=4
+)
+
 BOOTSTRAP3 = {
     'form_renderers': {
         'default': 'dbf.forms.FormRendererWithHiddenFieldErrors',

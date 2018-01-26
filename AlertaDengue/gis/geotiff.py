@@ -16,6 +16,7 @@ import multiprocessing as mp
 import numpy as np
 import rasterio
 import rasterio.mask
+import traceback as tb
 
 
 def convert_from_shapefile(shapefile, rgb_color):
@@ -144,6 +145,7 @@ def mask_raster_with_shapefile(
         raster_src, features, crop=True, nodata=np.nan, all_touched=True
     )
     out_meta = raster_src.meta.copy()
+    raster_src.close()
 
     img_type = out_image.dtype
     # cheating
@@ -162,8 +164,6 @@ def mask_raster_with_shapefile(
 
     with rasterio.open(raster_output_file_path, "w", **out_meta) as dst:
         dst.write(out_image)
-
-    raster_src.close()
 
 
 def increase_resolution(raster_file_path: str, factor_increase: int):
@@ -184,7 +184,8 @@ def increase_resolution(raster_file_path: str, factor_increase: int):
             shape=(
                 image.shape[0],  # same number of bands
                 round(image.shape[1] * res),  # n times resolution
-                round(image.shape[2] * res))  # n times resolution
+                round(image.shape[2] * res)),  # n times resolution
+            dtype=image.dtype
         )
 
         image = src.read(out=image_new).copy()
@@ -207,41 +208,62 @@ def increase_resolution(raster_file_path: str, factor_increase: int):
         dst.write(image)
 
 
-class Process:
+class MeteorologicalRasterProcess:
     def __init__(self, raster_class, raster_date, raster_input_file_path):
         self.raster_class = raster_class
         self.raster_date = raster_date
         self.raster_input_file_path = raster_input_file_path
 
     def __call__(self, geo_info):
-        geocode, city_name = geo_info
-        raster_output_dir_path = os.path.join(
-            RASTER_PATH, 'meteorological', 'city', self.raster_class,
-            str(geocode)
-        )
+        try:
+            geocode, city_name = geo_info
+            raster_output_dir_path = os.path.join(
+                RASTER_PATH, 'meteorological', 'city', self.raster_class,
+                str(geocode)
+            )
 
-        # create output path if not exists
-        if not os.path.exists(raster_output_dir_path):
-            os.makedirs(raster_output_dir_path, exist_ok=True)
+            # create output path if not exists
+            if not os.path.exists(raster_output_dir_path):
+                os.makedirs(raster_output_dir_path, exist_ok=True)
 
-        # check if shapefile exists
-        shapefile_path = os.path.join(
-            SHAPEFILE_PATH, '%s.shp' % geocode
-        )
-        if not os.path.exists(shapefile_path):
-            return
+            # check if shapefile exists
+            shapefile_path = os.path.join(
+                SHAPEFILE_PATH, '%s.shp' % geocode
+            )
+            if not os.path.exists(shapefile_path):
+                return
 
-        raster_output_file_path = os.path.join(
-            raster_output_dir_path,
-            '%s.tif' % self.raster_date.strftime('%Y%m%d')
-        )
+            raster_output_file_path = os.path.join(
+                raster_output_dir_path,
+                '%s.tif' % self.raster_date.strftime('%Y%m%d')
+            )
 
-        # apply mask on raster using shapefile by city
-        mask_raster_with_shapefile(
-            shapefile_path=shapefile_path,
-            raster_input_file_path=self.raster_input_file_path,
-            raster_output_file_path=raster_output_file_path
-        )
+            # apply mask on raster using shapefile by city
+            mask_raster_with_shapefile(
+                shapefile_path=shapefile_path,
+                raster_input_file_path=self.raster_input_file_path,
+                raster_output_file_path=raster_output_file_path
+            )
+
+            # increase resolution
+            increase_resolution(
+                raster_file_path=raster_output_file_path,
+                factor_increase=RASTER_METEROLOGICAL_FACTOR_INCREASE
+            )
+
+            # apply mask on increased resolution raster using shapefile by city
+            mask_raster_with_shapefile(
+                shapefile_path=shapefile_path,
+                raster_input_file_path=raster_output_file_path,
+                raster_output_file_path=raster_output_file_path
+            )
+        except:
+            if DEBUG:
+                log_path = os.path.join(
+                    os.sep, 'tmp', 'raster_%s.log' % self.raster_class
+                )
+                with open(log_path, 'a') as f:
+                    f.write('%s: %s' % (datetime.now(), tb.format_exc()))
 
 
 class MeteorologicalRaster:
@@ -286,8 +308,9 @@ class MeteorologicalRaster:
             p = mp.Pool(n_processes)
 
             p.map(
-                Process(raster_class, raster_date, raster_input_file_path),
-                cities
+                MeteorologicalRasterProcess(
+                    raster_class, raster_date, raster_input_file_path
+                ), cities
             )
             p.close()
             p.join()
