@@ -1,10 +1,18 @@
+from copy import copy
 from datetime import datetime
+from glob import glob
+from rasterio import Affine
 from rasterio.features import rasterize
 from rasterio.transform import from_origin
+
+#local
+from .settings import *
+from dados.dbdata import get_cities
 
 import fiona
 import geopy.distance
 import os
+import multiprocessing as mp
 import numpy as np
 import rasterio
 import rasterio.mask
@@ -156,3 +164,130 @@ def mask_raster_with_shapefile(
         dst.write(out_image)
 
     raster_src.close()
+
+
+def increase_resolution(raster_file_path: str, factor_increase: int):
+    """
+    References:
+    * mapbox.github.io/rasterio/topics/resampling.html#use-decimated-reads
+
+    :param raster_file_path:
+    :param factor_increase:
+    :return:
+    """
+    # this method need a integer factor resolution
+    res = int(factor_increase)  # alias
+    with rasterio.open(raster_file_path) as src:
+        image = src.read()
+
+        image_new = np.empty(
+            shape=(
+                image.shape[0],  # same number of bands
+                round(image.shape[1] * res),  # n times resolution
+                round(image.shape[2] * res))  # n times resolution
+        )
+
+        image = src.read(out=image_new).copy()
+        meta = dict(src.profile)
+
+    aff = copy(meta['affine'])
+    meta['transform'] = Affine(
+        aff.a / res,
+        aff.b,
+        aff.c,
+        aff.d,
+        aff.e / res,
+        aff.f
+    )
+    meta['affine'] = meta['transform']
+    meta['width'] *= res
+    meta['height'] *= res
+
+    with rasterio.open(raster_file_path, "w", **meta) as dst:
+        dst.write(image)
+
+
+class Process:
+    def __init__(self, raster_class, raster_date, raster_input_file_path):
+        self.raster_class = raster_class
+        self.raster_date = raster_date
+        self.raster_input_file_path = raster_input_file_path
+
+    def __call__(self, geo_info):
+        geocode, city_name = geo_info
+        raster_output_dir_path = os.path.join(
+            RASTER_PATH, 'meteorological', 'city', self.raster_class,
+            str(geocode)
+        )
+
+        # create output path if not exists
+        if not os.path.exists(raster_output_dir_path):
+            os.makedirs(raster_output_dir_path, exist_ok=True)
+
+        # check if shapefile exists
+        shapefile_path = os.path.join(
+            SHAPEFILE_PATH, '%s.shp' % geocode
+        )
+        if not os.path.exists(shapefile_path):
+            return
+
+        raster_output_file_path = os.path.join(
+            raster_output_dir_path,
+            '%s.tif' % self.raster_date.strftime('%Y%m%d')
+        )
+
+        # apply mask on raster using shapefile by city
+        mask_raster_with_shapefile(
+            shapefile_path=shapefile_path,
+            raster_input_file_path=self.raster_input_file_path,
+            raster_output_file_path=raster_output_file_path
+        )
+
+
+class MeteorologicalRaster:
+    @staticmethod
+    def generate_raster_cities(
+        raster_class: str,
+        date_start: datetime=None
+    ):
+        """
+        Create raster images by city using as mask a shapefile and background
+        a raster file of the whole country.
+
+        Each city can have raster file for datetime regards the datetime from
+        the original file (whole country).
+
+        :param raster_class:
+        :param date_start:
+        :return:
+        """
+        path_search = os.path.join(
+            RASTER_PATH,
+            'meteorological', 'country', raster_class, '*'
+        )
+
+        cities = get_cities().items()
+
+        n_processes = mp.cpu_count()
+
+        for raster_input_file_path in glob(path_search, recursive=True):
+            raster_name = raster_input_file_path.split(os.sep)[-1]
+
+            # filter by tiff format
+            if not raster_name[-3:] == 'tif':
+                continue
+
+            # filter by date
+            raster_date = get_date_from_file_name(raster_name)
+            if date_start is not None and raster_date < date_start:
+                continue
+
+            # processing
+            p = mp.Pool(n_processes)
+
+            p.map(
+                Process(raster_class, raster_date, raster_input_file_path),
+                cities
+            )
+            p.close()
+            p.join()
