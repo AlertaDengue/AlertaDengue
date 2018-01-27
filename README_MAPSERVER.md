@@ -47,6 +47,11 @@ After these configuration is done, execute:
 
 ```sh
 
+python manage.py generate_meteorological_raster_cities
+```
+
+```sh
+
 python manage.py generate_mapfiles
 ```
 
