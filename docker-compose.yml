@@ -37,7 +37,8 @@ services:
             - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
             - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
         restart: always
-   mapserver:
+
+    mapserver:
         build:
             context: "."
             dockerfile: "Dockerfile-mapserver"
