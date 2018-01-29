@@ -86,12 +86,6 @@ class Sinan(object):
             self.tabela["ID_MUNICIP"] = self.tabela.ID_MN_RESI
             del self.tabela['ID_MN_RESI']
         self._parse_date_cols()
-        if not (self.time_span[0].year == self.ano and self.time_span[1].year == self.ano):
-            raise ValidationError(_("Existem nesse arquivo notificações "
-                "incompatíveis com o ano de notificação informado. "
-                "Por favor, tenha certeza de que o ano de notificação é o mesmo "
-                "para todos os registros no arquivo e de que este foi o ano "
-                "informado no momento do envio."))
 
     def _parse_date_cols(self):
         print("Formatando as datas...")
