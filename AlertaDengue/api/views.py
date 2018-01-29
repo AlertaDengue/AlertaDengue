@@ -100,23 +100,32 @@ class AlertCityView(View, _GetMethod):
         format = ''
 
         try:
-            disease = self._get('disease', error_message='Disease sent is empty.').lower()
+            disease = self._get(
+                'disease', error_message='Disease sent is empty.'
+            ).lower()
             geocode = self._get(
                 'geocode', cast=int, error_message='GEO-Code sent is empty.'
             )
-            format = self._get('format', error_message='Format sent is empty.').lower()
+            format = self._get(
+                'format', error_message='Format sent is empty.'
+            ).lower()
             ew_start = self._get(
-                'ew_start', cast=int, error_message='Epidemic start week sent is empty.'
+                'ew_start', cast=int,
+                error_message='Epidemic start week sent is empty.'
             )
             ew_end = self._get(
-                'ew_end', cast=int, error_message='Epidemic end week sent is empty.'
+                'ew_end', cast=int,
+                error_message='Epidemic end week sent is empty.'
             )
             e_year = self._get(
-                'e_year', cast=int, error_message='Epidemic year sent is empty.'
+                'e_year', cast=int,
+                error_message='Epidemic year sent is empty.'
             )
 
             if format not in ['csv', 'json']:
-                raise Exception('The output format available are: `csv` or `json`.')
+                raise Exception(
+                    'The output format available are: `csv` or `json`.'
+                )
 
             ew_start = e_year*100 + ew_start
             ew_end = e_year*100 + ew_end
@@ -127,11 +136,14 @@ class AlertCityView(View, _GetMethod):
                 )
             else:
                 df = AlertCity.search(
-                    geocode=geocode, disease=disease, ew_start=ew_start, ew_end=ew_end
+                    geocode=geocode, disease=disease,
+                    ew_start=ew_start, ew_end=ew_end
                 )
                 # change all keys to lower case
-                df.drop(columns=['municipio_geocodigo', 'municipio_nome'], inplace=True)
-                df.rename(columns={k: k.lower() for k in df.keys()}, inplace=True)
+                df.drop(
+                    columns=['municipio_geocodigo', 'municipio_nome'],
+                    inplace=True
+                )
 
             if format == 'json':
                 result = df.to_json(orient='records')

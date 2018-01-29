@@ -115,7 +115,7 @@ class TestApiView(TestCase):
         assert 'error_message' not in result
 
         for r in result:
-            assert 201701 <= r['se'] <= 201750
+            assert 201701 <= r['SE'] <= 201750
 
         # test csv format
         response = self.client.get(
@@ -131,7 +131,7 @@ class TestApiView(TestCase):
         self.assertEqual(response.status_code, 200)
         buffer = io.BytesIO(response.content)
         df = pd.read_csv(buffer)
-        assert all(201701 <= df['se']) and all(df['se'] <= 201750)
+        assert all(201701 <= df['SE']) and all(df['SE'] <= 201750)
 
 
 if __name__ == '__main__':
