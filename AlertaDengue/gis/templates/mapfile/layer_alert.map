@@ -1,6 +1,6 @@
 LAYER
     # %(date_time)s
-    NAME         "%(name)s"
+    NAME         "%(geocode)s"
     DATA         "%(geocode)s"
     STATUS       ON
     TYPE         POLYGON
