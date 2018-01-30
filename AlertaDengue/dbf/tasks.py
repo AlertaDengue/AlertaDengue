@@ -12,32 +12,40 @@ import shutil
 
 
 def send_success_email(dbf):
-    subject = "[InfoDengue] DBF enviado em {:%d/%m/%Y} importado com successo".format(
-            dbf.uploaded_at)
+    subject = ("[InfoDengue] DBF enviado em {:%d/%m/%Y} "
+               "importado com successo".format(dbf.uploaded_at))
     body = render_to_string("successful_import_email.txt",
-            context={"dbf": dbf})
+                            context={"dbf": dbf})
 
     message_data = (
-        (subject, body, settings.EMAIL_FROM_ADDRESS, [dbf.uploaded_by.email]),
-        (subject, body, settings.EMAIL_FROM_ADDRESS, [settings.INFODENGUE_TEAM_EMAIL])
+        (subject, body, settings.EMAIL_FROM_ADDRESS,
+         [dbf.uploaded_by.email]),
+        (subject, body, settings.EMAIL_FROM_ADDRESS,
+         [settings.INFODENGUE_TEAM_EMAIL])
     )
     send_mass_mail(message_data)
 
+
 def send_failure_email(dbf, message):
-    subject = "[InfoDengue] Falha ao importar DBF enviado em {:%d/%m/%Y}".format(
-            dbf.uploaded_at)
+    subject = ("[InfoDengue] Falha ao importar DBF enviado em "
+               "{:%d/%m/%Y}".format(dbf.uploaded_at))
     body = render_to_string("failed_import_email.txt",
-            context={"dbf": dbf, "error_message": message})
+                            context={"dbf": dbf, "error_message": message})
 
     message_data = (
-        (subject, body, settings.EMAIL_FROM_ADDRESS, [dbf.uploaded_by.email]),
-        (subject, body, settings.EMAIL_FROM_ADDRESS, [settings.INFODENGUE_TEAM_EMAIL])
+        (subject, body, settings.EMAIL_FROM_ADDRESS,
+         [dbf.uploaded_by.email]),
+        (subject, body, settings.EMAIL_FROM_ADDRESS,
+         [settings.INFODENGUE_TEAM_EMAIL])
     )
     send_mass_mail(message_data)
 
 
 def copy_file_to_final_destination(dbf):
-    new_filename = "{}_{}_{}_{}.dbf".format(dbf.state_abbreviation, dbf.municipio, dbf.export_date, dbf.notification_year)
+    new_filename = "{}_{}_{}_{}.dbf".format(dbf.state_abbreviation,
+                                            dbf.municipio,
+                                            dbf.export_date,
+                                            dbf.notification_year)
     src = dbf.file.path
     dest = os.path.join(settings.IMPORTED_FILES_DIR, new_filename)
     shutil.copy(src, dest)
