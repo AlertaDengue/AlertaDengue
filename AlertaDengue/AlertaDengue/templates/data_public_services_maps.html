@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load lookup %}
+
+{% block extra_head %}
+    <meta property="og:image"
+          content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+    <meta property="og:image:secure_url"
+          content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+
+    <script src="/static/js/infodengue.js"
+            type="text/javascript"></script>
+
+    <style type="text/css"></style>
+    <script></script>
+
+{% endblock %}
+{% block title %}Serviço de Dados Público{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+      <div class="col-md-12 column">
+          <a href="./maps">Serviço de Mapas</a>
+          <a href="./api">API</a>
+      </div>
+    </div>
+</div>
+{% endblock %}
