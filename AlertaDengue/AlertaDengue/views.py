@@ -1,4 +1,9 @@
 from django.views.generic.base import TemplateView
+# local
+from .settings import MAPSERVER_URL, STATIC_ROOT, STATICFILES_DIRS
+
+import json
+import os
 
 
 class MapaDengueView(TemplateView):
@@ -55,4 +60,45 @@ class PartnersPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(PartnersPageView, self).get_context_data(**kwargs)
+        return context
+
+
+class DataPublicServicesPageView(TemplateView):
+    template_name = 'data_public_services.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        service = kwargs['service']
+        service_type = (
+            None if 'service_type' not in kwargs else kwargs['service_type']
+        )
+
+        if service == 'maps':
+            _static_root = os.path.abspath(STATIC_ROOT)
+            _static_dirs = os.path.abspath(STATICFILES_DIRS[0])
+
+            path_root = (
+                _static_root if os.path.exists(_static_root) else
+                _static_dirs
+            )
+
+            geo_info_path = os.path.join(
+                path_root, 'geojson', 'geo_info.json'
+            )
+
+            with open(geo_info_path) as f:
+                context.update({
+                    'mapserver_url': MAPSERVER_URL,
+                    'geo_info': json.load(f)
+                })
+            self.template_name = 'data_public_services_maps.html'
+        elif service == 'api':
+            if service_type == 'notebook':
+                self.template_name = 'data_public_services_api_notebook.html'
+            else:
+                self.template_name = 'data_public_services_api.html'
+        else:
+            self.template_name = 'data_public_services.html'
+
         return context

@@ -7,7 +7,7 @@ from django.views.generic import RedirectView
 # local
 from .views import (
     AboutPageView, ContactPageView, JoininPageView, MapaDengueView,
-    MapaMosquitoView, PartnersPageView
+    MapaMosquitoView, PartnersPageView, DataPublicServicesPageView
 )
 
 admin.autodiscover()
@@ -28,6 +28,10 @@ urlpatterns = [
     url(r'^partners/$', PartnersPageView.as_view(), name='partners'),
     url(r'^accounts/profile/$', RedirectView.as_view(url="/")),
     url(r'^accounts/', include('django.contrib.auth.urls')),
+    url(
+        r'^data-public-services/(?P<service>maps|api)?',
+        DataPublicServicesPageView.as_view(), name="data_public_services"
+    ),
     # apps
     url(r'', include('dados.urls')),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

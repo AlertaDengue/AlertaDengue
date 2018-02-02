@@ -4,26 +4,1150 @@
 {% load lookup %}
 
 {% block extra_head %}
-    <meta property="og:image"
-          content="http://info.dengue.mat.br/static/img/screenshot.png"/>
-    <meta property="og:image:secure_url"
-          content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+<meta property="og:image"
+      content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+<meta property="og:image:secure_url"
+      content="https://info.dengue.mat.br/static/img/screenshot.png"/>
 
-    <script src="/static/js/infodengue.js"
-            type="text/javascript"></script>
+<script src="/static/js/infodengue.js"
+        type="text/javascript"></script>
 
-    <style type="text/css"></style>
-    <script></script>
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="/static/css/notebook.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS_HTML"></script>
+<!-- MathJax configuration -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+
+
+</script>
+<!-- End of mathjax configuration -->
 
 {% endblock %}
-{% block title %}Serviço de Dados Público - Mapas{% endblock %}
+{% block title %}{% trans "Serviços de Dados Público" %} - API{% endblock %}
 
 {% block content %}
 
 <div class="container">
     <div class="row">
-      <div class="col-md-12 column">
-      </div>
+        <div class="col-md-12 column">
+
+            <div tabindex="-1" id="notebook" class="border-box-sizing">
+                <div class="" id="notebook-container">
+
+                    <div class="cell border-box-sizing text_cell rendered">
+                        <div class="prompt input_prompt">
+                        </div>
+                        <div class="inner_cell">
+                            <div class="text_cell_render border-box-sizing rendered_html">
+                                <p>
+                                <h1>{% trans "Tabela de conteúdo" %}<span
+                                        class="tocSkip"></span></h1></p>
+                                <div class="toc" style="margin-top: 1em;">
+                                    <ul class="toc-item">
+                                        <li><span><a
+                                                href="#Consulta-de-dados-de-alertas-para-a-cidade-do-Rio-de-Janeiro"
+                                                data-toc-modified-id="Consulta-de-dados-de-alertas-para-a-cidade-do-Rio-de-Janeiro-1"><span
+                                                class="toc-item-num">1&nbsp;&nbsp;</span>Consulta de dados de alertas para a cidade do Rio de Janeiro</a></span>
+                                            <ul class="toc-item">
+                                                <li><span><a
+                                                        href="#Consulta-em-formato-CSV"
+                                                        data-toc-modified-id="Consulta-em-formato-CSV-1.1"><span
+                                                        class="toc-item-num">1.1&nbsp;&nbsp;</span>Consulta em formato CSV</a></span>
+                                                </li>
+                                                <li><span><a
+                                                        href="#Consulta-em-formato-JSON"
+                                                        data-toc-modified-id="Consulta-em-formato-JSON-1.2"><span
+                                                        class="toc-item-num">1.2&nbsp;&nbsp;</span>Consulta em formato JSON</a></span>
+                                                </li>
+                                                <li><span><a
+                                                        href="#Tratamento-de-Erros"
+                                                        data-toc-modified-id="Tratamento-de-Erros-1.3"><span
+                                                        class="toc-item-num">1.3&nbsp;&nbsp;</span>Tratamento de Erros</a></span>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cell border-box-sizing code_cell rendered">
+                        <div class="input">
+                            <div class="prompt input_prompt">In&nbsp;[1]:</div>
+                            <div class="inner_cell">
+                                <div class="input_area">
+                                    <div class=" highlight hl-ipython3"><pre><span></span><span
+                                            class="kn">import</span> <span
+                                            class="nn">pandas</span> <span
+                                            class="k">as</span> <span
+                                            class="nn">pd</span>
+</pre>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="cell border-box-sizing text_cell rendered">
+                        <div class="prompt input_prompt">
+                        </div>
+                        <div class="inner_cell">
+                            <div class="text_cell_render border-box-sizing rendered_html">
+                                <h1 id="AlertaDengue-API">AlertaDengue API<a
+                                        class="anchor-link"
+                                        href="#AlertaDengue-API">&#182;</a>
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cell border-box-sizing text_cell rendered">
+                        <div class="prompt input_prompt">
+                        </div>
+                        <div class="inner_cell">
+                            <div class="text_cell_render border-box-sizing rendered_html">
+                                <p>A API AlertaDengue foi desenhada para
+                                    atender às Secretarias de Saúde que
+                                    necessitam dos dados do sistema para a
+                                    integração em suas próprias rotinas.</p>
+                                <p>A API disponibiliza a seguinte
+                                    funcionalidade:</p>
+                                <ul>
+                                    <li>consulta de dados de alertas para a
+                                        cidade do Rio de Janeiro.
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cell border-box-sizing text_cell rendered">
+                        <div class="prompt input_prompt">
+                        </div>
+                        <div class="inner_cell">
+                            <div class="text_cell_render border-box-sizing rendered_html">
+                                <h2 id="Consulta-de-dados-de-alertas-para-a-cidade-do-Rio-de-Janeiro">
+                                    Consulta de dados de alertas para a cidade
+                                    do Rio de Janeiro<a class="anchor-link"
+                                                        href="#Consulta-de-dados-de-alertas-para-a-cidade-do-Rio-de-Janeiro">&#182;</a>
+                                </h2>
+                                <p>Esssa funcionalidade está disponível por
+                                    meio da URL:</p>
+
+                                <pre><code>https://info.dengue.mat.br/api/alertcity?&lt;PARAMETROS_DA_CONSULTA&gt;</code></pre>
+                                <p>Onde
+                                    <code>&lt;PARAMETROS_DA_CONSULTA&gt;</code>
+                                    deve conter os parâmetros:</p>
+                                <ul>
+                                    <li>geocode: código IBGE da cidade</li>
+                                    <li>disease: tipo de doença a ser
+                                        consultado
+                                        (str:dengue|chikungunya|zika)
+                                    </li>
+                                    <li>format: formato de saída dos dados
+                                        (str:json|csv)
+                                    </li>
+                                    <li>ew_start: semana epidemiológica de
+                                        início da consulta (int:1-53)
+                                    </li>
+                                    <li>ew_end: semana epidemiológica de final
+                                        da consulta (int:1-53)
+                                    </li>
+                                    <li>e_year: ano de referência da consulta
+                                        (int:0-9999)
+                                    </li>
+                                </ul>
+                                <p>Todos os parâmetros acima mencionados são
+                                    obrigatórios para a consulta.</p>
+                                <p>Abaixo, segue exemplo de requisição de
+                                    registros de dengue entre a
+                                    semana 1 e 50 do ano de 2017, em formato
+                                    <code>CSV</code>:</p>
+
+                                <pre><code>https://info.dengue.mat.br/api/alertcity?geocode=3304557&amp;disease=dengue&amp;format=csv&amp;ew_start=1&amp;ew_end=50&amp;e_year=2017</code></pre>
+                                <p>A continuação, seguem exemplos de uso da API
+                                    referente a funcionalidade descrita.</p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cell border-box-sizing text_cell rendered">
+                        <div class="prompt input_prompt">
+                        </div>
+                        <div class="inner_cell">
+                            <div class="text_cell_render border-box-sizing rendered_html">
+                                <h3 id="Consulta-em-formato-CSV">Consulta em
+                                    formato CSV<a class="anchor-link"
+                                                  href="#Consulta-em-formato-CSV">&#182;</a>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cell border-box-sizing code_cell rendered">
+                        <div class="input">
+                            <div class="prompt input_prompt">In&nbsp;[2]:</div>
+                            <div class="inner_cell">
+                                <div class="input_area">
+                                    <div class=" highlight hl-ipython3"><pre><span></span><span
+                                            class="c1"># 3304557 = Rio de Janeiro city geocode</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://localhost:8000/api/alertcity&#39;</span>
+<span class="n">search_filter</span> <span class="o">=</span> <span
+                                                class="p">(</span>
+    <span class="s1">&#39;geocode=3304557&amp;disease=dengue&amp;format=csv&amp;&#39;</span> <span
+                                                class="o">+</span>
+    <span class="s1">&#39;ew_start=1&amp;ew_end=50&amp;e_year=2017&#39;</span>
+<span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span
+                                                class="n">pd</span><span
+                                                class="o">.</span><span
+                                                class="n">read_csv</span><span
+                                                class="p">(</span><span
+                                                class="s1">&#39;</span><span
+                                                class="si">%s</span><span
+                                                class="s1">?</span><span
+                                                class="si">%s</span><span
+                                                class="s1">&#39;</span> <span
+                                                class="o">%</span> <span
+                                                class="p">(</span><span
+                                                class="n">url</span><span
+                                                class="p">,</span> <span
+                                                class="n">search_filter</span><span
+                                                class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">url</span><span
+                                                class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span
+                                                class="n">head</span><span
+                                                class="p">()</span>
+</pre>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="output_wrapper">
+                            <div class="output">
+
+
+                                <div class="output_area">
+
+                                    <div class="prompt"></div>
+
+
+                                    <div class="output_subarea output_stream output_stdout output_text">
+<pre>http://localhost:8000/api/alertcity
+</pre>
+                                    </div>
+                                </div>
+
+                                <div class="output_area">
+
+                                    <div class="prompt output_prompt">Out[2]:
+                                    </div>
+
+
+                                    <div class="output_html rendered_html output_subarea output_execute_result">
+                                        <div>
+                                            <style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+
+
+                                            </style>
+                                            <table border="1"
+                                                   class="dataframe">
+                                                <thead>
+                                                <tr style="text-align: right;">
+                                                    <th></th>
+                                                    <th>id</th>
+                                                    <th>aps</th>
+                                                    <th>se</th>
+                                                    <th>data</th>
+                                                    <th>tweets</th>
+                                                    <th>casos</th>
+                                                    <th>casos_est</th>
+                                                    <th>casos_estmin</th>
+                                                    <th>casos_estmax</th>
+                                                    <th>tmin</th>
+                                                    <th>rt</th>
+                                                    <th>prt1</th>
+                                                    <th>inc</th>
+                                                    <th>nivel</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <th>0</th>
+                                                    <td>190034</td>
+                                                    <td>2.1</td>
+                                                    <td>201724</td>
+                                                    <td>2017-06-11</td>
+                                                    <td>12</td>
+                                                    <td>1</td>
+                                                    <td>1.0</td>
+                                                    <td>1.0</td>
+                                                    <td>1.0</td>
+                                                    <td>18.8571</td>
+                                                    <td>0.349526</td>
+                                                    <td>0.137641</td>
+                                                    <td>0.180933</td>
+                                                    <td>1</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>1</th>
+                                                    <td>213390</td>
+                                                    <td>2.1</td>
+                                                    <td>201733</td>
+                                                    <td>2017-08-13</td>
+                                                    <td>13</td>
+                                                    <td>5</td>
+                                                    <td>5.0</td>
+                                                    <td>5.0</td>
+                                                    <td>5.0</td>
+                                                    <td>19.7143</td>
+                                                    <td>1.777530</td>
+                                                    <td>0.797493</td>
+                                                    <td>0.904665</td>
+                                                    <td>1</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>2</th>
+                                                    <td>217372</td>
+                                                    <td>2.1</td>
+                                                    <td>201734</td>
+                                                    <td>2017-08-20</td>
+                                                    <td>15</td>
+                                                    <td>2</td>
+                                                    <td>2.0</td>
+                                                    <td>2.0</td>
+                                                    <td>2.0</td>
+                                                    <td>18.2857</td>
+                                                    <td>0.664763</td>
+                                                    <td>0.311178</td>
+                                                    <td>0.361866</td>
+                                                    <td>1</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>3</th>
+                                                    <td>225358</td>
+                                                    <td>2.1</td>
+                                                    <td>201737</td>
+                                                    <td>2017-09-10</td>
+                                                    <td>12</td>
+                                                    <td>3</td>
+                                                    <td>3.0</td>
+                                                    <td>3.0</td>
+                                                    <td>3.0</td>
+                                                    <td>17.9714</td>
+                                                    <td>1.266840</td>
+                                                    <td>0.616171</td>
+                                                    <td>0.542799</td>
+                                                    <td>1</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>4</th>
+                                                    <td>229380</td>
+                                                    <td>2.1</td>
+                                                    <td>201738</td>
+                                                    <td>2017-09-17</td>
+                                                    <td>22</td>
+                                                    <td>4</td>
+                                                    <td>4.0</td>
+                                                    <td>4.0</td>
+                                                    <td>4.0</td>
+                                                    <td>18.3429</td>
+                                                    <td>1.820440</td>
+                                                    <td>0.783039</td>
+                                                    <td>0.723732</td>
+                                                    <td>1</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="cell border-box-sizing code_cell rendered">
+                        <div class="input">
+                            <div class="prompt input_prompt">In&nbsp;[3]:</div>
+                            <div class="inner_cell">
+                                <div class="input_area">
+                                    <div class=" highlight hl-ipython3"><pre><span></span><span
+                                            class="c1"># 4106902 = Curitiba city geocode</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://localhost:8000/api/alertcity&#39;</span>
+<span class="n">search_filter</span> <span class="o">=</span> <span
+                                                class="p">(</span>
+    <span class="s1">&#39;geocode=4106902&amp;disease=dengue&amp;format=csv&amp;&#39;</span> <span
+                                                class="o">+</span>
+    <span class="s1">&#39;ew_start=1&amp;ew_end=50&amp;e_year=2017&#39;</span>
+<span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span
+                                                class="n">pd</span><span
+                                                class="o">.</span><span
+                                                class="n">read_csv</span><span
+                                                class="p">(</span><span
+                                                class="s1">&#39;</span><span
+                                                class="si">%s</span><span
+                                                class="s1">?</span><span
+                                                class="si">%s</span><span
+                                                class="s1">&#39;</span> <span
+                                                class="o">%</span> <span
+                                                class="p">(</span><span
+                                                class="n">url</span><span
+                                                class="p">,</span> <span
+                                                class="n">search_filter</span><span
+                                                class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">url</span><span
+                                                class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span
+                                                class="n">head</span><span
+                                                class="p">()</span>
+</pre>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="output_wrapper">
+                            <div class="output">
+
+
+                                <div class="output_area">
+
+                                    <div class="prompt"></div>
+
+
+                                    <div class="output_subarea output_stream output_stdout output_text">
+<pre>http://localhost:8000/api/alertcity
+</pre>
+                                    </div>
+                                </div>
+
+                                <div class="output_area">
+
+                                    <div class="prompt output_prompt">Out[3]:
+                                    </div>
+
+
+                                    <div class="output_html rendered_html output_subarea output_execute_result">
+                                        <div>
+                                            <style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+
+
+                                            </style>
+                                            <table border="1"
+                                                   class="dataframe">
+                                                <thead>
+                                                <tr style="text-align: right;">
+                                                    <th></th>
+                                                    <th>data_iniSE</th>
+                                                    <th>SE</th>
+                                                    <th>casos_est</th>
+                                                    <th>casos_est_min</th>
+                                                    <th>casos_est_max</th>
+                                                    <th>casos</th>
+                                                    <th>p_rt1</th>
+                                                    <th>p_inc100k</th>
+                                                    <th>Localidade_id</th>
+                                                    <th>nivel</th>
+                                                    <th>id</th>
+                                                    <th>versao_modelo</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <th>0</th>
+                                                    <td>2017-10-08</td>
+                                                    <td>201741</td>
+                                                    <td>22.0</td>
+                                                    <td>22</td>
+                                                    <td>22</td>
+                                                    <td>22</td>
+                                                    <td>0.477252</td>
+                                                    <td>1.16156</td>
+                                                    <td>0</td>
+                                                    <td>1</td>
+                                                    <td>4106902020174117533
+                                                    </td>
+                                                    <td>2018-01-02</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>1</th>
+                                                    <td>2017-11-26</td>
+                                                    <td>201748</td>
+                                                    <td>20.0</td>
+                                                    <td>18</td>
+                                                    <td>21</td>
+                                                    <td>18</td>
+                                                    <td>0.265967</td>
+                                                    <td>1.05597</td>
+                                                    <td>0</td>
+                                                    <td>1</td>
+                                                    <td>4106902020174817533
+                                                    </td>
+                                                    <td>2018-01-02</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>2</th>
+                                                    <td>2017-01-01</td>
+                                                    <td>201701</td>
+                                                    <td>130.0</td>
+                                                    <td>130</td>
+                                                    <td>130</td>
+                                                    <td>130</td>
+                                                    <td>0.999967</td>
+                                                    <td>6.86379</td>
+                                                    <td>0</td>
+                                                    <td>1</td>
+                                                    <td>4106902020170117533
+                                                    </td>
+                                                    <td>2018-01-02</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>3</th>
+                                                    <td>2017-01-08</td>
+                                                    <td>201702</td>
+                                                    <td>142.0</td>
+                                                    <td>142</td>
+                                                    <td>142</td>
+                                                    <td>142</td>
+                                                    <td>0.997440</td>
+                                                    <td>7.49737</td>
+                                                    <td>0</td>
+                                                    <td>1</td>
+                                                    <td>4106902020170217533
+                                                    </td>
+                                                    <td>2018-01-02</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>4</th>
+                                                    <td>2017-01-15</td>
+                                                    <td>201703</td>
+                                                    <td>143.0</td>
+                                                    <td>143</td>
+                                                    <td>143</td>
+                                                    <td>143</td>
+                                                    <td>0.913890</td>
+                                                    <td>7.55017</td>
+                                                    <td>0</td>
+                                                    <td>1</td>
+                                                    <td>4106902020170317533
+                                                    </td>
+                                                    <td>2018-01-02</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="cell border-box-sizing text_cell rendered">
+                        <div class="prompt input_prompt">
+                        </div>
+                        <div class="inner_cell">
+                            <div class="text_cell_render border-box-sizing rendered_html">
+                                <h3 id="Consulta-em-formato-JSON">Consulta em
+                                    formato JSON<a class="anchor-link"
+                                                   href="#Consulta-em-formato-JSON">&#182;</a>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cell border-box-sizing code_cell rendered">
+                        <div class="input">
+                            <div class="prompt input_prompt">In&nbsp;[4]:</div>
+                            <div class="inner_cell">
+                                <div class="input_area">
+                                    <div class=" highlight hl-ipython3"><pre><span></span><span
+                                            class="c1"># 4106902 = Curitiba city geocode</span>
+<span class="n">search_filter</span> <span class="o">=</span> <span
+                                                class="p">(</span>
+    <span class="s1">&#39;geocode=4106902&amp;disease=dengue&amp;format=json&amp;&#39;</span> <span
+                                                class="o">+</span>
+    <span class="s1">&#39;ew_start=1&amp;ew_end=50&amp;e_year=2017&#39;</span>
+<span class="p">)</span>
+<span class="n">search_url</span> <span class="o">=</span> <span class="s1">&#39;</span><span
+                                                class="si">%s</span><span
+                                                class="s1">?</span><span
+                                                class="si">%s</span><span
+                                                class="s1">&#39;</span> <span
+                                                class="o">%</span> <span
+                                                class="p">(</span><span
+                                                class="n">url</span><span
+                                                class="p">,</span> <span
+                                                class="n">search_filter</span><span
+                                                class="p">)</span>
+
+<span class="n">df</span> <span class="o">=</span> <span
+                                                class="n">pd</span><span
+                                                class="o">.</span><span
+                                                class="n">read_json</span><span
+                                                class="p">(</span><span
+                                                class="n">search_url</span><span
+                                                class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span
+                                                class="n">search_url</span><span
+                                                class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span
+                                                class="n">head</span><span
+                                                class="p">()</span>
+</pre>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="output_wrapper">
+                            <div class="output">
+
+
+                                <div class="output_area">
+
+                                    <div class="prompt"></div>
+
+
+                                    <div class="output_subarea output_stream output_stdout output_text">
+<pre>http://localhost:8000/api/alertcity?geocode=4106902&amp;disease=dengue&amp;format=json&amp;ew_start=1&amp;ew_end=50&amp;e_year=2017
+</pre>
+                                    </div>
+                                </div>
+
+                                <div class="output_area">
+
+                                    <div class="prompt output_prompt">Out[4]:
+                                    </div>
+
+
+                                    <div class="output_html rendered_html output_subarea output_execute_result">
+                                        <div>
+                                            <style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+
+
+                                            </style>
+                                            <table border="1"
+                                                   class="dataframe">
+                                                <thead>
+                                                <tr style="text-align: right;">
+                                                    <th></th>
+                                                    <th>Localidade_id</th>
+                                                    <th>SE</th>
+                                                    <th>casos</th>
+                                                    <th>casos_est</th>
+                                                    <th>casos_est_max</th>
+                                                    <th>casos_est_min</th>
+                                                    <th>data_iniSE</th>
+                                                    <th>id</th>
+                                                    <th>nivel</th>
+                                                    <th>p_inc100k</th>
+                                                    <th>p_rt1</th>
+                                                    <th>versao_modelo</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <th>0</th>
+                                                    <td>0</td>
+                                                    <td>201741</td>
+                                                    <td>22</td>
+                                                    <td>22</td>
+                                                    <td>22</td>
+                                                    <td>22</td>
+                                                    <td>1507420800000</td>
+                                                    <td>4106902020174117533
+                                                    </td>
+                                                    <td>1</td>
+                                                    <td>1.16156</td>
+                                                    <td>0.477252</td>
+                                                    <td>2018-01-02</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>1</th>
+                                                    <td>0</td>
+                                                    <td>201748</td>
+                                                    <td>18</td>
+                                                    <td>20</td>
+                                                    <td>21</td>
+                                                    <td>18</td>
+                                                    <td>1511654400000</td>
+                                                    <td>4106902020174817533
+                                                    </td>
+                                                    <td>1</td>
+                                                    <td>1.05597</td>
+                                                    <td>0.265967</td>
+                                                    <td>2018-01-02</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>2</th>
+                                                    <td>0</td>
+                                                    <td>201701</td>
+                                                    <td>130</td>
+                                                    <td>130</td>
+                                                    <td>130</td>
+                                                    <td>130</td>
+                                                    <td>1483228800000</td>
+                                                    <td>4106902020170117533
+                                                    </td>
+                                                    <td>1</td>
+                                                    <td>6.86379</td>
+                                                    <td>0.999967</td>
+                                                    <td>2018-01-02</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>3</th>
+                                                    <td>0</td>
+                                                    <td>201702</td>
+                                                    <td>142</td>
+                                                    <td>142</td>
+                                                    <td>142</td>
+                                                    <td>142</td>
+                                                    <td>1483833600000</td>
+                                                    <td>4106902020170217533
+                                                    </td>
+                                                    <td>1</td>
+                                                    <td>7.49737</td>
+                                                    <td>0.997440</td>
+                                                    <td>2018-01-02</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>4</th>
+                                                    <td>0</td>
+                                                    <td>201703</td>
+                                                    <td>143</td>
+                                                    <td>143</td>
+                                                    <td>143</td>
+                                                    <td>143</td>
+                                                    <td>1484438400000</td>
+                                                    <td>4106902020170317533
+                                                    </td>
+                                                    <td>1</td>
+                                                    <td>7.55017</td>
+                                                    <td>0.913890</td>
+                                                    <td>2018-01-02</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="cell border-box-sizing code_cell rendered">
+                        <div class="input">
+                            <div class="prompt input_prompt">In&nbsp;[5]:</div>
+                            <div class="inner_cell">
+                                <div class="input_area">
+                                    <div class=" highlight hl-ipython3"><pre><span></span><span
+                                            class="c1"># 3304557 = Rio de Janeiro city geocode</span>
+<span class="n">search_filter</span> <span class="o">=</span> <span
+                                                class="p">(</span>
+    <span class="s1">&#39;geocode=3304557&amp;disease=dengue&amp;format=json&amp;&#39;</span> <span
+                                                class="o">+</span>
+    <span class="s1">&#39;ew_start=1&amp;ew_end=50&amp;e_year=2017&#39;</span>
+<span class="p">)</span>
+<span class="n">search_url</span> <span class="o">=</span> <span class="s1">&#39;</span><span
+                                                class="si">%s</span><span
+                                                class="s1">?</span><span
+                                                class="si">%s</span><span
+                                                class="s1">&#39;</span> <span
+                                                class="o">%</span> <span
+                                                class="p">(</span><span
+                                                class="n">url</span><span
+                                                class="p">,</span> <span
+                                                class="n">search_filter</span><span
+                                                class="p">)</span>
+
+<span class="n">df</span> <span class="o">=</span> <span
+                                                class="n">pd</span><span
+                                                class="o">.</span><span
+                                                class="n">read_json</span><span
+                                                class="p">(</span><span
+                                                class="n">search_url</span><span
+                                                class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span
+                                                class="n">search_url</span><span
+                                                class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span
+                                                class="n">head</span><span
+                                                class="p">()</span>
+</pre>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="output_wrapper">
+                            <div class="output">
+
+
+                                <div class="output_area">
+
+                                    <div class="prompt"></div>
+
+
+                                    <div class="output_subarea output_stream output_stdout output_text">
+<pre>http://localhost:8000/api/alertcity?geocode=3304557&amp;disease=dengue&amp;format=json&amp;ew_start=1&amp;ew_end=50&amp;e_year=2017
+</pre>
+                                    </div>
+                                </div>
+
+                                <div class="output_area">
+
+                                    <div class="prompt output_prompt">Out[5]:
+                                    </div>
+
+
+                                    <div class="output_html rendered_html output_subarea output_execute_result">
+                                        <div>
+                                            <style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+
+
+                                            </style>
+                                            <table border="1"
+                                                   class="dataframe">
+                                                <thead>
+                                                <tr style="text-align: right;">
+                                                    <th></th>
+                                                    <th>aps</th>
+                                                    <th>casos</th>
+                                                    <th>casos_est</th>
+                                                    <th>casos_estmax</th>
+                                                    <th>casos_estmin</th>
+                                                    <th>data</th>
+                                                    <th>id</th>
+                                                    <th>inc</th>
+                                                    <th>nivel</th>
+                                                    <th>prt1</th>
+                                                    <th>rt</th>
+                                                    <th>se</th>
+                                                    <th>tmin</th>
+                                                    <th>tweets</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <th>0</th>
+                                                    <td>2.1</td>
+                                                    <td>1</td>
+                                                    <td>1</td>
+                                                    <td>1</td>
+                                                    <td>1</td>
+                                                    <td>1497139200000</td>
+                                                    <td>190034</td>
+                                                    <td>0.180933</td>
+                                                    <td>1</td>
+                                                    <td>0.137641</td>
+                                                    <td>0.349526</td>
+                                                    <td>201724</td>
+                                                    <td>18.8571</td>
+                                                    <td>12</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>1</th>
+                                                    <td>2.1</td>
+                                                    <td>5</td>
+                                                    <td>5</td>
+                                                    <td>5</td>
+                                                    <td>5</td>
+                                                    <td>1502582400000</td>
+                                                    <td>213390</td>
+                                                    <td>0.904665</td>
+                                                    <td>1</td>
+                                                    <td>0.797493</td>
+                                                    <td>1.777530</td>
+                                                    <td>201733</td>
+                                                    <td>19.7143</td>
+                                                    <td>13</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>2</th>
+                                                    <td>2.1</td>
+                                                    <td>2</td>
+                                                    <td>2</td>
+                                                    <td>2</td>
+                                                    <td>2</td>
+                                                    <td>1503187200000</td>
+                                                    <td>217372</td>
+                                                    <td>0.361866</td>
+                                                    <td>1</td>
+                                                    <td>0.311178</td>
+                                                    <td>0.664763</td>
+                                                    <td>201734</td>
+                                                    <td>18.2857</td>
+                                                    <td>15</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>3</th>
+                                                    <td>2.1</td>
+                                                    <td>3</td>
+                                                    <td>3</td>
+                                                    <td>3</td>
+                                                    <td>3</td>
+                                                    <td>1505001600000</td>
+                                                    <td>225358</td>
+                                                    <td>0.542799</td>
+                                                    <td>1</td>
+                                                    <td>0.616171</td>
+                                                    <td>1.266840</td>
+                                                    <td>201737</td>
+                                                    <td>17.9714</td>
+                                                    <td>12</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>4</th>
+                                                    <td>2.1</td>
+                                                    <td>4</td>
+                                                    <td>4</td>
+                                                    <td>4</td>
+                                                    <td>4</td>
+                                                    <td>1505606400000</td>
+                                                    <td>229380</td>
+                                                    <td>0.723732</td>
+                                                    <td>1</td>
+                                                    <td>0.783039</td>
+                                                    <td>1.820440</td>
+                                                    <td>201738</td>
+                                                    <td>18.3429</td>
+                                                    <td>22</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="cell border-box-sizing text_cell rendered">
+                        <div class="prompt input_prompt">
+                        </div>
+                        <div class="inner_cell">
+                            <div class="text_cell_render border-box-sizing rendered_html">
+                                <h3 id="Tratamento-de-Erros">Tratamento de
+                                    Erros<a class="anchor-link"
+                                            href="#Tratamento-de-Erros">&#182;</a>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cell border-box-sizing code_cell rendered">
+                        <div class="input">
+                            <div class="prompt input_prompt">In&nbsp;[6]:</div>
+                            <div class="inner_cell">
+                                <div class="input_area">
+                                    <div class=" highlight hl-ipython3"><pre><span></span><span
+                                            class="n">params</span> <span
+                                            class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;disease=dengue&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;geocode=3304557&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;format=csv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ew_start=1&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ew_end=50&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;e_year=2017&#39;</span>
+<span class="p">]</span>
+
+<span class="n">search_filter</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">sep</span> <span class="o">=</span> <span
+                                                class="s1">&#39;&#39;</span>
+<span class="k">for</span> <span class="n">param</span> <span
+                                                class="ow">in</span> <span
+                                                class="n">params</span><span
+                                                class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span> <span
+                                                class="o">*</span> <span
+                                                class="mi">80</span><span
+                                                class="p">)</span>
+
+    <span class="n">search_filter</span> <span class="o">+=</span> <span
+                                                class="n">sep</span> <span
+                                                class="o">+</span> <span
+                                                class="n">param</span>
+    <span class="n">url_search</span> <span class="o">=</span> <span
+                                                class="s1">&#39;</span><span
+                                                class="si">%s</span><span
+                                                class="s1">?</span><span
+                                                class="si">%s</span><span
+                                                class="s1">&#39;</span> <span
+                                                class="o">%</span> <span
+                                                class="p">(</span><span
+                                                class="n">url</span><span
+                                                class="p">,</span> <span
+                                                class="n">search_filter</span><span
+                                                class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">url_search</span><span
+                                                class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span
+                                                class="n">pd</span><span
+                                                class="o">.</span><span
+                                                class="n">read_csv</span><span
+                                                class="p">(</span><span
+                                                class="n">url_search</span><span
+                                                class="p">)</span>
+    <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;&amp;&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span
+                                                class="n">df</span><span
+                                                class="o">.</span><span
+                                                class="n">head</span><span
+                                                class="p">())</span>
+</pre>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="output_wrapper">
+                            <div class="output">
+
+
+                                <div class="output_area">
+
+                                    <div class="prompt"></div>
+
+
+                                    <div class="output_subarea output_stream output_stdout output_text">
+<pre>--------------------------------------------------------------------------------
+http://localhost:8000/api/alertcity?
+Empty DataFrame
+Columns: [[EE] error_message: Disease sent is empty.]
+Index: []
+--------------------------------------------------------------------------------
+http://localhost:8000/api/alertcity?&amp;disease=dengue
+Empty DataFrame
+Columns: [[EE] error_message: GEO-Code sent is empty.]
+Index: []
+--------------------------------------------------------------------------------
+http://localhost:8000/api/alertcity?&amp;disease=dengue&amp;geocode=3304557
+Empty DataFrame
+Columns: [[EE] error_message: Format sent is empty.]
+Index: []
+--------------------------------------------------------------------------------
+http://localhost:8000/api/alertcity?&amp;disease=dengue&amp;geocode=3304557&amp;format=csv
+Empty DataFrame
+Columns: [[EE] error_message: Epidemic start week sent is empty.]
+Index: []
+--------------------------------------------------------------------------------
+http://localhost:8000/api/alertcity?&amp;disease=dengue&amp;geocode=3304557&amp;format=csv&amp;ew_start=1
+Empty DataFrame
+Columns: [[EE] error_message: Epidemic end week sent is empty.]
+Index: []
+--------------------------------------------------------------------------------
+http://localhost:8000/api/alertcity?&amp;disease=dengue&amp;geocode=3304557&amp;format=csv&amp;ew_start=1&amp;ew_end=50
+Empty DataFrame
+Columns: [[EE] error_message: Epidemic year sent is empty.]
+Index: []
+--------------------------------------------------------------------------------
+http://localhost:8000/api/alertcity?&amp;disease=dengue&amp;geocode=3304557&amp;format=csv&amp;ew_start=1&amp;ew_end=50&amp;e_year=2017
+       id  aps      se        data  tweets  casos  casos_est  casos_estmin  \
+0  190034  2.1  201724  2017-06-11      12      1        1.0           1.0
+1  213390  2.1  201733  2017-08-13      13      5        5.0           5.0
+2  217372  2.1  201734  2017-08-20      15      2        2.0           2.0
+3  225358  2.1  201737  2017-09-10      12      3        3.0           3.0
+4  229380  2.1  201738  2017-09-17      22      4        4.0           4.0
+
+   casos_estmax     tmin        rt      prt1       inc  nivel
+0           1.0  18.8571  0.349526  0.137641  0.180933      1
+1           5.0  19.7143  1.777530  0.797493  0.904665      1
+2           2.0  18.2857  0.664763  0.311178  0.361866      1
+3           3.0  17.9714  1.266840  0.616171  0.542799      1
+4           4.0  18.3429  1.820440  0.783039  0.723732      1
+</pre>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

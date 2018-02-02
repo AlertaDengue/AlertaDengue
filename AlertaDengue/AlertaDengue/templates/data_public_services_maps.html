@@ -4,28 +4,188 @@
 {% load lookup %}
 
 {% block extra_head %}
-    <meta property="og:image"
-          content="http://info.dengue.mat.br/static/img/screenshot.png"/>
-    <meta property="og:image:secure_url"
-          content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+<meta property="og:image"
+      content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+<meta property="og:image:secure_url"
+      content="https://info.dengue.mat.br/static/img/screenshot.png"/>
 
-    <script src="/static/js/infodengue.js"
-            type="text/javascript"></script>
+<script src="/static/js/infodengue.js"
+        type="text/javascript"></script>
 
-    <style type="text/css"></style>
-    <script></script>
+<style type="text/css">
+    .form .col-head {
+        text-align: right;
+        font-weight: bold;
+        vertical-align: middle;
+    }
+
+    .form .row {
+        padding: 5px;
+    }
+
+    .word-break {
+        word-break: break-all;
+    }
+
+</style>
+<script></script>
 
 {% endblock %}
-{% block title %}Serviço de Dados Público{% endblock %}
+{% block title %}{% trans "Serviços de Dados Público" %} - {% trans "Mapas" %}{% endblock %}
 
 {% block content %}
 
 <div class="container">
-    <div class="row">
-      <div class="col-md-12 column">
-          <a href="./maps">Serviço de Mapas</a>
-          <a href="./api">API</a>
-      </div>
+    <div class="form">
+        <div class="row">
+            <div class="col-md-3 column col-head">
+                {% trans "Código IBGE" %}:
+            </div>
+            <div class="col-md-3 column">
+                <input type="text" id="geocode" maxlength="7"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 column col-head">
+                {% trans "Mapa" %}:
+            </div>
+            <div class="col-md-5 column">
+                <select id="map">
+                    <option value="/maps/alert/dengue.map">
+                        {% trans "Alerta Dengue" %}
+                    </option>
+                    <option value="/maps/alert/chikungunya.map">
+                        {% trans "Alerta Chikungunya" %}
+                    </option>
+                    <option value="/maps/alert/zika.map">
+                        {% trans "Alerta Zika" %}
+                    </option>
+                    <option value="/maps/meteorological/ndvi.map">
+                        {% trans "NDVI" %}
+                    </option>
+                    <option value="/maps/meteorological/lst_day_1km.map">
+                        {% trans "LST Dia" %}
+                    </option>
+                    <option value="/maps/meteorological/lst_night_1km.map">
+                        {% trans "LST Noite" %}
+                    </option>
+                    <option value="/maps/meteorological/relative_humidity_2m_above_ground.map">
+                        {% trans "Umidade Relativa" %}
+                    </option>
+                    <option value="/maps/meteorological/specific_humidity_2m_above_ground.map">
+                        {% trans "Umidade Específica" %}
+                    </option>
+                    <option value="/maps/meteorological/precipitation">
+                        {% trans "Precipitação" %}
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3 column col-head">
+                {% trans "Tipo de imagem de saída" %}:
+            </div>
+            <div class="col-md-3 column">
+                <select id="image-format">
+                    <option value="png">PNG</option>
+                    <option value="GTiff">GeoTIFF</option>
+                    <option value="kml">KML</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3 column col-head">
+                <select id="dimension-name">
+                    <option value="width">Width (px)</option>
+                    <option value="height">Height (px)</option>
+                </select>
+            </div>
+            <div class="col-md-3 column">
+                <input id="dimension-value" value="800"
+                       maxlength="6"
+                       max="999999"/>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 column col-head">
+                <input type="button"
+                       value='{% trans "Gerar URL do serviço" %}'
+                       onclick="generate_url();"
+                />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 column" id="message-url">
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+    var geo_info = {{geo_info|safe}};
+
+    function generate_url() {
+        var url = (
+            '{{mapserver_url}}/?map=<map>&' +
+            'SERVICE=WMS&' +
+            'VERSION=1.3.0&'+
+            'REQUEST=GetMap&' +
+            'LAYERS=<geocode>&' +
+            'CRS=CRS:84&' +
+            'BBOX=<bbox>&' +
+            'WIDTH=<width>&' +
+            'HEIGHT=<height>&' +
+            'FORMAT=<image-format>'
+        );
+        var geocode = $('#geocode').val();
+
+        if (!(geocode in geo_info)) {
+            return alert('Código IBGE não encontrado.');
+        }
+
+        var dimension_name = $('#dimension-name option:selected').val();
+        var dimension_value = parseInt($('#dimension-value').val());
+        // parse to int
+        $('#dimension-value').val(dimension_value);
+
+        if (!dimension_value > 0) {
+            return alert('Informe uma valor > 0 para o campo ' + dimension_name);
+        }
+
+        var geo_info_i = geo_info[geocode];
+        var bounds = geo_info_i['bounds'][0] + ',' +
+            geo_info_i['bounds'][1] + ',' +
+            geo_info_i['bounds'][2] + ',' +
+            geo_info_i['bounds'][3];
+        var width = geo_info_i['width'];
+        var height = geo_info_i['height'];
+
+        var width_i;
+        var height_i;
+        var factor;
+
+        if (dimension_name == 'width') {
+            factor = height/width;
+            width_i = dimension_value;
+            height_i = dimension_value*factor;
+        } else {
+            factor = width/height;
+            width_i = dimension_value*factor;
+            height_i = dimension_value;
+        }
+
+        url = url.replace('<map>', $('#map option:selected').val());
+        url = url.replace('<geocode>', geocode);
+        url = url.replace('<bbox>', bounds);
+        url = url.replace('<width>', width_i);
+        url = url.replace('<height>', height_i);
+        url = url.replace('<image-format>', $('#image-format option:selected').val());
+
+        $('#message-url').html('<a href="' + url + '" class="word-break">' + url + '</a>');
+    }
+</script>
 {% endblock %}

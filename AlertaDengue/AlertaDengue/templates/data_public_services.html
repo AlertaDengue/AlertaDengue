@@ -4,54 +4,30 @@
 {% load lookup %}
 
 {% block extra_head %}
-    <meta property="og:image"
-          content="http://info.dengue.mat.br/static/img/screenshot.png"/>
-    <meta property="og:image:secure_url"
-          content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+<meta property="og:image"
+      content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+<meta property="og:image:secure_url"
+      content="https://info.dengue.mat.br/static/img/screenshot.png"/>
 
-    <script src="/static/js/infodengue.js"
-            type="text/javascript"></script>
+<script src="/static/js/infodengue.js"
+        type="text/javascript"></script>
 
-    <style type="text/css"></style>
-    <script></script>
+<style type="text/css"></style>
+<script></script>
 
 {% endblock %}
-{% block title %}Parceiros{% endblock %}
+{% block title %}{% trans "Serviços de Dados Público" %}{% endblock %}
 
 {% block content %}
 
 <div class="container">
     <div class="row">
-      <div class="col-md-1 column"></div>
-      <div class="col-md-2 column">
-          <img src="/static/img/ufmg.jpg" alt="UFMG"
-               width="120px"
-               title="UFMG" class="logos">
-      </div>
-      <div class="col-md-2 column">
-          <img src="/static/img/UFPR.jpeg" alt="UFPR"
-               width="120px"
-               title="UFPR" class="logos">
-      </div>
-      <div class="col-md-2 column">
-          <img src="/static/img/logo_sms.jpg"
-               alt="Secretaria Municipal de Saúde do Rio de Janeiro"
-               width="150px"
-               title="Secretaria Municipal de Saúde do Rio de Janeiro"
-               class="logos">
-      </div>
-      <div class="col-md-2 column">
-          <img src="/static/img/ses-rj-2015.png" alt="SES" ,
-               width="120px"
-               title="Secretaria de Estado de Saúde"
-               class="logos">
-      </div>
-      <div class="col-md-2 column">
-          <img src="/static/img/1746.jpg" alt="1746"
-               width="120px"
-               title="1746" class="logos">
-      </div>
-      <div class="col-md-1 column"></div>
+        <div class="col-md-12 column">
+            <ul>
+                <li><h3><a href="./maps">Serviço de Mapas</a></h3></li>
+                <li><h3><a href="./api">API</a></h3></li>
+            </ul>
+        </div>
     </div>
 </div>
 {% endblock %}
