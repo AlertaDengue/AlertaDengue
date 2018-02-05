@@ -17,9 +17,8 @@ try:
 except:
     url_admin = url(r'^admin/', include(admin.site.urls))  # django old version
 
-
 urlpatterns = [
-    # local
+  # local
     url(r'^mapadengue/$', MapaDengueView.as_view(), name='mapadengue'),
     url(r'^mapamosquito/$', MapaMosquitoView.as_view(), name='mapamosquito'),
     url(r'^informacoes/$', AboutPageView.as_view(), name='about'),
@@ -29,8 +28,14 @@ urlpatterns = [
     url(r'^accounts/profile/$', RedirectView.as_view(url="/")),
     url(r'^accounts/', include('django.contrib.auth.urls')),
     url(
-        r'^data-public-services/(?P<service>maps|api)?',
-        DataPublicServicesPageView.as_view(), name="data_public_services"
+        r'^data-public-services/(?P<service>maps|api)?$',
+        DataPublicServicesPageView.as_view(),
+        name="data_public_services"
+    ),
+    url(
+        r'^data-public-services/(?P<service>maps)/(?P<service_type>doc)$',
+        DataPublicServicesPageView.as_view(),
+        name="data_public_services"
     ),
     # apps
     url(r'', include('dados.urls')),
@@ -39,4 +44,3 @@ urlpatterns = [
     url(r'^dbf/', include('dbf.urls')),
     url(r'^api/', include('api.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-

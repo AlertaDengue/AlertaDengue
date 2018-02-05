@@ -75,24 +75,27 @@ class DataPublicServicesPageView(TemplateView):
         )
 
         if service == 'maps':
-            _static_root = os.path.abspath(STATIC_ROOT)
-            _static_dirs = os.path.abspath(STATICFILES_DIRS[0])
+            if service_type is None:
+                _static_root = os.path.abspath(STATIC_ROOT)
+                _static_dirs = os.path.abspath(STATICFILES_DIRS[0])
 
-            path_root = (
-                _static_root if os.path.exists(_static_root) else
-                _static_dirs
-            )
+                path_root = (
+                    _static_root if os.path.exists(_static_root) else
+                    _static_dirs
+                )
 
-            geo_info_path = os.path.join(
-                path_root, 'geojson', 'geo_info.json'
-            )
+                geo_info_path = os.path.join(
+                    path_root, 'geojson', 'geo_info.json'
+                )
 
-            with open(geo_info_path) as f:
-                context.update({
-                    'mapserver_url': MAPSERVER_URL,
-                    'geo_info': json.load(f)
-                })
-            self.template_name = 'data_public_services_maps.html'
+                with open(geo_info_path) as f:
+                    context.update({
+                        'mapserver_url': MAPSERVER_URL,
+                        'geo_info': json.load(f)
+                    })
+                self.template_name = 'data_public_services_maps.html'
+            else:
+                self.template_name = 'data_public_services_maps_doc.html'
         elif service == 'api':
             if service_type == 'notebook':
                 self.template_name = 'data_public_services_api_notebook.html'

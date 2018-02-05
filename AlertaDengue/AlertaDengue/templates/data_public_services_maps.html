@@ -27,16 +27,29 @@
         word-break: break-all;
     }
 
+
+
+
 </style>
 <script></script>
 
 {% endblock %}
-{% block title %}{% trans "Serviços de Dados Público" %} - {% trans "Mapas" %}{% endblock %}
+{% block title %}{% trans "Serviços de Dados Públicos" %}: {% trans "Mapas" %}{% endblock %}
 
 {% block content %}
 
+
 <div class="container">
+
     <div class="form">
+        <div class="row">
+            <div class="col-md-12 column">
+                <a href="/data-public-services/maps/doc">
+                    {% trans "Para mais informações, acesse a documentação do serviço de mapas." %}
+                </a>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-3 column col-head">
                 {% trans "Código IBGE" %}:
@@ -187,5 +200,8 @@
 
         $('#message-url').html('<a href="' + url + '" class="word-break">' + url + '</a>');
     }
+
+
+
 </script>
 {% endblock %}
