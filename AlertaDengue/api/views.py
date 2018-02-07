@@ -1,5 +1,4 @@
-from datetime import datetime
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse
 from django.views.generic.base import View
 
 # local

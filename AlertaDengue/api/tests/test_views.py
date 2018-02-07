@@ -1,5 +1,4 @@
 from django.test import TestCase
-from unittest.mock import patch
 
 try:
     from django.urls import reverse  # django 2
@@ -20,10 +19,11 @@ import unittest
 
 
 class TestApiView(TestCase):
+    """
+
+    """
     def setUp(self):
         settings.DATA_DIR = os.path.dirname(__file__)
-
-
 
     def test_notification_reduced_csv_view(self):
         """
