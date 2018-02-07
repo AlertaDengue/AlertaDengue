@@ -46,7 +46,7 @@ class NotificationReducedCSV_View(View, _GetMethod):
         """
         self.request = request
 
-        state_name = self._get('state_abv').upper()
+        state_name = self._get('state_abv', default='').upper()
 
         if state_name not in self._state_name:
             return HttpResponse(
