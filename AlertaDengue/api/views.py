@@ -46,7 +46,14 @@ class NotificationReducedCSV_View(View, _GetMethod):
         """
         self.request = request
 
-        uf = self._state_name[self._get('state_abv')]
+        state_name = self._get('state_abv').upper()
+
+        if state_name not in self._state_name:
+            return HttpResponse(
+                'ERROR: STATE NOT FOUND.', content_type="text/plain"
+            )
+
+        uf = self._state_name[state_name]
 
         chart_type = self._get('chart_type')
 
