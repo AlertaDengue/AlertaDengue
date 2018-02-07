@@ -49,7 +49,9 @@ class NotificationReducedCSV_View(View, _GetMethod):
 
         if state_name not in self._state_name:
             return HttpResponse(
-                'ERROR: STATE NOT FOUND', content_type="text/plain",
+                'ERROR: The parameter state_abv not found. ' +
+                'This parameter should have 2 letter (e.g. RJ).',
+                content_type="text/plain",
                 status=404
             )
 

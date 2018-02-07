@@ -49,7 +49,11 @@ class TestApiView(TestCase):
             }
         )
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.content, b'ERROR: STATE NOT FOUND')
+        self.assertEqual(
+            response.content,
+            b'ERROR: The parameter state_abv not found. ' +
+            b'This parameter should have 2 letter (e.g. RJ).'
+        )
 
     def test_alert_rj(self):
         geocode = MRJ_GEOCODE
