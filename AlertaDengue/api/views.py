@@ -50,7 +50,7 @@ class NotificationReducedCSV_View(View, _GetMethod):
 
         if state_name not in self._state_name:
             return HttpResponse(
-                'ERROR: STATE NOT FOUND.', content_type="text/plain"
+                'ERROR: STATE NOT FOUND', content_type="text/plain"
             )
 
         uf = self._state_name[state_name]
