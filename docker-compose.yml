@@ -52,18 +52,3 @@ services:
             - ${DOCKER_HOST_TIFFS_DIR}:/tiffs:ro
             - ${DOCKER_HOST_LOG_DIR}:/maplog:ro
         restart: always
-
-    staging_mapserver:
-        build:
-            context: "."
-            dockerfile: "Dockerfile-mapserver"
-        ports:
-            - 7777:80
-        env_file:
-            - .env
-        volumes:
-            - ${DOCKER_HOST_MAPFILES_DIR}:/maps:ro
-            - ${DOCKER_HOST_SHAPEFILES_DIR}:/shapefiles:ro
-            - ${DOCKER_HOST_TIFFS_DIR}:/tiffs:ro
-            - ${DOCKER_HOST_LOG_DIR}:/maplog:ro
-        restart: always
