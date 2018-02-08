@@ -141,7 +141,7 @@ class MapFile:
     def prepare_folders(self):
         # check if mapserver folder exists
         if not os.path.exists(self.path['local_mapfile_dir']):
-            os.mkdir(self.path['local_mapfile_dir'])
+            os.makedirs(self.path['local_mapfile_dir'], exist_ok=True)
 
         # check if mapserver conf folder exists
         mapserver_conf_dir_path = os.path.join(
@@ -162,7 +162,7 @@ class MapFile:
 
     def create_layer(self, layer_conf: dict):
         if not os.path.exists(layer_conf['dir_path']):
-            os.makedirs(layer_conf['dir_path'])
+            os.makedirs(layer_conf['dir_path'], exist_ok=True)
 
         layer_path = os.path.join(
             layer_conf['dir_path'], layer_conf['file_name']
