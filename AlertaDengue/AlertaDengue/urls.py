@@ -6,8 +6,8 @@ from django.conf.urls.static import static
 from django.views.generic import RedirectView
 # local
 from .views import (
-    AboutPageView, ContactPageView, JoininPageView, MapaDengueView,
-    MapaMosquitoView, PartnersPageView, DataPublicServicesPageView
+    AboutPageView, ContactPageView, JoininPageView,
+    PartnersPageView, DataPublicServicesPageView
 )
 
 admin.autodiscover()
@@ -19,8 +19,6 @@ except:
 
 urlpatterns = [
   # local
-    url(r'^mapadengue/$', MapaDengueView.as_view(), name='mapadengue'),
-    url(r'^mapamosquito/$', MapaMosquitoView.as_view(), name='mapamosquito'),
     url(r'^informacoes/$', AboutPageView.as_view(), name='about'),
     url(r'^contato/$', ContactPageView.as_view(), name='contact'),
     url(r'^participe/$', JoininPageView.as_view(), name='joinin'),
@@ -35,7 +33,7 @@ urlpatterns = [
     url(
         r'^data-public-services/(?P<service>maps)/(?P<service_type>doc)$',
         DataPublicServicesPageView.as_view(),
-        name="data_public_services"
+        name="data_public_services_type"
     ),
     # apps
     url(r'', include('dados.urls')),

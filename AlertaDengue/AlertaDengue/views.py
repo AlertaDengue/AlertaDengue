@@ -6,22 +6,6 @@ import json
 import os
 
 
-class MapaDengueView(TemplateView):
-    template_name = 'mapadengue.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(MapaDengueView, self).get_context_data(**kwargs)
-        return context
-
-
-class MapaMosquitoView(TemplateView):
-    template_name = 'mapamosquito.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(MapaMosquitoView, self).get_context_data(**kwargs)
-        return context
-
-
 class AboutPageView(TemplateView):
     template_name = 'about.html'
 
