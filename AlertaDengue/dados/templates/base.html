@@ -60,15 +60,15 @@
                             </button>
                             <div class="collapse navbar-collapse">
                                 <ul class="nav navbar-nav">
-                                    <li><a href="{% url 'dados:main' %}">
+                                    <li class="py-2"><a href="{% url 'dados:main' %}">
                                         {% trans "Início" %}</a></li>
-                                    <li><a href="{% url 'about' %}">
+                                    <li class="py-2"><a href="{% url 'about' %}">
                                         {% trans "Saiba Mais" %}</a></li>
-                                    <li><a href="{% url 'contact' %}">
+                                    <li class="py-2"><a href="{% url 'contact' %}">
                                         {% trans "Fale Conosco" %}</a></li>
-                                    <li><a href="{% url 'joinin' %}">
+                                    <li class="py-2"><a href="{% url 'joinin' %}">
                                         {% trans "Participe" %}</a></li>
-                                    <li><a href="{% url 'partners' %}">
+                                    <li class="py-2"><a href="{% url 'partners' %}">
                                         {% trans "Parceiros" %}</a></li>
                                     <li style="overflow: visible">
                                         <div id="remote" class="twitter-typeahead"
@@ -81,10 +81,10 @@
                                         </div>
                                     </li>
                                     {% if user.is_authenticated %}
-                                        <li><a href="{% url 'dbf:upload' %}">
+                                        <li class="py-2"><a href="{% url 'dbf:upload' %}">
                                             {% trans "Envie dados atualizados" %}
                                         </a></li>
-                                        <li class="dropdown">
+                                        <li class="dropdown py-2">
                                             <a href="#" class="dropdown-toggle"
                                                data-toggle="dropdown">
                                                 {% trans "Account " %}
@@ -100,7 +100,7 @@
                                             </ul>
                                         </li>
                                     {% else %}
-                                        <li><a href="{% url 'login' %}">
+                                        <li class="py-2"><a href="{% url 'login' %}">
                                             {% trans "Login" %}
                                         </a></li>
                                     {% endif %}
@@ -150,7 +150,7 @@
     <!-- Begin page content -->
 
     <div class="container">
-        <div class="page-header">
+        <div class="page-header my-4">
             <h3>{% block title %}(no title){% endblock %}</h3>
         </div>
         {% bootstrap_messages %}
