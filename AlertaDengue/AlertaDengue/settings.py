@@ -53,7 +53,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'leaflet',
-    'bootstrap3',
+    'bootstrap4',
     'chunked_upload',
     'dados',
     'gis',
@@ -291,7 +291,7 @@ RASTER_METEROLOGICAL_FACTOR_INCREASE = config(
     'RASTER_METEROLOGICAL_FACTOR_INCREASE', default=4
 )
 
-BOOTSTRAP3 = {
+BOOTSTRAP4 = {
     'form_renderers': {
         'default': 'dbf.forms.FormRendererWithHiddenFieldErrors',
     }
