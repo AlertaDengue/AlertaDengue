@@ -17,6 +17,10 @@ class City(models.Model):
         db_column='nome', null=False, max_length=128,
         help_text=_('Nome do municipio')
     )
+    state = models.CharField(
+        db_column='uf', null=False, max_length=20,
+        help_text=_('Nome do estado')
+    )
 
     class Meta:
         db_table = 'Dengue_global\".\"Municipio'

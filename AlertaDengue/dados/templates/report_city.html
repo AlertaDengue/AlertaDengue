@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block extra_head %}
+<style>
+      .box {
+        border: 1px #dfdfdf solid;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+
+</style>
+
+{% endblock %}
+
+{% block title %}{% trans "Situação das Arboviroses em " %} {{city_name}} -
+{{state_name}} {% endblock %}
+
+{% block content %}
+
+<!--
+# ---------------------------------
+# 	CAIXA LATERAL - PRIMEIRA PAGINA
+# ---------------------------------
+-->
+<div class="row">
+  <div class="col-md-4">
+    <div class="box">
+      <h4>Boletim Semanal - Semana {{e_week}} de {{year}}</h4>
+      <hr/>
+      <a href="#tables">Tabelas</a><br/>
+      <a href="#color-code">Código de Cores</a><br/>
+      <a href="#var-tables">Variáveis nas Tabelas</a><br/>
+      <a href="#notes">Notas</a><br/>
+      <a href="#credits">Créditos</a><br/>
+      <hr/>
+      <a href="#contact">Contato</a><br/>
+    </div>
+  </div>
+
+  <div class="col-md-8">
+
+    <!--
+    # ----------------------
+    #	MAIN BODY - FIRST PAGE
+    # ----------------------
+    -->
+
+    Desde o início do ano, {{totanomun}} casos de dengue, {{totanomunC}} de
+    chikungunya e {{totanomunZ}} de Zika foram registrados na cidade.
+
+    <h4>Situação da Dengue</h4>
+
+    <p>
+      A figura abaixo mostra a situação da dengue nos últimos dois anos. (TOPO)
+      em preto, os casos suspeitos de dengue e em verde, a dengue mencionada em
+      rede social; (MEIO) Variável meteorológica
+      utilizada para análise da receptividade da cidade, valores acima do
+      limiar (linha horizontal) indicam condições favoraveis à transmissão.
+      (BAIXO) histórico do alerta de dengue na cidade (ver
+      <a href="#color-code">código de cores</a>).
+    </p>
+    <img src="data:image/png;base64,{{chart_city_dengue}}" alt="chart_city_dengue"/>
+
+    <!--
+    # ----------------------------------
+    # Pagina com figura para chikungunya
+    # ----------------------------------
+    -->
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <h4>Situação da Chikungunya</h4>
+
+    <p>
+      A figura abaixo mostra a situação da chikungunya nos últimos dois anos.
+      (TOPO) em preto, os casos suspeitos relatados (MEIO) Variável
+      meteorológica utilizada para análise da receptividade da cidade,
+      valores acima do limiar (linha horizontal) indicam condições favoraveis à
+      transmissão (mesmo indicador usado na dengue). (BAIXO) histórico do
+      alerta de chikungunya na cidade
+      (ver <a href="#color-code">código de cores</a>).
+    </p>
+    <img src="data:image/png;base64,{{chart_city_chik}}"/>
+
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <!--
+    # ---------------------------
+    # Pagina com figura para zika
+    # ---------------------------
+    -->
+
+    <h4>Situação da Zika</h4>
+    <p>
+      A figura abaixo mostra a situação da zika nos últimos dois anos. (TOPO)
+      em preto, os casos suspeitos relatados (MEIO) Variável meteorológica
+      utilizada para análise da receptividade da cidade, valores acima do
+      limiar (linha horizontal) indicam condições favoraveis à transmissão
+      (mesmo indicador usado na dengue). (BAIXO) histórico do alerta de zika na
+      cidade (ver <a href="#color-code">código de cores</a>).
+    </p>
+
+    <img src="data:image/png;base64,{{chart_city_zika}}"/>
+
+  </div>
+</div>
+<div class="row">
+  <div id="tables" class="col-md-12">
+
+    <!--
+    # -----------------
+    # Pagina com tabela
+    # -----------------
+    -->
+
+    <h3>Resumo das últimas semanas epidemiológicas</h3>
+
+    <h4>Situação da dengue no município</h4>
+
+    {{df_dengue|safe}}
+
+    <h4>Situação da chikungunya no município.</h4>
+    {{df_chik|safe}}
+
+    <!--
+    # ------------------------
+    # Pagina com tabela (cont)
+    # ------------------------
+    -->
+
+    <h4>Situação da zika no município.</h4>
+    {{df_zika|safe}}
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-2"></div>
+  <div id="color-code" class="col-md-8 box">
+    <!--
+    # ---------------------
+    # BOX - CODIGO DE CORES
+    # ---------------------
+    -->
+
+    <h4>O código de Cores</h4>
+
+    As cores indicam niveis de atenção
+
+    <ul>
+      <li class="bullet-green">
+        <strong>Verde:</strong> condições climáticas desfavoráveis, seja
+        por baixa temperatura ou baixa umidade, e baixa incidência de casos.
+      </li>
+      <li class="bullet-yellow">
+        <strong>Amarelo:</strong> condições climáticas propícias para
+        aumento da população do vetor e transmissão de arboviroses.
+      </li>
+      <li class="bullet-orange">
+        <strong>Laranja:</strong> transmissão aumentada e sustentada
+        da arbovirose.
+      </li>
+      <li class="bullet-red">
+        <strong>Vermelho:</strong> incidência alta, acima dos 90%
+        históricos.
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="row">
+  <div id="var-tables" class="col-md-12">
+    <!--
+    # ----------------------------------------
+    # Variáves nas Tabelas, Créditos e Contato
+    # ----------------------------------------
+    -->
+
+    <h4>Lista das variáveis apresentadas nas tabelas</h4>
+
+    <ul>
+      <li><strong>SE:</strong> semana epidemiológica</li>
+      <li><strong>temperatura:</strong>
+        média das temperaturas mínimas da semana (em graus centígrados)
+      </li>
+      <li><strong>umid.max:</strong>
+        média da umidade relativa máxima da semana</li>
+      <li><strong>tweet:</strong>
+        número de tweets indicativos de casos de dengue na cidade.
+        Por enquanto só há para dengue.
+      </li>
+      <li><strong>casos notif:</strong>
+        casos notificados de dengue , zika ou chikungunya</li>
+      <li><strong>incidência:</strong>
+        casos notificados dividido pela população (por 100.000)
+      </li>
+      <li><strong>casos máximos:</strong>
+        estimativa do número de casos esperado para a semana,
+        com base no perfil de atraso de notificação do município.
+      </li>
+      <li><strong>pr(inc subir):</strong>
+        probabilidade de aumento de incidência. Acima de 90%
+        é um indicador importante para o alerta laranja.
+      </li>
+      <li><strong>nivel:</strong>
+        cor do alerta (verde, amarelo, laranja, vermelho)</li>
+    </ul>
+  </div>
+</div>
+<div class="row">
+  <div id="notes" class="col-md-12">
+    <h4>Notas</h4>
+
+    <ul>
+      <li>Os dados do sinan mais recentes ainda não foram totalmente digitados.
+        Estimamos o número esperado de casos notificados considerando o tempo
+        até
+        os casos serem digitados.
+      <li>Os dados de tweets são gerados pelo Observatório de Dengue (UFMG). Os
+        tweets são processados para exclusão de informes e outros temas
+        relacionados a dengue.
+      <li>Algumas vezes, os casos da última semana ainda não estao disponíveis,
+        nesse caso, usa-se uma estimação com base na tendência de variação da
+        série.
+    </ul>
+  </div>
+</div>
+<div class="row">
+  <div id="credits" class="col-md-12">
+    <h4>Créditos</h4>
+
+    Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como
+    parceira entre:
+
+    <ul>
+      <li>Programa de Computação Científica, Fundação Oswaldo Cruz, Rio de
+        Janeiro.
+      </li>
+      <li>Escola de Matemática Aplicada, Fundação Getúlio Vargas.</li>
+      <li>Secretaria Estadual de Saúde do {{state_name}}.</li>
+      <li>Observatório de Dengue da UFMG.</li>
+    </ul>
+  </div>
+</div>
+<div class="row">
+  <div id="contact" class="col-md-12">
+    <h4>Contato</h4>
+    Para mais detalhes sobre o sistema de alerta InfoDengue, consultar:
+    <a href="http://info.dengue.mat.br">http://info.dengue.mat.br</a>
+  </div>
+</div>
+
+<!--
+<div class="row">
+  <div class="col-md-12">
+    <!--
+    # -------------------------------------------------
+    # SEGUNDA PAGINA: CAIXA LATERAL - INDICE MUNICIPIOS
+    # -------------------------------------------------
+    -- >
+
+    <!-- <a name="cities"><h3>Municipios</h3></a> -- >
+    <!--
+    ###<<r,echo=FALSE,results=tex>>=
+    ####coresbullets = c(verde='\\gsquare',amarelo='\\ysquare',
+    ####                 laranja='\\osquare',vermelho='\\rsquare')
+    ###
+    ####for (j in 1:dim(env$municip.reg)[1]) {
+    ####  nivel = env$tabelao$Nivel[env$tabelao$Municipio==env$municip.reg$nome[j]]
+    ####  corbullet = '\\wsquare'
+    ####  if(!is.na(nivel)) corbullet = coresbullets[nivel]
+    ####  cat(paste(corbullet,env$municip.reg$nome[j],'\n'))
+    ####}
+    ###@
+
+    #\end{itemize}
+    #\BackToContents
+    # fim do box e minipage
+    #\end{mdframed}\hfill
+    #\end{minipage}#  End of the sidebar mini page
+    #\newpage
+    -- >
+
+  </div>
+</div>
+-->
+
+{% endblock %}

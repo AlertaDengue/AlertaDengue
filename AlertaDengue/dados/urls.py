@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .views import (
     DetailsPageView, SinanCasesView, AlertaMRJPageView,
     AlertaGeoJSONView, AlertaMunicipioPageView, get_municipio, AlertaMainView,
-    AlertaStateView, GeoTiffView, GeoJsonView
+    AlertaStateView, GeoTiffView, GeoJsonView, ReportCityView
 )
 
 
@@ -31,6 +31,11 @@ app_name = "dados"
 __disease = '(?P<disease>dengue|chikungunya|zika)'
 __state = '(?P<state>CE|ES|MG|PR|RJ)'
 __geocode = '(?P<geocodigo>\d{7})'
+__geocode_ = '(?P<geocode>\d{7})'
+__year = '(?P<year>\d{4})'
+__month = '(?P<month>\d{2})'
+__day = '(?P<day>\d{2})'
+__e_week = '(?P<e_week>\d{2})'
 
 urlpatterns = [
     url(r'^$', AlertaMainView.as_view(), name='main'),
@@ -52,4 +57,6 @@ urlpatterns = [
         GeoTiffView.as_view(), name='geotiff'),
     url(r'^geojson/%s/%s/$' % (__geocode, __disease),
         GeoJsonView.as_view(), name='geojson'),
+    url(r'^report/city/%s/%s/%s/$' % (__geocode_, __year, __e_week),
+        ReportCityView.as_view(), name='report_city'),
 ]

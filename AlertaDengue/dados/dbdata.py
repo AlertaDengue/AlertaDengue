@@ -71,17 +71,29 @@ def get_disease_suffix(disease: str):
     )
 
 
-def get_cities() -> dict:
+def get_cities(regional_name: str=None, state_name: str=None) -> dict:
     """
     Get a list of cities from available states with code and name pairs
     :return:
     """
     with db_engine.connect() as conn:
-        state_names = [
-            "'%s'" % state_name for state_name in STATE_NAME.values()
-        ]
+        if regional_name is not None:
+            sql = '''
+                SELECT municipio_geocodigo, nome, nome_regional, uf
+                FROM \"Dengue_global\".\"Municipio\"
+                INNER JOIN \"Dengue_global\".regional_saude
+                ON municipio_geocodigo = geocodigo
+                where uf = '%s' AND nome_regional = '%s'
+            ''' % (state_name, regional_name)
+        else:
+            if state_name is None:
+                state_names = [
+                    "'%s'" % state_name for state_name in STATE_NAME.values()
+                ]
+            else:
+                state_names = ["'%s'" % state_name]
 
-        sql = '''
+            sql = '''
             SELECT geocodigo, nome
             FROM "Dengue_global"."Municipio"
             WHERE uf IN(%s)

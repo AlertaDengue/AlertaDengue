@@ -9,21 +9,24 @@ from django.http import HttpResponse
 from time import mktime
 from collections import defaultdict, OrderedDict
 # local
+from .report import get_chart_info_city_base64
 from . import dbdata, models as M
 from .dbdata import Forecast, MRJ_GEOCODE, CID10
 from .episem import episem
 from .maps import get_city_info
+from .report import get_chart_info_city_base64
+from .models import City
 from gis.geotiff import convert_from_shapefile
 
-import random
-import fiona
-import json
-import os
 import datetime
-import numpy as np
-import locale
+import fiona
 import geojson
-
+import json
+import locale
+import numpy as np
+import os
+import pandas as pd
+import random
 
 DBF = apps.get_model('dbf', 'DBF')
 
@@ -794,3 +797,58 @@ class GeoJsonView(View):
         )
 
         return response
+
+
+class ReportCityView(TemplateView):
+    template_name = 'report_city.html'
+
+    def get_context_data(self, **kwargs):
+        """
+
+        :param kwargs:
+        :return:
+        """
+        context = super(ReportCityView, self).get_context_data(**kwargs)
+
+        geocode = context['geocode']
+        e_week = context['e_week']
+        year = context['year']
+
+        city = City.objects.get(pk=int(geocode))
+
+        df_dengue = pd.DataFrame({
+            'a': np.random.randint(0, 100, 52),
+            'b': np.random.randint(0, 100, 52)
+        })
+        df_chik = pd.DataFrame({
+            'a': np.random.randint(0, 100, 52),
+            'b': np.random.randint(0, 100, 52)
+        })
+        df_zika = pd.DataFrame({
+            'a': np.random.randint(0, 100, 52),
+            'b': np.random.randint(0, 100, 52)
+        })
+
+        chart_city_dengue = get_chart_info_city_base64(
+            df_dengue, {}
+        )
+
+        chart_city_chik = get_chart_info_city_base64(
+            df_chik, {}
+        )
+
+        chart_city_zika= get_chart_info_city_base64(
+            df_zika, {}
+        )
+
+        context.update({
+            'city_name': city.name,
+            'state_name': city.state,
+            'df_dengue': df_dengue.to_html(classes="table table-striped"),
+            'df_chik': df_chik.to_html(classes="table table-striped"),
+            'df_zika': df_zika.to_html(classes="table table-striped"),
+            'chart_city_dengue': chart_city_dengue,
+            'chart_city_chik': chart_city_chik,
+            'chart_city_zika': chart_city_zika
+        })
+        return context
