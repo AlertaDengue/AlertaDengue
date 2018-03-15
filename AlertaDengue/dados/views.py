@@ -816,37 +816,212 @@ class ReportCityView(TemplateView):
 
         city = City.objects.get(pk=int(geocode))
 
-        df_dengue = pd.DataFrame({
-            'a': np.random.randint(0, 100, 52),
-            'b': np.random.randint(0, 100, 52)
-        })
-        df_chik = pd.DataFrame({
-            'a': np.random.randint(0, 100, 52),
-            'b': np.random.randint(0, 100, 52)
-        })
-        df_zika = pd.DataFrame({
-            'a': np.random.randint(0, 100, 52),
-            'b': np.random.randint(0, 100, 52)
-        })
+        k = [
+            'umid_max',
+            'n_tweets',
+            'casos',
+            'p_inc100k',
+            'casos_est',
+            'p_rt1',
+            'nivel'
+        ]
 
-        chart_city_dengue = get_chart_info_city_base64(
-            df_dengue, {}
-        )
+        df_dengue = pd.read_sql(
+            '''
+            SELECT
+                NULL AS umid_max,
+                hist."SE",
+                tweets.n_tweets,
+                hist.casos,
+                hist.p_rt1,
+                hist.casos_est,
+                hist.p_inc100k,
+                (CASE 
+                   WHEN hist.nivel=1 THEN 'verde'
+                   WHEN hist.nivel=2 THEN 'amarelo'
+                   WHEN hist.nivel=3 THEN 'laranja'
+                   WHEN hist.nivel=4 THEN 'vermelho'
+                   ELSE '-'    
+                 END) AS nivel
+            FROM 
+              "Municipio"."Historico_alerta" AS hist
+              LEFT JOIN (
+                SELECT 
+                  epi_week(data_dia) AS "SE", 
+                  SUM(numero) as n_tweets,
+                  "Municipio_geocodigo"
+                FROM "Municipio"."Tweet"
+                WHERE "Municipio_geocodigo" = %(geocode)s
+                  AND "CID10_codigo" = '%(disease_code)s'
+                  AND epi_week(data_dia) <= %(year)s%(week)s
+                GROUP BY "SE", "Municipio_geocodigo"
+                ORDER BY "SE" DESC
+              ) AS tweets
+                ON (
+                  "Municipio_geocodigo"="municipio_geocodigo"
+                  AND tweets."SE"=hist."SE"
+                )
+            WHERE 
+              hist."SE" <= %(year)s%(week)s
+              AND municipio_geocodigo=%(geocode)s
+            ORDER BY "SE" DESC
+            LIMIT 16
+            ''' % {
+                'year': year,
+                'week': e_week,
+                'geocode': geocode,
+                'disease_code': 'A90'
+            }, index_col='SE', con=dbdata.db_engine
+        )[k]
 
-        chart_city_chik = get_chart_info_city_base64(
-            df_chik, {}
-        )
+        df_dengue.n_tweets = df_dengue.n_tweets.round(0)
+        df_dengue.p_rt1 = (df_dengue.p_rt1*100).round(0).astype(int)
+        df_dengue.casos_est = df_dengue.casos_est.round(0).astype(int)
+        df_dengue.p_inc100k = df_dengue.p_inc100k.round(0).astype(int)
+        df_dengue.sort_index(ascending=True, inplace=True)
 
-        chart_city_zika= get_chart_info_city_base64(
-            df_zika, {}
+        df_dengue.rename({
+            'umid_max': 'umid.max',
+            'p_inc100k': 'incidência',
+            'casos': 'casos notif.',
+            'n_tweets': 'tweets',
+            'p_rt1': 'pr(incid. subir)'
+        }, axis=1, inplace=True)
+
+        k = [
+            'umid_max',
+            'casos',
+            'p_inc100k',
+            'casos_est',
+            'p_rt1',
+            'nivel'
+        ]
+
+        df_chik = pd.read_sql(
+            '''
+            SELECT
+                NULL AS umid_max,
+                hist."SE",
+                hist.casos,
+                hist.p_rt1,
+                hist.casos_est,
+                hist.p_inc100k,
+                (CASE 
+                   WHEN hist.nivel=1 THEN 'verde'
+                   WHEN hist.nivel=2 THEN 'amarelo'
+                   WHEN hist.nivel=3 THEN 'laranja'
+                   WHEN hist.nivel=4 THEN 'vermelho'
+                   ELSE '-'    
+                 END) AS nivel
+            FROM 
+              "Municipio"."Historico_alerta_chik" AS hist
+            WHERE 
+              hist."SE" <= %(year)s%(week)s
+              AND municipio_geocodigo=%(geocode)s
+            ORDER BY "SE" DESC
+            LIMIT 16
+            ''' % {
+                'year': year,
+                'week': e_week,
+                'geocode': geocode,
+            }, index_col='SE', con=dbdata.db_engine
+        )[k]
+
+        df_chik.p_rt1 = (df_chik.p_rt1 * 100).round(0).astype(int)
+        df_chik.casos_est = df_chik.casos_est.round(0).astype(int)
+        df_chik.p_inc100k = df_chik.p_inc100k.round(0).astype(int)
+        df_chik.sort_index(ascending=True, inplace=True)
+
+        df_chik.rename({
+            'umid_max': 'umid.max',
+            'p_inc100k': 'incidência',
+            'casos': 'casos notif.',
+            'p_rt1': 'pr(incid. subir)'
+        }, axis=1, inplace=True)
+
+        k = [
+            'umid_max',
+            'casos',
+            'p_inc100k',
+            'casos_est',
+            'p_rt1',
+            'nivel'
+        ]
+
+        df_zika = pd.read_sql(
+            '''
+            SELECT
+                NULL AS umid_max,
+                hist."SE",
+                hist.casos,
+                hist.p_rt1,
+                hist.casos_est,
+                hist.p_inc100k,
+                (CASE 
+                   WHEN hist.nivel=1 THEN 'verde'
+                   WHEN hist.nivel=2 THEN 'amarelo'
+                   WHEN hist.nivel=3 THEN 'laranja'
+                   WHEN hist.nivel=4 THEN 'vermelho'
+                   ELSE '-'    
+                 END) AS nivel
+            FROM 
+              "Municipio"."Historico_alerta_zika" AS hist
+            WHERE 
+              hist."SE" <= %(year)s%(week)s
+              AND municipio_geocodigo=%(geocode)s
+            ORDER BY "SE" DESC
+            LIMIT 16
+            ''' % {
+                'year': year,
+                'week': e_week,
+                'geocode': geocode,
+            }, index_col='SE', con=dbdata.db_engine
+        )[k]
+
+        df_zika.p_rt1 = (df_zika.p_rt1 * 100).round(0).astype(int)
+        df_zika.casos_est = df_zika.casos_est.round(0).astype(int)
+        df_zika.p_inc100k = df_zika.p_inc100k.round(0).astype(int)
+        df_zika.sort_index(ascending=True, inplace=True)
+
+        df_zika.rename({
+            'umid_max': 'umid.max',
+            'p_inc100k': 'incidência',
+            'casos': 'casos notif.',
+            'p_rt1': 'pr(incid. subir)'
+        }, axis=1, inplace=True)
+
+        if not df_dengue.empty:
+            chart_city_dengue = get_chart_info_city_base64(
+                df_dengue, {}
+            )
+        else:
+            chart_city_dengue = ''
+
+        if not df_chik.empty:
+            chart_city_chik = get_chart_info_city_base64(
+                df_chik, {}
+            )
+        else:
+            chart_city_chik = ''
+
+        if not df_zika.empty:
+            chart_city_zika= get_chart_info_city_base64(
+                df_zika, {}
+            )
+        else:
+            chart_city_zika = ''
+
+        s = dict(
+            na_rep='',
+            float_format=lambda x: ('%d' % x) if not np.isnan(x) else ''
         )
 
         context.update({
             'city_name': city.name,
             'state_name': city.state,
-            'df_dengue': df_dengue.to_html(classes="table table-striped"),
-            'df_chik': df_chik.to_html(classes="table table-striped"),
-            'df_zika': df_zika.to_html(classes="table table-striped"),
+            'df_dengue': df_dengue.to_html(classes="table table-striped", **s),
+            'df_chik': df_chik.to_html(classes="table table-striped", **s),
+            'df_zika': df_zika.to_html(classes="table table-striped", **s),
             'chart_city_dengue': chart_city_dengue,
             'chart_city_chik': chart_city_chik,
             'chart_city_zika': chart_city_zika
