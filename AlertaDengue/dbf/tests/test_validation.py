@@ -49,6 +49,14 @@ class DBFValidationTest(TestCase):
         with self.assertRaises(ValidationError):
             is_valid_dbf(missing_column_file, 2016)
 
+    def test_ID_MUNICIP_can_be_called_ID_MN_RESI(self):
+        """
+        The ID_MUNICIP collumn can also be named ID_MN_RESI
+        """
+
+        mn_resid_file = self._get_file_from_filename("id_mn_resi.dbf")
+        self.assertTrue(is_valid_dbf(mn_resid_file, 2016))
+
     def test_can_receive_file_with_name_that_does_not_exist(self):
         """
         This is a regression test. We had an error because we were testing this
