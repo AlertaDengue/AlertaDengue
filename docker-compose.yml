@@ -18,6 +18,10 @@ services:
             - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
         volumes:
             - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+            - ${DOCKER_HOST_MAPFILES_DIR}:/srv/deploy/maps
+            - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/AlertaDengue/static/shapefile
+            - ${DOCKER_HOST_TIFFS_DIR}:/srv/deploy/tiffs
+            - ${DOCKER_HOST_LOG_DIR}:/var/log/mapserver
         restart: always
 
     rabbitmq:
@@ -48,7 +52,7 @@ services:
             - .env
         volumes:
             - ${DOCKER_HOST_MAPFILES_DIR}:/maps:ro
-            - ${DOCKER_HOST_SHAPEFILES_DIR}:/shapefiles:ro
+            - ${DOCKER_HOST_SHAPEFILES_DIR}:/shapefile:ro
             - ${DOCKER_HOST_TIFFS_DIR}:/tiffs:ro
             - ${DOCKER_HOST_LOG_DIR}:/maplog:ro
         restart: always

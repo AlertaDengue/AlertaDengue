@@ -1,4 +1,3 @@
-from datetime import datetime
 from django.http import HttpResponse
 from django.views.generic.base import View
 
@@ -46,7 +45,17 @@ class NotificationReducedCSV_View(View, _GetMethod):
         """
         self.request = request
 
-        uf = self._state_name[self._get('state_abv')]
+        state_name = self._get('state_abv', default='').upper()
+
+        if state_name not in self._state_name:
+            return HttpResponse(
+                'ERROR: The parameter state_abv not found. ' +
+                'This parameter must have 2 letters (e.g. RJ).',
+                content_type="text/plain",
+                status=404
+            )
+
+        uf = self._state_name[state_name]
 
         chart_type = self._get('chart_type')
 
