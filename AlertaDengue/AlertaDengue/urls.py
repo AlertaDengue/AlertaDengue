@@ -4,11 +4,6 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic import RedirectView
-# local
-from .views import (
-    AboutPageView, ContactPageView, JoininPageView,
-    PartnersPageView, DataPublicServicesPageView
-)
 
 admin.autodiscover()
 
@@ -18,23 +13,8 @@ except:
     url_admin = url(r'^admin/', include(admin.site.urls))  # django old version
 
 urlpatterns = [
-  # local
-    url(r'^informacoes/$', AboutPageView.as_view(), name='about'),
-    url(r'^contato/$', ContactPageView.as_view(), name='contact'),
-    url(r'^participe/$', JoininPageView.as_view(), name='joinin'),
-    url(r'^partners/$', PartnersPageView.as_view(), name='partners'),
     url(r'^accounts/profile/$', RedirectView.as_view(url="/")),
     url(r'^accounts/', include('django.contrib.auth.urls')),
-    url(
-        r'^data-public-services/(?P<service>maps|api)?$',
-        DataPublicServicesPageView.as_view(),
-        name="data_public_services"
-    ),
-    url(
-        r'^data-public-services/(?P<service>maps)/(?P<service_type>doc)$',
-        DataPublicServicesPageView.as_view(),
-        name="data_public_services_type"
-    ),
     # apps
     url(r'', include('dados.urls')),
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
