@@ -29,7 +29,8 @@ geodjango.db
 chunked_uploads
 authorized_keys
 Dockerfile-dev
-*.dbf
+/AlertaDengue/*.dbf
+/*.dbf
 *.egg-info
 /dev_dump/
 /dist/
