@@ -7,10 +7,6 @@ from dados.dbdata import (
 )
 
 from .geodf import extract_boundaries
-from .geotiff import (
-    get_key_from_file_name, get_date_from_file_name,
-    mask_raster_with_shapefile
-)
 from .settings import *
 
 import geopandas as gpd
@@ -82,7 +78,7 @@ class MapFile:
         'wgs84': pyproj.Proj("+init=EPSG:4326"),
         'grs80': pyproj.Proj("+init=EPSG:2154")
     }
-    crs_proj_country = 'epsg:2154'
+    crs_proj_country = 'epsg:4326'
     wms_srs_country = crs_proj_country.upper()
 
     # boundaries in epsg:2154
@@ -121,7 +117,7 @@ class MapFile:
             'local_mapfile_dir': MAPFILE_PATH,
             'mapserver_error': MAPSERVER_LOG_PATH,
             'mapserver_cgi': MAPSERVER_URL + '?map=map.map&',
-            'mapserver_shapefile_dir': '/shapefiles',
+            'mapserver_shapefile_dir': '/shapefile',
             'mapserver_mapfile_dir': '/maps'
         }
 
@@ -142,13 +138,10 @@ class MapFile:
 
         self.extent_country = stringfy_boundaries(bounds=self.bounds, sep=' ')
 
-    def prepare_images(self):
-        pass
-
     def prepare_folders(self):
         # check if mapserver folder exists
         if not os.path.exists(self.path['local_mapfile_dir']):
-            os.mkdir(self.path['local_mapfile_dir'])
+            os.makedirs(self.path['local_mapfile_dir'], exist_ok=True)
 
         # check if mapserver conf folder exists
         mapserver_conf_dir_path = os.path.join(
@@ -164,13 +157,12 @@ class MapFile:
 
     def create_files(self):
         self.prepare_folders()
-        self.prepare_images()
         self.create_layers()
         self.create_map()
 
     def create_layer(self, layer_conf: dict):
         if not os.path.exists(layer_conf['dir_path']):
-            os.makedirs(layer_conf['dir_path'])
+            os.makedirs(layer_conf['dir_path'], exist_ok=True)
 
         layer_path = os.path.join(
             layer_conf['dir_path'], layer_conf['file_name']
@@ -416,63 +408,6 @@ class MapFileMeteorological(MapFile):
             'cgi_path': self.path['mapserver_cgi'],
             'shape_dir_path': self.path['mapserver_shapefile_dir'],
         })
-
-    def prepare_images(self):
-        """
-        Create raster images by city using as mask a shapefile and background
-        a raster file of the whole country.
-
-        Each city can have raster file for datetime regards the datetime from
-        the original file (whole country).
-
-        :return:
-        """
-        path_search = os.path.join(
-            self.path['raster_dir'],
-            'meteorological', 'country', self.map_class, '*'
-        )
-
-        for raster_input_file_path in glob(path_search, recursive=True):
-            raster_name = raster_input_file_path.split(os.sep)[-1]
-
-            # filter by tiff format
-            if not raster_name[-3:] == 'tif':
-                continue
-
-            # filter by date
-            raster_date = get_date_from_file_name(raster_name)
-            if self.date_start is not None and raster_date < self.date_start:
-                continue
-
-            for geocode, city_name in get_cities().items():
-                shapefile_path = os.path.join(
-                    SHAPEFILE_PATH, '%s.shp' % geocode
-                )
-
-                raster_output_dir_path = os.path.join(
-                    RASTER_PATH, 'meteorological', 'city', self.map_class,
-                    str(geocode)
-                )
-
-                # create output path if not exists
-                if not os.path.exists(raster_output_dir_path):
-                    os.mkdir(raster_output_dir_path)
-
-                raster_output_file_path = os.path.join(
-                    raster_output_dir_path,
-                    '%s.tif' % raster_date.strftime('%Y%m%d')
-                )
-
-                # filter if shapefile exists
-                if not os.path.exists(shapefile_path):
-                    continue
-
-                # apply mask on raster using shapefile by city
-                mask_raster_with_shapefile(
-                    shapefile_path=shapefile_path,
-                    raster_input_file_path=raster_input_file_path,
-                    raster_output_file_path=raster_output_file_path
-                )
 
     def create_layers(self):
         data_range = RASTER_METEROLOGICAL_DATA_RANGE[self.map_class]

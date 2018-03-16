@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .views import (
     DetailsPageView, SinanCasesView, AlertaMRJPageView,
     AlertaGeoJSONView, AlertaMunicipioPageView, get_municipio, AlertaMainView,
-    AlertaStateView, NotificationReducedCSV_View, GeoTiffView, GeoJsonView
+    AlertaStateView, GeoTiffView, GeoJsonView
 )
 
 
@@ -48,9 +48,6 @@ urlpatterns = [
         login_required(AlertaGeoJSONView.as_view()), name='alerta-layer'),
     url(r'^getcity/$', get_municipio, name='get_city'),
     url(r'^sinan/(\d{4})/(\d{1,2})', SinanCasesView.as_view(), name='sinan'),
-    url(r'^csv/notif_reduced$',
-        NotificationReducedCSV_View.as_view(),
-        name='notif_reduced'),
     url(r'^geotiff/%s/%s/$' % (__geocode, __disease),
         GeoTiffView.as_view(), name='geotiff'),
     url(r'^geojson/%s/%s/$' % (__geocode, __disease),

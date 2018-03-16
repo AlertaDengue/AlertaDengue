@@ -62,7 +62,7 @@ function plot_chart_age(data_male, data_female) {
 
 $(document).ready(function () {
     // Create the chart
-    var url = '/csv/notif_reduced?chart_type=age_gender' +
+    var url = '/api/notif_reduced?chart_type=age_gender' +
         '&diseases={{disease_label}}' +
         '&state_abv=' + state_abv;
 

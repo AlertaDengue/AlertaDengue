@@ -2,10 +2,18 @@ from datetime import datetime
 from django.test import TestCase
 from glob import glob
 # local
-from .. import geotiff
+from ..geotiff import (
+    get_date_from_file_name,
+    get_key_from_file_name,
+    mask_raster_with_shapefile,
+    increase_resolution
+)
 from .. import settings
 
 import os
+import numpy as np
+import rasterio
+import shutil
 import unittest
 
 
@@ -26,7 +34,7 @@ class TestGeoTiff(TestCase):
         :return:
         """
         for file_name in self.tiff_names:
-            result = geotiff.get_key_from_file_name(
+            result = get_key_from_file_name(
                 '_'.join(file_name) + '.tif'
             )
             assert result == file_name[0].lower()
@@ -37,7 +45,7 @@ class TestGeoTiff(TestCase):
         :return:
         """
         for file_name in self.tiff_names:
-            result = geotiff.get_date_from_file_name(
+            result = get_date_from_file_name(
                 '_'.join(file_name) + '.tif'
             )
             assert result == datetime.strptime(file_name[1], '%Y_%m_%d')
@@ -68,11 +76,52 @@ class TestGeoTiff(TestCase):
                 raster_output_file_path = os.path.join(
                     raster_city_dir_path, raster_new_name
                 )
-                geotiff.mask_raster_with_shapefile(
+                mask_raster_with_shapefile(
                     shapefile_path=shapefile_path,
                     raster_input_file_path=raster_input_file_path,
                     raster_output_file_path=raster_output_file_path
                 )
+
+    def test_increase_resolution(self):
+        """
+
+        :return:
+        """
+        raster_name = '3304557_NDVI_2010_09_30.tif'
+        factor_increase = 4
+
+        original_raster_file_path = os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__), 'data', raster_name
+            )
+        )
+        new_raster_file_path = os.path.join(os.sep, 'tmp', raster_name)
+
+        shutil.copyfile(
+            original_raster_file_path, new_raster_file_path
+        )
+
+        increase_resolution(
+            raster_file_path=new_raster_file_path,
+            factor_increase=factor_increase
+        )
+
+        res = factor_increase
+
+        with rasterio.open(original_raster_file_path) as src_original:
+            with rasterio.open(new_raster_file_path) as src_new:
+                profile1 = src_original.profile
+                profile2 = src_new.profile
+
+                img1 = src_original.read()
+                img2 = src_new.read()
+
+                assert profile1['height'] * res == profile2['height']
+                assert profile1['width'] * res == profile2['width']
+                assert np.nanmin(img1) == np.nanmin(img2)
+                assert np.nanmax(img1) == np.nanmax(img2)
+                assert np.nanmean(img1) == np.nanmean(img2)
+                assert np.nanmedian(img1) == np.nanmedian(img2)
 
 
 if __name__ == '__main__':

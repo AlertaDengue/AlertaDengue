@@ -1,8 +1,8 @@
 LAYER
     # %(date_time)s
-    NAME         "%(name)s"
+    NAME         "%(geocode)s"
     DATA         "%(geocode)s/%(data_name)s"
-    STATUS       DEFAULT # ON
+    STATUS       ON
     TYPE         RASTER
     OFFSITE      0 0 0
 
@@ -18,9 +18,9 @@ LAYER
       "wms_include_items" "all"
     END
 
-    COMPOSITE
-        OPACITY 70
-    END # COMPOSITE
+    # COMPOSITE
+    #     OPACITY 70
+    # END # COMPOSITE
 
     CLASS
      NAME "class_hotcolors"
