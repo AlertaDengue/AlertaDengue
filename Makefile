@@ -9,6 +9,11 @@ build:
 deploy: build
 	$(compose_cmd) up -d
 
+generate_maps: build
+	$(compose_cmd) run --rm web python3 manage.py sync_geofiles
+	$(compose_cmd) run --rm web python3 manage.py generate_meteorological_raster_cities
+	$(compose_cmd) run --rm web python3 manage.py generate_mapfiles
+
 stop:
 	$(compose_cmd) stop
 
@@ -24,6 +29,11 @@ deploy_staging: build_staging
 
 stop_staging:
 	$(staging_compose_cmd) stop
+
+generate_maps_staging: build
+	$(staging_compose_cmd) run --rm web python3 manage.py sync_geofiles
+	$(staging_compose_cmd) run --rm web python3 manage.py generate_meteorological_raster_cities
+	$(staging_compose_cmd) run --rm web python3 manage.py generate_mapfiles
 
 clean_staging:
 	$(staging_compose_cmd) stop
