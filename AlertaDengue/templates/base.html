@@ -66,14 +66,16 @@
                                 <ul class="nav navbar-nav">
                                     <li><a href="{% url 'dados:main' %}">
                                         {% trans "Início" %}</a></li>
-                                    <li><a href="{% url 'about' %}">
+                                    <li><a href="{% url 'dados:about' %}">
                                         {% trans "Saiba Mais" %}</a></li>
-                                    <li><a href="{% url 'contact' %}">
+                                    <li><a href="{% url 'dados:contact' %}">
                                         {% trans "Fale Conosco" %}</a></li>
-                                    <li><a href="{% url 'joinin' %}">
+                                    <li><a href="{% url 'dados:joinin' %}">
                                         {% trans "Participe" %}</a></li>
-                                    <li><a href="{% url 'partners' %}">
+                                    <li><a href="{% url 'dados:partners' %}">
                                         {% trans "Parceiros" %}</a></li>
+                                    <li><a href="{% url 'dados:data_public_services' %}">
+                                        {% trans "Serviço de Dados Públicos" %}</a></li>
                                     <li style="overflow: visible">
                                         <div id="remote" class="twitter-typeahead"
                                              style="overflow-y: auto; max-height: 150px; overflow: visible">
