@@ -59,6 +59,7 @@ INSTALLED_APPS = (
     'gis',
     'forecast',
     'dbf.apps.DbfConfig',
+    'api',
     'manager.router'
 )
 
@@ -179,7 +180,8 @@ DATABASES.update({
 
 MIGRATION_MODULES = {
     'dados': None,
-    'gis': None
+    'gis': None,
+    'api': None
 }
 
 # Internationalization
@@ -284,6 +286,10 @@ RASTER_METEROLOGICAL_DATA_RANGE = {
     'specific_humidity_2m_above_ground': (0.0, 1.0),
     'precipitation': (0, 200.0)
 }
+
+RASTER_METEROLOGICAL_FACTOR_INCREASE = config(
+    'RASTER_METEROLOGICAL_FACTOR_INCREASE', default=4
+)
 
 BOOTSTRAP3 = {
     'form_renderers': {

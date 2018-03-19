@@ -35,6 +35,10 @@ services:
         - PSQL_HOST=staging_db
       volumes:
         - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+        - ${DOCKER_HOST_MAPFILES_DIR}:/srv/deploy/maps
+        - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/AlertaDengue/static/shapefile
+        - ${DOCKER_HOST_TIFFS_DIR}:/srv/deploy/tiffs
+        - ${DOCKER_HOST_LOG_DIR}:/var/log/mapserver
       depends_on:
         - staging_db
         - staging_rabbitmq
@@ -59,3 +63,18 @@ services:
         - staging_rabbitmq
         - staging_memcache
       restart: always
+
+    staging_mapserver:
+        build:
+            context: "."
+            dockerfile: "Dockerfile-mapserver"
+        ports:
+            - 7777:80
+        env_file:
+            - .env
+        volumes:
+            - ${DOCKER_HOST_MAPFILES_DIR}:/maps:ro
+            - ${DOCKER_HOST_SHAPEFILES_DIR}:/shapefile:ro
+            - ${DOCKER_HOST_TIFFS_DIR}:/tiffs:ro
+            - ${DOCKER_HOST_LOG_DIR}:/maplog:ro
+        restart: always
