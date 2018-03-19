@@ -211,7 +211,6 @@ def get_series_by_UF(disease='dengue'):
 
     if series is None:
         with db_engine.connect() as conn:
-            print('select * from uf_total{}_view;'.format(_disease), disease)
             series = pd.read_sql(
                 'select * from uf_total{}_view;'.format(_disease),
                 conn, parse_dates=True
