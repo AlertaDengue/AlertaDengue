@@ -13,6 +13,49 @@ import json
 import os
 
 
+class TestAlertaStaticPageView(TestCase):
+    def test_about(self):
+        response = self.client.get(reverse('dados:about'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_contact(self):
+        response = self.client.get(reverse('dados:contact'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_joinin(self):
+        response = self.client.get(reverse('dados:joinin'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_partners(self):
+        response = self.client.get(reverse('dados:partners'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_data_public_services(self):
+        response = self.client.get(reverse('dados:data_public_services'))
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(
+            reverse('dados:data_public_services', kwargs={'service': 'maps'})
+        )
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(
+            reverse('dados:data_public_services', kwargs={'service': 'api'})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_data_public_services_type(self):
+        response = self.client.get(
+            reverse(
+                'dados:data_public_services_type',
+                kwargs={
+                    'service': 'maps',
+                    'service_type': 'doc'
+                })
+        )
+        self.assertEqual(response.status_code, 200)
+
+
 class TestAlertaPageView(TestCase):
     def setUp(self):
         settings.DATA_DIR = os.path.dirname(__file__)
