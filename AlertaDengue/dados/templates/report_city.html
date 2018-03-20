@@ -11,7 +11,7 @@
 
 
 </style>
-
+<script src="/static/libs/plotlyjs/plotly-latest.min.js"></script>
 {% endblock %}
 
 {% block title %}{% trans "Situação das Arboviroses em " %} {{city_name}} -
@@ -61,7 +61,7 @@
       (BAIXO) histórico do alerta de dengue na cidade (ver
       <a href="#color-code">código de cores</a>).
     </p>
-    <img src="data:image/png;base64,{{chart_city_dengue}}" alt="chart_city_dengue"/>
+    {{chart_dengue_climate|safe}}
 
     <!--
     # ----------------------------------

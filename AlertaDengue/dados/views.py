@@ -1,4 +1,4 @@
-# coding: utf-8
+from collections import defaultdict, OrderedDict
 from django.apps import apps
 from django.utils.translation import gettext
 from django.shortcuts import redirect
@@ -7,7 +7,10 @@ from django.contrib import messages
 from django.conf import settings
 from django.http import HttpResponse
 from time import mktime
-from collections import defaultdict, OrderedDict
+from plotly import tools
+from plotly.offline.offline import _plot_html
+
+
 # local
 from .report import get_chart_info_city_base64
 from . import dbdata, models as M
@@ -18,6 +21,7 @@ from .report import get_chart_info_city_base64
 from .models import City
 from gis.geotiff import convert_from_shapefile
 
+import cufflinks as cf
 import datetime
 import fiona
 import geojson
@@ -810,11 +814,25 @@ class ReportCityView(TemplateView):
         """
         context = super(ReportCityView, self).get_context_data(**kwargs)
 
-        geocode = context['geocode']
-        e_week = context['e_week']
-        year = context['year']
+        geocode = int(context['geocode'])
+        e_week = int(context['e_week'])
+        year = int(context['year'])
+        year_week = year * 100 + e_week
 
         city = City.objects.get(pk=int(geocode))
+
+        sql = '''
+        SELECT codigo_estacao_wu, varcli
+        FROM "Dengue_global".regional_saude
+        WHERE municipio_geocodigo = %s
+        ''' % geocode
+
+        df_station = pd.read_sql(sql, con=dbdata.db_engine)
+
+        if df_station.empty:
+            raise Exception('NO STATION FOUND')
+
+        station_id, var_climate = df_station.values[0]
 
         k = [
             'umid_max',
@@ -826,54 +844,63 @@ class ReportCityView(TemplateView):
             'nivel'
         ]
 
-        df_dengue = pd.read_sql(
-            '''
-            SELECT
-                NULL AS umid_max,
-                hist."SE",
-                tweets.n_tweets,
-                hist.casos,
-                hist.p_rt1,
-                hist.casos_est,
-                hist.p_inc100k,
-                (CASE 
-                   WHEN hist.nivel=1 THEN 'verde'
-                   WHEN hist.nivel=2 THEN 'amarelo'
-                   WHEN hist.nivel=3 THEN 'laranja'
-                   WHEN hist.nivel=4 THEN 'vermelho'
-                   ELSE '-'    
-                 END) AS nivel
-            FROM 
-              "Municipio"."Historico_alerta" AS hist
-              LEFT JOIN (
-                SELECT 
-                  epi_week(data_dia) AS "SE", 
-                  SUM(numero) as n_tweets,
-                  "Municipio_geocodigo"
-                FROM "Municipio"."Tweet"
-                WHERE "Municipio_geocodigo" = %(geocode)s
-                  AND "CID10_codigo" = '%(disease_code)s'
-                  AND epi_week(data_dia) <= %(year)s%(week)s
-                GROUP BY "SE", "Municipio_geocodigo"
-                ORDER BY "SE" DESC
-              ) AS tweets
-                ON (
-                  "Municipio_geocodigo"="municipio_geocodigo"
-                  AND tweets."SE"=hist."SE"
-                )
-            WHERE 
-              hist."SE" <= %(year)s%(week)s
-              AND municipio_geocodigo=%(geocode)s
+        sql = '''
+        SELECT
+            %(var_climate)s,
+            hist."SE",
+            tweets.n_tweets,
+            hist.casos,
+            hist.p_rt1,
+            hist.casos_est,
+            hist.p_inc100k,
+            (CASE 
+               WHEN hist.nivel=1 THEN 'verde'
+               WHEN hist.nivel=2 THEN 'amarelo'
+               WHEN hist.nivel=3 THEN 'laranja'
+               WHEN hist.nivel=4 THEN 'vermelho'
+               ELSE '-'    
+             END) AS nivel
+        FROM 
+          "Municipio"."Historico_alerta" AS hist
+          LEFT JOIN (
+            SELECT 
+                epi_week(data_dia) AS epiweek, 
+                AVG(%(var_climate)s) AS %(var_climate)s
+            FROM "Municipio"."Clima_wu"
+            WHERE "Estacao_wu_estacao_id" = '%(station_id)s'
+            GROUP BY epiweek
+            ORDER BY epiweek
+          ) AS climate_wu
+            ON (hist."SE"=climate_wu.epiweek)
+          LEFT JOIN (
+            SELECT 
+              epi_week(data_dia) AS "SE", 
+              SUM(numero) as n_tweets,
+              "Municipio_geocodigo"
+            FROM "Municipio"."Tweet"
+            WHERE "Municipio_geocodigo" = %(geocode)s
+              AND "CID10_codigo" = '%(disease_code)s'
+              AND epi_week(data_dia) <= %(year_week)s
+            GROUP BY "SE", "Municipio_geocodigo"
             ORDER BY "SE" DESC
-            LIMIT 16
-            ''' % {
-                'year': year,
-                'week': e_week,
-                'geocode': geocode,
-                'disease_code': 'A90'
-            }, index_col='SE', con=dbdata.db_engine
-        )[k]
+          ) AS tweets
+            ON (
+              "Municipio_geocodigo"="municipio_geocodigo"
+              AND tweets."SE"=hist."SE"
+            )
+        WHERE 
+          hist."SE" <= %(year_week)s
+          AND municipio_geocodigo=%(geocode)s
+        ORDER BY "SE" DESC
+        ''' % {
+            'year_week': year_week,
+            'geocode': geocode,
+            'disease_code': 'A90',
+            'station_id': station_id,
+            'var_climate': var_climate
+        }
 
+        df_dengue = pd.read_sql(sql, index_col='SE', con=dbdata.db_engine)[k]
         df_dengue.n_tweets = df_dengue.n_tweets.round(0)
         df_dengue.p_rt1 = (df_dengue.p_rt1*100).round(0).astype(int)
         df_dengue.casos_est = df_dengue.casos_est.round(0).astype(int)
@@ -897,36 +924,46 @@ class ReportCityView(TemplateView):
             'nivel'
         ]
 
-        df_chik = pd.read_sql(
-            '''
-            SELECT
-                NULL AS umid_max,
-                hist."SE",
-                hist.casos,
-                hist.p_rt1,
-                hist.casos_est,
-                hist.p_inc100k,
-                (CASE 
-                   WHEN hist.nivel=1 THEN 'verde'
-                   WHEN hist.nivel=2 THEN 'amarelo'
-                   WHEN hist.nivel=3 THEN 'laranja'
-                   WHEN hist.nivel=4 THEN 'vermelho'
-                   ELSE '-'    
-                 END) AS nivel
-            FROM 
-              "Municipio"."Historico_alerta_chik" AS hist
-            WHERE 
-              hist."SE" <= %(year)s%(week)s
-              AND municipio_geocodigo=%(geocode)s
-            ORDER BY "SE" DESC
-            LIMIT 16
-            ''' % {
-                'year': year,
-                'week': e_week,
-                'geocode': geocode,
-            }, index_col='SE', con=dbdata.db_engine
-        )[k]
+        sql = '''
+        SELECT
+            %(var_climate)s,
+            hist."SE",
+            hist.casos,
+            hist.p_rt1,
+            hist.casos_est,
+            hist.p_inc100k,
+            (CASE 
+               WHEN hist.nivel=1 THEN 'verde'
+               WHEN hist.nivel=2 THEN 'amarelo'
+               WHEN hist.nivel=3 THEN 'laranja'
+               WHEN hist.nivel=4 THEN 'vermelho'
+               ELSE '-'    
+             END) AS nivel
+        FROM 
+          "Municipio"."Historico_alerta_chik" AS hist
+          LEFT JOIN (
+            SELECT 
+                epi_week(data_dia) AS epiweek, 
+                AVG(%(var_climate)s) AS %(var_climate)s
+            FROM "Municipio"."Clima_wu"
+            WHERE "Estacao_wu_estacao_id" = '%(station_id)s'
+            GROUP BY epiweek
+            ORDER BY epiweek
+          ) AS climate_wu
+            ON (hist."SE"=climate_wu.epiweek)
+        WHERE 
+          hist."SE" <= %(year_week)s
+          AND hist.municipio_geocodigo=%(geocode)s
+        ORDER BY "SE" DESC
+        LIMIT 16
+        ''' % {
+            'year_week': year_week,
+            'geocode': geocode,
+            'station_id': station_id,
+            'var_climate': var_climate
+        }
 
+        df_chik = pd.read_sql(sql, index_col='SE', con=dbdata.db_engine)[k]
         df_chik.p_rt1 = (df_chik.p_rt1 * 100).round(0).astype(int)
         df_chik.casos_est = df_chik.casos_est.round(0).astype(int)
         df_chik.p_inc100k = df_chik.p_inc100k.round(0).astype(int)
@@ -948,35 +985,45 @@ class ReportCityView(TemplateView):
             'nivel'
         ]
 
-        df_zika = pd.read_sql(
-            '''
-            SELECT
-                NULL AS umid_max,
-                hist."SE",
-                hist.casos,
-                hist.p_rt1,
-                hist.casos_est,
-                hist.p_inc100k,
-                (CASE 
-                   WHEN hist.nivel=1 THEN 'verde'
-                   WHEN hist.nivel=2 THEN 'amarelo'
-                   WHEN hist.nivel=3 THEN 'laranja'
-                   WHEN hist.nivel=4 THEN 'vermelho'
-                   ELSE '-'    
-                 END) AS nivel
-            FROM 
-              "Municipio"."Historico_alerta_zika" AS hist
-            WHERE 
-              hist."SE" <= %(year)s%(week)s
-              AND municipio_geocodigo=%(geocode)s
-            ORDER BY "SE" DESC
-            LIMIT 16
-            ''' % {
-                'year': year,
-                'week': e_week,
-                'geocode': geocode,
-            }, index_col='SE', con=dbdata.db_engine
-        )[k]
+        sql = '''
+        SELECT
+            %(var_climate)s,
+            hist."SE",
+            hist.casos,
+            hist.p_rt1,
+            hist.casos_est,
+            hist.p_inc100k,
+            (CASE 
+               WHEN hist.nivel=1 THEN 'verde'
+               WHEN hist.nivel=2 THEN 'amarelo'
+               WHEN hist.nivel=3 THEN 'laranja'
+               WHEN hist.nivel=4 THEN 'vermelho'
+               ELSE '-'    
+             END) AS nivel
+        FROM 
+          "Municipio"."Historico_alerta_zika" AS hist
+          LEFT JOIN (
+            SELECT 
+                epi_week(data_dia) AS epiweek, 
+                AVG(%(var_climate)s) AS %(var_climate)s
+            FROM "Municipio"."Clima_wu"
+            WHERE "Estacao_wu_estacao_id" = '%(station_id)s'
+            GROUP BY epiweek
+            ORDER BY epiweek
+          ) AS climate_wu
+            ON (hist."SE"=climate_wu.epiweek)
+        WHERE 
+          hist."SE" <= %(year_week)s
+          AND municipio_geocodigo=%(geocode)s
+        ORDER BY "SE" DESC
+        LIMIT 16
+        ''' % {
+            'year_week': year_week,
+            'geocode': geocode,
+            'station_id': station_id,
+            'var_climate': var_climate
+        }
+        df_zika = pd.read_sql(sql, index_col='SE', con=dbdata.db_engine)[k]
 
         df_zika.p_rt1 = (df_zika.p_rt1 * 100).round(0).astype(int)
         df_zika.casos_est = df_zika.casos_est.round(0).astype(int)
@@ -991,9 +1038,28 @@ class ReportCityView(TemplateView):
         }, axis=1, inplace=True)
 
         if not df_dengue.empty:
-            chart_city_dengue = get_chart_info_city_base64(
-                df_dengue, {}
+            k = var_climate.replace('_', '.')
+            df_dengue_climate = df_dengue.reset_index()[['SE', k]]
+            df_dengue_climate = df_dengue_climate[
+                df_dengue_climate.SE >= year_week - 200
+            ]
+
+            df_dengue_climate['Data'] = df_dengue_climate.SE.apply(
+                lambda x: datetime.datetime.strptime(str(x) + '-0', '%Y%W-%w')
             )
+
+            figure = df_dengue_climate.iplot(
+                asFigure=True, x='Data', y=k,
+                showlegend=False,
+                yTitle=k, xTitle='Data'
+            )
+
+            figure['layout']['xaxis1'].update(tickangle=-60)
+
+            chart_dengue_climate = _plot_html(
+                figure_or_data=figure, config={}, validate=True,
+                default_width='100%', default_height=500, global_requirejs=''
+            )[0]
         else:
             chart_city_dengue = ''
 
@@ -1019,10 +1085,12 @@ class ReportCityView(TemplateView):
         context.update({
             'city_name': city.name,
             'state_name': city.state,
-            'df_dengue': df_dengue.to_html(classes="table table-striped", **s),
+            'df_dengue': df_dengue.iloc[-16:, :].to_html(
+                classes="table table-striped", **s
+            ),
             'df_chik': df_chik.to_html(classes="table table-striped", **s),
             'df_zika': df_zika.to_html(classes="table table-striped", **s),
-            'chart_city_dengue': chart_city_dengue,
+            'chart_dengue_climate': chart_dengue_climate,
             'chart_city_chik': chart_city_chik,
             'chart_city_zika': chart_city_zika
         })
