@@ -117,7 +117,7 @@ class MapFile:
             'local_mapfile_dir': MAPFILE_PATH,
             'mapserver_error': MAPSERVER_LOG_PATH,
             'mapserver_cgi': MAPSERVER_URL + '?map=map.map&',
-            'mapserver_shapefile_dir': '/shapefiles',
+            'mapserver_shapefile_dir': '/shapefile',
             'mapserver_mapfile_dir': '/maps'
         }
 

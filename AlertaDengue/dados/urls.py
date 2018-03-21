@@ -6,7 +6,9 @@ from django.contrib.auth.decorators import login_required
 from .views import (
     DetailsPageView, SinanCasesView, AlertaMRJPageView,
     AlertaGeoJSONView, AlertaMunicipioPageView, get_municipio, AlertaMainView,
-    AlertaStateView, GeoTiffView, GeoJsonView, ReportCityView
+    AlertaStateView, GeoTiffView, GeoJsonView, ReportCityView,
+    AboutPageView, ContactPageView, JoininPageView,
+    PartnersPageView, DataPublicServicesPageView
 )
 
 
@@ -39,6 +41,20 @@ __e_week = '(?P<e_week>\d{2})'
 
 urlpatterns = [
     url(r'^$', AlertaMainView.as_view(), name='main'),
+    url(r'^informacoes/$', AboutPageView.as_view(), name='about'),
+    url(r'^contato/$', ContactPageView.as_view(), name='contact'),
+    url(r'^participe/$', JoininPageView.as_view(), name='joinin'),
+    url(r'^partners/$', PartnersPageView.as_view(), name='partners'),
+    url(
+        r'^data-public-services/(?P<service>maps|api)?$',
+        DataPublicServicesPageView.as_view(),
+        name="data_public_services"
+    ),
+    url(
+        r'^data-public-services/(?P<service>maps)/(?P<service_type>doc)$',
+        DataPublicServicesPageView.as_view(),
+        name="data_public_services_type"
+    ),
     url(r'^alerta/%s[/]?$' % __state, redirect_alerta_dengue),
     url(r'^alerta/%s/%s$' % (__state, __disease),
         AlertaStateView.as_view(), name='alerta_uf'),
