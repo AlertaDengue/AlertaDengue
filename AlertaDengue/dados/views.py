@@ -888,6 +888,24 @@ class GeoJsonView(View):
         return response
 
 
+class ReportView(TemplateView):
+    template_name = 'report.html'
+
+    def get_context_data(self, **kwargs):
+        """
+
+        :param kwargs:
+        :return:
+        """
+        context = super().get_context_data(**kwargs)
+
+        context.update({
+            'disease_list': CID10,
+        })
+
+        return context
+
+
 class ReportCityView(TemplateView):
     template_name = 'report_city.html'
 
@@ -908,7 +926,7 @@ class ReportCityView(TemplateView):
 
         """
         k = [
-            'umid_max',
+            var_climate,
             'casos',
             'p_inc100k',
             'casos_est',
@@ -1002,6 +1020,7 @@ class ReportCityView(TemplateView):
 
         df.rename({
             'umid_max': 'umid.max',
+            'temp_min': 'temp.min',
             'p_inc100k': 'incidência',
             'casos': 'casos notif.',
             'n_tweets': 'tweets',
@@ -1044,7 +1063,70 @@ class ReportCityView(TemplateView):
         figure['layout']['xaxis1'].update(
             tickangle=-60, tickformat='%Y/%W'
         )
-        # figure['layout']['legend'].update(y=20, traceorder='normal')
+
+        figure['layout']['legend'].update(
+            x=-.1, y=1.2,
+            traceorder='normal',
+            font=dict(
+                family='sans-serif',
+                size=12,
+                color='#000'
+            ),
+            bgcolor='#E2E2E2',
+            bordercolor='#FFFFFF',
+            borderwidth=2
+        )
+
+        return _plot_html(
+            figure_or_data=figure, config={}, validate=True,
+            default_width='100%', default_height=500, global_requirejs=''
+        )[0]
+
+    def create_tweet_chart(
+        self, df: pd.DataFrame, year_week
+    ) -> 'Plotly_HTML':
+        """
+
+        :param df:
+        :param var_climate:
+        :param year_week:
+        :param climate_crit:
+        :param climate_title:
+        :return:
+        """
+        df_tweet = df.reset_index()[['SE', 'tweets', 'casos notif.']]
+        df_tweet = df_tweet[
+            df_tweet.SE >= year_week - 200
+        ]
+
+        df_tweet['Data'] = df_tweet.SE.apply(
+            lambda x: datetime.datetime.strptime(str(x) + '-0', '%Y%W-%w')
+        )
+
+        figure = df_tweet.iplot(
+            x=['Data'],
+            y=['tweets', 'casos notif.'], asFigure=True,
+            showlegend=True, xTitle='Período (Ano/Semana)'
+        )
+        figure = figure.set_axis('tweets', side='right')
+        figure['layout']['xaxis1'].update(
+            tickangle=-60, tickformat='%Y/%W'
+        )
+        figure['layout']['yaxis1'].update(title='Casos')
+        figure['layout']['yaxis2'].update(title='Tweets')
+
+        figure['layout']['legend'].update(
+            x=-.1, y=1.2,
+            traceorder='normal',
+            font=dict(
+                family='sans-serif',
+                size=12,
+                color='#000'
+            ),
+            bgcolor='#E2E2E2',
+            bordercolor='#FFFFFF',
+            borderwidth=2
+        )
 
         return _plot_html(
             figure_or_data=figure, config={}, validate=True,
@@ -1110,6 +1192,9 @@ class ReportCityView(TemplateView):
                 df=df_dengue, year_week=year_week, var_climate=var_climate,
                 climate_crit=climate_crit, climate_title=climate_title
             )
+            chart_dengue_tweets = self.create_tweet_chart(
+                df=df_dengue, year_week=year_week
+            )
         else:
             chart_dengue_climate = ''
 
@@ -1147,6 +1232,7 @@ class ReportCityView(TemplateView):
                 classes="table table-striped", **s
             ),
             'chart_dengue_climate': chart_dengue_climate,
+            'chart_dengue_tweets': chart_dengue_tweets,
             'chart_chik_climate': chart_chik_climate,
             'chart_zika_climate': chart_zika_climate
         })

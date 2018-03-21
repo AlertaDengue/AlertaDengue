@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block extra_head %}
+<style>
+      .col-header{
+        text-align: right;
+        vertical-align: bottom;
+        font-size: 16px;
+        font-weight: bold;
+      }
+
+      .col-field{
+        text-align: left;
+        vertical-align: middle;
+      }
+
+      .c {
+        text-align: center;
+      }
+
+      .pt-2 {
+        padding-top: 20px;
+      }
+</style>
+
+<script>
+function openReport() {
+  var geocode = $('#geocode').val();
+  var year = $('#year').val();
+  var week = $('#week').val();
+
+  $('#form-report').attr('action', (
+    '/report/city/' + $('#geocode').val() +
+    '/' +  $('#year').val() +
+    '/' + $('#week').val()
+  ));
+
+  return False;
+}
+</script>
+
+{% endblock %}
+{% block title %}{% trans "Relatório" %}{% endblock %}
+
+{% block content %}
+
+<form id="form-report" onsubmit="openReport();false;">
+  <div class="row">
+    <div class="col-md-12">
+      <!-- field:start -->
+      <div class="form-group">
+        <label for="geocode">{% trans "Código IBGE" %}</label>
+        <input type="text" class="form-control" id="geocode"
+               aria-describedby="geocodeHelp" required="required"
+               pattern="^([0-9]{7})$"
+               maxlength="7" style="width:120px;"
+        >
+        <small id="geocodedHelp" class="form-text text-muted">
+          {% trans "Código IBGE do município" %}
+          {% trans "(aceita apenas números, 7 números requeridos)" %}
+        </small>
+      </div>
+      <div class="form-group">
+        <label for="year">{% trans "Ano" %}/{% trans "Ano" %}</label><br/>
+        <input type="text" class="form-control" id="year"
+               aria-describedby="yearHelp" style="width:80px;display:inline;"
+               pattern="^([0-9]*)$"
+               maxlength="4" required="required" > /
+        <input type="text" class="form-control" id="week"
+               aria-describedby="yearHelp" style="width:50px;;display:inline;"
+               pattern="^([0-9]*)$"
+               maxlength="2" required="required">
+        <br/>
+        <small id="yearHelp" class="form-text text-muted">
+          {% trans "Ano/Semana Epidemiológico" %}
+          {% trans "(aceita apenas números, campo requerido)" %}
+        </small>
+      </div>
+      <!-- field:end -->
+      <div class="form-group">
+        <button class="btn btn-primary" type="submit">
+          {% trans "Abrir Relatório" %}
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+
+{% endblock %}
