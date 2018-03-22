@@ -9,6 +9,26 @@
         margin-bottom: 20px;
       }
 
+      .table tr td:nth-child(1){
+        background: #fafafa!important;
+        font-weight: bold;
+      }
+
+      .green-row td {
+        background: #8BFFB7;
+      }
+
+      .yellow-row td {
+        background: #FFEB5C;
+      }
+
+      .orange-row td {
+        background: #FFCE5C;
+      }
+
+      .red-row td {
+        background: #FF7C73;
+      }
 
 </style>
 <script src="/static/libs/plotlyjs/plotly-latest.min.js"></script>
@@ -25,21 +45,7 @@
 # ---------------------------------
 -->
 <div class="row">
-  <div class="col-md-4">
-    <div class="box">
-      <h4>Boletim Semanal - Semana {{e_week}} de {{year}}</h4>
-      <hr/>
-      <a href="#tables">Tabelas</a><br/>
-      <a href="#color-code">Código de Cores</a><br/>
-      <a href="#var-tables">Variáveis nas Tabelas</a><br/>
-      <a href="#notes">Notas</a><br/>
-      <a href="#credits">Créditos</a><br/>
-      <hr/>
-      <a href="#contact">Contato</a><br/>
-    </div>
-  </div>
-
-  <div class="col-md-8">
+  <div class="col-md-12">
 
     <!--
     # ----------------------
@@ -63,6 +69,7 @@
     </p>
     {{chart_dengue_climate|safe}}
     {{chart_dengue_tweets|safe}}
+    {{chart_dengue_incidence|safe}}
 
     <!--
     # ----------------------------------
@@ -286,5 +293,20 @@
   </div>
 </div>
 -->
+
+<script>
+  $(document).ready(function(){
+    var cssClasses = {
+      'verde': 'green-row',
+      'amarelo': 'yellow-row',
+      'laranja': 'orange-row',
+      'vermelho': 'red-row'
+    }
+
+    $('.table tr').each(function(i, obj){
+      $(this).addClass(cssClasses[$('td:last-child', this).text()]);
+    });
+  });
+</script>
 
 {% endblock %}

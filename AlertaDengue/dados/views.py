@@ -1029,6 +1029,75 @@ class ReportCityView(TemplateView):
 
         return df
 
+    def create_incidence_chart(
+        self, df: pd.DataFrame, year_week,
+    ) -> 'Plotly_HTML':
+        """
+
+        :param df:
+        :param var_climate:
+        :param year_week:
+        :param climate_crit:
+        :param climate_title:
+        :return:
+        """
+        df_incidence = df.reset_index()[['SE', 'incidência', 'casos notif.']]
+        df_incidence = df_incidence[
+            df_incidence.SE >= year_week - 200
+        ]
+
+        df_incidence['Data'] = df_incidence.SE.apply(
+            lambda x: datetime.datetime.strptime(str(x) + '-0', '%Y%W-%w')
+        )
+
+        k = 'incidência'
+        se = df_incidence[k]
+        df_incidence['g'] = df_incidence[np.all((0 <= se,  se < 20), axis=0)][k]
+        df_incidence['y'] = df_incidence[np.all((20 <= se, se < 40), axis=0)][k]
+        df_incidence['o'] = df_incidence[np.all((40 <= se, se < 60), axis=0)][k]
+        df_incidence['r'] = df_incidence[60 <= se][k]
+
+        figure_bar = df_incidence.iplot(
+            asFigure=True, kind='bar', x=['Data'], y=['g', 'y', 'o', 'r'],
+            showlegend=False,
+            yTitle='Incidência', xTitle='Período (Ano/Semana)',
+            color=['rgb(0,255,0)', 'rgb(255,255,0)', 'rgb(255,190,0)', 'rgb(255,0,0)'],
+        )
+
+        figure_line = df_incidence.iplot(
+            asFigure=True, x=['Data'], y=['casos notif.'],
+            showlegend=False,
+            secondary_y=['casos notif.'], secondary_y_title='Casos'
+        )
+
+        figure_line['layout']['xaxis1'].update(
+            tickangle=-60, tickformat='%Y/%W'
+        )
+
+        figure_line['layout']['legend'].update(
+            x=-.1, y=1.2,
+            traceorder='normal',
+            font=dict(
+                family='sans-serif',
+                size=12,
+                color='#000'
+            ),
+            bgcolor='#E2E2E2',
+            bordercolor='#FFFFFF',
+            borderwidth=2
+        )
+
+        figure_line['layout']['yaxis1'].update(
+            title='Incidência'
+        )
+
+        figure_line.data.extend(figure_bar.data)
+
+        return _plot_html(
+            figure_or_data=figure_line, config={}, validate=True,
+            default_width='100%', default_height=500, global_requirejs=''
+        )[0]
+
     def create_climate_chart(
         self, df: pd.DataFrame, var_climate, year_week,
         climate_crit, climate_title
@@ -1192,6 +1261,11 @@ class ReportCityView(TemplateView):
                 df=df_dengue, year_week=year_week, var_climate=var_climate,
                 climate_crit=climate_crit, climate_title=climate_title
             )
+
+            chart_dengue_incidence = self.create_incidence_chart(
+                df=df_dengue, year_week=year_week
+            )
+
             chart_dengue_tweets = self.create_tweet_chart(
                 df=df_dengue, year_week=year_week
             )
@@ -1216,23 +1290,26 @@ class ReportCityView(TemplateView):
 
         s = dict(
             na_rep='',
-            float_format=lambda x: ('%d' % x) if not np.isnan(x) else ''
+            float_format=lambda x: ('%d' % x) if not np.isnan(x) else '',
+            index=False,
+            classes="table table-striped"
         )
 
         context.update({
             'city_name': city.name,
             'state_name': city.state,
-            'df_dengue': df_dengue.iloc[-16:, :].to_html(
-                classes="table table-striped", **s
+            'df_dengue': (
+                df_dengue.iloc[-16:, :].reset_index().to_html(**s)
             ),
-            'df_chik': df_chik.iloc[-16:, :].to_html(
-                classes="table table-striped", **s
+            'df_chik': (
+                df_chik.iloc[-16:, :].reset_index().to_html(**s)
             ),
-            'df_zika': df_zika.iloc[-16:, :].to_html(
-                classes="table table-striped", **s
+            'df_zika': (
+                df_zika.iloc[-16:, :].reset_index().to_html(**s)
             ),
             'chart_dengue_climate': chart_dengue_climate,
             'chart_dengue_tweets': chart_dengue_tweets,
+            'chart_dengue_incidence': chart_dengue_incidence,
             'chart_chik_climate': chart_chik_climate,
             'chart_zika_climate': chart_zika_climate
         })
