@@ -11,7 +11,7 @@ import psycopg2
 import logging
 
 
-logger = logging.getLogger('Load_SINAN')
+logger = logging.getLogger(__name__)
 
 field_map = {
     'dt_notific': "DT_NOTIFIC",
@@ -73,6 +73,7 @@ class Sinan(object):
         :param ano: Ano dos dados
         :return:
         """
+        logger.info("Instanciando SINAN ({}, {})".format(dbf_fname, ano))
         self.ano = ano
         self.dbf = DBF(dbf_fname, encoding=encoding)
         self.colunas_entrada = self.dbf.field_names
@@ -88,7 +89,7 @@ class Sinan(object):
         self._parse_date_cols()
 
     def _parse_date_cols(self):
-        print("Formatando as datas...")
+        logger.info("Formatando as datas")
         for col in filter(lambda x: x.startswith("DT"), self.tabela.columns):
             try:
                 self.tabela[col] = pd.to_datetime(self.tabela[col])  # , errors='coerce')
@@ -120,7 +121,7 @@ class Sinan(object):
 
     def save_to_pgsql(self, table_name='"Municipio"."Notificacao"', default_cid=None):
         connection = self._get_postgres_connection()
-        print("Escrevendo no PostgreSQL...")
+        logger.info("Escrevendo no PostgreSQL")
         ano = self.time_span[1].year if self.time_span[0] == self.time_span[1] else self.ano
         geoclist_sql = ",".join([str(gc) for gc in self.geocodigos])
         with connection.cursor(cursor_factory=DictCursor) as cursor:
@@ -133,6 +134,8 @@ class Sinan(object):
                        ','.join(col_names),
                        ','.join(['%s' for i in col_names]),
                        ','.join(['{0}=excluded.{0}'.format(j) for j in col_names]))
+            logger.info("Formatando linhas e inserindo em {}".format(
+                table_name))
             for row in self.tabela[df_names].iterrows():
                 i = row[0]
                 row = row[1]
@@ -159,6 +162,9 @@ class Sinan(object):
                 row[13] = None if not row[13] else int(row[13])  # nu_idade_n
                 cursor.execute(insert_sql, row)
                 if (i % 1000 == 0) and (i > 0):
+                    logger.info("{} linhas inseridas. Commitando mudanças "
+                                "no banco".format(i))
                     connection.commit()
 
             connection.commit()
+            logger.info("Sinan {} inserido no banco".format(self.dbf))
