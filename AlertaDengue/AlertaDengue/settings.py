@@ -297,6 +297,24 @@ BOOTSTRAP3 = {
     }
 }
 
+
+import os
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': config('DJANGO_LOG_LEVEL', 'INFO'),
+    },
+}
+
+
 try:
     from .local_settings import *
 except ImportError:
