@@ -1018,14 +1018,14 @@ class ReportCityView(TemplateView):
         if has_tweets:
             df.n_tweets = df.n_tweets.round(0)
 
-        df.rename({
+        df.rename(columns={
             'umid_max': 'umid.max',
             'temp_min': 'temp.min',
             'p_inc100k': 'incidência',
             'casos': 'casos notif.',
             'n_tweets': 'tweets',
             'p_rt1': 'pr(incid. subir)'
-        }, axis=1, inplace=True)
+        }, inplace=True)
 
         return df
 
@@ -1061,7 +1061,10 @@ class ReportCityView(TemplateView):
             asFigure=True, kind='bar', x=['Data'], y=['g', 'y', 'o', 'r'],
             showlegend=False,
             yTitle='Incidência', xTitle='Período (Ano/Semana)',
-            color=['rgb(0,255,0)', 'rgb(255,255,0)', 'rgb(255,190,0)', 'rgb(255,0,0)'],
+            color=[
+                'rgb(0,255,0)', 'rgb(255,255,0)',
+                'rgb(255,190,0)', 'rgb(255,0,0)'
+            ],
         )
 
         figure_line = df_incidence.iplot(
