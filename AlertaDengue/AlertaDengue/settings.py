@@ -240,22 +240,6 @@ if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
     EMAIL_PORT = int(EMAIL_PORT)
     EMAIL_USE_TLS = True
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'null': {
-            'class': 'logging.NullHandler',
-        },
-    },
-    'loggers': {
-        'django.security.DisallowedHost': {
-            'handlers': ['null'],
-            'propagate': False,
-        },
-    },
-}
-
 
 CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=None)
 CELERY_TASK_ALWAYS_EAGER = config('CELERY_TASK_ALWAYS_EAGER', default=False)
@@ -296,6 +280,33 @@ BOOTSTRAP3 = {
         'default': 'dbf.forms.FormRendererWithHiddenFieldErrors',
     }
 }
+
+
+import os
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        'null': {
+            'class': 'logging.NullHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': config('DJANGO_LOG_LEVEL', 'INFO'),
+    },
+    'loggers': {
+        'django.security.DisallowedHost': {
+            'handlers': ['null'],
+            'propagate': False,
+        },
+    },
+}
+
 
 try:
     from .local_settings import *
