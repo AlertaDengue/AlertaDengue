@@ -931,7 +931,8 @@ class ReportCityView(TemplateView):
             'p_inc100k',
             'casos_est',
             'p_rt1',
-            'nivel'
+            'nivel',
+            'level_code'
         ]
 
         tweet_join = ''
@@ -976,6 +977,7 @@ class ReportCityView(TemplateView):
            hist.p_rt1,
            hist.casos_est,
            hist.p_inc100k,
+           hist.nivel AS level_code,
            (CASE 
               WHEN hist.nivel=1 THEN 'verde'
               WHEN hist.nivel=2 THEN 'amarelo'
@@ -1030,47 +1032,70 @@ class ReportCityView(TemplateView):
         return df
 
     def create_incidence_chart(
-        self, df: pd.DataFrame, year_week,
+        self, df: pd.DataFrame, year_week: int, threshold_pre_epidemic: float,
+        threshold_pos_epidemic: float, threshold_epidemic: float
     ) -> 'Plotly_HTML':
         """
 
         :param df:
-        :param var_climate:
         :param year_week:
-        :param climate_crit:
-        :param climate_title:
+        :param threshold_pre_epidemic: float,
+        :param threshold_pos_epidemic: float
+        :param threshold_epidemic: float
         :return:
         """
-        df_incidence = df.reset_index()[['SE', 'incidência', 'casos notif.']]
-        df_incidence = df_incidence[
-            df_incidence.SE >= year_week - 200
+        df = df.reset_index()[[
+            'SE', 'incidência', 'casos notif.', 'level_code'
+        ]]
+        df = df[
+            df.SE >= year_week - 200
         ]
 
-        df_incidence['Data'] = df_incidence.SE.apply(
+        df['Data'] = df.SE.apply(
             lambda x: datetime.datetime.strptime(str(x) + '-0', '%Y%W-%w')
         )
 
         k = 'incidência'
-        se = df_incidence[k]
-        df_incidence['g'] = df_incidence[np.all((0 <= se,  se < 20), axis=0)][k]
-        df_incidence['y'] = df_incidence[np.all((20 <= se, se < 40), axis=0)][k]
-        df_incidence['o'] = df_incidence[np.all((40 <= se, se < 60), axis=0)][k]
-        df_incidence['r'] = df_incidence[60 <= se][k]
 
-        figure_bar = df_incidence.iplot(
-            asFigure=True, kind='bar', x=['Data'], y=['g', 'y', 'o', 'r'],
+        df['alerta verde'] = df[df.level_code == 1][k]
+        df['alerta amarelo'] = df[df.level_code == 2][k]
+        df['alerta laranja'] = df[df.level_code == 3][k]
+        df['alerta vermelho'] = df[df.level_code  == 4][k]
+
+        df['limiar epidêmico'] = threshold_epidemic
+        df['limiar pós epidêmico'] = threshold_pos_epidemic
+        df['limiar pré epidêmico'] = threshold_pre_epidemic
+
+        figure_bar = df.iplot(
+            asFigure=True, kind='bar', x=['Data'], y=[
+                'alerta verde',
+                'alerta amarelo',
+                'alerta laranja',
+                'alerta vermelho'
+            ],
             showlegend=False,
             yTitle='Incidência', xTitle='Período (Ano/Semana)',
             color=[
                 'rgb(0,255,0)', 'rgb(255,255,0)',
-                'rgb(255,190,0)', 'rgb(255,0,0)'
-            ],
+                'rgb(255,150,0)', 'rgb(255,0,0)'
+            ], hoverinfo='none'
         )
 
-        figure_line = df_incidence.iplot(
+        figure_threshold = df.iplot(
+            asFigure=True, x=['Data'], y=[
+                'limiar pré epidêmico',
+                'limiar pós epidêmico',
+                'limiar epidêmico'
+            ], showlegend=True, color=[
+                'rgb(0,255,0)', 'rgb(255,150,0)', 'rgb(255,0,0)'
+            ], hoverinfo='y+name'
+        )
+
+        figure_line = df.iplot(
             asFigure=True, x=['Data'], y=['casos notif.'],
             showlegend=False,
-            secondary_y=['casos notif.'], secondary_y_title='Casos'
+            secondary_y=['casos notif.'], secondary_y_title='Casos',
+            hoverinfo='none'
         )
 
         figure_line['layout']['xaxis1'].update(
@@ -1094,7 +1119,8 @@ class ReportCityView(TemplateView):
             title='Incidência'
         )
 
-        figure_line.data.extend(figure_bar.data)
+        figure_threshold.data.extend(figure_bar.data)
+        figure_line.data.extend(figure_threshold.data)
 
         return _plot_html(
             figure_or_data=figure_line, config={}, validate=True,
@@ -1221,7 +1247,9 @@ class ReportCityView(TemplateView):
         city = City.objects.get(pk=int(geocode))
 
         sql = '''
-        SELECT codigo_estacao_wu, varcli, ucrit, tcrit
+        SELECT 
+          codigo_estacao_wu, varcli, ucrit, tcrit,
+          limiar_preseason, limiar_posseason, limiar_epidemico
         FROM "Dengue_global".regional_saude
         WHERE municipio_geocodigo = %s
         ''' % geocode
@@ -1231,7 +1259,9 @@ class ReportCityView(TemplateView):
         if df_station.empty:
             raise Exception('NO STATION FOUND')
 
-        station_id, var_climate, u_crit, t_crit = df_station.values[0]
+        (station_id, var_climate, u_crit, t_crit,
+         threshold_pre_epidemic, threshold_pos_epidemic, threshold_epidemic
+         ) = df_station.values[0]
         climate_crit = None
 
         if var_climate.startswith('temp'):
@@ -1266,7 +1296,10 @@ class ReportCityView(TemplateView):
             )
 
             chart_dengue_incidence = self.create_incidence_chart(
-                df=df_dengue, year_week=year_week
+                df=df_dengue, year_week=year_week,
+                threshold_pre_epidemic=threshold_pre_epidemic,
+                threshold_pos_epidemic=threshold_pos_epidemic,
+                threshold_epidemic=threshold_epidemic
             )
 
             chart_dengue_tweets = self.create_tweet_chart(
@@ -1277,19 +1310,36 @@ class ReportCityView(TemplateView):
 
         if not df_chik.empty:
             chart_chik_climate = self.create_climate_chart(
-                df=df_dengue, year_week=year_week, var_climate=var_climate,
+                df=df_chik, year_week=year_week, var_climate=var_climate,
                 climate_crit=climate_crit, climate_title=climate_title
+            )
+
+            chart_chik_incidence = self.create_incidence_chart(
+                df=df_chik, year_week=year_week,
+                threshold_pre_epidemic=threshold_pre_epidemic,
+                threshold_pos_epidemic=threshold_pos_epidemic,
+                threshold_epidemic=threshold_epidemic
             )
         else:
             chart_chik_climate = ''
+            chart_chik_incidence = ''
 
         if not df_zika.empty:
             chart_zika_climate = self.create_climate_chart(
-                df=df_dengue, year_week=year_week, var_climate=var_climate,
+                df=df_zika, year_week=year_week, var_climate=var_climate,
                 climate_crit=climate_crit, climate_title=climate_title
             )
+
+            chart_zika_incidence = self.create_incidence_chart(
+                df=df_zika, year_week=year_week,
+                threshold_pre_epidemic=threshold_pre_epidemic,
+                threshold_pos_epidemic=threshold_pos_epidemic,
+                threshold_epidemic=threshold_epidemic
+            )
+
         else:
             chart_zika_climate = ''
+            chart_zika_incidence = ''
 
         s = dict(
             na_rep='',
@@ -1302,18 +1352,20 @@ class ReportCityView(TemplateView):
             'city_name': city.name,
             'state_name': city.state,
             'df_dengue': (
-                df_dengue.iloc[-16:, :].reset_index().to_html(**s)
+                df_dengue.iloc[-16:, :-1].reset_index().to_html(**s)
             ),
             'df_chik': (
-                df_chik.iloc[-16:, :].reset_index().to_html(**s)
+                df_chik.iloc[-16:, :-1].reset_index().to_html(**s)
             ),
             'df_zika': (
-                df_zika.iloc[-16:, :].reset_index().to_html(**s)
+                df_zika.iloc[-16:, :-1].reset_index().to_html(**s)
             ),
             'chart_dengue_climate': chart_dengue_climate,
             'chart_dengue_tweets': chart_dengue_tweets,
             'chart_dengue_incidence': chart_dengue_incidence,
             'chart_chik_climate': chart_chik_climate,
-            'chart_zika_climate': chart_zika_climate
+            'chart_chik_incidence': chart_chik_incidence,
+            'chart_zika_climate': chart_zika_climate,
+            'chart_zika_incidence': chart_zika_incidence
         })
         return context
