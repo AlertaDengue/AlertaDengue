@@ -1,8 +1,10 @@
 from django.http import HttpResponse
 from django.views.generic.base import View
+from datetime import datetime
 
 # local
 from .db import NotificationQueries, STATE_NAME, AlertCity, MRJ_GEOCODE
+from dados.episem import episem
 
 
 class _GetMethod:
@@ -26,7 +28,6 @@ class _GetMethod:
         )
 
         return result if cast is None or result is None else cast(result)
-
 
 
 class NotificationReducedCSV_View(View, _GetMethod):
@@ -165,5 +166,41 @@ class AlertCityView(View, _GetMethod):
                 result = '[EE] error_message: %s' % e
 
         content_type = 'application/json' if format == 'json' else 'text/plain'
+
+        return HttpResponse(result, content_type=content_type)
+
+
+class EpiYearWeekView(View, _GetMethod):
+    """
+    JSON output
+    """
+    request = None
+
+    def get(self, request):
+        self.request = request
+        output_format = 'json'
+
+        try:
+            epidate_s = self._get(
+                'epidate', error_message='epidate sent is empty.'
+            )
+
+            epidate = datetime.strptime(epidate_s, '%Y-%m-%d')
+            epi_year_week = episem(epidate, sep='')
+
+            if output_format == 'json':
+                result = '{"epi_year_week": %s}' % epi_year_week
+            else:
+                result = '' % epi_year_week
+
+        except Exception as e:
+            if output_format == 'json':
+                result = '{"error_message": "%s"}' % e
+            else:
+                result = '[EE] error_message: %s' % e
+
+        content_type = (
+            'application/json' if output_format == 'json' else 'text/plain'
+        )
 
         return HttpResponse(result, content_type=content_type)

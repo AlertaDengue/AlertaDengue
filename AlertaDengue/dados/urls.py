@@ -38,6 +38,7 @@ __year = '(?P<year>\d{4})'
 __month = '(?P<month>\d{2})'
 __day = '(?P<day>\d{2})'
 __e_week = '(?P<e_week>\d{2})'
+__year_week = '(?P<year_week>\d{6})'
 
 urlpatterns = [
     url(r'^$', AlertaMainView.as_view(), name='main'),
@@ -74,6 +75,6 @@ urlpatterns = [
     url(r'^geojson/%s/%s/$' % (__geocode, __disease),
         GeoJsonView.as_view(), name='geojson'),
     url(r'^report/$', ReportView.as_view(), name='report'),
-    url(r'^report/city/%s/%s/%s/$' % (__geocode_, __year, __e_week),
+    url(r'^report/city/%s/%s/$' % (__geocode_, __year_week),
         ReportCityView.as_view(), name='report_city'),
 ]

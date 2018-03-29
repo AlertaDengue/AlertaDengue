@@ -117,6 +117,30 @@ def get_city_name_by_id(geocode: int):
         return res.fetchone()[0]
 
 
+def get_all_active_cities_state():
+    """
+    Fetch from the database a list on names of active cities
+    :return: list of tuples (geocode,name)
+    """
+    res = cache.get('get_all_active_cities')
+
+    if res is None:
+        with db_engine.connect() as conn:
+            res = conn.execute('''
+            SELECT DISTINCT 
+              hist.municipio_geocodigo, 
+              city.nome,
+              city.uf
+            FROM "Municipio"."Historico_alerta" AS hist
+              INNER JOIN "Dengue_global"."Municipio" AS city
+                ON (hist.municipio_geocodigo=city.geocodigo)
+            ''')
+            res = res.fetchall()
+            cache.set(
+                'get_all_active_cities', res, settings.QUERY_CACHE_TIMEOUT
+            )
+    return res
+
 def get_all_active_cities():
     """
     Fetch from the database a list on names of active cities
@@ -126,9 +150,14 @@ def get_all_active_cities():
 
     if res is None:
         with db_engine.connect() as conn:
-            res = conn.execute(
-                ' SELECT DISTINCT municipio_geocodigo, municipio_nome'
-                ' FROM "Municipio"."Historico_alerta";')
+            res = conn.execute('''
+            SELECT DISTINCT 
+              hist.municipio_geocodigo, 
+              city.nome
+            FROM "Municipio"."Historico_alerta" AS hist
+              INNER JOIN "Dengue_global"."Municipio" AS city
+                ON (hist.municipio_geocodigo=city.geocodigo)
+            ''')
             res = res.fetchall()
             cache.set(
                 'get_all_active_cities', res, settings.QUERY_CACHE_TIMEOUT

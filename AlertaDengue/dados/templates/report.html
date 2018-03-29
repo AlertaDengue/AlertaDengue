@@ -24,19 +24,28 @@
 </style>
 
 <script>
+var report_geocode;
+
 function openReport() {
-  var geocode = $('#geocode').val();
-  var year = $('#year').val();
-  var week = $('#week').val();
+  var geocode = $('#geocode option:selected').val();
+  var epidate = $('#epidate').val();
+  var url = '/api/epi_year_week?epidate=' + epidate;
 
-  $('#form-report').attr('action', (
-    '/report/city/' + $('#geocode').val() +
-    '/' +  $('#year').val() +
-    '/' + $('#week').val()
-  ));
+  $.ajax({
+      dataType: 'json',
+      url: url,
+      success: function(data) {
+        window.location.href = (
+          '/report/city/' +
+          geocode + '/' +
+          data['epi_year_week']
+        );
+      }
+  });
 
-  return False;
+  return false;
 }
+
 </script>
 
 {% endblock %}
@@ -44,36 +53,32 @@ function openReport() {
 
 {% block content %}
 
-<form id="form-report" onsubmit="openReport();false;">
+<form id="form-report" onsubmit="return openReport();">
   <div class="row">
     <div class="col-md-12">
       <!-- field:start -->
       <div class="form-group">
-        <label for="geocode">{% trans "Código IBGE" %}</label>
-        <input type="text" class="form-control" id="geocode"
-               aria-describedby="geocodeHelp" required="required"
-               pattern="^([0-9]{7})$"
-               maxlength="7" style="width:120px;"
+        <label for="geocode">{% trans "Município" %}</label>
+        <select id="geocode" class="form-control"
+                style="width:400px;"
+                required="required"
         >
+          <option value="">{% trans "Selecione um município" %}</option>
+          {{options_cities|safe}}
+        </select>
         <small id="geocodedHelp" class="form-text text-muted">
-          {% trans "Código IBGE do município" %}
-          {% trans "(aceita apenas números, 7 números requeridos)" %}
+          {% trans "Selecione o município desejado para a consulta" %}
         </small>
       </div>
       <div class="form-group">
-        <label for="year">{% trans "Ano" %}/{% trans "Ano" %}</label><br/>
-        <input type="text" class="form-control" id="year"
-               aria-describedby="yearHelp" style="width:80px;display:inline;"
-               pattern="^([0-9]*)$"
-               maxlength="4" required="required" > /
-        <input type="text" class="form-control" id="week"
-               aria-describedby="yearHelp" style="width:50px;;display:inline;"
-               pattern="^([0-9]*)$"
-               maxlength="2" required="required">
-        <br/>
-        <small id="yearHelp" class="form-text text-muted">
-          {% trans "Ano/Semana Epidemiológico" %}
-          {% trans "(aceita apenas números, campo requerido)" %}
+        <label for="epidate">{% trans "Data da Semana Epidemiológica" %}</label>
+        <input type="date" class="form-control"
+               id="epidate"
+               value="{{date_query}}"
+               aria-describedby="dateHelp"
+               required="required" style="width:200px;">
+        <small id="dateHelp" class="form-text text-muted">
+          {% trans "Selecione um dia da Semana Epidemiológica desejada" %}
         </small>
       </div>
       <!-- field:end -->

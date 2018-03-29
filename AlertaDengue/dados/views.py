@@ -15,7 +15,7 @@ from plotly.offline.offline import _plot_html
 from .report import get_chart_info_city_base64
 from . import dbdata, models as M
 from .dbdata import Forecast, MRJ_GEOCODE, CID10
-from .episem import episem
+from .episem import episem, episem2date
 from .maps import get_city_info
 from .report import get_chart_info_city_base64
 from .models import City
@@ -899,8 +899,27 @@ class ReportView(TemplateView):
         """
         context = super().get_context_data(**kwargs)
 
+        options_cities = ''
+        for geocode, city_name, city_state in (
+            dbdata.get_all_active_cities_state()
+        ):
+            options_cities += '''
+            <option value="%(geocode)s">
+                %(city_name)s - %(city_state)s
+            </option>''' % {
+                'geocode': geocode,
+                'city_name': city_name,
+                'city_state': city_state
+            }
+
+        dt = datetime.datetime.now() - datetime.timedelta(days=7)
+        yw = episem(dt, sep='')
+        dt_fmt = episem2date(yw, 1).strftime('%Y-%m-%d')
+
         context.update({
             'disease_list': CID10,
+            'options_cities': options_cities,
+            'date_query': dt_fmt
         })
 
         return context
@@ -1240,9 +1259,7 @@ class ReportCityView(TemplateView):
         context = super(ReportCityView, self).get_context_data(**kwargs)
 
         geocode = int(context['geocode'])
-        e_week = int(context['e_week'])
-        year = int(context['year'])
-        year_week = year * 100 + e_week
+        year_week = int(context['year_week'])
 
         city = City.objects.get(pk=int(geocode))
 
