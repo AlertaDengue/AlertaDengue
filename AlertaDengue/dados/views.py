@@ -7,21 +7,17 @@ from django.contrib import messages
 from django.conf import settings
 from django.http import HttpResponse
 from time import mktime
-from plotly import tools
-from plotly.offline.offline import _plot_html
 
 
 # local
-from .report import get_chart_info_city_base64
 from . import dbdata, models as M
-from .dbdata import Forecast, MRJ_GEOCODE, CID10
+from .dbdata import Forecast, MRJ_GEOCODE, CID10, ReportCity
 from .episem import episem, episem2date
 from .maps import get_city_info
-from .report import get_chart_info_city_base64
-from .models import City
+from .models import City, RegionalHealth
+from .charts import ReportCityCharts
 from gis.geotiff import convert_from_shapefile
 
-import cufflinks as cf
 import datetime
 import fiona
 import geojson
@@ -928,328 +924,6 @@ class ReportView(TemplateView):
 class ReportCityView(TemplateView):
     template_name = 'report_city.html'
 
-    def read_disease_data(
-        self, geocode: int, disease_code: str, station_id: str, year_week: int,
-        var_climate: str, has_tweets: bool=False
-    ) -> pd.DataFrame:
-        """
-
-        :param geocode:
-        :param disease_code:
-        :param station_id:
-        :param year_week:
-        :param var_climate:
-        :param has_tweets:
-
-        :return:
-
-        """
-        k = [
-            var_climate,
-            'casos',
-            'p_inc100k',
-            'casos_est',
-            'p_rt1',
-            'nivel',
-            'level_code'
-        ]
-
-        tweet_join = ''
-        tweet_field = ''
-
-        if has_tweets:
-            k.insert(1, 'n_tweets')
-            tweet_field = 'tweets.n_tweets,'
-
-            tweet_join = '''
-            LEFT JOIN (
-               SELECT 
-                 epi_week(data_dia) AS "SE", 
-                 SUM(numero) as n_tweets,
-                 "Municipio_geocodigo"
-               FROM "Municipio"."Tweet"
-               WHERE "Municipio_geocodigo" = %(geocode)s
-                 AND "CID10_codigo" = '%(disease_code)s'
-                 AND epi_week(data_dia) <= %(year_week)s
-               GROUP BY "SE", "Municipio_geocodigo"
-               ORDER BY "SE" DESC
-             ) AS tweets
-               ON (
-                 "Municipio_geocodigo"="municipio_geocodigo"
-                 AND tweets."SE"=hist."SE"
-               )
-            '''
-
-        disease_table_suffix = ''
-
-        if disease_code == CID10['chikungunya']:
-            disease_table_suffix = '_chik'
-        elif disease_code == CID10['zika']:
-            disease_table_suffix = '_zika'
-
-        sql = ('''
-        SELECT
-           %(var_climate)s,
-           hist."SE",
-           ''' + tweet_field + '''
-           hist.casos,
-           hist.p_rt1,
-           hist.casos_est,
-           hist.p_inc100k,
-           hist.nivel AS level_code,
-           (CASE 
-              WHEN hist.nivel=1 THEN 'verde'
-              WHEN hist.nivel=2 THEN 'amarelo'
-              WHEN hist.nivel=3 THEN 'laranja'
-              WHEN hist.nivel=4 THEN 'vermelho'
-              ELSE '-'    
-            END) AS nivel
-        FROM 
-         "Municipio"."Historico_alerta%(disease_table_suffix)s" AS hist
-         LEFT JOIN (
-           SELECT 
-               epi_week(data_dia) AS epiweek, 
-               AVG(%(var_climate)s) AS %(var_climate)s
-           FROM "Municipio"."Clima_wu"
-           WHERE "Estacao_wu_estacao_id" = '%(station_id)s'
-           GROUP BY epiweek
-           ORDER BY epiweek
-         ) AS climate_wu
-           ON (hist."SE"=climate_wu.epiweek)
-         ''' + tweet_join + '''
-        WHERE 
-         hist."SE" <= %(year_week)s
-         AND municipio_geocodigo=%(geocode)s
-        ORDER BY "SE" DESC
-        ''') % {
-            'year_week': year_week,
-            'geocode': geocode,
-            'disease_code': disease_code,
-            'station_id': station_id,
-            'var_climate': var_climate,
-            'disease_table_suffix': disease_table_suffix
-        }
-
-        df = pd.read_sql(sql, index_col='SE', con=dbdata.db_engine)[k]
-        df.p_rt1 = (df.p_rt1 * 100).round(0).astype(int)
-        df.casos_est = df.casos_est.round(0).astype(int)
-        df.p_inc100k = df.p_inc100k.round(0).astype(int)
-        df.sort_index(ascending=True, inplace=True)
-
-        if has_tweets:
-            df.n_tweets = df.n_tweets.round(0)
-
-        df.rename(columns={
-            'umid_max': 'umid.max',
-            'temp_min': 'temp.min',
-            'p_inc100k': 'incidência',
-            'casos': 'casos notif.',
-            'n_tweets': 'tweets',
-            'p_rt1': 'pr(incid. subir)'
-        }, inplace=True)
-
-        return df
-
-    def create_incidence_chart(
-        self, df: pd.DataFrame, year_week: int, threshold_pre_epidemic: float,
-        threshold_pos_epidemic: float, threshold_epidemic: float
-    ) -> 'Plotly_HTML':
-        """
-
-        :param df:
-        :param year_week:
-        :param threshold_pre_epidemic: float,
-        :param threshold_pos_epidemic: float
-        :param threshold_epidemic: float
-        :return:
-        """
-        df = df.reset_index()[[
-            'SE', 'incidência', 'casos notif.', 'level_code'
-        ]]
-        df = df[
-            df.SE >= year_week - 200
-        ]
-
-        df['Data'] = df.SE.apply(
-            lambda x: datetime.datetime.strptime(str(x) + '-0', '%Y%W-%w')
-        )
-
-        k = 'incidência'
-
-        df['alerta verde'] = df[df.level_code == 1][k]
-        df['alerta amarelo'] = df[df.level_code == 2][k]
-        df['alerta laranja'] = df[df.level_code == 3][k]
-        df['alerta vermelho'] = df[df.level_code  == 4][k]
-
-        df['limiar epidêmico'] = threshold_epidemic
-        df['limiar pós epidêmico'] = threshold_pos_epidemic
-        df['limiar pré epidêmico'] = threshold_pre_epidemic
-
-        figure_bar = df.iplot(
-            asFigure=True, kind='bar', x=['Data'], y=[
-                'alerta verde',
-                'alerta amarelo',
-                'alerta laranja',
-                'alerta vermelho'
-            ],
-            showlegend=False,
-            yTitle='Incidência', xTitle='Período (Ano/Semana)',
-            color=[
-                'rgb(0,255,0)', 'rgb(255,255,0)',
-                'rgb(255,150,0)', 'rgb(255,0,0)'
-            ], hoverinfo='none'
-        )
-
-        figure_threshold = df.iplot(
-            asFigure=True, x=['Data'], y=[
-                'limiar pré epidêmico',
-                'limiar pós epidêmico',
-                'limiar epidêmico'
-            ], showlegend=True, color=[
-                'rgb(0,255,0)', 'rgb(255,150,0)', 'rgb(255,0,0)'
-            ], hoverinfo='y+name'
-        )
-
-        figure_line = df.iplot(
-            asFigure=True, x=['Data'], y=['casos notif.'],
-            showlegend=False,
-            secondary_y=['casos notif.'], secondary_y_title='Casos',
-            hoverinfo='none'
-        )
-
-        figure_line['layout']['xaxis1'].update(
-            tickangle=-60, tickformat='%Y/%W'
-        )
-
-        figure_line['layout']['legend'].update(
-            x=-.1, y=1.2,
-            traceorder='normal',
-            font=dict(
-                family='sans-serif',
-                size=12,
-                color='#000'
-            ),
-            bgcolor='#E2E2E2',
-            bordercolor='#FFFFFF',
-            borderwidth=2
-        )
-
-        figure_line['layout']['yaxis1'].update(
-            title='Incidência'
-        )
-
-        figure_threshold.data.extend(figure_bar.data)
-        figure_line.data.extend(figure_threshold.data)
-
-        return _plot_html(
-            figure_or_data=figure_line, config={}, validate=True,
-            default_width='100%', default_height=500, global_requirejs=''
-        )[0]
-
-    def create_climate_chart(
-        self, df: pd.DataFrame, var_climate, year_week,
-        climate_crit, climate_title
-    ) -> 'Plotly_HTML':
-        """
-
-        :param df:
-        :param var_climate:
-        :param year_week:
-        :param climate_crit:
-        :param climate_title:
-        :return:
-        """
-        k = var_climate.replace('_', '.')
-        df_climate = df.reset_index()[['SE', k]]
-        df_climate = df_climate[
-            df_climate.SE >= year_week - 200
-            ]
-
-        df_climate['Data'] = df_climate.SE.apply(
-            lambda x: datetime.datetime.strptime(str(x) + '-0', '%Y%W-%w')
-        )
-
-        df_climate['Limiar favorável transmissão'] = climate_crit
-
-        figure = df_climate.iplot(
-            asFigure=True, x=['Data'], y=[k, 'Limiar favorável transmissão'],
-            showlegend=True,
-            yTitle=climate_title, xTitle='Período (Ano/Semana)'
-        )
-
-        figure['layout']['xaxis1'].update(
-            tickangle=-60, tickformat='%Y/%W'
-        )
-
-        figure['layout']['legend'].update(
-            x=-.1, y=1.2,
-            traceorder='normal',
-            font=dict(
-                family='sans-serif',
-                size=12,
-                color='#000'
-            ),
-            bgcolor='#E2E2E2',
-            bordercolor='#FFFFFF',
-            borderwidth=2
-        )
-
-        return _plot_html(
-            figure_or_data=figure, config={}, validate=True,
-            default_width='100%', default_height=500, global_requirejs=''
-        )[0]
-
-    def create_tweet_chart(
-        self, df: pd.DataFrame, year_week
-    ) -> 'Plotly_HTML':
-        """
-
-        :param df:
-        :param var_climate:
-        :param year_week:
-        :param climate_crit:
-        :param climate_title:
-        :return:
-        """
-        df_tweet = df.reset_index()[['SE', 'tweets', 'casos notif.']]
-        df_tweet = df_tweet[
-            df_tweet.SE >= year_week - 200
-        ]
-
-        df_tweet['Data'] = df_tweet.SE.apply(
-            lambda x: datetime.datetime.strptime(str(x) + '-0', '%Y%W-%w')
-        )
-
-        figure = df_tweet.iplot(
-            x=['Data'],
-            y=['tweets', 'casos notif.'], asFigure=True,
-            showlegend=True, xTitle='Período (Ano/Semana)'
-        )
-        figure = figure.set_axis('tweets', side='right')
-        figure['layout']['xaxis1'].update(
-            tickangle=-60, tickformat='%Y/%W'
-        )
-        figure['layout']['yaxis1'].update(title='Casos')
-        figure['layout']['yaxis2'].update(title='Tweets')
-
-        figure['layout']['legend'].update(
-            x=-.1, y=1.2,
-            traceorder='normal',
-            font=dict(
-                family='sans-serif',
-                size=12,
-                color='#000'
-            ),
-            bgcolor='#E2E2E2',
-            bordercolor='#FFFFFF',
-            borderwidth=2
-        )
-
-        return _plot_html(
-            figure_or_data=figure, config={}, validate=True,
-            default_width='100%', default_height=500, global_requirejs=''
-        )[0]
-
     def get_context_data(self, **kwargs):
         """
 
@@ -1263,22 +937,18 @@ class ReportCityView(TemplateView):
 
         city = City.objects.get(pk=int(geocode))
 
-        sql = '''
-        SELECT 
-          codigo_estacao_wu, varcli, ucrit, tcrit,
-          limiar_preseason, limiar_posseason, limiar_epidemico
-        FROM "Dengue_global".regional_saude
-        WHERE municipio_geocodigo = %s
-        ''' % geocode
+        regional_health = RegionalHealth.objects.get(
+            municipio_geocodigo=int(geocode)
+        )
 
-        df_station = pd.read_sql(sql, con=dbdata.db_engine)
+        station_id = regional_health.codigo_estacao_wu
+        var_climate = regional_health.varcli
+        u_crit = regional_health.ucrit
+        t_crit = regional_health.tcrit
+        threshold_pre_epidemic = regional_health.limiar_preseason
+        threshold_pos_epidemic = regional_health.limiar_posseason
+        threshold_epidemic = regional_health.limiar_epidemico
 
-        if df_station.empty:
-            raise Exception('NO STATION FOUND')
-
-        (station_id, var_climate, u_crit, t_crit,
-         threshold_pre_epidemic, threshold_pos_epidemic, threshold_epidemic
-         ) = df_station.values[0]
         climate_crit = None
 
         if var_climate.startswith('temp'):
@@ -1288,50 +958,50 @@ class ReportCityView(TemplateView):
             climate_crit = u_crit
             climate_title = 'Umidade'
 
-        df_dengue = self.read_disease_data(
+        df_dengue = ReportCity.read_disease_data(
             geocode=geocode, disease_code=CID10['dengue'],
             station_id=station_id,  year_week=year_week,
             var_climate=var_climate, has_tweets=True
         )
 
-        df_chik = self.read_disease_data(
+        df_chik = ReportCity.read_disease_data(
             geocode=geocode, disease_code=CID10['chikungunya'],
             station_id=station_id, year_week=year_week,
             var_climate=var_climate, has_tweets=False
         )
 
-        df_zika = self.read_disease_data(
+        df_zika = ReportCity.read_disease_data(
             geocode=geocode, disease_code=CID10['zika'],
             station_id=station_id, year_week=year_week,
             var_climate=var_climate, has_tweets=False
         )
 
         if not df_dengue.empty:
-            chart_dengue_climate = self.create_climate_chart(
+            chart_dengue_climate = ReportCityCharts.create_climate_chart(
                 df=df_dengue, year_week=year_week, var_climate=var_climate,
                 climate_crit=climate_crit, climate_title=climate_title
             )
 
-            chart_dengue_incidence = self.create_incidence_chart(
+            chart_dengue_incidence = ReportCityCharts.create_incidence_chart(
                 df=df_dengue, year_week=year_week,
                 threshold_pre_epidemic=threshold_pre_epidemic,
                 threshold_pos_epidemic=threshold_pos_epidemic,
                 threshold_epidemic=threshold_epidemic
             )
 
-            chart_dengue_tweets = self.create_tweet_chart(
+            chart_dengue_tweets = ReportCityCharts.create_tweet_chart(
                 df=df_dengue, year_week=year_week
             )
         else:
             chart_dengue_climate = ''
 
         if not df_chik.empty:
-            chart_chik_climate = self.create_climate_chart(
+            chart_chik_climate = ReportCityCharts.create_climate_chart(
                 df=df_chik, year_week=year_week, var_climate=var_climate,
                 climate_crit=climate_crit, climate_title=climate_title
             )
 
-            chart_chik_incidence = self.create_incidence_chart(
+            chart_chik_incidence = ReportCityCharts.create_incidence_chart(
                 df=df_chik, year_week=year_week,
                 threshold_pre_epidemic=threshold_pre_epidemic,
                 threshold_pos_epidemic=threshold_pos_epidemic,
@@ -1342,12 +1012,12 @@ class ReportCityView(TemplateView):
             chart_chik_incidence = ''
 
         if not df_zika.empty:
-            chart_zika_climate = self.create_climate_chart(
+            chart_zika_climate = ReportCityCharts.create_climate_chart(
                 df=df_zika, year_week=year_week, var_climate=var_climate,
                 climate_crit=climate_crit, climate_title=climate_title
             )
 
-            chart_zika_incidence = self.create_incidence_chart(
+            chart_zika_incidence = ReportCityCharts.create_incidence_chart(
                 df=df_zika, year_week=year_week,
                 threshold_pre_epidemic=threshold_pre_epidemic,
                 threshold_pos_epidemic=threshold_pos_epidemic,
