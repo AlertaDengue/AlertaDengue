@@ -2,6 +2,11 @@
 {% load i18n %}
 
 {% block extra_head %}
+
+<link rel="stylesheet" type="text/css" href="/static/libs/DataTables/datatables.min.css"/>
+
+<script type="text/javascript" src="/static/libs/DataTables/datatables.min.js"></script>
+
 <style>
       .box {
         border: 1px #dfdfdf solid;
@@ -308,6 +313,10 @@
     $('.table tr').each(function(i, obj){
       $(this).addClass(cssClasses[$('td:last-child', this).text()]);
     });
+
+    $(document).ready( function () {
+      $('.table').DataTable();
+    } );
   });
 </script>
 
