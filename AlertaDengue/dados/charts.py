@@ -39,6 +39,8 @@ class ReportCityCharts:
         df = df.reset_index()[[
             'SE', 'incidência', 'casos notif.', 'level_code'
         ]]
+
+        # 200 = 2 years
         df = df[
             df.SE >= year_week - 200
         ]
@@ -80,7 +82,7 @@ class ReportCityCharts:
                 'limiar epidêmico'
             ], showlegend=True, color=[
                 'rgb(0,255,0)', 'rgb(255,150,0)', 'rgb(255,0,0)'
-            ], hoverinfo='y+name'
+            ], hoverinfo='none'
         )
 
         figure_line = df.iplot(
@@ -109,6 +111,19 @@ class ReportCityCharts:
 
         figure_line['layout']['yaxis1'].update(
             title='Incidência'
+        )
+
+        figure_line['layout'].update(
+            title=(
+                'Limiares: ' +
+                'pré epidêmico=%s; ' +
+                'pós epidêmico=%s; ' +
+                'epidêmico=%s;'
+            ) % (
+                threshold_pre_epidemic,
+                threshold_pos_epidemic,
+                threshold_epidemic
+            )
         )
 
         figure_threshold.data.extend(figure_bar.data)

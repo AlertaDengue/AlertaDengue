@@ -976,6 +976,17 @@ class ReportCityView(TemplateView):
             var_climate=var_climate, has_tweets=False
         )
 
+        # prepare empty variables
+        chart_dengue_climate = ''
+        chart_chik_climate = ''
+        chart_chik_incidence = ''
+        chart_zika_climate = ''
+        chart_zika_incidence = ''
+
+        total_n_dengue = 0
+        total_n_zika = 0
+        total_n_chik = 0
+
         if not df_dengue.empty:
             chart_dengue_climate = ReportCityCharts.create_climate_chart(
                 df=df_dengue, year_week=year_week, var_climate=var_climate,
@@ -992,8 +1003,9 @@ class ReportCityView(TemplateView):
             chart_dengue_tweets = ReportCityCharts.create_tweet_chart(
                 df=df_dengue, year_week=year_week
             )
-        else:
-            chart_dengue_climate = ''
+            total_n_dengue = df_dengue[
+                df_dengue.index // 100 == 2018
+            ]['casos notif.'].sum()
 
         if not df_chik.empty:
             chart_chik_climate = ReportCityCharts.create_climate_chart(
@@ -1007,9 +1019,10 @@ class ReportCityView(TemplateView):
                 threshold_pos_epidemic=threshold_pos_epidemic,
                 threshold_epidemic=threshold_epidemic
             )
-        else:
-            chart_chik_climate = ''
-            chart_chik_incidence = ''
+
+            total_n_chik = df_chik[
+                df_chik.index // 100 == 2018
+                ]['casos notif.'].sum()
 
         if not df_zika.empty:
             chart_zika_climate = ReportCityCharts.create_climate_chart(
@@ -1024,35 +1037,36 @@ class ReportCityView(TemplateView):
                 threshold_epidemic=threshold_epidemic
             )
 
-        else:
-            chart_zika_climate = ''
-            chart_zika_incidence = ''
+            total_n_zika = df_zika[
+                df_zika.index // 100 == 2018
+            ]['casos notif.'].sum()
 
-        s = dict(
+        # param used by df.to_html
+        html_param = dict(
             na_rep='',
             float_format=lambda x: ('%d' % x) if not np.isnan(x) else '',
             index=False,
             classes="table table-striped"
         )
+        prepare_html = (
+            lambda df: df.iloc[-16:, :-1].reset_index().to_html(**html_param)
+        )
 
         context.update({
             'city_name': city.name,
             'state_name': city.state,
-            'df_dengue': (
-                df_dengue.iloc[-16:, :-1].reset_index().to_html(**s)
-            ),
-            'df_chik': (
-                df_chik.iloc[-16:, :-1].reset_index().to_html(**s)
-            ),
-            'df_zika': (
-                df_zika.iloc[-16:, :-1].reset_index().to_html(**s)
-            ),
+            'df_dengue': prepare_html(df_dengue),
+            'df_chik': prepare_html(df_chik),
+            'df_zika': prepare_html(df_zika),
             'chart_dengue_climate': chart_dengue_climate,
             'chart_dengue_tweets': chart_dengue_tweets,
             'chart_dengue_incidence': chart_dengue_incidence,
             'chart_chik_climate': chart_chik_climate,
             'chart_chik_incidence': chart_chik_incidence,
             'chart_zika_climate': chart_zika_climate,
-            'chart_zika_incidence': chart_zika_incidence
+            'chart_zika_incidence': chart_zika_incidence,
+            'total_n_dengue': total_n_dengue,
+            'total_n_chik': total_n_chik,
+            'total_n_zika': total_n_zika,
         })
         return context

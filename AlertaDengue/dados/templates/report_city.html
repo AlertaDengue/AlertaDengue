@@ -49,6 +49,7 @@
 # 	CAIXA LATERAL - PRIMEIRA PAGINA
 # ---------------------------------
 -->
+
 <div class="row">
   <div class="col-md-12">
 
@@ -58,8 +59,25 @@
     # ----------------------
     -->
 
-    Desde o início do ano, {{totanomun}} casos de dengue, {{totanomunC}} de
-    chikungunya e {{totanomunZ}} de Zika foram registrados na cidade.
+    {% if total_n_dengue or total_n_chik or total_n_zika %}
+
+    <div class="box">
+      <h5>Desde o início do ano foram registrados na cidade:</h5>
+      <ul>
+      {% if total_n_dengue > 0 %}
+        <li>{{total_n_dengue}} casos de dengue;</li>
+      {% endif %}
+
+      {% if total_n_chik > 0 %}
+        <li>{{total_n_chik}} de chikungunya;</li>
+      {% endif %}
+
+      {% if total_n_zika > 0 %}
+        <li>{{total_n_zika}} de Zika</li>
+      {% endif %}
+      </ul>
+    </div>
+    {% endif %}
 
     <h4>Situação da Dengue</h4>
 
@@ -315,7 +333,9 @@
     });
 
     $(document).ready( function () {
-      $('.table').DataTable();
+      $('.table').DataTable({
+        "pageLength": 50
+      } );
     } );
   });
 </script>
