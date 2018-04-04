@@ -210,12 +210,14 @@ class ReportCityCharts:
             lambda x: datetime.datetime.strptime(str(x) + '-0', '%Y%W-%w')
         )
 
+        df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
+
         figure = df_tweet.iplot(
             x=['Data'],
-            y=['tweets', 'casos notif.'], asFigure=True,
+            y=['menções', 'casos notif.'], asFigure=True,
             showlegend=True, xTitle='Período (Ano/Semana)'
         )
-        figure = figure.set_axis('tweets', side='right')
+        figure = figure.set_axis('menções', side='right')
         figure['layout']['xaxis1'].update(
             tickangle=-60, tickformat='%Y/%W'
         )

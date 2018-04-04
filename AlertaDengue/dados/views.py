@@ -1048,8 +1048,12 @@ class ReportCityView(TemplateView):
             index=False,
             classes="table table-striped"
         )
+
         prepare_html = (
-            lambda df: df.iloc[-16:, :-1].reset_index().to_html(**html_param)
+            lambda df: df.iloc[-16:, :-1]
+                .reset_index()
+                .sort_values(by='SE', ascending=[False])
+                .to_html(**html_param)
         )
 
         context.update({

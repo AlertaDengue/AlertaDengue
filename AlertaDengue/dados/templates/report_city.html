@@ -12,6 +12,7 @@
         border: 1px #dfdfdf solid;
         padding: 20px;
         margin-bottom: 20px;
+        background-color: #dfdfdf;
       }
 
       .table tr td:nth-child(1){
@@ -58,117 +59,145 @@
     #	MAIN BODY - FIRST PAGE
     # ----------------------
     -->
-
-    {% if total_n_dengue or total_n_chik or total_n_zika %}
-
-    <div class="box">
-      <h5>Desde o início do ano foram registrados na cidade:</h5>
-      <ul>
-      {% if total_n_dengue > 0 %}
-        <li>{{total_n_dengue}} casos de dengue;</li>
-      {% endif %}
-
-      {% if total_n_chik > 0 %}
-        <li>{{total_n_chik}} de chikungunya;</li>
-      {% endif %}
-
-      {% if total_n_zika > 0 %}
-        <li>{{total_n_zika}} de Zika</li>
-      {% endif %}
-      </ul>
-    </div>
-    {% endif %}
-
-    <h4>Situação da Dengue</h4>
-
     <p>
-      A figura abaixo mostra a situação da dengue nos últimos dois anos. (TOPO)
-      em preto, os casos suspeitos de dengue e em verde, a dengue mencionada em
-      rede social; (MEIO) Variável meteorológica
-      utilizada para análise da receptividade da cidade, valores acima do
-      limiar (linha horizontal) indicam condições favoraveis à transmissão.
-      (BAIXO) histórico do alerta de dengue na cidade (ver
-      <a href="#color-code">código de cores</a>).
+      Data da última atualização : {Semana/Ano}
     </p>
-    {{chart_dengue_climate|safe}}
+    <p>
+      <!--
+      usar a cor correspondente ao nivel de
+      alerta mais alto considerando as 3 doenças
+      -->
+      Situação de alerta do município: {Verde, Amarelo ou Laranja ou Vermelho}
+    </p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+      <h2>Condições climáticas para transmissão de arboviroses</h2>
+
+      A figura abaixo mostra o indicador meteorológico de receptividade do
+      município para a transmissão de arbovirores. Quando o indicador está
+      acima do limiar (linha horizontal), existem condições ambientais
+      favoraveis à transmissão viral. Isso significa que a atenção precisa ser
+      aumentada para a possivel circulação sustentada de arbovirus e para a
+      implementação de controle vetorial.
+
+      {{chart_dengue_climate|safe}}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <h2>Menção a arboviroses nas redes sociais</h2>
+
+    A figura abaixo mostra a intensidade de menção de sintomas de arboviroses
+    e presença de mosquitos na população do município que usa redes sociais.
+    Esse indicador, que é mais eficaz em cidades maiores, deve ser visto como
+    um auxiliar na detecção precoce de aumento de casos. Atualmente,
+    esse indicador é mais sensivel para detectar dengue do que outras
+    arboviroses.
+
     {{chart_dengue_tweets|safe}}
+
+  </div>
+</div>
+
+
+{% if total_n_dengue > 0 %}
+<div class="row">
+  <div class="col-md-12">
+
+    <h2>Situação da Dengue</h2>
+
+    <p>
+      Até essa semana, {{total_n_dengue}} casos de dengue foram registrados.
+      No ano passado, até essa semana, {total_n_dengue_last_year}
+      tinham sido registrados.
+
+      A figura abaixo mostra a situação da dengue nos últimos dois anos.
+      As linhas horizontais correspondem aos limiares pré-epidêmicos,
+      epidêmicos e pós-epidêmicos.
+
+      <!--
+      A figura do historico do alerta fica aqui, Falta colocar legenda.
+      Não entendi o que é a linha laranja.
+      As barras vão ficar coloridas conforme o alerta, certo?
+
+      Colocar a tabela, talvez só com 6 linhas aparecendo e permitir scroll
+      -->
+    </p>
+
     {{chart_dengue_incidence|safe}}
-
-    <!--
-    # ----------------------------------
-    # Pagina com figura para chikungunya
-    # ----------------------------------
-    -->
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-12">
-    <h4>Situação da Chikungunya</h4>
-
-    <p>
-      A figura abaixo mostra a situação da chikungunya nos últimos dois anos.
-      (TOPO) em preto, os casos suspeitos relatados (MEIO) Variável
-      meteorológica utilizada para análise da receptividade da cidade,
-      valores acima do limiar (linha horizontal) indicam condições favoraveis à
-      transmissão (mesmo indicador usado na dengue). (BAIXO) histórico do
-      alerta de chikungunya na cidade
-      (ver <a href="#color-code">código de cores</a>).
-    </p>
-    {{chart_chik_climate|safe}}
-    {{chart_chik_incidence|safe}}
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-12">
-    <!--
-    # ---------------------------
-    # Pagina com figura para zika
-    # ---------------------------
-    -->
-
-    <h4>Situação da Zika</h4>
-    <p>
-      A figura abaixo mostra a situação da zika nos últimos dois anos. (TOPO)
-      em preto, os casos suspeitos relatados (MEIO) Variável meteorológica
-      utilizada para análise da receptividade da cidade, valores acima do
-      limiar (linha horizontal) indicam condições favoraveis à transmissão
-      (mesmo indicador usado na dengue). (BAIXO) histórico do alerta de zika na
-      cidade (ver <a href="#color-code">código de cores</a>).
-    </p>
-
-    {{chart_zika_climate|safe}}
-    {{chart_zika_incidence|safe}}
-
-  </div>
-</div>
-<div class="row">
-  <div id="tables" class="col-md-12">
-
-    <!--
-    # -----------------
-    # Pagina com tabela
-    # -----------------
-    -->
-
-    <h3>Resumo das últimas semanas epidemiológicas</h3>
-
-    <h4>Situação da dengue no município</h4>
-
     {{df_dengue|safe}}
 
-    <h4>Situação da chikungunya no município.</h4>
-    {{df_chik|safe}}
-
-    <!--
-    # ------------------------
-    # Pagina com tabela (cont)
-    # ------------------------
-    -->
-
-    <h4>Situação da zika no município.</h4>
-    {{df_zika|safe}}
   </div>
 </div>
+{% endif %}
+
+
+{% if total_n_chik > 0 %}
+<div class="row">
+  <div class="col-md-12">
+
+    <h2>Situação da Chikungunya</h2>
+
+    <p>
+      Até essa semana, {{total_n_chik}} casos de dengue foram registrados.
+      No ano passado, até essa semana, {{total_n_chik_last_year}}
+      tinham sido registrados.
+
+      A figura abaixo mostra a situação da dengue nos últimos dois anos.
+      As linhas horizontais correspondem aos limiares pré-epidêmicos,
+      epidêmicos e pós-epidêmicos.
+
+      <!--
+      A figura do historico do alerta fica aqui, Falta colocar legenda.
+      Não entendi o que é a linha laranja.
+      As barras vão ficar coloridas conforme o alerta, certo?
+
+      Colocar a tabela, talvez só com 6 linhas aparecendo e permitir scroll
+      -->
+    </p>
+
+    {{chart_chik_incidence|safe}}
+    {{df_chik|safe}}
+
+  </div>
+</div>
+{% endif %}
+
+{% if total_n_zika > 0 %}
+<div class="row">
+  <div class="col-md-12">
+
+    <h2>Situação da Zika</h2>
+
+    <p>
+      Até essa semana, {{total_n_zika}} casos de dengue foram registrados.
+      No ano passado, até essa semana, {{total_n_zika_last_year}}
+      tinham sido registrados.
+
+      A figura abaixo mostra a situação da dengue nos últimos dois anos.
+      As linhas horizontais correspondem aos limiares pré-epidêmicos,
+      epidêmicos e pós-epidêmicos.
+
+      <!--
+      A figura do historico do alerta fica aqui, Falta colocar legenda.
+      Não entendi o que é a linha laranja.
+      As barras vão ficar coloridas conforme o alerta, certo?
+
+      Colocar a tabela, talvez só com 6 linhas aparecendo e permitir scroll
+      -->
+    </p>
+
+    {{chart_zika_incidence|safe}}
+    {{df_zika|safe}}
+
+  </div>
+</div>
+{% endif %}
+
 <div class="row">
   <div class="col-md-2"></div>
   <div id="color-code" class="col-md-8 box">
@@ -178,7 +207,7 @@
     # ---------------------
     -->
 
-    <h4>O código de Cores</h4>
+    <h2>O código de Cores</h2>
 
     As cores indicam niveis de atenção
 
@@ -202,6 +231,7 @@
     </ul>
   </div>
 </div>
+
 <div class="row">
   <div id="var-tables" class="col-md-12">
     <!--
@@ -210,7 +240,7 @@
     # ----------------------------------------
     -->
 
-    <h4>Lista das variáveis apresentadas nas tabelas</h4>
+    <h2>Lista das variáveis apresentadas nas tabelas</h2>
 
     <ul>
       <li><strong>SE:</strong> semana epidemiológica</li>
@@ -228,7 +258,7 @@
       <li><strong>incidência:</strong>
         casos notificados dividido pela população (por 100.000)
       </li>
-      <li><strong>casos máximos:</strong>
+      <li><strong>casos estimados:</strong>
         estimativa do número de casos esperado para a semana,
         com base no perfil de atraso de notificação do município.
       </li>
@@ -241,27 +271,30 @@
     </ul>
   </div>
 </div>
+
 <div class="row">
   <div id="notes" class="col-md-12">
-    <h4>Notas</h4>
+    <h2>Notas</h2>
 
     <ul>
       <li>Os dados do sinan mais recentes ainda não foram totalmente digitados.
         Estimamos o número esperado de casos notificados considerando o tempo
-        até
-        os casos serem digitados.
-      <li>Os dados de tweets são gerados pelo Observatório de Dengue (UFMG). Os
-        tweets são processados para exclusão de informes e outros temas
-        relacionados a dengue.
+        até os casos serem digitados.
+      </li>
+      <li>Os dados de redes sociais são coletados e
+        analisados pelo Observatório de Dengue (UFMG).
+      </li>
       <li>Algumas vezes, os casos da última semana ainda não estao disponíveis,
         nesse caso, usa-se uma estimação com base na tendência de variação da
         série.
+      </li>
     </ul>
   </div>
 </div>
+
 <div class="row">
   <div id="credits" class="col-md-12">
-    <h4>Créditos</h4>
+    <h2>Créditos</h2>
 
     Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como
     parceira entre:
@@ -276,48 +309,14 @@
     </ul>
   </div>
 </div>
+
 <div class="row">
   <div id="contact" class="col-md-12">
-    <h4>Contato</h4>
+    <h2>Contato</h2>
     Para mais detalhes sobre o sistema de alerta InfoDengue, consultar:
     <a href="http://info.dengue.mat.br">http://info.dengue.mat.br</a>
   </div>
 </div>
-
-<!--
-<div class="row">
-  <div class="col-md-12">
-    <!--
-    # -------------------------------------------------
-    # SEGUNDA PAGINA: CAIXA LATERAL - INDICE MUNICIPIOS
-    # -------------------------------------------------
-    -- >
-
-    <!-- <a name="cities"><h3>Municipios</h3></a> -- >
-    <!--
-    ###<<r,echo=FALSE,results=tex>>=
-    ####coresbullets = c(verde='\\gsquare',amarelo='\\ysquare',
-    ####                 laranja='\\osquare',vermelho='\\rsquare')
-    ###
-    ####for (j in 1:dim(env$municip.reg)[1]) {
-    ####  nivel = env$tabelao$Nivel[env$tabelao$Municipio==env$municip.reg$nome[j]]
-    ####  corbullet = '\\wsquare'
-    ####  if(!is.na(nivel)) corbullet = coresbullets[nivel]
-    ####  cat(paste(corbullet,env$municip.reg$nome[j],'\n'))
-    ####}
-    ###@
-
-    #\end{itemize}
-    #\BackToContents
-    # fim do box e minipage
-    #\end{mdframed}\hfill
-    #\end{minipage}#  End of the sidebar mini page
-    #\newpage
-    -- >
-
-  </div>
-</div>
--->
 
 <script>
   $(document).ready(function(){
@@ -334,7 +333,8 @@
 
     $(document).ready( function () {
       $('.table').DataTable({
-        "pageLength": 50
+        "pageLength": 6,
+        "order": [[ 1, "desc" ]]
       } );
     } );
   });
