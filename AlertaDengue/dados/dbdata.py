@@ -122,7 +122,7 @@ def get_all_active_cities_state():
     Fetch from the database a list on names of active cities
     :return: list of tuples (geocode,name)
     """
-    res = cache.get('get_all_active_cities')
+    res = cache.get('get_all_active_cities_state')
 
     if res is None:
         with db_engine.connect() as conn:
@@ -137,9 +137,11 @@ def get_all_active_cities_state():
             ''')
             res = res.fetchall()
             cache.set(
-                'get_all_active_cities', res, settings.QUERY_CACHE_TIMEOUT
+                'get_all_active_cities_state', res,
+                settings.QUERY_CACHE_TIMEOUT
             )
     return res
+
 
 def get_all_active_cities():
     """
