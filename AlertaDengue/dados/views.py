@@ -285,9 +285,12 @@ class DataPublicServicesPageView(TemplateView):
                 )
 
                 with open(geo_info_path) as f:
+                    geo_info_json = json.load(f)
+
                     context.update({
+                        'geocodes': list(geo_info_json.keys()),
                         'mapserver_url': settings.MAPSERVER_URL,
-                        'geo_info': json.load(f)
+                        'geo_info': geo_info_json
                     })
                 self.template_name = 'data_public_services_maps.html'
             else:

@@ -9,8 +9,16 @@
 <meta property="og:image:secure_url"
       content="https://info.dengue.mat.br/static/img/screenshot.png"/>
 
+
+<script src="/static/libs/bootstrap-select/bootstrap-select.min.js"
+        type="text/javascript"></script>
+
 <script src="/static/js/infodengue.js"
         type="text/javascript"></script>
+
+<link href="/static/libs/bootstrap-select/bootstrap-select.min.css"
+        type="text/css" rel="stylesheet" />
+
 
 <style type="text/css">
     .form .col-head {
@@ -26,12 +34,7 @@
     .word-break {
         word-break: break-all;
     }
-
-
-
-
 </style>
-<script></script>
 
 {% endblock %}
 {% block title %}{% trans "Serviços de Dados Públicos" %}: {% trans "Mapas" %}{% endblock %}
@@ -55,7 +58,17 @@
                 {% trans "Código IBGE" %}:
             </div>
             <div class="col-md-3 column">
-                <input type="text" id="geocode" maxlength="7"/>
+                <select id="geocode"
+                        class="selectpicker"
+                        data-live-search="true"
+                        data-title="{% blocktrans %}Selecione municipio(s){% endblocktrans %}"
+                        data-actions-box="true"
+                        data-selected-text-format="static"
+                >
+                    {% for k in geocodes %}
+                    <option value="{{k}}">{{k}}</option>
+                    {% endfor %}
+                </select>
             </div>
         </div>
         <div class="row">
