@@ -11,7 +11,10 @@ from time import mktime
 
 # local
 from . import dbdata, models as M
-from .dbdata import Forecast, MRJ_GEOCODE, CID10, ReportCity
+from .dbdata import (
+    Forecast, MRJ_GEOCODE, CID10, ReportCity,
+    ALERT_CODE, ALERT_COLOR
+)
 from .episem import episem, episem2date
 from .maps import get_city_info
 from .models import City, RegionalHealth
@@ -934,6 +937,7 @@ class ReportCityView(TemplateView):
 
         geocode = int(context['geocode'])
         year_week = int(context['year_week'])
+        year, week = context['year_week'][:4], context['year_week'][-2:]
 
         city = City.objects.get(pk=int(geocode))
 
@@ -984,8 +988,31 @@ class ReportCityView(TemplateView):
         chart_zika_incidence = ''
 
         total_n_dengue = 0
-        total_n_zika = 0
+        total_n_dengue_last_year = 0
         total_n_chik = 0
+        total_n_chik_last_year = 0
+        total_n_zika = 0
+        total_n_zika_last_year = 0
+
+        last_week = int(
+            np.nanmax([
+                df_dengue.index.max(),
+                df_chik.index.max(),
+                df_zika.index.max()
+            ])
+        )
+
+        disease_last_code = []
+        for df in [df_dengue, df_chik, df_zika ]:
+            result = df[df.index == last_week]
+            if not result.empty:
+                disease_last_code.append(float(result['level_code']))
+
+        max_alert_code = int(
+            np.nanmax(disease_last_code)
+        )
+
+        max_alert_color = ALERT_COLOR[max_alert_code]
 
         if not df_dengue.empty:
             chart_dengue_climate = ReportCityCharts.create_climate_chart(
@@ -1007,6 +1034,13 @@ class ReportCityView(TemplateView):
                 df_dengue.index // 100 == 2018
             ]['casos notif.'].sum()
 
+            total_n_dengue_last_year = (
+                df_dengue[
+                    (df_dengue.index // 100 == year_week // 100 - 1) &
+                    (df_dengue.index <= year_week - 100)
+                ]['casos notif.'].sum()
+            )
+
         if not df_chik.empty:
             chart_chik_climate = ReportCityCharts.create_climate_chart(
                 df=df_chik, year_week=year_week, var_climate=var_climate,
@@ -1022,7 +1056,14 @@ class ReportCityView(TemplateView):
 
             total_n_chik = df_chik[
                 df_chik.index // 100 == 2018
+            ]['casos notif.'].sum()
+
+            total_n_chik_last_year = (
+                df_chik[
+                    (df_chik.index // 100 == year_week // 100 - 1) &
+                    (df_chik.index <= year_week - 100)
                 ]['casos notif.'].sum()
+            )
 
         if not df_zika.empty:
             chart_zika_climate = ReportCityCharts.create_climate_chart(
@@ -1041,6 +1082,13 @@ class ReportCityView(TemplateView):
                 df_zika.index // 100 == 2018
             ]['casos notif.'].sum()
 
+            total_n_zika_last_year = (
+                df_zika[
+                    (df_zika.index // 100 == year_week // 100 - 1) &
+                    (df_zika.index <= year_week - 100)
+                ]['casos notif.'].sum()
+            )
+
         # param used by df.to_html
         html_param = dict(
             na_rep='',
@@ -1057,6 +1105,8 @@ class ReportCityView(TemplateView):
         )
 
         context.update({
+            'year': year,
+            'week': week,
             'city_name': city.name,
             'state_name': city.state,
             'df_dengue': prepare_html(df_dengue),
@@ -1070,7 +1120,11 @@ class ReportCityView(TemplateView):
             'chart_zika_climate': chart_zika_climate,
             'chart_zika_incidence': chart_zika_incidence,
             'total_n_dengue': total_n_dengue,
+            'total_n_dengue_last_year': total_n_dengue_last_year,
             'total_n_chik': total_n_chik,
+            'total_n_chik_last_year': total_n_chik_last_year,
             'total_n_zika': total_n_zika,
+            'total_n_zika_last_year': total_n_zika_last_year,
+            'max_alert_color': max_alert_color.title()
         })
         return context

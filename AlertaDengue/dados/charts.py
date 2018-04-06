@@ -201,7 +201,7 @@ class ReportCityCharts:
         :param climate_title:
         :return:
         """
-        df_tweet = df.reset_index()[['SE', 'tweets', 'casos notif.']]
+        df_tweet = df.reset_index()[['SE', 'tweets']]
         df_tweet = df_tweet[
             df_tweet.SE >= year_week - 200
         ]
@@ -214,15 +214,13 @@ class ReportCityCharts:
 
         figure = df_tweet.iplot(
             x=['Data'],
-            y=['menções', 'casos notif.'], asFigure=True,
+            y=['menções'], asFigure=True,
             showlegend=True, xTitle='Período (Ano/Semana)'
         )
-        figure = figure.set_axis('menções', side='right')
         figure['layout']['xaxis1'].update(
             tickangle=-60, tickformat='%Y/%W'
         )
-        figure['layout']['yaxis1'].update(title='Casos')
-        figure['layout']['yaxis2'].update(title='Tweets')
+        figure['layout']['yaxis1'].update(title='Tweets')
 
         figure['layout']['legend'].update(
             x=-.1, y=1.2,

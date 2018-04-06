@@ -60,14 +60,14 @@
     # ----------------------
     -->
     <p>
-      Data da última atualização : {Semana/Ano}
+      Data da última atualização : {{week}}/{{year}}
     </p>
     <p>
       <!--
       usar a cor correspondente ao nivel de
       alerta mais alto considerando as 3 doenças
       -->
-      Situação de alerta do município: {Verde, Amarelo ou Laranja ou Vermelho}
+      Situação de alerta do município: {{max_alert_color}}
     </p>
   </div>
 </div>
@@ -77,7 +77,7 @@
       <h2>Condições climáticas para transmissão de arboviroses</h2>
 
       A figura abaixo mostra o indicador meteorológico de receptividade do
-      município para a transmissão de arbovirores. Quando o indicador está
+      município para a transmissão de arboviroses. Quando o indicador está
       acima do limiar (linha horizontal), existem condições ambientais
       favoraveis à transmissão viral. Isso significa que a atenção precisa ser
       aumentada para a possivel circulação sustentada de arbovirus e para a
@@ -92,7 +92,8 @@
     <h2>Menção a arboviroses nas redes sociais</h2>
 
     A figura abaixo mostra a intensidade de menção de sintomas de arboviroses
-    e presença de mosquitos na população do município que usa redes sociais.
+    e presença de mosquitos de acordo com a população do município que usa
+    redes sociais.
     Esse indicador, que é mais eficaz em cidades maiores, deve ser visto como
     um auxiliar na detecção precoce de aumento de casos. Atualmente,
     esse indicador é mais sensivel para detectar dengue do que outras
@@ -111,8 +112,8 @@
     <h2>Situação da Dengue</h2>
 
     <p>
-      Até essa semana, {{total_n_dengue}} casos de dengue foram registrados.
-      No ano passado, até essa semana, {total_n_dengue_last_year}
+      Esse ano, até essa semana, {{total_n_dengue}} casos de dengue foram registrados.
+      No ano passado, até essa semana, {{total_n_dengue_last_year}}
       tinham sido registrados.
 
       A figura abaixo mostra a situação da dengue nos últimos dois anos.
@@ -143,7 +144,7 @@
     <h2>Situação da Chikungunya</h2>
 
     <p>
-      Até essa semana, {{total_n_chik}} casos de dengue foram registrados.
+      Esse ano, até essa semana, {{total_n_chik}} casos de dengue foram registrados.
       No ano passado, até essa semana, {{total_n_chik_last_year}}
       tinham sido registrados.
 
@@ -174,7 +175,8 @@
     <h2>Situação da Zika</h2>
 
     <p>
-      Até essa semana, {{total_n_zika}} casos de dengue foram registrados.
+      Esse ano, até essa semana, {{total_n_zika}} casos de dengue
+      foram registrados.
       No ano passado, até essa semana, {{total_n_zika_last_year}}
       tinham sido registrados.
 
@@ -334,7 +336,11 @@
     $(document).ready( function () {
       $('.table').DataTable({
         "pageLength": 6,
-        "order": [[ 1, "desc" ]]
+        "order": [[ 1, "desc" ]],
+        "searching": false,
+        "language": {
+          "url": "/static/libs/DataTables/i18n/pt_BR.json"
+        }
       } );
     } );
   });
