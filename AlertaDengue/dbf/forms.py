@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
-from bootstrap3.renderers import FormRenderer
+from bootstrap4.renderers import FormRenderer
 
 from .models import DBF, DBFChunkedUpload
 from .validation import is_valid_dbf

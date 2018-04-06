@@ -41,15 +41,13 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-<div class="row">
-  <div class="col-md-12">
-    <ul class="breadcrumb">
-      <li><a href="/report">{% trans "Relatórios" %}</a></li>
-      <li><a href="/report/{{ state }}">{{ state }}</a></li>
-      <li><a href="#">{{ city_name }}</a></li>
-  </ul>
-  </div>
-</div>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/report">{% trans "Relatórios" %}</a></li>
+      <li class="breadcrumb-item"><a href="/report/{{ state }}">{{ state }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ city_name }}</li>
+  </ol>
+</nav>
 {% endblock %}
 
 
