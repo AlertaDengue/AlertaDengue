@@ -40,6 +40,19 @@
 <script src="/static/libs/plotlyjs/plotly-latest.min.js"></script>
 {% endblock %}
 
+{% block breadcrumbs %}
+<div class="row">
+  <div class="col-md-12">
+    <ul class="breadcrumb">
+      <li><a href="/report">{% trans "Relatórios" %}</a></li>
+      <li><a href="/report/{{ state }}">{{ state }}</a></li>
+      <li><a href="#">{{ city_name }}</a></li>
+  </ul>
+  </div>
+</div>
+{% endblock %}
+
+
 {% block title %}{% trans "Relatório da Situação das Arboviroses em " %} {{city_name}} -
 {{state_name}} {% endblock %}
 

@@ -13,7 +13,7 @@ from time import mktime
 from . import dbdata, models as M
 from .dbdata import (
     Forecast, MRJ_GEOCODE, CID10, ReportCity,
-    ALERT_CODE, ALERT_COLOR
+    ALERT_COLOR, STATE_NAME
 )
 from .episem import episem, episem2date
 from .maps import get_city_info
@@ -888,8 +888,6 @@ class GeoJsonView(View):
 
 
 class ReportView(TemplateView):
-    template_name = 'report.html'
-
     def get_context_data(self, **kwargs):
         """
 
@@ -898,17 +896,59 @@ class ReportView(TemplateView):
         """
         context = super().get_context_data(**kwargs)
 
+        if 'state' not in context:
+            context.update(self.view_filter_state(context))
+        else:
+            context.update(self.view_filter_city(context))
+
+        context.update({
+            'disease_list': CID10,
+        })
+
+        return context
+
+    def view_filter_state(self, context):
+        """
+
+        :param context:
+        :return:
+        """
+        self.template_name = 'report_filter_state.html'
+
+        options_states = ''
+        for state_initial, state_name in STATE_NAME.items():
+            options_states += '''
+            <option value="%(state_initial)s">
+                %(state_name)s
+            </option>''' % {
+                'state_name': state_name,
+                'state_initial': state_initial
+            }
+
+        context.update({
+            'options_states': options_states,
+        })
+
+        return context
+
+    def view_filter_city(self, context):
+        """
+
+        :param context:
+        :return:
+        """
+        self.template_name = 'report_filter_city.html'
+
         options_cities = ''
-        for geocode, city_name, city_state in (
-            dbdata.get_all_active_cities_state()
-        ):
+        for geocode, city_name in dbdata.get_cities(
+            state_name=STATE_NAME[context['state']]
+        ).items():
             options_cities += '''
             <option value="%(geocode)s">
-                %(city_name)s - %(city_state)s
+                %(city_name)s
             </option>''' % {
                 'geocode': geocode,
                 'city_name': city_name,
-                'city_state': city_state
             }
 
         dt = datetime.datetime.now() - datetime.timedelta(days=7)
@@ -916,7 +956,6 @@ class ReportView(TemplateView):
         dt_fmt = episem2date(yw, 1).strftime('%Y-%m-%d')
 
         context.update({
-            'disease_list': CID10,
             'options_cities': options_cities,
             'date_query': dt_fmt
         })

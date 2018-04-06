@@ -106,6 +106,7 @@ def get_cities(regional_name: str=None, state_name: str=None) -> dict:
             SELECT geocodigo, nome
             FROM "Dengue_global"."Municipio"
             WHERE uf IN(%s)
+            ORDER BY nome
             ''' % ','.join(state_names)
 
         return dict(conn.execute(sql).fetchall())

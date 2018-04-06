@@ -34,7 +34,7 @@ function openReport() {
       url: url,
       success: function(data) {
         window.location.href = (
-          '/report/city/' +
+          '/report/{{state}}/' +
           geocode + '/' +
           data['epi_year_week']
         );
@@ -47,7 +47,20 @@ function openReport() {
 </script>
 
 {% endblock %}
-{% block title %}{% trans "Relatório" %}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="row">
+  <div class="col-md-12">
+    <ul class="breadcrumb">
+      <li><a href="/report">{% trans "Relatórios" %}</a></li>
+      <li><a href="#">{{ state }}</a></li>
+  </ul>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block title %}{% trans "Relatórios" %} / {{ state }}{% endblock %}
 
 {% block content %}
 
@@ -64,7 +77,7 @@ function openReport() {
           <option value="">{% trans "Selecione um município" %}</option>
           {{options_cities|safe}}
         </select>
-        <small id="geocodedHelp" class="form-text text-muted">
+        <small id="geocodeHelp" class="form-text text-muted">
           {% trans "Selecione o município desejado para a consulta" %}
         </small>
       </div>
