@@ -41,9 +41,8 @@
 </style>
 
 <script>
-    function geocode_search() {
-
-        var cond = '[value^="' + $('#geocode-search').val() + '"]';
+    function geocode_search(val) {
+        var cond = '[value^="' + val + '"]';
 
         $('#geocode').prop('selectedIndex',0);
 
@@ -52,10 +51,18 @@
         $('#geocode option' + cond).prop('disabled', false);
         $('#geocode option' + cond).removeClass('hidden');
 
+        //$('#geocode').prop('selectedIndex', 1);
+
         if ($('#geocode option[disabled!="disabled"]').length == 1) {
             $('#geocode option[disabled!="disabled"]').prop('selected', true);
         }
     }
+
+    $(document).ready(function(){
+        $("#geocode-search").on("input", function(e) {
+          geocode_search($(e.target).val());
+        });
+    });
 </script>
 
 {% endblock %}
@@ -80,7 +87,6 @@
                 <input id="geocode-search" type="text" maxlength="7"
                        class="form-control  input-sm"
                        placeholder='{% trans "Digite aqui para filtrar as opções do código IBGE." %}'
-                       oninput="geocode_search();"
                        aria-describedby="geocode-searchHelp"
                 />
 
