@@ -34,49 +34,86 @@
     .word-break {
         word-break: break-all;
     }
+
+    .hidden {
+        display: none;
+    }
 </style>
 
+<script>
+    function geocode_search() {
+
+        var cond = '[value^="' + $('#geocode-search').val() + '"]';
+
+        $('#geocode').prop('selectedIndex',0);
+
+        $('#geocode option').not(cond).prop('disabled', true);
+        $('#geocode option').not(cond).addClass('hidden');
+        $('#geocode option' + cond).prop('disabled', false);
+        $('#geocode option' + cond).removeClass('hidden');
+
+        if ($('#geocode option[disabled!="disabled"]').length == 1) {
+            $('#geocode option[disabled!="disabled"]').prop('selected', true);
+        }
+    }
+</script>
+
 {% endblock %}
+
 {% block title %}{% trans "Serviços de Dados Públicos" %}: {% trans "Mapas" %}{% endblock %}
 
 {% block content %}
 
 
 <div class="container">
-
-    <div class="form">
-        <div class="row">
-            <div class="col-md-12 column">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
                 <a href="/data-public-services/maps/doc">
                     {% trans "Para mais informações, acesse a documentação do serviço de mapas." %}
                 </a>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-3 column col-head">
-                {% trans "Código IBGE" %}:
+            <div class="form-group">
+                <label for="geocode-search">{% trans "Filtro Código IBGE" %}:</label>
+
+                <input id="geocode-search" type="text" maxlength="7"
+                       class="form-control  input-sm"
+                       placeholder='{% trans "Digite aqui para filtrar as opções do código IBGE." %}'
+                       oninput="geocode_search();"
+                       aria-describedby="geocode-searchHelp"
+                />
+
+                <small id="geocode-searchHelp" class="form-text text-muted">
+                  {% trans "Digite o código IBGE ou parte dele para buscar o código IBGE disponível." %}
+                </small>
             </div>
-            <div class="col-md-3 column">
+
+            <div class="form-group">
+                <label for="geocode">{% trans "Código IBGE" %}:</label>
+
                 <select id="geocode"
-                        class="selectpicker"
+                        class="form-control"
                         data-live-search="true"
                         data-title="{% blocktrans %}Selecione municipio(s){% endblocktrans %}"
                         data-actions-box="true"
                         data-selected-text-format="static"
+                        aria-describedby="geocodeHelp"
                 >
+                    <option value="">{% trans "Selecione o código IBGE da cidade desejada" %}</option>>
                     {% for k in geocodes %}
                     <option value="{{k}}">{{k}}</option>
                     {% endfor %}
                 </select>
+
+                <small id="geocodeHelp" class="form-text text-muted">
+                  {% trans "Selecione o município desejado para a consulta" %}
+                </small>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-3 column col-head">
-                {% trans "Mapa" %}:
-            </div>
-            <div class="col-md-5 column">
-                <select id="map">
+            <div class="form-group">
+                <label for="map">{% trans "Mapa" %}:</label>
+
+                <select id="map" aria-describedby="mapHelp" class="form-control" >
                     <option value="/maps/alert/dengue.map">
                         {% trans "Alerta Dengue" %}
                     </option>
@@ -105,47 +142,59 @@
                         {% trans "Precipitação" %}
                     </option>
                 </select>
-            </div>
-        </div>
 
-        <div class="row">
-            <div class="col-md-3 column col-head">
-                {% trans "Tipo de imagem de saída" %}:
+                <small id="mapHelp" class="form-text text-muted">
+                  {% trans "Selecione o tipo de mapa desejado" %}
+                </small>
             </div>
-            <div class="col-md-3 column">
-                <select id="image-format">
+            <div class="form-group">
+                <label>{% trans "Tipo de imagem de saída" %}:</label>
+                <select id="image-format"
+                        class="form-control"
+                        aria-describedby="image-formHelp"
+                >
                     <option value="png">PNG</option>
                     <option value="GTiff">GeoTIFF</option>
                     <option value="kml">KML</option>
                 </select>
+                <small id="image-formatHelp" class="form-text text-muted">
+                  {% trans "Selecione o Tipo de imagem de saída" %}
+                </small>
             </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-3 column col-head">
-                <select id="dimension-name">
+            <div class="form-group">
+                <label>{% trans "Dimensão de ajuste:" %}:</label>
+                <select id="dimension-name"
+                        class="form-control"
+                        aria-describedby="dimension-nameHelp"
+                >
                     <option value="width">Width (px)</option>
                     <option value="height">Height (px)</option>
                 </select>
+                <small id="dimension-nameHelp" class="form-text text-muted">
+                  {% trans "Dimensão de ajuste da imagem" %}
+                </small>
             </div>
-            <div class="col-md-3 column">
+            <div class="form-group">
+                <label>{% trans "Valor da dimensão selecionada" %}:</label>
                 <input id="dimension-value" value="800"
+                       class="form-control"
                        maxlength="6"
-                       max="999999"/>
+                       max="999999"
+                       aria-describedby="dimension-valueHelp"
+                />
+                <small id="dimension-valueHelp" class="form-text text-muted">
+                  {% trans "Selecione o valor para a dimensão informada" %}
+                </small>
             </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-4 column col-head">
-                <input type="button"
+            <div class="row">
+                <div class="col-md-12 column py-3" id="message-url">
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="button" class="btn btn-primary"
                        value='{% trans "Gerar URL do serviço" %}'
                        onclick="generate_url();"
                 />
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-12 column" id="message-url">
             </div>
         </div>
     </div>

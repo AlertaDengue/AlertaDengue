@@ -288,7 +288,7 @@ class DataPublicServicesPageView(TemplateView):
                     geo_info_json = json.load(f)
 
                     context.update({
-                        'geocodes': list(geo_info_json.keys()),
+                        'geocodes': sorted(list(geo_info_json.keys())),
                         'mapserver_url': settings.MAPSERVER_URL,
                         'geo_info': geo_info_json
                     })
