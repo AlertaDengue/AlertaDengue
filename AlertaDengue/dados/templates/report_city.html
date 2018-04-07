@@ -35,6 +35,10 @@
       .red-row td {
         background: #FF7C73;
       }
+      .table.dataTable, .table td, .table th {
+        border-collapse: collapse !important;
+        border: 1px solid #aaaaaa!important;
+      }
 
 </style>
 <script src="/static/libs/plotlyjs/plotly-latest.min.js"></script>
@@ -71,7 +75,7 @@
     # ----------------------
     -->
     <p>
-      Data da última atualização : {{week}}/{{year}}
+      Data da última atualização : {{last_week}}/{{last_year}}
     </p>
     <p>
       <!--

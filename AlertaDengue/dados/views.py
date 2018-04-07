@@ -1036,7 +1036,7 @@ class ReportCityView(TemplateView):
         total_n_zika = 0
         total_n_zika_last_year = 0
 
-        last_week = int(
+        last_year_week = int(
             np.nanmax([
                 df_dengue.index.max(),
                 df_chik.index.max(),
@@ -1046,7 +1046,7 @@ class ReportCityView(TemplateView):
 
         disease_last_code = []
         for df in [df_dengue, df_chik, df_zika ]:
-            result = df[df.index == last_week]
+            result = df[df.index == last_year_week]
             if not result.empty:
                 disease_last_code.append(float(result['level_code']))
 
@@ -1136,7 +1136,7 @@ class ReportCityView(TemplateView):
             na_rep='',
             float_format=lambda x: ('%d' % x) if not np.isnan(x) else '',
             index=False,
-            classes="table table-striped"
+            classes="table table-striped table-bordered"
         )
 
         prepare_html = (
@@ -1146,9 +1146,15 @@ class ReportCityView(TemplateView):
                 .to_html(**html_param)
         )
 
+        last_year_week_s = str(last_year_week)
+        last_year = last_year_week_s[:4]
+        last_week = last_year_week_s[-2:]
+
         context.update({
             'year': year,
             'week': week,
+            'last_year': last_year,
+            'last_week': last_week,
             'city_name': city.name,
             'state_name': city.state,
             'df_dengue': prepare_html(df_dengue),
