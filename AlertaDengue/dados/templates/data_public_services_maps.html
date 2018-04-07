@@ -51,11 +51,10 @@
         $('#geocode option' + cond).prop('disabled', false);
         $('#geocode option' + cond).removeClass('hidden');
 
-        //$('#geocode').prop('selectedIndex', 1);
-
-        if ($('#geocode option[disabled!="disabled"]').length == 1) {
-            $('#geocode option[disabled!="disabled"]').prop('selected', true);
-        }
+        $('#geocode').prop(
+            'selectedIndex',
+            $('#geocode option' + cond).first().index()
+        );
     }
 
     $(document).ready(function(){
