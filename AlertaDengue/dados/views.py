@@ -891,6 +891,13 @@ class GeoJsonView(View):
 
 
 class ReportView(TemplateView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.STATE_NAME = dict(STATE_NAME)
+        # there are some cities from SP
+        self.STATE_NAME.update({'SP': 'São Paulo'})
+
     def get_context_data(self, **kwargs):
         """
 
@@ -918,8 +925,10 @@ class ReportView(TemplateView):
         """
         self.template_name = 'report_filter_state.html'
 
+
+
         options_states = ''
-        for state_initial, state_name in STATE_NAME.items():
+        for state_initial, state_name in self.STATE_NAME.items():
             options_states += '''
             <option value="%(state_initial)s">
                 %(state_name)s
@@ -944,7 +953,7 @@ class ReportView(TemplateView):
 
         options_cities = ''
         for geocode, city_name in dbdata.get_cities(
-            state_name=STATE_NAME[context['state']]
+            state_name=self.STATE_NAME[context['state']]
         ).items():
             options_cities += '''
             <option value="%(geocode)s">
@@ -969,6 +978,15 @@ class ReportView(TemplateView):
 class ReportCityView(TemplateView):
     template_name = 'report_city.html'
 
+    def raise_error(self, context, message):
+        """
+
+        :return:
+        """
+        self.template_name = 'error.html'
+        context.update({'message': message})
+        return context
+
     def get_context_data(self, **kwargs):
         """
 
@@ -981,11 +999,23 @@ class ReportCityView(TemplateView):
         year_week = int(context['year_week'])
         year, week = context['year_week'][:4], context['year_week'][-2:]
 
+        error_message_city_doesnt_exist = (
+            'Esse municipio não participa do Infodengue. Se tiver ' +
+            'interesse em aderir, contacte-nos pelo email ' +
+            ' <a href="mailto:alerta_dengue@fiocruz.br">' +
+            'alerta_dengue@fiocruz.br</a>'
+        )
+
         city = City.objects.get(pk=int(geocode))
 
-        regional_health = RegionalHealth.objects.get(
-            municipio_geocodigo=int(geocode)
-        )
+        try:
+            regional_health = RegionalHealth.objects.get(
+                municipio_geocodigo=int(geocode)
+            )
+        except:
+            return self.raise_error(
+                context, error_message_city_doesnt_exist
+            )
 
         station_id = regional_health.codigo_estacao_wu
         var_climate = regional_health.varcli
@@ -996,6 +1026,7 @@ class ReportCityView(TemplateView):
         threshold_epidemic = regional_health.limiar_epidemico
 
         climate_crit = None
+        tweet_max = 0
 
         if var_climate.startswith('temp'):
             climate_crit = t_crit
@@ -1036,27 +1067,12 @@ class ReportCityView(TemplateView):
         total_n_zika = 0
         total_n_zika_last_year = 0
 
-        last_year_week = int(
-            np.nanmax([
-                df_dengue.index.max(),
-                df_chik.index.max(),
-                df_zika.index.max()
-            ])
-        )
-
+        last_year_week_l = []
         disease_last_code = []
-        for df in [df_dengue, df_chik, df_zika ]:
-            result = df[df.index == last_year_week]
-            if not result.empty:
-                disease_last_code.append(float(result['level_code']))
-
-        max_alert_code = int(
-            np.nanmax(disease_last_code)
-        )
-
-        max_alert_color = ALERT_COLOR[max_alert_code]
 
         if not df_dengue.empty:
+            last_year_week_l.append(df_dengue.index.max())
+
             chart_dengue_climate = ReportCityCharts.create_climate_chart(
                 df=df_dengue, year_week=year_week, var_climate=var_climate,
                 climate_crit=climate_crit, climate_title=climate_title
@@ -1083,7 +1099,11 @@ class ReportCityView(TemplateView):
                 ]['casos notif.'].sum()
             )
 
+            tweet_max = np.nanmax(df_dengue.tweets)
+
         if not df_chik.empty:
+            last_year_week_l.append(df_chik.index.max())
+
             chart_chik_climate = ReportCityCharts.create_climate_chart(
                 df=df_chik, year_week=year_week, var_climate=var_climate,
                 climate_crit=climate_crit, climate_title=climate_title
@@ -1108,6 +1128,8 @@ class ReportCityView(TemplateView):
             )
 
         if not df_zika.empty:
+            last_year_week_l.append(df_zika.index.max())
+
             chart_zika_climate = ReportCityCharts.create_climate_chart(
                 df=df_zika, year_week=year_week, var_climate=var_climate,
                 climate_crit=climate_crit, climate_title=climate_title
@@ -1130,6 +1152,21 @@ class ReportCityView(TemplateView):
                     (df_zika.index <= year_week - 100)
                 ]['casos notif.'].sum()
             )
+
+        if not last_year_week_l:
+            return self.raise_error(
+                context, error_message_city_doesnt_exist
+            )
+
+        last_year_week = int(np.nanmax(last_year_week_l))
+
+        for df in [df_dengue, df_chik, df_zika]:
+            result = df[df.index == last_year_week]
+            if not result.empty:
+                disease_last_code.append(float(result['level_code']))
+
+        max_alert_code = int(np.nanmax(disease_last_code))
+        max_alert_color = ALERT_COLOR[max_alert_code]
 
         # param used by df.to_html
         html_param = dict(
@@ -1173,6 +1210,7 @@ class ReportCityView(TemplateView):
             'total_n_chik_last_year': total_n_chik_last_year,
             'total_n_zika': total_n_zika,
             'total_n_zika_last_year': total_n_zika_last_year,
-            'max_alert_color': max_alert_color.title()
+            'max_alert_color': max_alert_color.title(),
+            'tweet_max': tweet_max
         })
         return context

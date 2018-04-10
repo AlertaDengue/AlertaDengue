@@ -1064,7 +1064,7 @@ class ReportCity:
         df.sort_index(ascending=True, inplace=True)
 
         if has_tweets:
-            df.n_tweets = df.n_tweets.round(0)
+            df.n_tweets = df.n_tweets.fillna(0).round(0)
 
         return df.rename(columns={
             'umid_max': 'umid.max',

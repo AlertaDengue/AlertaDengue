@@ -91,21 +91,26 @@
   <div class="col-md-12">
       <h2>Condições climáticas para transmissão de arboviroses</h2>
 
+      <p>
       A figura abaixo mostra o indicador meteorológico de receptividade do
       município para a transmissão de arboviroses. Quando o indicador está
       acima do limiar (linha horizontal), existem condições ambientais
       favoraveis à transmissão viral. Isso significa que a atenção precisa ser
       aumentada para a possivel circulação sustentada de arbovirus e para a
       implementação de controle vetorial.
+      </p>
 
       {{chart_dengue_climate|safe}}
+      <br/>&nbsp;
   </div>
 </div>
 
+{% if tweet_max > 0%}
 <div class="row">
   <div class="col-md-12">
     <h2>Menção a arboviroses nas redes sociais</h2>
 
+    <p>
     A figura abaixo mostra a intensidade de menção de sintomas de arboviroses
     e presença de mosquitos de acordo com a população do município que usa
     redes sociais.
@@ -113,12 +118,14 @@
     um auxiliar na detecção precoce de aumento de casos. Atualmente,
     esse indicador é mais sensivel para detectar dengue do que outras
     arboviroses.
+    </p>
 
     {{chart_dengue_tweets|safe}}
+    <br/>&nbsp;
 
   </div>
 </div>
-
+{% endif %}
 
 {% if total_n_dengue > 0 %}
 <div class="row">
@@ -145,8 +152,9 @@
     </p>
 
     {{chart_dengue_incidence|safe}}
+    <br/>&nbsp;
     {{df_dengue|safe}}
-
+    <br/>&nbsp;
   </div>
 </div>
 {% endif %}
@@ -177,8 +185,9 @@
     </p>
 
     {{chart_chik_incidence|safe}}
+    <br/>&nbsp;
     {{df_chik|safe}}
-
+    <br/>&nbsp;
   </div>
 </div>
 {% endif %}
@@ -209,8 +218,9 @@
     </p>
 
     {{chart_zika_incidence|safe}}
+    <br/>&nbsp;
     {{df_zika|safe}}
-
+    <br/>&nbsp;
   </div>
 </div>
 {% endif %}

@@ -7,6 +7,8 @@ import io
 import matplotlib.pyplot as plt
 import pandas as pd
 
+cf.set_config_file(theme='pearl')
+
 
 def transform_chart_to_base64(df: pd.DataFrame):
     """
@@ -72,7 +74,7 @@ class ReportCityCharts:
             color=[
                 'rgb(0,255,0)', 'rgb(255,255,0)',
                 'rgb(255,150,0)', 'rgb(255,0,0)'
-            ], hoverinfo='none'
+            ], hoverinfo='x+y+name'
         )
 
         figure_threshold = df.iplot(
@@ -89,7 +91,7 @@ class ReportCityCharts:
             asFigure=True, x=['Data'], y=['casos notif.'],
             showlegend=False,
             secondary_y=['casos notif.'], secondary_y_title='Casos',
-            hoverinfo='none'
+            hoverinfo='x+y+name', color=['rgb(33,33,33)']
         )
 
         figure_line['layout']['xaxis1'].update(

@@ -32,6 +32,7 @@ app_name = "dados"
 
 __disease = '(?P<disease>dengue|chikungunya|zika)'
 __state = '(?P<state>CE|ES|MG|PR|RJ)'
+__state_extra = '(?P<state>CE|ES|MG|PR|RJ|SP)'
 __geocode = '(?P<geocodigo>\d{7})'
 __geocode_ = '(?P<geocode>\d{7})'
 __year = '(?P<year>\d{4})'
@@ -77,9 +78,9 @@ urlpatterns = [
     url(r'^report/$',
         ReportView.as_view(),
         name='report'),
-    url(r'^report/%s$' % __state,
+    url(r'^report/%s$' % __state_extra,
         ReportView.as_view(),
         name='report_filter_city'),
-    url(r'^report/%s/%s/%s/$' % (__state, __geocode_, __year_week),
+    url(r'^report/%s/%s/%s/$' % (__state_extra, __geocode_, __year_week),
         ReportCityView.as_view(), name='report_city'),
 ]
