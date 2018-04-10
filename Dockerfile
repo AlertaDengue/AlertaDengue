@@ -16,7 +16,7 @@ RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
 # helps build the container a *lot* faster by using the cache.
 ADD AlertaDengue/requirements.txt /tmp/requirements.txt
 
-RUN pip3 install -r /tmp/requirements.txt --upgrade
+RUN pip3 install -r /tmp/requirements.txt
 RUN pip3 install pandas --upgrade
 
 # Send code to the container
