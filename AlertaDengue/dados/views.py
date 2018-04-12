@@ -1177,7 +1177,7 @@ class ReportCityView(TemplateView):
         )
 
         prepare_html = (
-            lambda df: df.iloc[-16:, :-1]
+            lambda df: df.iloc[-12:, :-2]
                 .reset_index()
                 .sort_values(by='SE', ascending=[False])
                 .to_html(**html_param)

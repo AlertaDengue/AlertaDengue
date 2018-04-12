@@ -8,7 +8,7 @@ from django.core.cache import cache
 from collections import defaultdict
 from datetime import datetime, timedelta
 # local
-from .episem import episem
+from .episem import episem, episem2date
 from . import settings
 
 import pandas as pd
@@ -1061,6 +1061,34 @@ class ReportCity:
         df.p_rt1 = (df.p_rt1 * 100).round(0).astype(int)
         df.casos_est = df.casos_est.round(0).astype(int)
         df.p_inc100k = df.p_inc100k.round(0).astype(int)
+
+        if df.empty:
+            df['init_date_week'] = None
+        else:
+            df['init_date_week'] = df.index.map(episem2date)
+
+            # merge with a range date dataframe to keep empty week on the data
+            ts_date = pd.date_range(
+                df['init_date_week'].min(),
+                df['init_date_week'].max(), freq='7D'
+            )
+            df_date = pd.DataFrame({'init_date_week': ts_date})
+            df_date.set_index(
+                df.init_date_week.map(
+                    lambda x: int(episem(str(x)[:10], sep=''))
+                ), drop=True, inplace=True
+            )
+
+            df = pd.merge(
+                df,
+                df_date,
+                how='outer',
+                on='init_date_week',
+                left_index=True,
+                right_index=True
+            )
+
+        df.index.name = 'SE'
         df.sort_index(ascending=True, inplace=True)
 
         if has_tweets:

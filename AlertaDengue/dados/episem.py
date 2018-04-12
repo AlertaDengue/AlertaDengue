@@ -104,18 +104,21 @@ def episem2date(epi_year_week: str, weekday: int=0):
     Function to obtain first day of corresponding Brazilian epidemiological
     week provided
 
-    Function \code{episem2date} uses the Brazilian definition of epidemiological
-    week and returns the date of the corresponding o the provided epi. week, using
-    week day requested. Uses Sunday as default, the first week day by Brazilian epi.
+    Function \code{episem2date} uses the Brazilian definition of
+    epidemiological
+    week and returns the date of the corresponding o the provided epi. week,
+    using week day requested. Uses Sunday as default, the first week day by
+    Brazilian epi.
     week definition.
-    @see https://github.com/marfcg/leos.opportunity.estimator/blob/master/R/episem2date.R
+    @see https://github.com/marfcg/leos.opportunity.estimator/
+        blob/master/R/episem2date.R
 
     @name episem2date
-    @param epiyearweek Epidemiological week in the format "%Y\[*\]%W" where Y and W defined
-     by the Brazilian epidemiological week system. The separator between Y and W is irrelevant.
-     Ex.: 2014W02
-    @param weekday Week day to be used as representative of the epi. week. Uses Date week day
-    classification. 0: Sunday, 6:Saturday. Default: 0
+    @param epiyearweek Epidemiological week in the format "%Y\[*\]%W"
+        where Y and W defined by the Brazilian epidemiological week system.
+        The separator between Y and W is irrelevant. Ex.: 2014W02
+    @param weekday Week day to be used as representative of the epi. week.
+        Uses Date week day classification. 0: Sunday, 6:Saturday. Default: 0
 
     @return Date corresponding to the Sunday of epiyearweek
     @export

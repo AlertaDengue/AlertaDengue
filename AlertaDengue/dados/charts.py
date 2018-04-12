@@ -47,9 +47,7 @@ class ReportCityCharts:
             df.SE >= year_week - 200
         ]
 
-        df['Data'] = df.SE.apply(
-            lambda x: datetime.datetime.strptime(str(x) + '-0', '%Y%W-%w')
-        )
+        df['SE'] = df.SE.map(lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:]))
 
         k = 'incidência'
 
@@ -63,7 +61,7 @@ class ReportCityCharts:
         df['limiar pré epidêmico'] = threshold_pre_epidemic
 
         figure_bar = df.iplot(
-            asFigure=True, kind='bar', x=['Data'], y=[
+            asFigure=True, kind='bar', x=['SE'], y=[
                 'alerta verde',
                 'alerta amarelo',
                 'alerta laranja',
@@ -78,7 +76,7 @@ class ReportCityCharts:
         )
 
         figure_threshold = df.iplot(
-            asFigure=True, x=['Data'], y=[
+            asFigure=True, x=['SE'], y=[
                 'limiar pré epidêmico',
                 'limiar pós epidêmico',
                 'limiar epidêmico'
@@ -88,14 +86,14 @@ class ReportCityCharts:
         )
 
         figure_line = df.iplot(
-            asFigure=True, x=['Data'], y=['casos notif.'],
+            asFigure=True, x=['SE'], y=['casos notif.'],
             showlegend=False,
             secondary_y=['casos notif.'], secondary_y_title='Casos',
             hoverinfo='x+y+name', color=['rgb(33,33,33)']
         )
 
         figure_line['layout']['xaxis1'].update(
-            tickangle=-60, tickformat='%Y/%W'
+            tickangle=-60, nticks=len(df)//4
         )
 
         figure_line['layout']['legend'].update(
@@ -154,22 +152,22 @@ class ReportCityCharts:
         df_climate = df.reset_index()[['SE', k]]
         df_climate = df_climate[
             df_climate.SE >= year_week - 200
-            ]
+        ]
 
-        df_climate['Data'] = df_climate.SE.apply(
-            lambda x: datetime.datetime.strptime(str(x) + '-0', '%Y%W-%w')
+        df_climate['SE'] = df_climate.SE.map(
+            lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:])
         )
 
         df_climate['Limiar favorável transmissão'] = climate_crit
 
         figure = df_climate.iplot(
-            asFigure=True, x=['Data'], y=[k, 'Limiar favorável transmissão'],
+            asFigure=True, x=['SE'], y=[k, 'Limiar favorável transmissão'],
             showlegend=True,
             yTitle=climate_title, xTitle='Período (Ano/Semana)'
         )
 
         figure['layout']['xaxis1'].update(
-            tickangle=-60, tickformat='%Y/%W'
+            tickangle=-60, nticks=len(df_climate)//4
         )
 
         figure['layout']['legend'].update(
@@ -208,19 +206,19 @@ class ReportCityCharts:
             df_tweet.SE >= year_week - 200
         ]
 
-        df_tweet['Data'] = df_tweet.SE.apply(
-            lambda x: datetime.datetime.strptime(str(x) + '-0', '%Y%W-%w')
+        df_tweet['SE'] = df_tweet.SE.map(
+            lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:])
         )
 
         df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
 
         figure = df_tweet.iplot(
-            x=['Data'],
+            x=['SE'],
             y=['menções'], asFigure=True,
             showlegend=True, xTitle='Período (Ano/Semana)'
         )
         figure['layout']['xaxis1'].update(
-            tickangle=-60, tickformat='%Y/%W'
+            tickangle=-60, nticks=len(df_tweet)//4
         )
         figure['layout']['yaxis1'].update(title='Tweets')
 
