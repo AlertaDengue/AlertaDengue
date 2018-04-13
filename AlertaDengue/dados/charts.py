@@ -2,7 +2,6 @@ from plotly.offline.offline import _plot_html
 
 import base64
 import cufflinks as cf
-import datetime
 import io
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -67,7 +66,8 @@ class ReportCityCharts:
                 'alerta laranja',
                 'alerta vermelho'
             ],
-            showlegend=False,
+            legend=True,
+            showlegend=True,
             yTitle='Incidência', xTitle='Período (Ano/Semana)',
             color=[
                 'rgb(0,255,0)', 'rgb(255,255,0)',
@@ -80,13 +80,17 @@ class ReportCityCharts:
                 'limiar pré epidêmico',
                 'limiar pós epidêmico',
                 'limiar epidêmico'
-            ], showlegend=True, color=[
+            ],
+            legend=False,
+            showlegend=False,
+            color=[
                 'rgb(0,255,0)', 'rgb(255,150,0)', 'rgb(255,0,0)'
             ], hoverinfo='none'
         )
 
         figure_line = df.iplot(
             asFigure=True, x=['SE'], y=['casos notif.'],
+            legend=False,
             showlegend=False,
             secondary_y=['casos notif.'], secondary_y_title='Casos',
             hoverinfo='x+y+name', color=['rgb(33,33,33)']
@@ -97,16 +101,17 @@ class ReportCityCharts:
         )
 
         figure_line['layout']['legend'].update(
-            x=-.1, y=1.2,
+            x=-.27, y=0.5,
             traceorder='normal',
             font=dict(
                 family='sans-serif',
                 size=12,
                 color='#000'
             ),
-            bgcolor='#E2E2E2',
-            bordercolor='#FFFFFF',
-            borderwidth=2
+            bgcolor='#FFFFFF',
+            bordercolor='#E2E2E2',
+            borderwidth=1,
+            orientation='l',
         )
 
         figure_line['layout']['yaxis1'].update(
@@ -123,7 +128,7 @@ class ReportCityCharts:
                 threshold_pre_epidemic,
                 threshold_pos_epidemic,
                 threshold_epidemic
-            )
+            ), showlegend=True
         )
 
         figure_threshold.data.extend(figure_bar.data)
@@ -178,9 +183,9 @@ class ReportCityCharts:
                 size=12,
                 color='#000'
             ),
-            bgcolor='#E2E2E2',
-            bordercolor='#FFFFFF',
-            borderwidth=2
+            bgcolor='#FFFFFF',
+            bordercolor='#E2E2E2',
+            borderwidth=1
         )
 
         return _plot_html(
@@ -230,9 +235,9 @@ class ReportCityCharts:
                 size=12,
                 color='#000'
             ),
-            bgcolor='#E2E2E2',
-            bordercolor='#FFFFFF',
-            borderwidth=2
+            bgcolor='#FFFFFF',
+            bordercolor='#E2E2E2',
+            borderwidth=1
         )
 
         return _plot_html(
