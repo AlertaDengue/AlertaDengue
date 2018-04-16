@@ -30,6 +30,9 @@ class ReportCityCharts:
     ) -> 'Plotly_HTML':
         """
 
+        @see: https://stackoverflow.com/questions/45526734/
+            hide-legend-entries-in-a-plotly-figure
+
         :param df:
         :param year_week:
         :param threshold_pre_epidemic: float,
@@ -96,10 +99,6 @@ class ReportCityCharts:
             hoverinfo='x+y+name', color=['rgb(33,33,33)']
         )
 
-        figure_line['layout']['xaxis1'].update(
-            tickangle=-60, nticks=len(df)//4
-        )
-
         figure_line['layout']['legend'].update(
             x=-.27, y=0.5,
             traceorder='normal',
@@ -120,19 +119,34 @@ class ReportCityCharts:
 
         figure_line['layout'].update(
             title=(
-                'Limiares: ' +
+                'Limiares de incidência:: ' +
                 'pré epidêmico=%s; ' +
                 'pós epidêmico=%s; ' +
                 'epidêmico=%s;'
             ) % (
-                threshold_pre_epidemic,
-                threshold_pos_epidemic,
-                threshold_epidemic
+                '{:.1f}'.format(threshold_pre_epidemic),
+                '{:.1f}'.format(threshold_pos_epidemic),
+                '{:.1f}'.format(threshold_epidemic)
             ), showlegend=True
         )
 
         figure_threshold.data.extend(figure_bar.data)
         figure_line.data.extend(figure_threshold.data)
+
+        figure_line['layout']['yaxis2'].update(
+            showgrid=False,
+            range=[0, df['casos notif.'].max()]
+        )
+
+        figure_line['layout']['xaxis1'].update(
+            tickangle=-60, nticks=len(df) // 4,
+            title='Período (Ano/Semana)'
+        )
+
+        for trace in figure_line['data']:
+            if trace['name'] == 'casos notif.':
+                trace['visible'] = 'legendonly'
+
 
         return _plot_html(
             figure_or_data=figure_line, config={}, validate=True,
