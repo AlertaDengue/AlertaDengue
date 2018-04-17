@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-16 15:55+0000\n"
+"POT-Creation-Date: 2018-04-17 13:58+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -519,9 +519,9 @@ msgid ""
 "FiqueAtento.aspx\">atento aos sintomas da Dengue!</a> Procure um médico caso "
 "suspeite de dengue."
 msgstr ""
-"Pay <a href=\"http://www.riocontradengue.rj.gov.br/Site/Conteudo/"
-"FiqueAtento.aspx\">attention to the Dengue symptoms!</a> Consult a doctor "
-"in any case of suspected Dengue."
+"Pay <a href=\"http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento."
+"aspx\">attention to the Dengue symptoms!</a> Consult a doctor in any case of "
+"suspected Dengue."
 
 #: dados/templates/alert_base.html:233 dados/templates/alert_state/map.html:25
 msgid "Baixo Risco"
@@ -794,11 +794,14 @@ msgstr ""
 " Dengue Situation - %(num_mun)s Monitored cities \n"
 
 #: dados/templates/data_public_services.html:19
-#: dados/templates/data_public_services_api.html:46
-#: dados/templates/data_public_services_maps.html:69
-#: dados/templates/data_public_services_maps_doc.html:47
 msgid "Serviços de Dados Públicos"
 msgstr "Public Data Service"
+
+#: dados/templates/data_public_services_api.html:46
+#: dados/templates/data_public_services_maps.html:69
+#: dados/templates/data_public_services_maps_doc.html:47 templates/base.html:74
+msgid "Dados"
+msgstr "Data"
 
 #: dados/templates/data_public_services_api.html:63
 msgid "Tabela de conteúdo"
@@ -1330,10 +1333,6 @@ msgstr "Join us"
 msgid "Parceiros"
 msgstr "Partners"
 
-#: templates/base.html:74
-msgid "Serviço de Dados Públicos"
-msgstr "Public Data Service"
-
 #: templates/base.html:82
 msgid "Encontre um município"
 msgstr "Search by city"
@@ -1415,4 +1414,3 @@ msgstr "Your username, if you have forgotten it, is:"
 #: templates/registration/password_reset_email.html:10
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
-

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-16 15:55+0000\n"
+"POT-Creation-Date: 2018-04-17 13:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -610,10 +610,13 @@ msgid ""
 msgstr ""
 
 #: dados/templates/data_public_services.html:19
+msgid "Serviços de Dados Públicos"
+msgstr ""
+
 #: dados/templates/data_public_services_api.html:46
 #: dados/templates/data_public_services_maps.html:69
-#: dados/templates/data_public_services_maps_doc.html:47
-msgid "Serviços de Dados Públicos"
+#: dados/templates/data_public_services_maps_doc.html:47 templates/base.html:74
+msgid "Dados"
 msgstr ""
 
 #: dados/templates/data_public_services_api.html:63
@@ -1101,10 +1104,6 @@ msgstr ""
 
 #: templates/base.html:72
 msgid "Parceiros"
-msgstr ""
-
-#: templates/base.html:74
-msgid "Serviço de Dados Públicos"
 msgstr ""
 
 #: templates/base.html:82

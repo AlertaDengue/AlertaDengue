@@ -66,7 +66,7 @@
 
 {% endblock %}
 
-{% block title %}{% trans "Serviços de Dados Públicos" %}: {% trans "Mapas" %}{% endblock %}
+{% block title %}{% trans "Dados" %}: {% trans "Mapas" %}{% endblock %}
 
 {% block content %}
 
@@ -196,7 +196,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <input type="button" class="btn btn-primary"
+                <input type="button" class="btn btn-primary hidden"
                        value='{% trans "Gerar URL do serviço" %}'
                        onclick="generate_url();"
                 />
