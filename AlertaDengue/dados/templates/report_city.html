@@ -1,0 +1,401 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block extra_head %}
+
+<link rel="stylesheet"
+      type="text/css" href="/static/libs/DataTables/datatables.min.css"/>
+
+<script type="text/javascript"
+        src="/static/libs/DataTables/datatables.min.js"></script>
+
+<style>
+      .box {
+        border: 1px #dfdfdf solid;
+        padding: 20px;
+        margin-bottom: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .table tr td:nth-child(1){
+        background: #fafafa!important;
+        font-weight: bold;
+      }
+
+      .green-row td {
+        background: #8BFFB7;
+      }
+
+      .yellow-row td {
+        background: #FFEB5C;
+      }
+
+      .orange-row td {
+        background: #FFCE5C;
+      }
+
+      .red-row td {
+        background: #FF7C73;
+      }
+      .table.dataTable, .table td, .table th {
+        border-collapse: collapse !important;
+        border: 1px solid #aaaaaa!important;
+      }
+
+</style>
+<script src="/static/libs/plotlyjs/plotly-latest.min.js"></script>
+{% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/report">{% trans "Relatórios" %}</a></li>
+      <li class="breadcrumb-item"><a href="/report/{{ state }}">{{ state }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ city_name }}</li>
+  </ol>
+</nav>
+{% endblock %}
+
+
+{% block title %}{% trans "Relatório da Situação das Arboviroses em " %} {{city_name}} -
+{{state_name}} {% endblock %}
+
+{% block content %}
+
+<!--
+# ---------------------------------
+# 	CAIXA LATERAL - PRIMEIRA PAGINA
+# ---------------------------------
+-->
+
+<div class="row">
+  <div class="col-md-12">
+
+    <!--
+    # ----------------------
+    #	MAIN BODY - FIRST PAGE
+    # ----------------------
+    -->
+    <p>
+      Data da última atualização : {{last_week}}/{{last_year}}
+    </p>
+    <p>
+      <!--
+      usar a cor correspondente ao nivel de
+      alerta mais alto considerando as 3 doenças
+      -->
+      Situação de alerta do município: {{max_alert_color}}
+    </p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+      <h2>Condições climáticas para transmissão de arboviroses</h2>
+
+      <p>
+      A figura abaixo mostra o indicador meteorológico de receptividade do
+      município para a transmissão de arboviroses. Quando o indicador está
+      acima do limiar (linha horizontal), existem condições ambientais
+      favoraveis à transmissão viral. Isso significa que a atenção precisa ser
+      aumentada para a possivel circulação sustentada de arbovirus e para a
+      implementação de controle vetorial.
+      </p>
+
+      {{chart_dengue_climate|safe}}
+      <br/>&nbsp;
+  </div>
+</div>
+
+{% if tweet_max > 0%}
+<div class="row">
+  <div class="col-md-12">
+    <h2>Menção a arboviroses nas redes sociais</h2>
+
+    <p>
+    A figura abaixo mostra a intensidade de menção de sintomas de arboviroses
+    e presença de mosquitos de acordo com a população do município que usa
+    redes sociais.
+    Esse indicador, que é mais eficaz em cidades maiores, deve ser visto como
+    um auxiliar na detecção precoce de aumento de casos. Atualmente,
+    esse indicador é mais sensivel para detectar dengue do que outras
+    arboviroses.
+    </p>
+
+    {{chart_dengue_tweets|safe}}
+    <br/>&nbsp;
+
+  </div>
+</div>
+{% endif %}
+
+<div class="row">
+  <div class="col-md-12">
+
+    <h2>Situação da Dengue</h2>
+
+    {% if total_n_dengue > 0 %}
+    <p>
+      Esse ano, até essa semana, {{total_n_dengue}} casos de dengue foram registrados.
+      No ano passado, até essa semana, {{total_n_dengue_last_year}}
+      tinham sido registrados.
+
+      A figura abaixo mostra a situação da dengue nos últimos dois anos.
+      As linhas horizontais correspondem aos limiares de incidência
+      pré-epidêmicos, epidêmicos e pós-epidêmicos
+      (casos por 100.000 habitantes)
+
+      <!--
+      A figura do historico do alerta fica aqui, Falta colocar legenda.
+      Não entendi o que é a linha laranja.
+      As barras vão ficar coloridas conforme o alerta, certo?
+
+      Colocar a tabela, talvez só com 6 linhas aparecendo e permitir scroll
+      -->
+    </p>
+
+    {{chart_dengue_incidence|safe}}
+    <br/>&nbsp;
+    {{df_dengue|safe}}
+
+
+    {% else %}
+    <p>
+      Sem dados disponíveis para geração dessa seção.
+    </p>
+    {% endif %}
+
+    <br/>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-md-12">
+
+    <h2>Situação da Chikungunya</h2>
+
+    {% if total_n_chik > 0 %}
+    <p>
+      Esse ano, até essa semana, {{total_n_chik}} casos de dengue foram registrados.
+      No ano passado, até essa semana, {{total_n_chik_last_year}}
+      tinham sido registrados.
+
+      A figura abaixo mostra a situação da dengue nos últimos dois anos.
+      As linhas horizontais correspondem aos limiares de incidência
+      pré-epidêmicos, epidêmicos e pós-epidêmicos
+      (casos por 100.000 habitantes)
+
+      <!--
+      A figura do historico do alerta fica aqui, Falta colocar legenda.
+      Não entendi o que é a linha laranja.
+      As barras vão ficar coloridas conforme o alerta, certo?
+
+      Colocar a tabela, talvez só com 6 linhas aparecendo e permitir scroll
+      -->
+    </p>
+
+    {{chart_chik_incidence|safe}}
+    <br/>&nbsp;
+    {{df_chik|safe}}
+
+
+    {% else %}
+    <p>
+      Sem dados disponíveis para geração dessa seção.
+    </p>
+    {% endif %}
+
+    <br/>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+
+    <h2>Situação da Zika</h2>
+
+    {% if total_n_zika > 0 %}
+    <p>
+      Esse ano, até essa semana, {{total_n_zika}} casos de dengue
+      foram registrados.
+      No ano passado, até essa semana, {{total_n_zika_last_year}}
+      tinham sido registrados.
+
+      A figura abaixo mostra a situação da dengue nos últimos dois anos.
+      As linhas horizontais correspondem aos limiares de incidência
+      pré-epidêmicos, epidêmicos e pós-epidêmicos
+      (casos por 100.000 habitantes)
+
+      <!--
+      A figura do historico do alerta fica aqui, Falta colocar legenda.
+      Não entendi o que é a linha laranja.
+      As barras vão ficar coloridas conforme o alerta, certo?
+
+      Colocar a tabela, talvez só com 6 linhas aparecendo e permitir scroll
+      -->
+    </p>
+
+    {{chart_zika_incidence|safe}}
+    <br/>&nbsp;
+    {{df_zika|safe}}
+
+
+    {% else %}
+    <p>
+      Sem dados disponíveis para geração dessa seção.
+    </p>
+    {% endif %}
+
+    <br/>&nbsp;
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-2"></div>
+  <div id="color-code" class="col-md-8 box">
+    <!--
+    # ---------------------
+    # BOX - CODIGO DE CORES
+    # ---------------------
+    -->
+
+    <h2>O código de Cores</h2>
+
+    As cores indicam niveis de atenção
+
+    <ul>
+      <li class="bullet-green">
+        <strong>Verde:</strong> condições climáticas desfavoráveis, seja
+        por baixa temperatura ou baixa umidade, e baixa incidência de casos.
+      </li>
+      <li class="bullet-yellow">
+        <strong>Amarelo:</strong> condições climáticas propícias para
+        aumento da população do vetor e transmissão de arboviroses.
+      </li>
+      <li class="bullet-orange">
+        <strong>Laranja:</strong> transmissão aumentada e sustentada
+        da arbovirose.
+      </li>
+      <li class="bullet-red">
+        <strong>Vermelho:</strong> incidência alta, acima dos 90%
+        históricos.
+      </li>
+    </ul>
+  </div>
+</div>
+<br/>
+<div class="row">
+  <div id="var-tables" class="col-md-12">
+    <!--
+    # ----------------------------------------
+    # Variáves nas Tabelas, Créditos e Contato
+    # ----------------------------------------
+    -->
+
+    <h2>Lista das variáveis apresentadas nas tabelas</h2>
+
+    <ul>
+      <li><strong>SE:</strong> semana epidemiológica</li>
+      <li><strong>temperatura:</strong>
+        média das temperaturas mínimas da semana (em graus centígrados)
+      </li>
+      <li><strong>umid.max:</strong>
+        média da umidade relativa máxima da semana</li>
+      <li><strong>tweet:</strong>
+        número de tweets indicativos de casos de dengue na cidade.
+        Por enquanto só há para dengue.
+      </li>
+      <li><strong>casos notif:</strong>
+        casos notificados de dengue , zika ou chikungunya</li>
+      <li><strong>incidência:</strong>
+        casos notificados dividido pela população (por 100.000)
+      </li>
+      <li><strong>casos estimados:</strong>
+        estimativa do número de casos esperado para a semana,
+        com base no perfil de atraso de notificação do município.
+      </li>
+      <li><strong>pr(inc subir):</strong>
+        probabilidade de aumento de incidência. Acima de 90%
+        é um indicador importante para o alerta laranja.
+      </li>
+      <li><strong>nivel:</strong>
+        cor do alerta (verde, amarelo, laranja, vermelho)</li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div id="notes" class="col-md-12">
+    <h2>Notas</h2>
+
+    <ul>
+      <li>Os dados do sinan mais recentes ainda não foram totalmente digitados.
+        Estimamos o número esperado de casos notificados considerando o tempo
+        até os casos serem digitados.
+      </li>
+      <li>Os dados de redes sociais são coletados e
+        analisados pelo Observatório de Dengue (UFMG).
+      </li>
+      <li>Algumas vezes, os casos da última semana ainda não estao disponíveis,
+        nesse caso, usa-se uma estimação com base na tendência de variação da
+        série.
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div id="credits" class="col-md-12">
+    <h2>Créditos</h2>
+
+    Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como
+    parceira entre:
+
+    <ul>
+      <li>Programa de Computação Científica, Fundação Oswaldo Cruz, Rio de
+        Janeiro.
+      </li>
+      <li>Escola de Matemática Aplicada, Fundação Getúlio Vargas.</li>
+      <li>Secretaria Estadual de Saúde do {{state_name}}.</li>
+      <li>Observatório de Dengue da UFMG.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div id="contact" class="col-md-12">
+    <h2>Contato</h2>
+    Para mais detalhes sobre o sistema de alerta InfoDengue, consultar:
+    <a href="http://info.dengue.mat.br">http://info.dengue.mat.br</a>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function(){
+    var cssClasses = {
+      'verde': 'green-row',
+      'amarelo': 'yellow-row',
+      'laranja': 'orange-row',
+      'vermelho': 'red-row'
+    }
+
+    $('.table tr').each(function(i, obj){
+      $(this).addClass(cssClasses[$('td:last-child', this).text()]);
+    });
+
+    $(document).ready( function () {
+      $('.table').DataTable({
+        "pageLength": 4,
+        "lengthMenu": [ 4, 8, 12 ],
+        "order": [[ 0, "desc" ]],
+        "searching": false,
+        "language": {
+          "url": "/static/libs/DataTables/i18n/pt_BR.json"
+        }
+      } );
+    } );
+  });
+</script>
+
+{% endblock %}

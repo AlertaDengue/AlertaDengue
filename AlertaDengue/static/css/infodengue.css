@@ -1,12 +1,24 @@
-.navbar-default .navbar-nav> li > a{
+.navbar-nav> li > a{
     color: #FFFFFF;
 }
 
-.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
-color: #003E7E;  /*Sets the text hover color on navbar*/
+.navbar-nav > li > a:hover, .navbar-nav > li > a:focus {
+    color: #003E7E;  /*Sets the text hover color on navbar*/
+    text-decoration: none;
 }
 
-h1 {
+.navbar-custom {
+    color: #FFFFFF;
+    background-color: #058ED0;
+}
+
+.navbar ul li {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+
+h1, h3 {
     color: #003E7E;
 }
 
@@ -38,11 +50,6 @@ h1 {
     border-color: #FB4A4C;
     border-width: medium;
     background-color: #FB4A4C;
-}
-
-.navbar-custom {
-    color: #FFFFFF;
-    background-color: #058ED0;
 }
 
 .bluebox {
@@ -184,20 +191,12 @@ h1 {
 }
 
 
-.chart-wrapper {
-    //background: #efefef;
-}
-
 .page-header {
     margin-top: 0;
 }
 
 .card-deck * {
     font-weight: bold;
-}
-
-.card-deck {
-    padding: 20px;
 }
 
 .card-indicator-value, .card-indicator-value *{

@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Saiba mais:" %}{% endblock %}
+{% block title %}{% trans "Saiba mais" %}{% endblock %}
 
 {% block content %}
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
+    <div class="card">
+        <div class="card-header">
             <h3 id="section1" class="panel-title">{% trans "O Sistema de Alerta InfoDengue" %}</h3>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
             {% blocktrans %}
             O <b>Sistema InfoDengue</b> visa gerar um sistema de alerta em tempo quase-real para os casos de
             transmissão de dengue nos municípios.
@@ -44,10 +44,10 @@
                 <a href="http://biorxiv.org/content/early/2016/03/29/046193" >Mais Detalhes...</a>
             {% endblocktrans %}
         </div>
-        <div class="panel-heading">
+        <div class="card-header">
             <h3 id="section2" class="panel-title">{% trans "O Sistema de Cores de Notificação " %}</h3>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
             {% blocktrans %}
             A dengue é difícil de prever, chega de repente. Tem ano que vem para arrasar, tem ano que mal aparece.
             O Info dengue é como um serviço de meteorologia, só que além do sol e da chuva, ele também fica de olho na
@@ -87,10 +87,10 @@
             seu bairro. Clique no <b>Mapa</b> e saiba agora mesmo como está a dengue aí, onde você está. <br><br>
             {% endblocktrans %}
         </div>
-        <div class="panel-heading">
+        <div class="card-header">
             <h3 id="section3" class="panel-title">{% trans "O Pré-Processamento de Dados e a Geração de Indicadores" %}</h3>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
             {% blocktrans %}
             A realização de uma análise preliminar dos dados de notificação de casos de dengue mostra que o tempo de
             atraso entre a notificação e digitação tem

@@ -1,31 +1,29 @@
 <!DOCTYPE html>
-{% load bootstrap3 %}
+{% load bootstrap4 %}
 {% load i18n %}
 {% load static %}
 <html>
 <head>
-    {% bootstrap_javascript jquery=True %}
-    <title>{% block bootstrap3_title %}{% endblock %}</title>
+    <title>{% block bootstrap4_title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+
+    <link href="/static/css/infodengue.css" rel="stylesheet" type="text/css">
+
+    <script src="/static/libs/jquery/jquery-3.3.1.js" type="text/javascript"></script>
+
     {% bootstrap_css %}
     <script src="/static/js/bloodhound.min.js" type="text/javascript"></script>
     <script src="/static/js/typeahead.bundle.min.js" type="text/javascript"></script>
 
     <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}"
           type="image/x-icon">
-    <link rel="icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
-
-    <link rel="stylesheet" type="text/css"
-          href="{% static 'libs/dashboards/css/keen-static.css' %}"/>
-    <link rel="stylesheet" type="text/css"
-          href="{% static 'libs/dashboards/css/keen-dashboards.css' %}"/>
-
-    <link href="/static/css/infodengue.css" rel="stylesheet" type="text/css">
 
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-{% block bootstrap3_content %}{% endblock %}
+{% block bootstrap4_content %}{% endblock %}
 
 <div id="footer">&nbsp;</div>
 <script>
