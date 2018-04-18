@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import numpy as np
 import datetime
 
@@ -95,3 +97,69 @@ def episem(x, sep='W', out='YW'):
     epiweek = int(((x - epistart)/7).days) + 1
 
     return out_format(epiyear, epiweek, out, sep)
+
+
+def episem2date(epi_year_week: str, weekday: int=0):
+    """
+    Function to obtain first day of corresponding Brazilian epidemiological
+    week provided
+
+    Function \code{episem2date} uses the Brazilian definition of
+    epidemiological
+    week and returns the date of the corresponding o the provided epi. week,
+    using week day requested. Uses Sunday as default, the first week day by
+    Brazilian epi.
+    week definition.
+    @see https://github.com/marfcg/leos.opportunity.estimator/
+        blob/master/R/episem2date.R
+
+    @name episem2date
+    @param epiyearweek Epidemiological week in the format "%Y\[*\]%W"
+        where Y and W defined by the Brazilian epidemiological week system.
+        The separator between Y and W is irrelevant. Ex.: 2014W02
+    @param weekday Week day to be used as representative of the epi. week.
+        Uses Date week day classification. 0: Sunday, 6:Saturday. Default: 0
+
+    @return Date corresponding to the Sunday of epiyearweek
+    @export
+
+    @examples
+    epiyearweek <- '2014W02'
+    episem2date(epiyearweek)
+
+    Test:
+
+    dt = datetime.datetime.now()
+
+    yw1 = int(episem(dt, sep=''))
+    dt1 = episem2date(yw1)
+    yw2 = int(episem(dt1, sep=''))
+
+    assert yw1 == yw2
+
+    :param epi_year_week:
+    :param weekday:
+    :return:
+    """
+    # force str format
+    epi_year_week = str(epi_year_week)
+    # Separate year and week:
+    if len(epi_year_week) not in [6, 7]:
+        raise Exception('Epi Year Week not valid.')
+
+    epiyear = int(epi_year_week[:4])
+    epiweek = int(epi_year_week[-2:])
+
+    # Obtain sunday of first epiweek of epiyear
+    # day.one
+    date_1 = datetime.datetime.strptime('%s-01-01' % epiyear, '%Y-%m-%d')
+    # day.one.week
+    date_1_w = int(date_1.strftime('%w'))
+
+    # Check wether week day of Jan 1st was before or after a Wednesday
+    # and set the start of the epiyear accordingly
+    epiweek_day_1 = (
+        date_1 - timedelta(days=date_1_w) if date_1_w <= 3 else
+        date_1 + timedelta(days=7 - date_1_w)
+    )
+    return epiweek_day_1 + timedelta(days=7 * (epiweek - 1) + weekday)

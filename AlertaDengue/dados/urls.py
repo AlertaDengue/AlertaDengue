@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .views import (
     DetailsPageView, SinanCasesView, AlertaMRJPageView,
     AlertaGeoJSONView, AlertaMunicipioPageView, get_municipio, AlertaMainView,
-    AlertaStateView, GeoTiffView, GeoJsonView,
+    AlertaStateView, GeoTiffView, GeoJsonView, ReportCityView, ReportView,
     AboutPageView, ContactPageView, JoininPageView,
     PartnersPageView, DataPublicServicesPageView
 )
@@ -32,7 +32,14 @@ app_name = "dados"
 
 __disease = '(?P<disease>dengue|chikungunya|zika)'
 __state = '(?P<state>CE|ES|MG|PR|RJ)'
+__state_extra = '(?P<state>CE|ES|MG|PR|RJ|SP)'
 __geocode = '(?P<geocodigo>\d{7})'
+__geocode_ = '(?P<geocode>\d{7})'
+__year = '(?P<year>\d{4})'
+__month = '(?P<month>\d{2})'
+__day = '(?P<day>\d{2})'
+__e_week = '(?P<e_week>\d{2})'
+__year_week = '(?P<year_week>\d{6})'
 
 urlpatterns = [
     url(r'^$', AlertaMainView.as_view(), name='main'),
@@ -68,4 +75,12 @@ urlpatterns = [
         GeoTiffView.as_view(), name='geotiff'),
     url(r'^geojson/%s/%s/$' % (__geocode, __disease),
         GeoJsonView.as_view(), name='geojson'),
+    url(r'^report/$',
+        ReportView.as_view(),
+        name='report'),
+    url(r'^report/%s$' % __state_extra,
+        ReportView.as_view(),
+        name='report_filter_city'),
+    url(r'^report/%s/%s/%s/$' % (__state_extra, __geocode_, __year_week),
+        ReportCityView.as_view(), name='report_city'),
 ]

@@ -181,8 +181,8 @@
         <div class="col-sm-5">
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="chart-wrapper">
-                      <div class="chart-stage">
+                    <div class="card">
+                      <div class="chart-body">
                           {% disease_chart %}
                       </div>
                     </div>
@@ -191,7 +191,7 @@
 
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="chart-wrapper" style="z-index:1001; position: relative;">
+                    <div class="card" style="z-index:1001; position: relative;">
                             <select id="cities"
                                     class="selectpicker"
                                     data-live-search="true"
@@ -222,8 +222,8 @@
         <div class="col-sm-7">
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="chart-wrapper">
-                      <div class="chart-title content-inline">
+                    <div class="card">
+                      <div class="card-body content-inline">
                           <strong>{% blocktrans %}Descrição de filtro{% endblocktrans %}:</strong>
                           <span id="filter-display"></span>
                       </div>
@@ -233,8 +233,8 @@
 
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="chart-wrapper">
-                      <div class="chart-stage">
+                    <div class="card">
+                      <div class="card-body">
                           {% date_chart %}
                       </div>
                     </div>
@@ -243,8 +243,8 @@
 
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="chart-wrapper">
-                      <div class="chart-stage">
+                    <div class="card">
+                      <div class="card-body">
                           {% age_chart %}
                       </div>
                     </div>
@@ -253,8 +253,8 @@
 
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="chart-wrapper">
-                      <div class="chart-stage">
+                    <div class="card">
+                      <div class="card-body">
                           {% gender_chart %}
                       </div>
                     </div>
@@ -265,8 +265,8 @@
     <div>&nbsp;</div>
     <div class="row">
         <div class="col-sm-12">
-            <div class="chart-wrapper">
-              <div class="chart-stage">
+            <div class="card">
+              <div class="card-body">
                   {% epiyears_chart %}
               </div>
             </div>

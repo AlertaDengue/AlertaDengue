@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Alerta Dengue" %}{% endblock %}
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-body">
+            <p>
+            {{message|safe}}
+            </p>
+            <a href="javascript:window.history.back();">Voltar</a>
+        </div>
+    </div>
+{% endblock %}
