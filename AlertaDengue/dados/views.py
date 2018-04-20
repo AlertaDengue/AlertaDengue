@@ -260,7 +260,7 @@ class PartnersPageView(TemplateView):
 
 
 class DataPublicServicesPageView(TemplateView):
-    template_name = 'data_public_services.html'
+    template_name = 'services.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -292,16 +292,45 @@ class DataPublicServicesPageView(TemplateView):
                         'mapserver_url': settings.MAPSERVER_URL,
                         'geo_info': geo_info_json
                     })
-                self.template_name = 'data_public_services_maps.html'
+                self.template_name = 'services_maps.html'
             else:
-                self.template_name = 'data_public_services_maps_doc.html'
+                self.template_name = 'services_maps_doc.html'
         elif service == 'api':
-            if service_type == 'notebook':
-                self.template_name = 'data_public_services_api_notebook.html'
+            if service_type is None:
+                self.template_name = 'services_api.html'
+
+                options_cities = ''
+                for state_abbv, state_name in STATE_NAME.items():
+                    for geocode, city_name in dbdata.get_cities(
+                        state_name=state_name
+                    ).items():
+                        options_cities += '''
+                        <option value="{0!s}">
+                            {0!s} - {1!s} - {2!s}
+                        </option>'''.format(
+                            geocode, city_name.upper(), state_abbv
+                        )
+
+                dt_end = datetime.datetime.now()
+                dt_start = dt_end - datetime.timedelta(weeks=4)
+
+                yw_start = episem(dt_start, sep='')
+                yw_end = episem(dt_end, sep='')
+
+                dt_start_fmt = episem2date(yw_start, 1).strftime('%Y-%m-%d')
+                dt_end_fmt = episem2date(yw_end, 1).strftime('%Y-%m-%d')
+
+                context.update({
+                    'options_cities': options_cities,
+                    'date_query_start': dt_start_fmt,
+                    'date_query_end': dt_end_fmt
+                })
+
+                return context
             else:
-                self.template_name = 'data_public_services_api.html'
+                self.template_name = 'services_api_doc.html'
         else:
-            self.template_name = 'data_public_services.html'
+            self.template_name = 'services.html'
 
         return context
 

@@ -6,6 +6,8 @@ from datetime import datetime
 from .db import NotificationQueries, STATE_NAME, AlertCity, MRJ_GEOCODE
 from dados.episem import episem
 
+import json
+
 
 class _GetMethod:
     """
@@ -127,9 +129,14 @@ class AlertCityView(View, _GetMethod):
                 'ew_end', cast=int,
                 error_message='Epidemic end week sent is empty.'
             )
-            e_year = self._get(
-                'e_year', cast=int,
-                error_message='Epidemic year sent is empty.'
+            ey_start = self._get(
+                'ey_start', cast=int,
+                error_message='Epidemic start year sent is empty.'
+            )
+
+            ey_end = self._get(
+                'ey_end', cast=int,
+                error_message='Epidemic end year sent is empty.'
             )
 
             if format not in ['csv', 'json']:
@@ -137,17 +144,17 @@ class AlertCityView(View, _GetMethod):
                     'The output format available are: `csv` or `json`.'
                 )
 
-            ew_start = e_year*100 + ew_start
-            ew_end = e_year*100 + ew_end
+            eyw_start = ey_start * 100 + ew_start
+            eyw_end = ey_end * 100 + ew_end
 
             if geocode == MRJ_GEOCODE:
                 df = AlertCity.search_rj(
-                    disease=disease, ew_start=ew_start, ew_end=ew_end
+                    disease=disease, ew_start=eyw_start, ew_end=eyw_end
                 )
             else:
                 df = AlertCity.search(
                     geocode=geocode, disease=disease,
-                    ew_start=ew_start, ew_end=ew_end
+                    ew_start=eyw_start, ew_end=eyw_end
                 )
                 # change all keys to lower case
                 df.drop(
@@ -189,7 +196,11 @@ class EpiYearWeekView(View, _GetMethod):
             epi_year_week = episem(epidate, sep='')
 
             if output_format == 'json':
-                result = '{"epi_year_week": %s}' % epi_year_week
+                result = json.dumps(dict(
+                    epi_year_week=epi_year_week,
+                    epi_year=epi_year_week[:4],
+                    epi_week=epi_year_week[4:],
+                ))
             else:
                 result = '' % epi_year_week
 
