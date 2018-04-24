@@ -170,10 +170,13 @@
                                     <li>ew_start: semana epidemiológica de
                                         início da consulta (int:1-53)
                                     </li>
-                                    <li>ew_end: semana epidemiológica de final
-                                        da consulta (int:1-53)
+                                    <li>ew_end: semana epidemiológica de
+                                        término da consulta (int:1-53)
                                     </li>
-                                    <li>e_year: ano de referência da consulta
+                                    <li>ey_start: ano de início da consulta
+                                        (int:0-9999)
+                                    </li>
+                                    <li>ey_end: ano de término da consulta
                                         (int:0-9999)
                                     </li>
                                 </ul>
@@ -184,7 +187,7 @@
                                     semana 1 e 50 do ano de 2017, em formato
                                     <code>CSV</code>:</p>
 
-                                <pre><code>https://info.dengue.mat.br/api/alertcity?geocode=3304557&amp;disease=dengue&amp;format=csv&amp;ew_start=1&amp;ew_end=50&amp;e_year=2017</code></pre>
+                                <pre><code>https://info.dengue.mat.br/api/alertcity?geocode=3304557&amp;disease=dengue&amp;format=csv&amp;ew_start=1&amp;ew_end=50&amp;ey_start=2017&amp;ey_end=2017</code></pre>
                                 <p>A continuação, seguem exemplos de uso da API
                                     referente a funcionalidade descrita.</p>
 
@@ -215,7 +218,7 @@
                                                 class="p">(</span>
     <span class="s1">&#39;geocode=3304557&amp;disease=dengue&amp;format=csv&amp;&#39;</span> <span
                                                 class="o">+</span>
-    <span class="s1">&#39;ew_start=1&amp;ew_end=50&amp;e_year=2017&#39;</span>
+    <span class="s1">&#39;ew_start=1&amp;ew_end=50&amp;ey_start=2017&amp;ey_end=2017&#39;</span>
 <span class="p">)</span>
 <span class="n">df</span> <span class="o">=</span> <span
                                                 class="n">pd</span><span
@@ -413,7 +416,7 @@
                                                 class="p">(</span>
     <span class="s1">&#39;geocode=4106902&amp;disease=dengue&amp;format=csv&amp;&#39;</span> <span
                                                 class="o">+</span>
-    <span class="s1">&#39;ew_start=1&amp;ew_end=50&amp;e_year=2017&#39;</span>
+    <span class="s1">&#39;ew_start=1&amp;ew_end=50&amp;ey_start=2017&amp;ey_end=2017&#39;</span>
 <span class="p">)</span>
 <span class="n">df</span> <span class="o">=</span> <span
                                                 class="n">pd</span><span
@@ -615,7 +618,7 @@
                                                 class="p">(</span>
     <span class="s1">&#39;geocode=4106902&amp;disease=dengue&amp;format=json&amp;&#39;</span> <span
                                                 class="o">+</span>
-    <span class="s1">&#39;ew_start=1&amp;ew_end=50&amp;e_year=2017&#39;</span>
+    <span class="s1">&#39;ew_start=1&amp;ew_end=50&amp;ey_start=2017&amp;ey_end=2017&#39;</span>
 <span class="p">)</span>
 <span class="n">search_url</span> <span class="o">=</span> <span class="s1">&#39;</span><span
                                                 class="si">%s</span><span
@@ -660,7 +663,7 @@
 
 
                                     <div class="output_subarea output_stream output_stdout output_text">
-<pre>http://localhost:8000/api/alertcity?geocode=4106902&amp;disease=dengue&amp;format=json&amp;ew_start=1&amp;ew_end=50&amp;e_year=2017
+<pre>http://localhost:8000/api/alertcity?geocode=4106902&amp;disease=dengue&amp;format=json&amp;ew_start=1&amp;ew_end=50&amp;ey_start=2017&amp;ey_end=2017
 </pre>
                                     </div>
                                 </div>
@@ -810,7 +813,7 @@
                                                 class="p">(</span>
     <span class="s1">&#39;geocode=3304557&amp;disease=dengue&amp;format=json&amp;&#39;</span> <span
                                                 class="o">+</span>
-    <span class="s1">&#39;ew_start=1&amp;ew_end=50&amp;e_year=2017&#39;</span>
+    <span class="s1">&#39;ew_start=1&amp;ew_end=50&amp;ey_start=2017&amp;ey_end=2017&#39;</span>
 <span class="p">)</span>
 <span class="n">search_url</span> <span class="o">=</span> <span class="s1">&#39;</span><span
                                                 class="si">%s</span><span
@@ -855,7 +858,7 @@
 
 
                                     <div class="output_subarea output_stream output_stdout output_text">
-<pre>http://localhost:8000/api/alertcity?geocode=3304557&amp;disease=dengue&amp;format=json&amp;ew_start=1&amp;ew_end=50&amp;e_year=2017
+<pre>http://localhost:8000/api/alertcity?geocode=3304557&amp;disease=dengue&amp;format=json&amp;ew_start=1&amp;ew_end=50&amp;ey_start=2017&amp;ey_end=2017
 </pre>
                                     </div>
                                 </div>
@@ -1027,7 +1030,8 @@
     <span class="s1">&#39;format=csv&#39;</span><span class="p">,</span>
     <span class="s1">&#39;ew_start=1&#39;</span><span class="p">,</span>
     <span class="s1">&#39;ew_end=50&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;e_year=2017&#39;</span>
+    <span class="s1">&#39;ey_start=2017&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ey_start=2017&#39;</span>
 <span class="p">]</span>
 
 <span class="n">search_filter</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
@@ -1120,10 +1124,15 @@ Index: []
 --------------------------------------------------------------------------------
 http://localhost:8000/api/alertcity?&amp;disease=dengue&amp;geocode=3304557&amp;format=csv&amp;ew_start=1&amp;ew_end=50
 Empty DataFrame
-Columns: [[EE] error_message: Epidemic year sent is empty.]
+Columns: [[EE] error_message: Epidemic start year sent is empty.]
 Index: []
 --------------------------------------------------------------------------------
-http://localhost:8000/api/alertcity?&amp;disease=dengue&amp;geocode=3304557&amp;format=csv&amp;ew_start=1&amp;ew_end=50&amp;e_year=2017
+http://localhost:8000/api/alertcity?&amp;disease=dengue&amp;geocode=3304557&amp;format=csv&amp;ew_start=1&amp;ew_end=50&ey_start=2017
+Empty DataFrame
+Columns: [[EE] error_message: Epidemic end year sent is empty.]
+Index: []
+--------------------------------------------------------------------------------
+http://localhost:8000/api/alertcity?&amp;disease=dengue&amp;geocode=3304557&amp;format=csv&amp;ew_start=1&amp;ew_end=50&amp;ey_start=2017&amp;ey_end=2017
        id  aps      se        data  tweets  casos  casos_est  casos_estmin  \
 0  190034  2.1  201724  2017-06-11      12      1        1.0           1.0
 1  213390  2.1  201733  2017-08-13      13      5        5.0           5.0
