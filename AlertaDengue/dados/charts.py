@@ -1,25 +1,9 @@
 from plotly.offline.offline import _plot_html
 
-import base64
 import cufflinks as cf
-import io
-import matplotlib.pyplot as plt
 import pandas as pd
 
 cf.set_config_file(theme='pearl')
-
-
-def transform_chart_to_base64(df: pd.DataFrame):
-    """
-    :param df:
-    :return:
-
-    """
-    buf = io.BytesIO()
-    df.plot()
-    plt.savefig(buf, format="png")
-    img = str(base64.b64encode(buf.getvalue()).strip())
-    return img[2:-1]
 
 
 class ReportCityCharts:

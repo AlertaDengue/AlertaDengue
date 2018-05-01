@@ -515,9 +515,18 @@ class AlertCity:
 
         sql = '''
         SELECT *
-        FROM "Municipio".alerta_mrj%s 
-        WHERE se BETWEEN %s AND %s
-        ''' % (get_disease_suffix(disease), ew_start, ew_end)
+        FROM "Municipio".alerta_mrj{0}, (
+          SELECT sum(casos)
+          FROM "Municipio".alerta_mrj{0} 
+          WHERE se BETWEEN {3}01 AND {3}54
+        ) AS notif_accum_year
+        WHERE se BETWEEN {1} AND {2}
+        '''.format(
+            get_disease_suffix(disease),
+            ew_start,
+            ew_end,
+            str(ew_end)[:4]
+        )
 
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn)
@@ -538,10 +547,21 @@ class AlertCity:
             )
 
         sql = '''
-            SELECT *
-            FROM "Municipio"."Historico_alerta%s" 
-            WHERE municipio_geocodigo=%s AND "SE" BETWEEN %s AND %s
-            ''' % (get_disease_suffix(disease), geocode, ew_start, ew_end)
+        SELECT *, (
+          SELECT sum(casos)
+          FROM "Municipio"."Historico_alerta{0}" 
+          WHERE municipio_geocodigo={1} AND "SE" BETWEEN {4}01 AND {4}54
+        ) AS notif_accum_year
+        FROM "Municipio"."Historico_alerta{0}" 
+        WHERE municipio_geocodigo={1} AND "SE" BETWEEN {2} AND {3}
+        '''.format(
+            get_disease_suffix(disease),
+            geocode,
+            ew_start,
+            ew_end,
+            str(ew_end)[:4]
+        )
 
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn)
+
