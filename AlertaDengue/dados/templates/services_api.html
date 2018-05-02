@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load lookup %}
+
+{% block extra_head %}
+<meta property="og:image"
+      content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+<meta property="og:image:secure_url"
+      content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+
+
+<script src="/static/libs/bootstrap-select/bootstrap-select.min.js"
+        type="text/javascript"></script>
+
+<script src="/static/js/infodengue.js"
+        type="text/javascript"></script>
+
+<link href="/static/libs/bootstrap-select/bootstrap-select.min.css"
+        type="text/css" rel="stylesheet" />
+
+
+<style type="text/css">
+    .form .col-head {
+        text-align: right;
+        font-weight: bold;
+        vertical-align: middle;
+    }
+
+    .form .row {
+        padding: 5px;
+    }
+
+    .word-break {
+        word-break: break-all;
+    }
+
+    .hidden {
+        display: none;
+    }
+</style>
+
+<script>
+    function geocode_search(val) {
+        var cond = ':contains("' + val.toUpperCase() + '")';
+
+        $('#geocode').prop('selectedIndex',0);
+
+        $('#geocode option').not(cond).prop('disabled', true);
+        $('#geocode option').not(cond).addClass('hidden');
+        $('#geocode option' + cond).prop('disabled', false);
+        $('#geocode option' + cond).removeClass('hidden');
+
+        $('#geocode').prop(
+            'selectedIndex',
+            $('#geocode option' + cond).first().index()
+        );
+    }
+
+    $(document).ready(function(){
+        $("#geocode-search").on("input", function(e) {
+          geocode_search($(e.target).val());
+        });
+    });
+</script>
+
+{% endblock %}
+
+{% block title %}{% trans "Dados" %}: {% trans "API" %}{% endblock %}
+
+{% block content %}
+
+
+<form onsubmit="return download();">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <a href="{% url 'dados:data_public_services' %}api/doc">
+                    {% trans "Para mais informações, acesse a documentação do serviço da API." %}
+                </a>
+            </div>
+
+            <div class="form-group">
+                <label for="geocode-search">{% trans "Filtro Município (código IBGE, nome do município ou U.F.)" %}:</label>
+
+                <input id="geocode-search" type="text" maxlength="30"
+                       class="form-control  input-sm"
+                       placeholder='{% trans "Digite aqui o filtro desejado para a consulta de municípios" %}'
+                       aria-describedby="geocode-searchHelp"
+                />
+
+                <small id="geocode-searchHelp" class="form-text text-muted">
+                  {% trans "Digite o código IBGE, nome do município ou U.F. para buscar o município desejado." %}
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="geocode">{% trans "Município" %}:</label>
+
+                <select id="geocode"
+                        class="form-control"
+                        data-live-search="true"
+                        data-title="{% blocktrans %}Selecione municipio(s){% endblocktrans %}"
+                        data-actions-box="true"
+                        data-selected-text-format="static"
+                        aria-describedby="geocodeHelp"
+                        required="required"
+                >
+                    <option value="">{% trans "Selecione o município desejado" %}</option>
+                    {{options_cities|safe}}
+                </select>
+
+                <small id="geocodeHelp" class="form-text text-muted">
+                  {% trans "Selecione o município desejado para a consulta" %}
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="epidate_start">{% trans "Data da Semana Epidemiológica de início da consulta" %}</label>
+                <input type="date" class="form-control"
+                       id="epidate_start"
+                       value="{{date_query_start}}"
+                       aria-describedby="date_startHelp"
+                       required="required" style="width:200px;">
+                <small id="date_startHelp" class="form-text text-muted">
+                  {% trans "Selecione um dia da Semana Epidemiológica de início da consulta" %}
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="epidate_end">{% trans "Data da Semana Epidemiológica de término da consulta" %}</label>
+                <input type="date" class="form-control"
+                       id="epidate_end"
+                       value="{{date_query_end}}"
+                       aria-describedby="date_endHelp"
+                       required="required" style="width:200px;">
+                <small id="date_endHelp" class="form-text text-muted">
+                  {% trans "Selecione um dia da Semana Epidemiológica de término da consulta" %}
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="disease">{% trans "Arbovirose" %}</label>
+                <select id="disease"
+                        class="form-control"
+                        aria-describedby="diseaseHelp"
+                        required="required"
+                >
+                    <option value="dengue" selected="selected">Dengue</option>
+                    <option value="chikungunya">Chikungunya</option>
+                    <option value="zika">Zika</option>
+                </select>
+                <small id="diseaseHelp" class="form-text text-muted">
+                  {% trans "Selecione a arbovirose para a consulta" %}
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="format">{% trans "Data da Semana Epidemiológica de término da consulta" %}</label>
+                <select id="format"
+                        class="form-control"
+                        aria-describedby="formatHelp"
+                >
+                    <option value="csv" selected="selected">CSV</option>
+                    <option value="json">JSON</option>
+                </select>
+                <small id="formatHelp" class="form-text text-muted">
+                  {% trans "Selecione o formato do arquivo de saída" %}
+                </small>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-12 column py-3" id="message-url">
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-primary"
+                       value='{% trans "Download" %}'
+                />
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    var epiYearStart;
+    var epiWeekStart;
+    var epiYearEnd;
+    var epiWeekEnd;
+
+    function getEpiYearWeek(epidate, func) {
+        var url = '/api/epi_year_week?epidate=' + epidate;
+
+        $.ajax({
+          dataType: 'json',
+          url: url,
+          success: function(data) {
+            func(data)
+          }
+        });
+    }
+
+    function download() {
+        getEpiYearWeek(
+            $('#epidate_start').val(),
+            function(result) {
+                epiYearStart = result['epi_year'];
+                epiWeekStart = result['epi_week'];
+
+                getEpiYearWeek(
+                    $('#epidate_end').val(),
+                    function(result) {
+                        epiYearEnd = result['epi_year'];
+                        epiWeekEnd= result['epi_week'];
+
+                        downloadOpen();
+                    }
+                );
+            }
+        );
+
+        return false;
+    }
+
+    function downloadOpen() {
+        var url = (
+            '{% url 'api:alertcity'%}/?' +
+            'geocode=<geocode>&' +
+            'disease=<disease>&' +
+            'format=<format>&'+
+            'ew_start=<ew_start>&' +
+            'ey_start=<ey_start>&' +
+            'ew_end=<ew_end>&' +
+            'ey_end=<ey_end>'
+        );
+
+        var geocode = $('#geocode option:selected').val();
+
+        url = url.replace('<geocode>', geocode);
+        url = url.replace('<disease>', $('#disease option:selected').val());
+        url = url.replace('<format>', $('#format option:selected').val());
+        url = url.replace('<ew_start>', epiWeekStart);
+        url = url.replace('<ey_start>', epiYearStart);
+        url = url.replace('<ew_end>', epiWeekEnd);
+        url = url.replace('<ey_end>', epiYearEnd);
+
+        window.open(url, '_blank');
+    }
+
+
+
+</script>
+{% endblock %}

@@ -48,12 +48,12 @@ urlpatterns = [
     url(r'^participe/$', JoininPageView.as_view(), name='joinin'),
     url(r'^partners/$', PartnersPageView.as_view(), name='partners'),
     url(
-        r'^data-public-services/(?P<service>maps|api)?$',
+        r'^services/(?P<service>maps|api)?$',
         DataPublicServicesPageView.as_view(),
         name="data_public_services"
     ),
     url(
-        r'^data-public-services/(?P<service>maps)/(?P<service_type>doc)$',
+        r'^services/(?P<service>maps|api)/(?P<service_type>doc)$',
         DataPublicServicesPageView.as_view(),
         name="data_public_services_type"
     ),
