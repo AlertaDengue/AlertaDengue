@@ -107,9 +107,9 @@ def get_cities(regional_name: str=None, state_name: str=None) -> dict:
     :return:
     """
     with db_engine.connect() as conn:
-        if regional_name is not None:
+        if regional_name is not None and state_name is not None:
             sql = '''
-                SELECT municipio_geocodigo, nome, nome_regional, uf
+                SELECT municipio_geocodigo, nome
                 FROM \"Dengue_global\".\"Municipio\"
                 INNER JOIN \"Dengue_global\".regional_saude
                 ON municipio_geocodigo = geocodigo
@@ -1148,23 +1148,18 @@ class ReportCity:
 class ReportState:
     @classmethod
     def read_disease_data(
-        cls, geocode: int, disease_code: str, station_id: str, year_week: int,
-        var_climate: str, has_tweets: bool=False
+        cls, state_initial: str, geocodes: list, year_week: int,
     ) -> pd.DataFrame:
         """
 
-        :param geocode:
-        :param disease_code:
-        :param station_id:
+        :param state_initial:
         :param year_week:
-        :param var_climate:
-        :param has_tweets:
+        :param list:
 
         :return:
 
         """
         k = [
-            var_climate,
             'casos',
             'p_inc100k',
             'casos_est',
@@ -1173,42 +1168,32 @@ class ReportState:
             'level_code'
         ]
 
-        tweet_join = ''
-        tweet_field = ''
+        k.insert(1, 'n_tweets')
+        tweet_field = 'tweets.n_tweets,'
 
-        if has_tweets:
-            k.insert(1, 'n_tweets')
-            tweet_field = 'tweets.n_tweets,'
-
-            tweet_join = '''
-            LEFT JOIN (
-               SELECT 
-                 epi_week(data_dia) AS "SE", 
-                 SUM(numero) as n_tweets,
-                 "Municipio_geocodigo"
-               FROM "Municipio"."Tweet"
-               WHERE "Municipio_geocodigo" = %(geocode)s
-                 AND "CID10_codigo" = '%(disease_code)s'
-                 AND epi_week(data_dia) <= %(year_week)s
-               GROUP BY "SE", "Municipio_geocodigo"
-               ORDER BY "SE" DESC
-             ) AS tweets
-               ON (
-                 "Municipio_geocodigo"="municipio_geocodigo"
-                 AND tweets."SE"=hist."SE"
-               )
-            '''
+        tweet_join = '''
+        LEFT JOIN (
+           SELECT 
+             epi_week(data_dia) AS "SE", 
+             SUM(numero) as n_tweets,
+             "Municipio_geocodigo"
+           FROM "Municipio"."Tweet"
+           WHERE 
+             "Municipio_geocodigo" IN (%(geocodes)s)
+             AND epi_week(data_dia) <= %(year_week)s
+           GROUP BY "SE", "Municipio_geocodigo"
+           ORDER BY "SE" DESC
+         ) AS tweets
+           ON (
+             "Municipio_geocodigo"="municipio_geocodigo"
+             AND tweets."SE"=hist."SE"
+           )
+        '''
 
         disease_table_suffix = ''
 
-        if disease_code == CID10['chikungunya']:
-            disease_table_suffix = '_chik'
-        elif disease_code == CID10['zika']:
-            disease_table_suffix = '_zika'
-
         sql = ('''
         SELECT
-           %(var_climate)s,
            hist."SE",
            ''' + tweet_field + '''
            hist.casos,
@@ -1225,28 +1210,21 @@ class ReportState:
             END) AS nivel
         FROM 
          "Municipio"."Historico_alerta%(disease_table_suffix)s" AS hist
-         LEFT JOIN (
-           SELECT 
-               epi_week(data_dia) AS epiweek, 
-               AVG(%(var_climate)s) AS %(var_climate)s
-           FROM "Municipio"."Clima_wu"
-           WHERE "Estacao_wu_estacao_id" = '%(station_id)s'
-           GROUP BY epiweek
-           ORDER BY epiweek
-         ) AS climate_wu
-           ON (hist."SE"=climate_wu.epiweek)
+           INNER JOIN "Dengue_global"."Municipio" AS m
+             ON (hist.municipio_geocodigo=m.geocodigo)
+           INNER JOIN "Dengue_global"."estado" AS uf
+             ON (UPPER(m.uf)=UPPER(uf.nome))
          ''' + tweet_join + '''
         WHERE 
          hist."SE" <= %(year_week)s
-         AND municipio_geocodigo=%(geocode)s
+         AND UPPER(uf.uf) = UPPER('%(state_initial)s')
+         AND hist.municipio_geocodigo IN (%(geocodes)s)
         ORDER BY "SE" DESC
         ''') % {
             'year_week': year_week,
-            'geocode': geocode,
-            'disease_code': disease_code,
-            'station_id': station_id,
-            'var_climate': var_climate,
-            'disease_table_suffix': disease_table_suffix
+            'disease_table_suffix': disease_table_suffix,
+            'state_initial': state_initial,
+            'geocodes': ','.join(map(lambda v: "'{}'".format(v), geocodes))
         }
 
         df = pd.read_sql(sql, index_col='SE', con=db_engine)[k]
@@ -1283,8 +1261,7 @@ class ReportState:
         df.index.name = 'SE'
         df.sort_index(ascending=True, inplace=True)
 
-        if has_tweets:
-            df.n_tweets = df.n_tweets.fillna(0).round(0)
+        df.n_tweets = df.n_tweets.fillna(0).round(0)
 
         return df.rename(columns={
             'umid_max': 'umid.max',
@@ -1294,24 +1271,3 @@ class ReportState:
             'n_tweets': 'tweets',
             'p_rt1': 'pr(incid. subir)'
         })
-
-    def get_station_data(self, geocode: int):
-        """
-
-        :return:
-        """
-        sql = '''
-        SELECT 
-          codigo_estacao_wu, varcli, ucrit, tcrit,
-          limiar_preseason, limiar_posseason, limiar_epidemico
-        FROM "Dengue_global".regional_saude
-        WHERE municipio_geocodigo = %s
-        ''' % geocode
-
-        df = pd.read_sql(sql, con=db_engine)
-
-        if df.empty:
-            raise Exception('NO STATION FOUND')
-
-        return df
-

@@ -12,7 +12,7 @@ from time import mktime
 # local
 from . import dbdata, models as M
 from .dbdata import (
-    Forecast, MRJ_GEOCODE, CID10, ReportCity,
+    Forecast, MRJ_GEOCODE, CID10, ReportCity, ReportState,
     ALERT_COLOR, STATE_NAME
 )
 from .episem import episem, episem2date
@@ -28,7 +28,6 @@ import json
 import locale
 import numpy as np
 import os
-import pandas as pd
 import random
 
 DBF = apps.get_model('dbf', 'DBF')
@@ -1309,32 +1308,32 @@ class ReportStateView(TemplateView):
         tweet_max = 0
 
         for regional_name in regional_names:
-            for disease_name, disease_code in CID10.items():
-                df = ReportState.read_disease_data(
-                    state_initial=state,
-                    disease_code=disease_code,
-                    year_week=year_week,
-                )
+            geocodes = dbdata.get_cities(
+                state_name=self.STATE_NAME[state],
+                regional_name=regional_name
+            )
+            df = ReportState.read_disease_data(
+                state_initial=state,
+                year_week=year_week,
+                geocodes=geocodes
+            )
 
-                n_cases = df[
-                    df.index // 100 == 2018
+            n_cases = df[
+                df.index // 100 == 2018
+            ]['casos notif.'].sum()
+
+            n_cases_last_year = (
+                df[
+                    (df.index // 100 == year_week // 100 - 1) &
+                    (df.index <= year_week - 100)
                 ]['casos notif.'].sum()
+            )
 
-                n_cases_last_year = (
-                    df[
-                        (df.index // 100 == year_week // 100 - 1) &
-                        (df.index <= year_week - 100)
-                    ]['casos notif.'].sum()
-                )
-
-                regional_info.update({
-                    regional_name: {
-                        disease_name: {
-                            'data': df
-                        }
-                    }
-                })
-
+            regional_info.update({
+                regional_name: {
+                    'data': df
+                }
+            })
 
         # param used by df.to_html
         html_param = dict(
@@ -1351,7 +1350,7 @@ class ReportStateView(TemplateView):
                 .to_html(**html_param)
         )
 
-        last_year_week_s = str(last_year_week)
+        last_year_week_s = str('999999')
         last_year = last_year_week_s[:4]
         last_week = last_year_week_s[-2:]
 
@@ -1361,16 +1360,7 @@ class ReportStateView(TemplateView):
             'last_year': last_year,
             'last_week': last_week,
             'state_name': self.STATE_NAME[state],
-            'df_dengue': prepare_html(df_dengue),
-            'df_chik': prepare_html(df_chik),
-            'df_zika': prepare_html(df_zika),
-            'total_n_dengue': total_n_dengue,
-            'total_n_dengue_last_year': total_n_dengue_last_year,
-            'total_n_chik': total_n_chik,
-            'total_n_chik_last_year': total_n_chik_last_year,
-            'total_n_zika': total_n_zika,
-            'total_n_zika_last_year': total_n_zika_last_year,
-            'max_alert_color': max_alert_color.title(),
+            'regional_info': regional_info,
             'tweet_max': tweet_max
         })
         return context
