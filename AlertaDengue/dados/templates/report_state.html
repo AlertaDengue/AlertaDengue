@@ -78,33 +78,21 @@
     # ----------------------
     -->
     <p>
-      Data da última atualização : {{last_week}}/{{last_year}}
+      Data da última atualização : {{ last_week }}/{{ last_year }}
     </p>
     <p>
-      <!--
-      usar a cor correspondente ao nivel de
-      alerta mais alto considerando as 3 doenças
-      -->
-      Situação de alerta do município: {{max_alert_color}}
+      Dos {{ n_cities }} municipios, {{ n_green }} encontram-se em nivel verde,
+      {{ n_yellow }} em nivel amarelo,
+      {{ n_orange }} em nivel laranja e
+      {{ n_red }} em nivel vermelho referentes a semana epidemiológica
+      {{ last_week }}-{{ last_year }}.
     </p>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-12">
-      <h2>Condições climáticas para transmissão de arboviroses</h2>
-
-      <p>
-      A figura abaixo mostra o indicador meteorológico de receptividade do
-      município para a transmissão de arboviroses. Quando o indicador está
-      acima do limiar (linha horizontal), existem condições ambientais
-      favoraveis à transmissão viral. Isso significa que a atenção precisa ser
-      aumentada para a possivel circulação sustentada de arbovirus e para a
-      implementação de controle vetorial.
-      </p>
-
-      {{chart_dengue_climate|safe}}
-      <br/>&nbsp;
+    <p>
+      Na semana passada:
+      {{ n_yellow_previous_week }} municípios em nivel amarelo,
+      {{ n_orange_previous_week }} em laranja e
+      {{ n_red_previous_week }}0 em vermelho.
+    </p>
   </div>
 </div>
 
@@ -141,24 +129,7 @@
       No ano passado, até essa semana, {{total_n_dengue_last_year}}
       tinham sido registrados.
 
-      A figura abaixo mostra a situação da dengue nos últimos dois anos.
-      As linhas horizontais correspondem aos limiares de incidência
-      pré-epidêmicos, epidêmicos e pós-epidêmicos
-      (casos por 100.000 habitantes)
-
-      <!--
-      A figura do historico do alerta fica aqui, Falta colocar legenda.
-      Não entendi o que é a linha laranja.
-      As barras vão ficar coloridas conforme o alerta, certo?
-
-      Colocar a tabela, talvez só com 6 linhas aparecendo e permitir scroll
-      -->
     </p>
-
-    {{chart_dengue_incidence|safe}}
-    <br/>&nbsp;
-    {{df_dengue|safe}}
-
 
     {% else %}
     <p>
@@ -181,26 +152,7 @@
       Esse ano, até essa semana, {{total_n_chik}} casos de dengue foram registrados.
       No ano passado, até essa semana, {{total_n_chik_last_year}}
       tinham sido registrados.
-
-      A figura abaixo mostra a situação da dengue nos últimos dois anos.
-      As linhas horizontais correspondem aos limiares de incidência
-      pré-epidêmicos, epidêmicos e pós-epidêmicos
-      (casos por 100.000 habitantes)
-
-      <!--
-      A figura do historico do alerta fica aqui, Falta colocar legenda.
-      Não entendi o que é a linha laranja.
-      As barras vão ficar coloridas conforme o alerta, certo?
-
-      Colocar a tabela, talvez só com 6 linhas aparecendo e permitir scroll
-      -->
     </p>
-
-    {{chart_chik_incidence|safe}}
-    <br/>&nbsp;
-    {{df_chik|safe}}
-
-
     {% else %}
     <p>
       Sem dados disponíveis para geração dessa seção.
@@ -222,26 +174,7 @@
       foram registrados.
       No ano passado, até essa semana, {{total_n_zika_last_year}}
       tinham sido registrados.
-
-      A figura abaixo mostra a situação da dengue nos últimos dois anos.
-      As linhas horizontais correspondem aos limiares de incidência
-      pré-epidêmicos, epidêmicos e pós-epidêmicos
-      (casos por 100.000 habitantes)
-
-      <!--
-      A figura do historico do alerta fica aqui, Falta colocar legenda.
-      Não entendi o que é a linha laranja.
-      As barras vão ficar coloridas conforme o alerta, certo?
-
-      Colocar a tabela, talvez só com 6 linhas aparecendo e permitir scroll
-      -->
     </p>
-
-    {{chart_zika_incidence|safe}}
-    <br/>&nbsp;
-    {{df_zika|safe}}
-
-
     {% else %}
     <p>
       Sem dados disponíveis para geração dessa seção.
