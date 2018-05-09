@@ -935,10 +935,17 @@ class ReportView(TemplateView):
         """
         context = super().get_context_data(**kwargs)
 
-        if 'state' not in context:
-            context.update(self.view_filter_state(context))
-        else:
+        report_type = (
+            context['report_type'] if 'report_type' in context else
+            None
+        )
+
+        if report_type is None:
+            context.update(self.view_filter_report_type(context))
+        elif report_type == 'city':
             context.update(self.view_filter_city(context))
+        else:
+            context.update(self.view_filter_state(context))
 
         context.update({
             'disease_list': CID10,
@@ -946,15 +953,13 @@ class ReportView(TemplateView):
 
         return context
 
-    def view_filter_state(self, context):
+    def view_filter_report_type(self, context):
         """
 
         :param context:
         :return:
         """
-        self.template_name = 'report_filter_state.html'
-
-
+        self.template_name = 'report_filter_report_type.html'
 
         options_states = ''
         for state_initial, state_name in self.STATE_NAME.items():
@@ -1003,6 +1008,22 @@ class ReportView(TemplateView):
 
         return context
 
+    def view_filter_state(self, context):
+        """
+
+        :param context:
+        :return:
+        """
+        self.template_name = 'report_filter_state.html'
+
+        dt = datetime.datetime.now() - datetime.timedelta(days=7)
+        yw = episem(dt, sep='')
+        dt_fmt = episem2date(yw, 1).strftime('%Y-%m-%d')
+
+        context.update({'date_query': dt_fmt})
+
+        return context
+
 
 class ReportCityView(TemplateView):
     template_name = 'report_city.html'
@@ -1030,6 +1051,248 @@ class ReportCityView(TemplateView):
 
         error_message_city_doesnt_exist = (
             'Esse municipio não participa do Infodengue. Se tiver ' +
+            'interesse em aderir, contacte-nos pelo email ' +
+            ' <a href="mailto:alerta_dengue@fiocruz.br">' +
+            'alerta_dengue@fiocruz.br</a>'
+        )
+
+        city = City.objects.get(pk=int(geocode))
+
+        try:
+            regional_health = RegionalHealth.objects.get(
+                municipio_geocodigo=int(geocode)
+            )
+        except:
+            return self.raise_error(
+                context, error_message_city_doesnt_exist
+            )
+
+        station_id = regional_health.codigo_estacao_wu
+        var_climate = regional_health.varcli
+        u_crit = regional_health.ucrit
+        t_crit = regional_health.tcrit
+        threshold_pre_epidemic = regional_health.limiar_preseason
+        threshold_pos_epidemic = regional_health.limiar_posseason
+        threshold_epidemic = regional_health.limiar_epidemico
+
+        climate_crit = None
+        tweet_max = 0
+
+        if var_climate.startswith('temp'):
+            climate_crit = t_crit
+            climate_title = 'Temperatura'
+        elif var_climate.startswith('umid'):
+            climate_crit = u_crit
+            climate_title = 'Umidade'
+
+        df_dengue = ReportCity.read_disease_data(
+            geocode=geocode, disease_code=CID10['dengue'],
+            station_id=station_id,  year_week=year_week,
+            var_climate=var_climate, has_tweets=True
+        )
+
+        df_chik = ReportCity.read_disease_data(
+            geocode=geocode, disease_code=CID10['chikungunya'],
+            station_id=station_id, year_week=year_week,
+            var_climate=var_climate, has_tweets=False
+        )
+
+        df_zika = ReportCity.read_disease_data(
+            geocode=geocode, disease_code=CID10['zika'],
+            station_id=station_id, year_week=year_week,
+            var_climate=var_climate, has_tweets=False
+        )
+
+        # prepare empty variables
+        chart_dengue_climate = ''
+        chart_chik_climate = ''
+        chart_chik_incidence = ''
+        chart_zika_climate = ''
+        chart_zika_incidence = ''
+
+        total_n_dengue = 0
+        total_n_dengue_last_year = 0
+        total_n_chik = 0
+        total_n_chik_last_year = 0
+        total_n_zika = 0
+        total_n_zika_last_year = 0
+
+        last_year_week_l = []
+        disease_last_code = []
+
+        if not df_dengue.empty:
+            last_year_week_l.append(df_dengue.index.max())
+
+            chart_dengue_climate = ReportCityCharts.create_climate_chart(
+                df=df_dengue, year_week=year_week, var_climate=var_climate,
+                climate_crit=climate_crit, climate_title=climate_title
+            )
+
+            chart_dengue_incidence = ReportCityCharts.create_incidence_chart(
+                df=df_dengue, year_week=year_week,
+                threshold_pre_epidemic=threshold_pre_epidemic,
+                threshold_pos_epidemic=threshold_pos_epidemic,
+                threshold_epidemic=threshold_epidemic
+            )
+
+            chart_dengue_tweets = ReportCityCharts.create_tweet_chart(
+                df=df_dengue, year_week=year_week
+            )
+            total_n_dengue = df_dengue[
+                df_dengue.index // 100 == 2018
+            ]['casos notif.'].sum()
+
+            total_n_dengue_last_year = (
+                df_dengue[
+                    (df_dengue.index // 100 == year_week // 100 - 1) &
+                    (df_dengue.index <= year_week - 100)
+                ]['casos notif.'].sum()
+            )
+
+            tweet_max = np.nanmax(df_dengue.tweets)
+
+        if not df_chik.empty:
+            last_year_week_l.append(df_chik.index.max())
+
+            chart_chik_climate = ReportCityCharts.create_climate_chart(
+                df=df_chik, year_week=year_week, var_climate=var_climate,
+                climate_crit=climate_crit, climate_title=climate_title
+            )
+
+            chart_chik_incidence = ReportCityCharts.create_incidence_chart(
+                df=df_chik, year_week=year_week,
+                threshold_pre_epidemic=threshold_pre_epidemic,
+                threshold_pos_epidemic=threshold_pos_epidemic,
+                threshold_epidemic=threshold_epidemic
+            )
+
+            total_n_chik = df_chik[
+                df_chik.index // 100 == 2018
+            ]['casos notif.'].sum()
+
+            total_n_chik_last_year = (
+                df_chik[
+                    (df_chik.index // 100 == year_week // 100 - 1) &
+                    (df_chik.index <= year_week - 100)
+                ]['casos notif.'].sum()
+            )
+
+        if not df_zika.empty:
+            last_year_week_l.append(df_zika.index.max())
+
+            chart_zika_climate = ReportCityCharts.create_climate_chart(
+                df=df_zika, year_week=year_week, var_climate=var_climate,
+                climate_crit=climate_crit, climate_title=climate_title
+            )
+
+            chart_zika_incidence = ReportCityCharts.create_incidence_chart(
+                df=df_zika, year_week=year_week,
+                threshold_pre_epidemic=threshold_pre_epidemic,
+                threshold_pos_epidemic=threshold_pos_epidemic,
+                threshold_epidemic=threshold_epidemic
+            )
+
+            total_n_zika = df_zika[
+                df_zika.index // 100 == 2018
+            ]['casos notif.'].sum()
+
+            total_n_zika_last_year = (
+                df_zika[
+                    (df_zika.index // 100 == year_week // 100 - 1) &
+                    (df_zika.index <= year_week - 100)
+                ]['casos notif.'].sum()
+            )
+
+        if not last_year_week_l:
+            return self.raise_error(
+                context, error_message_city_doesnt_exist
+            )
+
+        last_year_week = int(np.nanmax(last_year_week_l))
+
+        for df in [df_dengue, df_chik, df_zika]:
+            result = df[df.index == last_year_week]
+            if not result.empty:
+                disease_last_code.append(float(result['level_code']))
+
+        max_alert_code = int(np.nanmax(disease_last_code))
+        max_alert_color = ALERT_COLOR[max_alert_code]
+
+        # param used by df.to_html
+        html_param = dict(
+            na_rep='',
+            float_format=lambda x: ('%d' % x) if not np.isnan(x) else '',
+            index=False,
+            classes="table table-striped table-bordered"
+        )
+
+        prepare_html = (
+            lambda df: df.iloc[-12:, :-2]
+                .reset_index()
+                .sort_values(by='SE', ascending=[False])
+                .to_html(**html_param)
+        )
+
+        last_year_week_s = str(last_year_week)
+        last_year = last_year_week_s[:4]
+        last_week = last_year_week_s[-2:]
+
+        context.update({
+            'year': year,
+            'week': week,
+            'last_year': last_year,
+            'last_week': last_week,
+            'city_name': city.name,
+            'state_name': city.state,
+            'df_dengue': prepare_html(df_dengue),
+            'df_chik': prepare_html(df_chik),
+            'df_zika': prepare_html(df_zika),
+            'chart_dengue_climate': chart_dengue_climate,
+            'chart_dengue_tweets': chart_dengue_tweets,
+            'chart_dengue_incidence': chart_dengue_incidence,
+            'chart_chik_climate': chart_chik_climate,
+            'chart_chik_incidence': chart_chik_incidence,
+            'chart_zika_climate': chart_zika_climate,
+            'chart_zika_incidence': chart_zika_incidence,
+            'total_n_dengue': total_n_dengue,
+            'total_n_dengue_last_year': total_n_dengue_last_year,
+            'total_n_chik': total_n_chik,
+            'total_n_chik_last_year': total_n_chik_last_year,
+            'total_n_zika': total_n_zika,
+            'total_n_zika_last_year': total_n_zika_last_year,
+            'max_alert_color': max_alert_color.title(),
+            'tweet_max': tweet_max
+        })
+        return context
+
+
+class ReportStateView(TemplateView):
+    template_name = 'report_state.html'
+
+    def raise_error(self, context, message):
+        """
+
+        :return:
+        """
+        self.template_name = 'error.html'
+        context.update({'message': message})
+        return context
+
+    def get_context_data(self, **kwargs):
+        """
+
+        :param kwargs:
+        :return:
+        """
+        context = super().get_context_data(**kwargs)
+
+        year_week = int(context['year_week'])
+        year, week = context['year_week'][:4], context['year_week'][-2:]
+
+        regional_names = dbdata.get_regional_names(context['state'])
+
+        error_message_city_doesnt_exist = (
+            'Esse estado não participa do Infodengue. Se tiver ' +
             'interesse em aderir, contacte-nos pelo email ' +
             ' <a href="mailto:alerta_dengue@fiocruz.br">' +
             'alerta_dengue@fiocruz.br</a>'

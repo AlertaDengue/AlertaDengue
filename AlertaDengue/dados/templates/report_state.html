@@ -50,15 +50,15 @@
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="/report">{% trans "Relatórios" %}</a></li>
-      <li class="breadcrumb-item"><a href="/report">{% trans "Municipal" %}</a></li>
-      <li class="breadcrumb-item"><a href="/report/{{ state }}/city">{{ state }}</a></li>
-      <li class="breadcrumb-item active" aria-current="page">{{ city_name }}</li>
+      <li class="breadcrumb-item"><a href="/report">{% trans "Estadual" %}</a></li>
+      <li class="breadcrumb-item"><a href="/report/{{ state }}/state">{{ state }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{last_week}}/{{last_year}}</li>
   </ol>
 </nav>
 {% endblock %}
 
 
-{% block title %}{% trans "Relatório da Situação das Arboviroses em " %} {{city_name}} -
+{% block title %}{% trans "Relatório Estadual da Situação das Arboviroses em " %}
 {{state_name}} {% endblock %}
 
 {% block content %}
@@ -301,24 +301,30 @@
       <li><strong>temperatura:</strong>
         média das temperaturas mínimas da semana (em graus centígrados)
       </li>
-      <li><strong>umid.max:</strong>
-        média da umidade relativa máxima da semana</li>
       <li><strong>tweet:</strong>
         número de tweets indicativos de casos de dengue na cidade.
         Por enquanto só há para dengue.
       </li>
       <li><strong>casos notif:</strong>
-        casos notificados de dengue , zika ou chikungunya</li>
+        casos notificados de dengue, zika ou chikungunya</li>
       <li><strong>incidência:</strong>
-        casos notificados dividido pela população (por 100.000)
+        incidência por 100.000 habitantes
       </li>
-      <li><strong>casos estimados:</strong>
-        estimativa do número de casos esperado para a semana,
-        com base no perfil de atraso de notificação do município.
+      <li><strong>casos preditos:</strong>
+        número de casos estimados após correção pelo atraso de notificação
       </li>
-      <li><strong>pr(inc subir):</strong>
-        probabilidade de aumento de incidência. Acima de 90%
-        é um indicador importante para o alerta laranja.
+      <li><strong>ICmin:</strong>
+        número mínimo de casos estimados (IC 95%)
+      </li>
+      <li><strong>ICmax:</strong>
+        número máximo de casos estimados (IC 95%)
+      </li>
+      <li><strong>Rt:</strong>
+        número reprodutivo efetivo (> 1 indica aumento de casos transmissão)
+      </li>
+      <li><strong>p(Rt1):</strong>
+        probabilidade do número reprodutivo ser maior que 1
+        (> 0.95 indica aumento significativo de casos)
       </li>
       <li><strong>nivel:</strong>
         cor do alerta (verde, amarelo, laranja, vermelho)</li>

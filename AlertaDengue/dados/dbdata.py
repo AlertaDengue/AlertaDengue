@@ -80,6 +80,27 @@ def get_disease_suffix(disease: str):
     )
 
 
+def get_regional_names(state_name: str) -> list:
+    """
+
+    :param state_name:
+    :return:
+    """
+    sql = '''
+    SELECT DISTINCT nome_regional
+    FROM "Dengue_global"."regional_saude" AS rs
+      INNER JOIN "Dengue_global"."Municipio" AS m
+        ON (rs.municipio_geocodigo=m.geocodigo)
+      INNER JOIN "Dengue_global"."estado" AS uf
+        ON (UPPER(m.uf)=UPPER(uf.nome))
+    WHERE 
+      UPPER(uf.uf) = UPPER('{}')
+    '''.format(state_name)
+
+    with db_engine.connect() as conn:
+        return [v[0] for v in conn.execute(sql).fetchall()]
+
+
 def get_cities(regional_name: str=None, state_name: str=None) -> dict:
     """
     Get a list of cities from available states with code and name pairs
