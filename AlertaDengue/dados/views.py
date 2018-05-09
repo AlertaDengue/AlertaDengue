@@ -12,7 +12,7 @@ from time import mktime
 # local
 from . import dbdata, models as M
 from .dbdata import (
-    Forecast, MRJ_GEOCODE, CID10, ReportCity,
+    Forecast, MRJ_GEOCODE, CID10, ReportCity, ReportState,
     ALERT_COLOR, STATE_NAME
 )
 from .episem import episem, episem2date
@@ -28,7 +28,6 @@ import json
 import locale
 import numpy as np
 import os
-import pandas as pd
 import random
 
 DBF = apps.get_model('dbf', 'DBF')
@@ -935,10 +934,17 @@ class ReportView(TemplateView):
         """
         context = super().get_context_data(**kwargs)
 
-        if 'state' not in context:
-            context.update(self.view_filter_state(context))
-        else:
+        report_type = (
+            context['report_type'] if 'report_type' in context else
+            None
+        )
+
+        if report_type is None:
+            context.update(self.view_filter_report_type(context))
+        elif report_type == 'city':
             context.update(self.view_filter_city(context))
+        else:
+            context.update(self.view_filter_state(context))
 
         context.update({
             'disease_list': CID10,
@@ -946,15 +952,13 @@ class ReportView(TemplateView):
 
         return context
 
-    def view_filter_state(self, context):
+    def view_filter_report_type(self, context):
         """
 
         :param context:
         :return:
         """
-        self.template_name = 'report_filter_state.html'
-
-
+        self.template_name = 'report_filter_report_type.html'
 
         options_states = ''
         for state_initial, state_name in self.STATE_NAME.items():
@@ -1000,6 +1004,22 @@ class ReportView(TemplateView):
             'options_cities': options_cities,
             'date_query': dt_fmt
         })
+
+        return context
+
+    def view_filter_state(self, context):
+        """
+
+        :param context:
+        :return:
+        """
+        self.template_name = 'report_filter_state.html'
+
+        dt = datetime.datetime.now() - datetime.timedelta(days=7)
+        yw = episem(dt, sep='')
+        dt_fmt = episem2date(yw, 1).strftime('%Y-%m-%d')
+
+        context.update({'date_query': dt_fmt})
 
         return context
 
@@ -1240,6 +1260,107 @@ class ReportCityView(TemplateView):
             'total_n_zika': total_n_zika,
             'total_n_zika_last_year': total_n_zika_last_year,
             'max_alert_color': max_alert_color.title(),
+            'tweet_max': tweet_max
+        })
+        return context
+
+
+class ReportStateView(TemplateView):
+    template_name = 'report_state.html'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.STATE_NAME = dict(STATE_NAME)
+        # there are some cities from SP
+        self.STATE_NAME.update({'SP': 'São Paulo'})
+
+    def raise_error(self, context, message):
+        """
+
+        :return:
+        """
+        self.template_name = 'error.html'
+        context.update({'message': message})
+        return context
+
+    def get_context_data(self, **kwargs):
+        """
+
+        :param kwargs:
+        :return:
+        """
+        context = super().get_context_data(**kwargs)
+
+        year_week = int(context['year_week'])
+        year, week = context['year_week'][:4], context['year_week'][-2:]
+        state = context['state']
+
+        regional_names = dbdata.get_regional_names(state)
+
+        error_message_city_doesnt_exist = (
+            'Esse estado não participa do Infodengue. Se tiver ' +
+            'interesse em aderir, contacte-nos pelo email ' +
+            ' <a href="mailto:alerta_dengue@fiocruz.br">' +
+            'alerta_dengue@fiocruz.br</a>'
+        )
+
+        regional_info = {}
+        tweet_max = 0
+
+        for regional_name in regional_names:
+            geocodes = dbdata.get_cities(
+                state_name=self.STATE_NAME[state],
+                regional_name=regional_name
+            )
+            df = ReportState.read_disease_data(
+                state_initial=state,
+                year_week=year_week,
+                geocodes=geocodes
+            )
+
+            n_cases = df[
+                df.index // 100 == 2018
+            ]['casos notif.'].sum()
+
+            n_cases_last_year = (
+                df[
+                    (df.index // 100 == year_week // 100 - 1) &
+                    (df.index <= year_week - 100)
+                ]['casos notif.'].sum()
+            )
+
+            regional_info.update({
+                regional_name: {
+                    'data': df
+                }
+            })
+
+        # param used by df.to_html
+        html_param = dict(
+            na_rep='',
+            float_format=lambda x: ('%d' % x) if not np.isnan(x) else '',
+            index=False,
+            classes="table table-striped table-bordered"
+        )
+
+        prepare_html = (
+            lambda df: df.iloc[-12:, :-2]
+                .reset_index()
+                .sort_values(by='SE', ascending=[False])
+                .to_html(**html_param)
+        )
+
+        last_year_week_s = str('999999')
+        last_year = last_year_week_s[:4]
+        last_week = last_year_week_s[-2:]
+
+        context.update({
+            'year': year,
+            'week': week,
+            'last_year': last_year,
+            'last_week': last_week,
+            'state_name': self.STATE_NAME[state],
+            'regional_info': regional_info,
             'tweet_max': tweet_max
         })
         return context

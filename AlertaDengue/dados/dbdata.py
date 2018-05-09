@@ -80,15 +80,36 @@ def get_disease_suffix(disease: str):
     )
 
 
+def get_regional_names(state_name: str) -> list:
+    """
+
+    :param state_name:
+    :return:
+    """
+    sql = '''
+    SELECT DISTINCT nome_regional
+    FROM "Dengue_global"."regional_saude" AS rs
+      INNER JOIN "Dengue_global"."Municipio" AS m
+        ON (rs.municipio_geocodigo=m.geocodigo)
+      INNER JOIN "Dengue_global"."estado" AS uf
+        ON (UPPER(m.uf)=UPPER(uf.nome))
+    WHERE 
+      UPPER(uf.uf) = UPPER('{}')
+    '''.format(state_name)
+
+    with db_engine.connect() as conn:
+        return [v[0] for v in conn.execute(sql).fetchall()]
+
+
 def get_cities(regional_name: str=None, state_name: str=None) -> dict:
     """
     Get a list of cities from available states with code and name pairs
     :return:
     """
     with db_engine.connect() as conn:
-        if regional_name is not None:
+        if regional_name is not None and state_name is not None:
             sql = '''
-                SELECT municipio_geocodigo, nome, nome_regional, uf
+                SELECT municipio_geocodigo, nome
                 FROM \"Dengue_global\".\"Municipio\"
                 INNER JOIN \"Dengue_global\".regional_saude
                 ON municipio_geocodigo = geocodigo
@@ -1122,3 +1143,131 @@ class ReportCity:
             raise Exception('NO STATION FOUND')
 
         return df
+
+
+class ReportState:
+    @classmethod
+    def read_disease_data(
+        cls, state_initial: str, geocodes: list, year_week: int,
+    ) -> pd.DataFrame:
+        """
+
+        :param state_initial:
+        :param year_week:
+        :param list:
+
+        :return:
+
+        """
+        k = [
+            'casos',
+            'p_inc100k',
+            'casos_est',
+            'p_rt1',
+            'nivel',
+            'level_code'
+        ]
+
+        k.insert(1, 'n_tweets')
+        tweet_field = 'tweets.n_tweets,'
+
+        tweet_join = '''
+        LEFT JOIN (
+           SELECT 
+             epi_week(data_dia) AS "SE", 
+             SUM(numero) as n_tweets,
+             "Municipio_geocodigo"
+           FROM "Municipio"."Tweet"
+           WHERE 
+             "Municipio_geocodigo" IN (%(geocodes)s)
+             AND epi_week(data_dia) <= %(year_week)s
+           GROUP BY "SE", "Municipio_geocodigo"
+           ORDER BY "SE" DESC
+         ) AS tweets
+           ON (
+             "Municipio_geocodigo"="municipio_geocodigo"
+             AND tweets."SE"=hist."SE"
+           )
+        '''
+
+        disease_table_suffix = ''
+
+        sql = ('''
+        SELECT
+           hist."SE",
+           ''' + tweet_field + '''
+           hist.casos,
+           hist.p_rt1,
+           hist.casos_est,
+           hist.p_inc100k,
+           hist.nivel AS level_code,
+           (CASE 
+              WHEN hist.nivel=1 THEN 'verde'
+              WHEN hist.nivel=2 THEN 'amarelo'
+              WHEN hist.nivel=3 THEN 'laranja'
+              WHEN hist.nivel=4 THEN 'vermelho'
+              ELSE '-'    
+            END) AS nivel
+        FROM 
+         "Municipio"."Historico_alerta%(disease_table_suffix)s" AS hist
+           INNER JOIN "Dengue_global"."Municipio" AS m
+             ON (hist.municipio_geocodigo=m.geocodigo)
+           INNER JOIN "Dengue_global"."estado" AS uf
+             ON (UPPER(m.uf)=UPPER(uf.nome))
+         ''' + tweet_join + '''
+        WHERE 
+         hist."SE" <= %(year_week)s
+         AND UPPER(uf.uf) = UPPER('%(state_initial)s')
+         AND hist.municipio_geocodigo IN (%(geocodes)s)
+        ORDER BY "SE" DESC
+        ''') % {
+            'year_week': year_week,
+            'disease_table_suffix': disease_table_suffix,
+            'state_initial': state_initial,
+            'geocodes': ','.join(map(lambda v: "'{}'".format(v), geocodes))
+        }
+
+        df = pd.read_sql(sql, index_col='SE', con=db_engine)[k]
+        df.p_rt1 = (df.p_rt1 * 100).round(0).astype(int)
+        df.casos_est = df.casos_est.round(0).astype(int)
+        df.p_inc100k = df.p_inc100k.round(0).astype(int)
+
+        if df.empty:
+            df['init_date_week'] = None
+        else:
+            df['init_date_week'] = df.index.map(episem2date)
+
+            # merge with a range date dataframe to keep empty week on the data
+            ts_date = pd.date_range(
+                df['init_date_week'].min(),
+                df['init_date_week'].max(), freq='7D'
+            )
+            df_date = pd.DataFrame({'init_date_week': ts_date})
+            df_date.set_index(
+                df.init_date_week.map(
+                    lambda x: int(episem(str(x)[:10], sep=''))
+                ), drop=True, inplace=True
+            )
+
+            df = pd.merge(
+                df,
+                df_date,
+                how='outer',
+                on='init_date_week',
+                left_index=True,
+                right_index=True
+            )
+
+        df.index.name = 'SE'
+        df.sort_index(ascending=True, inplace=True)
+
+        df.n_tweets = df.n_tweets.fillna(0).round(0)
+
+        return df.rename(columns={
+            'umid_max': 'umid.max',
+            'temp_min': 'temp.min',
+            'p_inc100k': 'incidência',
+            'casos': 'casos notif.',
+            'n_tweets': 'tweets',
+            'p_rt1': 'pr(incid. subir)'
+        })
