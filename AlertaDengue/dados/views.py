@@ -28,6 +28,7 @@ import json
 import locale
 import numpy as np
 import os
+import pandas as pd
 import random
 
 DBF = apps.get_model('dbf', 'DBF')
@@ -1306,16 +1307,23 @@ class ReportStateView(TemplateView):
 
         regional_info = {}
         tweet_max = 0
+        last_year_week = None
 
         for regional_name in regional_names:
-            geocodes = dbdata.get_cities(
+            cities = dbdata.get_cities(
                 state_name=self.STATE_NAME[state],
                 regional_name=regional_name
             )
+
+            station_id, var_climate = (
+                dbdata.get_var_climate_info(cities.keys())
+            )
+
             df = ReportState.read_disease_data(
-                state_initial=state,
                 year_week=year_week,
-                geocodes=geocodes
+                cities=cities,
+                station_id=station_id,
+                var_climate=var_climate
             )
 
             n_cases = df[
@@ -1329,28 +1337,25 @@ class ReportStateView(TemplateView):
                 ]['casos notif.'].sum()
             )
 
+            last_year_week_ = df.index.max()
+            if last_year_week is None or last_year_week_ > last_year_week:
+                last_year_week = last_year_week_
+
+            cities_alert = {}
+            for i, row in df[df.index == last_year_week].iterrows():
+                cities_alert.update({row.geocode: row.level_code})
+
             regional_info.update({
                 regional_name: {
-                    'data': df
+                    'data': df,
+                    'table': self.prepare_html(df, var_climate),
+                    'cities_geocode': list(cities.keys()),
+                    'cities_name': cities,
+                    'cities_alert': cities_alert
                 }
             })
 
-        # param used by df.to_html
-        html_param = dict(
-            na_rep='',
-            float_format=lambda x: ('%d' % x) if not np.isnan(x) else '',
-            index=False,
-            classes="table table-striped table-bordered"
-        )
-
-        prepare_html = (
-            lambda df: df.iloc[-12:, :-2]
-                .reset_index()
-                .sort_values(by='SE', ascending=[False])
-                .to_html(**html_param)
-        )
-
-        last_year_week_s = str('999999')
+        last_year_week_s = str(last_year_week)
         last_year = last_year_week_s[:4]
         last_week = last_year_week_s[-2:]
 
@@ -1361,6 +1366,41 @@ class ReportStateView(TemplateView):
             'last_week': last_week,
             'state_name': self.STATE_NAME[state],
             'regional_info': regional_info,
-            'tweet_max': tweet_max
+            'tweet_max': tweet_max,
+            'regional_names': regional_names
         })
         return context
+
+    def prepare_html(self, df, var_climate):
+        """
+
+        :param df:
+        :param var_climate:
+        :return:
+        """
+        df['SE'] = df.index
+        cols_to_sum = ['tweets', 'casos notif.', 'casos_est']
+        cols_to_avg = [var_climate.replace('_', '.')]
+
+        df = df.groupby('SE')
+        df = df[cols_to_sum].sum().merge(
+            df[cols_to_avg].aggregate(np.nanmean),
+            how='outer',
+            left_index=True,
+            right_index=True
+        )[cols_to_avg + cols_to_sum]
+
+        # param used by df.to_html
+        html_param = dict(
+            na_rep='',
+            float_format=lambda x: ('%d' % x) if not np.isnan(x) else '',
+            index=False,
+            classes="table table-striped table-bordered"
+        )
+
+        return (
+            df.iloc[-6:, :]
+            .reset_index()
+            .sort_values(by='SE', ascending=[False])
+            .to_html(**html_param)
+        )

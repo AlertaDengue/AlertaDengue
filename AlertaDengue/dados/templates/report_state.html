@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load lookup %}
 {% load i18n %}
 
 {% block extra_head %}
@@ -42,6 +43,35 @@
         border: 1px solid #aaaaaa!important;
       }
 
+      ul.alert { padding: 0 30px; }
+
+      .alert li { list-style: none; }
+
+      .alert li:before {
+          font-family: AppleGothic, "Lucida Sans", Impact, Verdana, sans-serif;
+          content: '■';
+          float: left;
+          width: 1em;
+          margin: -2px -1.2em;
+          font-size: 100%;
+      }
+
+      .alert li.alert-1:before {
+        color: green;
+      }
+
+      .alert li.alert-2:before {
+        color: yellow;
+      }
+
+      .alert li.alert-3:before {
+        color: orange;
+      }
+
+      .alert li.alert-4:before {
+        color: red;
+      }
+
 </style>
 <script src="/static/libs/plotlyjs/plotly-latest.min.js"></script>
 {% endblock %}
@@ -52,7 +82,7 @@
       <li class="breadcrumb-item"><a href="/report">{% trans "Relatórios" %}</a></li>
       <li class="breadcrumb-item"><a href="/report">{% trans "Estadual" %}</a></li>
       <li class="breadcrumb-item"><a href="/report/{{ state }}/state">{{ state }}</a></li>
-      <li class="breadcrumb-item active" aria-current="page">{{last_week}}/{{last_year}}</li>
+      <li class="breadcrumb-item active" aria-current="page">{{ week }}/{{ year }}</li>
   </ol>
 </nav>
 {% endblock %}
@@ -96,94 +126,66 @@
   </div>
 </div>
 
-{% if tweet_max > 0%}
-<div class="row">
-  <div class="col-md-12">
-    <h2>Menção a arboviroses nas redes sociais</h2>
+{% for regional_name in regional_names %}
+  <div class="row">
+    <div class="col-md-12 my-2">
 
-    <p>
-    A figura abaixo mostra a intensidade de menção de sintomas de arboviroses
-    e presença de mosquitos de acordo com a população do município que usa
-    redes sociais.
-    Esse indicador, que é mais eficaz em cidades maiores, deve ser visto como
-    um auxiliar na detecção precoce de aumento de casos. Atualmente,
-    esse indicador é mais sensivel para detectar dengue do que outras
-    arboviroses.
-    </p>
+      <div class="row my-3">
+        <div class="col-md-12">
+          <h3>Regional {{ regional_name }}</h3>
+          <p>
+            Desde o início do ano, {{ regional_n_cases_from_jan_1st}} casos de dengue foram
+            registrados na Regional de Saúde, sendo {{ regional_n_cases_week }} na última semana.
+          </p>
+        </div>
+      </div>
 
-    {{chart_dengue_tweets|safe}}
-    <br/>&nbsp;
+      <div class="row my-3">
+        <div class="col-md-12">
+          <h4>Municípios:</h4>
+          <ul class="alert">
+          {% for city_geocode in regional_info|lookup:regional_name|lookup:'cities_geocode' %}
+          <li class="alert-{{ regional_info|lookup:regional_name|lookup:'cities_alert'|lookup:city_geocode}}">
+            {{ regional_info|lookup:regional_name|lookup:'cities_name'|lookup:city_geocode }}</li>
+          {% endfor %}
+          </ul>
+        </div>
+      </div>
 
+
+      <div class="row my-3">
+        <div class="col-md-12">
+          <h4>
+            Resumo das últimas seis semanas epidemiológicas na Regional de Saúde
+          </h4><br/>
+          {{ regional_info|lookup:regional_name|lookup:'table'|safe }}
+        </div>
+      </div>
+
+      {% if tweet_max > 0%}
+      <div class="row my-3">
+        <div class="col-md-12">
+          <h4>Menção a arboviroses nas redes sociais</h4>
+
+          <p>
+          A figura abaixo mostra a intensidade de menção de sintomas de arboviroses
+          e presença de mosquitos de acordo com a população do município que usa
+          redes sociais.
+          Esse indicador, que é mais eficaz em cidades maiores, deve ser visto como
+          um auxiliar na detecção precoce de aumento de casos. Atualmente,
+          esse indicador é mais sensivel para detectar dengue do que outras
+          arboviroses.
+          </p>
+
+          {{chart_dengue_tweets|safe}}
+          <br/>&nbsp;
+
+        </div>
+      </div>
+      {% endif %}
+    </div>
   </div>
-</div>
-{% endif %}
-
-<div class="row">
-  <div class="col-md-12">
-
-    <h2>Situação da Dengue</h2>
-
-    {% if total_n_dengue > 0 %}
-    <p>
-      Esse ano, até essa semana, {{total_n_dengue}} casos de dengue foram registrados.
-      No ano passado, até essa semana, {{total_n_dengue_last_year}}
-      tinham sido registrados.
-
-    </p>
-
-    {% else %}
-    <p>
-      Sem dados disponíveis para geração dessa seção.
-    </p>
-    {% endif %}
-
-    <br/>
-  </div>
-</div>
-
-
-<div class="row">
-  <div class="col-md-12">
-
-    <h2>Situação da Chikungunya</h2>
-
-    {% if total_n_chik > 0 %}
-    <p>
-      Esse ano, até essa semana, {{total_n_chik}} casos de dengue foram registrados.
-      No ano passado, até essa semana, {{total_n_chik_last_year}}
-      tinham sido registrados.
-    </p>
-    {% else %}
-    <p>
-      Sem dados disponíveis para geração dessa seção.
-    </p>
-    {% endif %}
-
-    <br/>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-12">
-
-    <h2>Situação da Zika</h2>
-
-    {% if total_n_zika > 0 %}
-    <p>
-      Esse ano, até essa semana, {{total_n_zika}} casos de dengue
-      foram registrados.
-      No ano passado, até essa semana, {{total_n_zika_last_year}}
-      tinham sido registrados.
-    </p>
-    {% else %}
-    <p>
-      Sem dados disponíveis para geração dessa seção.
-    </p>
-    {% endif %}
-
-    <br/>&nbsp;
-  </div>
-</div>
+{% endfor %}
 
 <div class="row">
   <div class="col-md-2"></div>
@@ -194,7 +196,7 @@
     # ---------------------
     -->
 
-    <h2>O código de Cores</h2>
+    <h3>O código de Cores</h3>
 
     As cores indicam niveis de atenção
 
@@ -227,7 +229,7 @@
     # ----------------------------------------
     -->
 
-    <h2>Lista das variáveis apresentadas nas tabelas</h2>
+    <h3>Lista das variáveis apresentadas nas tabelas</h3>
 
     <ul>
       <li><strong>SE:</strong> semana epidemiológica</li>
@@ -267,7 +269,7 @@
 
 <div class="row">
   <div id="notes" class="col-md-12">
-    <h2>Notas</h2>
+    <h3>Notas</h3>
 
     <ul>
       <li>Os dados do sinan mais recentes ainda não foram totalmente digitados.
@@ -287,7 +289,7 @@
 
 <div class="row">
   <div id="credits" class="col-md-12">
-    <h2>Créditos</h2>
+    <h3>Créditos</h3>
 
     Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como
     parceira entre:
@@ -305,7 +307,7 @@
 
 <div class="row">
   <div id="contact" class="col-md-12">
-    <h2>Contato</h2>
+    <h3>Contato</h3>
     Para mais detalhes sobre o sistema de alerta InfoDengue, consultar:
     <a href="http://info.dengue.mat.br">http://info.dengue.mat.br</a>
   </div>

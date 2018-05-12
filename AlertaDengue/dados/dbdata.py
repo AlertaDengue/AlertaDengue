@@ -101,6 +101,21 @@ def get_regional_names(state_name: str) -> list:
         return [v[0] for v in conn.execute(sql).fetchall()]
 
 
+def get_var_climate_info(geocodes: list):
+    """
+
+    :param geocodes:
+    :return:
+    """
+    sql = '''
+    SELECT DISTINCT codigo_estacao_wu, varcli 
+    FROM "Dengue_global".regional_saude 
+    WHERE municipio_geocodigo IN ({})
+    '''.format(','.join(map(lambda v: "'{}'".format(v), geocodes)))
+    with db_engine.connect() as conn:
+        return conn.execute(sql).fetchone()
+
+
 def get_cities(regional_name: str=None, state_name: str=None) -> dict:
     """
     Get a list of cities from available states with code and name pairs
@@ -1148,28 +1163,29 @@ class ReportCity:
 class ReportState:
     @classmethod
     def read_disease_data(
-        cls, state_initial: str, geocodes: list, year_week: int,
+        cls, cities: dict, station_id: str, year_week: int,
+        var_climate: str
     ) -> pd.DataFrame:
         """
 
-        :param state_initial:
+        :param cities:
+        :param station_id:
         :param year_week:
-        :param list:
-
+        :param var_climate:
         :return:
-
         """
+
         k = [
+            var_climate,
             'casos',
+            'n_tweets',
             'p_inc100k',
             'casos_est',
             'p_rt1',
             'nivel',
-            'level_code'
+            'level_code',
+            'geocode'
         ]
-
-        k.insert(1, 'n_tweets')
-        tweet_field = 'tweets.n_tweets,'
 
         tweet_join = '''
         LEFT JOIN (
@@ -1180,7 +1196,8 @@ class ReportState:
            FROM "Municipio"."Tweet"
            WHERE 
              "Municipio_geocodigo" IN (%(geocodes)s)
-             AND epi_week(data_dia) <= %(year_week)s
+             AND epi_week(data_dia) 
+               BETWEEN %(year_week_start)s AND %(year_week_end)s
            GROUP BY "SE", "Municipio_geocodigo"
            ORDER BY "SE" DESC
          ) AS tweets
@@ -1194,8 +1211,9 @@ class ReportState:
 
         sql = ('''
         SELECT
+           %(var_climate)s,
            hist."SE",
-           ''' + tweet_field + '''
+           tweets.n_tweets,
            hist.casos,
            hist.p_rt1,
            hist.casos_est,
@@ -1207,24 +1225,34 @@ class ReportState:
               WHEN hist.nivel=3 THEN 'laranja'
               WHEN hist.nivel=4 THEN 'vermelho'
               ELSE '-'    
-            END) AS nivel
+            END) AS nivel,
+            hist.municipio_geocodigo AS geocode
         FROM 
          "Municipio"."Historico_alerta%(disease_table_suffix)s" AS hist
-           INNER JOIN "Dengue_global"."Municipio" AS m
-             ON (hist.municipio_geocodigo=m.geocodigo)
-           INNER JOIN "Dengue_global"."estado" AS uf
-             ON (UPPER(m.uf)=UPPER(uf.nome))
+             INNER JOIN "Dengue_global"."Municipio" AS m
+               ON (hist.municipio_geocodigo=m.geocodigo)
+             LEFT JOIN (
+                 SELECT 
+                     epi_week(data_dia) AS epiweek, 
+                     AVG(%(var_climate)s) AS %(var_climate)s
+                 FROM "Municipio"."Clima_wu"
+                 WHERE "Estacao_wu_estacao_id" = '%(station_id)s'
+                 GROUP BY epiweek
+                 ORDER BY epiweek
+             ) AS climate_wu
+               ON (hist."SE"=climate_wu.epiweek)
          ''' + tweet_join + '''
         WHERE 
-         hist."SE" <= %(year_week)s
-         AND UPPER(uf.uf) = UPPER('%(state_initial)s')
+         hist."SE" BETWEEN %(year_week_start)s AND %(year_week_end)s
          AND hist.municipio_geocodigo IN (%(geocodes)s)
         ORDER BY "SE" DESC
         ''') % {
-            'year_week': year_week,
+            'year_week_start': year_week-200,
+            'year_week_end': year_week,
             'disease_table_suffix': disease_table_suffix,
-            'state_initial': state_initial,
-            'geocodes': ','.join(map(lambda v: "'{}'".format(v), geocodes))
+            'geocodes': ','.join(map(lambda v: "'{}'".format(v), cities)),
+            'var_climate': var_climate,
+            'station_id': station_id
         }
 
         df = pd.read_sql(sql, index_col='SE', con=db_engine)[k]
@@ -1236,6 +1264,7 @@ class ReportState:
             df['init_date_week'] = None
         else:
             df['init_date_week'] = df.index.map(episem2date)
+            dfs = []
 
             # merge with a range date dataframe to keep empty week on the data
             ts_date = pd.date_range(
@@ -1243,20 +1272,26 @@ class ReportState:
                 df['init_date_week'].max(), freq='7D'
             )
             df_date = pd.DataFrame({'init_date_week': ts_date})
-            df_date.set_index(
-                df.init_date_week.map(
-                    lambda x: int(episem(str(x)[:10], sep=''))
-                ), drop=True, inplace=True
-            )
 
-            df = pd.merge(
-                df,
-                df_date,
-                how='outer',
-                on='init_date_week',
-                left_index=True,
-                right_index=True
-            )
+            for geocode in df.geocode.unique():
+                df_ = df[df.geocode == geocode].sort_values('init_date_week')
+
+                df_date_ = df_date.set_index(
+                    df_.init_date_week.map(
+                        lambda x: int(episem(str(x)[:10], sep=''))
+                    ), drop=True
+                )
+
+                dfs.append(pd.merge(
+                    df_,
+                    df_date_,
+                    how='outer',
+                    on='init_date_week',
+                    left_index=True,
+                    right_index=True
+                ))
+
+            df = pd.concat(dfs)
 
         df.index.name = 'SE'
         df.sort_index(ascending=True, inplace=True)
@@ -1269,5 +1304,5 @@ class ReportState:
             'p_inc100k': 'incidência',
             'casos': 'casos notif.',
             'n_tweets': 'tweets',
-            'p_rt1': 'pr(incid. subir)'
+            'p_rt1': 'pr(incid. subir)',
         })
