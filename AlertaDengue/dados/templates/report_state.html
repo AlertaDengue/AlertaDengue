@@ -145,7 +145,7 @@
              <tr>
                <th width="20%">Município</th>
                {% for d in diseases_name%}
-               <th width="20%">{{ d }}</th>
+               <td width="20%" align="center"><strong>{{ d }}</strong></td>
                {% endfor %}
              </tr>
             </thead>
@@ -154,7 +154,7 @@
             <tr>
               <td>{{ regional_info|lookup:regional_name|lookup:'cities_name'|lookup:city_geocode }}</td>
               {% for d in diseases_code %}
-              <td>
+              <td align="center">
                 <span
                   class="circle alert-{{ regional_info|lookup:regional_name|lookup:'cities_alert'|lookup:city_geocode|lookup:d }}">&nbsp;
                 </span></td>
