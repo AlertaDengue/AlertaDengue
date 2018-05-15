@@ -1298,13 +1298,6 @@ class ReportStateView(TemplateView):
 
         regional_names = dbdata.get_regional_names(state)
 
-        error_message_city_doesnt_exist = (
-            'Esse estado não participa do Infodengue. Se tiver ' +
-            'interesse em aderir, contacte-nos pelo email ' +
-            ' <a href="mailto:alerta_dengue@fiocruz.br">' +
-            'alerta_dengue@fiocruz.br</a>'
-        )
-
         regional_info = {}
         tweet_max = 0
         last_year_week = None
@@ -1326,24 +1319,16 @@ class ReportStateView(TemplateView):
                 var_climate=var_climate
             )
 
-            n_cases = df[
-                df.index // 100 == 2018
-            ]['casos notif.'].sum()
-
-            n_cases_last_year = (
-                df[
-                    (df.index // 100 == year_week // 100 - 1) &
-                    (df.index <= year_week - 100)
-                ]['casos notif.'].sum()
-            )
-
             last_year_week_ = df.index.max()
             if last_year_week is None or last_year_week_ > last_year_week:
                 last_year_week = last_year_week_
 
             cities_alert = {}
             for i, row in df[df.index == last_year_week].iterrows():
-                cities_alert.update({row.geocode: row.level_code})
+                values = {}
+                for d in ['dengue', 'chik', 'zika']:
+                    values.update({d: row['level_code_{}'.format(d)]})
+                cities_alert.update({row.geocode: values})
 
             regional_info.update({
                 regional_name: {
@@ -1367,7 +1352,9 @@ class ReportStateView(TemplateView):
             'state_name': self.STATE_NAME[state],
             'regional_info': regional_info,
             'tweet_max': tweet_max,
-            'regional_names': regional_names
+            'regional_names': regional_names,
+            'diseases_code': ['dengue', 'chik', 'zika'],
+            'diseases_name': ['Dengue', 'Chikungunya', 'Zika']
         })
         return context
 
@@ -1379,7 +1366,11 @@ class ReportStateView(TemplateView):
         :return:
         """
         df['SE'] = df.index
-        cols_to_sum = ['tweets', 'casos notif.', 'casos_est']
+        cols_to_sum = ['tweets'] + [
+            'casos notif. dengue', 'casos est. dengue',
+            'casos notif. chik', 'casos est. chik',
+            'casos notif. zika', 'casos est. zika'
+        ]
         cols_to_avg = [var_climate.replace('_', '.')]
 
         df = df.groupby('SE')
@@ -1388,14 +1379,19 @@ class ReportStateView(TemplateView):
             how='outer',
             left_index=True,
             right_index=True
-        )[cols_to_avg + cols_to_sum]
+        )
+
+        for f in cols_to_avg + cols_to_sum:
+            if f not in df.columns:
+                df[f] = np.nan
+        df = df[cols_to_avg + cols_to_sum]
 
         # param used by df.to_html
         html_param = dict(
             na_rep='',
             float_format=lambda x: ('%d' % x) if not np.isnan(x) else '',
             index=False,
-            classes="table table-striped table-bordered"
+            classes="datatables table table-striped table-bordered"
         )
 
         return (

@@ -1161,6 +1161,8 @@ class ReportCity:
 
 
 class ReportState:
+    diseases = ['dengue', 'chik', 'zika']
+
     @classmethod
     def read_disease_data(
         cls, cities: dict, station_id: str, year_week: int,
@@ -1176,21 +1178,87 @@ class ReportState:
         """
 
         k = [
-            var_climate,
             'casos',
-            'n_tweets',
             'p_inc100k',
             'casos_est',
             'p_rt1',
             'nivel',
             'level_code',
-            'geocode'
         ]
+
+        k = [
+            '{}_{}'.format(v, d)
+            for v in k
+            for d in cls.diseases
+        ]
+
+        k.append(var_climate)
+        k.append('n_tweets')
+        k.append('geocode_dengue AS geocode')
+        k.append('"SE_dengue" AS "SE"')
+        k.append('epiweek2date("SE_dengue") AS init_date_week')
+
+        general_param = {
+            'year_week_start': year_week-200,
+            'year_week_end': year_week,
+            'geocodes': ','.join(map(lambda v: "'{}'".format(v), cities)),
+            'var_climate': var_climate,
+            'station_id': station_id
+        }
+
+        sql = ''
+        previous_disease = ''
+        for disease in cls.diseases:
+            _param = dict(general_param)
+            _param['disease'] = disease
+
+            table_suffix = ''
+            if disease != 'dengue':
+                table_suffix = '_{}'.format(disease)
+
+            _param['table_suffix'] = table_suffix
+
+            sql_ = '''
+            (SELECT
+               hist."SE" AS "SE_%(disease)s",
+               hist.casos AS casos_%(disease)s,
+               hist.p_rt1 AS p_rt1_%(disease)s,
+               hist.casos_est AS casos_est_%(disease)s,
+               hist.p_inc100k AS p_inc100k_%(disease)s,
+               hist.nivel AS level_code_%(disease)s,
+               (CASE 
+                  WHEN hist.nivel=1 THEN 'verde'
+                  WHEN hist.nivel=2 THEN 'amarelo'
+                  WHEN hist.nivel=3 THEN 'laranja'
+                  WHEN hist.nivel=4 THEN 'vermelho'
+                  ELSE '-'    
+                END) AS nivel_%(disease)s,
+                hist.municipio_geocodigo AS geocode_%(disease)s
+            FROM 
+             "Municipio"."Historico_alerta%(table_suffix)s" AS hist
+            WHERE 
+             hist."SE" BETWEEN %(year_week_start)s AND %(year_week_end)s
+             AND hist.municipio_geocodigo IN (%(geocodes)s)
+            ORDER BY "SE_%(disease)s" DESC
+            ) AS %(disease)s
+            ''' % _param
+
+            if not sql:
+                sql = sql_
+            else:
+                sql += '''
+                    LEFT JOIN {0}
+                    ON (
+                      {1}."SE_{1}" = {2}."SE_{2}"
+                      AND {1}.geocode_{1} = {2}.geocode_{2}
+                    )
+                '''.format(sql_, previous_disease, disease)
+            previous_disease = disease
 
         tweet_join = '''
         LEFT JOIN (
            SELECT 
-             epi_week(data_dia) AS "SE", 
+             epi_week(data_dia) AS "SE_twitter", 
              SUM(numero) as n_tweets,
              "Municipio_geocodigo"
            FROM "Municipio"."Tweet"
@@ -1198,72 +1266,37 @@ class ReportState:
              "Municipio_geocodigo" IN (%(geocodes)s)
              AND epi_week(data_dia) 
                BETWEEN %(year_week_start)s AND %(year_week_end)s
-           GROUP BY "SE", "Municipio_geocodigo"
-           ORDER BY "SE" DESC
-         ) AS tweets
+           GROUP BY "SE_twitter", "Municipio_geocodigo"
+           ORDER BY "SE_twitter" DESC
+        ) AS tweets
            ON (
-             "Municipio_geocodigo"="municipio_geocodigo"
-             AND tweets."SE"=hist."SE"
+             "Municipio_geocodigo"=dengue."geocode_dengue"
+             AND tweets."SE_twitter"=dengue."SE_dengue"
            )
-        '''
+        ''' % general_param
 
-        disease_table_suffix = ''
+        climate_join = '''
+        LEFT JOIN (
+          SELECT 
+             epi_week(data_dia) AS epiweek_climate, 
+             AVG(%(var_climate)s) AS %(var_climate)s
+          FROM "Municipio"."Clima_wu"
+          WHERE "Estacao_wu_estacao_id" = '%(station_id)s'
+          GROUP BY epiweek_climate
+          ORDER BY epiweek_climate
+        ) AS climate_wu
+           ON (dengue."SE_dengue"=climate_wu.epiweek_climate)
+        ''' % general_param
 
-        sql = ('''
-        SELECT
-           %(var_climate)s,
-           hist."SE",
-           tweets.n_tweets,
-           hist.casos,
-           hist.p_rt1,
-           hist.casos_est,
-           hist.p_inc100k,
-           hist.nivel AS level_code,
-           (CASE 
-              WHEN hist.nivel=1 THEN 'verde'
-              WHEN hist.nivel=2 THEN 'amarelo'
-              WHEN hist.nivel=3 THEN 'laranja'
-              WHEN hist.nivel=4 THEN 'vermelho'
-              ELSE '-'    
-            END) AS nivel,
-            hist.municipio_geocodigo AS geocode
-        FROM 
-         "Municipio"."Historico_alerta%(disease_table_suffix)s" AS hist
-             INNER JOIN "Dengue_global"."Municipio" AS m
-               ON (hist.municipio_geocodigo=m.geocodigo)
-             LEFT JOIN (
-                 SELECT 
-                     epi_week(data_dia) AS epiweek, 
-                     AVG(%(var_climate)s) AS %(var_climate)s
-                 FROM "Municipio"."Clima_wu"
-                 WHERE "Estacao_wu_estacao_id" = '%(station_id)s'
-                 GROUP BY epiweek
-                 ORDER BY epiweek
-             ) AS climate_wu
-               ON (hist."SE"=climate_wu.epiweek)
-         ''' + tweet_join + '''
-        WHERE 
-         hist."SE" BETWEEN %(year_week_start)s AND %(year_week_end)s
-         AND hist.municipio_geocodigo IN (%(geocodes)s)
-        ORDER BY "SE" DESC
-        ''') % {
-            'year_week_start': year_week-200,
-            'year_week_end': year_week,
-            'disease_table_suffix': disease_table_suffix,
-            'geocodes': ','.join(map(lambda v: "'{}'".format(v), cities)),
-            'var_climate': var_climate,
-            'station_id': station_id
-        }
+        sql += climate_join + tweet_join
 
-        df = pd.read_sql(sql, index_col='SE', con=db_engine)[k]
-        df.p_rt1 = (df.p_rt1 * 100).round(0).astype(int)
-        df.casos_est = df.casos_est.round(0).astype(int)
-        df.p_inc100k = df.p_inc100k.round(0).astype(int)
+        sql = ' SELECT {} FROM ({}) AS data'.format(
+            ','.join(k), sql
+        )
 
-        if df.empty:
-            df['init_date_week'] = None
-        else:
-            df['init_date_week'] = df.index.map(episem2date)
+        df = pd.read_sql(sql, index_col='SE', con=db_engine)
+
+        if not df.empty:
             dfs = []
 
             # merge with a range date dataframe to keep empty week on the data
@@ -1296,13 +1329,25 @@ class ReportState:
         df.index.name = 'SE'
         df.sort_index(ascending=True, inplace=True)
 
+        for d in cls.diseases:
+            k = 'p_rt1_{}'.format(d)
+            df[k] = (df[k] * 100).fillna(0).round(0).astype(int)
+            k = 'casos_est_{}'.format(d)
+            df[k] = df[k].fillna(0).round(0).astype(int)
+            k = 'p_inc100k_{}'.format(d)
+            df[k] = df[k].fillna(0).round(0).astype(int)
+
+            df.rename(columns={
+                'p_inc100k_{}'.format(d): 'incidência {}'.format(d),
+                'casos_{}'.format(d): 'casos notif. {}'.format(d),
+                'casos_est_{}'.format(d): 'casos est. {}'.format(d),
+                'p_rt1_{}'.format(d): 'pr(incid. subir) {}'.format(d),
+            }, inplace=True)
+
         df.n_tweets = df.n_tweets.fillna(0).round(0)
 
         return df.rename(columns={
             'umid_max': 'umid.max',
             'temp_min': 'temp.min',
-            'p_inc100k': 'incidência',
-            'casos': 'casos notif.',
             'n_tweets': 'tweets',
-            'p_rt1': 'pr(incid. subir)',
         })
