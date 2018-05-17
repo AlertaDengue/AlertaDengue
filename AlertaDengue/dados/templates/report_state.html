@@ -120,6 +120,21 @@
       {{ n_orange_previous_week }} em laranja e
       {{ n_red_previous_week }}0 em vermelho.
     </p>
+    <p>
+      Para mais detalhes sobre o estado, acesse a
+      <a href="/alerta/{{ state }}/dengue" target="__blank__">página de estados</a>:
+    </p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12 my-2">
+    <h3>Índice</h3>
+    <ul>
+    {% for regional_name in regional_names %}
+      <li><a href="#link_{{regional_name}}">Regional {{regional_name}}</a></li>
+    {% endfor %}
+    </ul>
   </div>
 </div>
 
@@ -129,7 +144,7 @@
 
       <div class="row my-3">
         <div class="col-md-12">
-          <h3>Regional {{ regional_name }}</h3>
+          <h3 id="link_{{ regional_name }}">Regional {{ regional_name }}</h3>
           <p>
             Desde o início do ano, {{ regional_n_cases_from_jan_1st }} casos de dengue foram
             registrados na Regional de Saúde, sendo {{ regional_n_cases_week }} na última semana.
