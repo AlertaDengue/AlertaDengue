@@ -18,7 +18,7 @@ from .dbdata import (
 from .episem import episem, episem2date
 from .maps import get_city_info
 from .models import City, RegionalHealth
-from .charts import ReportCityCharts
+from .charts import ReportCityCharts, ReportStateCharts
 from gis.geotiff import convert_from_shapefile
 
 import datetime
@@ -1330,13 +1330,18 @@ class ReportStateView(TemplateView):
                     values.update({d: row['level_code_{}'.format(d)]})
                 cities_alert.update({row.geocode: values})
 
+            chart_cases_twitter = ReportStateCharts.create_tweet_chart(
+                df=df, year_week=year_week
+            )
+
             regional_info.update({
                 regional_name: {
                     'data': df,
                     'table': self.prepare_html(df, var_climate),
                     'cities_geocode': list(cities.keys()),
                     'cities_name': cities,
-                    'cities_alert': cities_alert
+                    'cities_alert': cities_alert,
+                    'chart_cases_twitter': chart_cases_twitter
                 }
             })
 

@@ -131,7 +131,6 @@ class ReportCityCharts:
             if trace['name'] == 'casos notif.':
                 trace['visible'] = 'legendonly'
 
-
         return _plot_html(
             figure_or_data=figure_line, config={}, validate=True,
             default_width='100%', default_height=500, global_requirejs=''
@@ -240,5 +239,79 @@ class ReportCityCharts:
 
         return _plot_html(
             figure_or_data=figure, config={}, validate=True,
+            default_width='100%', default_height=500, global_requirejs=''
+        )[0]
+
+
+class ReportStateCharts:
+    @classmethod
+    def create_tweet_chart(
+        cls, df: pd.DataFrame, year_week
+    ) -> 'Plotly_HTML':
+        """
+
+        :param df:
+        :param year_week:
+        :return:
+        """
+        ks_cases = [
+            'casos notif. dengue',
+            'casos notif. chik',
+            'casos notif. zika'
+        ]
+
+        df_tweet = df.reset_index()[['SE', 'tweets'] + ks_cases]
+        df_tweet = df_tweet[
+            df_tweet.SE >= year_week - 200
+        ]
+
+        df_tweet['SE'] = df_tweet.SE.map(
+            lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:])
+        )
+
+        df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
+
+        fig_tweet = df_tweet.iplot(
+            x=['SE'],
+            y=['menções'], asFigure=True,
+            showlegend=True, xTitle='Período (Ano/Semana)',
+            color=['rgb(0,0,0)']
+        )
+
+        fig_cases = df_tweet.iplot(
+            x=['SE'], y=ks_cases, asFigure=True,
+            secondary_y=ks_cases, secondary_y_title='Casos',
+            showlegend=True, xTitle='Período (Ano/Semana)'
+        )
+
+        fig_cases.data.extend(fig_tweet.data)
+
+        fig_cases['layout']['xaxis1'].update(
+            tickangle=-60,
+            nticks=len(df_tweet) // 24
+        )
+        fig_cases['layout']['yaxis1'].update(
+            title='Tweets',
+            range=[0, df_tweet['menções'].max()]
+        )
+        fig_cases['layout']['yaxis2'].update(
+            range=[0, df_tweet[ks_cases].max().max()]
+        )
+
+        fig_cases['layout']['legend'].update(
+            x=-.1, y=1.2,
+            traceorder='normal',
+            font=dict(
+                family='sans-serif',
+                size=12,
+                color='#000'
+            ),
+            bgcolor='#FFFFFF',
+            bordercolor='#E2E2E2',
+            borderwidth=1
+        )
+
+        return _plot_html(
+            figure_or_data=fig_cases, config={}, validate=True,
             default_width='100%', default_height=500, global_requirejs=''
         )[0]

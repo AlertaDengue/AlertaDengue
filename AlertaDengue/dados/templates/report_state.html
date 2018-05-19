@@ -132,7 +132,7 @@
     <h3>Índice</h3>
     <ul>
     {% for regional_name in regional_names %}
-      <li><a href="#link_{{regional_name}}">Regional {{regional_name}}</a></li>
+      <li><a href="#{{regional_name}}">Regional {{regional_name}}</a></li>
     {% endfor %}
     </ul>
   </div>
@@ -144,7 +144,7 @@
 
       <div class="row my-3">
         <div class="col-md-12">
-          <h3 id="link_{{ regional_name }}">Regional {{ regional_name }}</h3>
+          <h3 id="{{ regional_name }}">Regional {{ regional_name }}</h3>
           <p>
             Desde o início do ano, {{ regional_n_cases_from_jan_1st }} casos de dengue foram
             registrados na Regional de Saúde, sendo {{ regional_n_cases_week }} na última semana.
@@ -154,7 +154,7 @@
 
       <div class="row my-3">
         <div class="col-md-12">
-          <h4>Alertas:</h4>
+          <h4>Alertas</h4>
           <table class="table table-striped table-bordered">
             <thead>
              <tr>
@@ -181,6 +181,16 @@
         </div>
       </div>
 
+      <div class="row my-3">
+        <div class="col-md-12">
+          <h4>
+            Casos notificados de arboviroses e índice de menção em
+            midia social sobre dengue na Regional de Saúde
+          </h4>
+
+          {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter' | safe}}
+        </div>
+      </div>
 
       <div class="row my-3">
         <div class="col-md-12">
