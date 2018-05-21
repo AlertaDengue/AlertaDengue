@@ -188,7 +188,16 @@
             midia social sobre dengue na Regional de Saúde
           </h4>
 
-          {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter' | safe}}
+        </div>
+      </div>
+
+      <div class="row my-3">
+        <div class="col-md-12 mb-2">
+          {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'dengue' | safe}}
+
+          {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'chik' | safe}}
+
+          {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'zika' | safe}}
         </div>
       </div>
 

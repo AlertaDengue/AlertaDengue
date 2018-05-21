@@ -246,18 +246,17 @@ class ReportCityCharts:
 class ReportStateCharts:
     @classmethod
     def create_tweet_chart(
-        cls, df: pd.DataFrame, year_week
+        cls, df: pd.DataFrame, year_week, disease: str
     ) -> 'Plotly_HTML':
         """
 
         :param df:
         :param year_week:
+        :param disease:
         :return:
         """
         ks_cases = [
-            'casos notif. dengue',
-            'casos notif. chik',
-            'casos notif. zika'
+            'casos notif. {}'.format(disease),
         ]
 
         df_tweet = df.reset_index()[['SE', 'tweets'] + ks_cases]
@@ -265,37 +264,46 @@ class ReportStateCharts:
             df_tweet.SE >= year_week - 200
         ]
 
-        df_tweet['SE'] = df_tweet.SE.map(
+        df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
+
+        df_grp = df_tweet.groupby(df.index)[
+            ['menções'] + ks_cases
+        ].sum().reset_index()
+
+        df_grp['SE'] = df_grp.SE.map(
             lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:])
         )
 
-        df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
-
-        fig_tweet = df_tweet.iplot(
+        fig_tweet = df_grp.iplot(
             x=['SE'],
             y=['menções'], asFigure=True,
             showlegend=True, xTitle='Período (Ano/Semana)',
-            color=['rgb(0,0,0)']
+            color=['rgb(128,128,128)']
         )
 
-        fig_cases = df_tweet.iplot(
+        fig_cases = df_grp.iplot(
             x=['SE'], y=ks_cases, asFigure=True,
             secondary_y=ks_cases, secondary_y_title='Casos',
-            showlegend=True, xTitle='Período (Ano/Semana)'
+            showlegend=True, xTitle='Período (Ano/Semana)',
+            color=['rgb(0,0,255)']
         )
 
         fig_cases.data.extend(fig_tweet.data)
 
         fig_cases['layout']['xaxis1'].update(
             tickangle=-60,
-            nticks=len(df_tweet) // 24
+            nticks=len(df_grp) // 24
         )
         fig_cases['layout']['yaxis1'].update(
             title='Tweets',
-            range=[0, df_tweet['menções'].max()]
+            range=[0, df_grp['menções'].max()]
         )
         fig_cases['layout']['yaxis2'].update(
-            range=[0, df_tweet[ks_cases].max().max()]
+            range=[0, df_grp[ks_cases].max().max()]
+        )
+
+        fig_cases['layout'].update(
+            title='Casos {} / Menções mídia social'.format(disease)
         )
 
         fig_cases['layout']['legend'].update(
@@ -313,5 +321,5 @@ class ReportStateCharts:
 
         return _plot_html(
             figure_or_data=fig_cases, config={}, validate=True,
-            default_width='100%', default_height=500, global_requirejs=''
+            default_width='100%', default_height=300, global_requirejs=''
         )[0]

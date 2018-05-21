@@ -1324,15 +1324,28 @@ class ReportStateView(TemplateView):
                 last_year_week = last_year_week_
 
             cities_alert = {}
+            chart_cases_twitter = {}
             for i, row in df[df.index == last_year_week].iterrows():
                 values = {}
                 for d in ['dengue', 'chik', 'zika']:
                     values.update({d: row['level_code_{}'.format(d)]})
-                cities_alert.update({row.geocode: values})
 
-            chart_cases_twitter = ReportStateCharts.create_tweet_chart(
-                df=df, year_week=year_week
-            )
+                    try:
+                        chart = ReportStateCharts.create_tweet_chart(
+                            df=df, year_week=year_week, disease=d
+                        )
+                    except:
+                        chart = '''
+                        <br/>
+                        <strong>Não há dados necessários para a geração do
+                        gráfico sobre {}.
+                        </strong>
+                        <br/>
+                        '''.format(d)
+
+                    chart_cases_twitter[d] = chart
+
+                cities_alert.update({row.geocode: values})
 
             regional_info.update({
                 regional_name: {
