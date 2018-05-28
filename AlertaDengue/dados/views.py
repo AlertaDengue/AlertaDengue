@@ -1414,6 +1414,7 @@ class ReportStateView(TemplateView):
 
         return (
             df.iloc[-6:, :]
+            .replace(0, np.nan)
             .reset_index()
             .sort_values(by='SE', ascending=[False])
             .to_html(**html_param)

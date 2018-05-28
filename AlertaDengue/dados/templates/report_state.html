@@ -108,21 +108,12 @@
       Data da última atualização : {{ last_week }}/{{ last_year }}
     </p>
     <p>
-      Dos {{ n_cities }} municipios, {{ n_green }} encontram-se em nivel verde,
-      {{ n_yellow }} em nivel amarelo,
-      {{ n_orange }} em nivel laranja e
-      {{ n_red }} em nivel vermelho referentes a semana epidemiológica
-      {{ last_week }}-{{ last_year }}.
-    </p>
-    <p>
-      Na semana passada:
-      {{ n_yellow_previous_week }} municípios em nivel amarelo,
-      {{ n_orange_previous_week }} em laranja e
-      {{ n_red_previous_week }}0 em vermelho.
-    </p>
-    <p>
-      Para mais detalhes sobre o estado, acesse a
-      <a href="/alerta/{{ state }}/dengue" target="__blank__">página de estados</a>:
+      Esse é o relatório resumido da situação de alerta de arboviroses no
+      estado, detalhado por Regional de Saúde. Para acessar estatísticas
+      gerais do estado, consulte a
+      <a href="/alerta/{{ state }}/dengue" target="__blank__">página de estados</a>.
+      E para consultar um município específico, consulte a
+      <a href="/report/{{ state }}/city" target="__blank__">página de relatórios municipais</a>.
     </p>
   </div>
 </div>
@@ -146,8 +137,9 @@
         <div class="col-md-12">
           <h3 id="{{ regional_name }}">Regional {{ regional_name }}</h3>
           <p>
-            Desde o início do ano, {{ regional_n_cases_from_jan_1st }} casos de dengue foram
-            registrados na Regional de Saúde, sendo {{ regional_n_cases_week }} na última semana.
+            A tabela abaixo mostra os niveis de alerta em cada município da
+            Regional de Saúde. As cores indicam niveis de atenção, conforme
+            detalhado na <a href="#color-code">tabela de cores</a>.
           </p>
         </div>
       </div>
@@ -184,9 +176,19 @@
       <div class="row my-3">
         <div class="col-md-12">
           <h4>
-            Casos notificados de arboviroses e índice de menção em
-            midia social sobre dengue na Regional de Saúde
+            Casos notificados de arboviroses na Regional de Saúde
           </h4>
+
+          <p>
+            A Figura abaixo mostra a série temporal de casos notificados de
+            arboviroses na última semana. A curva de menções refere-se à
+            intensidade de menção de sintomas de arboviroses e presença de
+            mosquitos de acordo com a população do município que usa
+            redes sociais. Esse indicador, que é mais eficaz em cidades
+            maiores, deve ser visto como um auxiliar na detecção precoce de
+            aumento de casos. Atualmente, esse indicador é mais sensivel para
+            detectar dengue do que outras arboviroses.
+          </p>
 
         </div>
       </div>
