@@ -4,11 +4,24 @@
 
 {% block extra_head %}
 
+{% load leaflet_tags %}
+{% leaflet_js %}
+{% leaflet_css %}
+{% leaflet_js plugins="ALL" %}
+
+{% load report_state %}
+
+<script src="/static/libs/jquery/jquery.sparkline.min.js"
+            type="text/javascript"></script>
+
 <link rel="stylesheet"
       type="text/css" href="/static/libs/DataTables/datatables.min.css"/>
 
 <script type="text/javascript"
         src="/static/libs/DataTables/datatables.min.js"></script>
+
+<script src="/static/js/infodengue.js"
+            type="text/javascript"></script>
 
 <style>
       .box {
@@ -69,8 +82,47 @@
         color: white;
       }
 
+      #main {
+          width: 100%;
+          height: 400px;
+      }
+
+      .info {
+          padding: 6px 8px;
+          font: 14px/16px Arial, Helvetica, sans-serif;
+          background: white;
+          background: rgba(255, 255, 255, 0.8);
+          box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+          border-radius: 5px;
+      }
+
+      .info h4, .info h6 {
+          margin: 0 0 5px;
+          color: #777;
+      }
+
+      .legend {
+          text-align: left;
+          line-height: 18px;
+          color: #555;
+      }
+
+      .legend i {
+          width: 18px;
+          height: 18px;
+          float: left;
+          margin-right: 8px;
+          opacity: 0.7;
+      }
+
 </style>
 <script src="/static/libs/plotlyjs/plotly-latest.min.js"></script>
+
+<script>
+  function isInArray(el, array) {
+      return (array.indexOf(el) >= 0) ? true : false;
+  }
+</script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -115,6 +167,29 @@
       E para consultar um município específico, consulte a
       <a href="/report/{{ state }}/city" target="__blank__">página de relatórios municipais</a>.
     </p>
+  </div>
+</div>
+
+<div class="row my-3">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Mapa Alerta Dengue</div>
+      <div class="card-body p-0">{% map_chart_dengue %}</div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Mapa Alerta Chikungunya</div>
+      <div class="card-body p-0">{% map_chart_chik %}</div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Mapa Alerta Zika</div>
+      <div class="card-body p-0">{% map_chart_zika %}</div>
+    </div>
   </div>
 </div>
 
