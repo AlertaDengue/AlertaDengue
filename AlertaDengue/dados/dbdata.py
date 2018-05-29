@@ -705,12 +705,15 @@ class NotificationResume:
         }
 
     @staticmethod
-    def get_cities_alert_by_state(state_name, disease='dengue'):
+    def get_cities_alert_by_state(
+        state_name, disease='dengue', epi_year_week: int=None
+    ):
         """
         Retorna vários indicadores de alerta a nível da cidade.
 
         :param state_name: State name
         :param disease: dengue|chikungunya|zika
+        :param epi_year_week: int
         :return: tupla
         """
 
@@ -725,6 +728,10 @@ class NotificationResume:
             (hist_alert.nivel-1) AS level_alert
         FROM
             "Municipio"."Historico_alerta{0}" AS hist_alert
+        '''
+
+        if epi_year_week is None:
+            sql += '''
             INNER JOIN (
                 SELECT geocodigo, MAX("data_iniSE") AS "data_iniSE"
                 FROM
@@ -736,10 +743,22 @@ class NotificationResume:
             ) AS recent_alert ON (
                 recent_alert.geocodigo=hist_alert.municipio_geocodigo
                 AND recent_alert."data_iniSE"=hist_alert."data_iniSE"
-            ) INNER JOIN "Dengue_global"."Municipio" AS municipio ON (
+            ) 
+            '''
+
+        sql += '''
+            INNER JOIN "Dengue_global"."Municipio" AS municipio ON (
                 hist_alert.municipio_geocodigo = municipio.geocodigo
             )
-        '''.format(_disease, state_name)
+        '''
+
+        if epi_year_week is not None:
+            sql += (
+                ' WHERE hist_alert."SE" = {}'.format(epi_year_week) +
+                ' AND uf=\'{1}\''
+            )
+
+        sql = sql.format(_disease, state_name)
 
         with db_engine.connect() as conn:
             return pd.read_sql_query(sql, conn, 'id', parse_dates=True)

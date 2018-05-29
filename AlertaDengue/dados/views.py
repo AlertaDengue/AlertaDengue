@@ -1357,13 +1357,9 @@ class ReportStateView(TemplateView):
 
         regional_names = dbdata.get_regional_names(state)
 
-        alerts = {}
-        mun_dict = {}
-
         disease_key = ['dengue', 'chik', 'zika']
 
         regional_info = {}
-        tweet_max = 0
         last_year_week = None
 
         for regional_name in regional_names:
@@ -1429,6 +1425,7 @@ class ReportStateView(TemplateView):
         # map
         notif = dbdata.NotificationResume  # alias
         cities_alert = {}
+        mun_dict = {}
         alerts = {}
         geo_ids = {}
         cases_series_last_12 = {}
@@ -1437,7 +1434,8 @@ class ReportStateView(TemplateView):
             _d = d if d != 'chik' else 'chikungunya'
 
             cities_alert[d] = notif.get_cities_alert_by_state(
-                self.STATE_NAME[state], CID10[_d]
+                state_name=self.STATE_NAME[state], disease=_d,
+                epi_year_week=last_year_week
             )
 
             alerts[d] = dict(
@@ -1450,7 +1448,7 @@ class ReportStateView(TemplateView):
 
             geo_ids[d] = list(mun_dict[d].keys())
 
-            if len(geo_ids) > 0:
+            if len(geo_ids[d]) > 0:
                 cases_series_last_12[d] = (
                     dbdata.NotificationResume.tail_estimated_cases(
                         geo_ids[d], 12
@@ -1466,7 +1464,6 @@ class ReportStateView(TemplateView):
             'last_week': last_week,
             'state_name': self.STATE_NAME[state],
             'regional_info': regional_info,
-            'tweet_max': tweet_max,
             'regional_names': regional_names,
             'diseases_code': ['dengue', 'chik', 'zika'],
             'diseases_name': ['Dengue', 'Chikungunya', 'Zika'],

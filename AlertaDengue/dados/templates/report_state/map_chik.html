@@ -86,8 +86,8 @@
         });
     }
 
-    function main_map_init_chik(map_chik, options) {
-        $(document).data('map_chik', map_chik);
+    function main_map_init_chik(map, options) {
+        $(document).data('map', map);
 
         map.setView(
             new L.latLng(
@@ -107,12 +107,12 @@
                '</a> Procure um médico caso suspeite de chik.',
             3: 'Fique <a href="http://www.riocontrachik.rj.gov.br/Site' +
                '/Conteudo/FiqueAtento.aspx">atento aos sintomas da Chikungunya!' +
-               '</a> Procure um médico caso suspeite de chikungunya.'
+               '</a> Procure um médico caso suspeite de chik.'
         };
 
         // control that shows state info on hover
 
-        info_chik.onAdd = function (map_chik) {
+        info_chik.onAdd = function (map) {
             this._div = L.DomUtil.create('div', 'info');
             this.update();
             return this._div;
@@ -139,7 +139,7 @@
             return div;
         };
 
-        legend_chik.addTo(map_chik);
+        legend_chik.addTo(map);
 
         function fill_details_chik(feature, layer){
             geo_id = parseInt(feature.properties.geocodigo);
