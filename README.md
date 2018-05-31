@@ -1,7 +1,7 @@
-#AlertaDengue
+# AlertaDengue
 Portal de dados do Projeto Alerta Dengue
 
-##Como Contribuir?
+## Como Contribuir?
 Para criar um ambiente desenvolvimento é necessário:
  1. Crie um virtualenv;
  2. Instale as dependencias do projeto;
@@ -15,7 +15,7 @@ $ python AlertaDengue/manage.py syncdb
 $ cp AlertaDengue/{example-,}settings.ini
 ```
 
-##Formato dos mapas
+## Formato dos mapas
 
 O site requer dados na projeção EPSG:4326
 para converter de SAD69 para EPSG:4326 (lat,lon) use o seguinte comando:
