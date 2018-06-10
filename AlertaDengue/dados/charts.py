@@ -3,7 +3,7 @@ from plotly.offline.offline import _plot_html
 import cufflinks as cf
 import pandas as pd
 
-cf.set_config_file(theme='pearl')
+cf.set_config_file(theme='pearl', offline=True)
 
 
 class ReportCityCharts:
