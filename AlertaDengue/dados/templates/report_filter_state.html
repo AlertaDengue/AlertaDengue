@@ -25,8 +25,20 @@
 
 <script>
 function openReport() {
-  var state_initial = $('#state option:selected').val();
-  window.location.href = '/report/' + state_initial;
+  var epidate = $('#epidate').val();
+  var url = '/api/epi_year_week?epidate=' + epidate;
+
+  $.ajax({
+      dataType: 'json',
+      url: url,
+      success: function(data) {
+        window.location.href = (
+          '/report/{{state}}/' +
+          data['epi_year_week']
+        );
+      }
+  });
+
   return false;
 }
 
@@ -37,12 +49,15 @@ function openReport() {
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-      <li class="breadcrumb-item active" aria-current="page">{% trans "Relatórios" %}</li>
+      <li class="breadcrumb-item"><a href="/report">{% trans "Relatórios" %}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{% trans "Municipal" %}</li>
+      <li class="breadcrumb-item active" aria-current="page">{{ state }}</li>
   </ol>
 </nav>
 {% endblock %}
 
-{% block title %}{% trans "Relatórios" %}{% endblock %}
+
+{% block title %}{% trans "Relatórios" %} / {{ state }}{% endblock %}
 
 {% block content %}
 
@@ -51,16 +66,14 @@ function openReport() {
     <div class="col-md-12">
       <!-- field:start -->
       <div class="form-group">
-        <label for="state">{% trans "Unidade Federal" %}</label>
-        <select id="state" class="form-control"
-                style="width:400px;"
-                required="required"
-        >
-          <option value="">{% trans "Selecione uma Unidade Federal" %}</option>
-          {{options_states|safe}}
-        </select>
-        <small id="stateHelp" class="form-text text-muted">
-          {% trans "Selecione a Unidade Federal desejada para a consulta" %}
+        <label for="epidate">{% trans "Data da Semana Epidemiológica" %}</label>
+        <input type="date" class="form-control"
+               id="epidate"
+               value="{{date_query}}"
+               aria-describedby="dateHelp"
+               required="required" style="width:200px;">
+        <small id="dateHelp" class="form-text text-muted">
+          {% trans "Selecione um dia da Semana Epidemiológica desejada" %}
         </small>
       </div>
       <!-- field:end -->

@@ -50,15 +50,15 @@
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="/report">{% trans "Relatórios" %}</a></li>
-      <li class="breadcrumb-item"><a href="/report">{% trans "Municipal" %}</a></li>
-      <li class="breadcrumb-item"><a href="/report/{{ state }}/city">{{ state }}</a></li>
-      <li class="breadcrumb-item active" aria-current="page">{{ city_name }}</li>
+      <li class="breadcrumb-item"><a href="/report">{% trans "Estadual" %}</a></li>
+      <li class="breadcrumb-item"><a href="/report/{{ state }}/state">{{ state }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{last_week}}/{{last_year}}</li>
   </ol>
 </nav>
 {% endblock %}
 
 
-{% block title %}{% trans "Relatório da Situação das Arboviroses em " %} {{city_name}} -
+{% block title %}{% trans "Relatório Estadual da Situação das Arboviroses em " %}
 {{state_name}} {% endblock %}
 
 {% block content %}
@@ -78,33 +78,21 @@
     # ----------------------
     -->
     <p>
-      Data da última atualização : {{last_week}}/{{last_year}}
+      Data da última atualização : {{ last_week }}/{{ last_year }}
     </p>
     <p>
-      <!--
-      usar a cor correspondente ao nivel de
-      alerta mais alto considerando as 3 doenças
-      -->
-      Situação de alerta do município: {{max_alert_color}}
+      Dos {{ n_cities }} municipios, {{ n_green }} encontram-se em nivel verde,
+      {{ n_yellow }} em nivel amarelo,
+      {{ n_orange }} em nivel laranja e
+      {{ n_red }} em nivel vermelho referentes a semana epidemiológica
+      {{ last_week }}-{{ last_year }}.
     </p>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-12">
-      <h2>Condições climáticas para transmissão de arboviroses</h2>
-
-      <p>
-      A figura abaixo mostra o indicador meteorológico de receptividade do
-      município para a transmissão de arboviroses. Quando o indicador está
-      acima do limiar (linha horizontal), existem condições ambientais
-      favoraveis à transmissão viral. Isso significa que a atenção precisa ser
-      aumentada para a possivel circulação sustentada de arbovirus e para a
-      implementação de controle vetorial.
-      </p>
-
-      {{chart_dengue_climate|safe}}
-      <br/>&nbsp;
+    <p>
+      Na semana passada:
+      {{ n_yellow_previous_week }} municípios em nivel amarelo,
+      {{ n_orange_previous_week }} em laranja e
+      {{ n_red_previous_week }}0 em vermelho.
+    </p>
   </div>
 </div>
 
@@ -141,24 +129,7 @@
       No ano passado, até essa semana, {{total_n_dengue_last_year}}
       tinham sido registrados.
 
-      A figura abaixo mostra a situação da dengue nos últimos dois anos.
-      As linhas horizontais correspondem aos limiares de incidência
-      pré-epidêmicos, epidêmicos e pós-epidêmicos
-      (casos por 100.000 habitantes)
-
-      <!--
-      A figura do historico do alerta fica aqui, Falta colocar legenda.
-      Não entendi o que é a linha laranja.
-      As barras vão ficar coloridas conforme o alerta, certo?
-
-      Colocar a tabela, talvez só com 6 linhas aparecendo e permitir scroll
-      -->
     </p>
-
-    {{chart_dengue_incidence|safe}}
-    <br/>&nbsp;
-    {{df_dengue|safe}}
-
 
     {% else %}
     <p>
@@ -181,26 +152,7 @@
       Esse ano, até essa semana, {{total_n_chik}} casos de dengue foram registrados.
       No ano passado, até essa semana, {{total_n_chik_last_year}}
       tinham sido registrados.
-
-      A figura abaixo mostra a situação da dengue nos últimos dois anos.
-      As linhas horizontais correspondem aos limiares de incidência
-      pré-epidêmicos, epidêmicos e pós-epidêmicos
-      (casos por 100.000 habitantes)
-
-      <!--
-      A figura do historico do alerta fica aqui, Falta colocar legenda.
-      Não entendi o que é a linha laranja.
-      As barras vão ficar coloridas conforme o alerta, certo?
-
-      Colocar a tabela, talvez só com 6 linhas aparecendo e permitir scroll
-      -->
     </p>
-
-    {{chart_chik_incidence|safe}}
-    <br/>&nbsp;
-    {{df_chik|safe}}
-
-
     {% else %}
     <p>
       Sem dados disponíveis para geração dessa seção.
@@ -222,26 +174,7 @@
       foram registrados.
       No ano passado, até essa semana, {{total_n_zika_last_year}}
       tinham sido registrados.
-
-      A figura abaixo mostra a situação da dengue nos últimos dois anos.
-      As linhas horizontais correspondem aos limiares de incidência
-      pré-epidêmicos, epidêmicos e pós-epidêmicos
-      (casos por 100.000 habitantes)
-
-      <!--
-      A figura do historico do alerta fica aqui, Falta colocar legenda.
-      Não entendi o que é a linha laranja.
-      As barras vão ficar coloridas conforme o alerta, certo?
-
-      Colocar a tabela, talvez só com 6 linhas aparecendo e permitir scroll
-      -->
     </p>
-
-    {{chart_zika_incidence|safe}}
-    <br/>&nbsp;
-    {{df_zika|safe}}
-
-
     {% else %}
     <p>
       Sem dados disponíveis para geração dessa seção.
@@ -301,24 +234,30 @@
       <li><strong>temperatura:</strong>
         média das temperaturas mínimas da semana (em graus centígrados)
       </li>
-      <li><strong>umid.max:</strong>
-        média da umidade relativa máxima da semana</li>
       <li><strong>tweet:</strong>
         número de tweets indicativos de casos de dengue na cidade.
         Por enquanto só há para dengue.
       </li>
       <li><strong>casos notif:</strong>
-        casos notificados de dengue , zika ou chikungunya</li>
+        casos notificados de dengue, zika ou chikungunya</li>
       <li><strong>incidência:</strong>
-        casos notificados dividido pela população (por 100.000)
+        incidência por 100.000 habitantes
       </li>
-      <li><strong>casos estimados:</strong>
-        estimativa do número de casos esperado para a semana,
-        com base no perfil de atraso de notificação do município.
+      <li><strong>casos preditos:</strong>
+        número de casos estimados após correção pelo atraso de notificação
       </li>
-      <li><strong>pr(inc subir):</strong>
-        probabilidade de aumento de incidência. Acima de 90%
-        é um indicador importante para o alerta laranja.
+      <li><strong>ICmin:</strong>
+        número mínimo de casos estimados (IC 95%)
+      </li>
+      <li><strong>ICmax:</strong>
+        número máximo de casos estimados (IC 95%)
+      </li>
+      <li><strong>Rt:</strong>
+        número reprodutivo efetivo (> 1 indica aumento de casos transmissão)
+      </li>
+      <li><strong>p(Rt1):</strong>
+        probabilidade do número reprodutivo ser maior que 1
+        (> 0.95 indica aumento significativo de casos)
       </li>
       <li><strong>nivel:</strong>
         cor do alerta (verde, amarelo, laranja, vermelho)</li>

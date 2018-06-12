@@ -28,48 +28,49 @@ h1, h3 {
     padding-bottom: 10px;
 }
 
-.panel-verde {
+.card-green * {
     border-color: #519452;
     border-width: medium;
-    background-color: #519452;
+    background-color: #519452!important;
 }
 
-.panel-amarelo {
+.card-green .btn-link,
+.card-yellow .btn-link,
+.card-orange .btn-link,
+.card-red .btn-link {
+    color: white!important;
+}
+
+.card-yellow{
     border-color: #D4DC53;
     border-width: medium;
-    background-color: #D4DC53;
+    background-color: #D4DC53!important;
 }
 
-.panel-laranja {
+.card-orange {
     border-color: #E8824C;
     border-width: medium;
-    background-color: #E8824C;
+    background-color: #E8824C!important;
 }
 
-.panel-vermelho {
+.card-red {
     border-color: #FB4A4C;
     border-width: medium;
-    background-color: #FB4A4C;
+    background-color: #FB4A4C!important;
 }
 
 .bluebox {
     color: #FFFFFF;
     background-color: #058ED0;
-    display: table-cell;
-    margin-left: 15px;
 
 }
 .boxrow{
-    display: table-row;
-    overflow: hidden;
 }
 
 .col-md-3.bluebox {
-    width: 23%;
 }
 
 .col-md-6.bluebox {
-    width: 50%;
 }
 
 .col-md-2 {
