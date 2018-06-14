@@ -1,0 +1,195 @@
+{% load i18n %}
+{% load leaflet_tags %}
+{% load lookup %}
+
+{% leaflet_map "map_dengue" callback="main_map_init_dengue" %}
+
+<script type="text/javascript">
+
+    var _filter_city_dengue;
+
+    var mun_dict_dengue = {{ mun_dict|lookup:'dengue'|safe }};
+    var alerta_dengue = {{ alerts_level|lookup:'dengue'|safe }};
+    var case_series_dengue = {{ case_series|lookup:'dengue'|safe }};
+    var recomendacoes_dengue;
+
+    var municipios_dengue = L.featureGroup();
+    var geo_ids_dengue = {{ geo_ids|lookup:'dengue' }};
+
+    var features_dengue = L.layerGroup();
+    var info_dengue = L.control();
+    var legend_dengue = L.control({position: 'bottomright'});
+    var alertLevels_dengue = [
+        {name: '{% blocktrans %}Baixo Risco{% endblocktrans %}', color: '#0D6B0D'},
+        {name: '{% blocktrans %}Atenção{% endblocktrans %}', color: '#C8D20F'},
+        {name: '{% blocktrans %}Transmissão{% endblocktrans %}', color: '#E45205'},
+        {name: '{% blocktrans %}Epidemia{% endblocktrans %}', color: '#FF0205'},
+    ];
+
+    $('.totalsparkline').sparkline('html', {
+        type: 'bar',
+        width: "auto",
+        heigth: "auto",
+        barWidth: "15px",
+        barColor: "White",
+        tooltipSuffix: " casos"
+    });
+
+    function style_dengue(feature) {
+        var i = +feature.properties.alerta || 0;
+        return {
+            weight: 1,
+            opacity: 0.9,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.9,
+            fillColor: alertLevels_dengue[i].color
+        };
+    }
+
+    function selected_style_dengue(feature) {
+        var i = +feature.properties.alerta || 0;
+        return {
+            weight: 2,
+            opacity: 0.9,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.9,
+            fillColor: alertLevels_dengue[i].color
+        };
+    }
+
+    function highlightFeature_dengue(e) {
+        var layer = e.target;
+
+        if (!L.Browser.ie && !L.Browser.opera) {
+            layer.bringToFront();
+        }
+        info_dengue.update(layer.feature.properties);
+
+        renderSparkline_dengue(e);
+
+        layer.bringToBack()
+    }
+
+    function resetHighlight_dengue(e) {
+        info_dengue.update();
+    }
+
+    function renderSparkline_dengue(e) {
+        $('.inlinesparkline').sparkline('html', {
+            type: 'bar',
+            width: "14em",
+            heigth: "5em",
+            barWidth: "9em",
+            tooltipSuffix: " casos"
+        });
+    }
+
+    function main_map_init_dengue(map, options) {
+        $(document).data('map', map);
+
+        map.setView(
+            new L.latLng(
+                {{map_center|lookup:0|safe}}, {{map_center|lookup:1|safe}}
+            ), {{map_zoom}}
+        );
+
+        recomendacoes_dengue = {
+            0: "Hora de arrumar o quintal, cobrir caixas d'água, <a " +
+               "href='http://www.riocontradengue.rj.gov.br/Site/Conteudo" +
+               "/Eliminar.aspx'>Não deixe criadouros para o mosquito!</a>",
+            1: 'Uma vez por semana, aplique os <a href="http://www.' +
+               'riocontradengue.com.br/Site/Conteudo/Checklist.aspx">' +
+               '“10 minutos Contra a dengue”!</a>',
+            2: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site' +
+               '/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!' +
+               '</a> Procure um médico caso suspeite de dengue.',
+            3: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site' +
+               '/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!' +
+               '</a> Procure um médico caso suspeite de dengue.'
+        };
+
+        // control that shows state info on hover
+
+        info_dengue.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info');
+            this.update();
+            return this._div;
+        };
+
+        info_dengue.update = function (props) {
+            this._div.innerHTML = '' +
+                '<h6>{% blocktrans %}Alerta Dengue{% endblocktrans %}:</h6>' +
+                (props ?
+                 '<b>'+ props.nome + '</b><br />' :
+                 '{% blocktrans %}Passe o mouse sobre o mapa{% endblocktrans %}');
+        };
+
+        info_dengue.addTo(map);
+
+        legend_dengue.onAdd = function () {
+            var div = L.DomUtil.create('div', 'info legend'),
+                    labels = alertLevels_dengue.map(function (alertLevel) {
+                        return '<i style="background:' + alertLevel.color +
+                            ';"></i> ' + alertLevel.name;
+                    }).reverse();
+            labels.push('O: {% blocktrans %}Unidades de Saúde{% endblocktrans %}');
+            div.innerHTML = labels.join('<br/>');
+            return div;
+        };
+
+        legend_dengue.addTo(map);
+
+        function fill_details_dengue(feature, layer){
+            geo_id = parseInt(feature.properties.geocodigo);
+
+            feature.properties.alerta = alerta_dengue[geo_id];
+
+            if (Object.keys(case_series_dengue).length > 0) {
+                feature.properties.series = case_series_dengue[geo_id];
+                feature.properties.casos = (
+                    case_series_dengue[geo_id][case_series_dengue[geo_id].length -1]
+                );
+            } else {
+                feature.properties.series = [];
+                feature.properties.casos = null;
+            }
+
+            layer.setStyle(selected_style_dengue(feature))
+            layer.on({
+                mouseover: highlightFeature_dengue,
+                mouseout: resetHighlight_dengue,
+            });
+        };
+
+        for (var i=0; i < geo_ids_dengue.length; i++){
+            var gc = geo_ids_dengue[i];
+            $.getJSON('/static/geojson/' + gc.toString() + '.json', function(data){
+                geojson = L.geoJson(
+                    data, {style: selected_style_dengue,
+                           onEachFeature: fill_details_dengue}
+                );
+                municipios_dengue.addLayer(geojson, true);
+            });
+        };
+
+        municipios_dengue.addTo(map);
+
+        var overlayMaps = {
+            'Municípios': municipios_dengue
+        };
+
+        var controls_dengue = L.control.layers(null, overlayMaps, {collapsed: true});
+
+        controls_dengue.addTo(map);
+
+        map.touchZoom.disable();
+        map.doubleClickZoom.disable();
+        map.boxZoom.disable();
+        map.keyboard.disable();
+        map.touchZoom.disable();
+        map.doubleClickZoom.disable();
+
+    }
+</script>

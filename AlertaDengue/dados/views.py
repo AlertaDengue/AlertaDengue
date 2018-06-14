@@ -18,7 +18,7 @@ from .dbdata import (
 from .episem import episem, episem2date
 from .maps import get_city_info
 from .models import City, RegionalHealth
-from .charts import ReportCityCharts
+from .charts import ReportCityCharts, ReportStateCharts
 from gis.geotiff import convert_from_shapefile
 
 import datetime
@@ -28,6 +28,7 @@ import json
 import locale
 import numpy as np
 import os
+import pandas as pd
 import random
 
 DBF = apps.get_model('dbf', 'DBF')
@@ -1268,6 +1269,21 @@ class ReportCityView(TemplateView):
 class ReportStateView(TemplateView):
     template_name = 'report_state.html'
 
+    _map_center = {
+        'CE': [-05.069, -39.397],
+        'ES': [-20.015, -40.803],
+        'MG': [-18.542, -44.319],
+        'PR': [-25.006, -51.833],
+        'RJ': [-22.187, -43.176]
+    }
+    _map_zoom = {
+        'CE': 6,
+        'ES': 6,
+        'MG': 6,
+        'PR': 6,
+        'RJ': 6
+    }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.STATE_NAME = dict(STATE_NAME)
@@ -1283,6 +1299,50 @@ class ReportStateView(TemplateView):
         context.update({'message': message})
         return context
 
+    def prepare_html(self, df, var_climate):
+        """
+
+        :param df:
+        :param var_climate:
+        :return:
+        """
+        df['SE'] = df.index
+        cols_to_sum = ['tweets'] + [
+            'casos notif. dengue', 'casos est. dengue',
+            'casos notif. chik', 'casos est. chik',
+            'casos notif. zika', 'casos est. zika'
+        ]
+        cols_to_avg = [var_climate.replace('_', '.')]
+
+        df = df.groupby('SE')
+        df = df[cols_to_sum].sum().merge(
+            df[cols_to_avg].aggregate(np.nanmean),
+            how='outer',
+            left_index=True,
+            right_index=True
+        )
+
+        for f in cols_to_avg + cols_to_sum:
+            if f not in df.columns:
+                df[f] = np.nan
+        df = df[cols_to_avg + cols_to_sum]
+
+        # param used by df.to_html
+        html_param = dict(
+            na_rep='',
+            float_format=lambda x: ('%d' % x) if not np.isnan(x) else '',
+            index=False,
+            classes="datatables table table-striped table-bordered"
+        )
+
+        return (
+            df.iloc[-6:, :]
+            .replace(0, np.nan)
+            .reset_index()
+            .sort_values(by='SE', ascending=[False])
+            .to_html(**html_param)
+        )
+
     def get_context_data(self, **kwargs):
         """
 
@@ -1297,62 +1357,105 @@ class ReportStateView(TemplateView):
 
         regional_names = dbdata.get_regional_names(state)
 
-        error_message_city_doesnt_exist = (
-            'Esse estado não participa do Infodengue. Se tiver ' +
-            'interesse em aderir, contacte-nos pelo email ' +
-            ' <a href="mailto:alerta_dengue@fiocruz.br">' +
-            'alerta_dengue@fiocruz.br</a>'
-        )
+        disease_key = ['dengue', 'chik', 'zika']
 
         regional_info = {}
-        tweet_max = 0
+        last_year_week = None
 
         for regional_name in regional_names:
-            geocodes = dbdata.get_cities(
+            cities = dbdata.get_cities(
                 state_name=self.STATE_NAME[state],
                 regional_name=regional_name
             )
+
+            station_id, var_climate = (
+                dbdata.get_var_climate_info(cities.keys())
+            )
+
             df = ReportState.read_disease_data(
-                state_initial=state,
                 year_week=year_week,
-                geocodes=geocodes
+                cities=cities,
+                station_id=station_id,
+                var_climate=var_climate
             )
 
-            n_cases = df[
-                df.index // 100 == 2018
-            ]['casos notif.'].sum()
+            last_year_week_ = df.index.max()
+            if last_year_week is None or last_year_week_ > last_year_week:
+                last_year_week = last_year_week_
 
-            n_cases_last_year = (
-                df[
-                    (df.index // 100 == year_week // 100 - 1) &
-                    (df.index <= year_week - 100)
-                ]['casos notif.'].sum()
-            )
+            cities_alert = {}
+            chart_cases_twitter = {}
+            for i, row in df[df.index == last_year_week].iterrows():
+                values = {}
+                for d in disease_key:
+                    values.update({d: row['level_code_{}'.format(d)]})
+
+                    try:
+                        chart = ReportStateCharts.create_tweet_chart(
+                            df=df, year_week=year_week, disease=d
+                        )
+                    except:
+                        chart = '''
+                        <br/>
+                        <strong>Não há dados necessários para a geração do
+                        gráfico sobre {}.
+                        </strong>
+                        <br/>
+                        '''.format(d)
+
+                    chart_cases_twitter[d] = chart
+
+                cities_alert.update({row.geocode: values})
 
             regional_info.update({
                 regional_name: {
-                    'data': df
+                    'data': df,
+                    'table': self.prepare_html(df, var_climate),
+                    'cities_geocode': list(cities.keys()),
+                    'cities_name': cities,
+                    'cities_alert': cities_alert,
+                    'chart_cases_twitter': chart_cases_twitter
                 }
             })
 
-        # param used by df.to_html
-        html_param = dict(
-            na_rep='',
-            float_format=lambda x: ('%d' % x) if not np.isnan(x) else '',
-            index=False,
-            classes="table table-striped table-bordered"
-        )
-
-        prepare_html = (
-            lambda df: df.iloc[-12:, :-2]
-                .reset_index()
-                .sort_values(by='SE', ascending=[False])
-                .to_html(**html_param)
-        )
-
-        last_year_week_s = str('999999')
+        last_year_week_s = str(last_year_week)
         last_year = last_year_week_s[:4]
         last_week = last_year_week_s[-2:]
+
+        # map
+        notif = dbdata.NotificationResume  # alias
+        cities_alert = {}
+        mun_dict = {}
+        alerts = {}
+        geo_ids = {}
+        cases_series_last_12 = {}
+
+        for d in disease_key:
+            _d = d if d != 'chik' else 'chikungunya'
+
+            cities_alert[d] = notif.get_cities_alert_by_state(
+                state_name=self.STATE_NAME[state], disease=_d,
+                epi_year_week=last_year_week
+            )
+
+            alerts[d] = dict(
+                cities_alert[d][['municipio_geocodigo', 'level_alert']].values
+            )
+
+            mun_dict[d] = dict(
+                cities_alert[d][['municipio_geocodigo', 'nome']].values
+            )
+
+            geo_ids[d] = list(mun_dict[d].keys())
+
+            if len(geo_ids[d]) > 0:
+                cases_series_last_12[d] = (
+                    dbdata.NotificationResume.tail_estimated_cases(
+                        geo_ids[d], 12
+                    )
+                )
+            else:
+                cases_series_last_12[d] = {}
 
         context.update({
             'year': year,
@@ -1361,6 +1464,14 @@ class ReportStateView(TemplateView):
             'last_week': last_week,
             'state_name': self.STATE_NAME[state],
             'regional_info': regional_info,
-            'tweet_max': tweet_max
+            'regional_names': regional_names,
+            'diseases_code': ['dengue', 'chik', 'zika'],
+            'diseases_name': ['Dengue', 'Chikungunya', 'Zika'],
+            'mun_dict': mun_dict,
+            'geo_ids': geo_ids,
+            'alerts_level': alerts,
+            'case_series': cases_series_last_12,
+            'map_center': self._map_center[state],
+            'map_zoom': self._map_zoom[state],
         })
         return context

@@ -1,13 +1,27 @@
 {% extends 'base.html' %}
+{% load lookup %}
 {% load i18n %}
 
 {% block extra_head %}
+
+{% load leaflet_tags %}
+{% leaflet_js %}
+{% leaflet_css %}
+{% leaflet_js plugins="ALL" %}
+
+{% load report_state %}
+
+<script src="/static/libs/jquery/jquery.sparkline.min.js"
+            type="text/javascript"></script>
 
 <link rel="stylesheet"
       type="text/css" href="/static/libs/DataTables/datatables.min.css"/>
 
 <script type="text/javascript"
         src="/static/libs/DataTables/datatables.min.js"></script>
+
+<script src="/static/js/infodengue.js"
+            type="text/javascript"></script>
 
 <style>
       .box {
@@ -42,8 +56,73 @@
         border: 1px solid #aaaaaa!important;
       }
 
+      .circle:before {
+        content: ' \25CF';
+        font-size: 30px;
+        line-height: 20px;
+      }
+
+      .alert-1 {
+        color: green;
+      }
+
+      .alert-2 {
+        color: yellow;
+      }
+
+      .alert-3 {
+        color: orange;
+      }
+
+      .alert-4 {
+        color: red;
+      }
+
+      .alert-None {
+        color: white;
+      }
+
+      #main {
+          width: 100%;
+          height: 400px;
+      }
+
+      .info {
+          padding: 6px 8px;
+          font: 14px/16px Arial, Helvetica, sans-serif;
+          background: white;
+          background: rgba(255, 255, 255, 0.8);
+          box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+          border-radius: 5px;
+      }
+
+      .info h4, .info h6 {
+          margin: 0 0 5px;
+          color: #777;
+      }
+
+      .legend {
+          text-align: left;
+          line-height: 18px;
+          color: #555;
+      }
+
+      .legend i {
+          width: 18px;
+          height: 18px;
+          float: left;
+          margin-right: 8px;
+          opacity: 0.7;
+      }
+
 </style>
 <script src="/static/libs/plotlyjs/plotly-latest.min.js"></script>
+
+<script>
+  function isInArray(el, array) {
+      return (array.indexOf(el) >= 0) ? true : false;
+  }
+</script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -52,7 +131,7 @@
       <li class="breadcrumb-item"><a href="/report">{% trans "Relatórios" %}</a></li>
       <li class="breadcrumb-item"><a href="/report">{% trans "Estadual" %}</a></li>
       <li class="breadcrumb-item"><a href="/report/{{ state }}/state">{{ state }}</a></li>
-      <li class="breadcrumb-item active" aria-current="page">{{last_week}}/{{last_year}}</li>
+      <li class="breadcrumb-item active" aria-current="page">{{ week }}/{{ year }}</li>
   </ol>
 </nav>
 {% endblock %}
@@ -81,109 +160,189 @@
       Data da última atualização : {{ last_week }}/{{ last_year }}
     </p>
     <p>
-      Dos {{ n_cities }} municipios, {{ n_green }} encontram-se em nivel verde,
-      {{ n_yellow }} em nivel amarelo,
-      {{ n_orange }} em nivel laranja e
-      {{ n_red }} em nivel vermelho referentes a semana epidemiológica
-      {{ last_week }}-{{ last_year }}.
-    </p>
-    <p>
-      Na semana passada:
-      {{ n_yellow_previous_week }} municípios em nivel amarelo,
-      {{ n_orange_previous_week }} em laranja e
-      {{ n_red_previous_week }}0 em vermelho.
+      Esse é o relatório resumido da situação de alerta de arboviroses no
+      estado, detalhado por Regional de Saúde. Para acessar estatísticas
+      gerais do estado, consulte a
+      <a href="/alerta/{{ state }}/dengue" target="__blank__">página de estados</a>.
+      E para consultar um município específico, consulte a
+      <a href="/report/{{ state }}/city" target="__blank__">página de relatórios municipais</a>.
     </p>
   </div>
 </div>
 
-{% if tweet_max > 0%}
-<div class="row">
-  <div class="col-md-12">
-    <h2>Menção a arboviroses nas redes sociais</h2>
-
-    <p>
-    A figura abaixo mostra a intensidade de menção de sintomas de arboviroses
-    e presença de mosquitos de acordo com a população do município que usa
-    redes sociais.
-    Esse indicador, que é mais eficaz em cidades maiores, deve ser visto como
-    um auxiliar na detecção precoce de aumento de casos. Atualmente,
-    esse indicador é mais sensivel para detectar dengue do que outras
-    arboviroses.
-    </p>
-
-    {{chart_dengue_tweets|safe}}
-    <br/>&nbsp;
-
+<div class="row my-3">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Mapa Alerta Dengue</div>
+      <div class="card-body p-0">{% map_chart_dengue %}</div>
+    </div>
   </div>
-</div>
-{% endif %}
 
-<div class="row">
-  <div class="col-md-12">
-
-    <h2>Situação da Dengue</h2>
-
-    {% if total_n_dengue > 0 %}
-    <p>
-      Esse ano, até essa semana, {{total_n_dengue}} casos de dengue foram registrados.
-      No ano passado, até essa semana, {{total_n_dengue_last_year}}
-      tinham sido registrados.
-
-    </p>
-
-    {% else %}
-    <p>
-      Sem dados disponíveis para geração dessa seção.
-    </p>
-    {% endif %}
-
-    <br/>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Mapa Alerta Chikungunya</div>
+      <div class="card-body p-0">{% map_chart_chik %}</div>
+    </div>
   </div>
-</div>
 
-
-<div class="row">
-  <div class="col-md-12">
-
-    <h2>Situação da Chikungunya</h2>
-
-    {% if total_n_chik > 0 %}
-    <p>
-      Esse ano, até essa semana, {{total_n_chik}} casos de dengue foram registrados.
-      No ano passado, até essa semana, {{total_n_chik_last_year}}
-      tinham sido registrados.
-    </p>
-    {% else %}
-    <p>
-      Sem dados disponíveis para geração dessa seção.
-    </p>
-    {% endif %}
-
-    <br/>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">Mapa Alerta Zika</div>
+      <div class="card-body p-0">{% map_chart_zika %}</div>
+    </div>
   </div>
 </div>
 
 <div class="row">
-  <div class="col-md-12">
-
-    <h2>Situação da Zika</h2>
-
-    {% if total_n_zika > 0 %}
-    <p>
-      Esse ano, até essa semana, {{total_n_zika}} casos de dengue
-      foram registrados.
-      No ano passado, até essa semana, {{total_n_zika_last_year}}
-      tinham sido registrados.
-    </p>
-    {% else %}
-    <p>
-      Sem dados disponíveis para geração dessa seção.
-    </p>
-    {% endif %}
-
-    <br/>&nbsp;
+  <div class="col-md-12 my-2">
+    <h3>Índice</h3>
+    <ul>
+    {% for regional_name in regional_names %}
+      <li><a href="#{{regional_name}}">Regional {{regional_name}}</a></li>
+    {% endfor %}
+    </ul>
   </div>
 </div>
+
+{% for regional_name in regional_names %}
+  <div class="row">
+    <div class="col-md-12 my-2">
+
+      <div class="row my-3">
+        <div class="col-md-12">
+          <h3 id="{{ regional_name }}">Regional {{ regional_name }}</h3>
+          <p>
+            A tabela abaixo mostra os niveis de alerta em cada município da
+            Regional de Saúde. As cores indicam niveis de atenção, conforme
+            detalhado na <a href="#color-code">tabela de cores</a>.
+          </p>
+        </div>
+      </div>
+
+      <div class="row my-3">
+        <div class="col-md-12">
+          <h4>Alertas</h4>
+          <table class="table table-striped table-bordered">
+            <thead>
+             <tr>
+               <th width="20%">Município</th>
+               {% for d in diseases_name%}
+               <td width="20%" align="center"><strong>{{ d }}</strong></td>
+               {% endfor %}
+             </tr>
+            </thead>
+            <tbody>
+            {% for city_geocode in regional_info|lookup:regional_name|lookup:'cities_geocode' %}
+            <tr>
+              <td>{{ regional_info|lookup:regional_name|lookup:'cities_name'|lookup:city_geocode }}</td>
+              {% for d in diseases_code %}
+              <td align="center">
+                <span
+                  class="circle alert-{{ regional_info|lookup:regional_name|lookup:'cities_alert'|lookup:city_geocode|lookup:d }}">&nbsp;
+                </span></td>
+              {% endfor %}
+            </tr>
+            </tbody>
+          {% endfor %}
+          </table>
+        </div>
+      </div>
+
+      <div class="row my-3">
+        <div class="col-md-12">
+          <h4>
+            Casos notificados de arboviroses na Regional de Saúde
+          </h4>
+
+          <p>
+            A Figura abaixo mostra a série temporal de casos notificados de
+            arboviroses na última semana. A curva de menções refere-se à
+            intensidade de menção de sintomas de arboviroses e presença de
+            mosquitos de acordo com a população do município que usa
+            redes sociais. Esse indicador, que é mais eficaz em cidades
+            maiores, deve ser visto como um auxiliar na detecção precoce de
+            aumento de casos. Atualmente, esse indicador é mais sensivel para
+            detectar dengue do que outras arboviroses.
+          </p>
+
+        </div>
+      </div>
+
+      <div class="row my-3">
+        <div class="col-md-12 mb-2">
+          <ul class="nav nav-tabs" id="charts-tab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="chart-dengue-tab" data-toggle="tab"
+                 href="#chart-dengue" role="tab" aria-controls="chart-dengue"
+                 aria-selected="true">Dengue</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="chart-chik-tab" data-toggle="tab"
+                 href="#chart-chik" role="tab" aria-controls="chart-chik"
+                 aria-selected="false">Chikungunya</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="chart-zika-tab" data-toggle="tab"
+                 href="#chart-zika" role="tab" aria-controls="chart-zika"
+                 aria-selected="false">Zika</a>
+            </li>
+          </ul>
+
+          <div class="tab-content p-3" id="charts-content"
+               style="border: 1px solid #dfdfdf"
+          >
+            <div class="fade show active" id="chart-dengue"
+                 role="tabpanel" aria-labelledby="chart-dengue-tab"
+            >
+              {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'dengue' | safe}}
+            </div>
+            <div class="fade" id="chart-chik" role="tabpanel"
+                 aria-labelledby="char-chik-tab"
+            >
+              {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'chik' | safe}}
+            </div>
+            <div class="fade" id="chart-zika" role="tabpanel"
+                 aria-labelledby="chart-zika-tab"
+            >
+              {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'zika' | safe}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row my-3">
+        <div class="col-md-12">
+          <h4>
+            Resumo das últimas seis semanas epidemiológicas na Regional de Saúde
+          </h4><br/>
+          {{ regional_info|lookup:regional_name|lookup:'table'|safe }}
+        </div>
+      </div>
+
+      {% if tweet_max > 0%}
+      <div class="row my-3">
+        <div class="col-md-12">
+          <h4>Menção a arboviroses nas redes sociais</h4>
+
+          <p>
+          A figura abaixo mostra a intensidade de menção de sintomas de arboviroses
+          e presença de mosquitos de acordo com a população do município que usa
+          redes sociais.
+          Esse indicador, que é mais eficaz em cidades maiores, deve ser visto como
+          um auxiliar na detecção precoce de aumento de casos. Atualmente,
+          esse indicador é mais sensivel para detectar dengue do que outras
+          arboviroses.
+          </p>
+
+          {{chart_dengue_tweets|safe}}
+          <br/>&nbsp;
+
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+{% endfor %}
 
 <div class="row">
   <div class="col-md-2"></div>
@@ -194,7 +353,7 @@
     # ---------------------
     -->
 
-    <h2>O código de Cores</h2>
+    <h3>O código de Cores</h3>
 
     As cores indicam niveis de atenção
 
@@ -227,7 +386,7 @@
     # ----------------------------------------
     -->
 
-    <h2>Lista das variáveis apresentadas nas tabelas</h2>
+    <h3>Lista das variáveis apresentadas nas tabelas</h3>
 
     <ul>
       <li><strong>SE:</strong> semana epidemiológica</li>
@@ -267,7 +426,7 @@
 
 <div class="row">
   <div id="notes" class="col-md-12">
-    <h2>Notas</h2>
+    <h3>Notas</h3>
 
     <ul>
       <li>Os dados do sinan mais recentes ainda não foram totalmente digitados.
@@ -287,7 +446,7 @@
 
 <div class="row">
   <div id="credits" class="col-md-12">
-    <h2>Créditos</h2>
+    <h3>Créditos</h3>
 
     Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como
     parceira entre:
@@ -305,7 +464,7 @@
 
 <div class="row">
   <div id="contact" class="col-md-12">
-    <h2>Contato</h2>
+    <h3>Contato</h3>
     Para mais detalhes sobre o sistema de alerta InfoDengue, consultar:
     <a href="http://info.dengue.mat.br">http://info.dengue.mat.br</a>
   </div>
@@ -324,17 +483,17 @@
       $(this).addClass(cssClasses[$('td:last-child', this).text()]);
     });
 
-    $(document).ready( function () {
-      $('.table').DataTable({
-        "pageLength": 4,
-        "lengthMenu": [ 4, 8, 12 ],
-        "order": [[ 0, "desc" ]],
-        "searching": false,
-        "language": {
-          "url": "/static/libs/DataTables/i18n/pt_BR.json"
-        }
-      } );
-    } );
+    $('.datatables').DataTable({
+      "pageLength": 4,
+      "lengthMenu": [ 4, 8, 12 ],
+      "order": [[ 0, "desc" ]],
+      "searching": false,
+      "language": {
+        "url": "/static/libs/DataTables/i18n/pt_BR.json"
+      }
+    });
+
+    $('.fade').addClass('tab-pane');
   });
 </script>
 
