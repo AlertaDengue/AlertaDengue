@@ -42,6 +42,7 @@ RUN conda install --file /tmp/requirements-conda.txt
 ADD AlertaDengue /srv/deploy/AlertaDengue
 
 # Change the permissions for the user home directory
+RUN mkdir /srv/deploy/logs
 RUN chown -R deploy:deploy /srv/deploy/
 
 WORKDIR /srv/deploy/AlertaDengue
