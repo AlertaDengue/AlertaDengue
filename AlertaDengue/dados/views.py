@@ -394,8 +394,8 @@ class AlertaMainView(TemplateView):
                     'casos_est': cases_est[-1] if cases_est.size else 0
                 }
                 estimated_cases_next_week[d][s] = gettext('Em breve')
-                v1 = cases_est[-2] if cases_est.size else 0
-                v2 = cases_est[-1] if cases_est.size else 0
+                v1 = 0 if not cases_est.size else cases_est[-2]
+                v2 = 0 if not cases_est.size else cases_est[-1]
 
                 v1_week_fixed[d][s] = v1 == 0 and v2 != 0
 

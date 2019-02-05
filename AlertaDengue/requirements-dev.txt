@@ -1,6 +1,6 @@
 jupyter
 jupyter_contrib_nbextensions
-eralchemy
+# eralchemy
 matplotlib
 PILLOW
 django-extensions
