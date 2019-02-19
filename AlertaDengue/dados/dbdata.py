@@ -539,7 +539,13 @@ def get_city_alert(cidade, disease='dengue'):
     alert = series_city['alerta'][-1]
     SE = series_city['SE'][-1]
     case_series = series_city['casos_est']
-    last_year = series_city['casos'][-52]
+    #last_year = series_city['casos'][-52]
+    last_year = (
+        series_city['casos'][-52] 
+        if len(series_city['casos']) >= 52 else
+        None
+    )
+
     obs_case_series = series_city['casos']
     min_max_est = (
         series_city['casos_est_min'][-1],
