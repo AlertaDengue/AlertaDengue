@@ -244,7 +244,29 @@
 
         <div class="col-md-3 bluebox p-3">
             <h3><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {% blocktrans %}Suspeita de um criadouro?{% endblocktrans %}</h3>
-            <p>{% blocktrans %}Em caso de suspeita de criadouro de mosquitos, ligue para a <a href="http://www.1746.rio.gov.br/" style="color: #FFFFFF">Central de atendimento ao cidadão 1746</a>.{% endblocktrans %}</p>
+            <p>
+            
+            {% blocktrans %}Em caso de suspeita de criadouro de mosquitos, {% endblocktrans %}
+            <!-- RJ -->    
+            {% if state == 'Rio de Janeiro' %}
+                {% blocktrans %}contacte a central de apoio ao cidadão: 1746{% endblocktrans %}
+            <!-- ES -->    
+            {% elif state == 'Espírito Santos' %}
+                {% blocktrans %}contacte a secretaria de saúde de sua cidade{% endblocktrans %}   
+            <!-- PR -->    
+            {% elif state == 'Paraná' %}
+                {% blocktrans %}<a href="http://www.dengue.pr.gov.br/modules/conteudo/conteudo.php?conteudo=19" style="color: #FFFFFF" target="_blank">contacte a secretaria de saúde de sua cidade</a>.{% endblocktrans %}
+            <!-- CE -->    
+            {% elif state == 'Ceará' %}
+                {% blocktrans %}contacte a central de apoio ao cidadão: 0800.285.0880{% endblocktrans %}
+            <!-- MG -->    
+            {% elif state == 'Minas Gerais' %}
+                {% blocktrans %}contacte a secretaria de saúde de sua cidade{% endblocktrans %}
+            <!-- SP -->    
+            {% elif state == 'São Paulo' %}
+                {% blocktrans %}contacte a secretaria de saúde de sua cidade{% endblocktrans %}
+            {% endif %}
+            </p>
         </div>
     </div>
 
