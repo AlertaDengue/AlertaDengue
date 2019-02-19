@@ -634,6 +634,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
         context.update({
             'geocodigo': geocode, # legacy
             'geocode': geocode,
+            'state': city_info['uf'],
             'nome': city_info['nome'],
             'populacao': city_info['populacao'],
             'incidencia': (

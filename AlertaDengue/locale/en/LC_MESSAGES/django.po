@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-17 13:58+0000\n"
+"POT-Creation-Date: 2019-02-19 20:24+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -409,11 +409,11 @@ msgstr "Forecast date reference"
 msgid "Níveis de Atenção"
 msgstr "Attention Levels"
 
-#: dados/templates/alert_base.html:146
+#: dados/templates/alert_base.html:151
 msgid "Nível Verde"
 msgstr "Green Level"
 
-#: dados/templates/alert_base.html:150
+#: dados/templates/alert_base.html:161
 msgid ""
 "Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições "
 "ideais para a reprodução do Mosquito."
@@ -421,11 +421,11 @@ msgstr ""
 "No risk. When the map is green, there is neither transmission nor good "
 "conditions for mosquito reproduction."
 
-#: dados/templates/alert_base.html:157
+#: dados/templates/alert_base.html:173
 msgid "Nível Amarelo"
 msgstr "Yellow Level"
 
-#: dados/templates/alert_base.html:161
+#: dados/templates/alert_base.html:183
 #, python-format
 msgid ""
 "Estação da %(disease_label)s. No nível amarelo, temos condições climáticas "
@@ -436,11 +436,11 @@ msgstr ""
 "conditions for mosquito breeding. But still without significant transmission "
 "of the disease."
 
-#: dados/templates/alert_base.html:168
+#: dados/templates/alert_base.html:195
 msgid "Nível Laranja"
 msgstr "Orange Level"
 
-#: dados/templates/alert_base.html:172
+#: dados/templates/alert_base.html:204
 #, python-format
 msgid ""
 "Transmissão de %(disease_label)s. No nível laranja, já observamos uma "
@@ -451,11 +451,11 @@ msgstr ""
 "a pronounced incidence of %(disease_label)s, but we can not yet confidently "
 "say that we will have an epidemic."
 
-#: dados/templates/alert_base.html:179
+#: dados/templates/alert_base.html:216
 msgid "Nível Vermelho"
 msgstr "Red Level"
 
-#: dados/templates/alert_base.html:183
+#: dados/templates/alert_base.html:225
 #, python-format
 msgid ""
 "Epidemia. Neste nível estamos em plena epidemia. Todo o cuidado é pouco, e "
@@ -466,11 +466,11 @@ msgstr ""
 "short, and we need to be aware of %(disease_label)s symptoms and seek the "
 "doctor immediately in case of suspected %(disease_label)s."
 
-#: dados/templates/alert_base.html:192 dados/templates/alert_state/map.html:212
+#: dados/templates/alert_base.html:234 dados/templates/alert_state/map.html:212
 msgid "Casos estimados"
 msgstr "Estimated cases"
 
-#: dados/templates/alert_base.html:194
+#: dados/templates/alert_base.html:236
 #, python-format
 msgid ""
 " São estimados entre <b>%(min_est)s</b> e <b>%(max_est)s novos casos</b> na "
@@ -482,38 +482,56 @@ msgstr ""
 "                 %(SE)s: %(data1)s to %(data2)s. With %(total_observed)s "
 "officially notified cases so far "
 
-#: dados/templates/alert_base.html:195
+#: dados/templates/alert_base.html:237
 #, python-format
 msgid " Últimas %(look_back)s semanas: "
 msgstr " Previous %(look_back)s weeks: "
 
-#: dados/templates/alert_base.html:205
+#: dados/templates/alert_base.html:247
 msgid "Suspeita de um criadouro?"
 msgstr "Want to report a breeding site?"
 
-#: dados/templates/alert_base.html:206
-msgid ""
-"Em caso de suspeita de criadouro de mosquitos, ligue para a <a href=\"http://"
-"www.1746.rio.gov.br/\" style=\"color: #FFFFFF\">Central de atendimento ao "
-"cidadão 1746</a>."
+#: dados/templates/alert_base.html:250
+msgid "Em caso de suspeita de criadouro de mosquitos, "
 msgstr ""
-"Want to report a breeding site? contact <a href=\"http://www.1746.rio.gov.br/"
-"\" style=\"color: #FFFFFF\">Citizen support central: 1746</a>."
 
-#: dados/templates/alert_base.html:216
+#: dados/templates/alert_base.html:253
+msgid "contacte a central de apoio ao cidadão: 1746"
+msgstr "contact the citizen support center: 1746"
+
+#: dados/templates/alert_base.html:256 dados/templates/alert_base.html:265
+#: dados/templates/alert_base.html:268
+msgid "contacte a secretaria de saúde de sua cidade"
+msgstr "contact your local health department"
+
+#: dados/templates/alert_base.html:259
+msgid ""
+"<a href=\"http://www.dengue.pr.gov.br/modules/conteudo/conteudo.php?"
+"conteudo=19\" style=\"color: #FFFFFF\" target=\"_blank\">contacte a "
+"secretaria de saúde de sua cidade</a>."
+msgstr ""
+"<a href=\"http://www.dengue.pr.gov.br/modules/conteudo/conteudo.php?"
+"conteudo=19\" style=\"color: #FFFFFF\" target=\"_blank\">contact "
+"your local health department</a>."
+
+#: dados/templates/alert_base.html:262
+msgid "contacte a central de apoio ao cidadão: 0800.285.0880"
+msgstr "contact the citizen support center: 0800.285.0880"
+
+#: dados/templates/alert_base.html:280
 msgid ""
 "Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www."
 "riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros "
 "para o mosquito!</a>"
 msgstr ""
 
-#: dados/templates/alert_base.html:217
+#: dados/templates/alert_base.html:281
 msgid ""
 "Uma vez por semana, aplique os <a href=\"http://www.riocontradengue.com.br/"
 "Site/Conteudo/Checklist.aspx\">“10 minutos Contra a dengue”!</a>"
 msgstr ""
 
-#: dados/templates/alert_base.html:218 dados/templates/alert_base.html:219
+#: dados/templates/alert_base.html:282 dados/templates/alert_base.html:283
 msgid ""
 "Fique <a href=\"http://www.riocontradengue.rj.gov.br/Site/Conteudo/"
 "FiqueAtento.aspx\">atento aos sintomas da Dengue!</a> Procure um médico caso "
@@ -523,23 +541,35 @@ msgstr ""
 "aspx\">attention to the Dengue symptoms!</a> Consult a doctor in any case of "
 "suspected Dengue."
 
-#: dados/templates/alert_base.html:233 dados/templates/alert_state/map.html:25
+#: dados/templates/alert_base.html:297 dados/templates/alert_state/map.html:25
+#: dados/templates/report_state/map_chik.html:23
+#: dados/templates/report_state/map_dengue.html:23
+#: dados/templates/report_state/map_zika.html:23
 msgid "Baixo Risco"
 msgstr "Low Risk"
 
-#: dados/templates/alert_base.html:234 dados/templates/alert_state/map.html:26
+#: dados/templates/alert_base.html:298 dados/templates/alert_state/map.html:26
+#: dados/templates/report_state/map_chik.html:24
+#: dados/templates/report_state/map_dengue.html:24
+#: dados/templates/report_state/map_zika.html:24
 msgid "Atenção"
 msgstr "Attention"
 
-#: dados/templates/alert_base.html:235 dados/templates/alert_state/map.html:27
+#: dados/templates/alert_base.html:299 dados/templates/alert_state/map.html:27
+#: dados/templates/report_state/map_chik.html:25
+#: dados/templates/report_state/map_dengue.html:25
+#: dados/templates/report_state/map_zika.html:25
 msgid "Transmissão"
 msgstr "Transmission"
 
-#: dados/templates/alert_base.html:236 dados/templates/alert_state/map.html:28
+#: dados/templates/alert_base.html:300 dados/templates/alert_state/map.html:28
+#: dados/templates/report_state/map_chik.html:26
+#: dados/templates/report_state/map_dengue.html:26
+#: dados/templates/report_state/map_zika.html:26
 msgid "Epidemia"
 msgstr "Epidemic"
 
-#: dados/templates/alert_base.html:245 dados/templates/alert_base.html:303
+#: dados/templates/alert_base.html:309 dados/templates/alert_base.html:367
 #: dados/templates/series_plot.html:44 dados/templates/series_plot.html:97
 #: dados/templates/series_plot.html:115 dados/templates/series_plot.html:132
 #: dados/templates/series_plot.html:147 dados/templates/series_plot.html:162
@@ -547,12 +577,15 @@ msgstr "Epidemic"
 msgid "casos"
 msgstr "cases"
 
-#: dados/templates/alert_base.html:337 dados/templates/alert_base.html:384
+#: dados/templates/alert_base.html:401 dados/templates/alert_base.html:448
 #: dados/templates/alert_state/map.html:188
+#: dados/templates/report_state/map_chik.html:137
+#: dados/templates/report_state/map_dengue.html:137
+#: dados/templates/report_state/map_zika.html:137
 msgid "Unidades de Saúde"
 msgstr "Healt Unities"
 
-#: dados/templates/alert_base.html:383
+#: dados/templates/alert_base.html:447
 msgid "Áreas de Planejamento"
 msgstr "Planning areas"
 
@@ -608,12 +641,16 @@ msgid "Distribuição por gênero"
 msgstr "Distribution by gender"
 
 #: dados/templates/alert_state/map.html:174
-#: dados/templates/alerta_municipio.html:17
-msgid "Número de casos estimados na semana"
-msgstr "Estimated cases in the week"
+#, fuzzy
+#| msgid "Total de casos notificado / estimados na semana"
+msgid "Total de casos de arboviroses na semana"
+msgstr "Total reported / estimated cases in the week"
 
 #: dados/templates/alert_state/map.html:177
 #: dados/templates/alerta_municipio.html:18
+#: dados/templates/report_state/map_chik.html:126
+#: dados/templates/report_state/map_dengue.html:126
+#: dados/templates/report_state/map_zika.html:126
 msgid "Passe o mouse sobre o mapa"
 msgstr "Move the mouse over the map"
 
@@ -647,6 +684,10 @@ msgstr ""
 "<b>Chances of going into <span class=\"label label-warning\">Orange</span> "
 "or <span class=\"label label-danger\">red</span> alert next week:</b> %(prt)s"
 "%%"
+
+#: dados/templates/alerta_municipio.html:17
+msgid "Número de casos estimados na semana"
+msgstr "Estimated cases in the week"
 
 #: dados/templates/contact.html:9
 msgid ""
@@ -793,135 +834,15 @@ msgstr ""
 "\n"
 " Dengue Situation - %(num_mun)s Monitored cities \n"
 
-#: dados/templates/data_public_services.html:19
-msgid "Serviços de Dados Públicos"
-msgstr "Public Data Service"
-
-#: dados/templates/data_public_services_api.html:46
-#: dados/templates/data_public_services_maps.html:69
-#: dados/templates/data_public_services_maps_doc.html:47 templates/base.html:74
-msgid "Dados"
-msgstr "Data"
-
-#: dados/templates/data_public_services_api.html:63
-msgid "Tabela de conteúdo"
-msgstr "Table of content"
-
-#: dados/templates/data_public_services_maps.html:69
-msgid "Mapas"
-msgstr "Maps"
-
-#: dados/templates/data_public_services_maps.html:79
-msgid "Para mais informações, acesse a documentação do serviço de mapas."
-msgstr "For more information, access the map service documentation"
-
-#: dados/templates/data_public_services_maps.html:84
-msgid "Filtro Código IBGE"
-msgstr "IBGE code filter"
-
-#: dados/templates/data_public_services_maps.html:88
-msgid "Digite aqui para filtrar as opções do código IBGE."
-msgstr "Type here to filter IBGE code options."
-
-#: dados/templates/data_public_services_maps.html:93
-msgid ""
-"Digite o código IBGE ou parte dele para buscar o código IBGE disponível."
-msgstr "Type the IBGE code or fragment to search available IBGE code."
-
-#: dados/templates/data_public_services_maps.html:98
-msgid "Código IBGE"
-msgstr "IBGE code"
-
-#: dados/templates/data_public_services_maps.html:103
-#: dados/templates/state_cities.html:198
-msgid "Selecione municipio(s)"
-msgstr "Select one or more cities"
-
-#: dados/templates/data_public_services_maps.html:108
-msgid "Selecione o código IBGE da cidade desejada"
-msgstr "Select the IBGE code of the desired city"
-
-#: dados/templates/data_public_services_maps.html:115
-#: dados/templates/report_filter_city.html:79
-msgid "Selecione o município desejado para a consulta"
-msgstr "Select the desired city to search"
-
-#: dados/templates/data_public_services_maps.html:119
-msgid "Mapa"
-msgstr "Map"
-
-#: dados/templates/data_public_services_maps.html:123
-#: dados/templates/error.html:4
-msgid "Alerta Dengue"
-msgstr "Dengue Alert"
-
-#: dados/templates/data_public_services_maps.html:126
-msgid "Alerta Chikungunya"
-msgstr "Chikungunya Alert"
-
-#: dados/templates/data_public_services_maps.html:129
-msgid "Alerta Zika"
-msgstr "Zika Level"
-
-#: dados/templates/data_public_services_maps.html:132
-msgid "NDVI"
-msgstr "NDVI"
-
-#: dados/templates/data_public_services_maps.html:135
-msgid "LST Dia"
-msgstr "LST Morning"
-
-#: dados/templates/data_public_services_maps.html:138
-msgid "LST Noite"
-msgstr "LST Night"
-
-#: dados/templates/data_public_services_maps.html:141
-msgid "Umidade Relativa"
-msgstr "Relative humidity"
-
-#: dados/templates/data_public_services_maps.html:144
-msgid "Umidade Específica"
-msgstr "Specific Humidity"
-
-#: dados/templates/data_public_services_maps.html:147
-msgid "Precipitação"
-msgstr "Precipitation"
-
-#: dados/templates/data_public_services_maps.html:152
-msgid "Selecione o tipo de mapa desejado"
-msgstr "Select the kind of desired map."
-
-#: dados/templates/data_public_services_maps.html:156
-msgid "Tipo de imagem de saída"
-msgstr "Output image type"
-
-#: dados/templates/data_public_services_maps.html:166
-msgid "Selecione o Tipo de imagem de saída"
-msgstr "Select the output image type"
-
-#: dados/templates/data_public_services_maps.html:170
-msgid "Dimensão de ajuste:"
-msgstr "Dimension's setting"
-
-#: dados/templates/data_public_services_maps.html:179
-msgid "Dimensão de ajuste da imagem"
-msgstr "Dimension's image setting"
-
-#: dados/templates/data_public_services_maps.html:183
-msgid "Valor da dimensão selecionada"
-msgstr "Value of selected dimension"
-
-#: dados/templates/data_public_services_maps.html:191
-msgid "Selecione o valor para a dimensão informada"
-msgstr "Select the value for the dimension type defined."
-
-#: dados/templates/data_public_services_maps.html:200
-msgid "Gerar URL do serviço"
-msgstr "Generate URL's service"
-
 #: dados/templates/details.html:20
 msgid "Alerta Dengue Rio"
 msgstr "Alerta Dengue Rio"
+
+#: dados/templates/error.html:4
+#: dados/templates/report_state/map_dengue.html:123
+#: dados/templates/services_maps.html:123
+msgid "Alerta Dengue"
+msgstr "Dengue Alert"
 
 #: dados/templates/historico.html:22
 msgid ""
@@ -1069,48 +990,102 @@ msgstr ""
 
 #: dados/templates/report_city.html:52
 #: dados/templates/report_filter_city.html:54
-#: dados/templates/report_filter_city.html:61
-#: dados/templates/report_filter_state.html:40
-#: dados/templates/report_filter_state.html:45 templates/base.html:76
+#: dados/templates/report_filter_city.html:62
+#: dados/templates/report_filter_report_type.html:41
+#: dados/templates/report_filter_report_type.html:46
+#: dados/templates/report_filter_state.html:52
+#: dados/templates/report_filter_state.html:60
+#: dados/templates/report_state.html:131 templates/base.html:76
 msgid "Relatórios"
 msgstr "Report"
 
-#: dados/templates/report_city.html:60
+#: dados/templates/report_city.html:53
+#: dados/templates/report_filter_city.html:55
+#: dados/templates/report_filter_report_type.html:60
+#: dados/templates/report_filter_state.html:53
+#, fuzzy
+#| msgid "Município"
+msgid "Municipal"
+msgstr "City"
+
+#: dados/templates/report_city.html:61
 msgid "Relatório da Situação das Arboviroses em "
 msgstr "Arborivirosis Situation report of "
 
-#: dados/templates/report_filter_city.html:70
+#: dados/templates/report_filter_city.html:71
+#: dados/templates/services_api.html:98
 msgid "Município"
 msgstr "City"
 
-#: dados/templates/report_filter_city.html:75
+#: dados/templates/report_filter_city.html:76
 msgid "Selecione um município"
 msgstr "Select a city"
 
-#: dados/templates/report_filter_city.html:83
+#: dados/templates/report_filter_city.html:80
+#: dados/templates/services_api.html:114 dados/templates/services_maps.html:115
+msgid "Selecione o município desejado para a consulta"
+msgstr "Select the desired city to search"
+
+#: dados/templates/report_filter_city.html:84
+#: dados/templates/report_filter_state.html:69
 msgid "Data da Semana Epidemiológica"
 msgstr "Date of the epidemiological week"
 
-#: dados/templates/report_filter_city.html:90
+#: dados/templates/report_filter_city.html:91
+#: dados/templates/report_filter_state.html:76
 msgid "Selecione um dia da Semana Epidemiológica desejada"
 msgstr "Select a day from the desired epidemiological week "
 
-#: dados/templates/report_filter_city.html:96
-#: dados/templates/report_filter_state.html:69
+#: dados/templates/report_filter_city.html:97
+#: dados/templates/report_filter_report_type.html:85
+#: dados/templates/report_filter_state.html:82
 msgid "Abrir Relatório"
 msgstr "Open Report"
 
-#: dados/templates/report_filter_state.html:54
+#: dados/templates/report_filter_report_type.html:55
+#, fuzzy
+#| msgid "Abrir Relatório"
+msgid "Tipo de Relatório"
+msgstr "Open Report"
+
+#: dados/templates/report_filter_report_type.html:61
+#: dados/templates/report_state.html:132
+msgid "Estadual"
+msgstr ""
+
+#: dados/templates/report_filter_report_type.html:64
+#, fuzzy
+#| msgid "Selecione o tipo de mapa desejado"
+msgid "Selecione o tipo do relatório"
+msgstr "Select the kind of desired map."
+
+#: dados/templates/report_filter_report_type.html:69
 msgid "Unidade Federal"
 msgstr "State"
 
-#: dados/templates/report_filter_state.html:59
+#: dados/templates/report_filter_report_type.html:74
 msgid "Selecione uma Unidade Federal"
 msgstr "Select a State"
 
-#: dados/templates/report_filter_state.html:63
+#: dados/templates/report_filter_report_type.html:78
 msgid "Selecione a Unidade Federal desejada para a consulta"
 msgstr "Select a desired State to search."
+
+#: dados/templates/report_state.html:140
+#, fuzzy
+#| msgid "Relatório da Situação das Arboviroses em "
+msgid "Relatório Estadual da Situação das Arboviroses em "
+msgstr "Arborivirosis Situation report of "
+
+#: dados/templates/report_state/map_chik.html:123
+#: dados/templates/services_maps.html:126
+msgid "Alerta Chikungunya"
+msgstr "Chikungunya Alert"
+
+#: dados/templates/report_state/map_zika.html:123
+#: dados/templates/services_maps.html:129
+msgid "Alerta Zika"
+msgstr "Zika Level"
 
 #: dados/templates/series_plot.html:23
 #, python-format
@@ -1152,6 +1127,192 @@ msgstr "Green Level"
 msgid "Casos Notificados de %(disease_label)s"
 msgstr "Reported cases of %(disease_label)s"
 
+#: dados/templates/services.html:19
+msgid "Serviços de Dados Públicos"
+msgstr "Public Data Service"
+
+#: dados/templates/services_api.html:69
+#: dados/templates/services_api_doc.html:46
+#: dados/templates/services_maps.html:69
+#: dados/templates/services_maps_doc.html:47 templates/base.html:74
+msgid "Dados"
+msgstr "Data"
+
+#: dados/templates/services_api.html:69
+msgid "API"
+msgstr ""
+
+#: dados/templates/services_api.html:79
+#, fuzzy
+#| msgid "Para mais informações, acesse a documentação do serviço de mapas."
+msgid "Para mais informações, acesse a documentação do serviço da API."
+msgstr "For more information, access the map service documentation"
+
+#: dados/templates/services_api.html:84
+msgid "Filtro Município (código IBGE, nome do município ou U.F.)"
+msgstr ""
+
+#: dados/templates/services_api.html:88
+msgid "Digite aqui o filtro desejado para a consulta de municípios"
+msgstr ""
+
+#: dados/templates/services_api.html:93
+#, fuzzy
+#| msgid ""
+#| "Digite o código IBGE ou parte dele para buscar o código IBGE disponível."
+msgid ""
+"Digite o código IBGE, nome do município ou U.F. para buscar o município "
+"desejado."
+msgstr "Type the IBGE code or fragment to search available IBGE code."
+
+#: dados/templates/services_api.html:103 dados/templates/services_maps.html:103
+#: dados/templates/state_cities.html:198
+msgid "Selecione municipio(s)"
+msgstr "Select one or more cities"
+
+#: dados/templates/services_api.html:109
+#, fuzzy
+#| msgid "Selecione o município desejado para a consulta"
+msgid "Selecione o município desejado"
+msgstr "Select the desired city to search"
+
+#: dados/templates/services_api.html:119
+#, fuzzy
+#| msgid "Data da Semana Epidemiológica"
+msgid "Data da Semana Epidemiológica de início da consulta"
+msgstr "Date of the epidemiological week"
+
+#: dados/templates/services_api.html:126
+#, fuzzy
+#| msgid "Selecione um dia da Semana Epidemiológica desejada"
+msgid "Selecione um dia da Semana Epidemiológica de início da consulta"
+msgstr "Select a day from the desired epidemiological week "
+
+#: dados/templates/services_api.html:131 dados/templates/services_api.html:159
+#, fuzzy
+#| msgid "Data da Semana Epidemiológica"
+msgid "Data da Semana Epidemiológica de término da consulta"
+msgstr "Date of the epidemiological week"
+
+#: dados/templates/services_api.html:138
+#, fuzzy
+#| msgid "Selecione um dia da Semana Epidemiológica desejada"
+msgid "Selecione um dia da Semana Epidemiológica de término da consulta"
+msgstr "Select a day from the desired epidemiological week "
+
+#: dados/templates/services_api.html:143
+msgid "Arbovirose"
+msgstr ""
+
+#: dados/templates/services_api.html:154
+#, fuzzy
+#| msgid "Selecione o município desejado para a consulta"
+msgid "Selecione a arbovirose para a consulta"
+msgstr "Select the desired city to search"
+
+#: dados/templates/services_api.html:168
+#, fuzzy
+#| msgid "Selecione o Tipo de imagem de saída"
+msgid "Selecione o formato do arquivo de saída"
+msgstr "Select the output image type"
+
+#: dados/templates/services_api.html:179
+msgid "Download"
+msgstr ""
+
+#: dados/templates/services_api_doc.html:63
+msgid "Tabela de conteúdo"
+msgstr "Table of content"
+
+#: dados/templates/services_maps.html:69
+msgid "Mapas"
+msgstr "Maps"
+
+#: dados/templates/services_maps.html:79
+msgid "Para mais informações, acesse a documentação do serviço de mapas."
+msgstr "For more information, access the map service documentation"
+
+#: dados/templates/services_maps.html:84
+msgid "Filtro Código IBGE"
+msgstr "IBGE code filter"
+
+#: dados/templates/services_maps.html:88
+msgid "Digite aqui para filtrar as opções do código IBGE."
+msgstr "Type here to filter IBGE code options."
+
+#: dados/templates/services_maps.html:93
+msgid ""
+"Digite o código IBGE ou parte dele para buscar o código IBGE disponível."
+msgstr "Type the IBGE code or fragment to search available IBGE code."
+
+#: dados/templates/services_maps.html:98
+msgid "Código IBGE"
+msgstr "IBGE code"
+
+#: dados/templates/services_maps.html:108
+msgid "Selecione o código IBGE da cidade desejada"
+msgstr "Select the IBGE code of the desired city"
+
+#: dados/templates/services_maps.html:119
+msgid "Mapa"
+msgstr "Map"
+
+#: dados/templates/services_maps.html:132
+msgid "NDVI"
+msgstr "NDVI"
+
+#: dados/templates/services_maps.html:135
+msgid "LST Dia"
+msgstr "LST Morning"
+
+#: dados/templates/services_maps.html:138
+msgid "LST Noite"
+msgstr "LST Night"
+
+#: dados/templates/services_maps.html:141
+msgid "Umidade Relativa"
+msgstr "Relative humidity"
+
+#: dados/templates/services_maps.html:144
+msgid "Umidade Específica"
+msgstr "Specific Humidity"
+
+#: dados/templates/services_maps.html:147
+msgid "Precipitação"
+msgstr "Precipitation"
+
+#: dados/templates/services_maps.html:152
+msgid "Selecione o tipo de mapa desejado"
+msgstr "Select the kind of desired map."
+
+#: dados/templates/services_maps.html:156
+msgid "Tipo de imagem de saída"
+msgstr "Output image type"
+
+#: dados/templates/services_maps.html:166
+msgid "Selecione o Tipo de imagem de saída"
+msgstr "Select the output image type"
+
+#: dados/templates/services_maps.html:170
+msgid "Dimensão de ajuste:"
+msgstr "Dimension's setting"
+
+#: dados/templates/services_maps.html:179
+msgid "Dimensão de ajuste da imagem"
+msgstr "Dimension's image setting"
+
+#: dados/templates/services_maps.html:183
+msgid "Valor da dimensão selecionada"
+msgstr "Value of selected dimension"
+
+#: dados/templates/services_maps.html:191
+msgid "Selecione o valor para a dimensão informada"
+msgstr "Select the value for the dimension type defined."
+
+#: dados/templates/services_maps.html:200
+msgid "Gerar URL do serviço"
+msgstr "Generate URL's service"
+
 #: dados/templates/state_cities.html:209
 msgid "Aplicar seleção"
 msgstr "Apply"
@@ -1181,11 +1342,11 @@ msgstr "Estimated cases of %(disease_label)s in monitored cities"
 msgid "casos estimados"
 msgstr "estimated cases"
 
-#: dados/views.py:367
+#: dados/views.py:396
 msgid "Em breve"
 msgstr "Coming soon"
 
-#: dados/views.py:782
+#: dados/views.py:812
 msgid "desconhecida"
 msgstr "unknown"
 
@@ -1372,7 +1533,7 @@ msgstr ""
 "within <code>#wrap</code> with <code>padding-top:\n"
 "                        60px;</code> on the <code>.container</code>."
 
-#: templates/my_bootstrap4_base.html:46
+#: templates/my_bootstrap4_base.html:47
 msgid "linguagem"
 msgstr "language"
 
@@ -1414,3 +1575,11 @@ msgstr "Your username, if you have forgotten it, is:"
 #: templates/registration/password_reset_email.html:10
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
+
+#~ msgid ""
+#~ "Em caso de suspeita de criadouro de mosquitos, ligue para a <a href="
+#~ "\"http://www.1746.rio.gov.br/\" style=\"color: #FFFFFF\">Central de "
+#~ "atendimento ao cidadão 1746</a>."
+#~ msgstr ""
+#~ "Want to report a breeding site? contact <a href=\"http://www.1746.rio.gov."
+#~ "br/\" style=\"color: #FFFFFF\">Citizen support central: 1746</a>."
