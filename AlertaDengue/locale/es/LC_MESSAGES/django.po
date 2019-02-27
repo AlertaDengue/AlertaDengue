@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-19 20:24+0000\n"
+"POT-Creation-Date: 2019-02-27 23:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -338,82 +337,85 @@ msgstr ""
 msgid "Suspeita de um criadouro?"
 msgstr ""
 
-#: dados/templates/alert_base.html:250
+#: dados/templates/alert_base.html:249
 msgid "Em caso de suspeita de criadouro de mosquitos, "
 msgstr ""
 
 #: dados/templates/alert_base.html:253
-msgid "contacte a central de apoio ao cidadão: 1746"
+msgid "contacte a "
+msgstr ""
+
+#: dados/templates/alert_base.html:255
+msgid "central de apoio ao cidadão: 1746."
 msgstr "póngase en contacto con la central de apoyo al ciudadano: 1746"
 
-#: dados/templates/alert_base.html:256 dados/templates/alert_base.html:265
-#: dados/templates/alert_base.html:268
+#: dados/templates/alert_base.html:258
+msgid "contacte a central de apoio ao cidadão: 1746."
+msgstr "póngase en contacto con la central de apoyo al ciudadano: 1746"
+
+#: dados/templates/alert_base.html:262 dados/templates/alert_base.html:273
+#: dados/templates/alert_base.html:276
 msgid "contacte a secretaria de saúde de sua cidade"
 msgstr "póngase en contacto con la secretaría de salud de su ciudad"
 
-#: dados/templates/alert_base.html:259
-msgid ""
-"<a href=\"http://www.dengue.pr.gov.br/modules/conteudo/conteudo.php?"
-"conteudo=19\" style=\"color: #FFFFFF\" target=\"_blank\">contacte a "
-"secretaria de saúde de sua cidade</a>."
-msgstr ""
-"<a href=\"http://www.dengue.pr.gov.br/modules/conteudo/conteudo.php?"
-"conteudo=19\" style=\"color: #FFFFFF\" target=\"_blank\">"
-"póngase en contacto con la secretaría de salud de su ciudad</a>."
+#: dados/templates/alert_base.html:266
+msgid "contacte a secretaria de saúde de sua cidade."
+msgstr "póngase en contacto con la secretaría de salud de su ciudad"
 
-#: dados/templates/alert_base.html:262
+#: dados/templates/alert_base.html:270
 msgid "contacte a central de apoio ao cidadão: 0800.285.0880"
-msgstr "póngase en contacto con la central de apoyo al ciudadano: 0800.285.0880"
+msgstr ""
+"póngase en contacto con la central de apoyo al ciudadano: 0800.285.0880"
 
-#: dados/templates/alert_base.html:280
+#: dados/templates/alert_base.html:288
 msgid ""
 "Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www."
 "riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros "
 "para o mosquito!</a>"
 msgstr ""
 
-#: dados/templates/alert_base.html:281
+#: dados/templates/alert_base.html:289
 msgid ""
 "Uma vez por semana, aplique os <a href=\"http://www.riocontradengue.com.br/"
 "Site/Conteudo/Checklist.aspx\">“10 minutos Contra a dengue”!</a>"
 msgstr ""
 
-#: dados/templates/alert_base.html:282 dados/templates/alert_base.html:283
+#: dados/templates/alert_base.html:290 dados/templates/alert_base.html:291
 msgid ""
 "Fique <a href=\"http://www.riocontradengue.rj.gov.br/Site/Conteudo/"
 "FiqueAtento.aspx\">atento aos sintomas da Dengue!</a> Procure um médico caso "
 "suspeite de dengue."
 msgstr ""
 
-#: dados/templates/alert_base.html:297 dados/templates/alert_state/map.html:25
+#: dados/templates/alert_base.html:305 dados/templates/alert_state/map.html:25
 #: dados/templates/report_state/map_chik.html:23
 #: dados/templates/report_state/map_dengue.html:23
 #: dados/templates/report_state/map_zika.html:23
 msgid "Baixo Risco"
 msgstr ""
 
-#: dados/templates/alert_base.html:298 dados/templates/alert_state/map.html:26
+#: dados/templates/alert_base.html:306 dados/templates/alert_state/map.html:26
 #: dados/templates/report_state/map_chik.html:24
 #: dados/templates/report_state/map_dengue.html:24
 #: dados/templates/report_state/map_zika.html:24
 msgid "Atenção"
 msgstr ""
 
-#: dados/templates/alert_base.html:299 dados/templates/alert_state/map.html:27
+#: dados/templates/alert_base.html:307 dados/templates/alert_state/map.html:27
 #: dados/templates/report_state/map_chik.html:25
 #: dados/templates/report_state/map_dengue.html:25
 #: dados/templates/report_state/map_zika.html:25
 msgid "Transmissão"
 msgstr ""
 
-#: dados/templates/alert_base.html:300 dados/templates/alert_state/map.html:28
+#: dados/templates/alert_base.html:308 dados/templates/alert_state/map.html:28
 #: dados/templates/report_state/map_chik.html:26
 #: dados/templates/report_state/map_dengue.html:26
 #: dados/templates/report_state/map_zika.html:26
 msgid "Epidemia"
 msgstr ""
 
-#: dados/templates/alert_base.html:309 dados/templates/alert_base.html:367
+#: dados/templates/alert_base.html:317 dados/templates/alert_base.html:375
 #: dados/templates/series_plot.html:44 dados/templates/series_plot.html:97
 #: dados/templates/series_plot.html:115 dados/templates/series_plot.html:132
 #: dados/templates/series_plot.html:147 dados/templates/series_plot.html:162
@@ -421,7 +423,7 @@ msgstr ""
 msgid "casos"
 msgstr ""
 
-#: dados/templates/alert_base.html:401 dados/templates/alert_base.html:448
+#: dados/templates/alert_base.html:409 dados/templates/alert_base.html:456
 #: dados/templates/alert_state/map.html:188
 #: dados/templates/report_state/map_chik.html:137
 #: dados/templates/report_state/map_dengue.html:137
@@ -429,7 +431,7 @@ msgstr ""
 msgid "Unidades de Saúde"
 msgstr ""
 
-#: dados/templates/alert_base.html:447
+#: dados/templates/alert_base.html:455
 msgid "Áreas de Planejamento"
 msgstr ""
 
