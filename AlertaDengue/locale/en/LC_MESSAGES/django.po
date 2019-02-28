@@ -497,7 +497,7 @@ msgstr "In case of suspected breeding of mosquitoes,"
 
 #: dados/templates/alert_base.html:253
 msgid "contacte a "
-msgstr ""
+msgstr "contact the"
 
 #: dados/templates/alert_base.html:255
 msgid "central de apoio ao cidadão: 1746."
@@ -837,7 +837,7 @@ msgstr ""
 
 #: dados/templates/details.html:20
 msgid "Alerta Dengue Rio"
-msgstr "Alerta Dengue Rio"
+msgstr "Dengue Alert Rio de Janeiro"
 
 #: dados/templates/error.html:4
 #: dados/templates/report_state/map_dengue.html:123
@@ -1006,7 +1006,7 @@ msgstr "Report"
 #: dados/templates/report_filter_state.html:53
  
 msgid "Municipal"
-msgstr "City"
+msgstr "By City"
 
 #: dados/templates/report_city.html:61
 msgid "Relatório da Situação das Arboviroses em "
@@ -1045,12 +1045,12 @@ msgstr "Open Report"
 #: dados/templates/report_filter_report_type.html:55
  
 msgid "Tipo de Relatório"
-msgstr "Open Report"
+msgstr "Report Type"
 
 #: dados/templates/report_filter_report_type.html:61
 #: dados/templates/report_state.html:132
 msgid "Estadual"
-msgstr ""
+msgstr "By state"
 
 #: dados/templates/report_filter_report_type.html:64
  
@@ -1140,21 +1140,20 @@ msgstr ""
 
 #: dados/templates/services_api.html:79
 msgid "Para mais informações, acesse a documentação do serviço da API."
-msgstr "For more information, access the map service documentation"
+msgstr "For more information, access the API service documentation."
 
 #: dados/templates/services_api.html:84
 msgid "Filtro Município (código IBGE, nome do município ou U.F.)"
-msgstr ""
+msgstr "Filter Municipality (IBGE code, name of the municipality or U.F.)"
 
 #: dados/templates/services_api.html:88
 msgid "Digite aqui o filtro desejado para a consulta de municípios"
-msgstr ""
+msgstr "Enter here the desired filter for the consultation of municipalities"
 
 #: dados/templates/services_api.html:93
 msgid ""
-"Digite o código IBGE, nome do município ou U.F. para buscar o município "
-"desejado."
-msgstr "Type the IBGE code or fragment to search available IBGE code."
+"Digite o código IBGE, nome do município ou U.F. para buscar o município desejado."
+msgstr "Enter the IBGE code, name of the municipality or U.F. to seek the desired municipality."
 
 #: dados/templates/services_api.html:103 dados/templates/services_maps.html:103
 #: dados/templates/state_cities.html:198
@@ -1167,7 +1166,7 @@ msgstr "Select the desired city to search"
 
 #: dados/templates/services_api.html:119
 msgid "Data da Semana Epidemiológica de início da consulta"
-msgstr "Date of the epidemiological week"
+msgstr "Epidemiological Week Start date of consultation"
 
 #: dados/templates/services_api.html:126
 msgid "Selecione um dia da Semana Epidemiológica de início da consulta"
@@ -1175,23 +1174,23 @@ msgstr "Select a day from the desired epidemiological week "
 
 #: dados/templates/services_api.html:131 dados/templates/services_api.html:159
 msgid "Data da Semana Epidemiológica de término da consulta"
-msgstr "Date of the epidemiological week"
+msgstr "Epidemiological Week End Date of Consultation"
 
 #: dados/templates/services_api.html:138
 msgid "Selecione um dia da Semana Epidemiológica de término da consulta"
-msgstr "Select a day from the desired epidemiological week "
+msgstr "Select a day of Epidemiological Week to end the consultation"
 
 #: dados/templates/services_api.html:143
 msgid "Arbovirose"
-msgstr ""
+msgstr "Arbovirosis"
 
 #: dados/templates/services_api.html:154
 msgid "Selecione a arbovirose para a consulta"
-msgstr "Select the desired city to search"
+msgstr "Select arbovirosis for the consultation"
 
 #: dados/templates/services_api.html:168
 msgid "Selecione o formato do arquivo de saída"
-msgstr "Select the output image type"
+msgstr "Select output file format"
 
 #: dados/templates/services_api.html:179
 msgid "Download"
