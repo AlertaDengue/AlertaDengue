@@ -343,11 +343,11 @@ msgstr ""
 
 #: dados/templates/alert_base.html:253
 msgid "contacte a "
-msgstr ""
+msgstr "póngase en contacto con"
 
 #: dados/templates/alert_base.html:255
 msgid "central de apoio ao cidadão: 1746."
-msgstr "póngase en contacto con la central de apoyo al ciudadano: 1746"
+msgstr "central de apoyo al ciudadano: 1746."
 
 #: dados/templates/alert_base.html:258
 msgid "contacte a central de apoio ao cidadão: 1746."
@@ -526,7 +526,7 @@ msgstr ""
 
 #: dados/templates/alerta_municipio.html:17
 msgid "Número de casos estimados na semana"
-msgstr ""
+msgstr "Número de casos estimados en la semana"
 
 #: dados/templates/contact.html:9
 msgid ""
