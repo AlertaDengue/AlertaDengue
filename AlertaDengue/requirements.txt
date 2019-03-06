@@ -5,6 +5,7 @@ geojson
 gunicorn
 numpy
 pandas
+pre_commit
 python-decouple
 pytz
 psycopg2
