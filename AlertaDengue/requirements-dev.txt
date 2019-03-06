@@ -3,5 +3,6 @@ jupyter_contrib_nbextensions
 # eralchemy
 matplotlib
 PILLOW
+pre_commit
 django-extensions
 werkzeug
