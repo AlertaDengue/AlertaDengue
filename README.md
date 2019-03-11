@@ -36,3 +36,7 @@ rode:
 copie a saída deste comando para models.py
 
 então modifique o script load.py para importar do shapefile os dados para o Banco do aplicativo Django.
+
+## inclusão do pre-commit hook
+
+make develop
