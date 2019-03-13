@@ -38,3 +38,4 @@ generate_maps_staging: build
 clean_staging:
 	$(staging_compose_cmd) stop
 	$(staging_compose_cmd) rm
+	

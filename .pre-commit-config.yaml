@@ -5,4 +5,5 @@ repos:
      - id: flake8
        types:
          - python
-       args: ['--config=setup.cfg']
+       args: ['--config=./AlertaDengue/setup.cfg']
+       
