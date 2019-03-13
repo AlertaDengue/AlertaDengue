@@ -37,9 +37,9 @@ copie a saída deste comando para models.py
 
 então modifique o script load.py para importar do shapefile os dados para o Banco do aplicativo Django.
 
-## Configurar ambiente de instalação
+## Configurar ambiente de desenvolvimento
 
-Em ambiente de desenvolvimento o Alerta Dengue será instalado e irá instalar um hook de pre-commit que irá analisar a formatação dos códigos python usando o plugin flake8 antes de efetivar qualquer comando commit.
+Em ambiente de desenvolvimento o Alerta Dengue será instalado e irá instalar um hook de pre-commit que irá analisar a formatação dos códigos python usando o flake8 antes de efetivar qualquer comando commit.
 
 rode:
 ```
