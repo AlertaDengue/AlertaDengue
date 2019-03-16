@@ -60,7 +60,7 @@ INSTALLED_APPS = (
     'forecast',
     'dbf.apps.DbfConfig',
     'api',
-    'manager.router'
+    'manager.router',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -81,30 +81,30 @@ ROOT_URLCONF = 'AlertaDengue.urls'
 
 WSGI_APPLICATION = 'AlertaDengue.wsgi.application'
 
-TEMPLATES = [{
-    'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'APP_DIRS': True,
-    'DIRS': [os.path.join(BASE_DIR, 'templates')],
-    'OPTIONS': {
-        'context_processors': [
-            "django.contrib.auth.context_processors.auth",
-            "django.template.context_processors.debug",
-            "django.template.context_processors.i18n",
-            "django.template.context_processors.media",
-            "django.template.context_processors.static",
-            "django.template.context_processors.tz",
-            "django.contrib.messages.context_processors.messages"
-        ],
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'OPTIONS': {
+            'context_processors': [
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.debug",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
+                "django.contrib.messages.context_processors.messages",
+            ]
+        },
     }
-}]
+]
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
 DATABASES = {
-    'default': config(
-        'DATABASE_URL', default='sqlite:///geodjango.db', cast=db_url
-    )
+    'default': config('DATABASE_URL', default='sqlite:///geodjango.db', cast=db_url)
 }
 
 MEMCACHED_HOST = config('MEMCACHED_HOST', '127.0.0.1')
@@ -126,23 +126,22 @@ LEAFLET_CONFIG = {
     # 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
     'TILES': 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
     'MINIMAP': False,
-    'ATTRIBUTION_PREFIX':
-        'Fonte: <a href=http://info.dengue.mat.br>info.dengue.mat.br</a>',
+    'ATTRIBUTION_PREFIX': 'Fonte: <a href=http://info.dengue.mat.br>info.dengue.mat.br</a>',
     'PLUGINS': {
         'cluster': {
             'js': 'js/leaflet.markercluster.js',
             'css': ['css/MarkerCluster.Default.css', 'css/MarkerCluster.css'],
-            'auto-include': True
+            'auto-include': True,
         },
         'heatmap': {
             'js': [
                 'libs/heatmap/heatmap.js',
                 'libs/heatmap/leaflet-heatmap.js',
-                'js/QuadTree.js'
-            ],
-        }
+                'js/QuadTree.js',
+            ]
+        },
     },
-    'RESET_VIEW': False
+    'RESET_VIEW': False,
 }
 
 PSQL_DB = config('PSQL_DB', default="dengue")
@@ -150,46 +149,37 @@ PSQL_USER = config('PSQL_USER', default="dengueadmin")
 PSQL_HOST = config('PSQL_HOST', default="localhost")
 PSQL_PASSWORD = config('PSQL_PASSWORD')
 
-DATABASE_ROUTERS = [
-    'manager.router.DatabaseAppsRouter'
-]
-DATABASE_APPS_MAPPING = {
-    'dados': 'dados',
-    'forecast': 'forecast',
-    'dbf': 'default'
-}
+DATABASE_ROUTERS = ['manager.router.DatabaseAppsRouter']
+DATABASE_APPS_MAPPING = {'dados': 'dados', 'forecast': 'forecast', 'dbf': 'default'}
 
-DATABASES.update({
-    'dados': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': PSQL_DB,
-        'USER': PSQL_USER,
-        'PASSWORD': PSQL_PASSWORD,
-        'HOST': PSQL_HOST,
-        'PORT': ''
-    },
-    'forecast': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': PSQL_DB,
-        'USER': 'forecast',
-        'PASSWORD': PSQL_PASSWORD,
-        'HOST': PSQL_HOST,
-        'PORT': ''
+DATABASES.update(
+    {
+        'dados': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': PSQL_DB,
+            'USER': PSQL_USER,
+            'PASSWORD': PSQL_PASSWORD,
+            'HOST': PSQL_HOST,
+            'PORT': '',
+        },
+        'forecast': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': PSQL_DB,
+            'USER': 'forecast',
+            'PASSWORD': PSQL_PASSWORD,
+            'HOST': PSQL_HOST,
+            'PORT': '',
+        },
     }
-})
+)
 
-MIGRATION_MODULES = {
-    'dados': None,
-    'gis': None,
-    'api': None
-}
+MIGRATION_MODULES = {'dados': None, 'gis': None, 'api': None}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
 LANGUAGE_CODE = 'pt-br'
-LANGUAGES = (('pt-br', 'Português'),
-             ('en-us', 'english'))
+LANGUAGES = (('pt-br', 'Português'), ('en-us', 'english'))
 
 TIME_ZONE = 'UTC'
 
@@ -211,9 +201,7 @@ CURRENT_DIR = os.path.join(os.path.dirname(__file__), '..')
 # up one level from settings.py
 STATIC_ROOT = os.path.join(CURRENT_DIR, 'static_files')
 # static is on root level
-STATICFILES_DIRS = (
-    os.path.abspath(os.path.join(CURRENT_DIR, 'static')),
-)
+STATICFILES_DIRS = (os.path.abspath(os.path.join(CURRENT_DIR, 'static')),)
 
 DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, 'data'))
 
@@ -223,19 +211,13 @@ MEDIA_ROOT = config('MEDIA_ROOT', default='')
 
 IMPORTED_FILES_DIR = config('IMPORTED_FILES_DIR', default=MEDIA_ROOT)
 
-EMAIL_BACKEND = config(
-    'EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend'
-)
-EMAIL_FROM_ADDRESS = config(
-    'EMAIL_FROM_ADDRESS', 'no-reply@info.dengue.mat.br'
-)
-INFODENGUE_TEAM_EMAIL = config('INFODENGUE_TEAM_EMAIL',
-        'infodengue@info.dengue.mat.br')
+EMAIL_BACKEND = config('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_FROM_ADDRESS = config('EMAIL_FROM_ADDRESS', 'no-reply@info.dengue.mat.br')
+INFODENGUE_TEAM_EMAIL = config('INFODENGUE_TEAM_EMAIL', 'infodengue@info.dengue.mat.br')
 
 if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
     EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = config(
-        'EMAIL_CONFIG', default='example_host,25,username,password',
-        cast=Csv()
+        'EMAIL_CONFIG', default='example_host,25,username,password', cast=Csv()
     )
     EMAIL_PORT = int(EMAIL_PORT)
     EMAIL_USE_TLS = True
@@ -244,23 +226,15 @@ if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
 CELERY_BROKER_URL = config('CELERY_BROKER_URL', default=None)
 CELERY_TASK_ALWAYS_EAGER = config('CELERY_TASK_ALWAYS_EAGER', default=False)
 
-MAPSERVER_URL = config(
-    'MAPSERVER_URL', default='http://localhost:80'
-)
+MAPSERVER_URL = config('MAPSERVER_URL', default='http://localhost:80')
 
-MAPSERVER_LOG_PATH = config(
-    'MAPSERVER_LOG_PATH', default='/var/log/mapserver.log'
-)
+MAPSERVER_LOG_PATH = config('MAPSERVER_LOG_PATH', default='/var/log/mapserver.log')
 
 
 SHAPEFILE_PATH = '%s/static/shapefile' % BASE_DIR
-MAPFILE_PATH = config(
-    'MAPFILE_PATH', default='%s/mapfiles' % PARENT_BASE_DIR
-)
+MAPFILE_PATH = config('MAPFILE_PATH', default='%s/mapfiles' % PARENT_BASE_DIR)
 
-RASTER_PATH = config(
-    'RASTER_PATH', default=os.path.join(PARENT_BASE_DIR, 'tiffs')
-)
+RASTER_PATH = config('RASTER_PATH', default=os.path.join(PARENT_BASE_DIR, 'tiffs'))
 
 RASTER_METEROLOGICAL_DATA_RANGE = {
     'ndvi': (-2000.0, +10000.0),
@@ -268,7 +242,7 @@ RASTER_METEROLOGICAL_DATA_RANGE = {
     'lst_night_1km': (-30.0, 30.0),
     'relative_humidity_2m_above_ground': (0.0, 100.0),
     'specific_humidity_2m_above_ground': (0.0, 1.0),
-    'precipitation': (0, 200.0)
+    'precipitation': (0, 200.0),
 }
 
 RASTER_METEROLOGICAL_FACTOR_INCREASE = config(
@@ -276,9 +250,7 @@ RASTER_METEROLOGICAL_FACTOR_INCREASE = config(
 )
 
 BOOTSTRAP4 = {
-    'form_renderers': {
-        'default': 'dbf.forms.FormRendererWithHiddenFieldErrors',
-    }
+    'form_renderers': {'default': 'dbf.forms.FormRendererWithHiddenFieldErrors'}
 }
 
 
@@ -288,22 +260,12 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-        'null': {
-            'class': 'logging.NullHandler',
-        },
+        'console': {'class': 'logging.StreamHandler'},
+        'null': {'class': 'logging.NullHandler'},
     },
-    'root': {
-        'handlers': ['console'],
-        'level': config('DJANGO_LOG_LEVEL', 'INFO'),
-    },
+    'root': {'handlers': ['console'], 'level': config('DJANGO_LOG_LEVEL', 'INFO')},
     'loggers': {
-        'django.security.DisallowedHost': {
-            'handlers': ['null'],
-            'propagate': False,
-        },
+        'django.security.DisallowedHost': {'handlers': ['null'], 'propagate': False}
     },
 }
 
