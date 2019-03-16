@@ -1,12 +1,13 @@
 from datetime import datetime
 from django.test import TestCase
 from glob import glob
+
 # local
 from ..geotiff import (
     get_date_from_file_name,
     get_key_from_file_name,
     mask_raster_with_shapefile,
-    increase_resolution
+    increase_resolution,
 )
 from .. import settings
 
@@ -25,7 +26,7 @@ class TestGeoTiff(TestCase):
             ('NDVI', '2010_12_19'),
             ('Precipitation', '2017_10_03', '354'),
             ('relative_humidity_2m_above_ground', '2016_07_18'),
-            ('specific_humidity_2m_above_ground', '2017_11_26')
+            ('specific_humidity_2m_above_ground', '2017_11_26'),
         )
 
     def test_get_key_from_file_name(self):
@@ -34,9 +35,7 @@ class TestGeoTiff(TestCase):
         :return:
         """
         for file_name in self.tiff_names:
-            result = get_key_from_file_name(
-                '_'.join(file_name) + '.tif'
-            )
+            result = get_key_from_file_name('_'.join(file_name) + '.tif')
             assert result == file_name[0].lower()
 
     def test_date_from_file_name(self):
@@ -45,9 +44,7 @@ class TestGeoTiff(TestCase):
         :return:
         """
         for file_name in self.tiff_names:
-            result = get_date_from_file_name(
-                '_'.join(file_name) + '.tif'
-            )
+            result = get_date_from_file_name('_'.join(file_name) + '.tif')
             assert result == datetime.strptime(file_name[1], '%Y_%m_%d')
 
     def test_mask_raster_with_shapefile(self):
@@ -79,7 +76,7 @@ class TestGeoTiff(TestCase):
                 mask_raster_with_shapefile(
                     shapefile_path=shapefile_path,
                     raster_input_file_path=raster_input_file_path,
-                    raster_output_file_path=raster_output_file_path
+                    raster_output_file_path=raster_output_file_path,
                 )
 
     def test_increase_resolution(self):
@@ -91,19 +88,15 @@ class TestGeoTiff(TestCase):
         factor_increase = 4
 
         original_raster_file_path = os.path.abspath(
-            os.path.join(
-                os.path.dirname(__file__), 'data', raster_name
-            )
+            os.path.join(os.path.dirname(__file__), 'data', raster_name)
         )
         new_raster_file_path = os.path.join(os.sep, 'tmp', raster_name)
 
-        shutil.copyfile(
-            original_raster_file_path, new_raster_file_path
-        )
+        shutil.copyfile(original_raster_file_path, new_raster_file_path)
 
         increase_resolution(
             raster_file_path=new_raster_file_path,
-            factor_increase=factor_increase
+            factor_increase=factor_increase,
         )
 
         res = factor_increase

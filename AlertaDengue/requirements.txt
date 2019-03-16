@@ -19,7 +19,7 @@ celery
 dj-static
 gdal
 fiona
-rasterio
+rasterio<1
 geopy
 geopandas
 sh

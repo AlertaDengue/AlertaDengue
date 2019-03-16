@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup, Command, find_packages
+from setuptools import setup, find_packages
 
-try: # for pip >= 10
+try:  # for pip >= 10
     from pip._internal.req import parse_requirements
-except ImportError: # for pip <= 9.0.3
+except ImportError:  # for pip <= 9.0.3
     from pip.req import parse_requirements
 
-try: # for pip >= 10
+try:  # for pip >= 10
     from pip._internal.download import PipSession
-except ImportError: # for pip <= 9.0.3
+except ImportError:  # for pip <= 9.0.3
     from pip.download import PipSession
 
 from glob import glob
@@ -28,6 +28,7 @@ try:
 
     class BuildDoc(SphinxBuildDoc):
         """Run in-place build before Sphinx doc build"""
+
         def run(self):
             ret = subprocess.call(
                 [sys.executable, sys.argv[0], 'build_ext', '-i']
@@ -35,6 +36,7 @@ try:
             if ret != 0:
                 raise RuntimeError("Building Scipy failed!")
             SphinxBuildDoc.run(self)
+
     cmdclass = {'build_sphinx': BuildDoc}
 except ImportError:
     cmdclass = {}
@@ -43,6 +45,7 @@ except ImportError:
 def get_version():
     """Obtain the version number"""
     import importlib
+
     mod = importlib.machinery.SourceFileLoader(
         'version', os.path.join('AlertaDengue', 'version.py')
     ).load_module()
@@ -50,10 +53,7 @@ def get_version():
 
 
 def list_dir(pathname=PATH_ROOT, dir_name=''):
-    result = glob(
-        os.path.join(pathname, dir_name, '**'), 
-        recursive=True
-    )[1:]
+    result = glob(os.path.join(pathname, dir_name, '**'), recursive=True)[1:]
 
     size = len(pathname)
 

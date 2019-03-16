@@ -1,7 +1,9 @@
 from django.core.management.base import BaseCommand
+
 # local
 
 from datetime import datetime
+
 # local
 from ... import geotiff
 from ...settings import RASTER_METEROLOGICAL_DATA_RANGE, DEBUG
@@ -30,8 +32,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         str_date_start = input(
-            'Type the initial date of the the raster' +
-            ' files to process (Y-m-d): '
+            'Type the initial date of the the raster'
+            + ' files to process (Y-m-d): '
         )
 
         if str_date_start:

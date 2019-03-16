@@ -9,17 +9,24 @@ class City(models.Model):
     active BOOL NOT NULL,
 
     """
+
     geocode = models.IntegerField(
-        db_column='geocodigo', null=False, primary_key=True,
-        help_text=_('Código do Município')
+        db_column='geocodigo',
+        null=False,
+        primary_key=True,
+        help_text=_('Código do Município'),
     )
     name = models.CharField(
-        db_column='nome', null=False, max_length=128,
-        help_text=_('Nome do municipio')
+        db_column='nome',
+        null=False,
+        max_length=128,
+        help_text=_('Nome do municipio'),
     )
     state = models.CharField(
-        db_column='uf', null=False, max_length=20,
-        help_text=_('Nome do estado')
+        db_column='uf',
+        null=False,
+        max_length=20,
+        help_text=_('Nome do estado'),
     )
 
     class Meta:
@@ -38,13 +45,19 @@ class CID10(models.Model):
     active BOOL NOT NULL,
 
     """
+
     code = models.CharField(
-        db_column='codigo', null=False, primary_key=True,
-        max_length=512, help_text=_('Código do doença')
+        db_column='codigo',
+        null=False,
+        primary_key=True,
+        max_length=512,
+        help_text=_('Código do doença'),
     )
     name = models.CharField(
-        db_column='nome', null=False, max_length=512,
-        help_text=_('Nome da doença')
+        db_column='nome',
+        null=False,
+        max_length=512,
+        help_text=_('Nome da doença'),
     )
 
     class Meta:
@@ -67,41 +80,51 @@ class RegionalHealth(models.Model):
     limiar_epidemico
 
     """
+
     id = models.IntegerField(
-        db_column='id', null=False, primary_key=True,
-        help_text=_('Código da Regional Saúde')
+        db_column='id',
+        null=False,
+        primary_key=True,
+        help_text=_('Código da Regional Saúde'),
     )
-    codigo_estacao_wu  = models.CharField(
-        db_column='codigo_estacao_wu', null=False, max_length=16,
-        help_text=_('Código da Estação WU')
+    codigo_estacao_wu = models.CharField(
+        db_column='codigo_estacao_wu',
+        null=False,
+        max_length=16,
+        help_text=_('Código da Estação WU'),
     )
     varcli = models.CharField(
-        db_column='varcli', null=False, max_length=10,
-        help_text=_('Variável climática')
+        db_column='varcli',
+        null=False,
+        max_length=10,
+        help_text=_('Variável climática'),
     )
     ucrit = models.FloatField(
-        db_column='ucrit', null=False,
-        help_text=_('Umidade Crítica')
+        db_column='ucrit', null=False, help_text=_('Umidade Crítica')
     )
     tcrit = models.FloatField(
-        db_column='tcrit', null=False,
-        help_text=_('Temperatura Crítica')
+        db_column='tcrit', null=False, help_text=_('Temperatura Crítica')
     )
     limiar_preseason = models.FloatField(
-        db_column='limiar_preseason', null=False,
-        help_text=_('Limiar pré-epidêmica')
+        db_column='limiar_preseason',
+        null=False,
+        help_text=_('Limiar pré-epidêmica'),
     )
     limiar_posseason = models.FloatField(
-        db_column='limiar_posseason', null=False,
-        help_text=_('Limiar pós-epidêmica')
+        db_column='limiar_posseason',
+        null=False,
+        help_text=_('Limiar pós-epidêmica'),
     )
     limiar_epidemico = models.FloatField(
-        db_column='limiar_epidemico', null=False,
-        help_text=_('Limiar epidêmico')
+        db_column='limiar_epidemico',
+        null=False,
+        help_text=_('Limiar epidêmico'),
     )
     municipio_geocodigo = models.FloatField(
-        db_column='municipio_geocodigo', null=False, unique=True,
-        help_text=_('Código do municipio')
+        db_column='municipio_geocodigo',
+        null=False,
+        unique=True,
+        help_text=_('Código do municipio'),
     )
 
     class Meta:

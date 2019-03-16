@@ -16,15 +16,14 @@ def int_or_none(x):
 @register.inclusion_tag("series_plot.html", takes_context=True)
 def alerta_series(context):
     disease = (
-        'dengue' if 'disease_code' not in context else
-        context['disease_code']
+        'dengue' if 'disease_code' not in context else context['disease_code']
     )
 
     epiweek = context['epiweek'] if 'epiweek' in context else 0
 
-    dados = load_series(
-        context['geocodigo'], disease, epiweek
-    )[context['geocodigo']]
+    dados = load_series(context['geocodigo'], disease, epiweek)[
+        context['geocodigo']
+    ]
 
     if dados is None:
         return {
@@ -35,49 +34,58 @@ def alerta_series(context):
             'amarelo': {},
             'laranja': {},
             'vermelho': {},
-            'disease_label': context['disease_label']
+            'disease_label': context['disease_label'],
         }
 
-    dados['dia'] = [
-        int(mktime(d.timetuple())) for d in dados['dia']
-    ]
+    dados['dia'] = [int(mktime(d.timetuple())) for d in dados['dia']]
 
     # green alert
     ga = [
         int(c) if a == 0 else None
-        for a, c in zip(dados['alerta'], dados['casos'])]
+        for a, c in zip(dados['alerta'], dados['casos'])
+    ]
     ga = [
         int_or_none(dados['casos'][n])
-        if i is None and ga[n - 1] is not None else int_or_none(i)
-        for n, i in enumerate(ga)]
+        if i is None and ga[n - 1] is not None
+        else int_or_none(i)
+        for n, i in enumerate(ga)
+    ]
     # yellow alert
     ya = [
         int(c) if a == 1 else None
-        for a, c in zip(dados['alerta'], dados['casos'])]
+        for a, c in zip(dados['alerta'], dados['casos'])
+    ]
     ya = [
         int_or_none(dados['casos'][n])
-        if i is None and ya[n - 1] is not None else int_or_none(i)
-        for n, i in enumerate(ya)]
+        if i is None and ya[n - 1] is not None
+        else int_or_none(i)
+        for n, i in enumerate(ya)
+    ]
     # orange alert
     oa = [
         int(c) if a == 2 else None
-        for a, c in zip(dados['alerta'], dados['casos'])]
+        for a, c in zip(dados['alerta'], dados['casos'])
+    ]
     oa = [
         int_or_none(dados['casos'][n])
-        if i is None and oa[n - 1] is not None else int_or_none(i)
-        for n, i in enumerate(oa)]
+        if i is None and oa[n - 1] is not None
+        else int_or_none(i)
+        for n, i in enumerate(oa)
+    ]
     # red alert
     ra = [
         int(c) if a == 3 else None
-        for a, c in zip(dados['alerta'], dados['casos'])]
+        for a, c in zip(dados['alerta'], dados['casos'])
+    ]
     ra = [
         int_or_none(dados['casos'][n])
-        if i is None and ra[n - 1] is not None else int_or_none(i)
-        for n, i in enumerate(ra)]
+        if i is None and ra[n - 1] is not None
+        else int_or_none(i)
+        for n, i in enumerate(ra)
+    ]
 
     forecast_models_keys = [
-        k for k in dados.keys()
-        if k.startswith('forecast_')
+        k for k in dados.keys() if k.startswith('forecast_')
     ]
 
     forecast_models_title = [
@@ -85,9 +93,7 @@ def alerta_series(context):
         for k in forecast_models_keys
     ]
 
-    forecast_data = {
-        k: json.dumps(dados[k]) for k in forecast_models_keys
-    }
+    forecast_data = {k: json.dumps(dados[k]) for k in forecast_models_keys}
 
     result = {
         'nome': context['nome'],
@@ -98,7 +104,7 @@ def alerta_series(context):
         'laranja': json.dumps(oa),
         'vermelho': json.dumps(ra),
         'disease_label': context['disease_label'],
-        'forecast_models': forecast_models_title
+        'forecast_models': forecast_models_title,
     }
 
     result.update(forecast_data)
@@ -136,8 +142,9 @@ def total_series(context, disease):
     '''
     # gc = context['geocodigos'][0]
     series = (
-        get_series_by_UF(disease) if 'case_series' not in context else
-        context['case_series'][disease]
+        get_series_by_UF(disease)
+        if 'case_series' not in context
+        else context['case_series'][disease]
     )
 
     if series.empty:
@@ -146,7 +153,7 @@ def total_series(context, disease):
             'start': None,
             'series': {},
             'series_est': {},
-            'disease': disease
+            'disease': disease,
         }
 
     ufs = list(set(series.uf.tolist()))
@@ -159,21 +166,16 @@ def total_series(context, disease):
     for uf in ufs:
         series_uf = series[series.uf == uf]
         datas = [
-            int(mktime(d.timetuple())) * 1000
-            for d in series_uf.data[-52:]
+            int(mktime(d.timetuple())) * 1000 for d in series_uf.data[-52:]
         ]
         casos[uf] = [
             list(t)
-            for t in zip(
-                datas,
-                series_uf.casos_s[-52:].astype('int').tolist()
-            )
+            for t in zip(datas, series_uf.casos_s[-52:].astype('int').tolist())
         ]
         casos_est[uf] = [
             list(t)
             for t in zip(
-                datas,
-                series_uf.casos_est_s[-52:].astype('int').tolist()
+                datas, series_uf.casos_est_s[-52:].astype('int').tolist()
             )
         ]
 
@@ -182,5 +184,5 @@ def total_series(context, disease):
         'start': start,
         'series': casos,
         'series_est': casos_est,
-        'disease': disease
+        'disease': disease,
     }

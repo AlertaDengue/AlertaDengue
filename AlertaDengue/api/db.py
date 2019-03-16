@@ -1,17 +1,22 @@
 from sqlalchemy import create_engine
+
 # local
 from . import settings
-from dados.dbdata import CID10, STATE_NAME, get_disease_suffix, MRJ_GEOCODE
+from dados.dbdata import (  # noqa:F401
+    CID10, STATE_NAME, get_disease_suffix, MRJ_GEOCODE
+)
 
 import pandas as pd
 
 
-db_engine = create_engine("postgresql://{}:{}@{}/{}".format(
-    settings.PSQL_USER,
-    settings.PSQL_PASSWORD,
-    settings.PSQL_HOST,
-    settings.PSQL_DB
-))
+db_engine = create_engine(
+    "postgresql://{}:{}@{}/{}".format(
+        settings.PSQL_USER,
+        settings.PSQL_PASSWORD,
+        settings.PSQL_HOST,
+        settings.PSQL_DB,
+    )
+)
 
 
 class NotificationQueries:
@@ -30,8 +35,14 @@ class NotificationQueries:
     dist_filters = None
 
     def __init__(
-        self, uf, disease_values, age_values, gender_values,
-        city_values, initial_date, final_date
+        self,
+        uf,
+        disease_values,
+        age_values,
+        gender_values,
+        city_values,
+        initial_date,
+        final_date,
     ):
         """
 
@@ -49,9 +60,7 @@ class NotificationQueries:
             ('gender', self._get_gender_filter(gender_values)),
             ('age', self._get_age_filter(age_values)),
             ('cities', self._get_city_filter(city_values)),
-            ('period', self._get_period_filter(
-                initial_date, final_date
-            )),
+            ('period', self._get_period_filter(initial_date, final_date)),
         ]
 
     def _process_filter(self, data_filter, exception_key=''):
@@ -71,12 +80,20 @@ class NotificationQueries:
         :return:
         """
         return (
-            "cs_sexo IN ('F', 'M')" if gender is None else
-            "cs_sexo IN ({})".format(','.join([
-                "'F'" if _gender == 'mulher' else
-                "'M'" if _gender == 'homem' else
-                None for _gender in gender.lower().split(',')
-            ]))
+            "cs_sexo IN ('F', 'M')"
+            if gender is None
+            else "cs_sexo IN ({})".format(
+                ','.join(
+                    [
+                        "'F'"
+                        if _gender == 'mulher'
+                        else "'M'"
+                        if _gender == 'homem'
+                        else None
+                        for _gender in gender.lower().split(',')
+                    ]
+                )
+            )
         )
 
     def _get_city_filter(self, city):
@@ -85,10 +102,7 @@ class NotificationQueries:
         :param city:
         :return:
         """
-        return (
-            '' if city is None else
-            'municipio_geocodigo IN(%s)' % city
-        )
+        return '' if city is None else 'municipio_geocodigo IN(%s)' % city
 
     def _get_age_filter(self, age):
         """
@@ -101,8 +115,7 @@ class NotificationQueries:
             return 'age IS NOT NULL'
 
         _age = [
-            "'{}'".format(_age.replace('  ', '+ '))
-            for _age in age.split(',')
+            "'{}'".format(_age.replace('  ', '+ ')) for _age in age.split(',')
         ]
         return "age IN ({})".format(','.join(_age))
 
@@ -119,11 +132,14 @@ class NotificationQueries:
         ) AS INTERVAL) AND
         '''
         return common_filter + (
-            '1=1' if not initial_date and not final_date else
-            'dt_notific {} '.format(
-                ">= '{}'".format(initial_date) if not final_date else
-                "<= '{}'".format(final_date) if not initial_date else
-                " BETWEEN '{}' AND '{}'".format(initial_date, final_date)
+            '1=1'
+            if not initial_date and not final_date
+            else 'dt_notific {} '.format(
+                ">= '{}'".format(initial_date)
+                if not final_date
+                else "<= '{}'".format(final_date)
+                if not initial_date
+                else " BETWEEN '{}' AND '{}'".format(initial_date, final_date)
             )
         )
 
@@ -135,13 +151,16 @@ class NotificationQueries:
         """
         _diseases = ','.join(["'%s'" % cid for cid in CID10.values()])
         return (
-            "REPLACE(cid10_codigo, '.', '') IN (%s)" % (
-                _diseases
-            ) if disease is None else
-            "REPLACE(cid10_codigo, '.', '') IN ({})".format(','.join([
-                "'{}'".format(CID10[cid.lower()])
-                for cid in disease.split(',')
-            ]))
+            "REPLACE(cid10_codigo, '.', '') IN (%s)" % (_diseases)
+            if disease is None
+            else "REPLACE(cid10_codigo, '.', '') IN ({})".format(
+                ','.join(
+                    [
+                        "'{}'".format(CID10[cid.lower()])
+                        for cid in disease.split(',')
+                    ]
+                )
+            )
         )
 
     def get_total_rows(self):
@@ -151,13 +170,14 @@ class NotificationQueries:
         :return:
         """
         _filt = filter(
-            lambda x: x, [
+            lambda x: x,
+            [
                 '1=1',
                 self._get_gender_filter(None),
                 self._get_disease_filter(None),
                 self._get_age_filter(None),
-                self._get_period_filter(None, None)
-            ]
+                self._get_period_filter(None, None),
+            ],
         )
 
         clean_filters = " uf='{}' AND ".format(self.uf) + ' AND '.join(_filt)
@@ -175,7 +195,9 @@ class NotificationQueries:
                       ON notif.municipio_geocodigo = municipio.geocodigo
             ) AS tb
             WHERE {}
-            '''.format(self._age_field, clean_filters)
+            '''.format(
+            self._age_field, clean_filters
+        )
 
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn, 'casos')
@@ -200,7 +222,9 @@ class NotificationQueries:
                       ON notif.municipio_geocodigo = municipio.geocodigo
             ) AS tb
             WHERE {}
-            '''.format(self._age_field, _dist_filters)
+            '''.format(
+            self._age_field, _dist_filters
+        )
 
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn, 'casos')
@@ -239,7 +263,9 @@ class NotificationQueries:
         ) AS tb
         WHERE {}
         GROUP BY cid10_nome;
-        '''.format(disease_label, self._age_field, _dist_filters)
+        '''.format(
+            disease_label, self._age_field, _dist_filters
+        )
 
         with db_engine.connect() as conn:
             df_disease_dist = pd.read_sql(sql, conn)
@@ -270,7 +296,9 @@ class NotificationQueries:
         WHERE {}
         GROUP BY age
         ORDER BY age
-        '''.format(self._age_field, _dist_filters)
+        '''.format(
+            self._age_field, _dist_filters
+        )
 
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn, 'category')
@@ -303,7 +331,9 @@ class NotificationQueries:
         WHERE {}
         GROUP BY age
         ORDER BY age
-        '''.format(self._age_field, _dist_filters)
+        '''.format(
+            self._age_field, _dist_filters
+        )
 
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn, 'category')
@@ -332,7 +362,9 @@ class NotificationQueries:
         WHERE {} AND cs_sexo = 'M'
         GROUP BY age
         ORDER BY age
-        '''.format(self._age_field, _dist_filters)
+        '''.format(
+            self._age_field, _dist_filters
+        )
 
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn, 'category')
@@ -361,7 +393,9 @@ class NotificationQueries:
         WHERE {} AND cs_sexo = 'F'
         GROUP BY age
         ORDER BY age
-        '''.format(self._age_field, _dist_filters)
+        '''.format(
+            self._age_field, _dist_filters
+        )
 
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn, 'category')
@@ -388,7 +422,9 @@ class NotificationQueries:
         ) AS tb
         WHERE {} AND cs_sexo IN ('F', 'M')
         GROUP BY cs_sexo;
-        '''.format(self._age_field, _dist_filters)
+        '''.format(
+            self._age_field, _dist_filters
+        )
 
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn, 'category')
@@ -420,7 +456,9 @@ class NotificationQueries:
         WHERE uf='{}' {}
         GROUP BY ano_notif, se_notif
         ORDER BY ano_notif, se_notif
-        '''.format(state_name, disease_filter)
+        '''.format(
+            state_name, disease_filter
+        )
 
         with db_engine.connect() as conn:
             df = pd.read_sql(sql, conn)
@@ -451,7 +489,9 @@ class NotificationQueries:
         WHERE {}
         GROUP BY dt_week
         ORDER BY dt_week
-        '''.format(self._age_field, _dist_filters)
+        '''.format(
+            self._age_field, _dist_filters
+        )
 
         with db_engine.connect() as conn:
             df_alert_period = pd.read_sql(sql, conn, index_col='dt_week')
@@ -472,35 +512,29 @@ class NotificationQueries:
             df_period_bounds = pd.read_sql(sql, conn)
 
         if not df_period_bounds.dt_week_start[0] in df_alert_period.index:
-            df = pd.DataFrame({
-                'category': [df_period_bounds.dt_week_start[0]],
-                'casos': [0]
-            })
+            df = pd.DataFrame(
+                {'category': [df_period_bounds.dt_week_start[0]], 'casos': [0]}
+            )
 
             df = df.set_index('category')
 
-            df_alert_period = pd.concat([
-                df, df_alert_period
-            ])
+            df_alert_period = pd.concat([df, df_alert_period])
 
         if not df_period_bounds.dt_week_end[0] in df_alert_period.index:
-            df = pd.DataFrame({
-                'category': [df_period_bounds.dt_week_end[0]],
-                'casos': [0]
-            })
+            df = pd.DataFrame(
+                {'category': [df_period_bounds.dt_week_end[0]], 'casos': [0]}
+            )
 
             df = df.set_index('category')
 
-            df_alert_period = pd.concat([
-                df_alert_period, df
-            ])
+            df_alert_period = pd.concat([df_alert_period, df])
 
         return df_alert_period
 
 
 class AlertCity:
     @staticmethod
-    def search_rj(disease: str, ew_start: int, ew_end:int):
+    def search_rj(disease: str, ew_start: int, ew_end: int):
         """
 
         :param disease:
@@ -510,22 +544,20 @@ class AlertCity:
         """
         if disease not in CID10.keys():
             raise Exception(
-                'The diseases available are: %s.' % ', '.join('`%s`' % k for k in CID10.keys())
+                'The diseases available are: %s.'
+                % ', '.join('`%s`' % k for k in CID10.keys())
             )
 
         sql = '''
         SELECT *
         FROM "Municipio".alerta_mrj{0}, (
           SELECT sum(casos)
-          FROM "Municipio".alerta_mrj{0} 
+          FROM "Municipio".alerta_mrj{0}
           WHERE se BETWEEN {3}01 AND {3}54
         ) AS notif_accum_year
         WHERE se BETWEEN {1} AND {2}
         '''.format(
-            get_disease_suffix(disease),
-            ew_start,
-            ew_end,
-            str(ew_end)[:4]
+            get_disease_suffix(disease), ew_start, ew_end, str(ew_end)[:4]
         )
 
         with db_engine.connect() as conn:
@@ -543,25 +575,25 @@ class AlertCity:
         """
         if disease not in CID10.keys():
             raise Exception(
-                'The diseases available are: %s.' % ', '.join('`%s`' % k for k in CID10.keys())
+                'The diseases available are: %s.'
+                % ', '.join('`%s`' % k for k in CID10.keys())
             )
 
         sql = '''
         SELECT *, (
           SELECT sum(casos)
-          FROM "Municipio"."Historico_alerta{0}" 
+          FROM "Municipio"."Historico_alerta{0}"
           WHERE municipio_geocodigo={1} AND "SE" BETWEEN {4}01 AND {4}54
         ) AS notif_accum_year
-        FROM "Municipio"."Historico_alerta{0}" 
+        FROM "Municipio"."Historico_alerta{0}"
         WHERE municipio_geocodigo={1} AND "SE" BETWEEN {2} AND {3}
         '''.format(
             get_disease_suffix(disease),
             geocode,
             ew_start,
             ew_end,
-            str(ew_end)[:4]
+            str(ew_end)[:4],
         )
 
         with db_engine.connect() as conn:
             return pd.read_sql(sql, conn)
-
