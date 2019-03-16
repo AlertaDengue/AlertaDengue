@@ -3,8 +3,8 @@ from django.core.files.base import File
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from datetime import date
-from io import StringIO
 from mock import patch
+
 # local
 from ..models import DBF
 
@@ -19,14 +19,13 @@ class DBFModelTest(TestCase):
     fixtures = ['users']
 
     def test_notification_year_cant_be_greater_than_current_year(self):
-        fake_file = StringIO("42")
         with open(os.path.join(TEST_DATA_DIR, "simple.dbf"), "rb") as fp:
             dbf = DBF.objects.create(
                 uploaded_by=User.objects.all()[0],
                 file=File(fp, name="simple.dbf"),
                 export_date=date.today(),
                 notification_year=date.today().year + 1,
-                state_abbreviation='RJ'
+                state_abbreviation='RJ',
             )
             with self.assertRaises(ValidationError):
                 dbf.clean()
@@ -40,7 +39,7 @@ class DBFModelTest(TestCase):
                 file=File(fp, name="invalid.dbf"),
                 export_date=date.today(),
                 notification_year=date.today().year,
-                state_abbreviation='RJ'
+                state_abbreviation='RJ',
             )
             with self.assertRaises(ValidationError):
                 dbf.clean()
