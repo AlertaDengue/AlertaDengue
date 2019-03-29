@@ -1,0 +1,34 @@
+version: 2
+
+jobs:
+  test:
+    working_directory: ~/repo
+    docker:
+      - image: continuumio/miniconda3:latest
+    steps:
+      - checkout
+      - run:
+          name: Update Conda
+          command: |
+            conda config --set always_yes True
+            conda config --add channels conda-forge
+            conda install -n base conda
+            conda update --all --update-deps
+            conda update --all
+            conda env update --file AlertaDengue/requirements-conda.txt --file AlertaDengue/requirements-dev.txt -n alertadengue
+      - run:
+          name: Show the exact environment used
+          command: |
+            source activate alertadengue
+            conda list
+      - run:
+          name: Run Tests
+          command: |
+            source activate alertadengue
+            cd AlertaDengue
+            flake8
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - test
