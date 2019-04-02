@@ -92,9 +92,13 @@ class Sinan(object):
         logger.info("Formatando as datas")
         for col in filter(lambda x: x.startswith("DT"), self.tabela.columns):
             try:
-                self.tabela[col] = pd.to_datetime(self.tabela[col])  # , errors='coerce')
+                self.tabela[col] = pd.to_datetime(
+                    self.tabela[col]
+                )  # , errors='coerce')
             except ValueError:
-                self.tabela[col] = pd.to_datetime(self.tabela[col], format='%d/%m/%y', errors='coerce')
+                self.tabela[col] = pd.to_datetime(
+                    self.tabela[col], format='%d/%m/%y', errors='coerce'
+                )
 
     @property
     def time_span(self):
@@ -108,8 +112,10 @@ class Sinan(object):
 
     def _fill_missing_columns(self, col_names):
         """
-        checks if the table to be inserted contains all columns required in the database model.
-        If not create this columns filled with Null values, to allow for database insertion.
+        checks if the table to be inserted contains all columns required in
+            the database model.
+        If not create this columns filled with Null values, to allow for
+            database insertion.
         :param col_names:
         """
         for nm in col_names:
@@ -119,51 +125,87 @@ class Sinan(object):
     def _get_postgres_connection(self):
         return psycopg2.connect(**self.db_config)
 
-    def save_to_pgsql(self, table_name='"Municipio"."Notificacao"', default_cid=None):
+    def save_to_pgsql(
+        self, table_name='"Municipio"."Notificacao"', default_cid=None
+    ):
         connection = self._get_postgres_connection()
         logger.info("Escrevendo no PostgreSQL")
-        ano = self.time_span[1].year if self.time_span[0] == self.time_span[1] else self.ano
-        geoclist_sql = ",".join([str(gc) for gc in self.geocodigos])
+
         with connection.cursor(cursor_factory=DictCursor) as cursor:
             cursor.execute("select * from {} limit 1;".format(table_name))
             col_names = [c.name for c in cursor.description if c.name != "id"]
             self._fill_missing_columns(col_names)
             df_names = [field_map[n] for n in col_names]
-            insert_sql = 'INSERT INTO {}({}) VALUES ({}) on conflict on CONSTRAINT casos_unicos do UPDATE SET {}'. \
-                format(table_name,
-                       ','.join(col_names),
-                       ','.join(['%s' for i in col_names]),
-                       ','.join(['{0}=excluded.{0}'.format(j) for j in col_names]))
-            logger.info("Formatando linhas e inserindo em {}".format(
-                table_name))
+            insert_sql = (
+                'INSERT INTO {}({}) VALUES ({}) on conflict '
+                'on CONSTRAINT casos_unicos do UPDATE SET {}'
+            ).format(
+                table_name,
+                ','.join(col_names),
+                ','.join(['%s' for i in col_names]),
+                ','.join(['{0}=excluded.{0}'.format(j) for j in col_names]),
+            )
+            logger.info(
+                "Formatando linhas e inserindo em {}".format(table_name)
+            )
             for row in self.tabela[df_names].iterrows():
                 i = row[0]
                 row = row[1]
-                row[0] = None if isinstance(row[0], pd.tslib.NaTType) else date.fromordinal(
-                    row[0].to_datetime().toordinal())  # dt_notific
+                row[0] = (
+                    None
+                    if isinstance(row[0], pd.tslib.NaTType)
+                    else date.fromordinal(row[0].to_datetime().toordinal())
+                )  # dt_notific
                 row[1] = int(str(int(row[1]))[-2:])  # se_notific
-                row[2] = int(self.ano) if pd.isnull(row[2]) else int(row[2])  # ano_notific
-                row[3] = None if isinstance(row[3], pd.tslib.NaTType) else date.fromordinal(
-                    row[3].to_datetime().toordinal())  # dt_sin_pri
-                row[4] = None if not row[4] else int(str(row[4])[-2:])  # se_sin_pri
-                row[5] = None if isinstance(row[5], pd.tslib.NaTType) else date.fromordinal(
-                    row[5].to_datetime().toordinal())  # dt_digita
-                row[7] = None if not row[7] else int(row[7])  # bairro_bairro_id
-                row[8] = None if row[8] == '' else add_dv(int(row[8]))  # municipio_geocodigo
+                row[2] = (
+                    int(self.ano) if pd.isnull(row[2]) else int(row[2])
+                )  # ano_notific
+                row[3] = (
+                    None
+                    if isinstance(row[3], pd.tslib.NaTType)
+                    else date.fromordinal(row[3].to_datetime().toordinal())
+                )  # dt_sin_pri
+                row[4] = (
+                    None if not row[4] else int(str(row[4])[-2:])
+                )  # se_sin_pri
+                row[5] = (
+                    None
+                    if isinstance(row[5], pd.tslib.NaTType)
+                    else date.fromordinal(row[5].to_datetime().toordinal())
+                )  # dt_digita
+                row[7] = (
+                    None if not row[7] else int(row[7])
+                )  # bairro_bairro_id
+                row[8] = (
+                    None if row[8] == '' else add_dv(int(row[8]))
+                )  # municipio_geocodigo
                 row[9] = int(row[9])  # nu_notific
                 if row[10] is None:
                     if default_cid is None:
-                        raise ValidationError(_("Existem nesse arquivo notificações "
-                                                "que não incluem a coluna ID_AGRAVO."))
+                        raise ValidationError(
+                            _(
+                                "Existem nesse arquivo notificações "
+                                "que não incluem a coluna ID_AGRAVO."
+                            )
+                        )
                     else:
                         row[10] = default_cid
 
-                row[11] = None if (isinstance(row[11], pd.tslib.NaTType) or row[11] is None) else date.fromordinal(row[11].to_datetime().toordinal())  # dt_nasc
+                row[11] = (
+                    None
+                    if (
+                        isinstance(row[11], pd.tslib.NaTType)
+                        or row[11] is None
+                    )
+                    else date.fromordinal(row[11].to_datetime().toordinal())
+                )  # dt_nasc
                 row[13] = None if not row[13] else int(row[13])  # nu_idade_n
                 cursor.execute(insert_sql, row)
                 if (i % 1000 == 0) and (i > 0):
-                    logger.info("{} linhas inseridas. Commitando mudanças "
-                                "no banco".format(i))
+                    logger.info(
+                        "{} linhas inseridas. Commitando mudanças "
+                        "no banco".format(i)
+                    )
                     connection.commit()
 
             connection.commit()

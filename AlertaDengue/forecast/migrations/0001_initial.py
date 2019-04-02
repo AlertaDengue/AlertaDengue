@@ -8,7 +8,7 @@ import sys
 
 
 def create_dengue_global():
-    if 'test'in sys.argv:
+    if 'test' in sys.argv:
         sql = '''
             CREATE SCHEMA IF NOT EXISTS "Dengue_global";
 
@@ -38,8 +38,6 @@ def create_dengue_global():
 class Migration(migrations.Migration):
     operations = [
         migrations.SeparateDatabaseAndState(
-            database_operations=[
-                create_dengue_global()
-            ],
+            database_operations=[create_dengue_global()]
         )
     ]

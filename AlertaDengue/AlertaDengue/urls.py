@@ -9,7 +9,7 @@ admin.autodiscover()
 
 try:
     url_admin = url(r'^admin/', admin.site.urls)  # django 2
-except:
+except Exception:
     url_admin = url(r'^admin/', include(admin.site.urls))  # django old version
 
 urlpatterns = [

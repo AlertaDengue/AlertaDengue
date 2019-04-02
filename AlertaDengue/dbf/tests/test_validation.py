@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.test import TestCase
 from datetime import date
+
 # local
 from ..models import DBF
 from ..validation import is_valid_dbf
@@ -45,7 +46,9 @@ class DBFValidationTest(TestCase):
         should raise an error.
         """
 
-        missing_column_file = self._get_file_from_filename("missing_nu_ano.dbf")
+        missing_column_file = self._get_file_from_filename(
+            "missing_nu_ano.dbf"
+        )
         with self.assertRaises(ValidationError):
             is_valid_dbf(missing_column_file, 2016)
 
@@ -68,14 +71,14 @@ class DBFValidationTest(TestCase):
         """
         inexistent_filename = "{}.dbf".format(datetime.datetime.now())
         with open(os.path.join(TEST_DATA_DIR, "simple.dbf"), "rb") as fp:
-            # Instead of using ".objects.create()" we only instantiate the file.
+            # Instead of using ".objects.create()" we only instantiate the file
             # This will trigger the error when calling dbf.clean() on an
             # unsaved instance.
             dbf = DBF(
                 uploaded_by=User.objects.all()[0],
                 file=File(fp, name=inexistent_filename),
                 export_date=date.today(),
-                notification_year=date.today().year
+                notification_year=date.today().year,
             )
             self.assertTrue(is_valid_dbf(dbf.file, dbf.notification_year))
 
@@ -85,7 +88,9 @@ class DBFValidationTest(TestCase):
         the data is poiting to the correct year
         """
 
-        wrong_data_type_file = self._get_file_from_filename("wrong_date_datatype.dbf")
+        wrong_data_type_file = self._get_file_from_filename(
+            "wrong_date_datatype.dbf"
+        )
         notification_year = 2015
 
         with self.assertRaises(ValidationError):

@@ -18,7 +18,8 @@ class UploadSuccessful(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         kwargs['last_uploaded'] = DBF.objects.filter(
-            uploaded_by=self.request.user).order_by("-uploaded_at")[:5]
+            uploaded_by=self.request.user
+        ).order_by("-uploaded_at")[:5]
         return super(UploadSuccessful, self).get_context_data(**kwargs)
 
 
@@ -35,32 +36,38 @@ class Upload(LoginRequiredMixin, FormView):
 
     def form_valid(self, form):
         chunked_upload = DBFChunkedUpload.objects.get(
-            id=form.cleaned_data['chunked_upload_id'],
-            user=self.request.user
+            id=form.cleaned_data['chunked_upload_id'], user=self.request.user
         )
-        uploaded_file = File(chunked_upload.file, form.cleaned_data['filename'])
+        uploaded_file = File(
+            chunked_upload.file, form.cleaned_data['filename']
+        )
         dbf = DBF.objects.create(
             uploaded_by=self.request.user,
             file=uploaded_file,
             export_date=form.cleaned_data['export_date'],
             notification_year=form.cleaned_data['notification_year'],
             state_abbreviation=form.cleaned_data['state_abbreviation'],
-            municipio=form.cleaned_data['municipio']
+            municipio=form.cleaned_data['municipio'],
         )
         import_dbf_to_database.delay(dbf.id)
-        success_message = _("O arquivo {} exportado em {:%d/%m/%Y} com notificações do ano {} "
-                            "foi enviado com sucesso. Você será informado "
-                            "por email ({}) assim que o processo de "
-                            "importação for finalizado, ".format(
-                                dbf.file.name, dbf.export_date,
-                                dbf.notification_year, self.request.user.email))
+        success_message = _(
+            "O arquivo {} exportado em {:%d/%m/%Y} com notificações do ano {} "
+            "foi enviado com sucesso. Você será informado "
+            "por email ({}) assim que o processo de "
+            "importação for finalizado, ".format(
+                dbf.file.name,
+                dbf.export_date,
+                dbf.notification_year,
+                self.request.user.email,
+            )
+        )
         messages.success(self.request, success_message)
         return super(Upload, self).form_valid(form)
 
-
     def get_context_data(self, **kwargs):
         kwargs['last_uploaded'] = DBF.objects.filter(
-            uploaded_by=self.request.user).order_by("-uploaded_at")[:5]
+            uploaded_by=self.request.user
+        ).order_by("-uploaded_at")[:5]
         return super(Upload, self).get_context_data(**kwargs)
 
 
@@ -75,4 +82,7 @@ class DBFChunkedUploadCompleteView(ChunkedUploadCompleteView):
     model = DBFChunkedUpload
 
     def get_response_data(self, chunked_upload, request):
-        return {'filename': chunked_upload.filename, 'chunked_upload_id': chunked_upload.id}
+        return {
+            'filename': chunked_upload.filename,
+            'chunked_upload_id': chunked_upload.id,
+        }
