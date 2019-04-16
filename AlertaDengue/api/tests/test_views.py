@@ -19,10 +19,6 @@ import unittest
 
 
 class TestApiView(TestCase):
-    """
-
-    """
-
     def setUp(self):
         settings.DATA_DIR = os.path.dirname(__file__)
 
@@ -37,6 +33,7 @@ class TestApiView(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
+    @unittest.skip("Waiting data on database demo.")
     def test_notification_reduced_csv_404_view(self):
         """
 
@@ -52,6 +49,7 @@ class TestApiView(TestCase):
             + b'This parameter should have 2 letter (e.g. RJ).',
         )
 
+    @unittest.skip("Waiting for Rio de Janeiro data on database demo.")
     def test_alert_rj(self):
         geocode = MRJ_GEOCODE
         # test epidemic start week missing
@@ -77,7 +75,6 @@ class TestApiView(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         result = response.json()
-
         assert 'error_message' not in result
 
         for r in result:
@@ -100,6 +97,7 @@ class TestApiView(TestCase):
         df = pd.read_csv(buffer)
         assert all(201701 <= df['se']) and all(df['se'] <= 201750)
 
+    @unittest.skip("Waiting for Curitiba data on database demo.")
     def test_alert_curitiba(self):
         geocode = 4106902
         # test epidemic start week missing
@@ -109,6 +107,7 @@ class TestApiView(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         result = response.json()
+
         assert result['error_message'] == 'Epidemic start week sent is empty.'
 
         # test json format
@@ -123,7 +122,9 @@ class TestApiView(TestCase):
                 'e_year': 2017,
             },
         )
+
         self.assertEqual(response.status_code, 200)
+
         result = response.json()
 
         assert 'error_message' not in result

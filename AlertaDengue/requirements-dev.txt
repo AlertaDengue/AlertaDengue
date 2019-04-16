@@ -5,6 +5,9 @@ matplotlib
 PILLOW
 pre_commit
 black
+<<<<<<< HEAD
 flake8
 # django-extensions
 werkzeug
+=======
+>>>>>>> 499012e... Test and fix system crashes with python 3.7
