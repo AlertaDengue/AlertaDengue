@@ -14,7 +14,8 @@ jobs:
             conda config --add channels conda-forge
             conda install -n base conda
             conda update --all
-            conda env update --file AlertaDengue/requirements-conda.txt --file AlertaDengue/requirements-dev.txt -n alertadengue
+            conda create -n alertadengue --file AlertaDengue/requirements-conda.txt
+            conda install -n alertadengue --file AlertaDengue/requirements-dev.txt
       - run:
           name: Show the exact environment used
           command: |
