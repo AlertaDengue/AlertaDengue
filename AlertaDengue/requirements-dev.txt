@@ -5,5 +5,3 @@ matplotlib
 PILLOW
 pre_commit
 black
-django-extensions
-werkzeug
