@@ -13,7 +13,6 @@ jobs:
             conda config --set always_yes True
             conda config --add channels conda-forge
             conda install -n base conda
-            conda update --all --update-deps
             conda update --all
             conda env update --file AlertaDengue/requirements-conda.txt --file AlertaDengue/requirements-dev.txt -n alertadengue
       - run:
