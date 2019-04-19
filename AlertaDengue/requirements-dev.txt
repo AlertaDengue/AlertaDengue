@@ -7,3 +7,4 @@ pre_commit
 black
 flake8
 # django-extensions
+werkzeug
