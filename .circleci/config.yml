@@ -2,11 +2,11 @@ version: 2
 
 
 base: &base
-    machine:
-      image: continuumio/miniconda3:latest
-    working_directory: ~/repo
+  working_directory: ~/repo
+  docker:
+    - image: continuumio/miniconda3:latest
 
-
+    
 test: &test
   <<: *base
   steps:
