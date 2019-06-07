@@ -24,6 +24,6 @@ geopy
 geopandas
 sh
 plotly==2.5.1
-#cufflinks==0.14.6
+cufflinks
 ipython
 sqlparse

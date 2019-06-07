@@ -18,7 +18,6 @@ test: &test
           conda config --add channels conda-forge
           conda install -n base conda
           conda update --all
-          conda create python=${PYTHON_VERSION} -n alertadengue --file AlertaDengue/requirements-conda.txt
           conda install python=${PYTHON_VERSION} -n alertadengue --file AlertaDengue/requirements-dev.txt
     - run:
         name: Show the exact environment used
