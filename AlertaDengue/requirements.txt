@@ -23,7 +23,7 @@ rasterio
 geopy
 geopandas
 sh
-plotly
-cufflinks
+plotly==2.5.1
+#cufflinks==0.14.6
 ipython
 sqlparse
