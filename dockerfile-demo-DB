@@ -72,9 +72,6 @@ RUN cd ~ && \
 RUN git clone -b develop https://github.com/AlertaDengue/AlertaDengue.git
 
 ENV PATH="/home/dengue/miniconda/bin:${PATH}"
-
-RUN /home/dengue/AlertaDengue/AlertaDengue/environment.yml /tmp/environment.yml
-RUN /home/dengue/AlertaDengue/AlertaDengue/requirements-dev.txt /tmp/requirements-dev.txt
 RUN /home/dengue/miniconda/bin/conda config --add channels conda-forge
 RUN /home/dengue/miniconda/bin/conda env update --file /tmp/environment.yml -n dengue36 python=3.6
 RUN /home/dengue/miniconda/bin/conda install --file /tmp/requirements-dev.txt
