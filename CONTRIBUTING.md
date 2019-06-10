@@ -66,30 +66,30 @@ Creates the settings file:
 nano ~/AlertaDengue/AlertaDengue/AlertaDengue/AlertaDengue/settings.ini
 ```
 
-    Consider your local setting. Example:
+Consider your local setting. Example:
 
-    ```sh
-    [settings]
-    ALLOWED_HOSTS=alerta.dengue.mat.br,info.dengue.mat.br,*
-    SECRET_KEY=my-secret-key
-    DEBUG=True
+```sh
+[settings]
+ALLOWED_HOSTS=alerta.dengue.mat.br,info.dengue.mat.br,*
+SECRET_KEY=my-secret-key
+DEBUG=True
 
-    DATABASE_URL=postgres://dengueadmin:dengueadmin@localhost:5432/infodengue
+DATABASE_URL=postgres://dengueadmin:dengueadmin@localhost:5432/infodengue
 
-    PSQL_DB = dengue
-    PSQL_PASSWORD = dengueadmin
-    PSQL_HOST = localhost
+PSQL_DB = dengue
+PSQL_PASSWORD = dengueadmin
+PSQL_HOST = localhost
 
-    ADMIN=''
-    CELERY_BROKER_URL = amqp://xmn:xmn@192.168.1.3:5672
-    CELERY_TASK_ALWAYS_EAGER = True
+ADMIN=''
+CELERY_BROKER_URL = amqp://xmn:xmn@192.168.1.3:5672
+CELERY_TASK_ALWAYS_EAGER = True
 
-    MAPSERVER_URL = http://172.17.0.2:80
-    MAPFILE_PATH = /var/www/mapserver/mapfiles
-    RASTER_PATH = /var/www/mapserver/tiffs
+MAPSERVER_URL = http://172.17.0.2:80
+MAPFILE_PATH = /var/www/mapserver/mapfiles
+RASTER_PATH = /var/www/mapserver/tiffs
 
-    MAPBOX_TOKEN = pk.eyJ1IjoieG1ubGFiIiwiYSI6ImNqZHhrNmcxbDBuZnUyd28xYTg5emVoeTcifQ.9CMl24WjXQ4iThxYYoc3XA
-    ```
+MAPBOX_TOKEN = pk.eyJ1IjoieG1ubGFiIiwiYSI6ImNqZHhrNmcxbDBuZnUyd28xYTg5emVoeTcifQ.9CMl24WjXQ4iThxYYoc3XA
+```
 
 Install the location packages:
 
