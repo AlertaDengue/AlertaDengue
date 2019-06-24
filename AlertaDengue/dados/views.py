@@ -17,7 +17,6 @@ from django.conf import settings
 from django.http import HttpResponse
 from time import mktime
 
-
 # local
 from . import dbdata, models as M
 from .dbdata import (
@@ -35,7 +34,8 @@ from .models import City, RegionalHealth
 from .charts import (
     ReportCityCharts,
     ReportStateCharts,
-    HomeCharts
+    HomeCharts,
+    CityCharts
 )
 from gis.geotiff import convert_from_shapefile
 
@@ -606,6 +606,13 @@ class AlertaMRJPageView(AlertCityPageBaseView):
                 'forecast_date_max': forecast_date_max,
                 'epiweek': epiweek,
                 'geojson_url': '/static/rio_aps.geojson',
+                'chart_alert': CityCharts.create_alert_chart(
+                    geocode,
+                    city_info['nome'],
+                    disease_label,
+                    disease_code,
+                    epiweek
+                )
             }
         )
         return context
@@ -708,6 +715,13 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
                 'forecast_date_max': forecast_date_max,
                 'epiweek': epiweek,
                 'geojson_url': '/static/geojson/%s.json' % geocode,
+                'chart_alert': CityCharts.create_alert_chart(
+                    geocode,
+                    city_info['nome'],
+                    disease_label,
+                    disease_code,
+                    epiweek
+                ),
             }
         )
         return context

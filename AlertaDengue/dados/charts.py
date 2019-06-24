@@ -1,12 +1,17 @@
 from datetime import timedelta
 from time import mktime
+import json
 
 import plotly.graph_objs as go
 import pandas as pd
 from plotly.subplots import make_subplots
 
 # local
-from .dbdata import get_series_by_UF
+from .dbdata import get_series_by_UF, load_series
+
+
+def int_or_none(x):
+    return None if x is None else int(x)
 
 
 class ReportCityCharts:
@@ -529,9 +534,9 @@ class HomeCharts:
 
     @classmethod
     def _create_chart(cls, case_series, disease):
-        series_est = cls.total_series(case_series, disease=disease)[
-            'series_est'
-        ]
+        series_est = cls.total_series(
+            case_series, disease=disease
+        )['series_est']
 
         dfs = []
         for k, v in series_est.items():
@@ -618,3 +623,210 @@ class HomeCharts:
     @classmethod
     def create_zika_chart(cls, case_series):
         return cls._create_chart(case_series, 'zika')
+
+
+class CityCharts:
+
+    @classmethod
+    def create_alert_chart(
+        cls, geocode, nome, disease_label, disease_code='dengue', epiweek=0
+    ):
+
+        result = cls.prepare_data(
+            geocode, nome, disease_label, disease_code, epiweek
+        )
+
+        df_dados = pd.DataFrame(result['dados'])
+
+        df_verde = df_dados[df_dados.alerta == 0]
+        df_verde.index = pd.to_datetime(df_verde.dia, unit='s')
+        df_verde.sort_index(inplace=True)
+
+        df_amarelo = df_dados[df_dados.alerta == 1]
+        df_amarelo.index = pd.to_datetime(df_amarelo.dia, unit='s')
+        df_amarelo.sort_index(inplace=True)
+
+        df_laranja = df_dados[df_dados.alerta == 2]
+        df_laranja.index = pd.to_datetime(df_laranja.dia, unit='s')
+        df_laranja.sort_index(inplace=True)
+
+        df_vermelho = df_dados[df_dados.alerta == 3]
+        df_vermelho.index = pd.to_datetime(df_vermelho.dia, unit='s')
+        df_vermelho.sort_index(inplace=True)
+
+        fig = go.Figure()
+
+        fig.add_trace(
+            go.Scatter(
+                x=pd.to_datetime(df_dados.dia, unit='s'),
+                y=df_dados.casos,
+                mode='lines',
+                name='Casos Notificados de ' + disease_label,
+                line={'color': '#4572A7'},
+                hovertemplate=" %{x} : %{y:1f} ",
+            )
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=pd.to_datetime(df_verde.dia, unit='s'),
+                y=df_verde.casos,
+                name='Alerta Verde de ' + disease_label,
+                marker={'color': '#48FD48'},
+                hovertemplate=" %{x} : %{y:1f} ",
+                stackgroup='one',
+                fill=None,
+            )
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=pd.to_datetime(df_amarelo.dia, unit='s'),
+                y=df_amarelo.casos,
+                name='Alerta Amarelo de ' + disease_label,
+                marker={'color': '#FBFC49'},
+                hovertemplate=" %{x} : %{y:1f} ",
+                stackgroup='one',
+                line=dict(width=0),
+            )
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=pd.to_datetime(df_laranja.dia, unit='s'),
+                y=df_laranja.casos,
+                name='Alerta Laranja de ' + disease_label,
+                marker={'color': '#FFA858'},
+                hovertemplate="%{x}:%{y:1f}", stackgroup='one',
+                line=dict(width=0),
+            )
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=pd.to_datetime(df_vermelho.dia, unit='s'),
+                y=df_vermelho.casos,
+                name='Alerta Vermelho de ' + disease_label,
+                marker={'color': '#FB4949'},
+                hovertemplate="%{x}:%{y:1f}",
+                stackgroup='one',
+                line=dict(width=0),
+            )
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=pd.to_datetime(df_dados.dia, unit='s'),
+                y=df_dados.casos_est,
+                mode='lines',
+                name='Casos Estimados de ' + disease_label,
+                line={'color': '#AA4643', 'dash': 'dot'},
+                hovertemplate="%{x} : %{y:1f}",
+            )
+        )
+
+        fig.update_layout(
+            title='Séries de dados e Alertas anteriores para ' + nome,
+            xaxis=go.layout.XAxis(
+                rangeselector=dict(
+                    buttons=list([
+                        dict(step="all")
+                    ])
+                ),
+                rangeslider=dict(
+                    visible=True
+                ),
+                type="date"
+            ),
+            yaxis=dict(
+                title='Pessoas',
+                gridcolor='rgb(220, 220, 220)',
+            ),
+            plot_bgcolor='rgb(255, 255, 255)',
+        )
+        return fig.to_html()
+
+    @classmethod
+    def prepare_data(
+        cls, geocodigo, nome, disease_label, disease='dengue', epiweek=0
+    ):
+        dados = load_series(geocodigo, disease, epiweek)[geocodigo]
+        if dados is None:
+            return {
+                'nome': nome,
+                'dados': {},
+                'start': {},
+                'verde': {},
+                'amarelo': {},
+                'laranja': {},
+                'vermelho': {},
+                'disease_label': disease_label,
+            }
+        dados['dia'] = [int(mktime(d.timetuple())) for d in dados['dia']]
+        # green alert
+        ga = [
+            int(c) if a == 0 else None
+            for a, c in zip(dados['alerta'], dados['casos'])
+        ]
+        ga = [
+            int_or_none(dados['casos'][n])
+            if i is None and ga[n - 1] is not None
+            else int_or_none(i)
+            for n, i in enumerate(ga)
+        ]
+        # yellow alert
+        ya = [
+            int(c) if a == 1 else None
+            for a, c in zip(dados['alerta'], dados['casos'])
+        ]
+        ya = [
+            int_or_none(dados['casos'][n])
+            if i is None and ya[n - 1] is not None
+            else int_or_none(i)
+            for n, i in enumerate(ya)
+        ]
+        # orange alert
+        oa = [
+            int(c) if a == 2 else None
+            for a, c in zip(dados['alerta'], dados['casos'])
+        ]
+        oa = [
+            int_or_none(dados['casos'][n])
+            if i is None and oa[n - 1] is not None
+            else int_or_none(i)
+            for n, i in enumerate(oa)
+        ]
+        # red alert
+        ra = [
+            int(c) if a == 3 else None
+            for a, c in zip(dados['alerta'], dados['casos'])
+        ]
+        ra = [
+            int_or_none(dados['casos'][n])
+            if i is None and ra[n - 1] is not None
+            else int_or_none(i)
+            for n, i in enumerate(ra)
+        ]
+        forecast_models_keys = [
+            k for k in dados.keys() if k.startswith('forecast_')
+        ]
+        forecast_models_title = [
+            (k, k.replace('forecast_', '').replace('_cases', '').title())
+            for k in forecast_models_keys
+        ]
+        forecast_data = {
+            k: json.dumps(dados[k]) for k in forecast_models_keys
+        }
+        result = {
+            'nome': nome,
+            'dados': dados,
+            'start': dados['dia'][0],
+            'verde': json.dumps(ga),
+            'amarelo': json.dumps(ya),
+            'laranja': json.dumps(oa),
+            'vermelho': json.dumps(ra),
+            'disease_label': disease_label,
+            'forecast_models': forecast_models_title,
+        }
+        result.update(forecast_data)
+        return result
