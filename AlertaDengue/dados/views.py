@@ -1,4 +1,13 @@
 from collections import defaultdict, OrderedDict
+import datetime
+import fiona
+import geojson
+import json
+import locale
+import numpy as np
+import os
+import random
+
 from django.apps import apps
 from django.utils.translation import gettext
 from django.shortcuts import redirect
@@ -25,15 +34,6 @@ from .maps import get_city_info
 from .models import City, RegionalHealth
 from .charts import ReportCityCharts, ReportStateCharts
 from gis.geotiff import convert_from_shapefile
-
-import datetime
-import fiona
-import geojson
-import json
-import locale
-import numpy as np
-import os
-import random
 
 DBF = apps.get_model('dbf', 'DBF')
 
@@ -1345,6 +1345,7 @@ class ReportStateView(TemplateView):
         ]
         cols_to_avg = [var_climate.replace('_', '.')]
 
+        df.index.name = None
         df = df.groupby('SE')
         df = (
             df[cols_to_sum]
@@ -1406,6 +1407,7 @@ class ReportStateView(TemplateView):
                 cities.keys()
             )
 
+            
             df = ReportState.read_disease_data(
                 year_week=year_week,
                 cities=cities,
@@ -1419,28 +1421,30 @@ class ReportStateView(TemplateView):
 
             cities_alert = {}
             chart_cases_twitter = {}
+
+            for d in disease_key:
+                try:
+                    chart = ReportStateCharts.create_tweet_chart(
+                        df=df, year_week=year_week, disease=d
+                    )
+                except Exception:
+                    chart = '''
+                    <br/>
+                    <strong>Não há dados necessários para a geração do
+                    gráfico sobre {}.
+                    </strong>
+                    <br/>
+                    '''.format(
+                        d
+                    )
+
+                chart_cases_twitter[d] = chart
+
+            # each line refers to a city
             for i, row in df[df.index == last_year_week].iterrows():
                 values = {}
                 for d in disease_key:
                     values.update({d: row['level_code_{}'.format(d)]})
-
-                    try:
-                        chart = ReportStateCharts.create_tweet_chart(
-                            df=df, year_week=year_week, disease=d
-                        )
-                    except Exception:
-                        chart = '''
-                        <br/>
-                        <strong>Não há dados necessários para a geração do
-                        gráfico sobre {}.
-                        </strong>
-                        <br/>
-                        '''.format(
-                            d
-                        )
-
-                    chart_cases_twitter[d] = chart
-
                 cities_alert.update({row.geocode: values})
 
             regional_info.update(

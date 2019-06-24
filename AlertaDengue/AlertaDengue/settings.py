@@ -52,6 +52,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'django_altair',
     'leaflet',
     'bootstrap4',
     'chunked_upload',

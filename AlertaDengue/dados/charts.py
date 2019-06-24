@@ -1,10 +1,5 @@
-from plotly.offline.offline import _plot_html
-
-import cufflinks as cf
+import altair as alt
 import pandas as pd
-
-cf.set_config_file(theme='pearl', offline=True)
-
 
 class ReportCityCharts:
     @classmethod
@@ -48,6 +43,7 @@ class ReportCityCharts:
         df['limiar pós epidêmico'] = threshold_pos_epidemic
         df['limiar pré epidêmico'] = threshold_pre_epidemic
 
+        """
         figure_bar = df.iplot(
             asFigure=True,
             kind='bar',
@@ -148,6 +144,13 @@ class ReportCityCharts:
             default_height=500,
             global_requirejs='',
         )[0]
+        """
+        
+        df_casos = df.rename(columns = {"casos notif.": "casosnotif"})
+        base = alt.Chart(df_casos).encode(alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)')))
+        bar = base.mark_bar().encode(alt.Y('incidência', axis=alt.Axis(title='Incidência')))
+        line = base.mark_line(color="#ffd100", strokeWidth=5).encode(alt.Y('casosnotif', axis=alt.Axis(title='Casos')))
+        return (bar + line).resolve_scale(y='independent').properties(width=1000)
 
     @classmethod
     def create_climate_chart(
@@ -176,7 +179,7 @@ class ReportCityCharts:
         )
 
         df_climate['Limiar favorável transmissão'] = climate_crit
-
+        """
         figure = df_climate.iplot(
             asFigure=True,
             x=['SE'],
@@ -208,6 +211,16 @@ class ReportCityCharts:
             default_height=500,
             global_requirejs='',
         )[0]
+        """
+        
+        df_climate_chart = df_climate.rename(columns = { 
+            "temp.min":"temp_min", 
+            "Limiar favorável transmissão": "limiar_transmissao"})
+
+        return alt.Chart(df_climate_chart).mark_trail().encode(
+            alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)')),
+            alt.Y('temp_min', axis=alt.Axis(title='Temperatura'))
+        ).properties(width=1050)
 
     @classmethod
     def create_tweet_chart(cls, df: pd.DataFrame, year_week):
@@ -227,8 +240,9 @@ class ReportCityCharts:
             lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:])
         )
 
-        df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
-
+        #df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
+        
+        """
         figure = df_tweet.iplot(
             x=['SE'],
             y=['menções'],
@@ -259,86 +273,183 @@ class ReportCityCharts:
             default_height=500,
             global_requirejs='',
         )[0]
-
+        """
+        return alt.Chart(df_tweet).mark_trail().encode(
+            alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)')),
+            alt.Y('tweets', axis=alt.Axis(title='Tweets'))
+        ).properties(width=1050)
 
 class ReportStateCharts:
     @classmethod
     def create_tweet_chart(cls, df: pd.DataFrame, year_week, disease: str):
         """
-
         :param df:
         :param year_week:
         :param disease:
         :return:
         """
+
+        # print(cls)
+        # <class 'dados.charts.ReportStateCharts'>
+
         ks_cases = ['casos notif. {}'.format(disease)]
+        # print(ks_cases)
+        # ['casos notif. zika']
 
         df_tweet = df.reset_index()[['SE', 'tweets'] + ks_cases]
+        #df_tweet.to_csv('df_tweet01.csv')
+
+        # filtro
+        # print(year_week)
+        # 201923
         df_tweet = df_tweet[df_tweet.SE >= year_week - 200]
+        #df_tweet.to_csv('df_tweet02.csv')
 
-        df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
 
-        df_grp = (
-            df_tweet.groupby(df.index)[['menções'] + ks_cases]
-            .sum()
-            .reset_index()
-        )
+        # rename
+        df_tweet.rename(columns={'tweets':'mencoes'}, inplace=True)
+        #df_tweet.to_csv('df_tweet03.csv')
 
-        df_grp['SE'] = df_grp.SE.map(
-            lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:])
-        )
+        #df.to_csv('df2.csv')
 
-        fig_tweet = df_grp.iplot(
-            x=['SE'],
-            y=['menções'],
-            asFigure=True,
-            showlegend=True,
-            xTitle='Período (Ano/Semana)',
-            color=['rgb(128,128,128)'],
-        )
+        #print(df.index)
+        """
+        Int64Index([201723, 201723, 201723, 201723, 201723, 201723, 201723, 201723,
+                    201723, 201723,
+                    ...
+                    201923, 201923, 201923, 201923, 201923, 201923, 201923, 201923,
+                    201923, 201923],
+                   dtype='int64', name='SE', length=1680)
+        """
+        
+        if ks_cases != "":
+            df_grp = (
+                df_tweet.groupby(df.index)[['mencoes'] + ks_cases]
+                .sum()
+                .reset_index()
+            )
 
-        fig_cases = df_grp.iplot(
-            x=['SE'],
-            y=ks_cases,
-            asFigure=True,
-            secondary_y=ks_cases,
-            secondary_y_title='Casos',
-            showlegend=True,
-            xTitle='Período (Ano/Semana)',
-            color=['rgb(0,0,255)'],
-        )
+            # df_grp.info()
+            df_grp.to_csv('df_grp0001.csv')
 
-        fig_cases.data.extend(fig_tweet.data)
+            df_grp['SE'] = df_grp.SE.map(
+                lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:])
+            )
 
-        fig_cases['layout']['xaxis1'].update(
-            tickangle=-60, nticks=len(df_grp) // 24
-        )
-        fig_cases['layout']['yaxis1'].update(
-            title='Tweets', range=[0, df_grp['menções'].max()]
-        )
-        fig_cases['layout']['yaxis2'].update(
-            range=[0, df_grp[ks_cases].max().max()]
-        )
+            #df_grp.to_csv('df_grp0002.csv')
 
-        fig_cases['layout'].update(
-            title='Casos {} / Menções mídia social'.format(disease)
-        )
+            """
+            fig_tweet = df_grp.iplot(
+                x=['SE'],
+                y=['menções'],
+                asFigure=True,
+                showlegend=True,
+                xTitle='Período (Ano/Semana)',
+                color=['rgb(128,128,128)'],
+            )
 
-        fig_cases['layout']['legend'].update(
-            x=-0.1,
-            y=1.2,
-            traceorder='normal',
-            font=dict(family='sans-serif', size=12, color='#000'),
-            bgcolor='#FFFFFF',
-            bordercolor='#E2E2E2',
-            borderwidth=1,
-        )
+            fig_cases = df_grp.iplot(
+                x=['SE'],
+                y=ks_cases,
+                asFigure=True,
+                secondary_y=ks_cases,
+                secondary_y_title='Casos',
+                showlegend=True,
+                xTitle='Período (Ano/Semana)',
+                color=['rgb(0,0,255)'],
+            )
 
-        return _plot_html(
-            figure_or_data=fig_cases,
-            config={},
-            validate=True,
-            default_width='100%',
-            default_height=300,
-            global_requirejs='',
-        )[0]
+            fig_cases.data.extend(fig_tweet.data)
+
+            fig_cases['layout']['xaxis1'].update(
+                tickangle=-60, nticks=len(df_grp) // 24
+            )
+            fig_cases['layout']['yaxis1'].update(
+                title='Tweets', range=[0, df_grp['menções'].max()]
+            )
+            fig_cases['layout']['yaxis2'].update(
+                range=[0, df_grp[ks_cases].max().max()]
+            )
+
+            fig_cases['layout'].update(
+                title='Casos {} / Menções mídia social'.format(disease)
+            )
+
+            fig_cases['layout']['legend'].update(
+                x=-0.1,
+                y=1.2,
+                traceorder='normal',
+                font=dict(family='sans-serif', size=12, color='#000'),
+                bgcolor='#FFFFFF',
+                bordercolor='#E2E2E2',
+                borderwidth=1,
+            )
+            
+            return _plot_html(
+                figure_or_data=fig_cases,
+                config={},
+                validate=True,
+                default_width='100%',
+                default_height=300,
+                global_requirejs='',
+            )[0]
+            """
+        
+            """
+            se = alt.Chart(df_grp).encode(
+                alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)'))
+            )
+            tweets = se.mark_trail().encode(
+                alt.Y('mencoes', axis=alt.Axis(title='Tweets'))
+            )
+            casos = se.mark_trail().encode(
+                alt.Y('casos notif dengue', axis=alt.Axis(title='Casos'))
+            )
+            return (tweets, casos).resolve_scale(y='independent')
+            """
+
+            #print(ks_cases)
+            if ks_cases == "['casos notif. dengue']":
+                df_grp.rename(columns={'casos notif. dengue':'casos notif dengue'}, inplace=True)
+                #df_grp.info()
+                return alt.Chart(df_grp).mark_trail().encode(
+                    alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)')),
+                    alt.Y('mencoes', axis=alt.Axis(title='Tweets')),
+                    alt.Y('casos notif dengue', axis=alt.Axis(title='Casos'))
+                ).resolve_scale(y='independent').properties(width=900)
+
+            elif ks_cases == "['casos notif. chik']":
+                df_grp.rename(columns={'casos notif. chik':'casos notif chik'}, inplace=True)
+                #df_grp.info()
+                return alt.Chart(df_grp).mark_trail().encode(
+                    alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)')),
+                    alt.Y('mencoes', axis=alt.Axis(title='Tweets')),
+                    alt.Y('casos notif chik', axis=alt.Axis(title='Casos'))
+                ).resolve_scale(y='independent').properties(width=900)
+
+            elif ks_cases == "['casos notif. zika']":
+                df_grp.rename(columns={'casos notif. zika':'casos notif zika'}, inplace=True)
+                #df_grp.info()
+                return alt.Chart(df_grp).mark_trail().encode(
+                    alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)')),
+                    alt.Y('mencoes', axis=alt.Axis(title='Tweets')),
+                    alt.Y('casos notif zika', axis=alt.Axis(title='Casos'))
+                ).resolve_scale(y='independent').properties(width=900)
+            else :
+                #df_grp.info()
+                return alt.Chart(df_grp).mark_trail().encode(
+                    alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)')),
+                    alt.Y('mencoes', axis=alt.Axis(title='Tweets')),
+                ).resolve_scale(y='independent').properties(width=900)
+
+            """
+            df.to_csv('df_agora.csv')
+            df_grp.rename(columns={'casos notif. dengue':'casos notif dengue'}, inplace=True)
+            df_grp.rename(columns={'casos notif. chik':'casos notif chik'}, inplace=True)
+            df_grp.rename(columns={'casos notif. zika':'casos notif zika'}, inplace=True)
+            df_grp.info()
+            return alt.Chart(df_grp).mark_trail().encode(
+                alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)')),
+                alt.Y('mencoes', axis=alt.Axis(title='Tweets')),
+            ).resolve_scale(y='independent').properties(width=1020)
+            """

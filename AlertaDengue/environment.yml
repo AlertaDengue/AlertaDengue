@@ -28,9 +28,9 @@ dependencies:
 - geopy
 - geopandas
 - sh
-- cufflinks-py
 - ipython
 - sqlparse
+- altair
 - pip
 - pip:
-    - plotly==2.5.1
+    - git+https://github.com/Jesse-jApps/django-altair

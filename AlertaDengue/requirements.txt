@@ -23,7 +23,7 @@ rasterio
 geopy
 geopandas
 sh
-plotly==2.5.1
-#cufflinks
+altair
+git+https://github.com/Jesse-jApps/django-altair
 ipython
 sqlparse

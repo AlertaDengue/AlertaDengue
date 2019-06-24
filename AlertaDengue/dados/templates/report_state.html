@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% load lookup %}
 {% load i18n %}
+{% load django_altair %}
+{% load staticfiles %}
 
 {% block extra_head %}
 
@@ -116,7 +118,9 @@
       }
 
 </style>
-<script src="/static/libs/plotlyjs/plotly-latest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vega/3.2.0/vega.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vega-lite/2.4.1/vega-lite.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vega-embed/3.0.0/vega-embed.min.js"></script>
 
 <script>
   function isInArray(el, array) {
@@ -200,6 +204,7 @@
     {% for regional_name in regional_names %}
       <li><a href="#{{regional_name}}">Regional {{regional_name}}</a></li>
     {% endfor %}
+
     </ul>
   </div>
 </div>
@@ -294,17 +299,20 @@
             <div class="fade show active" id="chart-dengue"
                  role="tabpanel" aria-labelledby="chart-dengue-tab"
             >
-              {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'dengue' | safe}}
+              {% render_chart regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'dengue' %}
+
             </div>
             <div class="fade" id="chart-chik" role="tabpanel"
                  aria-labelledby="char-chik-tab"
             >
-              {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'chik' | safe}}
+              {% render_chart regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'chik' %}
+
+              
             </div>
             <div class="fade" id="chart-zika" role="tabpanel"
                  aria-labelledby="chart-zika-tab"
             >
-              {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'zika' | safe}}
+              {% render_chart regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'zika' %}
             </div>
           </div>
         </div>
@@ -334,7 +342,8 @@
           arboviroses.
           </p>
 
-          {{chart_dengue_tweets|safe}}
+          <!-- gráfico 2 -->
+          {% render_chart chart_dengue_tweets %}
           <br/>&nbsp;
 
         </div>

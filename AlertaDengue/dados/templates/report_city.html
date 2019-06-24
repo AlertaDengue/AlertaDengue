@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load django_altair %}
+{% load staticfiles %}
 
 {% block extra_head %}
 
@@ -43,7 +45,9 @@
       }
 
 </style>
-<script src="/static/libs/plotlyjs/plotly-latest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vega/3.2.0/vega.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vega-lite/2.4.1/vega-lite.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vega-embed/3.0.0/vega-embed.min.js"></script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -103,7 +107,7 @@
       implementação de controle vetorial.
       </p>
 
-      {{chart_dengue_climate|safe}}
+      {% render_chart chart_dengue_climate %}
       <br/>&nbsp;
   </div>
 </div>
@@ -123,7 +127,7 @@
     arboviroses.
     </p>
 
-    {{chart_dengue_tweets|safe}}
+    {% render_chart chart_dengue_tweets %}
     <br/>&nbsp;
 
   </div>
@@ -155,7 +159,7 @@
       -->
     </p>
 
-    {{chart_dengue_incidence|safe}}
+    {% render_chart chart_dengue_incidence %}
     <br/>&nbsp;
     {{df_dengue|safe}}
 
@@ -196,7 +200,7 @@
       -->
     </p>
 
-    {{chart_chik_incidence|safe}}
+    {% render_chart chart_chik_incidence %}
     <br/>&nbsp;
     {{df_chik|safe}}
 
@@ -237,7 +241,7 @@
       -->
     </p>
 
-    {{chart_zika_incidence|safe}}
+    {% render_chart chart_zika_incidence %}
     <br/>&nbsp;
     {{df_zika|safe}}
 
