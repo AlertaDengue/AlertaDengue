@@ -1,10 +1,5 @@
-from plotly.offline.offline import _plot_html
-
-import cufflinks as cf
+import altair as alt
 import pandas as pd
-
-cf.set_config_file(theme='pearl', offline=True)
-
 
 class ReportCityCharts:
     @classmethod
@@ -47,7 +42,7 @@ class ReportCityCharts:
         df['limiar epidêmico'] = threshold_epidemic
         df['limiar pós epidêmico'] = threshold_pos_epidemic
         df['limiar pré epidêmico'] = threshold_pre_epidemic
-
+        """
         figure_bar = df.iplot(
             asFigure=True,
             kind='bar',
@@ -148,6 +143,17 @@ class ReportCityCharts:
             default_height=500,
             global_requirejs='',
         )[0]
+        """
+
+        data3 = pd.DataFrame({
+            'a': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
+            'b': [28, 55, 43, 91, 81, 53, 19, 87, 52]
+        })
+
+        return alt.Chart(data3).mark_bar().encode(
+            x='a',
+            y='b'
+        ).interactive()
 
     @classmethod
     def create_climate_chart(
@@ -176,7 +182,7 @@ class ReportCityCharts:
         )
 
         df_climate['Limiar favorável transmissão'] = climate_crit
-
+        """
         figure = df_climate.iplot(
             asFigure=True,
             x=['SE'],
@@ -208,6 +214,16 @@ class ReportCityCharts:
             default_height=500,
             global_requirejs='',
         )[0]
+        """
+        data3 = pd.DataFrame({
+            'a': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
+            'b': [28, 55, 43, 91, 81, 53, 19, 87, 52]
+        })
+
+        return alt.Chart(data3).mark_bar().encode(
+            x='a',
+            y='b'
+        ).interactive()
 
     @classmethod
     def create_tweet_chart(cls, df: pd.DataFrame, year_week):
@@ -228,7 +244,8 @@ class ReportCityCharts:
         )
 
         df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
-
+        
+        """
         figure = df_tweet.iplot(
             x=['SE'],
             y=['menções'],
@@ -259,7 +276,16 @@ class ReportCityCharts:
             default_height=500,
             global_requirejs='',
         )[0]
+        """
+        data3 = pd.DataFrame({
+            'a': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
+            'b': [28, 55, 43, 91, 81, 53, 19, 87, 52]
+        })
 
+        return alt.Chart(data3).mark_bar().encode(
+            x='a',
+            y='b'
+        ).interactive()
 
 class ReportStateCharts:
     @classmethod

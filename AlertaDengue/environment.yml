@@ -9,7 +9,7 @@ dependencies:
 - geojson
 - gunicorn
 - numpy
-- pandas==0.23.4
+- pandas
 - python-decouple
 - pytz
 - psycopg2
@@ -28,9 +28,9 @@ dependencies:
 - geopy
 - geopandas
 - sh
-- cufflinks-py
 - ipython
 - sqlparse
+- altair
 - pip
 - pip:
-    - plotly==2.5.1
+    - git+https://github.com/Jesse-jApps/django-altair
