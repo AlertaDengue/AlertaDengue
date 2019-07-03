@@ -42,6 +42,7 @@ class ReportCityCharts:
         df['limiar epidêmico'] = threshold_epidemic
         df['limiar pós epidêmico'] = threshold_pos_epidemic
         df['limiar pré epidêmico'] = threshold_pre_epidemic
+
         """
         figure_bar = df.iplot(
             asFigure=True,
@@ -144,16 +145,12 @@ class ReportCityCharts:
             global_requirejs='',
         )[0]
         """
-
-        data3 = pd.DataFrame({
-            'a': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
-            'b': [28, 55, 43, 91, 81, 53, 19, 87, 52]
-        })
-
-        return alt.Chart(data3).mark_bar().encode(
-            x='a',
-            y='b'
-        ).interactive()
+        
+        df_casos = df.rename(columns = {"casos notif.": "casosnotif"})
+        base = alt.Chart(df_casos).encode(alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)')))
+        bar = base.mark_bar().encode(alt.Y('incidência', axis=alt.Axis(title='Incidência')))
+        line = base.mark_line(color="#ffd100", strokeWidth=5).encode(alt.Y('casosnotif', axis=alt.Axis(title='Casos')))
+        return (bar + line).resolve_scale(y='independent').properties(width=1000)
 
     @classmethod
     def create_climate_chart(
@@ -215,15 +212,15 @@ class ReportCityCharts:
             global_requirejs='',
         )[0]
         """
-        data3 = pd.DataFrame({
-            'a': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
-            'b': [28, 55, 43, 91, 81, 53, 19, 87, 52]
-        })
+        
+        df_climate_chart = df_climate.rename(columns = { 
+            "temp.min":"temp_min", 
+            "Limiar favorável transmissão": "limiar_transmissao"})
 
-        return alt.Chart(data3).mark_bar().encode(
-            x='a',
-            y='b'
-        ).interactive()
+        return alt.Chart(df_climate_chart).mark_trail().encode(
+            alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)')),
+            alt.Y('temp_min', axis=alt.Axis(title='Temperatura'))
+        ).properties(width=1050)
 
     @classmethod
     def create_tweet_chart(cls, df: pd.DataFrame, year_week):
@@ -243,7 +240,7 @@ class ReportCityCharts:
             lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:])
         )
 
-        df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
+        #df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
         
         """
         figure = df_tweet.iplot(
@@ -277,15 +274,10 @@ class ReportCityCharts:
             global_requirejs='',
         )[0]
         """
-        data3 = pd.DataFrame({
-            'a': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
-            'b': [28, 55, 43, 91, 81, 53, 19, 87, 52]
-        })
-
-        return alt.Chart(data3).mark_bar().encode(
-            x='a',
-            y='b'
-        ).interactive()
+        return alt.Chart(df_tweet).mark_trail().encode(
+            alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)')),
+            alt.Y('tweets', axis=alt.Axis(title='Tweets'))
+        ).properties(width=1050)
 
 class ReportStateCharts:
     @classmethod
