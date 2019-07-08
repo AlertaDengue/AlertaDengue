@@ -1345,7 +1345,7 @@ class ReportStateView(TemplateView):
         ]
         cols_to_avg = [var_climate.replace('_', '.')]
 
-        df = df.groupby('SE')
+        df = df.groupby(df.index)
         df = (
             df[cols_to_sum]
             .sum()
@@ -1406,6 +1406,7 @@ class ReportStateView(TemplateView):
                 cities.keys()
             )
 
+            
             df = ReportState.read_disease_data(
                 year_week=year_week,
                 cities=cities,

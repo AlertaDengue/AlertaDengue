@@ -1398,7 +1398,7 @@ class ReportState:
         sql = ' SELECT {} FROM ({}) AS data'.format(','.join(k), sql)
 
         df = pd.read_sql(sql, index_col='SE', con=db_engine)
-
+        
         if not df.empty:
             dfs = []
 
@@ -1408,17 +1408,23 @@ class ReportState:
                 df['init_date_week'].max(),
                 freq='7D',
             )
+            
             df_date = pd.DataFrame({'init_date_week': ts_date})
 
             for geocode in df.geocode.unique():
-                df_ = df[df.geocode == geocode].sort_values('init_date_week')
 
+                df_ = df[df.geocode == geocode].sort_values('init_date_week')
+                df_['init_date_week'] = pd.to_datetime(df_['init_date_week'], errors='coerce')
+                
                 df_date_ = df_date.set_index(
                     df_.init_date_week.map(
                         lambda x: int(episem(str(x)[:10], sep=''))
                     ),
                     drop=True,
                 )
+                
+                df_date_.index.name = None
+                df_.index.name = None
 
                 dfs.append(
                     pd.merge(
@@ -1430,7 +1436,6 @@ class ReportState:
                         right_index=True,
                     )
                 )
-
             df = pd.concat(dfs)
 
         df.index.name = 'SE'
