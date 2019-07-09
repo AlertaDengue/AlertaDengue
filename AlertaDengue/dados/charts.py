@@ -301,11 +301,15 @@ class ReportStateCharts:
             .sum()
             .reset_index()
         )
+        print(df_grp)
 
         df_grp['SE'] = df_grp.SE.map(
             lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:])
         )
 
+        print(df_grp)
+
+        """
         fig_tweet = df_grp.iplot(
             x=['SE'],
             y=['menções'],
@@ -351,7 +355,7 @@ class ReportStateCharts:
             bordercolor='#E2E2E2',
             borderwidth=1,
         )
-
+        
         return _plot_html(
             figure_or_data=fig_cases,
             config={},
@@ -360,3 +364,21 @@ class ReportStateCharts:
             default_height=300,
             global_requirejs='',
         )[0]
+        """
+        """
+        df_grp.info()
+
+        return alt.Chart(df_grp).mark_trail().encode(
+            alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)')),
+            alt.Y('menções', axis=alt.Axis(title='menções'))
+        ).properties(width=1050)
+        """
+        data3 = pd.DataFrame({
+            'a': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
+            'b': [28, 55, 43, 91, 81, 53, 19, 87, 52]
+        })
+
+        return alt.Chart(data3).mark_bar().encode(
+            x='a',
+            y='b'
+        ).interactive()

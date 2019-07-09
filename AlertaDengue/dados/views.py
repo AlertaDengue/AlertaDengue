@@ -1345,7 +1345,8 @@ class ReportStateView(TemplateView):
         ]
         cols_to_avg = [var_climate.replace('_', '.')]
 
-        df = df.groupby(df.index)
+        df.index.name = None
+        df = df.groupby('SE')
         df = (
             df[cols_to_sum]
             .sum()
@@ -1439,6 +1440,8 @@ class ReportStateView(TemplateView):
                         '''.format(
                             d
                         )
+
+                    print(chart)
 
                     chart_cases_twitter[d] = chart
 
