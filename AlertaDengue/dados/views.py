@@ -1441,8 +1441,6 @@ class ReportStateView(TemplateView):
                             d
                         )
 
-                    print(chart)
-
                     chart_cases_twitter[d] = chart
 
                 cities_alert.update({row.geocode: values})

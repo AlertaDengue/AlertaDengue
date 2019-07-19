@@ -299,22 +299,20 @@
             <div class="fade show active" id="chart-dengue"
                  role="tabpanel" aria-labelledby="chart-dengue-tab"
             >
-              <!-- gráfico 1 -->
-              <!-- {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'dengue' | safe}} -->
+              {% render_chart regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'dengue' %}
+
             </div>
             <div class="fade" id="chart-chik" role="tabpanel"
                  aria-labelledby="char-chik-tab"
             >
-              <!-- gráfico 1 -->
-              {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'chik' | safe}}
+              {% render_chart regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'chik' %}
 
               
             </div>
             <div class="fade" id="chart-zika" role="tabpanel"
                  aria-labelledby="chart-zika-tab"
             >
-              <!-- gráfico 1 -->
-              {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'zika' | safe}}
+              {% render_chart regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'zika' %}
             </div>
           </div>
         </div>
