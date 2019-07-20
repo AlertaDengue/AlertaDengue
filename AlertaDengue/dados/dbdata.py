@@ -1216,6 +1216,8 @@ class ReportCity:
                 inplace=True,
             )
 
+            df.index.name = None
+            df_date.index.name = None
             df = pd.merge(
                 df,
                 df_date,

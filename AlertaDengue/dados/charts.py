@@ -1,9 +1,7 @@
-from plotly.offline.offline import _plot_html
+import plotly.express as px
+# import plotly.graph_objs as go
 
-import cufflinks as cf
 import pandas as pd
-
-cf.set_config_file(theme='pearl', offline=True)
 
 
 class ReportCityCharts:
@@ -48,9 +46,8 @@ class ReportCityCharts:
         df['limiar pós epidêmico'] = threshold_pos_epidemic
         df['limiar pré epidêmico'] = threshold_pre_epidemic
 
-        figure_bar = df.iplot(
-            asFigure=True,
-            kind='bar',
+        figure_bar = px.bar(
+            df,
             x=['SE'],
             y=[
                 'alerta verde',
@@ -59,9 +56,8 @@ class ReportCityCharts:
                 'alerta vermelho',
             ],
             legend=True,
-            showlegend=True,
-            yTitle='Incidência',
-            xTitle='Período (Ano/Semana)',
+            # yTitle='Incidência',
+            # xTitle='Período (Ano/Semana)',
             color=[
                 'rgb(0,255,0)',
                 'rgb(255,255,0)',
@@ -71,8 +67,8 @@ class ReportCityCharts:
             hoverinfo='x+y+name',
         )
 
-        figure_threshold = df.iplot(
-            asFigure=True,
+        figure_threshold = px.line(
+            df,
             x=['SE'],
             y=[
                 'limiar pré epidêmico',
@@ -80,17 +76,15 @@ class ReportCityCharts:
                 'limiar epidêmico',
             ],
             legend=False,
-            showlegend=False,
             color=['rgb(0,255,0)', 'rgb(255,150,0)', 'rgb(255,0,0)'],
             hoverinfo='none',
         )
 
-        figure_line = df.iplot(
-            asFigure=True,
+        figure_line = px.line(
+            df,
             x=['SE'],
             y=['casos notif.'],
             legend=False,
-            showlegend=False,
             secondary_y=['casos notif.'],
             secondary_y_title='Casos',
             hoverinfo='x+y+name',
@@ -122,7 +116,6 @@ class ReportCityCharts:
                 '{:.1f}'.format(threshold_pos_epidemic),
                 '{:.1f}'.format(threshold_epidemic),
             ),
-            showlegend=True,
         )
 
         figure_threshold.data.extend(figure_bar.data)
@@ -140,14 +133,15 @@ class ReportCityCharts:
             if trace['name'] == 'casos notif.':
                 trace['visible'] = 'legendonly'
 
-        return _plot_html(
-            figure_or_data=figure_line,
-            config={},
-            validate=True,
-            default_width='100%',
-            default_height=500,
-            global_requirejs='',
-        )[0]
+        # return _plot_html(
+        #     figure_or_data=figure_line,
+        #     config={},
+        #     validate=True,
+        #     default_width='100%',
+        #     default_height=500,
+        #     global_requirejs='',
+        # )[0]
+        return figure_line.to_html()
 
     @classmethod
     def create_climate_chart(
@@ -177,13 +171,18 @@ class ReportCityCharts:
 
         df_climate['Limiar favorável transmissão'] = climate_crit
 
-        figure = df_climate.iplot(
-            asFigure=True,
-            x=['SE'],
-            y=[k, 'Limiar favorável transmissão'],
-            showlegend=True,
-            yTitle=climate_title,
-            xTitle='Período (Ano/Semana)',
+        df_climate = df_climate.rename(
+            columns={
+                'Limiar favorável transmissão': 'Limiar_favorável_transmissão'
+            }
+        )
+        figure = px.line(
+            df_climate[k, 'Limiar favorável transmissão'].melt('SE'),
+            x='SE',
+            y='value',
+            color='variable'
+            # yTitle=climate_title,
+            # xTitle='Período (Ano/Semana)',
         )
 
         figure['layout']['xaxis1'].update(
@@ -200,14 +199,15 @@ class ReportCityCharts:
             borderwidth=1,
         )
 
-        return _plot_html(
-            figure_or_data=figure,
-            config={},
-            validate=True,
-            default_width='100%',
-            default_height=500,
-            global_requirejs='',
-        )[0]
+        # return _plot_html(
+        #     figure_or_data=figure,
+        #     config={},
+        #     validate=True,
+        #     default_width='100%',
+        #     default_height=500,
+        #     global_requirejs='',
+        # )[0]
+        return figure.to_html()
 
     @classmethod
     def create_tweet_chart(cls, df: pd.DataFrame, year_week):
@@ -229,11 +229,10 @@ class ReportCityCharts:
 
         df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
 
-        figure = df_tweet.iplot(
+        figure = px.line(
+            df_tweet,
             x=['SE'],
             y=['menções'],
-            asFigure=True,
-            showlegend=True,
             xTitle='Período (Ano/Semana)',
         )
         figure['layout']['xaxis1'].update(
@@ -251,14 +250,15 @@ class ReportCityCharts:
             borderwidth=1,
         )
 
-        return _plot_html(
-            figure_or_data=figure,
-            config={},
-            validate=True,
-            default_width='100%',
-            default_height=500,
-            global_requirejs='',
-        )[0]
+        # return _plot_html(
+        #     figure_or_data=figure,
+        #     config={},
+        #     validate=True,
+        #     default_width='100%',
+        #     default_height=500,
+        #     global_requirejs='',
+        # )[0]
+        return figure.to_html()
 
 
 class ReportStateCharts:
@@ -291,8 +291,6 @@ class ReportStateCharts:
         fig_tweet = df_grp.iplot(
             x=['SE'],
             y=['menções'],
-            asFigure=True,
-            showlegend=True,
             xTitle='Período (Ano/Semana)',
             color=['rgb(128,128,128)'],
         )
@@ -300,10 +298,8 @@ class ReportStateCharts:
         fig_cases = df_grp.iplot(
             x=['SE'],
             y=ks_cases,
-            asFigure=True,
             secondary_y=ks_cases,
             secondary_y_title='Casos',
-            showlegend=True,
             xTitle='Período (Ano/Semana)',
             color=['rgb(0,0,255)'],
         )
@@ -334,11 +330,12 @@ class ReportStateCharts:
             borderwidth=1,
         )
 
-        return _plot_html(
-            figure_or_data=fig_cases,
-            config={},
-            validate=True,
-            default_width='100%',
-            default_height=300,
-            global_requirejs='',
-        )[0]
+        # return _plot_html(
+        #     figure_or_data=fig_cases,
+        #     config={},
+        #     validate=True,
+        #     default_width='100%',
+        #     default_height=300,
+        #     global_requirejs='',
+        # )[0]
+        return fig_cases.to_html()
