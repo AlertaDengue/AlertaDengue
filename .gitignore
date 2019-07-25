@@ -36,3 +36,4 @@ Dockerfile-dev
 /dist/
 /build/
 /tiffs/
+.vscode

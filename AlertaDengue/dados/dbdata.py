@@ -1423,8 +1423,12 @@ class ReportState:
                     drop=True,
                 )
                 
-                df_date_.index.name = None
                 df_.index.name = None
+                df_date_.index.name = None
+
+                df_['init_date_week'] = pd.to_datetime(
+                    df_['init_date_week'], errors='coerce'
+                )
 
                 dfs.append(
                     pd.merge(
@@ -1438,7 +1442,6 @@ class ReportState:
                 )
             df = pd.concat(dfs)
 
-        df.index.name = 'SE'
         df.sort_index(ascending=True, inplace=True)
 
         for d in cls.diseases:

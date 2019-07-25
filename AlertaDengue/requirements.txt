@@ -24,6 +24,6 @@ geopy
 geopandas
 sh
 altair
-git+https://github.com/Jesse-jApps/django-altair
+git+https://github.com/xmnlab/django-altair.git@fix-output_div
 ipython
 sqlparse
