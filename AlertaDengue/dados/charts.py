@@ -1,5 +1,5 @@
 import plotly.express as px
-# import plotly.graph_objs as go
+import plotly.graph_objs as go
 
 import pandas as pd
 
@@ -46,92 +46,103 @@ class ReportCityCharts:
         df['limiar pós epidêmico'] = threshold_pos_epidemic
         df['limiar pré epidêmico'] = threshold_pre_epidemic
 
-        figure_bar = px.bar(
-            df,
-            x=['SE'],
-            y=[
-                'alerta verde',
-                'alerta amarelo',
-                'alerta laranja',
-                'alerta vermelho',
-            ],
-            legend=True,
+        ks_alert = [
+            'alerta verde',
+            'alerta amarelo',
+            'alerta laranja',
+            'alerta vermelho',
+        ]
+
+        figure = px.bar(
+            df[ks_alert + ['SE']].melt('SE'),
+            x='SE',
+            y='value',
+            # legend=True,
             # yTitle='Incidência',
             # xTitle='Período (Ano/Semana)',
-            color=[
-                'rgb(0,255,0)',
-                'rgb(255,255,0)',
-                'rgb(255,150,0)',
-                'rgb(255,0,0)',
-            ],
-            hoverinfo='x+y+name',
+            color='variable',
+            # hover_info='x+y+name',
         )
 
-        figure_threshold = px.line(
-            df,
-            x=['SE'],
-            y=[
-                'limiar pré epidêmico',
-                'limiar pós epidêmico',
-                'limiar epidêmico',
-            ],
-            legend=False,
-            color=['rgb(0,255,0)', 'rgb(255,150,0)', 'rgb(255,0,0)'],
-            hoverinfo='none',
+        ks_threshold = [
+            'limiar pré epidêmico',
+            'limiar pós epidêmico',
+            'limiar epidêmico',
+        ]
+
+        df_threshold = df[ks_threshold + ['SE']].melt('SE')
+
+        threshold_trace = go.Line(
+            x=df_threshold['SE'],
+            y=df_threshold['value'],
+            # legend=False,
+            color='variable',
+            # hoverinfo='none',
         )
 
-        figure_line = px.line(
-            df,
-            x=['SE'],
-            y=['casos notif.'],
-            legend=False,
-            secondary_y=['casos notif.'],
-            secondary_y_title='Casos',
-            hoverinfo='x+y+name',
-            color=['rgb(33,33,33)'],
+        notif_trace = go.Line(
+            x=df['SE'],
+            y=df['casos notif.'],
+            # legend=False,
+            # secondary_y=['casos notif.'],
+            # secondary_y_title='Casos',
+            # hoverinfo='x+y+name',
+            # color=['rgb(33,33,33)'],
+            name='Notificações',
+            marker={'color': 'rgb(33,33,33)'}
         )
 
-        figure_line['layout']['legend'].update(
-            x=-0.27,
-            y=0.5,
-            traceorder='normal',
-            font=dict(family='sans-serif', size=12, color='#000'),
-            bgcolor='#FFFFFF',
-            bordercolor='#E2E2E2',
-            borderwidth=1,
-            orientation='l',
+        # notif_trace['layout']['legend'].update(
+        #     x=-0.27,
+        #     y=0.5,
+        #     traceorder='normal',
+        #     font=dict(family='sans-serif', size=12, color='#000'),
+        #     bgcolor='#FFFFFF',
+        #     bordercolor='#E2E2E2',
+        #     borderwidth=1,
+        #     orientation='v',
+        # )
+
+        # notif_trace['layout']['yaxis1'].update(title='Incidência')
+
+        # notif_trace['layout'].update(
+        #     title=(
+        #         'Limiares de incidência:: '
+        #         + 'pré epidêmico=%s; '
+        #         + 'pós epidêmico=%s; '
+        #         + 'epidêmico=%s;'
+        #     )
+        #     % (
+        #         '{:.1f}'.format(threshold_pre_epidemic),
+        #         '{:.1f}'.format(threshold_pos_epidemic),
+        #         '{:.1f}'.format(threshold_epidemic),
+        #     ),
+        # )
+
+        # figure_threshold.data.extend(figure_bar.data)
+        # figure_line.data.extend(figure_threshold.data)
+
+        figure.add_trace(notif_trace)
+        # TODO: comment that when necessary
+        figure.add_trace(threshold_trace)
+
+        # figure['layout']['yaxis2'].update(
+        #     showgrid=False, range=[0, df['casos notif.'].max()]
+        # )
+
+        figure['layout']['xaxis1'].update(
+            tickangle=-60, nticks=len(df) // 4,
+            title='Período (Ano/Semana)'
         )
 
-        figure_line['layout']['yaxis1'].update(title='Incidência')
-
-        figure_line['layout'].update(
-            title=(
-                'Limiares de incidência:: '
-                + 'pré epidêmico=%s; '
-                + 'pós epidêmico=%s; '
-                + 'epidêmico=%s;'
-            )
-            % (
-                '{:.1f}'.format(threshold_pre_epidemic),
-                '{:.1f}'.format(threshold_pos_epidemic),
-                '{:.1f}'.format(threshold_epidemic),
-            ),
-        )
-
-        figure_threshold.data.extend(figure_bar.data)
-        figure_line.data.extend(figure_threshold.data)
-
-        figure_line['layout']['yaxis2'].update(
-            showgrid=False, range=[0, df['casos notif.'].max()]
-        )
-
-        figure_line['layout']['xaxis1'].update(
-            tickangle=-60, nticks=len(df) // 4, title='Período (Ano/Semana)'
-        )
-
-        for trace in figure_line['data']:
+        for trace in figure['data']:
             if trace['name'] == 'casos notif.':
                 trace['visible'] = 'legendonly'
+
+        # figure.for_each_trace(
+        #    lambda trace: trace.update(
+        #        name=trace.name.replace('variable=', '')),
+        # )
 
         # return _plot_html(
         #     figure_or_data=figure_line,
@@ -141,7 +152,7 @@ class ReportCityCharts:
         #     default_height=500,
         #     global_requirejs='',
         # )[0]
-        return figure_line.to_html()
+        return figure.to_html()
 
     @classmethod
     def create_climate_chart(
@@ -173,11 +184,12 @@ class ReportCityCharts:
 
         df_climate = df_climate.rename(
             columns={
-                'Limiar favorável transmissão': 'Limiar_favorável_transmissão'
+                'Limiar favorável transmissão': 'threshold_transmission'
             }
         )
+
         figure = px.line(
-            df_climate[k, 'Limiar favorável transmissão'].melt('SE'),
+            df_climate[['SE', 'threshold_transmission', k]].melt('SE'),
             x='SE',
             y='value',
             color='variable'
@@ -231,9 +243,9 @@ class ReportCityCharts:
 
         figure = px.line(
             df_tweet,
-            x=['SE'],
-            y=['menções'],
-            xTitle='Período (Ano/Semana)',
+            x='SE',
+            y='menções',
+            # xTitle='Período (Ano/Semana)',
         )
         figure['layout']['xaxis1'].update(
             tickangle=-60, nticks=len(df_tweet) // 4
