@@ -1423,9 +1423,6 @@ class ReportState:
                     drop=True,
                 )
                 
-                df_date_.index.name = None
-                df_.index.name = None
-
                 df_.index.name = None
                 df_date_.index.name = None
 

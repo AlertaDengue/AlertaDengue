@@ -239,6 +239,7 @@ class ReportCityCharts:
             .properties(width=1050)
         )
 
+
     @classmethod
     def create_tweet_chart(cls, df: pd.DataFrame, year_week):
         """
@@ -257,7 +258,6 @@ class ReportCityCharts:
             lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:])
         )
 
-        # df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
 
         """
         figure = df_tweet.iplot(
@@ -317,7 +317,9 @@ class ReportStateCharts:
 
         df.index.name = 'SE'
         df_tweet = df.reset_index()[['SE', 'tweets', k_cases]]
+
         df_tweet = df_tweet[df_tweet.SE >= year_week - 200]
+        #df_tweet.to_csv('df_tweet02.csv')
 
         df_grp = (
             df_tweet.groupby(df.index)[['tweets', k_cases]]
@@ -325,9 +327,7 @@ class ReportStateCharts:
             .reset_index()
         )
 
-        df_grp['SE'] = df_grp.SE.map(
-            lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:])
-        )
+        #df.to_csv('df2.csv')
 
         se = alt.Chart(df_grp).encode(
             alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)'))

@@ -1407,6 +1407,7 @@ class ReportStateView(TemplateView):
                 cities.keys()
             )
 
+            
             df = ReportState.read_disease_data(
                 year_week=year_week,
                 cities=cities,
