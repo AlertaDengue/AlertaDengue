@@ -1439,7 +1439,6 @@ class ReportState:
 
             df = pd.concat(dfs)
 
-        # df.index.name = 'SE'
         df.sort_index(ascending=True, inplace=True)
 
         for d in cls.diseases:
