@@ -1407,7 +1407,6 @@ class ReportStateView(TemplateView):
                 cities.keys()
             )
 
-            
             df = ReportState.read_disease_data(
                 year_week=year_week,
                 cities=cities,
@@ -1423,20 +1422,20 @@ class ReportStateView(TemplateView):
             chart_cases_twitter = {}
 
             for d in disease_key:
-                try:
-                    chart = ReportStateCharts.create_tweet_chart(
-                        df=df, year_week=year_week, disease=d
-                    )
-                except Exception:
-                    chart = '''
-                    <br/>
-                    <strong>Não há dados necessários para a geração do
-                    gráfico sobre {}.
-                    </strong>
-                    <br/>
-                    '''.format(
-                        d
-                    )
+                # TODO: check the data necessary to create the chart
+                # if False:
+                #     chart = '''
+                #     <br/>
+                #     <strong>Não há dados necessários para a geração do
+                #     gráfico sobre {}.
+                #     </strong>
+                #     <br/>
+                #     '''.format(
+                #         d
+                #     )
+                chart = ReportStateCharts.create_tweet_chart(
+                    df=df, year_week=year_week, disease=d
+                ).properties(width=1000)
 
                 chart_cases_twitter[d] = chart
 

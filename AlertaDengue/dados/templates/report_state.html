@@ -118,8 +118,8 @@
       }
 
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vega/3.2.0/vega.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vega-lite/2.4.1/vega-lite.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vega/5.0.0/vega.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vega-lite/3.3.0/vega-lite.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-embed/3.0.0/vega-embed.min.js"></script>
 
 <script>
@@ -275,42 +275,45 @@
 
       <div class="row my-3">
         <div class="col-md-12 mb-2">
-          <ul class="nav nav-tabs" id="charts-tab" role="tablist">
+          <ul class="nav nav-tabs" id="charts-{{regional_name}}-tab" role="tablist">
             <li class="nav-item">
-              <a class="nav-link active" id="chart-dengue-tab" data-toggle="tab"
-                 href="#chart-dengue" role="tab" aria-controls="chart-dengue"
+              <a class="nav-link active" id="chart-dengue-{{regional_name}}-tab" data-toggle="tab"
+                 href="#chart-dengue-{{regional_name}}" role="tab"
+                 aria-controls="chart-dengue-{{regional_name}}"
                  aria-selected="true">Dengue</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="chart-chik-tab" data-toggle="tab"
-                 href="#chart-chik" role="tab" aria-controls="chart-chik"
+              <a class="nav-link" id="chart-chik-{{regional_name}}-tab" data-toggle="tab"
+                 href="#chart-chik-{{regional_name}}" role="tab"
+                 aria-controls="chart-chik-{{regional_name}}"
                  aria-selected="false">Chikungunya</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" id="chart-zika-tab" data-toggle="tab"
-                 href="#chart-zika" role="tab" aria-controls="chart-zika"
+              <a class="nav-link" id="chart-zika-{{regional_name}}-tab" data-toggle="tab"
+                 href="#chart-zika-{{regional_name}}" role="tab"
+                 aria-controls="chart-zika-{{regional_name}}"
                  aria-selected="false">Zika</a>
             </li>
           </ul>
 
-          <div class="tab-content p-3" id="charts-content"
+          <div class="tab-content p-3" id="charts-content-{{regional_name}}"
                style="border: 1px solid #dfdfdf"
           >
-            <div class="fade show active" id="chart-dengue"
-                 role="tabpanel" aria-labelledby="chart-dengue-tab"
+            <div class="fade show active" id="chart-dengue-{{regional_name}}"
+                 role="tabpanel" aria-labelledby="chart-dengue-{{regional_name}}-tab"
             >
               {% render_chart regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'dengue' %}
 
             </div>
-            <div class="fade" id="chart-chik" role="tabpanel"
-                 aria-labelledby="char-chik-tab"
+            <div class="fade" id="chart-chik-{{regional_name}}" role="tabpanel"
+                 aria-labelledby="char-chik-{{regional_name}}-tab"
             >
               {% render_chart regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'chik' %}
 
-              
+
             </div>
-            <div class="fade" id="chart-zika" role="tabpanel"
-                 aria-labelledby="chart-zika-tab"
+            <div class="fade" id="chart-zika-{{regional_name}}" role="tabpanel"
+                 aria-labelledby="chart-zika-{{regional_name}}-tab"
             >
               {% render_chart regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'zika' %}
             </div>
