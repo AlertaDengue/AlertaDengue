@@ -31,4 +31,4 @@ dependencies:
 - sh
 - ipython
 - sqlparse
-- plotly=4.0.0rc1
+- plotly=4.0.0
