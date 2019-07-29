@@ -1,6 +1,5 @@
 import plotly.express as px
 import plotly.graph_objs as go
-
 import pandas as pd
 
 
@@ -60,8 +59,9 @@ class ReportCityCharts:
             # legend=True,
             # yTitle='Incidência',
             # xTitle='Período (Ano/Semana)',
-            # color='variable',
+            color='variable',
             # hover_info='x+y+name',
+                   
         )
 
         ks_threshold = [
@@ -135,6 +135,10 @@ class ReportCityCharts:
             title='Período (Ano/Semana)'
         )
 
+        figure['layout']['yaxis1'].update(
+            title='Incidência'
+        )
+
         for trace in figure['data']:
             if trace['name'] == 'casos notif.':
                 trace['visible'] = 'legendonly'
@@ -193,14 +197,16 @@ class ReportCityCharts:
             x='SE',
             y='value',
             color='variable'
-            # yTitle=climate_title,
-            # xTitle='Período (Ano/Semana)',
         )
-
+        
         figure['layout']['xaxis1'].update(
-            tickangle=-60, nticks=len(df_climate) // 4
+            tickangle=-60, nticks=len(df_climate) // 4,
+            title='Período (Ano/Semana)'
         )
-
+        figure['layout']['yaxis1'].update(
+            title='Temperatura'
+        )
+        
         figure['layout']['legend'].update(
             x=-0.1,
             y=1.2,
@@ -245,12 +251,16 @@ class ReportCityCharts:
             df_tweet,
             x='SE',
             y='menções',
-            # xTitle='Período (Ano/Semana)',
         )
+
         figure['layout']['xaxis1'].update(
-            tickangle=-60, nticks=len(df_tweet) // 4
+            tickangle=-60, nticks=len(df_tweet) // 4,
+            title='Período (Ano/Semana)'
         )
-        figure['layout']['yaxis1'].update(title='Tweets')
+        
+        figure['layout']['yaxis1'].update(
+            title='Tweets'
+        )
 
         figure['layout']['legend'].update(
             x=-0.1,
