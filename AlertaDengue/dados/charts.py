@@ -60,7 +60,7 @@ class ReportCityCharts:
             # legend=True,
             # yTitle='Incidência',
             # xTitle='Período (Ano/Semana)',
-            color='variable',
+            # color='variable',
             # hover_info='x+y+name',
         )
 
@@ -76,7 +76,7 @@ class ReportCityCharts:
             x=df_threshold['SE'],
             y=df_threshold['value'],
             # legend=False,
-            color='variable',
+            # color='variable',
             # hoverinfo='none',
         )
 
