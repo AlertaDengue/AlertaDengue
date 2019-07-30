@@ -51,9 +51,11 @@ class ReportCityCharts:
             'alerta laranja',
             'alerta vermelho',
         ]
-
+        
+        df_ks = df[ks_alert + ['SE']].melt('SE')
+    
         figure = px.bar(
-            df[ks_alert + ['SE']].melt('SE'),
+            df_ks,
             x='SE',
             y='value',
             # legend=True,
@@ -61,7 +63,6 @@ class ReportCityCharts:
             # xTitle='Período (Ano/Semana)',
             color='variable',
             # hover_info='x+y+name',
-            
         )
 
         ks_threshold = [
@@ -191,33 +192,46 @@ class ReportCityCharts:
             }
         )
 
-        figure = px.line(
-            df_climate[['SE', 'threshold_transmission', k]].melt('SE'),
-            x='SE',
-            y='value',
-            color='variable'
-            # yTitle=climate_title,
-            # xTitle='Período (Ano/Semana)',
-        )
-        
-        figure['layout']['xaxis1'].update(
-            tickangle=-60, nticks=len(df_climate) // 4,
-            title='Período (Ano/Semana)'
-        )
-        figure['layout']['yaxis1'].update(
-            title='Temperatura'
-        )
-        
+        df_clim = df_climate[['SE', 'threshold_transmission', k]].melt('SE')
 
-        figure['layout']['legend'].update(
-            x=-0.1,
-            y=1.2,
-            traceorder='normal',
-            font=dict(family='sans-serif', size=12, color='#000'),
-            bgcolor='#FFFFFF',
-            bordercolor='#E2E2E2',
-            borderwidth=1,
+        trace = go.Scatter(
+            x = df_clim['SE'],
+            y = df_clim['value'],
+            mode = 'lines',
+            name = 'Limiar Favorável'
+            )
+
+        layout = go.Layout(
+            title = "Condições Climáticas", 
+            showlegend = True,
+            xaxis=go.layout.XAxis(
+            title='Período (Ano/Semana)',
+            tickangle=-60, nticks=len(df_clim) // 8,
+            automargin=True),
+            yaxis=go.layout.YAxis(
+            title='Temperatura',
+            automargin=True)
         )
+        
+        figure = go.Figure(data = trace, layout = layout)
+
+        # figure = px.line(
+        #     df_climate[['SE', 'threshold_transmission', k]].melt('SE'),
+        #     x='SE',
+        #     y='value',
+        #     color='variable'
+        #     # yTitle=climate_title,
+        #     # xTitle='Período (Ano/Semana)',
+        # )
+        # figure['layout']['legend'].update(
+        #     x=-0.1,
+        #     y=1.2,
+        #     traceorder='normal',
+        #     font=dict(family='sans-serif', size=12, color='#000'),
+        #     bgcolor='#FFFFFF',
+        #     bordercolor='#E2E2E2',
+        #     borderwidth=1,
+        # )
 
         # return _plot_html(
         #     figure_or_data=figure,
@@ -248,32 +262,37 @@ class ReportCityCharts:
         )
 
         df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
-
-        figure = px.line(
-            df_tweet,
-            x='SE',
-            y='menções',
-            # xTitle='Período (Ano/Semana)',
+        
+        trace = go.Scatter(
+            x = df_tweet['SE'],
+            y = df_tweet['menções'],
+            mode = 'lines',
+            name = 'Tweets'
         )
 
-        figure['layout']['xaxis1'].update(
+        layout = go.Layout(
+            title = "Menção arboviroses", 
+            showlegend = True,
+            xaxis=go.layout.XAxis(
+            title='Período (Ano/Semana)',
             tickangle=-60, nticks=len(df_tweet) // 4,
-            title='Período (Ano/Semana)'
+            automargin=True),
+            yaxis=go.layout.YAxis(
+            title='Tweets',
+            automargin=True)
         )
         
-        figure['layout']['yaxis1'].update(
-            title='Tweets'
-        )
-
-        figure['layout']['legend'].update(
-            x=-0.1,
-            y=1.2,
-            traceorder='normal',
-            font=dict(family='sans-serif', size=12, color='#000'),
-            bgcolor='#FFFFFF',
-            bordercolor='#E2E2E2',
-            borderwidth=1,
-        )
+        figure = go.Figure(data = trace, layout = layout)
+ 
+        # figure['layout']['legend'].update(
+        #     x=-0.1,
+        #     y=1.2,
+        #     traceorder='normal',
+        #     font=dict(family='sans-serif', size=12, color='#000'),
+        #     bgcolor='#FFFFFF',
+        #     bordercolor='#E2E2E2',
+        #     borderwidth=1,
+        # )
 
         # return _plot_html(
         #     figure_or_data=figure,
