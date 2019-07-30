@@ -61,7 +61,7 @@ class ReportCityCharts:
             # xTitle='Período (Ano/Semana)',
             color='variable',
             # hover_info='x+y+name',
-                   
+            
         )
 
         ks_threshold = [
@@ -105,20 +105,6 @@ class ReportCityCharts:
 
         # notif_trace['layout']['yaxis1'].update(title='Incidência')
 
-        # notif_trace['layout'].update(
-        #     title=(
-        #         'Limiares de incidência:: '
-        #         + 'pré epidêmico=%s; '
-        #         + 'pós epidêmico=%s; '
-        #         + 'epidêmico=%s;'
-        #     )
-        #     % (
-        #         '{:.1f}'.format(threshold_pre_epidemic),
-        #         '{:.1f}'.format(threshold_pos_epidemic),
-        #         '{:.1f}'.format(threshold_epidemic),
-        #     ),
-        # )
-
         # figure_threshold.data.extend(figure_bar.data)
         # figure_line.data.extend(figure_threshold.data)
 
@@ -138,7 +124,20 @@ class ReportCityCharts:
         figure['layout']['yaxis1'].update(
             title='Incidência'
         )
-
+        figure['layout'].update(
+            title=(
+                'Limiares de incidência:: '
+                + 'pré epidêmico=%s; '
+                + 'pós epidêmico=%s; '
+                + 'epidêmico=%s;'
+            )
+            % (
+                '{:.1f}'.format(threshold_pre_epidemic),
+                '{:.1f}'.format(threshold_pos_epidemic),
+                '{:.1f}'.format(threshold_epidemic),
+            ),
+        )
+        
         for trace in figure['data']:
             if trace['name'] == 'casos notif.':
                 trace['visible'] = 'legendonly'
@@ -197,6 +196,8 @@ class ReportCityCharts:
             x='SE',
             y='value',
             color='variable'
+            # yTitle=climate_title,
+            # xTitle='Período (Ano/Semana)',
         )
         
         figure['layout']['xaxis1'].update(
@@ -207,6 +208,7 @@ class ReportCityCharts:
             title='Temperatura'
         )
         
+
         figure['layout']['legend'].update(
             x=-0.1,
             y=1.2,
@@ -251,6 +253,7 @@ class ReportCityCharts:
             df_tweet,
             x='SE',
             y='menções',
+            # xTitle='Período (Ano/Semana)',
         )
 
         figure['layout']['xaxis1'].update(
