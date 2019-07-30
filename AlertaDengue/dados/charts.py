@@ -2,7 +2,6 @@ import plotly.express as px
 import plotly.graph_objs as go
 import pandas as pd
 
-
 class ReportCityCharts:
     @classmethod
     def create_incidence_chart(
@@ -53,17 +52,23 @@ class ReportCityCharts:
         ]
         
         df_ks = df[ks_alert + ['SE']].melt('SE')
-    
-        figure = px.bar(
-            df_ks,
-            x='SE',
-            y='value',
-            # legend=True,
-            # yTitle='Incidência',
-            # xTitle='Período (Ano/Semana)',
-            color='variable',
-            # hover_info='x+y+name',
+
+        figure = go.Scatter(
+            x = df_ks['SE'],
+            y = df_ks['value'],
+            mode = 'markers',         
         )
+
+        # figure = px.bar(
+        #     df_ks,
+        #     x='SE',
+        #     y='value',
+        #     # legend=True,
+        #     # yTitle='Incidência',
+        #     # xTitle='Período (Ano/Semana)',
+        #     color='variable',
+        #     # hover_info='x+y+name',
+        # )
 
         ks_threshold = [
             'limiar pré epidêmico',
@@ -73,24 +78,38 @@ class ReportCityCharts:
 
         df_threshold = df[ks_threshold + ['SE']].melt('SE')
 
-        threshold_trace = go.Line(
-            x=df_threshold['SE'],
-            y=df_threshold['value'],
-            # legend=False,
-            # color='variable',
-            # hoverinfo='none',
+        # threshold_trace = go.Line(
+        #     x=df_threshold['SE'],
+        #     y=df_threshold['value'],
+        #     # legend=False,
+        #     # color='variable',
+        #     # hoverinfo='none',
+        # )
+
+        threshold_trace = go.Scatter(
+            x = df_threshold['SE'],
+            y = df_threshold['value'],
+            mode = 'markers',
+            name = 'Threshold'
         )
 
-        notif_trace = go.Line(
-            x=df['SE'],
-            y=df['casos notif.'],
-            # legend=False,
-            # secondary_y=['casos notif.'],
-            # secondary_y_title='Casos',
-            # hoverinfo='x+y+name',
-            # color=['rgb(33,33,33)'],
-            name='Notificações',
-            marker={'color': 'rgb(33,33,33)'}
+        # notif_trace = go.Line(
+        #     x=df['SE'],
+        #     y=df['casos notif.'],
+        #     # legend=False,
+        #     # secondary_y=['casos notif.'],
+        #     # secondary_y_title='Casos',
+        #     # hoverinfo='x+y+name',
+        #     # color=['rgb(33,33,33)'],
+        #     name='Notificações',
+        #     marker={'color': 'rgb(33,33,33)'}
+        # )
+        
+        notif_trace = go.Scatter(
+            x = df['SE'],
+            y = df['casos notif.'],
+            mode = 'lines',
+            name = 'Notificações'
         )
 
         # notif_trace['layout']['legend'].update(
@@ -109,23 +128,7 @@ class ReportCityCharts:
         # figure_threshold.data.extend(figure_bar.data)
         # figure_line.data.extend(figure_threshold.data)
 
-        figure.add_trace(notif_trace)
-        # TODO: comment that when necessary
-        figure.add_trace(threshold_trace)
-
-        # figure['layout']['yaxis2'].update(
-        #     showgrid=False, range=[0, df['casos notif.'].max()]
-        # )
-
-        figure['layout']['xaxis1'].update(
-            tickangle=-60, nticks=len(df) // 4,
-            title='Período (Ano/Semana)'
-        )
-
-        figure['layout']['yaxis1'].update(
-            title='Incidência'
-        )
-        figure['layout'].update(
+        layout = go.Layout(
             title=(
                 'Limiares de incidência:: '
                 + 'pré epidêmico=%s; '
@@ -136,8 +139,49 @@ class ReportCityCharts:
                 '{:.1f}'.format(threshold_pre_epidemic),
                 '{:.1f}'.format(threshold_pos_epidemic),
                 '{:.1f}'.format(threshold_epidemic),
-            ),
+            ),    
+            xaxis=go.layout.XAxis(
+            title='Período (Ano/Semana)',
+            tickangle=-60, nticks=len(df) // 4,
+            automargin=True),
+            yaxis=go.layout.YAxis(
+            title='Incidência',
+            automargin=True)
         )
+        
+        data = [threshold_trace, notif_trace]
+
+        figure = go.Figure(data = data, layout = layout)   
+        
+        # figure.add_trace(notif_trace)
+        # # TODO: comment that when necessary
+        # figure.add_trace(threshold_trace)
+
+        # figure['layout']['yaxis2'].update(
+        #     showgrid=False, range=[0, df['casos notif.'].max()]
+        # )
+
+        # figure['layout']['xaxis1'].update(
+        #     tickangle=-60, nticks=len(df) // 4,
+        #     title='Período (Ano/Semana)'
+        # )
+
+        # figure['layout']['yaxis1'].update(
+        #     title='Incidência'
+        # )
+        # figure['layout'].update(
+        #     title=(
+        #         'Limiares de incidência:: '
+        #         + 'pré epidêmico=%s; '
+        #         + 'pós epidêmico=%s; '
+        #         + 'epidêmico=%s;'
+        #     )
+        #     % (
+        #         '{:.1f}'.format(threshold_pre_epidemic),
+        #         '{:.1f}'.format(threshold_pos_epidemic),
+        #         '{:.1f}'.format(threshold_epidemic),
+        #     ),
+        # )
         
         for trace in figure['data']:
             if trace['name'] == 'casos notif.':
@@ -267,7 +311,7 @@ class ReportCityCharts:
             x = df_tweet['SE'],
             y = df_tweet['menções'],
             mode = 'lines',
-            name = 'Tweets'
+            name = 'Menções'
         )
 
         layout = go.Layout(
