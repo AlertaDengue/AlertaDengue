@@ -3,7 +3,6 @@ import plotly.graph_objs as go
 import pandas as pd
 from plotly.subplots import make_subplots
 
-
 class ReportCityCharts:
     @classmethod
     def create_incidence_chart(
@@ -50,88 +49,39 @@ class ReportCityCharts:
         
         figure = make_subplots(specs=[[{"secondary_y": True}]])
       
-        #figure = go.Figure()
-
-        # figure_bar  = [
-        #   go.Bar(
-        #     x = df_ks['SE'], 
-        #     y = df_ks['value'],
-        #     )
-        # ] 
-
-        # # figure = go.Scatter(
-        # #     x = df_ks['SE'],
-        # #     y = df_ks['value'],
-        # #     mode = 'markers',         
-        # # )
-
-        # # figure = px.bar(
-        # #     df_ks,
-        # #     x='SE',
-        # #     y='value',
-        # #     # legend=True,
-        # #     # yTitle='Incidência',
-        # #     # xTitle='Período (Ano/Semana)',
-        # #     color='variable',
-        # #     # hover_info='x+y+name',
-        # # )
-
-        figure.add_trace(
-            go.Scatter(
-                x=df['SE'],
-                y=df['limiar pré epidêmico'],
-                name='Limiar pré epidêmico',
-                marker={'color': 'rgb(0,255,0)'}
-            ),
-            secondary_y=True,               
-        )
-
-        figure.add_trace(
-            go.Scatter(
-                x=df['SE'],
-                y=df['limiar epidêmico'],
-                name='Limiar epidêmico',
-                marker={'color': 'rgb(255,0,0)'}
-            ),
-            secondary_y=True,               
-        )
-
-        figure.add_trace(
-            go.Scatter(
-                x=df['SE'],
-                y=df['limiar pós epidêmico'],
-                name='Limiar pós epidêmico',
-                marker={'color': 'rgb(255,150,0)'}
-            ),
-            secondary_y=True,              
-        )
-
-        # # threshold_trace = go.Line(
-        # #     x=df_threshold['SE'],
-        # #     y=df_threshold['value'],
-        # #     # legend=False,
-        # #     # color='variable',
-        # #     # hoverinfo='none',
-        # # )
-
-        # threshold_trace = go.Scatter(
-        #     x = df_threshold['SE'],
-        #     y = df_threshold['value'],
-        #     #mode = 'markers',
-        #     #name = 'Threshold'
-        # )
-        # Create figure with secondary y-axis
-        
-
         figure.add_trace(
             go.Scatter(
                 x = df['SE'],
                 y = df['casos notif.'],
                 name='Casos notificações',
-                marker={'color': 'rgb(33,33,33)'}
+                marker={'color': 'rgb(33,33,33)'},
             ),
             secondary_y=True,
-        )
+        )   
+              
+        ks_limiar = [            
+            'limiar pré epidêmico',         
+            'limiar pós epidêmico',
+            'limiar epidêmico',
+            
+        ]
+
+        colors = [
+            'rgb(0,255,0)', 
+            'rgb(255,150,0)', 
+            'rgb(255,0,0)'
+        ]
+            
+        for k, c in zip(ks_limiar, colors):
+            figure.add_trace(
+                go.Scatter(
+                    x = df['SE'], 
+                    y = df[k],
+                    name=k.title(),
+                    marker={'color': c}
+                ),
+                secondary_y=True, 
+            )
 
         ks_alert = [
             'alerta verde',
@@ -157,27 +107,9 @@ class ReportCityCharts:
                 ),
                 secondary_y=False, 
             )
-        
-        #['rgb(0,255,0)', 'rgb(255,150,0)', 'rgb(255,0,0)'],
-        # # notif_trace = go.Line(
-        # #     x=df['SE'],
-        # #     y=df['casos notif.'],
-        # #     # legend=False,
-        # #     # secondary_y=['casos notif.'],
-        # #     # secondary_y_title='Casos',
-        # #     # hoverinfo='x+y+name',
-        # #     # color=['rgb(33,33,33)'],
-        # #     name='Notificações',
-        # #     marker={'color': 'rgb(33,33,33)'}
-        # # )
-        
-        # notif_trace = go.Scatter(
-        #     x = df['SE'],
-        #     y = df['casos notif.'],
-        #     #mode = 'lines',
-        #     #name = 'Notificações'
-        # )
-     
+
+
+
         figure.update_layout(
             xaxis=dict(
                 title='Período (Ano/Semana)',
@@ -194,17 +126,20 @@ class ReportCityCharts:
                     color='rgb(82, 82, 82)',
                 ),
             ),
-            # yaxis1=dict(
-            #     title='Incidência',
-            #     showgrid=False,
-            #     zeroline=False,
-            #     showline=True,
-            #     showticklabels=False,
-            # ),
+            yaxis=dict(
+                 title='Incidência',
+                 showgrid=False,
+                 zeroline=False,
+                 showline=True,
+                 showticklabels=False,
+            ),
             showlegend=True,
             plot_bgcolor='white'
         )
-
+        figure.update_yaxes(
+            title_text="<b>Casos</b>", 
+            secondary_y=True
+        )
         # # notif_trace['layout']['legend'].update(
         # #     x=-0.27,
         # #     y=0.5,
@@ -253,7 +188,9 @@ class ReportCityCharts:
                 '{:.1f}'.format(threshold_pre_epidemic),
                 '{:.1f}'.format(threshold_pos_epidemic),
                 '{:.1f}'.format(threshold_epidemic),
-            ),
+            ),            
+            font=dict(
+                family='sans-serif', size=12, color='#000'),
         )
         
         for trace in figure['data']:
