@@ -108,8 +108,6 @@ class ReportCityCharts:
                 secondary_y=False, 
             )
 
-
-
         figure.update_layout(
             xaxis=dict(
                 title='Período (Ano/Semana)',
@@ -150,33 +148,7 @@ class ReportCityCharts:
         # #     borderwidth=1,
         # #     orientation='v',
         # # )
-
-        # # notif_trace['layout']['yaxis1'].update(title='Incidência')
-
-        # # figure_threshold.data.extend(figure_bar.data)
-        # # figure_line.data.extend(figure_threshold.data)
-
-        #data = [figure_bar]
-
-        #figure = go.Figure(data = , layout = layout)   
-        
-        #figure.add_trace(notif_trace)
-        # # TODO: comment that when necessary
-        #figure.add_trace(threshold_trace)
-
-        # figure['layout']['yaxis2'].update(
-        #     showgrid=False, range=[0, df['casos notif.'].max()]
-        # )
-
-        # figure['layout']['xaxis1'].update(
-        #     tickangle=-60, nticks=len(df) // 4,
-        #     title='Período (Ano/Semana)'
-        # )
-
-        # figure['layout']['yaxis1'].update(
-        #     title='Incidência'
-        # )
-        
+       
         figure['layout'].update(
             title=(
                 'Limiares de incidência:: '
@@ -197,19 +169,6 @@ class ReportCityCharts:
             if trace['name'] == 'casos notif.':
                 trace['visible'] = 'legendonly'
 
-        # figure.for_each_trace(
-        #    lambda trace: trace.update(
-        #        name=trace.name.replace('variable=', '')),
-        # )
-
-        # return _plot_html(
-        #     figure_or_data=figure_line,
-        #     config={},
-        #     validate=True,
-        #     default_width='100%',
-        #     default_height=500,
-        #     global_requirejs='',
-        # )[0]
         return figure.to_html()
 
     @classmethod
@@ -246,46 +205,47 @@ class ReportCityCharts:
             }
         )
 
-        df_clim = df_climate[['SE', 'threshold_transmission', k]].melt('SE')
+        # df_clima = df_climate[['SE', 'threshold_transmission', k]].melt('SE')
 
-        trace = go.Scatter(
-            x = df_clim['SE'],
-            y = df_clim['value'],
-            mode = 'lines',
-            name = 'Limiar Favorável'
-            )
-
-        layout = go.Layout(
-            title = "Condições Climáticas", 
-            showlegend = True,
-            xaxis=go.layout.XAxis(
-            title='Período (Ano/Semana)',
-            tickangle=-60, nticks=len(df_clim) // 8,
-            automargin=True),
-            yaxis=go.layout.YAxis(
-            title='Temperatura',
-            automargin=True)
+        figure = go.Figure()
+        figure.add_trace(
+            go.Scatter(
+                x = df_climate['SE'],
+                y = df_climate['threshold_transmission'],
+                name='Limiar Favorável',
+                marker={'color': 'rgb(51, 172, 255)'},
+            ),            
         )
         
-        figure = go.Figure(data = trace, layout = layout)
+        figure.add_trace(
+            go.Scatter(
+                x = df_climate['SE'],
+                y = df_climate[k],
+                name='Temperatura min.',
+                marker={'color': 'rgb(255,150,0)'},
+            ),            
+        ) 
 
-        # figure = px.line(
-        #     df_climate[['SE', 'threshold_transmission', k]].melt('SE'),
-        #     x='SE',
-        #     y='value',
-        #     color='variable'
-        #     # yTitle=climate_title,
-        #     # xTitle='Período (Ano/Semana)',
-        # )
-        # figure['layout']['legend'].update(
-        #     x=-0.1,
-        #     y=1.2,
-        #     traceorder='normal',
-        #     font=dict(family='sans-serif', size=12, color='#000'),
-        #     bgcolor='#FFFFFF',
-        #     bordercolor='#E2E2E2',
-        #     borderwidth=1,
-        # )
+        figure.update_layout(
+                #title = "Condições Climáticas para transmissão de arboviroses",
+                xaxis=dict(
+                    title='Período (Ano/Semana)',
+                    tickangle=-60, nticks=len(df_climate) // 4,
+                ),
+                yaxis=dict(
+                    title='Temperatura',
+                )
+        )
+
+        figure['layout']['legend'].update(
+            x=-0.1,
+            y=1.2,
+            traceorder='normal',
+            font=dict(family='sans-serif', size=12, color='#000'),
+            bgcolor='#FFFFFF',
+            bordercolor='#E2E2E2',
+            borderwidth=1,
+        )
 
         # return _plot_html(
         #     figure_or_data=figure,
