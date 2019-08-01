@@ -51,8 +51,8 @@ class ReportCityCharts:
       
         figure.add_trace(
             go.Scatter(
-                x = df['SE'],
-                y = df['casos notif.'],
+                x=df['SE'],
+                y=df['casos notif.'],
                 name='Casos notificações',
                 marker={'color': 'rgb(33,33,33)'},
             ),
@@ -75,14 +75,14 @@ class ReportCityCharts:
         for k, c in zip(ks_limiar, colors):
             figure.add_trace(
                 go.Scatter(
-                    x = df['SE'], 
-                    y = df[k],
+                    x=df['SE'], 
+                    y=df[k],
                     name=k.title(),
                     marker={'color': c}
                 ),
                 secondary_y=True, 
             )
-
+        
         ks_alert = [
             'alerta verde',
             'alerta amarelo',
@@ -100,8 +100,8 @@ class ReportCityCharts:
         for k, c in zip(ks_alert, colors):
             figure.add_trace(
                 go.Bar(
-                    x = df['SE'], 
-                    y = df[k],
+                    x=df['SE'], 
+                    y=df[k],
                     name=k.title(),
                     marker={'color': c}
                 ),
@@ -208,43 +208,48 @@ class ReportCityCharts:
         # df_clima = df_climate[['SE', 'threshold_transmission', k]].melt('SE')
 
         figure = go.Figure()
+
         figure.add_trace(
             go.Scatter(
-                x = df_climate['SE'],
-                y = df_climate['threshold_transmission'],
+                x=df_climate['SE'],
+                y=df_climate['threshold_transmission'],
                 name='Limiar Favorável',
                 marker={'color': 'rgb(51, 172, 255)'},
-            ),            
+            ),       
         )
         
         figure.add_trace(
             go.Scatter(
-                x = df_climate['SE'],
-                y = df_climate[k],
+                x=df_climate['SE'],
+                y=df_climate[k],
                 name='Temperatura min.',
                 marker={'color': 'rgb(255,150,0)'},
             ),            
         ) 
 
         figure.update_layout(
-                #title = "Condições Climáticas para transmissão de arboviroses",
+                #title = "",
                 xaxis=dict(
                     title='Período (Ano/Semana)',
                     tickangle=-60, nticks=len(df_climate) // 4,
                 ),
                 yaxis=dict(
                     title='Temperatura',
-                )
+                 showline=True,
+                 showticklabels=False,
+                ),
+                showlegend=True,
+                plot_bgcolor='white'
         )
-
+           
         figure['layout']['legend'].update(
-            x=-0.1,
-            y=1.2,
-            traceorder='normal',
-            font=dict(family='sans-serif', size=12, color='#000'),
-            bgcolor='#FFFFFF',
-            bordercolor='#E2E2E2',
-            borderwidth=1,
+                x=-0.1,
+                y=1.2,
+                traceorder='normal',
+                font=dict(family='sans-serif', size=12, color='#000'),
+                bgcolor='#FFFFFF',
+                bordercolor='#E2E2E2',
+                borderwidth=1,
         )
 
         # return _plot_html(
@@ -276,27 +281,30 @@ class ReportCityCharts:
         )
 
         df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
-        
-        trace = go.Scatter(
-            x = df_tweet['SE'],
-            y = df_tweet['menções'],
-            mode = 'lines',
-            name = 'Menções'
-        )
 
-        layout = go.Layout(
-            title = "Menção arboviroses", 
-            showlegend = True,
-            xaxis=go.layout.XAxis(
-            title='Período (Ano/Semana)',
-            tickangle=-60, nticks=len(df_tweet) // 4,
-            automargin=True),
-            yaxis=go.layout.YAxis(
-            title='Tweets',
-            automargin=True)
-        )
-        
-        figure = go.Figure(data = trace, layout = layout)
+        figure = go.Figure()
+     
+        figure.add_trace(
+            go.Scatter(
+                x=df_tweet['SE'],
+                y=df_tweet['menções'],
+                name = 'Menções',
+                marker={'color': 'rgb(255,150,0)'},
+            ),
+      
+        ) 
+
+        figure.update_layout(
+                title = "Menção arboviroses",
+                showlegend = True, 
+                xaxis=dict(
+                    title='Período (Ano/Semana)',
+                    tickangle=-60, nticks=len(df_tweet) // 4,
+                ),
+                yaxis=go.layout.YAxis(
+                    title='Tweets',
+                    automargin=True),
+        )                
         
         # figure['layout']['legend'].update(
         #     x=-0.1,
@@ -307,15 +315,7 @@ class ReportCityCharts:
         #     bordercolor='#E2E2E2',
         #     borderwidth=1,
         # )
-
-        # return _plot_html(
-        #     figure_or_data=figure,
-        #     config={},
-        #     validate=True,
-        #     default_width='100%',
-        #     default_height=500,
-        #     global_requirejs='',
-        # )[0]
+        
         return figure.to_html()
 
 class ReportStateCharts:
@@ -345,54 +345,88 @@ class ReportStateCharts:
             lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:])
         )
 
-        fig_tweet = df_grp.iplot(
-            x=['SE'],
-            y=['menções'],
-            xTitle='Período (Ano/Semana)',
-            color=['rgb(128,128,128)'],
+        # fig_tweet = df_grp.iplot(
+        #     x=['SE'],
+        #     y=['menções'],
+        #     xTitle='Período (Ano/Semana)',
+        #     color=['rgb(128,128,128)'],
+        # )
+
+        # fig_cases = df_grp.iplot(
+        #     x=['SE'],
+        #     y=ks_cases,
+        #     secondary_y=ks_cases,
+        #     secondary_y_title='Casos',
+        #     xTitle='Período (Ano/Semana)',
+        #     color=['rgb(0,0,255)'],
+        # )
+
+        # fig_cases.data.extend(fig_tweet.data)
+
+        # fig_cases['layout']['xaxis1'].update(
+        #     tickangle=-60, nticks=len(df_grp) // 24
+        # )
+        # fig_cases['layout']['yaxis1'].update(
+        #     title='Tweets', range=[0, df_grp['menções'].max()]
+        # )
+        # fig_cases['layout']['yaxis2'].update(
+        #     range=[0, df_grp[ks_cases].max().max()]
+        # )
+
+        # fig_cases['layout'].update(
+        #     title='Casos {} / Menções mídia social'.format(disease)
+        # )
+
+        figure = make_subplots(specs=[[{"secondary_y": True}]])
+
+        figure.add_trace(
+            go.Scatter(
+                x=['SE'],
+                y=['menções'],
+                name='Menciones',
+                marker={'color': 'rgb(51, 172, 255)'},
+            ),            
+            secondary_y=True,          
+        )
+        
+        figure.add_trace(
+            go.Scatter(
+                x=['SE'],
+                y=ks_cases,
+                name='Casos',
+                marker={'color': 'rgb(255,150,0)'},
+            ),
+            secondary_y=False,           
+        ) 
+
+        figure.update_layout(
+                title='Menções mídia social',
+                xaxis=dict(
+                    title='Período (Ano/Semana)',
+                    tickangle=-60, nticks=len(df_climate) // 4,
+                ),
+                yaxis=dict(
+                    title='Temperatura',
+                 showline=True,
+                 showticklabels=False,
+                ),
+                showlegend=True,
+                plot_bgcolor='white'
         )
 
-        fig_cases = df_grp.iplot(
-            x=['SE'],
-            y=ks_cases,
-            secondary_y=ks_cases,
-            secondary_y_title='Casos',
-            xTitle='Período (Ano/Semana)',
-            color=['rgb(0,0,255)'],
+        figure.update_yaxes(
+                title_text="Y_axies", 
+                secondary_y=True
+        )               
+
+        figure['layout']['legend'].update(
+                x=-0.1,
+                y=1.2,
+                traceorder='normal',
+                font=dict(family='sans-serif', size=12, color='#000'),
+                bgcolor='#FFFFFF',
+                bordercolor='#E2E2E2',
+                borderwidth=1,
         )
 
-        fig_cases.data.extend(fig_tweet.data)
-
-        fig_cases['layout']['xaxis1'].update(
-            tickangle=-60, nticks=len(df_grp) // 24
-        )
-        fig_cases['layout']['yaxis1'].update(
-            title='Tweets', range=[0, df_grp['menções'].max()]
-        )
-        fig_cases['layout']['yaxis2'].update(
-            range=[0, df_grp[ks_cases].max().max()]
-        )
-
-        fig_cases['layout'].update(
-            title='Casos {} / Menções mídia social'.format(disease)
-        )
-
-        fig_cases['layout']['legend'].update(
-            x=-0.1,
-            y=1.2,
-            traceorder='normal',
-            font=dict(family='sans-serif', size=12, color='#000'),
-            bgcolor='#FFFFFF',
-            bordercolor='#E2E2E2',
-            borderwidth=1,
-        )
-
-        # return _plot_html(
-        #     figure_or_data=fig_cases,
-        #     config={},
-        #     validate=True,
-        #     default_width='100%',
-        #     default_height=300,
-        #     global_requirejs='',
-        # )[0]
-        return fig_cases.to_html()
+        return figure_cases.to_html()
