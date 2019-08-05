@@ -28,9 +28,6 @@ dependencies:
 - geopy
 - geopandas
 - sh
-- cufflinks-py
 - ipython
 - sqlparse
-- pip
-- pip:
-    - plotly==2.5.1
+- plotly=4.0.0
