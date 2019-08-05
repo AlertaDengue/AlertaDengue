@@ -45,8 +45,6 @@ class ReportCityCharts:
         df['limiar pós epidêmico'] = threshold_pos_epidemic
         df['limiar pré epidêmico'] = threshold_pre_epidemic
 
-        # df_ks = df[ks_alert + ['SE']].melt('SE')
-
         figure = make_subplots(specs=[[{"secondary_y": True}]])
 
         figure.add_trace(
@@ -132,8 +130,8 @@ class ReportCityCharts:
                 gridcolor='rgb(176, 196, 222)',
             ),
             showlegend=True,
-            plot_bgcolor='rgb(245, 246, 249)',
-            paper_bgcolor='rgb(212, 227, 249)',
+            plot_bgcolor='rgb(255, 255, 255)',
+            paper_bgcolor='rgb(245, 246, 249)',
             width=1100,
             height=500,
         )
@@ -255,8 +253,8 @@ class ReportCityCharts:
                 gridcolor='rgb(176, 196, 222)',
             ),
             showlegend=True,
-            plot_bgcolor='rgb(245, 246, 249)',
-            paper_bgcolor='rgb(212, 227, 249)',
+            plot_bgcolor='rgb(255, 255, 255)',
+            paper_bgcolor='rgb(245, 246, 249)',
             width=1100,
             height=500,
         )
@@ -271,14 +269,6 @@ class ReportCityCharts:
             borderwidth=1,
         )
 
-        # return _plot_html(
-        #     figure_or_data=figure,
-        #     config={},
-        #     validate=True,
-        #     default_width='100%',
-        #     default_height=500,
-        #     global_requirejs='',
-        # )[0]
         return figure.to_html()
 
     @classmethod
@@ -335,8 +325,8 @@ class ReportCityCharts:
                 gridcolor='rgb(176, 196, 222)',
             ),
             showlegend=True,
-            plot_bgcolor='rgb(245, 246, 249)',
-            paper_bgcolor='rgb(212, 227, 249)',
+            plot_bgcolor='rgb(255, 255, 255)',
+            paper_bgcolor='rgb(245, 246, 249)',
             width=1100,
             height=500,
 
@@ -381,38 +371,6 @@ class ReportStateCharts:
         df_grp['SE'] = df_grp.SE.map(
             lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:])
         )
-
-        # fig_tweet = df_grp.iplot(
-        #     x=['SE'],
-        #     y=['menções'],
-        #     xTitle='Período (Ano/Semana)',
-        #     color=['rgb(128,128,128)'],
-        # )
-
-        # fig_cases = df_grp.iplot(
-        #     x=['SE'],
-        #     y=ks_cases,
-        #     secondary_y=ks_cases,
-        #     secondary_y_title='Casos',
-        #     xTitle='Período (Ano/Semana)',
-        #     color=['rgb(0,0,255)'],
-        # )
-
-        # fig_cases.data.extend(fig_tweet.data)
-
-        # fig_cases['layout']['xaxis1'].update(
-        #     tickangle=-60, nticks=len(df_grp) // 24
-        # )
-        # fig_cases['layout']['yaxis1'].update(
-        #     title='Tweets', range=[0, df_grp['menções'].max()]
-        # )
-        # fig_cases['layout']['yaxis2'].update(
-        #     range=[0, df_grp[ks_cases].max().max()]
-        # )
-
-        # fig_cases['layout'].update(
-        #     title='Casos {} / Menções mídia social'.format(disease)
-        # )
 
         figure = make_subplots(specs=[[{"secondary_y": True}]])
 
@@ -459,8 +417,8 @@ class ReportStateCharts:
                 gridcolor='rgb(176, 196, 222)',
             ),
             showlegend=True,
-            plot_bgcolor='rgb(245, 246, 249)',
-            paper_bgcolor='rgb(212, 227, 249)',
+            plot_bgcolor='rgb(255, 255, 255)',
+            paper_bgcolor='rgb(245, 246, 249)',
             width=1100,
             height=500,
         )

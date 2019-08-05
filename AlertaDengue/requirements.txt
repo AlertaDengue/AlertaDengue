@@ -23,6 +23,6 @@ rasterio
 geopy
 geopandas
 sh
-plotly==4.0.0rc1
+plotly==4.0.0
 ipython
 sqlparse

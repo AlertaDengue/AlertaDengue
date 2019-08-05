@@ -1,7 +1,6 @@
 name: alertadengue
 channels:
   - conda-forge
-  - plotly/label/test
   - defaults
 dependencies:
 - django
