@@ -32,7 +32,7 @@ class ReportCityCharts:
         df = df[df.SE >= year_week - 200]
 
         df['SE'] = df.SE.map(lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:]))
-
+        """
         k = 'incidência'
 
         df['alerta verde'] = df[df.level_code == 1][k]
@@ -44,7 +44,7 @@ class ReportCityCharts:
         df['limiar pós epidêmico'] = threshold_pos_epidemic
         df['limiar pré epidêmico'] = threshold_pre_epidemic
 
-        """
+
         figure_bar = df.iplot(
             asFigure=True,
             kind='bar',
@@ -146,19 +146,39 @@ class ReportCityCharts:
             global_requirejs='',
         )[0]
         """
-
         df_casos = df.rename(columns={"casos notif.": "casosnotif"})
+
+        # Legendas
+        df_casos.insert(1, 'labelIncidencia', 'incidência')
+        df_casos.insert(2, 'labelCasos', 'Casos')
+
         base = alt.Chart(df_casos).encode(
             alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)'))
         )
-        bar = base.mark_bar().encode(
-            alt.Y('incidência', axis=alt.Axis(title='Incidência'))
+        bar = (
+            base.mark_bar()
+            .encode(
+                alt.Y('incidência:Q', axis=alt.Axis(title='Incidência')),
+                alt.Color('labelIncidencia', legend=alt.Legend(title='')),
+            )
+            .interactive()
         )
-        line = base.mark_line(color="#ffd100", strokeWidth=5).encode(
-            alt.Y('casosnotif', axis=alt.Axis(title='Casos'))
+
+        line = (
+            base.mark_line(color="#ffd100", strokeWidth=5)
+            .encode(
+                alt.Y('casosnotif:Q', axis=alt.Axis(title='Casos')),
+                alt.Color('labelCasos', legend=alt.Legend(title='')),
+            )
+            .interactive()
         )
+
         return (
-            (bar + line).resolve_scale(y='independent').properties(width=1000)
+            (bar + line)
+            .resolve_scale(y='independent')
+            .configure_legend(orient='bottom')
+            .configure_axis(labelColor='black')
+            .properties(width=1050)
         )
 
     @classmethod
@@ -231,19 +251,17 @@ class ReportCityCharts:
 
         return (
             alt.Chart(df_climate_chart)
-            .mark_trail()
+            .mark_trail(strokeWidth=2, color='orange')
             .encode(
                 alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)')),
-                alt.Y('temp_min', axis=alt.Axis(title='Temperatura')),
+                alt.Y('temp_min:Q', axis=alt.Axis(title='Temperatura')),
             )
             .properties(width=1050)
         )
 
-
     @classmethod
     def create_tweet_chart(cls, df: pd.DataFrame, year_week):
         """
-
         :param df:
         :param var_climate:
         :param year_week:
@@ -257,7 +275,6 @@ class ReportCityCharts:
         df_tweet['SE'] = df_tweet.SE.map(
             lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:])
         )
-
 
         """
         figure = df_tweet.iplot(
@@ -293,10 +310,10 @@ class ReportCityCharts:
         """
         return (
             alt.Chart(df_tweet)
-            .mark_trail()
+            .mark_trail(strokeWidth=2, color='orange')
             .encode(
                 alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)')),
-                alt.Y('tweets', axis=alt.Axis(title='Tweets')),
+                alt.Y('tweets:Q', axis=alt.Axis(title='Tweets')),
             )
             .properties(width=1050)
         )
@@ -319,24 +336,45 @@ class ReportStateCharts:
         df_tweet = df.reset_index()[['SE', 'tweets', k_cases]]
 
         df_tweet = df_tweet[df_tweet.SE >= year_week - 200]
-        #df_tweet.to_csv('df_tweet02.csv')
 
         df_grp = (
-            df_tweet.groupby(df.index)[['tweets', k_cases]]
-            .sum()
-            .reset_index()
+            df_tweet.groupby(df.index)[['tweets', k_cases]].sum().reset_index()
         )
 
-        #df.to_csv('df2.csv')
+        df_grp['SE'] = df_grp.SE.map(
+            lambda v: '%s/%s' % (str(v)[:4], str(v)[-2:])
+        )
+
+        # Legendas
+        df_grp.insert(1, 'Tweets', 'Tweets')
+        df_grp.insert(2, 'Casos', 'Casos')
 
         se = alt.Chart(df_grp).encode(
             alt.X('SE:T', axis=alt.Axis(title='Período (Ano/Semana)'))
         )
-        tweets = se.mark_trail().encode(
-            alt.Y('tweets', axis=alt.Axis(title='Tweets'))
-        )
-        casos = se.mark_trail().encode(
-            alt.Y(k_cases, axis=alt.Axis(title='Casos'))
+
+        tweets = (
+            se.mark_line(strokeWidth=2, color='blue')
+            .encode(
+                alt.Y('tweets:Q', axis=alt.Axis(title='Tweets')),
+                alt.Color('Tweets', legend=alt.Legend(title='')),
+            )
+            .interactive()
         )
 
-        return (tweets + casos).resolve_scale(y='independent')
+        casos = (
+            se.mark_trail(strokeWidth=2, color='orange')
+            .encode(
+                alt.Y(k_cases + ':Q', axis=alt.Axis(title='Casos')),
+                alt.Color('Casos', legend=alt.Legend(title='')),
+            )
+            .interactive()
+        )
+
+        return (
+            (tweets + casos)
+            .resolve_scale(y='independent')
+            .configure_legend(orient='bottom')
+            .configure_axis(labelColor='black')
+            .properties(width=1050)
+        )
