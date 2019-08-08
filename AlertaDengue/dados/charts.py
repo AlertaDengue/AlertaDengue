@@ -114,7 +114,7 @@ class ReportCityCharts:
             xaxis=dict(
                 title='Período (Ano/Semana)',
                 tickangle=-60,
-                nticks=len(df) // 8,
+                nticks=len(df) // 4,
                 showline=True,
                 showgrid=True,
                 showticklabels=True,
@@ -248,7 +248,7 @@ class ReportCityCharts:
             xaxis=dict(
                 title='Período (Ano/Semana)',
                 tickangle=-60,
-                nticks=len(df_climate) // 8,
+                nticks=len(df_climate) // 4,
                 showline=True,
                 showgrid=True,
                 showticklabels=True,
@@ -324,7 +324,7 @@ class ReportCityCharts:
             xaxis=dict(
                 title='Período (Ano/Semana)',
                 tickangle=-60,
-                nticks=len(df_tweet) // 8,
+                nticks=len(df_tweet) // 4,
                 showline=True,
                 showgrid=True,
                 showticklabels=True,
@@ -421,7 +421,7 @@ class ReportStateCharts:
             xaxis=dict(
                 title='Período (Ano/Semana)',
                 tickangle=-60,
-                nticks=len(ks_cases) // 8,
+                nticks=len(ks_cases) // 4,
                 showline=True,
                 showgrid=True,
                 showticklabels=True,
