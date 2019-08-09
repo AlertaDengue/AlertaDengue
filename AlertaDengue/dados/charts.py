@@ -51,8 +51,11 @@ class ReportCityCharts:
             go.Scatter(
                 x=df['SE'],
                 y=df['casos notif.'],
-                name='Casos notificações',
+                name='Notificações',
                 marker={'color': 'rgb(33,33,33)'},
+                text=df.SE.map(lambda v: '{}'.format(str(v)[-2:])),
+                hoverinfo='text',
+                hovertemplate="Semana %{text} : %{y:1f} Casos",
             ),
             secondary_y=True,
         )
@@ -63,10 +66,7 @@ class ReportCityCharts:
             'limiar epidêmico',
         ]
 
-        colors = ['rgb(0,255,0)',
-                  'rgb(255,150,0)',
-                  'rgb(255,0,0)',
-                  ]
+        colors = ['rgb(0,255,0)', 'rgb(255,150,0)', 'rgb(255,0,0)']
 
         for k, c in zip(ks_limiar, colors):
             figure.add_trace(
@@ -74,7 +74,10 @@ class ReportCityCharts:
                     x=df['SE'],
                     y=df[k],
                     name=k.title(),
-                    marker={'color': c}
+                    marker={'color': c},
+                    text=df.SE.map(lambda v: '{}'.format(str(v)[-2:])),
+                    hoverinfo='text',
+                    hovertemplate="Semana %{text} : %{y:1f} Casos",
                 ),
                 secondary_y=True,
             )
@@ -98,8 +101,11 @@ class ReportCityCharts:
                 go.Bar(
                     x=df['SE'],
                     y=df[k],
+                    marker={'color': c},
                     name=k.title(),
-                    marker={'color': c}
+                    text=df.SE.map(lambda v: '{}'.format(str(v)[-2:])),
+                    hoverinfo='text',
+                    hovertemplate="Semana %{text} : %{y:1f} Casos",
                 ),
                 secondary_y=False,
             )
@@ -195,6 +201,7 @@ class ReportCityCharts:
         :return:
         """
         k = var_climate.replace('_', '.')
+
         df_climate = df.reset_index()[['SE', k]]
         df_climate = df_climate[df_climate.SE >= year_week - 200]
 
@@ -218,6 +225,9 @@ class ReportCityCharts:
                 y=df_climate['threshold_transmission'],
                 name='Limiar Favorável',
                 marker={'color': 'rgb(51, 172, 255)'},
+                text=df_climate.SE.map(lambda v: '{}'.format(str(v)[-2:])),
+                hoverinfo='text',
+                hovertemplate="Semana %{text} : %{y:1f}°C",
             )
         )
 
@@ -227,6 +237,9 @@ class ReportCityCharts:
                 y=df_climate[k],
                 name='Temperatura min.',
                 marker={'color': 'rgb(255,150,0)'},
+                text=df_climate.SE.map(lambda v: '{}'.format(str(v)[-2:])),
+                hoverinfo='text',
+                hovertemplate="Semana %{text} : %{y:1f}°C",
             )
         )
 
@@ -251,6 +264,7 @@ class ReportCityCharts:
                 linecolor='rgb(204, 204, 204)',
                 linewidth=0,
                 gridcolor='rgb(176, 196, 222)',
+                hoverformat=".1f",
             ),
             showlegend=True,
             plot_bgcolor='rgb(255, 255, 255)',
@@ -299,6 +313,9 @@ class ReportCityCharts:
                 y=df_tweet['menções'],
                 name='Menções',
                 marker={'color': 'rgb(0,0,255)'},
+                text=df_tweet.SE.map(lambda v: '{}'.format(str(v)[-2:])),
+                hoverinfo='text',
+                hovertemplate="Semana %{text} : %{y} Tweets",
             )
         )
 
@@ -329,7 +346,6 @@ class ReportCityCharts:
             paper_bgcolor='rgb(245, 246, 249)',
             width=1100,
             height=500,
-
         )
 
         figure['layout']['legend'].update(
@@ -380,6 +396,9 @@ class ReportStateCharts:
                 y=['menções'],
                 name='Menciones',
                 marker={'color': 'rgb(51, 172, 255)'},
+                text=df_grp.SE.map(lambda v: '{}'.format(str(v)[-2:])),
+                hoverinfo='text',
+                hovertemplate="Semana %{text} : %{y:.1f} Casos",
             ),
             secondary_y=True,
         )
@@ -390,6 +409,9 @@ class ReportStateCharts:
                 y=ks_cases,
                 name='Casos',
                 marker={'color': 'rgb(255,150,0)'},
+                text=df_grp.SE.map(lambda v: '{}'.format(str(v)[-2:])),
+                hoverinfo='text',
+                hovertemplate="Semana %{text} : %{y:.1f} Casos",
             ),
             secondary_y=False,
         )
@@ -423,10 +445,7 @@ class ReportStateCharts:
             height=500,
         )
 
-        figure.update_yaxes(
-            title_text="Y_axies",
-            secondary_y=True
-        )
+        figure.update_yaxes(title_text="Y_axies", secondary_y=True)
 
         figure['layout']['legend'].update(
             x=-0.1,
