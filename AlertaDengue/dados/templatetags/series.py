@@ -1,8 +1,7 @@
-from datetime import timedelta
 from django import template
 from time import mktime
 
-from ..dbdata import load_series, get_series_by_UF
+from ..dbdata import load_series
 
 import json
 
@@ -110,79 +109,3 @@ def alerta_series(context):
     result.update(forecast_data)
 
     return result
-
-
-@register.inclusion_tag("total_series.html", takes_context=True)
-def total_series_dengue(context):
-    _context = total_series(context, disease='dengue')
-    _context.update({'disease_label': 'Dengue'})
-    return _context
-
-
-@register.inclusion_tag("total_series.html", takes_context=True)
-def total_series_chik(context):
-    _context = total_series(context, disease='chikungunya')
-    _context.update({'disease_label': 'Chikungunya'})
-    return _context
-
-
-@register.inclusion_tag("total_series.html", takes_context=True)
-def total_series_zika(context):
-    _context = total_series(context, disease='zika')
-    _context.update({'disease_label': 'Zika'})
-    return _context
-
-
-def total_series(context, disease):
-    '''
-
-    :param context:
-    :param disease: dengue|chikungunya|zika
-    :return:
-    '''
-    # gc = context['geocodigos'][0]
-    series = (
-        get_series_by_UF(disease)
-        if 'case_series' not in context
-        else context['case_series'][disease]
-    )
-
-    if series.empty:
-        return {
-            'ufs': [],
-            'start': None,
-            'series': {},
-            'series_est': {},
-            'disease': disease,
-        }
-
-    ufs = list(set(series.uf.tolist()))
-    # 51 weeks to get the end of the SE
-    start = series.data.max() - timedelta(weeks=51)
-    start = int(mktime(start.timetuple()))
-    casos = {}
-    casos_est = {}
-
-    for uf in ufs:
-        series_uf = series[series.uf == uf]
-        datas = [
-            int(mktime(d.timetuple())) * 1000 for d in series_uf.data[-52:]
-        ]
-        casos[uf] = [
-            list(t)
-            for t in zip(datas, series_uf.casos_s[-52:].astype('int').tolist())
-        ]
-        casos_est[uf] = [
-            list(t)
-            for t in zip(
-                datas, series_uf.casos_est_s[-52:].astype('int').tolist()
-            )
-        ]
-
-    return {
-        'ufs': ufs,
-        'start': start,
-        'series': casos,
-        'series_est': casos_est,
-        'disease': disease,
-    }

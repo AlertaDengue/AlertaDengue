@@ -32,7 +32,11 @@ from .dbdata import (
 from .episem import episem, episem2date
 from .maps import get_city_info
 from .models import City, RegionalHealth
-from .charts import ReportCityCharts, ReportStateCharts
+from .charts import (
+    ReportCityCharts,
+    ReportStateCharts,
+    HomeCharts
+)
 from gis.geotiff import convert_from_shapefile
 
 DBF = apps.get_model('dbf', 'DBF')
@@ -462,6 +466,12 @@ class AlertaMainView(TemplateView):
                 'last_se': last_se,
                 'card_cols': card_cols,
                 'chart_cols': chart_cols,
+                # TODO: passar o df para o método que cria o chart
+                #       gerar o gráfico referente ao dado
+                #       atualmente apenas retorna um gráfico demo
+                'chart_dengue': HomeCharts.create_dengue_chart({}),
+                'chart_chik': HomeCharts.create_chik_chart({}),
+                'chart_zika': HomeCharts.create_zika_chart({}),
             }
         )
 
