@@ -474,9 +474,17 @@ class HomeCharts:
         'Minas Gerais': 'rgb(0,0,255)',
         'Rio de Janeiro': 'rgb(255,255,0)',
         'São Paulo': 'rgb(0,255,255)',
-        'Santa Catarina': 'rgb(0,128,128)',
     }
 
+    labels = {
+        'Ceará': 'Ceará', 
+        'Espírito Santo':'Espírito Santo',
+        'Paraná': 'Paraná',
+        'Minas Gerais': 'Minas Gerais',
+        'Rio de Janeiro': 'Rio de Janeiro',
+        'São Paulo': 'São Paulo',
+    }
+       
     @classmethod
     def total_series(cls, case_series, disease):
         '''
@@ -551,16 +559,68 @@ class HomeCharts:
 
         df_ufs = pd.concat(dfs, sort=True)
 
-        fig = go.Figure()
+        fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-        for k in df_ufs.columns:
-            trace = go.Scatter(
-                y=df_ufs[k],
-                x=df_ufs.index,
-                name=k,
-                marker={'color': cls.colors[k]}
+        for k in df_ufs:
+            fig.add_trace(
+                go.Scatter(
+                    x=df_ufs.index,
+                    y=df_ufs[k],                   
+                    name=k,            
+                    marker={'color': cls.colors[k]},
+                    # text=df_ufs[k],
+                    hovertemplate = '%{x}<br>'
+                                    '%{y} Casos Estimados<br>'
+                                    '<extra></extra>',                    
+                                    #  '%{text}',
+            ),
+                secondary_y=True,
             )
-            fig.add_trace(trace)
+
+            fig.update_layout(
+                title='Casos Estimados de' '%{}',
+                xaxis=dict(
+                    #title='Período (Ano/Semana)',
+                    tickangle=-60,
+                    nticks=len(df) // 4,
+                    showline=True,
+                    showgrid=True,
+                    showticklabels=True,
+                    linecolor='rgb(204, 204, 204)',
+                    linewidth=0,
+                    gridcolor='rgb(176, 196, 222)',
+                    ticks='outside',
+                    tickfont=dict(
+                        family='Arial', size=12, color='rgb(82, 82, 82)'
+                    ),
+                ),
+                yaxis=dict(
+                    title='Incidência',
+                    showline=True,
+                    showgrid=True,
+                    showticklabels=True,
+                    linecolor='rgb(204, 204, 204)',
+                    linewidth=0,
+                    gridcolor='rgb(176, 196, 222)',
+                ),
+                showlegend=True,
+                plot_bgcolor='rgb(255, 255, 255)',
+                paper_bgcolor='rgb(255, 255, 255)',
+                width=1100,
+                height=500,
+            )
+
+            fig.update_yaxes(
+                title_text="Pessoas",
+                secondary_y=True,
+                showline=True,
+                showgrid=True,
+                showticklabels=True,
+                linecolor='rgb(204, 204, 204)',
+                linewidth=0,
+                gridcolor='rgb(204, 204, 204)',
+            )
+   
         return fig.to_html()
 
     @classmethod

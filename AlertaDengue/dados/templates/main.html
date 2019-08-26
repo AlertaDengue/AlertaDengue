@@ -67,9 +67,9 @@
 {% block content %}
     <div class="container-fluid">
         <!-- chart-plot:begin -->
-        <div class="row">
+        <div>
             <div class="col-sm-{{chart_cols}}">
-                <div class="card my-2">
+                <div>
                   <div class="card-body">
                     {{ chart_dengue | safe }}
                   </div>
@@ -77,7 +77,7 @@
             </div>
             {% if n_alerts_chik > 0 %}
             <div class="col-sm-{{chart_cols}}">
-                <div class="card my-2">
+                <div>
                   <div class="card-body">
                     {{ chart_chik | safe }}
                   </div>
@@ -87,7 +87,7 @@
 
             {% if n_alerts_zika > 0 %}
             <div class="col-sm-{{chart_cols}}">
-                <div class="card">
+                <div>
                   <div class="card-body">
                     {{ chart_zika | safe }}
                   </div>
