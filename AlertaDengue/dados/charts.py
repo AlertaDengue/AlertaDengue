@@ -529,9 +529,9 @@ class HomeCharts:
 
     @classmethod
     def _create_chart(cls, case_series, disease):
-        series_est = cls.total_series(
-            case_series, disease=disease
-        )['series_est']
+        series_est = cls.total_series(case_series, disease=disease)[
+            'series_est'
+        ]
 
         dfs = []
         for k, v in series_est.items():
@@ -544,41 +544,32 @@ class HomeCharts:
 
         df_ufs = pd.concat(dfs, sort=True)
 
-        fig = make_subplots(
-            subplot_titles=("Casos estimados de Dengue", 
-                        "Casos estimados de Chikungunya", 
-                        "Casos estimados de Zika"), 
-            specs=[[{"secondary_y": True}]]
-            )
+        fig = make_subplots(specs=[[{"secondary_y": True}]])
 
         for k in df_ufs:
             fig.add_trace(
                 go.Scatter(
                     x=df_ufs.index,
-                    y=df_ufs[k],                   
-                    name=k,            
+                    y=df_ufs[k],
+                    name=k,
                     marker={'color': cls.colors[k]},
-                    hovertemplate = '%{x}<br>'
-                                    '%{y} Casos Estimados<br>'
-                                    '<extra></extra>',                    
-            ),
+                    hovertemplate='%{x}<br>'
+                    '%{y} Casos Estimados<br>'
+                    '<extra></extra>',
+                ),
                 secondary_y=True,
             )
 
             fig.update_layout(
-                height=350, 
-                width=1000, 
-                #title_text="Casos Estimados",
+                height=350,
+                width=1000,
+                title_text="Casos estimados de {}".format(disease),
                 plot_bgcolor='rgb(255, 255, 255)',
                 paper_bgcolor='rgb(255, 255, 255)',
                 showlegend=True,
-                font=dict(
-                    family="sans-serif",
-                    size=14,
-                    color="black"
-                    ),
+                font=dict(family="sans-serif", size=14, color="black"),
                 xaxis=dict(
-                    #title='',
+                    # title='',
                     tickangle=-60,
                     nticks=len(df) // 3,
                     showline=True,
@@ -593,7 +584,7 @@ class HomeCharts:
                     ),
                 ),
                 yaxis=dict(
-                    #title='',
+                    # title='',
                     showline=True,
                     showgrid=True,
                     showticklabels=True,
@@ -601,7 +592,6 @@ class HomeCharts:
                     linewidth=0,
                     gridcolor='rgb(176, 196, 222)',
                 ),
-
             )
 
             fig.update_yaxes(
@@ -614,9 +604,8 @@ class HomeCharts:
                 linewidth=0,
                 gridcolor='rgb(204, 204, 204)',
             )
-   
+
         return fig.to_html()
-        
 
     @classmethod
     def create_dengue_chart(cls, case_series):
@@ -627,5 +616,5 @@ class HomeCharts:
         return cls._create_chart(case_series, 'chikungunya')
 
     @classmethod
-    def create_zika_chart(cls, case_series):       
+    def create_zika_chart(cls, case_series):
         return cls._create_chart(case_series, 'zika')
