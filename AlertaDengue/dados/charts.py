@@ -20,10 +20,8 @@ class ReportCityCharts:
         threshold_epidemic: float,
     ):
         """
-
         @see: https://stackoverflow.com/questions/45526734/
             hide-legend-entries-in-a-plotly-figure
-
         :param df:
         :param year_week:
         :param threshold_pre_epidemic: float,
@@ -198,7 +196,6 @@ class ReportCityCharts:
         climate_title,
     ):
         """
-
         :param df:
         :param var_climate:
         :param year_week:
@@ -294,7 +291,6 @@ class ReportCityCharts:
     @classmethod
     def create_tweet_chart(cls, df: pd.DataFrame, year_week):
         """
-
         :param df:
         :param var_climate:
         :param year_week:
@@ -371,7 +367,6 @@ class ReportStateCharts:
     @classmethod
     def create_tweet_chart(cls, df: pd.DataFrame, year_week, disease: str):
         """
-
         :param df:
         :param year_week:
         :param disease:
@@ -476,19 +471,9 @@ class HomeCharts:
         'São Paulo': 'rgb(0,255,255)',
     }
 
-    labels = {
-        'Ceará': 'Ceará', 
-        'Espírito Santo':'Espírito Santo',
-        'Paraná': 'Paraná',
-        'Minas Gerais': 'Minas Gerais',
-        'Rio de Janeiro': 'Rio de Janeiro',
-        'São Paulo': 'São Paulo',
-    }
-       
     @classmethod
     def total_series(cls, case_series, disease):
         '''
-
         :param case_series:
         :param disease: dengue|chikungunya|zika
         :return:
@@ -559,7 +544,10 @@ class HomeCharts:
 
         df_ufs = pd.concat(dfs, sort=True)
 
-        fig = make_subplots(specs=[[{"secondary_y": True}]])
+        fig = make_subplots(
+            subplot_titles=("Dengue", "Chikungunya", "Zika"), 
+            specs=[[{"secondary_y": True}]]
+            )
 
         for k in df_ufs:
             fig.add_trace(
@@ -568,21 +556,29 @@ class HomeCharts:
                     y=df_ufs[k],                   
                     name=k,            
                     marker={'color': cls.colors[k]},
-                    # text=df_ufs[k],
                     hovertemplate = '%{x}<br>'
                                     '%{y} Casos Estimados<br>'
                                     '<extra></extra>',                    
-                                    #  '%{text}',
             ),
                 secondary_y=True,
             )
 
             fig.update_layout(
-                title='Casos Estimados de' '%{}',
+                height=400, 
+                width=1000, 
+                title_text="Casos Estimados",
+                plot_bgcolor='rgb(255, 255, 255)',
+                paper_bgcolor='rgb(255, 255, 255)',
+                showlegend=True,
+                font=dict(
+                    family="sans-serif",
+                    size=14,
+                    color="black"
+                    ),
                 xaxis=dict(
-                    #title='Período (Ano/Semana)',
+                    #title='',
                     tickangle=-60,
-                    nticks=len(df) // 4,
+                    nticks=len(df) // 3,
                     showline=True,
                     showgrid=True,
                     showticklabels=True,
@@ -595,7 +591,7 @@ class HomeCharts:
                     ),
                 ),
                 yaxis=dict(
-                    title='Incidência',
+                    #title='',
                     showline=True,
                     showgrid=True,
                     showticklabels=True,
@@ -603,11 +599,7 @@ class HomeCharts:
                     linewidth=0,
                     gridcolor='rgb(176, 196, 222)',
                 ),
-                showlegend=True,
-                plot_bgcolor='rgb(255, 255, 255)',
-                paper_bgcolor='rgb(255, 255, 255)',
-                width=1100,
-                height=500,
+
             )
 
             fig.update_yaxes(
@@ -622,6 +614,7 @@ class HomeCharts:
             )
    
         return fig.to_html()
+        
 
     @classmethod
     def create_dengue_chart(cls, case_series):
@@ -632,5 +625,5 @@ class HomeCharts:
         return cls._create_chart(case_series, 'chikungunya')
 
     @classmethod
-    def create_zika_chart(cls, case_series):
+    def create_zika_chart(cls, case_series):       
         return cls._create_chart(case_series, 'zika')
