@@ -545,7 +545,9 @@ class HomeCharts:
         df_ufs = pd.concat(dfs, sort=True)
 
         fig = make_subplots(
-            subplot_titles=("Dengue", "Chikungunya", "Zika"), 
+            subplot_titles=("Casos estimados de Dengue", 
+                        "Casos estimados de Chikungunya", 
+                        "Casos estimados de Zika"), 
             specs=[[{"secondary_y": True}]]
             )
 
@@ -564,9 +566,9 @@ class HomeCharts:
             )
 
             fig.update_layout(
-                height=400, 
+                height=350, 
                 width=1000, 
-                title_text="Casos Estimados",
+                #title_text="Casos Estimados",
                 plot_bgcolor='rgb(255, 255, 255)',
                 paper_bgcolor='rgb(255, 255, 255)',
                 showlegend=True,
