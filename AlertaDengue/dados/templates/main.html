@@ -3,7 +3,6 @@
 {% load static %}
 {% load lookup %}
 {% block extra_head %}
-    {% load series %}
     <meta property="og:image"
           content="http://info.dengue.mat.br/static/img/screenshot.png"/>
     <meta property="og:image:secure_url"
@@ -55,7 +54,7 @@
     </style>
     <script src="/static/js/Autolinker.min.js"></script>
     <script src="/static/libs/jquery/jquery.sparkline.min.js"></script>
-    <script src="/static/js/highstock.js"></script>
+    <script src="/static/libs/plotlyjs/plotly-latest.min.js"></script>
     <script src="/static/js/modules/exporting.js"></script>
     <script src="/static/js/infodengue.js"></script>
 
@@ -68,20 +67,19 @@
 {% block content %}
     <div class="container-fluid">
         <!-- chart-plot:begin -->
-        <div class="row">
+        <div>
             <div class="col-sm-{{chart_cols}}">
-                <div class="card my-2">
+                <div>
                   <div class="card-body">
-                    {% total_series_dengue %}
+                    {{ chart_dengue | safe }}
                   </div>
                 </div>
             </div>
-
             {% if n_alerts_chik > 0 %}
             <div class="col-sm-{{chart_cols}}">
-                <div class="card my-2">
+                <div>
                   <div class="card-body">
-                    {% total_series_chik %}
+                    {{ chart_chik | safe }}
                   </div>
                 </div>
             </div>
@@ -89,9 +87,9 @@
 
             {% if n_alerts_zika > 0 %}
             <div class="col-sm-{{chart_cols}}">
-                <div class="card">
+                <div>
                   <div class="card-body">
-                    {% total_series_zika %}
+                    {{ chart_zika | safe }}
                   </div>
                 </div>
             </div>
