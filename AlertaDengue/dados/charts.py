@@ -739,7 +739,6 @@ class CityCharts:
         )
 
         fig.update_layout(
-            #title='Séries de dados e Alertas anteriores para ' + nome,
             xaxis=go.layout.XAxis(
                 rangeselector=dict(
                     buttons=list([
