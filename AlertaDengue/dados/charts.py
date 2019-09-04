@@ -663,7 +663,9 @@ class CityCharts:
                 mode='lines',
                 name='Casos Notificados de ' + disease_label,
                 line={'color': '#4572A7'},
-                hovertemplate=" %{x} : %{y:1f} ",
+                text=df_dados.SE.map(lambda v: '{}'.format(str(v)[-2:])),
+                hoverinfo='text',
+                hovertemplate="%{x}, SE: %{text}, Casos: %{y:.1f} ",
             )
         )
 
@@ -673,7 +675,9 @@ class CityCharts:
                 y=df_verde.casos,
                 name='Alerta Verde de ' + disease_label,
                 marker={'color': '#48FD48'},
-                hovertemplate=" %{x} : %{y:1f} ",
+                text=df_verde.SE.map(lambda v: '{}'.format(str(v)[-2:])),
+                hoverinfo='text',
+                hovertemplate="%{x}, SE: %{text}, Casos: %{y:.1f} ",
                 stackgroup='one',
                 fill=None,
             )
@@ -685,7 +689,9 @@ class CityCharts:
                 y=df_amarelo.casos,
                 name='Alerta Amarelo de ' + disease_label,
                 marker={'color': '#FBFC49'},
-                hovertemplate=" %{x} : %{y:1f} ",
+                text=df_amarelo.SE.map(lambda v: '{}'.format(str(v)[-2:])),
+                hoverinfo='text',
+                hovertemplate="%{x}, SE: %{text}, Casos: %{y:.1f} ",
                 stackgroup='one',
                 line=dict(width=0),
             )
@@ -697,7 +703,10 @@ class CityCharts:
                 y=df_laranja.casos,
                 name='Alerta Laranja de ' + disease_label,
                 marker={'color': '#FFA858'},
-                hovertemplate="%{x}:%{y:1f}", stackgroup='one',
+                text=df_laranja.SE.map(lambda v: '{}'.format(str(v)[-2:])),
+                hoverinfo='text',
+                hovertemplate="%{x}, SE: %{text}, Casos: %{y:.1f} ",
+                stackgroup='one',
                 line=dict(width=0),
             )
         )
@@ -708,7 +717,9 @@ class CityCharts:
                 y=df_vermelho.casos,
                 name='Alerta Vermelho de ' + disease_label,
                 marker={'color': '#FB4949'},
-                hovertemplate="%{x}:%{y:1f}",
+                text=df_vermelho.SE.map(lambda v: '{}'.format(str(v)[-2:])),
+                hoverinfo='text',
+                hovertemplate="%{x}, SE: %{text}, Casos: %{y:.1f} ",
                 stackgroup='one',
                 line=dict(width=0),
             )
@@ -721,12 +732,14 @@ class CityCharts:
                 mode='lines',
                 name='Casos Estimados de ' + disease_label,
                 line={'color': '#AA4643', 'dash': 'dot'},
-                hovertemplate="%{x} : %{y:1f}",
+                text=df_dados.SE.map(lambda v: '{}'.format(str(v)[-2:])),
+                hoverinfo='text',
+                hovertemplate="%{x}, SE: %{text}, Casos: %{y:.1f} ",
             )
         )
 
         fig.update_layout(
-            title='Séries de dados e Alertas anteriores para ' + nome,
+            #title='Séries de dados e Alertas anteriores para ' + nome,
             xaxis=go.layout.XAxis(
                 rangeselector=dict(
                     buttons=list([

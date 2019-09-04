@@ -85,7 +85,7 @@
     <div class="panel-body">
         <h3>{% blocktrans with populacao=populacao|intword %}<b>População:</b> {{ populacao }} de
             habitantes.{% endblocktrans %}</h3>
-        <h3>{% blocktrans with incidencia=incidencia|floatformat %}<b>Incidência estimada:</b> {{ incidencia }} por 100
+        <h3>{% blocktrans with incidencia=incidencia|floatformat %}<b>Incidência estimada na SE {{ SE }}:</b> {{ incidencia }} por 100
             mil habitantes. {% endblocktrans %}</h3>
         {% block info_panel%}{% endblock %}
     </div>
