@@ -7,115 +7,268 @@
 
     <div class="card">
         <div class="card-header">
-            <h3 id="section1" class="panel-title">{% trans "O Sistema de Alerta InfoDengue" %}</h3>
+            <h3 id="section1" class="panel-title">{% trans "Sobre o InfoDengue" %}</h3>
         </div>
         <div class="card-body">
             {% blocktrans %}
-            O <b>Sistema InfoDengue</b> visa gerar um sistema de alerta em tempo quase-real para os casos de
-            transmissão de dengue nos municípios.
-            A ideia principal é o acesso rápido a informação! <br><br>
+            
+            <h5>O InfoDengue é um sistema de alerta para arboviroses baseado em dados
+            hı́bridos gerados por meio da análise integrada de dados minerados a partir da Web
+            social e de dados climáticos e epidemiológicos.</h5> 
+            Implementado em 2015, o sistema foi desenvolvido por pesquisadores do Programa de Computação Científica (Fundação Oswaldo Cruz, RJ) 
+            e da Escola de Matemática Aplicada (Fundação Getúlio Vargas) com a forte colaboração da Secretaria Municipal 
+            de Saúde do Rio de Janeiro, o Observatório da Dengue (UFMG) e pesquisadores da Universidade Federal 
+            do Paraná e da Universidade Estadual do Oeste do Paraná. <br><br>  
 
-            As Secretarias de Vigilância em Saúde, através da utilização das informações geradas semanalmente pelo
-            sistema, poderiam tornar mais ágeis
-            e eficazes suas tomadas de decisão quanto aos seus programas de vigilância em dengue. O sistema de alerta
-            procura remover a distância que
-            existe entre a análise das informações sempre aplicadas ao passado, e a necessidade de gerar informações em
-            tempo quase-real para tomada de decisão. <br><br>
+            Desde 2016, outros municípios e estados aderiram ao sistema: Estado do Rio de Janeiro,
+            Estado do Paraná, Estado do Ceará, Estado do Espírito Santo, Regional de Saúde de Sete
+            Lagoas (MG) e a cidade de São José do Rio Preto (SP). A adesão pode ser feita por
+            municípios isolados, ou em grupo (regionais ou estados). Cada instância recebe um relatório de análise de 
+            situação da dengue semanalmente. A versão pública do site é acessada por muitas pessoas e é comum recebemos
+             notícias de que essas informações são utilizadas
+            na definição de viagens e outras atividades. <br><br>
 
-            Para que o sistema funcione, diversas metodologias de análise são utilizadas de forma integrada, incluindo
-            modelagem de sobrevida, modelagem
-            bayesiana, e um pipeline de coleta e processamento rápido de dados. Essa automatização integrada com
-            modelagem estatística possibilita a rápida
-            visualização da distribuição dos casos de transmissão de dengue em um município ao longo do tempo e do
-            espaço. Os dados que alimentam o sistema
-            são provenientes de diferentes fontes, incluindo clima, redes sociais e dados oficiais de
-            notificação.<br><br>
+            Nossa rede de colaboradores cresceu e conta agora com a parceria de grupos de pesquisa internacionais que 
+            buscam soluções para arboviroses em outros países. Por meio do compartilhamento de experiências e metodologias, 
+            ampliamos a inovação e o conhecimento das arboviroses. <br><br> 
 
-            Além disso, o site disponibiliza informações sobre o histórico da dengue no município em diferentes formatos
-            que podem ser acessados por todos,
-            cidadãos, estudantes, professores, pesquisadores, enfim, qualquer pessoa interessada em entender como anda a
-            situação da transmissão de dengue em seu município.<br><br>
+            Vários desafios técnicos e científicos foram enfrentados durante o desenvolvimento do InfoDengue, resultando 
+            em diversas teses e dissertações. Como os desafios não terminam, continuamos e continuaremos sempre investigando 
+            novas soluções para gerar informação útil para a gestão e para o avanço do conhecimento das arboviroses e seu 
+            controle. <br><br>
 
-            O controle da incidência e preparação para o enfrentamento de epidemias de dengue dependem de um
-            monitoramento eficaz de sinais que pressagiem o
-            aumento de casos e potenciais epidemias. Desta forma, é de grande importância a análise de toda a informação
-            sobre dengue gerada durante o processo
-            de sua notificação, servindo assim como base para as decisões da política de saúde dos municípios. <br><br>
-                <a href="http://biorxiv.org/content/early/2016/03/29/046193" >Mais Detalhes...</a>
+              
             {% endblocktrans %}
         </div>
+
         <div class="card-header">
-            <h3 id="section2" class="panel-title">{% trans "O Sistema de Cores de Notificação " %}</h3>
+            <h3 id="section2" class="panel-title">{% trans "O Sistema" %}</h3>
         </div>
         <div class="card-body">
             {% blocktrans %}
-            A dengue é difícil de prever, chega de repente. Tem ano que vem para arrasar, tem ano que mal aparece.
-            O Info dengue é como um serviço de meteorologia, só que além do sol e da chuva, ele também fica de olho na
-            dengue,
-            no mosquito, e nos murmurinhos nas redes sociais. Essas informações alimentam modelos estatísticos
-            previamente validados com dados históricos, que indicam a situação da dengue na cidade.<br><br>
 
-            Quando está tudo bem, o mapa está <span style="background-color:green">VERDE</span>. O clima não está muito
-            pra
-            mosquito, e a dengue acontece aqui e ali. Porém, quando a temperatura aumenta, os mosquitos começam a se
-            reproduzir
-            mais rápido. O <span style="background-color:yellow">AMARELO</span> indica que está um quente bom para
-            mosquitos e
-            é preciso prestar atenção nos criadouros. O que você pode fazer? Dedique 10 minutos do seu dia ao combate da
-            dengue.
-            Confira as dicas em: <a href="http://www.riocontradengue.com.br/Site/Conteudo/Porque.aspx/">10 minutos
-            contra a Dengue</a> <br><br>
+            <h5>O sistema InfoDengue é um pipeline de coleta, harmonização e análise de dados semi-automatizado, 
+            que gera indicadores de situação epidemiológica da dengue e outras arboviroses a nível municipal.</h5><br>
 
-            Quando junta muito mosquito com muitas pessoas que não tiveram dengue, é o prato perfeito para o virus da
-            dengue se
-            espalhar. Ele passa do mosquito para a pessoa que passa para outro mosquito que passa para outra pessoa, e
-            pronto,
-            tem-se a transmissão sustentada da dengue! A cor <span style="background-color:orange">LARANJA</span> indica
-            essa
-            situação. É hora de redobrar os esforços para eliminar focos de mosquito. Preste também atenção nos sintomas
-            da
-            dengue em você, na sua família, nos seus vizinhos e amigos. <br><br>
+            <center><img style="relative: left;" src="/static/img/system_level_color.png" alt="gibberish" width="400" /></center><br><br>
 
-            Se uma de cada 1000 pessoas em um município tem dengue, então o alerta passa para o <span
-                style="background-color:red">VERMELHO</span>
-            avisando que se você não teve dengue ainda, o risco é grande. Todo cuidado é pouco. Preste atenção aos
-            sintomas e busque ajuda.
-            A <b>DENGUE É CÍCLICA</b>, e depois do <span style="background-color:red">VERMELHO</span> vem o <span
-                style="background-color:green">VERDE</span>
-            e todo o ciclo começa de novo. Então não se esqueça de estar sempre antenado no <b>InfoDengue</b>. Nele,
-            você tem como saber sobre a situação do
-            seu bairro. Clique no <b>Mapa</b> e saiba agora mesmo como está a dengue aí, onde você está. <br><br>
+            <br>
+            <b>De onde vem os dados?</b><br>
+
+            <b>• Casos de dengue, chikungunya e zika:</b> Essas são doenças de notificação obrigatória, isso é, o profissional 
+            de saúde que diagnostica um caso suspeito precisa preencher uma ficha de notificação que alimenta um banco 
+            de dados municipal que depois é consolidado a nível estadual e finalmente, a nível federal pelo Ministério 
+            da Saúde. Apenas uma fração desses casos são confirmados laboratorialmente, a maioria recebe classificação 
+            final com base em critérios clínico-epidemiológicos. A partir dos casos notificados, são calculados os 
+            indicadores de incidência que alimentam o InfoDengue.<br><br>
+
+            <b>• Dados meteorológicos: </b>A transmissão de arboviroses é muito influenciada pelo clima. 
+            O mosquito transmissor, Aedes aegypti, requer temperatura alta e umidade para se reproduzir e viver. 
+            O vírus ao infectar o mosquito, também irá se reproduzir melhor em temperaturas mais altas. Dados de 
+            temperatura e umidade são obtidos das <a href="https://estacoes.dengue.mat.br/">estações meteorológicas</a> de aeroportos assim como de imagens de 
+            satélite.<br><br> 
+
+            <b>• Dados de menção à dengue nas redes sociais:</b> as pessoas em geral buscam informações ou contam sobre 
+            seu estado de saúde nas redes sociais antes de buscarem ajuda médica. Assim, conhecer o número de menções 
+            à dengue nas redes sociais ajuda a identificar quando os casos estão aumentando na população. 
+            O Infodengue tem parceria com o <a href="https://www.observatorio.inweb.org.br">Observatório da Dengue</a> que captura e analisa tweets de pessoas 
+            geolocalizadas quanto à menção de sintomas de dengue.<br><br> 
+
+            <b>• Dados demográficos:</b> indicadores epidemiológicos precisam ser calculados em relação ao tamanho da população. 
+            Dados demográficos dos municípios brasileiros são atualizados a cada ano no Infodengue, utilizando as estimativas 
+            do <a href="https://www.ibge.gov.br/pt/inicio.html">IBGE<a>.<br><br>
+
+            <b>O que o sistema faz?</b><br>
+
+            • <span style="color: #ff9900;">Correção do atraso de notificação (nowcasting): </span>os dados de notificação de doenças tem sempre um atraso. 
+            Isso ocorre por vários motivos e inclui o tempo entre a pessoa adoecer e buscar atendimento médico, 
+            o tempo que leva para o profissional de saúde notificar e o tempo que demora para agregar as informações 
+            nos bancos de dados. Esse atraso dificulta a tomada de decisão pois tem-se sempre que olhar para um dado 
+            desatualizado. Para contornar esse problema, foi desenvolvido um método estatístico baseado em inferência 
+            Bayesiana que combina a estimação do atraso com a estimação do padrão temporal histórico da incidência para 
+            calcular o número esperado de casos a cada semana. Esse processo se chama nowcasting ou estimação do 
+            presente e está descrita em <a href="https://onlinelibrary.wiley.com/doi/full/10.1002/sim.8303">Bastos, Economou et al (2019)</a> 
+            ”A modelling approach for correcting reporting delays in disease surveillance data”. 
+            A Figura abaixo (retirada de Bastos et al 2019) mostra em preto, a incidência verdadeira, em vermelho, 
+            aquela observada com atraso e , em cinza, o nowcasting. Para mais detalhes técnicos, ver a referida publicação.<br><br><br>
+
+          
+            <center><img style="relative: left;" src="/static/img/graph_weeks.png" alt="gibberish" width="700" /></center><br><br> 
+
+
+            • <span style="color: #ff9900;">Detecção de transmissão sustentada:</span> A estimação do número reprodutivo é importante em vários aspectos. Sequência de semanas com transmissão 
+            crítica (Rt > 1) indica transmissão sustentada. Isso é, indica que estamos na fase de espalhamento da doença, e que ações adequadas para controle 
+            precisam ser implementadas. Já períodos sub-críticos (Rt < 1) indicam que não há transmissão sustentada, isso pode ocorrer por causa do clima, 
+            por causa do controle ou pela redução do contingente de suscetíveis. Para estimar R0 e Rt a partir dos dados de incidência, desenvolvemos metodologia 
+            própria, descrita em <a href="https://www.sciencedirect.com/science/article/pii/S1755436517300907?via%3Dihub">Codeço et al. 2018 </a>“Estimating the effective reproduction number of dengue considering temperature-dependent generation intervals”.<br><br>
+            • <span style="color: #ECF000;">Análise de receptividade: </span>A transmissão das arboviroses requer condições climáticas adequadas, que podem variar de lugar para lugar. No Rio de Janeiro, 
+            por exemplo, temperatura maior que 22 graus é condição necessária para transmissão sustentada. Em Fortaleza, umidade máxima acima de 85% é a condição 
+            necessária. Nós ajustamos modelos de árvore de decisão, para avaliar que combinação de variáveis climáticas e ambientais são indicadoras de condições de 
+            transmissão. Essa informação serve de alerta precoce de chegada da temporada da arbovirose.<br><br>  
+            • <span style="color: #ECF000;">Análise de menção a dengue nas redes sociais: </span>Indicadores de redes sociais calculados pelo Observatório da Dengue são usados como variáveis auxiliares 
+            no InfoDengue. A metodologia de captura e análise é descrita em <a href="https://journals.plos.org/plosntds/article?id=10.1371/journal.pntd.0005729">Marques-Toledo et al (2017)</a>.<br><br>
+            • <span style="color: #ff0000;">Detecção de situação atípica: </span>Para estimar limiares epidêmicos, nós utilizamos o Moving Epidemics Method (MEM) (<a href="https://onlinelibrary.wiley.com/doi/full/10.1111/j.1750-2659.2012.00422.x">Vega et al. 2012</a>), que permite estimar 
+            diversas grandezas de interesse com base em dados históricos locais como limiar pré- epidêmico, níveis de atividade típicas, valores esperados para 
+            cada semana, etc. Como este limiar é obtido a partir do histórico de dados que alimenta o sistema, ele tem valores particulares para cada localidade. 
+            Além destes limiares globais para a série temporal, a metodologia utilizada permite ainda obter estimativas para o número esperado de casos por semana, 
+            juntamente de intervalos de confiança que permitem definir zonas de atividade semanal. Estas regiões são definidas de maneira similar aos níveis de atividade, 
+            porém são calculados com base na distribuição típica de casos para cada semana. Tal construção identifica visualmente os padrões sazonais, uma vez que 
+            apresentam a evolução temporal típica com base na mediana dos casos esperados para cada semana e intervalos de confiança inferior e superior 
+            (utilizamos 10% e 90%, respectivamente), definindo corredores de atividade típica, como um diagrama de controle.<br><br>
+
+            <b>Código de Cores: </b><br>
+
+            <p align="left">&nbsp;</p>
+            <table style="height: 517px; margin-left: auto; margin-right: auto;" border="2" width="568" cellspacing="0" cellpadding="7">
+            <tbody>
+            <tr valign="top">
+            <td style="text-align: center; width: 36px;" height="39">
+            <p style="text-align: center;" align="left"><strong>Cor</strong></p>
+            </td>
+            <td style="text-align: center; width: 207px;">
+            <p style="text-align: center;" align="left"><strong>Nivel</strong></p>
+            </td>
+            <td style="text-align: center; width: 273px;">
+            <p style="text-align: center;" align="left"><strong>Situa&ccedil;&atilde;o</strong></p>
+            </td>
+            </tr>
+            <tr valign="top">
+            <td style="width: 36px;" bgcolor="#62F900" height="101">&nbsp;</td>
+            <td style="width: 207px;">
+            <p align="left"><br />Condi&ccedil;&otilde;es n&atilde;o favor&aacute;veis para transmiss&atilde;o / baixo risco</p>
+            </td>
+            <td style="width: 273px;">
+            <ul>
+            <li>
+            <p align="left">Temperatura baixa ou umidade baixa</p>
+            </li>
+            <li>
+            <p align="left">Atividade viral baixa</p>
+            </li>
+            <li>
+            <p align="left">Atividade online baixa</p>
+            </li>
+            </ul>
+            </td>
+            </tr>
+            <tr valign="top">
+            <td style="width: 36px;" bgcolor="#ECF000" height="108">&nbsp;</td>
+            <td style="width: 207px;">
+            <p align="left"><strong><br />Aten&ccedil;&atilde;o:</strong> Condi&ccedil;&otilde;es favor&aacute;veis com presen&ccedil;a de circula&ccedil;&atilde;o viral</p>
+            </td>
+            <td style="width: 273px;">
+            <ul>
+            <li>
+            <p align="left">Temperatura e umidade altas presen&ccedil;a do v&iacute;rus</p>
+            </li>
+            <li>
+            <p align="left">atividade online aumentada</p>
+            </li>
+            </ul>
+            </td>
+            </tr>
+            <tr valign="top">
+            <td style="width: 36px;" bgcolor="FF9900" height="111">&nbsp;</td>
+            <td style="width: 207px;">
+            <p align="left"><br /><br />Transmiss&atilde;o sustentada</p>
+            </td>
+            <td style="width: 273px;">
+            <ul>
+            <li>
+            <p align="left">Incid&ecirc;ncia crescente por&eacute;m dentro dos n&iacute;veis hist&oacute;ricos</p>
+            </li>
+            </ul>
+            </td>
+            </tr>
+            <tr valign="top">
+            <td style="width: 36px;" bgcolor="#FF0000" height="54">&nbsp;</td>
+            <td style="width: 207px;">
+            <p align="left"><br /><br />Incid&ecirc;ncia alta</p>
+            <p align="left">&nbsp;</p>
+            </td>
+            <td style="width: 273px;">
+            <ul>
+            <li>
+            <p align="left">Incid&ecirc;ncia alta para padr&otilde;es hist&oacute;ricos</p>
+            </li>
+            </ul>
+            <p align="left">&nbsp;</p>
+            </td>
+            </tr>
+            </tbody>
+            </table>
+            <p align="left">&nbsp;</p>
+
+            <b>Implementação</b></br>
+
+            Todos os códigos gerados para o InfoDengue, em sua maioria em R e Python, estão disponíveis em acesso aberto em​ 
+            <a href="https://github.com/AlertaDengue">​https://github.com/AlertaDengue</a> <br><br>
+            
             {% endblocktrans %}
         </div>
+
         <div class="card-header">
-            <h3 id="section3" class="panel-title">{% trans "O Pré-Processamento de Dados e a Geração de Indicadores" %}</h3>
+            <h3 id="section3" class="panel-title">{% trans "Como citar o InfoDengue" %}</h3>
         </div>
         <div class="card-body">
             {% blocktrans %}
-            A realização de uma análise preliminar dos dados de notificação de casos de dengue mostra que o tempo de
-            atraso entre a notificação e digitação tem
-            uma mediana de 14 dias. Para corrigir este atraso, um modelo de sobrevivência lognormal
-            <a href="https://portal.fiocruz.br/pt-br/content/an%C3%A1lise-de-sobreviv%C3%AAncia-teoria-e-aplica%C3%A7%C3%B5es-em-sa%C3%BAde">(Carvalho
-                et al, 2011)</a>
-            foi ajustado aos dados e utilizado para inferir o número de casos na semana, na ausência de atraso.<br><br>
 
-            Com a série temporal de casos corrigida para cada regional de saúde, o número reprodutivo efetivo (Rt) é
-            calculado, de acordo com a equação 4.2 de
-            <a href="http://rsif.royalsocietypublishing.org/content/7/43/297">Nishiura et al (2010)</a> e assumindo um
-            intervalo serial para a dengue de 3 semanas.
-            O Rt é basicamente uma medida da variação do número de casos e é calculado como a razão entre o número de
-            casos em um intervalo temporal e o número de
-            casos no intervalo anterior. Se Rt > 1, há expansão da epidemia, se Rt %3C 1, há retração. Para dar conta da
-            incerteza nas estimativas dessa quantidade,
-            nós calculamos o intervalo de credibilidade <a href="http://arxiv.org/pdf/1502.01236.pdf">(Coelho &
-            Carvalho, 2015)</a> para o Rt e consideramos um evento
-            de expansão se a probabilidade de que Rt > 1 for superior a 90%. <br><br>
+            C. Codeco, F. Coelho, O. Cruz, S. Oliveira, T. Castro, L. Bastos, Infodengue:<br> 
+            A nowcasting system for the surveillance of arboviruses in Brazil, Revue d'Épidémiologie et de Santé Publique, 
+            Vol 66, Suppl 5, 2018, Page S386,<a href="https://www.sciencedirect.com/science/article/pii/S0398762018311088?via%3Dihub">​https://doi.org/10.1016/j.respe.2018.05.408</a>.<br><br>
 
-            Com relação aos dados de tweets, a mesma técnica é empregada, gerando um número reprodutivo dos tweets
-            (Rttw).
-            Variações positivas significativas indicam um aumento de risco.<br><br>
+            <b>@article</b>{CODECO2018S386,<br>
+            <b>title</b> = "Infodengue: A nowcasting system for the surveillance of arboviruses in Brazil",<br>
+            <b>journal</b> = "Revue d'Épidémiologie et de Santé Publique",<br>
+            <b>volume</b> = "66",<br>
+            <b>pages</b> = "S386",<br>
+            <b>year</b> = "2018",<br>
+            <b>note</b> = "European Congress of Epidemiology “Crises, epidemiological transitions and the role of epidemiologists”",<br>
+            <b>issn</b> = "0398-7620",<br>
+            <b>doi</b> = "https://doi.org/10.1016/j.respe.2018.05.408",<br>
+            <b>url</b> = "http://www.sciencedirect.com/science/article/pii/S0398762018311088",<br>
+            <b>author</b> = "C. Codeco and F. Coelho and O. Cruz and S. Oliveira and T. Castro and L. Bastos"<br>
+            }
+
             {% endblocktrans %}
         </div>
+
+        <div class="card-header">
+            <h3 id="section4" class="panel-title">{% trans "Produções científicas associadas ao Infodengue" %}</h3>
+        </div>
+        <div class="card-body">
+            {% blocktrans %}
+
+            <a href="https://www.sciencedirect.com/science/article/pii/S0398762018311088?via%3Dihub">​https://scholar.google.com/scholar?hl=en&as_sdt=0%2C5&q=infodengue&btnG=</a> 
+
+            {% endblocktrans %}
+        </div>
+
+        <div class="card-header">
+            <h3 id="section5" class="panel-title">{% trans "Eventos" %}</h3>
+        </div>
+        <div class="card-body">
+            {% blocktrans %}
+
+            <b>E-vigilância 2019</b> <a href="http://e-vigilancia.dengue.mat.br/">​ http://e-vigilancia.dengue.mat.br/</a> 
+
+            {% endblocktrans %}
+        </div>
+
+        <div class="card-header">
+            <h3 id="section6" class="panel-title">{% trans "Como colaborar" %}</h3>
+        </div>
+        <div class="card-body">
+            {% blocktrans %}
+                        
+            • Se sua cidade não está no Infodengue, entre em contato com a Secretaria de Saúde<br>
+            • Se é um estudante ou pesquisador e gostaria de contribuir com análises e modelos, nos escreva<br>
+            • Se quiser contribuir com patrocínios, escreva-nos<br>
+            • Se quiser aprender a usar o infodengue, tem sugestões, críticas ou se percebeu algum erro no site, escreva-nos<br><br>
+            <b>Vencer as arboviroses é um trabalho de todos, toda colaboração é bem vinda!</b>
+
+            {% endblocktrans %}
+        </div>        
 
     </div>
 {% endblock %}
