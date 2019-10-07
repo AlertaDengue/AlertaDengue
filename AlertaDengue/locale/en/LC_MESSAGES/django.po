@@ -602,10 +602,9 @@ msgstr ""
 "            "
 
 #: AlertaDengue/dados/templates/about.html:180
-
 #| msgid "Como colaborar"
 msgid "Como colaborar"
-msgstr "Collaborate"
+msgstr "How to Collaborate"
 
 #: AlertaDengue/dados/templates/about.html:183
 msgid ""
