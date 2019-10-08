@@ -19,6 +19,12 @@
             height: 400px;
         }
 
+        .char_div {
+            width: 100%;
+            height: 100%;
+            margin: 0 0 5px;
+        }
+
         .info {
             padding: 6px 8px;
             font: 14px/16px Arial, Helvetica, sans-serif;
@@ -53,7 +59,7 @@
         }
 
         .p { 
-            padding-bottom: 60px; 
+            padding-bottom: 90px; 
         }
 
     </style>
@@ -73,17 +79,20 @@
     <div class="container-fluid">
         <!-- chart-plot:begin -->
         <div>
+            {% if n_alerts_chik > 0 %}
             <div class="col-sm-{{chart_cols}}">
                 <div>
-                  <div class="card-body">
+                  <div class="char_div">
                     {{ chart_dengue | safe }}
                   </div>
                 </div>
             </div>
+            {% endif %}
+            
             {% if n_alerts_chik > 0 %}
             <div class="col-sm-{{chart_cols}}">
                 <div>
-                  <div class="card-body">
+                  <div class="char_div">
                     {{ chart_chik | safe }}
                   </div>
                 </div>
@@ -93,7 +102,7 @@
             {% if n_alerts_zika > 0 %}
             <div class="col-sm-{{chart_cols}}">
                 <div>
-                  <div class="card-body">
+                  <div class="char_div">
                     {{ chart_zika | safe }}
                   </div>
                 </div>

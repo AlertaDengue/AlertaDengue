@@ -550,7 +550,9 @@ class HomeCharts:
 
         df_ufs = pd.concat(dfs, sort=True)
 
-        fig = make_subplots(specs=[[{"secondary_y": True}]])
+        fig = make_subplots(
+            specs=[[{"secondary_y": True}]]
+        )
 
         for k in df_ufs:
             fig.add_trace(
@@ -559,57 +561,62 @@ class HomeCharts:
                     y=df_ufs[k],
                     name=k,
                     marker={'color': cls.colors[k]},
-                    hovertemplate='%{x}<br>'
-                    '%{y} Casos Estimados<br>'
+                    text=df_ufs.index.strftime('%d-%b-%Y <br>{}'.format(k)),
+                    hovertemplate='%{text} <br>'
+                    '%{y} Casos Estimados '
                     '<extra></extra>',
                 ),
-                secondary_y=True,
+                secondary_y=True
             )
 
-            fig.update_layout(
-                height=350,
-                width=1000,
-                title_text=_('Casos estimados de {}').format(disease),
-                plot_bgcolor='rgb(255, 255, 255)',
-                paper_bgcolor='rgb(255, 255, 255)',
-                showlegend=True,
-                font=dict(family="sans-serif", size=14, color="black"),
-                xaxis=dict(
-                    # title='',
-                    tickangle=-60,
-                    nticks=len(df) // 3,
-                    showline=True,
-                    showgrid=True,
-                    showticklabels=True,
-                    linecolor='rgb(204, 204, 204)',
-                    linewidth=0,
-                    gridcolor='rgb(176, 196, 222)',
-                    ticks='outside',
-                    tickfont=dict(
-                        family='Arial', size=12, color='rgb(82, 82, 82)'
-                    ),
-                ),
-                yaxis=dict(
-                    # title='',
-                    showline=True,
-                    showgrid=True,
-                    showticklabels=True,
-                    linecolor='rgb(204, 204, 204)',
-                    linewidth=0,
-                    gridcolor='rgb(176, 196, 222)',
-                ),
-            )
-
-            fig.update_yaxes(
-                title_text=_('Pessoas'),
-                secondary_y=True,
-                showline=False,
+        fig.update_layout(
+            height=350,
+            width=1000,
+            title=go.layout.Title(
+                text=_('Casos estimados de {}').format(disease)),
+            showlegend=True,
+            font=dict(
+                    family="sans-serif",
+                    size=12,
+                    color="black"),
+            plot_bgcolor='rgb(255, 255, 255)',
+            paper_bgcolor='rgb(255, 255, 255)',
+            xaxis=dict(
+                # title='',
+                tickangle=-20,
+                nticks=len(df) // 3,
+                showline=True,
                 showgrid=True,
                 showticklabels=True,
                 linecolor='rgb(204, 204, 204)',
                 linewidth=0,
-                gridcolor='rgb(204, 204, 204)',
+                gridcolor='rgb(176, 196, 222)',
+                ticks='outside',
+                tickfont=dict(
+                    family='Arial', size=12, color='rgb(82, 82, 82)'
+                )
+            ),
+            yaxis=dict(
+                # title='',
+                showline=True,
+                showgrid=True,
+                showticklabels=True,
+                linecolor='rgb(204, 204, 204)',
+                linewidth=0,
+                gridcolor='rgb(176, 196, 222)',
             )
+        )
+
+        fig.update_yaxes(
+            title_text=_('Pessoas'),
+            secondary_y=True,
+            showline=False,
+            showgrid=True,
+            showticklabels=True,
+            linecolor='rgb(204, 204, 204)',
+            linewidth=0,
+            gridcolor='rgb(204, 204, 204)',
+        )
 
         return fig.to_html()
 
