@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-08 09:21+0000\n"
+"POT-Creation-Date: 2019-10-08 14:29+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1009,8 +1009,8 @@ msgid ""
 "            "
 msgstr ""
 "\n"
-"<h5>InfoDengue is developed and maintained by a  consortium of researchers and "
-"professionals from several institutions:</h5><br> "
+"<h5>InfoDengue is developed and maintained by a  consortium of researchers "
+"and professionals from several institutions:</h5><br> "
 
 #: AlertaDengue/dados/templates/contact.html:13
 msgid "Coordenação Geral:"
@@ -1018,74 +1018,66 @@ msgstr "Principal Investigators:"
 
 #: AlertaDengue/dados/templates/contact.html:15
 #, fuzzy
-#| msgid ""
-#| " Flávio Codeço Coelho: Professor Associado - Escola de Matemática "
-#| "Aplicada/FGV,"
+#| msgid "Professor Associado - Escola de Matemática Aplicada / FGV"
 msgid "Professor Associado - Escola de Matemática Aplicada/FGV"
-msgstr ""
-" Flávio Codeço Coelho: Associate Professor - School of Applied Mathematics - "
-"FGV,"
+msgstr " Associate Professor - School of Applied Mathematics / FGV,"
 
 #: AlertaDengue/dados/templates/contact.html:16
 #: AlertaDengue/dados/templates/contact.html:24
 #: AlertaDengue/dados/templates/contact.html:25
 #, fuzzy
-#| msgid ""
-#| " Oswaldo Gonçalves Cruz: Pesquisador Titular - Programa de Computação "
-#| "Científica/Fiocruz,"
+#| msgid "Pesquisador Titular - Programa de Computação Científica / Fiocruz"
 msgid "Pesquisador Titular - Programa de Computação Científica/Fiocruz"
-msgstr ""
-" Oswaldo Gonçalves Cruz: Full Researcher - Scientific Computing Program - "
-"Fiocruz,"
+msgstr " Associate Researcher - Scientific Computing Program / Fiocruz,"
 
 #: AlertaDengue/dados/templates/contact.html:17
 #, fuzzy
-#| msgid ""
-#| " Cláudia Torres Codeço: Pesquisadora Titular - Programa de Computação "
-#| "Científica/Fiocruz"
+#| msgid "Pesquisadora Titular - Programa de Computação Científica / Fiocruz"
 msgid "Pesquisadora Titular - Programa de Computação Científica/Fiocruz"
-msgstr ""
-" Cláudia Torres Codeço: Full Researcher - Scientific Computing Program - "
-"Fiocruz"
+msgstr " Associate Researcher - Scientific Computing Program / Fiocruz"
 
 #: AlertaDengue/dados/templates/contact.html:19
 msgid "Equipe:"
 msgstr "Team:"
 
 #: AlertaDengue/dados/templates/contact.html:21
-msgid "Epidemiologista : Bolsista INOVA"
-msgstr ""
+#, fuzzy
+#| msgid "Epidemiologista - Bolsista INOVA"
+msgid "Epidemiologista, bolsista INOVA"
+msgstr "Epidemiologist, INOVA fellowship"
 
 #: AlertaDengue/dados/templates/contact.html:22
-msgid "Epidemiologista - Bolsista PDJ-INOVA"
-msgstr ""
+#, fuzzy
+#| msgid "Epidemiologista - Bolsista PDJ-INOVA"
+msgid "Epidemiologista, bolsista PDJ-INOVA"
+msgstr "Epidemiologist, INOVA postdoc"
 
 #: AlertaDengue/dados/templates/contact.html:23
 #, fuzzy
 #| msgid ""
 #| "Thais Riback: Pesquisadora Colaboradora - Programa de Computação "
-#| "Científica/Fiocruz"
+#| "Científica / Fiocruz"
 msgid "Pesquisador Associado - Programa de Computação Científica/Fiocruz"
 msgstr ""
 "Thais Riback: Assistant researcher - Scientific Computing Program - Fiocruz"
 
 #: AlertaDengue/dados/templates/contact.html:26
-msgid "Cientista de dados - Bolsista INOVA"
-msgstr ""
+#, fuzzy
+#| msgid "Cientista de dados - Bolsista INOVA"
+msgid "Cientista de dados, bolsista INOVA"
+msgstr "Data Scientist, INOVA fellowship"
 
 #: AlertaDengue/dados/templates/contact.html:27
 msgid "Cientista de dados (Observatório da Dengue/InfoDengue)"
-msgstr ""
+msgstr "Data Scientist (Observatório da Dengue/InfoDengue fellowship)"
 
 #: AlertaDengue/dados/templates/contact.html:28
-#, fuzzy
-#| msgid "O Sistema de Alerta InfoDengue"
 msgid "Cientista de dados (WMP/InfoDengue)"
-msgstr "The InfoDengue alert system"
+msgstr "Data Scientist (WMP/InfoDengue fellowship)"
 
 #: AlertaDengue/dados/templates/contact.html:29
 msgid "Especialista em comunicação"
-msgstr ""
+msgstr "Communication Professional "
 
 #: AlertaDengue/dados/templates/contact.html:30
 msgid "TI"
@@ -1102,10 +1094,8 @@ msgstr "Colaborators:"
 #: AlertaDengue/dados/templates/contact.html:35
 #: AlertaDengue/dados/templates/contact.html:36
 #: AlertaDengue/dados/templates/contact.html:37
-#, fuzzy
-#| msgid "Observatório da Dengue"
 msgid "Observatório da Dengue/UFMG"
-msgstr "Observatório da Dengue"
+msgstr "Observatório da Dengue/UFMG"
 
 #: AlertaDengue/dados/templates/contact.html:38
 msgid "World Mosquito Program/Fiocruz"
@@ -1113,7 +1103,7 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/contact.html:39
 msgid "Instituto de Biociências/UFPR"
-msgstr ""
+msgstr "Instituto de Biociências/UFPR"
 
 #: AlertaDengue/dados/templates/contact.html:41
 msgid "Colaboradores internacionais:"
@@ -1121,15 +1111,15 @@ msgstr "International Collaborators:"
 
 #: AlertaDengue/dados/templates/contact.html:43
 msgid "University of Exeter: UK"
-msgstr ""
+msgstr "University of Exeter, UK"
 
 #: AlertaDengue/dados/templates/contact.html:44
 msgid "University of Warwick: UK"
-msgstr ""
+msgstr "University of Warwick, UK"
 
 #: AlertaDengue/dados/templates/contact.html:45
 msgid "University of Chicago: USA"
-msgstr ""
+msgstr "University of Chicago, USA"
 
 #: AlertaDengue/dados/templates/contact.html:47
 msgid "Alunos:"
@@ -1137,26 +1127,31 @@ msgstr "Students:"
 
 #: AlertaDengue/dados/templates/contact.html:49
 msgid ""
-"Aluna de mestrado do Programa de Epidemiologia em Saúde Pública: ENSP/Fiocruz"
+"Aluna de mestrado do Programa de Epidemiologia em Saúde Pública - ENSP/"
+"Fiocruz"
 msgstr ""
+"Master student Programa de Epidemiologia em Saúde Pública, ENSP/Fiocruz"
 
 #: AlertaDengue/dados/templates/contact.html:50
 msgid ""
 "Aluna de graduação do Programa de Matemática Aplicada da FGV e PIBIC da "
 "Fiocruz"
 msgstr ""
+"Undergraduate student Programa de Matemática Aplicada da FGV e PIBIC da "
+"Fiocruz"
 
 #: AlertaDengue/dados/templates/contact.html:51
 msgid ""
-"Aluno de doutorado do Programa de Epidemiologia em Saúde Pública: ENSP/"
+"Aluno de doutorado do Programa de Epidemiologia em Saúde Pública - ENSP/"
 "Fiocruz"
-msgstr ""
+msgstr "PhD student Programa de Epidemiologia em Saúde Pública, ENSP/Fiocruz"
 
 #: AlertaDengue/dados/templates/contact.html:52
 msgid ""
-"Aluno de doutorado do Programa de Biologia Computacional e Sistemas: IOC/"
+"Aluno de doutorado do Programa de Biologia Computacional e Sistemas - IOC/"
 "Fiocruz"
 msgstr ""
+"PhD student Programa de Biologia Computacional e Sistemas, IOC/Fiocruz"
 
 #: AlertaDengue/dados/templates/contact.html:54
 msgid "Parceria:"
