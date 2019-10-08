@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}Equipe{% endblock %}
+{% block title %}{% trans "Equipe" %}{% endblock %}
 
 {% block content %}
     <div class="card">
         <div class="card-body">
             {% blocktrans %}
-            O Sistema de Alerta Info Dengue é desenvolvido pela parceria de pesquisadores e profissionais 
-            de diversas instituições:<br><br>
+            <h5>O Sistema de Alerta Info Dengue é desenvolvido pela parceria de pesquisadores e profissionais 
+            de diversas instituições:</h5><br>
             {% endblocktrans %}
             <b>{% trans "Coordenação Geral:" %}</b>
             <ul>
@@ -18,7 +18,7 @@
             </ul>
             <b>{% trans "Equipe:" %}</b>
             <ul>
-                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4361680P0">Sara de Souza Oliveira</a>: {% trans "Epidemiologista : bolsista INOVA" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4361680P0">Sara de Souza Oliveira</a>: {% trans "Epidemiologista : Bolsista INOVA" %}
                 <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4223051Y0">Raquel Martins Lana</a>: {% trans "Epidemiologista - Bolsista PDJ-INOVA" %}
                 <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4739761D0">Marcelo F C Gomes</a>: {% trans "Pesquisador Associado - Programa de Computação Científica/Fiocruz" %}
                 <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4791405Z2">Daniel A M Villela</a>: {% trans "Pesquisador Titular - Programa de Computação Científica/Fiocruz" %}
@@ -27,7 +27,7 @@
                 <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4456987Y3">Marcelo B B Ribeiro</a>: {% trans "Cientista de dados (Observatório da Dengue/InfoDengue)" %}
                 <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4488506T6">Felipe Bottega Diniz</a>: {% trans "Cientista de dados (WMP/InfoDengue)" %}
                 <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K8593649P3">Marcelle Chagas</a>: {% trans "Especialista em comunicação" %}
-                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4293185J8">Elton Nogueira Santana</a>: {% trans ": TI" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4293185J8">Elton Nogueira Santana</a>: {% trans "TI" %}
                 <li>{% trans "Sandro Loch : TI" %}
             </ul>
             <b>{% trans "Colaboradores:" %}</b>

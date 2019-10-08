@@ -1231,7 +1231,7 @@ msgid "Saiba Mais"
 msgstr ""
 
 #: templates/base.html:68
-msgid "Fale Conosco"
+msgid "Equipe"
 msgstr ""
 
 #: templates/base.html:70
