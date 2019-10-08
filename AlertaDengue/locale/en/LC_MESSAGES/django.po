@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-07 15:44+0000\n"
+"POT-Creation-Date: 2019-10-08 14:29+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -602,7 +602,6 @@ msgstr ""
 "            "
 
 #: AlertaDengue/dados/templates/about.html:180
-#| msgid "Como colaborar"
 msgid "Como colaborar"
 msgstr "How to Collaborate"
 
@@ -996,141 +995,231 @@ msgstr ""
 msgid "Número de casos estimados na semana"
 msgstr "Estimated cases in the week"
 
+#: AlertaDengue/dados/templates/contact.html:4
+#: AlertaDengue/templates/base.html:68
+msgid "Equipe"
+msgstr "Team"
+
 #: AlertaDengue/dados/templates/contact.html:9
 msgid ""
 "\n"
-"            O Sistema de Alerta Info Dengue é desenvolvido graças a parceria "
-"entre pesquisadores de diversas\n"
-"            instituições e o serviço público:<br><br>\n"
+"            <h5>O Sistema de Alerta Info Dengue é desenvolvido pela parceria "
+"de pesquisadores e profissionais \n"
+"            de diversas instituições:</h5><br>\n"
 "            "
 msgstr ""
 "\n"
-"The InfoDengue system is developed as a parternship between researchers from "
-"many institutions and public servants:<br><br>"
+"<h5>InfoDengue is developed and maintained by a  consortium of researchers "
+"and professionals from several institutions:</h5><br> "
 
 #: AlertaDengue/dados/templates/contact.html:13
 msgid "Coordenação Geral:"
-msgstr "Chief Coordinators:"
+msgstr "Principal Investigators:"
 
 #: AlertaDengue/dados/templates/contact.html:15
-msgid ""
-" Flávio Codeço Coelho: Professor Associado - Escola de Matemática Aplicada/"
-"FGV,"
-msgstr ""
-" Flávio Codeço Coelho: Associate Professor - School of Applied Mathematics - "
-"FGV,"
+#, fuzzy
+#| msgid "Professor Associado - Escola de Matemática Aplicada / FGV"
+msgid "Professor Associado - Escola de Matemática Aplicada/FGV"
+msgstr " Associate Professor - School of Applied Mathematics / FGV,"
 
 #: AlertaDengue/dados/templates/contact.html:16
-msgid ""
-" Oswaldo Gonçalves Cruz: Pesquisador Titular - Programa de Computação "
-"Científica/Fiocruz,"
-msgstr ""
-" Oswaldo Gonçalves Cruz: Full Researcher - Scientific Computing Program - "
-"Fiocruz,"
+#: AlertaDengue/dados/templates/contact.html:24
+#: AlertaDengue/dados/templates/contact.html:25
+#, fuzzy
+#| msgid "Pesquisador Titular - Programa de Computação Científica / Fiocruz"
+msgid "Pesquisador Titular - Programa de Computação Científica/Fiocruz"
+msgstr " Associate Researcher - Scientific Computing Program / Fiocruz,"
 
 #: AlertaDengue/dados/templates/contact.html:17
-msgid ""
-" Cláudia Torres Codeço: Pesquisadora Titular - Programa de Computação "
-"Científica/Fiocruz"
-msgstr ""
-" Cláudia Torres Codeço: Full Researcher - Scientific Computing Program - "
-"Fiocruz"
+#, fuzzy
+#| msgid "Pesquisadora Titular - Programa de Computação Científica / Fiocruz"
+msgid "Pesquisadora Titular - Programa de Computação Científica/Fiocruz"
+msgstr " Associate Researcher - Scientific Computing Program / Fiocruz"
 
 #: AlertaDengue/dados/templates/contact.html:19
-msgid "Gestão do Projeto:"
-msgstr "Project management:"
+msgid "Equipe:"
+msgstr "Team:"
 
 #: AlertaDengue/dados/templates/contact.html:21
-msgid ""
-"Thais Riback: Pesquisadora Colaboradora - Programa de Computação Científica/"
-"Fiocruz"
+#, fuzzy
+#| msgid "Epidemiologista - Bolsista INOVA"
+msgid "Epidemiologista, bolsista INOVA"
+msgstr "Epidemiologist, INOVA fellowship"
+
+#: AlertaDengue/dados/templates/contact.html:22
+#, fuzzy
+#| msgid "Epidemiologista - Bolsista PDJ-INOVA"
+msgid "Epidemiologista, bolsista PDJ-INOVA"
+msgstr "Epidemiologist, INOVA postdoc"
+
+#: AlertaDengue/dados/templates/contact.html:23
+#, fuzzy
+#| msgid ""
+#| "Thais Riback: Pesquisadora Colaboradora - Programa de Computação "
+#| "Científica / Fiocruz"
+msgid "Pesquisador Associado - Programa de Computação Científica/Fiocruz"
 msgstr ""
 "Thais Riback: Assistant researcher - Scientific Computing Program - Fiocruz"
 
-#: AlertaDengue/dados/templates/contact.html:23
-msgid "Desenvolvimento:"
-msgstr "Software Developers:"
-
-#: AlertaDengue/dados/templates/contact.html:25
-msgid " Flávio Amieiro: Sys Admin e Desenvolvedor - InfoDengue"
-msgstr " Flávio Amieiro: Sys Admin e Developer - InfoDengue"
-
 #: AlertaDengue/dados/templates/contact.html:26
-msgid " Israel Teixeira: Desenvolvedor - InfoDengue"
-msgstr " Israel Teixeira: developer - InfoDengue"
+#, fuzzy
+#| msgid "Cientista de dados - Bolsista INOVA"
+msgid "Cientista de dados, bolsista INOVA"
+msgstr "Data Scientist, INOVA fellowship"
 
 #: AlertaDengue/dados/templates/contact.html:27
-msgid ""
-" Marcelo Gomes: Pesquisador Visitante - Programa de Computação Científica/"
-"Fiocruz"
-msgstr ""
-" Marcelo Gomes: Visiting Researcher - Scientific Computing Program - Fiocruz"
+msgid "Cientista de dados (Observatório da Dengue/InfoDengue)"
+msgstr "Data Scientist (Observatório da Dengue/InfoDengue fellowship)"
+
+#: AlertaDengue/dados/templates/contact.html:28
+msgid "Cientista de dados (WMP/InfoDengue)"
+msgstr "Data Scientist (WMP/InfoDengue fellowship)"
 
 #: AlertaDengue/dados/templates/contact.html:29
+msgid "Especialista em comunicação"
+msgstr "Communication Professional "
+
+#: AlertaDengue/dados/templates/contact.html:30
+msgid "TI"
+msgstr ""
+
+#: AlertaDengue/dados/templates/contact.html:31
+msgid "Sandro Loch : TI"
+msgstr ""
+
+#: AlertaDengue/dados/templates/contact.html:33
 msgid "Colaboradores:"
 msgstr "Colaborators:"
 
-#: AlertaDengue/dados/templates/contact.html:31
-msgid ""
-" Wagner Meira: Professor Titular – Departamento de Ciência da Computação/UFMG"
-msgstr ""
-" Wagner Meira: Professor Titular – Departamento de Ciência da Computação/UFMG"
-
-#: AlertaDengue/dados/templates/contact.html:32
-msgid " Walter dos Santos Filho: Observatório da Dengue/UFMG"
-msgstr " Walter dos Santos Filho: Observatório da Dengue/UFMG"
-
-#: AlertaDengue/dados/templates/contact.html:33
-msgid ""
-" Magda Clara Vieira da Costa Ribeiro: Professora Adjunta – Instituto de "
-"Biociências/UFPR"
-msgstr ""
-" Magda Clara Vieira da Costa Ribeiro: Professora Adjunta – Instituto de "
-"Biociências/UFPR"
-
-#: AlertaDengue/dados/templates/contact.html:34
-msgid " Jean Carlos dos Santos Barrado: Doutorando – ENSP/Fiocruz"
-msgstr " Jean Carlos dos Santos Barrado: Doutorando – ENSP/Fiocruz"
-
 #: AlertaDengue/dados/templates/contact.html:35
-msgid ""
-" Cláudia Brandelero Rizzi: Professora - Curso de Ciência da Computação/"
-"UNIOESTE"
-msgstr ""
-" Cláudia Brandelero Rizzi: Professora - Curso de Ciência da Computação/"
-"UNIOESTE"
-
 #: AlertaDengue/dados/templates/contact.html:36
-msgid ""
-" Carolin Degener: Pós-Doutoranda – Programa de Computação Científica/Fiocruz"
-msgstr ""
-" Carolin Degener: Pós-Doutoranda – Programa de Computação Científica/Fiocruz"
+#: AlertaDengue/dados/templates/contact.html:37
+msgid "Observatório da Dengue/UFMG"
+msgstr "Observatório da Dengue/UFMG"
 
 #: AlertaDengue/dados/templates/contact.html:38
-msgid "Apoio:"
-msgstr "Support:"
+msgid "World Mosquito Program/Fiocruz"
+msgstr ""
 
-#: AlertaDengue/dados/templates/contact.html:40
+#: AlertaDengue/dados/templates/contact.html:39
+msgid "Instituto de Biociências/UFPR"
+msgstr "Instituto de Biociências/UFPR"
+
+#: AlertaDengue/dados/templates/contact.html:41
+msgid "Colaboradores internacionais:"
+msgstr "International Collaborators:"
+
+#: AlertaDengue/dados/templates/contact.html:43
+msgid "University of Exeter: UK"
+msgstr "University of Exeter, UK"
+
+#: AlertaDengue/dados/templates/contact.html:44
+msgid "University of Warwick: UK"
+msgstr "University of Warwick, UK"
+
+#: AlertaDengue/dados/templates/contact.html:45
+msgid "University of Chicago: USA"
+msgstr "University of Chicago, USA"
+
+#: AlertaDengue/dados/templates/contact.html:47
+msgid "Alunos:"
+msgstr "Students:"
+
+#: AlertaDengue/dados/templates/contact.html:49
+msgid ""
+"Aluna de mestrado do Programa de Epidemiologia em Saúde Pública - ENSP/"
+"Fiocruz"
+msgstr ""
+"Master student Programa de Epidemiologia em Saúde Pública, ENSP/Fiocruz"
+
+#: AlertaDengue/dados/templates/contact.html:50
+msgid ""
+"Aluna de graduação do Programa de Matemática Aplicada da FGV e PIBIC da "
+"Fiocruz"
+msgstr ""
+"Undergraduate student Programa de Matemática Aplicada da FGV e PIBIC da "
+"Fiocruz"
+
+#: AlertaDengue/dados/templates/contact.html:51
+msgid ""
+"Aluno de doutorado do Programa de Epidemiologia em Saúde Pública - ENSP/"
+"Fiocruz"
+msgstr "PhD student Programa de Epidemiologia em Saúde Pública, ENSP/Fiocruz"
+
+#: AlertaDengue/dados/templates/contact.html:52
+msgid ""
+"Aluno de doutorado do Programa de Biologia Computacional e Sistemas - IOC/"
+"Fiocruz"
+msgstr ""
+"PhD student Programa de Biologia Computacional e Sistemas, IOC/Fiocruz"
+
+#: AlertaDengue/dados/templates/contact.html:54
+msgid "Parceria:"
+msgstr "Partners:"
+
+#: AlertaDengue/dados/templates/contact.html:56
 msgid "Observatório da Dengue"
 msgstr "Observatório da Dengue"
 
-#: AlertaDengue/dados/templates/contact.html:41
+#: AlertaDengue/dados/templates/contact.html:57
 msgid "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
 msgstr "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
 
-#: AlertaDengue/dados/templates/contact.html:42
-msgid " Secretaria de estado de Saúde do Rio de Janeiro"
+#: AlertaDengue/dados/templates/contact.html:58
+#, fuzzy
+#| msgid " Secretaria de estado de Saúde do Rio de Janeiro"
+msgid "Secretaria de estado de Saúde do Rio de Janeiro"
 msgstr " Secretaria de estado de Saúde do Rio de Janeiro"
 
-#: AlertaDengue/dados/templates/contact.html:45
+#: AlertaDengue/dados/templates/contact.html:59
+#, fuzzy
+#| msgid " Secretaria de estado de Saúde do Rio de Janeiro"
+msgid "Secretaria Estadual de Saúde do Estado do Espírito Santo"
+msgstr " Secretaria de estado de Saúde do Rio de Janeiro"
+
+#: AlertaDengue/dados/templates/contact.html:60
+#, fuzzy
+#| msgid " Secretaria de estado de Saúde do Rio de Janeiro"
+msgid "Secretaria Estadual de Saúde do Estado do Paraná"
+msgstr " Secretaria de estado de Saúde do Rio de Janeiro"
+
+#: AlertaDengue/dados/templates/contact.html:61
+#, fuzzy
+#| msgid " Secretaria de estado de Saúde do Rio de Janeiro"
+msgid "Secretaria Estadual de Saúde do Estado do Ceará"
+msgstr " Secretaria de estado de Saúde do Rio de Janeiro"
+
+#: AlertaDengue/dados/templates/contact.html:62
+msgid "Regional de Saúde de Sete Lagoas/MG"
+msgstr ""
+
+#: AlertaDengue/dados/templates/contact.html:63
+#, fuzzy
+#| msgid "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
+msgid "Secretaria Municipal de Saúde de São José do Rio Preto"
+msgstr "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
+
+#: AlertaDengue/dados/templates/contact.html:65
+msgid "Apoio:"
+msgstr "Support:"
+
+#: AlertaDengue/dados/templates/contact.html:67
+msgid "DECIT/MS (2014 – 2016)"
+msgstr ""
+
+#: AlertaDengue/dados/templates/contact.html:68
+msgid "Fiocruz Edital Inova 2019 (2019-2020)"
+msgstr ""
+
+#: AlertaDengue/dados/templates/contact.html:70
 msgid ""
 " Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta "
 "Info Dengue?\n"
-"                Entre em contato <a href=\"mailto:alerta_dengue@fiocruz.br"
-"\">conosco</a>."
+"            Entre em contato<a href=\"mailto:alerta_dengue@fiocruz.br\"> "
+"conosco."
 msgstr ""
-" Would you like to know more or ask questions about the InfoDengue system? "
-"Contact <a href=\"mailto:alerta_dengue@fiocruz.br\">us</a>."
+" Would like to know more about Infodenue? <a href=\"mailto:"
+"alerta_dengue@fiocruz.br\"> Write to us</a>."
 
 #: AlertaDengue/dados/templates/dashboard_cities.html:56
 #, python-format
@@ -1771,10 +1860,6 @@ msgstr "Start"
 msgid "Saiba Mais"
 msgstr "Know more"
 
-#: AlertaDengue/templates/base.html:68
-msgid "Fale Conosco"
-msgstr "Get in touch"
-
 #: AlertaDengue/templates/base.html:70
 msgid "Participe"
 msgstr "Join us"
@@ -1865,8 +1950,58 @@ msgstr "Your username, if you have forgotten it, is:"
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
 
-#~ msgid "O Sistema de Alerta InfoDengue"
-#~ msgstr "The InfoDengue alert system"
+#~ msgid "Gestão do Projeto:"
+#~ msgstr "Project management:"
+
+#~ msgid "Desenvolvimento:"
+#~ msgstr "Software Developers:"
+
+#~ msgid " Flávio Amieiro: Sys Admin e Desenvolvedor - InfoDengue"
+#~ msgstr " Flávio Amieiro: Sys Admin e Developer - InfoDengue"
+
+#~ msgid " Israel Teixeira: Desenvolvedor - InfoDengue"
+#~ msgstr " Israel Teixeira: developer - InfoDengue"
+
+#~ msgid ""
+#~ " Marcelo Gomes: Pesquisador Visitante - Programa de Computação Científica/"
+#~ "Fiocruz"
+#~ msgstr ""
+#~ " Marcelo Gomes: Visiting Researcher - Scientific Computing Program - "
+#~ "Fiocruz"
+
+#~ msgid ""
+#~ " Wagner Meira: Professor Titular – Departamento de Ciência da Computação/"
+#~ "UFMG"
+#~ msgstr ""
+#~ " Wagner Meira: Professor Titular – Departamento de Ciência da Computação/"
+#~ "UFMG"
+
+#~ msgid " Walter dos Santos Filho: Observatório da Dengue/UFMG"
+#~ msgstr " Walter dos Santos Filho: Observatório da Dengue/UFMG"
+
+#~ msgid ""
+#~ " Magda Clara Vieira da Costa Ribeiro: Professora Adjunta – Instituto de "
+#~ "Biociências/UFPR"
+#~ msgstr ""
+#~ " Magda Clara Vieira da Costa Ribeiro: Professora Adjunta – Instituto de "
+#~ "Biociências/UFPR"
+
+#~ msgid " Jean Carlos dos Santos Barrado: Doutorando – ENSP/Fiocruz"
+#~ msgstr " Jean Carlos dos Santos Barrado: Doutorando – ENSP/Fiocruz"
+
+#~ msgid ""
+#~ " Cláudia Brandelero Rizzi: Professora - Curso de Ciência da Computação/"
+#~ "UNIOESTE"
+#~ msgstr ""
+#~ " Cláudia Brandelero Rizzi: Professora - Curso de Ciência da Computação/"
+#~ "UNIOESTE"
+
+#~ msgid ""
+#~ " Carolin Degener: Pós-Doutoranda – Programa de Computação Científica/"
+#~ "Fiocruz"
+#~ msgstr ""
+#~ " Carolin Degener: Pós-Doutoranda – Programa de Computação Científica/"
+#~ "Fiocruz"
 
 #~ msgid ""
 #~ "\n"

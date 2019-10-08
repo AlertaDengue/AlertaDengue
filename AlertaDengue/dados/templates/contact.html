@@ -1,51 +1,75 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}Equipe{% endblock %}
+{% block title %}{% trans "Equipe" %}{% endblock %}
 
 {% block content %}
     <div class="card">
         <div class="card-body">
             {% blocktrans %}
-            O Sistema de Alerta Info Dengue é desenvolvido graças a parceria entre pesquisadores de diversas
-            instituições e o serviço público:<br><br>
+            <h5>O Sistema de Alerta Info Dengue é desenvolvido pela parceria de pesquisadores e profissionais 
+            de diversas instituições:</h5><br>
             {% endblocktrans %}
             <b>{% trans "Coordenação Geral:" %}</b>
             <ul>
-                <li>{% trans " Flávio Codeço Coelho: Professor Associado - Escola de Matemática Aplicada/FGV," %}
-                <li>{% trans " Oswaldo Gonçalves Cruz: Pesquisador Titular - Programa de Computação Científica/Fiocruz," %}
-                <li>{% trans " Cláudia Torres Codeço: Pesquisadora Titular - Programa de Computação Científica/Fiocruz" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4784466T7">Flávio Codeço Coelho</a>: {% trans "Professor Associado - Escola de Matemática Aplicada/FGV" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4791352H4">Oswaldo Gonçalves Cruz</a>: {% trans "Pesquisador Titular - Programa de Computação Científica/Fiocruz" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4790532T7">Cláudia Torres Codeço</a>: {% trans "Pesquisadora Titular - Programa de Computação Científica/Fiocruz" %}
             </ul>
-            <b>{% trans "Gestão do Projeto:" %}</b>
+            <b>{% trans "Equipe:" %}</b>
             <ul>
-                <li>{% trans "Thais Riback: Pesquisadora Colaboradora - Programa de Computação Científica/Fiocruz" %}
-            </ul>
-            <b>{% trans "Desenvolvimento:" %}</b>
-            <ul>
-                <li>{% trans " Flávio Amieiro: Sys Admin e Desenvolvedor - InfoDengue" %}
-                <li>{% trans " Israel Teixeira: Desenvolvedor - InfoDengue" %}
-                <li>{% trans " Marcelo Gomes: Pesquisador Visitante - Programa de Computação Científica/Fiocruz" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4361680P0">Sara de Souza Oliveira</a>: {% trans "Epidemiologista, bolsista INOVA" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4223051Y0">Raquel Martins Lana</a>: {% trans "Epidemiologista, bolsista PDJ-INOVA" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4739761D0">Marcelo F C Gomes</a>: {% trans "Pesquisador Associado - Programa de Computação Científica/Fiocruz" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4791405Z2">Daniel A M Villela</a>: {% trans "Pesquisador Titular - Programa de Computação Científica/Fiocruz" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4764470D2">Leonardo Souza Bastos</a>: {% trans "Pesquisador Titular - Programa de Computação Científica/Fiocruz" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4409483U3">Linneu Holanda</a>: {% trans "Cientista de dados, bolsista INOVA" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4456987Y3">Marcelo B B Ribeiro</a>: {% trans "Cientista de dados (Observatório da Dengue/InfoDengue)" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4488506T6">Felipe Bottega Diniz</a>: {% trans "Cientista de dados (WMP/InfoDengue)" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K8593649P3">Marcelle Chagas</a>: {% trans "Especialista em comunicação" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4293185J8">Elton Nogueira Santana</a>: {% trans "TI" %}
+                <li>{% trans "Sandro Loch : TI" %}
             </ul>
             <b>{% trans "Colaboradores:" %}</b>
             <ul>
-                <li>{% trans " Wagner Meira: Professor Titular – Departamento de Ciência da Computação/UFMG" %}
-                <li>{% trans " Walter dos Santos Filho: Observatório da Dengue/UFMG" %}
-                <li>{% trans " Magda Clara Vieira da Costa Ribeiro: Professora Adjunta – Instituto de Biociências/UFPR" %}
-                <li>{% trans " Jean Carlos dos Santos Barrado: Doutorando – ENSP/Fiocruz" %}
-                <li>{% trans " Cláudia Brandelero Rizzi: Professora - Curso de Ciência da Computação/UNIOESTE" %}
-                <li>{% trans " Carolin Degener: Pós-Doutoranda – Programa de Computação Científica/Fiocruz" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4469269H2">Karina Talita O S Jorge</a> - {% trans "Observatório da Dengue/UFMG" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4782323E6">Mauro Martins Teixeira</a> - {% trans "Observatório da Dengue/UFMG" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4716736T4">Cecilia Marques Toledo</a> - {% trans "Observatório da Dengue/UFMG" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4759101T0">Thais I S Riback</a> - {% trans "World Mosquito Program/Fiocruz" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4700277J3">Magda C V C Ribeiro</a> - {% trans  "Instituto de Biociências/UFPR" %}
+            </ul>
+            <b>{% trans "Colaboradores internacionais:" %}</b>
+            <ul>
+                <li><a href="http://emps.exeter.ac.uk/mathematics/staff/te201">Theo Economou</a> - {% trans  "University of Exeter: UK" %}
+                <li><a href="https://www.wbs.ac.uk/about/person/suzy-moat/">Suzy Moat</a> and <a href="https://www.wbs.ac.uk/about/person/tobias-preis/">Tobias Preis</a> - {% trans "University of Warwick: UK" %}
+                <li><a href="https://pondside.uchicago.edu/ecol-evol/people/pascual.html">Mercedes Pascual</a> - {% trans  "University of Chicago: USA" %}
+            </ul>
+            <b>{% trans "Alunos:" %}</b>
+            <ul>
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4354190H7">Iasmim Ferreira de Almeida</a>: {% trans "Aluna de mestrado do Programa de Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K8736491E0">Beatriz Macedo Coimbra</a>: {% trans "Aluna de graduação do Programa de Matemática Aplicada da FGV e PIBIC da Fiocruz" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4473376Z6">Lucas Monteiro Bianchi</a>: {% trans "Aluno de doutorado do Programa de Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}
+                <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4859585D4">Leon Diniz Alves</a>: {% trans "Aluno de doutorado do Programa de Biologia Computacional e Sistemas - IOC/Fiocruz" %}
+            </ul>
+            <b>{% trans "Parceria:" %}</b> 
+            <ul>
+                <li><a href="https://observatorio.inweb.org.br">{% trans "Observatório da Dengue" %}</a>
+                <li><a href="http://www.rio.rj.gov.br/web/sms ">{% trans "Secretaria Municipal de Saúde/Rio de Janeiro/RJ" %}</a>
+                <li><a href="http://www.saude.rj.gov.br/">{% trans "Secretaria de estado de Saúde do Rio de Janeiro" %}</a>
+                <li>{% trans "Secretaria Estadual de Saúde do Estado do Espírito Santo" %}
+                <li>{% trans "Secretaria Estadual de Saúde do Estado do Paraná" %}
+                <li>{% trans "Secretaria Estadual de Saúde do Estado do Ceará" %}
+                <li>{% trans "Regional de Saúde de Sete Lagoas/MG" %}
+                <li>{% trans "Secretaria Municipal de Saúde de São José do Rio Preto" %}
             </ul>
             <b>{% trans "Apoio:" %}</b>
             <ul>
-                <li><a href="http://observatorio.inweb.org.br/">{% trans "Observatório da Dengue" %}</a>
-                <li><a href="http://www.rio.rj.gov.br/web/sms">{% trans "Secretaria Municipal de Saúde/Rio de Janeiro/RJ" %}</a>
-                <li><a href="http://www.saude.rj.gov.br">{% trans " Secretaria de estado de Saúde do Rio de Janeiro" %}</a>
+                <li> {% trans "DECIT/MS (2014 – 2016)" %}
+                <li> {% trans "Fiocruz Edital Inova 2019 (2019-2020)" %}
             </ul>
-
             <p>{% blocktrans %} Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta Info Dengue?
-                Entre em contato <a href="mailto:alerta_dengue@fiocruz.br">conosco</a>.{% endblocktrans %}
-
-            </p>
+            Entre em contato<a href="mailto:alerta_dengue@fiocruz.br"> conosco.{% endblocktrans %} 
+            <p>
 
 
         </div>
