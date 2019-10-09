@@ -266,14 +266,6 @@ class JoininPageView(TemplateView):
         return context
 
 
-class PartnersPageView(TemplateView):
-    template_name = 'partners.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(PartnersPageView, self).get_context_data(**kwargs)
-        return context
-
-
 class DataPublicServicesPageView(TemplateView):
     template_name = 'services.html'
 

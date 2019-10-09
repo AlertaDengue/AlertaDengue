@@ -21,7 +21,6 @@ from .views import (
     AboutPageView,
     ContactPageView,
     JoininPageView,
-    PartnersPageView,
     DataPublicServicesPageView,
 )
 
@@ -59,7 +58,6 @@ urlpatterns = [
     url(r'^informacoes/$', AboutPageView.as_view(), name='about'),
     url(r'^contato/$', ContactPageView.as_view(), name='contact'),
     url(r'^participe/$', JoininPageView.as_view(), name='joinin'),
-    url(r'^partners/$', PartnersPageView.as_view(), name='partners'),
     url(
         r'^services/(?P<service>maps|api)?$',
         DataPublicServicesPageView.as_view(),
