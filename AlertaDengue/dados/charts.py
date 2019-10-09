@@ -602,7 +602,7 @@ class HomeCharts:
             fig.update_yaxes(
                 title_text="Pessoas",
                 secondary_y=True,
-                showline=True,
+                showline=False,
                 showgrid=True,
                 showticklabels=True,
                 linecolor='rgb(204, 204, 204)',
