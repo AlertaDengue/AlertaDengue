@@ -169,7 +169,7 @@
                 </small>
             </div>
 
-
+            <a name="nome_da_ancora"></a>
             <div class="row">
                 <div class="col-md-12 column py-3" id="message-url">
                 </div>
@@ -178,6 +178,33 @@
                 <input type="submit" class="btn btn-primary"
                        value='{% trans "Download" %}'
                 />
+   
+            <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="true" aria-controls="collapseExample">
+                Dicionário de variáveis
+            </a>
+            </div>
+            <div class="collapse" id="collapseExample">
+            <div class="card card-body">
+          
+                    <h5><b>Dicionário de variáveis</b></h5>
+                    <ul>
+                    <p><li><b>Id</b> : {% trans "Indice numérico" %}.</p></li>
+                    <p><li><b>Aps</b>: {% trans "Apenas útil na cidade do Rio de Janeiro, onde os indicadores são calculados por área programática da saúde" %}.</p></li>
+                    <p><li><b>Se</b> : {% trans "Semana epidemiológica" %}.</p></li>
+                    <p><li><b>Data</b>: {% trans "Data da semana epidemiológica" %}.</p></li>
+                    <p><li><b>Tweets</b>: {% trans "Número de menções à sintomas de dengue nos tweets geolocalizados no município de interesse. Fonte: Observatório da Dengue/UFMG" %}.</p></li>
+                    <p><li><b>Casos</b>: {% trans "Número de casos notificados de dengue na semana (atenção que os dados não são necessariamente completos e estão sujeitos a modificações, os valores são atualizados todas as semanas, inclusive os históricos)" %}</p></li>
+                    <p><li><b>Casos_est</b>: {% trans "Estimativa pontual de casos ede dengue na semana usando modelo de nowcating (atenção: esses valores são atualizados todas as semanas, inclusive os históricos)" %}</p></li>
+                    <p><li><b>Casos_estmin e casos_estmax</b>: {% trans "Intervalo de credibilidade de 95% das estimativas de casos" %}.</p></li>
+                    <p><li><b>Tmin</b>: {% trans "Média semanal das temperaturas mínimas. Fonte: aeroportos, com dados, mais próximos da cidade selecionada" %}.</p></li>
+                    <p><li><b>Rt</b>: {% trans "Estimativa pontual do número reprodutivo de casos na semana ver" %} (<a href="/informacoes/">{% trans "Saiba Mais" %}</a>).</p></li>
+                    <p><li><b>Prt1</b>: {% trans "Probabilidade do número reprodutivo estimado ser maior que 1. Para o alerta, usamos como critério: prt1 > 95%" %}</p></li>
+                    <p><li><b>Inc</b>: {% trans "Incidência de casos de dengue calculado dividindo casos pela população" %}.</p></li>
+                    <p><li><b>Nivel</b>: {% trans "Nivel de alerta (1 = verde, 2 = amarelo, 3 = laranja, 4 = vermelho)" %}. {% trans "Para mais detalhes, ver" %} (<a href="/informacoes/">{% trans "Saiba Mais" %}</a>)</p></li>
+                    <li><b>Sum</b>: {% trans "Número de registros" %}.</p></li>
+                    </ul>
+            
+            </div>
             </div>
         </div>
     </div>
