@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-10 18:55+0000\n"
+"POT-Creation-Date: 2019-10-11 17:24+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1521,6 +1521,11 @@ msgstr "Reported cases of %(disease_label)s"
 #: AlertaDengue/dados/templates/services.html:19
 msgid "Serviços de Dados Públicos"
 msgstr "Public Data Service"
+
+#: AlertaDengue/dados/templates/services.html:27
+msgid ""
+"Aqui podem ser encontrados os dados mostrados nas figuras e tabelas do site"
+msgstr "Here you can find the data shown in the figures and tables of the site"
 
 #: AlertaDengue/dados/templates/services_api.html:69
 #: AlertaDengue/dados/templates/services_api_doc.html:46
