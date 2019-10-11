@@ -7,7 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2019-10-11 17:24+0000\n"
+=======
+"POT-Creation-Date: 2019-10-11 20:05+0000\n"
+>>>>>>> Translated titles of graphics on main-page (Lenguage English)
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -19,6 +23,15 @@ msgstr ""
 "X-Language: en_US\n"
 "X-Source-Language: pt_BR\n"
 "X-Generator: Poedit 1.8.7.1\n"
+
+#: AlertaDengue/dados/charts.py:572
+msgid "Casos estimados de {}"
+msgstr "Estimated cases {}"
+
+#: AlertaDengue/dados/charts.py:604
+#: AlertaDengue/dados/templates/series_plot.html:37
+msgid "Pessoas"
+msgstr "People"
 
 #: AlertaDengue/dados/models.py:17 AlertaDengue/forecast/models.py:55
 msgid "Código do Município"
@@ -1482,10 +1495,6 @@ msgstr "Zika Level"
 #, python-format
 msgid "Séries de dados e Alertas anteriores para %(nome)s"
 msgstr "Data series and previous level alerts for %(nome)s"
-
-#: AlertaDengue/dados/templates/series_plot.html:37
-msgid "Pessoas"
-msgstr "People"
 
 #: AlertaDengue/dados/templates/series_plot.html:87
 #, python-format

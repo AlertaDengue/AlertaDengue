@@ -1,6 +1,7 @@
 from datetime import timedelta
 from time import mktime
 import json
+from django.utils.translation import gettext as _
 
 import plotly.graph_objs as go
 import pandas as pd
@@ -568,7 +569,7 @@ class HomeCharts:
             fig.update_layout(
                 height=350,
                 width=1000,
-                title_text="Casos estimados de {}".format(disease),
+                title_text=_('Casos estimados de {}').format(disease),
                 plot_bgcolor='rgb(255, 255, 255)',
                 paper_bgcolor='rgb(255, 255, 255)',
                 showlegend=True,
@@ -600,7 +601,7 @@ class HomeCharts:
             )
 
             fig.update_yaxes(
-                title_text="Pessoas",
+                title_text=_('Pessoas'),
                 secondary_y=True,
                 showline=False,
                 showgrid=True,
