@@ -7,11 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2019-10-11 17:24+0000\n"
-=======
-"POT-Creation-Date: 2019-10-11 20:05+0000\n"
->>>>>>> Translated titles of graphics on main-page (Lenguage English)
+"POT-Creation-Date: 2019-10-14 12:07+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1612,12 +1608,12 @@ msgid "Download"
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:182
-msgid "Mostrar dicionário de variáveis"
-msgstr "Show Variable Dictionary"
+msgid "Mostrar Dicionário de Dados"
+msgstr "Show Data Dictionary"
 
 #: AlertaDengue/dados/templates/services_api.html:188
-msgid "Dicionário de variáveis"
-msgstr "Variable Dictionary"
+msgid "Dicionário de Dados"
+msgstr " Data Dictionary"
 
 #: AlertaDengue/dados/templates/services_api.html:190
 msgid "Id"
@@ -1653,10 +1649,8 @@ msgid "Data"
 msgstr "Date"
 
 #: AlertaDengue/dados/templates/services_api.html:193
-#, fuzzy
-#| msgid "Data da Semana Epidemiológica"
 msgid "Data da semana epidemiológica"
-msgstr "Date of the epidemiological week"
+msgstr "Mid-date of the epidemiological week"
 
 #: AlertaDengue/dados/templates/services_api.html:194
 msgid "Tweets"
@@ -1664,7 +1658,7 @@ msgstr "Tweets"
 
 #: AlertaDengue/dados/templates/services_api.html:194
 msgid ""
-"Número de menções à sintomas de dengue nos tweets geolocalizados no "
+"Número de menções a sintomas de dengue nos tweets geolocalizados no "
 "município de interesse. Fonte: Observatório da Dengue/UFMG"
 msgstr ""
 "Number of mentions of dengue symptoms in geolocated tweets in the "
@@ -1672,13 +1666,13 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:195
 msgid ""
-"Número de casos notificados de dengue na semana (atenção que os dados não "
-"são necessariamente completos e estão sujeitos a modificações, os valores "
-"são atualizados todas as semanas, inclusive os históricos)"
+"Número de casos de dengue na semana (atenção que os dados não são "
+"necessariamente completos e estão sujeitos a modificações, os valores são "
+"atualizados todas as semanas, inclusive os históricos)"
 msgstr ""
 "Number of reported cases of dengue in the week (note that data are not "
 "necessarily complete and subject to change, values ​​are updated weekly, "
-"including historical)"
+"including historical data)"
 
 #: AlertaDengue/dados/templates/services_api.html:196
 msgid "Casos_est"
@@ -1690,17 +1684,16 @@ msgid ""
 "(atenção: esses valores são atualizados todas as semanas, inclusive os "
 "históricos)"
 msgstr ""
-"Spot case dengue case estimates for the week using nowcating model (note: "
+"Point estimate of dengue incidence per week using nowcating model (note: "
 "these values ​​are updated every week, including historical ones)"
 
 #: AlertaDengue/dados/templates/services_api.html:197
-msgid "Casos_estmin e casos_estmax"
-msgstr "Cases_estmin and Cases_estmax"
+msgid "Casos_est_min e casos_est_max"
+msgstr "Cases_est_min and Cases_est_max"
 
 #: AlertaDengue/dados/templates/services_api.html:197
-#, python-format
 msgid "Intervalo de credibilidade de 95%% das estimativas de casos"
-msgstr "95%% credibility range of case estimates"
+msgstr "95% credibility interval of the estimated dengue incidence"
 
 #: AlertaDengue/dados/templates/services_api.html:198
 msgid "Tmin"
@@ -1711,16 +1704,16 @@ msgid ""
 "Média semanal das temperaturas mínimas. Fonte: aeroportos, com dados, mais "
 "próximos da cidade selecionada"
 msgstr ""
-"Weekly average minimum temperatures. Source: airports with data closest to "
-"the selected city"
+"Average of the daily minimum temperatures. Source: airports with data "
+"closest to the selected city"
 
 #: AlertaDengue/dados/templates/services_api.html:199
 msgid "Rt"
 msgstr "Rt"
 
 #: AlertaDengue/dados/templates/services_api.html:199
-msgid "Estimativa pontual do número reprodutivo de casos na semana, ver"
-msgstr "Point estimate of the reproductive number of cases in the week"
+msgid "Estimativa pontual do número reprodutivo de casos, ver"
+msgstr "Point estimate of the reproductive number of cases, see"
 
 #: AlertaDengue/dados/templates/services_api.html:199
 #: AlertaDengue/dados/templates/services_api.html:202
@@ -1733,21 +1726,24 @@ msgid "Prt1"
 msgstr "Prt1"
 
 #: AlertaDengue/dados/templates/services_api.html:200
-#, python-format
 msgid ""
 "Probabilidade do número reprodutivo estimado ser maior que 1. Para o alerta, "
-"usamos como critério: prt1 > 95%%"
+"usamos como critério: prt1 > 95"
 msgstr ""
-" Probability of estimated reproductive number to be greater than 1. For the "
-"alert, we used as criteria: prt1> 95%%"
+" Probability (Rt > 1). For issuing the orange alert, we use criterion "
+"prt1>0.95"
 
 #: AlertaDengue/dados/templates/services_api.html:201
 msgid "Inc"
 msgstr "Inc"
 
 #: AlertaDengue/dados/templates/services_api.html:201
-msgid "Incidência de casos de dengue calculado dividindo casos pela população"
-msgstr "Incidence of dengue cases calculated by dividing cases by population"
+msgid ""
+"Incidência de casos de dengue calculado dividindo casos pela população (x "
+"100,000)"
+msgstr ""
+"Dengue incidence calculated as the ratio between cases and population (x "
+"100,000)"
 
 #: AlertaDengue/dados/templates/services_api.html:202
 msgid "Nivel"
