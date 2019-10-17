@@ -573,14 +573,14 @@ class HomeCharts:
             height=350,
             width=1000,
             title=go.layout.Title(
-                text=_('Casos estimados de {}').format(disease)),
-            showlegend=True,
-            font=dict(
-                    family="sans-serif",
-                    size=12,
-                    color="black"),
+                text=_(
+                    'Casos Estimados de {} <br>'
+                    'nos municípios monitorados').format(disease.capitalize()),
+                font=dict(family="sans-serif", size=16)),
             plot_bgcolor='rgb(255, 255, 255)',
             paper_bgcolor='rgb(255, 255, 255)',
+            showlegend=True,
+            font=dict(family="sans-serif", size=12),
             xaxis=dict(
                 # title='',
                 tickangle=-20,
@@ -593,8 +593,7 @@ class HomeCharts:
                 gridcolor='rgb(176, 196, 222)',
                 ticks='outside',
                 tickfont=dict(
-                    family='Arial', size=12, color='rgb(82, 82, 82)'
-                )
+                    family='Arial', size=12, color='rgb(82, 82, 82)')
             ),
             yaxis=dict(
                 # title='',
