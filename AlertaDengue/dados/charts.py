@@ -562,9 +562,9 @@ class HomeCharts:
                     name=k,
                     marker={'color': cls.colors[k]},
                     text=df_ufs.index.strftime('%d-%b-%Y <br>{}'.format(k)),
-                    hovertemplate='%{text} <br>'
-                    '%{y} Casos Estimados '
-                    '<extra></extra>',
+                    hovertemplate=_('%{text} <br>'
+                                    '%{y} Casos Estimados'
+                                    '<extra></extra>'),
                 ),
                 secondary_y=True
             )
@@ -574,7 +574,7 @@ class HomeCharts:
             width=1000,
             title=go.layout.Title(
                 text=_(
-                    'Casos Estimados de {} <br>'
+                    'Casos Estimados de {} '
                     'nos municípios monitorados').format(disease.capitalize()),
                 font=dict(family="sans-serif", size=16)),
             plot_bgcolor='rgb(255, 255, 255)',

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-17 13:31+0000\n"
+"POT-Creation-Date: 2019-10-18 12:29+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -20,11 +20,15 @@ msgstr ""
 "X-Source-Language: pt_BR\n"
 "X-Generator: Poedit 1.8.7.1\n"
 
-#: AlertaDengue/dados/charts.py:577
-msgid "Casos Estimados de {} <br>nos municípios monitorados"
-msgstr "Estimated cases of {} <br>in monitored cities"
+#: AlertaDengue/dados/charts.py:565
+msgid "%{text} <br>%{y} Casos Estimados<extra></extra>"
+msgstr "%{text} <br>%{y} Estimated cases<extra></extra>"
 
-#: AlertaDengue/dados/charts.py:610
+#: AlertaDengue/dados/charts.py:577
+msgid "Casos Estimados de {} nos municípios monitorados"
+msgstr "Estimated cases of {} in monitored cities"
+
+#: AlertaDengue/dados/charts.py:611
 #: AlertaDengue/dados/templates/series_plot.html:37
 msgid "Pessoas"
 msgstr "People"
@@ -1331,39 +1335,39 @@ msgstr ""
 "            If you have further questions, please contact  <a href=\"mailto:"
 "alerta_dengue@fiocruz.br\">us </a>: <br>"
 
-#: AlertaDengue/dados/templates/main.html:75
+#: AlertaDengue/dados/templates/main.html:76
 #, python-format
 msgid "Situação Epidemiológica - %(num_mun)s Municípios monitorados"
 msgstr "Epidemiological Situation - %(num_mun)s Monitored cities"
 
-#: AlertaDengue/dados/templates/main.html:124
+#: AlertaDengue/dados/templates/main.html:125
 #: AlertaDengue/dados/templates/state_cities.html:177
 msgid "Última atualização"
 msgstr "Last update"
 
-#: AlertaDengue/dados/templates/main.html:135
+#: AlertaDengue/dados/templates/main.html:136
 msgid "Municípios participantes"
 msgstr "Participating Municipalities"
 
-#: AlertaDengue/dados/templates/main.html:142
+#: AlertaDengue/dados/templates/main.html:143
 msgid "Total de casos notificado / estimados na semana"
 msgstr "Total reported / estimated cases in the week"
 
-#: AlertaDengue/dados/templates/main.html:151
+#: AlertaDengue/dados/templates/main.html:152
 msgid "Previsão de casos para as próximas semanas"
 msgstr "Prediction of cases for the coming weeks"
 
-#: AlertaDengue/dados/templates/main.html:158
+#: AlertaDengue/dados/templates/main.html:159
 msgid "Variação em relação à semana anterior"
 msgstr "Variation from the previous week"
 
-#: AlertaDengue/dados/templates/main.html:180
+#: AlertaDengue/dados/templates/main.html:181
 msgid ""
 "Variação da quadrissemana atual em relação à quadrissemana do último ano"
 msgstr ""
 "Variation of the current 4 weeks in relation to the 4 weeks of the last year"
 
-#: AlertaDengue/dados/templates/main.html:209
+#: AlertaDengue/dados/templates/main.html:210
 msgid "Clique aqui para ver mais detalhes"
 msgstr "Click here to see more details"
 
@@ -2107,6 +2111,9 @@ msgstr "Your username, if you have forgotten it, is:"
 #: AlertaDengue/templates/registration/password_reset_email.html:10
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
+
+#~ msgid "%{y} Casos Estimados"
+#~ msgstr "%{y} Estimated cases"
 
 #~ msgid "Casos estimados de {}"
 #~ msgstr "Estimated cases {}"
