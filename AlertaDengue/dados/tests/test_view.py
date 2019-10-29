@@ -1,19 +1,16 @@
-# coding=utf-8
-from django.conf import settings
-from django.test import TestCase
-from unittest import skip
-
-try:
-    from django.urls import reverse  # django 2
-except ModuleNotFoundError:
-    # django old version
-    from django.core.urlresolvers import reverse
-
 import json
-import os
+
+from django.urls import reverse  # django 2
+from django.test import Client
+
+import pytest
 
 
-class TestAlertaStaticPageView(TestCase):
+@pytest.mark.django_db
+class TestAlertaStaticPageView:
+    def setup(self):
+        self.client = Client()
+
     def test_about(self):
         response = self.client.get(reverse('dados:about'))
         self.assertEqual(response.status_code, 200)
@@ -54,12 +51,12 @@ class TestAlertaStaticPageView(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class TestAlertaPageView(TestCase):
-    def setUp(self):
-        settings.DATA_DIR = os.path.dirname(__file__)
+class TestAlertaPageView:
+    def setup(self):
+        # settings.DATA_DIR = os.path.dirname(__file__)
         self.response = self.client.get(reverse('dados:mrj', args=['dengue']))
 
-    @skip
+    @pytest.mark.skip
     def test_casos_por_ap(self):
         casos_por_ap = {
             u"1.0": 0,
@@ -77,7 +74,7 @@ class TestAlertaPageView(TestCase):
             json.loads(self.response.context['casos_por_ap']), casos_por_ap
         )
 
-    @skip
+    @pytest.mark.skip
     def test_alerta(self):
         alerta = {
             1.0: 1,
@@ -94,12 +91,12 @@ class TestAlertaPageView(TestCase):
 
         self.assertEqual(self.response.context['alerta'], alerta)
 
-    @skip
+    @pytest.mark.skip
     def test_novos_casos(self):
         novos_casos = 143
         self.assertEqual(self.response.context['novos_casos'], novos_casos)
 
-    @skip
+    @pytest.mark.skip
     def test_series_casos(self):
         series_casos = {
             '1.0': [3, 6, 4, 2, 5, 3, 12, 14, 10, 0, 0, 0],
@@ -115,32 +112,32 @@ class TestAlertaPageView(TestCase):
         }
         self.assertEqual(self.response.context['series_casos'], series_casos)
 
-    @skip
+    @pytest.mark.skip
     def test_SE(self):
         SE = 20
         self.assertEqual(self.response.context['SE'], SE)
 
-    @skip
+    @pytest.mark.skip
     def test_data1(self):
         data1 = '18 de maio de 2015'
         self.assertEqual(self.response.context['data1'], data1)
 
-    @skip
+    @pytest.mark.skip
     def test_data2(self):
         data2 = '24 de maio de 2015'
         self.assertEqual(self.response.context['data2'], data2)
 
-    @skip
+    @pytest.mark.skip
     def test_last_year(self):
         last_year = 0
         self.assertEqual(self.response.context['last_year'], last_year)
 
-    @skip
+    @pytest.mark.skip
     def test_look_back(self):
         look_back = 12
         self.assertEqual(self.response.context['look_back'], look_back)
 
-    @skip
+    @pytest.mark.skip
     def test_total_series(self):
         total_series = (
             '98, 134, 177, 241, 247, 371, 703, 466, 495, 136, 142, 143'

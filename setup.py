@@ -47,7 +47,7 @@ def get_version():
     import importlib
 
     mod = importlib.machinery.SourceFileLoader(
-        'version', os.path.join('AlertaDengue', 'version.py')
+        'version', os.path.join('AlertaDengue', 'AlertaDengue', 'version.py')
     ).load_module()
     return mod.__version__
 
@@ -60,10 +60,10 @@ def list_dir(pathname=PATH_ROOT, dir_name=''):
     return ['.%s' % r[size:] for r in result]
 
 
-with open('../README.md', encoding='utf-8') as readme_file:
+with open('README.md', encoding='utf-8') as readme_file:
     readme = readme_file.read()
 
-with open('../HISTORY.md', encoding='utf-8') as history_file:
+with open('HISTORY.md', encoding='utf-8') as history_file:
     history = history_file.read()
 
 install_reqs = parse_requirements('requirements.txt', session=PipSession())
@@ -93,7 +93,6 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],

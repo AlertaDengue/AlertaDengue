@@ -1,5 +1,7 @@
-compose_cmd = docker-compose -p infodengue -f docker-compose.yml
-staging_compose_cmd = docker-compose -p infodengue_staging -f staging-compose.yml
+compose_cmd = docker-compose -p infodengue -f docker/docker-compose.yml
+staging_compose_cmd = docker-compose -p infodengue_staging -f docker/staging-compose.yml
+
+# DEPLOY PRODUCTION AND STAGING
 
 build:
 	$(compose_cmd) build
@@ -38,4 +40,15 @@ generate_maps_staging: build
 clean_staging:
 	$(staging_compose_cmd) stop
 	$(staging_compose_cmd) rm
-	
+
+# DEVELOP
+
+clean:
+	python setup.py clean
+	find ./ -name '*.pyc' -type f -delete
+
+develop: clean
+	python setup.py develop
+	pip install pre_commit
+	cd ..
+	pre-commit install

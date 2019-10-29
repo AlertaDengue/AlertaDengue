@@ -35,7 +35,7 @@ RUN conda config --set show_channel_urls True && \
     conda clean --tarballs --packages && \
     conda config --add channels conda-forge
 
-ADD AlertaDengue/environment.yml /tmp/environment.yml
+ADD environment.yml /tmp/environment.yml
 RUN conda env update -n base --file /tmp/environment.yml
 
 # Send code to the container

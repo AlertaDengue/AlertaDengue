@@ -1,4 +1,4 @@
-version: "2"
+version: "3"
 services:
     staging_memcache:
       image: memcached:latest
@@ -13,17 +13,21 @@ services:
 
     staging_db:
       build:
-        context: "."
-        dockerfile: "Dockerfile-postgres"
+        context: ..
+        dockerfile: docker/Dockerfile-postgres
       env_file:
         - .env
       hostname: staging_db
       volumes:
         - ${STAGING_DATA_DIR}:/var/lib/postgresql/data
       restart: always
+      entrypoint:
+        - ./docker-entrypoint-initdb.d/entrypoint.sh
 
     staging_web:
-      build: .
+      build:
+        context: ..
+        dockerfile: docker/Dockerfile
       env_file:
         - .env
       ports:
@@ -47,8 +51,8 @@ services:
 
     staging_celery-worker:
       build:
-        context: "."
-        dockerfile: "Dockerfile-celery"
+        context: ..
+        dockerfile: docker/Dockerfile-celery
       env_file:
         - .env
       environment:
@@ -66,8 +70,8 @@ services:
 
     staging_mapserver:
         build:
-            context: "."
-            dockerfile: "Dockerfile-mapserver"
+            context: ..
+            dockerfile: docker/Dockerfile-mapserver
         ports:
             - 7777:80
         env_file:

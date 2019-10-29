@@ -1,0 +1,34 @@
+name: alertadengue
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+- django
+- django-bootstrap4
+- django-leaflet
+- geojson
+- gunicorn
+- numpy
+- pandas
+- pip
+- python-decouple
+- pytz
+- psycopg2
+- sqlalchemy
+- python-memcached
+- django-makemessages-xgettext
+- mock
+- dbfread
+- dj-database-url
+- django-chunked-upload
+- celery
+- dj-static
+- gdal
+- fiona
+- rasterio
+- geopy
+- geopandas
+- sh
+- ipython
+- sqlparse
+- plotly=4.0.0
