@@ -13,16 +13,14 @@ services:
 
     staging_db:
       build:
-        context: ..
-        dockerfile: docker/Dockerfile-postgres
+        context: .
+        dockerfile: Dockerfile-postgres
       env_file:
         - .env
       hostname: staging_db
       volumes:
         - ${STAGING_DATA_DIR}:/var/lib/postgresql/data
       restart: always
-      entrypoint:
-        - ./docker-entrypoint-initdb.d/entrypoint.sh
 
     staging_web:
       build:
