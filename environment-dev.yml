@@ -22,6 +22,7 @@ dependencies:
 - dbfread
 - dj-database-url
 - django-chunked-upload
+- docker-compose
 - celery
 - dj-static
 - gdal

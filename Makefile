@@ -3,7 +3,13 @@ staging_compose_cmd = docker-compose -p infodengue_staging -f docker/staging-com
 
 # DEPLOY PRODUCTION AND STAGING
 
-build:
+# TODO: remove that when docker-compose v1.25 is available
+#       and add the parameter --env-file ./docker/.env
+#       see: https://github.com/docker/compose/pull/6535
+dotenv:
+	cp docker/.env .env
+
+build: dotenv
 	$(compose_cmd) build
 	$(compose_cmd) run --rm web python3 manage.py migrate --noinput
 	$(compose_cmd) run --rm web python3 manage.py migrate --database=forecast --noinput
@@ -20,7 +26,7 @@ stop:
 	$(compose_cmd) stop
 
 
-build_staging:
+build_staging: dotenv
 	$(staging_compose_cmd) build
 	$(staging_compose_cmd) run --rm staging_db postgres -V
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --noinput

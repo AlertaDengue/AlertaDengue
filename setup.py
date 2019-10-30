@@ -75,7 +75,7 @@ test_requirements = [
 ]
 
 setup(
-    name='AlertaDengue',
+    name='alerta-dengue',
     version=get_version(),
     description="Dengue alert",
     long_description=readme + '\n\n' + history,

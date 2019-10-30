@@ -35,7 +35,7 @@ services:
       environment:
         - MEMCACHED_HOST=staging_memcache
         - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
-        - DATABASE_URL = postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:5432/infodengue
+        - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:5432/infodengue
         - PSQL_HOST=staging_db
       volumes:
         - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
@@ -57,7 +57,7 @@ services:
         - .env
       environment:
         - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
-        - DATABASE_URL = postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:5432/infodengue
+        - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:5432/infodengue
         - PSQL_HOST=staging_db
       volumes:
         - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT

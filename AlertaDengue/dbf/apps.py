@@ -2,4 +2,5 @@ from django.apps import AppConfig
 
 
 class DbfConfig(AppConfig):
-    name = 'dbf'
+    # TODO: fix this if necessary
+    name = 'AlertaDengue.dbf'
