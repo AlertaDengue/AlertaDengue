@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-04 14:25+0000\n"
+"POT-Creation-Date: 2019-11-04 14:59+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -20,13 +20,24 @@ msgstr ""
 "X-Source-Language: pt_BR\n"
 "X-Generator: Poedit 1.8.7.1\n"
 
-#: dados/charts.py:572
-msgid "Casos estimados de {}"
-msgstr "Estimated cases {}"
+#: dados/charts.py:563
+#, python-brace-format
+msgid "%{text} <br>%{y} Casos Estimados<extra></extra>"
+msgstr ""
 
-#: dados/charts.py:604 dados/templates/series_plot.html:37
-msgid "Pessoas"
-msgstr "People"
+#: dados/charts.py:575
+msgid "Casos Estimados de {} nos municípios monitorados"
+msgstr "Estimated cases of {} in monitored cities"
+
+#: dados/charts.py:608 dados/templates/alert_state/age.html:121
+#: dados/templates/alert_state/date.html:93
+#: dados/templates/alert_state/disease.html:117
+#: dados/templates/alert_state/epiyears.html:39
+#: dados/templates/alert_state/gender.html:111
+#: dados/templates/alerta_mrj.html:21 dados/templates/services_api.html:195
+#: dados/templates/total_series.html:28
+msgid "Casos"
+msgstr "Cases"
 
 #: dados/models.py:17 forecast/models.py:55
 msgid "Código do Município"
@@ -894,16 +905,6 @@ msgstr "Planning areas"
 msgid "Distribuição por Idade"
 msgstr "Age distribution"
 
-#: dados/templates/alert_state/age.html:121
-#: dados/templates/alert_state/date.html:93
-#: dados/templates/alert_state/disease.html:117
-#: dados/templates/alert_state/epiyears.html:39
-#: dados/templates/alert_state/gender.html:111
-#: dados/templates/alerta_mrj.html:21 dados/templates/services_api.html:195
-#: dados/templates/total_series.html:28
-msgid "Casos"
-msgstr "Cases"
-
 #: dados/templates/alert_state/age.html:137
 #: dados/templates/alert_state/gender.html:127
 msgid "Clique na categoria (coluna) para <br/>alterar seleção de filtro."
@@ -1300,38 +1301,38 @@ msgstr ""
 "            If you have further questions, please contact  <a href=\"mailto:"
 "alerta_dengue@fiocruz.br\">us </a>: <br>"
 
-#: dados/templates/main.html:69
+#: dados/templates/main.html:76
 #, python-format
 msgid "Situação Epidemiológica - %(num_mun)s Municípios monitorados"
 msgstr "Epidemiological Situation - %(num_mun)s Monitored cities"
 
-#: dados/templates/main.html:115 dados/templates/state_cities.html:181
+#: dados/templates/main.html:122 dados/templates/state_cities.html:181
 msgid "Última atualização"
 msgstr "Last update"
 
-#: dados/templates/main.html:126
+#: dados/templates/main.html:133
 msgid "Municípios participantes"
 msgstr "Participating Municipalities"
 
-#: dados/templates/main.html:133
+#: dados/templates/main.html:140
 msgid "Total de casos notificado / estimados na semana"
 msgstr "Total reported / estimated cases in the week"
 
-#: dados/templates/main.html:142
+#: dados/templates/main.html:149
 msgid "Previsão de casos para as próximas semanas"
 msgstr "Prediction of cases for the coming weeks"
 
-#: dados/templates/main.html:149
+#: dados/templates/main.html:156
 msgid "Variação em relação à semana anterior"
 msgstr "Variation from the previous week"
 
-#: dados/templates/main.html:171
+#: dados/templates/main.html:178
 msgid ""
 "Variação da quadrissemana atual em relação à quadrissemana do último ano"
 msgstr ""
 "Variation of the current 4 weeks in relation to the 4 weeks of the last year"
 
-#: dados/templates/main.html:200
+#: dados/templates/main.html:207
 msgid "Clique aqui para ver mais detalhes"
 msgstr "Click here to see more details"
 
@@ -1457,6 +1458,10 @@ msgstr "Zika Level"
 #, python-format
 msgid "Séries de dados e Alertas anteriores para %(nome)s"
 msgstr "Data series and previous level alerts for %(nome)s"
+
+#: dados/templates/series_plot.html:37
+msgid "Pessoas"
+msgstr "People"
 
 #: dados/templates/series_plot.html:87
 #, python-format
@@ -2054,6 +2059,9 @@ msgstr "Your username, if you have forgotten it, is:"
 #: templates/registration/password_reset_email.html:10
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
+
+#~ msgid "Casos estimados de {}"
+#~ msgstr "Estimated cases {}"
 
 #~ msgid "Aplicar seleção"
 #~ msgstr "Apply"

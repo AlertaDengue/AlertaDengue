@@ -56,6 +56,13 @@
             padding-bottom: 60px; 
         }
 
+        .chart_div {
+            width: 100%;
+            height: 100%;
+            margin: 0 0 -25px;
+            margin: -25px 0 0 -25px;
+            padding: 0px 0px 0px 0px;
+
     </style>
     <script src="/static/js/Autolinker.min.js"></script>
     <script src="/static/libs/jquery/jquery.sparkline.min.js"></script>
@@ -75,7 +82,7 @@
         <div>
             <div class="col-sm-{{chart_cols}}">
                 <div>
-                  <div class="card-body">
+                  <div class="chart_div">
                     {{ chart_dengue | safe }}
                   </div>
                 </div>
@@ -83,7 +90,7 @@
             {% if n_alerts_chik > 0 %}
             <div class="col-sm-{{chart_cols}}">
                 <div>
-                  <div class="card-body">
+                  <div class="chart_div">
                     {{ chart_chik | safe }}
                   </div>
                 </div>
@@ -93,7 +100,7 @@
             {% if n_alerts_zika > 0 %}
             <div class="col-sm-{{chart_cols}}">
                 <div>
-                  <div class="card-body">
+                  <div class="chart_div">
                     {{ chart_zika | safe }}
                   </div>
                 </div>

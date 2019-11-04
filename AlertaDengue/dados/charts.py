@@ -559,57 +559,61 @@ class HomeCharts:
                     y=df_ufs[k],
                     name=k,
                     marker={'color': cls.colors[k]},
-                    hovertemplate='%{x}<br>'
-                    '%{y} Casos Estimados<br>'
-                    '<extra></extra>',
+                    text=df_ufs.index.strftime('%d-%b-%Y <br>{}'.format(k)),
+                    hovertemplate=_('%{text} <br>'
+                                    '%{y} Casos Estimados'
+                                    '<extra></extra>'),
                 ),
-                secondary_y=True,
+                secondary_y=True
             )
 
-            fig.update_layout(
-                height=350,
-                width=1000,
-                title_text=_('Casos estimados de {}').format(disease),
-                plot_bgcolor='rgb(255, 255, 255)',
-                paper_bgcolor='rgb(255, 255, 255)',
-                showlegend=True,
-                font=dict(family="sans-serif", size=14, color="black"),
-                xaxis=dict(
-                    # title='',
-                    tickangle=-60,
-                    nticks=len(df) // 3,
-                    showline=True,
-                    showgrid=True,
-                    showticklabels=True,
-                    linecolor='rgb(204, 204, 204)',
-                    linewidth=0,
-                    gridcolor='rgb(176, 196, 222)',
-                    ticks='outside',
-                    tickfont=dict(
-                        family='Arial', size=12, color='rgb(82, 82, 82)'
-                    ),
-                ),
-                yaxis=dict(
-                    # title='',
-                    showline=True,
-                    showgrid=True,
-                    showticklabels=True,
-                    linecolor='rgb(204, 204, 204)',
-                    linewidth=0,
-                    gridcolor='rgb(176, 196, 222)',
-                ),
-            )
-
-            fig.update_yaxes(
-                title_text=_('Pessoas'),
-                secondary_y=True,
-                showline=False,
+        fig.update_layout(
+            height=350,
+            width=1000,
+            title=go.layout.Title(
+                text=_(
+                    'Casos Estimados de {} '
+                    'nos municípios monitorados').format(disease.capitalize()),
+                font=dict(family="sans-serif", size=16)),
+            plot_bgcolor='rgb(255, 255, 255)',
+            paper_bgcolor='rgb(255, 255, 255)',
+            showlegend=True,
+            font=dict(family="sans-serif", size=14),
+            xaxis=dict(
+                # title='',
+                tickangle=-20,
+                nticks=len(df) // 3,
+                showline=True,
                 showgrid=True,
                 showticklabels=True,
                 linecolor='rgb(204, 204, 204)',
                 linewidth=0,
-                gridcolor='rgb(204, 204, 204)',
+                gridcolor='rgb(176, 196, 222)',
+                ticks='outside',
+                tickfont=dict(
+                    family='Arial', size=12, color='rgb(82, 82, 82)')
+            ),
+            yaxis=dict(
+                # title='',
+                showline=True,
+                showgrid=True,
+                showticklabels=True,
+                linecolor='rgb(204, 204, 204)',
+                linewidth=0,
+                gridcolor='rgb(176, 196, 222)',
             )
+        )
+
+        fig.update_yaxes(
+            title_text=_('Casos'),
+            secondary_y=True,
+            showline=False,
+            showgrid=True,
+            showticklabels=True,
+            linecolor='rgb(204, 204, 204)',
+            linewidth=0,
+            gridcolor='rgb(204, 204, 204)',
+        )
 
         return fig.to_html()
 
@@ -752,7 +756,7 @@ class CityCharts:
                 type="date"
             ),
             yaxis=dict(
-                title='Pessoas',
+                title='Casos',
                 gridcolor='rgb(220, 220, 220)',
             ),
             plot_bgcolor='rgb(255, 255, 255)',
