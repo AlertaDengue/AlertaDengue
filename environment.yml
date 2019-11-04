@@ -6,6 +6,7 @@ dependencies:
 - django
 - django-bootstrap4
 - django-leaflet
+- boto3
 - geojson
 - gunicorn
 - numpy
@@ -24,6 +25,7 @@ dependencies:
 - docker-compose
 - celery
 - dj-static
+- pyproj=1.9.6
 - gdal
 - fiona
 - rasterio
@@ -33,3 +35,5 @@ dependencies:
 - ipython
 - sqlparse
 - plotly=4.0.0
+- pip:
+  - BeautifulSoup4

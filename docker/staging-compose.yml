@@ -13,13 +13,11 @@ services:
 
     staging_db:
       build:
-        context: .
-        dockerfile: Dockerfile-postgres
+        context: ..
+        dockerfile: docker/Dockerfile-postgres
       env_file:
         - .env
       hostname: staging_db
-      volumes:
-        - ${STAGING_DATA_DIR}:/var/lib/postgresql/data
       restart: always
 
     staging_web:
