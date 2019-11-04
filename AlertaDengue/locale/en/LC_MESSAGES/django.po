@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-04 13:40+0000\n"
+"POT-Creation-Date: 2019-11-04 14:25+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1305,7 +1305,7 @@ msgstr ""
 msgid "Situação Epidemiológica - %(num_mun)s Municípios monitorados"
 msgstr "Epidemiological Situation - %(num_mun)s Monitored cities"
 
-#: dados/templates/main.html:115 dados/templates/state_cities.html:177
+#: dados/templates/main.html:115 dados/templates/state_cities.html:181
 msgid "Última atualização"
 msgstr "Last update"
 
@@ -1530,7 +1530,6 @@ msgstr ""
 "municipality."
 
 #: dados/templates/services_api.html:103 dados/templates/services_maps.html:103
-#: dados/templates/state_cities.html:198
 msgid "Selecione municipio(s)"
 msgstr "Select one or more cities"
 
@@ -1821,23 +1820,11 @@ msgstr "Select the value for the dimension type defined."
 msgid "Gerar URL do serviço"
 msgstr "Generate URL's service"
 
-#: dados/templates/state_cities.html:209
-msgid "Aplicar seleção"
-msgstr "Apply"
-
-#: dados/templates/state_cities.html:211
-msgid ""
-"Após alterar a seleção das cidades do filtro, clique no botão <Aplicar "
-"Seleção>."
-msgstr ""
-"After changing the city selection, from the filter, click the <Apply "
-"Selection> button."
-
-#: dados/templates/state_cities.html:227
+#: dados/templates/state_cities.html:212
 msgid "Descrição de filtro"
 msgstr "Filter description"
 
-#: dados/templates/state_cities.html:285
+#: dados/templates/state_cities.html:270
 msgid "Por favor, aguarde."
 msgstr "Please, wait."
 
@@ -2067,6 +2054,16 @@ msgstr "Your username, if you have forgotten it, is:"
 #: templates/registration/password_reset_email.html:10
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
+
+#~ msgid "Aplicar seleção"
+#~ msgstr "Apply"
+
+#~ msgid ""
+#~ "Após alterar a seleção das cidades do filtro, clique no botão <Aplicar "
+#~ "Seleção>."
+#~ msgstr ""
+#~ "After changing the city selection, from the filter, click the <Apply "
+#~ "Selection> button."
 
 #~ msgid "Parceiros"
 #~ msgstr "Partners"

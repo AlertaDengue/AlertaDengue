@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-04 13:40+0000\n"
+"POT-Creation-Date: 2019-11-04 14:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -957,7 +957,7 @@ msgstr ""
 msgid "Situação Epidemiológica - %(num_mun)s Municípios monitorados"
 msgstr ""
 
-#: dados/templates/main.html:115 dados/templates/state_cities.html:177
+#: dados/templates/main.html:115 dados/templates/state_cities.html:181
 msgid "Última atualização"
 msgstr ""
 
@@ -1178,7 +1178,6 @@ msgid ""
 msgstr ""
 
 #: dados/templates/services_api.html:103 dados/templates/services_maps.html:103
-#: dados/templates/state_cities.html:198
 msgid "Selecione municipio(s)"
 msgstr ""
 
@@ -1453,21 +1452,11 @@ msgstr ""
 msgid "Gerar URL do serviço"
 msgstr ""
 
-#: dados/templates/state_cities.html:209
-msgid "Aplicar seleção"
-msgstr ""
-
-#: dados/templates/state_cities.html:211
-msgid ""
-"Após alterar a seleção das cidades do filtro, clique no botão <Aplicar "
-"Seleção>."
-msgstr ""
-
-#: dados/templates/state_cities.html:227
+#: dados/templates/state_cities.html:212
 msgid "Descrição de filtro"
 msgstr ""
 
-#: dados/templates/state_cities.html:285
+#: dados/templates/state_cities.html:270
 msgid "Por favor, aguarde."
 msgstr ""
 
