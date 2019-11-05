@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-04 14:59+0000\n"
+"POT-Creation-Date: 2019-11-04 20:04+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -155,23 +155,21 @@ msgstr ""
 msgid "O Sistema"
 msgstr ""
 
-#: dados/templates/about.html:48
-#, python-format
+#: dados/templates/about.html:49
 msgid ""
-"\n"
 "\n"
 "            <h5>O sistema InfoDengue é um pipeline de coleta, harmonização e "
 "análise de dados semi-automatizado, \n"
 "            que gera indicadores de situação epidemiológica da dengue e "
 "outras arboviroses a nível municipal.</h5><br>\n"
+"            "
+msgstr ""
+
+#: dados/templates/about.html:55
+msgid ""
 "\n"
-"            <center><img style=\"relative: left;\" src=\"/static/img/"
-"system_level_color.png\" alt=\"gibberish\" width=\"400\" /></"
-"center><br><br>\n"
-"\n"
-"            <br>\n"
 "            <b>De onde vem os dados?</b><br>\n"
-"\n"
+"            \n"
 "            <b>• Casos de dengue, chikungunya e zika:</b> Essas são doenças "
 "de notificação obrigatória, isso é, o profissional \n"
 "            de saúde que diagnostica um caso suspeito precisa preencher uma "
@@ -211,13 +209,21 @@ msgid ""
 "            Dados demográficos dos municípios brasileiros são atualizados a "
 "cada ano no Infodengue, utilizando as estimativas \n"
 "            do <a href=\"https://www.ibge.gov.br/pt/inicio.html\">IBGE<a>."
-"<br><br>\n"
+"<br><br>"
+msgstr ""
+
+#: dados/templates/about.html:81
+msgid ""
 "\n"
 "            <b>O que o sistema faz?</b><br>\n"
-"\n"
-"            • <span style=\"color: #ff9900;\">Correção do atraso de "
-"notificação (nowcasting): </span>os dados de notificação de doenças tem "
-"sempre um atraso. \n"
+"            "
+msgstr ""
+
+#: dados/templates/about.html:84
+#, python-format
+msgid ""
+"\"Correção do atraso de notificação (nowcasting) %%}:</span>os dados de "
+"notificação de doenças tem sempre um atraso. \n"
 "            Isso ocorre por vários motivos e inclui o tempo entre a pessoa "
 "adoecer e buscar atendimento médico, \n"
 "            o tempo que leva para o profissional de saúde notificar e o "
@@ -237,16 +243,14 @@ msgid ""
 "            A Figura abaixo (retirada de Bastos et al 2019) mostra em preto, "
 "a incidência verdadeira, em vermelho, \n"
 "            aquela observada com atraso e , em cinza, o nowcasting. Para "
-"mais detalhes técnicos, ver a referida publicação.<br><br><br>\n"
-"\n"
-"          \n"
-"            <center><img style=\"relative: left;\" src=\"/static/img/"
-"graph_weeks.png\" alt=\"gibberish\" width=\"700\" /></center><br><br> \n"
-"\n"
-"\n"
-"            • <span style=\"color: #ff9900;\">Detecção de transmissão "
-"sustentada:</span> A estimação do número reprodutivo é importante em vários "
-"aspectos. Sequência de semanas com transmissão \n"
+"mais detalhes técnicos, ver a referida publicação.<br><br><br>"
+msgstr ""
+
+#: dados/templates/about.html:99
+#, python-format
+msgid ""
+"Detecção de transmissão sustentada:</span> A estimação do número reprodutivo "
+"é importante em vários aspectos. Sequência de semanas com transmissão \n"
 "            crítica (Rt > 1) indica transmissão sustentada. Isso é, indica "
 "que estamos na fase de espalhamento da doença, e que ações adequadas para "
 "controle \n"
@@ -259,10 +263,15 @@ msgid ""
 "            própria, descrita em <a href=\"https://www.sciencedirect.com/"
 "science/article/pii/S1755436517300907?via%%3Dihub\">Codeço et al. 2018 </"
 "a>“Estimating the effective reproduction number of dengue considering "
-"temperature-dependent generation intervals”.<br><br>\n"
-"            • <span style=\"color: #ECF000;\">Análise de receptividade: </"
-"span>A transmissão das arboviroses requer condições climáticas adequadas, "
-"que podem variar de lugar para lugar. No Rio de Janeiro, \n"
+"temperature-dependent generation intervals”."
+msgstr ""
+
+#: dados/templates/about.html:104
+#, python-format
+msgid ""
+"Análise de receptividade: </span>A transmissão das arboviroses requer "
+"condições climáticas adequadas, que podem variar de lugar para lugar. No Rio "
+"de Janeiro, \n"
 "            por exemplo, temperatura maior que 22 graus é condição "
 "necessária para transmissão sustentada. Em Fortaleza, umidade máxima acima "
 "de 85%% é a condição \n"
@@ -270,17 +279,26 @@ msgid ""
 "avaliar que combinação de variáveis climáticas e ambientais são indicadoras "
 "de condições de \n"
 "            transmissão. Essa informação serve de alerta precoce de chegada "
-"da temporada da arbovirose.<br><br>  \n"
-"            • <span style=\"color: #ECF000;\">Análise de menção a dengue nas "
-"redes sociais: </span>Indicadores de redes sociais calculados pelo "
-"Observatório da Dengue são usados como variáveis auxiliares \n"
+"da temporada da arbovirose."
+msgstr ""
+
+#: dados/templates/about.html:108
+msgid ""
+"Análise de menção a dengue nas redes sociais: </span>Indicadores de redes "
+"sociais calculados pelo Observatório da Dengue são usados como variáveis "
+"auxiliares \n"
 "            no InfoDengue. A metodologia de captura e análise é descrita em "
 "<a href=\"https://journals.plos.org/plosntds/article?id=10.1371/journal."
-"pntd.0005729\">Marques-Toledo et al (2017)</a>.<br><br>\n"
-"            • <span style=\"color: #ff0000;\">Detecção de situação atípica: "
-"</span>Para estimar limiares epidêmicos, nós utilizamos o Moving Epidemics "
-"Method (MEM) (<a href=\"https://onlinelibrary.wiley.com/doi/full/10.1111/"
-"j.1750-2659.2012.00422.x\">Vega et al. 2012</a>), que permite estimar \n"
+"pntd.0005729\">Marques-Toledo et al (2017)</a>."
+msgstr ""
+
+#: dados/templates/about.html:110
+#, python-format
+msgid ""
+"Detecção de situação atípica: </span>Para estimar limiares epidêmicos, nós "
+"utilizamos o Moving Epidemics Method (MEM) (<a href=\"https://onlinelibrary."
+"wiley.com/doi/full/10.1111/j.1750-2659.2012.00422.x\">Vega et al. 2012</a>), "
+"que permite estimar \n"
 "            diversas grandezas de interesse com base em dados históricos "
 "locais como limiar pré- epidêmico, níveis de atividade típicas, valores "
 "esperados para \n"
@@ -300,7 +318,11 @@ msgid ""
 "casos esperados para cada semana e intervalos de confiança inferior e "
 "superior \n"
 "            (utilizamos 10%% e 90%%, respectivamente), definindo corredores "
-"de atividade típica, como um diagrama de controle.<br><br>\n"
+"de atividade típica, como um diagrama de controle."
+msgstr ""
+
+#: dados/templates/about.html:119
+msgid ""
 "\n"
 "            <b>Código de Cores: </b><br><br>\n"
 "\n"
@@ -318,11 +340,11 @@ msgid ""
 "            "
 msgstr ""
 
-#: dados/templates/about.html:132
+#: dados/templates/about.html:133
 msgid "Como citar o InfoDengue"
 msgstr ""
 
-#: dados/templates/about.html:135
+#: dados/templates/about.html:136
 #, python-format
 msgid ""
 "\n"
@@ -357,11 +379,11 @@ msgid ""
 "            "
 msgstr ""
 
-#: dados/templates/about.html:158
+#: dados/templates/about.html:159
 msgid "Produções científicas associadas ao Infodengue"
 msgstr ""
 
-#: dados/templates/about.html:161
+#: dados/templates/about.html:162
 #, python-format
 msgid ""
 "\n"
@@ -373,11 +395,11 @@ msgid ""
 "            "
 msgstr ""
 
-#: dados/templates/about.html:169
+#: dados/templates/about.html:170
 msgid "Eventos"
 msgstr ""
 
-#: dados/templates/about.html:172
+#: dados/templates/about.html:173
 msgid ""
 "\n"
 "\n"
@@ -387,11 +409,11 @@ msgid ""
 "            "
 msgstr ""
 
-#: dados/templates/about.html:180
+#: dados/templates/about.html:181
 msgid "Como colaborar"
 msgstr ""
 
-#: dados/templates/about.html:183
+#: dados/templates/about.html:184
 msgid ""
 "\n"
 "                        \n"
