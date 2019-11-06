@@ -666,7 +666,7 @@ class CityCharts:
                 x=pd.to_datetime(df_dados.dia, unit='s'),
                 y=df_dados.casos,
                 mode='lines',
-                name='Casos Notificados de ' + disease_label,
+                name=_('Casos Notificados de ') + disease_label,
                 line={'color': '#4572A7'},
                 text=df_dados.SE.map(lambda v: '{}'.format(str(v)[-2:])),
                 hoverinfo='text',
@@ -678,7 +678,7 @@ class CityCharts:
             go.Scatter(
                 x=pd.to_datetime(df_verde.dia, unit='s'),
                 y=df_verde.casos,
-                name='Alerta Verde de ' + disease_label,
+                name=_('Alerta Verde de ') + disease_label,
                 marker={'color': '#48FD48'},
                 text=df_verde.SE.map(lambda v: '{}'.format(str(v)[-2:])),
                 hoverinfo='text',
@@ -692,7 +692,7 @@ class CityCharts:
             go.Scatter(
                 x=pd.to_datetime(df_amarelo.dia, unit='s'),
                 y=df_amarelo.casos,
-                name='Alerta Amarelo de ' + disease_label,
+                name=_('Alerta Amarelo de ') + disease_label,
                 marker={'color': '#FBFC49'},
                 text=df_amarelo.SE.map(lambda v: '{}'.format(str(v)[-2:])),
                 hoverinfo='text',
@@ -706,7 +706,7 @@ class CityCharts:
             go.Scatter(
                 x=pd.to_datetime(df_laranja.dia, unit='s'),
                 y=df_laranja.casos,
-                name='Alerta Laranja de ' + disease_label,
+                name=_('Alerta Laranja de ') + disease_label,
                 marker={'color': '#FFA858'},
                 text=df_laranja.SE.map(lambda v: '{}'.format(str(v)[-2:])),
                 hoverinfo='text',
@@ -720,7 +720,7 @@ class CityCharts:
             go.Scatter(
                 x=pd.to_datetime(df_vermelho.dia, unit='s'),
                 y=df_vermelho.casos,
-                name='Alerta Vermelho de ' + disease_label,
+                name=_('Alerta Vermelho de ') + disease_label,
                 marker={'color': '#FB4949'},
                 text=df_vermelho.SE.map(lambda v: '{}'.format(str(v)[-2:])),
                 hoverinfo='text',
@@ -735,11 +735,11 @@ class CityCharts:
                 x=pd.to_datetime(df_dados.dia, unit='s'),
                 y=df_dados.casos_est,
                 mode='lines',
-                name='Casos Estimados de ' + disease_label,
+                name=_('Casos Estimados de ') + disease_label,
                 line={'color': '#AA4643', 'dash': 'dot'},
                 text=df_dados.SE.map(lambda v: '{}'.format(str(v)[-2:])),
                 hoverinfo='text',
-                hovertemplate="%{x}, SE: %{text}, Casos: %{y:.1f} ",
+                hovertemplate= _("%{x}, SE: %{text}, Casos: %{y:.1f} "),
             )
         )
 
@@ -756,7 +756,7 @@ class CityCharts:
                 type="date"
             ),
             yaxis=dict(
-                title='Casos',
+                title=_('Casos'),
                 gridcolor='rgb(220, 220, 220)',
             ),
             plot_bgcolor='rgb(255, 255, 255)',

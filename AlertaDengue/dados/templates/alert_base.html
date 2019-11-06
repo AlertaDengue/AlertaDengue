@@ -441,10 +441,10 @@
 </script>
     <br>
 <div class="card-footer">
-    <h4 id="section1" class="panel-title"><b>Relatório da Situação das Arboviroses em: </b> 
+    <h4 id="section1" class="panel-title"><b>{% trans "Relatório da Situação das Arboviroses em" %}: </b> 
     <a href="{% url 'dados:report_city' state=state_abv geocode=geocode year_week=SE %}">{{ nome }}</a></h4>
 
-    <h4 id="section1" class="panel-title"><b>Para mais detalhes acesse a página de Estados:</b> 
+    <h4 id="section1" class="panel-title"><b>{% trans "Para mais detalhes acesse a página de Estados" %}:</b> 
     <a href="{% url 'dados:alerta_uf' disease=disease_code state=state_abv %}">{{state}}</a></h4>
 </div>
 

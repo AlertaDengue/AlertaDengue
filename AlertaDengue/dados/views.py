@@ -566,7 +566,7 @@ class AlertaMRJPageView(AlertCityPageBaseView):
                 'geocodigo': geocode,  # legacy
                 'geocode': geocode,
                 'state_abv': 'RJ',
-                'state': city_info['uf'], 
+                'state': city_info['uf'],
                 'nome': city_info['nome'],
                 'populacao': city_info['populacao'],
                 'incidencia': (
@@ -720,7 +720,6 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
                 ),
             }
         )
-      
         return context
 
 
@@ -894,7 +893,6 @@ class AlertaStateView(TemplateView):
                 'last_update': last_update,
             }
         )
-        
         return context
 
 
