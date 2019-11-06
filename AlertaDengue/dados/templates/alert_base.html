@@ -70,6 +70,7 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="panel panel-default" style="padding: 20px;">
     {% blocktrans %}Selecione a doença a ser visualizada:{% endblocktrans %}
     <input id="disease-dengue" type="radio" name="disease" value="dengue" {% if disease_code == 'dengue' %}
@@ -245,7 +246,6 @@
         </p>
     </div>
 </div>
-
 <script>
     var geocode = "{{geocode}}";
     var casos_por_ap = {{ casos_por_ap| safe }};
@@ -439,5 +439,13 @@
     }
 
 </script>
+    <br>
+<div class="card-footer">
+    <h4 id="section1" class="panel-title"><b>Relatório da Situação das Arboviroses em: </b> 
+    <a href="{% url 'dados:report_city' state=state_abv geocode=geocode year_week=SE %}">{{ nome }}</a></h4>
+
+    <h4 id="section1" class="panel-title"><b>Para mais detalhes acesse a página de Estados:</b> 
+    <a href="{% url 'dados:alerta_uf' disease=disease_code state=state_abv %}">{{state}}</a></h4>
+</div>
 
 {% endblock %}

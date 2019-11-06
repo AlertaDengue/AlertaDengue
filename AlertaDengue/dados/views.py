@@ -27,6 +27,7 @@ from .dbdata import (
     ReportState,
     ALERT_COLOR,
     STATE_NAME,
+    STATE_INITIAL
 )
 from .episem import episem, episem2date
 from .maps import get_city_info
@@ -564,6 +565,8 @@ class AlertaMRJPageView(AlertCityPageBaseView):
             {
                 'geocodigo': geocode,  # legacy
                 'geocode': geocode,
+                'state_abv': 'RJ',
+                'state': city_info['uf'], 
                 'nome': city_info['nome'],
                 'populacao': city_info['populacao'],
                 'incidencia': (
@@ -677,6 +680,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
                 'geocodigo': geocode,  # legacy
                 'geocode': geocode,
                 'state': city_info['uf'],
+                'state_abv': STATE_INITIAL[city_info['uf']],
                 'nome': city_info['nome'],
                 'populacao': city_info['populacao'],
                 'incidencia': (case_series[-1] / city_info['populacao'])
@@ -716,6 +720,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
                 ),
             }
         )
+      
         return context
 
 
@@ -889,6 +894,7 @@ class AlertaStateView(TemplateView):
                 'last_update': last_update,
             }
         )
+        
         return context
 
 
