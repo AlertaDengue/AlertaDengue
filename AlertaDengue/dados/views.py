@@ -63,7 +63,7 @@ def hex_to_rgb(value):
     value = value.lstrip('#')
     lv = len(value)
     return tuple(
-        int(value[i : i + lv // 3], 16) for i in range(0, lv, lv // 3)
+        int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3)
     )
 
 
@@ -578,6 +578,7 @@ class AlertaMRJPageView(AlertCityPageBaseView):
                 # 'max_est': sum(current.casos_estmax.values),
                 'series_casos': case_series,
                 'SE': int(semana),
+                'WEEK': str(semana),
                 'data1': segunda.strftime("%d de %B de %Y"),
                 'data2': (
                     segunda + datetime.timedelta(6)
@@ -689,6 +690,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
                 'max_est': min_max_est[1],
                 'series_casos': {geocode: case_series[-12:]},
                 'SE': SE,
+                'WEEK': str(SE)[4:],
                 'data1': dia.strftime("%d de %B de %Y"),
                 # .strftime("%d de %B de %Y")
                 'data2': (dia + datetime.timedelta(6)),

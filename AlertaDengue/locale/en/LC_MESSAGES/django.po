@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-06 16:02+0000\n"
+"POT-Creation-Date: 2019-11-07 10:52+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -20,7 +20,7 @@ msgstr ""
 "X-Source-Language: pt_BR\n"
 "X-Generator: Poedit 1.8.7.1\n"
 
-#: dados/charts.py:563
+#: dados/charts.py:564
 #, python-brace-format
 msgid "%{text} <br>%{y} Casos Estimados<extra></extra>"
 msgstr "%{text} <br>%{y} Estimated cases<extra></extra>"
@@ -29,7 +29,7 @@ msgstr "%{text} <br>%{y} Estimated cases<extra></extra>"
 msgid "Casos Estimados de {} nos municípios monitorados"
 msgstr "Estimated cases of {} in monitored cities"
 
-#: dados/charts.py:608 dados/charts.py:771
+#: dados/charts.py:610 dados/charts.py:774
 #: dados/templates/alert_state/age.html:121
 #: dados/templates/alert_state/date.html:93
 #: dados/templates/alert_state/disease.html:117
@@ -40,37 +40,37 @@ msgstr "Estimated cases of {} in monitored cities"
 msgid "Casos"
 msgstr "Cases"
 
-#: dados/charts.py:669
+#: dados/charts.py:670
 msgid "Casos Notificados de "
 msgstr "Estimated cases "
 
-#: dados/charts.py:672 dados/charts.py:686 dados/charts.py:702
-#: dados/charts.py:718 dados/charts.py:734
+#: dados/charts.py:674 dados/charts.py:690 dados/charts.py:708
+#: dados/charts.py:726 dados/charts.py:744
 #, python-brace-format
 msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados<extra></extra>"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
 
-#: dados/charts.py:683
+#: dados/charts.py:686
 msgid "Alerta Verde de "
 msgstr "Green Level "
 
-#: dados/charts.py:699
+#: dados/charts.py:704
 msgid "Alerta Amarelo de "
 msgstr "Yellow Level "
 
-#: dados/charts.py:715
+#: dados/charts.py:722
 msgid "Alerta Laranja de "
 msgstr "Orange Level "
 
-#: dados/charts.py:731
+#: dados/charts.py:740
 msgid "Alerta Vermelho de "
 msgstr "Red Level "
 
-#: dados/charts.py:748
+#: dados/charts.py:759
 msgid "Casos Estimados de "
 msgstr "Estimated cases "
 
-#: dados/charts.py:751
+#: dados/charts.py:763
 #, python-brace-format
 msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
@@ -737,12 +737,13 @@ msgid ""
 msgstr "<b>Population:</b> %(populacao)s of inhabitants."
 
 #: dados/templates/alert_base.html:88
+#, python-format
 msgid ""
-"<b>Incidência estimada na SE %(SE)s:</b> %(incidencia)s por 100\n"
+"<b>Incidência estimada na SE %(WEEK)s:</b> %(incidencia)s por 100\n"
 "            mil habitantes. "
 msgstr ""
-"<b>Estimated Incidence epidemiological week %(SE)s:</b> %(incidencia)s per 100 "
-"thousand inhabitants. "
+"<b>Estimated Incidence epidemiological week %(WEEK)s:</b> %(incidencia)s per "
+"100 thousand inhabitants. "
 
 #: dados/templates/alert_base.html:98
 msgid "Data de referência da previsão"
@@ -757,10 +758,6 @@ msgid "Nível Verde"
 msgstr "Green Level"
 
 #: dados/templates/alert_base.html:138
-#, fuzzy
-#| msgid ""
-#| "Sem Risco. Quando o mapa está verde, não existe transmissão e nem "
-#| "condições ideais para a reprodução do Mosquito."
 msgid ""
 "Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições\n"
 "                        ideais para a reprodução do Mosquito."
@@ -773,11 +770,6 @@ msgid "Nível Amarelo"
 msgstr "Yellow Level"
 
 #: dados/templates/alert_base.html:156
-#, fuzzy, python-format
-#| msgid ""
-#| "Estação da %(disease_label)s. No nível amarelo, temos condições "
-#| "climáticas propícias à reprodução do mosquito. Mas ainda sem transmissão "
-#| "significativa da Doença."
 msgid ""
 "Estação da %(disease_label)s. No nível amarelo, temos condições climáticas\n"
 "                        propícias à reprodução do mosquito. Mas ainda sem "
@@ -963,7 +955,9 @@ msgid "Relatório da Situação das Arboviroses em"
 msgstr "Arborivirosis Situation report of "
 
 #: dados/templates/alert_base.html:447
-msgid "Para mais detalhes acesse a página de Estados"
+#, fuzzy
+#| msgid "Para mais detalhes acesse a página de Estados"
+msgid "Para mais detalhes, acesse a página de Estados"
 msgstr "For more details go to the States page"
 
 #: dados/templates/alert_state/age.html:116
@@ -1123,7 +1117,7 @@ msgstr "Communication Professional "
 
 #: dados/templates/contact.html:30
 msgid "Cientista de dados"
-msgstr "Data Scientist, INOVA fellowship"
+msgstr "Data Scientist"
 
 #: dados/templates/contact.html:31
 msgid "Professora Associada - Universidade do Oeste do Paraná"
@@ -1907,11 +1901,11 @@ msgstr "Estimated cases of %(disease_label)s in monitored cities"
 msgid "casos estimados"
 msgstr "estimated cases"
 
-#: dados/views.py:409
+#: dados/views.py:404
 msgid "Em breve"
 msgstr "Coming soon"
 
-#: dados/views.py:866
+#: dados/views.py:863
 msgid "desconhecida"
 msgstr "unknown"
 

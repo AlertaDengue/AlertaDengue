@@ -85,7 +85,7 @@
     <div class="panel-body">
         <h3>{% blocktrans with populacao=populacao|intword %}<b>População:</b> {{ populacao }} de
             habitantes.{% endblocktrans %}</h3>
-        <h3>{% blocktrans with incidencia=incidencia|floatformat %}<b>Incidência estimada na SE {{ SE }}:</b> {{ incidencia }} por 100
+        <h3>{% blocktrans with incidencia=incidencia|floatformat %}<b>Incidência estimada na SE {{ WEEK }}:</b> {{ incidencia }} por 100
             mil habitantes. {% endblocktrans %}</h3>
         {% block info_panel%}{% endblock %}
     </div>
@@ -441,7 +441,7 @@
     <br>
 <div class="card-footer">
     <h4 id="section1" class="panel-title"><b>{% trans "Relatório da Situação das Arboviroses em" %}: </b> 
-    <a href="{% url 'dados:report_city' state=state_abv geocode=geocode year_week=SE %}">{{ nome }}</a></h4>
+    <a href="{% url 'dados:report_city' state=state_abv geocode=geocode year_week=SE %}">{{ nome }}</a></h4> 
 
     <h4 id="section1" class="panel-title"><b>{% trans "Para mais detalhes, acesse a página de Estados" %}:</b> 
     <a href="{% url 'dados:alerta_uf' disease=disease_code state=state_abv %}">{{state}}</a></h4>
