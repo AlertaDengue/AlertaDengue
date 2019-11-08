@@ -32,7 +32,7 @@ ALERT_COLOR = {1: 'verde', 2: 'amarelo', 3: 'laranja', 4: 'vermelho'}
 
 ALERT_CODE = dict(zip(ALERT_COLOR.values(), ALERT_COLOR.keys()))
 
-STATE_INITIAL = dict(zip(STATE_NAME.keys(), STATE_NAME.values()))
+STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
 
 db_engine = create_engine(
     "postgresql://{}:{}@{}/{}".format(

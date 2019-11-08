@@ -10,6 +10,7 @@ dependencies:
 - gunicorn
 - numpy
 - pandas
+- pip
 - python-decouple
 - pytz
 - psycopg2
@@ -20,8 +21,10 @@ dependencies:
 - dbfread
 - dj-database-url
 - django-chunked-upload
+- docker-compose
 - celery
 - dj-static
+- pyproj=1.9.6
 - gdal
 - fiona
 - rasterio
@@ -31,3 +34,4 @@ dependencies:
 - ipython
 - sqlparse
 - plotly=4.0.0
+- BeautifulSoup4

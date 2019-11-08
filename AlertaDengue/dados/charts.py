@@ -535,9 +535,9 @@ class HomeCharts:
 
     @classmethod
     def _create_chart(cls, case_series, disease):
-        series_est = cls.total_series(
-            case_series, disease=disease
-        )['series_est']
+        series_est = cls.total_series(case_series, disease=disease)[
+            'series_est'
+        ]
 
         dfs = []
         for k, v in series_est.items():
@@ -559,57 +559,63 @@ class HomeCharts:
                     y=df_ufs[k],
                     name=k,
                     marker={'color': cls.colors[k]},
-                    hovertemplate='%{x}<br>'
-                    '%{y} Casos Estimados<br>'
-                    '<extra></extra>',
-                ),
-                secondary_y=True,
-            )
-
-            fig.update_layout(
-                height=350,
-                width=1000,
-                title_text=_('Casos estimados de {}').format(disease),
-                plot_bgcolor='rgb(255, 255, 255)',
-                paper_bgcolor='rgb(255, 255, 255)',
-                showlegend=True,
-                font=dict(family="sans-serif", size=14, color="black"),
-                xaxis=dict(
-                    # title='',
-                    tickangle=-60,
-                    nticks=len(df) // 3,
-                    showline=True,
-                    showgrid=True,
-                    showticklabels=True,
-                    linecolor='rgb(204, 204, 204)',
-                    linewidth=0,
-                    gridcolor='rgb(176, 196, 222)',
-                    ticks='outside',
-                    tickfont=dict(
-                        family='Arial', size=12, color='rgb(82, 82, 82)'
+                    text=df_ufs.index.strftime('%d-%b-%Y <br>{}'.format(k)),
+                    hovertemplate=_(
+                        '%{text} <br>' '%{y} Casos Estimados' '<extra></extra>'
                     ),
                 ),
-                yaxis=dict(
-                    # title='',
-                    showline=True,
-                    showgrid=True,
-                    showticklabels=True,
-                    linecolor='rgb(204, 204, 204)',
-                    linewidth=0,
-                    gridcolor='rgb(176, 196, 222)',
-                ),
+                secondary_y=True,
             )
 
-            fig.update_yaxes(
-                title_text=_('Pessoas'),
-                secondary_y=True,
-                showline=False,
+        fig.update_layout(
+            height=350,
+            width=1000,
+            title=go.layout.Title(
+                text=_(
+                    'Casos Estimados de {} ' 'nos municípios monitorados'
+                ).format(disease.capitalize()),
+                font=dict(family="sans-serif", size=16),
+            ),
+            plot_bgcolor='rgb(255, 255, 255)',
+            paper_bgcolor='rgb(255, 255, 255)',
+            showlegend=True,
+            font=dict(family="sans-serif", size=14),
+            xaxis=dict(
+                # title='',
+                tickangle=-20,
+                nticks=len(df) // 3,
+                showline=True,
                 showgrid=True,
                 showticklabels=True,
                 linecolor='rgb(204, 204, 204)',
                 linewidth=0,
-                gridcolor='rgb(204, 204, 204)',
-            )
+                gridcolor='rgb(176, 196, 222)',
+                ticks='outside',
+                tickfont=dict(
+                    family='Arial', size=12, color='rgb(82, 82, 82)'
+                ),
+            ),
+            yaxis=dict(
+                # title='',
+                showline=True,
+                showgrid=True,
+                showticklabels=True,
+                linecolor='rgb(204, 204, 204)',
+                linewidth=0,
+                gridcolor='rgb(176, 196, 222)',
+            ),
+        )
+
+        fig.update_yaxes(
+            title_text=_('Casos'),
+            secondary_y=True,
+            showline=False,
+            showgrid=True,
+            showticklabels=True,
+            linecolor='rgb(204, 204, 204)',
+            linewidth=0,
+            gridcolor='rgb(204, 204, 204)',
+        )
 
         return fig.to_html()
 
@@ -627,7 +633,6 @@ class HomeCharts:
 
 
 class CityCharts:
-
     @classmethod
     def create_alert_chart(
         cls, geocode, nome, disease_label, disease_code='dengue', epiweek=0
@@ -662,11 +667,15 @@ class CityCharts:
                 x=pd.to_datetime(df_dados.dia, unit='s'),
                 y=df_dados.casos,
                 mode='lines',
-                name='Casos Notificados de ' + disease_label,
+                name=_('Casos Notificados de ') + disease_label,
                 line={'color': '#4572A7'},
                 text=df_dados.SE.map(lambda v: '{}'.format(str(v)[-2:])),
-                hoverinfo='text',
-                hovertemplate="%{x}, SE: %{text}, Casos: %{y:.1f} ",
+                hovertemplate=_(
+                    '%{x} <br>'
+                    'Semana: %{text} <br>'
+                    '%{y} Casos Estimados'
+                    '<extra></extra>'
+                ),
             )
         )
 
@@ -674,11 +683,15 @@ class CityCharts:
             go.Scatter(
                 x=pd.to_datetime(df_verde.dia, unit='s'),
                 y=df_verde.casos,
-                name='Alerta Verde de ' + disease_label,
+                name=_('Alerta Verde de ') + disease_label,
                 marker={'color': '#48FD48'},
                 text=df_verde.SE.map(lambda v: '{}'.format(str(v)[-2:])),
-                hoverinfo='text',
-                hovertemplate="%{x}, SE: %{text}, Casos: %{y:.1f} ",
+                hovertemplate=_(
+                    '%{x} <br>'
+                    'Semana: %{text} <br>'
+                    '%{y} Casos Estimados'
+                    '<extra></extra>'
+                ),
                 stackgroup='one',
                 fill=None,
             )
@@ -688,11 +701,15 @@ class CityCharts:
             go.Scatter(
                 x=pd.to_datetime(df_amarelo.dia, unit='s'),
                 y=df_amarelo.casos,
-                name='Alerta Amarelo de ' + disease_label,
+                name=_('Alerta Amarelo de ') + disease_label,
                 marker={'color': '#FBFC49'},
                 text=df_amarelo.SE.map(lambda v: '{}'.format(str(v)[-2:])),
-                hoverinfo='text',
-                hovertemplate="%{x}, SE: %{text}, Casos: %{y:.1f} ",
+                hovertemplate=_(
+                    '%{x} <br>'
+                    'Semana: %{text} <br>'
+                    '%{y} Casos Estimados'
+                    '<extra></extra>'
+                ),
                 stackgroup='one',
                 line=dict(width=0),
             )
@@ -702,11 +719,15 @@ class CityCharts:
             go.Scatter(
                 x=pd.to_datetime(df_laranja.dia, unit='s'),
                 y=df_laranja.casos,
-                name='Alerta Laranja de ' + disease_label,
+                name=_('Alerta Laranja de ') + disease_label,
                 marker={'color': '#FFA858'},
                 text=df_laranja.SE.map(lambda v: '{}'.format(str(v)[-2:])),
-                hoverinfo='text',
-                hovertemplate="%{x}, SE: %{text}, Casos: %{y:.1f} ",
+                hovertemplate=_(
+                    '%{x} <br>'
+                    'Semana: %{text} <br>'
+                    '%{y} Casos Estimados'
+                    '<extra></extra>'
+                ),
                 stackgroup='one',
                 line=dict(width=0),
             )
@@ -716,11 +737,15 @@ class CityCharts:
             go.Scatter(
                 x=pd.to_datetime(df_vermelho.dia, unit='s'),
                 y=df_vermelho.casos,
-                name='Alerta Vermelho de ' + disease_label,
+                name=_('Alerta Vermelho de ') + disease_label,
                 marker={'color': '#FB4949'},
                 text=df_vermelho.SE.map(lambda v: '{}'.format(str(v)[-2:])),
-                hoverinfo='text',
-                hovertemplate="%{x}, SE: %{text}, Casos: %{y:.1f} ",
+                hovertemplate=_(
+                    '%{x} <br>'
+                    'Semana: %{text} <br>'
+                    '%{y} Casos Estimados'
+                    '<extra></extra>'
+                ),
                 stackgroup='one',
                 line=dict(width=0),
             )
@@ -731,30 +756,22 @@ class CityCharts:
                 x=pd.to_datetime(df_dados.dia, unit='s'),
                 y=df_dados.casos_est,
                 mode='lines',
-                name='Casos Estimados de ' + disease_label,
+                name=_('Casos Estimados de ') + disease_label,
                 line={'color': '#AA4643', 'dash': 'dot'},
                 text=df_dados.SE.map(lambda v: '{}'.format(str(v)[-2:])),
-                hoverinfo='text',
-                hovertemplate="%{x}, SE: %{text}, Casos: %{y:.1f} ",
+                hovertemplate=_(
+                    '%{x} <br>' 'Semana: %{text} <br>' '%{y} Casos Estimados'
+                ),
             )
         )
 
         fig.update_layout(
             xaxis=go.layout.XAxis(
-                rangeselector=dict(
-                    buttons=list([
-                        dict(step="all")
-                    ])
-                ),
-                rangeslider=dict(
-                    visible=True
-                ),
-                type="date"
+                rangeselector=dict(buttons=list([dict(step="all")])),
+                rangeslider=dict(visible=True),
+                type="date",
             ),
-            yaxis=dict(
-                title='Pessoas',
-                gridcolor='rgb(220, 220, 220)',
-            ),
+            yaxis=dict(title=_('Casos'), gridcolor='rgb(220, 220, 220)'),
             plot_bgcolor='rgb(255, 255, 255)',
         )
         return fig.to_html()
@@ -827,9 +844,7 @@ class CityCharts:
             (k, k.replace('forecast_', '').replace('_cases', '').title())
             for k in forecast_models_keys
         ]
-        forecast_data = {
-            k: json.dumps(dados[k]) for k in forecast_models_keys
-        }
+        forecast_data = {k: json.dumps(dados[k]) for k in forecast_models_keys}
         result = {
             'nome': nome,
             'dados': dados,
