@@ -11,7 +11,7 @@ dependencies:
 - numpy
 - pandas
 - pip
-- python-decouple
+- python-dotenv
 - pytz
 - psycopg2
 - sqlalchemy
@@ -28,6 +28,7 @@ dependencies:
 - gdal
 - fiona
 - rasterio
+- boto3
 - geopy
 - geopandas
 - sh
