@@ -955,8 +955,6 @@ msgid "Relatório da Situação das Arboviroses em"
 msgstr "Arborivirosis Situation report of "
 
 #: dados/templates/alert_base.html:447
-#, fuzzy
-#| msgid "Para mais detalhes acesse a página de Estados"
 msgid "Para mais detalhes, acesse a página de Estados"
 msgstr "For more details go to the States page"
 

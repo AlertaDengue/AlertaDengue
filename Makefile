@@ -1,3 +1,4 @@
+# DEPLOY PRODUCTION AND STAGING
 compose_cmd = docker-compose -p infodengue -f docker-compose.yml
 staging_compose_cmd = docker-compose -p infodengue_staging -f staging-compose.yml
 
@@ -38,4 +39,3 @@ generate_maps_staging: build
 clean_staging:
 	$(staging_compose_cmd) stop
 	$(staging_compose_cmd) rm
-	
