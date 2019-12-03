@@ -17,11 +17,8 @@ from pathlib import Path
 from dj_database_url import parse as db_url
 
 
-project_path = os.path.expanduser(
-    '/home/esloch/work_lab/fiocruz/AlertaDengue/'
-)  # adjust as appropriate
+project_path = os.path.expanduser('./')
 load_dotenv(os.path.join(project_path, '.env'))
-
 
 def read_admins(value):
     # ADMIN in settings.ini should be in the format:
@@ -114,38 +111,38 @@ TEMPLATES = [
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PSQL_DB'),
-        'USER': os.getenv('PSQL_USER'),
-        'PASSWORD': os.getenv('PSQL_PASSWORD'),
-        'HOST': os.getenv('PSQL_HOST'),
-        'PORT': os.getenv('PSQL_PORT'),
-    },
-    'dados': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PSQL_DB'),
-        'USER': os.getenv('PSQL_USER'),
-        'PASSWORD': os.getenv('PSQL_PASSWORD'),
-        'HOST': os.getenv('PSQL_HOST'),
-        'PORT': os.getenv('PSQL_PORT'),
-    },
-    'forecast': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PSQL_DB'),
-        'USER': os.getenv('PSQL_USER'),
-        'PASSWORD': os.getenv('PSQL_PASSWORD'),
-        'HOST': os.getenv('PSQL_HOST'),
-        'PORT': os.getenv('PSQL_PORT'),
-    },
-}
-
 PSQL_DB = os.getenv('PSQL_DB')
 PSQL_USER = os.getenv('PSQL_USER')
 PSQL_HOST = os.getenv('PSQL_HOST')
 PSQL_PASSWORD = os.getenv('PSQL_PASSWORD')
 PSQL_PORT = os.getenv('PSQL_PORT')
+
+DATABASES={
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': PSQL_DB,
+            'USER': PSQL_USER,
+            'PASSWORD': PSQL_PASSWORD,
+            'HOST': PSQL_HOST,
+            'PORT': '',
+        },
+        'dados': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': PSQL_DB,
+            'USER': PSQL_USER,
+            'PASSWORD': PSQL_PASSWORD,
+            'HOST': PSQL_HOST,
+            'PORT': '',
+        },
+        'forecast': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': PSQL_DB,
+            'USER': 'forecast',
+            'PASSWORD': PSQL_PASSWORD,
+            'HOST': PSQL_HOST,
+            'PORT': '',
+        },
+    }
 
 DATABASE_ROUTERS = ['manager.router.DatabaseAppsRouter']
 DATABASE_APPS_MAPPING = {
