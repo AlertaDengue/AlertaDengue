@@ -17,8 +17,8 @@ from pathlib import Path
 from dj_database_url import parse as db_url
 
 
-project_path = os.path.expanduser('./')
-load_dotenv(os.path.join(project_path, '.env'))
+env_path = Path('.') / '.env'
+load_dotenv(dotenv_path=env_path)
 
 
 def read_admins(value):
