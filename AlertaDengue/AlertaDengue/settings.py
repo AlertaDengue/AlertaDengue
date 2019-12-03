@@ -20,6 +20,7 @@ from dj_database_url import parse as db_url
 project_path = os.path.expanduser('./')
 load_dotenv(os.path.join(project_path, '.env'))
 
+
 def read_admins(value):
     # ADMIN in settings.ini should be in the format:
     # admin 1, admin1@example.org; admin 2, admin2@example.org
@@ -143,6 +144,46 @@ DATABASES={
             'PORT': '',
         },
     }
+
+DATABASE_ROUTERS = ['manager.router.DatabaseAppsRouter']
+DATABASE_APPS_MAPPING = {
+    'dados': 'dados',
+    'forecast': 'forecast',
+    'dbf': 'default',
+}
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('PSQL_DB'),
+        'USER': os.getenv('PSQL_USER'),
+        'PASSWORD': os.getenv('PSQL_PASSWORD'),
+        'HOST': os.getenv('PSQL_HOST'),
+        'PORT': os.getenv('PSQL_PORT'),
+    },
+    'dados': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('PSQL_DB'),
+        'USER': os.getenv('PSQL_USER'),
+        'PASSWORD': os.getenv('PSQL_PASSWORD'),
+        'HOST': os.getenv('PSQL_HOST'),
+        'PORT': os.getenv('PSQL_PORT'),
+    },
+    'forecast': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('PSQL_DB'),
+        'USER': os.getenv('PSQL_USER'),
+        'PASSWORD': os.getenv('PSQL_PASSWORD'),
+        'HOST': os.getenv('PSQL_HOST'),
+        'PORT': os.getenv('PSQL_PORT'),
+    },
+}
+
+PSQL_DB = os.getenv('PSQL_DB')
+PSQL_USER = os.getenv('PSQL_USER')
+PSQL_HOST = os.getenv('PSQL_HOST')
+PSQL_PASSWORD = os.getenv('PSQL_PASSWORD')
+PSQL_PORT = os.getenv('PSQL_PORT')
 
 DATABASE_ROUTERS = ['manager.router.DatabaseAppsRouter']
 DATABASE_APPS_MAPPING = {
