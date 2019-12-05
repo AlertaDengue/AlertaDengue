@@ -1,11 +1,11 @@
-django
+django==2.0
 django-bootstrap4
 django-leaflet
 geojson
 gunicorn
 numpy
 pandas
-python-decouple
+python-dotenv
 pytz
 psycopg2
 sqlalchemy

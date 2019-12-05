@@ -13,12 +13,12 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 import sys
 from dotenv import load_dotenv
-from pathlib import Path
+from os.path import join, dirname
 from dj_database_url import parse as db_url
 
 
-env_path = Path('.') / '.env'
-load_dotenv(dotenv_path=env_path)
+dotenv_path = join(dirname(dirname(dirname(__file__))), '.env')
+load_dotenv(dotenv_path)
 
 
 def read_admins(value):
@@ -120,7 +120,7 @@ PSQL_PORT = os.getenv('PSQL_PORT')
 
 DATABASES={
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'django.db.backends.postgresql',
             'NAME': PSQL_DB,
             'USER': PSQL_USER,
             'PASSWORD': PSQL_PASSWORD,
@@ -128,7 +128,7 @@ DATABASES={
             'PORT': '',
         },
         'dados': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'django.db.backends.postgresql',
             'NAME': PSQL_DB,
             'USER': PSQL_USER,
             'PASSWORD': PSQL_PASSWORD,
@@ -136,7 +136,7 @@ DATABASES={
             'PORT': '',
         },
         'forecast': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'django.db.backends.postgresql',
             'NAME': PSQL_DB,
             'USER': 'forecast',
             'PASSWORD': PSQL_PASSWORD,
