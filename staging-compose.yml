@@ -16,14 +16,14 @@ services:
         context: "."
         dockerfile: "Dockerfile-postgres"
       env_file:
-        - .env
+        - .env_staging
       hostname: staging_db
       restart: always
 
     staging_web:
       build: .
       env_file:
-        - .env
+        - .env_staging
       ports:
         - 8080:8000
       environment:
@@ -48,7 +48,7 @@ services:
         context: "."
         dockerfile: "Dockerfile-celery"
       env_file:
-        - .env
+        - .env_staging
       environment:
         - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
         - DATABASE_URL = postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:5432/infodengue
@@ -69,7 +69,7 @@ services:
         ports:
             - 7777:80
         env_file:
-            - .env
+            - .env_staging
         volumes:
             - ${DOCKER_HOST_MAPFILES_DIR}:/maps:ro
             - ${DOCKER_HOST_SHAPEFILES_DIR}:/shapefile:ro

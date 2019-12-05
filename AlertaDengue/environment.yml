@@ -3,15 +3,16 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-- django
+- django=2.0
 - django-bootstrap4
 - django-leaflet
 - geojson
 - gunicorn
 - numpy
 - pandas
-- pip
-- python-decouple
+- pip=19.3
+- python=3.7
+- python-dotenv
 - pytz
 - psycopg2
 - sqlalchemy
@@ -28,6 +29,7 @@ dependencies:
 - gdal
 - fiona
 - rasterio
+- boto3
 - geopy
 - geopandas
 - sh
@@ -35,3 +37,4 @@ dependencies:
 - sqlparse
 - plotly=4.0.0
 - BeautifulSoup4
+- setuptools=41.5.1 # TODO: remove this when django 3 is used
