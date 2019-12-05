@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-- django=2.0
+- django>=2,<3
 - django-bootstrap4
 - django-leaflet
 - geojson
