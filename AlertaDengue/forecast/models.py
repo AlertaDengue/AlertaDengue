@@ -19,7 +19,7 @@ class Forecast(models.Model):
     model INT,
     se INT NOT NULL,
     se_predicted INT NOT NULL,
-    active    BOOL    NOT    NULL
+    active    BOOL,
     """
 
     id = models.AutoField(primary_key=True)  # (serial)
@@ -51,7 +51,7 @@ class ForecastModel(models.Model):
     train_start    DateField NOT    NULL,
     train_end    DateField NOT    NULL,
     filename    FileField NOT    NULL,
-    active    BOOL    NOT    NULL.
+    active    BOOL.
     """
 
     id = models.AutoField(primary_key=True)  # id (serial)
@@ -67,10 +67,10 @@ class ForecastModel(models.Model):
         max_length=7, null=False, help_text=_('ID do commit (github)')
     )
     train_start = models.DateField(
-        null=False, help_text=_('Data Inicio')
+        null=False, default='timezone.now', help_text=_('Data Inicio')
     )  # start date of th training period
     train_end = models.DateField(
-        null=False, help_text=_('Data Final')
+        null=False, default='timezone.now', help_text=_('Data Final')
     )  # end date of the training period
     filename = models.FileField(
         upload_to='uploads/%Y/%m/%d/', null=False, default='Trained model'
