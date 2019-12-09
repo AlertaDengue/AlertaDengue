@@ -1,9 +1,3 @@
-"""
-Added into the first migration file:
-migrations.RunSQL(
-    "CREATE SCHEMA IF NOT EXISTS forecast"
-),
-"""
 # from django.apps import apps
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -19,7 +13,7 @@ class Forecast(models.Model):
     model INT,
     se INT NOT NULL,
     se_predicted INT NOT NULL,
-    active    BOOL,
+    active    BOOL NOT NULL,
     """
 
     id = models.AutoField(primary_key=True)  # (serial)
@@ -51,7 +45,7 @@ class ForecastModel(models.Model):
     train_start    DateField NOT    NULL,
     train_end    DateField NOT    NULL,
     filename    FileField NOT    NULL,
-    active    BOOL.
+    active    BOOL NOT  NULL,
     """
 
     id = models.AutoField(primary_key=True)  # id (serial)
