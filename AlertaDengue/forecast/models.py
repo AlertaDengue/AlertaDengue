@@ -14,6 +14,12 @@ from django.utils.translation import ugettext_lazy as _
 
 class Forecast(models.Model):
     """
+    id    SERIAL    PRIMARY    KEY,
+    municipio_geocodigo INT NOT NULL,
+    model INT,
+    se INT NOT NULL,
+    se_predicted INT NOT NULL,
+    active    BOOL    NOT    NULL
     """
 
     id = models.AutoField(primary_key=True)  # (serial)
@@ -38,28 +44,36 @@ class Forecast(models.Model):
 
 class ForecastModel(models.Model):
     """
+    id    SERIAL    PRIMARY    KEY,
+    name    VARCHAR(128)    NOT    NULL,
+    github   URLField    NOT    NULL,
+    commit_id    CHAR(7)    NOT    NULL,
+    train_start    DateField NOT    NULL,
+    train_end    DateField NOT    NULL,
+    filename    FileField NOT    NULL,
+    active    BOOL    NOT    NULL.
     """
 
     id = models.AutoField(primary_key=True)  # id (serial)
     name = models.CharField(
-        max_length=128, null=False, help_text=_('Forecast Model Name')
+        max_length=128, null=False, help_text=_('Nome do Modelo de Previsão')
     )
     github = models.URLField(
         max_length=100,
-        help_text='URL of the the github repo',
+        help_text=_('URL do repositório github'),
         default='github.com',
     )  # URL of the the github
     commit_id = models.CharField(
         max_length=7, null=False, help_text=_('ID do commit (github)')
     )
     train_start = models.DateField(
-        null=True, blank=True
+        null=False, help_text=_('Data Inicio')
     )  # start date of th training period
     train_end = models.DateField(
-        null=True, blank=True
+        null=False, help_text=_('Data Final')
     )  # end date of the training period
     filename = models.FileField(
-        upload_to='uploads/%Y/%m/%d/', default='Trained model'
+        upload_to='uploads/%Y/%m/%d/', null=False, default='Trained model'
     )  # filename of the saved trained model which will be loaded
     active = models.BooleanField(null=False, help_text=_('Está ativo?'))
 
