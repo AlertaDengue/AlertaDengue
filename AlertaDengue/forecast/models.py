@@ -1,10 +1,8 @@
 """
 Added into the first migration file:
-
 migrations.RunSQL(
     "CREATE SCHEMA IF NOT EXISTS forecast"
 ),
-
 """
 # from django.apps import apps
 from django.db import models
@@ -14,23 +12,24 @@ from django.utils.translation import ugettext_lazy as _
 # City = apps.get_model('dados', 'City')
 
 
-class Forecast_table(models.Model):
+class Forecast(models.Model):
     """
     """
 
     id = models.AutoField(primary_key=True)  # (serial)
     model = models.ForeignKey(
-        'ForecastModel', on_delete=models.CASCADE, null=True
-    )  # (foreign key to the models table)
+        'forecast.ForecastModel', on_delete=models.CASCADE, null=True
+    )  # (foreign key to the models table) -->> forecast_model_weeks?
     se = models.IntegerField(
         null=False, help_text=_('Epidemiological Week')
     )  # Epid. week when the prediction was generated
     se_predicted = models.IntegerField(
         null=False, help_text=_('Predicted Week')
     )  # (integer) Epid. week predicted
+    active = models.BooleanField(null=False, help_text=_('Está ativo?'))
 
     class Meta:
-        db_table = 'forecast"."forecast_predicted'
+        db_table = 'forecast"."forecast_model'
         app_label = 'forecast'
 
     def __str__(self):
@@ -60,11 +59,12 @@ class ForecastModel(models.Model):
         null=True, blank=True
     )  # end date of the training period
     filename = models.FileField(
-        upload_to='uploads/%Y/%m/%d/', default='trained model'
+        upload_to='uploads/%Y/%m/%d/', default='Trained model'
     )  # filename of the saved trained model which will be loaded
+    active = models.BooleanField(null=False, help_text=_('Está ativo?'))
 
     class Meta:
-        db_table = 'forecast"."forecast_model'
+        db_table = 'forecast"."forecast_table'
         app_label = 'forecast'
 
     def __str__(self):
@@ -76,7 +76,6 @@ class ForecastCity(models.Model):
     city/geocode INT NOT NULL,
     forecast_model_id INT,
     active BOOL NOT NULL,
-
     """
 
     city = models.ForeignKey(
@@ -115,7 +114,6 @@ class ForecastCases(models.Model):
     published_date date NOT NULL,
     init_date_epiweek date NOT NULL,
     cases INT NOT NULL,
-
     PRIMARY KEY (
       epiweek, geocode, cid10, forecast_model_id, published_date
     ),
