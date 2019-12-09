@@ -14,23 +14,54 @@ from django.utils.translation import ugettext_lazy as _
 # City = apps.get_model('dados', 'City')
 
 
-class ForecastModel(models.Model):
+class Forecast_table(models.Model):
     """
-    id    SERIAL    PRIMARY    KEY,
-    name    VARCHAR(128)    NOT    NULL,
-    total_weeks   SMALLINT    NOT    NULL,
-    commit_id    CHAR(7)    NOT    NULL,
-    active    BOOL    NOT    NULL
     """
 
+    id = models.AutoField(primary_key=True)  # (serial)
+    model = models.ForeignKey(
+        'ForecastModel', on_delete=models.CASCADE, null=True
+    )  # (foreign key to the models table)
+    se = models.IntegerField(
+        null=False, help_text=_('Epidemiological Week')
+    )  # Epid. week when the prediction was generated
+    se_predicted = models.IntegerField(
+        null=False, help_text=_('Predicted Week')
+    )  # (integer) Epid. week predicted
+
+    class Meta:
+        db_table = 'forecast"."forecast_predicted'
+        app_label = 'forecast'
+
+    def __str__(self):
+        return self.municipio_geocodigo
+
+
+class ForecastModel(models.Model):
+    """
+    """
+
+    id = models.AutoField(primary_key=True)  # id (serial)
     name = models.CharField(
-        max_length=128, null=False, help_text=_('Nome do Modelo de Previsão')
+        max_length=128, null=False, help_text=_('Forecast Model Name')
     )
-    weeks = models.IntegerField(null=False, help_text=_('Total de Semanas'))
+    github = models.URLField(
+        max_length=100,
+        help_text='URL of the the github repo',
+        default='github.com',
+    )  # URL of the the github
     commit_id = models.CharField(
         max_length=7, null=False, help_text=_('ID do commit (github)')
     )
-    active = models.BooleanField(null=False, help_text=_('Está ativo?'))
+    train_start = models.DateField(
+        null=True, blank=True
+    )  # start date of th training period
+    train_end = models.DateField(
+        null=True, blank=True
+    )  # end date of the training period
+    filename = models.FileField(
+        upload_to='uploads/%Y/%m/%d/', default='trained model'
+    )  # filename of the saved trained model which will be loaded
 
     class Meta:
         db_table = 'forecast"."forecast_model'
