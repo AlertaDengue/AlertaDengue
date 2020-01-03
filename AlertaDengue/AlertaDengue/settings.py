@@ -232,16 +232,15 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
 EMAIL_FROM_ADDRESS = os.getenv('EMAIL_FROM_ADDRESS')
 
 INFODENGUE_TEAM_EMAIL = os.getenv('INFODENGUE_TEAM_EMAIL')
-####modificar####################confiD
+
 if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
-    EMAIL_HOST = os.getenv('EMAIL_HOST')
-    EMAIL_PORT = os.getenv('EMAIL_PORT')
-    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+    EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = os.getenv(
+        'EMAIL_CONFIG').split(',')
+    EMAIL_PORT = int(EMAIL_PORT)
     EMAIL_USE_TLS = True
 
 
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')  # Verificar ERROR CELERY
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 CELERY_TASK_ALWAYS_EAGER = os.getenv('CELERY_TASK_ALWAYS_EAGER')
 
 MAPSERVER_URL = os.getenv('MAPSERVER_URL')
