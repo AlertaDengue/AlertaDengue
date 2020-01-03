@@ -152,46 +152,6 @@ DATABASE_APPS_MAPPING = {
     'dbf': 'default',
 }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PSQL_DB'),
-        'USER': os.getenv('PSQL_USER'),
-        'PASSWORD': os.getenv('PSQL_PASSWORD'),
-        'HOST': os.getenv('PSQL_HOST'),
-        'PORT': os.getenv('PSQL_PORT'),
-    },
-    'dados': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PSQL_DB'),
-        'USER': os.getenv('PSQL_USER'),
-        'PASSWORD': os.getenv('PSQL_PASSWORD'),
-        'HOST': os.getenv('PSQL_HOST'),
-        'PORT': os.getenv('PSQL_PORT'),
-    },
-    'forecast': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PSQL_DB'),
-        'USER': os.getenv('PSQL_USER'),
-        'PASSWORD': os.getenv('PSQL_PASSWORD'),
-        'HOST': os.getenv('PSQL_HOST'),
-        'PORT': os.getenv('PSQL_PORT'),
-    },
-}
-
-PSQL_DB = os.getenv('PSQL_DB')
-PSQL_USER = os.getenv('PSQL_USER')
-PSQL_HOST = os.getenv('PSQL_HOST')
-PSQL_PASSWORD = os.getenv('PSQL_PASSWORD')
-PSQL_PORT = os.getenv('PSQL_PORT')
-
-DATABASE_ROUTERS = ['manager.router.DatabaseAppsRouter']
-DATABASE_APPS_MAPPING = {
-    'dados': 'dados',
-    'forecast': 'forecast',
-    'dbf': 'default',
-}
-
 MEMCACHED_HOST = os.getenv('MEMCACHED_HOST')
 MEMCACHED_PORT = os.getenv('MEMCACHED_PORT')
 QUERY_CACHE_TIMEOUT = 60 * 60
@@ -271,16 +231,15 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
 EMAIL_FROM_ADDRESS = os.getenv('EMAIL_FROM_ADDRESS')
 
 INFODENGUE_TEAM_EMAIL = os.getenv('INFODENGUE_TEAM_EMAIL')
-####modificar####################confiD
+
 if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
-    EMAIL_HOST = os.getenv('EMAIL_HOST')
-    EMAIL_PORT = os.getenv('EMAIL_PORT')
-    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+    EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = os.getenv(
+        'EMAIL_CONFIG').split(',')
+    EMAIL_PORT = int(EMAIL_PORT)
     EMAIL_USE_TLS = True
 
 
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')  # Verificar ERROR CELERY
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
 CELERY_TASK_ALWAYS_EAGER = os.getenv('CELERY_TASK_ALWAYS_EAGER')
 
 MAPSERVER_URL = os.getenv('MAPSERVER_URL')
