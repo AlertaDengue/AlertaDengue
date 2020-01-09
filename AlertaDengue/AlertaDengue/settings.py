@@ -39,9 +39,9 @@ PARENT_BASE_DIR = os.path.dirname(BASE_DIR)
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG')
-# You must set settings.ALLOWED_HOSTS if DEBUG is False.
+DEBUG = os.getenv('DEBUG', '').lower() == 'true'
 
+# You must set settings.ALLOWED_HOSTS if DEBUG is False.
 ADMINS = os.getenv('ADMINS')
 
 # ALLOWED_HOSTS=os.getenv["alerta.dengue.mat.br", "info.dengue.mat.br", '127.0.0.1'] ###VERIFICAR EM .ENV
