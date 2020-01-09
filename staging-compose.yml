@@ -18,6 +18,10 @@ services:
       env_file:
         - .env_staging
       hostname: staging_db
+      ports:
+        - 5432:5432
+      volumes:
+        - ${STAGING_DATA_DIR}:/var/lib/postgresql/data
       restart: always
 
     staging_web:
@@ -51,7 +55,7 @@ services:
         - .env_staging
       environment:
         - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
-        - DATABASE_URL = postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:5432/infodengue
+        - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:5432/infodengue
         - PSQL_HOST=staging_db
       volumes:
         - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
