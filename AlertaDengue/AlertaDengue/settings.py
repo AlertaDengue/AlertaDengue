@@ -132,7 +132,7 @@ DATABASES = {
         'USER': PSQL_USER,
         'PASSWORD': PSQL_PASSWORD,
         'HOST': PSQL_HOST,
-        'PORT': '',
+        'PORT': PSQL_PORT,
     },
     'dados': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -140,7 +140,7 @@ DATABASES = {
         'USER': PSQL_USER,
         'PASSWORD': PSQL_PASSWORD,
         'HOST': PSQL_HOST,
-        'PORT': '',
+        'PORT': PSQL_PORT,
     },
     'forecast': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -148,7 +148,7 @@ DATABASES = {
         'USER': 'forecast',
         'PASSWORD': PSQL_PASSWORD,
         'HOST': PSQL_HOST,
-        'PORT': '',
+        'PORT': PSQL_PORT,
     },
 }
 
