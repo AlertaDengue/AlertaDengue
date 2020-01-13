@@ -118,33 +118,6 @@ PSQL_HOST = os.getenv('PSQL_HOST')
 PSQL_PASSWORD = os.getenv('PSQL_PASSWORD')
 PSQL_PORT = os.getenv('PSQL_PORT')
 
-DATABASES={
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': PSQL_DB,
-            'USER': PSQL_USER,
-            'PASSWORD': PSQL_PASSWORD,
-            'HOST': PSQL_HOST,
-            'PORT': '',
-        },
-        'dados': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': PSQL_DB,
-            'USER': PSQL_USER,
-            'PASSWORD': PSQL_PASSWORD,
-            'HOST': PSQL_HOST,
-            'PORT': '',
-        },
-        'forecast': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': PSQL_DB,
-            'USER': 'forecast',
-            'PASSWORD': PSQL_PASSWORD,
-            'HOST': PSQL_HOST,
-            'PORT': '',
-        },
-    }
-
 DATABASE_ROUTERS = ['manager.router.DatabaseAppsRouter']
 DATABASE_APPS_MAPPING = {
     'dados': 'dados',
@@ -155,42 +128,30 @@ DATABASE_APPS_MAPPING = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PSQL_DB'),
-        'USER': os.getenv('PSQL_USER'),
-        'PASSWORD': os.getenv('PSQL_PASSWORD'),
-        'HOST': os.getenv('PSQL_HOST'),
-        'PORT': os.getenv('PSQL_PORT'),
+        'NAME': PSQL_DB,
+        'USER': PSQL_USER,
+        'PASSWORD': PSQL_PASSWORD,
+        'HOST': PSQL_HOST,
+        'PORT': PSQL_PORT,
     },
     'dados': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PSQL_DB'),
-        'USER': os.getenv('PSQL_USER'),
-        'PASSWORD': os.getenv('PSQL_PASSWORD'),
-        'HOST': os.getenv('PSQL_HOST'),
-        'PORT': os.getenv('PSQL_PORT'),
+        'NAME': PSQL_DB,
+        'USER': PSQL_USER,
+        'PASSWORD': PSQL_PASSWORD,
+        'HOST': PSQL_HOST,
+        'PORT': PSQL_PORT,
     },
     'forecast': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('PSQL_DB'),
-        'USER': os.getenv('PSQL_USER'),
-        'PASSWORD': os.getenv('PSQL_PASSWORD'),
-        'HOST': os.getenv('PSQL_HOST'),
-        'PORT': os.getenv('PSQL_PORT'),
+        'NAME': PSQL_DB,
+        'USER': 'forecast',
+        'PASSWORD': PSQL_PASSWORD,
+        'HOST': PSQL_HOST,
+        'PORT': PSQL_PORT,
     },
 }
 
-PSQL_DB = os.getenv('PSQL_DB')
-PSQL_USER = os.getenv('PSQL_USER')
-PSQL_HOST = os.getenv('PSQL_HOST')
-PSQL_PASSWORD = os.getenv('PSQL_PASSWORD')
-PSQL_PORT = os.getenv('PSQL_PORT')
-
-DATABASE_ROUTERS = ['manager.router.DatabaseAppsRouter']
-DATABASE_APPS_MAPPING = {
-    'dados': 'dados',
-    'forecast': 'forecast',
-    'dbf': 'default',
-}
 
 MEMCACHED_HOST = os.getenv('MEMCACHED_HOST')
 MEMCACHED_PORT = os.getenv('MEMCACHED_PORT')
