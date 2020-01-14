@@ -41,10 +41,10 @@ class DBF(models.Model):
         ('SC', 'Santa Catarina'),
         ('SP', 'São Paulo'),
         ('SE', 'Sergipe'),
-        ('TO', 'Tocantins')
+        ('TO', 'Tocantins'),
     )
 
-    uploaded_by = models.ForeignKey('auth.User',on_delete=models.DO_NOTHING)
+    uploaded_by = models.ForeignKey('auth.User', on_delete=models.DO_NOTHING)
     file = models.FileField()
     uploaded_at = models.DateTimeField(auto_now_add=True)
     export_date = models.DateField()
@@ -56,8 +56,14 @@ class DBF(models.Model):
 
     def clean(self):
         if self.notification_year > date.today().year:
-            raise ValidationError({"notification_year": _("O ano de notificação "
-                        "não pode ser maior do que o ano atual")})
+            raise ValidationError(
+                {
+                    "notification_year": _(
+                        "O ano de notificação "
+                        "não pode ser maior do que o ano atual"
+                    )
+                }
+            )
 
         if not is_valid_dbf(self.file, self.notification_year):
             raise ValidationError({"file": _("Arquivo DBF inválido")})
@@ -77,4 +83,5 @@ class DBFChunkedUpload(ChunkedUpload):
     https://github.com/juliomalegria/django-chunked-upload/pull/21 is
     merged, we can remove this.
     """
+
     pass

@@ -1,0 +1,40 @@
+name: alertadengue
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+- django>=2,<3
+- django-bootstrap4
+- django-leaflet
+- geojson
+- gunicorn
+- numpy
+- pandas
+- pip=19.3
+- python=3.7
+- python-dotenv
+- pytz
+- psycopg2
+- sqlalchemy
+- python-memcached
+- django-makemessages-xgettext
+- mock
+- dbfread
+- dj-database-url
+- django-chunked-upload
+- docker-compose
+- celery
+- dj-static
+- pyproj=1.9.6
+- gdal
+- fiona
+- rasterio
+- boto3
+- geopy
+- geopandas
+- sh
+- ipython
+- sqlparse
+- plotly=4.0.0
+- BeautifulSoup4
+- setuptools=41.5.1 # TODO: remove this when django 3 is used

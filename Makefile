@@ -1,5 +1,7 @@
+# Deploy production and staging
 compose_cmd = docker-compose -p infodengue -f docker-compose.yml
 staging_compose_cmd = docker-compose -p infodengue_staging -f staging-compose.yml
+
 
 build:
 	$(compose_cmd) build
@@ -38,3 +40,16 @@ generate_maps_staging: build
 clean_staging:
 	$(staging_compose_cmd) stop
 	$(staging_compose_cmd) rm
+
+# Clean containers and images docker
+build_remove_orphans:
+	$(compose_cmd) up --build --remove-orphans
+
+build_remove_orphans_staging:
+	$(staging_compose_cmd) up staging_web --remove-orphans
+
+remove_stoped_containers:
+	docker rm $(docker ps -a -q)
+
+remove_untagged_images:
+	docker rmi $(docker images | grep "^<none>" | awk "{print $3}")

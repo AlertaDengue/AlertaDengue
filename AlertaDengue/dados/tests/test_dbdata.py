@@ -1,6 +1,7 @@
 from unittest import TestCase
 from .. import dbdata
 import datetime
+import unittest
 
 
 class TestLoadAlerta(TestCase):
@@ -26,34 +27,47 @@ class TestLoadAlerta(TestCase):
         self.assertIsInstance(
             self.series[str(self.cidade)]['casos'][0],
             int,
-            '{}'.format(self.series[str(self.cidade)]['casos']))
+            '{}'.format(self.series[str(self.cidade)]['casos']),
+        )
         self.assertIsInstance(
             self.series[str(self.cidade)]['casos_est'][0],
             int,
-            '{}'.format(self.series[str(self.cidade)]['casos_est']))
+            '{}'.format(self.series[str(self.cidade)]['casos_est']),
+        )
         self.assertIsInstance(
             self.series[str(self.cidade)]['casos_est_min'][0],
             int,
-            '{}'.format(self.series[str(self.cidade)]['casos_est_min']))
+            '{}'.format(self.series[str(self.cidade)]['casos_est_min']),
+        )
         self.assertIsInstance(
             self.series[str(self.cidade)]['casos_est_max'][0],
             int,
-            '{}'.format(self.series[str(self.cidade)]['casos_est_max']))
+            '{}'.format(self.series[str(self.cidade)]['casos_est_max']),
+        )
 
     def test_dia_is_date(self):
         self.assertIsInstance(
             self.series[str(self.cidade)]['dia'][0],
             datetime.date,
-            '{}'.format(type(self.series[str(self.cidade)]['dia'][0])))
+            '{}'.format(type(self.series[str(self.cidade)]['dia'][0])),
+        )
 
+    @unittest.skip("Waiting data on database demo. skipping")
     def test_alerta_is_between_0_and_3(self):
         self.assertEqual(max(self.series[str(self.cidade)]['alerta']), 3)
         self.assertEqual(min(self.series[str(self.cidade)]['alerta']), 0)
 
     def test_get_city_alert(self):
-        (alert, SE, case_series,
-         last_year, obs_case_series,
-         min_max_est, dia, ptr1) = dbdata.get_city_alert(3303302)
+        (
+            alert,
+            SE,
+            case_series,
+            last_year,
+            obs_case_series,
+            min_max_est,
+            dia,
+            ptr1,
+        ) = dbdata.get_city_alert(3303302)
         self.assertIsInstance(alert, int)
         self.assertIsInstance(SE, int, SE)
         self.assertIsInstance(case_series, list)
