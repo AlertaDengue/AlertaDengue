@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load lookup %}
+
+{% block extra_head %}
+<meta property="og:image"
+      content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+<meta property="og:image:secure_url"
+      content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+
+
+<script src="/static/libs/bootstrap-select/bootstrap-select.min.js"
+        type="text/javascript"></script>
+
+<script src="/static/js/infodengue.js"
+        type="text/javascript"></script>
+
+<link href="/static/libs/bootstrap-select/bootstrap-select.min.css"
+        type="text/css" rel="stylesheet" />
+
+{% endblock %}
+
+{% block title %}{% trans "Dados" %}: {% trans "Tutorial" %}{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 column">
+            <div tabindex="-1" id="notebook" class="border-box-sizing">
+
+                <li><span>
+                    <a href="{% url 'dados:data_public_services' %}tutorial/R">
+                        {% trans "Para acessar e fazer visualizações a partir da tabela de dados do Infodengue usando a linguagem R." %}
+                    </a>
+                </span></li>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

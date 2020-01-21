@@ -9,14 +9,15 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('dbf', '0006_auto_20171114_1026'),
-    ]
+    dependencies = [('dbf', '0006_auto_20171114_1026')]
 
     operations = [
         migrations.AlterField(
             model_name='dbf',
             name='uploaded_by',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to=settings.AUTH_USER_MODEL),
-        ),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to=settings.AUTH_USER_MODEL,
+            ),
+        )
     ]

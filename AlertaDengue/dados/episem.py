@@ -29,14 +29,13 @@ def firstepiday(year=int):
     if day_week < 4:
         day = day - datetime.timedelta(days=day_week)
     else:
-        day = day + datetime.timedelta(days=(7-day_week))
+        day = day + datetime.timedelta(days=(7 - day_week))
 
     return day
 
 
 def lastepiday(year=int):
     day = datetime.datetime.strptime('%s-12-31' % year, '%Y-%m-%d')
-
 
     day_week = extractweekday(day)
 
@@ -46,9 +45,9 @@ def lastepiday(year=int):
     # epiweek 01 of the next year includes it.
     # Otherwise, it is still the last epiweek of the current year
     if day_week < 3:
-        day = day - datetime.timedelta(days=(day_week+1))
+        day = day - datetime.timedelta(days=(day_week + 1))
     else:
-        day = day + datetime.timedelta(days=(6-day_week))
+        day = day + datetime.timedelta(days=(6 - day_week))
 
     return day
 
@@ -94,13 +93,13 @@ def episem(x, sep='W', out='YW'):
         epiyear -= 1
         epistart = firstepiday(epiyear)
 
-    epiweek = int(((x - epistart)/7).days) + 1
+    epiweek = int(((x - epistart) / 7).days) + 1
 
     return out_format(epiyear, epiweek, out, sep)
 
 
-def episem2date(epi_year_week: str, weekday: int=0):
-    """
+def episem2date(epi_year_week: str, weekday: int = 0):
+    r"""
     Function to obtain first day of corresponding Brazilian epidemiological
     week provided
 
@@ -159,7 +158,8 @@ def episem2date(epi_year_week: str, weekday: int=0):
     # Check wether week day of Jan 1st was before or after a Wednesday
     # and set the start of the epiyear accordingly
     epiweek_day_1 = (
-        date_1 - timedelta(days=date_1_w) if date_1_w <= 3 else
-        date_1 + timedelta(days=7 - date_1_w)
+        date_1 - timedelta(days=date_1_w)
+        if date_1_w <= 3
+        else date_1 + timedelta(days=7 - date_1_w)
     )
     return epiweek_day_1 + timedelta(days=7 * (epiweek - 1) + weekday)

@@ -3,7 +3,6 @@
 {% load static %}
 {% load lookup %}
 {% block extra_head %}
-    {% load series %}
     <meta property="og:image"
           content="http://info.dengue.mat.br/static/img/screenshot.png"/>
     <meta property="og:image:secure_url"
@@ -52,10 +51,22 @@
             padding: 10px;
             font-size: 12px;
         }
+
+        .p { 
+            padding-bottom: 60px; 
+        }
+
+        .chart_div {
+            width: 100%;
+            height: 100%;
+            margin: 0 0 -25px;
+            margin: -25px 0 0 -25px;
+            padding: 0px 0px 0px 0px;
+
     </style>
     <script src="/static/js/Autolinker.min.js"></script>
     <script src="/static/libs/jquery/jquery.sparkline.min.js"></script>
-    <script src="/static/js/highstock.js"></script>
+    <script src="/static/libs/plotlyjs/plotly-latest.min.js"></script>
     <script src="/static/js/modules/exporting.js"></script>
     <script src="/static/js/infodengue.js"></script>
 
@@ -68,20 +79,19 @@
 {% block content %}
     <div class="container-fluid">
         <!-- chart-plot:begin -->
-        <div class="row">
+        <div>
             <div class="col-sm-{{chart_cols}}">
-                <div class="card my-2">
-                  <div class="card-body">
-                    {% total_series_dengue %}
+                <div>
+                  <div class="chart_div">
+                    {{ chart_dengue | safe }}
                   </div>
                 </div>
             </div>
-
             {% if n_alerts_chik > 0 %}
             <div class="col-sm-{{chart_cols}}">
-                <div class="card my-2">
-                  <div class="card-body">
-                    {% total_series_chik %}
+                <div>
+                  <div class="chart_div">
+                    {{ chart_chik | safe }}
                   </div>
                 </div>
             </div>
@@ -89,12 +99,13 @@
 
             {% if n_alerts_zika > 0 %}
             <div class="col-sm-{{chart_cols}}">
-                <div class="card">
-                  <div class="card-body">
-                    {% total_series_zika %}
+                <div>
+                  <div class="chart_div">
+                    {{ chart_zika | safe }}
                   </div>
                 </div>
             </div>
+            <div class="p"></div>
             {% endif %}
 
         </div>

@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from dbf.sinan import Sinan
 
+
 class Command(BaseCommand):
     help = "Imports SINAN DBF into the database"
 

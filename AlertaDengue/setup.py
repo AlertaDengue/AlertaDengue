@@ -1,9 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from setuptools import setup, Command, find_packages
-from pip.req import parse_requirements
-from pip.download import PipSession
+from setuptools import setup, find_packages
+
+try:  # for pip >= 10
+    from pip._internal.req import parse_requirements
+except ImportError:  # for pip <= 9.0.3
+    from pip.req import parse_requirements
+
+try:  # for pip >= 10
+    from pip._internal.download import PipSession
+except ImportError:  # for pip <= 9.0.3
+    from pip.download import PipSession
+
 from glob import glob
 
 import os
@@ -19,6 +28,7 @@ try:
 
     class BuildDoc(SphinxBuildDoc):
         """Run in-place build before Sphinx doc build"""
+
         def run(self):
             ret = subprocess.call(
                 [sys.executable, sys.argv[0], 'build_ext', '-i']
@@ -26,6 +36,7 @@ try:
             if ret != 0:
                 raise RuntimeError("Building Scipy failed!")
             SphinxBuildDoc.run(self)
+
     cmdclass = {'build_sphinx': BuildDoc}
 except ImportError:
     cmdclass = {}
@@ -34,6 +45,7 @@ except ImportError:
 def get_version():
     """Obtain the version number"""
     import importlib
+
     mod = importlib.machinery.SourceFileLoader(
         'version', os.path.join('AlertaDengue', 'version.py')
     ).load_module()
@@ -41,20 +53,17 @@ def get_version():
 
 
 def list_dir(pathname=PATH_ROOT, dir_name=''):
-    result = glob(
-        os.path.join(pathname, dir_name, '**'), 
-        recursive=True
-    )[1:]
+    result = glob(os.path.join(pathname, dir_name, '**'), recursive=True)[1:]
 
     size = len(pathname)
 
     return ['.%s' % r[size:] for r in result]
 
 
-with open('../README.md') as readme_file:
+with open('../README.md', encoding='utf-8') as readme_file:
     readme = readme_file.read()
 
-with open('../HISTORY.md') as history_file:
+with open('../HISTORY.md', encoding='utf-8') as history_file:
     history = history_file.read()
 
 install_reqs = parse_requirements('requirements.txt', session=PipSession())
@@ -86,6 +95,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     cmdclass=cmdclass,
     # test_suite='tests',
