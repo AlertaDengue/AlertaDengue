@@ -1,7 +1,6 @@
 from django.test import TestCase
-
 # local
-from ..models import ForecastModel
+from ..models import ForecastCity, ForecastCases, ForecastModel
 
 
 class ForecastModelTest(TestCase):

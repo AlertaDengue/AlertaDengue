@@ -79,10 +79,6 @@
             opacity: 0.7;
         }
 
-        .p {
-            height: 50px;
-        }
-
         #disease-chart {
             height: 200px;
         }
@@ -195,7 +191,26 @@
 
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="p">
+                    <div class="card" style="z-index:1001; position: relative;">
+                            <select id="cities"
+                                    class="selectpicker"
+                                    data-live-search="true"
+                                    data-title="{% blocktrans %}Selecione municipio(s){% endblocktrans %}"
+                                    data-actions-box="true"
+                                    data-selected-text-format="static"
+                                    multiple
+                            >
+                                {% for k in mun_dict_ordered %}
+                                <option value="{{k}}" selected="selected"
+                                  >{{mun_dict_ordered|lookup:k}}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="button"
+                                   value="{% blocktrans %}Aplicar seleção{% endblocktrans %}"
+                                   onclick="apply_cities_selection();"
+                                   title="{% blocktrans %}Após alterar a seleção das cidades do filtro, clique no botão <Aplicar Seleção>.{% endblocktrans %}"
+                            />
+
                     </div>
                     <div class="chart-stage">
                         {% map_chart %}

@@ -48,8 +48,10 @@ class TestAlertaStaticPageView(TestCase):
         response = self.client.get(
             reverse(
                 'dados:data_public_services_type',
-                kwargs={'service': 'maps', 'service_type': 'doc'},
-            )
+                kwargs={
+                    'service': 'maps',
+                    'service_type': 'doc'
+                })
         )
         self.assertEqual(response.status_code, 200)
 
@@ -80,17 +82,17 @@ class TestAlertaPageView(TestCase):
     @skip
     def test_alerta(self):
         alerta = {
-            1.0: 1,
-            2.1: 1,
-            2.2: 1,
-            3.1: 2,
-            3.2: 1,
-            3.3: 2,
-            4.0: 1,
-            5.1: 1,
-            5.2: 1,
-            5.3: 1,
-        }
+             1.0: 1,
+             2.1: 1,
+             2.2: 1,
+             3.1: 2,
+             3.2: 1,
+             3.3: 2,
+             4.0: 1,
+             5.1: 1,
+             5.2: 1,
+             5.3: 1
+         }
 
         self.assertEqual(self.response.context['alerta'], alerta)
 

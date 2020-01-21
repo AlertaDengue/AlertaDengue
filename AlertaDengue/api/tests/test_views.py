@@ -19,6 +19,9 @@ import unittest
 
 
 class TestApiView(TestCase):
+    """
+
+    """
     def setUp(self):
         settings.DATA_DIR = os.path.dirname(__file__)
 
@@ -28,34 +31,39 @@ class TestApiView(TestCase):
         :return:
         """
         response = self.client.get(
-            reverse('api:notif_reduced'),
-            {'state_abv': 'RJ', 'chart_type': 'disease'},
+            reverse('api:notif_reduced'), {
+                'state_abv': 'RJ',
+                'chart_type': 'disease'
+            }
         )
         self.assertEqual(response.status_code, 200)
 
-    @unittest.skip("Waiting data on database demo.")
     def test_notification_reduced_csv_404_view(self):
         """
 
         :return:
         """
         response = self.client.get(
-            reverse('api:notif_reduced'), {'chart_type': 'disease'}
+            reverse('api:notif_reduced'), {
+                'chart_type': 'disease'
+            }
         )
         self.assertEqual(response.status_code, 404)
         self.assertEqual(
             response.content,
-            b'ERROR: The parameter state_abv not found. '
-            + b'This parameter should have 2 letter (e.g. RJ).',
+            b'ERROR: The parameter state_abv not found. ' +
+            b'This parameter should have 2 letter (e.g. RJ).'
         )
 
-    @unittest.skip("Waiting for Rio de Janeiro data on database demo.")
     def test_alert_rj(self):
         geocode = MRJ_GEOCODE
         # test epidemic start week missing
         response = self.client.get(
-            reverse('api:alertcity'),
-            {'disease': 'dengue', 'geocode': geocode, 'format': 'json'},
+            reverse('api:alertcity'), {
+                'disease': 'dengue',
+                'geocode': geocode,
+                'format': 'json'
+            }
         )
         self.assertEqual(response.status_code, 200)
         result = response.json()
@@ -63,18 +71,18 @@ class TestApiView(TestCase):
 
         # test json format
         response = self.client.get(
-            reverse('api:alertcity'),
-            {
+            reverse('api:alertcity'), {
                 'disease': 'dengue',
                 'geocode': geocode,
                 'format': 'json',
                 'ew_start': 1,
                 'ew_end': 50,
-                'e_year': 2017,
-            },
+                'e_year': 2017
+            }
         )
         self.assertEqual(response.status_code, 200)
         result = response.json()
+
         assert 'error_message' not in result
 
         for r in result:
@@ -82,49 +90,46 @@ class TestApiView(TestCase):
 
         # test csv format
         response = self.client.get(
-            reverse('api:alertcity'),
-            {
+            reverse('api:alertcity'), {
                 'disease': 'dengue',
                 'geocode': geocode,
                 'format': 'csv',
                 'ew_start': '1',
                 'ew_end': '50',
-                'e_year': '2017',
-            },
+                'e_year': '2017'
+            }
         )
         self.assertEqual(response.status_code, 200)
         buffer = io.BytesIO(response.content)
         df = pd.read_csv(buffer)
         assert all(201701 <= df['se']) and all(df['se'] <= 201750)
 
-    @unittest.skip("Waiting for Curitiba data on database demo.")
     def test_alert_curitiba(self):
         geocode = 4106902
         # test epidemic start week missing
         response = self.client.get(
-            reverse('api:alertcity'),
-            {'disease': 'dengue', 'geocode': geocode, 'format': 'json'},
+            reverse('api:alertcity'), {
+                'disease': 'dengue',
+                'geocode': geocode,
+                'format': 'json'
+            }
         )
         self.assertEqual(response.status_code, 200)
         result = response.json()
-
         assert result['error_message'] == 'Epidemic start week sent is empty.'
 
         # test json format
         response = self.client.get(
-            reverse('api:alertcity'),
-            {
+            reverse('api:alertcity'), {
                 'disease': 'dengue',
                 'geocode': geocode,
                 'format': 'json',
                 'ew_start': 1,
                 'ew_end': 50,
-                'e_year': 2017,
-            },
+                'e_year': 2017
+            }
         )
-
         self.assertEqual(response.status_code, 200)
-
         result = response.json()
 
         assert 'error_message' not in result
@@ -134,15 +139,14 @@ class TestApiView(TestCase):
 
         # test csv format
         response = self.client.get(
-            reverse('api:alertcity'),
-            {
+            reverse('api:alertcity'), {
                 'disease': 'dengue',
                 'geocode': geocode,
                 'format': 'csv',
                 'ew_start': '1',
                 'ew_end': '50',
-                'e_year': '2017',
-            },
+                'e_year': '2017'
+            }
         )
         self.assertEqual(response.status_code, 200)
         buffer = io.BytesIO(response.content)

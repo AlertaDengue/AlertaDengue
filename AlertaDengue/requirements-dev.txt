@@ -1,9 +1,7 @@
 jupyter
 jupyter_contrib_nbextensions
-# eralchemy
+eralchemy
 matplotlib
 PILLOW
-pre_commit
-black
-flake8
-# django-extensions
+django-extensions
+werkzeug

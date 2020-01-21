@@ -1,23 +1,13 @@
 from datetime import datetime
 from glob import glob
-
 # local
 from dados.dbdata import (
-    STATE_INITIAL,
-    db_engine,
-    get_cities,
-    NotificationResume as notif,
+    STATE_INITIAL, db_engine, get_cities,
+    NotificationResume as notif
 )
 
 from .geodf import extract_boundaries
-from .settings import (
-    SHAPEFILE_PATH,
-    RASTER_PATH,
-    MAPFILE_PATH,
-    MAPSERVER_LOG_PATH,
-    MAPSERVER_URL,
-    RASTER_METEROLOGICAL_DATA_RANGE,
-)
+from .settings import *
 
 import geopandas as gpd
 import numpy as np
@@ -31,7 +21,7 @@ def stringfy_boundaries(bounds: np.array, sep=' '):
     return sep.join(str_boundaries)
 
 
-def calc_layer_width_by_boundaries(bounds: np.array, layer_height: int = 400):
+def calc_layer_width_by_boundaries(bounds: np.array, layer_height: int=400):
     # ratio size
     width = np.abs(bounds[0] - bounds[2])
     height = np.abs(bounds[1] - bounds[3])
@@ -50,17 +40,21 @@ def get_template_content(file_name: str):
     current_dir = os.path.dirname(__file__)
     mapfile_template_dir = os.path.join(current_dir, 'templates', 'mapfile')
 
-    with open(os.path.join(mapfile_template_dir, file_name)) as f:
+    with open(
+        os.path.join(mapfile_template_dir, file_name)
+    ) as f:
         return f.read()
 
 
 def transform_boundaries(bounds: np.array, proj_from, proj_to):
     # boundaries in epsg:4326
     bounds[0], bounds[1] = pyproj.transform(
-        proj_from, proj_to, bounds[0], bounds[1]
+        proj_from, proj_to,
+        bounds[0], bounds[1]
     )
     bounds[2], bounds[3] = pyproj.transform(
-        proj_from, proj_to, bounds[2], bounds[3]
+        proj_from, proj_to,
+        bounds[2], bounds[3]
     )
 
     return bounds
@@ -70,7 +64,6 @@ class MapFile:
     """
 
     """
-
     layers = []
     map_config = {}
     path = {}
@@ -83,7 +76,7 @@ class MapFile:
     # LatLon with WGS84 datum used by GPS units and Google Earth
     projections = {
         'wgs84': pyproj.Proj("+init=EPSG:4326"),
-        'grs80': pyproj.Proj("+init=EPSG:2154"),
+        'grs80': pyproj.Proj("+init=EPSG:2154")
     }
     crs_proj_country = 'epsg:4326'
     wms_srs_country = crs_proj_country.upper()
@@ -107,17 +100,16 @@ class MapFile:
             'map': get_template_content('map.map'),
             'layer': '',
             'url': (
-                MAPSERVER_URL
-                + '?'
-                + 'map=/maps/%(map_type)s/%(map_class)s.map&'
-                + 'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&'
-                + 'STYLES=&CRS=%(crs_url)s&BBOX=%(bbox)s&'
-                + 'WIDTH=%(width)s&HEIGHT=%(height)s&FORMAT=%%(format)s&'
-                + 'LAYERS=%(layer_name)s'
+                settings.MAPSERVER_URL + '?' +
+                'map=/maps/%(map_type)s/%(map_class)s.map&' +
+                'SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&' +
+                'STYLES=&CRS=%(crs_url)s&BBOX=%(bbox)s&' +
+                'WIDTH=%(width)s&HEIGHT=%(height)s&FORMAT=%%(format)s&' +
+                'LAYERS=%(layer_name)s'
             ),
             'include_layer': (
                 '  INCLUDE "layers/%(map_class)s/%(file_name)s"  # %(title)s'
-            ),
+            )
         }
         self.path = {
             'shapefile_dir': SHAPEFILE_PATH,
@@ -126,7 +118,7 @@ class MapFile:
             'mapserver_error': MAPSERVER_LOG_PATH,
             'mapserver_cgi': MAPSERVER_URL + '?map=map.map&',
             'mapserver_shapefile_dir': '/shapefile',
-            'mapserver_mapfile_dir': '/maps',
+            'mapserver_mapfile_dir': '/maps'
         }
 
         # Getting general info geo from Brazil
@@ -158,7 +150,8 @@ class MapFile:
 
         if not os.path.exists(mapserver_conf_dir_path):
             conf_dir = os.path.join(
-                os.path.dirname(__file__), 'templates', 'mapfile', 'conf'
+                os.path.dirname(__file__),
+                'templates', 'mapfile', 'conf'
             )
             sh.cp('-R', conf_dir, self.path['local_mapfile_dir'])
 
@@ -179,7 +172,7 @@ class MapFile:
         self.generate(
             template=self.templates['layer'],
             parameters=layer_conf,
-            output_file_path=layer_path,
+            output_file_path=layer_path
         )
 
     def create_layers(self):
@@ -190,7 +183,7 @@ class MapFile:
         self.generate(
             template=self.templates['map'],
             parameters=self.map_config,
-            output_file_path=self.map_config['file_path'],
+            output_file_path=self.map_config['file_path']
         )
 
     def generate(self, template: str, parameters: dict, output_file_path: str):
@@ -214,7 +207,12 @@ class MapFile:
 
 
 class MapFileAlert(MapFile):
-    alert_colors = ['#00FF00', '#FFFF00', '#FF9900', '#FF0000']
+    alert_colors = [
+        '#00FF00',
+        '#FFFF00',
+        '#FF9900',
+        '#FF0000',
+    ]
 
     map_class = None
 
@@ -225,13 +223,11 @@ class MapFileAlert(MapFile):
         self.map_config['map_type'] = 'alert'
         self.map_config['map_class'] = map_class
 
-        self.templates.update(
-            {
-                'layer': get_template_content(
-                    'layer_%s.map' % self.map_config['map_type']
-                )
-            }
-        )
+        self.templates.update({
+            'layer': get_template_content(
+                'layer_%s.map' % self.map_config['map_type']
+            ),
+        })
 
         self.path['local_mapfile_dir'] = os.path.join(
             self.path['local_mapfile_dir'], self.map_config['map_type']
@@ -249,27 +245,25 @@ class MapFileAlert(MapFile):
         ms_mapfile_path = os.path.join(
             self.path['mapserver_mapfile_dir'], mapfile_name
         )
-        self.path['mapserver_cgi'] = MAPSERVER_URL + (
-            '?map=%s&' % ms_mapfile_path
+        self.path['mapserver_cgi'] = (
+            MAPSERVER_URL + ('?map=%s&' % ms_mapfile_path)
         )
 
-        self.map_config.update(
-            {
-                'map_class': self.map_class,
-                'title': self.map_class.title(),
-                'name': 'INFO_DENGUE_%s' % self.map_class,
-                'date_time': '%s' % datetime.now(),
-                # paths
-                'error_path': self.path['mapserver_error'],
-                'cgi_path': self.path['mapserver_cgi'],
-                'shape_dir_path': self.path['mapserver_shapefile_dir'],
-                # projections and extensions
-                'file_path': mapfile_path,
-                'extent': self.extent_country,
-                'wms_srs': self.wms_srs_country,
-                'crs_proj': self.crs_proj_country,
-            }
-        )
+        self.map_config.update({
+            'map_class': self.map_class,
+            'title': self.map_class.title(),
+            'name': 'INFO_DENGUE_%s' % self.map_class,
+            'date_time': '%s' % datetime.now(),
+            # paths
+            'error_path': self.path['mapserver_error'],
+            'cgi_path': self.path['mapserver_cgi'],
+            'shape_dir_path': self.path['mapserver_shapefile_dir'],
+            # projections and extensions
+            'file_path': mapfile_path,
+            'extent': self.extent_country,
+            'wms_srs': self.wms_srs_country,
+            'crs_proj': self.crs_proj_country,
+        })
 
     def create_layers(self):
         """
@@ -277,8 +271,8 @@ class MapFileAlert(MapFile):
         :return:
         """
         sql_template = '''
-        SELECT geocodigo, nome
-        FROM "Dengue_global"."Municipio"
+        SELECT geocodigo, nome 
+        FROM "Dengue_global"."Municipio" 
         WHERE uf = '%s'
         ORDER BY nome;
         '''
@@ -295,11 +289,9 @@ class MapFileAlert(MapFile):
                 state_name, self.map_class
             )
 
-            alerts.update(
-                dict(
-                    cities_alert[['municipio_geocodigo', 'level_alert']].values
-                )
-            )
+            alerts.update(dict(
+                cities_alert[['municipio_geocodigo', 'level_alert']].values
+            ))
 
         for geocode, city_name in cities.items():
             # getting shapefile settings
@@ -323,9 +315,8 @@ class MapFileAlert(MapFile):
 
             alert_level = alerts[geocode] if geocode in alerts else -1
             alert_color = (
-                self.alert_colors[alert_level]
-                if 0 <= alert_level <= 3
-                else '#DFDFDF'  # gray
+                self.alert_colors[alert_level] if 0 <= alert_level <= 3 else
+                '#DFDFDF'  # gray
             )
 
             layer_name = city_name.upper().replace(' ', '_')
@@ -343,8 +334,8 @@ class MapFileAlert(MapFile):
                 'crs_proj': crs_proj,
                 'crs_url': (
                     crs_proj
-                    if not crs_proj.upper() == 'EPSG:4326'
-                    else 'CRS:84'
+                    if not crs_proj.upper() == 'EPSG:4326' else
+                    'CRS:84'
                 ),
                 'bbox': layer_bbox,
                 'width': layer_width,
@@ -352,8 +343,9 @@ class MapFileAlert(MapFile):
                 # paths
                 'file_name': '%s.map' % geocode,
                 'dir_path': os.path.join(
-                    self.path['local_mapfile_dir'], 'layers', self.map_class
-                ),
+                    self.path['local_mapfile_dir'],
+                    'layers', self.map_class
+                )
             }
 
             self.create_layer(layer_conf)
@@ -363,20 +355,19 @@ class MapFileMeteorological(MapFile):
     """
 
     """
-
-    def __init__(self, map_class: str, date_start: datetime = None, **kwargs):
+    def __init__(
+        self, map_class: str, date_start: datetime=None, **kwargs
+    ):
         super(MapFileMeteorological, self).__init__(**kwargs)
         self.map_config['map_type'] = 'meteorological'
         self.map_class = map_class
         self.date_start = date_start
 
-        self.templates.update(
-            {
-                'layer': get_template_content(
-                    'layer_%s.map' % self.map_config['map_type']
-                )
-            }
-        )
+        self.templates.update({
+            'layer': get_template_content(
+                'layer_%s.map' % self.map_config['map_type']
+            ),
+        })
 
         self.path['local_mapfile_dir'] = os.path.join(
             self.path['local_mapfile_dir'], self.map_config['map_type']
@@ -394,31 +385,29 @@ class MapFileMeteorological(MapFile):
         ms_mapfile_path = os.path.join(
             self.path['mapserver_mapfile_dir'], mapfile_name
         )
-        self.path['mapserver_cgi'] = MAPSERVER_URL + (
-            '?map=%s&' % ms_mapfile_path
+        self.path['mapserver_cgi'] = (
+                MAPSERVER_URL + ('?map=%s&' % ms_mapfile_path)
         )
         self.path['mapserver_shapefile_dir'] = os.path.join(
             os.sep, 'tiffs', 'meteorological', 'city', self.map_class
         )
 
-        self.map_config.update(
-            {
-                # general information
-                'name': 'INFO_DENGUE_%s' % self.map_class.upper(),
-                'map_class': self.map_class,
-                'title': self.map_class.upper(),
-                'date_time': '%s' % datetime.now(),
-                # projections and extensions
-                'extent': self.extent_country,
-                'wms_srs': self.wms_srs_country,
-                'crs_proj': self.crs_proj_country,
-                # paths
-                'file_path': mapfile_path,
-                'error_path': self.path['mapserver_error'],
-                'cgi_path': self.path['mapserver_cgi'],
-                'shape_dir_path': self.path['mapserver_shapefile_dir'],
-            }
-        )
+        self.map_config.update({
+            # general information
+            'name': 'INFO_DENGUE_%s' % self.map_class.upper(),
+            'map_class': self.map_class,
+            'title': self.map_class.upper(),
+            'date_time': '%s' % datetime.now(),
+            # projections and extensions
+            'extent': self.extent_country,
+            'wms_srs': self.wms_srs_country,
+            'crs_proj': self.crs_proj_country,
+            # paths
+            'file_path': mapfile_path,
+            'error_path': self.path['mapserver_error'],
+            'cgi_path': self.path['mapserver_cgi'],
+            'shape_dir_path': self.path['mapserver_shapefile_dir'],
+        })
 
     def create_layers(self):
         data_range = RASTER_METEROLOGICAL_DATA_RANGE[self.map_class]
@@ -430,13 +419,12 @@ class MapFileMeteorological(MapFile):
 
             # check the last raster file available by city
             raster_dir_path = os.path.join(
-                RASTER_PATH,
-                'meteorological',
-                'city',
-                self.map_class,
+                RASTER_PATH, 'meteorological', 'city', self.map_class,
                 str(geocode),
             )
-            search_path = os.path.join(raster_dir_path, '*')
+            search_path = os.path.join(
+                raster_dir_path, '*'
+            )
 
             for raster_file_path in glob(search_path, recursive=True):
                 # filter by tiff format
@@ -475,8 +463,9 @@ class MapFileMeteorological(MapFile):
                 'file_name': '%s.map' % geocode,
                 'data_name': '%s.tif' % raster_date.strftime('%Y%m%d'),
                 'dir_path': os.path.join(
-                    self.path['local_mapfile_dir'], 'layers', self.map_class
-                ),
+                    self.path['local_mapfile_dir'],
+                    'layers', self.map_class
+                )
             }
 
             self.create_layer(layer_conf)

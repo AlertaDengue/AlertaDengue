@@ -5,13 +5,8 @@ from rasterio import Affine
 from rasterio.features import rasterize
 from rasterio.transform import from_origin
 
-# local
-from .settings import (
-    SHAPEFILE_PATH,
-    RASTER_METEROLOGICAL_FACTOR_INCREASE,
-    DEBUG,
-    RASTER_PATH,
-)
+#local
+from .settings import *
 from dados.dbdata import get_cities
 
 import fiona
@@ -26,9 +21,10 @@ import traceback as tb
 
 def convert_from_shapefile(shapefile, rgb_color):
     """
-    :param shp:
-    :param rgb_color:
-    :return:
+    
+    :param shp: 
+    :param rgb_color: 
+    :return: 
     """
     shp = shapefile  # alias
     # get coordinates
@@ -49,7 +45,9 @@ def convert_from_shapefile(shapefile, rgb_color):
     out_shape = int(height), int(width)
 
     transform = from_origin(
-        shp.bounds[0] - res_x / 2, shp.bounds[3] + res_y / 2, res_x, res_y
+        shp.bounds[0] - res_x / 2,
+        shp.bounds[3] + res_y / 2,
+        res_x, res_y
     )
 
     shapes = [
@@ -67,7 +65,7 @@ def convert_from_shapefile(shapefile, rgb_color):
         fill=fill,
         transform=transform,
         dtype=dtype,
-        all_touched=True,
+        all_touched=True
     )
 
     rasters = [rasterize(shape, **raster_args) for shape in shapes]
@@ -85,7 +83,7 @@ def convert_from_shapefile(shapefile, rgb_color):
         height=height,
         nodata=np.nan,
         transform=transform,
-        photometric='RGB',
+        photometric='RGB'
     ) as dst:
         for i in range(1, 4):
             dst.write_band(i, rasters[i - 1])
@@ -125,7 +123,7 @@ def get_date_from_file_name(raster_name, to_lower=True):
 def mask_raster_with_shapefile(
     shapefile_path: str,
     raster_input_file_path: str,
-    raster_output_file_path: str,
+    raster_output_file_path: str
 ):
     """
 
@@ -156,15 +154,13 @@ def mask_raster_with_shapefile(
     elif img_type == np.float32:
         img_type = np.float32
 
-    out_meta.update(
-        {
-            'driver': "GTiff",
-            'height': out_image.shape[1],
-            'width': out_image.shape[2],
-            'transform': out_transform,
-            'dtype': img_type,
-        }
-    )
+    out_meta.update({
+        'driver': "GTiff",
+        'height': out_image.shape[1],
+        'width': out_image.shape[2],
+        'transform': out_transform,
+        'dtype': img_type
+    })
 
     with rasterio.open(raster_output_file_path, "w", **out_meta) as dst:
         dst.write(out_image)
@@ -188,17 +184,21 @@ def increase_resolution(raster_file_path: str, factor_increase: int):
             shape=(
                 image.shape[0],  # same number of bands
                 round(image.shape[1] * res),  # n times resolution
-                round(image.shape[2] * res),
-            ),  # n times resolution
-            dtype=image.dtype,
+                round(image.shape[2] * res)),  # n times resolution
+            dtype=image.dtype
         )
 
         image = src.read(out=image_new).copy()
         meta = dict(src.profile)
 
-    aff = copy(meta['transform'])
+    aff = copy(meta['affine'])
     meta['transform'] = Affine(
-        aff.a / res, aff.b, aff.c, aff.d, aff.e / res, aff.f
+        aff.a / res,
+        aff.b,
+        aff.c,
+        aff.d,
+        aff.e / res,
+        aff.f
     )
     meta['affine'] = meta['transform']
     meta['width'] *= res
@@ -218,11 +218,8 @@ class MeteorologicalRasterProcess:
         try:
             geocode, city_name = geo_info
             raster_output_dir_path = os.path.join(
-                RASTER_PATH,
-                'meteorological',
-                'city',
-                self.raster_class,
-                str(geocode),
+                RASTER_PATH, 'meteorological', 'city', self.raster_class,
+                str(geocode)
             )
 
             # create output path if not exists
@@ -230,35 +227,37 @@ class MeteorologicalRasterProcess:
                 os.makedirs(raster_output_dir_path, exist_ok=True)
 
             # check if shapefile exists
-            shapefile_path = os.path.join(SHAPEFILE_PATH, '%s.shp' % geocode)
+            shapefile_path = os.path.join(
+                SHAPEFILE_PATH, '%s.shp' % geocode
+            )
             if not os.path.exists(shapefile_path):
                 return
 
             raster_output_file_path = os.path.join(
                 raster_output_dir_path,
-                '%s.tif' % self.raster_date.strftime('%Y%m%d'),
+                '%s.tif' % self.raster_date.strftime('%Y%m%d')
             )
 
             # apply mask on raster using shapefile by city
             mask_raster_with_shapefile(
                 shapefile_path=shapefile_path,
                 raster_input_file_path=self.raster_input_file_path,
-                raster_output_file_path=raster_output_file_path,
+                raster_output_file_path=raster_output_file_path
             )
 
             # increase resolution
             increase_resolution(
                 raster_file_path=raster_output_file_path,
-                factor_increase=RASTER_METEROLOGICAL_FACTOR_INCREASE,
+                factor_increase=RASTER_METEROLOGICAL_FACTOR_INCREASE
             )
 
             # apply mask on increased resolution raster using shapefile by city
             mask_raster_with_shapefile(
                 shapefile_path=shapefile_path,
                 raster_input_file_path=raster_output_file_path,
-                raster_output_file_path=raster_output_file_path,
+                raster_output_file_path=raster_output_file_path
             )
-        except Exception:
+        except:
             if DEBUG:
                 log_path = os.path.join(
                     os.sep, 'tmp', 'raster_%s.log' % self.raster_class
@@ -269,7 +268,10 @@ class MeteorologicalRasterProcess:
 
 class MeteorologicalRaster:
     @staticmethod
-    def generate_raster_cities(raster_class: str, date_start: datetime = None):
+    def generate_raster_cities(
+        raster_class: str,
+        date_start: datetime=None
+    ):
         """
         Create raster images by city using as mask a shapefile and background
         a raster file of the whole country.
@@ -282,7 +284,8 @@ class MeteorologicalRaster:
         :return:
         """
         path_search = os.path.join(
-            RASTER_PATH, 'meteorological', 'country', raster_class, '*'
+            RASTER_PATH,
+            'meteorological', 'country', raster_class, '*'
         )
 
         cities = get_cities().items()
@@ -307,8 +310,7 @@ class MeteorologicalRaster:
             p.map(
                 MeteorologicalRasterProcess(
                     raster_class, raster_date, raster_input_file_path
-                ),
-                cities,
+                ), cities
             )
             p.close()
             p.join()

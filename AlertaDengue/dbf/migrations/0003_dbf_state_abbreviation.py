@@ -7,12 +7,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [('dbf', '0002_dbfchunkedupload')]
+    dependencies = [
+        ('dbf', '0002_dbfchunkedupload'),
+    ]
 
     operations = [
         migrations.AddField(
             model_name='dbf',
             name='state_abbreviation',
             field=models.CharField(max_length=2, null=True),
-        )
+        ),
     ]

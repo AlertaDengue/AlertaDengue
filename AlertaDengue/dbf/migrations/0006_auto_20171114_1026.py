@@ -8,15 +8,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [('dbf', '0005_dbf_municipio')]
+    dependencies = [
+        ('dbf', '0005_dbf_municipio'),
+    ]
 
     operations = [
         migrations.AlterField(
             model_name='dbfchunkedupload',
             name='file',
-            field=models.FileField(
-                max_length=255,
-                upload_to=chunked_upload.settings.default_upload_to,
-            ),
-        )
+            field=models.FileField(max_length=255, upload_to=chunked_upload.settings.default_upload_to),
+        ),
     ]

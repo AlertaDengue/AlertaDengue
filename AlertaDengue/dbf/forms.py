@@ -23,7 +23,7 @@ class DBFForm(forms.Form):
         choices=DBF.STATE_ABBREVIATION_CHOICES, label=_("U.F.")
     )
     municipio = forms.CharField(
-        label=_("Nome do município (opcional)"), required=False
+        label=_("Nome do município (opcional)"),  required=False
     )
 
     def clean(self):
@@ -39,17 +39,15 @@ class DBFForm(forms.Form):
             )
         except DBF.DoesNotExist:
             raise ValidationError(
-                _(
-                    "Houve um erro durante o envio do arquivo. "
-                    "Por favor, tente novamente."
-                )
-            )
+                _("Houve um erro durante o envio do arquivo. "
+                  "Por favor, tente novamente."))
         # This might be a performance problem for really large DBFs
         is_valid_dbf(uploaded_file.file, cleaned_data['notification_year'])
         return cleaned_data
 
 
 class FormRendererWithHiddenFieldErrors(FormRenderer):
+
     def get_fields_errors(self):
         form_errors = []
         for field in self.form:

@@ -10,58 +10,22 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [('dados', '__first__'), ('forecast', '0001_initial')]
+    dependencies = [
+        ('dados', '__first__'),
+        ('forecast', '0001_initial'),
+    ]
 
     state_operations = [
         migrations.CreateModel(
             name='ForecastCases',
             fields=[
-                (
-                    'id',
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name='ID',
-                    ),
-                ),
-                (
-                    'epiweek',
-                    models.IntegerField(help_text='Semana epidemiológica'),
-                ),
-                (
-                    'published_date',
-                    models.DateField(
-                        db_column='published_date',
-                        help_text='Data da publicação da previsão',
-                    ),
-                ),
-                (
-                    'init_date_epiweek',
-                    models.DateField(
-                        db_column='init_date_epiweek',
-                        help_text='Data do inicio da semana da previsão',
-                    ),
-                ),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('epiweek', models.IntegerField(help_text='Semana epidemiológica')),
+                ('published_date', models.DateField(db_column='published_date', help_text='Data da publicação da previsão')),
+                ('init_date_epiweek', models.DateField(db_column='init_date_epiweek', help_text='Data do inicio da semana da previsão')),
                 ('cases', models.IntegerField(help_text='Casos Previstos')),
-                (
-                    'cid10',
-                    models.ForeignKey(
-                        db_column='cid10',
-                        help_text='Doença',
-                        on_delete=django.db.models.deletion.CASCADE,
-                        to='dados.CID10',
-                    ),
-                ),
-                (
-                    'city',
-                    models.ForeignKey(
-                        db_column='geocode',
-                        help_text='Cidade',
-                        on_delete=django.db.models.deletion.CASCADE,
-                        to='dados.City',
-                    ),
-                ),
+                ('cid10', models.ForeignKey(db_column='cid10', help_text='Doença', on_delete=django.db.models.deletion.CASCADE, to='dados.CID10')),
+                ('city', models.ForeignKey(db_column='geocode', help_text='Cidade', on_delete=django.db.models.deletion.CASCADE, to='dados.City')),
             ],
             options={
                 'db_table': 'forecast"."forecast_cases',
@@ -71,28 +35,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ForecastCity',
             fields=[
-                (
-                    'id',
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name='ID',
-                    ),
-                ),
-                (
-                    'active',
-                    models.BooleanField(default=True, help_text='Está Ativo?'),
-                ),
-                (
-                    'city',
-                    models.ForeignKey(
-                        db_column='geocode',
-                        help_text='Código do Município',
-                        on_delete=django.db.models.deletion.CASCADE,
-                        to='dados.City',
-                    ),
-                ),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('active', models.BooleanField(default=True, help_text='Está Ativo?')),
+                ('city', models.ForeignKey(db_column='geocode', help_text='Código do Município', on_delete=django.db.models.deletion.CASCADE, to='dados.City')),
             ],
             options={
                 'db_table': 'forecast"."forecast_city',
@@ -102,51 +47,25 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ForecastModel',
             fields=[
-                (
-                    'id',
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name='ID',
-                    ),
-                ),
-                (
-                    'name',
-                    models.CharField(
-                        help_text='Nome do Modelo de Previsão', max_length=128
-                    ),
-                ),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(help_text='Nome do Modelo de Previsão', max_length=128)),
                 ('weeks', models.IntegerField(help_text='Total de Semanas')),
-                (
-                    'commit_id',
-                    models.CharField(
-                        help_text='ID do commit (github)', max_length=7
-                    ),
-                ),
+                ('commit_id', models.CharField(help_text='ID do commit (github)', max_length=7)),
                 ('active', models.BooleanField(help_text='Está ativo?')),
             ],
-            options={'db_table': 'forecast"."forecast_model'},
+            options={
+                'db_table': 'forecast"."forecast_model',
+            },
         ),
         migrations.AddField(
             model_name='forecastcity',
             name='forecast_model',
-            field=models.ForeignKey(
-                db_column='forecast_model_id',
-                help_text='Modelo de Previsão',
-                on_delete=django.db.models.deletion.CASCADE,
-                to='forecast.ForecastModel',
-            ),
+            field=models.ForeignKey(db_column='forecast_model_id', help_text='Modelo de Previsão', on_delete=django.db.models.deletion.CASCADE, to='forecast.ForecastModel'),
         ),
         migrations.AddField(
             model_name='forecastcases',
             name='forecast_model',
-            field=models.ForeignKey(
-                db_column='forecast_model_id',
-                help_text='Modelo de Previsão',
-                on_delete=django.db.models.deletion.CASCADE,
-                to='forecast.ForecastModel',
-            ),
+            field=models.ForeignKey(db_column='forecast_model_id', help_text='Modelo de Previsão', on_delete=django.db.models.deletion.CASCADE, to='forecast.ForecastModel'),
         ),
         migrations.AlterUniqueTogether(
             name='forecastcity',
@@ -154,25 +73,15 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='forecastcases',
-            unique_together=set(
-                [
-                    (
-                        'epiweek',
-                        'city',
-                        'cid10',
-                        'forecast_model',
-                        'published_date',
-                    )
-                ]
-            ),
+            unique_together=set([('epiweek', 'city', 'cid10', 'forecast_model', 'published_date')]),
         ),
     ]
+
 
     operations = [
         migrations.SeparateDatabaseAndState(
             database_operations=[
-                migrations.RunSQL(
-                    '''
+                migrations.RunSQL('''
                     CREATE SCHEMA IF NOT EXISTS "forecast";
 
                     CREATE TABLE IF NOT EXISTS "forecast".forecast_model (
@@ -213,7 +122,7 @@ class Migration(migrations.Migration):
                         FOREIGN KEY(geocode) REFERENCES "Dengue_global"."Municipio"(geocodigo)
                     );
                     ''',
-                    hints={'target_db': 'forecast'},
+                    hints={'target_db': 'forecast'}
                 )
             ],
             state_operations=state_operations,

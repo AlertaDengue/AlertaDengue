@@ -7,45 +7,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [('dbf', '0003_dbf_state_abbreviation')]
+    dependencies = [
+        ('dbf', '0003_dbf_state_abbreviation'),
+    ]
 
     operations = [
         migrations.AlterField(
             model_name='dbf',
             name='state_abbreviation',
-            field=models.CharField(
-                choices=[
-                    (None, ''),
-                    ('AC', 'Acre'),
-                    ('AL', 'Alagoas'),
-                    ('AP', 'Amapá'),
-                    ('AM', 'Amazonas'),
-                    ('BA', 'Bahia'),
-                    ('CE', 'Ceará'),
-                    ('DF', 'Distrito Federal'),
-                    ('ES', 'Espírito Santo'),
-                    ('GO', 'Goiás'),
-                    ('MA', 'Maranhão'),
-                    ('MT', 'Mato Grosso'),
-                    ('MS', 'Mato Grosso do Sul'),
-                    ('MG', 'Minas Gerais'),
-                    ('PA', 'Pará'),
-                    ('PB', 'Paraíba'),
-                    ('PR', 'Paraná'),
-                    ('PE', 'Pernambuco'),
-                    ('PI', 'Piauí'),
-                    ('RJ', 'Rio de Janeiro'),
-                    ('RN', 'Rio Grande do Norte'),
-                    ('RS', 'Rio Grande do Sul'),
-                    ('RO', 'Rondônia'),
-                    ('RR', 'Roraima'),
-                    ('SC', 'Santa Catarina'),
-                    ('SP', 'São Paulo'),
-                    ('SE', 'Sergipe'),
-                    ('TO', 'Tocantins'),
-                ],
-                max_length=2,
-                null=True,
-            ),
-        )
+            field=models.CharField(choices=[(None, ''), ('AC', 'Acre'), ('AL', 'Alagoas'), ('AP', 'Amapá'), ('AM', 'Amazonas'), ('BA', 'Bahia'), ('CE', 'Ceará'), ('DF', 'Distrito Federal'), ('ES', 'Espírito Santo'), ('GO', 'Goiás'), ('MA', 'Maranhão'), ('MT', 'Mato Grosso'), ('MS', 'Mato Grosso do Sul'), ('MG', 'Minas Gerais'), ('PA', 'Pará'), ('PB', 'Paraíba'), ('PR', 'Paraná'), ('PE', 'Pernambuco'), ('PI', 'Piauí'), ('RJ', 'Rio de Janeiro'), ('RN', 'Rio Grande do Norte'), ('RS', 'Rio Grande do Sul'), ('RO', 'Rondônia'), ('RR', 'Roraima'), ('SC', 'Santa Catarina'), ('SP', 'São Paulo'), ('SE', 'Sergipe'), ('TO', 'Tocantins')], max_length=2, null=True),
+        ),
     ]

@@ -1,10 +1,9 @@
 from django.test import TestCase
 from datetime import datetime
-
 # local
 from .. import mapfile
 from ..settings import RASTER_METEROLOGICAL_DATA_RANGE
-from dados.dbdata import CID10
+from dados.dbdata import CID10, get_cities
 
 import numpy as np
 import os
@@ -54,12 +53,16 @@ class TestMapFile(TestCase):
         wgs84 = pyproj.Proj("+init=EPSG:4326")
         grs80 = pyproj.Proj("+init=EPSG:2154")
 
-        bounds_from = [-73.99044997, -33.75208127, -28.83590763, 5.27184108]
+        bounds_from = [
+            -73.99044997, -33.75208127, -28.83590763, 5.27184108
+        ]
         # boundaries in epsg:2154
         bounds_to = mapfile.transform_boundaries(
             bounds=bounds_from, proj_from=grs80, proj_to=wgs84
         )
-        bounds_assert = [-1.36352984, -5.98409199, -1.36326239, -5.98383341]
+        bounds_assert = [
+            -1.36352984, -5.98409199, -1.36326239, -5.98383341
+        ]
 
         np.testing.assert_allclose(bounds_to, bounds_assert, atol=0.00000001)
 

@@ -13,7 +13,6 @@ class _GetMethod:
     """
 
     """
-
     def _get(self, param, default=None, cast=None, error_message=None):
         """
 
@@ -25,7 +24,9 @@ class _GetMethod:
             raise Exception(error_message)
 
         result = (
-            self.request.GET[param] if param in self.request.GET else default
+            self.request.GET[param]
+            if param in self.request.GET else
+            default
         )
 
         return result if cast is None or result is None else cast(result)
@@ -35,7 +36,6 @@ class NotificationReducedCSV_View(View, _GetMethod):
     """
 
     """
-
     _state_name = STATE_NAME
 
     request = None
@@ -52,10 +52,10 @@ class NotificationReducedCSV_View(View, _GetMethod):
 
         if state_name not in self._state_name:
             return HttpResponse(
-                'ERROR: The parameter state_abv not found. '
-                + 'This parameter must have 2 letters (e.g. RJ).',
+                'ERROR: The parameter state_abv not found. ' +
+                'This parameter must have 2 letters (e.g. RJ).',
                 content_type="text/plain",
-                status=404,
+                status=404
             )
 
         uf = self._state_name[state_name]
@@ -69,7 +69,7 @@ class NotificationReducedCSV_View(View, _GetMethod):
             gender_values=self._get('genders'),
             city_values=self._get('cities'),
             initial_date=self._get('initial_date'),
-            final_date=self._get('final_date'),
+            final_date=self._get('final_date')
         )
 
         result = None
@@ -105,7 +105,6 @@ class AlertCityView(View, _GetMethod):
     """
 
     """
-
     request = None
 
     def get(self, request):
@@ -123,25 +122,21 @@ class AlertCityView(View, _GetMethod):
                 'format', error_message='Format sent is empty.'
             ).lower()
             ew_start = self._get(
-                'ew_start',
-                cast=int,
-                error_message='Epidemic start week sent is empty.',
+                'ew_start', cast=int,
+                error_message='Epidemic start week sent is empty.'
             )
             ew_end = self._get(
-                'ew_end',
-                cast=int,
-                error_message='Epidemic end week sent is empty.',
+                'ew_end', cast=int,
+                error_message='Epidemic end week sent is empty.'
             )
             ey_start = self._get(
-                'ey_start',
-                cast=int,
-                error_message='Epidemic start year sent is empty.',
+                'ey_start', cast=int,
+                error_message='Epidemic start year sent is empty.'
             )
 
             ey_end = self._get(
-                'ey_end',
-                cast=int,
-                error_message='Epidemic end year sent is empty.',
+                'ey_end', cast=int,
+                error_message='Epidemic end year sent is empty.'
             )
 
             if format not in ['csv', 'json']:
@@ -158,15 +153,13 @@ class AlertCityView(View, _GetMethod):
                 )
             else:
                 df = AlertCity.search(
-                    geocode=geocode,
-                    disease=disease,
-                    ew_start=eyw_start,
-                    ew_end=eyw_end,
+                    geocode=geocode, disease=disease,
+                    ew_start=eyw_start, ew_end=eyw_end
                 )
                 # change all keys to lower case
                 df.drop(
                     columns=['municipio_geocodigo', 'municipio_nome'],
-                    inplace=True,
+                    inplace=True
                 )
 
             if format == 'json':
@@ -188,7 +181,6 @@ class EpiYearWeekView(View, _GetMethod):
     """
     JSON output
     """
-
     request = None
 
     def get(self, request):
@@ -204,13 +196,11 @@ class EpiYearWeekView(View, _GetMethod):
             epi_year_week = episem(epidate, sep='')
 
             if output_format == 'json':
-                result = json.dumps(
-                    dict(
-                        epi_year_week=epi_year_week,
-                        epi_year=epi_year_week[:4],
-                        epi_week=epi_year_week[4:],
-                    )
-                )
+                result = json.dumps(dict(
+                    epi_year_week=epi_year_week,
+                    epi_year=epi_year_week[:4],
+                    epi_week=epi_year_week[4:],
+                ))
             else:
                 result = '' % epi_year_week
 

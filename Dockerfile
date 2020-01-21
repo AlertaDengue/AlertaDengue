@@ -1,4 +1,4 @@
-FROM debian:testing-20190708
+FROM debian:testing
 
 # RUN apt-get update && apt-get install -q -y locales python3 python3-pip python3-setuptools python3-numpy python3-pandas libpq-dev python3-gdal libgdal-dev python3-geopandas
 RUN apt-get update && \
@@ -35,8 +35,8 @@ RUN conda config --set show_channel_urls True && \
     conda clean --tarballs --packages && \
     conda config --add channels conda-forge
 
-ADD AlertaDengue/environment.yml /tmp/environment.yml
-RUN conda env update -n base --file /tmp/environment.yml
+ADD AlertaDengue/requirements-conda.txt /tmp/requirements-conda.txt
+RUN conda install --file /tmp/requirements-conda.txt
 
 # Send code to the container
 ADD AlertaDengue /srv/deploy/AlertaDengue
