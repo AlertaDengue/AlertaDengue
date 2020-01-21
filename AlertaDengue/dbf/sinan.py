@@ -12,7 +12,6 @@ import pandas as pd
 import psycopg2
 import logging
 
-
 logger = logging.getLogger(__name__)
 
 field_map = {
