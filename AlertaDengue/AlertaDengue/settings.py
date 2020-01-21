@@ -130,7 +130,6 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': PSQL_DBF,
-        'NAME': PSQL_DB,
         'USER': PSQL_USER,
         'PASSWORD': PSQL_PASSWORD,
         'HOST': PSQL_HOST,
