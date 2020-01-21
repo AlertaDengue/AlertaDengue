@@ -42,7 +42,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv('DEBUG', '').lower() == 'true'
 
 # You must set settings.ALLOWED_HOSTS if DEBUG is False.
-ADMINS = os.getenv('ADMINS')
+ADMINS = os.getenv('ADMINS', [])
 
 # ALLOWED_HOSTS=os.getenv["alerta.dengue.mat.br", "info.dengue.mat.br", '127.0.0.1'] ###VERIFICAR EM .ENV
 ALLOWED_HOSTS = (
@@ -113,6 +113,7 @@ TEMPLATES = [
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
 PSQL_DB = os.getenv('PSQL_DB')
+PSQL_DBF = os.getenv('PSQL_DBF')
 PSQL_USER = os.getenv('PSQL_USER')
 PSQL_HOST = os.getenv('PSQL_HOST')
 PSQL_PASSWORD = os.getenv('PSQL_PASSWORD')
@@ -128,7 +129,7 @@ DATABASE_APPS_MAPPING = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': PSQL_DB,
+        'NAME': PSQL_DBF,
         'USER': PSQL_USER,
         'PASSWORD': PSQL_PASSWORD,
         'HOST': PSQL_HOST,
@@ -232,12 +233,11 @@ EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
 EMAIL_FROM_ADDRESS = os.getenv('EMAIL_FROM_ADDRESS')
 
 INFODENGUE_TEAM_EMAIL = os.getenv('INFODENGUE_TEAM_EMAIL')
-####modificar####################confiD
+
 if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
-    EMAIL_HOST = os.getenv('EMAIL_HOST')
-    EMAIL_PORT = os.getenv('EMAIL_PORT')
-    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+    EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = os.getenv(
+        'EMAIL_CONFIG').split(',')
+    EMAIL_PORT = int(EMAIL_PORT)
     EMAIL_USE_TLS = True
 
 

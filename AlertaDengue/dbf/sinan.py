@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from datetime import date
 from psycopg2.extras import DictCursor
 from dbfread import DBF
@@ -9,7 +8,6 @@ from django.utils.translation import ugettext_lazy as _
 import pandas as pd
 import psycopg2
 import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -153,8 +151,8 @@ class Sinan(object):
                 row = row[1]
                 row[0] = (
                     None
-                    if isinstance(row[0], pd.tslib.NaTType)
-                    else date.fromordinal(row[0].to_datetime().toordinal())
+                    if isinstance(row[0], type(pd.NaT))
+                    else date.fromordinal(row[0].to_pydatetime().toordinal())
                 )  # dt_notific
                 row[1] = int(str(int(row[1]))[-2:])  # se_notific
                 row[2] = (
@@ -162,16 +160,16 @@ class Sinan(object):
                 )  # ano_notific
                 row[3] = (
                     None
-                    if isinstance(row[3], pd.tslib.NaTType)
-                    else date.fromordinal(row[3].to_datetime().toordinal())
+                    if isinstance(row[3], type(pd.NaT))
+                    else date.fromordinal(row[3].to_pydatetime().toordinal())
                 )  # dt_sin_pri
                 row[4] = (
                     None if not row[4] else int(str(row[4])[-2:])
                 )  # se_sin_pri
                 row[5] = (
                     None
-                    if isinstance(row[5], pd.tslib.NaTType)
-                    else date.fromordinal(row[5].to_datetime().toordinal())
+                    if isinstance(row[5], type(pd.NaT))
+                    else date.fromordinal(row[5].to_pydatetime().toordinal())
                 )  # dt_digita
                 row[7] = (
                     None if not row[7] else int(row[7])
@@ -193,11 +191,8 @@ class Sinan(object):
 
                 row[11] = (
                     None
-                    if (
-                        isinstance(row[11], pd.tslib.NaTType)
-                        or row[11] is None
-                    )
-                    else date.fromordinal(row[11].to_datetime().toordinal())
+                    if (isinstance(row[11], type(pd.NaT)) or row[11] is None)
+                    else date.fromordinal(row[11].to_pydatetime().toordinal())
                 )  # dt_nasc
                 row[13] = None if not row[13] else int(row[13])  # nu_idade_n
                 cursor.execute(insert_sql, row)
