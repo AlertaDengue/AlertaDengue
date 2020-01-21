@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 from datetime import date
 from psycopg2.extras import DictCursor
 from dbfread import DBF
