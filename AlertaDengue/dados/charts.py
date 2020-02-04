@@ -83,13 +83,15 @@ class ReportCityCharts:
                 go.Scatter(
                     x=df['SE'],
                     y=df[k],
+                    y0=df['incidência'],
                     name=k.title(),
                     marker={'color': c},
                     text=df.SE.map(lambda v: '{}'.format(str(v)[-2:])),
                     hoverinfo='text',
-                    hovertemplate="Semana %{text} : %{y:1f} Casos",
+                    hovertext=df['incidência'],
+                    hovertemplate="Semana %{text} <br>Incidência=%{y:1f}",
                 ),
-                secondary_y=True,
+                secondary_y=False,
             )
 
         ks_alert = [
@@ -115,7 +117,7 @@ class ReportCityCharts:
                     name=k.title(),
                     text=df.SE.map(lambda v: '{}'.format(str(v)[-2:])),
                     hoverinfo='text',
-                    hovertemplate="Semana %{text} : %{y:1f} Casos",
+                    hovertemplate="Semana %{text}<br>Incidência=%{y:1f}",
                 ),
                 secondary_y=False,
             )
@@ -125,7 +127,7 @@ class ReportCityCharts:
                 title='Período (Ano/Semana)',
                 tickangle=-60,
                 nticks=len(df) // 4,
-                showline=True,
+                showline=False,
                 showgrid=True,
                 showticklabels=True,
                 linecolor='rgb(204, 204, 204)',
@@ -138,7 +140,7 @@ class ReportCityCharts:
             ),
             yaxis=dict(
                 title='Incidência',
-                showline=True,
+                showline=False,
                 showgrid=True,
                 showticklabels=True,
                 linecolor='rgb(204, 204, 204)',
@@ -153,9 +155,9 @@ class ReportCityCharts:
         )
 
         figure.update_yaxes(
-            title_text="Casos",
+            title_text="Casos Notificados",
             secondary_y=True,
-            showline=True,
+            showline=False,
             showgrid=True,
             showticklabels=True,
             linecolor='rgb(204, 204, 204)',
@@ -521,7 +523,7 @@ class HomeCharts:
             casos_est[uf] = [
                 list(t)
                 for t in zip(
-                    datas, series_uf.casos_est_s[-52:].astype('int').tolist()
+                    datas, series_uf.casos_s[-52:].astype('int').tolist()
                 )
             ]
 
