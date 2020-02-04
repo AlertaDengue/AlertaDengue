@@ -79,30 +79,82 @@
             opacity: 0.7;
         }
 
-        .p {
-            height: 50px;
+        p {
+            height: 5px;
         }
 
         #disease-chart {
-            height: 200px;
+            height: 175px;
+            width: 95%;
         }
 
         #date-chart {
-            height: 175px;
+            height: 150px;
         }
 
-        #age-chart,
+        #age-chart{
+            height: 150px;
+        }
         #gender-chart{
-            height: 110px;
+            height: 150px;
         }
     </style>
 
-    <script type="text/javascript">
+    <script>
+
+    var pt_BR = {
+        "decimal": ",",
+        "thousands": ".",
+        "grouping": [3],
+        "currency": ["R$", ""],
+        "dateTime": "%a %b %e %X %Y",
+        "date": "%d/%m/%Y",
+        "time": "%H:%M:%S",
+        "periods": ["AM", "PM"],
+        "days": ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"],
+        "shortDays": ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+        "months": ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
+        "shortMonths": ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
+    };
+
+    var es_ES = {
+        "decimal": ",",
+        "thousands": ".",
+        "grouping": [3],
+        "currency": ["€", ""],
+        "dateTime": "%a %b %e %X %Y",
+        "date": "%d/%m/%Y",
+        "time": "%H:%M:%S",
+        "periods": ["AM", "PM"],
+        "days": ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
+        "shortDays": ["Dom", "Lun", "Mar", "Mi", "Jue", "Vie", "Sab"],
+        "months": ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+        "shortMonths": ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+    };
+
+    var en_US = {
+        "decimal": ",",
+        "thousands": ".",
+        "grouping": [3],
+        "currency": ["$", ""],
+        "dateTime": "%x, %X",
+        "date": "%-m/%-d/%Y",
+        "time": "%-I:%M:%S %p",
+        "periods": ["AM", "PM"],
+        "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        "shortDays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+        "shortMonths": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    }
+    </script>
+    
+    <script type="text/javascript">  
         // Browser
         var data;
         var initial_load = true;
         var state_abv = '{{state_abv}}';
         var ignore_chart = false;
+        var chart_footer = 'Selecione no filtro o período desejado';
 
         function plots_refresh(_ignore_chart) {
             if (_ignore_chart != undefined) {
@@ -132,22 +184,30 @@
                 .await(function(
                     error, data_disease, data_age_male, data_age_female,
                     data_gender, data_period
-                ){
-                    //console.log('Starting ...');
-                    //var start = performance.now();
-                    var format = d3.timeFormat('%d/%m//%Y');
+                ){                 
+                    
+                    var format = d3.timeFormat('%d/%m/%Y');
                     var extremes = date_chart.xAxis[0].getExtremes(),
                         start = format(new Date(extremes.min)),
                         end   = format(new Date(extremes.max));
 
+                    d3.timeFormatDefaultLocale(pt_BR);
+
+                    var format_date = d3.timeFormat('%d %B %Y');
+                    var extremes_date = date_chart.xAxis[0].getExtremes(),
+                        inicio = format_date(new Date(extremes_date.min)),  
+                        fim   = format_date(new Date(extremes_date.max));
+
+                    var desc_period = 'Dados de ' + inicio + ' a ' + fim;
+
                     if (ignore_chart != 'disease')
-                        plot_chart_disease(data_disease);
+                        plot_chart_disease(data_disease, {'subtitle': desc_period});
                     if (ignore_chart != 'age')
-                        plot_chart_age(data_age_male, data_age_female);
+                        plot_chart_age(data_age_male, data_age_female, {'subtitle': desc_period});
                     if (ignore_chart != 'gender')
-                        plot_chart_gender(data_gender);
+                        plot_chart_gender(data_gender, {'subtitle': desc_period});
                     if (ignore_chart != 'date')
-                        plot_chart_date(data_period);
+                        plot_chart_date(data_period, {'subtitle': desc_period});
 
                     $('#filter-display').text(
                         ' Casos de ' + _get_diseases_selected().join(', ') +
@@ -181,12 +241,25 @@
         <small>{% blocktrans %}Última atualização{% endblocktrans %}: {{last_update}}</small>
         <br/> &nbsp;
     </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body content-inline">
+                    <strong>{% blocktrans %}Descrição de filtro{% endblocktrans %}: </strong>
+                    <span id="filter-display"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-sm-5">
             <div class="row">
                 <div class="col-sm-12">
+                    <p>
                     <div class="card">
-                      <div class="chart-body">
+                      <div class="chart-body" id="disease-chart">
                           {% disease_chart %}
                       </div>
                     </div>
@@ -195,8 +268,7 @@
 
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="p">
-                    </div>
+                    <p>
                     <div class="chart-stage">
                         {% map_chart %}
                     </div>
@@ -205,19 +277,10 @@
         </div>
 
         <div class="col-sm-7">
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="card">
-                      <div class="card-body content-inline">
-                          <strong>{% blocktrans %}Descrição de filtro{% endblocktrans %}:</strong>
-                          <span id="filter-display"></span>
-                      </div>
-                    </div>
-                </div>
-            </div>
 
             <div class="row">
                 <div class="col-sm-12">
+                    <p>
                     <div class="card">
                       <div class="card-body">
                           {% date_chart %}
@@ -228,6 +291,7 @@
 
             <div class="row">
                 <div class="col-sm-12">
+                    <p>
                     <div class="card">
                       <div class="card-body">
                           {% age_chart %}
@@ -238,6 +302,7 @@
 
             <div class="row">
                 <div class="col-sm-12">
+                    <p>
                     <div class="card">
                       <div class="card-body">
                           {% gender_chart %}

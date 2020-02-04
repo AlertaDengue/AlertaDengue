@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n %} 
 <div id="age-chart" class="chart-default"></div>
 <script type="application/javascript">
 var age_chart;
@@ -35,7 +35,7 @@ function get_ages_selected() {
     return '&ages=' + _get_ages_selected().join(',');
 }
 
-function plot_chart_age(data_male, data_female) {
+function plot_chart_age(data_male, data_female, config) {
     var _counter_female = new Array(age_categories.length).fill(0);
     var _counter_male = new Array(age_categories.length).fill(0);
 
@@ -58,6 +58,8 @@ function plot_chart_age(data_male, data_female) {
     // set data
     age_chart.series[0].setData(_counter_female);
     age_chart.series[1].setData(_counter_male);
+    // settings
+    age_chart.setTitle(null, { text: config['subtitle']});
 }
 
 $(document).ready(function () {
@@ -70,7 +72,7 @@ $(document).ready(function () {
         age_chart = Highcharts.chart('age-chart', {
             chart: {
                 type: 'column',
-                spacingBottom: 0,
+                spacingBottom: 20,
                 spacingTop: 0,
                 spacingLeft: 0,
                 spacingRight: 0,
@@ -110,10 +112,15 @@ $(document).ready(function () {
             },
 
             title: {
-                text: ''
+                text: '{% blocktrans %}Distribuição por Idade{% endblocktrans %}'
             },
             subtitle: {
-                text: '{% blocktrans %}Distribuição por Idade{% endblocktrans %}'
+                text: chart_footer,
+                verticalAlign: 'bottom',
+                floating: true,
+                align: 'center',
+                x: 0,
+                y: 17
             },
             yAxis: {
                 min: 0,
