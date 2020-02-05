@@ -10,7 +10,7 @@ services:
     web:
         build: .
         ports:
-            - 8000:8000
+            - 8000:8000 
         env_file:
             - .env
         environment:
@@ -40,7 +40,23 @@ services:
         volumes:
             - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
             - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+        depends_on:
+            - rabbitmq
+            - memcache
         restart: always
+
+    flower:
+        build:
+            context: "."
+            dockerfile: "Dockerfile-flower"
+        environment:
+            - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
+        ports:
+            - 5555:5555
+        expose:
+            - 5555
+        depends_on:
+            - celery-worker
 
     mapserver:
         build:
