@@ -105,15 +105,14 @@
     <script>
     {% if LANGUAGE_CODE == "pt-br" %}
         d3.json("https://cdn.jsdelivr.net/npm/d3-time-format@2/locale/pt-BR.json", function(error, locale) {
-            if (error) throw error;
-            d3.timeFormatDefaultLocale(locale);
-            });
+    {% elif LANGUAGE_CODE == "en-us" %}
+       d3.json("https://cdn.jsdelivr.net/npm/d3-time-format@2/locale/en-US.json", function(error, locale) {
     {% else %}
-        d3.json("https://cdn.jsdelivr.net/npm/d3-time-format@2/locale/en-US.json", function(error, locale) {
+         d3.json("https://cdn.jsdelivr.net/npm/d3-time-format@2/locale/es-ES.json", function(error, locale) {
+    {% endif %}    
             if (error) throw error;
             d3.timeFormatDefaultLocale(locale);
-            });
-    {% endif %}
+        });
     </script>
 
     <script type="text/javascript">  
