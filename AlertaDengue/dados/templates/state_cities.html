@@ -2,6 +2,8 @@
 {% load i18n %}
 {% load static %}
 {% load lookup %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 
 {% block extra_head %}
     {% load leaflet_tags %}
@@ -79,30 +81,47 @@
             opacity: 0.7;
         }
 
-        .p {
-            height: 50px;
+        p {
+            height: 5px;
         }
 
         #disease-chart {
-            height: 200px;
+            height: 175px;
+            width: 95%;
         }
 
         #date-chart {
-            height: 175px;
+            height: 150px;
         }
 
-        #age-chart,
+        #age-chart{
+            height: 150px;
+        }
         #gender-chart{
-            height: 110px;
+            height: 150px;
         }
     </style>
 
-    <script type="text/javascript">
+    <script>
+    {% if LANGUAGE_CODE == "pt-br" %}
+        d3.json("https://cdn.jsdelivr.net/npm/d3-time-format@2/locale/pt-BR.json", function(error, locale) {
+    {% elif LANGUAGE_CODE == "en-us" %}
+       d3.json("https://cdn.jsdelivr.net/npm/d3-time-format@2/locale/en-US.json", function(error, locale) {
+    {% else %}
+         d3.json("https://cdn.jsdelivr.net/npm/d3-time-format@2/locale/es-ES.json", function(error, locale) {
+    {% endif %}    
+            if (error) throw error;
+            d3.timeFormatDefaultLocale(locale);
+        });
+    </script>
+
+    <script type="text/javascript">  
         // Browser
         var data;
         var initial_load = true;
         var state_abv = '{{state_abv}}';
         var ignore_chart = false;
+        var chart_footer = 'Selecione no filtro o período desejado';
 
         function plots_refresh(_ignore_chart) {
             if (_ignore_chart != undefined) {
@@ -133,21 +152,25 @@
                     error, data_disease, data_age_male, data_age_female,
                     data_gender, data_period
                 ){
-                    //console.log('Starting ...');
-                    //var start = performance.now();
-                    var format = d3.timeFormat('%d/%m//%Y');
+                    var format = d3.timeFormat('%d/%m/%Y');
                     var extremes = date_chart.xAxis[0].getExtremes(),
                         start = format(new Date(extremes.min)),
                         end   = format(new Date(extremes.max));
 
+                    var format_date = d3.timeFormat('%d %B %Y');
+                    var extremes_date = date_chart.xAxis[0].getExtremes(),
+                        inicio = format_date(new Date(extremes_date.min)),  
+                        fim   = format_date(new Date(extremes_date.max));
+                    var desc_period = 'Dados de ' + inicio + ' a ' + fim;
+
                     if (ignore_chart != 'disease')
-                        plot_chart_disease(data_disease);
+                        plot_chart_disease(data_disease, {'subtitle': desc_period});
                     if (ignore_chart != 'age')
-                        plot_chart_age(data_age_male, data_age_female);
+                        plot_chart_age(data_age_male, data_age_female, {'subtitle': desc_period});
                     if (ignore_chart != 'gender')
-                        plot_chart_gender(data_gender);
+                        plot_chart_gender(data_gender, {'subtitle': desc_period});
                     if (ignore_chart != 'date')
-                        plot_chart_date(data_period);
+                        plot_chart_date(data_period, {'subtitle': desc_period});
 
                     $('#filter-display').text(
                         ' Casos de ' + _get_diseases_selected().join(', ') +
@@ -181,12 +204,25 @@
         <small>{% blocktrans %}Última atualização{% endblocktrans %}: {{last_update}}</small>
         <br/> &nbsp;
     </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body content-inline">
+                    <strong>{% blocktrans %}Descrição de filtro{% endblocktrans %}: </strong>
+                    <span id="filter-display"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-sm-5">
             <div class="row">
                 <div class="col-sm-12">
+                    <p>
                     <div class="card">
-                      <div class="chart-body">
+                      <div class="chart-body" id="disease-chart">
                           {% disease_chart %}
                       </div>
                     </div>
@@ -195,8 +231,7 @@
 
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="p">
-                    </div>
+                    <p>
                     <div class="chart-stage">
                         {% map_chart %}
                     </div>
@@ -207,17 +242,7 @@
         <div class="col-sm-7">
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="card">
-                      <div class="card-body content-inline">
-                          <strong>{% blocktrans %}Descrição de filtro{% endblocktrans %}:</strong>
-                          <span id="filter-display"></span>
-                      </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-sm-12">
+                    <p>
                     <div class="card">
                       <div class="card-body">
                           {% date_chart %}
@@ -228,6 +253,7 @@
 
             <div class="row">
                 <div class="col-sm-12">
+                    <p>
                     <div class="card">
                       <div class="card-body">
                           {% age_chart %}
@@ -238,6 +264,7 @@
 
             <div class="row">
                 <div class="col-sm-12">
+                    <p>
                     <div class="card">
                       <div class="card-body">
                           {% gender_chart %}

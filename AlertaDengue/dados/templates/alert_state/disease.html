@@ -12,7 +12,6 @@ function disease_click_bar(name) {
     }
 }
 
-
 function _select_disease() {
     for (j in disease_chart.series[0].data) {
         if (disease_chart.series[0].data[j].name == '{{disease_label}}') {
@@ -49,7 +48,7 @@ function get_diseases_selected() {
     return '&diseases=' + _get_diseases_selected().join(',');
 }
 
-function plot_chart_disease(data){
+function plot_chart_disease(data, config){
     var _counter = new Array(disease_categories.length).fill(0);
 
     for (i in data) {
@@ -59,9 +58,10 @@ function plot_chart_disease(data){
             }
         }
     }
-
     // set data
     disease_chart.series[0].setData(_counter);
+    // settings
+    disease_chart.setTitle(null, {text: config['subtitle']});
 }
 
 $(document).ready(function () {
@@ -71,8 +71,8 @@ $(document).ready(function () {
         disease_chart = Highcharts.chart('disease-chart', {
             chart: {
                 type: 'column',
-                spacingBottom: 0,
-                spacingTop: 0,
+                spacingBottom: 30,
+                spacingTop: 15,
                 spacingLeft: 0,
                 spacingRight: 0,
                 events: {
@@ -106,10 +106,15 @@ $(document).ready(function () {
                 }
             },
             title: {
-                text: ''
+                text: '{% blocktrans %}Casos notificados no Período{% endblocktrans %}'
             },
             subtitle: {
-                text: '{% blocktrans %}Casos notificados no Período{% endblocktrans %}'
+                text: chart_footer,
+                verticalAlign: 'bottom',
+                floating: true,
+                align: 'center',
+                x: 0,
+                y: 17
             },
             yAxis: {
                 min: 0,
@@ -142,7 +147,6 @@ $(document).ready(function () {
         });
 
         _select_disease();
-
         $('#disease-chart .highcharts-xaxis-labels text').on('click', function () {
             disease_click_bar($(this).text());
         });

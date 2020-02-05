@@ -36,7 +36,7 @@ function get_genders_selected() {
     return '&genders=' + _get_genders_selected().join(',');
 }
 
-function plot_chart_gender(data){
+function plot_chart_gender(data, config){
     var _counter = new Array(gender_categories.length).fill(0);
 
     for (i in data) {
@@ -46,11 +46,11 @@ function plot_chart_gender(data){
             }
         }
     }
-
     // set data
     gender_chart.series[0].setData(_counter);
+    // settings
+    gender_chart.setTitle(null, {text: config['subtitle']});
 }
-
 
 $(document).ready(function () {
     var url = '/api/notif_reduced?chart_type=gender' +
@@ -61,7 +61,7 @@ $(document).ready(function () {
         gender_chart = Highcharts.chart('gender-chart', {
             chart: {
                 type: 'column',
-                spacingBottom: 0,
+                spacingBottom: 20,
                 spacingTop: 0,
                 spacingLeft: 0,
                 spacingRight: 0,
@@ -72,7 +72,6 @@ $(document).ready(function () {
                     }
                 }
             },
-
             plotOptions: {
                 series: {
                     cursor: 'pointer',
@@ -88,7 +87,6 @@ $(document).ready(function () {
                             }
                         }
                     },
-
                     states: {
                         select: {
                             //color: '#112C51',
@@ -98,12 +96,16 @@ $(document).ready(function () {
                     },
                 },
             },
-
             title: {
-                text: ''
+                text: '{% blocktrans %}Distribuição por gênero{% endblocktrans %}'
             },
             subtitle: {
-                text: '{% blocktrans %}Distribuição por gênero{% endblocktrans %}'
+                text: chart_footer,
+                verticalAlign: 'bottom',
+                floating: true,
+                align: 'center',
+                x: 0,
+                y: 17
             },
             yAxis: {
                 min: 0,
