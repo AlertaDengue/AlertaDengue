@@ -1,4 +1,4 @@
-{% load i18n %} 
+{% load i18n %}
 <div id="gender-chart"></div>
 <script type="application/javascript">
 // Create the chart
@@ -87,7 +87,6 @@ $(document).ready(function () {
                             }
                         }
                     },
-
                     states: {
                         select: {
                             //color: '#112C51',
@@ -98,7 +97,7 @@ $(document).ready(function () {
                 },
             },
             title: {
-                text: '{% blocktrans %}Distribuição por gênero{% endblocktrans %}' 
+                text: '{% blocktrans %}Distribuição por gênero{% endblocktrans %}'
             },
             subtitle: {
                 text: chart_footer,
