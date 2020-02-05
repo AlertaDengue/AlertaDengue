@@ -2,6 +2,8 @@
 {% load i18n %}
 {% load static %}
 {% load lookup %}
+{% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 
 {% block extra_head %}
     {% load leaflet_tags %}
@@ -102,52 +104,20 @@
 
     <script>
 
-    var pt_BR = {
-        "decimal": ",",
-        "thousands": ".",
-        "grouping": [3],
-        "currency": ["R$", ""],
-        "dateTime": "%a %b %e %X %Y",
-        "date": "%d/%m/%Y",
-        "time": "%H:%M:%S",
-        "periods": ["AM", "PM"],
-        "days": ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"],
-        "shortDays": ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
-        "months": ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
-        "shortMonths": ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
-    };
+    {% if LANGUAGE_CODE == "pt-br" %}
+        d3.json("https://cdn.jsdelivr.net/npm/d3-time-format@2/locale/pt-BR.json", function(error, locale) {
+            if (error) throw error;
+            d3.timeFormatDefaultLocale(locale);
+            });
+    {% else %}
+        d3.json("https://cdn.jsdelivr.net/npm/d3-time-format@2/locale/en-US.json", function(error, locale) {
+            if (error) throw error;
+            d3.timeFormatDefaultLocale(locale);
+            });
+    {% endif %}
 
-    var es_ES = {
-        "decimal": ",",
-        "thousands": ".",
-        "grouping": [3],
-        "currency": ["€", ""],
-        "dateTime": "%a %b %e %X %Y",
-        "date": "%d/%m/%Y",
-        "time": "%H:%M:%S",
-        "periods": ["AM", "PM"],
-        "days": ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
-        "shortDays": ["Dom", "Lun", "Mar", "Mi", "Jue", "Vie", "Sab"],
-        "months": ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-        "shortMonths": ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
-    };
-
-    var en_US = {
-        "decimal": ",",
-        "thousands": ".",
-        "grouping": [3],
-        "currency": ["$", ""],
-        "dateTime": "%x, %X",
-        "date": "%-m/%-d/%Y",
-        "time": "%-I:%M:%S %p",
-        "periods": ["AM", "PM"],
-        "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-        "shortDays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-        "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-        "shortMonths": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-    }
     </script>
-    
+
     <script type="text/javascript">  
         // Browser
         var data;
@@ -184,20 +154,16 @@
                 .await(function(
                     error, data_disease, data_age_male, data_age_female,
                     data_gender, data_period
-                ){                 
-                    
+                ){
                     var format = d3.timeFormat('%d/%m/%Y');
                     var extremes = date_chart.xAxis[0].getExtremes(),
                         start = format(new Date(extremes.min)),
                         end   = format(new Date(extremes.max));
 
-                    d3.timeFormatDefaultLocale(pt_BR);
-
                     var format_date = d3.timeFormat('%d %B %Y');
                     var extremes_date = date_chart.xAxis[0].getExtremes(),
                         inicio = format_date(new Date(extremes_date.min)),  
                         fim   = format_date(new Date(extremes_date.max));
-
                     var desc_period = 'Dados de ' + inicio + ' a ' + fim;
 
                     if (ignore_chart != 'disease')
@@ -277,7 +243,6 @@
         </div>
 
         <div class="col-sm-7">
-
             <div class="row">
                 <div class="col-sm-12">
                     <p>

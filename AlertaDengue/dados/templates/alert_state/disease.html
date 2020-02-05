@@ -12,7 +12,6 @@ function disease_click_bar(name) {
     }
 }
 
-
 function _select_disease() {
     for (j in disease_chart.series[0].data) {
         if (disease_chart.series[0].data[j].name == '{{disease_label}}') {
@@ -59,7 +58,6 @@ function plot_chart_disease(data, config){
             }
         }
     }
-
     // set data
     disease_chart.series[0].setData(_counter);
     // settings
@@ -149,7 +147,6 @@ $(document).ready(function () {
         });
 
         _select_disease();
-
         $('#disease-chart .highcharts-xaxis-labels text').on('click', function () {
             disease_click_bar($(this).text());
         });

@@ -54,7 +54,6 @@ function plot_chart_age(data_male, data_female, config) {
             }
         }
     }
-
     // set data
     age_chart.series[0].setData(_counter_female);
     age_chart.series[1].setData(_counter_male);
@@ -83,7 +82,6 @@ $(document).ready(function () {
                     }
                 }
             },
-
             plotOptions: {
                 column: {
                     stacking: 'normal',
@@ -110,7 +108,6 @@ $(document).ready(function () {
                     }
                 }
             },
-
             title: {
                 text: '{% blocktrans %}Distribuição por Idade{% endblocktrans %}'
             },

@@ -38,13 +38,11 @@ function plot_chart_date(data, config){
         dt_utc = Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate());
         _values.push([dt_utc, parseInt(data[i].casos)]);
     }
-
     // set data
     date_chart.series[0].setData(_values);
     // settings
     date_chart.setTitle(null, { text: config['subtitle']});
 }
-
 
 $(document).ready(function () {
     // Create the chart
