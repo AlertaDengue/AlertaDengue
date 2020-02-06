@@ -25,7 +25,7 @@ function get_period_selected() {
     return '&initial_date=' + period[0] + '&final_date=' + period[1];
 }
 
-function plot_chart_date(data){
+function plot_chart_date(data, config){
     var _values = [];
     var parser = d3.timeParse('%Y-%m-%d');
     var format = d3.timeFormat('%Y-%m-%d');
@@ -38,9 +38,10 @@ function plot_chart_date(data){
         dt_utc = Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate());
         _values.push([dt_utc, parseInt(data[i].casos)]);
     }
-
     // set data
     date_chart.series[0].setData(_values);
+    // settings
+    date_chart.setTitle(null, { text: config['subtitle']});
 }
 
 $(document).ready(function () {
@@ -53,7 +54,7 @@ $(document).ready(function () {
         date_chart = Highcharts.stockChart('date-chart', {
             chart: {
                 type: 'line',
-                spacingBottom: 0,
+                spacingBottom: 30,
                 spacingTop: 0,
                 spacingLeft: 0,
                 spacingRight: 0,
@@ -77,15 +78,21 @@ $(document).ready(function () {
                 },
                 events: {
                     afterSetExtremes: function afterSetExtremes(e) {
-                        plots_refresh('date');
+                        plots_refresh('date'),
+                        plots_refresh('subtitle')
                     }
                 },
             },
             title: {
-                text: ''
+                text: '{% blocktrans %}Casos por semana{% endblocktrans %}'
             },
             subtitle: {
-                text: '{% blocktrans %}Casos por semana{% endblocktrans %}'
+                text: chart_footer,
+                verticalAlign: 'bottom',
+                floating: true,
+                align: 'center',
+                x: 0,
+                y: 25
             },
             yAxis: {
                 min: 0,
