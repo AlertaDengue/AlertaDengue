@@ -6,7 +6,6 @@ from django.views.generic import RedirectView
 
 admin.autodiscover()
 
-# see https://docs.djangoproject.com/en/3.0/ref/urls/
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^accounts/profile/$', RedirectView.as_view(url="/")),

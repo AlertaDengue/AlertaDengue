@@ -41,7 +41,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv('DEBUG', '').lower() == 'true'
 
 # You must set settings.ALLOWED_HOSTS if DEBUG is False.
-ADMINS = os.getenv('ADMINS', [])
+ADMINS = os.getenv('ADMINS').split(',')
 
 # ALLOWED_HOSTS=os.getenv["alerta.dengue.mat.br", "info.dengue.mat.br", '127.0.0.1'] ###VERIFICAR EM .ENV
 ALLOWED_HOSTS = (

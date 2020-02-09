@@ -13,23 +13,31 @@
         type="text/javascript"></script>
 
 <style type="text/css"></style>
-<script></script>
+
+<script>
+function goBack() {
+    window.history.back()
+}
+</script>
 
 {% endblock %}
-{% block title %}{% trans "Serviços de Dados Públicos" %}{% endblock %}
+{% block title %}{% trans "Algo há ocorrido" %}{% endblock %}
 
 {% block content %}
 
 <div class="container">
     <div class="row">
         <div class="col-md-12 column">
-            <h5>{% trans "Aqui podem ser encontrados os dados mostrados nas figuras e tabelas do site" %}.</h5>
+           <h5> {% trans "A página ou os dados que você procura não existem ou não estão disponiveis no momento" %}.</h5>
             <p>
             <ul>
-                <li><h5><a href="./api">API</a></h5></li>
+                <li><h5><a href="../">Voltar a home</a></h5></li>
             </ul>
             <ul>
-                <li><h5><a href="./tutorial">Tutorial</a></h5></li>
+                <li><h5><a href="#" onclick="goBack();">Voltar a página anterior</a></h5></li>
+            </ul>
+            <ul>
+                <li><h5><a href="../participe">Fale conosco</a></h5></li>
             </ul>
         </div>
     </div>
