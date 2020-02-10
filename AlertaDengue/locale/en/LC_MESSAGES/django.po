@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-03 00:16+0000\n"
+"POT-Creation-Date: 2020-02-10 16:13+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -20,59 +20,59 @@ msgstr ""
 "X-Source-Language: pt_BR\n"
 "X-Generator: Poedit 1.8.7.1\n"
 
-#: AlertaDengue/dados/charts.py:564
+#: AlertaDengue/dados/charts.py:566
 #, python-brace-format
 msgid "%{text} <br>%{y} Casos Estimados<extra></extra>"
 msgstr "%{text} <br>%{y} Estimated cases<extra></extra>"
 
-#: AlertaDengue/dados/charts.py:575
+#: AlertaDengue/dados/charts.py:577
 msgid "Casos Estimados de {} nos municípios monitorados"
 msgstr "Estimated cases of {} in monitored cities"
 
-#: AlertaDengue/dados/charts.py:610 AlertaDengue/dados/charts.py:774
-#: AlertaDengue/dados/templates/alert_state/age.html:121
-#: AlertaDengue/dados/templates/alert_state/date.html:93
-#: AlertaDengue/dados/templates/alert_state/disease.html:117
+#: AlertaDengue/dados/charts.py:612 AlertaDengue/dados/charts.py:776
+#: AlertaDengue/dados/templates/alert_state/age.html:125
+#: AlertaDengue/dados/templates/alert_state/date.html:100
+#: AlertaDengue/dados/templates/alert_state/disease.html:122
 #: AlertaDengue/dados/templates/alert_state/epiyears.html:39
-#: AlertaDengue/dados/templates/alert_state/gender.html:111
+#: AlertaDengue/dados/templates/alert_state/gender.html:113
 #: AlertaDengue/dados/templates/alerta_mrj.html:21
 #: AlertaDengue/dados/templates/services_api.html:195
 #: AlertaDengue/dados/templates/total_series.html:28
 msgid "Casos"
 msgstr "Cases"
 
-#: AlertaDengue/dados/charts.py:670
+#: AlertaDengue/dados/charts.py:672
 msgid "Casos Notificados de "
 msgstr "Estimated cases "
 
-#: AlertaDengue/dados/charts.py:674 AlertaDengue/dados/charts.py:690
-#: AlertaDengue/dados/charts.py:708 AlertaDengue/dados/charts.py:726
-#: AlertaDengue/dados/charts.py:744
+#: AlertaDengue/dados/charts.py:676 AlertaDengue/dados/charts.py:692
+#: AlertaDengue/dados/charts.py:710 AlertaDengue/dados/charts.py:728
+#: AlertaDengue/dados/charts.py:746
 #, python-brace-format
 msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados<extra></extra>"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
 
-#: AlertaDengue/dados/charts.py:686
+#: AlertaDengue/dados/charts.py:688
 msgid "Alerta Verde de "
 msgstr "Green Level "
 
-#: AlertaDengue/dados/charts.py:704
+#: AlertaDengue/dados/charts.py:706
 msgid "Alerta Amarelo de "
 msgstr "Yellow Level "
 
-#: AlertaDengue/dados/charts.py:722
+#: AlertaDengue/dados/charts.py:724
 msgid "Alerta Laranja de "
 msgstr "Orange Level "
 
-#: AlertaDengue/dados/charts.py:740
+#: AlertaDengue/dados/charts.py:742
 msgid "Alerta Vermelho de "
 msgstr "Red Level "
 
-#: AlertaDengue/dados/charts.py:759
+#: AlertaDengue/dados/charts.py:761
 msgid "Casos Estimados de "
 msgstr "Estimated cases "
 
-#: AlertaDengue/dados/charts.py:763
+#: AlertaDengue/dados/charts.py:765
 #, python-brace-format
 msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
@@ -974,29 +974,29 @@ msgstr "Arborivirosis Situation report of "
 msgid "Para mais detalhes, acesse a página de Estados"
 msgstr "For more details go to the States page"
 
-#: AlertaDengue/dados/templates/alert_state/age.html:116
+#: AlertaDengue/dados/templates/alert_state/age.html:112
 msgid "Distribuição por Idade"
 msgstr "Age distribution"
 
-#: AlertaDengue/dados/templates/alert_state/age.html:137
-#: AlertaDengue/dados/templates/alert_state/gender.html:127
+#: AlertaDengue/dados/templates/alert_state/age.html:141
+#: AlertaDengue/dados/templates/alert_state/gender.html:129
 msgid "Clique na categoria (coluna) para <br/>alterar seleção de filtro."
 msgstr "Click on the category (column) to <br/> change filter selection."
 
-#: AlertaDengue/dados/templates/alert_state/date.html:88
+#: AlertaDengue/dados/templates/alert_state/date.html:87
 msgid "Casos por semana"
 msgstr "Cases per week"
 
-#: AlertaDengue/dados/templates/alert_state/date.html:105
+#: AlertaDengue/dados/templates/alert_state/date.html:112
 msgid ""
 "Para alterar o zoom do gráfico,<br/>utilize os controles da parte inferior."
 msgstr "To change the graphic zoom, use the controls at the bottom."
 
-#: AlertaDengue/dados/templates/alert_state/disease.html:112
+#: AlertaDengue/dados/templates/alert_state/disease.html:109
 msgid "Casos notificados no Período"
 msgstr "Reported cases on the period"
 
-#: AlertaDengue/dados/templates/alert_state/disease.html:133
+#: AlertaDengue/dados/templates/alert_state/disease.html:138
 msgid ""
 "Clique na categoria (coluna) para <br/>alterar seleção de filtro. A escolha "
 "da doença <br/>implica no recarregamento da página."
@@ -1008,11 +1008,11 @@ msgstr ""
 msgid "Semana"
 msgstr "Week"
 
-#: AlertaDengue/dados/templates/alert_state/epiyears.html:34
+#: AlertaDengue/dados/templates/alert_state/epiyears.html:31
 msgid "Casos por semanas epidemiológicas"
 msgstr "Cases per epidemiological week"
 
-#: AlertaDengue/dados/templates/alert_state/gender.html:106
+#: AlertaDengue/dados/templates/alert_state/gender.html:100
 msgid "Distribuição por gênero"
 msgstr "Distribution by gender"
 
@@ -1385,7 +1385,7 @@ msgid "Situação Epidemiológica - %(num_mun)s Municípios monitorados"
 msgstr "Epidemiological Situation - %(num_mun)s Monitored cities"
 
 #: AlertaDengue/dados/templates/main.html:122
-#: AlertaDengue/dados/templates/state_cities.html:181
+#: AlertaDengue/dados/templates/state_cities.html:220
 msgid "Última atualização"
 msgstr "Last update"
 
@@ -1925,11 +1925,39 @@ msgstr ""
 "To access and make visualizations from the Infodengue data table using the R "
 "language."
 
-#: AlertaDengue/dados/templates/state_cities.html:212
+#: AlertaDengue/dados/templates/state_cities.html:180
+msgid "Dados de"
+msgstr "Data of"
+
+#: AlertaDengue/dados/templates/state_cities.html:180
+msgid "a"
+msgstr "and"
+
+#: AlertaDengue/dados/templates/state_cities.html:192
+msgid "Casos de"
+msgstr "Cases of"
+
+#: AlertaDengue/dados/templates/state_cities.html:193
+msgid "entre"
+msgstr "between"
+
+#: AlertaDengue/dados/templates/state_cities.html:193
+msgid "e"
+msgstr "and"
+
+#: AlertaDengue/dados/templates/state_cities.html:194
+msgid "sexo"
+msgstr "sex"
+
+#: AlertaDengue/dados/templates/state_cities.html:195
+msgid "idades"
+msgstr "ages"
+
+#: AlertaDengue/dados/templates/state_cities.html:228
 msgid "Descrição de filtro"
 msgstr "Filter description"
 
-#: AlertaDengue/dados/templates/state_cities.html:270
+#: AlertaDengue/dados/templates/state_cities.html:313
 msgid "Por favor, aguarde."
 msgstr "Please, wait."
 
@@ -1978,7 +2006,7 @@ msgstr "Notification year can not be greater than current year"
 msgid "Arquivo DBF inválido"
 msgstr "Invalid DBF file"
 
-#: AlertaDengue/dbf/sinan.py:187
+#: AlertaDengue/dbf/sinan.py:185
 msgid "Existem nesse arquivo notificações que não incluem a coluna ID_AGRAVO."
 msgstr ""
 

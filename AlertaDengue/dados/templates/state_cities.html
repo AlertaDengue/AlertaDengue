@@ -126,15 +126,17 @@
 
         initialize_page_id = window.setInterval(function () {
             if (
+                age_chart !== undefined &&
+                gender_chart !== undefined &&
+                disease_chart !== undefined &&
+                date_chart !== undefined &&
                 _get_diseases_selected !== undefined &&
                 _get_genders_selected !== undefined &&
                 _get_ages_selected !== undefined
             ) {
                 clearInterval(initialize_page_id);
                 plots_refresh();
-                console.log('done.');
             }
-            console.log('waiting....');
         }, 1000);
 
         function plots_refresh(_ignore_chart) {
@@ -175,7 +177,7 @@
                     var extremes_date = date_chart.xAxis[0].getExtremes(),
                         inicio = format_date(new Date(extremes_date.min)),
                         fim   = format_date(new Date(extremes_date.max));
-                    var desc_period = 'Dados de ' + inicio + ' a ' + fim;
+                    var desc_period = '{% trans "Dados de" %} ' + inicio + ' {% trans "a" %} ' + fim;
 
                     if (ignore_chart != 'disease')
                         plot_chart_disease(data_disease, {'subtitle': desc_period});
@@ -187,10 +189,10 @@
                         plot_chart_date(data_period, {'subtitle': desc_period});
 
                     $('#filter-display').text(
-                        ' Casos de ' + _get_diseases_selected().join(', ') +
-                        ' entre ' + start + ' e ' + end + ',' +
-                        ' sexo: ' + _get_genders_selected().join(', ') + ',' +
-                        ' idades: ' + _get_ages_selected().join(', ')
+                        '{% trans "Casos de" %} ' + _get_diseases_selected().join(', ') +
+                        ' {% trans "entre" %} ' + start + ' {% trans "e" %} ' + end + ', ' +
+                        ' {% trans "sexo" %}: ' + _get_genders_selected().join(', ') + ', ' +
+                        ' {% trans "idades" %}: ' + _get_ages_selected().join(', ')
                     );
 
                     ignore_chart = '';
