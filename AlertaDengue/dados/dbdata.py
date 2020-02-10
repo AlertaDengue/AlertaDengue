@@ -28,11 +28,16 @@ STATE_NAME = {
     'RJ': 'Rio de Janeiro',
 }
 
+ALL_STATE_NAMES = STATE_NAME.copy()
+# TODO: add missing states here
+ALL_STATE_NAMES.update({'SP': 'São Paulo'})
+
 ALERT_COLOR = {1: 'verde', 2: 'amarelo', 3: 'laranja', 4: 'vermelho'}
 
 ALERT_CODE = dict(zip(ALERT_COLOR.values(), ALERT_COLOR.keys()))
 
 STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
+ALL_STATE_INITIAL = dict(zip(ALL_STATE_NAMES.values(), ALL_STATE_NAMES.keys()))
 
 db_engine = create_engine(
     "postgresql://{}:{}@{}/{}".format(
