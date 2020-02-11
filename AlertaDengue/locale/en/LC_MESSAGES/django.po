@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-10 16:13+0000\n"
+"POT-Creation-Date: 2020-02-11 20:58+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -20,16 +20,16 @@ msgstr ""
 "X-Source-Language: pt_BR\n"
 "X-Generator: Poedit 1.8.7.1\n"
 
-#: AlertaDengue/dados/charts.py:566
+#: AlertaDengue/dados/charts.py:567
 #, python-brace-format
 msgid "%{text} <br>%{y} Casos Estimados<extra></extra>"
 msgstr "%{text} <br>%{y} Estimated cases<extra></extra>"
 
-#: AlertaDengue/dados/charts.py:577
+#: AlertaDengue/dados/charts.py:578
 msgid "Casos Estimados de {} nos municípios monitorados"
 msgstr "Estimated cases of {} in monitored cities"
 
-#: AlertaDengue/dados/charts.py:612 AlertaDengue/dados/charts.py:776
+#: AlertaDengue/dados/charts.py:613 AlertaDengue/dados/charts.py:777
 #: AlertaDengue/dados/templates/alert_state/age.html:125
 #: AlertaDengue/dados/templates/alert_state/date.html:100
 #: AlertaDengue/dados/templates/alert_state/disease.html:122
@@ -41,38 +41,38 @@ msgstr "Estimated cases of {} in monitored cities"
 msgid "Casos"
 msgstr "Cases"
 
-#: AlertaDengue/dados/charts.py:672
+#: AlertaDengue/dados/charts.py:673
 msgid "Casos Notificados de "
 msgstr "Estimated cases "
 
-#: AlertaDengue/dados/charts.py:676 AlertaDengue/dados/charts.py:692
-#: AlertaDengue/dados/charts.py:710 AlertaDengue/dados/charts.py:728
-#: AlertaDengue/dados/charts.py:746
+#: AlertaDengue/dados/charts.py:677 AlertaDengue/dados/charts.py:693
+#: AlertaDengue/dados/charts.py:711 AlertaDengue/dados/charts.py:729
+#: AlertaDengue/dados/charts.py:747
 #, python-brace-format
 msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados<extra></extra>"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
 
-#: AlertaDengue/dados/charts.py:688
+#: AlertaDengue/dados/charts.py:689
 msgid "Alerta Verde de "
 msgstr "Green Level "
 
-#: AlertaDengue/dados/charts.py:706
+#: AlertaDengue/dados/charts.py:707
 msgid "Alerta Amarelo de "
 msgstr "Yellow Level "
 
-#: AlertaDengue/dados/charts.py:724
+#: AlertaDengue/dados/charts.py:725
 msgid "Alerta Laranja de "
 msgstr "Orange Level "
 
-#: AlertaDengue/dados/charts.py:742
+#: AlertaDengue/dados/charts.py:743
 msgid "Alerta Vermelho de "
 msgstr "Red Level "
 
-#: AlertaDengue/dados/charts.py:761
+#: AlertaDengue/dados/charts.py:762
 msgid "Casos Estimados de "
 msgstr "Estimated cases "
 
-#: AlertaDengue/dados/charts.py:765
+#: AlertaDengue/dados/charts.py:766
 #, python-brace-format
 msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
@@ -132,6 +132,24 @@ msgstr "Epidemic threshold"
 #: AlertaDengue/dados/models.py:127
 msgid "Código do municipio"
 msgstr "City code"
+
+#: AlertaDengue/dados/templates/404.html:24
+msgid "Página não encontrada"
+msgstr "Page not found"
+
+#: AlertaDengue/dados/templates/404.html:31
+msgid ""
+"A página ou os dados que você procura não existem ou não estão disponiveis "
+"no momento"
+msgstr "The page or data does not exist or is not currently available"
+
+#: AlertaDengue/dados/templates/404.html:34
+msgid "Voltar a homepage"
+msgstr "Go to homepage"
+
+#: AlertaDengue/dados/templates/404.html:37
+msgid "Fale conosco"
+msgstr "Contact Us"
 
 #: AlertaDengue/dados/templates/about.html:4
 msgid "Saiba mais"
@@ -1579,7 +1597,7 @@ msgstr "Reported cases of %(disease_label)s"
 msgid "Serviços de Dados Públicos"
 msgstr "Public Data Service"
 
-#: AlertaDengue/dados/templates/services.html:27
+#: AlertaDengue/dados/templates/services.html:26
 msgid ""
 "Aqui podem ser encontrados os dados mostrados nas figuras e tabelas do site"
 msgstr "Here you can find the data shown in the figures and tables of the site"
