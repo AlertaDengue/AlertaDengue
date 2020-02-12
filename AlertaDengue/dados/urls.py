@@ -1,5 +1,4 @@
-# coding=utf-8
-from django.conf.urls import url
+from django.urls import re_path
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 
@@ -54,76 +53,78 @@ __year_week = r'(?P<year_week>\d{6})'
 __report_type = '(?P<report_type>city|state)'
 
 urlpatterns = [
-    url(r'^$', AlertaMainView.as_view(), name='main'),
-    url(r'^informacoes/$', AboutPageView.as_view(), name='about'),
-    url(r'^contato/$', ContactPageView.as_view(), name='contact'),
-    url(r'^participe/$', JoininPageView.as_view(), name='joinin'),
-    url(
+    re_path(r'^$', AlertaMainView.as_view(), name='main'),
+    re_path(r'^informacoes/$', AboutPageView.as_view(), name='about'),
+    re_path(r'^contato/$', ContactPageView.as_view(), name='contact'),
+    re_path(r'^participe/$', JoininPageView.as_view(), name='joinin'),
+    re_path(
         r'^services/(?P<service>maps|api)?$',
         DataPublicServicesPageView.as_view(),
         name="data_public_services",
     ),
-    url(
+    re_path(
         r'^services/(?P<service>maps|tutorial)?$',
         DataPublicServicesPageView.as_view(),
         name="data_public_services",
     ),
-    url(
+    re_path(
         r'^services/(?P<service>maps|tutorial)/(?P<service_type>R)$',
         DataPublicServicesPageView.as_view(),
         name="data_public_services_type",
     ),
-    url(
+    re_path(
         r'^services/(?P<service>maps|api)/(?P<service_type>doc)$',
         DataPublicServicesPageView.as_view(),
         name="data_public_services_type",
     ),
-    url(r'^alerta/%s[/]?$' % __state, redirect_alerta_dengue),
-    url(
+    re_path(r'^alerta/%s[/]?$' % __state, redirect_alerta_dengue),
+    re_path(
         r'^alerta/%s/%s$' % (__state, __disease),
         AlertaStateView.as_view(),
         name='alerta_uf',
     ),
-    url(r'^alerta/rio/$', redirect_alert_rio_dengue),
-    url(
+    re_path(r'^alerta/rio/$', redirect_alert_rio_dengue),
+    re_path(
         r'^alerta/rio/%s$' % __disease, AlertaMRJPageView.as_view(), name='mrj'
     ),
-    url(r'^alerta/%s[/]?$' % __geocode, redirect_alert_city_dengue),
-    url(
+    re_path(r'^alerta/%s[/]?$' % __geocode, redirect_alert_city_dengue),
+    re_path(
         r'^alerta/%s/%s$' % (__geocode, __disease),
         AlertaMunicipioPageView.as_view(),
         name='alerta_cidade',
     ),
-    url(r'^alerta-detalhado/$', DetailsPageView.as_view(), name='home'),
-    url(
+    re_path(r'^alerta-detalhado/$', DetailsPageView.as_view(), name='home'),
+    re_path(
         r'^alertageoJSON/$',
         login_required(AlertaGeoJSONView.as_view()),
         name='alerta-layer',
     ),
-    url(r'^getcity/$', get_municipio, name='get_city'),
-    url(r'^sinan/(\d{4})/(\d{1,2})', SinanCasesView.as_view(), name='sinan'),
-    url(
+    re_path(r'^getcity/$', get_municipio, name='get_city'),
+    re_path(
+        r'^sinan/(\d{4})/(\d{1,2})', SinanCasesView.as_view(), name='sinan'
+    ),
+    re_path(
         r'^geotiff/%s/%s/$' % (__geocode, __disease),
         GeoTiffView.as_view(),
         name='geotiff',
     ),
-    url(
+    re_path(
         r'^geojson/%s/%s/$' % (__geocode, __disease),
         GeoJsonView.as_view(),
         name='geojson',
     ),
-    url(r'^report/$', ReportView.as_view(), name='report'),
-    url(
+    re_path(r'^report/$', ReportView.as_view(), name='report'),
+    re_path(
         r'^report/{}/{}$'.format(__state_extra, __report_type),
         ReportView.as_view(),
         name='report_filter',
     ),
-    url(
+    re_path(
         r'^report/{}/{}/{}$'.format(__state_extra, __geocode_, __year_week),
         ReportCityView.as_view(),
         name='report_city',
     ),
-    url(
+    re_path(
         r'^report/{}/{}$'.format(__state_extra, __year_week),
         ReportStateView.as_view(),
         name='report_state',
