@@ -5,7 +5,7 @@ channels:
 dependencies:
 - django>=2,<3
 - django-bootstrap4
-- django-leaflet
+- django-leaflet==0.26.0
 - geojson
 - gunicorn
 - numpy
@@ -38,3 +38,6 @@ dependencies:
 - plotly=4.0.0
 - BeautifulSoup4
 - setuptools=41.5.1 # TODO: remove this when django 3 is used
+- pip:
+    - django-leaflet==0.26.0
+    
