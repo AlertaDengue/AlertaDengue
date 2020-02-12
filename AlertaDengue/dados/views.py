@@ -268,7 +268,7 @@ class DataPublicServicesPageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        service = kwargs['service']
+        service = kwargs.get('service', None)
         service_type = (
             None if 'service_type' not in kwargs else kwargs['service_type']
         )
@@ -817,8 +817,9 @@ class AlertaStateView(TemplateView):
         'MG': [-18.542, -44.319],
         'PR': [-25.006, -51.833],
         'RJ': [-22.187, -43.176],
+        'SP': [-23.5489, -46.6388],
     }
-    _map_zoom = {'CE': 6, 'ES': 6, 'MG': 6, 'PR': 6, 'RJ': 6}
+    _map_zoom = {'CE': 6, 'ES': 6, 'MG': 6, 'PR': 6, 'RJ': 6, 'SP': 6}
 
     def get_context_data(self, **kwargs):
         """
@@ -1333,8 +1334,9 @@ class ReportStateView(TemplateView):
         'MG': [-18.542, -44.319],
         'PR': [-25.006, -51.833],
         'RJ': [-22.187, -43.176],
+        'SP': [-23.5489, -46.6388]
     }
-    _map_zoom = {'CE': 6, 'ES': 6, 'MG': 6, 'PR': 6, 'RJ': 6}
+    _map_zoom = {'CE': 6, 'ES': 6, 'MG': 6, 'PR': 6, 'RJ': 6, 'SP': 6}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
