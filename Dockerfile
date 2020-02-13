@@ -1,4 +1,4 @@
-FROM debian:testing-20190708
+FROM debian:testing-20190708-slim
 
 RUN apt-get update && \
     apt-get install -q -y locales \
