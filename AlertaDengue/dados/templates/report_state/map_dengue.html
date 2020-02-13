@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load leaflet_tags %}
 {% load lookup %}
+{% load static %}
 
 {% leaflet_map "map_dengue" callback="main_map_init_dengue" %}
 
@@ -165,7 +166,7 @@
 
         for (var i=0; i < geo_ids_dengue.length; i++){
             var gc = geo_ids_dengue[i];
-            $.getJSON('/static/geojson/' + gc.toString() + '.json', function(data){
+            $.getJSON('{% static '/geojson_simplified/' %}' + gc.toString() + '.json', function(data){
                 geojson = L.geoJson(
                     data, {style: selected_style_dengue,
                            onEachFeature: fill_details_dengue}
