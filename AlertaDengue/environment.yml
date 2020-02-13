@@ -1,4 +1,4 @@
-name: alertadengue-Dj30
+name: alertadengue
 channels:
   - conda-forge
   - defaults
