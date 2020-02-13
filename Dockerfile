@@ -1,6 +1,5 @@
 FROM debian:testing-20190708
 
-# RUN apt-get update && apt-get install -q -y locales python3 python3-pip python3-setuptools python3-numpy python3-pandas libpq-dev python3-gdal libgdal-dev python3-geopandas
 RUN apt-get update && \
     apt-get install -q -y locales \
       python3 \
