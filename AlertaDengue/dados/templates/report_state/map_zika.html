@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load leaflet_tags %}
 {% load lookup %}
+{% load static %}
 
 {% leaflet_map "map_zika" callback="main_map_init_zika" %}
 
@@ -165,7 +166,7 @@
 
         for (var i=0; i < geo_ids_zika.length; i++){
             var gc = geo_ids_zika[i];
-            $.getJSON('/static/geojson/' + gc.toString() + '.json', function(data){
+            $.getJSON('{% static '/geojson_simplified/' %}' + gc.toString() + '.json', function(data){
                 geojson = L.geoJson(
                     data, {style: selected_style_zika,
                            onEachFeature: fill_details_zika}

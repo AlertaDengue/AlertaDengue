@@ -41,7 +41,7 @@ def redirect_alert_city_dengue(request, geocodigo):
 app_name = "dados"
 
 __disease = '(?P<disease>dengue|chikungunya|zika)'
-__state = '(?P<state>CE|ES|MG|PR|RJ)'
+__state = '(?P<state>CE|ES|MG|PR|RJ|SP)'
 __state_extra = '(?P<state>CE|ES|MG|PR|RJ|SP)'
 __geocode = r'(?P<geocodigo>\d{7})'
 __geocode_ = r'(?P<geocode>\d{7})'

@@ -80,6 +80,14 @@ class Command(BaseCommand):
 
         os.makedirs(geojson_dir_path, exist_ok=True)
 
+        if not os.path.exists(geojson_original_path):
+            self.stdout.write(
+                self.style.WARNING(
+                    'GeoJSON/simplified %s not synchronized!' % geocode
+                )
+            )
+            return
+
         # creates the shapefile
         with fiona.open(geojson_original_path, 'r') as shp:
             multipolygon = MultiPolygon(

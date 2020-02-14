@@ -26,11 +26,11 @@ STATE_NAME = {
     'MG': 'Minas Gerais',
     'PR': 'Paraná',
     'RJ': 'Rio de Janeiro',
+    'SP': 'São Paulo',
 }
 
 ALL_STATE_NAMES = STATE_NAME.copy()
 # TODO: add missing states here
-ALL_STATE_NAMES.update({'SP': 'São Paulo'})
 
 ALERT_COLOR = {1: 'verde', 2: 'amarelo', 3: 'laranja', 4: 'vermelho'}
 
