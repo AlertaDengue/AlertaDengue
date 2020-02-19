@@ -17,7 +17,7 @@ dj-database-url
 django-chunked-upload
 celery  
 dj-static
-gdal==2.4.2
+gdal
 fiona
 rasterio
 geopy
