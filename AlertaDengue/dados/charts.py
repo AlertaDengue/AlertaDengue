@@ -228,6 +228,11 @@ class ReportCityCharts:
 
         df_climate[['SE', 'threshold_transmission', k]].melt('SE')
 
+        if k == "temp.min":
+            varclim_title = "Temperatura"
+        elif k == "umid.max":
+            varclim_title = "Umidade relativa do ar"
+
         figure = go.Figure()
 
         figure.add_trace(
@@ -246,7 +251,7 @@ class ReportCityCharts:
             go.Scatter(
                 x=df_climate['SE'],
                 y=df_climate[k],
-                name='Temperatura min.',
+                name=varclim_title,
                 marker={'color': 'rgb(255,150,0)'},
                 text=df_climate.SE.map(lambda v: '{}'.format(str(v)[-2:])),
                 hoverinfo='text',
@@ -268,7 +273,7 @@ class ReportCityCharts:
                 gridcolor='rgb(176, 196, 222)',
             ),
             yaxis=dict(
-                title='Temperatura',
+                title=varclim_title,
                 showline=True,
                 showgrid=True,
                 showticklabels=True,
@@ -516,16 +521,11 @@ class HomeCharts:
             ]
             casos[uf] = [
                 list(t)
-                for t in zip(
-                    datas,
-                    series_uf.casos_s[-52:].fillna(0).tolist(),
-                )
+                for t in zip(datas, series_uf.casos_s[-52:].fillna(0).tolist())
             ]
             casos_est[uf] = [
                 list(t)
-                for t in zip(
-                    datas, series_uf.casos_s[-52:].fillna(0).tolist()
-                )
+                for t in zip(datas, series_uf.casos_s[-52:].fillna(0).tolist())
             ]
 
         return {
