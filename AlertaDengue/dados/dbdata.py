@@ -1197,9 +1197,9 @@ class ReportCity:
         )
 
         df = pd.read_sql(sql, index_col='SE', con=db_engine)[k]
-        df.p_rt1 = (df.p_rt1 * 100).round(0).astype(int)
-        df.casos_est = df.casos_est.round(0).astype(int)
-        df.p_inc100k = df.p_inc100k.round(0).astype(int)
+        df.p_rt1 = (df.p_rt1 * 100).round(0).fillna(0)
+        df.casos_est = df.casos_est.round(0).fillna(0)
+        df.p_inc100k = df.p_inc100k.round(0).fillna(0)
 
         if df.empty:
             df['init_date_week'] = None
@@ -1450,11 +1450,11 @@ class ReportState:
 
         for d in cls.diseases:
             k = 'p_rt1_{}'.format(d)
-            df[k] = (df[k] * 100).fillna(0).round(0).astype(int)
+            df[k] = (df[k] * 100).fillna(0)
             k = 'casos_est_{}'.format(d)
-            df[k] = df[k].fillna(0).round(0).astype(int)
+            df[k] = df[k].fillna(0).round(0)
             k = 'p_inc100k_{}'.format(d)
-            df[k] = df[k].fillna(0).round(0).astype(int)
+            df[k] = df[k].fillna(0).round(0)
 
             df.rename(
                 columns={

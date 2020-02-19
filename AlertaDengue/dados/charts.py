@@ -518,13 +518,13 @@ class HomeCharts:
                 list(t)
                 for t in zip(
                     datas,
-                    series_uf.casos_s[-52:].fillna(0).astype(int).tolist(),
+                    series_uf.casos_s[-52:].fillna(0).tolist(),
                 )
             ]
             casos_est[uf] = [
                 list(t)
                 for t in zip(
-                    datas, series_uf.casos_s[-52:].astype('int').tolist()
+                    datas, series_uf.casos_s[-52:].fillna(0).tolist()
                 )
             ]
 
