@@ -76,7 +76,6 @@ class Sinan(object):
         self.dbf = DBF(dbf_fname, encoding=encoding)
         self.colunas_entrada = self.dbf.field_names
         self.tabela = pd.DataFrame(list(self.dbf))
-        self.tabela.drop_duplicates('NU_NOTIFIC', keep='first', inplace=True)
         if "ID_MUNICIP" in self.tabela.columns:
             self.geocodigos = self.tabela.ID_MUNICIP.dropna().unique()
         elif "ID_MN_RESI" in self.tabela.columns:
