@@ -41,7 +41,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv('DEBUG', '').lower() == 'true'
 
 # You must set settings.ALLOWED_HOSTS if DEBUG is False.
-ADMINS = os.getenv('ADMINS', [])
+ADMINS = tuple(v.split(':') for v in os.getenv('ADMINS').split(','))
 
 # ALLOWED_HOSTS=os.getenv["alerta.dengue.mat.br", "info.dengue.mat.br", '127.0.0.1'] ###VERIFICAR EM .ENV
 ALLOWED_HOSTS = (
@@ -196,11 +196,7 @@ MIGRATION_MODULES = {'dados': None, 'gis': None, 'api': None}
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
 LANGUAGE_CODE = 'pt-br'
-LANGUAGES = (
-('pt-br', 'Português'), 
-('en-us', 'english'), 
-('es', 'Spanish')
-)
+LANGUAGES = (('pt-br', 'Português'), ('en-us', 'english'), ('es', 'Spanish'))
 
 TIME_ZONE = 'UTC'
 
@@ -239,7 +235,8 @@ INFODENGUE_TEAM_EMAIL = os.getenv('INFODENGUE_TEAM_EMAIL')
 
 if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
     EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = os.getenv(
-        'EMAIL_CONFIG').split(',')
+        'EMAIL_CONFIG'
+    ).split(',')
     EMAIL_PORT = int(EMAIL_PORT)
     EMAIL_USE_TLS = True
 

@@ -3,9 +3,8 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-- django>=2,<3
+- django=3.0.3
 - django-bootstrap4
-- django-leaflet
 - geojson
 - gunicorn
 - numpy
@@ -37,4 +36,7 @@ dependencies:
 - sqlparse
 - plotly=4.0.0
 - BeautifulSoup4
-- setuptools=41.5.1 # TODO: remove this when django 3 is used
+#- setuptools=41.5.1 # TODO: remove this when django 3 is used
+- pip:
+    - django-leaflet==0.26.0
+    

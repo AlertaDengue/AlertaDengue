@@ -1,6 +1,6 @@
-django==2.2.8
+django==3.0.3
 django-bootstrap4
-django-leaflet
+django-leaflet==0.26.0
 geojson
 gunicorn
 numpy

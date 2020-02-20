@@ -26,13 +26,18 @@ STATE_NAME = {
     'MG': 'Minas Gerais',
     'PR': 'Paraná',
     'RJ': 'Rio de Janeiro',
+    'SP': 'São Paulo',
 }
+
+ALL_STATE_NAMES = STATE_NAME.copy()
+# TODO: add missing states here
 
 ALERT_COLOR = {1: 'verde', 2: 'amarelo', 3: 'laranja', 4: 'vermelho'}
 
 ALERT_CODE = dict(zip(ALERT_COLOR.values(), ALERT_COLOR.keys()))
 
 STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
+ALL_STATE_INITIAL = dict(zip(ALL_STATE_NAMES.values(), ALL_STATE_NAMES.keys()))
 
 db_engine = create_engine(
     "postgresql://{}:{}@{}/{}".format(
@@ -1192,9 +1197,9 @@ class ReportCity:
         )
 
         df = pd.read_sql(sql, index_col='SE', con=db_engine)[k]
-        df.p_rt1 = (df.p_rt1 * 100).round(0).astype(int)
-        df.casos_est = df.casos_est.round(0).astype(int)
-        df.p_inc100k = df.p_inc100k.round(0).astype(int)
+        df.p_rt1 = (df.p_rt1 * 100).round(0).fillna(0)
+        df.casos_est = df.casos_est.round(0).fillna(0)
+        df.p_inc100k = df.p_inc100k.round(0).fillna(0)
 
         if df.empty:
             df['init_date_week'] = None
@@ -1445,11 +1450,11 @@ class ReportState:
 
         for d in cls.diseases:
             k = 'p_rt1_{}'.format(d)
-            df[k] = (df[k] * 100).fillna(0).round(0).astype(int)
+            df[k] = (df[k] * 100).fillna(0)
             k = 'casos_est_{}'.format(d)
-            df[k] = df[k].fillna(0).round(0).astype(int)
+            df[k] = df[k].fillna(0).round(0)
             k = 'p_inc100k_{}'.format(d)
-            df[k] = df[k].fillna(0).round(0).astype(int)
+            df[k] = df[k].fillna(0).round(0)
 
             df.rename(
                 columns={

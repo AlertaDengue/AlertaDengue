@@ -3,7 +3,10 @@ from sqlalchemy import create_engine
 # local
 from . import settings
 from dados.dbdata import (  # noqa:F401
-    CID10, STATE_NAME, get_disease_suffix, MRJ_GEOCODE
+    CID10,
+    STATE_NAME,
+    get_disease_suffix,
+    MRJ_GEOCODE,
 )
 
 import pandas as pd

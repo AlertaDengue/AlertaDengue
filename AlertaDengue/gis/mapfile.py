@@ -1,29 +1,26 @@
+import os
 from datetime import datetime
 from glob import glob
 
+import geopandas as gpd
+import numpy as np
+import pyproj
+import sh
+
 # local
-from dados.dbdata import (
-    STATE_INITIAL,
-    db_engine,
-    get_cities,
-    NotificationResume as notif,
-)
+from dados.dbdata import STATE_NAME
+from dados.dbdata import NotificationResume as notif
+from dados.dbdata import db_engine, get_cities
 
 from .geodf import extract_boundaries
 from .settings import (
-    SHAPEFILE_PATH,
-    RASTER_PATH,
     MAPFILE_PATH,
     MAPSERVER_LOG_PATH,
     MAPSERVER_URL,
     RASTER_METEROLOGICAL_DATA_RANGE,
+    RASTER_PATH,
+    SHAPEFILE_PATH,
 )
-
-import geopandas as gpd
-import numpy as np
-import os
-import pyproj
-import sh
 
 
 def stringfy_boundaries(bounds: np.array, sep=' '):
@@ -43,7 +40,6 @@ def calc_layer_width_by_boundaries(bounds: np.array, layer_height: int = 400):
 
 def get_template_content(file_name: str):
     """
-
     :param file_name:
     :return:
     """
@@ -68,7 +64,6 @@ def transform_boundaries(bounds: np.array, proj_from, proj_to):
 
 class MapFile:
     """
-
     """
 
     layers = []
@@ -94,7 +89,6 @@ class MapFile:
 
     def __init__(self, **kwargs):
         """
-
         :param kwargs:
         """
         if kwargs:
@@ -134,7 +128,6 @@ class MapFile:
         gdf_country = gpd.GeoDataFrame.from_file(
             os.path.join(self.path['shapefile_dir'], '%s.shp' % 'UFEBRASIL')
         )
-
         # boundaries in epsg:2154
         self.bounds = transform_boundaries(
             bounds=extract_boundaries(gdf_country),
@@ -195,7 +188,6 @@ class MapFile:
 
     def generate(self, template: str, parameters: dict, output_file_path: str):
         """
-
         :param template:
         :param parameters:
         :param output_file_path:
@@ -206,7 +198,6 @@ class MapFile:
 
     def include_layer(self, layer_conf):
         """
-
         :param layer_conf:
         :return:
         """
@@ -273,7 +264,6 @@ class MapFileAlert(MapFile):
 
     def create_layers(self):
         """
-
         :return:
         """
         sql_template = '''
@@ -285,7 +275,7 @@ class MapFileAlert(MapFile):
         cities = {}
         alerts = {}
 
-        for state_name in STATE_INITIAL.values():
+        for state_name in STATE_NAME.values():
             with db_engine.connect() as conn:
                 sql = sql_template % state_name
                 result = conn.execute(sql).fetchall()
@@ -361,7 +351,6 @@ class MapFileAlert(MapFile):
 
 class MapFileMeteorological(MapFile):
     """
-
     """
 
     def __init__(self, map_class: str, date_start: datetime = None, **kwargs):

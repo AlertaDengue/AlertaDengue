@@ -1,5 +1,4 @@
- 
-FROM debian:testing
+FROM debian:testing-slim
 
 # Install
 RUN apt-get update \
