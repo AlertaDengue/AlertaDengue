@@ -76,10 +76,8 @@ class Command(BaseCommand):
         geojson_original_path = os.path.join(
             f_path, 'geojson', '%s.json' % geocode
         )
-        geojson_dir_path = os.path.dirname(geojson_original_path)
 
         geojson_simplified_dir_path = os.path.dirname(geojson_simplified_path)
-
         os.makedirs(geojson_simplified_dir_path, exist_ok=True)
 
         if not os.path.exists(geojson_original_path):
