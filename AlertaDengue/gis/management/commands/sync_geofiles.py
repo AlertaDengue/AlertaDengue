@@ -78,7 +78,9 @@ class Command(BaseCommand):
         )
         geojson_dir_path = os.path.dirname(geojson_original_path)
 
-        os.makedirs(geojson_dir_path, exist_ok=True)
+        geojson_simplified_dir_path = os.path.dirname(geojson_simplified_path)
+
+        os.makedirs(geojson_simplified_dir_path, exist_ok=True)
 
         if not os.path.exists(geojson_original_path):
             self.stdout.write(
@@ -190,8 +192,8 @@ class Command(BaseCommand):
         geo_info = {}
 
         for geocode in geocodes:
-            # self.create_geojson(f_geojson_path, geocode)
-            # self.create_shapefile(path_root, geocode)
+            self.create_geojson(f_geojson_path, geocode)
+            self.create_shapefile(path_root, geocode)
             self.simplify_geojson(path_root, geocode)
             geo_info.update(self.extract_geo_info_table(path_root, geocode))
 
