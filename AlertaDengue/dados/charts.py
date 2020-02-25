@@ -232,6 +232,8 @@ class ReportCityCharts:
             varclim_title = "Temperatura"
         elif k == "umid.max":
             varclim_title = "Umidade relativa do ar"
+        else:
+            raise Exception('Climate variable not found.')
 
         figure = go.Figure()
 
@@ -525,7 +527,9 @@ class HomeCharts:
             ]
             casos_est[uf] = [
                 list(t)
-                for t in zip(datas, series_uf.casos_s[-52:].fillna(0).tolist())
+                for t in zip(
+                    datas, series_uf.casos_est_s[-52:].fillna(0).tolist()
+                )
             ]
 
         return {

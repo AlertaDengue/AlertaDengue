@@ -28,7 +28,7 @@ def read_admins(value):
     return tuple(tuple(v.split(',')) for v in value.split(';'))
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PARENT_BASE_DIR = os.path.dirname(BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
@@ -212,12 +212,15 @@ APPEND_SLASH = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-CURRENT_DIR = os.path.join(os.path.dirname(__file__), '..')
+CURRENT_DIR = os.path.join(dirname(dirname(__file__)))
+
 
 # up one level from settings.py
-STATIC_ROOT = os.path.join(CURRENT_DIR, 'static_files')
+STATIC_ROOT = os.path.join(CURRENT_DIR, 'static')
 # static is on root level
-STATICFILES_DIRS = (os.path.abspath(os.path.join(CURRENT_DIR, 'static')),)
+STATICFILES_DIRS = (
+    os.path.abspath(os.path.join(CURRENT_DIR, 'static_files')),
+)
 
 DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, 'data'))
 
