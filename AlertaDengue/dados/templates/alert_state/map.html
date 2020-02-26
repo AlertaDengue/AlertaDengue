@@ -232,7 +232,7 @@
 
         for (var i=0; i < geo_ids.length; i++){
             var gc = geo_ids[i];
-            $.getJSON('{% static '/geojson_simplified/' %}' + gc.toString() + '.json', function(data){
+            $.getJSON('{% static "/geojson_simplified/" %}' + gc.toString() + '.json', function(data){
                 geojson = L.geoJson(
                     data, {style: selected_style, onEachFeature: fill_details}
                 );

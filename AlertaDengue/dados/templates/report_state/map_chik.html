@@ -166,7 +166,7 @@
 
         for (var i=0; i < geo_ids_chik.length; i++){
             var gc = geo_ids_chik[i];
-            $.getJSON('{% static '/geojson_simplified/' %}' + gc.toString() + '.json', function(data){
+            $.getJSON('{% static "/geojson_simplified/" %}' + gc.toString() + '.json', function(data){
                 geojson = L.geoJson(
                     data, {style: selected_style_chik,
                            onEachFeature: fill_details_chik}
