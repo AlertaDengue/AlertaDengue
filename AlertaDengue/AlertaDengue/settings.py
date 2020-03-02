@@ -28,7 +28,7 @@ def read_admins(value):
     return tuple(tuple(v.split(',')) for v in value.split(';'))
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 PARENT_BASE_DIR = os.path.dirname(BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
@@ -69,6 +69,7 @@ INSTALLED_APPS = (
     'dbf.apps.DbfConfig',
     'api',
     'manager.router',
+    'django_extensions',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -216,11 +217,9 @@ CURRENT_DIR = os.path.join(dirname(dirname(__file__)))
 
 
 # up one level from settings.py
-STATIC_ROOT = os.path.join(CURRENT_DIR, 'static')
+STATIC_ROOT = os.path.join(CURRENT_DIR, 'static_files')
 # static is on root level
-STATICFILES_DIRS = (
-    os.path.abspath(os.path.join(CURRENT_DIR, 'static_files')),
-)
+STATICFILES_DIRS = (os.path.abspath(os.path.join(CURRENT_DIR, 'static')),)
 
 DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, 'data'))
 

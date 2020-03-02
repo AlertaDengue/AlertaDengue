@@ -47,7 +47,14 @@ def get_version():
     import importlib
 
     mod = importlib.machinery.SourceFileLoader(
-        'version', os.path.join('AlertaDengue', 'version.py')
+        'version',
+        os.path.abspath(
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                'AlertaDengue',
+                'version.py',
+            )
+        ),
     ).load_module()
     return mod.__version__
 
@@ -60,13 +67,19 @@ def list_dir(pathname=PATH_ROOT, dir_name=''):
     return ['.%s' % r[size:] for r in result]
 
 
-with open('../README.md', encoding='utf-8') as readme_file:
+with open(
+    os.path.abspath(os.path.join('README.md')), encoding='utf-8'
+) as readme_file:
     readme = readme_file.read()
 
-with open('../HISTORY.md', encoding='utf-8') as history_file:
+with open(
+    os.path.abspath(os.path.join('HISTORY.md')), encoding='utf-8'
+) as history_file:
     history = history_file.read()
 
-install_reqs = parse_requirements('requirements.txt', session=PipSession())
+install_reqs = parse_requirements(
+    'AlertaDengue/requirements.txt', session=PipSession()
+)
 
 requirements = [str(ir.req) for ir in install_reqs]
 
