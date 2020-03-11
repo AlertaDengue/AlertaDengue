@@ -1,6 +1,6 @@
 # Deploy production and staging
-compose_cmd = docker-compose -p infodengue -f docker-compose.yml
-staging_compose_cmd = docker-compose -p infodengue_staging -f staging-compose.yml
+compose_cmd = docker-compose -p infodengue -f docker/docker-compose.yml
+staging_compose_cmd = docker-compose -p infodengue_staging -f docker/staging-compose.yml
 
 
 build:

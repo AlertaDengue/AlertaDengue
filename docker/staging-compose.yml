@@ -13,19 +13,21 @@ services:
 
     staging_db:
       build:
-        context: "."
-        dockerfile: "Dockerfile-postgres"
+        context: ".."
+        dockerfile: "docker/Dockerfile-postgres"
       env_file:
-        - .env_staging
+        - ../.env_staging
       hostname: staging_db
       volumes:
         - ${STAGING_DATA_DIR}:/var/lib/postgresql/data
       restart: always
 
     staging_web:
-      build: .
+      build:
+        context: ".."
+        dockerfile: "docker/Dockerfile"
       env_file:
-        - .env_staging
+        - ../.env_staging
       ports:
         - 8080:8000
       environment:
@@ -47,10 +49,10 @@ services:
 
     staging_celery-worker:
       build:
-        context: "."
-        dockerfile: "Dockerfile-celery"
+        context: ".."
+        dockerfile: "docker/Dockerfile-celery"
       env_file:
-        - .env_staging
+        - ../.env_staging
       environment:
         - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
         - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:5432/infodengue
@@ -66,8 +68,8 @@ services:
 
     staging_flower:
       build:
-        context: "."
-        dockerfile: "Dockerfile-flower"
+        context: ".."
+        dockerfile: "docker/Dockerfile-flower"
       environment:
         - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
       ports:
@@ -79,12 +81,12 @@ services:
 
     staging_mapserver:
         build:
-            context: "."
-            dockerfile: "Dockerfile-mapserver"
+            context: ".."
+            dockerfile: "docker/Dockerfile-mapserver"
         ports:
             - 7777:80
         env_file:
-            - .env_staging
+            - ../.env_staging
         volumes:
             - ${DOCKER_HOST_MAPFILES_DIR}:/maps:ro
             - ${DOCKER_HOST_SHAPEFILES_DIR}:/shapefile:ro
