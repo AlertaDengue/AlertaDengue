@@ -19,8 +19,7 @@ import os
 import subprocess
 import sys
 
-PATH_ROOT = os.getcwd()
-
+PATH_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # Documentation building command
 try:
@@ -42,7 +41,7 @@ except ImportError:
     cmdclass = {}
 
 
-def get_version():
+def get_version(path_root: str = PATH_ROOT):
     """Obtain the version number"""
     import importlib
 
@@ -50,9 +49,7 @@ def get_version():
         'version',
         os.path.abspath(
             os.path.join(
-                os.path.dirname(os.path.abspath(__file__)),
-                'AlertaDengue',
-                'version.py',
+                path_root, 'AlertaDengue', 'AlertaDengue', 'version.py',
             )
         ),
     ).load_module()
@@ -68,17 +65,17 @@ def list_dir(pathname=PATH_ROOT, dir_name=''):
 
 
 with open(
-    os.path.abspath(os.path.join('README.md')), encoding='utf-8'
+    os.path.join(PATH_ROOT, 'README.md'), encoding='utf-8'
 ) as readme_file:
     readme = readme_file.read()
 
 with open(
-    os.path.abspath(os.path.join('HISTORY.md')), encoding='utf-8'
+    os.path.join(PATH_ROOT, 'HISTORY.md'), encoding='utf-8'
 ) as history_file:
     history = history_file.read()
 
 install_reqs = parse_requirements(
-    'AlertaDengue/requirements.txt', session=PipSession()
+    os.path.join(PATH_ROOT, 'requirements.txt'), session=PipSession()
 )
 
 requirements = [str(ir.req) for ir in install_reqs]
@@ -106,9 +103,9 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
     cmdclass=cmdclass,
     # test_suite='tests',

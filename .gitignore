@@ -37,3 +37,6 @@ Dockerfile-dev
 /build/
 /tiffs/
 .vscode
+
+# env
+.env*
