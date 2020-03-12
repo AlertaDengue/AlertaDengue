@@ -17,6 +17,7 @@ ENV LANG=C.UTF-8
 # Create deploy user
 RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
 
+# config conda
 ADD environment.yml /tmp/environment.yml
 
 RUN /opt/conda/bin/conda config --add channels conda-forge \
@@ -27,15 +28,13 @@ RUN /opt/conda/bin/conda config --add channels conda-forge \
 
 ENV PATH="/opt/conda/bin:${PATH}"
 
-# Send code to the container
-USER deploy
+# copy code to the container
 # Change the permissions for the user home directory
 RUN mkdir /srv/deploy/logs
-ADD AlertaDengue /srv/deploy/AlertaDengue
-# RUN chown -R deploy:deploy /srv/deploy/
+COPY --chown=deploy AlertaDengue  /srv/deploy/AlertaDengue
 
 WORKDIR /srv/deploy/AlertaDengue
 
 EXPOSE 8000
-
+USER deploy
 CMD ["/srv/deploy/AlertaDengue/runwsgi.sh"]
