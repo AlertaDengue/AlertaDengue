@@ -13,10 +13,11 @@ import pandas as pd
 
 
 db_engine = create_engine(
-    "postgresql://{}:{}@{}/{}".format(
+    "postgresql://{}:{}@{}:{}/{}".format(
         settings.PSQL_USER,
         settings.PSQL_PASSWORD,
         settings.PSQL_HOST,
+        settings.PSQL_PORT,
         settings.PSQL_DB,
     )
 )
