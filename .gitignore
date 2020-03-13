@@ -32,7 +32,7 @@ Dockerfile-dev
 /AlertaDengue/*.dbf
 /*.dbf
 *.egg-info
-/dev_dump/
+/docker/dev_dumps/
 /dist/
 /build/
 /tiffs/
