@@ -6,7 +6,7 @@ base: &base
   docker:
     - image: continuumio/miniconda3:latest
 
-    
+
 test: &test
   <<: *base
   steps:
@@ -18,8 +18,8 @@ test: &test
           conda config --add channels conda-forge
           conda install -n base conda
           conda update --all
-          conda env create python=${PYTHON_VERSION} -f AlertaDengue/environment.yml
-          conda install python=${PYTHON_VERSION} -n alertadengue --file AlertaDengue/requirements-dev.txt
+          conda env create python=${PYTHON_VERSION} -f environment.yml
+          conda install python=${PYTHON_VERSION} -n alertadengue --file requirements-dev.txt
     - run:
         name: Show the exact environment used
         command: |
@@ -30,8 +30,8 @@ test: &test
         command: |
           source activate alertadengue
           cd AlertaDengue
-          flake8  
-  
+          flake8
+
 jobs:
   python36_test:
       <<: *test

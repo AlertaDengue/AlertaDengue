@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load lookup %}
 {% load i18n %}
+{% load static %}
 
 {% block extra_head %}
 
@@ -11,17 +12,14 @@
 
 {% load report_state %}
 
-<script src="/static/libs/jquery/jquery.sparkline.min.js"
+<script src="{% static '/libs/jquery/jquery.sparkline.min.js' %}"
             type="text/javascript"></script>
 
 <link rel="stylesheet"
-      type="text/css" href="/static/libs/DataTables/datatables.min.css"/>
+      type="text/css" href="{% static '/libs/DataTables/datatables.min.css' %}"/>
 
 <script type="text/javascript"
-        src="/static/libs/DataTables/datatables.min.js"></script>
-
-<script src="/static/js/infodengue.js"
-            type="text/javascript"></script>
+        src="{% static '/libs/DataTables/datatables.min.js' %}"></script>
 
 <style>
       .box {
@@ -116,7 +114,7 @@
       }
 
 </style>
-<script src="/static/libs/plotlyjs/plotly-latest.min.js"></script>
+<script src="{% static '/libs/plotlyjs/plotly-latest.min.js' %}"></script>
 
 <script>
   function isInArray(el, array) {
@@ -489,7 +487,7 @@
       "order": [[ 0, "desc" ]],
       "searching": false,
       "language": {
-        "url": "/static/libs/DataTables/i18n/pt_BR.json"
+        "url": "{% static '/libs/DataTables/i18n/pt_BR.json' %}"
       }
     });
 

@@ -1,4 +1,3 @@
-# coding=utf-8
 """
 Django settings for AlertaDengue project.
 
@@ -10,11 +9,8 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-import sys
 from dotenv import load_dotenv
 from os.path import join, dirname
-from dj_database_url import parse as db_url
-
 
 dotenv_path = join(dirname(dirname(dirname(__file__))), '.env')
 load_dotenv(dotenv_path)
@@ -28,7 +24,7 @@ def read_admins(value):
     return tuple(tuple(v.split(',')) for v in value.split(';'))
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 PARENT_BASE_DIR = os.path.dirname(BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
@@ -43,7 +39,8 @@ DEBUG = os.getenv('DEBUG', '').lower() == 'true'
 # You must set settings.ALLOWED_HOSTS if DEBUG is False.
 ADMINS = tuple(v.split(':') for v in os.getenv('ADMINS').split(','))
 
-# ALLOWED_HOSTS=os.getenv["alerta.dengue.mat.br", "info.dengue.mat.br", '127.0.0.1'] ###VERIFICAR EM .ENV
+# ALLOWED_HOSTS=os.getenv["alerta.dengue.mat.br",
+# "info.dengue.mat.br", '127.0.0.1'] ###VERIFICAR EM .ENV
 ALLOWED_HOSTS = (
     os.getenv('ALLOWED_HOSTS').split(',') if os.getenv('ALLOWED_HOSTS') else []
 )
@@ -172,7 +169,9 @@ LEAFLET_CONFIG = {
     # 'http://{s}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png',
     'TILES': 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
     'MINIMAP': False,
-    'ATTRIBUTION_PREFIX': 'Fonte: <a href=http://info.dengue.mat.br>info.dengue.mat.br</a>',
+    'ATTRIBUTION_PREFIX': (
+        'Fonte: <a href=http://info.dengue.mat.br>info.dengue.mat.br</a>'
+    ),
     'PLUGINS': {
         'cluster': {
             'js': 'js/leaflet.markercluster.js',
@@ -216,11 +215,9 @@ CURRENT_DIR = os.path.join(dirname(dirname(__file__)))
 
 
 # up one level from settings.py
-STATIC_ROOT = os.path.join(CURRENT_DIR, 'static')
+STATIC_ROOT = os.path.join(CURRENT_DIR, 'static_files')
 # static is on root level
-STATICFILES_DIRS = (
-    os.path.abspath(os.path.join(CURRENT_DIR, 'static_files')),
-)
+STATICFILES_DIRS = (os.path.abspath(os.path.join(CURRENT_DIR, 'static')),)
 
 DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, 'data'))
 
@@ -278,9 +275,6 @@ BOOTSTRAP4 = {
         'default': 'dbf.forms.FormRendererWithHiddenFieldErrors'
     }
 }
-
-
-import os
 
 LOGGING = {
     'version': 1,
