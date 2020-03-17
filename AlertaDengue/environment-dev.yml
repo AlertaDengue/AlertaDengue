@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-- django=3.0.7
+- django=3.0.3
 - django-bootstrap4
 - ibis-framework
 - geojson
@@ -22,7 +22,7 @@ dependencies:
 - dbfread
 - dj-database-url
 - django-chunked-upload=1.1.3
-- docker-compose>=1.25
+- docker-compose
 - celery
 - dj-static
 - pyproj
@@ -37,8 +37,16 @@ dependencies:
 - sqlparse
 - plotly=4.0.0
 - BeautifulSoup4
-- make
-#- setuptools=41.5.1 # TODO: remove this when django 3 is used
+# develop
+- jupyterlab
+- matplotlib
+- flake8
+- pillow
+- pre-commit
+- black
+- flake8
+- mypy
 - pip:
     - django-leaflet==0.26.0
-    - django-maintenance-mode
+    # develop
+    - django-extensions

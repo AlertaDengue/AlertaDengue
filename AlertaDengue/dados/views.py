@@ -17,6 +17,7 @@ from django.contrib import messages
 from django.conf import settings
 from django.http import HttpResponse
 from time import mktime
+import pandas as pd
 
 # local
 from . import dbdata, models as M
@@ -1016,10 +1017,6 @@ class ReportView(TemplateView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.STATE_NAME = dict(STATE_NAME)
-        # there are some cities from SP
-        self.STATE_NAME.update({'SP': 'São Paulo'})
-
     def get_context_data(self, **kwargs):
         """
 
@@ -1052,7 +1049,7 @@ class ReportView(TemplateView):
         self.template_name = 'report_filter_report_type.html'
 
         options_states = ''
-        for state_initial, state_name in self.STATE_NAME.items():
+        for state_initial, state_name in STATE_NAME.items():
             options_states += '''
             <option value="%(state_initial)s">
                 %(state_name)s
@@ -1075,7 +1072,7 @@ class ReportView(TemplateView):
 
         options_cities = ''
         for geocode, city_name in dbdata.get_cities(
-            state_name=self.STATE_NAME[context['state']]
+            state_name=STATE_NAME[context['state']]
         ).items():
             options_cities += '''
             <option value="%(geocode)s">
@@ -1392,9 +1389,6 @@ class ReportStateView(TemplateView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.STATE_NAME = dict(STATE_NAME)
-        # there are some cities from SP
-        self.STATE_NAME.update({'SP': 'São Paulo'})
 
     def raise_error(self, context, message):
         """
@@ -1405,12 +1399,20 @@ class ReportStateView(TemplateView):
         context.update({'message': message})
         return context
 
-    def prepare_html(self, df, var_climate):
+    def prepare_html(self, df: pd.DataFrame, var_climate: str) -> str:
         """
+        Prepare data as datafra
 
-        :param df:
-        :param var_climate:
-        :return:
+        Parameters
+        ----------
+        df : pd.DataFrame
+        var_climate : str, {'umid.max', 'temp.min'}
+            Climate variable
+
+        Returns
+        -------
+        str
+            The dataframe in HTML format.
         """
         df['SE'] = df.index
         cols_to_sum = ['tweets'] + [
@@ -1477,7 +1479,7 @@ class ReportStateView(TemplateView):
 
         for regional_name in regional_names:
             cities = dbdata.get_cities(
-                state_name=self.STATE_NAME[state], regional_name=regional_name
+                state_name=STATE_NAME[state], regional_name=regional_name
             )
 
             station_id, var_climate = dbdata.get_var_climate_info(
@@ -1499,11 +1501,11 @@ class ReportStateView(TemplateView):
             chart_cases_twitter = {}
 
             for d in disease_key:
-                try:
+                if not df.empty:
                     chart = ReportStateCharts.create_tweet_chart(
                         df=df, year_week=year_week, disease=d
                     )
-                except Exception:
+                else:
                     chart = '''
                     <br/>
                     <strong>Não há dados necessários para a geração do
@@ -1552,7 +1554,7 @@ class ReportStateView(TemplateView):
             _d = d if d != 'chik' else 'chikungunya'
 
             cities_alert[d] = notif.get_cities_alert_by_state(
-                state_name=self.STATE_NAME[state],
+                state_name=STATE_NAME[state],
                 disease=_d,
                 epi_year_week=last_year_week,
             )
@@ -1582,7 +1584,7 @@ class ReportStateView(TemplateView):
                 'week': week,
                 'last_year': last_year,
                 'last_week': last_week,
-                'state_name': self.STATE_NAME[state],
+                'state_name': STATE_NAME[state],
                 'regional_info': regional_info,
                 'regional_names': regional_names,
                 'diseases_code': ['dengue', 'chik', 'zika'],
