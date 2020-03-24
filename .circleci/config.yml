@@ -18,7 +18,7 @@ test: &test
           conda config --add channels conda-forge
           conda install -n base conda
           conda update --all
-          conda env create python=${PYTHON_VERSION} -f environment.yml
+          conda env create -f environment-${PYTHON_VERSION}.yml
           conda install python=${PYTHON_VERSION} -n alertadengue --file requirements-dev.txt
     - run:
         name: Show the exact environment used
@@ -33,10 +33,6 @@ test: &test
           flake8
 
 jobs:
-  python36_test:
-      <<: *test
-      environment:
-        - PYTHON_VERSION: 3.6
   python37_test:
       <<: *test
       environment:
@@ -46,5 +42,4 @@ workflows:
   version: 2
   test:
     jobs:
-      - python36_test
       - python37_test

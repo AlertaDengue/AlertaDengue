@@ -17,7 +17,8 @@ ENV LANG=C.UTF-8
 # Create deploy user
 RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
 
-COPY environment.yml /tmp/environment.yml
+ARG PYTHON_VERSION
+COPY environment-${PYTHON_VERSION}.yml /tmp/environment.yml
 
 RUN /opt/conda/bin/conda config --add channels conda-forge \
   && /opt/conda/bin/conda update --all --yes --quiet \
