@@ -8,11 +8,15 @@ services:
         restart: always
 
     web:
-        build: .
+        build:
+            context: ".."
+            dockerfile: "docker/Dockerfile"
+            args:
+                PYTHON_VERSION: ${PYTHON_VERSION:-3.7}
         ports:
             - 8000:8000
         env_file:
-            - .env
+            - ../.env
         environment:
             - MEMCACHED_HOST=memcache
             - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
@@ -31,10 +35,10 @@ services:
 
     celery-worker:
         build:
-            context: "."
-            dockerfile: "Dockerfile-celery"
+            context: ".."
+            dockerfile: "docker/Dockerfile"
         env_file:
-            - .env
+            - ../.env
         environment:
             - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
         volumes:
@@ -47,8 +51,8 @@ services:
 
     flower:
         build:
-            context: "."
-            dockerfile: "Dockerfile-flower"
+            context: ".."
+            dockerfile: "dokcer/Dockerfile-flower"
         environment:
             - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
         ports:
@@ -60,12 +64,12 @@ services:
 
     mapserver:
         build:
-            context: "."
-            dockerfile: "Dockerfile-mapserver"
+            context: ".."
+            dockerfile: "docker/Dockerfile-mapserver"
         ports:
             - 7000:80
         env_file:
-            - .env
+            - ../.env
         volumes:
             - ${DOCKER_HOST_MAPFILES_DIR}:/maps:ro
             - ${DOCKER_HOST_SHAPEFILES_DIR}:/shapefile:ro

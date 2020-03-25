@@ -40,10 +40,11 @@ STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
 ALL_STATE_INITIAL = dict(zip(ALL_STATE_NAMES.values(), ALL_STATE_NAMES.keys()))
 
 db_engine = create_engine(
-    "postgresql://{}:{}@{}/{}".format(
+    "postgresql://{}:{}@{}:{}/{}".format(
         settings.PSQL_USER,
         settings.PSQL_PASSWORD,
         settings.PSQL_HOST,
+        settings.PSQL_PORT,
         settings.PSQL_DB,
     )
 )
