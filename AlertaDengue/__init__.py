@@ -1,1 +1,1 @@
-from .AlertaDengue.version import __version__  # noqa: F401
+from .ad_main.version import __version__  # noqa: F401

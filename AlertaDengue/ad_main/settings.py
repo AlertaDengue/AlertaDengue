@@ -12,7 +12,9 @@ import os
 from dotenv import load_dotenv
 from os.path import join, dirname
 
-dotenv_path = join(dirname(dirname(dirname(__file__))), '.env')
+env_file = os.environ.get('ENV_FILE', '.env')
+
+dotenv_path = join(dirname(dirname(dirname(__file__))), env_file)
 load_dotenv(dotenv_path)
 
 
@@ -87,9 +89,9 @@ MIDDLEWARE_CLASSES = (
 # django 2
 MIDDLEWARE = MIDDLEWARE_CLASSES
 
-ROOT_URLCONF = 'AlertaDengue.urls'
+ROOT_URLCONF = 'ad_main.urls'
 
-WSGI_APPLICATION = 'AlertaDengue.wsgi.application'
+WSGI_APPLICATION = 'ad_main.wsgi.application'
 
 TEMPLATES = [
     {
@@ -124,22 +126,31 @@ PSQL_PORT = os.getenv('PSQL_PORT')
 DATABASE_ROUTERS = ['manager.router.DatabaseAppsRouter']
 DATABASE_APPS_MAPPING = {
     'dados': 'dados',
+    'default': 'default',
+    'dbf': 'infodengue',
     'forecast': 'forecast',
-    'dbf': 'default',
 }
 
 DATABASES = {
-    'default': {
+    'dados': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': PSQL_DBF,
+        'NAME': PSQL_DB,
         'USER': PSQL_USER,
         'PASSWORD': PSQL_PASSWORD,
         'HOST': PSQL_HOST,
         'PORT': PSQL_PORT,
     },
-    'dados': {
+    'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': PSQL_DB,
+        'USER': PSQL_USER,
+        'PASSWORD': PSQL_PASSWORD,
+        'HOST': PSQL_HOST,
+        'PORT': PSQL_PORT,
+    },
+    'infodengue': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': PSQL_DBF,
         'USER': PSQL_USER,
         'PASSWORD': PSQL_PASSWORD,
         'HOST': PSQL_HOST,
@@ -257,7 +268,7 @@ MAPSERVER_URL = os.getenv('MAPSERVER_URL')
 MAPSERVER_LOG_PATH = os.getenv('MAPSERVER_LOG_PATH')
 
 
-SHAPEFILE_PATH = '%s/static/shapefile' % BASE_DIR
+SHAPEFILE_PATH = os.getenv('SHAPEFILE_PATH')
 MAPFILE_PATH = os.getenv('MAPFILE_PATH')
 
 RASTER_PATH = os.getenv(

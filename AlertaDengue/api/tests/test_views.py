@@ -1,11 +1,6 @@
 from django.test import TestCase
 
-try:
-    from django.urls import reverse  # django 2
-except ModuleNotFoundError:
-    # django old version
-    from django.core.urlresolvers import reverse
-
+from django.urls import reverse
 
 # local
 from .. import settings

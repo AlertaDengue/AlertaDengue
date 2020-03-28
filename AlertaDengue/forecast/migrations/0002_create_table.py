@@ -194,13 +194,15 @@ class Migration(migrations.Migration):
                         cases INT NOT NULL,
 
                         UNIQUE (
-                          epiweek, geocode, cid10, forecast_model_id, published_date
+                          epiweek, geocode, cid10, forecast_model_id,
+                          published_date
                         ),
                         FOREIGN KEY(forecast_model_id)
                           REFERENCES "forecast".forecast_model(id),
                         FOREIGN KEY(geocode)
                           REFERENCES "Dengue_global"."Municipio"(geocodigo),
-                        FOREIGN KEY(cid10) REFERENCES "Dengue_global"."CID10"(codigo)
+                        FOREIGN KEY(cid10)
+                          REFERENCES "Dengue_global"."CID10"(codigo)
                     );
 
                     CREATE TABLE IF NOT EXISTS "forecast".forecast_city (
@@ -209,8 +211,10 @@ class Migration(migrations.Migration):
                         forecast_model_id INT,
                         active BOOL NOT NULL,
                         UNIQUE (geocode, forecast_model_id),
-                        FOREIGN KEY(forecast_model_id) REFERENCES "forecast".forecast_model(id),
-                        FOREIGN KEY(geocode) REFERENCES "Dengue_global"."Municipio"(geocodigo)
+                        FOREIGN KEY(forecast_model_id)
+                          REFERENCES "forecast".forecast_model(id),
+                        FOREIGN KEY(geocode)
+                          REFERENCES "Dengue_global"."Municipio"(geocodigo)
                     );
                     ''',
                     hints={'target_db': 'forecast'},

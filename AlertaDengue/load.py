@@ -1,6 +1,6 @@
 # coding=utf-8
 from django.contrib.gis.utils.layermapping import LayerMapping
-from dados.models import (
+from ad_dados.models import (
     Dengue_2010,
     dengue_2010_mapping,
     Dengue_2011,

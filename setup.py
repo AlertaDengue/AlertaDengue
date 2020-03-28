@@ -48,9 +48,7 @@ def get_version(path_root: str = PATH_ROOT):
     mod = importlib.machinery.SourceFileLoader(
         'version',
         os.path.abspath(
-            os.path.join(
-                path_root, 'AlertaDengue', 'AlertaDengue', 'version.py',
-            )
+            os.path.join(path_root, 'AlertaDengue', 'ad_main', 'version.py',)
         ),
     ).load_module()
     return mod.__version__
@@ -107,6 +105,8 @@ setup(
         'Programming Language :: Python :: 3.8',
     ],
     cmdclass=cmdclass,
+    scripts=['AlertaDengue/manage.py'],
+    include_package_data=True,
     # test_suite='tests',
     # tests_require=test_requirements
 )

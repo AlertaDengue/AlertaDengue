@@ -6,13 +6,13 @@ from rasterio.features import rasterize
 from rasterio.transform import from_origin
 
 # local
-from .settings import (
+from AlertaDengue.ad_main.settings import (
     SHAPEFILE_PATH,
     RASTER_METEROLOGICAL_FACTOR_INCREASE,
     DEBUG,
     RASTER_PATH,
 )
-from dados.dbdata import get_cities
+from AlertaDengue.dados.dbdata import get_cities
 
 import fiona
 import geopy.distance

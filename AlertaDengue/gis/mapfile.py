@@ -8,12 +8,12 @@ import pyproj
 import sh
 
 # local
-from dados.dbdata import STATE_NAME
-from dados.dbdata import NotificationResume as notif
-from dados.dbdata import db_engine, get_cities
+from AlertaDengue.dados.dbdata import STATE_NAME
+from AlertaDengue.dados.dbdata import NotificationResume as notif
+from AlertaDengue.dados.dbdata import db_engine, get_cities
 
-from .geodf import extract_boundaries
-from .settings import (
+from AlertaDengue.gis.geodf import extract_boundaries
+from AlertaDengue.ad_main.settings import (
     MAPFILE_PATH,
     MAPSERVER_LOG_PATH,
     MAPSERVER_URL,

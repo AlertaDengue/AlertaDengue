@@ -1,5 +1,5 @@
 jupyter
-jupyter_contrib_nbextensions
+# jupyter_contrib_nbextensions
 # eralchemy
 matplotlib
 PILLOW
@@ -7,4 +7,5 @@ pre-commit
 black
 flake8
 pytest
+pytest-django
 # django-extensions

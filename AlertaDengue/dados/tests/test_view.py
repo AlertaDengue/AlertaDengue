@@ -1,13 +1,10 @@
 # coding=utf-8
 from django.conf import settings
 from django.test import TestCase
+import unittest
 from unittest import skip
 
-try:
-    from django.urls import reverse  # django 2
-except ModuleNotFoundError:
-    # django old version
-    from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 import json
 import os
@@ -24,10 +21,6 @@ class TestAlertaStaticPageView(TestCase):
 
     def test_joinin(self):
         response = self.client.get(reverse('dados:joinin'))
-        self.assertEqual(response.status_code, 200)
-
-    def test_partners(self):
-        response = self.client.get(reverse('dados:partners'))
         self.assertEqual(response.status_code, 200)
 
     def test_data_public_services(self):
@@ -54,6 +47,7 @@ class TestAlertaStaticPageView(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
+@unittest.skip("reason='Issue #334'")
 class TestAlertaPageView(TestCase):
     def setUp(self):
         settings.DATA_DIR = os.path.dirname(__file__)

@@ -91,19 +91,19 @@ services:
       expose:
         - 25555
       depends_on:
-          - staging_celery-worker
+        - staging_celery-worker
 
     staging_mapserver:
-        build:
-            context: ".."
-            dockerfile: "docker/Dockerfile-mapserver"
-        ports:
-            - 7777:80
-        env_file:
-            - ../.env_staging
-        volumes:
-            - ${DOCKER_HOST_MAPFILES_DIR}:/maps:ro
-            - ${DOCKER_HOST_SHAPEFILES_DIR}:/shapefile:ro
-            - ${DOCKER_HOST_TIFFS_DIR}:/tiffs:ro
-            - ${DOCKER_HOST_LOG_DIR}:/maplog:ro
-        restart: always
+      build:
+          context: ".."
+          dockerfile: "docker/Dockerfile-mapserver"
+      ports:
+        - 7777:80
+      env_file:
+          - ../.env_staging
+      volumes:
+        - ${DOCKER_HOST_MAPFILES_DIR}:/maps:ro
+        - ${DOCKER_HOST_SHAPEFILES_DIR}:/shapefile:ro
+        - ${DOCKER_HOST_TIFFS_DIR}:/tiffs:ro
+        - ${DOCKER_HOST_LOG_DIR}:/maplog:ro
+      restart: always
