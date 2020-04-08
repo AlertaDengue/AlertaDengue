@@ -1,4 +1,4 @@
-version: "2"
+version: "3"
 services:
     memcache:
         image: memcached:latest
@@ -36,7 +36,7 @@ services:
     celery-worker:
         build:
             context: ".."
-            dockerfile: "docker/Dockerfile"
+            dockerfile: "docker/Dockerfile-celery"
         env_file:
             - ../.env
         environment:
