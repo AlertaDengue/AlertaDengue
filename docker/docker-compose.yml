@@ -37,6 +37,8 @@ services:
         build:
             context: ".."
             dockerfile: "docker/Dockerfile-celery"
+            args:
+                PYTHON_VERSION: ${PYTHON_VERSION:-3.7}
         env_file:
             - ../.env
         environment:

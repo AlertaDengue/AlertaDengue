@@ -6,13 +6,10 @@ RUN apt-get -qq update --yes \
     ca-certificates wget locales \
  && rm -rf /var/lib/apt/lists/*
 
-# Set locale
-RUN echo "pt_BR.UTF-8 UTF-8" > /etc/locale.gen
-RUN locale-gen pt_BR.UTF-8
-RUN update-locale pt_BR.UTF-8
-ENV LC_ALL pt_BR.UTF-8
-ENV LC_ALL=C.UTF-8
-ENV LANG=C.UTF-8
+#Set locale
+RUN sed -i -e "s/# pt_BR.*/pt_BR.UTF-8 UTF-8/" /etc/locale.gen \
+    && dpkg-reconfigure --frontend=noninteractive locales \
+    && update-locale LANG=pt_BR.UTF-8
 
 # Create deploy user
 RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
