@@ -25,7 +25,8 @@ RUN /opt/conda/bin/conda config --add channels conda-forge \
 
 ENV PATH="/opt/conda/bin:${PATH}"
 
-COPY prepare_permission.sh /prepare_permission.sh
+# Create deploy user
+COPY docker/prepare_permission.sh /prepare_permission.sh
 ARG HOST_UID
 ARG HOST_GID
 RUN /prepare_permission.sh
