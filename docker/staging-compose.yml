@@ -59,6 +59,8 @@ services:
         dockerfile: "docker/Dockerfile-celery"
         args:
           PYTHON_VERSION: ${PYTHON_VERSION:-3.7}
+          HOST_UID: ${HOST_UID}
+          HOST_GID: ${HOST_GID}
       env_file:
         - ../.env_staging
       environment:

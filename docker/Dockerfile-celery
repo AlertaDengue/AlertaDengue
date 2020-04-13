@@ -2,6 +2,7 @@ FROM continuumio/miniconda3
 
 RUN apt-get -qq update --yes \
  && apt-get -qq install --yes --no-install-recommends \
+        postgresql-client \
         build-essential \
         libpq-dev \
         libgdal-dev \
@@ -12,9 +13,6 @@ RUN apt-get -qq update --yes \
 RUN sed -i -e "s/# pt_BR.*/pt_BR.UTF-8 UTF-8/" /etc/locale.gen \
     && dpkg-reconfigure --frontend=noninteractive locales \
     && update-locale LANG=pt_BR.UTF-8
-
-# Create deploy user
-RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
 
 ARG PYTHON_VERSION
 COPY environment-${PYTHON_VERSION}.yml /tmp/environment.yml
@@ -27,17 +25,23 @@ RUN /opt/conda/bin/conda config --add channels conda-forge \
 
 ENV PATH="/opt/conda/bin:${PATH}"
 
+COPY prepare_permission.sh /prepare_permission.sh
+ARG HOST_UID
+ARG HOST_GID
+RUN /prepare_permission.sh
+
 # copy code to the container and attribute permissions to user
-RUN mkdir /srv/deploy/logs
+RUN mkdir /srv/deploy/logs \
+  && chown -R deploy:celery /srv/deploy/logs
 # folders
-COPY --chown=deploy docker  /srv/deploy/docker
-COPY --chown=deploy AlertaDengue  /srv/deploy/AlertaDengue
+COPY --chown=deploy:celery docker  /srv/deploy/docker
+COPY --chown=deploy:celery AlertaDengue  /srv/deploy/AlertaDengue
 # files
-COPY --chown=deploy requirements.txt example_env_file /srv/deploy/
+COPY --chown=deploy:celery requirements.txt example_env_file /srv/deploy/
 
 WORKDIR /srv/deploy/AlertaDengue
 
-RUN cp /srv/deploy/example_env_file /srv/deploy/.env_staging
+RUN cp -p /srv/deploy/example_env_file /srv/deploy/.env_staging
 
 USER deploy
 

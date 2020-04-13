@@ -1,8 +1,12 @@
 # Deploy production and staging
 # note: --env-file requires docker-compose>=1.25
 #       ref: https://github.com/docker/compose/pull/6535
+
+include $(ENVFILE)
+export
+
 compose_cmd = docker-compose -p infodengue -f docker/docker-compose.yml --env-file .env
-staging_compose_cmd = docker-compose -p infodengue_staging -f docker/staging-compose.yml --env-file .env_staging
+staging_compose_cmd = docker-compose -f docker/staging-compose.yml --env-file .env_staging
 
 
 build:
@@ -23,6 +27,7 @@ stop:
 
 
 build_staging:
+	$(cat .env_staging) ./prepare_permission.sh
 	$(staging_compose_cmd) build
 	$(staging_compose_cmd) run --rm staging_db postgres -V
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --noinput
