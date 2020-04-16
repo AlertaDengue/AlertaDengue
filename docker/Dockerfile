@@ -18,7 +18,7 @@ RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
 RUN conda config --add channels conda-forge \
   && conda update --all --yes --quiet \
   && conda install --yes conda-build mamba \
-  && conda clean --all --yes
+  && conda clean -afy
 
 # Copy environment file to tmp/
 ARG PYTHON_VERSION
@@ -26,7 +26,7 @@ COPY environment-${PYTHON_VERSION}.yml /tmp/environment.yml
 
 # Use environment to update the env base
 RUN mamba env update --file /tmp/environment.yml --name base \
-  && mamba clean --all --yes
+  && conda clean -afy
 
 # Copy AlertaDengue into home directory and fix permissions
 RUN mkdir /srv/deploy/logs
@@ -36,5 +36,5 @@ WORKDIR /srv/deploy/AlertaDengue
 
 EXPOSE 8000
 USER deploy
-CMD [“conda”, “env”, “create”, “source activate base"]
-ENTRYPOINT [ "/srv/deploy/AlertaDengue/runwsgi.sh" ]
+
+CMD ["/srv/deploy/AlertaDengue/runwsgi.sh"]
