@@ -14,16 +14,19 @@ RUN sed -i -e "s/# pt_BR.*/pt_BR.UTF-8 UTF-8/" /etc/locale.gen \
     && dpkg-reconfigure --frontend=noninteractive locales \
     && update-locale LANG=pt_BR.UTF-8
 
+# Configure conda-channels and install mamba
+RUN conda config --add channels conda-forge \
+  && conda update --all --yes --quiet \
+  && conda install --yes conda-build mamba \
+  && conda clean --all --yes
+
+# Copy environment file to tmp/
 ARG PYTHON_VERSION
 COPY environment-${PYTHON_VERSION}.yml /tmp/environment.yml
 
-RUN /opt/conda/bin/conda config --add channels conda-forge \
-  && /opt/conda/bin/conda update --all --yes --quiet \
-  && /opt/conda/bin/conda env update --name base --file /tmp/environment.yml \
-  && /opt/conda/bin/conda install --yes conda-build \
-  && /opt/conda/bin/conda clean --all --yes
-
-ENV PATH="/opt/conda/bin:${PATH}"
+# Use environment to update the env base
+RUN mamba env update --file /tmp/environment.yml --name base \
+  && mamba clean --all --yes
 
 # Create deploy user
 COPY docker/prepare_permission.sh /prepare_permission.sh
@@ -46,4 +49,5 @@ RUN cp -p /srv/deploy/example_env_file /srv/deploy/.env_staging
 
 USER deploy
 
-CMD ["/srv/deploy/AlertaDengue/run_celery_worker.sh"]
+CMD [“conda”, “env”, “create”, “source activate base"]
+ENTRYPOINT ["/srv/deploy/AlertaDengue/run_celery_worker.sh"]

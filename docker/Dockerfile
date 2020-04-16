@@ -14,19 +14,21 @@ RUN sed -i -e "s/# pt_BR.*/pt_BR.UTF-8 UTF-8/" /etc/locale.gen \
 # Create deploy user
 RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
 
+# Configure conda-channels and install mamba
+RUN conda config --add channels conda-forge \
+  && conda update --all --yes --quiet \
+  && conda install --yes conda-build mamba \
+  && conda clean --all --yes
+
+# Copy environment file to tmp/
 ARG PYTHON_VERSION
 COPY environment-${PYTHON_VERSION}.yml /tmp/environment.yml
 
-RUN /opt/conda/bin/conda config --add channels conda-forge \
-  && /opt/conda/bin/conda update --all --yes --quiet \
-  && /opt/conda/bin/conda env update --name base --file /tmp/environment.yml \
-  && /opt/conda/bin/conda install --yes conda-build \
-  && /opt/conda/bin/conda clean --all --yes
+# Use environment to update the env base
+RUN mamba env update --file /tmp/environment.yml --name base \
+  && mamba clean --all --yes
 
-ENV PATH="/opt/conda/bin:${PATH}"
-
-# copy code to the container
-# Change the permissions for the user home directory
+# Copy AlertaDengue into home directory and fix permissions
 RUN mkdir /srv/deploy/logs
 COPY --chown=deploy AlertaDengue  /srv/deploy/AlertaDengue
 
@@ -34,4 +36,5 @@ WORKDIR /srv/deploy/AlertaDengue
 
 EXPOSE 8000
 USER deploy
-CMD ["/srv/deploy/AlertaDengue/runwsgi.sh"]
+CMD [“conda”, “env”, “create”, “source activate base"]
+ENTRYPOINT [ "/srv/deploy/AlertaDengue/runwsgi.sh" ]
