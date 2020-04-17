@@ -83,9 +83,9 @@ services:
       environment:
         - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
       ports:
-        - 8888:8888
+        - 25555:5555
       expose:
-        - 8888
+        - 25555
       depends_on:
           - staging_celery-worker
 
