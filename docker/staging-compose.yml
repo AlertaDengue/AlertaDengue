@@ -57,11 +57,15 @@ services:
       build:
         context: ".."
         dockerfile: "docker/Dockerfile-celery"
+        args:
+          PYTHON_VERSION: ${PYTHON_VERSION:-3.7}
+          HOST_UID: ${HOST_UID}
+          HOST_GID: ${HOST_GID}
       env_file:
         - ../.env_staging
       environment:
         - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
-        - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:5432/infodengue
+        - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:25432/infodengue
         - PSQL_HOST=staging_db
       volumes:
         - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
@@ -79,9 +83,9 @@ services:
       environment:
         - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
       ports:
-        - 5555:5555
+        - 25555:5555
       expose:
-        - 5555
+        - 25555
       depends_on:
           - staging_celery-worker
 

@@ -1,45 +1,51 @@
-FROM debian:testing-slim
+FROM continuumio/miniconda3
 
-# Install
-RUN apt-get update \
-  && apt-get install -q -y \
-        python3 \
-        python3-pip \
-        python3-setuptools \
-        python3-numpy \
-        python3-pandas \
+RUN apt-get -qq update --yes \
+ && apt-get -qq install --yes --no-install-recommends \
+        postgresql-client \
+        build-essential \
         libpq-dev \
-        python3-gdal \
         libgdal-dev \
-        python3-geopandas \
-        locales \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+        ca-certificates locales \
+ && rm -rf /var/lib/apt/lists/*
 
 #Set locale
 RUN sed -i -e "s/# pt_BR.*/pt_BR.UTF-8 UTF-8/" /etc/locale.gen \
     && dpkg-reconfigure --frontend=noninteractive locales \
     && update-locale LANG=pt_BR.UTF-8
 
+# Configure conda-channels and install mamba
+RUN conda config --add channels conda-forge \
+  && conda update --all --yes --quiet \
+  && conda install --yes conda-build mamba \
+  && conda clean -afy
+
+# Copy environment file to tmp/
+ARG PYTHON_VERSION
+COPY environment-${PYTHON_VERSION}.yml /tmp/environment.yml
+
+# Use environment to update the env base
+RUN mamba env update --file /tmp/environment.yml --name base \
+  && conda clean -afy
+
 # Create deploy user
-RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
+COPY docker/prepare_permission.sh /prepare_permission.sh
+ARG HOST_UID
+ARG HOST_GID
+RUN /prepare_permission.sh
 
-# Add and install requirements.txt before we send the code so we don't have to
-# install everything again whenever any file in this directory changes (this
-# helps build the container a *lot* faster by using the cache.
-ADD requirements.txt /tmp/requirements.txt
-
-RUN pip3 install -r /tmp/requirements.txt
-
-# Send code to the container
-ADD AlertaDengue /srv/deploy/AlertaDengue
+# copy code to the container and attribute permissions to user
+RUN mkdir /srv/deploy/logs \
+  && chown -R deploy:celery /srv/deploy/logs
+# folders
+COPY --chown=deploy:celery docker  /srv/deploy/docker
+COPY --chown=deploy:celery AlertaDengue  /srv/deploy/AlertaDengue
+# files
+COPY --chown=deploy:celery requirements.txt example_env_file /srv/deploy/
 
 WORKDIR /srv/deploy/AlertaDengue
 
-# Change the permissions for the user home directory
-RUN chown -R deploy:deploy /srv/deploy/
-
-RUN pip3 install celery
+RUN cp -p /srv/deploy/example_env_file /srv/deploy/.env_staging
 
 USER deploy
 
