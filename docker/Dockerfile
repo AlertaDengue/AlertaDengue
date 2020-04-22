@@ -30,10 +30,9 @@ COPY docker/prepare_permission.sh /prepare_permission.sh
 ARG HOST_UID
 ARG HOST_GID
 RUN /prepare_permission.sh
-
 # copy code to the container and attribute permissions to user
 RUN mkdir /srv/deploy/logs \
-  && chown -R deploy:celery /srv/deploy/logs
+  && chown -R deploy:deploy /srv/deploy/logs
 # folders
 COPY --chown=deploy:deploy docker  /srv/deploy/docker
 COPY --chown=deploy:deploy AlertaDengue  /srv/deploy/AlertaDengue
@@ -41,6 +40,8 @@ COPY --chown=deploy:deploy AlertaDengue  /srv/deploy/AlertaDengue
 COPY --chown=deploy:deploy requirements.txt example_env_file /srv/deploy/
 
 WORKDIR /srv/deploy/AlertaDengue
+
+RUN cp -p /srv/deploy/example_env_file /srv/deploy/.env_staging
 
 EXPOSE 8000
 USER deploy

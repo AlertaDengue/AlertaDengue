@@ -33,7 +33,6 @@ COPY docker/prepare_permission.sh /prepare_permission.sh
 ARG HOST_UID
 ARG HOST_GID
 RUN /prepare_permission.sh
-
 # copy code to the container and attribute permissions to user
 RUN mkdir /srv/deploy/logs \
   && chown -R deploy:deploy /srv/deploy/logs
