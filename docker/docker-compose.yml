@@ -13,6 +13,8 @@ services:
             dockerfile: "docker/Dockerfile"
             args:
                 PYTHON_VERSION: ${PYTHON_VERSION:-3.7}
+                HOST_UID: ${HOST_UID}
+                HOST_GID: ${HOST_GID}
         ports:
             - 8000:8000
         env_file:

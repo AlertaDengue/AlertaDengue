@@ -11,9 +11,6 @@ RUN sed -i -e "s/# pt_BR.*/pt_BR.UTF-8 UTF-8/" /etc/locale.gen \
     && dpkg-reconfigure --frontend=noninteractive locales \
     && update-locale LANG=pt_BR.UTF-8
 
-# Create deploy user
-RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
-
 # Configure conda-channels and install mamba
 RUN conda config --add channels conda-forge \
   && conda update --all --yes --quiet \
@@ -28,9 +25,20 @@ COPY environment-${PYTHON_VERSION}.yml /tmp/environment.yml
 RUN mamba env update --file /tmp/environment.yml --name base \
   && conda clean -afy
 
-# Copy AlertaDengue into home directory and fix permissions
-RUN mkdir /srv/deploy/logs
-COPY --chown=deploy AlertaDengue  /srv/deploy/AlertaDengue
+# Create deploy user
+COPY docker/prepare_permission.sh /prepare_permission.sh
+ARG HOST_UID
+ARG HOST_GID
+RUN /prepare_permission.sh
+
+# copy code to the container and attribute permissions to user
+RUN mkdir /srv/deploy/logs \
+  && chown -R deploy:celery /srv/deploy/logs
+# folders
+COPY --chown=deploy:deploy docker  /srv/deploy/docker
+COPY --chown=deploy:deploy AlertaDengue  /srv/deploy/AlertaDengue
+# files
+COPY --chown=deploy:deploy requirements.txt example_env_file /srv/deploy/
 
 WORKDIR /srv/deploy/AlertaDengue
 

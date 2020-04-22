@@ -36,12 +36,12 @@ RUN /prepare_permission.sh
 
 # copy code to the container and attribute permissions to user
 RUN mkdir /srv/deploy/logs \
-  && chown -R deploy:celery /srv/deploy/logs
+  && chown -R deploy:deploy /srv/deploy/logs
 # folders
-COPY --chown=deploy:celery docker  /srv/deploy/docker
-COPY --chown=deploy:celery AlertaDengue  /srv/deploy/AlertaDengue
+COPY --chown=deploy:deploy docker  /srv/deploy/docker
+COPY --chown=deploy:deploy AlertaDengue  /srv/deploy/AlertaDengue
 # files
-COPY --chown=deploy:celery requirements.txt example_env_file /srv/deploy/
+COPY --chown=deploy:deploy requirements.txt example_env_file /srv/deploy/
 
 WORKDIR /srv/deploy/AlertaDengue
 
