@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Basic if statement
-if [-z ${HOST_UID}]
+if [ -z ${HOST_UID} ]
   then
     RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
   else
