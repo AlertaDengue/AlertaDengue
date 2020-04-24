@@ -441,9 +441,9 @@
 <div class="card-footer">
     <h4 id="section1" class="panel-title"><b>{% trans "Relatório da Situação das Arboviroses em" %}: </b>
     {% if geocode == "3304557" %}
-        <a href="{% url 'dados:report_city' state=state_abv geocode=geocode year_week=yearweek %}">{{ nome }} </a></h4>
+        <a href="{% url 'dados:report_city' state=state_abv geocode=geocode year_week=yearweek %}"> {{ nome }} </a></h4>
     {% else %}
-        <a href="{% url 'dados:report_city' state=state_abv geocode=geocode year_week=SE %}">{{ nome }} </a></h4>
+        <a href="{% url 'dados:report_city' state=state_abv geocode=geocode year_week=SE %}"> {{ nome }} </a></h4>   
     {% endif %}
 
     <h4 id="section1" class="panel-title"><b>{% trans "Para mais detalhes, acesse a página de Estados" %}:</b> 
