@@ -586,6 +586,7 @@ class AlertaMRJPageView(AlertCityPageBaseView):
                 'series_casos': case_series,
                 'SE': int(semana),
                 'WEEK': str(semana),
+                'yearweek': str(current.se.iat[0])[:],
                 'data1': segunda.strftime("%d de %B de %Y"),
                 'data2': (
                     segunda + datetime.timedelta(6)
