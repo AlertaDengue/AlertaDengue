@@ -39,3 +39,4 @@ dependencies:
 #- setuptools=41.5.1 # TODO: remove this when django 3 is used
 - pip:
     - django-leaflet==0.26.0
+    - django-maintenance-mode

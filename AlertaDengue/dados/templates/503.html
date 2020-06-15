@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load lookup %}
+
+{% block extra_head %}
+<meta property="og:image"
+      content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+<meta property="og:image:secure_url"
+      content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+
+<script src="/static/js/infodengue.js"
+        type="text/javascript"></script>
+
+<style type="text/css"></style>
+
+<script>
+function goBack() {
+    window.history.back()
+}
+</script>
+
+{% endblock %}
+{% block title %}{% trans "Estamos em manutenção" %}{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 column">
+           <h5> {% trans "Os serviços de AlertaDengue/Infodengue estão momentaneamente indisponíveis para manutenção programada." %}.</h5>
+            <p>
+            <ul>
+                <li><h5><a href="mailto:alerta_dengue@fiocruz.br">{% trans "Fale conosco" %}</a></h5></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
