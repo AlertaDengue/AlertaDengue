@@ -1,4 +1,4 @@
-name: alerta
+name: alertadengue
 channels:
   - conda-forge
   - defaults
