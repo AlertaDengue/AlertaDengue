@@ -36,6 +36,9 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', '').lower() == 'true'
 
+# if True the maintenance-mode will be activated
+MAINTENANCE_MODE = None
+
 # You must set settings.ALLOWED_HOSTS if DEBUG is False.
 ADMINS = tuple(v.split(':') for v in os.getenv('ADMINS').split(','))
 
@@ -66,6 +69,7 @@ INSTALLED_APPS = (
     'dbf.apps.DbfConfig',
     'api',
     'manager.router',
+    'maintenance_mode',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -77,6 +81,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'maintenance_mode.middleware.MaintenanceModeMiddleware',
 )
 
 # django 2
@@ -100,6 +105,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
+                "maintenance_mode.context_processors.maintenance_mode",
             ]
         },
     }
@@ -222,6 +228,8 @@ STATICFILES_DIRS = (os.path.abspath(os.path.join(CURRENT_DIR, 'static')),)
 DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, 'data'))
 
 STATIC_URL = '/static/'
+
+MAINTENANCE_MODE_TEMPLATE = '%s/dados/templates/503.html' % BASE_DIR
 
 MEDIA_ROOT = os.getenv('MEDIA_ROOT')
 
