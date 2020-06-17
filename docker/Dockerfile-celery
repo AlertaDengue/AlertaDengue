@@ -14,10 +14,9 @@ RUN sed -i -e "s/# pt_BR.*/pt_BR.UTF-8 UTF-8/" /etc/locale.gen \
     && dpkg-reconfigure --frontend=noninteractive locales \
     && update-locale LANG=pt_BR.UTF-8
 
-# Configure conda-channels and install mamba
+# Configure conda-channels
 RUN conda config --add channels conda-forge \
   && conda update --all --yes --quiet \
-  && conda install --yes conda-build mamba \
   && conda clean -afy
 
 # Copy environment file to tmp/
@@ -25,7 +24,7 @@ ARG PYTHON_VERSION
 COPY environment-${PYTHON_VERSION}.yml /tmp/environment.yml
 
 # Use environment to update the env base
-RUN mamba env update --file /tmp/environment.yml --name base \
+RUN conda env update --file /tmp/environment.yml --name base \
   && conda clean -afy
 
 # Create deploy user
