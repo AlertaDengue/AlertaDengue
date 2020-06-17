@@ -25,9 +25,10 @@ RUN conda env update --file /tmp/environment.yml --name base \
   && conda clean -afy
 
 # Create deploy user
-COPY docker/prepare_permission.sh /prepare_permission.sh
 ARG HOST_UID
 ARG HOST_GID
+COPY docker/prepare_permission.sh /prepare_permission.sh
+RUN chmod +x /prepare_permission.sh
 RUN /prepare_permission.sh
 # copy code to the container and attribute permissions to user
 RUN mkdir /srv/deploy/logs \
