@@ -25,6 +25,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Copy env_file as env_staging
+      run: |
+        cp example_env_file .env_staging
+
     - name: Build image
       run: make build_staging
 
