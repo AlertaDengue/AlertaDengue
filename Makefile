@@ -8,6 +8,10 @@ export
 compose_cmd = docker-compose -p infodengue -f docker/docker-compose.yml --env-file .env
 staging_compose_cmd = docker-compose -f docker/staging-compose.yml --env-file .env_staging
 
+
+SERVICES_STAGING :=
+
+
 build:
 	$(compose_cmd) build
 
@@ -28,7 +32,7 @@ stop:
 
 
 build_staging:
-	$(staging_compose_cmd) build
+	$(staging_compose_cmd) build ${SERVICES_STAGING}
 
 build_migrate_staging: build_staging
 	$(staging_compose_cmd) run --rm staging_db postgres -V
@@ -37,6 +41,10 @@ build_migrate_staging: build_staging
 
 deploy_staging: build_migrate_staging
 	$(staging_compose_cmd) up -d
+
+# Exemplo: make start_staging SERVICES=staging_db
+start_staging:
+	$(staging_compose_cmd) up -d ${SERVICES_STAGING}
 
 stop_staging:
 	$(staging_compose_cmd) stop

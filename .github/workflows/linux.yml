@@ -30,7 +30,7 @@ jobs:
         cp example_env_file .env_staging
 
     - name: Build image
-      run: make build_staging
+      run: make build_staging SERVICES_STAGING=staging_web
 
     - name: Run flake8
-      run: make flake8_staging
+      run: make flake8_staging SERVICES_STAGING=staging_web
