@@ -75,4 +75,4 @@ remove_untagged_images:
 # Docker TEST
 
 flake8_staging: build_staging
-	$(staging_compose_cmd) run --rm staging_web flake8
+	$(staging_compose_cmd) run --rm --no-deps staging_web flake8
