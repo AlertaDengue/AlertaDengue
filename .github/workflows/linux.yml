@@ -25,6 +25,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Check docker and docker-compose versions
+      run: |
+        docker-compose --version
+        docker --version
+
     - name: Copy env_file as env_staging
       run: |
         cp example_env_file .env_staging
