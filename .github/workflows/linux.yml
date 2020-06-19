@@ -44,5 +44,8 @@ jobs:
     - name: Build image
       run: make build_staging SERVICES_STAGING=staging_web
 
+    - name: Install requirements-dev
+      run: pip install
+
     - name: Run flake8
       run: make flake8_staging SERVICES_STAGING=staging_web
