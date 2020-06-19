@@ -39,7 +39,7 @@ COPY --chown=deploy pyproject.toml setup.cfg setup.py .pre-commit-config.yaml RE
 
 ADD requirements-dev.txt /tmp/requirements-dev.txt
 
-RUN pip3 install -r /tmp/requirements-dev.txt
+RUN pip install -r /tmp/requirements-dev.txt
 
 WORKDIR /srv/deploy/AlertaDengue
 
