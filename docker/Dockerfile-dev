@@ -41,6 +41,9 @@ ADD requirements-dev.txt /tmp/requirements-dev.txt
 
 RUN pip install -r /tmp/requirements-dev.txt
 
+# Create script activate environment
+RUN echo 'source /opt/conda/bin/activate base && exec "$@"' > activate.sh
+RUN chmod +x /activate.sh
 WORKDIR /srv/deploy/AlertaDengue
 
 RUN cp /srv/deploy/example_env_file /srv/deploy/.env_staging
@@ -51,4 +54,5 @@ RUN cd ..; python setup.py install
 EXPOSE 8000
 USER deploy
 
+ENTRYPOINT ["bash", "/activate.sh"]
 CMD ["/srv/deploy/AlertaDengue/runwsgi.sh"]
