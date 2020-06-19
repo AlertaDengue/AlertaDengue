@@ -15,7 +15,10 @@ ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
 # Create deploy user
-RUN useradd --shell=/bin/bash --home=/srv/deploy/ --create-home deploy
+ARG HOST_UID
+ARG HOST_GID
+COPY docker/prepare_permission.sh /prepare_permission.sh
+RUN /prepare_permission.sh
 
 ARG PYTHON_VERSION
 COPY environment-${PYTHON_VERSION}.yml /tmp/environment.yml
