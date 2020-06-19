@@ -25,8 +25,24 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: Install Latest Docker
+      run: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
+        sudo apt-get update
+        sudo apt-get install docker-ce
+
+    - name: Check docker and docker-compose versions
+      run: |
+        docker-compose --version
+        docker --version
+
+    - name: Copy env_file as env_staging
+      run: |
+        cp example_env_file .env_staging
+
     - name: Build image
-      run: make build_staging
+      run: make build_staging SERVICES_STAGING=staging_web
 
     - name: Run flake8
-      run: make flake8_staging
+      run: make flake8_staging SERVICES_STAGING=staging_web
