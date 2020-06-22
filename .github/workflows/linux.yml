@@ -51,6 +51,7 @@ jobs:
       run: |
         mv docker/dev_dumps/alertademo_data.sql docker/dev_dumps/latest_dengue.sql
         cat docker/dev_dumps/patch/notificacao.sql >> docker/dev_dumps/latest_dengue.sql
+        du -h docker/dev_dumps/
 
     - name: Prepare data file
       run: |
@@ -60,6 +61,16 @@ jobs:
     - name: Copy env_file as env_staging
       run: |
         cp example_env_file .env_staging
+
+    - name: Update Conda
+      run: |
+        conda config --set always_yes True
+        conda config --add channels conda-forge
+        conda install -n base conda
+        conda update --all
+        conda install docker-compose make
+        conda env create -f environment-${PYTHON_VERSION}.yml
+        conda install --file requirements-dev.txt --name alertadengue python=${PYTHON_VERSION}
 
     - name: Build image
       run: make build_staging SERVICES_STAGING=staging_web
