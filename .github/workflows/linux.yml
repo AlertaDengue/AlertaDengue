@@ -37,6 +37,11 @@ jobs:
         docker-compose --version
         docker --version
 
+    - name: Check Git-LFS
+      run: |
+        git-lfs --version
+        git lfs install
+
     - name: Copy env_file as env_staging
       run: |
         cp example_env_file .env_staging
