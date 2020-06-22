@@ -62,17 +62,6 @@ jobs:
       run: |
         cp example_env_file .env_staging
 
-    - name: Update Conda and activate alertadengue environment
-      run: |
-        conda config --set always_yes True
-        conda config --add channels conda-forge
-        conda install -n base conda
-        conda update --all
-        conda install docker-compose make
-        conda env create -f environment-${PYTHON_VERSION}.yml
-        conda install --file requirements-dev.txt --name alertadengue python=${PYTHON_VERSION}
-        source activate alertadengue
-
     - name: make deploy_staging
       run: make deploy_staging
 
