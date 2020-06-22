@@ -37,10 +37,18 @@ jobs:
         docker-compose --version
         docker --version
 
-    - name: Check Git-LFS
+    - name: Git-LFS initialize
       run: |
         git-lfs --version
         git lfs install
+  
+    - name: Clone frontend repository
+      run: |
+        ls -la
+        mkdir docker/
+        git clone https://github.com/esloch/Data.git docker/dev_dumps
+        pwd
+        ls -la docker/dev_dumps
 
     - name: Copy env_file as env_staging
       run: |
