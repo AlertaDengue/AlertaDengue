@@ -52,6 +52,11 @@ jobs:
         mv docker/dev_dumps/alertademo_data.sql docker/dev_dumps/latest_dengue.sql
         cat docker/dev_dumps/patch/notificacao.sql >> docker/dev_dumps/latest_dengue.sql
 
+    - name: Prepare data file
+      run: |
+        cat docker/dev_dumps/latest_dengue.sql | gzip > docker/dev_dumps/latest_dengue.sql.gz
+        echo '' | gzip > docker/dev_dumps/latest_infodengue.sql.gz
+
     - name: Copy env_file as env_staging
       run: |
         cp example_env_file .env_staging
