@@ -47,6 +47,11 @@ jobs:
         git clone https://github.com/esloch/Data.git docker/dev_dumps
         ls -la docker/dev_dumps
 
+    - name: Rename data file and merge patch
+      run: |
+        mv docker/dev_dumps/alertademo_data.sql docker/dev_dumps/latest_dengue.sql
+        cat docker/dev_dumps/patch/notificacao.sql >> docker/dev_dumps/latest_dengue.sql
+
     - name: Copy env_file as env_staging
       run: |
         cp example_env_file .env_staging
