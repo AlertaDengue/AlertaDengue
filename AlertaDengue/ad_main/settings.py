@@ -254,8 +254,8 @@ INFODENGUE_TEAM_EMAIL = os.getenv('INFODENGUE_TEAM_EMAIL')
 
 if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
     EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = (
-        os.getenv('EMAIL_CONFIG').split(',')
-    )
+        os.getenv('EMAIL_CONFIG')
+    ).split(',')
     EMAIL_PORT = int(EMAIL_PORT)
     EMAIL_USE_TLS = True
 
