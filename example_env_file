@@ -10,7 +10,7 @@ EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 EMAIL_FROM_ADDRESS=no-reply@info.dengue.mat.br
 INFODENGUE_TEAM_EMAIL=no-reply@info.dengue.mat.br
 
-EMAIL_CONFIG=django.core.mail.backends.smtp.EmailBackend
+EMAIL_CONFIG=smtp.gmail.com,587,projetoinfodengue@gmail.com,fFbnwE6DJrTyJfXv
 
 CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
 CELERY_TASK_ALWAYS_EAGER=True
