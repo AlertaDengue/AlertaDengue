@@ -9,15 +9,20 @@ compose_cmd = docker-compose -p infodengue -f docker/docker-compose.yml --env-fi
 staging_compose_cmd = docker-compose -f docker/staging-compose.yml --env-file .env_staging
 
 
+SERVICES_STAGING :=
+
+
 build:
 	$(compose_cmd) build
+
+build_migrate: build
 	$(compose_cmd) run --rm web python3 manage.py migrate --noinput
 	$(compose_cmd) run --rm web python3 manage.py migrate --database=forecast --noinput
 
-deploy: build
+deploy: build_migrate
 	$(compose_cmd) up -d
 
-generate_maps: build
+generate_maps: build_migrate
 	$(compose_cmd) run --rm web python3 manage.py sync_geofiles
 	$(compose_cmd) run --rm web python3 manage.py generate_meteorological_raster_cities
 	$(compose_cmd) run --rm web python3 manage.py generate_mapfiles
@@ -27,18 +32,24 @@ stop:
 
 
 build_staging:
-	$(staging_compose_cmd) build
+	$(staging_compose_cmd) build ${SERVICES_STAGING}
+
+build_migrate_staging: build_staging
 	$(staging_compose_cmd) run --rm staging_db postgres -V
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --noinput
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --database=forecast --noinput
 
-deploy_staging: build_staging
+deploy_staging: build_migrate_staging
 	$(staging_compose_cmd) up -d
+
+# Exemplo: make start_staging SERVICES=staging_db
+start_staging:
+	$(staging_compose_cmd) up -d ${SERVICES_STAGING}
 
 stop_staging:
 	$(staging_compose_cmd) stop
 
-generate_maps_staging: build
+generate_maps_staging: build_migrate_staging
 	$(staging_compose_cmd) run --rm web python3 manage.py sync_geofiles
 	$(staging_compose_cmd) run --rm web python3 manage.py generate_meteorological_raster_cities
 	$(staging_compose_cmd) run --rm web python3 manage.py generate_mapfiles
@@ -59,3 +70,9 @@ remove_stoped_containers:
 
 remove_untagged_images:
 	docker rmi $(docker images | grep "^<none>" | awk "{print $3}")
+
+
+# Docker TEST
+
+flake8_staging: build_staging
+	$(staging_compose_cmd) run --rm --no-deps staging_web flake8
