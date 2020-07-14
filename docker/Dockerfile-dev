@@ -40,9 +40,7 @@ COPY --chown=deploy AlertaDengue  /srv/deploy/AlertaDengue
 # files
 COPY --chown=deploy pyproject.toml setup.cfg setup.py .pre-commit-config.yaml LICENSE README.md HISTORY.md requirements-dev.txt requirements.txt example_env_file /srv/deploy/
 
-ADD requirements-dev.txt /tmp/requirements-dev.txt
-
-RUN pip install -r /tmp/requirements-dev.txt
+RUN pip install -r /srv/deploy/requirements-dev.txt
 
 # Create script activate environment
 RUN echo 'source /opt/conda/bin/activate base && exec "$@"' > activate.sh
@@ -50,6 +48,9 @@ RUN chmod +x /activate.sh
 WORKDIR /srv/deploy/AlertaDengue
 
 RUN cp /srv/deploy/example_env_file /srv/deploy/.env_staging
+
+# install the AlertaDengue
+RUN cd ..; pip install -e .
 
 EXPOSE 8000
 USER deploy

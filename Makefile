@@ -35,7 +35,7 @@ stop:
 build_staging:
 	$(staging_compose_cmd) build ${SERVICES_STAGING}
 
-build_migrate_staging: build_staging install
+build_migrate_staging: build_staging
 	$(staging_compose_cmd) run --rm staging_db postgres -V
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --noinput
 	#$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --database=forecast --noinput
