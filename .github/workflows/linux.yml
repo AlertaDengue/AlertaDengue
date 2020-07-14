@@ -67,3 +67,6 @@ jobs:
 
     - name: Run flake8
       run: make flake8_staging SERVICES_STAGING=staging_web
+
+    - name: Run tests
+      run: make test_staging_web SERVICES_STAGING=staging_web

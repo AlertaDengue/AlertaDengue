@@ -62,7 +62,7 @@ class Sinan(object):
         'user': settings.PSQL_USER,
         'password': settings.PSQL_PASSWORD,
         'host': settings.PSQL_HOST,
-        'port': settings.PSQL_PORT
+        'port': settings.PSQL_PORT,
     }
 
     def __init__(self, dbf_fname, ano, encoding="iso=8859-1"):

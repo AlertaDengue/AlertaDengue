@@ -5,9 +5,9 @@ from django.core.management.base import BaseCommand
 from datetime import datetime
 
 # local
-from AlertaDengue.gis import mapfile
-from AlertaDengue.ad_main.settings import RASTER_METEROLOGICAL_DATA_RANGE
-from AlertaDengue.dados.dbdata import CID10
+from gis import mapfile
+from ad_main.settings import RASTER_METEROLOGICAL_DATA_RANGE
+from dados.dbdata import CID10
 
 
 class Command(BaseCommand):

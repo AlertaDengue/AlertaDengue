@@ -25,7 +25,7 @@ deploy: build_migrate
 generate_maps: build_migrate
 	$(compose_cmd) run --rm web python3 manage.py sync_geofiles
 	$(compose_cmd) run --rm web python3 manage.py generate_meteorological_raster_cities
-	$(compose_cmd) run --rm web python3 manage.py generate_mapfiles --date-start=None
+	$(compose_cmd) run --rm web python3 manage.py generate_mapfiles
 	$(compose_cmd) run --rm web python3 manage.py python3 manage.py collectstatic --noinput
 
 stop:
@@ -35,7 +35,7 @@ stop:
 build_staging:
 	$(staging_compose_cmd) build ${SERVICES_STAGING}
 
-build_migrate_staging: build_staging
+build_migrate_staging: build_staging install
 	$(staging_compose_cmd) run --rm staging_db postgres -V
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --noinput
 	#$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --database=forecast --noinput
@@ -54,7 +54,7 @@ stop_staging:
 generate_maps_staging: build_migrate_staging
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py sync_geofiles
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py generate_meteorological_raster_cities
-	$(staging_compose_cmd) run --rm staging_web python3 manage.py generate_mapfiles --date-start=None
+	$(staging_compose_cmd) run --rm staging_web python3 manage.py generate_mapfiles
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py collectstatic --noinput
 
 clean_staging:
@@ -80,9 +80,12 @@ remove_untagged_images:
 flake8_staging: build_staging
 	$(staging_compose_cmd) run --rm --no-deps staging_web flake8
 
-test_web: generate_maps_staging
+test_staging_web: generate_maps_staging
 	$(staging_compose_cmd) run --no-deps staging_web bash ../docker/test.sh dados
 	$(staging_compose_cmd) run --no-deps staging_web bash ../docker/test.sh dbf
 	$(staging_compose_cmd) run --no-deps staging_web bash ../docker/test.sh gis
 	$(staging_compose_cmd) run --no-deps staging_web bash ../docker/test.sh api
 	#$(staging_compose_cmd) run --no-deps staging_web bash ../docker/test.sh forecast
+
+install:
+	pip install -e .

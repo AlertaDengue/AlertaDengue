@@ -8,12 +8,12 @@ import pyproj
 import sh
 
 # local
-from AlertaDengue.dados.dbdata import STATE_NAME
-from AlertaDengue.dados.dbdata import NotificationResume as notif
-from AlertaDengue.dados.dbdata import db_engine, get_cities
+from dados.dbdata import STATE_NAME
+from dados.dbdata import NotificationResume as notif
+from dados.dbdata import db_engine, get_cities
 
-from AlertaDengue.gis.geodf import extract_boundaries
-from AlertaDengue.ad_main.settings import (
+from gis.geodf import extract_boundaries
+from ad_main.settings import (
     MAPFILE_PATH,
     MAPSERVER_LOG_PATH,
     MAPSERVER_URL,
@@ -142,7 +142,9 @@ class MapFile:
     def prepare_folders(self):
         # check if mapserver folder exists
         if not os.path.exists(self.path['local_mapfile_dir']):
-            os.makedirs(self.path['local_mapfile_dir'], exist_ok=True)
+            os.makedirs(
+                self.path['local_mapfile_dir'], exist_ok=True, mode=0o777
+            )
 
         # check if mapserver conf folder exists
         mapserver_conf_dir_path = os.path.join(

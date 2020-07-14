@@ -37,8 +37,9 @@ RUN mkdir /srv/deploy/logs
 # folders
 COPY --chown=deploy docker  /srv/deploy/docker
 COPY --chown=deploy AlertaDengue  /srv/deploy/AlertaDengue
+COPY --chown=deploy AlertaDengue/static/shapefile /srv/deploy/AlertaDengue/static/shapefile
 # files
-COPY --chown=deploy pyproject.toml setup.cfg setup.py .pre-commit-config.yaml README.md HISTORY.md requirements.txt example_env_file /srv/deploy/
+COPY --chown=deploy pyproject.toml setup.cfg setup.py .pre-commit-config.yaml LICENSE README.md HISTORY.md requirements-dev.txt requirements.txt example_env_file /srv/deploy/
 
 ADD requirements-dev.txt /tmp/requirements-dev.txt
 
@@ -50,9 +51,6 @@ RUN chmod +x /activate.sh
 WORKDIR /srv/deploy/AlertaDengue
 
 RUN cp /srv/deploy/example_env_file /srv/deploy/.env_staging
-
-# install the AlertaDengue
-RUN cd ..; python setup.py install
 
 EXPOSE 8000
 USER deploy

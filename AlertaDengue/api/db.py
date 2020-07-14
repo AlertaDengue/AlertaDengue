@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine
 
 # local
-from AlertaDengue.ad_main import settings
-from AlertaDengue.dados.dbdata import (  # noqa:F401
+from ad_main import settings
+from dados.dbdata import (  # noqa:F401
     CID10,
     STATE_NAME,
     get_disease_suffix,

@@ -5,8 +5,8 @@ from django.core.management.base import BaseCommand
 from datetime import datetime
 
 # local
-from AlertaDengue.gis import geotiff
-from AlertaDengue.ad_main.settings import (
+from gis import geotiff
+from ad_main.settings import (
     RASTER_METEROLOGICAL_DATA_RANGE,
     DEBUG,
 )
