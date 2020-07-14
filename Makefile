@@ -53,9 +53,9 @@ stop_staging:
 
 generate_maps_staging: build_migrate_staging
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py sync_geofiles
+	$(staging_compose_cmd) run --rm staging_web python3 manage.py collectstatic --noinput
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py generate_meteorological_raster_cities
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py generate_mapfiles
-	$(staging_compose_cmd) run --rm staging_web python3 manage.py collectstatic --noinput
 
 clean_staging:
 	$(staging_compose_cmd) stop
