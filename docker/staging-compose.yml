@@ -46,10 +46,12 @@ services:
       volumes:
         - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
         - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+        - ${DOCKER_HOST_MAPFILES_DIR}:/srv/deploy/maps
+        - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
+        - ${DOCKER_HOST_TIFFS_DIR}:/srv/deploy/tiffs
         - ${DOCKER_HOST_LOG_DIR}:/var/log/mapserver
-        - staging_web_shapefile:/srv/deploy/shapefile/
-        - staging_web_maps:/srv/deploy/maps/
-        - staging_web_tiffs:/srv/deploy/tiffs/
+        - staging_web_static:/srv/deploy/AlertaDengue/static_files/
+        - staging_web_static_dir:/srv/deploy/AlertaDengue/static/
       depends_on:
         - staging_db
         - staging_rabbitmq
@@ -109,6 +111,5 @@ services:
       restart: always
 
 volumes:
-  staging_web_maps:
-  staging_web_tiffs:
-  staging_web_shapefile:
+  staging_web_static:
+  staging_web_static_dir:
