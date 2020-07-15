@@ -55,5 +55,9 @@ RUN cd ..; pip install -e .
 EXPOSE 8000
 USER deploy
 
+# Create directories
+RUN mkdir /srv/deploy/map \
+  && mkdir /srv/deploy/tiff
+
 ENTRYPOINT ["bash", "/activate.sh"]
 CMD ["/srv/deploy/AlertaDengue/runwsgi.sh"]

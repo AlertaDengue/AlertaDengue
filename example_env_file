@@ -28,24 +28,24 @@ POSTGRES_USER=test_user
 MEDIA_ROOT=/MEDIA_ROOT
 IMPORTED_FILES_DIR=/IMPORTED_FILES
 
-DOCKER_HOST_MEDIA_ROOT=/srv/deploy/uploaded
-DOCKER_HOST_IMPORTED_FILES_DIR=/srv/deploy/imported
-DOCKER_HOST_MAPFILES_DIR=/srv/deploy/mapfiles
-DOCKER_HOST_SHAPEFILES_DIR=/srv/deploy/shapefiles
-DOCKER_HOST_TIFFS_DIR=/srv/deploy/tiffs
-DOCKER_HOST_LOG_DIR=/srv/deploy/logs
+DOCKER_HOST_MEDIA_ROOT=/tmp/uploaded
+DOCKER_HOST_IMPORTED_FILES_DIR=/tmp/imported
+DOCKER_HOST_MAPFILES_DIR=/tmp/mapfiles
+DOCKER_HOST_SHAPEFILES_DIR=/tmp/shapefiles
+DOCKER_HOST_TIFFS_DIR=/tmp/tiffs
+DOCKER_HOST_LOG_DIR=/tmp/logs
 
 QUERY_CACHE_TIMEOUT=86400
 MEMCACHED_HOST=127.0.0.1
 MEMCACHED_PORT=11211
 
-STAGING_DATA_DIR=/srv/deploy/data
+STAGING_DATA_DIR=/tmp/data
 
 MAPSERVER_URL=http://mapserver:80
-RASTER_PATH=/srv/deploy/tiffs
-MAPFILE_PATH=/srv/deploy/maps
+RASTER_PATH=/tmp/tiffs
+MAPFILE_PATH=/tmp/maps
 MAPFILE_LOG_PATH=/var/log/mapserver
-SHAPEFILE_PATH=/srv/deploy/AlertaDengue/static/shapefiles
+SHAPEFILE_PATH=/tmp/AlertaDengue/static/shapefiles
 
 HOST_UID=1004
 HOST_GID=1004
