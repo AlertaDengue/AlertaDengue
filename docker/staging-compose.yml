@@ -50,8 +50,7 @@ services:
         - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
         - ${DOCKER_HOST_TIFFS_DIR}:/srv/deploy/tiffs
         - ${DOCKER_HOST_LOG_DIR}:/var/log/mapserver
-        - staging_web_static:/srv/deploy/AlertaDengue/static_files/
-        - staging_web_static_dir:/srv/deploy/AlertaDengue/static/
+        - staging_web:/srv/deploy/AlertaDengue/
       depends_on:
         - staging_db
         - staging_rabbitmq
@@ -111,5 +110,5 @@ services:
       restart: always
 
 volumes:
-  staging_web_static:
-  staging_web_static_dir:
+  staging_web:
+
