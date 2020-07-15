@@ -24,6 +24,7 @@ try:
 except ImportError:
     cmdclass = {}
 
+
 def get_version(path_root: str = PATH_ROOT):
     """Obtain the version number"""
     import importlib
@@ -35,6 +36,7 @@ def get_version(path_root: str = PATH_ROOT):
         ),
     ).load_module()
     return mod.__version__
+
 
 with open(
     os.path.join(PATH_ROOT, 'README.md'), encoding='utf-8'
@@ -48,11 +50,7 @@ with open(
 
 
 def read(filename):
-    return [
-        req.strip()
-        for req
-        in open(filename).readlines()
-    ]
+    return [req.strip() for req in open(filename).readlines()]
 
 
 setup(
@@ -65,9 +63,7 @@ setup(
     url='https://github.com/AlertaDengue/AlertaDengue',
     packages=find_packages("AlertaDengue"),
     install_requires=read("requirements.txt"),
-    extras_require={
-        "dev": read("requirements-dev.txt")
-    },
+    extras_require={"dev": read("requirements-dev.txt")},
     license="GNU General Public License v3",
     zip_safe=False,
     keywords='dengue',
@@ -83,7 +79,9 @@ setup(
     cmdclass=cmdclass,
     scripts=['AlertaDengue/manage.py'],
     include_package_data=True,
-    package_dir={"": "AlertaDengue"},   # tell distutils packages are under AlertaDengue
+    package_dir={
+        "": "AlertaDengue"
+    },  # tell distutils packages are under AlertaDengue
     # test_suite='tests',
     # tests_require=test_requirements
 )
