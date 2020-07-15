@@ -78,7 +78,7 @@ class Command(BaseCommand):
         )
 
         geojson_simplified_dir_path = os.path.dirname(geojson_simplified_path)
-        os.makedirs(geojson_simplified_dir_path, exist_ok=True)
+        os.mkdir(geojson_simplified_dir_path, mode=0o777, exist_ok=True)
 
         if not os.path.exists(geojson_original_path):
             self.stdout.write(
