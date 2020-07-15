@@ -51,7 +51,7 @@ class TestLoadAlerta(TestCase):
             '{}'.format(type(self.series[str(self.cidade)]['dia'][0])),
         )
 
-    # @unittest.skip("Waiting data on database demo. skipping")
+    @unittest.skip("Waiting data on database demo. skipping")
     def test_alerta_is_between_0_and_3(self):
         self.assertEqual(max(self.series[str(self.cidade)]['alerta']), 3)
         self.assertEqual(min(self.series[str(self.cidade)]['alerta']), 0)
