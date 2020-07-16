@@ -34,7 +34,7 @@ class Command(BaseCommand):
             )
 
     def handle(self, *args, **options):
-        str_date_start = None  # TODO: receive str_date_start from command line
+        str_date_start = None  # TODO: receive str_date_start from command line #343
         if str_date_start:
             date_start = datetime.strptime(str_date_start, '%Y-%m-%d')
             print('Start date "%s" defined.' % date_start)

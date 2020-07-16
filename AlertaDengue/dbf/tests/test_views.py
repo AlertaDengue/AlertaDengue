@@ -2,7 +2,6 @@ import os
 from django.contrib.auth.models import User
 from django.core.files.base import File
 from django.test import TestCase
-import pytest
 
 from django.urls import reverse
 
@@ -23,8 +22,6 @@ class DBFUploadViewTest(TestCase):
     databases = ['infodengue', 'default']
     fixtures = ['AlertaDengue/dbf/fixtures/users.json']
 
-    @pytest.fixture()
-    @pytest.mark.django_db(transaction=True)
     def _create_dbf_from_test_data(
         self, uploaded_by, filename, export_date, notification_year
     ):
