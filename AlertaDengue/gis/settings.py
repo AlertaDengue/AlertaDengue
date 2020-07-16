@@ -1,8 +1,5 @@
-try:
-    # to be used externally (such as notebooks science)
-    from AlertaDengue.AlertaDengue import settings
-except:
-    from django.conf import settings
+from AlertaDengue.ad_main import settings
+
 
 BASE_DIR = settings.BASE_DIR
 RASTER_PATH = settings.RASTER_PATH

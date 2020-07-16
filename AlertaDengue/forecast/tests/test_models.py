@@ -1,9 +1,11 @@
 from django.test import TestCase
+from unittest import skip
 
 # local
-from ..models import ForecastModel
+from forecast.models import ForecastModel
 
 
+@skip
 class ForecastModelTest(TestCase):
     multi_db = True
 

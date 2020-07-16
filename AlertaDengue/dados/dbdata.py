@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 
 # local
 from .episem import episem, episem2date
-from . import settings
+from ad_main import settings
 
 import pandas as pd
 import numpy as np

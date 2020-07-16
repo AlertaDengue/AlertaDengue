@@ -4,7 +4,7 @@ from celery import Celery
 
 # This makes sure celery knows where settings are, so we don't need to set it
 # when calling it from the command line
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "AlertaDengue.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ad_main.settings")
 
 app = Celery("AlertaDengue")
 

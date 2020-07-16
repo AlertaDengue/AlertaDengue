@@ -78,7 +78,7 @@ class Command(BaseCommand):
         )
 
         geojson_simplified_dir_path = os.path.dirname(geojson_simplified_path)
-        os.makedirs(geojson_simplified_dir_path, exist_ok=True)
+        os.makedirs(geojson_simplified_dir_path, mode=0o777, exist_ok=True)
 
         if not os.path.exists(geojson_original_path):
             self.stdout.write(
@@ -182,10 +182,10 @@ class Command(BaseCommand):
         f_shapefile_path = os.path.join(path_root, 'shapefile')
 
         if not os.path.exists(f_geojson_path):
-            os.mkdir(f_geojson_path, mode=0o777)
+            os.makedirs(f_geojson_path, mode=0o777)
 
         if not os.path.exists(f_shapefile_path):
-            os.mkdir(f_shapefile_path, mode=0o777)
+            os.makedirs(f_shapefile_path, mode=0o777)
 
         geo_info = {}
 

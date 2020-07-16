@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 
 # local
-from . import settings
+from ad_main import settings
 from dados.dbdata import (  # noqa:F401
     CID10,
     STATE_NAME,
