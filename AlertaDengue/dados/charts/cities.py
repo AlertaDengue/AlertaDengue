@@ -1,5 +1,4 @@
 from copy import deepcopy
-from datetime import timedelta
 from time import mktime
 import json
 from django.utils.translation import gettext as _
@@ -435,7 +434,7 @@ class ReportStateCharts:
                 hoverinfo='text',
                 hovertemplate=_(
                     "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
-                )
+                ),
             ),
             secondary_y=False,
         )
@@ -450,7 +449,7 @@ class ReportStateCharts:
                 hoverinfo='text',
                 hovertemplate=_(
                     "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
-                )
+                ),
             ),
             secondary_y=True,
         )
@@ -497,7 +496,6 @@ class ReportStateCharts:
         figure.update_yaxes(title_text="<b>Casos</b>", secondary_y=True)
 
         return figure.to_html()
-
 
 
 class CityCharts:

@@ -35,6 +35,7 @@ stop:
 build_staging:
 	$(staging_compose_cmd) build ${SERVICES_STAGING}
 
+
 build_migrate_staging: build_staging
 	$(staging_compose_cmd) run --rm staging_db postgres -V
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --noinput
@@ -43,6 +44,13 @@ build_migrate_staging: build_staging
 
 deploy_staging: build_migrate_staging
 	$(staging_compose_cmd) up -d
+
+
+start_staging_db_demo:
+	$(staging_compose_cmd) up -d staging_db_demo
+
+start_staging_db:
+	$(staging_compose_cmd) up -d staging_db
 
 # Exemplo: make start_staging SERVICES=staging_db
 start_staging:

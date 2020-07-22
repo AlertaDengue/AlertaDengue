@@ -21,7 +21,7 @@ services:
       ports:
         - "25432:25432"
       volumes:
-        - ${STAGING_DATA_DIR}:/var/lib/postgresql/data
+        - ${STAGING_DATA_DIR}/staging:/var/lib/postgresql/data
       restart: always
       command: -p 25432
 
@@ -52,7 +52,6 @@ services:
         - ${DOCKER_HOST_LOG_DIR}:/var/log/mapserver
         - staging_web:/srv/deploy/AlertaDengue/
       depends_on:
-        - staging_db
         - staging_rabbitmq
         - staging_memcache
       restart: always

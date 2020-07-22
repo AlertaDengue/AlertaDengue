@@ -1,7 +1,8 @@
+import datetime
 import unittest
 from unittest import TestCase
 from AlertaDengue.dados import dbdata
-import datetime
+from . import legacy  # noqa
 
 
 class TestLoadAlerta(TestCase):
@@ -83,3 +84,12 @@ class TestMunicipio(TestCase):
         self.assertIsInstance(muns, list)
         self.assertGreater(len(muns), 0)
         self.assertIn((3303302, 'Niterói'), muns)
+
+
+class TestReportState(TestCase):
+    def test_report_state(self):
+
+        # função = Value
+        # função = Value
+
+        assert True

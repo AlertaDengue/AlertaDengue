@@ -16,7 +16,7 @@ from ibis import config as cf
 from ibis.sql.postgres import existing_udf
 
 # local
-from .episem import episem, episem2date
+from dados.episem import episem, episem2date
 from ad_main import settings
 
 with cf.config_prefix('sql'):
@@ -1596,12 +1596,7 @@ class ReportState:
                 )
 
                 dfs.append(
-                    pd.merge(
-                        df_,
-                        df_date_,
-                        how='outer',
-                        on='init_date_week',
-                    )
+                    pd.merge(df_, df_date_, how='outer', on='init_date_week',)
                 )
 
             df = pd.concat(dfs)

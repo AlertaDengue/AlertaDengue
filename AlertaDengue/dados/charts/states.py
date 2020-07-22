@@ -5,18 +5,37 @@ Module for plotting charts in the states reports
 import plotly.graph_objs as go
 import pandas as pd
 from plotly.subplots import make_subplots
+from django.utils.translation import gettext as _
+
+from copy import deepcopy
 
 
 class ReportStateCharts:
+    """Charts used by Report State."""
+
     @classmethod
-    def create_tweet_chart(cls, df: pd.DataFrame, year_week, disease: str):
+    def create_tweet_chart(
+        cls, df: pd.DataFrame, year_week: int, disease: str
+    ) -> str:
         """
-        :param df:
-        :param year_week:
-        :param disease:
-        :return:
+        Create chart with tweet information.
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Dataframe with tweet information
+        year_week : int
+            Year and week desired filter e.g.: 202002
+        disease : str, {'dengue', 'chik', 'zika'}
+            Disease name
+        Returns
+        -------
+        str
+            HTML with Plotly chart.
         """
+        df = deepcopy(df)
         ks_cases = ['casos notif. {}'.format(disease)]
+
+        # TODO: check this code
 
         df_tweet = df.reset_index()[['SE', 'tweets'] + ks_cases]
         df_tweet = df_tweet[df_tweet.SE >= year_week - 200]
@@ -24,7 +43,7 @@ class ReportStateCharts:
         df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
 
         df_grp = (
-            df_tweet.groupby(df.index)[['menções'] + ks_cases]
+            df_tweet.groupby(df_tweet.SE)[['menções'] + ks_cases]
             .sum()
             .reset_index()
         )
@@ -37,32 +56,36 @@ class ReportStateCharts:
 
         figure.add_trace(
             go.Scatter(
-                x=['SE'],
-                y=['menções'],
-                name='Menciones',
+                x=df_grp['SE'],
+                y=df_grp.iloc[:, 1],  # menções tweets
+                name='Tweets',
                 marker={'color': 'rgb(51, 172, 255)'},
                 text=df_grp.SE.map(lambda v: '{}'.format(str(v)[-2:])),
                 hoverinfo='text',
-                hovertemplate="Semana %{text} : %{y:.1f} Casos",
-            ),
-            secondary_y=True,
-        )
-
-        figure.add_trace(
-            go.Scatter(
-                x=['SE'],
-                y=ks_cases,
-                name='Casos',
-                marker={'color': 'rgb(255,150,0)'},
-                text=df_grp.SE.map(lambda v: '{}'.format(str(v)[-2:])),
-                hoverinfo='text',
-                hovertemplate="Semana %{text} : %{y:.1f} Casos",
+                hovertemplate=_(
+                    "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
+                ),
             ),
             secondary_y=False,
         )
 
+        figure.add_trace(
+            go.Scatter(
+                x=df_grp['SE'],
+                y=df_grp.iloc[:, 2],  # casos notif
+                name='Casos notificados',
+                marker={'color': 'rgb(255,150,0)'},
+                text=df_grp.SE.map(lambda v: '{}'.format(str(v)[-2:])),
+                hoverinfo='text',
+                hovertemplate=_(
+                    "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
+                ),
+            ),
+            secondary_y=True,
+        )
+
         figure.update_layout(
-            title='Menções mídia social',
+            title='Menções na mídia social',
             xaxis=dict(
                 title='Período (Ano/Semana)',
                 tickangle=-60,
@@ -75,8 +98,8 @@ class ReportStateCharts:
                 gridcolor='rgb(176, 196, 222)',
             ),
             yaxis=dict(
-                title='Temperatura',
-                showline=True,
+                # title='',
+                showline=False,
                 showgrid=True,
                 showticklabels=True,
                 linecolor='rgb(204, 204, 204)',
@@ -88,18 +111,18 @@ class ReportStateCharts:
             paper_bgcolor='rgb(245, 246, 249)',
             width=1100,
             height=500,
+            legend=dict(
+                # x=-.1, y=1.2,
+                bgcolor='#FFFFFF',
+                bordercolor='#E2E2E2',
+                traceorder='normal',
+                font=dict(family='sans-serif', size=12, color='#000'),
+                borderwidth=1,
+            ),
         )
 
-        figure.update_yaxes(title_text="Y_axies", secondary_y=True)
-
-        figure['layout']['legend'].update(
-            x=-0.1,
-            y=1.2,
-            traceorder='normal',
-            font=dict(family='sans-serif', size=12, color='#000'),
-            bgcolor='#FFFFFF',
-            bordercolor='#E2E2E2',
-            borderwidth=1,
-        )
+        # Set y-axes titles
+        figure.update_yaxes(title_text="<b>Menções</b>", secondary_y=False)
+        figure.update_yaxes(title_text="<b>Casos</b>", secondary_y=True)
 
         return figure.to_html()
