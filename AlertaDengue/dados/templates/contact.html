@@ -6,6 +6,10 @@
 {% block content %}
     <div class="card">
         <div class="card-body">
+            <b>{% trans "Oportunidade:" %}</b>
+            <ul>
+                <li><a href="/static/docs/processo_seletivo_infodengue.pdf" class="text-success">{% trans "Chamada de bolsa de pesquisa" %}</a></li>
+           </ul>
             {% blocktrans %}
             <h5>O Sistema de Alerta Info Dengue é desenvolvido pela parceria de pesquisadores e profissionais 
             de diversas instituições:</h5><br>
@@ -68,10 +72,6 @@
             <ul>
                 <li> {% trans "DECIT/MS (2014 – 2016)" %}
                 <li> {% trans "Fiocruz Edital Inova 2019 (2019-2020)" %}
-            </ul>
-            <b>{% trans "Oportunidade:" %}</b>
-            <ul>
-                <li><a href="/static/docs/processo_seletivo_infodengue.pdf">{% trans "Chamada de bolsa de pesquisa" %}</a>
             </ul>
             <p>{% blocktrans %} Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta Info Dengue?
             Entre em contato<a href="mailto:alerta_dengue@fiocruz.br"> conosco.{% endblocktrans %} 
