@@ -1,20 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from setuptools import setup, find_packages
-
-try:  # for pip >= 10
-    from pip._internal.req import parse_requirements
-except ImportError:  # for pip <= 9.0.3
-    from pip.req import parse_requirements
-
-try:  # for pip >= 10
-    from pip._internal.download import PipSession
-except ImportError:  # for pip <= 9.0.3
-    from pip.download import PipSession
-
-from glob import glob
-
 import os
 import subprocess
 import sys
@@ -48,20 +32,10 @@ def get_version(path_root: str = PATH_ROOT):
     mod = importlib.machinery.SourceFileLoader(
         'version',
         os.path.abspath(
-            os.path.join(
-                path_root, 'AlertaDengue', 'AlertaDengue', 'version.py',
-            )
+            os.path.join(path_root, 'AlertaDengue', 'ad_main', 'version.py',)
         ),
     ).load_module()
     return mod.__version__
-
-
-def list_dir(pathname=PATH_ROOT, dir_name=''):
-    result = glob(os.path.join(pathname, dir_name, '**'), recursive=True)[1:]
-
-    size = len(pathname)
-
-    return ['.%s' % r[size:] for r in result]
 
 
 with open(
@@ -74,15 +48,10 @@ with open(
 ) as history_file:
     history = history_file.read()
 
-install_reqs = parse_requirements(
-    os.path.join(PATH_ROOT, 'requirements.txt'), session=PipSession()
-)
 
-requirements = [str(ir.req) for ir in install_reqs]
+def read(filename):
+    return [req.strip() for req in open(filename).readlines()]
 
-test_requirements = [
-    # TODO: put package test requirements here
-]
 
 setup(
     name='AlertaDengue',
@@ -92,8 +61,9 @@ setup(
     author="FIOCRUZ",
     author_email='alerta_dengue@fiocruz.br',
     url='https://github.com/AlertaDengue/AlertaDengue',
-    packages=find_packages(),
-    install_requires=requirements,
+    packages=find_packages("AlertaDengue"),
+    install_requires=read("requirements.txt"),
+    extras_require={"dev": read("requirements-dev.txt")},
     license="GNU General Public License v3",
     zip_safe=False,
     keywords='dengue',
@@ -107,6 +77,11 @@ setup(
         'Programming Language :: Python :: 3.8',
     ],
     cmdclass=cmdclass,
+    scripts=['AlertaDengue/manage.py'],
+    include_package_data=True,
+    package_dir={
+        "": "AlertaDengue"
+    },  # tell distutils packages are under AlertaDengue
     # test_suite='tests',
     # tests_require=test_requirements
 )

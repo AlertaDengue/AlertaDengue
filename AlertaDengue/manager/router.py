@@ -14,6 +14,8 @@ class DatabaseAppsRouter(object):
     DATABASE_APPS_MAPPING = {'app1': 'db1', 'app2': 'db2'}
     """
 
+    core_apps = {'contenttypes', 'auth'}
+
     def db_for_read(self, model, **hints):
         """"Point all read operations to the specific database."""
         db = None
@@ -30,10 +32,18 @@ class DatabaseAppsRouter(object):
 
     def allow_relation(self, obj1, obj2, **hints):
         """Allow any relation between apps that use the same database."""
-        db_obj1 = settings.DATABASE_APPS_MAPPING.get(obj1._meta.app_label)
-        db_obj2 = settings.DATABASE_APPS_MAPPING.get(obj2._meta.app_label)
+        label1 = obj1._meta.app_label
+        label2 = obj2._meta.app_label
+
+        db_obj1 = settings.DATABASE_APPS_MAPPING.get(label1)
+        db_obj2 = settings.DATABASE_APPS_MAPPING.get(label2)
 
         allow = None
+
+        # Allow core and 3rd-party relationships here
+        set_1 = {label1, label2}
+        if self.core_apps - set_1 != self.core_apps:
+            return True
 
         if db_obj1 and db_obj2:
             allow = True if db_obj1 == db_obj2 else False
@@ -49,6 +59,12 @@ class DatabaseAppsRouter(object):
             allow = apps_mapping.get(model._meta.app_label) == db
         elif model._meta.app_label in apps_mapping:
             allow = False
+
+        # Allow core and 3rd-party relationships here
+        set_1 = {model._meta.app_label}
+        if self.core_apps - set_1 != self.core_apps:
+            return True
+
         return allow
 
     def allow_migrate(self, db, app_label, **hints):
@@ -64,4 +80,8 @@ class DatabaseAppsRouter(object):
         if allow and app_label in settings.MIGRATION_MODULES:
             if settings.MIGRATION_MODULES[app_label] is None:
                 allow = False
+        # Allow core and 3rd-party relationships here
+        set_1 = {app_label}
+        if self.core_apps - set_1 != self.core_apps:
+            return True
         return allow

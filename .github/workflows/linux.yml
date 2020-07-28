@@ -37,12 +37,36 @@ jobs:
         docker-compose --version
         docker --version
 
+    - name: Git-LFS initialize
+      run: |
+        git-lfs --version
+        git lfs install
+  
+    - name: Clone frontend repository
+      run: |
+        git clone https://github.com/esloch/Data.git docker/dev_dumps
+        ls -la docker/dev_dumps
+
+    - name: Rename data file and merge patch
+      run: |
+        mv docker/dev_dumps/alertademo_data.sql docker/dev_dumps/latest_dengue.sql
+        cat docker/dev_dumps/patch/notificacao.sql >> docker/dev_dumps/latest_dengue.sql
+        du -h docker/dev_dumps/
+
+    - name: Prepare data file
+      run: |
+        cat docker/dev_dumps/latest_dengue.sql | gzip > docker/dev_dumps/latest_dengue.sql.gz
+        echo '' | gzip > docker/dev_dumps/latest_infodengue.sql.gz
+
     - name: Copy env_file as env_staging
       run: |
         cp example_env_file .env_staging
 
-    - name: Build image
-      run: make build_staging SERVICES_STAGING=staging_web
+    - name: make deploy_staging
+      run: make deploy_staging
 
     - name: Run flake8
       run: make flake8_staging SERVICES_STAGING=staging_web
+
+    - name: Run tests
+      run: make test_staging_web SERVICES_STAGING=staging_web

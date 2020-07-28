@@ -5,8 +5,8 @@ from django.core.management.base import BaseCommand
 from datetime import datetime
 
 # local
-from ... import mapfile
-from ...settings import RASTER_METEROLOGICAL_DATA_RANGE
+from gis import mapfile
+from ad_main.settings import RASTER_METEROLOGICAL_DATA_RANGE
 from dados.dbdata import CID10
 
 
@@ -36,11 +36,7 @@ class Command(BaseCommand):
             mf.create_files()
 
     def handle(self, *args, **options):
-        str_date_start = input(
-            'Type the initial date of the the raster'
-            + ' files to process (Y-m-d): '
-        )
-
+        str_date_start = None  # TODO: receive str_date_start from command line
         if str_date_start:
             date_start = datetime.strptime(str_date_start, '%Y-%m-%d')
             print('Start date "%s" defined.' % date_start)

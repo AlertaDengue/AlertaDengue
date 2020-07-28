@@ -1,7 +1,7 @@
-from unittest import TestCase
-from .. import dbdata
-import datetime
 import unittest
+from unittest import TestCase
+from AlertaDengue.dados import dbdata
+import datetime
 
 
 class TestLoadAlerta(TestCase):

@@ -28,7 +28,7 @@ pip-selfcheck.json
 geodjango.db
 chunked_uploads
 authorized_keys
-Dockerfile-dev
+
 /AlertaDengue/*.dbf
 /*.dbf
 *.egg-info
@@ -40,3 +40,5 @@ Dockerfile-dev
 
 # env
 .env*
+
+.mypy_cache

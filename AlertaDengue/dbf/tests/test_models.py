@@ -1,3 +1,4 @@
+import os
 from django.contrib.auth.models import User
 from django.core.files.base import File
 from django.core.exceptions import ValidationError
@@ -6,9 +7,9 @@ from datetime import date
 from mock import patch
 
 # local
-from ..models import DBF
+from django.apps import apps
 
-import os
+DBF = apps.get_model('dbf', 'DBF')
 
 __all__ = ["DBFModelTest"]
 

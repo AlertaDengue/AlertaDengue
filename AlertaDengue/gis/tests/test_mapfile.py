@@ -2,9 +2,9 @@ from django.test import TestCase
 from datetime import datetime
 
 # local
-from .. import mapfile
-from ..settings import RASTER_METEROLOGICAL_DATA_RANGE
-from dados.dbdata import CID10
+from AlertaDengue.gis import mapfile
+from AlertaDengue.ad_main.settings import RASTER_METEROLOGICAL_DATA_RANGE
+from AlertaDengue.dados.dbdata import CID10
 
 import numpy as np
 import os

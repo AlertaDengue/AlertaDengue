@@ -3,13 +3,13 @@ from django.test import TestCase
 from glob import glob
 
 # local
-from ..geotiff import (
+from AlertaDengue.gis.geotiff import (
     get_date_from_file_name,
     get_key_from_file_name,
     mask_raster_with_shapefile,
     increase_resolution,
 )
-from .. import settings
+from AlertaDengue.ad_main import settings
 
 import os
 import numpy as np

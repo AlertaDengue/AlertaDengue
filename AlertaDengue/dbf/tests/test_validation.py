@@ -5,8 +5,8 @@ from django.test import TestCase
 from datetime import date
 
 # local
-from ..models import DBF
-from ..validation import is_valid_dbf
+from AlertaDengue.dbf.models import DBF
+from AlertaDengue.dbf.validation import is_valid_dbf
 
 import datetime
 import os
