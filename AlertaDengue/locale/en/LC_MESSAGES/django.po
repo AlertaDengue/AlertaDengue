@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-28 19:17+0000\n"
+"POT-Creation-Date: 2020-07-28 19:33+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1500,10 +1500,6 @@ msgid ""
 "Janeiro."
 msgstr ""
 "Spatial GAM model of the eggtrap positivity in the city of Rio de Janeiro."
-
-#: AlertaDengue/dados/templates/oportunidade.html:24
-msgid "Vaga para bolsista de pesquisa."
-msgstr ""
 
 #: AlertaDengue/dados/templates/report_city.html:52
 #: AlertaDengue/dados/templates/report_filter_city.html:54
