@@ -820,8 +820,9 @@ class AlertaStateView(TemplateView):
         'PR': [-25.006, -51.833],
         'RJ': [-22.187, -43.176],
         'SP': [-23.5489, -46.6388],
+        'RS': [-51.217699, -30.034632],
     }
-    _map_zoom = {'CE': 6, 'ES': 6, 'MG': 6, 'PR': 6, 'RJ': 6, 'SP': 6}
+    _map_zoom = {'CE': 6, 'ES': 6, 'MG': 6, 'PR': 6, 'RJ': 6, 'SP': 6, 'RS': 6}
 
     def get_context_data(self, **kwargs):
         """
@@ -1337,8 +1338,9 @@ class ReportStateView(TemplateView):
         'PR': [-25.006, -51.833],
         'RJ': [-22.187, -43.176],
         'SP': [-23.5489, -46.6388],
+        'RS': [-51.217699, -30.034632],
     }
-    _map_zoom = {'CE': 6, 'ES': 6, 'MG': 6, 'PR': 6, 'RJ': 6, 'SP': 6}
+    _map_zoom = {'CE': 6, 'ES': 6, 'MG': 6, 'PR': 6, 'RJ': 6, 'SP': 6, 'RS': 6}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
