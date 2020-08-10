@@ -71,9 +71,9 @@ class ReportCityCharts:
         )
 
         ks_limiar = [
-            'limiar pré epidêmico',
-            'limiar pós epidêmico',
-            'limiar epidêmico',
+            _('limiar pré epidêmico'),
+            _('limiar pós epidêmico'),
+            _('limiar epidêmico'),
         ]
 
         colors = ['rgb(0,255,0)', 'rgb(255,150,0)', 'rgb(255,0,0)']
@@ -642,6 +642,81 @@ class HomeCharts:
 
 class CityCharts:
     @classmethod
+    def prepare_data(
+        cls, geocode, nome, disease_label, disease='dengue', epiweek=0
+    ):
+        dados = load_series(geocode, disease, epiweek)[geocode]
+        if dados is None:
+            return {
+                'nome': nome,
+                'dados': {},
+                'start': {},
+                'verde': {},
+                'amarelo': {},
+                'laranja': {},
+                'vermelho': {},
+                'disease_label': disease_label,
+            }
+        dados['dia'] = [int(mktime(d.timetuple())) for d in dados['dia']]
+        # green alert
+        ga = [
+            int(c) if a == 0 else None
+            for a, c in zip(dados['alerta'], dados['casos'])
+        ]
+        ga = [
+            int_or_none(dados['casos'][n])
+            if i is None and ga[n - 1] is not None
+            else int_or_none(i)
+            for n, i in enumerate(ga)
+        ]
+        # yellow alert
+        ya = [
+            int(c) if a == 1 else None
+            for a, c in zip(dados['alerta'], dados['casos'])
+        ]
+        ya = [
+            int_or_none(dados['casos'][n])
+            if i is None and ya[n - 1] is not None
+            else int_or_none(i)
+            for n, i in enumerate(ya)
+        ]
+        # orange alert
+        oa = [
+            int(c) if a == 2 else None
+            for a, c in zip(dados['alerta'], dados['casos'])
+        ]
+        oa = [
+            int_or_none(dados['casos'][n])
+            if i is None and oa[n - 1] is not None
+            else int_or_none(i)
+            for n, i in enumerate(oa)
+        ]
+        # red alert
+        ra = [
+            int(c) if a == 3 else None
+            for a, c in zip(dados['alerta'], dados['casos'])
+        ]
+        ra = [
+            int_or_none(dados['casos'][n])
+            if i is None and ra[n - 1] is not None
+            else int_or_none(i)
+            for n, i in enumerate(ra)
+        ]
+
+        result = {
+            'nome': nome,
+            'dados': dados,
+            'start': dados['dia'][0],
+            'verde': json.dumps(ga),
+            'amarelo': json.dumps(ya),
+            'laranja': json.dumps(oa),
+            'vermelho': json.dumps(ra),
+            'disease_label': disease_label,
+        }
+        result.update(dados)
+        return result
+
+    @classmethod
     def create_alert_chart(
         cls, geocode, nome, disease_label, disease_code='dengue', epiweek=0
     ):
@@ -651,6 +726,9 @@ class CityCharts:
         )
 
         df_dados = pd.DataFrame(result['dados'])
+
+        if df_dados.empty:
+            raise ValueError('Data for alert chart creation is empty')
 
         df_verde = df_dados[df_dados.alerta == 0]
         df_verde.index = pd.to_datetime(df_verde.dia, unit='s')
@@ -783,86 +861,3 @@ class CityCharts:
             plot_bgcolor='rgb(255, 255, 255)',
         )
         return fig.to_html()
-
-    @classmethod
-    def prepare_data(
-        cls, geocodigo, nome, disease_label, disease='dengue', epiweek=0
-    ):
-        dados = load_series(geocodigo, disease, epiweek)[geocodigo]
-        if dados is None:
-            return {
-                'nome': nome,
-                'dados': {},
-                'start': {},
-                'verde': {},
-                'amarelo': {},
-                'laranja': {},
-                'vermelho': {},
-                'disease_label': disease_label,
-            }
-        dados['dia'] = [int(mktime(d.timetuple())) for d in dados['dia']]
-        # green alert
-        ga = [
-            int(c) if a == 0 else None
-            for a, c in zip(dados['alerta'], dados['casos'])
-        ]
-        ga = [
-            int_or_none(dados['casos'][n])
-            if i is None and ga[n - 1] is not None
-            else int_or_none(i)
-            for n, i in enumerate(ga)
-        ]
-        # yellow alert
-        ya = [
-            int(c) if a == 1 else None
-            for a, c in zip(dados['alerta'], dados['casos'])
-        ]
-        ya = [
-            int_or_none(dados['casos'][n])
-            if i is None and ya[n - 1] is not None
-            else int_or_none(i)
-            for n, i in enumerate(ya)
-        ]
-        # orange alert
-        oa = [
-            int(c) if a == 2 else None
-            for a, c in zip(dados['alerta'], dados['casos'])
-        ]
-        oa = [
-            int_or_none(dados['casos'][n])
-            if i is None and oa[n - 1] is not None
-            else int_or_none(i)
-            for n, i in enumerate(oa)
-        ]
-        # red alert
-        ra = [
-            int(c) if a == 3 else None
-            for a, c in zip(dados['alerta'], dados['casos'])
-        ]
-        ra = [
-            int_or_none(dados['casos'][n])
-            if i is None and ra[n - 1] is not None
-            else int_or_none(i)
-            for n, i in enumerate(ra)
-        ]
-        forecast_models_keys = [
-            k for k in dados.keys() if k.startswith('forecast_')
-        ]
-        forecast_models_title = [
-            (k, k.replace('forecast_', '').replace('_cases', '').title())
-            for k in forecast_models_keys
-        ]
-        forecast_data = {k: json.dumps(dados[k]) for k in forecast_models_keys}
-        result = {
-            'nome': nome,
-            'dados': dados,
-            'start': dados['dia'][0],
-            'verde': json.dumps(ga),
-            'amarelo': json.dumps(ya),
-            'laranja': json.dumps(oa),
-            'vermelho': json.dumps(ra),
-            'disease_label': disease_label,
-            'forecast_models': forecast_models_title,
-        }
-        result.update(forecast_data)
-        return result

@@ -8,8 +8,9 @@ import numpy as np
 import os
 import random
 
+
 from django.apps import apps
-from django.utils.translation import gettext
+from django.utils.translation import gettext as _
 from django.shortcuts import redirect
 from django.views.generic.base import TemplateView, View
 from django.contrib import messages
@@ -409,7 +410,7 @@ class AlertaMainView(TemplateView):
                     'casos': cases[-1] if cases.size else 0,
                     'casos_est': cases_est[-1] if cases_est.size else 0,
                 }
-                estimated_cases_next_week[d][s] = gettext('Em breve')
+                estimated_cases_next_week[d][s] = _('Em breve')
                 v1 = 0 if not cases_est.size else cases_est[-2]
                 v2 = 0 if not cases_est.size else cases_est[-1]
 
@@ -564,6 +565,26 @@ class AlertaMRJPageView(AlertCityPageBaseView):
             total_series = [0]
             total_observed_series = [0]
 
+        menssagem = _(
+            f"A doença {disease_label} não está registrada "
+            f"em nosso banco de dados para o município de {city_info['nome']}."
+        )
+
+        try:
+            city_chart = CityCharts.create_alert_chart(
+                geocode,
+                city_info['nome'],
+                disease_label,
+                disease_code,
+                epiweek,
+            )
+        except ValueError:
+            context = {'message': menssagem}
+
+            self.template_name = 'error.html'
+
+            return context
+
         context.update(
             {
                 'geocodigo': geocode,  # legacy
@@ -606,13 +627,7 @@ class AlertaMRJPageView(AlertCityPageBaseView):
                 'forecast_date_max': forecast_date_max,
                 'epiweek': epiweek,
                 'geojson_url': '/static/rio_aps.geojson',
-                'chart_alert': CityCharts.create_alert_chart(
-                    geocode,
-                    city_info['nome'],
-                    disease_label,
-                    disease_code,
-                    epiweek,
-                ),
+                'chart_alert': city_chart,
             }
         )
         return context
@@ -680,6 +695,26 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
             total_series = [0]
             total_observed_series = [0]
 
+        menssagem = _(
+            f"A doença {disease_label} não está registrada "
+            f"em nosso banco de dados para o município de {city_info['nome']}."
+        )
+
+        try:
+            city_chart = CityCharts.create_alert_chart(
+                geocode,
+                city_info['nome'],
+                disease_label,
+                disease_code,
+                epiweek,
+            )
+        except ValueError:
+            context = {'message': menssagem}
+
+            self.template_name = 'error.html'
+
+            return context
+
         context.update(
             {
                 'geocodigo': geocode,  # legacy
@@ -717,13 +752,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
                 'forecast_date_max': forecast_date_max,
                 'epiweek': epiweek,
                 'geojson_url': '/static/geojson/%s.json' % geocode,
-                'chart_alert': CityCharts.create_alert_chart(
-                    geocode,
-                    city_info['nome'],
-                    disease_label,
-                    disease_code,
-                    epiweek,
-                ),
+                'chart_alert': city_chart,
             }
         )
         return context
@@ -871,7 +900,7 @@ class AlertaStateView(TemplateView):
         )
 
         if dbf is None:
-            last_update = gettext('desconhecida')
+            last_update = _('desconhecida')
         else:
             last_update = dbf.export_date
 
