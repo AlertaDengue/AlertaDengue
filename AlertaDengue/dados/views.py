@@ -565,11 +565,6 @@ class AlertaMRJPageView(AlertCityPageBaseView):
             total_series = [0]
             total_observed_series = [0]
 
-        menssagem = _(
-            f"A doença {disease_label} não está registrada "
-            f"em nosso banco de dados para o município de {city_info['nome']}."
-        )
-
         try:
             city_chart = CityCharts.create_alert_chart(
                 geocode,
@@ -579,7 +574,12 @@ class AlertaMRJPageView(AlertCityPageBaseView):
                 epiweek,
             )
         except ValueError:
-            context = {'message': menssagem}
+            context = {
+                'message': _(
+                    "A doença {} não está registrada "
+                    "em nosso banco de dados para o município de {}."
+                ).format(disease_label, city_info['nome'])
+            }
 
             self.template_name = 'error.html'
 
@@ -695,11 +695,6 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
             total_series = [0]
             total_observed_series = [0]
 
-        menssagem = _(
-            f"A doença {disease_label} não está registrada "
-            f"em nosso banco de dados para o município de {city_info['nome']}."
-        )
-
         try:
             city_chart = CityCharts.create_alert_chart(
                 geocode,
@@ -709,7 +704,12 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
                 epiweek,
             )
         except ValueError:
-            context = {'message': menssagem}
+            context = {
+                'message': _(
+                    "A doença {} não está registrada "
+                    "em nosso banco de dados para o município de {}."
+                ).format(disease_label, city_info['nome'])
+            }
 
             self.template_name = 'error.html'
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-10 12:58+0000\n"
+"POT-Creation-Date: 2020-08-11 14:11+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2049,13 +2049,11 @@ msgstr "estimated cases"
 msgid "Em breve"
 msgstr "Coming soon"
 
-#: AlertaDengue/dados/views.py:569 AlertaDengue/dados/views.py:699
+#: AlertaDengue/dados/views.py:579 AlertaDengue/dados/views.py:709
 msgid ""
-"A doença {disease_label} não está registrada em nosso banco de dados para o "
-"município de {city_info['nome']}."
-msgstr ""
-"The disease {disease_label} is not registered in our database for"
-"{city_info['name']} municipality."
+"A doença {} não está registrada em nosso banco de dados para o município de "
+"{}."
+msgstr "This disease {} is not registered in our database for {} municipality"
 
 #: AlertaDengue/dados/views.py:903
 msgid "desconhecida"
