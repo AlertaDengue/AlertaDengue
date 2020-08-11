@@ -580,9 +580,7 @@ class AlertaMRJPageView(AlertCityPageBaseView):
                     "em nosso banco de dados para o município de {}."
                 ).format(disease_label, city_info['nome'])
             }
-
             self.template_name = 'error.html'
-
             return context
 
         context.update(
@@ -710,9 +708,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
                     "em nosso banco de dados para o município de {}."
                 ).format(disease_label, city_info['nome'])
             }
-
             self.template_name = 'error.html'
-
             return context
 
         context.update(
