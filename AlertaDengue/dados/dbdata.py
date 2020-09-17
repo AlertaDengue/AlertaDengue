@@ -28,6 +28,7 @@ STATE_NAME = {
     'RJ': 'Rio de Janeiro',
     'SP': 'São Paulo',
     'RS': 'Rio Grande do Sul',
+    'MA': 'Maranhão',
 }
 
 ALL_STATE_NAMES = STATE_NAME.copy()
