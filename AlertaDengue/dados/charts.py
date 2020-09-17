@@ -485,6 +485,7 @@ class HomeCharts:
         'Rio de Janeiro': 'rgb(255,255,0)',
         'São Paulo': 'rgb(0,255,255)',
         'Rio Grande do Sul': 'rgb(255,150,0)',
+        'Maranhão': 'rgb(255,0,255)',
     }
 
     @classmethod
