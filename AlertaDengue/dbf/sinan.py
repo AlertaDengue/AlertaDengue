@@ -46,10 +46,17 @@ def calculate_digit(dig):
 
 
 def add_dv(geocodigo):
+    """
+    Retorna o geocóodigo do município adicionando o digito verificador,
+    se necessário.
+    :param geocodigo: geocóodigo com 6 ou 7 dígitos
+    """
     if len(str(geocodigo)) == 7:
         return geocodigo
-    else:
+    elif len(str(geocodigo)) == 6:
         return int(str(geocodigo) + str(calculate_digit(geocodigo)))
+    else:
+        raise ValueError('geocode does not match!')
 
 
 class Sinan(object):
