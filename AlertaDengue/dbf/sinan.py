@@ -46,6 +46,11 @@ def calculate_digit(dig):
 
 
 def add_dv(geocodigo):
+    """
+    Retorna o geocóodigo do município adicionando o digito verificador,
+    se necessário.
+    :param geocodigo: geocóodigo com 6 ou 7 dígitos
+    """
     if len(str(geocodigo)) == 7:
         return geocodigo
     elif len(str(geocodigo)) == 6:
