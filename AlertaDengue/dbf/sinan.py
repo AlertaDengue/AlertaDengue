@@ -48,8 +48,10 @@ def calculate_digit(dig):
 def add_dv(geocodigo):
     if len(str(geocodigo)) == 7:
         return geocodigo
-    else:
+    elif len(str(geocodigo)) == 6:
         return int(str(geocodigo) + str(calculate_digit(geocodigo)))
+    else:
+        raise ValueError('geocode does not match!')
 
 
 class Sinan(object):
