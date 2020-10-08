@@ -497,7 +497,7 @@ class HomeCharts:
         '''
         # gc = context['geocodigos'][0]
         series = (
-            get_series_by_UF(disease)
+            get_series_by_UF(disease, weeks=52)
             if disease not in case_series
             else case_series[disease]
         )
@@ -517,20 +517,22 @@ class HomeCharts:
         start = int(mktime(start.timetuple()))
         casos = {}
         casos_est = {}
+        initial_range = -52  # to get the last 52 weeks
 
         for uf in ufs:
             series_uf = series[series.uf == uf]
             datas = [
-                int(mktime(d.timetuple())) * 1000 for d in series_uf.data[-52:]
+                int(mktime(d.timetuple())) * 1000
+                for d in series_uf.data[initial_range:]
             ]
             casos[uf] = [
                 list(t)
-                for t in zip(datas, series_uf.casos_s[-52:].fillna(0).tolist())
+                for t in zip(datas, series_uf.casos_s[initial_range:].tolist())
             ]
             casos_est[uf] = [
                 list(t)
                 for t in zip(
-                    datas, series_uf.casos_est_s[-52:].fillna(0).tolist()
+                    datas, series_uf.casos_est_s[initial_range:].tolist()
                 )
             ]
 
@@ -588,7 +590,7 @@ class HomeCharts:
             plot_bgcolor='rgb(255, 255, 255)',
             paper_bgcolor='rgb(255, 255, 255)',
             showlegend=True,
-            font=dict(family="sans-serif", size=14),
+            font=dict(family="sans-serif", size=12),
             xaxis=dict(
                 # title='',
                 tickangle=-20,

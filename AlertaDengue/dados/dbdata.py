@@ -310,7 +310,7 @@ def get_city(query):
     return result.fetchall()
 
 
-def get_series_by_UF(disease='dengue'):
+def get_series_by_UF(disease='dengue', weeks=None):
     """
     Get the incidence series from the database aggregated (sum) by state
     :param UF: substring of the name of the state
@@ -324,11 +324,16 @@ def get_series_by_UF(disease='dengue'):
 
     if series is None:
         with db_engine.connect() as conn:
-            series = pd.read_sql(
-                'select * from uf_total{}_view;'.format(_disease),
-                conn,
-                parse_dates=True,
-            )
+
+            if weeks:
+                sql = f'''
+                SELECT * FROM uf_total{_disease}_view
+                WHERE data >= NOW() - interval '{weeks+2} weeks'
+                '''
+            else:
+                sql = f'SELECT * FROM uf_total{_disease}_view;'
+
+            series = pd.read_sql(sql, conn, parse_dates=['data'],)
             cache.set(cache_id, series, settings.QUERY_CACHE_TIMEOUT)
 
     return series
@@ -622,8 +627,10 @@ def add_dv(geocodigo):
     """
     if len(str(geocodigo)) == 7:
         return geocodigo
-    else:
+    elif len(str(geocodigo)) == 6:
         return int(str(geocodigo) + str(calculate_digit(geocodigo)))
+    else:
+        raise ValueError('geocode does not match!')
 
 
 class NotificationResume:
