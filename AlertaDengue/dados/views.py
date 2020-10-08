@@ -385,9 +385,8 @@ class AlertaMainView(TemplateView):
         mundict = dict(dbdata.get_all_active_cities())
         # municipios, geocodigos = list(mundict.values()), list(mundict.keys())
         # results[d] = dbdata.load_serie_cities(geocodigos, d)
-
         for d in diseases:
-            case_series[d] = dbdata.get_series_by_UF(d)
+            case_series[d] = dbdata.get_series_by_UF(d, 52)
 
             for s in self._state_names:
                 df = case_series[d]  # alias
