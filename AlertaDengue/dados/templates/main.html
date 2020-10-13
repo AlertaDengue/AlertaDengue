@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load static %}
 {% load lookup %}
+{% load home_components %}
 {% block extra_head %}
     <meta property="og:image"
           content="http://info.dengue.mat.br/static/img/screenshot.png"/>
@@ -78,147 +79,12 @@
 
 {% block content %}
     <div class="container-fluid">
-        <!-- chart-plot:begin -->
-        <div>
-            <div class="col-sm-{{chart_cols}}">
-                <div>
-                  <div class="chart_div">
-                    {{ chart_dengue | safe }}
-                  </div>
-                </div>
-            </div>
-            {% if n_alerts_chik > 0 %}
-            <div class="col-sm-{{chart_cols}}">
-                <div>
-                  <div class="chart_div">
-                    {{ chart_chik | safe }}
-                  </div>
-                </div>
-            </div>
-            {% endif %}
-
-            {% if n_alerts_zika > 0 %}
-            <div class="col-sm-{{chart_cols}}">
-                <div>
-                  <div class="chart_div">
-                    {{ chart_zika | safe }}
-                  </div>
-                </div>
-            </div>
-            <div class="p"></div>
-            {% endif %}
-
+         <!-- chart-plot:begin -->
+        <div class="container">
+            {% state_component %}
         </div>
         <!-- chart-plot:end -->
 
-        <!-- chart-states:begin -->
-        <div class="row">
-            {% for state_name in states %}
-            <div class="col-sm-{{card_cols}}">
-                <div class="card my-2">
-                    <h4 class="card-header">{{state_name}}</h4>
-                    <div class="card-body">
-                        <small style="color:#888888;">
-                            {% blocktrans %}Última atualização{% endblocktrans %}:
-                            {{last_se|lookup:state_name}}
-                        </small>
-                        <table class="table-card">
-                            <tr>
-                                <th></th>
-                                {% for disease in diseases %}
-                                <th style="text-transform:capitalize;">{{disease}}</th>
-                                {% endfor %}
-                            </tr>
-                            <tr>
-                                <th>{% blocktrans %}Municípios participantes{% endblocktrans %}:</th>
-                                {% for disease in diseases %}
-                                <td class="card-indicator-value">
-                                    <span>{{count_cities|lookup:disease|lookup:state_name}}</span></td>
-                                {% endfor %}
-                            </tr>
-                            <tr>
-                                <th>{% blocktrans %}Total de casos notificado / estimados na semana{% endblocktrans %}:</th>
-                                {% for disease in diseases %}
-                                <td class="card-indicator-value">
-                                    <span>{{current_week|lookup:disease|lookup:state_name|lookup:'casos'}} /
-                                    {{current_week|lookup:disease|lookup:state_name|lookup:'casos_est'}}
-                                </span></td>
-                                {% endfor %}
-                            </tr>
-                            <tr>
-                                <th>{% blocktrans %}Previsão de casos para as próximas semanas{% endblocktrans %}:</th>
-                                {% for disease in diseases %}
-                                <td class="card-indicator-value">
-                                    <span>{{estimated_cases_next_week|lookup:disease|lookup:state_name}}</span></td>
-                                {% endfor %}
-                            </tr>
-                            <tr>
-                                <th>{% blocktrans %}Variação em relação à semana anterior{% endblocktrans %}:</th>
-                                {% for disease in diseases %}
-                                <td class="">
-                                    {% if variation_to_current_week|lookup:disease|lookup:state_name > 0%}
-                                        <span class="badge alert-danger">
-                                            {{variation_to_current_week|lookup:disease|lookup:state_name}}%
-                                            &uarr;
-                                        </span>
-                                    {% elif variation_to_current_week|lookup:disease|lookup:state_name < 0 %}
-                                        <span class="badge alert-success">
-                                            {{variation_to_current_week|lookup:disease|lookup:state_name}}%
-                                            &darr;
-                                        </span>
-                                    {% else %}
-                                        <span class="badge alert-warning">
-                                            {{variation_to_current_week|lookup:disease|lookup:state_name}}%
-                                        </span>
-                                    {% endif %}
-                                </td>
-                                {% endfor %}
-                            </tr>
-                            <tr>
-                                <th>{% blocktrans %}Variação da quadrissemana atual em relação à quadrissemana do último ano{% endblocktrans %}:</th>
-                                {% for disease in diseases %}
-                                <td class="">
-                                    {% if variation_4_weeks|lookup:disease|lookup:state_name > 0%}
-                                        <span class="badge alert-danger">
-                                            {{variation_4_weeks|lookup:disease|lookup:state_name}}%
-                                            &uarr;
-                                        </span>
-                                    {% elif variation_4_weeks|lookup:disease|lookup:state_name < 0 %}
-                                        <span class="badge alert-success">
-                                            {{variation_4_weeks|lookup:disease|lookup:state_name}}%
-                                            &darr;
-                                        </span>
-                                    {% else %}
-                                        <span class="badge alert-warning">
-                                            {{variation_4_weeks|lookup:disease|lookup:state_name}}%
-                                        </span>
-                                    {% endif %}
-                                </td>
-                                {% endfor %}
-                            </tr>
-                            <tr>
-                                <th></th>
-                                <td></td>
-                            </tr>
-                        </table>
-                        <div class="row vertical-align">
-                            <div class="col-sm-12" style="font-size:12px;">
-                                <a href="/alerta/{{state_initials|lookup:state_name}}">
-                                    {% blocktrans %}Clique aqui para ver mais detalhes{% endblocktrans %}.
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-              <!--
-              <div class="chart-notes">
-                This is a sample text region to describe this chart.
-              </div>
-              -->
-            </div>
-            {% endfor %}
-        </div>
-        <!-- chart-states:end -->
     </div>
 
 {% endblock %}

@@ -1,0 +1,41 @@
+
+<!-- Start component state lists -->
+{% block state_component %}
+
+<div class="columns">
+  <h4>State Overview</h4>&nbsp;
+
+    <select name="example">
+    <option value="A">Rio de Janeiro</option>
+    <option value="B">São Paulo</option>
+    <option value="-">All States</option>
+    </select>
+
+  <div class="column">
+        <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+            <th width="20%">State</th>
+            {% for t in title_table %}
+            <td width="20%" align="center"><strong>{{ t }}</strong></td>
+            {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for state in states %}
+        <tr>
+            <td>{{ state }}</td>
+            {% for d in diseases_code %}
+            <td align="center">
+            <span>
+                <text> {{ d }} </text>
+            </span></td>
+            {% endfor %}
+        </tr>
+        </tbody>
+        {% endfor %}
+        </table>
+    </div>
+    </div>
+{% endblock %}
+<!-- End component state lists -->
