@@ -25,10 +25,13 @@ pip-selfcheck.json
 /shapely
 /share
 .ipynb_checkpoints
+notebooks_tmp/
 geodjango.db
 chunked_uploads
 authorized_keys
 
+AlertaDengue/static/geo_info.json
+AlertaDengue/static/geojson_simplified/*
 /AlertaDengue/*.dbf
 /*.dbf
 *.egg-info
