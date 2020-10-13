@@ -1,3 +1,7 @@
+'''
+Module for plotting charts in the cities reports
+'''
+
 from time import mktime
 import json
 from django.utils.translation import gettext as _
@@ -8,10 +12,6 @@ from plotly.subplots import make_subplots
 
 # local
 from dados.dbdata import load_series
-
-'''
-Module for plotting charts in the cities reports
-'''
 
 
 def int_or_none(x):

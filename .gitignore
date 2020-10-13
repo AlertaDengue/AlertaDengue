@@ -18,9 +18,6 @@ docker_shared_files
 /include
 /lib
 /AlertaDengue/geodjango.db
-/AlertaDengue/static_files/*
-/AlertaDengue/static/geojson/*.json
-/AlertaDengue/static/shapefile/*
 pip-selfcheck.json
 /shapely
 /share
@@ -30,8 +27,7 @@ geodjango.db
 chunked_uploads
 authorized_keys
 
-AlertaDengue/static/geo_info.json
-AlertaDengue/static/geojson_simplified/*
+AlertaDengue/static/*
 /AlertaDengue/*.dbf
 /*.dbf
 *.egg-info

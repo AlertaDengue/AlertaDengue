@@ -1,3 +1,7 @@
+'''
+Module for plotting in the homepage charts
+'''
+
 from datetime import timedelta
 from time import mktime
 from django.utils.translation import gettext as _
@@ -8,10 +12,6 @@ from plotly.subplots import make_subplots
 
 # local
 from dados.dbdata import get_series_by_UF
-
-'''
-Module for plotting in the homepage charts
-'''
 
 
 class HomeCharts:

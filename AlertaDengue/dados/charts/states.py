@@ -1,10 +1,10 @@
-import plotly.graph_objs as go
-import pandas as pd
-from plotly.subplots import make_subplots
-
 '''
 Module for plotting charts in the states reports
 '''
+
+import plotly.graph_objs as go
+import pandas as pd
+from plotly.subplots import make_subplots
 
 
 class ReportStateCharts:
