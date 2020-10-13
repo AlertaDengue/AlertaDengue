@@ -33,7 +33,11 @@ from .dbdata import (
 from .episem import episem, episem2date
 from .maps import get_city_info
 from .models import City, RegionalHealth
-from .charts import ReportCityCharts, ReportStateCharts, HomeCharts, CityCharts
+
+from dados.charts.states import ReportStateCharts
+from dados.charts.home import HomeCharts
+from dados.charts.cities import ReportCityCharts, CityCharts
+
 from gis.geotiff import convert_from_shapefile
 
 DBF = apps.get_model('dbf', 'DBF')
