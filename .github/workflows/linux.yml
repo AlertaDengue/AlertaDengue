@@ -1,14 +1,13 @@
- 
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+ # This workflow will install Postgresql dependencies and run the database demo.
+
 
 name: CI
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master]
   pull_request:
-    branches: [ master, develop ]
+    branches: [ master]
 
 jobs:
   build:
@@ -31,42 +30,14 @@ jobs:
         sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
         sudo apt-get update
         sudo apt-get install docker-ce
-
     - name: Check docker and docker-compose versions
       run: |
         docker-compose --version
         docker --version
-
-    - name: Git-LFS initialize
+    - name: Download data from Dataverse
       run: |
-        git-lfs --version
-        git lfs install
-  
-    - name: Clone frontend repository
+        make download_demodb
+    - name: Build and deploy
       run: |
-        git clone https://github.com/esloch/Data.git docker/dev_dumps
-        ls -la docker/dev_dumps
-
-    - name: Rename data file and merge patch
-      run: |
-        mv docker/dev_dumps/alertademo_data.sql docker/dev_dumps/latest_dengue.sql
-        cat docker/dev_dumps/patch/notificacao.sql >> docker/dev_dumps/latest_dengue.sql
-        du -h docker/dev_dumps/
-
-    - name: Prepare data file
-      run: |
-        cat docker/dev_dumps/latest_dengue.sql | gzip > docker/dev_dumps/latest_dengue.sql.gz
-        echo '' | gzip > docker/dev_dumps/latest_infodengue.sql.gz
-
-    - name: Copy env_file as env_staging
-      run: |
-        cp example_env_file .env_staging
-
-    - name: make deploy_staging
-      run: make deploy_staging
-
-    - name: Run flake8
-      run: make flake8_staging SERVICES_STAGING=staging_web
-
-    - name: Run tests
-      run: make test_staging_web SERVICES_STAGING=staging_web
+        make build
+        make deploy

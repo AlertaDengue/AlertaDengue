@@ -152,22 +152,18 @@ class AlertCityView(View, _GetMethod):
             eyw_start = ey_start * 100 + ew_start
             eyw_end = ey_end * 100 + ew_end
 
-            if geocode == MRJ_GEOCODE:
-                df = AlertCity.search_rj(
-                    disease=disease, ew_start=eyw_start, ew_end=eyw_end
-                )
-            else:
-                df = AlertCity.search(
-                    geocode=geocode,
-                    disease=disease,
-                    ew_start=eyw_start,
-                    ew_end=eyw_end,
-                )
-                # change all keys to lower case
-                df.drop(
-                    columns=['municipio_geocodigo', 'municipio_nome'],
-                    inplace=True,
-                )
+            
+            df = AlertCity.search(
+                geocode=geocode,
+                disease=disease,
+                ew_start=eyw_start,
+                ew_end=eyw_end,
+            )
+            # change all keys to lower case
+            df.drop(
+                columns=['municipio_geocodigo', 'municipio_nome'],
+                inplace=True,
+            )
 
             if format == 'json':
                 result = df.to_json(orient='records')
