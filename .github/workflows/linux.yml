@@ -42,8 +42,7 @@ jobs:
   
     - name: Clone frontend repository
       run: |
-        git clone https://github.com/esloch/Data.git docker/dev_dumps
-        ls -la docker/dev_dumps
+        git clone https://github.com/esloch/Data.git
     - name: Download demo_data
       run: |
         mkdir -p docker/dev_dumps
