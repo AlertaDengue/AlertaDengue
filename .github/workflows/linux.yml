@@ -25,32 +25,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install Latest Docker
+    - name: Prepare data file from Dataverser
       run: |
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
-        sudo apt-get update
-        sudo apt-get install docker-ce
-    - name: Check docker and docker-compose versions
-      run: |
-        docker-compose --version
-        docker --version
-    - name: Git-LFS initialize
-      run: |
-        git-lfs --version
-        git lfs install
-  
-    - name: Clone frontend repository
-      run: |
-        git clone https://github.com/esloch/Data.git
-    - name: Download demo_data
-      run: |
-        wget https://dataverse.harvard.edu/api/access/datafile/4154429 -O docker/demo_data/demo_infodengue.sql.gz
-        wget https://dataverse.harvard.edu/api/access/datafile/4154518 -O docker/demo_data/demo_dengue.sql.gz
+        mkdir -p docker/dev_dumps
+        wget https://dataverse.harvard.edu/api/access/datafile/4154429 -O docker/dev_dumps/latest_infodengue.sql.gz
+        wget https://dataverse.harvard.edu/api/access/datafile/4154518 -O docker/dev_dumps/latest_dengue.sql.gz
 
     - name: Copy env_file as env_staging
       run: |
         cp example_env_file .env_staging
+        
     - name: make deploy_staging
       run: make deploy_staging
 
