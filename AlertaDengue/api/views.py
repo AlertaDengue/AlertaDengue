@@ -3,7 +3,7 @@ from django.views.generic.base import View
 from datetime import datetime
 
 # local
-from .db import NotificationQueries, STATE_NAME, AlertCity, MRJ_GEOCODE
+from .db import NotificationQueries, STATE_NAME, AlertCity
 from dados.episem import episem
 
 import json
@@ -152,7 +152,6 @@ class AlertCityView(View, _GetMethod):
             eyw_start = ey_start * 100 + ew_start
             eyw_end = ey_end * 100 + ew_end
 
-            
             df = AlertCity.search(
                 geocode=geocode,
                 disease=disease,
