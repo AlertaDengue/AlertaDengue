@@ -1,13 +1,14 @@
- # This workflow will install Postgresql dependencies and run the database demo.
-
+ 
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
 name: CI
 
 on:
   push:
-    branches: [ master]
+    branches: [ master, develop ]
   pull_request:
-    branches: [ master]
+    branches: [ master, develop ]
 
 jobs:
   build:
@@ -23,21 +24,22 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+  
+    - name: Download data files for Dataverse
+      run: |
+        mkdir -p docker/dev_dumps
+        wget https://dataverse.harvard.edu/api/access/datafile/4154429 -O docker/dev_dumps/latest_infodengue.sql.gz
+        wget https://dataverse.harvard.edu/api/access/datafile/4154518 -O docker/dev_dumps/latest_dengue.sql.gz
 
-    - name: Install Latest Docker
+    - name: Copy env_file as env_staging
       run: |
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
-        sudo apt-get update
-        sudo apt-get install docker-ce
-    - name: Check docker and docker-compose versions
-      run: |
-        docker-compose --version
-        docker --version
-    - name: Download data from Dataverse
-      run: |
-        make download_demodb
-    - name: Build and deploy
-      run: |
-        make build
-        make deploy
+        cp example_env_file .env_staging
+
+    - name: make deploy_staging
+      run: make deploy_staging
+
+    - name: Run flake8
+      run: make flake8_staging SERVICES_STAGING=staging_web
+
+    - name: Run tests
+      run: make test_staging_web SERVICES_STAGING=staging_web
