@@ -537,7 +537,6 @@ class NotificationQueries:
 
 
 class AlertCity:
-
     @staticmethod
     def search(disease: str, geocode: int, ew_start: int, ew_end: int):
         """
