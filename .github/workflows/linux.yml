@@ -42,12 +42,12 @@ jobs:
   
     - name: Clone frontend repository
       run: |
+        mkdir -p docker/dev_dumps
         git clone https://github.com/esloch/Data.git docker/dev_dumps
         ls -la docker/dev_dumps
 
     - name: Download demo_data
       run: |
-        mkdir -p docker/dev_dumps
         wget https://dataverse.harvard.edu/api/access/datafile/4154429 -O docker/demo_data/demodb_infodengue.sql.gz
         wget https://dataverse.harvard.edu/api/access/datafile/4154518 -O docker/demo_data/demodb_dengue.sql.gz
 
