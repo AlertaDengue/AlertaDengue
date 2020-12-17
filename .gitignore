@@ -28,6 +28,7 @@ chunked_uploads
 authorized_keys
 
 AlertaDengue/static/*
+AlertaDengue/static_files/*
 /AlertaDengue/*.dbf
 /*.dbf
 *.egg-info
