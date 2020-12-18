@@ -319,16 +319,18 @@ def get_series_by_UF(disease='dengue', weeks=None):
     """
     cache_id = 'get_series_by_UF-{}'.format(disease)
     series = cache.get(cache_id)
-
     _disease = get_disease_suffix(disease)
 
+    # TODO: this function is deprecated and will be
+    # removed when plotly-dash charts are ready
     if series is None:
         with db_engine.connect() as conn:
-
             if weeks:
                 sql = f'''
                 SELECT * FROM uf_total{_disease}_view
-                WHERE data >= NOW() - interval '{weeks+2} weeks'
+                WHERE data >= (
+                    SELECT MAX(data) AS max_date FROM uf_total{_disease}_view
+                ) - INTERVAL '{weeks+2} WEEKS'
                 '''
             else:
                 sql = f'SELECT * FROM uf_total{_disease}_view;'

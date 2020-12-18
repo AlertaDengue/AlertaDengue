@@ -400,7 +400,7 @@ class AlertaMainView(TemplateView):
                 # cases estimation
                 cases_est = df_state.casos_est_s.values
 
-                case_series_state[d][s] = cases[:-52]
+                case_series_state[d][s] = cases[-52:]
 
                 if d == 'dengue':
                     if not df_state.empty:
@@ -414,7 +414,7 @@ class AlertaMainView(TemplateView):
                     'casos_est': cases_est[-1] if cases_est.size else 0,
                 }
                 estimated_cases_next_week[d][s] = _('Em breve')
-                v1 = 0 if not cases_est.size else cases_est[-2]
+                v1 = 0 if not cases_est.size > 1 else cases_est[-2]
                 v2 = 0 if not cases_est.size else cases_est[-1]
 
                 v1_week_fixed[d][s] = v1 == 0 and v2 != 0
