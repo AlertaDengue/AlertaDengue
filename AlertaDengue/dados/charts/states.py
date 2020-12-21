@@ -35,11 +35,8 @@ class ReportStateCharts:
         df = deepcopy(df)
         ks_cases = ['casos notif. {}'.format(disease)]
 
-        # TODO: check this code
-
         df_tweet = df.reset_index()[['SE', 'tweets'] + ks_cases]
         df_tweet = df_tweet[df_tweet.SE >= year_week - 200]
-
         df_tweet.rename(columns={'tweets': 'menções'}, inplace=True)
 
         df_grp = (
@@ -58,7 +55,7 @@ class ReportStateCharts:
             go.Scatter(
                 x=df_grp['SE'],
                 y=df_grp.iloc[:, 1],  # menções tweets
-                name='Tweets',
+                name=_('Menções em tweets'),
                 marker={'color': 'rgb(51, 172, 255)'},
                 text=df_grp.SE.map(lambda v: '{}'.format(str(v)[-2:])),
                 hoverinfo='text',
@@ -73,7 +70,7 @@ class ReportStateCharts:
             go.Scatter(
                 x=df_grp['SE'],
                 y=df_grp.iloc[:, 2],  # casos notif
-                name='Casos notificados',
+                name=_('Casos notificados'),
                 marker={'color': 'rgb(255,150,0)'},
                 text=df_grp.SE.map(lambda v: '{}'.format(str(v)[-2:])),
                 hoverinfo='text',
@@ -85,9 +82,9 @@ class ReportStateCharts:
         )
 
         figure.update_layout(
-            title='Menções na mídia social',
+            title=_('Menções na mídia social'),
             xaxis=dict(
-                title='Período (Ano/Semana)',
+                title=_('Período: Ano/Semana'),
                 tickangle=-60,
                 nticks=len(ks_cases) // 4,
                 showline=True,
@@ -122,7 +119,13 @@ class ReportStateCharts:
         )
 
         # Set y-axes titles
-        figure.update_yaxes(title_text="<b>Menções</b>", secondary_y=False)
-        figure.update_yaxes(title_text="<b>Casos</b>", secondary_y=True)
+        figure.update_yaxes(
+            title_text="<b>{}</b>".format(_("Menções em tweets")),
+            secondary_y=False,
+        )
+        figure.update_yaxes(
+            title_text="<b>{}</b>".format(_("Casos notificados")),
+            secondary_y=True,
+        )
 
         return figure.to_html()

@@ -1,8 +1,18 @@
 import datetime
-import unittest
 from unittest import TestCase
-from AlertaDengue.dados import dbdata
-from . import legacy  # noqa
+from pandas._testing import assert_frame_equal
+
+from dados import dbdata
+from dados.tests import legacy  # noqa
+
+
+# Paramaters
+cities = [3304557]
+year_week_start = 202003
+year_week_end = 202003
+var_climate = 'temp_min'
+year_week = 202002
+station_id = 'SBRJ'
 
 
 class TestLoadAlerta(TestCase):
@@ -53,7 +63,6 @@ class TestLoadAlerta(TestCase):
             '{}'.format(type(self.series[str(self.cidade)]['dia'][0])),
         )
 
-    @unittest.skip("Waiting data on database demo. skipping")
     def test_alerta_is_between_0_and_3(self):
         self.assertEqual(max(self.series[str(self.cidade)]['alerta']), 3)
         self.assertEqual(min(self.series[str(self.cidade)]['alerta']), 0)
@@ -89,7 +98,17 @@ class TestMunicipio(TestCase):
 class TestReportState(TestCase):
     def test_report_state(self):
 
-        # função = Value
-        # função = Value
+        df_sql_func = legacy.OldReportState._read_disease_data(
+            cities, station_id, year_week, var_climate
+        )
+        df_sql = df_sql_func.iloc[:, 3:12].astype(float)
+        df_sql.info()
 
-        assert True
+        df_ibis_func = dbdata.ReportState.read_disease_data(
+            cities, station_id, year_week, var_climate
+        )
+        df_ibis_func.set_index("SE", inplace=True)
+        df_ibis = df_ibis_func.iloc[:, 3:12].astype(float)
+        df_ibis.info()
+
+        assert_frame_equal(df_sql, df_ibis)

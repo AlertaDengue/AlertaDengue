@@ -20,8 +20,7 @@ from dados.episem import episem, episem2date
 from ad_main import settings
 
 with cf.config_prefix('sql'):
-    k = 'default_limit'
-    cf.set_option(k, None)
+    cf.set_option('default_limit', None)
 
 # rio de janeiro city geocode
 MRJ_GEOCODE = 3304557
