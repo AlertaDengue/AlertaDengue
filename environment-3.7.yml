@@ -5,7 +5,6 @@ channels:
 dependencies:
 - django=3.0.7
 - django-bootstrap4
-- ibis-framework
 - geojson
 - gunicorn
 - numpy
@@ -38,7 +37,7 @@ dependencies:
 - plotly=4.0.0
 - BeautifulSoup4
 - make
-#- setuptools=41.5.1 # TODO: remove this when django 3 is used
 - pip:
     - django-leaflet==0.26.0
     - django-maintenance-mode
+    - ibis_framework==1.3.0
