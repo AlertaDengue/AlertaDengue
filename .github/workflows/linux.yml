@@ -24,39 +24,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Install Latest Docker
-      run: |
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
-        sudo apt-get update
-        sudo apt-get install docker-ce
-
-    - name: Check docker and docker-compose versions
-      run: |
-        docker-compose --version
-        docker --version
-
-    - name: Git-LFS initialize
-      run: |
-        git-lfs --version
-        git lfs install
   
-    - name: Clone frontend repository
+    - name: Download data files for Dataverse
       run: |
-        git clone https://github.com/esloch/Data.git docker/dev_dumps
-        ls -la docker/dev_dumps
-
-    - name: Rename data file and merge patch
-      run: |
-        mv docker/dev_dumps/alertademo_data.sql docker/dev_dumps/latest_dengue.sql
-        cat docker/dev_dumps/patch/notificacao.sql >> docker/dev_dumps/latest_dengue.sql
-        du -h docker/dev_dumps/
-
-    - name: Prepare data file
-      run: |
-        cat docker/dev_dumps/latest_dengue.sql | gzip > docker/dev_dumps/latest_dengue.sql.gz
-        echo '' | gzip > docker/dev_dumps/latest_infodengue.sql.gz
+        mkdir -p docker/dev_dumps
+        wget https://dataverse.harvard.edu/api/access/datafile/4154429 -O docker/dev_dumps/latest_infodengue.sql.gz
+        wget https://dataverse.harvard.edu/api/access/datafile/4154518 -O docker/dev_dumps/latest_dengue.sql.gz
 
     - name: Copy env_file as env_staging
       run: |

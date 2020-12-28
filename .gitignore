@@ -18,17 +18,17 @@ docker_shared_files
 /include
 /lib
 /AlertaDengue/geodjango.db
-/AlertaDengue/static_files/*
-/AlertaDengue/static/geojson/*.json
-/AlertaDengue/static/shapefile/*
 pip-selfcheck.json
 /shapely
 /share
 .ipynb_checkpoints
+notebooks_tmp/
 geodjango.db
 chunked_uploads
 authorized_keys
 
+AlertaDengue/static/*
+AlertaDengue/static_files/*
 /AlertaDengue/*.dbf
 /*.dbf
 *.egg-info
