@@ -8,7 +8,7 @@ dependencies:
 - geojson
 - gunicorn
 - numpy
-- pandas
+- pandas=1.1.5 #issue#385
 - pip=19.3
 - python=3.7
 - python-dotenv

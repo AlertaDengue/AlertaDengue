@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-11 14:11+0000\n"
+"POT-Creation-Date: 2020-12-29 12:12+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -20,34 +20,73 @@ msgstr ""
 "X-Source-Language: pt_BR\n"
 "X-Generator: Poedit 1.8.7.1\n"
 
-#: AlertaDengue/dados/charts.py:74
+#: AlertaDengue/dados/charts/cities.py:74
 #, fuzzy
 #| msgid "Limiar epidêmico"
 msgid "limiar pré epidêmico"
 msgstr "Epidemic threshold"
 
-#: AlertaDengue/dados/charts.py:75
+#: AlertaDengue/dados/charts/cities.py:75
 #, fuzzy
 #| msgid "Limiar epidêmico"
 msgid "limiar pós epidêmico"
 msgstr "Epidemic threshold"
 
-#: AlertaDengue/dados/charts.py:76
+#: AlertaDengue/dados/charts/cities.py:76
 #, fuzzy
 #| msgid "Limiar epidêmico"
 msgid "limiar epidêmico"
 msgstr "Epidemic threshold"
 
-#: AlertaDengue/dados/charts.py:572
+#: AlertaDengue/dados/charts/cities.py:436
+#: AlertaDengue/dados/charts/cities.py:451
+#: AlertaDengue/dados/charts/states.py:63
+#: AlertaDengue/dados/charts/states.py:78
+#, fuzzy, python-brace-format
+#| msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados<extra></extra>"
+msgid "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
+msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
+
+#: AlertaDengue/dados/charts/cities.py:614
+msgid "Casos Notificados de "
+msgstr "Estimated cases "
+
+#: AlertaDengue/dados/charts/cities.py:618
+#: AlertaDengue/dados/charts/cities.py:634
+#: AlertaDengue/dados/charts/cities.py:652
+#: AlertaDengue/dados/charts/cities.py:670
+#: AlertaDengue/dados/charts/cities.py:688
 #, python-brace-format
-msgid "%{text} <br>%{y} Casos Estimados<extra></extra>"
-msgstr "%{text} <br>%{y} Estimated cases<extra></extra>"
+msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados<extra></extra>"
+msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
 
-#: AlertaDengue/dados/charts.py:583
-msgid "Casos Estimados de {} nos municípios monitorados"
-msgstr "Estimated cases of {} in monitored cities"
+#: AlertaDengue/dados/charts/cities.py:630
+msgid "Alerta Verde de "
+msgstr "Green Level "
 
-#: AlertaDengue/dados/charts.py:618 AlertaDengue/dados/charts.py:860
+#: AlertaDengue/dados/charts/cities.py:648
+msgid "Alerta Amarelo de "
+msgstr "Yellow Level "
+
+#: AlertaDengue/dados/charts/cities.py:666
+msgid "Alerta Laranja de "
+msgstr "Orange Level "
+
+#: AlertaDengue/dados/charts/cities.py:684
+msgid "Alerta Vermelho de "
+msgstr "Red Level "
+
+#: AlertaDengue/dados/charts/cities.py:703
+msgid "Casos Estimados de "
+msgstr "Estimated cases "
+
+#: AlertaDengue/dados/charts/cities.py:707
+#, python-brace-format
+msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
+msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
+
+#: AlertaDengue/dados/charts/cities.py:718
+#: AlertaDengue/dados/charts/home.py:159
 #: AlertaDengue/dados/templates/alert_state/age.html:125
 #: AlertaDengue/dados/templates/alert_state/date.html:100
 #: AlertaDengue/dados/templates/alert_state/disease.html:122
@@ -59,41 +98,34 @@ msgstr "Estimated cases of {} in monitored cities"
 msgid "Casos"
 msgstr "Cases"
 
-#: AlertaDengue/dados/charts.py:756
-msgid "Casos Notificados de "
+#: AlertaDengue/dados/charts/home.py:113
+#, python-brace-format
+msgid "%{text} <br>%{y} Casos Estimados<extra></extra>"
+msgstr "%{text} <br>%{y} Estimated cases<extra></extra>"
+
+#: AlertaDengue/dados/charts/home.py:124
+msgid "Casos Estimados de {} nos municípios monitorados"
+msgstr "Estimated cases of {} in monitored cities"
+
+#: AlertaDengue/dados/charts/states.py:58
+#: AlertaDengue/dados/charts/states.py:122
+msgid "Menções em tweets"
+msgstr "Mentions in tweets"
+
+#: AlertaDengue/dados/charts/states.py:73
+#: AlertaDengue/dados/charts/states.py:123
+#, fuzzy
+#| msgid "Casos Notificados de "
+msgid "Casos notificados"
 msgstr "Estimated cases "
 
-#: AlertaDengue/dados/charts.py:760 AlertaDengue/dados/charts.py:776
-#: AlertaDengue/dados/charts.py:794 AlertaDengue/dados/charts.py:812
-#: AlertaDengue/dados/charts.py:830
-#, python-brace-format
-msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados<extra></extra>"
-msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
+#: AlertaDengue/dados/charts/states.py:85
+msgid "Menções na mídia social"
+msgstr "Mentions on social media"
 
-#: AlertaDengue/dados/charts.py:772
-msgid "Alerta Verde de "
-msgstr "Green Level "
-
-#: AlertaDengue/dados/charts.py:790
-msgid "Alerta Amarelo de "
-msgstr "Yellow Level "
-
-#: AlertaDengue/dados/charts.py:808
-msgid "Alerta Laranja de "
-msgstr "Orange Level "
-
-#: AlertaDengue/dados/charts.py:826
-msgid "Alerta Vermelho de "
-msgstr "Red Level "
-
-#: AlertaDengue/dados/charts.py:845
-msgid "Casos Estimados de "
-msgstr "Estimated cases "
-
-#: AlertaDengue/dados/charts.py:849
-#, python-brace-format
-msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
-msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
+#: AlertaDengue/dados/charts/states.py:87
+msgid "Período: Ano/Semana"
+msgstr "Period: Year / Week"
 
 #: AlertaDengue/dados/models.py:17 AlertaDengue/forecast/models.py:55
 msgid "Código do Município"
@@ -1524,7 +1556,7 @@ msgstr ""
 #: AlertaDengue/dados/templates/report_filter_report_type.html:46
 #: AlertaDengue/dados/templates/report_filter_state.html:52
 #: AlertaDengue/dados/templates/report_filter_state.html:60
-#: AlertaDengue/dados/templates/report_state.html:129
+#: AlertaDengue/dados/templates/report_state.html:130
 #: AlertaDengue/templates/base.html:74
 msgid "Relatórios"
 msgstr "Report"
@@ -1541,6 +1573,7 @@ msgid "Relatório da Situação das Arboviroses em "
 msgstr "Arborivirosis Situation report of "
 
 #: AlertaDengue/dados/templates/report_filter_city.html:71
+#: AlertaDengue/dados/templates/report_state.html:227
 #: AlertaDengue/dados/templates/services_api.html:98
 msgid "Município"
 msgstr "City"
@@ -1576,7 +1609,7 @@ msgid "Tipo de Relatório"
 msgstr "Report Type"
 
 #: AlertaDengue/dados/templates/report_filter_report_type.html:61
-#: AlertaDengue/dados/templates/report_state.html:130
+#: AlertaDengue/dados/templates/report_state.html:131
 msgid "Estadual"
 msgstr "By state"
 
@@ -1596,14 +1629,381 @@ msgstr "Select a State"
 msgid "Selecione a Unidade Federal desejada para a consulta"
 msgstr "Select a desired State to search."
 
-#: AlertaDengue/dados/templates/report_state.html:138
+#: AlertaDengue/dados/templates/report_state.html:139
 msgid "Relatório Estadual da Situação das Arboviroses em "
 msgstr "Arborivirosis Situation report of "
+
+#: AlertaDengue/dados/templates/report_state.html:159
+msgid "Data da última atualização"
+msgstr "Last update"
+
+#: AlertaDengue/dados/templates/report_state.html:161
+msgid ""
+"\n"
+"      Esse é o relatório resumido da situação de alerta de arboviroses no\n"
+"      estado, detalhado por Regional de Saúde. Para acessar estatísticas\n"
+"      gerais do estado, consulte a"
+msgstr ""
+"\n"
+"This is the summary report of the arboviruses alert situation in \n"
+"state, detailed by Regional Health. To access statistics \n"
+"general status, see   "
+
+#: AlertaDengue/dados/templates/report_state.html:165
+msgid "página de estados"
+msgstr "states page"
+
+#: AlertaDengue/dados/templates/report_state.html:166
+msgid "E para consultar um município específico, consulte a"
+msgstr "To consult a specific municipality, consult the"
+
+#: AlertaDengue/dados/templates/report_state.html:167
+msgid "página de relatórios municipais"
+msgstr "municipal reports page"
+
+#: AlertaDengue/dados/templates/report_state.html:175
+msgid "Mapa Alerta Dengue"
+msgstr "Dengue Level"
+
+#: AlertaDengue/dados/templates/report_state.html:182
+msgid "Mapa Alerta Chikungunya"
+msgstr "Chikungunya Level"
+
+#: AlertaDengue/dados/templates/report_state.html:189
+msgid "Mapa Alerta Zika"
+msgstr "Zika Level"
+
+#: AlertaDengue/dados/templates/report_state.html:197
+msgid "Índice"
+msgstr "Index"
+
+#: AlertaDengue/dados/templates/report_state.html:200
+msgid "Regional"
+msgstr ""
+
+#: AlertaDengue/dados/templates/report_state.html:213
+msgid ""
+" \n"
+"            A tabela abaixo mostra os niveis de alerta em cada município da\n"
+"            Regional de Saúde. As cores indicam niveis de atenção, conforme\n"
+"            detalhado na "
+msgstr ""
+" \n"
+"            The table below shows the alert levels in each municipality in\n"
+"            regional Health. The colors indicate levels of attention, as\n"
+"            detailed in "
+
+#: AlertaDengue/dados/templates/report_state.html:216
+msgid "tabela de cores"
+msgstr "Table of content"
+
+#: AlertaDengue/dados/templates/report_state.html:223
+msgid "Alertas"
+msgstr "Levels"
+
+#: AlertaDengue/dados/templates/report_state.html:253
+msgid "Casos notificados de arboviroses na Regional de Saúde"
+msgstr "Notified cases of arboviruses in the Regional Health"
+
+#: AlertaDengue/dados/templates/report_state.html:256
+msgid ""
+" \n"
+"            A Figura abaixo mostra a série temporal de casos notificados de\n"
+"            arboviroses na última semana. A curva de menções refere-se à\n"
+"            intensidade de menção de sintomas de arboviroses e presença de\n"
+"            mosquitos de acordo com a população do município que usa\n"
+"            redes sociais. Esse indicador, que é mais eficaz em cidades\n"
+"            maiores, deve ser visto como um auxiliar na detecção precoce de\n"
+"            aumento de casos. Atualmente, esse indicador é mais sensivel "
+"para\n"
+"            detectar dengue do que outras arboviroses"
+msgstr ""
+" \n"
+"The Figure below shows the time series of notified cases of \n"
+"arboviruses in the last week. The mention curve refers to \n"
+"intensity of mention of symptoms of arboviruses and presence of \n"
+"mosquitoes according to the population of the municipality using \n"
+"social networks. This indicator, which is most effective in cities \n"
+"larger, should be seen as an aid in the early detection of \n"
+"increase in cases. Currently, this indicator is more sensitivefor\n"
+"detect dengue than other arboviruses"
+
+#: AlertaDengue/dados/templates/report_state.html:334
+msgid "Resumo das últimas seis semanas epidemiológicas na Regional de Saúde"
+msgstr "Summary of the last six epidemiological weeks in the Regional Health"
+
+#: AlertaDengue/dados/templates/report_state.html:343
+msgid "Menção a arboviroses nas redes sociais"
+msgstr "Mention of arboviruses on social media"
+
+#: AlertaDengue/dados/templates/report_state.html:345
+#, fuzzy
+#| msgid ""
+#| " \n"
+#| "          A figura abaixo mostra a intensidade de menção de sintomas de "
+#| "arboviroses\n"
+#| "          e presença de mosquitos de acordo com a população do município "
+#| "que usa\n"
+#| "          redes sociais.\n"
+#| "          Esse indicador, que é mais eficaz em cidades maiores, deve ser "
+#| "visto como\n"
+#| "          um auxiliar na detecção precoce de aumento de casos. "
+#| "Atualmente,\n"
+#| "          esse indicador é mais sensivel para detectar dengue do que "
+#| "outras\n"
+#| "          arboviroses"
+msgid ""
+"\n"
+"          A figura abaixo mostra a intensidade de menção de sintomas de "
+"arboviroses\n"
+"          e presença de mosquitos de acordo com a população do município que "
+"usa\n"
+"          redes sociais.\n"
+"          Esse indicador, que é mais eficaz em cidades maiores, deve ser "
+"visto como\n"
+"          um auxiliar na detecção precoce de aumento de casos. Atualmente,\n"
+"          esse indicador é mais sensivel para detectar dengue do que outras\n"
+"          arboviroses"
+msgstr ""
+" \n"
+"The Figure below shows the time series of notified cases of \n"
+"arboviruses in the last week. The mention curve refers to \n"
+"intensity of mention of symptoms of arboviruses and presence of \n"
+"mosquitoes according to the population of the municipality using \n"
+"social networks. This indicator, which is most effective in cities \n"
+"larger, should be seen as an aid in the early detection of \n"
+"increase in cases. Currently, this indicator is more sensitivefor\n"
+"detect dengue than other arboviruses"
+
+#: AlertaDengue/dados/templates/report_state.html:374
+msgid "O código de Cores"
+msgstr "The color code"
+
+#: AlertaDengue/dados/templates/report_state.html:376
+msgid "As cores indicam niveis de atenção"
+msgstr "The colors indicate levels of alerts"
+
+#: AlertaDengue/dados/templates/report_state.html:380
+msgid "Verde"
+msgstr "Green"
+
+#: AlertaDengue/dados/templates/report_state.html:380
+msgid "condições climáticas desfavoráveis, seja"
+msgstr "unfavorable climatic conditions, whether"
+
+#: AlertaDengue/dados/templates/report_state.html:381
+msgid "por baixa temperatura ou baixa umidade, e baixa incidência de casos"
+msgstr "due to low temperature or low humidity, and low incidence of cases"
+
+#: AlertaDengue/dados/templates/report_state.html:384
+msgid "Amarelo"
+msgstr "Yellow"
+
+#: AlertaDengue/dados/templates/report_state.html:384
+msgid "condições climáticas propícias para"
+msgstr "favorable climatic conditions for"
+
+#: AlertaDengue/dados/templates/report_state.html:385
+msgid "aumento da população do vetor e transmissão de arboviroses"
+msgstr "increase of the vector population and transmission of arboviruses"
+
+#: AlertaDengue/dados/templates/report_state.html:388
+msgid "Laranja"
+msgstr "Orange"
+
+#: AlertaDengue/dados/templates/report_state.html:388
+msgid "transmissão aumentada e sustentada da arbovirose"
+msgstr "increased and sustained transmission of arbovirus"
+
+#: AlertaDengue/dados/templates/report_state.html:391
+msgid "Vermelho"
+msgstr "Red"
+
+#: AlertaDengue/dados/templates/report_state.html:391
+#, python-format
+msgid "incidência alta, acima dos 90%% históricos"
+msgstr "high incidence, above historical 90%%"
+
+#: AlertaDengue/dados/templates/report_state.html:405
+msgid "Lista das variáveis apresentadas nas tabelas"
+msgstr "List of variables presented in the tables"
+
+#: AlertaDengue/dados/templates/report_state.html:408
+msgid "SE"
+msgstr "SE"
+
+#: AlertaDengue/dados/templates/report_state.html:409
+msgid "semana epidemiológica"
+msgstr "Epidemiological week"
+
+#: AlertaDengue/dados/templates/report_state.html:411
+msgid "temperatura"
+msgstr "Temperature"
+
+#: AlertaDengue/dados/templates/report_state.html:412
+msgid "média das temperaturas mínimas da semana (em graus centígrados)"
+msgstr "average minimum temperatures for the week (in degrees centigrade)"
+
+#: AlertaDengue/dados/templates/report_state.html:414
+msgid "tweet"
+msgstr "Tweets"
+
+#: AlertaDengue/dados/templates/report_state.html:415
+msgid ""
+"número de tweets indicativos de casos de dengue na cidade. Por enquanto só "
+"há para dengue"
+msgstr ""
+"number of tweets indicating dengue cases in the city. For now onlythere is "
+"for dengue"
+
+#: AlertaDengue/dados/templates/report_state.html:417
+msgid "casos notif"
+msgstr "Estimated cases "
+
+#: AlertaDengue/dados/templates/report_state.html:418
+msgid "casos notificados de dengue, zika ou chikungunya"
+msgstr "reported cases of dengue, zika or chikungunya"
+
+#: AlertaDengue/dados/templates/report_state.html:420
+msgid "incidência"
+msgstr "Incidence"
+
+#: AlertaDengue/dados/templates/report_state.html:421
+msgid "incidência por 100.000 habitantes"
+msgstr "incidence per 100,000 population"
+
+#: AlertaDengue/dados/templates/report_state.html:423
+msgid "casos preditos"
+msgstr "Forecast cases"
+
+#: AlertaDengue/dados/templates/report_state.html:424
+msgid "número de casos estimados após correção pelo atraso de notificação"
+msgstr "number of estimated cases after correction for notification delay"
+
+#: AlertaDengue/dados/templates/report_state.html:426
+msgid "ICmin"
+msgstr "ICmin"
+
+#: AlertaDengue/dados/templates/report_state.html:427
+#, fuzzy, python-format
+#| msgid "número mínimo de casos estimados (IC 95%%)"
+msgid "número mínimo de casos estimados (IC 95%%)"
+msgstr "minimum number of estimated cases (95% CI)"
+
+#: AlertaDengue/dados/templates/report_state.html:429
+msgid "ICmax"
+msgstr "ICmax"
+
+#: AlertaDengue/dados/templates/report_state.html:430
+#, fuzzy, python-format
+#| msgid "número máximo de casos estimados (IC 95%%)"
+msgid "número máximo de casos estimados (IC 95%%)"
+msgstr "maximum number of estimated cases (95% CI)"
+
+#: AlertaDengue/dados/templates/report_state.html:432
+#: AlertaDengue/dados/templates/services_api.html:199
+msgid "Rt"
+msgstr "Rt"
+
+#: AlertaDengue/dados/templates/report_state.html:433
+msgid "número reprodutivo efetivo (> 1 indica aumento de casos transmissão)"
+msgstr ""
+"effective reproductive number (> 1 indicates increase in transmission cases)"
+
+#: AlertaDengue/dados/templates/report_state.html:435
+msgid "p(Rt1)"
+msgstr "p(Rt1)"
+
+#: AlertaDengue/dados/templates/report_state.html:436
+msgid ""
+"probabilidade do número reprodutivo ser maior que 1 (> 0.95 indica aumento "
+"significativo de casos)"
+msgstr ""
+"probability that the reproductive number is greater than 1 (> 0.95 indicates "
+"an increasesignificant of cases)"
+
+#: AlertaDengue/dados/templates/report_state.html:438
+msgid "nivel"
+msgstr "Level:"
+
+#: AlertaDengue/dados/templates/report_state.html:439
+msgid "cor do alerta (verde, amarelo, laranja, vermelho)"
+msgstr "alert level (green, yellow, orange, red)"
+
+#: AlertaDengue/dados/templates/report_state.html:447
+msgid "Notas"
+msgstr "Notes"
+
+#: AlertaDengue/dados/templates/report_state.html:450
+msgid ""
+"Os dados do sinan mais recentes ainda não foram totalmente digitados.\n"
+"        Estimamos o número esperado de casos notificados considerando o "
+"tempo\n"
+"        até os casos serem digitados"
+msgstr ""
+"The latest sinan data has not yet been fully entered. \n"
+"We estimate the expected number of reported cases considering thetime \n"
+"until cases are typed"
+
+#: AlertaDengue/dados/templates/report_state.html:454
+msgid ""
+"Os dados de redes sociais são coletados e\n"
+"        analisados pelo Observatório de Dengue (UFMG)"
+msgstr ""
+"The social media data is collected and \n"
+"analyzed by the Dengue Observatory (UFMG)"
+
+#: AlertaDengue/dados/templates/report_state.html:457
+msgid ""
+"Algumas vezes, os casos da última semana ainda não estao disponíveis,\n"
+"        nesse caso, usa-se uma estimação com base na tendência de variação "
+"da série"
+msgstr ""
+"Sometimes, cases from the past week are not yet available, \n"
+"in this case, an estimation based on the trend of variation is usedfrom the "
+"series"
+
+#: AlertaDengue/dados/templates/report_state.html:466
+msgid "Créditos"
+msgstr "Credits"
+
+#: AlertaDengue/dados/templates/report_state.html:468
+msgid ""
+"Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como "
+"parceira entre"
+msgstr ""
+"This was a project developed with support from SVS/MS and is operated as"
+"partner between"
+
+#: AlertaDengue/dados/templates/report_state.html:471
+msgid ""
+"Programa de Computação Científica, Fundação Oswaldo Cruz, Rio de Janeiro"
+msgstr "Scientific Computing Program, Oswaldo Cruz Foundation, Rio de Janeiro"
+
+#: AlertaDengue/dados/templates/report_state.html:473
+msgid "Escola de Matemática Aplicada, Fundação Getúlio Vargas"
+msgstr "School of Applied Mathematics, Fundação Getúlio Vargas"
+
+#: AlertaDengue/dados/templates/report_state.html:474
+msgid "Secretaria Estadual de Saúde do Rio Grande do Sul"
+msgstr "State Health Secretariat of Rio Grande do Sul"
+
+#: AlertaDengue/dados/templates/report_state.html:475
+msgid "Observatório de Dengue da UFMG"
+msgstr "UFMG Dengue Observatory"
+
+#: AlertaDengue/dados/templates/report_state.html:482
+msgid "Contato"
+msgstr "Contact Us"
+
+#: AlertaDengue/dados/templates/report_state.html:483
+msgid "Para mais detalhes sobre o sistema de alerta InfoDengue, consultar"
+msgstr "For more details on the InfoDengue alert system, see"
 
 #: AlertaDengue/dados/templates/report_state/map_chik.html:124
 #: AlertaDengue/dados/templates/services_maps.html:126
 msgid "Alerta Chikungunya"
-msgstr "Chikungunya Alert"
+msgstr "Chikungunya Level"
 
 #: AlertaDengue/dados/templates/report_state/map_zika.html:124
 #: AlertaDengue/dados/templates/services_maps.html:129
@@ -1838,10 +2238,6 @@ msgstr ""
 "closest to the selected city"
 
 #: AlertaDengue/dados/templates/services_api.html:199
-msgid "Rt"
-msgstr "Rt"
-
-#: AlertaDengue/dados/templates/services_api.html:199
 msgid "Estimativa pontual do número reprodutivo de casos, ver"
 msgstr "Point estimate of the reproductive number of cases, see"
 
@@ -2045,17 +2441,17 @@ msgstr "Estimated cases of %(disease_label)s in monitored cities"
 msgid "casos estimados"
 msgstr "estimated cases"
 
-#: AlertaDengue/dados/views.py:413
+#: AlertaDengue/dados/views.py:417
 msgid "Em breve"
 msgstr "Coming soon"
 
-#: AlertaDengue/dados/views.py:579 AlertaDengue/dados/views.py:709
+#: AlertaDengue/dados/views.py:583 AlertaDengue/dados/views.py:711
 msgid ""
 "A doença {} não está registrada em nosso banco de dados para o município de "
 "{}."
 msgstr "This disease {} is not registered in our database for {} municipality"
 
-#: AlertaDengue/dados/views.py:903
+#: AlertaDengue/dados/views.py:913
 msgid "desconhecida"
 msgstr "unknown"
 
@@ -2087,7 +2483,7 @@ msgstr "Notification year can not be greater than current year"
 msgid "Arquivo DBF inválido"
 msgstr "Invalid DBF file"
 
-#: AlertaDengue/dbf/sinan.py:185
+#: AlertaDengue/dbf/sinan.py:192
 msgid "Existem nesse arquivo notificações que não incluem a coluna ID_AGRAVO."
 msgstr ""
 

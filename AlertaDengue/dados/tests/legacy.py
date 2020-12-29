@@ -179,13 +179,12 @@ class OldReportState:
                 df_['init_date_week'] = pd.to_datetime(
                     df_['init_date_week'], errors='coerce'
                 )
-
+                # TODO: these parameters is not valid in the future releases.
                 dfs.append(
                     pd.merge(
                         df_,
                         df_date_,
                         how='outer',
-                        on='init_date_week',
                         left_index=True,
                         right_index=True,
                     )

@@ -1274,6 +1274,8 @@ class ReportCity:
 
             df.index.name = None
             df_date.index.name = None
+            # TODO: these parameters is not valid in the future releases.
+            # issue #385
             df = pd.merge(
                 df,
                 df_date,
