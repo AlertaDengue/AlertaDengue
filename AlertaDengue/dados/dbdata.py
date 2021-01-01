@@ -1549,7 +1549,12 @@ class ReportState:
             ]
         )
 
-        return joined_expr[proj].sort_by(['SE', 'geocode']).execute()
+        return (
+            joined_expr[proj]
+            .sort_by(['SE', 'geocode'])
+            .execute()
+            .set_index('SE', drop=False)
+        )
 
     @classmethod
     def _format_data(cls, df: pd.DataFrame) -> pd.DataFrame:
@@ -1656,7 +1661,7 @@ class ReportState:
         pd.DataFrame
 
         """
-        year_week_start = year_week - 200
+        year_week_start = year_week - 100
         year_week_end = year_week
         geocodes_list = [v for v in cities]
 

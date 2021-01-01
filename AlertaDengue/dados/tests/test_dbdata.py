@@ -96,7 +96,10 @@ class TestMunicipio(TestCase):
 
 
 class TestReportState(TestCase):
-    def test_report_state(self):
+    def test_read_disease_data(self):
+        '''
+        Compare the structure of dataframes
+        '''
 
         df_sql_func = legacy.OldReportState._read_disease_data(
             cities, station_id, year_week, var_climate
@@ -107,6 +110,7 @@ class TestReportState(TestCase):
         df_ibis_func = dbdata.ReportState.read_disease_data(
             cities, station_id, year_week, var_climate
         )
+
         df_ibis_func.set_index("SE", inplace=True)
         df_ibis = df_ibis_func.iloc[:, 3:12].astype(float)
         df_ibis.info()

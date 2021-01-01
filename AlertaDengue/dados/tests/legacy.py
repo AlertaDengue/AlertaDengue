@@ -46,7 +46,7 @@ class OldReportState:
         k.append('epiweek2date("SE_dengue") AS init_date_week')
 
         general_param = {
-            'year_week_start': year_week - 200,
+            'year_week_start': year_week - 100,
             'year_week_end': year_week,
             'geocodes': ','.join(map(lambda v: "'{}'".format(v), cities)),
             'var_climate': var_climate,

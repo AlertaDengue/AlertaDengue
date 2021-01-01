@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-29 12:12+0000\n"
+"POT-Creation-Date: 2021-01-01 23:20+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -108,12 +108,12 @@ msgid "Casos Estimados de {} nos municípios monitorados"
 msgstr "Estimated cases of {} in monitored cities"
 
 #: AlertaDengue/dados/charts/states.py:58
-#: AlertaDengue/dados/charts/states.py:122
+#: AlertaDengue/dados/charts/states.py:123
 msgid "Menções em tweets"
 msgstr "Mentions in tweets"
 
 #: AlertaDengue/dados/charts/states.py:73
-#: AlertaDengue/dados/charts/states.py:123
+#: AlertaDengue/dados/charts/states.py:127
 #, fuzzy
 #| msgid "Casos Notificados de "
 msgid "Casos notificados"
@@ -1834,7 +1834,7 @@ msgstr "SE"
 
 #: AlertaDengue/dados/templates/report_state.html:409
 msgid "semana epidemiológica"
-msgstr "Epidemiological week"
+msgstr "Epidemiological week."
 
 #: AlertaDengue/dados/templates/report_state.html:411
 msgid "temperatura"
@@ -1842,7 +1842,7 @@ msgstr "Temperature"
 
 #: AlertaDengue/dados/templates/report_state.html:412
 msgid "média das temperaturas mínimas da semana (em graus centígrados)"
-msgstr "average minimum temperatures for the week (in degrees centigrade)"
+msgstr "average minimum temperatures for the week (in degrees centigrade)."
 
 #: AlertaDengue/dados/templates/report_state.html:414
 msgid "tweet"
@@ -1853,8 +1853,8 @@ msgid ""
 "número de tweets indicativos de casos de dengue na cidade. Por enquanto só "
 "há para dengue"
 msgstr ""
-"number of tweets indicating dengue cases in the city. For now onlythere is "
-"for dengue"
+"number of tweets indicating dengue cases in the city. Currently, only for "
+"dengue"
 
 #: AlertaDengue/dados/templates/report_state.html:417
 msgid "casos notif"
@@ -1862,7 +1862,7 @@ msgstr "Estimated cases "
 
 #: AlertaDengue/dados/templates/report_state.html:418
 msgid "casos notificados de dengue, zika ou chikungunya"
-msgstr "reported cases of dengue, zika or chikungunya"
+msgstr "reported cases of dengue, zika or chikungunya."
 
 #: AlertaDengue/dados/templates/report_state.html:420
 msgid "incidência"
@@ -1870,7 +1870,7 @@ msgstr "Incidence"
 
 #: AlertaDengue/dados/templates/report_state.html:421
 msgid "incidência por 100.000 habitantes"
-msgstr "incidence per 100,000 population"
+msgstr "incidence per 100,000 population."
 
 #: AlertaDengue/dados/templates/report_state.html:423
 msgid "casos preditos"
@@ -1878,27 +1878,23 @@ msgstr "Forecast cases"
 
 #: AlertaDengue/dados/templates/report_state.html:424
 msgid "número de casos estimados após correção pelo atraso de notificação"
-msgstr "number of estimated cases after correction for notification delay"
+msgstr "number of estimated cases after correction for notification delay."
 
 #: AlertaDengue/dados/templates/report_state.html:426
 msgid "ICmin"
 msgstr "ICmin"
 
 #: AlertaDengue/dados/templates/report_state.html:427
-#, fuzzy, python-format
-#| msgid "número mínimo de casos estimados (IC 95%%)"
 msgid "número mínimo de casos estimados (IC 95%%)"
-msgstr "minimum number of estimated cases (95% CI)"
+msgstr "Lower 95% confidence bounds for the estimated number of cases."
 
 #: AlertaDengue/dados/templates/report_state.html:429
 msgid "ICmax"
 msgstr "ICmax"
 
 #: AlertaDengue/dados/templates/report_state.html:430
-#, fuzzy, python-format
-#| msgid "número máximo de casos estimados (IC 95%%)"
 msgid "número máximo de casos estimados (IC 95%%)"
-msgstr "maximum number of estimated cases (95% CI)"
+msgstr "Upper 95% confidence bounds for the estimated number of cases."
 
 #: AlertaDengue/dados/templates/report_state.html:432
 #: AlertaDengue/dados/templates/services_api.html:199
@@ -1908,7 +1904,7 @@ msgstr "Rt"
 #: AlertaDengue/dados/templates/report_state.html:433
 msgid "número reprodutivo efetivo (> 1 indica aumento de casos transmissão)"
 msgstr ""
-"effective reproductive number (> 1 indicates increase in transmission cases)"
+"effective reproductive number (> 1 indicates increase in transmission cases)."
 
 #: AlertaDengue/dados/templates/report_state.html:435
 msgid "p(Rt1)"
@@ -1920,7 +1916,7 @@ msgid ""
 "significativo de casos)"
 msgstr ""
 "probability that the reproductive number is greater than 1 (> 0.95 indicates "
-"an increasesignificant of cases)"
+"an increasesignificant of cases)."
 
 #: AlertaDengue/dados/templates/report_state.html:438
 msgid "nivel"
@@ -1928,7 +1924,7 @@ msgstr "Level:"
 
 #: AlertaDengue/dados/templates/report_state.html:439
 msgid "cor do alerta (verde, amarelo, laranja, vermelho)"
-msgstr "alert level (green, yellow, orange, red)"
+msgstr "alert level (green, yellow, orange, red)."
 
 #: AlertaDengue/dados/templates/report_state.html:447
 msgid "Notas"
@@ -1972,8 +1968,8 @@ msgid ""
 "Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como "
 "parceira entre"
 msgstr ""
-"This was a project developed with support from SVS/MS and is operated as"
-"partner between"
+"This was a project developed with support from SVS/MS and is operated "
+"aspartner between"
 
 #: AlertaDengue/dados/templates/report_state.html:471
 msgid ""
@@ -1985,8 +1981,10 @@ msgid "Escola de Matemática Aplicada, Fundação Getúlio Vargas"
 msgstr "School of Applied Mathematics, Fundação Getúlio Vargas"
 
 #: AlertaDengue/dados/templates/report_state.html:474
-msgid "Secretaria Estadual de Saúde do Rio Grande do Sul"
-msgstr "State Health Secretariat of Rio Grande do Sul"
+#, fuzzy
+#| msgid " Secretaria de estado de Saúde do Rio de Janeiro"
+msgid "Secretaria Estadual de Saúde do"
+msgstr " Secretaria de estado de Saúde do Rio de Janeiro"
 
 #: AlertaDengue/dados/templates/report_state.html:475
 msgid "Observatório de Dengue da UFMG"
@@ -2441,17 +2439,17 @@ msgstr "Estimated cases of %(disease_label)s in monitored cities"
 msgid "casos estimados"
 msgstr "estimated cases"
 
-#: AlertaDengue/dados/views.py:417
+#: AlertaDengue/dados/views.py:418
 msgid "Em breve"
 msgstr "Coming soon"
 
-#: AlertaDengue/dados/views.py:583 AlertaDengue/dados/views.py:711
+#: AlertaDengue/dados/views.py:584 AlertaDengue/dados/views.py:712
 msgid ""
 "A doença {} não está registrada em nosso banco de dados para o município de "
 "{}."
 msgstr "This disease {} is not registered in our database for {} municipality"
 
-#: AlertaDengue/dados/views.py:913
+#: AlertaDengue/dados/views.py:914
 msgid "desconhecida"
 msgstr "unknown"
 
@@ -2665,6 +2663,9 @@ msgstr "Your username, if you have forgotten it, is:"
 #: AlertaDengue/templates/registration/password_reset_email.html:10
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
+
+#~ msgid "Secretaria Estadual de Saúde do Rio Grande do Sul"
+#~ msgstr "State Health Secretariat of Rio Grande do Sul"
 
 #~ msgid "%{x}, SE: %{text}, Casos: %{y:.1f} "
 #~ msgstr "%{x}, SE: %{text}, Cases: %{y:.1f} "

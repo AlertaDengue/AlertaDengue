@@ -1,13 +1,14 @@
 from collections import defaultdict, OrderedDict
 import datetime
-import fiona
-import geojson
-import json
-import locale
-import numpy as np
 import os
 import random
+import json
+import locale
+from typing import List, Dict, Tuple
 
+import fiona
+import geojson
+import numpy as np
 
 from django.apps import apps
 from django.utils.translation import gettext as _
@@ -1414,7 +1415,8 @@ class ReportStateView(TemplateView):
         str
             The dataframe in HTML format.
         """
-        df['SE'] = df.index
+        # df['SE'] = df.index
+        df.set_index('SE', drop=True, inplace=True)
         cols_to_sum = ['tweets'] + [
             'casos notif. dengue',
             'casos est. dengue',
@@ -1458,22 +1460,27 @@ class ReportStateView(TemplateView):
             .to_html(**html_param)
         )
 
-    def get_context_data(self, **kwargs):
+    def get_regional_info(
+        self,
+        regional_names: List[str],
+        state: str,
+        year_week: str,
+        diseases: List[str],
+    ) -> Tuple[Dict[str, Dict], str]:
         """
+        Get regional information.
 
-        :param kwargs:
-        :return:
+        Parameters
+        ----------
+        regional_names : List[str]
+        state : str
+        year_week : str
+        diseases : List[str]
+
+        Returns
+        -------
+        Tuple[Dict[str, Dict], str]
         """
-        context = super().get_context_data(**kwargs)
-
-        year_week = int(context['year_week'])
-        year, week = context['year_week'][:4], context['year_week'][-2:]
-        state = context['state']
-
-        regional_names = dbdata.get_regional_names(state)
-
-        disease_key = ['dengue', 'chik', 'zika']
-
         regional_info = {}
         last_year_week = None
 
@@ -1493,14 +1500,14 @@ class ReportStateView(TemplateView):
                 var_climate=var_climate,
             )
 
-            last_year_week_ = df.index.max()
+            last_year_week_ = df.SE.max()
             if last_year_week is None or last_year_week_ > last_year_week:
                 last_year_week = last_year_week_
 
             cities_alert = {}
             chart_cases_twitter = {}
 
-            for d in disease_key:
+            for d in diseases:
                 if not df.empty:
                     chart = ReportStateCharts.create_tweet_chart(
                         df=df, year_week=year_week, disease=d
@@ -1519,9 +1526,9 @@ class ReportStateView(TemplateView):
                 chart_cases_twitter[d] = chart
 
             # each line refers to a city
-            for i, row in df[df.index == last_year_week].iterrows():
+            for i, row in df[df.SE == last_year_week].iterrows():
                 values = {}
-                for d in disease_key:
+                for d in diseases:
                     values.update({d: row['level_code_{}'.format(d)]})
                 cities_alert.update({row.geocode: values})
 
@@ -1537,22 +1544,41 @@ class ReportStateView(TemplateView):
                     }
                 }
             )
+        return regional_info, last_year_week
 
-        last_year_week_s = str(last_year_week)
-        last_year = last_year_week_s[:4]
-        last_week = last_year_week_s[-2:]
+    def get_alerts_info(
+        self, diseases: List[str], state: str, last_year_week: str,
+    ) -> Dict:
+        """
+        Return alerts information.
 
-        # map
-        notif = dbdata.NotificationResume  # alias
+        Parameters
+        ----------
+        diseases : List[str]
+        state : str
+        last_year_week : str
+
+        Returns
+        -------
+        dict
+            The dictionary has the follow entries:
+                cities_alert : Dict[str, pd.DataFrame]
+                alerts : Dict[str, dict]
+                mun_dict : Dict[str, dict]
+                geo_ids : Dict[str, List[str]]
+                cases_series_last_12 : Dict[str, Dict]
+        """
         cities_alert = {}
         mun_dict = {}
         alerts = {}
         geo_ids = {}
         cases_series_last_12 = {}
 
-        for d in disease_key:
-            _d = d if d != 'chik' else 'chikungunya'
+        notif = dbdata.NotificationResume
 
+        for d in diseases:
+            _d = d if d != 'chik' else 'chikungunya'
+            # check this ->
             cities_alert[d] = notif.get_cities_alert_by_state(
                 state_name=STATE_NAME[state],
                 disease=_d,
@@ -1578,6 +1604,43 @@ class ReportStateView(TemplateView):
             else:
                 cases_series_last_12[d] = {}
 
+        return dict(
+            cities_alert=cities_alert,
+            mun_dict=mun_dict,
+            alerts=alerts,
+            geo_ids=geo_ids,
+            cases_series_last_12=cases_series_last_12,
+        )
+
+    def get_context_data(self, **kwargs):
+        """
+
+        :param kwargs:
+        :return:
+        """
+        context = super().get_context_data(**kwargs)
+
+        year_week = int(context['year_week'])
+        year, week = context['year_week'][:4], context['year_week'][-2:]
+        state = context['state']
+
+        regional_names = dbdata.get_regional_names(state)
+
+        diseases_key = ['dengue', 'chik', 'zika']
+
+        regional_info, last_year_week = self.get_regional_info(
+            regional_names, state, year_week, diseases_key
+        )
+
+        last_year_week_s = str(last_year_week)
+        last_year = last_year_week_s[:4]
+        last_week = last_year_week_s[-2:]
+
+        # map
+        alerts_info = self.get_alerts_info(
+            diseases_key, state, last_year_week,
+        )
+
         context.update(
             {
                 'year': year,
@@ -1587,12 +1650,12 @@ class ReportStateView(TemplateView):
                 'state_name': STATE_NAME[state],
                 'regional_info': regional_info,
                 'regional_names': regional_names,
-                'diseases_code': ['dengue', 'chik', 'zika'],
+                'diseases_code': diseases_key,
                 'diseases_name': ['Dengue', 'Chikungunya', 'Zika'],
-                'mun_dict': mun_dict,
-                'geo_ids': geo_ids,
-                'alerts_level': alerts,
-                'case_series': cases_series_last_12,
+                'mun_dict': alerts_info['mun_dict'],
+                'geo_ids': alerts_info['geo_ids'],
+                'alerts_level': alerts_info['alerts'],
+                'case_series': alerts_info['cases_series_last_12'],
                 'map_center': self._map_center[state],
                 'map_zoom': self._map_zoom[state],
             }
