@@ -1,4 +1,3 @@
- 
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
@@ -30,11 +29,9 @@ jobs:
         mkdir -p docker/dev_dumps
         wget https://dataverse.harvard.edu/api/access/datafile/4154429 -O docker/dev_dumps/latest_infodengue.sql.gz
         wget https://dataverse.harvard.edu/api/access/datafile/4154518 -O docker/dev_dumps/latest_dengue.sql.gz
-
     - name: Copy env_file as env_staging
       run: |
         cp example_env_file .env_staging
-
     - name: Build and Deploy staging_DB
       id: staging_db
       run: |
@@ -45,23 +42,18 @@ jobs:
     - name: Build staging_WEB
       run: |
         make build_staging SERVICES_STAGING=staging_web
-
     - name: Deploy staging_WEB
       run: |
         make start_staging SERVICES_STAGING=staging_web
-
     - name: Migrate staging_DB
       run: |
         make build_migrate_staging
-
     - name: Generate MapFiles 
       run: |
         make generate_maps_staging
-
     - name: Run Flake8
       run: |
         make flake8_staging SERVICES_STAGING=staging_web
-
     - name: Run tests to APP
       run: |
         make test_staging_web SERVICES_STAGING=staging_web
