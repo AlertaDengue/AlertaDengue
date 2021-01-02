@@ -4,7 +4,7 @@ django-leaflet==0.26.0
 geojson
 gunicorn
 numpy
-pandas
+pandas==1.1.5
 python-dotenv
 pytz
 psycopg2
