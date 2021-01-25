@@ -24,6 +24,7 @@ class HomeCharts:
         'São Paulo': 'rgb(0,255,255)',
         'Rio Grande do Sul': 'rgb(255,150,0)',
         'Maranhão': 'rgb(255,0,255)',
+        'Santa Catarina': 'rgb(150,0,0)',
     }
 
     @classmethod
@@ -117,7 +118,7 @@ class HomeCharts:
             )
 
         fig.update_layout(
-            height=350,
+            height=375,
             width=1000,
             title=go.layout.Title(
                 text=_(
