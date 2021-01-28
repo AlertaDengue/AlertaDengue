@@ -1236,7 +1236,7 @@ class ReportCityView(TemplateView):
             chart_dengue_tweets = ReportCityCharts.create_tweet_chart(
                 df=df_dengue, year_week=year_week
             )
-            total_n_dengue = df_dengue[df_dengue.index // 100 == 2018][
+            total_n_dengue = df_dengue[df_dengue.index // 100 == int(year)][
                 'casos notif.'
             ].sum()
 
