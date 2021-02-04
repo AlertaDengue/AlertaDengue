@@ -1,11 +1,3 @@
-"""
-Added into the first migration file:
-
-migrations.RunSQL(
-    "CREATE SCHEMA IF NOT EXISTS forecast"
-),
-
-"""
 # from django.apps import apps
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -14,26 +6,73 @@ from django.utils.translation import ugettext_lazy as _
 # City = apps.get_model('dados', 'City')
 
 
-class ForecastModel(models.Model):
+class Forecast(models.Model):
     """
     id    SERIAL    PRIMARY    KEY,
-    name    VARCHAR(128)    NOT    NULL,
-    total_weeks   SMALLINT    NOT    NULL,
-    commit_id    CHAR(7)    NOT    NULL,
-    active    BOOL    NOT    NULL
+    municipio_geocodigo INT NOT NULL,
+    model INT,
+    se INT NOT NULL,
+    se_predicted INT NOT NULL,
+    active    BOOL NOT NULL,
     """
 
-    name = models.CharField(
-        max_length=128, null=False, help_text=_('Nome do Modelo de Previsão')
-    )
-    weeks = models.IntegerField(null=False, help_text=_('Total de Semanas'))
-    commit_id = models.CharField(
-        max_length=7, null=False, help_text=_('ID do commit (github)')
-    )
+    id = models.AutoField(primary_key=True)  # (serial)
+    model = models.ForeignKey(
+        'forecast.ForecastModel', on_delete=models.CASCADE, null=True
+    )  # (foreign key to the models table) -->> forecast_model_weeks?
+    se = models.IntegerField(
+        null=False, help_text=_('Epidemiological Week')
+    )  # Epid. week when the prediction was generated
+    se_predicted = models.IntegerField(
+        null=False, help_text=_('Predicted Week')
+    )  # (integer) Epid. week predicted
     active = models.BooleanField(null=False, help_text=_('Está ativo?'))
 
     class Meta:
         db_table = 'forecast"."forecast_model'
+        app_label = 'forecast'
+
+    def __str__(self):
+        return self.municipio_geocodigo
+
+
+class ForecastModel(models.Model):
+    """
+    id    SERIAL    PRIMARY    KEY,
+    name    VARCHAR(128)    NOT    NULL,
+    github   URLField    NOT    NULL,
+    commit_id    CHAR(7)    NOT    NULL,
+    train_start    DateField NOT    NULL,
+    train_end    DateField NOT    NULL,
+    filename    FileField NOT    NULL,
+    active    BOOL NOT  NULL,
+    """
+
+    id = models.AutoField(primary_key=True)  # id (serial)
+    name = models.CharField(
+        max_length=128, null=False, help_text=_('Nome do Modelo de Previsão')
+    )
+    github = models.URLField(
+        max_length=100,
+        help_text=_('URL do repositório github'),
+        default='github.com',
+    )  # URL of the the github
+    commit_id = models.CharField(
+        max_length=7, null=False, help_text=_('ID do commit (github)')
+    )
+    train_start = models.DateField(
+        null=False, default='timezone.now', help_text=_('Data Inicio')
+    )  # start date of th training period
+    train_end = models.DateField(
+        null=False, default='timezone.now', help_text=_('Data Final')
+    )  # end date of the training period
+    filename = models.FileField(
+        upload_to='uploads/%Y/%m/%d/', null=False, default='Trained model'
+    )  # filename of the saved trained model which will be loaded
+    active = models.BooleanField(null=False, help_text=_('Está ativo?'))
+
+    class Meta:
+        db_table = 'forecast"."forecast_table'
         app_label = 'forecast'
 
     def __str__(self):
@@ -45,7 +84,6 @@ class ForecastCity(models.Model):
     city/geocode INT NOT NULL,
     forecast_model_id INT,
     active BOOL NOT NULL,
-
     """
 
     city = models.ForeignKey(
@@ -84,7 +122,6 @@ class ForecastCases(models.Model):
     published_date date NOT NULL,
     init_date_epiweek date NOT NULL,
     cases INT NOT NULL,
-
     PRIMARY KEY (
       epiweek, geocode, cid10, forecast_model_id, published_date
     ),
