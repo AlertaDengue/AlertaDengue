@@ -31,7 +31,11 @@ jobs:
         wget https://dataverse.harvard.edu/api/access/datafile/4154518 -O docker/dev_dumps/latest_dengue.sql.gz
     - name: Copy env_file as env_staging
       run: |
+        curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        docker-compose --version
         cp example_env_file .env_staging
+        env $(cat .env_staging)
+
     - name: Build and Deploy staging_DB
       id: staging_db
       run: |
