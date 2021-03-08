@@ -2,7 +2,7 @@
 # note: --env-file requires docker-compose>=1.25
 #       ref: https://github.com/docker/compose/pull/6535
 
-include $(ENVFILE)
+include .env_staging
 export
 
 compose_cmd = docker-compose -p infodengue -f docker/docker-compose.yml --env-file .env
