@@ -90,9 +90,15 @@ class Command(BaseCommand):
 
         # creates the shapefile
         with fiona.open(geojson_original_path, 'r') as shp:
-            multipolygon = MultiPolygon(
-                [shape(pol['geometry']) for pol in shp]
-            )
+            polygon_list = [shape(pol['geometry']) for pol in shp]
+
+            if len(polygon_list) == 1 and isinstance(
+                polygon_list[0], MultiPolygon
+            ):
+                multipolygon = polygon_list[0]
+            else:
+                multipolygon = MultiPolygon(polygon_list)
+
             shp_min = multipolygon.simplify(0.005)
             with open(geojson_simplified_path, 'w') as f:
                 geojson_geometry = shapely.geometry.mapping(shp_min)
