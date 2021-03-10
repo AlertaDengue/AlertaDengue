@@ -1,6 +1,6 @@
 django==3.0.7
 django-bootstrap4
-django-leaflet==0.26.0
+django-leaflet
 geojson
 gunicorn
 numpy
@@ -23,6 +23,6 @@ rasterio
 geopy
 geopandas
 sh
-plotly==4.0.0
+plotly
 ipython
 sqlparse
