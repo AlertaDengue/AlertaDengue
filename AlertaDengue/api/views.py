@@ -1,12 +1,20 @@
 from django.http import HttpResponse
 from django.views.generic.base import View
 import datetime
+import os
 
 # local
 from .db import NotificationQueries, STATE_NAME, AlertCity
 from dados.episem import episem
 
 import json
+from dotenv import load_dotenv
+from os.path import join, dirname
+
+env_file = os.environ.get('ENV_FILE', '.env')
+
+env_path = join(dirname(dirname(dirname(__file__))), env_file)
+load_dotenv(env_path)
 
 
 class _GetMethod:
@@ -116,12 +124,11 @@ class AlertCityView(View, _GetMethod):
         self.request = request
         format = ''
 
+        week_nd = int(os.getenv('WEEK_ND'))
         dt_end = datetime.datetime.now()
-        dt_start = dt_end - datetime.timedelta(weeks=2)
-
+        dt_start = dt_end - datetime.timedelta(weeks=week_nd)
         yw_end_default = episem(dt_end, sep='')
         yw_start_default = episem(dt_start, sep='')
-
         year_end, week_end = yw_end_default[:4], yw_end_default[-2:]
         year_start, week_start = yw_start_default[:4], yw_start_default[-2:]
 
