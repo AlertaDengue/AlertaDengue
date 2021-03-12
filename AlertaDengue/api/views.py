@@ -1,12 +1,20 @@
 from django.http import HttpResponse
 from django.views.generic.base import View
-from datetime import datetime
+import datetime
+import os
 
 # local
 from .db import NotificationQueries, STATE_NAME, AlertCity
 from dados.episem import episem
 
 import json
+from dotenv import load_dotenv
+from os.path import join, dirname
+
+env_file = os.environ.get('ENV_FILE', '.env')
+
+env_path = join(dirname(dirname(dirname(__file__))), env_file)
+load_dotenv(env_path)
 
 
 class _GetMethod:
@@ -21,7 +29,11 @@ class _GetMethod:
         :param default:
         :return:
         """
-        if error_message is not None and param not in self.request.GET:
+        if (
+            error_message is not None
+            and param not in self.request.GET
+            and default is None
+        ):
             raise Exception(error_message)
 
         result = (
@@ -112,6 +124,14 @@ class AlertCityView(View, _GetMethod):
         self.request = request
         format = ''
 
+        week_nd = int(os.getenv('WEEK_ND'))
+        dt_end = datetime.datetime.now()
+        dt_start = dt_end - datetime.timedelta(weeks=week_nd)
+        yw_end_default = episem(dt_end, sep='')
+        yw_start_default = episem(dt_start, sep='')
+        year_end, week_end = yw_end_default[:4], yw_end_default[-2:]
+        year_start, week_start = yw_start_default[:4], yw_start_default[-2:]
+
         try:
             disease = self._get(
                 'disease', error_message='Disease sent is empty.'
@@ -124,22 +144,26 @@ class AlertCityView(View, _GetMethod):
             ).lower()
             ew_start = self._get(
                 'ew_start',
+                default=int(week_start),
                 cast=int,
                 error_message='Epidemic start week sent is empty.',
             )
             ew_end = self._get(
                 'ew_end',
+                default=int(week_end),
                 cast=int,
                 error_message='Epidemic end week sent is empty.',
             )
             ey_start = self._get(
                 'ey_start',
+                default=int(year_start),
                 cast=int,
                 error_message='Epidemic start year sent is empty.',
             )
 
             ey_end = self._get(
                 'ey_end',
+                default=int(year_end),
                 cast=int,
                 error_message='Epidemic end year sent is empty.',
             )
