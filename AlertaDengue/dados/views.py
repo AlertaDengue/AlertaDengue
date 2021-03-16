@@ -1214,6 +1214,8 @@ class ReportCityView(TemplateView):
         last_year_week_l = []
         disease_last_code = []
 
+        this_year = int(context['year_week'][:4])
+
         if not df_dengue.empty:
             last_year_week_l.append(df_dengue.index.max())
 
@@ -1236,7 +1238,7 @@ class ReportCityView(TemplateView):
             chart_dengue_tweets = ReportCityCharts.create_tweet_chart(
                 df=df_dengue, year_week=year_week
             )
-            total_n_dengue = df_dengue[df_dengue.index // 100 == int(year)][
+            total_n_dengue = df_dengue[df_dengue.index // 100 == this_year][
                 'casos notif.'
             ].sum()
 
@@ -1266,7 +1268,7 @@ class ReportCityView(TemplateView):
                 threshold_epidemic=threshold_epidemic,
             )
 
-            total_n_chik = df_chik[df_chik.index // 100 == 2018][
+            total_n_chik = df_chik[df_chik.index // 100 == this_year][
                 'casos notif.'
             ].sum()
 
@@ -1294,7 +1296,7 @@ class ReportCityView(TemplateView):
                 threshold_epidemic=threshold_epidemic,
             )
 
-            total_n_zika = df_zika[df_zika.index // 100 == 2018][
+            total_n_zika = df_zika[df_zika.index // 100 == this_year][
                 'casos notif.'
             ].sum()
 
