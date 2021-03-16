@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.views.generic.base import View
-import datetime
+import datetime as dt
+from datetime import datetime
 import os
 
 # local
@@ -125,8 +126,8 @@ class AlertCityView(View, _GetMethod):
         format = ''
 
         week_nd = int(os.getenv('WEEK_ND'))
-        dt_end = datetime.datetime.now()
-        dt_start = dt_end - datetime.timedelta(weeks=week_nd)
+        dt_end = dt.datetime.now()
+        dt_start = dt_end - dt.timedelta(weeks=week_nd)
         yw_end_default = episem(dt_end, sep='')
         yw_start_default = episem(dt_start, sep='')
         year_end, week_end = yw_end_default[:4], yw_end_default[-2:]
