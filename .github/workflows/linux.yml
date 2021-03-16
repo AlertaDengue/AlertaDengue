@@ -44,18 +44,23 @@ jobs:
     - name: Build staging_WEB
       run: |
         make build_staging SERVICES_STAGING=staging_web
+
     - name: Deploy staging_WEB
       run: |
         make start_staging SERVICES_STAGING=staging_web
+
     - name: Migrate staging_DB
       run: |
         make build_migrate_staging
+
     - name: Generate MapFiles 
       run: |
         make generate_maps_staging
+
     - name: Run Flake8
       run: |
         make flake8_staging SERVICES_STAGING=staging_web
+
     - name: Run tests to APP
       run: |
         make test_staging_web SERVICES_STAGING=staging_web

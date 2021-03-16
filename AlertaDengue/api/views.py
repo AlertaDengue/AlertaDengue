@@ -19,9 +19,7 @@ load_dotenv(env_path)
 
 
 class _GetMethod:
-    """
-
-    """
+    """"""
 
     def _get(self, param, default=None, cast=None, error_message=None):
         """
@@ -45,9 +43,7 @@ class _GetMethod:
 
 
 class NotificationReducedCSV_View(View, _GetMethod):
-    """
-
-    """
+    """"""
 
     _state_name = STATE_NAME
 
@@ -115,9 +111,7 @@ class NotificationReducedCSV_View(View, _GetMethod):
 
 
 class AlertCityView(View, _GetMethod):
-    """
-
-    """
+    """"""
 
     request = None
 
