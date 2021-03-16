@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.views.generic.base import View
-import datetime
+import datetime as dt
+from datetime import datetime
 import os
 
 # local
@@ -18,9 +19,7 @@ load_dotenv(env_path)
 
 
 class _GetMethod:
-    """
-
-    """
+    """"""
 
     def _get(self, param, default=None, cast=None, error_message=None):
         """
@@ -44,9 +43,7 @@ class _GetMethod:
 
 
 class NotificationReducedCSV_View(View, _GetMethod):
-    """
-
-    """
+    """"""
 
     _state_name = STATE_NAME
 
@@ -114,9 +111,7 @@ class NotificationReducedCSV_View(View, _GetMethod):
 
 
 class AlertCityView(View, _GetMethod):
-    """
-
-    """
+    """"""
 
     request = None
 
@@ -125,8 +120,8 @@ class AlertCityView(View, _GetMethod):
         format = ''
 
         week_nd = int(os.getenv('WEEK_ND'))
-        dt_end = datetime.datetime.now()
-        dt_start = dt_end - datetime.timedelta(weeks=week_nd)
+        dt_end = dt.datetime.now()
+        dt_start = dt_end - dt.timedelta(weeks=week_nd)
         yw_end_default = episem(dt_end, sep='')
         yw_start_default = episem(dt_start, sep='')
         year_end, week_end = yw_end_default[:4], yw_end_default[-2:]
