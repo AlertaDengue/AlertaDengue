@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - django=3.0.7
+  - django=3.1.6
   - django-bootstrap4
   - geojson
   - gunicorn
@@ -14,7 +14,7 @@ dependencies:
   - python-dotenv
   - pytz
   - psycopg2
-  - sqlalchemy
+  - sqlalchemy=1.3.23
   - python-memcached
   - django-makemessages-xgettext
   - mock
