@@ -42,3 +42,4 @@ AlertaDengue/static_files/*
 .env*
 
 .mypy_cache
+*migrations*

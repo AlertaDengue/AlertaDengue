@@ -72,6 +72,7 @@ INSTALLED_APPS = (
     'api',
     'manager.router',
     'maintenance_mode',
+    'common',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -130,6 +131,7 @@ DATABASE_APPS_MAPPING = {
     'default': 'default',
     'dbf': 'infodengue',
     'forecast': 'forecast',
+    'common': 'infodengue',
 }
 
 DATABASES = {
