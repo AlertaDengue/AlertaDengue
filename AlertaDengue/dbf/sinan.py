@@ -102,7 +102,7 @@ class Sinan(object):
                 )  # , errors='coerce')
             except ValueError:
                 self.tabela[col] = pd.to_datetime(
-                    self.tabela[col], format='%d/%m/%y', errors='coerce'
+                    self.tabela[col], errors='coerce'
                 )
 
     @property
