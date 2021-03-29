@@ -2,7 +2,7 @@ from django.db import models
 
 
 # Create your models here.
-class RequestPartnerData(models.Model):
+class SendToPartner(models.Model):
     STATUS_CHOICES = [
         (True, 'Enable'),
         (False, 'Disable'),
@@ -17,9 +17,12 @@ class RequestPartnerData(models.Model):
         null=False, choices=STATUS_CHOICES, help_text='Está ativo?'
     )
 
+    def save_partner(self):
+        self.save()
+
     class Meta:
         app_label = 'common'
-        verbose_name_plural = "Request Partner Data"
+        verbose_name_plural = "Send To Partners"
 
     def __str__(self):
         return f'{self.geocode}, {self.name}'

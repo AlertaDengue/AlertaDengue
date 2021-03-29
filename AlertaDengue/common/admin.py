@@ -1,10 +1,14 @@
 from django.contrib import admin
-from common.models import RequestPartnerData
+from common.models import SendToPartner
 
 
-class RequestPartnerDataAdmin(admin.ModelAdmin):
+class SendToPartnerAdmin(admin.ModelAdmin):
     list_display = ['name', 'level', 'contact', 'status']
     ordering = ['name']
 
+    def save_model(self, request, obj, change):
+        obj.SendToPartner.save()
+        obj.save()
 
-admin.site.register(RequestPartnerData, RequestPartnerDataAdmin)
+
+admin.site.register(SendToPartner, SendToPartnerAdmin)

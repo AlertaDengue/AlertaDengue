@@ -41,7 +41,7 @@ def get_partner_active():
     :return: dict
     """
     sql = '''
-      SELECT name, contact FROM common_requestpartnerdata
+      SELECT name, contact FROM common_sendtoPartner
       WHERE status = 'True'
       ORDER BY name
     '''
@@ -50,16 +50,16 @@ def get_partner_active():
         return dict(conn.execute(sql).fetchall())
 
 
-def send_mail_partner():
+def send_email_partner():
     mail_host = os.getenv("MAIL_HOST")
     mail_port = os.getenv("MAIL_PORT")
-    mail_sender = os.getenv("MAIL_FROM")
+    mail_from = os.getenv("MAIL_FROM")
     mail_password = os.getenv("MAIL_PASSWORD")
 
     message = MIMEMultipart("alternative")
     message["Subject"] = f'Informe de dados Infodengue SE{week}'
 
-    text = f"""\
+    mail_text = f"""\
     Olá, bom dia, tudo bem?
 
     Vocês já possuem  os dados de dengue, chikungunya e Zika  da SE {week}?
@@ -71,7 +71,7 @@ def send_mail_partner():
     """
 
     # html = ""
-    to_text = MIMEText(text, "plain")
+    to_text = MIMEText(mail_text, "plain")
     # to_html = MIMEText(html, "html")
     message.attach(to_text)
     # message.attach(to_html)
@@ -79,7 +79,7 @@ def send_mail_partner():
     mailing = get_partner_active()
     context = ssl.create_default_context()
     with smtplib.SMTP_SSL(mail_host, mail_port, context=context) as server:
-        server.login(mail_sender, mail_password)
-        for to_name, to_addrs in mailing.items():
-            server.sendmail(mail_sender, to_addrs, message.as_string())
-            logging.info(f"e-mail enviado para: {to_name}")
+        server.login(mail_from, mail_password)
+        for partner_name, mail_to in mailing.items():
+            server.sendmail(mail_from, mail_to, message.as_string())
+            logging.info(f"e-mail enviado para: {partner_name}")
