@@ -1,0 +1,2 @@
+* * * * * echo "Start task cron" >> /var/log/cron.log 2>&1
+* * * * * bash /activate.sh python /srv/deploy/AlertaDengue/manage.py send_mail >> /var/log/cron.log 2>&1
