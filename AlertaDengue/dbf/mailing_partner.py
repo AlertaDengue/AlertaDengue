@@ -1,24 +1,18 @@
 import os
-from django.core.mail import EmailMultiAlternatives
-
-
-# from django.core.mail import EmailMultiAlternatives
-from datetime import datetime
-import logging
-
-from sqlalchemy import create_engine
-from ad_main import settings
-
-from dados.episem import episem
 from dotenv import load_dotenv
 from os.path import join, dirname
+from datetime import datetime
 
-
-# from django.core.mail import send_mass_mail
-
+from django.core.mail import EmailMultiAlternatives
 from django.utils.module_loading import import_string
-
 from django.template.loader import render_to_string
+
+from sqlalchemy import create_engine
+import logging
+
+from ad_main import settings
+from dados.episem import episem
+
 
 env_file = os.environ.get('ENV_FILE', '.env')
 
@@ -66,7 +60,7 @@ def get_partner_active():
 
 
 def send_email_partner(
-    fail_silently=False, auth_user=None, auth_password=None, connection=None,
+    fail_silently=False, connection=None,
 ):
     """
     Given a datatuple of (subject, message, from_email, recipient_list), send
@@ -80,6 +74,7 @@ def send_email_partner(
 
     mail_from = os.getenv("EMAIL_FROM_ADDRESS")
     mail_password = os.getenv("MAIL_PASSWORD")
+    # mail_host = os.getenv('MAIL_HOST')
     mailing = get_partner_active()
 
     recipient = []
@@ -89,6 +84,7 @@ def send_email_partner(
     connection = connection or get_connection(
         username=mail_from,
         password=mail_password,
+        # hostname=mail_host,
         fail_silently=fail_silently,
     )
 
