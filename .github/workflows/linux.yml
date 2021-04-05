@@ -33,6 +33,7 @@ jobs:
     - name: Copy env_file as env_staging
       run: |
         cp example_env_file .env_staging
+        cp example_env_file .env
 
     - name: Build and Deploy staging_DB
       id: staging_db

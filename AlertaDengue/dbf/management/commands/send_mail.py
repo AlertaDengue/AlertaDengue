@@ -17,6 +17,6 @@ class Command(BaseCommand):
         self.send_email()
         self.stdout.write(
             self.style.SUCCESS(
-                'Successfully send e-mail "{}"'.format(date_send)
+                'Successfully sent emails on "{}"!'.format(date_send)
             )
         )

@@ -253,6 +253,7 @@ EMAIL_FROM_ADDRESS = os.getenv('EMAIL_FROM_ADDRESS')
 
 INFODENGUE_TEAM_EMAIL = os.getenv('INFODENGUE_TEAM_EMAIL')
 
+# ADMIN
 if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
     EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = (
         os.getenv('EMAIL_CONFIG')
@@ -260,6 +261,26 @@ if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
     EMAIL_PORT = int(EMAIL_PORT)
     EMAIL_USE_TLS = True
 
+# SEND_MAIL DBF
+EMAIL_CONNECTIONS = {
+    'mailpartners': {
+        'host': os.getenv("EMAIL_HOST"),
+        'username': os.getenv("EMAIL_USER"),
+        'password': os.getenv("EMAIL_PASSWORD"),
+        'port': os.getenv("EMAIL_PORT"),
+        'use_tls': True,
+    },
+    'socketlabs': {
+        'host': os.getenv("EMAIL_DEV_HOST"),
+        'username': os.getenv("EMAIL_DEV_USER"),
+        'password': os.getenv("EMAIL_DEV_PASSWORD"),
+        'port': os.getenv("EMAIL_DEV_PORT"),
+        'use_tls': False,
+    },
+    'ses': {'backend': 'django_ses.SESBackend'},
+}
+EMAIL_CONNECTION_DEFAULT = 'mailpartners'
+#
 
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')  # Verificar ERROR CELERY
 CELERY_TASK_ALWAYS_EAGER = os.getenv('CELERY_TASK_ALWAYS_EAGER')

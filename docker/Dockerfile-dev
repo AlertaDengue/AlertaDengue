@@ -35,16 +35,14 @@ ENV PATH="/opt/conda/bin:${PATH}"
 # folders
 COPY --chown=deploy:deploy docker  /srv/deploy/docker
 COPY --chown=deploy:deploy AlertaDengue  /srv/deploy/AlertaDengue
+
 # files
-COPY --chown=deploy pyproject.toml setup.cfg setup.py \
-  && .pre-commit-config.yaml LICENSE README.md HISTORY.md \
-  && requirements-dev.txt requirements.txt example_env_file /srv/deploy/
+COPY --chown=deploy requirements-dev.txt requirements.txt example_env_file /srv/deploy/
 
 RUN cp /srv/deploy/example_env_file /srv/deploy/.env_staging
 
 RUN mkdir /srv/deploy/logs \
   && chown -R deploy:deploy /srv/deploy/logs
-
 
 RUN pip install -r /srv/deploy/requirements-dev.txt
 
