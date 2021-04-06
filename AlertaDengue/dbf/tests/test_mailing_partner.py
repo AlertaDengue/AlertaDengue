@@ -36,7 +36,7 @@ class SendToPartnerTest(unittest.TestCase):
         mail_from = 'info_dengue@gmail.com'
         mail_text = 'Here is the message.'
         mail_subject = f'Informe de dados Infodengue SE {week}'
-        mail_to = str(partner.contact)
+        mail_to = str(partner.mail)
         mail.send_mail(
             mail_subject, mail_text, mail_from, [mail_to], fail_silently=False,
         )

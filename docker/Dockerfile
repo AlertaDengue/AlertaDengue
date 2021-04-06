@@ -54,7 +54,8 @@ RUN chmod 0644 /etc/cron.d/cron-sendmail \
   && echo "deploy"  > /etc/cron.allow \
   && touch /var/log/cron.log \
   && chown deploy:deploy /var/log/cron.log
-ADD entrypoint.sh /
+
+ADD docker/entrypoint.sh /entrypoint.sh
 
 # USER deploy
 
