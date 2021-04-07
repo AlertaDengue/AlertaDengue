@@ -5,6 +5,8 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from datetime import date
 from mock import patch
+import unittest
+
 
 # local
 from django.apps import apps
@@ -16,6 +18,7 @@ __all__ = ["DBFModelTest"]
 TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "data/")
 
 
+@unittest.skip("reason='Issue #416'")
 class DBFModelTest(TestCase):
     fixtures = ['users']
 

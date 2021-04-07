@@ -1,9 +1,9 @@
-import unittest
+from django.test import TestCase
 from dbf.models import SendToPartner
 from django.core import mail
 
 
-class SendToPartnerTest(unittest.TestCase):
+class SendToPartnerTest(TestCase):
     """
     Tests create partner and sent mail.
     """
