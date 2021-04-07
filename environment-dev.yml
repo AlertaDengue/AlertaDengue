@@ -1,4 +1,4 @@
-name: alertadengue
+name: alertadengue-dev
 channels:
   - conda-forge
 dependencies:
@@ -36,7 +36,6 @@ dependencies:
 - sqlalchemy <1.4
 # develop
 - black
-- flake8
 - flake8
 - ipython
 - jupyterlab

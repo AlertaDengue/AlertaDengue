@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-29 23:31+0000\n"
+"POT-Creation-Date: 2021-06-10 22:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,28 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: AlertaDengue/common/templates/dbf_upload.html:66
+#: AlertaDengue/dbf/templates/dbf_upload.html:66
+msgid "Envie aqui os dados atualizados do SINAN"
+msgstr ""
+
+#: AlertaDengue/common/templates/dbf_upload.html:172
+#: AlertaDengue/dbf/templates/dbf_upload.html:172
+msgid "Enviar"
+msgstr ""
+
+#: AlertaDengue/common/templates/dbf_upload.html:179
+#: AlertaDengue/common/templates/upload_successful.html:10
+#: AlertaDengue/dbf/templates/dbf_upload.html:179
+#: AlertaDengue/dbf/templates/upload_successful.html:10
+msgid "Ultimos arquivos enviados:"
+msgstr ""
+
+#: AlertaDengue/common/templates/upload_successful.html:5
+#: AlertaDengue/dbf/templates/upload_successful.html:5
+msgid "Dados do SINAN recebidos"
+msgstr ""
 
 #: AlertaDengue/dados/charts/cities.py:74
 msgid "limiar pré epidêmico"
@@ -76,7 +98,6 @@ msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
 msgstr ""
 
 #: AlertaDengue/dados/charts/cities.py:718
-#: AlertaDengue/dados/charts/home.py:153
 #: AlertaDengue/dados/templates/alert_state/age.html:125
 #: AlertaDengue/dados/templates/alert_state/date.html:100
 #: AlertaDengue/dados/templates/alert_state/disease.html:122
@@ -86,15 +107,6 @@ msgstr ""
 #: AlertaDengue/dados/templates/services_api.html:195
 #: AlertaDengue/dados/templates/total_series.html:28
 msgid "Casos"
-msgstr ""
-
-#: AlertaDengue/dados/charts/home.py:107
-#, python-brace-format
-msgid "%{text} <br>%{y} Casos Estimados<extra></extra>"
-msgstr ""
-
-#: AlertaDengue/dados/charts/home.py:118
-msgid "Casos Estimados de {} nos municípios monitorados"
 msgstr ""
 
 #: AlertaDengue/dados/charts/states.py:58
@@ -115,7 +127,7 @@ msgstr ""
 msgid "Período: Ano/Semana"
 msgstr ""
 
-#: AlertaDengue/dados/models.py:17 AlertaDengue/forecast/models.py:93
+#: AlertaDengue/dados/models.py:17 AlertaDengue/forecast/models.py:96
 msgid "Código do Município"
 msgstr "Código de la municipalidad"
 
@@ -950,40 +962,11 @@ msgid ""
 "            "
 msgstr ""
 
-#: AlertaDengue/dados/templates/main.html:76
-#, python-format
-msgid "Situação Epidemiológica - %(num_mun)s Municípios monitorados"
-msgstr ""
-
-#: AlertaDengue/dados/templates/main.html:122
-#: AlertaDengue/dados/templates/state_cities.html:219
-msgid "Última atualização"
-msgstr ""
-
-#: AlertaDengue/dados/templates/main.html:133
-msgid "Municípios participantes"
-msgstr ""
-
-#: AlertaDengue/dados/templates/main.html:140
-msgid "Total de casos notificado / estimados na semana"
-msgstr ""
-
-#: AlertaDengue/dados/templates/main.html:149
-msgid "Previsão de casos para as próximas semanas"
-msgstr ""
-
-#: AlertaDengue/dados/templates/main.html:156
-msgid "Variação em relação à semana anterior"
-msgstr ""
-
-#: AlertaDengue/dados/templates/main.html:178
-msgid ""
-"Variação da quadrissemana atual em relação à quadrissemana do último ano"
-msgstr ""
-
-#: AlertaDengue/dados/templates/main.html:207
-msgid "Clique aqui para ver mais detalhes"
-msgstr ""
+#: AlertaDengue/dados/templates/main.html:16
+#, fuzzy
+#| msgid "Epidemiologia"
+msgid "Situação Epidemiológica"
+msgstr "Epidemiología"
 
 #: AlertaDengue/dados/templates/mapadengue.html:20
 msgid "Mapa de Casos"
@@ -1019,7 +1002,7 @@ msgstr ""
 #: AlertaDengue/dados/templates/report_filter_state.html:52
 #: AlertaDengue/dados/templates/report_filter_state.html:60
 #: AlertaDengue/dados/templates/report_state.html:130
-#: AlertaDengue/templates/base.html:74
+#: AlertaDengue/templates/base.html:72
 msgid "Relatórios"
 msgstr ""
 
@@ -1475,7 +1458,7 @@ msgstr ""
 #: AlertaDengue/dados/templates/services_maps_doc.html:47
 #: AlertaDengue/dados/templates/services_tutorial.html:24
 #: AlertaDengue/dados/templates/services_tutorial_R.html:46
-#: AlertaDengue/templates/base.html:72
+#: AlertaDengue/templates/base.html:70
 msgid "Dados"
 msgstr ""
 
@@ -1574,7 +1557,7 @@ msgid "Se"
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:192
-#: AlertaDengue/forecast/models.py:136
+#: AlertaDengue/forecast/models.py:139
 msgid "Semana epidemiológica"
 msgstr ""
 
@@ -1639,7 +1622,7 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:199
 #: AlertaDengue/dados/templates/services_api.html:202
-#: AlertaDengue/templates/base.html:66
+#: AlertaDengue/templates/base.html:64
 msgid "Saiba Mais"
 msgstr ""
 
@@ -1814,6 +1797,10 @@ msgstr ""
 msgid "idades"
 msgstr ""
 
+#: AlertaDengue/dados/templates/state_cities.html:219
+msgid "Última atualização"
+msgstr ""
+
 #: AlertaDengue/dados/templates/state_cities.html:227
 msgid "Descrição de filtro"
 msgstr ""
@@ -1822,7 +1809,7 @@ msgstr ""
 msgid "Por favor, aguarde."
 msgstr ""
 
-#: AlertaDengue/dados/templates/team.html:5 AlertaDengue/templates/base.html:68
+#: AlertaDengue/dados/templates/team.html:5 AlertaDengue/templates/base.html:66
 msgid "Equipe"
 msgstr "Equipo"
 
@@ -1933,32 +1920,32 @@ msgid ""
 "Aluna de mestrado do Programa de Epidemiologia em Saúde Pública - ENSP/"
 "Fiocruz"
 msgstr ""
-"Estudiante de maestría del \"Programa de Epidemiologia em Saúde Pública - ENSP/"
-"Fiocruz\""
+"Estudiante de maestría del \"Programa de Epidemiologia em Saúde Pública - "
+"ENSP/Fiocruz\""
 
 #: AlertaDengue/dados/templates/team.html:56
 msgid ""
 "Aluna de graduação do Programa de Matemática Aplicada da FGV e PIBIC da "
 "Fiocruz"
 msgstr ""
-"Estudiante de pregrado del \"Programa de Matemática Aplicada da FGV e PIBIC da "
-"Fiocruz\""
+"Estudiante de pregrado del \"Programa de Matemática Aplicada da FGV e PIBIC "
+"da Fiocruz\""
 
 #: AlertaDengue/dados/templates/team.html:57
 msgid ""
 "Aluno de doutorado do Programa de Epidemiologia em Saúde Pública - ENSP/"
 "Fiocruz"
 msgstr ""
-"Estudiante de doctorado del \"Programa de Epidemiologia em Saúde Pública - ENSP/"
-"Fiocruz\""
+"Estudiante de doctorado del \"Programa de Epidemiologia em Saúde Pública - "
+"ENSP/Fiocruz\""
 
 #: AlertaDengue/dados/templates/team.html:58
 msgid ""
 "Aluno de doutorado do Programa de Biologia Computacional e Sistemas - IOC/"
 "Fiocruz"
 msgstr ""
-"Estudiante de doctorado del \"Programa de Biología Computacional e Sistemas - IOC/"
-"Fiocruz\""
+"Estudiante de doctorado del \"Programa de Biología Computacional e Sistemas "
+"- IOC/Fiocruz\""
 
 #: AlertaDengue/dados/templates/team.html:60
 msgid "Parceria"
@@ -1990,9 +1977,9 @@ msgid ""
 "de dados, tem conhecimento de R ou Python, e tem interesse em colaborar com "
 "o Infodengue, mande seu currículo"
 msgstr ""
-"Por el momento no tenemos puestos vacantes, pero si tienes experiencia en ciencia "
-"de datos, tienes conocimientos de R o Python y estás interesado en colaborar con "
-"Infodengue, envía tu currículum"
+"Por el momento no tenemos puestos vacantes, pero si tienes experiencia en "
+"ciencia de datos, tienes conocimientos de R o Python y estás interesado en "
+"colaborar con Infodengue, envía tu currículum"
 
 #: AlertaDengue/dados/templates/team.html:87
 msgid ""
@@ -2001,8 +1988,8 @@ msgid ""
 "            <i>Entre em contato<a href=\"mailto:alerta_dengue@fiocruz.br\"> "
 "conosco"
 msgstr ""
-" ¿Le gustaría obtener más información o hacer preguntas sobre el Sistema de Alerta " 
-"Info Dengue?\n"
+" ¿Le gustaría obtener más información o hacer preguntas sobre el Sistema de "
+"Alerta Info Dengue?\n"
 "            <i><a href=\"mailto:alerta_dengue@fiocruz.br\">Contáctenos"
 
 #: AlertaDengue/dados/templates/total_series.html:19
@@ -2014,17 +2001,13 @@ msgstr ""
 msgid "casos estimados"
 msgstr ""
 
-#: AlertaDengue/dados/views.py:429
-msgid "Em breve"
-msgstr ""
-
-#: AlertaDengue/dados/views.py:593 AlertaDengue/dados/views.py:721
+#: AlertaDengue/dados/views.py:487 AlertaDengue/dados/views.py:615
 msgid ""
 "A doença {} não está registrada em nosso banco de dados para o município de "
 "{}."
 msgstr ""
 
-#: AlertaDengue/dados/views.py:925
+#: AlertaDengue/dados/views.py:818
 msgid "desconhecida"
 msgstr ""
 
@@ -2060,23 +2043,6 @@ msgstr ""
 msgid "Existem nesse arquivo notificações que não incluem a coluna ID_AGRAVO."
 msgstr ""
 
-#: AlertaDengue/dbf/templates/dbf_upload.html:66
-msgid "Envie aqui os dados atualizados do SINAN"
-msgstr ""
-
-#: AlertaDengue/dbf/templates/dbf_upload.html:172
-msgid "Enviar"
-msgstr ""
-
-#: AlertaDengue/dbf/templates/dbf_upload.html:179
-#: AlertaDengue/dbf/templates/upload_successful.html:10
-msgid "Ultimos arquivos enviados:"
-msgstr ""
-
-#: AlertaDengue/dbf/templates/upload_successful.html:5
-msgid "Dados do SINAN recebidos"
-msgstr ""
-
 #: AlertaDengue/dbf/validation.py:50
 msgid "Este arquivo não parece um DBF válido "
 msgstr ""
@@ -2099,99 +2065,103 @@ msgid ""
 "importação for finalizado, "
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:24
+#: AlertaDengue/forecast/models.py:22
+msgid "Geocode"
+msgstr ""
+
+#: AlertaDengue/forecast/models.py:28
 msgid "Epidemiological Week"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:27
+#: AlertaDengue/forecast/models.py:31
 msgid "Predicted Week"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:29 AlertaDengue/forecast/models.py:72
-msgid "Está ativo?"
-msgstr ""
-
-#: AlertaDengue/forecast/models.py:53
+#: AlertaDengue/forecast/models.py:56
 msgid "Nome do Modelo de Previsão"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:57
+#: AlertaDengue/forecast/models.py:60
 msgid "URL do repositório github"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:61
+#: AlertaDengue/forecast/models.py:64
 msgid "ID do commit (github)"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:64
+#: AlertaDengue/forecast/models.py:67
 msgid "Data Inicio"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:67
+#: AlertaDengue/forecast/models.py:70
 msgid "Data Final"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:97
+#: AlertaDengue/forecast/models.py:75
+msgid "Está ativo?"
+msgstr ""
+
+#: AlertaDengue/forecast/models.py:100
 msgid "Está Ativo?"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:102 AlertaDengue/forecast/models.py:156
+#: AlertaDengue/forecast/models.py:105 AlertaDengue/forecast/models.py:159
 msgid "Modelo de Previsão"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:142
+#: AlertaDengue/forecast/models.py:145
 msgid "Cidade"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:149
+#: AlertaDengue/forecast/models.py:152
 msgid "Doença"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:162
+#: AlertaDengue/forecast/models.py:165
 msgid "Data da publicação da previsão"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:167
+#: AlertaDengue/forecast/models.py:170
 msgid "Data do inicio da semana da previsão"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:169
+#: AlertaDengue/forecast/models.py:172
 msgid "Casos Previstos"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:64
+#: AlertaDengue/templates/base.html:62
 msgid "Início"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:70
+#: AlertaDengue/templates/base.html:68
 msgid "Participe"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:80
+#: AlertaDengue/templates/base.html:78
 msgid "Encontre um município"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:87
+#: AlertaDengue/templates/base.html:85
 msgid "Envie dados atualizados"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:92
+#: AlertaDengue/templates/base.html:90
 msgid "Account "
 msgstr ""
 
-#: AlertaDengue/templates/base.html:97
+#: AlertaDengue/templates/base.html:95
 msgid "Logout"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:100
+#: AlertaDengue/templates/base.html:98
 msgid "Change password"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:106
+#: AlertaDengue/templates/base.html:104
 msgid "Login"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:161
+#: AlertaDengue/templates/base.html:160
 msgid ""
 "Pin a fixed-height footer to the bottom\n"
 "            of the viewport in desktop browsers with this\n"

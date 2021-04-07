@@ -1,11 +1,10 @@
 """
 Este módulo contem funções para interagir com o banco principal do projeto
  Alertadengue.
-
 """
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Tuple
 
 import ibis
 import numpy as np
@@ -22,7 +21,6 @@ from dados.info_states import STATE_NAMES
 
 with cf.config_prefix('sql'):
     cf.set_option('default_limit', None)
-
 
 PSQL_URI = "postgresql://{}:{}@{}:{}/{}".format(
     settings.PSQL_USER,
@@ -54,7 +52,6 @@ def filter_active_states(
 ) -> Callable:
     """
     Return a dictionary by active state abbreviation
-
     Returns
     -------
     Callable
@@ -79,14 +76,132 @@ STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
 MAP_CENTER = filter_active_states(_map_center)
 MAP_ZOOM = filter_active_states(_map_zoom)
 
-
 # Ibis utils functions
+
+
+def con_table(disease) -> con:
+    """
+    name: hist_uf_dengue_materialized_view
+    Creates the connection in the tables with the disease suffix.
+    Parameters
+    ----------
+    disease: str
+        option: dengue|chikungunya|zika
+    Returns
+    -------
+    schema:
+        uf : string
+        municipio_geocodigo : int32
+        SE : int32
+        data_iniSE : date
+        casos_est : float32
+        casos : int32
+        nivel : int16
+        receptivo : int16    ​
+    """
+
+    _disease = get_disease_suffix(disease, empty_for_dengue=False)
+    connect_table = con.table(f'hist_uf{_disease}_materialized_view')
+
+    return connect_table
+
+
+def get_scatter_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
+    """
+    Filter the columns and return the cases by given state and disease.
+    Parameters
+    ----------
+    uf: str
+        State abbreviation
+    disease: str
+        option: dengue|chikungunya|zika
+    Returns
+    -------
+    DataFrame
+    """
+
+    res = cache.get('get_scatter_data')
+
+    t_hist = con_table(disease)
+
+    proj = t_hist['uf', 'SE', 'data_iniSE', 'casos_est', 'casos'].sort_by(
+        ('SE', True)
+    )
+    df_hist = proj[proj['uf'] == uf]
+
+    res = df_hist.execute()
+    cache.set(
+        'get_scatter_data', res, settings.QUERY_CACHE_TIMEOUT,
+    )
+
+    return res
+
+
+def get_indicator_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
+    """
+    Filter the columns and return receptivity by given state and disease.
+    Parameters
+    ----------
+    uf: str
+        State abbreviation
+    disease: str
+        option: dengue|chikungunya|zika
+    Returns
+    -------
+    DataFrame
+    """
+
+    res = cache.get('get_indicator_data')
+
+    t_receptivity = con_table(disease)
+
+    proj = t_receptivity[
+        'SE', 'uf', 'municipio_geocodigo', 'receptivo'
+    ].sort_by(('SE', True))
+    df_receptivity = proj[proj['uf'] == uf]
+
+    res = df_receptivity.execute()
+    cache.set(
+        'get_indicator_data', res, settings.QUERY_CACHE_TIMEOUT,
+    )
+
+    return res
+
+
+def get_stack_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
+    """
+    Filter the columns and return the alert levels by given state and disease.
+    Parameters
+    ----------
+    uf: str
+        State abbreviation
+    disease: str
+        option: dengue|chikungunya|zika
+    Returns
+    -------
+    DataFrame
+    """
+
+    res = cache.get('get_stack_data')
+
+    t_alert = con_table(disease)
+
+    proj = t_alert['SE', 'uf', 'nivel', 'municipio_geocodigo'].sort_by(
+        ('SE', True)
+    )
+    df_alert = proj[proj['uf'] == uf]
+
+    res = df_alert.execute()
+    cache.set(
+        'get_stack_data', res, settings.QUERY_CACHE_TIMEOUT,
+    )
+
+    return res
 
 
 def get_epi_week_expr() -> Callable:
     """
     Return a UDF expression for epi_week function.
-
     Returns
     -------
     Callable
@@ -99,7 +214,6 @@ def get_epi_week_expr() -> Callable:
 def get_epiweek2date_expr() -> Callable:
     """
     Return a UDF expression for epiweek2date
-
     Returns
     -------
     Callable
@@ -114,7 +228,6 @@ def get_epiweek2date_expr() -> Callable:
 
 def _nan_to_num_int_list(v):
     """
-
     :param v: numpy.array
     :return: list
     """
@@ -128,14 +241,13 @@ def _episem(dt):
     return episem(dt, sep='')
 
 
-def get_disease_suffix(disease: str):
+def get_disease_suffix(disease: str, empty_for_dengue: bool = True):
     """
-
     :param disease:
     :return:
     """
     return (
-        ''
+        ('' if empty_for_dengue else '_dengue')
         if disease == 'dengue'
         else '_chik'
         if disease == 'chikungunya'
@@ -147,7 +259,6 @@ def get_disease_suffix(disease: str):
 
 def get_regional_names(state_name: str) -> list:
     """
-
     :param state_name:
     :return:
     """
@@ -169,7 +280,6 @@ def get_regional_names(state_name: str) -> list:
 
 def get_var_climate_info(geocodes: list):
     """
-
     :param geocodes:
     :return:
     """
@@ -223,7 +333,6 @@ def get_cities(regional_name: str = None, state_name: str = None) -> dict:
 
 def get_city_name_by_id(geocode: int):
     """
-
     :param geocode:
     :return:
     """
@@ -277,7 +386,6 @@ def get_all_active_cities_state():
 def get_all_active_cities() -> List[Tuple[str, str]]:
     """
     Return a list of names and geo codes for the active cities.
-
     Returns
     -------
     list_of_active_cities: List[Tuple[str, str]]
@@ -336,7 +444,6 @@ def get_alerta_mrj_zika():
 
 def get_last_alert(geo_id, disease):
     """
-
     :param geo_id:
     :param disease:
     :return:
@@ -378,79 +485,6 @@ def get_city(query):
         result = conexao.execute(sql, ('%' + query + '%',))
 
     return result.fetchall()
-
-
-def get_series_by_UF(
-    disease: str = 'dengue', weeks: Optional[int] = None
-) -> pd.DataFrame:
-    """
-    Get the incidence series from the database aggregated (sum) by state.
-
-    Parameters
-    ----------
-    disease: str
-        options: dengue|chikungunya|zika
-    weeks: optional int
-        number of weeks to be returned
-
-    Returns
-    -------
-    incidence_by_state: pd.DataFrame
-        Incidence by state with the following information:
-        uf, data, casos_s, casos_est_s.
-    """
-    cache_id = 'get_series_by_UF-{}'.format(disease)
-    df_cases = cache.get(cache_id)
-    _disease = get_disease_suffix(disease)
-
-    # TODO: this function is deprecated and will be
-    # removed when plotly-dash charts are ready
-    if df_cases is None:
-        with db_engine.connect() as conn:
-            if weeks:
-                sql = f'''
-                SELECT * FROM uf_total{_disease}_view
-                WHERE data >= (
-                    SELECT MAX(data) AS max_date FROM uf_total{_disease}_view
-                ) - INTERVAL '{weeks+2} WEEKS'
-                '''
-            else:
-                sql = f'SELECT * FROM uf_total{_disease}_view;'
-
-            df_cases = pd.read_sql(sql, conn, parse_dates=['data'],)
-            cache.set(cache_id, df_cases, settings.QUERY_CACHE_TIMEOUT)
-
-    return df_cases
-
-
-def get_n_chik_alerts() -> int:
-    """
-    Return the total number of cases of chikungunya disease registered.
-
-    Returns
-    -------
-    total_cases_of_chikungunya : int
-    """
-    sql = '''
-    SELECT COUNT(*) AS n_alerts
-    FROM "Municipio"."Historico_alerta_chik"
-    '''
-    return pd.read_sql_query(sql, db_engine).loc[0, 'n_alerts']
-
-
-def get_n_zika_alerts() -> int:
-    """
-    Return the total number of cases of zika disease registered.
-
-    Returns
-    -------
-    total_cases_of_zika : int
-    """
-    sql = '''
-    SELECT COUNT(*) AS n_alerts
-    FROM "Municipio"."Historico_alerta_zika"
-    '''
-    return pd.read_sql_query(sql, db_engine).loc[0, 'n_alerts']
 
 
 def load_series(cidade, disease: str = 'dengue', epiweek: int = 0):
@@ -524,7 +558,6 @@ def load_series(cidade, disease: str = 'dengue', epiweek: int = 0):
 
 def load_cases_without_forecast(geocode: int, disease):
     """
-
     :param geocode:
     :param disease:
     :return:
@@ -728,14 +761,12 @@ class NotificationResume:
     def count_cities_by_uf(uf: str, disease: str = 'dengue') -> int:
         """
         Return the total of the measured cities by given state and disease.
-
         Parameters
         ----------
         uf: str
             State abbreviation
         disease: str
             option: dengue|chikungunya|zika
-
         Returns
         -------
         total_cities: int
@@ -760,73 +791,8 @@ class NotificationResume:
             return pd.read_sql(sql, conn).astype(int).iloc[0]['count']
 
     @staticmethod
-    def count_cases_by_uf(uf, se):
-        """
-        Returna contagem de cidades participantes por estado
-
-        :param uf: uf a ser consultada
-        :param se: número do ano e semana (no ano), ex: 201503
-        :return: dataframe
-        """
-
-        sql = '''
-            SELECT
-                COALESCE(SUM(casos), 0) AS casos,
-                COALESCE(SUM(casos_est), 0) AS casos_est
-            FROM
-                "Municipio".historico_casos AS dengue
-                INNER JOIN "Dengue_global"."Municipio" AS city
-                    ON dengue.municipio_geocodigo = city.geocodigo
-            WHERE uf='%s' AND "SE" = %s
-            ''' % (
-            uf,
-            se,
-        )
-
-        with db_engine.connect() as conn:
-            return pd.read_sql(sql, conn).astype(int)
-
-    @staticmethod
-    def count_cases_week_variation_by_uf(uf, se1, se2):
-        """
-        Returna contagem de cidades participantes por estado
-
-        AND alerta."SE"=(select epi_week(NOW()::DATE))
-        AND alerta_passado."SE"=(select epi_week(NOW()::DATE-7))
-
-        :param uf: uf a ser consutado
-        :param se1: número do ano e semana (no ano), ex: 201503
-        :param se2: número do ano e semana (no ano), ex: 201503
-        :return: dataframe
-        """
-
-        sql = '''
-        SELECT
-            COALESCE(SUM(alerta.casos)-SUM(alerta_passado.casos), 0) AS casos,
-            COALESCE(SUM(alerta.casos_est)-SUM(alerta_passado.casos_est), 0)
-                AS casos_est
-        FROM "Municipio".historico_casos AS alerta
-        INNER JOIN "Municipio".historico_casos AS alerta_passado
-          ON (
-            alerta.municipio_geocodigo = alerta_passado.municipio_geocodigo
-            AND alerta."SE"=%s
-            AND alerta_passado."SE"=%s)
-        INNER JOIN "Dengue_global"."Municipio" AS municipio
-          ON alerta.municipio_geocodigo = municipio.geocodigo
-        WHERE uf ='%s'
-        ''' % (
-            se2,
-            se1,
-            uf,
-        )
-
-        with db_engine.connect() as conn:
-            return pd.read_sql(sql, conn).astype(int)
-
-    @staticmethod
     def tail_estimated_cases(geo_ids, n=12):
         """
-
         :param geo_ids: list of city geo ids
         :param n: the last n estimated cases
         :return: dict
@@ -869,7 +835,6 @@ class NotificationResume:
     ):
         """
         Retorna vários indicadores de alerta a nível da cidade.
-
         :param state_name: State name
         :param disease: dengue|chikungunya|zika
         :param epi_year_week: int
@@ -975,11 +940,9 @@ class Forecast:
     @staticmethod
     def get_min_max_date(geocode: int, cid10: str) -> (str, str):
         """
-
         :param geocode:
         :param cid10:
         :return: tuple with min and max date (str) from the forecasts
-
         """
         sql = '''
         SELECT
@@ -1002,7 +965,6 @@ class Forecast:
     @staticmethod
     def load_cases(geocode: int, disease: str, epiweek: int):
         """
-
         :param geocode:
         :param disease:
         :param epiweek:
@@ -1197,16 +1159,13 @@ class ReportCity:
         has_tweets: bool = False,
     ) -> pd.DataFrame:
         """
-
         :param geocode:
         :param disease_code:
         :param station_id:
         :param year_week:
         :param var_climate:
         :param has_tweets:
-
         :return:
-
         """
         k = [
             var_climate,
@@ -1360,7 +1319,6 @@ class ReportCity:
 
     def get_station_data(self, geocode: int):
         """
-
         :return:
         """
         sql = (
@@ -1395,7 +1353,6 @@ class ReportState:
     ) -> ibis.expr.types.Expr:
         """
         Return an ibis expression with the history for a given disease.
-
         Parameters
         ----------
         disease : str, {'dengue', 'chik', 'zika'}
@@ -1404,7 +1361,6 @@ class ReportState:
             The starting Year/Week, e.g.: 202002
         year_week_end : int
             The ending Year/Week, e.g.: 202005
-
         Returns
         -------
         ibis.expr.types.Expr
@@ -1449,13 +1405,11 @@ class ReportState:
     ) -> ibis.expr.types.Expr:
         """
         Return a twitter expression for given parameters.
-
         Parameters
         ----------
         geocodes_list : List[int]
         year_week_start : int
         year_week_end : int
-
         Returns
         -------
         ibis.expr.types.Expr
@@ -1484,12 +1438,10 @@ class ReportState:
     ) -> ibis.expr.types.Expr:
         """
         Return an ibis expression for climate_wu for given parameters.
-
         Parameters
         ----------
         var_climate : str, {'umid_max', 'temp_min'}
         station_id : str
-
         Returns
         -------
         ibis.expr.types.Expr
@@ -1524,7 +1476,6 @@ class ReportState:
         station_id: str,
     ) -> pd.DataFrame:
         """Get Repor State Data.
-
         Parameters
         ----------
         geocodes_list : List[int]
@@ -1534,7 +1485,6 @@ class ReportState:
             The ending Year/Week e.g.: 202005
         var_climate : str, {'umid_max', 'temp_min'}
         station_id : str
-
         Returns
         -------
         pd.DataFrame
@@ -1616,11 +1566,9 @@ class ReportState:
     def _format_data(cls, df: pd.DataFrame) -> pd.DataFrame:
         """
         Format the data for plotting.
-
         Parameters
         ----------
         df : pd.DataFrame
-
         Returns
         -------
         pd.DataFrame
@@ -1703,7 +1651,6 @@ class ReportState:
     ) -> pd.DataFrame:
         """
         Return a disease dataframe from given parameters.
-
         Parameters
         ----------
         cities : dict[int, str]
@@ -1711,11 +1658,9 @@ class ReportState:
         year_week : int
             The last Year/Week for searching reference.
         var_climate : str, {'umid_max', 'temp_min'}
-
         Returns
         -------
         pd.DataFrame
-
         """
         year_week_start = year_week - 100
         year_week_end = year_week
