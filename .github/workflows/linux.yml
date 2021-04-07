@@ -33,6 +33,7 @@ jobs:
     - name: Copy env_file as env_staging
       run: |
         cp example_env_file .env_staging
+        cp example_env_file .env
 
     - name: Build and Deploy staging_DB
       id: staging_db
@@ -49,7 +50,7 @@ jobs:
       run: |
         make start_staging SERVICES_STAGING=staging_web
 
-    - name: Migrate staging_DB
+    - name: Migrate staging database
       run: |
         make build_migrate_staging
 
@@ -61,10 +62,6 @@ jobs:
       run: |
         make flake8_staging SERVICES_STAGING=staging_web
 
-    - name: Run tests to APP
+    - name: Run tests to APPs
       run: |
         make test_staging_web SERVICES_STAGING=staging_web
-        
-    - name: Run tests on staging_WEB
-      run: |
-        make test_all SERVICES_STAGING=staging_web
