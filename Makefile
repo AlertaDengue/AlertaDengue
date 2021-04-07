@@ -20,7 +20,7 @@ build:
 build_migrate: build
 	$(compose_cmd) run --rm web python3 manage.py migrate --noinput
 	$(compose_cmd) run --rm web python3 manage.py migrate --database=forecast --noinput
-	$(compose_cmd) run --rm web python3 manage.py migrate --database=infodengue common
+	$(compose_cmd) run --rm web python3 manage.py migrate --database=infodengue dbf
 
 deploy: build_migrate
 	$(compose_cmd) up -d ${SERVICES_INFODENGUE}
@@ -62,9 +62,11 @@ run_staging_db:
 
 ## Migrate databases and create shapefiles to synchronize with static_files
 build_migrate_staging: run_staging_db
+	$(staging_compose_cmd) run --rm staging_web python3 manage.py makemigrations
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --database=dados --noinput
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --database=infodengue --noinput
 	#$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --database=forecast --noinput
+	$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --database=infodengue dbf
 
 generate_maps_staging:
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py sync_geofiles
