@@ -42,7 +42,7 @@ def get_partner_active():
     :return: pandas dataframe
     """
     sql = '''
-      SELECT name, contact, mail FROM dbf_sendtoPartner
+      SELECT name, contact, email FROM dbf_sendtoPartner
       WHERE status = 'True'
       ORDER BY name
     '''
@@ -95,10 +95,10 @@ def send_email_partner(
         )
 
         message = EmailMultiAlternatives(
-            subject, body, mail_from, [row['mail']]
+            subject, body, mail_from, [row['email']]
         )
 
-        logging.info(f"Enviando email para: {row['mail']},")
+        logging.info(f"Enviando email para: {row['email']},")
         # message.attach_alternative(html, 'text/html')
         messages.append(message)
 
