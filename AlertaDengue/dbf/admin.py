@@ -8,7 +8,7 @@ admin.site.register(DBF)
 
 
 class SendToPartnerAdmin(admin.ModelAdmin):
-    list_display = ['name', 'level', 'contact', 'mail', 'status']
+    list_display = ['name', 'level', 'contact', 'email', 'status']
     ordering = ['name']
 
 

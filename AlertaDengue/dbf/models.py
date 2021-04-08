@@ -99,7 +99,7 @@ class SendToPartner(models.Model):
     state_abbreviation = models.CharField(help_text='uf', max_length=5)
     level = models.CharField(help_text='nível de atuação', max_length=10)
     contact = models.CharField(help_text='nome do contato', max_length=50)
-    mail = models.EmailField(help_text='e-mail', max_length=50)
+    email = models.EmailField(help_text='e-mail', max_length=50)
     status = models.BooleanField(
         null=False, choices=STATUS_CHOICES, help_text='Está ativo?'
     )

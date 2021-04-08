@@ -17,7 +17,7 @@ class SendToPartnerTest(TestCase):
             state_abbreviation="RJ",
             level="Municipal",
             contact="Secretária",
-            mail="sec.test@gov.br",
+            email="sec.test@gov.br",
             status=True,
         )
 
@@ -28,7 +28,7 @@ class SendToPartnerTest(TestCase):
         self.assertEqual(partner.state_abbreviation, "RJ")
         self.assertEqual(partner.level, 'Municipal')
         self.assertEqual(partner.contact, 'Secretária')
-        self.assertEqual(partner.mail, 'sec.test@gov.br')
+        self.assertEqual(partner.email, 'sec.test@gov.br')
 
     def test_send_mail(self):
         partner = self.create_partner()
@@ -36,9 +36,9 @@ class SendToPartnerTest(TestCase):
         mail_from = 'info_dengue@gmail.com'
         mail_text = 'Here is the message.'
         mail_subject = f'Informe de dados Infodengue SE {week}'
-        mail_to = str(partner.mail)
+        email = str(partner.email)
         mail.send_mail(
-            mail_subject, mail_text, mail_from, [mail_to], fail_silently=False,
+            mail_subject, mail_text, mail_from, [email], fail_silently=False,
         )
 
         # Test that one message has been sent.
