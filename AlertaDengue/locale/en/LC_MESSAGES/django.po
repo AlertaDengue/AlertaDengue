@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-01 23:20+0000\n"
+"POT-Creation-Date: 2021-03-28 23:36+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -86,7 +86,7 @@ msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
 
 #: AlertaDengue/dados/charts/cities.py:718
-#: AlertaDengue/dados/charts/home.py:159
+#: AlertaDengue/dados/charts/home.py:160
 #: AlertaDengue/dados/templates/alert_state/age.html:125
 #: AlertaDengue/dados/templates/alert_state/date.html:100
 #: AlertaDengue/dados/templates/alert_state/disease.html:122
@@ -98,12 +98,12 @@ msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
 msgid "Casos"
 msgstr "Cases"
 
-#: AlertaDengue/dados/charts/home.py:113
+#: AlertaDengue/dados/charts/home.py:114
 #, python-brace-format
 msgid "%{text} <br>%{y} Casos Estimados<extra></extra>"
 msgstr "%{text} <br>%{y} Estimated cases<extra></extra>"
 
-#: AlertaDengue/dados/charts/home.py:124
+#: AlertaDengue/dados/charts/home.py:125
 msgid "Casos Estimados de {} nos municípios monitorados"
 msgstr "Estimated cases of {} in monitored cities"
 
@@ -127,7 +127,7 @@ msgstr "Mentions on social media"
 msgid "Período: Ano/Semana"
 msgstr "Period: Year / Week"
 
-#: AlertaDengue/dados/models.py:17 AlertaDengue/forecast/models.py:55
+#: AlertaDengue/dados/models.py:17 AlertaDengue/forecast/models.py:93
 msgid "Código do Município"
 msgstr "City Code"
 
@@ -1161,230 +1161,6 @@ msgstr ""
 msgid "Número de casos estimados na semana"
 msgstr "Estimated cases in the week"
 
-#: AlertaDengue/dados/templates/contact.html:5
-#: AlertaDengue/templates/base.html:68
-msgid "Equipe"
-msgstr "Team"
-
-#: AlertaDengue/dados/templates/contact.html:9
-#: AlertaDengue/dados/templates/contact.html:78
-msgid "Oportunidade:"
-msgstr "Opportunity:"
-
-#: AlertaDengue/dados/templates/contact.html:10
-#: AlertaDengue/dados/templates/contact.html:80
-msgid "Chamada de bolsa de pesquisa"
-msgstr "Call for research fellowship program"
-
-#: AlertaDengue/dados/templates/contact.html:15
-msgid ""
-"\n"
-"            <h5>O Sistema de Alerta Info Dengue é desenvolvido pela parceria "
-"de pesquisadores e profissionais \n"
-"            de diversas instituições:</h5><br>\n"
-"            "
-msgstr ""
-"\n"
-"<h5>InfoDengue is developed and maintained by a  consortium of researchers "
-"and professionals from several institutions:</h5><br> "
-
-#: AlertaDengue/dados/templates/contact.html:19
-msgid "Coordenação Geral:"
-msgstr "Principal Investigators:"
-
-#: AlertaDengue/dados/templates/contact.html:21
-msgid "Professor Associado - Escola de Matemática Aplicada/FGV"
-msgstr "Associate Professor - Escola de Matemática Aplicada/FGV"
-
-#: AlertaDengue/dados/templates/contact.html:22
-#: AlertaDengue/dados/templates/contact.html:30
-#: AlertaDengue/dados/templates/contact.html:31
-msgid "Pesquisador Titular - Programa de Computação Científica/Fiocruz"
-msgstr "Associate Researcher - Scientific Computing Program / Fiocruz,"
-
-#: AlertaDengue/dados/templates/contact.html:23
-msgid "Pesquisadora Titular - Programa de Computação Científica/Fiocruz"
-msgstr " Associate Researcher - Scientific Computing Program / Fiocruz"
-
-#: AlertaDengue/dados/templates/contact.html:25
-msgid "Equipe:"
-msgstr "Team:"
-
-#: AlertaDengue/dados/templates/contact.html:27
-msgid "Epidemiologista, bolsista INOVA"
-msgstr "Epidemiologist, INOVA fellowship"
-
-#: AlertaDengue/dados/templates/contact.html:28
-msgid "Epidemiologista, bolsista PDJ-INOVA"
-msgstr "Epidemiologist, INOVA postdoc"
-
-#: AlertaDengue/dados/templates/contact.html:29
-msgid "Pesquisador Associado - Programa de Computação Científica/Fiocruz"
-msgstr ""
-"Thais Riback: Assistant researcher - Scientific Computing Program - Fiocruz"
-
-#: AlertaDengue/dados/templates/contact.html:32
-msgid "Cientista de dados, bolsista INOVA"
-msgstr "Data Scientist, INOVA fellowship"
-
-#: AlertaDengue/dados/templates/contact.html:33
-msgid "Cientista de dados (Observatório da Dengue/InfoDengue)"
-msgstr "Data Scientist (Observatório da Dengue/InfoDengue fellowship)"
-
-#: AlertaDengue/dados/templates/contact.html:34
-msgid "Cientista de dados (WMP/InfoDengue)"
-msgstr "Data Scientist (WMP/InfoDengue fellowship)"
-
-#: AlertaDengue/dados/templates/contact.html:35
-msgid "Especialista em comunicação"
-msgstr "Communication Professional "
-
-#: AlertaDengue/dados/templates/contact.html:36
-msgid "Cientista de dados"
-msgstr "Data Scientist"
-
-#: AlertaDengue/dados/templates/contact.html:37
-msgid "Professora Associada - Universidade do Oeste do Paraná"
-msgstr "Associate Professor - Universidade do Oeste do Paraná"
-
-#: AlertaDengue/dados/templates/contact.html:38
-#: AlertaDengue/dados/templates/contact.html:39
-msgid "TI"
-msgstr ""
-
-#: AlertaDengue/dados/templates/contact.html:41
-msgid "Colaboradores:"
-msgstr "Colaborators:"
-
-#: AlertaDengue/dados/templates/contact.html:43
-#: AlertaDengue/dados/templates/contact.html:44
-#: AlertaDengue/dados/templates/contact.html:45
-msgid "Observatório da Dengue/UFMG"
-msgstr "Observatório da Dengue/UFMG"
-
-#: AlertaDengue/dados/templates/contact.html:46
-msgid "World Mosquito Program/Fiocruz"
-msgstr ""
-
-#: AlertaDengue/dados/templates/contact.html:47
-msgid "Instituto de Biociências/UFPR"
-msgstr "Instituto de Biociências/UFPR"
-
-#: AlertaDengue/dados/templates/contact.html:49
-msgid "Colaboradores internacionais:"
-msgstr "International Collaborators:"
-
-#: AlertaDengue/dados/templates/contact.html:51
-msgid "University of Exeter: UK"
-msgstr "University of Exeter, UK"
-
-#: AlertaDengue/dados/templates/contact.html:52
-msgid "University of Warwick: UK"
-msgstr "University of Warwick, UK"
-
-#: AlertaDengue/dados/templates/contact.html:53
-msgid "University of Chicago: USA"
-msgstr "University of Chicago, USA"
-
-#: AlertaDengue/dados/templates/contact.html:55
-msgid "Alunos:"
-msgstr "Students:"
-
-#: AlertaDengue/dados/templates/contact.html:57
-msgid ""
-"Aluna de mestrado do Programa de Epidemiologia em Saúde Pública - ENSP/"
-"Fiocruz"
-msgstr ""
-"Master student Programa de Epidemiologia em Saúde Pública, ENSP/Fiocruz"
-
-#: AlertaDengue/dados/templates/contact.html:58
-msgid ""
-"Aluna de graduação do Programa de Matemática Aplicada da FGV e PIBIC da "
-"Fiocruz"
-msgstr ""
-"Undergraduate student Programa de Matemática Aplicada da FGV e PIBIC da "
-"Fiocruz"
-
-#: AlertaDengue/dados/templates/contact.html:59
-msgid ""
-"Aluno de doutorado do Programa de Epidemiologia em Saúde Pública - ENSP/"
-"Fiocruz"
-msgstr "PhD student Programa de Epidemiologia em Saúde Pública, ENSP/Fiocruz"
-
-#: AlertaDengue/dados/templates/contact.html:60
-msgid ""
-"Aluno de doutorado do Programa de Biologia Computacional e Sistemas - IOC/"
-"Fiocruz"
-msgstr "PhD student Programa de Biologia Computacional e Sistemas, IOC/Fiocruz"
-
-#: AlertaDengue/dados/templates/contact.html:62
-msgid "Parceria:"
-msgstr "Partners:"
-
-#: AlertaDengue/dados/templates/contact.html:64
-msgid "Observatório da Dengue"
-msgstr "Observatório da Dengue"
-
-#: AlertaDengue/dados/templates/contact.html:65
-msgid "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
-msgstr "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
-
-#: AlertaDengue/dados/templates/contact.html:66
-#, fuzzy
-#| msgid " Secretaria de estado de Saúde do Rio de Janeiro"
-msgid "Secretaria de estado de Saúde do Rio de Janeiro"
-msgstr " Secretaria de estado de Saúde do Rio de Janeiro"
-
-#: AlertaDengue/dados/templates/contact.html:67
-#, fuzzy
-#| msgid " Secretaria de estado de Saúde do Rio de Janeiro"
-msgid "Secretaria Estadual de Saúde do Estado do Espírito Santo"
-msgstr " Secretaria de estado de Saúde do Rio de Janeiro"
-
-#: AlertaDengue/dados/templates/contact.html:68
-#, fuzzy
-#| msgid " Secretaria de estado de Saúde do Rio de Janeiro"
-msgid "Secretaria Estadual de Saúde do Estado do Paraná"
-msgstr " Secretaria de estado de Saúde do Rio de Janeiro"
-
-#: AlertaDengue/dados/templates/contact.html:69
-#, fuzzy
-#| msgid " Secretaria de estado de Saúde do Rio de Janeiro"
-msgid "Secretaria Estadual de Saúde do Estado do Ceará"
-msgstr " Secretaria de estado de Saúde do Rio de Janeiro"
-
-#: AlertaDengue/dados/templates/contact.html:70
-msgid "Regional de Saúde de Sete Lagoas/MG"
-msgstr ""
-
-#: AlertaDengue/dados/templates/contact.html:71
-#, fuzzy
-#| msgid "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
-msgid "Secretaria Municipal de Saúde de São José do Rio Preto"
-msgstr "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
-
-#: AlertaDengue/dados/templates/contact.html:73
-msgid "Apoio:"
-msgstr "Support:"
-
-#: AlertaDengue/dados/templates/contact.html:75
-msgid "DECIT/MS (2014 – 2016)"
-msgstr ""
-
-#: AlertaDengue/dados/templates/contact.html:76
-msgid "Fiocruz Edital Inova 2019 (2019-2020)"
-msgstr ""
-
-#: AlertaDengue/dados/templates/contact.html:82
-msgid ""
-" Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta "
-"Info Dengue?\n"
-"            Entre em contato<a href=\"mailto:alerta_dengue@fiocruz.br\"> "
-"conosco."
-msgstr ""
-" Would like to know more about Infodenue? <a href=\"mailto:"
-"alerta_dengue@fiocruz.br\"> Write to us</a>."
-
 #: AlertaDengue/dados/templates/dashboard_cities.html:56
 #, python-format
 msgid ""
@@ -1885,6 +1661,8 @@ msgid "ICmin"
 msgstr "ICmin"
 
 #: AlertaDengue/dados/templates/report_state.html:427
+#, fuzzy, python-format
+#| msgid "número mínimo de casos estimados (IC 95%%)"
 msgid "número mínimo de casos estimados (IC 95%%)"
 msgstr "Lower 95% confidence bounds for the estimated number of cases."
 
@@ -1893,6 +1671,8 @@ msgid "ICmax"
 msgstr "ICmax"
 
 #: AlertaDengue/dados/templates/report_state.html:430
+#, fuzzy, python-format
+#| msgid "número máximo de casos estimados (IC 95%%)"
 msgid "número máximo de casos estimados (IC 95%%)"
 msgstr "Upper 95% confidence bounds for the estimated number of cases."
 
@@ -2166,7 +1946,7 @@ msgid "Se"
 msgstr "Se"
 
 #: AlertaDengue/dados/templates/services_api.html:192
-#: AlertaDengue/forecast/models.py:99
+#: AlertaDengue/forecast/models.py:136
 msgid "Semana epidemiológica"
 msgstr "Epidemiological week"
 
@@ -2430,6 +2210,183 @@ msgstr "Filter description"
 msgid "Por favor, aguarde."
 msgstr "Please, wait."
 
+#: AlertaDengue/dados/templates/team.html:5 AlertaDengue/templates/base.html:68
+msgid "Equipe"
+msgstr "Team"
+
+#: AlertaDengue/dados/templates/team.html:11
+msgid ""
+"\n"
+"            <h5>O Sistema de Alerta Info Dengue é desenvolvido pela parceria "
+"de pesquisadores e profissionais \n"
+"            de diversas instituições:</h5><br>\n"
+"            "
+msgstr ""
+"\n"
+"<h5>InfoDengue is developed and maintained by a  consortium of researchers "
+"and professionals from several institutions:</h5><br> "
+
+#: AlertaDengue/dados/templates/team.html:15
+msgid "Coordenação Geral"
+msgstr "General Coordination"
+
+#: AlertaDengue/dados/templates/team.html:17
+msgid "Escola de Matemática Aplicada/FGV"
+msgstr "Associate Professor - Escola de Matemática Aplicada/FGV"
+
+#: AlertaDengue/dados/templates/team.html:18
+#: AlertaDengue/dados/templates/team.html:19
+msgid "PROCC/Fiocruz"
+msgstr ""
+
+#: AlertaDengue/dados/templates/team.html:21
+msgid "Epidemiologia"
+msgstr "Epidemiology"
+
+#: AlertaDengue/dados/templates/team.html:23
+msgid "World Mosquito Program/Fiocruz"
+msgstr ""
+
+#: AlertaDengue/dados/templates/team.html:24
+msgid "Epidemiologista, bolsista INOVA"
+msgstr "Epidemiologist, INOVA fellowship"
+
+#: AlertaDengue/dados/templates/team.html:25
+msgid "Epidemiologista, bolsista PDJ-INOVA"
+msgstr "Epidemiologist, INOVA postdoc"
+
+#: AlertaDengue/dados/templates/team.html:26
+msgid "Pesquisador Associado - PROCC/Fiocruz"
+msgstr "Thais Riback: Assistant researcher - PROCC/Fiocruz"
+
+#: AlertaDengue/dados/templates/team.html:27
+#: AlertaDengue/dados/templates/team.html:28
+msgid "Pesquisador Titular - PROCC/Fiocruz"
+msgstr "Associate Researcher - PROCC/Fiocruz"
+
+#: AlertaDengue/dados/templates/team.html:30
+msgid "Desenvolvimento"
+msgstr "Software Developers"
+
+#: AlertaDengue/dados/templates/team.html:32
+#: AlertaDengue/dados/templates/team.html:35
+msgid "Cientista de dados"
+msgstr "Data Scientist"
+
+#: AlertaDengue/dados/templates/team.html:33
+#: AlertaDengue/dados/templates/team.html:34
+msgid "Full Stack TI"
+msgstr ""
+
+#: AlertaDengue/dados/templates/team.html:37
+msgid "Comunicação"
+msgstr "Communication"
+
+#: AlertaDengue/dados/templates/team.html:39
+#: AlertaDengue/dados/templates/team.html:44
+#: AlertaDengue/dados/templates/team.html:45
+msgid "Observatório da Dengue/UFMG"
+msgstr "Observatório da Dengue/UFMG"
+
+#: AlertaDengue/dados/templates/team.html:42
+msgid "Colaboradores"
+msgstr "Colaborators"
+
+#: AlertaDengue/dados/templates/team.html:46
+msgid "Instituto de Biociências/UFPR"
+msgstr "Instituto de Biociências/UFPR"
+
+#: AlertaDengue/dados/templates/team.html:48
+msgid "Colaboradores internacionais"
+msgstr "International Collaborators"
+
+#: AlertaDengue/dados/templates/team.html:50
+msgid "University of Exeter: UK"
+msgstr "University of Exeter, UK"
+
+#: AlertaDengue/dados/templates/team.html:51
+msgid "University of Warwick: UK"
+msgstr "University of Warwick, UK"
+
+#: AlertaDengue/dados/templates/team.html:52
+msgid "University of Chicago: USA"
+msgstr "University of Chicago, USA"
+
+#: AlertaDengue/dados/templates/team.html:54
+msgid "Alunos"
+msgstr "Students"
+
+#: AlertaDengue/dados/templates/team.html:56
+msgid ""
+"Aluna de mestrado do Programa de Epidemiologia em Saúde Pública - ENSP/"
+"Fiocruz"
+msgstr ""
+"Master student Programa de Epidemiologia em Saúde Pública, ENSP/Fiocruz"
+
+#: AlertaDengue/dados/templates/team.html:57
+msgid ""
+"Aluna de graduação do Programa de Matemática Aplicada da FGV e PIBIC da "
+"Fiocruz"
+msgstr ""
+"Undergraduate student Programa de Matemática Aplicada da FGV e PIBIC da "
+"Fiocruz"
+
+#: AlertaDengue/dados/templates/team.html:58
+msgid ""
+"Aluno de doutorado do Programa de Epidemiologia em Saúde Pública - ENSP/"
+"Fiocruz"
+msgstr "PhD student Programa de Epidemiologia em Saúde Pública, ENSP/Fiocruz"
+
+#: AlertaDengue/dados/templates/team.html:59
+msgid ""
+"Aluno de doutorado do Programa de Biologia Computacional e Sistemas - IOC/"
+"Fiocruz"
+msgstr "PhD student Programa de Biologia Computacional e Sistemas, IOC/Fiocruz"
+
+#: AlertaDengue/dados/templates/team.html:61
+msgid "Parceria"
+msgstr "Partners"
+
+#: AlertaDengue/dados/templates/team.html:78
+msgid "Apoio"
+msgstr "Support"
+
+#: AlertaDengue/dados/templates/team.html:80
+msgid "DECIT/MS (2014 – 2016)"
+msgstr ""
+
+#: AlertaDengue/dados/templates/team.html:81
+msgid "Fiocruz Edital Inova 2019 (2019-2021)"
+msgstr ""
+
+#: AlertaDengue/dados/templates/team.html:82
+msgid "FNS/MS (2020-2021)"
+msgstr ""
+
+#: AlertaDengue/dados/templates/team.html:84
+msgid "Oportunidade"
+msgstr "Opportunity"
+
+#: AlertaDengue/dados/templates/team.html:86
+msgid ""
+"No momento não temos posições abertas, mas se você tem formação em ciência "
+"de dados, tem conhecimento de R ou Python, e tem interesse em colaborar com "
+"o Infodengue, mande seu currículo"
+msgstr ""
+"At the moment we do not have any open positions, but if you have a "
+"background in data science, have knowledge of R or Python, and are "
+"interested in collaborating with Infodengue, send us your resume"
+
+#: AlertaDengue/dados/templates/team.html:88
+msgid ""
+" Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta "
+"Info Dengue?\n"
+"            <i>Entre em contato<a href=\"mailto:alerta_dengue@fiocruz.br\"> "
+"conosco"
+msgstr ""
+" Would like to know more about Infodengue? <a href=\"mailto:"
+"alerta_dengue@fiocruz.br\"> Write to us"
+
 #: AlertaDengue/dados/templates/total_series.html:19
 #, python-format
 msgid "Casos Estimados de %(disease_label)s nos municípios monitorados"
@@ -2449,7 +2406,7 @@ msgid ""
 "{}."
 msgstr "This disease {} is not registered in our database for {} municipality"
 
-#: AlertaDengue/dados/views.py:914
+#: AlertaDengue/dados/views.py:916
 msgid "desconhecida"
 msgstr "unknown"
 
@@ -2530,47 +2487,63 @@ msgstr ""
 "was sent successfully. You will be informed by email ({}) once the import "
 "process is completed, "
 
+#: AlertaDengue/forecast/models.py:24
+msgid "Epidemiological Week"
+msgstr ""
+
 #: AlertaDengue/forecast/models.py:27
-msgid "Nome do Modelo de Previsão"
-msgstr "Forecast model name"
+msgid "Predicted Week"
+msgstr ""
 
-#: AlertaDengue/forecast/models.py:29
-msgid "Total de Semanas"
-msgstr "Total of weeks"
-
-#: AlertaDengue/forecast/models.py:31
-msgid "ID do commit (github)"
-msgstr "Commit ID (github)"
-
-#: AlertaDengue/forecast/models.py:33
+#: AlertaDengue/forecast/models.py:29 AlertaDengue/forecast/models.py:72
 msgid "Está ativo?"
 msgstr "Is it activated?"
 
-#: AlertaDengue/forecast/models.py:59
+#: AlertaDengue/forecast/models.py:53
+msgid "Nome do Modelo de Previsão"
+msgstr "Forecast model name"
+
+#: AlertaDengue/forecast/models.py:57
+msgid "URL do repositório github"
+msgstr ""
+
+#: AlertaDengue/forecast/models.py:61
+msgid "ID do commit (github)"
+msgstr "Commit ID (github)"
+
+#: AlertaDengue/forecast/models.py:64
+msgid "Data Inicio"
+msgstr ""
+
+#: AlertaDengue/forecast/models.py:67
+msgid "Data Final"
+msgstr ""
+
+#: AlertaDengue/forecast/models.py:97
 msgid "Está Ativo?"
 msgstr "Is it activated?"
 
-#: AlertaDengue/forecast/models.py:64 AlertaDengue/forecast/models.py:119
+#: AlertaDengue/forecast/models.py:102 AlertaDengue/forecast/models.py:156
 msgid "Modelo de Previsão"
 msgstr "Forecast model"
 
-#: AlertaDengue/forecast/models.py:105
+#: AlertaDengue/forecast/models.py:142
 msgid "Cidade"
 msgstr "City"
 
-#: AlertaDengue/forecast/models.py:112
+#: AlertaDengue/forecast/models.py:149
 msgid "Doença"
 msgstr "Disease"
 
-#: AlertaDengue/forecast/models.py:125
+#: AlertaDengue/forecast/models.py:162
 msgid "Data da publicação da previsão"
 msgstr "Published forecast date"
 
-#: AlertaDengue/forecast/models.py:130
+#: AlertaDengue/forecast/models.py:167
 msgid "Data do inicio da semana da previsão"
 msgstr "Forecast week initial date"
 
-#: AlertaDengue/forecast/models.py:132
+#: AlertaDengue/forecast/models.py:169
 msgid "Casos Previstos"
 msgstr "Forecast cases"
 
@@ -2663,6 +2636,88 @@ msgstr "Your username, if you have forgotten it, is:"
 #: AlertaDengue/templates/registration/password_reset_email.html:10
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
+
+#~ msgid "Observatório da Dengue"
+#~ msgstr "Observatório da Dengue"
+
+#~ msgid "Secretaria Estadual de Saúde do Rio de Janeiro"
+#~ msgstr "Secretaria de estado de Saúde do Rio de Janeiro"
+
+#~ msgid "Secretaria Estadual de Saúde do Estado do Espirito Santo"
+#~ msgstr "Secretaria de estado de Saúde do Rio de Janeiro"
+
+#~ msgid "Secretaria Estadual de Saúde do Estado do Paraná"
+#~ msgstr "Secretaria de estado de Saúde do Rio de Janeiro"
+
+#, fuzzy
+#~| msgid " Secretaria de estado de Saúde do Rio de Janeiro"
+#~ msgid "Secretaria Estadual de Saúde do Estado do Ceará"
+#~ msgstr " Secretaria de estado de Saúde do Rio de Janeiro"
+
+#, fuzzy
+#~| msgid " Secretaria de estado de Saúde do Rio de Janeiro"
+#~ msgid "Secretaria Estadual de Saúde do Estado de Minas Gerais"
+#~ msgstr " Secretaria de estado de Saúde do Rio de Janeiro"
+
+#, fuzzy
+#~| msgid " Secretaria de estado de Saúde do Rio de Janeiro"
+#~ msgid "Secretaria Estadual de Saúde do Estado do Maranhão"
+#~ msgstr " Secretaria de estado de Saúde do Rio de Janeiro"
+
+#, fuzzy
+#~| msgid " Secretaria de estado de Saúde do Rio de Janeiro"
+#~ msgid "Secretaria Estadual de Saúde do Estado de Santa Catarina"
+#~ msgstr " Secretaria de estado de Saúde do Rio de Janeiro"
+
+#~ msgid "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
+#~ msgstr "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
+
+#, fuzzy
+#~| msgid "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
+#~ msgid "Secretaria Municipal de Saúde de São José do Rio Preto/SP"
+#~ msgstr "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
+
+#, fuzzy
+#~| msgid "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
+#~ msgid "Secretaria Municipal de Saúde de Bauru/SP"
+#~ msgstr "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
+
+#, fuzzy
+#~| msgid "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
+#~ msgid "Secretaria Municipal de Saúde de Sorocaba/SP"
+#~ msgstr "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
+
+#, fuzzy
+#~| msgid "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
+#~ msgid "Secretaria Municipal de Saúde de Porto Alegre/RS"
+#~ msgstr "Secretaria Municipal de Saúde/Rio de Janeiro/RJ"
+
+#~ msgid "Chamada de bolsa de pesquisa"
+#~ msgstr "Call for research fellowship program"
+
+#~ msgid "Pesquisadora Titular - Programa de Computação Científica/Fiocruz"
+#~ msgstr " Associate Researcher - Scientific Computing Program / Fiocruz"
+
+#~ msgid "Equipe:"
+#~ msgstr "Team:"
+
+#~ msgid "Cientista de dados, bolsista INOVA"
+#~ msgstr "Data Scientist, INOVA fellowship"
+
+#~ msgid "Cientista de dados (Observatório da Dengue/InfoDengue)"
+#~ msgstr "Data Scientist (Observatório da Dengue/InfoDengue fellowship)"
+
+#~ msgid "Cientista de dados (WMP/InfoDengue)"
+#~ msgstr "Data Scientist (WMP/InfoDengue fellowship)"
+
+#~ msgid "Especialista em comunicação"
+#~ msgstr "Communication Professional "
+
+#~ msgid "Professora Associada - Universidade do Oeste do Paraná"
+#~ msgstr "Associate Professor - Universidade do Oeste do Paraná"
+
+#~ msgid "Total de Semanas"
+#~ msgstr "Total of weeks"
 
 #~ msgid "Secretaria Estadual de Saúde do Rio Grande do Sul"
 #~ msgstr "State Health Secretariat of Rio Grande do Sul"
@@ -3185,9 +3240,6 @@ msgstr "Thank you for use InfoDengue"
 
 #~ msgid "Gestão do Projeto:"
 #~ msgstr "Project management:"
-
-#~ msgid "Desenvolvimento:"
-#~ msgstr "Software Developers:"
 
 #~ msgid " Flávio Amieiro: Sys Admin e Desenvolvedor - InfoDengue"
 #~ msgstr " Flávio Amieiro: Sys Admin e Developer - InfoDengue"

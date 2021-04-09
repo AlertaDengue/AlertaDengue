@@ -18,7 +18,7 @@ from .views import (
     ReportCityView,
     ReportView,
     AboutPageView,
-    ContactPageView,
+    TeamPageView,
     JoininPageView,
     DataPublicServicesPageView,
 )
@@ -55,7 +55,7 @@ __report_type = '(?P<report_type>city|state)'
 urlpatterns = [
     re_path(r'^$', AlertaMainView.as_view(), name='main'),
     re_path(r'^informacoes/$', AboutPageView.as_view(), name='about'),
-    re_path(r'^contato/$', ContactPageView.as_view(), name='contact'),
+    re_path(r'^equipe/$', TeamPageView.as_view(), name='team'),
     re_path(r'^participe/$', JoininPageView.as_view(), name='joinin'),
     re_path(
         r'^services/(?P<service>maps|api)?$',

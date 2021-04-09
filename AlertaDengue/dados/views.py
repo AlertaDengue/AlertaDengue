@@ -248,11 +248,11 @@ class AboutPageView(TemplateView):
         return context
 
 
-class ContactPageView(TemplateView):
-    template_name = 'contact.html'
+class TeamPageView(TemplateView):
+    template_name = 'team.html'
 
     def get_context_data(self, **kwargs):
-        context = super(ContactPageView, self).get_context_data(**kwargs)
+        context = super(TeamPageView, self).get_context_data(**kwargs)
         # messages.info(
         #   self.request,
         #   'O site do projeto Alerta Dengue está em construção.')
