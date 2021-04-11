@@ -46,6 +46,6 @@ dependencies:
 - flake8
 - mypy
 - pip:
-    - django-maintenance-mode
-    # develop
-    - django-extensions
+  - django-maintenance-mode
+  # develop
+  - django-extensions

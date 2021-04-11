@@ -36,5 +36,5 @@ dependencies:
 - sh
 - sqlalchemy <1.4
 - sqlparse
-  - pip:
-      - django-maintenance-mode
+- pip:
+  - django-maintenance-mode
