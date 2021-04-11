@@ -19,9 +19,7 @@ dependencies:
 - geopy
 - gunicorn
 - ibis-framework 1.4.*
-- ipython
 - make
-- mock
 - numpy
 - pandas <=1.1.5  # issue#385
 - pip
@@ -35,16 +33,17 @@ dependencies:
 - rasterio
 - sh
 - sqlalchemy <1.4
-- sqlparse
 # develop
-- jupyterlab
-- matplotlib
-- flake8
-- pillow
-- pre-commit
 - black
 - flake8
+- flake8
+- ipython
+- jupyterlab
+- matplotlib
+- mock
 - mypy
+- pillow
+- pre-commit
 - pip:
   - django-maintenance-mode
   # develop

@@ -52,7 +52,7 @@ jobs:
 
     - name: Migrate staging database
       run: |
-        make build_migrate_staging
+        make migrate_staging
 
     - name: Generate MapFiles
       run: |
