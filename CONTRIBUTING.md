@@ -45,7 +45,7 @@ git clone https://github.com/AlertaDengue/AlertaDengue.git
 Create the virtual env and install the packages needed to run the application:
 
 ```sh
-conda env create python=3.7 -f ~/AlertaDengue/AlertaDengue/AlertaDengue/environment.yml
+conda env create -f ~/AlertaDengue/AlertaDengue/AlertaDengue/environment-3.8.yml
 ```
 
 Enable a virtual env "alertadengue":
@@ -60,7 +60,7 @@ Installs the archive packages "requirements-dev.txt":
 conda install -f ~/AlertaDengue/AlertaDengue/AlertaDengue/requirements-dev.txt
 ```
 
-Creates the settings file: 
+Creates the settings file:
 
 ```sh
 nano ~/AlertaDengue/AlertaDengue/AlertaDengue/AlertaDengue/settings.ini

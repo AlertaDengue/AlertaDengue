@@ -58,7 +58,7 @@ run_staging_db:
 	$(staging_compose_cmd) run --rm staging_db postgres -V
 
 ## Migrate databases and create shapefiles to synchronize with static_files
-build_migrate_staging: run_staging_db
+migrate_staging: run_staging_db
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --database=dados --noinput
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --database=infodengue --noinput
 	#$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --database=forecast --noinput
@@ -104,11 +104,13 @@ remove_untagged_images:
 
 #
 # Uses for development
-install:
+develop:
 	pip install -e .
 
-download_demodb:
-	bash download_db.sh
+
+install:
+	pip install .
+
 
 sync_mapfiles:
 	python AlertaDengue/manage.py sync_geofiles
