@@ -13,7 +13,6 @@ import pandas as pd
 import numpy as np
 import ibis
 from ibis import config as cf
-from ibis.sql.postgres import existing_udf
 
 # local
 from dados.episem import episem, episem2date
@@ -73,7 +72,9 @@ def get_epi_week_expr() -> Callable:
     -------
     Callable
     """
-    return existing_udf('epi_week', input_types=['date'], output_type='int64')
+    return ibis.postgres.udf.existing_udf(
+        'epi_week', input_types=['date'], output_type='int64'
+    )
 
 
 def get_epiweek2date_expr() -> Callable:
@@ -84,7 +85,7 @@ def get_epiweek2date_expr() -> Callable:
     -------
     Callable
     """
-    return existing_udf(
+    return ibis.postgres.udf.existing_udf(
         'epiweek2date', input_types=['int64'], output_type='date'
     )
 

@@ -1,9 +1,9 @@
+ipython
 jupyter
-# jupyter_contrib_nbextensions
-# eralchemy
 matplotlib
+mock
 PILLOW
 pre-commit
 black
 flake8
-# django-extensions
+django-extensions
