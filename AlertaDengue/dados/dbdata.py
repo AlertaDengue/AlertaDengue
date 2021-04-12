@@ -72,7 +72,7 @@ def get_epi_week_expr() -> Callable:
     -------
     Callable
     """
-    return ibis.postgres.existing_udf(
+    return ibis.postgres.udf.existing_udf(
         'epi_week', input_types=['date'], output_type='int64'
     )
 
@@ -85,7 +85,7 @@ def get_epiweek2date_expr() -> Callable:
     -------
     Callable
     """
-    return ibis.postgres.existing_udf(
+    return ibis.postgres.udf.existing_udf(
         'epiweek2date', input_types=['int64'], output_type='date'
     )
 

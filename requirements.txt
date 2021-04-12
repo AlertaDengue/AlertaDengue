@@ -13,6 +13,7 @@ geojson
 geopandas
 geopy
 gunicorn
+ibis-framework==1.4.*
 numpy
 pandas<=1.1.5
 plotly
