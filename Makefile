@@ -48,7 +48,7 @@ stop_staging:
 build_staging:
 	$(staging_compose_cmd) build ${SERVICES_STAGING}
 
-deploy_staging:
+deploy_staging: migrate_staging
 	$(staging_compose_cmd) up -d
 
 up_staging_db:
