@@ -42,3 +42,5 @@ AlertaDengue/static_files/*
 .env*
 
 .mypy_cache
+
+maintenance_mode_state.txt

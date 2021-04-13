@@ -2,6 +2,7 @@ name: alertadengue
 channels:
   - conda-forge
 dependencies:
+- beautifulsoup4  # needed by django-bootstrap4
 - celery
 - dbfread
 - dj-database-url
@@ -48,3 +49,4 @@ dependencies:
   - django-maintenance-mode
   # develop
   - django-extensions
+  - django-cprofile-middleware
