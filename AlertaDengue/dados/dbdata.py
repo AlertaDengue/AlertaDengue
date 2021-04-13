@@ -5,7 +5,7 @@ Este módulo contem funções para interagir com o banco principal do projeto
 """
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Dict, List, Callable
+from typing import Dict, List, Tuple, Callable, Optional
 
 from sqlalchemy import create_engine
 from django.core.cache import cache
@@ -26,6 +26,7 @@ MRJ_GEOCODE = 3304557
 
 CID10 = {'dengue': 'A90', 'chikungunya': 'A920', 'zika': 'A928'}
 DISEASES_SHORT = ['dengue', 'chik', 'zika']
+DISEASES_NAMES = CID10.keys()
 
 STATE_NAME = {
     'CE': 'Ceará',
@@ -249,10 +250,14 @@ def get_all_active_cities_state():
     return res
 
 
-def get_all_active_cities():
+def get_all_active_cities() -> List[Tuple[str, str]]:
     """
-    Fetch from the database a list on names of active cities
-    :return: list of tuples (geocode,name)
+    Return a list of names and geo codes for the active cities.
+
+    Returns
+    -------
+    list_of_active_cities: List[Tuple[str, str]]
+        List of city information (geocode, name)
     """
     res = cache.get('get_all_active_cities')
 
@@ -351,20 +356,32 @@ def get_city(query):
     return result.fetchall()
 
 
-def get_series_by_UF(disease='dengue', weeks=None):
+def get_series_by_UF(
+    disease: str = 'dengue', weeks: Optional[int] = None
+) -> pd.DataFrame:
     """
-    Get the incidence series from the database aggregated (sum) by state
-    :param UF: substring of the name of the state
-    :param disease: dengue|chikungunya|zika
-    :return: Dataframe with the series in long format
+    Get the incidence series from the database aggregated (sum) by state.
+
+    Parameters
+    ----------
+    disease: str
+        options: dengue|chikungunya|zika
+    weeks: optional int
+        number of weeks to be returned
+
+    Returns
+    -------
+    incidence_by_state: pd.DataFrame
+        Incidence by state with the following information:
+        uf, data, casos_s, casos_est_s.
     """
     cache_id = 'get_series_by_UF-{}'.format(disease)
-    series = cache.get(cache_id)
+    df_cases = cache.get(cache_id)
     _disease = get_disease_suffix(disease)
 
     # TODO: this function is deprecated and will be
     # removed when plotly-dash charts are ready
-    if series is None:
+    if df_cases is None:
         with db_engine.connect() as conn:
             if weeks:
                 sql = f'''
@@ -376,16 +393,19 @@ def get_series_by_UF(disease='dengue', weeks=None):
             else:
                 sql = f'SELECT * FROM uf_total{_disease}_view;'
 
-            series = pd.read_sql(sql, conn, parse_dates=['data'],)
-            cache.set(cache_id, series, settings.QUERY_CACHE_TIMEOUT)
+            df_cases = pd.read_sql(sql, conn, parse_dates=['data'],)
+            cache.set(cache_id, df_cases, settings.QUERY_CACHE_TIMEOUT)
 
-    return series
+    return df_cases
 
 
-def get_n_chik_alerts():
+def get_n_chik_alerts() -> int:
     """
+    Return the total number of cases of chikungunya disease registered.
 
-    :return: int
+    Returns
+    -------
+    total_cases_of_chikungunya : int
     """
     sql = '''
     SELECT COUNT(*) AS n_alerts
@@ -394,10 +414,13 @@ def get_n_chik_alerts():
     return pd.read_sql_query(sql, db_engine).loc[0, 'n_alerts']
 
 
-def get_n_zika_alerts():
+def get_n_zika_alerts() -> int:
     """
+    Return the total number of cases of zika disease registered.
 
-    :return: int
+    Returns
+    -------
+    total_cases_of_zika : int
     """
     sql = '''
     SELECT COUNT(*) AS n_alerts
@@ -678,13 +701,20 @@ def add_dv(geocodigo):
 
 class NotificationResume:
     @staticmethod
-    def count_cities_by_uf(uf, disease='dengue'):
+    def count_cities_by_uf(uf: str, disease: str = 'dengue') -> int:
         """
-        Returna contagem de cidades participantes por estado
+        Return the total of the measured cities by given state and disease.
 
-        :param uf: uf a ser consultada
-        :param disease: dengue|chikungunya|zika
-        :return: dataframe
+        Parameters
+        ----------
+        uf: str
+            State abbreviation
+        disease: str
+            option: dengue|chikungunya|zika
+
+        Returns
+        -------
+        total_cities: int
         """
 
         table_name = 'Historico_alerta' + get_disease_suffix(disease)
