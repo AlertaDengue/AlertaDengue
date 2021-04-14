@@ -3,10 +3,12 @@ from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.test import TestCase
 from datetime import date
+import unittest
+
 
 # local
-from AlertaDengue.dbf.models import DBF
-from AlertaDengue.dbf.validation import is_valid_dbf
+from dbf.models import DBF
+from dbf.validation import is_valid_dbf
 
 import datetime
 import os
@@ -16,6 +18,7 @@ __all__ = ["DBFValidationTest"]
 TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "data/")
 
 
+@unittest.skip("reason='Issue #416'")
 class DBFValidationTest(TestCase):
     fixtures = ['users']
 

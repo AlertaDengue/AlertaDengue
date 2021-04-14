@@ -83,7 +83,7 @@ class Sinan(object):
         self.ano = ano
         self.dbf = DBF(dbf_fname, encoding=encoding)
         self.colunas_entrada = self.dbf.field_names
-        self.tabela = pd.DataFrame(list(self.dbf))
+        self.tabela = pd.DataFrame(self.dbf.records)
         if "ID_MUNICIP" in self.tabela.columns:
             self.geocodigos = self.tabela.ID_MUNICIP.dropna().unique()
         elif "ID_MN_RESI" in self.tabela.columns:

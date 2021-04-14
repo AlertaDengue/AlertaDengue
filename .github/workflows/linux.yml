@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7]
+        python-version: [3.8]
 
     env:
       COMPOSE_FILE: docker/staging-compose.yml
@@ -23,7 +23,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-  
+
     - name: Download data files from Dataverse
       run: |
         mkdir -p docker/dev_dumps
@@ -33,6 +33,7 @@ jobs:
     - name: Copy env_file as env_staging
       run: |
         cp example_env_file .env_staging
+        cp example_env_file .env
 
     - name: Build and Deploy staging_DB
       id: staging_db
@@ -40,7 +41,7 @@ jobs:
         make build_staging SERVICES_STAGING=staging_db
         make start_staging SERVICES_STAGING=staging_db
         docker ps
-  
+
     - name: Build staging_WEB
       run: |
         make build_staging SERVICES_STAGING=staging_web
@@ -49,11 +50,11 @@ jobs:
       run: |
         make start_staging SERVICES_STAGING=staging_web
 
-    - name: Migrate staging_DB
+    - name: Migrate staging database
       run: |
-        make build_migrate_staging
+        make migrate_staging
 
-    - name: Generate MapFiles 
+    - name: Generate MapFiles
       run: |
         make generate_maps_staging
 
@@ -61,10 +62,6 @@ jobs:
       run: |
         make flake8_staging SERVICES_STAGING=staging_web
 
-    - name: Run tests to APP
+    - name: Run tests to APPs
       run: |
         make test_staging_web SERVICES_STAGING=staging_web
-        
-    - name: Run tests on staging_WEB
-      run: |
-        make test_all SERVICES_STAGING=staging_web

@@ -15,8 +15,8 @@ class TestAlertaStaticPageView(TestCase):
         response = self.client.get(reverse('dados:about'))
         self.assertEqual(response.status_code, 200)
 
-    def test_contact(self):
-        response = self.client.get(reverse('dados:contact'))
+    def test_team(self):
+        response = self.client.get(reverse('dados:team'))
         self.assertEqual(response.status_code, 200)
 
     def test_joinin(self):

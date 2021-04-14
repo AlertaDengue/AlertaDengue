@@ -107,15 +107,27 @@ def get_last_color_alert(geocode, disease, color_type='rgb'):
     return hex_to_rgb(color_list[level])
 
 
-def variation_p(v1, v2):
-    return round(
+def variation_p(v1: int, v2: int) -> float:
+    """
+    Return the percent of the variation between previous and last week.
+
+    Parameters
+    ----------
+    v1 : int
+    v2 : int
+
+    Returns
+    -------
+    float
+    """
+    v = (
         0
         if v1 == v2 == 0
         else ((v2 - v1) / 1) * 100
         if v1 == 0
-        else ((v2 - v1) / v1) * 100,
-        2,
+        else ((v2 - v1) / v1) * 100
     )
+    return round(v, 2)
 
 
 def get_alert(disease='dengue'):
@@ -219,9 +231,7 @@ def load_series():
 
 
 class _GetMethod:
-    """
-
-    """
+    """"""
 
     def _get(self, param, default=None):
         """
@@ -248,11 +258,11 @@ class AboutPageView(TemplateView):
         return context
 
 
-class ContactPageView(TemplateView):
-    template_name = 'contact.html'
+class TeamPageView(TemplateView):
+    template_name = 'team.html'
 
     def get_context_data(self, **kwargs):
-        context = super(ContactPageView, self).get_context_data(**kwargs)
+        context = super(TeamPageView, self).get_context_data(**kwargs)
         # messages.info(
         #   self.request,
         #   'O site do projeto Alerta Dengue está em construção.')
@@ -367,7 +377,7 @@ class AlertaMainView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AlertaMainView, self).get_context_data(**kwargs)
 
-        diseases = tuple(dbdata.CID10.keys())
+        diseases = tuple(dbdata.DISEASES_NAMES)
 
         n_alerts_chik = dbdata.get_n_chik_alerts()
         n_alerts_zika = dbdata.get_n_zika_alerts()
@@ -391,6 +401,7 @@ class AlertaMainView(TemplateView):
         mundict = dict(dbdata.get_all_active_cities())
         # municipios, geocodigos = list(mundict.values()), list(mundict.keys())
         # results[d] = dbdata.load_serie_cities(geocodigos, d)
+
         for d in diseases:
             case_series[d] = dbdata.get_series_by_UF(d, 52)
 
@@ -416,7 +427,9 @@ class AlertaMainView(TemplateView):
                     'casos_est': cases_est[-1] if cases_est.size else 0,
                 }
                 estimated_cases_next_week[d][s] = _('Em breve')
+                # v1 is the value of the previous week
                 v1 = 0 if not cases_est.size > 1 else cases_est[-2]
+                # v2 is the value of the last week
                 v2 = 0 if not cases_est.size else cases_est[-1]
 
                 v1_week_fixed[d][s] = v1 == 0 and v2 != 0
@@ -433,6 +446,7 @@ class AlertaMainView(TemplateView):
 
                     variation_4_weeks[d][s] = variation_p(v1, v2)
 
+        # chart_cols is used for the graphic interface render
         if n_alerts_chik > 0 and n_alerts_zika > 0:
             chart_cols = 4
             # card_cols = 6
@@ -448,14 +462,9 @@ class AlertaMainView(TemplateView):
 
         context.update(
             {
-                # 'mundict': json.dumps(mundict),
                 'num_mun': len(mundict),
-                # 'municipios': municipios,
-                # 'geocodigos': geocodigos,
-                # 'alerta': json.dumps(alerta),
                 'diseases': diseases,
                 'case_series': case_series,
-                # 'total': json.dumps(total.tolist()),
                 'states': self._state_names,
                 'count_cities': count_cities,
                 'current_week': current_week,
@@ -471,9 +480,9 @@ class AlertaMainView(TemplateView):
                 # TODO: passar o df para o método que cria o chart
                 #       gerar o gráfico referente ao dado
                 #       atualmente apenas retorna um gráfico demo
-                'chart_dengue': HomeCharts.create_dengue_chart({}),
-                'chart_chik': HomeCharts.create_chik_chart({}),
-                'chart_zika': HomeCharts.create_zika_chart({}),
+                'chart_dengue': HomeCharts.create_dengue_chart(case_series),
+                'chart_chik': HomeCharts.create_chik_chart(case_series),
+                'chart_zika': HomeCharts.create_zika_chart(case_series),
             }
         )
 
@@ -978,9 +987,7 @@ class GeoTiffView(View):
 
 
 class GeoJsonView(View):
-    """
-
-    """
+    """"""
 
     def get(self, request, geocodigo, disease):
         """

@@ -10,9 +10,6 @@ import plotly.graph_objs as go
 import pandas as pd
 from plotly.subplots import make_subplots
 
-# local
-from dados.dbdata import get_series_by_UF
-
 
 class HomeCharts:
     colors = {
@@ -35,11 +32,7 @@ class HomeCharts:
         :return:
         '''
         # gc = context['geocodigos'][0]
-        series = (
-            get_series_by_UF(disease, weeks=52)
-            if disease not in case_series
-            else case_series[disease]
-        )
+        series = case_series[disease]
 
         if series.empty:
             return {

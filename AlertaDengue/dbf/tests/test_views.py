@@ -2,14 +2,16 @@ import os
 from django.contrib.auth.models import User
 from django.core.files.base import File
 from django.test import TestCase
+import unittest
+
 
 from django.urls import reverse
 
 from datetime import date
 
 # local
-from AlertaDengue.dbf.models import DBF, DBFChunkedUpload
-from AlertaDengue.dbf.forms import DBFForm
+from dbf.models import DBF, DBFChunkedUpload
+from dbf.forms import DBFForm
 
 
 __all__ = ["DBFUploadViewTest"]
@@ -18,6 +20,7 @@ __all__ = ["DBFUploadViewTest"]
 TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "data/")
 
 
+@unittest.skip("reason='Issue #416'")
 class DBFUploadViewTest(TestCase):
     databases = ['infodengue', 'default']
     fixtures = ['AlertaDengue/dbf/fixtures/users.json']
