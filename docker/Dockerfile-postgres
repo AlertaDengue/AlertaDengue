@@ -1,4 +1,4 @@
-FROM mdillon/postgis:9.6
+FROM postgis/postgis:9.6-3.1
 
 ADD docker/postgres_setup/* /docker-entrypoint-initdb.d/
 ADD docker/dev_dumps /dumps

@@ -19,11 +19,11 @@ services:
         - ../.env_staging
       hostname: staging_db
       ports:
-        - "25432:25432"
+        - ${PSQL_PORT}:${PSQL_PORT}
       volumes:
         - ${STAGING_DATA_DIR}/staging:/var/lib/postgresql/data
       restart: always
-      command: -p 25432
+      command: -p ${PSQL_PORT}
 
     staging_web:
       build:

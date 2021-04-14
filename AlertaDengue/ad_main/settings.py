@@ -74,6 +74,10 @@ INSTALLED_APPS = (
     'maintenance_mode',
 )
 
+if DEBUG:
+    INSTALLED_APPS += ('django_extensions',)
+
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -85,6 +89,12 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
 )
+
+if DEBUG:
+    MIDDLEWARE_CLASSES += (
+        'django_cprofile_middleware.middleware.ProfilerMiddleware',
+    )
+    DJANGO_CPROFILE_MIDDLEWARE_REQUIRE_STAFF = False
 
 # django 2
 MIDDLEWARE = MIDDLEWARE_CLASSES
