@@ -1,6 +1,7 @@
 # from django.apps import apps
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 
 
 # City = apps.get_model('dados', 'City')
@@ -17,19 +18,21 @@ class Forecast(models.Model):
     """
 
     id = models.AutoField(primary_key=True)  # (serial)
+    city_geocode = models.IntegerField(
+        null=False, help_text=_('Geocode')
+    )  # Epid. week when the prediction was generated
     model = models.ForeignKey(
         'forecast.ForecastModel', on_delete=models.CASCADE, null=True
     )  # (foreign key to the models table) -->> forecast_model_weeks?
-    se = models.IntegerField(
+    epiweek = models.IntegerField(
         null=False, help_text=_('Epidemiological Week')
     )  # Epid. week when the prediction was generated
-    se_predicted = models.IntegerField(
+    epiweek_predicted = models.IntegerField(
         null=False, help_text=_('Predicted Week')
     )  # (integer) Epid. week predicted
-    active = models.BooleanField(null=False, help_text=_('Está ativo?'))
 
     class Meta:
-        db_table = 'forecast"."forecast_model'
+        db_table = 'forecast"."forecast'
         app_label = 'forecast'
 
     def __str__(self):
@@ -61,10 +64,10 @@ class ForecastModel(models.Model):
         max_length=7, null=False, help_text=_('ID do commit (github)')
     )
     train_start = models.DateField(
-        null=False, default='timezone.now', help_text=_('Data Inicio')
+        null=False, default=timezone.now, help_text=_('Data Inicio'),
     )  # start date of th training period
     train_end = models.DateField(
-        null=False, default='timezone.now', help_text=_('Data Final')
+        null=False, default=timezone.now, help_text=_('Data Final'),
     )  # end date of the training period
     filename = models.FileField(
         upload_to='uploads/%Y/%m/%d/', null=False, default='Trained model'
@@ -72,7 +75,7 @@ class ForecastModel(models.Model):
     active = models.BooleanField(null=False, help_text=_('Está ativo?'))
 
     class Meta:
-        db_table = 'forecast"."forecast_table'
+        db_table = 'forecast"."forecast_model'
         app_label = 'forecast'
 
     def __str__(self):

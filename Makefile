@@ -15,24 +15,25 @@ SERVICES_STAGING :=
 build:
 	$(compose_cmd) build ${SERVICES_INFODENGUE}
 
-build_migrate: build
+migrate:
 	$(compose_cmd) run --rm web python3 manage.py migrate --noinput
-	$(compose_cmd) run --rm web python3 manage.py migrate --database=forecast --noinput
+	$(compose_cmd) run --rm web python3 manage.py migrate dbf --database=infodengue --noinput
+	# $(compose_cmd) run --rm web python3 manage.py migrate forecast --database=forecast --noinput
 
-deploy: build_migrate
+deploy: migrate
 	$(compose_cmd) up -d ${SERVICES_INFODENGUE}
 
 generate_maps: build_migrate
 	$(compose_cmd) run --rm web python3 manage.py sync_geofiles
 	$(compose_cmd) run --rm web python3 manage.py generate_meteorological_raster_cities
 	$(compose_cmd) run --rm web python3 manage.py generate_mapfiles
-	$(compose_cmd) run --rm web python3 manage.py python3 manage.py collectstatic --noinput
+	$(compose_cmd) run --rm web python3 manage.py collectstatic --noinput
 
 exec:
 	$(compose_cmd) exec ${SERVICES_INFODENGUE} bash
 
 stop:
-	$(compose_cmd) stop
+	$(compose_cmd) stop ${SERVICES_INFODENGUE}
 
 #
 ## Example: make start_staging SERVICES=staging_db
@@ -61,7 +62,7 @@ run_staging_db:
 migrate_staging: run_staging_db
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --database=dados --noinput
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --database=infodengue --noinput
-	#$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate --database=forecast --noinput
+	$(staging_compose_cmd) run --rm staging_web python3 manage.py migrate forecast --database=forecast
 
 generate_maps_staging:
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py sync_geofiles
