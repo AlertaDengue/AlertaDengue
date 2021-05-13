@@ -22,6 +22,7 @@ class HomeCharts:
         'Rio Grande do Sul': 'rgb(255,150,0)',
         'Maranhão': 'rgb(255,0,255)',
         'Santa Catarina': 'rgb(150,0,0)',
+        'Acre': 'rgb(150,0,150)',
     }
 
     @classmethod
@@ -101,7 +102,7 @@ class HomeCharts:
                     x=df_ufs.index,
                     y=df_ufs[k],
                     name=k,
-                    marker={'color': cls.colors[k]},
+                    marker={'color': cls.colors.get(k)},
                     text=df_ufs.index.strftime('%d-%b-%Y <br>{}'.format(k)),
                     hovertemplate=_(
                         '%{text} <br>' '%{y} Casos Estimados' '<extra></extra>'
