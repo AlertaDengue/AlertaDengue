@@ -44,3 +44,6 @@ AlertaDengue/static_files/*
 .mypy_cache
 
 maintenance_mode_state.txt
+
+# Rever
+rever/
