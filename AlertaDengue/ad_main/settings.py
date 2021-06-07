@@ -81,8 +81,10 @@ if DEBUG:
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -180,12 +182,18 @@ DATABASES = {
 
 MEMCACHED_HOST = os.getenv('MEMCACHED_HOST')
 MEMCACHED_PORT = os.getenv('MEMCACHED_PORT')
-QUERY_CACHE_TIMEOUT = 60 * 60
+QUERY_CACHE_TIMEOUT = os.getenv('QUERY_CACHE_TIMEOUT')
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '{}:{}'.format(MEMCACHED_HOST, MEMCACHED_PORT),
+        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'LOCATION': f'{MEMCACHED_HOST}:{MEMCACHED_PORT}',
+        'OPTIONS': {
+            'no_delay': True,
+            'ignore_exc': True,
+            'max_pool_size': 4,
+            'use_pooling': True,
+        },
     }
 }
 
