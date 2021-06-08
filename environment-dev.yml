@@ -47,6 +47,7 @@ dependencies:
 - pre-commit
 - pip:
   - django-maintenance-mode
+  - django-pymemcache
   # develop
   - django-extensions
   - django-cprofile-middleware

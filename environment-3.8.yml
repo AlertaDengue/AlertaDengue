@@ -36,3 +36,4 @@ dependencies:
 - sqlalchemy <1.4
 - pip:
   - django-maintenance-mode
+  - django-pymemcache
