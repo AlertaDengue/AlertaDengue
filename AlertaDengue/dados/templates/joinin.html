@@ -1,35 +1,68 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
 
 {% block title %}{% trans "Como participar do InfoDengue" %}{% endblock %}
 
 {% block content %}
-    <div class="card">
 
-        <div class="card-body">
-          {% blocktrans %}
-            É muito fácil descobrir se o seu município pode participar do <b>Sistema de Alerta InfoDengue</b>.
-            Para isso é necessário que três etapas sejam cumpridas:<br><br>
-
-            1 - Preencher o <a href="http://goo.gl/forms/JHK3ZhZduH" target="_blank">formulário de adesão</a> com as informações
-            sobre o município e sobre a pessoa responsável pelos dados de dengue com quem manteremos contato;<br><br>
-
-            2 - Para dar continuidade à análise de viabilidade de participação, vamos precisar analisar
-            os dados de notificação de dengue (SINAN) em seu município, de 2012 até o presente. Enviaremos para você uma
-            carta sobre o compromisso do <b>Sistema de Alerta InfoDengue</b> a respeito da utilização dos dados.
-            É importante ressaltar que não há necessidade de informação sobre a identificação dos casos.<br><br>
-
-            3 - Se o seu município conseguiu preencher os dois requisitos anteriores, PARABÉNS! Os modelos de alerta já
-            estarão
-            prontos para seu município. Será elaborado e enviado um relatório contendo a análise dos dados históricos a
-            você.
-            Agora é hora de fazer o sistema funcionar daqui para frente. Para isso, um termo de compromisso deverá ser
-            assinado
-            entre o <b>Sistema de Alerta InfoDengue</b> e a Secretária Municipal de Saúde, autorizando a utilização dos
-            dados. <br><br>
-
-            Em caso de dúvidas, entre em contato <a href="mailto:alerta_dengue@fiocruz.br">conosco</a>:  <br><br>
-            {% endblocktrans %}
-        </div>
+<!-- begin -->
+<div class="container">
+  <div class="row" style="background-color: #e0effd; ">
+    <div class="col-md-12 col-sm-6 mb-1">
+    </br>
+    <h3><small class="p-4">Mapa do site:</small></h3>
     </div>
+    <div class="col-md-4 col-sm-6 mb-1">
+      <div class="h-100 border-0 p-4">
+        <a href="report/" title="Clique para abrir os relatórios estaduais">
+          <img class="img-fluid" src="{% static "img/participe/report_type.png" %}" />
+        </a>
+      </div>
+      <!-- <div class="h-60 border-0 p-5 ms-3"></div> -->
+    </div>
+
+    <div class="col-md-4 col-sm-6 mb-4">
+      <!-- <div class="h-40 border-0"></div> -->
+      <div class="h-100 border-0">
+        <div class="card-body">
+          <p class="text-muted">
+            Ao clicar no município de interesse  você
+            terá acesso a dados gerais sobre a situação das arboviroses.
+            Na parte inferior da página terá acesso ao relatório da situação das arboviroses,
+            contendo informações detalhadas para o município de interesse.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 col-sm-6 mb-4">
+      <div class="h-100 border-0 p-4 ">
+        <a href="report/" title="Clique para abrir os relatórios estaduais">
+          <img class="img-fluid" src="{% static "img/participe/select_city.png" %}" />
+        </a>
+      </div>
+      <!-- <div class="h-40 border-0"></div> -->
+    </div>
+  </div>
+</br>
+
+  <div class="row mt-12" style="background-color: #e0effd; ">
+    <div class="col-md-12 col-sm-6 mb-4">
+      <div class="h-60 border-0 p-4">
+                      <h3><small class="" >Participe:</small></h3>
+
+        <p class="text-muted">
+
+            Caso seu estado/ município ainda não faça parte do Infodengue,
+            basta a secretaria de saúde entrar em contato conosco,
+            preenchendo o formulário de adesão com as informações sobre o município
+            e sobre a pessoa responsável pelos dados de dengue com quem manteremos contato.
+            Em caso de dúvidas, entre em contato <a href="mailto:comunicacao@dengue.mat.br">conosco</a>:  <br><br>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end -->
+
 {% endblock %}
