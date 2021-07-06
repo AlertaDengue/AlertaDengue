@@ -30,7 +30,7 @@ DISEASES_NAMES = CID10.keys()
 
 STATE_NAME = {
     'CE': 'Ceará',
-    'ES': 'Espírito Santo',
+    # 'ES': 'Espírito Santo',
     'MG': 'Minas Gerais',
     'PR': 'Paraná',
     'RJ': 'Rio de Janeiro',
@@ -232,14 +232,20 @@ def get_all_active_cities_state():
         with db_engine.connect() as conn:
             res = conn.execute(
                 '''
-            SELECT DISTINCT
-              hist.municipio_geocodigo,
-              city.nome,
-              city.uf
-            FROM "Municipio"."Historico_alerta" AS hist
-              INNER JOIN "Dengue_global"."Municipio" AS city
-                ON (hist.municipio_geocodigo=city.geocodigo)
-            '''
+                SELECT DISTINCT
+                hist.municipio_geocodigo,
+                hist."data_iniSE",
+                city.nome,
+                city.uf
+                FROM "Municipio"."Historico_alerta" AS hist
+                INNER JOIN "Dengue_global"."Municipio" AS city
+                    ON (hist.municipio_geocodigo=city.geocodigo)
+                WHERE hist."data_iniSE" >= (
+                    SELECT MAX(hist."data_iniSE") - interval '52 weeks'
+                    FROM "Municipio"."Historico_alerta" AS hist
+                    )
+                ORDER BY hist."data_iniSE";
+                '''
             )
             res = res.fetchall()
             cache.set(
