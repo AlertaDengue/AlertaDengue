@@ -52,3 +52,5 @@ WEEK_ND=5
 
 HOST_UID=1000
 HOST_GID=1000
+
+ACTIVE_STATES = ['CE', 'MA', 'MG', 'RS', 'RJ', 'SC', 'SP', 'PR']

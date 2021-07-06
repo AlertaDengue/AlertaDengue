@@ -5,18 +5,19 @@ Este módulo contem funções para interagir com o banco principal do projeto
 """
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Dict, List, Tuple, Callable, Optional
+from typing import Callable, Dict, List, Optional, Tuple
 
-from sqlalchemy import create_engine
-from django.core.cache import cache
-import pandas as pd
-import numpy as np
 import ibis
+import numpy as np
+import pandas as pd
+from django.core.cache import cache
 from ibis import config as cf
+from sqlalchemy import create_engine
+
+from ad_main import settings
 
 # local
 from dados.episem import episem, episem2date
-from ad_main import settings
 from dados.info_states import STATE_NAMES
 
 with cf.config_prefix('sql'):
@@ -241,14 +242,20 @@ def get_all_active_cities_state():
         with db_engine.connect() as conn:
             res = conn.execute(
                 '''
-            SELECT DISTINCT
-              hist.municipio_geocodigo,
-              city.nome,
-              city.uf
-            FROM "Municipio"."Historico_alerta" AS hist
-              INNER JOIN "Dengue_global"."Municipio" AS city
-                ON (hist.municipio_geocodigo=city.geocodigo)
-            '''
+                SELECT DISTINCT
+                hist.municipio_geocodigo,
+                hist."data_iniSE",
+                city.nome,
+                city.uf
+                FROM "Municipio"."Historico_alerta" AS hist
+                INNER JOIN "Dengue_global"."Municipio" AS city
+                    ON (hist.municipio_geocodigo=city.geocodigo)
+                WHERE hist."data_iniSE" >= (
+                    SELECT MAX(hist."data_iniSE") - interval '52 weeks'
+                    FROM "Municipio"."Historico_alerta" AS hist
+                    )
+                ORDER BY hist."data_iniSE";
+                '''
             )
             res = res.fetchall()
             cache.set(
