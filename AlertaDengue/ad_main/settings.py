@@ -355,3 +355,8 @@ LOGGING = {
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+# ACTIVE_STATES = os.getenv('ACTIVE_STATES')
+ACTIVE_STATES = (
+    os.getenv('ACTIVE_STATES').split(',') if os.getenv('ACTIVE_STATES') else []
+)

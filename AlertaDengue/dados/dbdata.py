@@ -5,50 +5,24 @@ Este módulo contem funções para interagir com o banco principal do projeto
 """
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Dict, List, Tuple, Callable, Optional
+from typing import Callable, Dict, List, Optional, Tuple
 
-from sqlalchemy import create_engine
-from django.core.cache import cache
-import pandas as pd
-import numpy as np
 import ibis
+import numpy as np
+import pandas as pd
+from django.core.cache import cache
 from ibis import config as cf
+from sqlalchemy import create_engine
+
+from ad_main import settings
 
 # local
 from dados.episem import episem, episem2date
-from ad_main import settings
+from dados.info_states import STATE_NAMES
 
 with cf.config_prefix('sql'):
     cf.set_option('default_limit', None)
 
-# rio de janeiro city geocode
-MRJ_GEOCODE = 3304557
-
-CID10 = {'dengue': 'A90', 'chikungunya': 'A920', 'zika': 'A928'}
-DISEASES_SHORT = ['dengue', 'chik', 'zika']
-DISEASES_NAMES = CID10.keys()
-
-STATE_NAME = {
-    'CE': 'Ceará',
-    'ES': 'Espírito Santo',
-    'MG': 'Minas Gerais',
-    'PR': 'Paraná',
-    'RJ': 'Rio de Janeiro',
-    'SP': 'São Paulo',
-    'RS': 'Rio Grande do Sul',
-    'MA': 'Maranhão',
-    'SC': 'Santa Catarina',
-}
-
-ALL_STATE_NAMES = STATE_NAME.copy()
-# TODO: add missing states here
-
-ALERT_COLOR = {1: 'verde', 2: 'amarelo', 3: 'laranja', 4: 'vermelho'}
-
-ALERT_CODE = dict(zip(ALERT_COLOR.values(), ALERT_COLOR.keys()))
-
-STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
-ALL_STATE_INITIAL = dict(zip(ALL_STATE_NAMES.values(), ALL_STATE_NAMES.keys()))
 
 PSQL_URI = "postgresql://{}:{}@{}:{}/{}".format(
     settings.PSQL_USER,
@@ -60,6 +34,50 @@ PSQL_URI = "postgresql://{}:{}@{}:{}/{}".format(
 
 db_engine = create_engine(PSQL_URI)
 con = ibis.postgres.connect(url=PSQL_URI)
+
+
+# rio de janeiro city geocode
+MRJ_GEOCODE = 3304557
+
+CID10 = {'dengue': 'A90', 'chikungunya': 'A920', 'zika': 'A928'}
+DISEASES_SHORT = ['dengue', 'chik', 'zika']
+DISEASES_NAMES = CID10.keys()
+ALERT_COLOR = {1: 'verde', 2: 'amarelo', 3: 'laranja', 4: 'vermelho'}
+ALERT_CODE = dict(zip(ALERT_COLOR.values(), ALERT_COLOR.keys()))
+
+
+# Create the dictionaries for active states
+
+
+def filter_active_states(
+    data: dict, active_states: list = settings.ACTIVE_STATES
+) -> Callable:
+    """
+    Return a dictionary by active state abbreviation
+
+    Returns
+    -------
+    Callable
+    """
+
+    return {
+        key: value for (key, value) in data.items() if key in active_states
+    }
+
+
+_state_name = {}
+_map_center = {}
+_map_zoom = {}
+
+for state in STATE_NAMES:
+    _state_name[state['state_abbv']] = state['state_name']
+    _map_center[state['state_abbv']] = [state['lat'], state['long']]
+    _map_zoom[state['state_abbv']] = state['map_zoom']
+
+STATE_NAME = filter_active_states(_state_name)
+STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
+MAP_CENTER = filter_active_states(_map_center)
+MAP_ZOOM = filter_active_states(_map_zoom)
 
 
 # Ibis utils functions
@@ -91,7 +109,7 @@ def get_epiweek2date_expr() -> Callable:
     )
 
 
-# general util functions
+# General util functions
 
 
 def _nan_to_num_int_list(v):
@@ -232,14 +250,20 @@ def get_all_active_cities_state():
         with db_engine.connect() as conn:
             res = conn.execute(
                 '''
-            SELECT DISTINCT
-              hist.municipio_geocodigo,
-              city.nome,
-              city.uf
-            FROM "Municipio"."Historico_alerta" AS hist
-              INNER JOIN "Dengue_global"."Municipio" AS city
-                ON (hist.municipio_geocodigo=city.geocodigo)
-            '''
+                SELECT DISTINCT
+                hist.municipio_geocodigo,
+                hist."data_iniSE",
+                city.nome,
+                city.uf
+                FROM "Municipio"."Historico_alerta" AS hist
+                INNER JOIN "Dengue_global"."Municipio" AS city
+                    ON (hist.municipio_geocodigo=city.geocodigo)
+                WHERE hist."data_iniSE" >= (
+                    SELECT MAX(hist."data_iniSE") - interval '52 weeks'
+                    FROM "Municipio"."Historico_alerta" AS hist
+                    )
+                ORDER BY hist."data_iniSE";
+                '''
             )
             res = res.fetchall()
             cache.set(

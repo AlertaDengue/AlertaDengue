@@ -122,15 +122,20 @@ class Command(BaseCommand):
 
         # create a dictionary with geocode by ufs
         geojson_codes_states = {
-            state_code: [] for state_code in dbdata.ALL_STATE_NAMES.keys()
+            state_code: [] for state_code in dbdata.STATE_NAME.keys()
         }
-        for (geocode, _, state_name) in dbdata.get_all_active_cities_state():
-            state_code = dbdata.ALL_STATE_INITIAL[state_name]
+        for (
+            geocode,
+            _,
+            _,
+            state_name,
+        ) in dbdata.get_all_active_cities_state():
+            state_code = dbdata.STATE_INITIAL[state_name]
             geojson_codes_states[state_code].append(geocode)
 
         geojson_states: dict = {
             state_code: {'type': 'FeatureCollection', 'features': []}
-            for state_code in dbdata.ALL_STATE_NAMES.keys()
+            for state_code in dbdata.STATE_NAME.keys()
         }
 
         for state_code, geocodes in geojson_codes_states.items():
