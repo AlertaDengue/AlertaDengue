@@ -1,6 +1,7 @@
 from django.urls import re_path
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
+from dados.dbdata import STATE_NAME
 
 # local
 from .views import (
@@ -40,9 +41,13 @@ def redirect_alert_city_dengue(request, geocodigo):
 
 app_name = "dados"
 
+STATE_ABBV = '(?P<state>{})'.format(
+    '|'.join(state for state in STATE_NAME.keys())
+)
+
 __disease = '(?P<disease>dengue|chikungunya|zika)'
-__state = '(?P<state>CE|ES|MG|PR|RJ|SP|RS|MA|SC)'
-__state_extra = '(?P<state>CE|ES|MG|PR|RJ|SP|RS|MA|SC)'
+__state = STATE_ABBV
+__state_extra = STATE_ABBV
 __geocode = r'(?P<geocodigo>\d{7})'
 __geocode_ = r'(?P<geocode>\d{7})'
 __year = r'(?P<year>\d{4})'

@@ -42,15 +42,27 @@ MRJ_GEOCODE = 3304557
 CID10 = {'dengue': 'A90', 'chikungunya': 'A920', 'zika': 'A928'}
 DISEASES_SHORT = ['dengue', 'chik', 'zika']
 DISEASES_NAMES = CID10.keys()
+ALERT_COLOR = {1: 'verde', 2: 'amarelo', 3: 'laranja', 4: 'vermelho'}
+ALERT_CODE = dict(zip(ALERT_COLOR.values(), ALERT_COLOR.keys()))
 
-STATE_LIST = settings.ACTIVE_STATES
+
+# Create the dictionaries for active states
 
 
-def get_dict_uf(data):
-    dict_uf = {
-        key: value for (key, value) in data.items() if key in STATE_LIST
+def filter_active_states(
+    data: dict, active_states: list = settings.ACTIVE_STATES
+) -> Callable:
+    """
+    Return a dictionary by active state abbreviation
+
+    Returns
+    -------
+    Callable
+    """
+
+    return {
+        key: value for (key, value) in data.items() if key in active_states
     }
-    return dict_uf
 
 
 _state_name = {}
@@ -62,15 +74,11 @@ for state in STATE_NAMES:
     _map_center[state['state_abbv']] = [state['lat'], state['long']]
     _map_zoom[state['state_abbv']] = state['map_zoom']
 
-STATE_NAME = get_dict_uf(_state_name)
+STATE_NAME = filter_active_states(_state_name)
 STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
-MAP_CENTER = get_dict_uf(_map_center)
-MAP_ZOOM = get_dict_uf(_map_zoom)
+MAP_CENTER = filter_active_states(_map_center)
+MAP_ZOOM = filter_active_states(_map_zoom)
 
-
-ALERT_COLOR = {1: 'verde', 2: 'amarelo', 3: 'laranja', 4: 'vermelho'}
-
-ALERT_CODE = dict(zip(ALERT_COLOR.values(), ALERT_COLOR.keys()))
 
 # Ibis utils functions
 
@@ -101,7 +109,7 @@ def get_epiweek2date_expr() -> Callable:
     )
 
 
-# general util functions
+# General util functions
 
 
 def _nan_to_num_int_list(v):
