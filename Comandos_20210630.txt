@@ -1,0 +1,145 @@
+    1  man sudo_root
+    2  sudo chmd +x Discord
+    3  sudo chmod +x Discord
+    4  man sudo_root
+    5  sudo chmod +x Discord
+    6  25413698**
+    7  ./Discord
+    8  sudo chmod +x Discord
+    9  sudo passwd root
+   10  sudo passwd ubunto
+   11  sudo su 25413698**
+   12  Aplicações
+   13  root sudo passwd
+   14  sudo snap install root-framework
+   15  sudo chmod +x Discord
+   16  25413698**
+   17  man sudo
+   18  sudo --user
+   19  sudo update-grub
+   20  sudo chmod +x Discord
+   21  sudo snap install discord
+   22  sudo apt-get install git
+   23  clear
+   24  pwd
+   25  ls
+   26  ls -a
+   27  git config --global user.name "Breno Marques Azevedo"
+   28  git config -- global user.mail "eborn.azevedo@gmail.com"
+   29  git config --global user.name "Breno Marques Azevedo"
+   30  git config --global user.mail "eborn.azevedo@gmail.com"
+   31  ls -a
+   32  cat .gitconfig
+   33  git clone https://github.com/Breno-Azevedo/Trabalho_A2_ver_Final
+   34  ls
+   35  cd Trabalho_A2_ver_Final
+   36  ls
+   37  ls -l
+   38  chmod +x main.py
+   39  ls -l
+   40  sh main.py
+   41  chmod +x fundo.py
+   42  chmod +x elementos.py
+   43  ls -l
+   44  sh main.py
+   45  sudo apt update
+   46  sudo apt upgrade
+   47  sudo apt install ubunto-restricted-extras
+   48  apt install ubuntu-restricted-extras ubunto-restricted-addons
+   49  apt install ubuntu-restricted-extras ubuntu-restricted-addons
+   50  sudo apt install ubuntu-restricted-extras ubuntu-restricted-addons
+   51  bash Anaconda-latest-Linux-x86_64.sh
+   52  bash Anaconda3-2021.05-Linux-x86_64.sh
+   53  sha256sum Anaconda3-2021.05-Linux-x86_64.sh
+   54  ls
+   55  ls -a
+   56  ls Downloads
+   57  sha256sum .Downloads/Anaconda3-2021.05-Linux-x86_64.sh
+   58  cd /home/Downloads
+   59  cd /home/Downloads/
+   60  cd
+   61  home
+   62  /home/
+   63  /home/Downloads/
+   64  ls
+   65  ls --Downloads
+   66  ls --helo
+   67  ls --kelp
+   68  ls --help
+   69  clear
+   70  cd /home/breno/Downloads/
+   71  sha256sum Anaconda3-2021.05-Linux-x86_64.sh
+   72  bash /home/breno/Downloads/Anaconda3-2021.05-Linux-x86_64.sh
+   73  conda list
+   74  conda --version
+   75  cd
+   76  conda list
+   77  /home/
+   78  cd /home/breno/
+   79  conda list
+   80  cd /home/breno/conda
+   81  cd/home/breno/anaconda3/
+   82  conda --version
+   83  bash Anaconda3-2021.05-Linux-x86_64.sh
+   84  conda list cd/home/breno/anaconda3/
+   85  /DownloadsQ
+   86  /Downloads/
+   87  cd Downloads
+   88  ls
+   89  pycharm-community-2021.1.2
+   90  Downloads/pycharm-community-2021.1.2
+   91  pycharm-community-2021.1.2.tar.gz
+   92  cd
+   93  cd Downloads/pycharm-community-2021.1.2.tar.gz/bin
+   94  cd Downloads/pycharm-community-2021.1.2.tar.gz
+   95  clear
+   96  cd Downloads/
+   97  ls
+   98  cd pycharm-community-2021.1.2
+   99  cd bin/
+  100  pycharm.sh
+  101  ./pycharm
+  102  ./pycharm.sh
+  103  cd
+  104  pip install pygame
+  105  conda env list
+  106  pwd
+  107  ls
+  108  mkdir InfoDengue
+  109  ls
+  110  ls -la
+  111  ls -lF
+  112  cd InfoDengue/
+  113  git clone https://github.com/AlertaDengue/AlertaDengue.git
+  114  ls
+  115  cd AlertaDengue
+  116  ls
+  117  ls -l
+  118  python --version
+  119  pwd
+  120  conda create --name env-teste pip 
+  121  conda activate env-teste 
+  122  python --version
+  123  pip freeze
+  124  pip list
+  125  cd:
+  126  cd ..
+  127  git clone https://github.com/Breno-Azevedo/Data.git
+  128  cd Data/
+  129  code .
+  130  git remote -v
+  131  cd ..
+  132  cd AlertaDengue/
+  133  git remote -v
+  134  git remote rename origin upstream
+  135  git remote -v
+  136  git remote add origin https://github.com/Breno-Azevedo/AlertaDengue.git
+  137  git remote -v
+  138  git branch
+  139  git branch --all
+  140  git fetch --all
+  141  git branch --all
+  142  conda env list
+  143  history
+  144  echo history > Comandos_20210630.txt
+  145  history > Comandos_20210630.txt
