@@ -1,0 +1,74 @@
+{% load lookup %}
+{% load hashthis %}
+
+<!-- Start Component -->
+{% block collapse_component %}
+<div class="row">
+  <div class="col-sm-12 mb-4 mb-xl-0">
+    <div id="accordion">
+      {% for state_name in states_abbv %}
+      <div class="card">
+        <div id="flip_{{ state_name | hashthis }}"
+          class="collapse-style">
+            <button
+              class="collapse-effect text-left"
+              data-toggle="collapse"
+              data-target="#panel_{{ state_name | hashthis }}"
+              aria-expanded="true"
+              data-toggle="tooltip"
+              data-placement="bottom"
+              title="Clique para visualizar os dados sobre as doenças no estado de {{ state_name }}"
+              aria-controls="panel_{{ state_name | hashthis }}">
+              <span>{{ state_name }}</span>
+          </button>
+        </div>
+
+        <div id="panel_{{ state_name | hashthis }}"
+          {% if state_name == 'Ceará' %}
+            class="collapse show"
+            {% else %}
+            class="collapse"
+            {% endif %}
+            aria-labelledby="flip_{{ state_name | hashthis }}"
+            data-parent="#accordion">
+          <div class="card-body">
+            <div class="spinner-border text-muted"></div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script> //The columns of the charts are provided by the views template in the
+  $(document).ready(function(){
+
+    //TODO: Change iteration to UF in state_abbv #issue
+    {% for state_name in states_abbv %}
+
+    var requestCache = {};
+    function LoadDataFromApi(apiUrl) {
+      if (!requestCache[apiUrl]) {
+        requestCache[apiUrl] = $.ajax({
+            type: 'GET',
+            url: apiUrl,
+            dataType: "html"
+        });
+      }
+      return requestCache[apiUrl];
+    }
+
+    LoadDataFromApi("/chartshome/{{ state_name }}")
+      .then(function(data) {
+        $("#panel_{{ state_name | hashthis }}").html(data);
+        // console.log(data);
+      });
+
+    {% endfor %}
+  });
+</script>
+
+{% endblock %}
+<!-- End component -->

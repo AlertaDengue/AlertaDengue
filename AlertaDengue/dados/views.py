@@ -1,46 +1,53 @@
-from collections import defaultdict, OrderedDict
 import datetime
-import os
-import random
 import json
 import locale
-from typing import List, Dict, Tuple
+import os
+import random
+from collections import OrderedDict, defaultdict
+from os.path import dirname, join
+from time import mktime
+from typing import Dict, List, Tuple
 
 import fiona
 import geojson
 import numpy as np
-
-from django.apps import apps
-from django.utils.translation import gettext as _
-from django.shortcuts import redirect
-from django.views.generic.base import TemplateView, View
-from django.contrib import messages
-from django.conf import settings
-from django.http import HttpResponse
-from time import mktime
 import pandas as pd
+from django.apps import apps
+from django.conf import settings
+from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.utils.translation import gettext as _
+from django.views.generic.base import TemplateView, View
+
+from gis.geotiff import convert_from_shapefile
 
 # local
-from . import dbdata, models as M
+from . import dbdata
+from . import models as M
+from .charts.cities import CityCharts, ReportCityCharts
+from .charts.home import (
+    _create_indicator_chart,
+    _create_scatter_chart,
+    _create_stack_chart,
+)
+from .charts.states import ReportStateCharts
 from .dbdata import (
-    Forecast,
-    MRJ_GEOCODE,
+    ALERT_COLOR,
     CID10,
+    MRJ_GEOCODE,
+    STATE_INITIAL,
+    STATE_NAME,
+    Forecast,
     ReportCity,
     ReportState,
-    ALERT_COLOR,
-    STATE_NAME,
-    STATE_INITIAL,
+    get_indicator_data,
+    get_scatter_data,
+    get_stack_data,
 )
 from .episem import episem, episem2date
 from .maps import get_city_info
 from .models import City, RegionalHealth
-
-from dados.charts.states import ReportStateCharts
-from dados.charts.home import HomeCharts
-from dados.charts.cities import ReportCityCharts, CityCharts
-
-from gis.geotiff import convert_from_shapefile
 
 DBF = apps.get_model('dbf', 'DBF')
 
@@ -77,7 +84,6 @@ def hex_to_rgb(value):
 
 def get_last_color_alert(geocode, disease, color_type='rgb'):
     """
-
     :param geocode:
     :param disease:
     :param color_type: rba|hex
@@ -105,29 +111,6 @@ def get_last_color_alert(geocode, disease, color_type='rgb'):
         return color_list[level]
 
     return hex_to_rgb(color_list[level])
-
-
-def variation_p(v1: int, v2: int) -> float:
-    """
-    Return the percent of the variation between previous and last week.
-
-    Parameters
-    ----------
-    v1 : int
-    v2 : int
-
-    Returns
-    -------
-    float
-    """
-    v = (
-        0
-        if v1 == v2 == 0
-        else ((v2 - v1) / 1) * 100
-        if v1 == 0
-        else ((v2 - v1) / v1) * 100
-    )
-    return round(v, 2)
 
 
 def get_alert(disease='dengue'):
@@ -235,7 +218,6 @@ class _GetMethod:
 
     def _get(self, param, default=None):
         """
-
         :param param:
         :param default:
         :return:
@@ -371,120 +353,8 @@ class DataPublicServicesPageView(TemplateView):
 class AlertaMainView(TemplateView):
     template_name = 'main.html'
 
-    _state_names = sorted(dbdata.STATE_NAME.values())
-    _state_initials = {v: k for k, v in dbdata.STATE_NAME.items()}
-
     def get_context_data(self, **kwargs):
         context = super(AlertaMainView, self).get_context_data(**kwargs)
-
-        diseases = tuple(dbdata.DISEASES_NAMES)
-
-        n_alerts_chik = dbdata.get_n_chik_alerts()
-        n_alerts_zika = dbdata.get_n_zika_alerts()
-
-        # today
-        last_se = {}
-
-        case_series = defaultdict(dict)
-        case_series_state = defaultdict(dict)
-
-        count_cities = defaultdict(dict)
-        current_week = defaultdict(dict)
-        estimated_cases_next_week = defaultdict(dict)
-        variation_to_current_week = defaultdict(dict)
-        variation_4_weeks = defaultdict(dict)
-        v1_week_fixed = defaultdict(dict)
-        v1_4week_fixed = defaultdict(dict)
-
-        notif_resume = dbdata.NotificationResume
-
-        mundict = dict(dbdata.get_all_active_cities())
-        # municipios, geocodigos = list(mundict.values()), list(mundict.keys())
-        # results[d] = dbdata.load_serie_cities(geocodigos, d)
-
-        for d in diseases:
-            case_series[d] = dbdata.get_series_by_UF(d, 52)
-
-            for s in self._state_names:
-                df = case_series[d]  # alias
-                df_state = df[df.uf == s]
-                cases = df_state.casos_s.values
-
-                # cases estimation
-                cases_est = df_state.casos_est_s.values
-
-                case_series_state[d][s] = cases[-52:]
-
-                if d == 'dengue':
-                    if not df_state.empty:
-                        last_se[s] = df_state.tail(1).data.iloc[0]
-                    else:
-                        last_se[s] = ''
-
-                count_cities[d][s] = notif_resume.count_cities_by_uf(s, d)
-                current_week[d][s] = {
-                    'casos': cases[-1] if cases.size else 0,
-                    'casos_est': cases_est[-1] if cases_est.size else 0,
-                }
-                estimated_cases_next_week[d][s] = _('Em breve')
-                # v1 is the value of the previous week
-                v1 = 0 if not cases_est.size > 1 else cases_est[-2]
-                # v2 is the value of the last week
-                v2 = 0 if not cases_est.size else cases_est[-1]
-
-                v1_week_fixed[d][s] = v1 == 0 and v2 != 0
-
-                variation_to_current_week[d][s] = variation_p(v1, v2)
-
-                if cases_est.size < 55:
-                    variation_4_weeks[d][s] = 0
-                else:
-                    v2 = cases_est[-4:-1].sum()
-                    v1 = cases_est[-55:-52].sum()
-
-                    v1_4week_fixed[d][s] = v1 == 0 and v2 != 0
-
-                    variation_4_weeks[d][s] = variation_p(v1, v2)
-
-        # chart_cols is used for the graphic interface render
-        if n_alerts_chik > 0 and n_alerts_zika > 0:
-            chart_cols = 4
-            # card_cols = 6
-        elif n_alerts_chik > 0 or n_alerts_zika > 0:
-            chart_cols = 6
-            # card_cols = 3
-        else:
-            chart_cols = 12
-            # card_cols = 4
-
-        # cheating
-        card_cols = 6
-
-        context.update(
-            {
-                'num_mun': len(mundict),
-                'diseases': diseases,
-                'case_series': case_series,
-                'states': self._state_names,
-                'count_cities': count_cities,
-                'current_week': current_week,
-                'estimated_cases_next_week': estimated_cases_next_week,
-                'variation_to_current_week': variation_to_current_week,
-                'variation_4_weeks': variation_4_weeks,
-                'state_initials': self._state_initials,
-                'n_alerts_chik': n_alerts_chik,
-                'n_alerts_zika': n_alerts_zika,
-                'last_se': last_se,
-                'card_cols': card_cols,
-                'chart_cols': chart_cols,
-                # TODO: passar o df para o método que cria o chart
-                #       gerar o gráfico referente ao dado
-                #       atualmente apenas retorna um gráfico demo
-                'chart_dengue': HomeCharts.create_dengue_chart(case_series),
-                'chart_chik': HomeCharts.create_chik_chart(case_series),
-                'chart_zika': HomeCharts.create_zika_chart(case_series),
-            }
-        )
 
         return context
 
@@ -877,7 +747,6 @@ class AlertaStateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         """
-
         :param kwargs:
         :return:
         """
@@ -955,6 +824,166 @@ class AlertaStateView(TemplateView):
         return context
 
 
+class ChartsMainView(TemplateView):
+    template_name = 'components/home/charts.html'
+
+    _state_names = sorted(dbdata.STATE_NAME.values())
+    _state_initials = {v: k for k, v in dbdata.STATE_NAME.items()}
+
+    def get_img_map(self, s: str, d: str) -> str:
+
+        """
+        Verify if file exists and return a string to path.
+        Parameters
+        ----------
+        s: str
+            State full name
+        d: str
+            option: dengue|chikungunya|zika
+        Returns
+        -------
+        image_path: str
+        """
+
+        state_abbv = self._state_initials.get(s)
+
+        img_name = (
+            f'static/img/incidence_maps/uf/incidence_{state_abbv}_{d}.png'
+        )
+
+        img_data = f"""
+                <div class='mt-4'>
+                    <img
+                    src='{img_name}'
+                    alt=''
+                    title='Mapa de {d} para o estado de {s}'
+                    style='width:100%'
+                    />
+                </div>"""
+
+        img_no_data = f"""
+                <div class='alert alert-primary' align='center'>
+                    <p>Não há dados suficientes para
+                    a geração do mapa sobre {d}</p>
+                </div>"""
+
+        image_path = join(dirname(dirname(__file__)), img_name)
+
+        if os.path.exists(image_path):
+            return img_data
+        else:
+            return img_no_data
+
+    def get_context_data(self, **kwargs):
+        context = super(ChartsMainView, self).get_context_data(**kwargs)
+        diseases = tuple(dbdata.DISEASES_NAMES)
+
+        create_scatter_chart = defaultdict(dict)
+        create_indicator_chart = defaultdict(dict)
+        create_stack_chart = defaultdict(dict)
+        count_cities = defaultdict(dict)
+        create_maps = defaultdict(dict)
+        last_se = defaultdict(dict)
+        empty_charts_count = defaultdict(dict)
+        notif_resume = dbdata.NotificationResume
+
+        s = context['state_name']
+
+        for d in diseases:
+
+            no_data_chart = f"""
+                <div class='alert alert-primary' align='center'>
+                    Não há dados suficientes para a geração do
+                    gráfico sobre {d}
+                </div>"""
+
+            empty_charts_count[d] = 0
+
+            create_maps[d][s] = self.get_img_map(s, d)
+
+            count_cities[d][s] = notif_resume.count_cities_by_uf(s, d)
+
+            # scatterchart
+            df_hist = get_scatter_data(uf=s, disease=d)
+
+            if d == 'dengue':
+                if not df_hist.empty:
+                    last_se[s] = df_hist.data_iniSE.max().strftime('%d-%m-%Y')
+                else:
+                    last_se[s] = ''
+
+            keys = ['casos_est', 'casos']
+            df_by_uf = df_hist.groupby(['SE'])[keys].sum()
+
+            if not df_by_uf.empty:
+                scatter_chart = _create_scatter_chart(
+                    df=df_by_uf, uf=s, disease=d
+                )
+            else:
+                scatter_chart = no_data_chart
+                empty_charts_count[d] += 1
+
+            create_scatter_chart[d][s] = scatter_chart
+
+            # indicatorchart
+            df_receptivity = get_indicator_data(uf=s, disease=d)
+            if not df_receptivity.empty:
+                indicator_chart = _create_indicator_chart(
+                    df=df_receptivity, uf=s, disease=d
+                )
+            else:
+                indicator_chart = no_data_chart
+                empty_charts_count[d] += 1
+
+            create_indicator_chart[d][s] = indicator_chart
+
+            # stackchart
+            df_alert = get_stack_data(uf=s, disease=d)
+
+            df_alert = (
+                df_alert.groupby(['SE', 'nivel'])['municipio_geocodigo']
+                .count()
+                .reset_index()
+            )
+
+            color_alert = {1: 'Green', 2: 'Yellow', 3: 'Orange', 4: 'Red'}
+            df_alert.nivel = df_alert.nivel.apply(
+                lambda v: f'{color_alert[v]} Alert'
+            )
+
+            this_year_week = df_alert.SE.max()
+            get_week = df_alert.SE >= this_year_week - 4
+            df_alert_uf = df_alert[get_week].sort_values(
+                by=['nivel'], ascending=False
+            )
+
+            if not df_alert_uf.empty:
+                stack_chart = _create_stack_chart(
+                    df=df_alert_uf, uf=s, disease=d
+                )
+            else:
+                stack_chart = no_data_chart
+                empty_charts_count[d] += 1
+
+            create_stack_chart[d][s] = stack_chart
+
+        context.update(
+            {
+                'diseases': diseases,
+                'chart_scatter': create_scatter_chart,
+                'chart_indicator': create_indicator_chart,
+                'chart_stack': create_stack_chart,
+                'count_cities': count_cities,
+                'last_se': last_se,
+                'state_initials': self._state_initials,
+                'create_maps': create_maps,
+                'no_data_chart': no_data_chart,
+                'empty_charts_count': empty_charts_count,
+            }
+        )
+        return context
+
+
 class GeoTiffView(View):
     def get(self, request, geocodigo, disease):
         """
@@ -991,10 +1020,8 @@ class GeoJsonView(View):
 
     def get(self, request, geocodigo, disease):
         """
-
         :param kwargs:
         :return:
-
         """
         geocode = geocodigo
 
@@ -1029,7 +1056,6 @@ class ReportView(TemplateView):
 
     def get_context_data(self, **kwargs):
         """
-
         :param kwargs:
         :return:
         """
@@ -1052,7 +1078,6 @@ class ReportView(TemplateView):
 
     def view_filter_report_type(self, context):
         """
-
         :param context:
         :return:
         """
@@ -1074,7 +1099,6 @@ class ReportView(TemplateView):
 
     def view_filter_city(self, context):
         """
-
         :param context:
         :return:
         """
@@ -1104,7 +1128,6 @@ class ReportView(TemplateView):
 
     def view_filter_state(self, context):
         """
-
         :param context:
         :return:
         """
@@ -1124,7 +1147,6 @@ class ReportCityView(TemplateView):
 
     def raise_error(self, context, message):
         """
-
         :return:
         """
         self.template_name = 'error.html'
@@ -1133,7 +1155,6 @@ class ReportCityView(TemplateView):
 
     def get_context_data(self, **kwargs):
         """
-
         :param kwargs:
         :return:
         """
@@ -1406,7 +1427,6 @@ class ReportStateView(TemplateView):
 
     def raise_error(self, context, message):
         """
-
         :return:
         """
         self.template_name = 'error.html'
@@ -1416,13 +1436,11 @@ class ReportStateView(TemplateView):
     def prepare_html(self, df: pd.DataFrame, var_climate: str) -> str:
         """
         Prepare data as datafra
-
         Parameters
         ----------
         df : pd.DataFrame
         var_climate : str, {'umid.max', 'temp.min'}
             Climate variable
-
         Returns
         -------
         str
@@ -1482,14 +1500,12 @@ class ReportStateView(TemplateView):
     ) -> Tuple[Dict[str, Dict], str]:
         """
         Get regional information.
-
         Parameters
         ----------
         regional_names : List[str]
         state : str
         year_week : str
         diseases : List[str]
-
         Returns
         -------
         Tuple[Dict[str, Dict], str]
@@ -1564,13 +1580,11 @@ class ReportStateView(TemplateView):
     ) -> Dict:
         """
         Return alerts information.
-
         Parameters
         ----------
         diseases : List[str]
         state : str
         last_year_week : str
-
         Returns
         -------
         dict
@@ -1627,7 +1641,6 @@ class ReportStateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         """
-
         :param kwargs:
         :return:
         """

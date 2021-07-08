@@ -13,6 +13,7 @@ from .views import (
     get_municipio,
     AlertaMainView,
     AlertaStateView,
+    ChartsMainView,
     GeoTiffView,
     GeoJsonView,
     ReportStateView,
@@ -46,6 +47,11 @@ STATE_ABBV = '(?P<state>{})'.format(
 )
 
 __disease = '(?P<disease>dengue|chikungunya|zika)'
+__state_name = (
+    '(?P<state_name>Acre|Ceará|Paraná|Maranhão|São Paulo|'
+    'Rio de Janeiro|Rio Grande do Sul|'
+    'Minas Gerais|Santa Catarina)'
+)
 __state = STATE_ABBV
 __state_extra = STATE_ABBV
 __geocode = r'(?P<geocodigo>\d{7})'
@@ -59,6 +65,12 @@ __report_type = '(?P<report_type>city|state)'
 
 urlpatterns = [
     re_path(r'^$', AlertaMainView.as_view(), name='main'),
+    # TODO: Chage the get_url to __state
+    re_path(
+        r'^chartshome/{}$'.format(__state_name),
+        ChartsMainView.as_view(),
+        name='chartshome',
+    ),
     re_path(r'^informacoes/$', AboutPageView.as_view(), name='about'),
     re_path(r'^equipe/$', TeamPageView.as_view(), name='team'),
     re_path(r'^participe/$', JoininPageView.as_view(), name='joinin'),

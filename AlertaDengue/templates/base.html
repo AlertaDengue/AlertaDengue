@@ -50,16 +50,14 @@
             </div>
             <div class="row clearfix mb-3">
                 <div class="col-md-12">
-                    <nav class="navbar navbar-light navbar-custom navbar-expand-md rounded py-1">
-                        <div class="container">
-                            <button type="button" class="navbar-toggler"
-                                    data-toggle="collapse"
-                                    data-target=".navbar-collapse">
-                                <span class="sr-only">Toggle navigation</span>
-                                <span class="icon-bar"></span>
-                            </button>
-                            <div class="collapse navbar-collapse">
-                                <ul class="nav navbar-nav">
+
+                    <nav class="navbar navbar-expand-lg navbar-light navbar-custom navbar-expand-md rounded py-1">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <ul class="navbar-nav mr-auto">
                                     <li class="py-2"><a href="{% url 'dados:main' %}">
                                         {% trans "Início" %}</a></li>
                                     <li class="py-2"><a href="{% url 'dados:about' %}">
@@ -74,48 +72,49 @@
                                         {% trans "Relatórios" %}</a></li>
                                     <li style="overflow: visible">
                                         <div id="remote" class="twitter-typeahead"
-                                             style="overflow-y: auto; max-height: 150px; overflow: visible">
-                                            <input type="text"
-                                                   class="form-control input-lg typeahead twitter-typeahead tt-dropdown-menu"
-                                                   placeholder="{% blocktrans %}Encontre um município{% endblocktrans %} ..."
-                                                   name="q"
-                                                   style="position: relative" />
+                                            style="overflow-y: auto; max-height: 150px; overflow: visible">
+                                        <input type="text"
+                                                class="form-control input-lg typeahead twitter-typeahead tt-dropdown-menu"
+                                                placeholder="{% blocktrans %}Encontre um município{% endblocktrans %} ..."
+                                                name="q"
+                                                style="position: relative" />
                                         </div>
                                     </li>
                                     {% if user.is_authenticated %}
-                                        <li class="py-2"><a href="{% url 'dbf:upload' %}">
-                                            {% trans "Envie dados atualizados" %}
+                                    <li class="py-2"><a href="{% url 'dbf:upload' %}">
+                                        {% trans "Envie dados atualizados" %}
+                                    </a></li>
+                                    <li class="dropdown py-2">
+                                        <a href="#" class="dropdown-toggle"
+                                            data-toggle="dropdown">
+                                            {% trans "Account " %}
+                                            <b class="caret"></b>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                        <li><a href="{% url 'logout' %}">
+                                            {% trans "Logout" %}
                                         </a></li>
-                                        <li class="dropdown py-2">
-                                            <a href="#" class="dropdown-toggle"
-                                               data-toggle="dropdown">
-                                                {% trans "Account " %}
-                                                <b class="caret"></b>
-                                            </a>
-                                            <ul class="dropdown-menu">
-                                                <li><a href="{% url 'logout' %}">
-                                                    {% trans "Logout" %}
-                                                </a></li>
-                                                <li><a href="{% url 'password_change' %}">
-                                                    {% trans "Change password" %}
-                                                </a></li>
-                                            </ul>
-                                        </li>
-                                    {% else %}
-                                        <li class="py-2"><a href="{% url 'login' %}">
-                                            {% trans "Login" %}
+                                        <li><a href="{% url 'password_change' %}">
+                                            {% trans "Change password" %}
                                         </a></li>
-                                    {% endif %}
-                                </ul>
-                            </div>
-                            <!--/.nav-collapse -->
-                            <script type="application/javascript">
-                            // $('ul.nav.nav-pills li a').click(function () {
-                            //   $(this).parent().addClass('active').siblings().removeClass('active');
-                            // });
-                            </script>
+                                        </ul>
+                                    </li>
+                                {% else %}
+                                    <li class="py-2"><a href="{% url 'login' %}">
+                                        {% trans "Login" %}
+                                    </a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <!--/.nav-collapse -->
+                        <script type="application/javascript">
+                        // $('ul.nav.nav-pills li a').click(function () {
+                        //   $(this).parent().addClass('active').siblings().removeClass('active');
+                        // });
+                        </script>
                         </div>
                     </nav>
+
                 </div>
             </div>
         </div>
@@ -153,7 +152,7 @@
 
     <div class="container">
         {% block breadcrumbs %}{% endblock %}
-        <div class="page-header my-4">
+        <div class="page-header my-4 align-title">
             <h3>{% block title %}(no title){% endblock %}</h3>
         </div>
         {% bootstrap_messages %}
