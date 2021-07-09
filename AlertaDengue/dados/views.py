@@ -819,7 +819,7 @@ class ChartsMainView(TemplateView):
         image_path: str
         """
 
-        img_name = f'static/img/incidence_maps/uf/incidence_{s}_{d}.png'
+        img_name = f'static/img/incidence_maps/state/incidence_{s}_{d}.png'
 
         img_data = f"""
                 <div class='mt-4'>
