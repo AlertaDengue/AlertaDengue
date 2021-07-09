@@ -35,15 +35,13 @@ from .charts.states import ReportStateCharts
 from .dbdata import (
     ALERT_COLOR,
     CID10,
+    DISEASES_NAMES,
     MRJ_GEOCODE,
     STATE_INITIAL,
     STATE_NAME,
     Forecast,
     ReportCity,
     ReportState,
-    get_indicator_data,
-    get_scatter_data,
-    get_stack_data,
 )
 from .episem import episem, episem2date
 from .maps import get_city_info
@@ -720,30 +718,7 @@ class SinanCasesView(View):
 class AlertaStateView(TemplateView):
     template_name = 'state_cities.html'
 
-    _state_name = dbdata.STATE_NAME
-
-    _map_center = {
-        'CE': [-05.069, -39.397],
-        'ES': [-20.015, -40.803],
-        'MG': [-18.542, -44.319],
-        'PR': [-25.006, -51.833],
-        'RJ': [-22.187, -43.176],
-        'SP': [-23.5489, -46.6388],
-        'RS': [-51.217699, -30.034632],
-        'MA': [-2.53073, -44.3068],
-        'SC': [-27.5969, -50.5495],
-    }
-    _map_zoom = {
-        'CE': 6,
-        'ES': 6,
-        'MG': 6,
-        'PR': 6,
-        'RJ': 6,
-        'SP': 6,
-        'RS': 6,
-        'MA': 6,
-        'SC': 6,
-    }
+    _state_name = STATE_NAME
 
     def get_context_data(self, **kwargs):
         """
@@ -809,8 +784,8 @@ class AlertaStateView(TemplateView):
             {
                 'state_abv': context['state'],
                 'state': self._state_name[context['state']],
-                'map_center': self._map_center[context['state']],
-                'map_zoom': self._map_zoom[context['state']],
+                'map_center': dbdata.MAP_CENTER[context['state']],
+                'map_zoom': dbdata.MAP_ZOOM[context['state']],
                 'mun_dict': mun_dict,
                 'mun_dict_ordered': mun_dict_ordered,
                 'geo_ids': geo_ids,
@@ -827,8 +802,7 @@ class AlertaStateView(TemplateView):
 class ChartsMainView(TemplateView):
     template_name = 'components/home/charts.html'
 
-    _state_names = sorted(dbdata.STATE_NAME.values())
-    _state_initials = {v: k for k, v in dbdata.STATE_NAME.items()}
+    _states_name = STATE_NAME
 
     def get_img_map(self, s: str, d: str) -> str:
 
@@ -845,11 +819,7 @@ class ChartsMainView(TemplateView):
         image_path: str
         """
 
-        state_abbv = self._state_initials.get(s)
-
-        img_name = (
-            f'static/img/incidence_maps/uf/incidence_{state_abbv}_{d}.png'
-        )
+        img_name = f'static/img/incidence_maps/uf/incidence_{s}_{d}.png'
 
         img_data = f"""
                 <div class='mt-4'>
@@ -876,7 +846,7 @@ class ChartsMainView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ChartsMainView, self).get_context_data(**kwargs)
-        diseases = tuple(dbdata.DISEASES_NAMES)
+        diseases = tuple(DISEASES_NAMES)
 
         create_scatter_chart = defaultdict(dict)
         create_indicator_chart = defaultdict(dict)
@@ -885,12 +855,16 @@ class ChartsMainView(TemplateView):
         create_maps = defaultdict(dict)
         last_se = defaultdict(dict)
         empty_charts_count = defaultdict(dict)
+        states_alert = defaultdict(dict)
         notif_resume = dbdata.NotificationResume
 
-        s = context['state_name']
+        s = context['state']
+        states_alert[s] = s
+
+        # Use as an argument to fetch in database
+        state_name = self._states_name.get(s)
 
         for d in diseases:
-
             no_data_chart = f"""
                 <div class='alert alert-primary' align='center'>
                     Não há dados suficientes para a geração do
@@ -901,10 +875,10 @@ class ChartsMainView(TemplateView):
 
             create_maps[d][s] = self.get_img_map(s, d)
 
-            count_cities[d][s] = notif_resume.count_cities_by_uf(s, d)
+            count_cities[d][s] = notif_resume.count_cities_by_uf(state_name, d)
 
             # scatterchart
-            df_hist = get_scatter_data(uf=s, disease=d)
+            df_hist = dbdata.get_scatter_data(uf=state_name, disease=d)
 
             if d == 'dengue':
                 if not df_hist.empty:
@@ -917,7 +891,7 @@ class ChartsMainView(TemplateView):
 
             if not df_by_uf.empty:
                 scatter_chart = _create_scatter_chart(
-                    df=df_by_uf, uf=s, disease=d
+                    df=df_by_uf, uf=state_name, disease=d
                 )
             else:
                 scatter_chart = no_data_chart
@@ -926,10 +900,12 @@ class ChartsMainView(TemplateView):
             create_scatter_chart[d][s] = scatter_chart
 
             # indicatorchart
-            df_receptivity = get_indicator_data(uf=s, disease=d)
+            df_receptivity = dbdata.get_indicator_data(
+                uf=state_name, disease=d
+            )
             if not df_receptivity.empty:
                 indicator_chart = _create_indicator_chart(
-                    df=df_receptivity, uf=s, disease=d
+                    df=df_receptivity, uf=state_name, disease=d
                 )
             else:
                 indicator_chart = no_data_chart
@@ -938,7 +914,7 @@ class ChartsMainView(TemplateView):
             create_indicator_chart[d][s] = indicator_chart
 
             # stackchart
-            df_alert = get_stack_data(uf=s, disease=d)
+            df_alert = dbdata.get_stack_data(uf=state_name, disease=d)
 
             df_alert = (
                 df_alert.groupby(['SE', 'nivel'])['municipio_geocodigo']
@@ -959,7 +935,7 @@ class ChartsMainView(TemplateView):
 
             if not df_alert_uf.empty:
                 stack_chart = _create_stack_chart(
-                    df=df_alert_uf, uf=s, disease=d
+                    df=df_alert_uf, uf=state_name, disease=d
                 )
             else:
                 stack_chart = no_data_chart
@@ -969,16 +945,15 @@ class ChartsMainView(TemplateView):
 
         context.update(
             {
-                'diseases': diseases,
                 'chart_scatter': create_scatter_chart,
                 'chart_indicator': create_indicator_chart,
                 'chart_stack': create_stack_chart,
                 'count_cities': count_cities,
                 'last_se': last_se,
-                'state_initials': self._state_initials,
                 'create_maps': create_maps,
                 'no_data_chart': no_data_chart,
                 'empty_charts_count': empty_charts_count,
+                'states_alert': states_alert,
             }
         )
         return context
@@ -1399,29 +1374,6 @@ class ReportCityView(TemplateView):
 class ReportStateView(TemplateView):
     template_name = 'report_state.html'
 
-    _map_center = {
-        'CE': [-05.069, -39.397],
-        'ES': [-20.015, -40.803],
-        'MG': [-18.542, -44.319],
-        'PR': [-25.006, -51.833],
-        'RJ': [-22.187, -43.176],
-        'SP': [-23.5489, -46.6388],
-        'RS': [-51.217699, -30.034632],
-        'MA': [-2.53073, -44.3068],
-        'SC': [-27.5969, -48.5495],
-    }
-    _map_zoom = {
-        'CE': 6,
-        'ES': 6,
-        'MG': 6,
-        'PR': 6,
-        'RJ': 6,
-        'SP': 6,
-        'RS': 6,
-        'MA': 6,
-        'SC': 6,
-    }
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -1682,8 +1634,8 @@ class ReportStateView(TemplateView):
                 'geo_ids': alerts_info['geo_ids'],
                 'alerts_level': alerts_info['alerts'],
                 'case_series': alerts_info['cases_series_last_12'],
-                'map_center': self._map_center[state],
-                'map_zoom': self._map_zoom[state],
+                'map_center': dbdata.MAP_CENTER[state],
+                'map_zoom': dbdata.MAP_ZOOM[state],
             }
         )
         return context
