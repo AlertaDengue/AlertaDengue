@@ -5,15 +5,10 @@ from .. import dbdata
 register = template.Library()
 
 
-# TODO: Change the states_abbv context to get keys() #issue
 @register.inclusion_tag('components/home/collapse.html', takes_context=True)
 def collapse_component(context):
-    context['states_abbv'] = sorted(dbdata.STATE_NAME.values())
-    return context
+    context['states_name'] = dbdata.STATE_NAME
 
-
-@register.inclusion_tag('components/home/color_code.html', takes_context=True)
-def color_code_component(context):
     return context
 
 

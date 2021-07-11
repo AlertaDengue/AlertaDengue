@@ -1,58 +1,23 @@
 {% load lookup %}
-{% load hashthis %}
 {% load i18n %}
 
-{% block extra_head %}
-  <meta charset="UTF-8">
-  <style>
-    .nav-tabs .nav-item .nav-link {
-      background-color: white;
-      color: #0080FF;
-    }
-
-    .nav-tabs .nav-item .nav-link.active {
-      background-color: #e0eefd63;
-      color: #495057;
-    }
-    .nav-tabs .nav-item .nav-link.disabled {
-        color: #DBDBDB;
-        pointer-events: none;
-        cursor: copy;
-    }
-    .tab-content {
-      border: 1px solid #e0eefd63;
-      border-top: transparent;
-      padding: 10px;
-    }
-
-    .tab-content .tab-pane {
-      background-color: #e0eefd63;
-      color: #0080FF;
-      min-height: 200px;
-      height: auto;
-    }
-  </style>
-{% endblock %}
-
+{% block content %}
 
 <div class="row justify-content-md-center">
-
   <!-- Grid column -->
   <div class="col-sm-12 mb-1 mb-xl-0">
-
     <!-- Section: Live preview -->
     <section>
-
       <ul class="nav nav-tabs"
           id="diseaseTab"
           role="tablist">
         <li class="nav-item waves-effect waves-light">
           <a class="nav-link  active{% if empty_charts_count|lookup:'dengue' == 3 %} disabled{% endif %}"
-            id="dengue-{{ state_name | hashthis }}-tab"
+            id="dengue-{{ state }}-tab"
             data-toggle="tab"
-            href="#dengue-{{ state_name | hashthis }}"
+            href="#dengue-{{ state }}"
             role="tab"
-            aria-controls="dengue-{{ state_name | hashthis }}"
+            aria-controls="dengue-{{ state }}"
             aria-selected="true"
             title="Gráficos sobre Dengue"
             >Dengue
@@ -60,11 +25,11 @@
         </li>
         <li class="nav-item waves-effect waves-light">
           <a class="nav-link{% if empty_charts_count|lookup:'chikungunya' == 3 %} disabled{% endif %}"
-            id="chikungunya-{{ state_name | hashthis }}-tab"
+            id="chikungunya-{{ state }}-tab"
             data-toggle="tab"
-            href="#chikungunya-{{ state_name | hashthis }}"
+            href="#chikungunya-{{ state }}"
             role="tab"
-            aria-controls="chikungunya-{{ state_name | hashthis }}"
+            aria-controls="chikungunya-{{ state }}"
             aria-selected="false"
             title="Gráficos sobre Chikungunya"
             >Chikungunya
@@ -72,10 +37,10 @@
         </li>
         <li class="nav-item waves-effect waves-light">
           <a class="nav-link{% if empty_charts_count|lookup:'zika' == 3 %} disabled{% endif %}"
-            id="zika-{{ state_name | hashthis }}-tab"
+            id="zika-{{ state }}-tab"
             data-toggle="tab"
-            href="#zika-{{ state_name | hashthis }}" role="tab"
-            aria-controls="zika-{{ state_name | hashthis }}"
+            href="#zika-{{ state }}" role="tab"
+            aria-controls="zika-{{ state }}"
             aria-selected="false"
             title="Gráficos sobre Zika"
             >Zika
@@ -83,10 +48,10 @@
         </li>
         <li class="nav-item waves-effect waves-light">
           <a class="nav-link"
-            id="modo-{{ state_name | hashthis }}-tab"
+            id="modo-{{ state }}-tab"
             data-toggle="tab"
-            href="#incidence_map-{{ state_name | hashthis }}" role="tab"
-            aria-controls="incidence_map-{{ state_name | hashthis }}"
+            href="#incidence_map-{{ state }}" role="tab"
+            aria-controls="incidence_map-{{ state }}"
             aria-selected="false"
             title="Veja o mapa de incidência das doenças no estado"
             >Mapa incidência
@@ -102,78 +67,78 @@
       >
         <!-- Description -->
         <h6><small class="px-3" style="color:#888888;">
-          {{ count_cities|lookup:'dengue'|lookup:state_name | safe }}
+          {{ count_cities|lookup:'dengue'|lookup:state | safe }}
           {% trans "Municípios monitorados" %}. {% trans "Última atualização" %}: 
-          {{ last_se|lookup:state_name | safe }}
+          {{ last_se|lookup:state | safe }}
         </small></h6>
         <div class="tab-pane fade active show"
-            id="dengue-{{ state_name | hashthis }}"
+            id="dengue-{{ state }}"
             role="tabpanel"
-            aria-labelledby="dengue-{{ state_name | hashthis }}-tab">
+            aria-labelledby="dengue-{{ state }}-tab">
           <div class="row">
             <div class="col-md-4 w-100">
-              {{ chart_scatter|lookup:'dengue'|lookup:state_name | safe }}
+              {{ chart_scatter|lookup:'dengue'|lookup:state | safe }}
             </div>
             <div class="col-md-4 w-100">
-              {{ chart_indicator|lookup:'dengue'|lookup:state_name | safe }}
+              {{ chart_indicator|lookup:'dengue'|lookup:state | safe }}
             </div>
             <div class="col-md-4 w-100">
-              {{ chart_stack|lookup:'dengue'|lookup:state_name | safe }}
+              {{ chart_stack|lookup:'dengue'|lookup:state | safe }}
             </div>
           </div>
         </div>
         <div class="tab-pane fade"
-            id="chikungunya-{{ state_name | hashthis }}"
+            id="chikungunya-{{ state }}"
             role="tabpanel"
-            aria-labelledby="chikungunya-{{ state_name | hashthis }}-tab">
+            aria-labelledby="chikungunya-{{ state }}-tab">
           <div class="row">
             <div class="col-md-4 w-100">
-              {{ chart_scatter|lookup:'chikungunya'|lookup:state_name | safe }}
+              {{ chart_scatter|lookup:'chikungunya'|lookup:state | safe }}
             </div>
             <div class="col-md-4 w-100">
-              {{ chart_indicator|lookup:'chikungunya'|lookup:state_name | safe }}
+              {{ chart_indicator|lookup:'chikungunya'|lookup:state | safe }}
             </div>
             <div class="col-md-4 w-100">
-              {{ chart_stack|lookup:'chikungunya'|lookup:state_name | safe }}
+              {{ chart_stack|lookup:'chikungunya'|lookup:state | safe }}
             </div>
           </div>
         </div> 
         <div class="tab-pane fade"
-            id="zika-{{ state_name | hashthis }}"
+            id="zika-{{ state }}"
             role="tabpanel"
-            aria-labelledby="zika-{{ state_name | hashthis }}-tab">
+            aria-labelledby="zika-{{ state }}-tab">
           <div class="row">
             <div class="col-md-4 w-100">
-              {{ chart_scatter|lookup:'zika'|lookup:state_name | safe }}
+              {{ chart_scatter|lookup:'zika'|lookup:state | safe }}
             </div>
             <div class="col-md-4 w-100">
-              {{ chart_indicator|lookup:'zika'|lookup:state_name | safe }}
+              {{ chart_indicator|lookup:'zika'|lookup:state | safe }}
             </div>
             <div class="col-md-4 w-100">
-              {{ chart_stack|lookup:'zika'|lookup:state_name | safe }}
+              {{ chart_stack|lookup:'zika'|lookup:state | safe }}
             </div>
           </div>
         </div>
         <div class="tab-pane fade"
-            id="incidence_map-{{ state_name | hashthis }}"
+            id="incidence_map-{{ state }}"
             role="tabpanel"
-            aria-labelledby="incidence_map-{{ state_name | hashthis }}-tab">
+            aria-labelledby="incidence_map-{{ state }}-tab">
           <div class="row">
             <div class="col-md-4 w-100">
-              {{ create_maps|lookup:'dengue'|lookup:state_name | safe }}
+              {{ create_maps|lookup:'dengue'|lookup:state | safe }}
             </div>
             <div class="col-md-4 w-100">
-              {{ create_maps|lookup:'chikungunya'|lookup:state_name | safe }}
+              {{ create_maps|lookup:'chikungunya'|lookup:state | safe }}
             </div>
             <div class="col-md-4 w-100">
-              {{ create_maps|lookup:'zika'|lookup:state_name | safe }}
+              {{ create_maps|lookup:'zika'|lookup:state | safe }}
             </div>
           </div>
         </div>
         <div class="align-buttom mt-2">
-          <a href="/alerta/{{state_initials|lookup:state_name}}"
+          <a href="/alerta/{{states_alert|lookup:state}}"
             class="btn btn-outline-primary btn-sm" style="font-size: medium;">
-                <span class="badge">Informações detalhadas sobre o Estado</span>
+            <span class="badge">Informações detalhadas sobre o Estado</span>
           </a>
         </div>
       </div>
@@ -183,3 +148,5 @@
   </div>
   <!-- Grid column -->
 </div>
+
+{% endblock %}

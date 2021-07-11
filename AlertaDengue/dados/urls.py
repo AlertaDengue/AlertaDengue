@@ -42,18 +42,10 @@ def redirect_alert_city_dengue(request, geocodigo):
 
 app_name = "dados"
 
-STATE_ABBV = '(?P<state>{})'.format(
-    '|'.join(state for state in STATE_NAME.keys())
-)
+state_abbv = '|'.join(state for state in STATE_NAME.keys())
 
 __disease = '(?P<disease>dengue|chikungunya|zika)'
-__state_name = (
-    '(?P<state_name>Acre|Ceará|Paraná|Maranhão|São Paulo|'
-    'Rio de Janeiro|Rio Grande do Sul|'
-    'Minas Gerais|Santa Catarina)'
-)
-__state = STATE_ABBV
-__state_extra = STATE_ABBV
+__state_abbv = f'(?P<state>{state_abbv})'
 __geocode = r'(?P<geocodigo>\d{7})'
 __geocode_ = r'(?P<geocode>\d{7})'
 __year = r'(?P<year>\d{4})'
@@ -65,9 +57,8 @@ __report_type = '(?P<report_type>city|state)'
 
 urlpatterns = [
     re_path(r'^$', AlertaMainView.as_view(), name='main'),
-    # TODO: Chage the get_url to __state
     re_path(
-        r'^chartshome/{}$'.format(__state_name),
+        r'^chartshome/{}$'.format(__state_abbv),
         ChartsMainView.as_view(),
         name='chartshome',
     ),
@@ -94,9 +85,9 @@ urlpatterns = [
         DataPublicServicesPageView.as_view(),
         name="data_public_services_type",
     ),
-    re_path(r'^alerta/%s[/]?$' % __state, redirect_alerta_dengue),
+    re_path(r'^alerta/%s[/]?$' % __state_abbv, redirect_alerta_dengue),
     re_path(
-        r'^alerta/%s/%s$' % (__state, __disease),
+        r'^alerta/%s/%s$' % (__state_abbv, __disease),
         AlertaStateView.as_view(),
         name='alerta_uf',
     ),
@@ -132,17 +123,17 @@ urlpatterns = [
     ),
     re_path(r'^report/$', ReportView.as_view(), name='report'),
     re_path(
-        r'^report/{}/{}$'.format(__state_extra, __report_type),
+        r'^report/{}/{}$'.format(__state_abbv, __report_type),
         ReportView.as_view(),
         name='report_filter',
     ),
     re_path(
-        r'^report/{}/{}/{}$'.format(__state_extra, __geocode_, __year_week),
+        r'^report/{}/{}/{}$'.format(__state_abbv, __geocode_, __year_week),
         ReportCityView.as_view(),
         name='report_city',
     ),
     re_path(
-        r'^report/{}/{}$'.format(__state_extra, __year_week),
+        r'^report/{}/{}$'.format(__state_abbv, __year_week),
         ReportStateView.as_view(),
         name='report_state',
     ),

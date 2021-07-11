@@ -1,38 +1,38 @@
 {% load lookup %}
-{% load hashthis %}
 
 <!-- Start Component -->
 {% block collapse_component %}
+
 <div class="row">
   <div class="col-sm-12 mb-4 mb-xl-0">
     <div id="accordion">
-      {% for state_name in states_abbv %}
+      {% for key,value in states_name.items %}
       <div class="card">
-        <div id="flip_{{ state_name | hashthis }}"
+        <div id="flip_{{ key }}"
           class="collapse-style">
             <button
               class="collapse-effect text-left"
               data-toggle="collapse"
-              data-target="#panel_{{ state_name | hashthis }}"
+              data-target="#panel_{{ key }}"
               aria-expanded="true"
               data-toggle="tooltip"
               data-placement="bottom"
-              title="Clique para visualizar os dados sobre as doenças no estado de {{ state_name }}"
-              aria-controls="panel_{{ state_name | hashthis }}">
-              <span>{{ state_name }}</span>
+              title="Clique para visualizar os dados sobre as doenças no estado de {{ key }}"
+              aria-controls="panel_{{ key }}">
+              <span>{{ value }}</span>
           </button>
         </div>
-
-        <div id="panel_{{ state_name | hashthis }}"
-          {% if state_name == 'Ceará' %}
+        <div id="panel_{{ key }}"
+          {% if key == 'CE' %}
             class="collapse show"
             {% else %}
             class="collapse"
             {% endif %}
-            aria-labelledby="flip_{{ state_name | hashthis }}"
+            aria-labelledby="flip_{{ key }}"
             data-parent="#accordion">
           <div class="card-body">
-            <div class="spinner-border text-muted"></div>
+            <div class="spinner-border text-muted">
+            </div>
           </div>
         </div>
       </div>
@@ -41,12 +41,10 @@
   </div>
 </div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script> //The columns of the charts are provided by the views template in the
+<script> //Chart columns are provided by template charts.html
   $(document).ready(function(){
 
-    //TODO: Change iteration to UF in state_abbv #issue
-    {% for state_name in states_abbv %}
+    {% for key,value in states_name.items %}
 
     var requestCache = {};
     function LoadDataFromApi(apiUrl) {
@@ -60,9 +58,9 @@
       return requestCache[apiUrl];
     }
 
-    LoadDataFromApi("/chartshome/{{ state_name }}")
+    LoadDataFromApi("/chartshome/{{ key }}")
       .then(function(data) {
-        $("#panel_{{ state_name | hashthis }}").html(data);
+        $("#panel_{{ key }}").html(data);
         // console.log(data);
       });
 
