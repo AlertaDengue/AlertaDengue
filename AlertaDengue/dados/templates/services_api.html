@@ -185,23 +185,55 @@
             <div class="collapse" id="expan_dict">
             <div class="card card-body">
           
-                    <h5><b>{% trans "Dicionário de Dados" %}</b></h5>
-                    <ul>
-                    <p><li><b>{% trans "Id" %}</b> : {% trans "Indice numérico" %}</p></li>
-                    <p><li><b>{% trans "Aps" %}</b>: {% trans "Apenas útil na cidade do Rio de Janeiro, onde os indicadores são calculados por área programática da saúde" %}</p></li>
-                    <p><li><b>{% trans "Se" %}</b> : {% trans "Semana epidemiológica" %}</p></li>
-                    <p><li><b>{% trans "Data" %}</b>: {% trans "Data da semana epidemiológica" %}</p></li>
-                    <p><li><b>{% trans "Tweets" %}</b>: {% trans "Número de menções a sintomas de dengue nos tweets geolocalizados no município de interesse. Fonte: Observatório da Dengue/UFMG" %}</p></li>
-                    <p><li><b>{% trans "Casos" %}</b>: {% trans "Número de casos de dengue na semana (atenção que os dados não são necessariamente completos e estão sujeitos a modificações, os valores são atualizados todas as semanas, inclusive os históricos)" %}</p></li>
-                    <p><li><b>{% trans "Casos_est" %}</b>: {% trans "Estimativa pontual de casos ede dengue na semana usando modelo de nowcating (atenção: esses valores são atualizados todas as semanas, inclusive os históricos)" %}</p></li>
-                    <p><li><b>{% trans "Casos_est_min e casos_est_max" %}</b>: {% trans "Intervalo de credibilidade de 95% das estimativas de casos" %}</p></li>
-                    <p><li><b>{% trans "Tmin" %}</b>: {% trans "Média semanal das temperaturas mínimas. Fonte: aeroportos, com dados, mais próximos da cidade selecionada" %}</p></li>
-                    <p><li><b>{% trans "Rt" %}</b>: {% trans "Estimativa pontual do número reprodutivo de casos, ver" %} (<a href="/informacoes/">{% trans "Saiba Mais" %}</a>)</p></li>
-                    <p><li><b>{% trans "Prt1" %}</b>: {% trans "Probabilidade do número reprodutivo estimado ser maior que 1. Para o alerta, usamos como critério: prt1 > 95" %}</p></li>
-                    <p><li><b>{% trans "Inc" %}</b>: {% trans "Incidência de casos de dengue calculado dividindo casos pela população (x 100,000)" %}</p></li>
-                    <p><li><b>{% trans "Nivel" %}</b>: {% trans "Nivel de alerta (1 = verde, 2 = amarelo, 3 = laranja, 4 = vermelho)" %}, {% trans "para mais detalhes ver" %} (<a href="/informacoes/">{% trans "Saiba Mais" %}</a>)</p></li>
-                    <li><b>{% trans "Sum" %}</b>: {% trans "Número de registros" %}</p></li>
-                    </ul>
+                <h4><b>{% trans "English Version" %}</b></h4>
+                <h5><b>{% trans "Data Dictionary" %}</b></h5>
+                <ul>
+                    <p><li><b>{% trans "data_ini_SE" %}</b> : {% trans "First day of the epidemiological week (Sunday)" %}</li></p>
+                    <p><li><b>{% trans "SE" %}</b> : {% trans "Epidemiological week" %}</li></p>
+                    <p><li><b>{% trans "casos_est" %}</b> : {% trans "Estimated number of cases per week using the nowcasting model (note: values ​​are retrospectively updated every week)" %}</li></p>
+                    <p><li><b>{% trans "cases_est_min and cases_est_max" %}</b> : {% trans "95% credible interval of the estimated number of cases" %}</li></p>
+                    <p><li><b>{% trans "casos" %}</b> : {% trans "Number of notified cases per week (values ​​are retrospectively updated every week)" %}</li></p>
+                    <p><li><b>{% trans "p_rt1" %}</b> : {% trans "Probability (Rt > 1). For issuing the orange alert, we use criterion p_rt1 > 0.95 for 3 weeks or more." %}</li></p>
+                    <p><li><b>{% trans "p_inc100k" %}</b> : {% trans "Estimated incidence rate per 100.000 (cases per pop x 1e5)" %}</li></p>
+                    <p><li><b>{% trans "Localidade_id" %}</b> : {% trans "Sub-municipality division (currently implemented only in Rio de Janeiro)" %}</li></p>
+                    <p><li><b>{% trans "nivel" %}</b> : {% trans "Alert level (1 = green, 2 = yellow, 3 = orange, 4 = red), more details, see (Know more)" %}</li></p>
+                    <p><li><b>{% trans "id" %}</b> : {% trans "Numeric index" %}</li></p>
+                    <p><li><b>{% trans "versao_modelo" %}</b> : {% trans "Model version (internal use)" %}</li></p>
+                    <p><li><b>{% trans "tweet" %}</b> : {% trans "Number of messages mentioning dengue symptoms within geolocated tweets. Source: Dengue Observatory / UFMG" %}</li></p>
+                    <p><li><b>{% trans "Rt" %}</b> : {% trans "Point estimate of the reproductive number of cases, see (Know more)" %}</li></p>
+                    <p><li><b>{% trans "pop" %}</b> : {% trans "Estimated population (IBGE)" %}</li></p>
+                    <p><li><b>{% trans "tempmin" %}</b> : {% trans "Average of the daily minimum temperatures along the week" %}</li></p>
+                    <p><li><b>{% trans "umidmax" %}</b> : {% trans "Average of the daily maximum relative air humidity along the week" %}</li></p>
+                    <p><li><b>{% trans "receptivo" %}</b> : {% trans "Indicates climate receptivity, i.e., conditions for high vectorial capacity. 0 = unfavorable, 1 = favorable, 2 = favorable this week and last week, 3 = favorable for at least three weeks (sufficient for completing a transmission cycle)" %}</li></p>
+                    <p><li><b>{% trans "transmissao" %}</b> : {% trans "Evidence of sustained transmission: 0 = no evidence, 1 = possible, 2 = likely, 3 = highly likely  " %}</li></p>
+                    <p><li><b>{% trans "nivel_inc" %}</b> : {% trans "0 = estimated incidence below pre-epidemic threshold, 1 = above pre-epidemic threshold but below epidemic threshold, 2 = above epidemic threshold" %}</li></p>
+                    <p><li><b>{% trans "notif_accum_year" %}</b> : {% trans "Accumulated number of cases per year" %}</li></p>
+                </ul>
+
+                <h4><b>{% trans " Versão em Português" %}</b></h4>
+                <h5><b>{% trans "Dicionário de Dados" %}</b></h5>
+                <ul>
+                <p><li><b>{% trans "data_ini_SE" %}</b> : {% trans "Primeiro dia da semana epidemiológica (Domingo)" %}</p></li>
+                <p><li><b>{% trans "SE" %}</b>: {% trans "Semana epidemiológica" %}</p></li>
+                <p><li><b>{% trans "casos_est" %}</b> : {% trans "Número estimado de casos por semana usando o modelo de nowcasting (nota: Os valores são atualizados retrospectivamente a cada semana)" %}</p></li>
+                <p><li><b>{% trans "cases_est_min and cases_est_max" %}</b>: {% trans "Intervalo de credibilidade de 95% do número estimado de casos" %}</p></li>
+                <p><li><b>{% trans "casos" %}</b>: {% trans "Número de casos notificados por semana (Os valores são atualizados retrospectivamente todas as semanas)" %}</p></li>
+                <p><li><b>{% trans "p_rt1" %}</b>: {% trans "Probabilidade de (Rt> 1). Para emitir o alerta laranja, usamos o critério p_rt1> 0,95 por 3 semanas ou mais." %}</p></li>
+                <p><li><b>{% trans "p_inc100k" %}</b>: {% trans "Taxa de incidência estimada por 100.000" %}</p></li>
+                <p><li><b>{% trans "Localidade_id" %}</b>: {% trans "divisão submunicipal (atualmente implementada apenas no Rio de Janeiro)" %}</p></li>
+                <p><li><b>{% trans "nivel" %}</b>: {% trans "Nível de alerta (1 = verde, 2 = amarelo, 3 = laranja, 4 = vermelho), mais detalhes, consulte (Saiba mais)" %}</p></li>
+                <p><li><b>{% trans "id" %}</b>: {% trans "Índice numérico" %}</a>)</p></li>
+                <p><li><b>{% trans "versao_modelo" %}</b>: {% trans "Versão do modelo (uso interno)" %}</p></li>
+                <p><li><b>{% trans "tweet" %}</b>: {% trans "Número de mensagens mencionando sintomas de dengue em tweets geolocalizados. Fonte: Observatório da Dengue / UFMG" %}</p></li>
+                <p><li><b>{% trans "Rt" %}</b>: {% trans "Estimativa pontual do número reprodutivo de casos, ver (Saiba mais)" %}</a>)</p></li>
+                <p><li><b>{% trans "pop" %}</b>: {% trans "População estimada (IBGE)" %}</p></li>
+                <p><li><b>{% trans "tempmin" %}</b>: {% trans "Média das temperaturas mínimas diárias ao longo da semana" %}</p></li>
+                <p><li><b>{% trans "umidmax" %}</b>: {% trans "Média da umidade relativa máxima diária do ar ao longo da semana" %}</p></li>
+                <p><li><b>{% trans "receptivo" %}</b>: {% trans "Indica receptividade climática, ou seja, condições para alta capacidade vetorial. 0 = desfavorável, 1 = favorável, 2 = favorável nesta semana e na semana passada, 3 = favorável por pelo menos três semanas (suficiente para completar um ciclo de transmissão)" %}</p></li>
+                <p><li><b>{% trans "transmissao" %}</b>: {% trans "Evidência de transmissão sustentada: 0 = nenhuma evidência, 1 = possível, 2 = provável, 3 = altamente provável" %}</p></li>
+                <p><li><b>{% trans "nivel_inc" %}</b>: {% trans "0 = Incidência estimada abaixo do limiar pré-epidemia, 1 = acima do limiar pré-epidemia, mas abaixo do limiar epidêmico, 2 = acima do limiar epidêmico" %}</p></li>
+                <p><li><b>{% trans "notif_accum_year" %}</b>: {% trans "Número acumulado de casos no ano" %}</p></li>
+                </ul>
             
             </div>
             </div>
