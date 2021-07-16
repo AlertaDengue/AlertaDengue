@@ -29,6 +29,7 @@ authorized_keys
 
 AlertaDengue/static/*
 AlertaDengue/static_files/*
+*/incidence_maps/*
 /AlertaDengue/*.dbf
 /*.dbf
 *.egg-info

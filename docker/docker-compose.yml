@@ -28,6 +28,7 @@ services:
             - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/AlertaDengue/static/shapefile
             - ${DOCKER_HOST_TIFFS_DIR}:/srv/deploy/tiffs
             - ${DOCKER_HOST_LOG_DIR}:/var/log/mapserver
+            - ${DOCKER_HOST_INCIDENCE_MAPS}:/srv/deploy/AlertaDengue/static/img/incidence_maps
         restart: always
 
     rabbitmq:
