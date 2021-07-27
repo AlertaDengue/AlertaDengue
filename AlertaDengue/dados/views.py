@@ -302,8 +302,10 @@ class DataPublicServicesPageView(TemplateView):
         elif service == 'tutorial':
             if service_type is None:
                 self.template_name = 'services_tutorial.html'
-            else:
+            elif service_type == 'R':
                 self.template_name = 'services_tutorial_R.html'
+            else:
+                self.template_name = 'services_tutorial_Python.html'
         elif service == 'api':
             if service_type is None:
                 self.template_name = 'services_api.html'

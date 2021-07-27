@@ -81,6 +81,11 @@ urlpatterns = [
         name="data_public_services_type",
     ),
     re_path(
+        r'^services/(?P<service>maps|tutorial)/(?P<service_type>Python)$',
+        DataPublicServicesPageView.as_view(),
+        name="data_public_services_type",
+    ),
+    re_path(
         r'^services/(?P<service>maps|api)/(?P<service_type>doc)$',
         DataPublicServicesPageView.as_view(),
         name="data_public_services_type",
