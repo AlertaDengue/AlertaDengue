@@ -2,6 +2,10 @@ from setuptools import setup, find_packages
 import os
 import subprocess
 import sys
+import site
+
+
+site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
 
 PATH_ROOT = os.path.dirname(os.path.abspath(__file__))
 

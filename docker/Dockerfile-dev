@@ -6,13 +6,21 @@ RUN apt-get -qq update --yes \
   ca-certificates wget locales cron \
   && rm -rf /var/lib/apt/lists/*
 
-# Set locale
-RUN echo "pt_BR.UTF-8 UTF-8" > /etc/locale.gen
-RUN locale-gen pt_BR.UTF-8
-RUN update-locale pt_BR.UTF-8
-ENV LC_ALL pt_BR.UTF-8
-ENV LC_ALL=C.UTF-8
-ENV LANG=C.UTF-8
+#Set locale
+RUN sed -i -e "s/# pt_BR.*/pt_BR.UTF-8 UTF-8/" /etc/locale.gen \
+  && dpkg-reconfigure --frontend=noninteractive locales \
+  && update-locale LANG=pt_BR.UTF-8
+
+# Copy environment file to tmp/
+ARG PYTHON_VERSION
+COPY environment-dev.yml /tmp/environment.yml
+
+# Use environment to update the env base
+RUN conda update -n base -c defaults conda \
+  && conda install mamba -n base -c conda-forge \
+  && mamba update --all --yes --quiet \
+  && mamba env update --file /tmp/environment.yml --name base \
+  && mamba clean -afy
 
 # Create deploy user
 ARG HOST_UID
@@ -20,39 +28,19 @@ ARG HOST_GID
 COPY docker/prepare_permission.sh /prepare_permission.sh
 RUN /prepare_permission.sh
 
-ARG PYTHON_VERSION
-COPY environment-${PYTHON_VERSION}.yml /tmp/environment.yml
-
-RUN /opt/conda/bin/conda config --add channels conda-forge \
-  && /opt/conda/bin/conda update --all --yes --quiet \
-  && /opt/conda/bin/conda env update --name base --file /tmp/environment.yml \
-  && /opt/conda/bin/conda install --yes conda-build \
-  && /opt/conda/bin/conda clean --all --yes
-
-ENV PATH="/opt/conda/bin:${PATH}"
-
 ## Copy code to the container with permissions to user
-# folders
-COPY --chown=deploy:deploy docker  /srv/deploy/docker
 COPY --chown=deploy:deploy AlertaDengue  /srv/deploy/AlertaDengue
-
-# files
-COPY --chown=deploy pyproject.toml setup.cfg setup.py .pre-commit-config.yaml LICENSE README.md HISTORY.md /srv/deploy/
+COPY --chown=deploy pyproject.toml setup.cfg setup.py LICENSE README.md HISTORY.md /srv/deploy/
 COPY --chown=deploy requirements-dev.txt requirements.txt /srv/deploy/
 COPY --chown=deploy example_env_file /srv/deploy/.env_staging
 
 RUN mkdir /srv/deploy/logs \
   && chown -R deploy:deploy /srv/deploy/logs
 
-RUN pip install -r /srv/deploy/requirements-dev.txt
-
 # Create script activate environment
 RUN echo 'source /opt/conda/bin/activate base && exec "$@"' > activate.sh
 RUN chmod +x /activate.sh
 WORKDIR /srv/deploy/AlertaDengue
-
-# install the AlertaDengue
-RUN cd ..; pip install -e .
 
 # configure cron for DBF request
 COPY docker/cron-sendmail /etc/cron.d/cron-sendmail
@@ -64,7 +52,12 @@ RUN chmod 0644 /etc/cron.d/cron-sendmail \
 
 ADD docker/entrypoint.sh /entrypoint.sh
 
-# USER deploy
+USER deploy
+
+ENV PATH /srv/deploy/.local/bin:$PATH
+
+# install the AlertaDengue
+RUN cd ..; pip install --user -e .
 
 ENTRYPOINT ["bash", "/activate.sh"]
 CMD ["/entrypoint.sh", "/srv/deploy/AlertaDengue/runwsgi.sh"]
