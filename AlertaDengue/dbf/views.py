@@ -46,7 +46,7 @@ class Upload(LoginRequiredMixin, FormView):
             file=uploaded_file,
             export_date=form.cleaned_data['export_date'],
             notification_year=form.cleaned_data['notification_year'],
-            state_abbreviation=form.cleaned_data['state_abbreviation'],
+            abbreviation=form.cleaned_data['abbreviation'],
             municipio=form.cleaned_data['municipio'],
         )
         import_dbf_to_database.delay(dbf.id)

@@ -760,7 +760,7 @@ class AlertaStateView(TemplateView):
         geo_ids = list(mun_dict.keys())
 
         dbf = (
-            DBF.objects.filter(state_abbreviation=context['state'])
+            DBF.objects.filter(abbreviation=context['state'])
             .order_by('export_date')
             .last()
         )

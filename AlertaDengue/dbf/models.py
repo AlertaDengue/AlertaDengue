@@ -1,9 +1,9 @@
-from django.db import models
-from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
-
 from datetime import date
+
 from chunked_upload.models import ChunkedUpload
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from .validation import is_valid_dbf
 
@@ -13,8 +13,9 @@ def current_year():
 
 
 class DBF(models.Model):
-    STATE_ABBREVIATION_CHOICES = (
-        (None, ''),
+    ABBREVIATION = (
+        ('BR', 'Brasil'),
+        (None, '-----'),
         ('AC', 'Acre'),
         ('AL', 'Alagoas'),
         ('AP', 'Amapá'),
@@ -49,8 +50,8 @@ class DBF(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     export_date = models.DateField()
     notification_year = models.IntegerField(default=current_year)
-    state_abbreviation = models.CharField(
-        max_length=2, null=True, choices=STATE_ABBREVIATION_CHOICES
+    abbreviation = models.CharField(
+        max_length=2, null=True, choices=ABBREVIATION
     )
     municipio = models.CharField(max_length=255, blank=True, default="")
 

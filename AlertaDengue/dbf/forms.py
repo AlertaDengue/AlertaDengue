@@ -1,9 +1,8 @@
+from bootstrap4.renderers import FormRenderer
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
-
-from bootstrap4.renderers import FormRenderer
 
 from .models import DBF, DBFChunkedUpload
 from .validation import is_valid_dbf
@@ -19,8 +18,8 @@ class DBFForm(forms.Form):
     filename = forms.CharField(required=False, widget=forms.HiddenInput())
     export_date = forms.DateField(label=_("Data da exportação"))
     notification_year = forms.IntegerField(label=_("Ano de notificação"))
-    state_abbreviation = forms.ChoiceField(
-        choices=DBF.STATE_ABBREVIATION_CHOICES, label=_("U.F.")
+    abbreviation = forms.ChoiceField(
+        choices=DBF.ABBREVIATION, label=_("Abrangência")
     )
     municipio = forms.CharField(
         label=_("Nome do município (opcional)"), required=False
