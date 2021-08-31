@@ -6,10 +6,10 @@ include .env_staging .env
 export
 
 compose_cmd = docker-compose -p infodengue -f docker/docker-compose.yml --env-file .env
-staging_compose_cmd = docker-compose -p dev -f docker/staging-compose.yml --env-file .env_staging
+staging_compose_cmd = docker-compose -p info -f docker/staging-compose.yml --env-file .env_staging
 SERVICES_INFODENGUE :=
 SERVICES_STAGING :=
-
+MAKE = make -f Makefile
 
 # Create the containers to run in production
 build:
@@ -35,10 +35,13 @@ exec:
 stop:
 	$(compose_cmd) stop ${SERVICES_INFODENGUE}
 
-#
-## Example: make start_staging SERVICES=staging_db
+# Exemplo: make start_staging SERVICES=staging_web
 start_staging:
 	$(staging_compose_cmd) up -d ${SERVICES_STAGING}
+
+# Used for make deploy
+up_staging_db:
+	$(staging_compose_cmd) up -d staging_db
 
 exec_staging:
 	$(staging_compose_cmd) exec ${SERVICES_STAGING} bash
@@ -49,11 +52,9 @@ stop_staging:
 build_staging:
 	$(staging_compose_cmd) build ${SERVICES_STAGING}
 
-deploy_staging: migrate_staging
+deploy_staging: up_staging_db
+	$(MAKE) migrate_staging
 	$(staging_compose_cmd) up -d
-
-up_staging_db:
-	$(staging_compose_cmd) up -d staging_db
 
 run_staging_db:
 	$(staging_compose_cmd) run --rm staging_db postgres -V
@@ -84,34 +85,21 @@ test_staging_web:
 test_all: #deploy_staging
 	$(staging_compose_cmd) run --rm staging_web python3 manage.py test
 
-#
+
 # Clean containers and images docker
-clean_staging:
-	$(staging_compose_cmd) stop
-	$(staging_compose_cmd) rm
-
-build_remove_orphans_staging:
-	$(staging_compose_cmd) up staging_web --remove-orphans
-
-
-build_remove_orphans:
-	$(compose_cmd) up --build --remove-orphans
-
 remove_stoped_containers:
 	docker rm $(docker ps -a -q)
 
 remove_untagged_images:
 	docker rmi $(docker images | grep "^<none>" | awk "{print $3}")
 
-#
+
 # Uses for development
 develop:
-	pip install -e .
-
+	pip install --user -e .
 
 install:
 	pip install .
-
 
 sync_mapfiles:
 	python AlertaDengue/manage.py sync_geofiles
@@ -122,11 +110,9 @@ sync_mapfiles:
 run_alertadengue:
 	python AlertaDengue/manage.py runserver
 
-#
 # Uses for cron
 send_mail_partner:
 	$(compose_cmd) run --rm web python manage.py send_mail
-
 
 clean:
 	@find ./ -name '*.pyc' -exec rm -f {} \;

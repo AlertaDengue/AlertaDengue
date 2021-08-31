@@ -1,1 +1,11 @@
-staging_data_dir/
+ci/*
+docs/*
+*dev_dumps/*
+notebooks_tmp/*
+notebooks/*
+rever/*
+
+.git*
+.coverage
+.vscode
+.pre-commit*
