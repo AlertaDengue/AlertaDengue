@@ -13,6 +13,7 @@ dependencies:
 - django-leaflet
 - django-makemessages-xgettext
 - docker-compose
+- fastparquet
 - fiona
 - gdal >=2.4.2
 - geojson
@@ -47,6 +48,7 @@ dependencies:
 - pip:
   - django-maintenance-mode
   - django-pymemcache
+  - simpledbf
   # develop
   - django-extensions
   - django-cprofile-middleware

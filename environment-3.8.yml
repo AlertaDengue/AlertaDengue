@@ -13,6 +13,7 @@ dependencies:
 - django-leaflet
 - django-makemessages-xgettext
 - docker-compose
+- fastparquet
 - fiona
 - gdal >=2.4.2
 - geojson
@@ -35,5 +36,6 @@ dependencies:
 - sh
 - sqlalchemy <1.4
 - pip:
+  - simpledbf
   - django-maintenance-mode
   - django-pymemcache

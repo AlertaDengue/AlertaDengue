@@ -1,32 +1,18 @@
+import logging
 from datetime import date
-from psycopg2.extras import DictCursor
-from dbfread import DBF
-from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
 
 import pandas as pd
 import psycopg2
-import logging
+
+# from dbfread import DBF
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
+from psycopg2.extras import DictCursor
+
+from .utils import FIELD_MAP, chunk_dbf_toparquet
 
 logger = logging.getLogger(__name__)
-
-field_map = {
-    'dt_notific': "DT_NOTIFIC",
-    'se_notif': "SEM_NOT",
-    'ano_notif': "NU_ANO",
-    'dt_sin_pri': "DT_SIN_PRI",
-    'se_sin_pri': "SEM_PRI",
-    'dt_digita': "DT_DIGITA",
-    'bairro_nome': "NM_BAIRRO",
-    'bairro_bairro_id': "ID_BAIRRO",
-    'municipio_geocodigo': "ID_MUNICIP",
-    'nu_notific': "NU_NOTIFIC",
-    'cid10_codigo': "ID_AGRAVO",
-    'cs_sexo': "CS_SEXO",
-    'dt_nasc': "DT_NASC",
-    'nu_idade_n': "NU_IDADE_N",
-}
 
 
 def calculate_digit(dig):
@@ -79,11 +65,17 @@ class Sinan(object):
         :param ano: Ano dos dados
         :return:
         """
-        logger.info("Instanciando SINAN ({}, {})".format(dbf_fname, ano))
+        logger.info("Partition parquet files and concatenate in pandas")
+
+        pq_files = chunk_dbf_toparquet(dbf_fname)
+        chunks_list = [
+            pd.read_parquet(f, engine='fastparquet') for f in pq_files
+        ]
+        self.tabela = pd.concat(chunks_list, ignore_index=True)
         self.ano = ano
-        self.dbf = DBF(dbf_fname, encoding=encoding)
-        self.colunas_entrada = self.dbf.field_names
-        self.tabela = pd.DataFrame(self.dbf.records)
+
+        logger.info(f"Instanciando SINAN ({dbf_fname}, {ano})")
+
         if "ID_MUNICIP" in self.tabela.columns:
             self.geocodigos = self.tabela.ID_MUNICIP.dropna().unique()
         elif "ID_MN_RESI" in self.tabela.columns:
@@ -124,8 +116,8 @@ class Sinan(object):
         :param col_names:
         """
         for nm in col_names:
-            if field_map[nm] not in self.tabela.columns:
-                self.tabela[field_map[nm]] = None
+            if FIELD_MAP[nm] not in self.tabela.columns:
+                self.tabela[FIELD_MAP[nm]] = None
 
     def _get_postgres_connection(self):
         return psycopg2.connect(**self.db_config)
@@ -137,10 +129,10 @@ class Sinan(object):
         logger.info("Escrevendo no PostgreSQL")
 
         with connection.cursor(cursor_factory=DictCursor) as cursor:
-            cursor.execute("select * from {} limit 1;".format(table_name))
+            cursor.execute(f"SELECT * FROM {table_name} LIMIT 1;")
             col_names = [c.name for c in cursor.description if c.name != "id"]
             self._fill_missing_columns(col_names)
-            df_names = [field_map[n] for n in col_names]
+            df_names = [FIELD_MAP[n] for n in col_names]
             insert_sql = (
                 'INSERT INTO {}({}) VALUES ({}) on conflict '
                 'on CONSTRAINT casos_unicos do UPDATE SET {}'
@@ -150,9 +142,7 @@ class Sinan(object):
                 ','.join(['%s' for i in col_names]),
                 ','.join(['{0}=excluded.{0}'.format(j) for j in col_names]),
             )
-            logger.info(
-                "Formatando linhas e inserindo em {}".format(table_name)
-            )
+            logger.info(f"Formatando linhas e inserindo em {table_name}")
             for row in self.tabela[df_names].iterrows():
                 i = row[0]
                 row = row[1]
@@ -178,8 +168,11 @@ class Sinan(object):
                     if isinstance(row[5], type(pd.NaT))
                     else date.fromordinal(row[5].to_pydatetime().toordinal())
                 )  # dt_digita
+                row[6] = (
+                    None if pd.isnull(row[6]) else str(row[6])
+                )  # nm_bairro
                 row[7] = (
-                    None if not row[7] else int(row[7])
+                    None if pd.isnull(row[7]) else int(row[7])
                 )  # bairro_bairro_id
                 row[8] = (
                     None if row[8] == '' else add_dv(int(row[8]))
@@ -201,14 +194,18 @@ class Sinan(object):
                     if (isinstance(row[11], type(pd.NaT)) or row[11] is None)
                     else date.fromordinal(row[11].to_pydatetime().toordinal())
                 )  # dt_nasc
-                row[13] = None if not row[13] else int(row[13])  # nu_idade_n
+                row[13] = None if pd.isnull(row[13]) else int(row[13])
                 cursor.execute(insert_sql, row)
                 if (i % 1000 == 0) and (i > 0):
                     logger.info(
-                        "{} linhas inseridas. Commitando mudanças "
-                        "no banco".format(i)
+                        f"{i} linhas inseridas. Commitando mudanças "
+                        "no banco"
                     )
                     connection.commit()
 
             connection.commit()
-            logger.info("Sinan {} inserido no banco".format(self.dbf))
+            logger.info(
+                'Sinan {} rows in {} fields inserted in the database'.format(
+                    self.tabela.shape[0], self.tabela.shape[1]
+                )
+            )

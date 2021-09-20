@@ -56,7 +56,7 @@ def send_failure_email(dbf, message):
 
 def copy_file_to_final_destination(dbf):
     new_filename = "{}_{}_{}_{}.dbf".format(
-        dbf.state_abbreviation,
+        dbf.abbreviation,
         dbf.municipio,
         dbf.export_date,
         dbf.notification_year,

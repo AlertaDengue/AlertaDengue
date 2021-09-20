@@ -26,6 +26,8 @@ services:
       - 25432:25432
     volumes:
       - ${STAGING_DATA_DIR}/staging:/var/lib/postgresql/data
+      - ./dev_dumps:/dumps
+
     restart: always
     command: -p 25432
     networks:
@@ -57,6 +59,7 @@ services:
       - ${DOCKER_HOST_TIFFS_DIR}:/srv/deploy/tiffs
       - ${DOCKER_HOST_LOG_DIR}:/var/log/mapserver
       - ${DOCKER_HOST_INCIDENCE_MAPS}:/srv/deploy/AlertaDengue/static/img/incidence_maps
+      - ./${DOCKER_HOST_PQDIR}:/tmp/dbfs_parquet
       - staging_web:/srv/deploy/AlertaDengue/
     depends_on:
       - staging_rabbitmq
@@ -83,6 +86,7 @@ services:
     volumes:
       - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      - ./${DOCKER_HOST_PQDIR}:/tmp/dbfs_parquet
     depends_on:
       - staging_db
       - staging_rabbitmq

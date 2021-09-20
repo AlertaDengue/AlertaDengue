@@ -1,17 +1,15 @@
-from contextlib import contextmanager
-from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
-from tempfile import NamedTemporaryFile
-
 import os
 import struct
+from contextlib import contextmanager
+from tempfile import NamedTemporaryFile
+
 import dbfread
+from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
 
 expected_fields = [
     u'NU_ANO',
     u'ID_MUNICIP',
-    u'NM_BAIRRO',
-    u'ID_BAIRRO',
     u'ID_AGRAVO',
     u'DT_SIN_PRI',
     u'SEM_PRI',
