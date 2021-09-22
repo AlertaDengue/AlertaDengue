@@ -8,8 +8,7 @@ RUN apt-get -qq update --yes \
 
 #Set locale
 RUN sed -i -e "s/# pt_BR.*/pt_BR.UTF-8 UTF-8/" /etc/locale.gen \
-  && dpkg-reconfigure --frontend=noninteractive locales \
-  && update-locale LANG=pt_BR.UTF-8
+  && dpkg-reconfigure --frontend=noninteractive locales
 
 # Copy environment file to tmp/
 ARG PYTHON_VERSION
