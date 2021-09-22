@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3
+FROM condaforge/mambaforge
 
 RUN apt-get -qq update --yes \
   && apt-get -qq install --yes --no-install-recommends \
