@@ -42,9 +42,9 @@ RUN chmod +x /activate.sh
 WORKDIR /srv/deploy/AlertaDengue
 
 # Configure cron for DBF request
-COPY docker/cron-sendmail /etc/cron.d/cron-sendmail
-RUN chmod 0644 /etc/cron.d/cron-sendmail \
-  && crontab -u deploy /etc/cron.d/cron-sendmail \
+COPY docker/cron-tasks /etc/cron.d/cron-tasks
+RUN chmod 0644 /etc/cron.d/cron-tasks \
+  && crontab -u deploy /etc/cron.d/cron-tasks \
   && echo "deploy"  > /etc/cron.allow \
   && touch /var/log/cron.log \
   && chown deploy:deploy /var/log/cron.log
