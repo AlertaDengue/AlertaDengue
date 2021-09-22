@@ -35,7 +35,7 @@ services:
       - ${DOCKER_HOST_TIFFS_DIR}:/srv/deploy/tiffs
       - ${DOCKER_HOST_LOG_DIR}:/var/log/mapserver
       - ${DOCKER_HOST_INCIDENCE_MAPS}:/srv/deploy/AlertaDengue/static/img/incidence_maps
-      - ${DOCKER_HOST_PQDIR}:/tmp/dbfs_parquet
+      - ./${DOCKER_HOST_PQDIR}:/tmp/dbfs_parquet
     depends_on:
       - rabbitmq
       - memcache
@@ -56,6 +56,7 @@ services:
     volumes:
       - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      - ./${DOCKER_HOST_PQDIR}:/tmp/dbfs_parquet
     depends_on:
       - rabbitmq
       - memcache

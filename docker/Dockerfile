@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3
+FROM condaforge/mambaforge
 
 RUN apt-get -qq update --yes \
   && apt-get -qq install --yes --no-install-recommends \
@@ -8,8 +8,7 @@ RUN apt-get -qq update --yes \
 
 #Set locale
 RUN sed -i -e "s/# pt_BR.*/pt_BR.UTF-8 UTF-8/" /etc/locale.gen \
-  && dpkg-reconfigure --frontend=noninteractive locales \
-  && update-locale LANG=pt_BR.UTF-8
+  && dpkg-reconfigure --frontend=noninteractive locales
 
 # Copy environment file to tmp/
 ARG PYTHON_VERSION
@@ -43,9 +42,9 @@ RUN chmod +x /activate.sh
 WORKDIR /srv/deploy/AlertaDengue
 
 # Configure cron for DBF request
-COPY docker/cron-sendmail /etc/cron.d/cron-sendmail
-RUN chmod 0644 /etc/cron.d/cron-sendmail \
-  && crontab -u deploy /etc/cron.d/cron-sendmail \
+COPY docker/cron-tasks /etc/cron.d/cron-tasks
+RUN chmod 0644 /etc/cron.d/cron-tasks \
+  && crontab -u deploy /etc/cron.d/cron-tasks \
   && echo "deploy"  > /etc/cron.allow \
   && touch /var/log/cron.log \
   && chown deploy:deploy /var/log/cron.log
