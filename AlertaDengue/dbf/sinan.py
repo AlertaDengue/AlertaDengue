@@ -65,37 +65,20 @@ class Sinan(object):
         :param ano: Ano dos dados
         :return:
         """
-        logger.info("Partition parquet files and concatenate in pandas")
+        logger.info("Formatting fields and save chunks dbf to parquet")
 
         pq_files = chunk_dbf_toparquet(dbf_fname)
+
+        logger.info("Read parquet files and concatenate in pandas")
+
         chunks_list = [
             pd.read_parquet(f, engine='fastparquet') for f in pq_files
         ]
+
         self.tabela = pd.concat(chunks_list, ignore_index=True)
         self.ano = ano
 
         logger.info(f"Instanciando SINAN ({dbf_fname}, {ano})")
-
-        if "ID_MUNICIP" in self.tabela.columns:
-            self.geocodigos = self.tabela.ID_MUNICIP.dropna().unique()
-        elif "ID_MN_RESI" in self.tabela.columns:
-            # print(self.tabela.columns)
-            self.geocodigos = self.tabela.ID_MN_RESI.dropna().unique()
-            self.tabela["ID_MUNICIP"] = self.tabela.ID_MN_RESI
-            del self.tabela['ID_MN_RESI']
-        self._parse_date_cols()
-
-    def _parse_date_cols(self):
-        logger.info("Formatando as datas")
-        for col in filter(lambda x: x.startswith("DT"), self.tabela.columns):
-            try:
-                self.tabela[col] = pd.to_datetime(
-                    self.tabela[col]
-                )  # , errors='coerce')
-            except ValueError:
-                self.tabela[col] = pd.to_datetime(
-                    self.tabela[col], errors='coerce'
-                )
 
     @property
     def time_span(self):

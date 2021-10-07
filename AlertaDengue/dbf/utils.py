@@ -1,13 +1,31 @@
 import glob
 import os
 
-# from typing import Callable
-
 import geopandas as gpd
+import pandas as pd
 from simpledbf import Dbf5
 
 
-DBFS_PQDIR = '/tmp/dbfs_parquet'
+DBFS_PQDIR = '/MEDIA_ROOT/dbfs_parquet'
+
+expected_fields = [
+    u'NU_ANO',
+    u'ID_MUNICIP',
+    u'ID_AGRAVO',
+    u'DT_SIN_PRI',
+    u'SEM_PRI',
+    u'DT_NOTIFIC',
+    u'NU_NOTIFIC',
+    u'SEM_NOT',
+    u'DT_DIGITA',
+    u'DT_NASC',
+    u'NU_IDADE_N',
+    u'CS_SEXO',
+]
+
+synonyms = {u'ID_MUNICIP': [u'ID_MN_RESI']}
+
+expected_date_fields = [u'DT_SIN_PRI', u'DT_NOTIFIC', u'DT_DIGITA', u'DT_NASC']
 
 FIELD_MAP = {
     'dt_notific': "DT_NOTIFIC",
@@ -25,6 +43,34 @@ FIELD_MAP = {
     'dt_nasc': "DT_NASC",
     'nu_idade_n': "NU_IDADE_N",
 }
+
+
+def _parse_fields(df: gpd) -> pd:
+    """
+    Rename columns and set type datetime when startswith "DT"
+    Parameters
+    ----------
+    geopandas
+    Returns
+    -------
+    dataframe
+    """
+    df = df.copy(deep=True)
+
+    if "ID_MUNICIP" in df.columns:
+        df = df.dropna(subset=['ID_MUNICIP'])
+    elif "ID_MN_RESI" in df.columns:
+        df = df.dropna(subset=['ID_MN_RESI'])
+        df["ID_MUNICIP"] = df.ID_MN_RESI
+        del df['ID_MN_RESI']
+
+    for col in filter(lambda x: x.startswith("DT"), df.columns):
+        try:
+            df[col] = pd.to_datetime(df[col])  # , errors='coerce')
+        except ValueError:
+            df[col] = pd.to_datetime(df[col], errors='coerce')
+
+    return df
 
 
 def chunk_gen(chunksize, totalsize):
@@ -69,15 +115,14 @@ def chunk_dbf_toparquet(dbfname) -> glob:
     for chunk, (lowerbound, upperbound) in enumerate(
         chunk_gen(1000, dbf.numrec)
     ):
-        df = gpd.read_file(
-            dbfname, rows=slice(lowerbound, upperbound), ignore_geometry=True,
-        )
-
         pq_fname = os.path.join(
             f'{DBFS_PQDIR}', f'{fname_topath}-{chunk}.parquet'
         )
-
-        df[FIELD_MAP.values()].to_parquet(pq_fname)
+        df_gpd = gpd.read_file(
+            dbfname, rows=slice(lowerbound, upperbound), ignore_geometry=True,
+        )
+        df_gpd = _parse_fields(df_gpd)
+        df_gpd[expected_fields].to_parquet(pq_fname)
 
     fetch_pq_fname = os.path.join(f'{DBFS_PQDIR}', f'{fname_topath}')
     return glob.glob(f'{fetch_pq_fname}*.parquet')

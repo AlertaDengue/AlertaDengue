@@ -7,24 +7,7 @@ import dbfread
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
-expected_fields = [
-    u'NU_ANO',
-    u'ID_MUNICIP',
-    u'ID_AGRAVO',
-    u'DT_SIN_PRI',
-    u'SEM_PRI',
-    u'DT_NOTIFIC',
-    u'NU_NOTIFIC',
-    u'SEM_NOT',
-    u'DT_DIGITA',
-    u'DT_NASC',
-    u'NU_IDADE_N',
-    u'CS_SEXO',
-]
-
-synonyms = {u'ID_MUNICIP': [u'ID_MN_RESI']}
-
-expected_date_fields = [u'DT_SIN_PRI', u'DT_NOTIFIC', u'DT_DIGITA', u'DT_NASC']
+from dbf.utils import expected_fields, synonyms, expected_date_fields
 
 
 @contextmanager
