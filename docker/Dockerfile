@@ -51,7 +51,7 @@ RUN chmod 0644 /etc/cron.d/cron-tasks \
 
 ADD docker/entrypoint.sh /entrypoint.sh
 
-# USER deploy
+USER deploy
 
 ENTRYPOINT ["bash", "/activate.sh"]
 CMD ["/entrypoint.sh", "/srv/deploy/AlertaDengue/runwsgi.sh"]
