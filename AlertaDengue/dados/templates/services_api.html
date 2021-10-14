@@ -66,7 +66,21 @@
 
 {% endblock %}
 
-{% block title %}{% trans "Dados" %}: {% trans "API" %}{% endblock %}
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="/services">{% trans "Dados" %}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <a href='/services/tutorial'>{% trans "API" %}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">{{ services }}</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block title %}{% trans "API" %}{% endblock %}
 
 {% block content %}
 
@@ -177,14 +191,14 @@
                 <input type="submit" class="btn btn-primary"
                        value='{% trans "Download" %}'
                 />
-   
+
             <a class="btn btn-primary" data-toggle="collapse" href="#expan_dict" role="button" aria-expanded="false" aria-controls="expan_dict">
                 {% trans "Mostrar Dicionário de Dados" %}
             </a>
             </div>
             <div class="collapse" id="expan_dict">
             <div class="card card-body">
-          
+
                 <h5><b>{% trans "Dicionário de Dados" %}</b></h5>
                 <ul>
                 <p><li><b>{% trans "data_ini_SE" %}</b> : {% trans "Primeiro dia da semana epidemiológica (Domingo)" %}</p></li>
@@ -208,7 +222,7 @@
                 <p><li><b>{% trans "nivel_inc" %}</b>: {% trans "Incidência estimada abaixo do limiar pré-epidemia, 1 = acima do limiar pré-epidemia, mas abaixo do limiar epidêmico, 2 = acima do limiar epidêmico" %}</p></li>
                 <p><li><b>{% trans "notif_accum_year" %}</b>: {% trans "Número acumulado de casos no ano" %}</p></li>
                 </ul>
-            
+
             </div>
             </div>
         </div>

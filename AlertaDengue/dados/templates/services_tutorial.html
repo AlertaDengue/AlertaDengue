@@ -21,7 +21,21 @@
 
 {% endblock %}
 
-{% block title %}{% trans "Dados" %}: {% trans "Tutorial" %}{% endblock %}
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="/services">{% trans "Dados" %}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <a href='/services/tutorial'>{% trans "Tutorial" %}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">{{ services }}</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block title %}{% trans "Tutorial" %}{% endblock %}
 
 {% block content %}
 
@@ -29,14 +43,19 @@
     <div class="row">
         <div class="col-md-12 column">
             <div tabindex="-1" id="notebook" class="border-box-sizing">
-
+                <h4>Visualizações a partir da tabela de dados do Infodengue</h4>
                 <li><span>
                     <a href="{% url 'dados:data_public_services' %}tutorial/R">
-                        {% trans "Para acessar e fazer visualizações a partir da tabela de dados do Infodengue usando a linguagem R." %}
+                        {% trans "Linguagem R." %}
                     </a>
                 </span></li>
-
+                <li><span>
+                    <a href="{% url 'dados:data_public_services' %}tutorial/Python">
+                        {% trans "Linguagem Python." %}
+                    </a>
+                </span></li>
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

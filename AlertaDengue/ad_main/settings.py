@@ -90,6 +90,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'maintenance_mode.middleware.MaintenanceModeMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 if DEBUG:
@@ -362,3 +363,4 @@ ACTIVE_STATES = (
 )
 
 DOCKER_HOST_PQDIR = os.getenv('DOCKER_HOST_PQDIR')
+X_FRAME_OPTIONS = 'SAMEORIGIN'
