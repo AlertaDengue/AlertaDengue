@@ -81,7 +81,9 @@ urlpatterns = [
     ),
     re_path(
         r'^services/(?P<service>maps|tutorial)/(?P<service_type>R)$',
-        TemplateView.as_view(template_name="services_tutorial_R.html"),
+        DataPublicServicesPageView.as_view(
+            template_name="services_tutorial_R.html"
+        ),
         name='services_tutorial_R',
     ),
     re_path(
@@ -93,7 +95,9 @@ urlpatterns = [
     ),
     re_path(
         r'^services/(?P<service>maps|tutorial)/(?P<service_type>Python)$',
-        TemplateView.as_view(template_name="services_tutorial_Python.html"),
+        DataPublicServicesPageView.as_view(
+            template_name="services_tutorial_Python.html"
+        ),
         name='services_tutorial_Python',
     ),
     re_path(
