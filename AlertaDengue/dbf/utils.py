@@ -42,6 +42,9 @@ FIELD_MAP = {
     'cs_sexo': "CS_SEXO",
     'dt_nasc': "DT_NASC",
     'nu_idade_n': "NU_IDADE_N",
+    'resul_pcr': "RESUL_PCR",
+    'criterio': "CRITERIO",
+    'classi_fin': "CLASSI_FIN",
 }
 
 
