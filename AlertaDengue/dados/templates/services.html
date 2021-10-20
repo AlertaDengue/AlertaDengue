@@ -16,6 +16,18 @@
 <script></script>
 
 {% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="/services">{% trans "Dados" %}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">{{ services }}</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block title %}{% trans "Serviços de Dados Públicos" %}{% endblock %}
 
 {% block content %}
@@ -23,7 +35,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12 column">
-            <h5>{% trans "Aqui podem ser encontrados os dados mostrados nas figuras e tabelas do site" %}.</h5>
+            <h5>{% trans "Aqui podem ser encontrados os dados mostrados nas figuras e tabelas do site" %}</h5>
             <p>
             <ul>
                 <li><h5><a href="./api">API</a></h5></li>
