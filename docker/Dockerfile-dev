@@ -29,6 +29,7 @@ COPY docker/prepare_permission.sh /prepare_permission.sh
 RUN /prepare_permission.sh
 
 ## Copy code to the container with permissions to user
+COPY --chown=deploy:deploy docker/test.sh  /srv/deploy/docker/test.sh
 COPY --chown=deploy:deploy AlertaDengue  /srv/deploy/AlertaDengue
 COPY --chown=deploy pyproject.toml setup.cfg setup.py LICENSE README.md HISTORY.md /srv/deploy/
 COPY --chown=deploy requirements-dev.txt requirements.txt /srv/deploy/

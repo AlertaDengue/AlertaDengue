@@ -4,7 +4,7 @@ Este módulo contem funções para interagir com o banco principal do projeto
 """
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Callable, Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple, Optional
 
 import ibis
 import numpy as np
@@ -32,7 +32,6 @@ PSQL_URI = "postgresql://{}:{}@{}:{}/{}".format(
 
 db_engine = create_engine(PSQL_URI)
 con = ibis.postgres.connect(url=PSQL_URI)
-
 
 # rio de janeiro city geocode
 MRJ_GEOCODE = 3304557
@@ -76,7 +75,137 @@ STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
 MAP_CENTER = filter_active_states(_map_center)
 MAP_ZOOM = filter_active_states(_map_zoom)
 
-# Ibis utils functions
+# Ibis utils
+
+
+class RegionalParameters:
+    schema_dglob = con.schema('Dengue_global')
+    t_parameters = schema_dglob.table('parameters')
+    t_municipio = schema_dglob.table('Municipio')
+    t_estado = schema_dglob.table('estado')
+    t_regional = schema_dglob.table('regional')
+    t_regional_s = schema_dglob.table('regional_saude')
+
+    @classmethod
+    def get_regional_names(cls, state_name: str) -> list:
+        """
+        Parameters
+        ----------
+            dict_keys with state names
+        Returns
+        -------
+            list(iterable)
+        """
+
+        cond_t_municipio_uf = cls.t_municipio[cls.t_municipio.uf == state_name]
+        t_joined = cls.t_regional.join(cond_t_municipio_uf, cls.t_parameters)[
+            cls.t_regional.nome
+        ].distinct()
+        df_regional_names = t_joined.execute()
+
+        return df_regional_names['nome'].to_list()
+
+    @classmethod
+    def get_var_climate_info(cls, geocodes: list) -> Tuple[str]:
+        """
+        Parameters
+        ----------
+            list dict_keys
+        Returns
+        ----------
+            Tuples pairs
+        """
+
+        geocode_filter = cls.t_parameters.municipio_geocodigo.isin(geocodes)
+        t_parameters_expr = cls.t_parameters[geocode_filter].distinct()
+        climate_proj = t_parameters_expr.projection(
+            ['codigo_estacao_wu', 'varcli']
+        ).execute()
+        var_climate_info = climate_proj.to_records(index=False).tolist()[0]
+
+        return var_climate_info
+
+    @classmethod
+    def get_cities(
+        cls,
+        regional_name: Optional[str] = None,
+        state_name: Optional[str] = None,
+    ) -> dict:
+        """
+        Get a list of cities from available states with code and name pairs
+        Returns
+        ----------
+        """
+        cities_by_region = {}
+
+        if regional_name is not None and state_name is not None:
+
+            cache_name = (
+                str(regional_name).replace(" ", "_")
+                + "_"
+                + str(state_name).replace(" ", "_")
+            )
+            res = cache.get(cache_name)
+
+            if res:
+                # print('Regional found', res)
+                return res
+
+            else:
+                # print('Add new regional to dict...', res)
+                cond_t_municipio_uf = cls.t_municipio[
+                    cls.t_municipio.uf == state_name
+                ]
+                cond_t_regional_name = cls.t_regional[
+                    cls.t_regional.nome == regional_name
+                ]
+                df_cities = cond_t_municipio_uf.join(
+                    cond_t_regional_name, cls.t_parameters
+                )[
+                    cond_t_municipio_uf.geocodigo, cond_t_municipio_uf.nome
+                ].execute()
+
+                for row in df_cities.to_dict(orient="records"):
+                    cities_by_region[row['geocodigo']] = row['nome']
+
+                res = cities_by_region
+
+                cache.set(
+                    cache_name, res, settings.QUERY_CACHE_TIMEOUT,
+                )
+
+                return res
+
+        else:
+            cache_name = 'all_cities'
+            res = cache.get(cache_name)
+            if res:
+                # print('Fetch all cities', res)
+                return res
+            else:
+                # print('Add all cities')
+                if state_name is None:
+                    state_names = [
+                        f"{state_name}" for state_name in STATE_NAME.values()
+                    ]
+
+                else:
+                    state_names = [f"{state_name}"]
+                expr_t_municipio_uf = cls.t_municipio.uf.isin(state_names)
+                df_cities = cls.t_municipio[expr_t_municipio_uf][
+                    'geocodigo', 'nome'
+                ].execute()
+
+                for row in df_cities.to_dict(orient="records"):
+                    cities_by_region[row['geocodigo']] = row['nome']
+
+                res = cities_by_region
+
+                cache.set(
+                    cache_name, res, settings.QUERY_CACHE_TIMEOUT,
+                )
+
+                return res
 
 
 def con_table(disease) -> con:
@@ -255,80 +384,6 @@ def get_disease_suffix(disease: str, empty_for_dengue: bool = True):
         if disease == 'zika'
         else ''
     )
-
-
-def get_regional_names(state_name: str) -> list:
-    """
-    :param state_name:
-    :return:
-    """
-    sql = '''
-    SELECT DISTINCT nome_regional
-    FROM "Dengue_global"."regional_saude" AS rs\
-    INNER JOIN "Dengue_global"."Municipio" AS m
-        ON (rs.municipio_geocodigo=m.geocodigo)
-    INNER JOIN "Dengue_global"."estado" AS uf
-        ON (UPPER(m.uf)=UPPER(uf.nome))
-    WHERE UPPER(uf.uf) = UPPER('{}')
-    '''.format(
-        state_name
-    )
-
-    with db_engine.connect() as conn:
-        return [v[0] for v in conn.execute(sql).fetchall()]
-
-
-def get_var_climate_info(geocodes: list):
-    """
-    :param geocodes:
-    :return:
-    """
-    sql = '''
-    SELECT DISTINCT codigo_estacao_wu, varcli
-    FROM "Dengue_global".regional_saude
-    WHERE municipio_geocodigo IN ({})
-    '''.format(
-        ','.join(map(lambda v: "'{}'".format(v), geocodes))
-    )
-    with db_engine.connect() as conn:
-        return conn.execute(sql).fetchone()
-
-
-def get_cities(regional_name: str = None, state_name: str = None) -> dict:
-    """
-    Get a list of cities from available states with code and name pairs
-    :return:
-    """
-    with db_engine.connect() as conn:
-        if regional_name is not None and state_name is not None:
-            sql = '''
-                SELECT municipio_geocodigo, nome
-                FROM \"Dengue_global\".\"Municipio\"
-                INNER JOIN \"Dengue_global\".regional_saude
-                ON municipio_geocodigo = geocodigo
-                where uf = '%s' AND nome_regional = '%s'
-            ''' % (
-                state_name,
-                regional_name,
-            )
-        else:
-            if state_name is None:
-                state_names = [
-                    "'%s'" % state_name for state_name in STATE_NAME.values()
-                ]
-            else:
-                state_names = ["'%s'" % state_name]
-
-            sql = '''
-            SELECT geocodigo, nome
-            FROM "Dengue_global"."Municipio"
-            WHERE uf IN(%s)
-            ORDER BY nome
-            ''' % ','.join(
-                state_names
-            )
-
-        return dict(conn.execute(sql).fetchall())
 
 
 def get_city_name_by_id(geocode: int):
@@ -1673,4 +1728,5 @@ class ReportState:
             var_climate=var_climate,
             station_id=station_id,
         )
+
         return cls._format_data(df)

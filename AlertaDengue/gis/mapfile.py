@@ -10,7 +10,7 @@ import sh
 # local
 from dados.dbdata import STATE_NAME
 from dados.dbdata import NotificationResume as notif
-from dados.dbdata import db_engine, get_cities
+from dados.dbdata import db_engine, RegionalParameters
 
 from gis.geodf import extract_boundaries
 from ad_main.settings import (
@@ -415,7 +415,7 @@ class MapFileMeteorological(MapFile):
         data_range = RASTER_METEROLOGICAL_DATA_RANGE[self.map_class]
 
         # get a list with geo codes and city names from available states
-        for geocode, city_name in get_cities().items():
+        for (geocode, city_name,) in RegionalParameters.get_cities().items():
             raster_name = None
             raster_date = None
 

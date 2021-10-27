@@ -42,10 +42,12 @@ from .dbdata import (
     Forecast,
     ReportCity,
     ReportState,
+    RegionalParameters,
 )
 from .episem import episem, episem2date
 from .maps import get_city_info
 from .models import City, RegionalHealth
+
 
 DBF = apps.get_model('dbf', 'DBF')
 
@@ -312,7 +314,7 @@ class DataPublicServicesPageView(TemplateView):
 
                 options_cities = ''
                 for state_abbv, state_name in STATE_NAME.items():
-                    for geocode, city_name in dbdata.get_cities(
+                    for (geocode, city_name,) in RegionalParameters.get_cities(
                         state_name=state_name
                     ).items():
                         options_cities += '''
@@ -1082,7 +1084,7 @@ class ReportView(TemplateView):
         self.template_name = 'report_filter_city.html'
 
         options_cities = ''
-        for geocode, city_name in dbdata.get_cities(
+        for geocode, city_name in RegionalParameters.get_cities(
             state_name=STATE_NAME[context['state']]
         ).items():
             options_cities += '''
@@ -1468,11 +1470,11 @@ class ReportStateView(TemplateView):
         last_year_week = None
 
         for regional_name in regional_names:
-            cities = dbdata.get_cities(
+            cities = RegionalParameters.get_cities(
                 state_name=STATE_NAME[state], regional_name=regional_name
             )
 
-            station_id, var_climate = dbdata.get_var_climate_info(
+            station_id, var_climate = RegionalParameters.get_var_climate_info(
                 cities.keys()
             )
 
@@ -1603,8 +1605,9 @@ class ReportStateView(TemplateView):
         year_week = int(context['year_week'])
         year, week = context['year_week'][:4], context['year_week'][-2:]
         state = context['state']
+        state_name = STATE_NAME[state]
 
-        regional_names = dbdata.get_regional_names(state)
+        regional_names = RegionalParameters.get_regional_names(state_name)
 
         diseases_key = ['dengue', 'chik', 'zika']
 
@@ -1627,7 +1630,7 @@ class ReportStateView(TemplateView):
                 'week': week,
                 'last_year': last_year,
                 'last_week': last_week,
-                'state_name': STATE_NAME[state],
+                'state_name': state_name,
                 'regional_info': regional_info,
                 'regional_names': regional_names,
                 'diseases_code': diseases_key,
