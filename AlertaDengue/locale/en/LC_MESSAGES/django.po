@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-09 01:16+0000\n"
+"POT-Creation-Date: 2021-11-18 23:35+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -20,22 +20,12 @@ msgstr ""
 "X-Source-Language: pt_BR\n"
 "X-Generator: Poedit 1.8.7.1\n"
 
-#: AlertaDengue/dados/charts/cities.py:74
-msgid "limiar pré epidêmico"
-msgstr "Epidemic threshold"
-
-#: AlertaDengue/dados/charts/cities.py:75
-msgid "limiar pós epidêmico"
-msgstr "Epidemic threshold"
-
-#: AlertaDengue/dados/charts/cities.py:76
-msgid "limiar epidêmico"
-msgstr "Epidemic threshold"
-
 #: AlertaDengue/dados/charts/cities.py:436
 #: AlertaDengue/dados/charts/cities.py:451
 #: AlertaDengue/dados/charts/states.py:63
 #: AlertaDengue/dados/charts/states.py:78
+#, fuzzy, python-brace-format
+#| msgid "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
 msgid "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
 
@@ -93,6 +83,8 @@ msgid "Registrados"
 msgstr ""
 
 #: AlertaDengue/dados/charts/home.py:47
+#, fuzzy, python-brace-format
+#| msgid "<br>SE %{text}<br>%{y:1f} Casos notificados<extra></extra>"
 msgid "<br>SE %{text}<br>%{y:1f} Casos notificados<extra></extra>"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
 
@@ -101,12 +93,14 @@ msgid "Estimados"
 msgstr "Estimated cases"
 
 #: AlertaDengue/dados/charts/home.py:63
+#, fuzzy, python-brace-format
+#| msgid "<br>SE %{text}<br>%{y:1f} Casos estimados<extra></extra>"
 msgid "<br>SE %{text}<br>%{y:1f} Casos estimados<extra></extra>"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
 
 #: AlertaDengue/dados/charts/home.py:75
 msgid "Total de casos no estado"
-msgstr "Accumulated number of cases per year"
+msgstr "Cumulative number of cases in the state"
 
 #: AlertaDengue/dados/charts/home.py:81 AlertaDengue/dados/charts/home.py:219
 #: AlertaDengue/dados/charts/home.py:323
@@ -538,6 +532,7 @@ msgid "Análise de receptividade:"
 msgstr "Receptivity Analysis"
 
 #: AlertaDengue/dados/templates/about.html:127
+#, python-format
 msgid ""
 "A transmissão das arboviroses requer condições climáticas adequadas, que "
 "podem variar de lugar para lugar. No Rio de Janeiro,\n"
@@ -589,6 +584,7 @@ msgstr ""
 "Method (MEM)"
 
 #: AlertaDengue/dados/templates/about.html:138
+#, python-format
 msgid ""
 "que permite estimar\n"
 "            diversas grandezas de interesse com base em dados históricos "
@@ -788,6 +784,7 @@ msgid "Nível Laranja"
 msgstr "Orange Level"
 
 #: AlertaDengue/dados/templates/alert_base.html:171
+#, python-format
 msgid ""
 "Transmissão de %(disease_label)s. No nível laranja, já observamos uma "
 "incidência\n"
@@ -804,6 +801,7 @@ msgid "Nível Vermelho"
 msgstr "Red Level"
 
 #: AlertaDengue/dados/templates/alert_base.html:186
+#, python-format
 msgid ""
 "Epidemia. Neste nível estamos em plena epidemia. Todo o cuidado é pouco, e\n"
 "                        precisamos ficar atentos aos sintomas da "
@@ -1523,6 +1521,8 @@ msgid "ICmin"
 msgstr "ICmin"
 
 #: AlertaDengue/dados/templates/report_state.html:426
+#, fuzzy, python-format
+#| msgid "número mínimo de casos estimados (IC 95%%)"
 msgid "número mínimo de casos estimados (IC 95%%)"
 msgstr "Lower 95% confidence bounds for the estimated number of cases."
 
@@ -1531,6 +1531,8 @@ msgid "ICmax"
 msgstr "ICmax"
 
 #: AlertaDengue/dados/templates/report_state.html:429
+#, fuzzy, python-format
+#| msgid "número máximo de casos estimados (IC 95%%)"
 msgid "número máximo de casos estimados (IC 95%%)"
 msgstr "Upper 95% confidence bounds for the estimated number of cases."
 
@@ -1806,6 +1808,8 @@ msgid "cases_est_min and cases_est_max"
 msgstr "cases_est_min and cases_est_max"
 
 #: AlertaDengue/dados/templates/services_api.html:207
+#, fuzzy, python-format
+#| msgid "Intervalo de credibilidade de 95%% do número estimado de casos"
 msgid "Intervalo de credibilidade de 95%% do número estimado de casos"
 msgstr "95% credible interval of the estimated number of cases"
 
@@ -2532,3 +2536,12 @@ msgstr "Your username, if you have forgotten it, is:"
 #: AlertaDengue/templates/registration/password_reset_email.html:10
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
+
+#~ msgid "limiar pré epidêmico"
+#~ msgstr "Epidemic threshold"
+
+#~ msgid "limiar pós epidêmico"
+#~ msgstr "Epidemic threshold"
+
+#~ msgid "limiar epidêmico"
+#~ msgstr "Epidemic threshold"

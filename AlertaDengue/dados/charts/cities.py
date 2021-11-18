@@ -71,9 +71,9 @@ class ReportCityCharts:
         )
 
         ks_limiar = [
-            _('limiar pré epidêmico'),
-            _('limiar pós epidêmico'),
-            _('limiar epidêmico'),
+            'limiar pré epidêmico',
+            'limiar pós epidêmico',
+            'limiar epidêmico',
         ]
 
         colors = ['rgb(0,255,0)', 'rgb(255,150,0)', 'rgb(255,0,0)']
