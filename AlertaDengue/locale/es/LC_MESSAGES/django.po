@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-10 22:48+0000\n"
+"POT-Creation-Date: 2021-10-30 00:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,28 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-#: AlertaDengue/common/templates/dbf_upload.html:66
-#: AlertaDengue/dbf/templates/dbf_upload.html:66
-msgid "Envie aqui os dados atualizados do SINAN"
-msgstr ""
-
-#: AlertaDengue/common/templates/dbf_upload.html:172
-#: AlertaDengue/dbf/templates/dbf_upload.html:172
-msgid "Enviar"
-msgstr ""
-
-#: AlertaDengue/common/templates/dbf_upload.html:179
-#: AlertaDengue/common/templates/upload_successful.html:10
-#: AlertaDengue/dbf/templates/dbf_upload.html:179
-#: AlertaDengue/dbf/templates/upload_successful.html:10
-msgid "Ultimos arquivos enviados:"
-msgstr ""
-
-#: AlertaDengue/common/templates/upload_successful.html:5
-#: AlertaDengue/dbf/templates/upload_successful.html:5
-msgid "Dados do SINAN recebidos"
-msgstr ""
 
 #: AlertaDengue/dados/charts/cities.py:74
 msgid "limiar pré epidêmico"
@@ -97,16 +75,64 @@ msgstr ""
 msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
 msgstr ""
 
-#: AlertaDengue/dados/charts/cities.py:718
+#: AlertaDengue/dados/charts/cities.py:718 AlertaDengue/dados/charts/home.py:91
 #: AlertaDengue/dados/templates/alert_state/age.html:125
 #: AlertaDengue/dados/templates/alert_state/date.html:100
 #: AlertaDengue/dados/templates/alert_state/disease.html:122
 #: AlertaDengue/dados/templates/alert_state/epiyears.html:39
 #: AlertaDengue/dados/templates/alert_state/gender.html:113
 #: AlertaDengue/dados/templates/alerta_mrj.html:21
-#: AlertaDengue/dados/templates/services_api.html:195
 #: AlertaDengue/dados/templates/total_series.html:28
 msgid "Casos"
+msgstr ""
+
+#: AlertaDengue/dados/charts/home.py:41
+msgid "Registrados"
+msgstr ""
+
+#: AlertaDengue/dados/charts/home.py:47
+#, python-brace-format
+msgid "<br>SE %{text}<br>%{y:1f} Casos notificados<extra></extra>"
+msgstr ""
+
+#: AlertaDengue/dados/charts/home.py:58
+msgid "Estimados"
+msgstr ""
+
+#: AlertaDengue/dados/charts/home.py:63
+#, python-brace-format
+msgid "<br>SE %{text}<br>%{y:1f} Casos estimados<extra></extra>"
+msgstr ""
+
+#: AlertaDengue/dados/charts/home.py:75
+msgid "Total de casos no estado"
+msgstr ""
+
+#: AlertaDengue/dados/charts/home.py:81 AlertaDengue/dados/charts/home.py:219
+#: AlertaDengue/dados/charts/home.py:323
+#: AlertaDengue/dados/templates/services_api.html:191
+#: AlertaDengue/forecast/models.py:139
+msgid "Semana epidemiológica"
+msgstr ""
+
+#: AlertaDengue/dados/charts/home.py:213
+#, python-brace-format
+msgid "{df_this_week} Cidades com clima favorável<br>para transmissão"
+msgstr ""
+
+#: AlertaDengue/dados/charts/home.py:302
+#, python-brace-format
+msgid "%{y} Cidades na semana %{x}<extra></extra>"
+msgstr ""
+
+#: AlertaDengue/dados/charts/home.py:307
+#, fuzzy
+#| msgid "Epidemiologia"
+msgid "Situação epidemiológica das cidades"
+msgstr "Epidemiología"
+
+#: AlertaDengue/dados/charts/home.py:333
+msgid "Número de cidades"
 msgstr ""
 
 #: AlertaDengue/dados/charts/states.py:58
@@ -223,11 +249,16 @@ msgstr ""
 #: AlertaDengue/dados/templates/about.html:36
 msgid ""
 "        \n"
-"            <h5>O InfoDengue é um sistema de alerta para arboviroses baseado "
-"em dados\n"
+"            O InfoDengue é um sistema de alerta para arboviroses baseado em "
+"dados\n"
 "            hı́bridos gerados por meio da análise integrada de dados "
 "minerados a partir da Web\n"
-"            social e de dados climáticos e epidemiológicos.</h5> \n"
+"            social e de dados climáticos e epidemiológicos."
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:40
+msgid ""
+" \n"
 "            Implementado em 2015, o sistema foi desenvolvido por "
 "pesquisadores do Programa de Computação Científica (Fundação Oswaldo Cruz, "
 "RJ) \n"
@@ -235,8 +266,11 @@ msgid ""
 "a forte colaboração da Secretaria Municipal \n"
 "            de Saúde do Rio de Janeiro, o Observatório da Dengue (UFMG) e "
 "pesquisadores da Universidade Federal \n"
-"            do Paraná e da Universidade Estadual do Oeste do Paraná. "
-"<br><br>\n"
+"            do Paraná e da Universidade Estadual do Oeste do Paraná."
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:45
+msgid ""
 "\n"
 "            Desde 2016, outros municípios e estados aderiram ao sistema: "
 "Estado do Rio de Janeiro,\n"
@@ -249,13 +283,21 @@ msgid ""
 "            situação da dengue semanalmente. A versão pública do site é "
 "acessada por muitas pessoas e é comum recebemos\n"
 "             notícias de que essas informações são utilizadas\n"
-"            na definição de viagens e outras atividades. <br><br>\n"
-"            \n"
+"            na definição de viagens e outras atividades."
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:53
+msgid ""
+"\n"
 "            Nossa rede de colaboradores cresceu e conta agora com a parceria "
 "de grupos de pesquisa internacionais que \n"
 "            buscam soluções para arboviroses em outros países. Por meio do "
 "compartilhamento de experiências e metodologias, \n"
-"            ampliamos a inovação e o conhecimento das arboviroses. <br><br>\n"
+"            ampliamos a inovação e o conhecimento das arboviroses."
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:57
+msgid ""
 "\n"
 "            Vários desafios técnicos e científicos foram enfrentados durante "
 "o desenvolvimento do InfoDengue, resultando \n"
@@ -263,8 +305,7 @@ msgid ""
 "continuamos e continuaremos sempre investigando \n"
 "            novas soluções para gerar informação útil para a gestão e para o "
 "avanço do conhecimento das arboviroses e seu \n"
-"            controle. <br>            \n"
-"            "
+"            controle."
 msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:65
@@ -274,31 +315,27 @@ msgstr ""
 #: AlertaDengue/dados/templates/about.html:69
 msgid ""
 "\n"
-"            <h5>O sistema InfoDengue é um pipeline de coleta, harmonização e "
+"            O sistema InfoDengue é um pipeline de coleta, harmonização e "
 "análise de dados semi-automatizado, \n"
 "            que gera indicadores de situação epidemiológica da dengue e "
-"outras arboviroses a nível municipal.</h5><br>\n"
-"            "
+"outras arboviroses a nível municipal."
 msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:73
-msgid ""
-"\n"
-"            <center><img style=\"relative: left;\" src=\"/static/img/"
-"system_level_color.png\" alt=\"gibberish\" width=\"400\" /></"
-"center><br><br>\n"
-"            "
+msgid "/static/img/system_level_color.png"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:76
-msgid "De onde vem os dados"
+#: AlertaDengue/dados/templates/about.html:75
+msgid "De onde vem os dados?"
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:78
+msgid "Casos de dengue, chikungunya e zika:"
 msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:78
 msgid ""
-"\n"
-"            <b>• Casos de dengue, chikungunya e zika:</b> Essas são doenças "
-"de notificação obrigatória, isso é, o profissional \n"
+"Essas são doenças de notificação obrigatória, isso é, o profissional \n"
 "            de saúde que diagnostica um caso suspeito precisa preencher uma "
 "ficha de notificação que alimenta um banco \n"
 "            de dados municipal que depois é consolidado a nível estadual e "
@@ -307,10 +344,16 @@ msgid ""
 "laboratorialmente, a maioria recebe classificação \n"
 "            final com base em critérios clínico-epidemiológicos. A partir "
 "dos casos notificados, são calculados os \n"
-"            indicadores de incidência que alimentam o InfoDengue.<br><br>\n"
-"\n"
-"            <b>• Dados meteorológicos: </b>A transmissão de arboviroses é "
-"muito influenciada pelo clima. \n"
+"            indicadores de incidência que alimentam o InfoDengue."
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:85
+msgid "Dados meteorológicos:"
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:85
+msgid ""
+"A transmissão de arboviroses é muito influenciada pelo clima. \n"
 "            O mosquito transmissor, Aedes aegypti, requer temperatura alta e "
 "umidade para se reproduzir e viver. \n"
 "            O vírus ao infectar o mosquito, também irá se reproduzir melhor "
@@ -318,10 +361,16 @@ msgid ""
 "            temperatura e umidade são obtidos das <a href=\"https://estacoes."
 "dengue.mat.br/\">estações meteorológicas</a> de aeroportos assim como de "
 "imagens de \n"
-"            satélite.<br><br> \n"
-"\n"
-"            <b>• Dados de menção à dengue nas redes sociais:</b> as pessoas "
-"em geral buscam informações ou contam sobre \n"
+"            satélite."
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:91
+msgid "Dados de menção à dengue nas redes sociais:"
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:91
+msgid ""
+"As pessoas em geral buscam informações ou contam sobre \n"
 "            seu estado de saúde nas redes sociais antes de buscarem ajuda "
 "médica. Assim, conhecer o número de menções \n"
 "            à dengue nas redes sociais ajuda a identificar quando os casos "
@@ -329,26 +378,31 @@ msgid ""
 "            O Infodengue tem parceria com o <a href=\"https://www."
 "observatorio.inweb.org.br\">Observatório da Dengue</a> que captura e analisa "
 "tweets de pessoas \n"
-"            geolocalizadas quanto à menção de sintomas de dengue.<br><br>\n"
-"\n"
-"            <b>• Dados demográficos:</b> indicadores epidemiológicos "
-"precisam ser calculados em relação ao tamanho da população. \n"
-"            Dados demográficos dos municípios brasileiros são atualizados a "
-"cada ano no Infodengue, utilizando as estimativas \n"
-"            do <a href=\"https://www.ibge.gov.br/pt/inicio.html\">IBGE<a>."
-"<br><br>\n"
-"            "
+"            geolocalizadas quanto à menção de sintomas de dengue."
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:104
+#: AlertaDengue/dados/templates/about.html:97
+msgid "Dados demográficos:"
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:97
+msgid ""
+"Indicadores epidemiológicos precisam ser calculados em relação ao tamanho da "
+"população. \n"
+"            Dados demográficos dos municípios brasileiros são atualizados a "
+"cada ano no Infodengue, utilizando as estimativas \n"
+"            do"
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:102
 msgid "O que o sistema faz"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:106
-msgid "Correção do atraso de notificação (nowcasting)"
+#: AlertaDengue/dados/templates/about.html:104
+msgid "Correção do atraso de notificação (nowcasting):"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:106
+#: AlertaDengue/dados/templates/about.html:105
 msgid ""
 " Os dados de notificação de doenças tem sempre um atraso. \n"
 "            Isso ocorre por vários motivos e inclui o tempo entre a pessoa "
@@ -363,25 +417,25 @@ msgid ""
 "padrão temporal histórico da incidência para \n"
 "            calcular o número esperado de casos a cada semana. Esse processo "
 "se chama nowcasting ou estimação do \n"
-"            presente e está descrita em <a href=\"https://onlinelibrary."
-"wiley.com/doi/full/10.1002/sim.8303\">Bastos, Economou et al (2019)</a> \n"
-"            ”A modelling approach for correcting reporting delays in disease "
-"surveillance data”. \n"
-"            A Figura abaixo (retirada de Bastos et al 2019) mostra em preto, "
-"a incidência verdadeira, em vermelho, \n"
-"            aquela observada com atraso e , em cinza, o nowcasting. Para "
-"mais detalhes técnicos, ver a referida publicação.<br><br><br>"
+"            presente e está descrita em: "
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:121
-msgid "Detecção de transmissão sustentada"
-msgstr ""
-
-#: AlertaDengue/dados/templates/about.html:121
-#, python-format
+#: AlertaDengue/dados/templates/about.html:115
 msgid ""
-" A estimação do número reprodutivo é importante em vários aspectos. "
-"Sequência de semanas com transmissão \n"
+"A Figura abaixo (retirada de Bastos et al 2019) mostra em preto, a "
+"incidência verdadeira, em vermelho, \n"
+"            aquela observada com atraso e, em cinza, o nowcasting. Para mais "
+"detalhes técnicos, ver a referida publicação."
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:121
+msgid "Detecção de transmissão sustentada:"
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:121
+msgid ""
+"A estimação do número reprodutivo é importante em vários aspectos. Sequência "
+"de semanas com transmissão \n"
 "            crítica (Rt > 1) indica transmissão sustentada. Isso é, indica "
 "que estamos na fase de espalhamento da doença, e que ações adequadas para "
 "controle \n"
@@ -391,20 +445,17 @@ msgid ""
 "            por causa do controle ou pela redução do contingente de "
 "suscetíveis. Para estimar R0 e Rt a partir dos dados de incidência, "
 "desenvolvemos metodologia \n"
-"            própria, descrita em <a href=\"https://www.sciencedirect.com/"
-"science/article/pii/S1755436517300907?via%%3Dihub\">Codeço et al. 2018 </"
-"a>“Estimating the effective reproduction number of dengue considering "
-"temperature-dependent generation intervals”."
+"            própria, descrita em"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:127
-msgid "Análise de receptividade"
+#: AlertaDengue/dados/templates/about.html:128
+msgid "Análise de receptividade:"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:127
+#: AlertaDengue/dados/templates/about.html:128
 #, python-format
 msgid ""
-" A transmissão das arboviroses requer condições climáticas adequadas, que "
+"A transmissão das arboviroses requer condições climáticas adequadas, que "
 "podem variar de lugar para lugar. No Rio de Janeiro, \n"
 "            por exemplo, temperatura maior que 22 graus é condição "
 "necessária para transmissão sustentada. Em Fortaleza, umidade máxima acima "
@@ -416,29 +467,31 @@ msgid ""
 "da temporada da arbovirose."
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:132
-msgid "Análise de menção a dengue nas redes sociais"
+#: AlertaDengue/dados/templates/about.html:133
+msgid "Análise de menção a dengue nas redes sociais:"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:132
+#: AlertaDengue/dados/templates/about.html:133
 msgid ""
-" Indicadores de redes sociais calculados pelo Observatório da Dengue são "
+"Indicadores de redes sociais calculados pelo Observatório da Dengue são "
 "usados como variáveis auxiliares \n"
-"            no InfoDengue. A metodologia de captura e análise é descrita em "
-"<a href=\"https://journals.plos.org/plosntds/article?id=10.1371/journal."
-"pntd.0005729\">Marques-Toledo et al (2017)</a>."
+"            no InfoDengue. A metodologia de captura e análise é descrita em"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:135
-msgid "Detecção de situação atípica"
+#: AlertaDengue/dados/templates/about.html:137
+msgid "Detecção de situação atípica:"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:135
+#: AlertaDengue/dados/templates/about.html:138
+msgid ""
+"Para estimar limiares epidêmicos, nós utilizamos o Moving Epidemics Method "
+"(MEM)"
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:139
 #, python-format
 msgid ""
-" Para estimar limiares epidêmicos, nós utilizamos o Moving Epidemics Method "
-"(MEM) (<a href=\"https://onlinelibrary.wiley.com/doi/full/10.1111/"
-"j.1750-2659.2012.00422.x\">Vega et al. 2012</a>), que permite estimar \n"
+"que permite estimar \n"
 "            diversas grandezas de interesse com base em dados históricos "
 "locais como limiar pré- epidêmico, níveis de atividade típicas, valores "
 "esperados para \n"
@@ -461,128 +514,86 @@ msgid ""
 "de atividade típica, como um diagrama de controle."
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:145
+#: AlertaDengue/dados/templates/about.html:149
 #, fuzzy
 #| msgid "Código do doença"
-msgid "Código de Cores"
+msgid "Código de Cores:"
 msgstr "Código de la enfermedad"
 
-#: AlertaDengue/dados/templates/about.html:146
-msgid ""
-"\n"
-"            <center><img style=\"relative: left;\" src=\"/static/img/"
-"table_color_level_pt.png\" alt=\"gibberish\" width=\"500\" /></"
-"center><br><br>\n"
-"            "
+#: AlertaDengue/dados/templates/about.html:151
+msgid "/static/img/table_color_level_pt.png"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:149
+#: AlertaDengue/dados/templates/about.html:153
 msgid "Implementação"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:150
+#: AlertaDengue/dados/templates/about.html:154
 msgid ""
-"\n"
-"            Todos os códigos gerados para o InfoDengue, em sua maioria em R "
-"e Python, estão disponíveis em acesso aberto em​:<br>\n"
-"            <a href=\"https://github.com/AlertaDengue\">​https://github.com/"
-"AlertaDengue</a>      \n"
-"            "
+"Todos os códigos gerados para o InfoDengue, em sua maioria em R e Python, "
+"estão disponíveis em acesso aberto em​:"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:157
+#: AlertaDengue/dados/templates/about.html:159
 msgid "Como citar o InfoDengue"
-msgstr ""
-
-#: AlertaDengue/dados/templates/about.html:161
-#, python-format
-msgid ""
-"\n"
-"            C. Codeco, F. Coelho, O. Cruz, S. Oliveira, T. Castro, L. "
-"Bastos, Infodengue:<br> \n"
-"            A nowcasting system for the surveillance of arboviruses in "
-"Brazil, Revue d'Épidémiologie et de Santé Publique, \n"
-"            Vol 66, Suppl 5, 2018, Page S386,<a href=\"https://www."
-"sciencedirect.com/science/article/pii/S0398762018311088?via%%3Dihub\">​"
-"https://doi.org/10.1016/j.respe.2018.05.408</a>.<br><br>\n"
-"\n"
-"            <b>@article</b>{CODECO2018S386,<br>\n"
-"            <b>title</b> = \"Infodengue: A nowcasting system for the "
-"surveillance of arboviruses in Brazil\",<br>\n"
-"            <b>journal</b> = \"Revue d'Épidémiologie et de Santé Publique\","
-"<br>\n"
-"            <b>volume</b> = \"66\",<br>\n"
-"            <b>pages</b> = \"S386\",<br>\n"
-"            <b>year</b> = \"2018\",<br>\n"
-"            <b>note</b> = \"European Congress of Epidemiology “Crises, "
-"epidemiological transitions and the role of epidemiologists”\",<br>\n"
-"            <b>issn</b> = \"0398-7620\",<br>\n"
-"            <b>doi</b> = \"https://doi.org/10.1016/j.respe.2018.05.408\","
-"<br>\n"
-"            <b>url</b> = \"http://www.sciencedirect.com/science/article/pii/"
-"S0398762018311088\",<br>\n"
-"            <b>author</b> = \"C. Codeco and F. Coelho and O. Cruz and S. "
-"Oliveira and T. Castro and L. Bastos\"}<br>\n"
-"            "
 msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:181
 msgid "Produções científicas associadas ao Infodengue"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:185
-#, python-format
-msgid ""
-"\n"
-"            <a href=\"https://www.sciencedirect.com/science/article/pii/"
-"S0398762018311088?via%%3Dihub\">​Publicações</a> \n"
-"            "
-msgstr ""
-
-#: AlertaDengue/dados/templates/about.html:191
+#: AlertaDengue/dados/templates/about.html:189
 msgid "Eventos"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:195
-msgid ""
-"\n"
-"            <b>E-vigilância 2019</b> <a href=\"http://e-vigilancia.dengue."
-"mat.br/\">​ http://e-vigilancia.dengue.mat.br/</a> \n"
-"            "
-msgstr ""
-
-#: AlertaDengue/dados/templates/about.html:201
+#: AlertaDengue/dados/templates/about.html:196
 msgid "Como colaborar"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:205
+#: AlertaDengue/dados/templates/about.html:200
 msgid ""
-"                        \n"
-"            • Se sua cidade não está no Infodengue, entre em contato com a "
-"Secretaria de Saúde<br>\n"
-"            • Se é um estudante ou pesquisador e gostaria de contribuir com "
-"análises e modelos, nos escreva<br>\n"
-"            • Se quiser contribuir com patrocínios, escreva-nos<br>\n"
-"            • Se quiser aprender a usar o infodengue, tem sugestões, "
-"críticas ou se percebeu algum erro no site, escreva-nos<br><br>\n"
-"            <b>Vencer as arboviroses é um trabalho de todos, toda "
-"colaboração é bem vinda!</b>\n"
-"            "
+"Se sua cidade não está no Infodengue, entre em contato com a Secretaria de "
+"Saúde"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:216
+#: AlertaDengue/dados/templates/about.html:201
+msgid ""
+"Se é um estudante ou pesquisador e gostaria de contribuir com análises e "
+"modelos, nos escreva"
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:202
+msgid "Se quiser contribuir com patrocínios, escreva-nos"
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:203
+msgid ""
+"Se quiser aprender a usar o infodengue, tem sugestões, críticas ou se "
+"percebeu algum erro no site, escreva-nos"
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:204
+msgid ""
+"Vencer as arboviroses é um trabalho de todos, toda colaboração é bem vinda!"
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:209
 msgid "Videos relacionados"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:221
+#: AlertaDengue/dados/templates/about.html:215
 msgid "Entenda o modelo mais usado para representar a pandemia de COVID-19"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:231
+#: AlertaDengue/dados/templates/about.html:225
+msgid "Curso PySUS - Aula 1"
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:236
 msgid "Mais videos da série no canal"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:233
+#: AlertaDengue/dados/templates/about.html:238
 msgid "A Matemática das Epidemias"
 msgstr ""
 
@@ -787,6 +798,7 @@ msgstr ""
 #: AlertaDengue/dados/templates/series_plot.html:162
 #: AlertaDengue/dados/templates/series_plot.html:177
 #: AlertaDengue/dados/templates/series_plot.html:193
+#: AlertaDengue/dados/templates/services_api.html:194
 msgid "casos"
 msgstr ""
 
@@ -896,6 +908,15 @@ msgstr ""
 msgid "Número de casos estimados na semana"
 msgstr "Número de casos estimados en la semana"
 
+#: AlertaDengue/dados/templates/components/home/charts.html:71
+msgid "Municípios monitorados"
+msgstr ""
+
+#: AlertaDengue/dados/templates/components/home/charts.html:71
+#: AlertaDengue/dados/templates/state_cities.html:219
+msgid "Última atualização"
+msgstr ""
+
 #: AlertaDengue/dados/templates/dashboard_cities.html:56
 #, python-format
 msgid ""
@@ -962,7 +983,13 @@ msgid ""
 "            "
 msgstr ""
 
-#: AlertaDengue/dados/templates/main.html:16
+#: AlertaDengue/dados/templates/main.html:20
+#, fuzzy
+#| msgid "Número de casos estimados na semana"
+msgid "Situação de casos estimados"
+msgstr "Número de casos estimados en la semana"
+
+#: AlertaDengue/dados/templates/main.html:80
 #, fuzzy
 #| msgid "Epidemiologia"
 msgid "Situação Epidemiológica"
@@ -1235,6 +1262,7 @@ msgid "Lista das variáveis apresentadas nas tabelas"
 msgstr ""
 
 #: AlertaDengue/dados/templates/report_state.html:408
+#: AlertaDengue/dados/templates/services_api.html:191
 msgid "SE"
 msgstr ""
 
@@ -1253,6 +1281,7 @@ msgid "média das temperaturas mínimas da semana (em graus centígrados)"
 msgstr ""
 
 #: AlertaDengue/dados/templates/report_state.html:414
+#: AlertaDengue/dados/templates/services_api.html:201
 msgid "tweet"
 msgstr ""
 
@@ -1307,7 +1336,7 @@ msgid "número máximo de casos estimados (IC 95%%)"
 msgstr "Número de casos estimados en la semana"
 
 #: AlertaDengue/dados/templates/report_state.html:432
-#: AlertaDengue/dados/templates/services_api.html:199
+#: AlertaDengue/dados/templates/services_api.html:202
 msgid "Rt"
 msgstr ""
 
@@ -1326,6 +1355,7 @@ msgid ""
 msgstr ""
 
 #: AlertaDengue/dados/templates/report_state.html:438
+#: AlertaDengue/dados/templates/services_api.html:198
 msgid "nivel"
 msgstr ""
 
@@ -1535,136 +1565,166 @@ msgid "Dicionário de Dados"
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:190
-msgid "Id"
+msgid "data_ini_SE"
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:190
-msgid "Indice numérico"
+msgid "Primeiro dia da semana epidemiológica (Domingo)"
 msgstr ""
 
-#: AlertaDengue/dados/templates/services_api.html:191
-msgid "Aps"
+#: AlertaDengue/dados/templates/services_api.html:192
+msgid "casos_est"
 msgstr ""
 
-#: AlertaDengue/dados/templates/services_api.html:191
+#: AlertaDengue/dados/templates/services_api.html:192
 msgid ""
-"Apenas útil na cidade do Rio de Janeiro, onde os indicadores são calculados "
-"por área programática da saúde"
-msgstr ""
-
-#: AlertaDengue/dados/templates/services_api.html:192
-msgid "Se"
-msgstr ""
-
-#: AlertaDengue/dados/templates/services_api.html:192
-#: AlertaDengue/forecast/models.py:139
-msgid "Semana epidemiológica"
+"Número estimado de casos por semana usando o modelo de nowcasting (nota: Os "
+"valores são atualizados retrospectivamente a cada semana)"
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:193
-msgid "Data"
+msgid "cases_est_min and cases_est_max"
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:193
-msgid "Data da semana epidemiológica"
-msgstr ""
-
-#: AlertaDengue/dados/templates/services_api.html:194
-msgid "Tweets"
+#, python-format
+msgid "Intervalo de credibilidade de 95%% do número estimado de casos"
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:194
 msgid ""
-"Número de menções a sintomas de dengue nos tweets geolocalizados no "
-"município de interesse. Fonte: Observatório da Dengue/UFMG"
+"Número de casos notificados por semana (Os valores são atualizados "
+"retrospectivamente todas as semanas)"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:195
+msgid "p_rt1"
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:195
 msgid ""
-"Número de casos de dengue na semana (atenção que os dados não são "
-"necessariamente completos e estão sujeitos a modificações, os valores são "
-"atualizados todas as semanas, inclusive os históricos)"
+"Probabilidade de (Rt> 1). Para emitir o alerta laranja, usamos o critério "
+"p_rt1> 0,95 por 3 semanas ou mais."
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:196
-msgid "Casos_est"
+msgid "p_inc100k"
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:196
-msgid ""
-"Estimativa pontual de casos ede dengue na semana usando modelo de nowcating "
-"(atenção: esses valores são atualizados todas as semanas, inclusive os "
-"históricos)"
+msgid "Taxa de incidência estimada por 100.000"
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:197
-msgid "Casos_est_min e casos_est_max"
+msgid "Localidade_id"
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:197
-#, python-format
-msgid "Intervalo de credibilidade de 95%% das estimativas de casos"
-msgstr ""
-
-#: AlertaDengue/dados/templates/services_api.html:198
-msgid "Tmin"
+msgid "Divisão submunicipal (atualmente implementada apenas no Rio de Janeiro)"
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:198
 msgid ""
-"Média semanal das temperaturas mínimas. Fonte: aeroportos, com dados, mais "
-"próximos da cidade selecionada"
+"Nível de alerta (1 = verde, 2 = amarelo, 3 = laranja, 4 = vermelho), mais "
+"detalhes, consulte (Saiba mais)"
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:199
-msgid "Estimativa pontual do número reprodutivo de casos, ver"
+msgid "id"
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:199
+msgid "Índice numérico"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:200
+msgid "versao_modelo"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:200
+msgid "Versão do modelo (uso interno)"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:201
+msgid ""
+"Número de mensagens mencionando sintomas de dengue em tweets geolocalizados. "
+"Fonte: Observatório da Dengue / UFMG"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:202
+msgid "Estimativa pontual do número reprodutivo de casos, ver "
+msgstr ""
+
 #: AlertaDengue/dados/templates/services_api.html:202
 #: AlertaDengue/templates/base.html:64
 msgid "Saiba Mais"
 msgstr ""
 
-#: AlertaDengue/dados/templates/services_api.html:200
-msgid "Prt1"
-msgstr ""
-
-#: AlertaDengue/dados/templates/services_api.html:200
-msgid ""
-"Probabilidade do número reprodutivo estimado ser maior que 1. Para o alerta, "
-"usamos como critério: prt1 > 95"
-msgstr ""
-
-#: AlertaDengue/dados/templates/services_api.html:201
-msgid "Inc"
-msgstr ""
-
-#: AlertaDengue/dados/templates/services_api.html:201
-msgid ""
-"Incidência de casos de dengue calculado dividindo casos pela população (x "
-"100,000)"
-msgstr ""
-
-#: AlertaDengue/dados/templates/services_api.html:202
-msgid "Nivel"
-msgstr ""
-
-#: AlertaDengue/dados/templates/services_api.html:202
-msgid "Nivel de alerta (1 = verde, 2 = amarelo, 3 = laranja, 4 = vermelho)"
-msgstr ""
-
-#: AlertaDengue/dados/templates/services_api.html:202
-msgid "para mais detalhes ver"
+#: AlertaDengue/dados/templates/services_api.html:203
+msgid "pop"
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_api.html:203
-msgid "Sum"
+msgid "População estimada (IBGE)"
 msgstr ""
 
-#: AlertaDengue/dados/templates/services_api.html:203
-msgid "Número de registros"
+#: AlertaDengue/dados/templates/services_api.html:204
+msgid "tempmin"
 msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:204
+msgid "Média das temperaturas mínimas diárias ao longo da semana"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:205
+msgid "umidmax"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:205
+msgid "Média da umidade relativa máxima diária do ar ao longo da semana"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:206
+msgid "receptivo"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:206
+msgid ""
+"Indica receptividade climática, ou seja, condições para alta capacidade "
+"vetorial. 0 = desfavorável, 1 = favorável, 2 = favorável nesta semana e na "
+"semana passada, 3 = favorável por pelo menos três semanas (suficiente para "
+"completar um ciclo de transmissão)"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:207
+msgid "transmissao"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:207
+msgid ""
+"Evidência de transmissão sustentada: 0 = nenhuma evidência, 1 = possível, 2 "
+"= provável, 3 = altamente provável"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:208
+msgid "nivel_inc"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:208
+msgid ""
+"Incidência estimada abaixo do limiar pré-epidemia, 1 = acima do limiar pré-"
+"epidemia, mas abaixo do limiar epidêmico, 2 = acima do limiar epidêmico"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:209
+msgid "notif_accum_year"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api.html:209
+#, fuzzy
+#| msgid "Número de casos estimados na semana"
+msgid "Número acumulado de casos no ano"
+msgstr "Número de casos estimados en la semana"
 
 #: AlertaDengue/dados/templates/services_api_doc.html:63
 msgid "Tabela de conteúdo"
@@ -1795,10 +1855,6 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/state_cities.html:194
 msgid "idades"
-msgstr ""
-
-#: AlertaDengue/dados/templates/state_cities.html:219
-msgid "Última atualização"
 msgstr ""
 
 #: AlertaDengue/dados/templates/state_cities.html:227
@@ -2001,13 +2057,13 @@ msgstr ""
 msgid "casos estimados"
 msgstr ""
 
-#: AlertaDengue/dados/views.py:487 AlertaDengue/dados/views.py:615
+#: AlertaDengue/dados/views.py:461 AlertaDengue/dados/views.py:589
 msgid ""
 "A doença {} não está registrada em nosso banco de dados para o município de "
 "{}."
 msgstr ""
 
-#: AlertaDengue/dados/views.py:818
+#: AlertaDengue/dados/views.py:769
 msgid "desconhecida"
 msgstr ""
 
@@ -2041,6 +2097,23 @@ msgstr ""
 
 #: AlertaDengue/dbf/sinan.py:192
 msgid "Existem nesse arquivo notificações que não incluem a coluna ID_AGRAVO."
+msgstr ""
+
+#: AlertaDengue/dbf/templates/dbf_upload.html:66
+msgid "Envie aqui os dados atualizados do SINAN"
+msgstr ""
+
+#: AlertaDengue/dbf/templates/dbf_upload.html:172
+msgid "Enviar"
+msgstr ""
+
+#: AlertaDengue/dbf/templates/dbf_upload.html:179
+#: AlertaDengue/dbf/templates/upload_successful.html:10
+msgid "Ultimos arquivos enviados:"
+msgstr ""
+
+#: AlertaDengue/dbf/templates/upload_successful.html:5
+msgid "Dados do SINAN recebidos"
 msgstr ""
 
 #: AlertaDengue/dbf/validation.py:50
@@ -2161,7 +2234,7 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:160
+#: AlertaDengue/templates/base.html:165
 msgid ""
 "Pin a fixed-height footer to the bottom\n"
 "            of the viewport in desktop browsers with this\n"
@@ -2171,7 +2244,7 @@ msgid ""
 "                60px;</code> on the <code>.container</code>."
 msgstr ""
 
-#: AlertaDengue/templates/my_bootstrap4_base.html:47
+#: AlertaDengue/templates/my_bootstrap4_base.html:48
 msgid "linguagem"
 msgstr ""
 
