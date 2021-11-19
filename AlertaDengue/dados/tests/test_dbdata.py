@@ -3,8 +3,8 @@ from unittest import TestCase
 from pandas._testing import assert_frame_equal
 
 from dados import dbdata
+from dados.dbdata import RegionalParameters
 from dados.tests import legacy  # noqa
-
 
 # Paramaters
 cities = [3304557]
@@ -25,14 +25,6 @@ class TestLoadAlerta(TestCase):
         self.assertIn('casos_est', self.series[str(self.cidade)].keys())
         self.assertIn('casos', self.series[str(self.cidade)].keys())
         self.assertGreater(len(self.series), 0)
-
-    def test_get_cities(self):
-        """
-
-        :return:
-        """
-        cities = dbdata.get_cities()
-        assert cities[3304557] == 'Rio de Janeiro'
 
     def test_casos_are_ints(self):
         self.assertIsInstance(
@@ -116,3 +108,50 @@ class TestReportState(TestCase):
         df_ibis.info()
 
         assert_frame_equal(df_sql, df_ibis)
+
+
+class TestRegionalParameters(TestCase):
+    def setUp(self):
+
+        state = 'RJ'
+        self.state_name = dbdata.STATE_NAME[state]
+
+    def test_load(self):
+        pass
+
+    def test_get_regional_names(self):
+        """
+
+        :return:
+        """
+        regional_names = RegionalParameters.get_regional_names(self.state_name)
+        self.assertIsNotNone(
+            self.state_name, msg="required argument: 'state_name'"
+        )
+        self.assertIsInstance(regional_names, list)
+        self.assertEqual(len(regional_names), 9)
+
+    def test_get_var_climate_info(self):
+        """
+
+        :return:
+        """
+        cities = {3304557: 'Rio de Janeiro'}
+
+        var_climate = RegionalParameters.get_var_climate_info(cities.keys())
+
+        self.assertIsInstance(var_climate, tuple)
+        self.assertIn('temp_min', var_climate)
+        self.assertEqual(var_climate[0], 'SBGL')
+
+    def test_get_cities(self):
+        """
+
+        :return:
+        """
+        cities = RegionalParameters.get_cities()
+
+        self.assertIsInstance(cities, dict)
+        self.assertEqual(len(cities), 3204)
+        self.assertIn('Rio de Janeiro', self.state_name)
+        self.assertEqual(cities[3304557], 'Rio de Janeiro')

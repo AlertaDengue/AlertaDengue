@@ -12,7 +12,7 @@ from ad_main.settings import (
     DEBUG,
     RASTER_PATH,
 )
-from dados.dbdata import get_cities
+from dados.dbdata import RegionalParameters
 
 import fiona
 import geopy.distance
@@ -285,7 +285,7 @@ class MeteorologicalRaster:
             RASTER_PATH, 'meteorological', 'country', raster_class, '*'
         )
 
-        cities = get_cities().items()
+        cities = RegionalParameters.get_cities().items()
 
         n_processes = mp.cpu_count()
 
