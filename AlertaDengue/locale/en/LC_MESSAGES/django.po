@@ -1116,7 +1116,7 @@ msgstr "How to Participate in InfoDengue"
 #: AlertaDengue/dados/templates/joinin.html:17
 msgid "É muito fácil consultar ou participar do Sistema de Alerta InfoDengue"
 msgstr ""
-"It is very easy to search or participate in the InfoDengue Alert System"
+"It is very easy to search or participate in the InfoDengue"
 
 #: AlertaDengue/dados/templates/joinin.html:19
 msgid ""
@@ -1126,7 +1126,7 @@ msgid ""
 "aplicativo "
 msgstr ""
 "If you are a citizen and interested in up-to-date information and fast "
-"informationabout the level\n"
+"information about the level\n"
 " alert for arboviruses in your municipality, download the application "
 
 #: AlertaDengue/dados/templates/joinin.html:22
