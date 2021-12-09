@@ -61,14 +61,14 @@
 
       <div class="tab-content"
         id="diseaseTabContent"
-        style="background-color: #e0eefd63; 
-          margin-bottom: 20px; 
+        style="background-color: #e0eefd63;
+          margin-bottom: 20px;
           border-radius: 7px"
       >
         <!-- Description -->
         <h6><small class="px-3" style="color:#888888;">
           {{ count_cities|lookup:'dengue'|lookup:state | safe }}
-          {% trans "Municípios monitorados" %}. {% trans "Última atualização" %}: 
+          {% trans "Municípios monitorados" %}. {% trans "Última atualização SE" %}:
           {{ last_se|lookup:state | safe }}
         </small></h6>
         <div class="tab-pane fade active show"
@@ -102,7 +102,7 @@
               {{ chart_stack|lookup:'chikungunya'|lookup:state | safe }}
             </div>
           </div>
-        </div> 
+        </div>
         <div class="tab-pane fade"
             id="zika-{{ state }}"
             role="tabpanel"
