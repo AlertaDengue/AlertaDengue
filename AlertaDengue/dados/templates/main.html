@@ -31,17 +31,18 @@
       <div class="h-40 border-0 p-3 mt-5 ">
         <h5>
         <p class="text-muted text-center font-italic">
+          {% blocktrans %}
           Análise integrada de dados
           epidemiológicos, climáticos e
-          redes sociais.
+          redes sociais{% endblocktrans %}.
         </p></h5>
       </div>
       <div class="h-60 border-0 p-5 ms-3">
-          <h3><small>Atualização semanal:</small></h3>
+          <h3><small>{% trans "Atualização semanal" %}:</small></h3>
           <p class="text-muted">
-            <li class="text-muted">Incidência estimada (nowcasting)</li>
-            <li class="text-muted">Cidades com condições favoráveis para transmissão</li>
-            <li class="text-muted">Cidades em níveis de atenção</li>
+            <li class="text-muted">{% trans "Incidência estimada" %} (nowcasting)</li>
+            <li class="text-muted">{% trans "Cidades com condições favoráveis para transmissão" %}</li>
+            <li class="text-muted">{% trans "Cidades em níveis de atenção" %}</li>
           </p>
       </div>
     </div>
@@ -52,21 +53,21 @@
     </div>
     <div class="col-md-4 col-sm-6 mb-4">
       <div class="h-40 border-0 p-4 mt-5">
-        <h3><small class="">Funcionalidades:</small></h3>
+        <h3><small class="">{% trans "Funcionalidades" %}:</small></h3>
         <p class="text-muted">
-            <li class="text-muted">Relatórios municipais </li>
-            <li class="text-muted">Mapas estaduais </li>
+            <li class="text-muted">{% trans "Relatórios municipais" %} </li>
+            <li class="text-muted">{% trans "Mapas estaduais" %} </li>
             <li class="text-muted">API </li>
         </p>
       </div>
       <div class="h-60 border-0 p-4">
-        <h3><small class="">Participe:</small></h3>
+        <h3><small class="">{% trans "Participe" %}:</small></h3>
         <p class="text-muted">
-            Existem várias formas de participar,<br/>
+          {% trans "Existem várias formas de participar" %}<br/>
             <span class=""><a href="participe/"
-              title="Clique e saiba como participar do Infodengue"
+              title={% trans "Clique e saiba como participar do Infodengue" %}
               style="font-size: small;"
-              >Confira aqui!
+              >{% trans "Confira aqui!" %}
             </a>
           </span>
         </p>
@@ -75,7 +76,7 @@
   </div>
 </div>
 <!-- end maps -->
-    
+
 <div class="page-header align-title mt-4" style="margin-bottom: 20px;">
   <h3>{% translate "Situação Epidemiológica" %}</h3>
 </div>

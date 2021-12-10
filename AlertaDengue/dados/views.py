@@ -886,7 +886,12 @@ class ChartsMainView(TemplateView):
 
             if d == 'dengue':
                 if not df_hist.empty:
-                    last_se[s] = df_hist.data_iniSE.max().strftime('%d-%m-%Y')
+                    last_se[s] = (
+                        str(df_hist.SE.max())[4:]
+                        + "/"
+                        + str(df_hist.SE.max())[:4]
+                    )
+
                 else:
                     last_se[s] = ''
 
