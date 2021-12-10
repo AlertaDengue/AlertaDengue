@@ -19,7 +19,7 @@
             role="tab"
             aria-controls="dengue-{{ state }}"
             aria-selected="true"
-            title="Gráficos sobre Dengue"
+            title={% trans "Gráficos sobre Dengue" %}
             >Dengue
           </a>
         </li>
@@ -31,7 +31,7 @@
             role="tab"
             aria-controls="chikungunya-{{ state }}"
             aria-selected="false"
-            title="Gráficos sobre Chikungunya"
+            title={% trans "Gráficos sobre Chikungunya" %}
             >Chikungunya
           </a>
         </li>
@@ -42,7 +42,7 @@
             href="#zika-{{ state }}" role="tab"
             aria-controls="zika-{{ state }}"
             aria-selected="false"
-            title="Gráficos sobre Zika"
+            title={% trans "Gráficos sobre Zika" %}
             >Zika
           </a>
         </li>
@@ -53,8 +53,8 @@
             href="#incidence_map-{{ state }}" role="tab"
             aria-controls="incidence_map-{{ state }}"
             aria-selected="false"
-            title="Veja o mapa de incidência das doenças no estado"
-            >Mapa incidência
+            title={% trans "Veja o mapa de incidência das doenças no estado" %}
+            >{% trans "Mapa incidência" %}
           </a>
         </li>
       </ul>
@@ -68,7 +68,7 @@
         <!-- Description -->
         <h6><small class="px-3" style="color:#888888;">
           {{ count_cities|lookup:'dengue'|lookup:state | safe }}
-          {% trans "Municípios monitorados" %}. {% trans "Última atualização SE" %}:
+          {% trans "Municípios monitorados" %}. {% trans "Última atualização na SE" %}:
           {{ last_se|lookup:state | safe }}
         </small></h6>
         <div class="tab-pane fade active show"
@@ -138,7 +138,7 @@
         <div class="align-buttom mt-2">
           <a href="/alerta/{{states_alert|lookup:state}}"
             class="btn btn-outline-primary btn-sm" style="font-size: medium;">
-            <span class="badge">Informações detalhadas sobre o Estado</span>
+            <span class="badge">{% trans "Informações detalhadas sobre o Estado" %}</span>
           </a>
         </div>
       </div>

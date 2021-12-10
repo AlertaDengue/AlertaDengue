@@ -102,8 +102,8 @@ def _create_scatter_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
                     orientation="h",
                     yanchor="bottom",
                     y=1.01,
-                    xanchor="right",
-                    x=1,
+                    xanchor="left",
+                    # x=1,
                 ),
                 hovermode='x',
                 hoverlabel=dict(
@@ -209,10 +209,8 @@ def _create_indicator_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
             'data': traces,
             'layout': go.Layout(
                 title={
-                    "text": _(
-                        f"{df_this_week} Cidades com clima favorável<br>"
-                        "para transmissão"
-                    ),
+                    "text": f"{df_this_week} "
+                    + _('Cidades com clima favorável <br>para transmissão'),
                     "font": {"family": "Helvetica", "size": 16},
                     "x": 0.5,
                 },
