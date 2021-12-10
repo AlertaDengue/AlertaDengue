@@ -1202,7 +1202,7 @@ msgstr "contact us"
 
 #: AlertaDengue/dados/templates/main.html:20
 msgid "Situação de casos estimados"
-msgstr "Estimated cases Situation"
+msgstr "Estimated cases"
 
 #: AlertaDengue/dados/templates/main.html:34
 msgid ""
