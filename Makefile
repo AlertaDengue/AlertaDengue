@@ -2,7 +2,7 @@
 # note: --env-file requires docker-compose>=1.25
 #       ref: https://github.com/docker/compose/pull/6535
 
-include .env_staging .env
+# include .env_staging .env
 export
 
 compose_cmd = docker-compose -p infodengue -f docker/docker-compose.yml --env-file .env
@@ -96,10 +96,12 @@ remove_untagged_images:
 
 # Uses for development
 develop:
+	envsubst < .env.tmpl > .env_staging
 	pip install --user -e .
 
 install:
-	pip install .
+	envsubst < .env.tmpl > .env
+	# && pip install .
 
 sync_mapfiles:
 	python AlertaDengue/manage.py sync_geofiles

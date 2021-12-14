@@ -30,10 +30,13 @@ jobs:
         wget https://dataverse.harvard.edu/api/access/datafile/4154429 -O docker/dev_dumps/latest_infodengue.sql.gz
         wget https://dataverse.harvard.edu/api/access/datafile/4154518 -O docker/dev_dumps/latest_dengue.sql.gz
 
-    - name: Copy env_file as env_staging
+    - name: Copy env template
       run: |
-        cp example_env_file .env_staging
-        cp example_env_file .env
+        cp .env.tmpl ./
+
+    - name: install dependencies
+      run: |
+        make install
 
     - name: Build and Deploy staging_DB
       id: staging_db
