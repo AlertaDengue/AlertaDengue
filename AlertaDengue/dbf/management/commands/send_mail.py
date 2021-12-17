@@ -1,14 +1,14 @@
 from django.core.management.base import BaseCommand
 from datetime import datetime
 
-from dbf import mailing_partner
+from dbf.tasks import send_mail_partner
 
 
 class Command(BaseCommand):
     help = '>>> Envia emails para as secretarias de saúde'
 
     def send_email(self):
-        mailing_partner.send_email_partner()
+        send_mail_partner()
 
     def handle(self, *args, **options):
         today = datetime.today()

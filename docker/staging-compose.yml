@@ -38,7 +38,7 @@ services:
       context: ".."
       dockerfile: "docker/Dockerfile-dev"
       args:
-        PYTHON_VERSION: ${PYTHON_VERSION:-3.8}
+        PYTHON_VERSION: ${PYTHON_VERSION:-3.9}
         HOST_UID: ${HOST_UID}
         HOST_GID: ${HOST_GID}
     env_file:
@@ -48,7 +48,6 @@ services:
     environment:
       - MEMCACHED_HOST=staging_memcache
       - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:25432/infodengue
       - PSQL_HOST=staging_db
       - PSQL_PORT=25432
     volumes:
@@ -60,7 +59,6 @@ services:
       - ${DOCKER_HOST_TIFFS_DIR}:/srv/deploy/tiffs
       - ${DOCKER_HOST_LOG_DIR}:/var/log/mapserver
       - ${DOCKER_HOST_INCIDENCE_MAPS}:/srv/deploy/AlertaDengue/static/img/incidence_maps
-      - staging_web:/srv/deploy/AlertaDengue/
     depends_on:
       - staging_rabbitmq
       - staging_memcache
@@ -73,14 +71,13 @@ services:
       context: ".."
       dockerfile: "docker/Dockerfile-celery"
       args:
-        PYTHON_VERSION: ${PYTHON_VERSION:-3.8}
+        PYTHON_VERSION: ${PYTHON_VERSION:-3.9}
         HOST_UID: ${HOST_UID}
         HOST_GID: ${HOST_GID}
     env_file:
       - ../.env_staging
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@staging_rabbitmq:5672
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@staging_db:25432/infodengue
       - PSQL_HOST=staging_db
       - PSQL_PORT=25432
     volumes:
@@ -109,9 +106,6 @@ services:
       - ${DOCKER_HOST_TIFFS_DIR}:/tiffs:ro
       - ${DOCKER_HOST_LOG_DIR}:/maplog:ro
     restart: always
-
-volumes:
-  staging_web:
 
 networks:
   staging:

@@ -39,3 +39,5 @@ dependencies:
   - simpledbf
   - django-maintenance-mode
   - django-pymemcache
+  # develop
+  - django-extensions

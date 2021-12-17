@@ -9,8 +9,9 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from os.path import dirname, join
+
 from dotenv import load_dotenv
-from os.path import join, dirname
 
 env_file = os.environ.get('ENV_FILE', '.env')
 
@@ -266,40 +267,39 @@ MEDIA_ROOT = os.getenv('MEDIA_ROOT')
 
 IMPORTED_FILES_DIR = os.getenv('IMPORTED_FILES_DIR')
 
+# Console backend writes to stdout.
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
-
-EMAIL_FROM_ADDRESS = os.getenv('EMAIL_FROM_ADDRESS')
-
-INFODENGUE_TEAM_EMAIL = os.getenv('INFODENGUE_TEAM_EMAIL')
-
-# ADMIN
-if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
+if EMAIL_BACKEND != 'django.core.mail.backends.smtp.EmailBackend':
     EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = (
         os.getenv('EMAIL_CONFIG')
     ).split(',')
     EMAIL_PORT = int(EMAIL_PORT)
     EMAIL_USE_TLS = True
 
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_FROM_INFODENGUE = os.getenv('EMAIL_FROM_INFODENGUE')
+EMAIL_TO_ADDRESS = os.getenv('EMAIL_TO_ADDRESS')
+
 # SEND_MAIL DBF
 EMAIL_CONNECTIONS = {
-    'mailpartners': {
+    'outlook': {
         'host': os.getenv("EMAIL_HOST"),
-        'username': os.getenv("EMAIL_USER"),
-        'password': os.getenv("EMAIL_PASSWORD"),
+        'username': os.getenv("EMAIL_HOST_USER"),
+        'password': os.getenv("EMAIL_HOST_PASSWORD"),
         'port': os.getenv("EMAIL_PORT"),
         'use_tls': True,
     },
-    'socketlabs': {
-        'host': os.getenv("EMAIL_DEV_HOST"),
-        'username': os.getenv("EMAIL_DEV_USER"),
-        'password': os.getenv("EMAIL_DEV_PASSWORD"),
-        'port': os.getenv("EMAIL_DEV_PORT"),
+    'gmail': {
+        'host': os.getenv("EMAIL_HOST"),
+        'username': os.getenv("EMAIL_HOST_USER"),
+        'password': os.getenv("EMAIL_HOST_PASSWORD"),
+        'port': os.getenv("EMAIL_PORT"),
         'use_tls': False,
     },
     'ses': {'backend': 'django_ses.SESBackend'},
 }
-EMAIL_CONNECTION_DEFAULT = 'mailpartners'
-#
+
+EMAIL_CONNECTION_DEFAULT = os.getenv("EMAIL_CONNECTION_DEFAULT")
 
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')  # Verificar ERROR CELERY
 CELERY_TASK_ALWAYS_EAGER = os.getenv('CELERY_TASK_ALWAYS_EAGER')

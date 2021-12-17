@@ -16,7 +16,6 @@ COPY environment-${PYTHON_VERSION}.yml /tmp/environment.yml
 
 # Use environment to update the env base
 RUN conda update -n base -c defaults conda \
-  && conda install mamba -n base -c conda-forge \
   && mamba update --all --yes --quiet \
   && mamba env update --file /tmp/environment.yml --name base \
   && mamba clean -afy
@@ -27,10 +26,14 @@ ARG HOST_UID
 ARG HOST_GID
 RUN /prepare_permission.sh
 
+RUN usermod -aG sudo deploy
+# New added for disable sudo password
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
 ## Copy code to the container with permissions to user
 COPY --chown=deploy:deploy AlertaDengue  /srv/deploy/AlertaDengue
 COPY --chown=deploy:deploy requirements.txt /srv/deploy/
-COPY --chown=deploy:deploy example_env_file /srv/deploy/.env
+COPY --chown=deploy:deploy .env.tmpl /srv/deploy/
 
 RUN mkdir /srv/deploy/logs \
   && chown -R deploy:deploy /srv/deploy/logs

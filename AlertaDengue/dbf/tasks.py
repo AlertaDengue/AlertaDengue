@@ -1,17 +1,47 @@
-from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.core.mail import send_mass_mail
-from django.template.loader import render_to_string
+import logging
+import os
+import shutil
+from datetime import datetime
+from email.mime.image import MIMEImage
+
 from celery import shared_task
+from django.core import mail
+from django.core.exceptions import ValidationError
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+
+from ad_main import settings
+from dados.episem import episem
+from dbf.db import is_partner_active
 
 from .models import DBF
 from .sinan import Sinan
 
-import os
-import shutil
+
+class MissingConnectionException(Exception):
+    pass
+
+
+def get_connection(label=None, **kwargs):
+    if label is None:
+        label = getattr(settings, 'EMAIL_CONNECTION_DEFAULT', None)
+
+    try:
+        connections = getattr(settings, 'EMAIL_CONNECTIONS')
+        options = connections[label]
+    except KeyError:
+        raise MissingConnectionException(
+            'Settings for connection "%s" were not found' % label
+        )
+
+    options.update(kwargs)
+    return mail.get_connection(**options)
 
 
 def send_success_email(dbf):
+    connection = get_connection()
+    messages = []
+
     subject = (
         "[InfoDengue] DBF enviado em {:%d/%m/%Y} "
         "importado com successo".format(dbf.uploaded_at)
@@ -20,19 +50,19 @@ def send_success_email(dbf):
         "successful_import_email.txt", context={"dbf": dbf}
     )
 
-    message_data = (
-        (subject, body, settings.EMAIL_FROM_ADDRESS, [dbf.uploaded_by.email]),
-        (
-            subject,
-            body,
-            settings.EMAIL_FROM_ADDRESS,
-            [settings.INFODENGUE_TEAM_EMAIL],
-        ),
+    message = EmailMultiAlternatives(
+        subject, body, settings.EMAIL_HOST_USER, [settings.EMAIL_TO_ADDRESS]
     )
-    send_mass_mail(message_data)
+
+    messages.append(message)
+
+    return connection.send_messages(messages)
 
 
 def send_failure_email(dbf, message):
+    connection = get_connection()
+    messages = []
+
     subject = (
         "[InfoDengue] Falha ao importar DBF enviado em "
         "{:%d/%m/%Y}".format(dbf.uploaded_at)
@@ -42,16 +72,13 @@ def send_failure_email(dbf, message):
         context={"dbf": dbf, "error_message": message},
     )
 
-    message_data = (
-        (subject, body, settings.EMAIL_FROM_ADDRESS, [dbf.uploaded_by.email]),
-        (
-            subject,
-            body,
-            settings.EMAIL_FROM_ADDRESS,
-            [settings.INFODENGUE_TEAM_EMAIL],
-        ),
+    message = EmailMultiAlternatives(
+        subject, body, settings.EMAIL_HOST_USER, [settings.EMAIL_TO_ADDRESS]
     )
-    send_mass_mail(message_data)
+
+    messages.append(message)
+
+    return connection.send_messages(messages)
 
 
 def copy_file_to_final_destination(dbf):
@@ -78,3 +105,46 @@ def import_dbf_to_database(dbf_id):
         copy_file_to_final_destination(dbf)
     except ValidationError as exc:
         send_failure_email(dbf, exc.message)
+
+
+def send_mail_partner(
+    fail_silently=False, connection=None,
+):
+    """
+    Given a datatuple of (subject, message, from_email, recipient_list), send
+    each message to each recipient list. Return the number of emails sent.
+    """
+    mailing = is_partner_active()
+    connection = get_connection()
+
+    messages = []
+
+    dt_now = datetime.now().strftime('%Y-%m-%d')
+    year_week = episem(dt_now, sep='')
+    week = year_week[-2:]
+    last_week = int(week) - 1
+
+    for idx, row in mailing.iterrows():
+        subject = f'Informe de dados Infodengue SE{last_week}'
+        body = render_to_string(
+            "email_secretarias.txt",
+            context={"name": row['contact'], "context_message": last_week},
+        )
+        message = EmailMultiAlternatives(
+            subject, body, settings.EMAIL_HOST_USER, [row['email']]
+        )
+        logging.info(f"Enviando email para: {row['email']},")
+        # message.attach_alternative(html, 'text/html')
+        fp = open(
+            os.path.join(
+                settings.STATICFILES_DIRS[0], 'img/logo_signature.png'
+            ),
+            'rb',
+        )
+        msg_img = MIMEImage(fp.read())
+        fp.close()
+        # msg_img.add_header('Content-ID', '<{}>'.format("logo_signature.png"))
+        message.attach(msg_img)
+        messages.append(message)
+
+    return connection.send_messages(messages)

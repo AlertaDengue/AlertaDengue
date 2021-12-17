@@ -30,9 +30,8 @@ jobs:
         wget https://dataverse.harvard.edu/api/access/datafile/4154429 -O docker/dev_dumps/latest_infodengue.sql.gz
         wget https://dataverse.harvard.edu/api/access/datafile/4154518 -O docker/dev_dumps/latest_dengue.sql.gz
 
-    - name: Copy env template
-      run: |
-        cp .env.tmpl ./
+    - name: Create env
+      run: envsubst < .env.tmpl > .env_staging
 
     - name: install dependencies
       run: |
@@ -53,13 +52,13 @@ jobs:
       run: |
         make start_staging SERVICES_STAGING=staging_web
 
-    - name: Migrate staging database
-      run: |
-        make migrate_staging
+    # - name: Migrate staging database
+      # run: |
+        # make migrate_staging
 
-    - name: Generate MapFiles
-      run: |
-        make generate_maps_staging
+    # - name: Generate MapFiles
+      # run: |
+        # make generate_maps_staging
 
     - name: Run Flake8
       run: |
