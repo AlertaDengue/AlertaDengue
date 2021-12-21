@@ -18,29 +18,7 @@ from .models import DBF
 from .sinan import Sinan
 
 
-class MissingConnectionException(Exception):
-    pass
-
-
-def get_connection(label=None, **kwargs):
-    if label is None:
-        label = getattr(settings, 'EMAIL_CONNECTION_DEFAULT', None)
-
-    try:
-        connections = getattr(settings, 'EMAIL_CONNECTIONS')
-        options = connections[label]
-    except KeyError:
-        raise MissingConnectionException(
-            'Settings for connection "%s" were not found' % label
-        )
-
-    options.update(kwargs)
-    return mail.get_connection(**options)
-
-
 def send_success_email(dbf):
-    connection = get_connection()
-    messages = []
 
     subject = (
         "[InfoDengue] DBF enviado em {:%d/%m/%Y} "
@@ -49,19 +27,12 @@ def send_success_email(dbf):
     body = render_to_string(
         "successful_import_email.txt", context={"dbf": dbf}
     )
-
-    message = EmailMultiAlternatives(
-        subject, body, settings.EMAIL_HOST_USER, [settings.EMAIL_TO_ADDRESS]
-    )
-
-    messages.append(message)
-
-    return connection.send_messages(messages)
+    from_email, to = settings.EMAIL_FROM_USER, settings.EMAIL_TO_ADDRESS
+    msg = EmailMultiAlternatives(subject, body, from_email, [to])
+    msg.send()
 
 
 def send_failure_email(dbf, message):
-    connection = get_connection()
-    messages = []
 
     subject = (
         "[InfoDengue] Falha ao importar DBF enviado em "
@@ -71,14 +42,9 @@ def send_failure_email(dbf, message):
         "failed_import_email.txt",
         context={"dbf": dbf, "error_message": message},
     )
-
-    message = EmailMultiAlternatives(
-        subject, body, settings.EMAIL_HOST_USER, [settings.EMAIL_TO_ADDRESS]
-    )
-
-    messages.append(message)
-
-    return connection.send_messages(messages)
+    from_email, to = settings.EMAIL_FROM_USER, settings.EMAIL_TO_ADDRESS
+    msg = EmailMultiAlternatives(subject, body, from_email, [to])
+    msg.send()
 
 
 def copy_file_to_final_destination(dbf):
@@ -107,16 +73,32 @@ def import_dbf_to_database(dbf_id):
         send_failure_email(dbf, exc.message)
 
 
+# Used to send emails from partners
+class MissingConnectionException(Exception):
+    pass
+
+
+def get_connection(label=None, **kwargs):
+    if label is None:
+        label = getattr(settings, 'EMAIL_CONNECTION_DEFAULT', None)
+
+    try:
+        connections = getattr(settings, 'EMAIL_CONNECTIONS')
+        options = connections[label]
+    except KeyError:
+        raise MissingConnectionException(
+            'Settings for connection "%s" were not found' % label
+        )
+
+    options.update(kwargs)
+    return mail.get_connection(**options)
+
+
 def send_mail_partner(
     fail_silently=False, connection=None,
 ):
-    """
-    Given a datatuple of (subject, message, from_email, recipient_list), send
-    each message to each recipient list. Return the number of emails sent.
-    """
     mailing = is_partner_active()
     connection = get_connection()
-
     messages = []
 
     dt_now = datetime.now().strftime('%Y-%m-%d')
@@ -131,20 +113,18 @@ def send_mail_partner(
             context={"name": row['contact'], "context_message": last_week},
         )
         message = EmailMultiAlternatives(
-            subject, body, settings.EMAIL_HOST_USER, [row['email']]
+            subject, body, settings.EMAIL_OUTLOOK_USER, [row['email']]
         )
         logging.info(f"Enviando email para: {row['email']},")
-        # message.attach_alternative(html, 'text/html')
         fp = open(
             os.path.join(
                 settings.STATICFILES_DIRS[0], 'img/logo_signature.png'
             ),
             'rb',
         )
-        msg_img = MIMEImage(fp.read())
+        img_signature = MIMEImage(fp.read())
         fp.close()
-        # msg_img.add_header('Content-ID', '<{}>'.format("logo_signature.png"))
-        message.attach(msg_img)
+        message.attach(img_signature)
         messages.append(message)
 
-    return connection.send_messages(messages)
+    connection.send_messages(messages)

@@ -269,37 +269,39 @@ IMPORTED_FILES_DIR = os.getenv('IMPORTED_FILES_DIR')
 
 # Console backend writes to stdout.
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
-if EMAIL_BACKEND != 'django.core.mail.backends.smtp.EmailBackend':
+if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
     EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = (
         os.getenv('EMAIL_CONFIG')
     ).split(',')
     EMAIL_PORT = int(EMAIL_PORT)
     EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-EMAIL_FROM_INFODENGUE = os.getenv('EMAIL_FROM_INFODENGUE')
-EMAIL_TO_ADDRESS = os.getenv('EMAIL_TO_ADDRESS')
-
 # SEND_MAIL DBF
 EMAIL_CONNECTIONS = {
-    'outlook': {
-        'host': os.getenv("EMAIL_HOST"),
-        'username': os.getenv("EMAIL_HOST_USER"),
-        'password': os.getenv("EMAIL_HOST_PASSWORD"),
-        'port': os.getenv("EMAIL_PORT"),
-        'use_tls': True,
-    },
     'gmail': {
-        'host': os.getenv("EMAIL_HOST"),
+        'host': 'smtp.gmail.com',
         'username': os.getenv("EMAIL_HOST_USER"),
         'password': os.getenv("EMAIL_HOST_PASSWORD"),
         'port': os.getenv("EMAIL_PORT"),
         'use_tls': False,
     },
+    'outlook': {
+        'host': 'imap-mail.outlook.com',
+        'username': os.getenv("EMAIL_OUTLOOK_USER"),
+        'password': os.getenv("EMAIL_OUTLOOK_PASSWORD"),
+        'port': os.getenv("EMAIL_PORT"),
+        'use_tls': True,
+    },
     'ses': {'backend': 'django_ses.SESBackend'},
 }
 
 EMAIL_CONNECTION_DEFAULT = os.getenv("EMAIL_CONNECTION_DEFAULT")
+
+# Uses the same credentials from email backend
+EMAIL_FROM_USER = os.getenv('EMAIL_FROM_USER')
+
+EMAIL_TO_ADDRESS = os.getenv('EMAIL_TO_ADDRESS')
+EMAIL_OUTLOOK_USER = os.getenv('EMAIL_OUTLOOK_USER')
 
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')  # Verificar ERROR CELERY
 CELERY_TASK_ALWAYS_EAGER = os.getenv('CELERY_TASK_ALWAYS_EAGER')
