@@ -10,6 +10,18 @@ on:
     branches: [ main ]
 
 env:
+  ALLOWED_HOSTS: 'localhost'
+  ADMINS: Dev:dev@example.com
+  SECRET_KEY: my-secret-key
+  DEBUG: False
+  PSQL_DB: ${{ secrets.PSQL_DB }}
+  PSQL_USER: ${{ secrets.PSQL_USER }}
+  PSQL_PASSWORD: ${{ secrets.PSQL_PASSWORD }}
+  PSQL_HOST: staging_db
+  PSQL_PORT: ${{ secrets.PSQL_PORT }}
+  QUERY_CACHE_TIMEOUT: 86400
+  MEMCACHED_HOST: ${{ secrets.MEMCACHED_HOST }}
+  MEMCACHED_PORT: ${{ secrets.MEMCACHED_PORT }}
   DOCKER_HOST_MEDIA_ROOT: /MEDIA_ROOT
   ${DOCKER_HOST_MEDIA_ROOT}/dbfs_parquet: /MEDIA_ROOT/dbfs_parquet
   DOCKER_HOST_IMPORTED_FILES_DIR: /IMPORTED_FILES
@@ -18,7 +30,12 @@ env:
   DOCKER_HOST_TIFFS_DIR: /srv/deploy/tiffs
   DOCKER_HOST_LOG_DIR: /var/log/mapserver
   DOCKER_HOST_INCIDENCE_MAPS: /srv/deploy/AlertaDengue/static/img/incidence_maps
-
+  EMAIL_CONFIG: ${{ secrets.EMAIL_CONFIG }}
+  EMAIL_PORT: 587
+  EMAIL_CONNECTION_DEFAULT: 'outlook'
+  EMAIL_HOST: 'smtp.gmail.com'
+  EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+  EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
 jobs:
   build:
 

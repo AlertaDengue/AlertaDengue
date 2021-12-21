@@ -266,14 +266,13 @@ MAINTENANCE_MODE_TEMPLATE = '%s/dados/templates/503.html' % BASE_DIR
 MEDIA_ROOT = os.getenv('MEDIA_ROOT')
 
 IMPORTED_FILES_DIR = os.getenv('IMPORTED_FILES_DIR')
-
 # Console backend writes to stdout.
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
 if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
-    EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = (
-        os.getenv('EMAIL_CONFIG')
-    ).split(',')
-    EMAIL_PORT = int(EMAIL_PORT)
+    EMAIL_HOST = os.getenv('EMAIL_HOST')
+    EMAIL_PORT = os.getenv('EMAIL_PORT')
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
     EMAIL_USE_TLS = True
 
 # SEND_MAIL DBF
