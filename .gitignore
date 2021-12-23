@@ -26,7 +26,7 @@ notebooks_tmp/
 geodjango.db
 chunked_uploads
 authorized_keys
-export_all_variables.sh
+.env_export.sh
 
 AlertaDengue/static/*
 AlertaDengue/static_files/*
