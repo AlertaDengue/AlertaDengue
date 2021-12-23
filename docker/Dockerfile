@@ -24,7 +24,6 @@ RUN conda update -n base -c defaults conda \
 ARG HOST_UID
 ARG HOST_GID
 COPY docker/prepare_permission.sh /prepare_permission.sh
-
 RUN /prepare_permission.sh \
 # New added for disable sudo password
 && usermod -aG sudo deploy \

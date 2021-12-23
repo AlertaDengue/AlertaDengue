@@ -26,6 +26,10 @@ ARG HOST_UID
 ARG HOST_GID
 COPY docker/prepare_permission.sh /prepare_permission.sh
 RUN /prepare_permission.sh
+RUN usermod -aG sudo deploy
+# New added for disable sudo password
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
 ## Copy code to the container with permissions to user
 COPY --chown=deploy:deploy docker/test.sh  /srv/deploy/docker/test.sh
 COPY --chown=deploy:deploy AlertaDengue  /srv/deploy/AlertaDengue
