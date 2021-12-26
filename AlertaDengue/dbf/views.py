@@ -1,15 +1,14 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from chunked_upload.views import ChunkedUploadCompleteView, ChunkedUploadView
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.base import File
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
-from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
-
-from .models import DBF, DBFChunkedUpload
 from .forms import DBFForm
+from .models import DBF, DBFChunkedUpload
 from .tasks import import_dbf_to_database
 
 
@@ -51,15 +50,13 @@ class Upload(LoginRequiredMixin, FormView):
         )
         import_dbf_to_database.delay(dbf.id)
         success_message = _(
-            "O arquivo {} exportado em {:%d/%m/%Y} com notificações do ano {} "
-            "foi enviado com sucesso. Você será informado "
-            "por email ({}) assim que o processo de "
-            "importação for finalizado, ".format(
-                dbf.file.name,
-                dbf.export_date,
-                dbf.notification_year,
-                self.request.user.email,
-            )
+            f'''
+            O arquivo {dbf.file.name} exportado em {dbf.export_date:%d/%m/%Y}
+            com notificações do ano {dbf.notification_year}
+            foi enviado com sucesso. Você será informado por email
+            ({self.request.user.email}) assim que o processo de
+            importação for finalizado,
+            '''
         )
         messages.success(self.request, success_message)
         return super(Upload, self).form_valid(form)

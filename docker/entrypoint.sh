@@ -1,6 +1,8 @@
 #!/bin/bash
-echo "Executing the entrypoint!"
-echo "Force crond start"
-service cron restart
-echo "executing $@"
-$@
+
+echo "Create environment variables..."
+envsubst < /srv/deploy/.env.tmpl > /srv/deploy/.env
+echo "Start crontab..."
+sudo service cron start
+echo "Start django..."
+bash /srv/deploy/AlertaDengue/runwsgi.sh

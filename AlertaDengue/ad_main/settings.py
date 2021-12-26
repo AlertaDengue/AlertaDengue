@@ -9,8 +9,9 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from os.path import dirname, join
+
 from dotenv import load_dotenv
-from os.path import join, dirname
 
 env_file = os.environ.get('ENV_FILE', '.env')
 
@@ -28,6 +29,8 @@ def read_admins(value):
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 PARENT_BASE_DIR = os.path.dirname(BASE_DIR)
+CURRENT_DIR = os.path.join(dirname(dirname(__file__)))
+DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, 'data'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -41,7 +44,7 @@ DEBUG = os.getenv('DEBUG', '').lower() == 'true'
 # if True the maintenance-mode will be activated
 MAINTENANCE_MODE = None
 
-# You must set settings.ALLOWED_HOSTS if DEBUG is False.
+# You must set settings.ALLOWED_HOSTS if DEBUG is False
 ADMINS = tuple(v.split(':') for v in os.getenv('ADMINS').split(','))
 
 # ALLOWED_HOSTS=os.getenv["alerta.dengue.mat.br",
@@ -50,9 +53,7 @@ ALLOWED_HOSTS = (
     os.getenv('ALLOWED_HOSTS').split(',') if os.getenv('ALLOWED_HOSTS') else []
 )
 
-
 # Application definition
-
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
@@ -77,7 +78,6 @@ INSTALLED_APPS = (
 if DEBUG:
     INSTALLED_APPS += ('django_extensions',)
 
-
 MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -101,9 +101,7 @@ if DEBUG:
 
 # django 2
 MIDDLEWARE = MIDDLEWARE_CLASSES
-
 ROOT_URLCONF = 'ad_main.urls'
-
 WSGI_APPLICATION = 'ad_main.wsgi.application'
 
 TEMPLATES = [
@@ -128,8 +126,6 @@ TEMPLATES = [
 ]
 
 # Database
-# https://docs.djangoproject.com/en/1.6/ref/settings/#databases
-
 PSQL_DB = os.getenv('PSQL_DB')
 PSQL_DBF = os.getenv('PSQL_DBF')
 PSQL_USER = os.getenv('PSQL_USER')
@@ -144,7 +140,6 @@ DATABASE_APPS_MAPPING = {
     'dbf': 'infodengue',
     'forecast': 'forecast',
 }
-
 DATABASES = {
     'dados': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -180,6 +175,78 @@ DATABASES = {
     },
 }
 
+MIGRATION_MODULES = {'dados': None, 'gis': None, 'api': None}
+
+# Console backend writes to stdout.
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
+if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
+    EMAIL_HOST = os.getenv('EMAIL_HOST')
+    EMAIL_PORT = os.getenv('EMAIL_PORT')
+    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+    EMAIL_USE_TLS = True
+
+# SEND_MAIL DBF
+EMAIL_CONNECTIONS = {
+    'gmail': {
+        'host': 'smtp.gmail.com',
+        'username': os.getenv("EMAIL_HOST_USER"),
+        'password': os.getenv("EMAIL_HOST_PASSWORD"),
+        'port': os.getenv("EMAIL_PORT"),
+        'use_tls': False,
+    },
+    'outlook': {
+        'host': 'imap-mail.outlook.com',
+        'username': os.getenv("EMAIL_OUTLOOK_USER"),
+        'password': os.getenv("EMAIL_OUTLOOK_PASSWORD"),
+        'port': os.getenv("EMAIL_PORT"),
+        'use_tls': True,
+    },
+    'ses': {'backend': 'django_ses.SESBackend'},
+}
+EMAIL_CONNECTION_DEFAULT = os.getenv("EMAIL_CONNECTION_DEFAULT")
+
+# Uses the same credentials from email backend
+EMAIL_FROM_USER = os.getenv('EMAIL_FROM_USER')
+EMAIL_TO_ADDRESS = os.getenv('EMAIL_TO_ADDRESS')
+EMAIL_OUTLOOK_USER = os.getenv('EMAIL_OUTLOOK_USER')
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+# up one level from settings.py
+STATIC_ROOT = os.path.join(CURRENT_DIR, 'static_files')
+# static is on root level
+STATICFILES_DIRS = (os.path.abspath(os.path.join(CURRENT_DIR, 'static')),)
+
+# used to upload dbf
+MEDIA_ROOT = os.getenv('MEDIA_ROOT')
+IMPORTED_FILES_DIR = os.getenv('IMPORTED_FILES_DIR')
+DOCKER_HOST_PQDIR = os.getenv('DOCKER_HOST_PQDIR')
+
+MAPSERVER_URL = os.getenv('MAPSERVER_URL')
+MAPSERVER_LOG_PATH = os.getenv('MAPSERVER_LOG_PATH')
+
+SHAPEFILE_PATH = os.getenv('SHAPEFILE_PATH')
+MAPFILE_PATH = os.getenv('MAPFILE_PATH')
+
+RASTER_PATH = os.getenv(
+    'RASTER_PATH'
+)  # , default=os.path.join(PARENT_BASE_DIR, 'tiffs'
+
+RASTER_METEROLOGICAL_DATA_RANGE = {
+    'ndvi': (-2000.0, +10000.0),
+    'lst_day_1km': (0.0, 20000.0),
+    'lst_night_1km': (-30.0, 30.0),
+    'relative_humidity_2m_above_ground': (0.0, 100.0),
+    'specific_humidity_2m_above_ground': (0.0, 1.0),
+    'precipitation': (0, 200.0),
+}
+RASTER_METEROLOGICAL_FACTOR_INCREASE = os.getenv(
+    'RASTER_METEROLOGICAL_FACTOR_INCREASE'
+)  # VERIFICAR , default=4
+
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')  # Verificar ERROR CELERY
+CELERY_TASK_ALWAYS_EAGER = os.getenv('CELERY_TASK_ALWAYS_EAGER')
 
 MEMCACHED_HOST = os.getenv('MEMCACHED_HOST')
 MEMCACHED_PORT = os.getenv('MEMCACHED_PORT')
@@ -197,6 +264,32 @@ CACHES = {
         },
     }
 }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler'},
+        'null': {'class': 'logging.NullHandler'},
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+    },
+    'loggers': {
+        'django.security.DisallowedHost': {
+            'handlers': ['null'],
+            'propagate': False,
+        }
+    },
+}
+
+BOOTSTRAP4 = {
+    'form_renderers': {
+        'default': 'dbf.forms.FormRendererWithHiddenFieldErrors'
+    }
+}
+
 
 LEAFLET_CONFIG = {
     # 'SPATIAL_EXTENT': (),
@@ -226,135 +319,6 @@ LEAFLET_CONFIG = {
     'RESET_VIEW': False,
 }
 
-MIGRATION_MODULES = {'dados': None, 'gis': None, 'api': None}
-
-# Internationalization
-# https://docs.djangoproject.com/en/1.6/topics/i18n/
-
-LANGUAGE_CODE = 'pt-br'
-LANGUAGES = (('pt-br', 'Português'), ('en-us', 'english'), ('es', 'Spanish'))
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
-
-LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
-
-APPEND_SLASH = True
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.6/howto/static-files/
-CURRENT_DIR = os.path.join(dirname(dirname(__file__)))
-
-
-# up one level from settings.py
-STATIC_ROOT = os.path.join(CURRENT_DIR, 'static_files')
-# static is on root level
-STATICFILES_DIRS = (os.path.abspath(os.path.join(CURRENT_DIR, 'static')),)
-
-DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, 'data'))
-
-STATIC_URL = '/static/'
-
-MAINTENANCE_MODE_TEMPLATE = '%s/dados/templates/503.html' % BASE_DIR
-
-MEDIA_ROOT = os.getenv('MEDIA_ROOT')
-
-IMPORTED_FILES_DIR = os.getenv('IMPORTED_FILES_DIR')
-
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
-
-EMAIL_FROM_ADDRESS = os.getenv('EMAIL_FROM_ADDRESS')
-
-INFODENGUE_TEAM_EMAIL = os.getenv('INFODENGUE_TEAM_EMAIL')
-
-# ADMIN
-if EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend':
-    EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = (
-        os.getenv('EMAIL_CONFIG')
-    ).split(',')
-    EMAIL_PORT = int(EMAIL_PORT)
-    EMAIL_USE_TLS = True
-
-# SEND_MAIL DBF
-EMAIL_CONNECTIONS = {
-    'mailpartners': {
-        'host': os.getenv("EMAIL_HOST"),
-        'username': os.getenv("EMAIL_USER"),
-        'password': os.getenv("EMAIL_PASSWORD"),
-        'port': os.getenv("EMAIL_PORT"),
-        'use_tls': True,
-    },
-    'socketlabs': {
-        'host': os.getenv("EMAIL_DEV_HOST"),
-        'username': os.getenv("EMAIL_DEV_USER"),
-        'password': os.getenv("EMAIL_DEV_PASSWORD"),
-        'port': os.getenv("EMAIL_DEV_PORT"),
-        'use_tls': False,
-    },
-    'ses': {'backend': 'django_ses.SESBackend'},
-}
-EMAIL_CONNECTION_DEFAULT = 'mailpartners'
-#
-
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')  # Verificar ERROR CELERY
-CELERY_TASK_ALWAYS_EAGER = os.getenv('CELERY_TASK_ALWAYS_EAGER')
-
-MAPSERVER_URL = os.getenv('MAPSERVER_URL')
-
-MAPSERVER_LOG_PATH = os.getenv('MAPSERVER_LOG_PATH')
-
-
-SHAPEFILE_PATH = os.getenv('SHAPEFILE_PATH')
-MAPFILE_PATH = os.getenv('MAPFILE_PATH')
-
-RASTER_PATH = os.getenv(
-    'RASTER_PATH'
-)  # , default=os.path.join(PARENT_BASE_DIR, 'tiffs'
-
-
-RASTER_METEROLOGICAL_DATA_RANGE = {
-    'ndvi': (-2000.0, +10000.0),
-    'lst_day_1km': (0.0, 20000.0),
-    'lst_night_1km': (-30.0, 30.0),
-    'relative_humidity_2m_above_ground': (0.0, 100.0),
-    'specific_humidity_2m_above_ground': (0.0, 1.0),
-    'precipitation': (0, 200.0),
-}
-
-RASTER_METEROLOGICAL_FACTOR_INCREASE = os.getenv(
-    'RASTER_METEROLOGICAL_FACTOR_INCREASE'
-)  # VERIFICAR , default=4
-
-BOOTSTRAP4 = {
-    'form_renderers': {
-        'default': 'dbf.forms.FormRendererWithHiddenFieldErrors'
-    }
-}
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {'class': 'logging.StreamHandler'},
-        'null': {'class': 'logging.NullHandler'},
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-    },
-    'loggers': {
-        'django.security.DisallowedHost': {
-            'handlers': ['null'],
-            'propagate': False,
-        }
-    },
-}
-
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # ACTIVE_STATES = os.getenv('ACTIVE_STATES')
@@ -362,5 +326,21 @@ ACTIVE_STATES = (
     os.getenv('ACTIVE_STATES').split(',') if os.getenv('ACTIVE_STATES') else []
 )
 
-DOCKER_HOST_PQDIR = os.getenv('DOCKER_HOST_PQDIR')
+MAINTENANCE_MODE_TEMPLATE = '%s/dados/templates/503.html' % BASE_DIR
+
+# HTTP security header
 X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# HTTP redirect is issued to the same URL
+APPEND_SLASH = True
+
+# for translation files
+LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
+
+# Internationalization
+LANGUAGE_CODE = 'pt-br'
+LANGUAGES = (('pt-br', 'Português'), ('en-us', 'english'), ('es', 'Spanish'))
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True

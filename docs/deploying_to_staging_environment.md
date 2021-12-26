@@ -6,8 +6,8 @@ You will need a fresh dump of the development environment on
 to set the following environment variables in your local `.env` file
 (along with all the other ones that were already set):
 
-* `POSTGRES_PASSWORD`
-* `POSTGRES_USER`
+* `PSQL_PASSWORD`
+* `PSQL_USER`
 * `PSQL_HOST=staging_db` - you need this value for `PSQL_HOST` as it will be the hostname for the database container
 * `STAGING_DATA_DIR` - this is where the db container will keep the postgres data directory
 

@@ -3,7 +3,7 @@ FROM condaforge/mambaforge
 RUN apt-get -qq update --yes \
   && apt-get -qq install --yes --no-install-recommends \
   build-essential git make postgresql-client \
-  ca-certificates wget locales cron \
+  ca-certificates wget locales cron sudo \
   && rm -rf /var/lib/apt/lists/*
 
 #Set locale
@@ -16,7 +16,6 @@ COPY environment-${PYTHON_VERSION}.yml /tmp/environment.yml
 
 # Use environment to update the env base
 RUN conda update -n base -c defaults conda \
-  && conda install mamba -n base -c conda-forge \
   && mamba update --all --yes --quiet \
   && mamba env update --file /tmp/environment.yml --name base \
   && mamba clean -afy
@@ -25,20 +24,23 @@ RUN conda update -n base -c defaults conda \
 ARG HOST_UID
 ARG HOST_GID
 COPY docker/prepare_permission.sh /prepare_permission.sh
-RUN /prepare_permission.sh
+RUN /prepare_permission.sh \
+# New added for disable sudo password
+&& usermod -aG sudo deploy \
+&& echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 ## Copy code to the container with permissions to user
 COPY --chown=deploy:deploy AlertaDengue  /srv/deploy/AlertaDengue
-COPY --chown=deploy:deploy requirements.txt example_env_file /srv/deploy/
+COPY --chown=deploy:deploy requirements.txt /srv/deploy/
+COPY --chown=deploy:deploy .env.tmpl /srv/deploy/
 
 RUN mkdir /srv/deploy/logs \
   && chown -R deploy:deploy /srv/deploy/logs
 
-RUN cp -p /srv/deploy/example_env_file /srv/deploy/.env
-
 # Create script activate environment
-RUN echo 'source /opt/conda/bin/activate base && exec "$@"' > activate.sh
-RUN chmod +x /activate.sh
+RUN echo 'source /opt/conda/bin/activate base && exec "$@"' > activate.sh \
+&& chmod +x /activate.sh
+
 WORKDIR /srv/deploy/AlertaDengue
 
 # Configure cron for DBF request
@@ -54,4 +56,4 @@ ADD docker/entrypoint.sh /entrypoint.sh
 USER deploy
 
 ENTRYPOINT ["bash", "/activate.sh"]
-CMD ["/entrypoint.sh", "/srv/deploy/AlertaDengue/runwsgi.sh"]
+CMD ["/entrypoint.sh"]

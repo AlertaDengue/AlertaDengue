@@ -1,17 +1,25 @@
-from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.core.mail import send_mass_mail
-from django.template.loader import render_to_string
+import logging
+import os
+import shutil
+from datetime import datetime
+from email.mime.image import MIMEImage
+
 from celery import shared_task
+from django.core import mail
+from django.core.exceptions import ValidationError
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+
+from ad_main import settings
+from dados.episem import episem
+from dbf.db import is_partner_active
 
 from .models import DBF
 from .sinan import Sinan
 
-import os
-import shutil
-
 
 def send_success_email(dbf):
+
     subject = (
         "[InfoDengue] DBF enviado em {:%d/%m/%Y} "
         "importado com successo".format(dbf.uploaded_at)
@@ -19,20 +27,13 @@ def send_success_email(dbf):
     body = render_to_string(
         "successful_import_email.txt", context={"dbf": dbf}
     )
-
-    message_data = (
-        (subject, body, settings.EMAIL_FROM_ADDRESS, [dbf.uploaded_by.email]),
-        (
-            subject,
-            body,
-            settings.EMAIL_FROM_ADDRESS,
-            [settings.INFODENGUE_TEAM_EMAIL],
-        ),
-    )
-    send_mass_mail(message_data)
+    from_email, to = settings.EMAIL_FROM_USER, settings.EMAIL_TO_ADDRESS
+    msg = EmailMultiAlternatives(subject, body, from_email, [to])
+    msg.send()
 
 
 def send_failure_email(dbf, message):
+
     subject = (
         "[InfoDengue] Falha ao importar DBF enviado em "
         "{:%d/%m/%Y}".format(dbf.uploaded_at)
@@ -41,17 +42,9 @@ def send_failure_email(dbf, message):
         "failed_import_email.txt",
         context={"dbf": dbf, "error_message": message},
     )
-
-    message_data = (
-        (subject, body, settings.EMAIL_FROM_ADDRESS, [dbf.uploaded_by.email]),
-        (
-            subject,
-            body,
-            settings.EMAIL_FROM_ADDRESS,
-            [settings.INFODENGUE_TEAM_EMAIL],
-        ),
-    )
-    send_mass_mail(message_data)
+    from_email, to = settings.EMAIL_FROM_USER, settings.EMAIL_TO_ADDRESS
+    msg = EmailMultiAlternatives(subject, body, from_email, [to])
+    msg.send()
 
 
 def copy_file_to_final_destination(dbf):
@@ -78,3 +71,60 @@ def import_dbf_to_database(dbf_id):
         copy_file_to_final_destination(dbf)
     except ValidationError as exc:
         send_failure_email(dbf, exc.message)
+
+
+# Used to send emails from partners
+class MissingConnectionException(Exception):
+    pass
+
+
+def get_connection(label=None, **kwargs):
+    if label is None:
+        label = getattr(settings, 'EMAIL_CONNECTION_DEFAULT', None)
+
+    try:
+        connections = getattr(settings, 'EMAIL_CONNECTIONS')
+        options = connections[label]
+    except KeyError:
+        raise MissingConnectionException(
+            'Settings for connection "%s" were not found' % label
+        )
+
+    options.update(kwargs)
+    return mail.get_connection(**options)
+
+
+def send_mail_partner(
+    fail_silently=False, connection=None,
+):
+    mailing = is_partner_active()
+    connection = get_connection()
+    messages = []
+
+    dt_now = datetime.now().strftime('%Y-%m-%d')
+    year_week = episem(dt_now, sep='')
+    week = year_week[-2:]
+    last_week = int(week) - 1
+
+    for idx, row in mailing.iterrows():
+        subject = f'Informe de dados Infodengue SE{last_week}'
+        body = render_to_string(
+            "email_secretarias.txt",
+            context={"name": row['contact'], "context_message": last_week},
+        )
+        message = EmailMultiAlternatives(
+            subject, body, settings.EMAIL_OUTLOOK_USER, [row['email']]
+        )
+        logging.info(f"Enviando email para: {row['email']},")
+        fp = open(
+            os.path.join(
+                settings.STATICFILES_DIRS[0], 'img/logo_signature.png'
+            ),
+            'rb',
+        )
+        img_signature = MIMEImage(fp.read())
+        fp.close()
+        message.attach(img_signature)
+        messages.append(message)
+
+    connection.send_messages(messages)
