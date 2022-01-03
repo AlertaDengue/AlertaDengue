@@ -252,21 +252,33 @@ def get_scatter_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
     DataFrame
     """
 
-    res = cache.get('get_scatter_data')
-
-    t_hist = con_table(disease)
-
-    proj = t_hist['uf', 'SE', 'data_iniSE', 'casos_est', 'casos'].sort_by(
-        ('SE', True)
-    )
-    df_hist = proj[proj['uf'] == uf]
-
-    res = df_hist.execute()
-    cache.set(
-        'get_scatter_data', res, settings.QUERY_CACHE_TIMEOUT,
+    cache_name = (
+        "get_scatter_" + str(uf).replace(" ", "_") + "_" + str(disease)
     )
 
-    return res
+    print('cache_name: ', cache_name)
+    res = cache.get(cache_name)
+
+    if res:
+        print(f'cache_name {cache_name} found: ', res)
+        return res
+
+    else:
+
+        t_hist = con_table(disease)
+
+        proj = t_hist['uf', 'SE', 'data_iniSE', 'casos_est', 'casos'].sort_by(
+            ('SE', True)
+        )
+        df_hist = proj[proj['uf'] == uf]
+
+        res = df_hist.execute()
+
+        cache.set(
+            cache_name, res, settings.QUERY_CACHE_TIMEOUT,
+        )
+
+        return res
 
 
 def get_indicator_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
@@ -283,21 +295,32 @@ def get_indicator_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
     DataFrame
     """
 
-    res = cache.get('get_indicator_data')
-
-    t_receptivity = con_table(disease)
-
-    proj = t_receptivity[
-        'SE', 'uf', 'municipio_geocodigo', 'receptivo'
-    ].sort_by(('SE', True))
-    df_receptivity = proj[proj['uf'] == uf]
-
-    res = df_receptivity.execute()
-    cache.set(
-        'get_indicator_data', res, settings.QUERY_CACHE_TIMEOUT,
+    cache_name = (
+        "get_indicator_" + str(uf).replace(" ", "_") + "_" + str(disease)
     )
 
-    return res
+    print('cache_name: ', cache_name)
+    res = cache.get(cache_name)
+
+    if res:
+        print(f'cache_name {cache_name} found: ', res)
+        return res
+
+    else:
+
+        t_receptivity = con_table(disease)
+
+        proj = t_receptivity[
+            'SE', 'uf', 'municipio_geocodigo', 'receptivo'
+        ].sort_by(('SE', True))
+        df_receptivity = proj[proj['uf'] == uf]
+
+        res = df_receptivity.execute()
+        cache.set(
+            cache_name, res, settings.QUERY_CACHE_TIMEOUT,
+        )
+
+        return res
 
 
 def get_stack_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
@@ -314,21 +337,30 @@ def get_stack_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
     DataFrame
     """
 
-    res = cache.get('get_stack_data')
+    cache_name = "get_stack_" + str(uf).replace(" ", "_") + "_" + str(disease)
 
-    t_alert = con_table(disease)
+    print('cache_name: ', cache_name)
+    res = cache.get(cache_name)
 
-    proj = t_alert['SE', 'uf', 'nivel', 'municipio_geocodigo'].sort_by(
-        ('SE', True)
-    )
-    df_alert = proj[proj['uf'] == uf]
+    if res:
+        print(f'cache_name {cache_name} found: ', res)
+        return res
 
-    res = df_alert.execute()
-    cache.set(
-        'get_stack_data', res, settings.QUERY_CACHE_TIMEOUT,
-    )
+    else:
 
-    return res
+        t_alert = con_table(disease)
+
+        proj = t_alert['SE', 'uf', 'nivel', 'municipio_geocodigo'].sort_by(
+            ('SE', True)
+        )
+        df_alert = proj[proj['uf'] == uf]
+
+        res = df_alert.execute()
+        cache.set(
+            cache_name, res, settings.QUERY_CACHE_TIMEOUT,
+        )
+
+        return res
 
 
 def get_epi_week_expr() -> Callable:
