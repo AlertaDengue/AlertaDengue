@@ -1,10 +1,13 @@
 version: "3.4"
 services:
-  memcache:
+  memcached:
     image: memcached:latest
-    hostname: memcache
+    hostname: memcached
     ports:
       - 11211:11211
+    entrypoint:
+      - memcached
+      - -m 64
     restart: always
 
   rabbitmq:
@@ -25,7 +28,8 @@ services:
     ports:
       - 8000:8000
     environment:
-      - MEMCACHED_HOST=memcache
+      - MEMCACHED_HOST=memcached
+      - MEMCACHED_PORT=11211
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
     volumes:
       - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
@@ -38,7 +42,7 @@ services:
       - ${DOCKER_HOST_INCIDENCE_MAPS}:/srv/deploy/AlertaDengue/static/img/incidence_maps
     depends_on:
       - rabbitmq
-      - memcache
+      - memcached
     restart: always
 
   celery-worker:
@@ -59,7 +63,7 @@ services:
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
     depends_on:
       - rabbitmq
-      - memcache
+      - memcached
     restart: always
 
   mapserver:
