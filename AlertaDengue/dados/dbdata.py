@@ -145,14 +145,15 @@ class RegionalParameters:
                 + "_"
                 + str(state_name).replace(" ", "_")
             )
+            # print('cache_name: ', cache_name)
             res = cache.get(cache_name)
 
             if res:
-                # print('Regional found', res)
+                # print(f'cache_name {cache_name} found: ', res)
                 return res
 
             else:
-                # print('Add new regional to dict...', res)
+                # print(f'Add new cache_name: {cache_name}')
                 cond_t_municipio_uf = cls.t_municipio[
                     cls.t_municipio.uf == state_name
                 ]
@@ -177,13 +178,15 @@ class RegionalParameters:
                 return res
 
         else:
-            cache_name = 'all_cities'
+            cache_name = (
+                "all_cities_from" + "_" + str(state_name).replace(" ", "_")
+            )
             res = cache.get(cache_name)
             if res:
-                # print('Fetch all cities', res)
+                # print(f'Fetch {cache_name}', res)
                 return res
             else:
-                # print('Add all cities')
+                # print(f'Add cache_name {cache_name}')
                 if state_name is None:
                     state_names = [
                         f"{state_name}" for state_name in STATE_NAME.values()
