@@ -256,15 +256,10 @@ def get_scatter_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
         "get_scatter_" + str(uf).replace(" ", "_") + "_" + str(disease)
     )
 
-    print('cache_name: ', cache_name)
     res = cache.get(cache_name)
+    # print(f'cache_name {cache_name} found: ', res)
 
-    if res:
-        print(f'cache_name {cache_name} found: ', res)
-        return res
-
-    else:
-
+    if res is None:
         t_hist = con_table(disease)
 
         proj = t_hist['uf', 'SE', 'data_iniSE', 'casos_est', 'casos'].sort_by(
@@ -278,7 +273,7 @@ def get_scatter_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
             cache_name, res, settings.QUERY_CACHE_TIMEOUT,
         )
 
-        return res
+    return res
 
 
 def get_indicator_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
@@ -299,15 +294,10 @@ def get_indicator_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
         "get_indicator_" + str(uf).replace(" ", "_") + "_" + str(disease)
     )
 
-    print('cache_name: ', cache_name)
     res = cache.get(cache_name)
+    # print(f'cache_name {cache_name} found: ', res)
 
-    if res:
-        print(f'cache_name {cache_name} found: ', res)
-        return res
-
-    else:
-
+    if res is None:
         t_receptivity = con_table(disease)
 
         proj = t_receptivity[
@@ -320,7 +310,7 @@ def get_indicator_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
             cache_name, res, settings.QUERY_CACHE_TIMEOUT,
         )
 
-        return res
+    return res
 
 
 def get_stack_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
@@ -339,15 +329,10 @@ def get_stack_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
 
     cache_name = "get_stack_" + str(uf).replace(" ", "_") + "_" + str(disease)
 
-    print('cache_name: ', cache_name)
     res = cache.get(cache_name)
+    # print(f'cache_name {cache_name} found: ', res)
 
-    if res:
-        print(f'cache_name {cache_name} found: ', res)
-        return res
-
-    else:
-
+    if res is None:
         t_alert = con_table(disease)
 
         proj = t_alert['SE', 'uf', 'nivel', 'municipio_geocodigo'].sort_by(
@@ -360,7 +345,7 @@ def get_stack_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
             cache_name, res, settings.QUERY_CACHE_TIMEOUT,
         )
 
-        return res
+    return res
 
 
 def get_epi_week_expr() -> Callable:
