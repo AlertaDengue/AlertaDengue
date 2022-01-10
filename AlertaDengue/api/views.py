@@ -119,13 +119,18 @@ class AlertCityView(View, _GetMethod):
         self.request = request
         format = ''
 
-        week_nd = int(os.getenv('WEEK_ND'))
-        dt_end = dt.datetime.now()
-        dt_start = dt_end - dt.timedelta(weeks=week_nd)
-        yw_end_default = episem(dt_end, sep='')
-        yw_start_default = episem(dt_start, sep='')
-        year_end, week_end = yw_end_default[:4], yw_end_default[-2:]
-        year_start, week_start = yw_start_default[:4], yw_start_default[-2:]
+        dt_now = dt.datetime.now()
+        dt_start = dt_now - dt.timedelta(weeks=int(os.getenv('WEEK_ND')))
+
+        # Epidemic Year Week default format = YYYYWW
+        year_end, week_end = (
+            episem(dt_now, sep='')[:4],
+            episem(dt_now, sep='')[-2:],
+        )
+        year_start, week_start = (
+            episem(dt_start, sep='')[:4],
+            episem(dt_start, sep='')[-2:],
+        )
 
         try:
             disease = self._get(
@@ -137,27 +142,29 @@ class AlertCityView(View, _GetMethod):
             format = self._get(
                 'format', error_message='Format sent is empty.'
             ).lower()
-            ew_start = self._get(
-                'ew_start',
+
+            epiweek_start = self._get(
+                'epiweek_start',
                 default=int(week_start),
                 cast=int,
                 error_message='Epidemic start week sent is empty.',
             )
-            ew_end = self._get(
-                'ew_end',
+
+            epiweek_end = self._get(
+                'epiweek_end',
                 default=int(week_end),
                 cast=int,
                 error_message='Epidemic end week sent is empty.',
             )
-            ey_start = self._get(
-                'ey_start',
+
+            epiyear_start = self._get(
+                'epiyear_start',
                 default=int(year_start),
                 cast=int,
                 error_message='Epidemic start year sent is empty.',
             )
-
-            ey_end = self._get(
-                'ey_end',
+            epiyear_end = self._get(
+                'epiyear_end',
                 default=int(year_end),
                 cast=int,
                 error_message='Epidemic end year sent is empty.',
@@ -168,15 +175,23 @@ class AlertCityView(View, _GetMethod):
                     'The output format available are: `csv` or `json`.'
                 )
 
-            eyw_start = ey_start * 100 + ew_start
-            eyw_end = ey_end * 100 + ew_end
+            # EpidemEpidemiological Week default format = YYYYWW
+            epi_yearweek_start = epiyear_start * 100 + epiweek_start
+            epi_yearweek_end = epiyear_end * 100 + epiweek_end
 
-            df = AlertCity.search(
-                geocode=geocode,
-                disease=disease,
-                ew_start=eyw_start,
-                ew_end=eyw_end,
-            )
+            df = None
+
+            while True:
+                df = AlertCity.search(
+                    geocode=geocode,
+                    disease=disease,
+                    ew_start=epi_yearweek_start,
+                    ew_end=epi_yearweek_end,
+                )
+                if not df.empty:
+                    break
+                epi_yearweek_start -= 3
+
             # change all keys to lower case
             df.drop(
                 columns=['municipio_geocodigo', 'municipio_nome'],
