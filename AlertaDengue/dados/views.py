@@ -43,6 +43,7 @@ from .dbdata import (
     ReportCity,
     ReportState,
     RegionalParameters,
+    chart_home_data,
 )
 from .episem import episem, episem2date
 from .maps import get_city_info
@@ -882,7 +883,9 @@ class ChartsMainView(TemplateView):
             count_cities[d][s] = notif_resume.count_cities_by_uf(state_name, d)
 
             # scatterchart
-            df_hist = dbdata.get_scatter_data(uf=state_name, disease=d)
+            df_hist = chart_home_data(
+                uf=state_name, disease=d, chart_type='scatter_chart'
+            )
 
             if d == 'dengue':
                 if not df_hist.empty:
@@ -909,9 +912,10 @@ class ChartsMainView(TemplateView):
             create_scatter_chart[d][s] = scatter_chart
 
             # indicatorchart
-            df_receptivity = dbdata.get_indicator_data(
-                uf=state_name, disease=d
+            df_receptivity = chart_home_data(
+                uf=state_name, disease=d, chart_type='indicator_chart'
             )
+
             if not df_receptivity.empty:
                 indicator_chart = _create_indicator_chart(
                     df=df_receptivity, uf=state_name, disease=d
@@ -923,7 +927,9 @@ class ChartsMainView(TemplateView):
             create_indicator_chart[d][s] = indicator_chart
 
             # stackchart
-            df_alert = dbdata.get_stack_data(uf=state_name, disease=d)
+            df_alert = chart_home_data(
+                uf=state_name, disease=d, chart_type='stackbar_chart'
+            )
 
             df_alert = (
                 df_alert.groupby(['SE', 'nivel'])['municipio_geocodigo']

@@ -78,6 +78,133 @@ MAP_ZOOM = filter_active_states(_map_zoom)
 # Ibis utils
 
 
+def con_table(disease) -> con:
+    """
+    name: hist_uf_dengue_materialized_view
+    Creates the connection in the tables with the disease suffix.
+    Parameters
+    ----------
+    disease: str
+        option: dengue|chikungunya|zika
+    Returns
+    -------
+    schema:
+        uf : string
+        municipio_geocodigo : int32
+        SE : int32
+        data_iniSE : date
+        casos_est : float32
+        casos : int32
+        nivel : int16
+        receptivo : int16    ​
+    """
+
+    _disease = get_disease_suffix(disease, empty_for_dengue=False)
+    connect_table = con.table(f'hist_uf{_disease}_materialized_view')
+
+    return connect_table
+
+
+def chart_home_data(
+    uf: str, disease: str = 'dengue', chart_type: str = None
+) -> pd.DataFrame:
+
+    # Connect table by disease
+    table_hist_uf = con_table(disease)
+
+    # Choise chart type with data
+
+    if chart_type == 'scatter_chart':
+        cache_name = (
+            "scatter_chart"
+            + "_"
+            + str(uf).replace(" ", "_")
+            + "_"
+            + str(disease)
+        )
+        res = cache.get(cache_name)
+        if res is None:
+            proj = table_hist_uf[
+                'uf', 'SE', 'data_iniSE', 'casos_est', 'casos'
+            ].sort_by(('SE', True))
+            df_hist_uf = proj[proj['uf'] == uf]
+            res = df_hist_uf.execute()
+
+            cache.set(
+                cache_name, res, settings.QUERY_CACHE_TIMEOUT,
+            )
+
+        return res
+
+    elif chart_type == 'indicator_chart':
+        cache_name = (
+            "indicator_chart"
+            + "_"
+            + str(uf).replace(" ", "_")
+            + "_"
+            + str(disease)
+        )
+        res = cache.get(cache_name)
+        if res is None:
+            proj = table_hist_uf[
+                'SE', 'uf', 'municipio_geocodigo', 'receptivo'
+            ].sort_by(('SE', True))
+            df_receptivity = proj[proj['uf'] == uf]
+            res = df_receptivity.execute()
+
+            cache.set(
+                cache_name, res, settings.QUERY_CACHE_TIMEOUT,
+            )
+
+        return res
+
+    elif chart_type == 'stackbar_chart':
+        cache_name = (
+            "stackbar_chart"
+            + "_"
+            + str(uf).replace(" ", "_")
+            + "_"
+            + str(disease)
+        )
+        res = cache.get(cache_name)
+        if res is None:
+            proj = table_hist_uf[
+                'SE', 'uf', 'nivel', 'municipio_geocodigo'
+            ].sort_by(('SE', True))
+            df_alert = proj[proj['uf'] == uf]
+            res = df_alert.execute()
+
+            cache.set(
+                cache_name, res, settings.QUERY_CACHE_TIMEOUT,
+            )
+
+        return res
+
+
+def get_epi_week_expr() -> Callable:
+    """
+    Return a UDF expression for epi_week function.
+    Returns
+    -------
+    Callable
+    """
+    return ibis.postgres.udf.existing_udf(
+        'epi_week', input_types=['date'], output_type='int64'
+    )
+
+
+def get_epiweek2date_expr() -> Callable:
+    """
+    Return a UDF expression for epiweek2date
+    Returns
+    -------
+    Callable
+    """
+    return ibis.postgres.udf.existing_udf(
+        'epiweek2date', input_types=['int64'], output_type='date'
+    )
+
+
 class RegionalParameters:
     schema_dglob = con.schema('Dengue_global')
     t_parameters = schema_dglob.table('parameters')
@@ -211,170 +338,7 @@ class RegionalParameters:
                 return res
 
 
-def con_table(disease) -> con:
-    """
-    name: hist_uf_dengue_materialized_view
-    Creates the connection in the tables with the disease suffix.
-    Parameters
-    ----------
-    disease: str
-        option: dengue|chikungunya|zika
-    Returns
-    -------
-    schema:
-        uf : string
-        municipio_geocodigo : int32
-        SE : int32
-        data_iniSE : date
-        casos_est : float32
-        casos : int32
-        nivel : int16
-        receptivo : int16    ​
-    """
-
-    _disease = get_disease_suffix(disease, empty_for_dengue=False)
-    connect_table = con.table(f'hist_uf{_disease}_materialized_view')
-
-    return connect_table
-
-
-def get_scatter_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
-    """
-    Filter the columns and return the cases by given state and disease.
-    Parameters
-    ----------
-    uf: str
-        State abbreviation
-    disease: str
-        option: dengue|chikungunya|zika
-    Returns
-    -------
-    DataFrame
-    """
-
-    cache_name = (
-        "get_scatter_" + str(uf).replace(" ", "_") + "_" + str(disease)
-    )
-
-    res = cache.get(cache_name)
-    # print(f'cache_name {cache_name} found: ', res)
-
-    if res is None:
-        t_hist = con_table(disease)
-
-        proj = t_hist['uf', 'SE', 'data_iniSE', 'casos_est', 'casos'].sort_by(
-            ('SE', True)
-        )
-        df_hist = proj[proj['uf'] == uf]
-
-        res = df_hist.execute()
-
-        cache.set(
-            cache_name, res, settings.QUERY_CACHE_TIMEOUT,
-        )
-
-    return res
-
-
-def get_indicator_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
-    """
-    Filter the columns and return receptivity by given state and disease.
-    Parameters
-    ----------
-    uf: str
-        State abbreviation
-    disease: str
-        option: dengue|chikungunya|zika
-    Returns
-    -------
-    DataFrame
-    """
-
-    cache_name = (
-        "get_indicator_" + str(uf).replace(" ", "_") + "_" + str(disease)
-    )
-
-    res = cache.get(cache_name)
-    # print(f'cache_name {cache_name} found: ', res)
-
-    if res is None:
-        t_receptivity = con_table(disease)
-
-        proj = t_receptivity[
-            'SE', 'uf', 'municipio_geocodigo', 'receptivo'
-        ].sort_by(('SE', True))
-        df_receptivity = proj[proj['uf'] == uf]
-
-        res = df_receptivity.execute()
-        cache.set(
-            cache_name, res, settings.QUERY_CACHE_TIMEOUT,
-        )
-
-    return res
-
-
-def get_stack_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
-    """
-    Filter the columns and return the alert levels by given state and disease.
-    Parameters
-    ----------
-    uf: str
-        State abbreviation
-    disease: str
-        option: dengue|chikungunya|zika
-    Returns
-    -------
-    DataFrame
-    """
-
-    cache_name = "get_stack_" + str(uf).replace(" ", "_") + "_" + str(disease)
-
-    res = cache.get(cache_name)
-    # print(f'cache_name {cache_name} found: ', res)
-
-    if res is None:
-        t_alert = con_table(disease)
-
-        proj = t_alert['SE', 'uf', 'nivel', 'municipio_geocodigo'].sort_by(
-            ('SE', True)
-        )
-        df_alert = proj[proj['uf'] == uf]
-
-        res = df_alert.execute()
-        cache.set(
-            cache_name, res, settings.QUERY_CACHE_TIMEOUT,
-        )
-
-    return res
-
-
-def get_epi_week_expr() -> Callable:
-    """
-    Return a UDF expression for epi_week function.
-    Returns
-    -------
-    Callable
-    """
-    return ibis.postgres.udf.existing_udf(
-        'epi_week', input_types=['date'], output_type='int64'
-    )
-
-
-def get_epiweek2date_expr() -> Callable:
-    """
-    Return a UDF expression for epiweek2date
-    Returns
-    -------
-    Callable
-    """
-    return ibis.postgres.udf.existing_udf(
-        'epiweek2date', input_types=['int64'], output_type='date'
-    )
-
-
 # General util functions
-
-
 def _nan_to_num_int_list(v):
     """
     :param v: numpy.array
