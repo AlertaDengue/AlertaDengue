@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-10 13:09+0000\n"
+"POT-Creation-Date: 2022-01-13 17:43+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -89,7 +89,7 @@ msgstr "Estimated cases "
 msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
 
-#: AlertaDengue/dados/charts/cities.py:718 AlertaDengue/dados/charts/home.py:91
+#: AlertaDengue/dados/charts/cities.py:718 AlertaDengue/dados/charts/home.py:81
 #: AlertaDengue/dados/templates/alert_state/age.html:125
 #: AlertaDengue/dados/templates/alert_state/date.html:100
 #: AlertaDengue/dados/templates/alert_state/disease.html:122
@@ -104,43 +104,43 @@ msgstr "Cases"
 msgid "Registrados"
 msgstr "Registered"
 
-#: AlertaDengue/dados/charts/home.py:47
-msgid "<br>SE %{text}<br>%{y:1f} Casos notificados<extra></extra>"
-msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
+#: AlertaDengue/dados/charts/home.py:45
+msgid "<br>SE %{x}<br>%{y:1f} Casos notificados<extra></extra>"
+msgstr "<br>Week %{x}<br>%{y:1f} Registered Cases<extra></extra>"
 
-#: AlertaDengue/dados/charts/home.py:58
+#: AlertaDengue/dados/charts/home.py:54
 msgid "Estimados"
 msgstr "Estimated"
 
-#: AlertaDengue/dados/charts/home.py:63
-msgid "<br>SE %{text}<br>%{y:1f} Casos estimados<extra></extra>"
-msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
+#: AlertaDengue/dados/charts/home.py:57
+msgid "<br>SE %{x}<br>%{y:1f} Casos estimados<extra></extra>"
+msgstr "<br>Week: %{x}<br>%{y:1f} Estimated Cases<extra></extra>"
 
-#: AlertaDengue/dados/charts/home.py:75
+#: AlertaDengue/dados/charts/home.py:67
 msgid "Total de casos no estado"
 msgstr "Cumulative number of cases in the State"
 
-#: AlertaDengue/dados/charts/home.py:81 AlertaDengue/dados/charts/home.py:216
-#: AlertaDengue/dados/charts/home.py:320
+#: AlertaDengue/dados/charts/home.py:72 AlertaDengue/dados/charts/home.py:207
+#: AlertaDengue/dados/charts/home.py:311
 #: AlertaDengue/dados/templates/services_api.html:205
 #: AlertaDengue/forecast/models.py:139
 msgid "Semana epidemiológica"
 msgstr "Epidemiological week"
 
-#: AlertaDengue/dados/charts/home.py:212
+#: AlertaDengue/dados/charts/home.py:203
 msgid "Cidades com clima favorável <br>para transmissão"
 msgstr "Cities with favorable environment <br>for transmission"
 
-#: AlertaDengue/dados/charts/home.py:299
+#: AlertaDengue/dados/charts/home.py:290
 #, python-brace-format
 msgid "%{y} Cidades na semana %{x}<extra></extra>"
 msgstr "%{y} Cities in the week %{x}<extra></extra>"
 
-#: AlertaDengue/dados/charts/home.py:304
+#: AlertaDengue/dados/charts/home.py:295
 msgid "Situação epidemiológica das cidades"
 msgstr "Epidemiological Situation"
 
-#: AlertaDengue/dados/charts/home.py:330
+#: AlertaDengue/dados/charts/home.py:321
 msgid "Número de cidades"
 msgstr "Number of cities"
 
@@ -2383,13 +2383,13 @@ msgstr "Estimated cases of %(disease_label)s in monitored cities"
 msgid "casos estimados"
 msgstr "estimated cases"
 
-#: AlertaDengue/dados/views.py:465 AlertaDengue/dados/views.py:593
+#: AlertaDengue/dados/views.py:466 AlertaDengue/dados/views.py:594
 msgid ""
 "A doença {} não está registrada em nosso banco de dados para o município de "
 "{}."
 msgstr "This disease {} is not registered in our database for {} municipality"
 
-#: AlertaDengue/dados/views.py:773
+#: AlertaDengue/dados/views.py:774
 msgid "desconhecida"
 msgstr "unknown"
 
@@ -2443,11 +2443,21 @@ msgid ""
 msgstr ""
 "This file does not contain {}, which is expected in a valid SINAN file."
 
-#: AlertaDengue/dbf/views.py:54
+#: AlertaDengue/dbf/views.py:53
+#, fuzzy
+#| msgid ""
+#| "O arquivo {} exportado em {:%d/%m/%Y} com notificações do ano {} foi "
+#| "enviado com sucesso. Você será informado por email ({}) assim que o "
+#| "processo de importação for finalizado, "
 msgid ""
-"O arquivo {} exportado em {:%d/%m/%Y} com notificações do ano {} foi enviado "
-"com sucesso. Você será informado por email ({}) assim que o processo de "
-"importação for finalizado, "
+"\n"
+"            O arquivo {dbf.file.name} exportado em {dbf.export_date:%d/%m/"
+"%Y}\n"
+"            com notificações do ano {dbf.notification_year}\n"
+"            foi enviado com sucesso. Você será informado por email\n"
+"            ({self.request.user.email}) assim que o processo de\n"
+"            importação for finalizado,\n"
+"            "
 msgstr ""
 "The file {} exported in {:% d /% m /% Y} with notifications of the year {} "
 "was sent successfully. You will be informed by email ({}) once the import "
