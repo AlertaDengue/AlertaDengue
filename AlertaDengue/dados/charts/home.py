@@ -31,38 +31,30 @@ def _create_scatter_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
     """
 
     df = deepcopy(df)
-
+    df['SE'] = df.index.map(lambda v: '{}'.format(str(v)[-2:]))
     traces = []
 
     traces.append(
         go.Bar(
-            x=df.index.map(lambda v: '%s' % (str(v)[-2:])),
+            x=df['SE'],
             y=df['casos'],
             name=_("Registrados"),
             marker=dict(color='#BDC3C7', line=dict(color='#3A4750', width=1),),
             width=0.5,
-            text=df.index.map(lambda v: '{}'.format(str(v)[-2:])),
-            hoverinfo='text',
             hovertemplate=_(
-                '<br>SE %{text}<br>'
-                '%{y:1f} Casos notificados'
-                '<extra></extra>',
+                '<br>SE %{x}<br>' '%{y:1f} Casos notificados' '<extra></extra>'
             ),
         )
     )
     traces.append(
         go.Scatter(
             mode='lines+markers',
-            x=df.index.map(lambda v: '%s' % (str(v)[-2:])),
+            x=df['SE'],
             y=df['casos_est'],
             name=_("Estimados"),
             line=dict(color='#4169e1', width=4),
-            text=df.index.map(lambda v: '{}'.format(str(v)[-2:])),
-            hoverinfo='text',
             hovertemplate=_(
-                '<br>SE %{text}<br>'
-                '%{y:1f} Casos estimados'
-                '<extra></extra>',
+                '<br>SE %{x}<br>' '%{y:1f} Casos estimados' '<extra></extra>'
             ),
         )
     )
@@ -76,10 +68,8 @@ def _create_scatter_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
                     "font": {"family": "Helvetica", "size": 16},
                     "x": 0.5,
                 },
-                # xaxis={'title': _('Semana epidemiológica')},
                 xaxis=dict(
                     title=_('Semana epidemiológica'),
-                    categoryorder='category ascending',
                     showline=True,
                     showgrid=True,
                     showticklabels=True,

@@ -39,11 +39,11 @@ from .dbdata import (
     MRJ_GEOCODE,
     STATE_INITIAL,
     STATE_NAME,
+    chart_home_data,
     Forecast,
     ReportCity,
     ReportState,
     RegionalParameters,
-    chart_home_data,
 )
 from .episem import episem, episem2date
 from .maps import get_city_info
