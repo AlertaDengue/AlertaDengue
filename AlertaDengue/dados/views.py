@@ -882,43 +882,30 @@ class ChartsMainView(TemplateView):
 
             count_cities[d][s] = notif_resume.count_cities_by_uf(state_name, d)
 
+            df = chart_home_data(uf=state_name, disease=d)
+
             # scatterchart
-            df_hist = chart_home_data(
-                uf=state_name, disease=d, chart_type='scatter_chart'
-            )
-
             if d == 'dengue':
-                if not df_hist.empty:
+                if not df.empty:
                     last_se[s] = (
-                        str(df_hist.SE.max())[4:]
-                        + "/"
-                        + str(df_hist.SE.max())[:4]
+                        str(df.SE.max())[4:] + "/" + str(df.SE.max())[:4]
                     )
-
+                    keys = ['uf', 'casos_est', 'casos']
+                    df_by_uf = df.groupby(['SE'])[keys].sum()
+                    scatter_chart = _create_scatter_chart(
+                        df=df_by_uf, uf=state_name, disease=d
+                    )
                 else:
                     last_se[s] = ''
-
-            keys = ['casos_est', 'casos']
-            df_by_uf = df_hist.groupby(['SE'])[keys].sum()
-
-            if not df_by_uf.empty:
-                scatter_chart = _create_scatter_chart(
-                    df=df_by_uf, uf=state_name, disease=d
-                )
-            else:
-                scatter_chart = no_data_chart
-                empty_charts_count[d] += 1
+                    scatter_chart = no_data_chart
+                    empty_charts_count[d] += 1
 
             create_scatter_chart[d][s] = scatter_chart
 
             # indicatorchart
-            df_receptivity = chart_home_data(
-                uf=state_name, disease=d, chart_type='indicator_chart'
-            )
-
-            if not df_receptivity.empty:
+            if not df.empty:
                 indicator_chart = _create_indicator_chart(
-                    df=df_receptivity, uf=state_name, disease=d
+                    df=df, uf=state_name, disease=d
                 )
             else:
                 indicator_chart = no_data_chart
@@ -926,22 +913,16 @@ class ChartsMainView(TemplateView):
 
             create_indicator_chart[d][s] = indicator_chart
 
-            # stackchart
-            df_alert = chart_home_data(
-                uf=state_name, disease=d, chart_type='stackbar_chart'
-            )
-
+            # stackbarchart
             df_alert = (
-                df_alert.groupby(['SE', 'nivel'])['municipio_geocodigo']
+                df.groupby(['SE', 'nivel'])['municipio_geocodigo']
                 .count()
                 .reset_index()
             )
-
             color_alert = {1: 'Green', 2: 'Yellow', 3: 'Orange', 4: 'Red'}
             df_alert.nivel = df_alert.nivel.apply(
                 lambda v: f'{color_alert[v]} Alert'
             )
-
             this_year_week = df_alert.SE.max()
             get_week = df_alert.SE >= this_year_week - 4
             df_alert_uf = df_alert[get_week].sort_values(

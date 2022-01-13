@@ -105,80 +105,37 @@ def con_table(disease) -> con:
     return connect_table
 
 
-def chart_home_data(
-    uf: str, disease: str = 'dengue', chart_type: str = None
-) -> pd.DataFrame:
+def chart_home_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
 
     # Connect table by disease
     table_hist_uf = con_table(disease)
 
-    # Choise chart type with data
+    cache_name = (
+        "data_chart" + "_" + str(uf).replace(" ", "_") + "_" + str(disease)
+    )
+    res = cache.get(cache_name)
 
-    if chart_type == 'scatter_chart':
-        cache_name = (
-            "scatter_chart"
-            + "_"
-            + str(uf).replace(" ", "_")
-            + "_"
-            + str(disease)
+    if res is None:
+        keys = [
+            'SE',
+            'uf',
+            'data_iniSE',
+            'casos_est',
+            'casos',
+            'nivel',
+            'municipio_geocodigo',
+            'receptivo',
+        ]
+        proj = table_hist_uf[keys].sort_by(('data_iniSE', True))
+        df_hist_uf = proj[proj['uf'] == uf]
+
+        res = df_hist_uf.execute()
+
+        cache.set(
+            cache_name, res, settings.QUERY_CACHE_TIMEOUT,
         )
-        res = cache.get(cache_name)
-        if res is None:
-            proj = table_hist_uf[
-                'uf', 'SE', 'data_iniSE', 'casos_est', 'casos'
-            ].sort_by(('SE', True))
-            df_hist_uf = proj[proj['uf'] == uf]
-            res = df_hist_uf.execute()
 
-            cache.set(
-                cache_name, res, settings.QUERY_CACHE_TIMEOUT,
-            )
-
-        return res
-
-    elif chart_type == 'indicator_chart':
-        cache_name = (
-            "indicator_chart"
-            + "_"
-            + str(uf).replace(" ", "_")
-            + "_"
-            + str(disease)
-        )
-        res = cache.get(cache_name)
-        if res is None:
-            proj = table_hist_uf[
-                'SE', 'uf', 'municipio_geocodigo', 'receptivo'
-            ].sort_by(('SE', True))
-            df_receptivity = proj[proj['uf'] == uf]
-            res = df_receptivity.execute()
-
-            cache.set(
-                cache_name, res, settings.QUERY_CACHE_TIMEOUT,
-            )
-
-        return res
-
-    elif chart_type == 'stackbar_chart':
-        cache_name = (
-            "stackbar_chart"
-            + "_"
-            + str(uf).replace(" ", "_")
-            + "_"
-            + str(disease)
-        )
-        res = cache.get(cache_name)
-        if res is None:
-            proj = table_hist_uf[
-                'SE', 'uf', 'nivel', 'municipio_geocodigo'
-            ].sort_by(('SE', True))
-            df_alert = proj[proj['uf'] == uf]
-            res = df_alert.execute()
-
-            cache.set(
-                cache_name, res, settings.QUERY_CACHE_TIMEOUT,
-            )
-
-        return res
+    return res
 
 
 def get_epi_week_expr() -> Callable:
