@@ -309,7 +309,6 @@ def _create_stack_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
         width=310,
         xaxis=dict(
             title=_('Semana epidemiológica'),
-            categoryorder='category ascending',
             showline=True,
             showgrid=True,
             showticklabels=True,
