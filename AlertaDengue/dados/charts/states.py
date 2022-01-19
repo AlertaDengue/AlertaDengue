@@ -109,11 +109,13 @@ class ReportStateCharts:
             width=1100,
             height=450,
             legend=dict(
-                # x=-.1, y=1.2,
+                orientation="h",
+                yanchor="bottom",
+                y=1.01,
+                xanchor="left",
+                font=dict(family='sans-serif', size=12, color='#000'),
                 bgcolor='#FFFFFF',
                 bordercolor='#E2E2E2',
-                traceorder='normal',
-                font=dict(family='sans-serif', size=12, color='#000'),
                 borderwidth=1,
             ),
         )
