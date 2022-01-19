@@ -135,7 +135,7 @@
 
     <h2>Situação da Dengue</h2>
 
-    {% if total_n_dengue > 0 %}
+    {% if total_n_dengue >= 0 %}
     <p>
       Esse ano, até essa semana, {{total_n_dengue}} casos de dengue foram registrados.
       No ano passado, até essa semana, {{total_n_dengue_last_year}}
@@ -176,7 +176,7 @@
 
     <h2>Situação da Chikungunya</h2>
 
-    {% if total_n_chik > 0 %}
+    {% if total_n_chik >= 0 %}
     <p>
       Esse ano, até essa semana, {{total_n_chik}} casos de dengue foram registrados.
       No ano passado, até essa semana, {{total_n_chik_last_year}}
@@ -216,7 +216,7 @@
 
     <h2>Situação da Zika</h2>
 
-    {% if total_n_zika > 0 %}
+    {% if total_n_zika >= 0 %}
     <p>
       Esse ano, até essa semana, {{total_n_zika}} casos de dengue
       foram registrados.
