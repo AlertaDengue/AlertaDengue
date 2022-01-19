@@ -99,10 +99,10 @@ if DEBUG:
     )
     DJANGO_CPROFILE_MIDDLEWARE_REQUIRE_STAFF = False
 
-# django 2
 MIDDLEWARE = MIDDLEWARE_CLASSES
 ROOT_URLCONF = 'ad_main.urls'
 WSGI_APPLICATION = 'ad_main.wsgi.application'
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 TEMPLATES = [
     {
