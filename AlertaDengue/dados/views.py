@@ -25,7 +25,8 @@ from gis.geotiff import convert_from_shapefile
 # local
 from . import dbdata
 from . import models as M
-from .charts.cities import CityCharts, ReportCityCharts
+from .charts.cities import ReportCityCharts
+from .charts.alerts import AlertCitiesCharts
 from .charts.home import (
     _create_indicator_chart,
     _create_scatter_chart,
@@ -376,6 +377,8 @@ class AlertaMRJPageView(AlertCityPageBaseView):
     def get_context_data(self, **kwargs):
         context = super(AlertaMRJPageView, self).get_context_data(**kwargs)
 
+        chart_alerts = AlertCitiesCharts()
+
         disease_code = context['disease']
 
         disease_label = _get_disease_label(disease_code)
@@ -453,7 +456,7 @@ class AlertaMRJPageView(AlertCityPageBaseView):
             total_observed_series = [0]
 
         try:
-            city_chart = CityCharts.create_alert_chart(
+            city_chart = chart_alerts.create_alert_chart(
                 geocode,
                 city_info['nome'],
                 disease_label,
@@ -538,6 +541,8 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
             **kwargs
         )
 
+        chart_alerts = AlertCitiesCharts()
+
         disease_code = context['disease']
 
         disease_label = _get_disease_label(disease_code)
@@ -581,7 +586,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
             total_observed_series = [0]
 
         try:
-            city_chart = CityCharts.create_alert_chart(
+            city_chart = chart_alerts.create_alert_chart(
                 geocode,
                 city_info['nome'],
                 disease_label,
