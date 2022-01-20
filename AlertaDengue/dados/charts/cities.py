@@ -117,7 +117,7 @@ class ReportCityCharts:
 
         figure.update_layout(
             title=(
-                _('<b>Limiares de incidência</b>:<br>')
+                _('Limiares de incidência:<br>')
                 + ''.ljust(8)
                 + _('pré epidêmico=')
                 + f'{threshold_pre_epidemic:.1f}'.ljust(8)
@@ -252,7 +252,7 @@ class ReportCityCharts:
         )
 
         figure.update_layout(
-            # title = '',
+            title=_('Condições climáticas para transmissão'),
             xaxis=dict(
                 title=_('Período (Ano/Semana)'),
                 tickangle=-60,
@@ -328,7 +328,7 @@ class ReportCityCharts:
         )
 
         figure.update_layout(
-            # title='',
+            title=_('Menções na mídia social'),
             xaxis=dict(
                 title=_('Período (Ano/Semana)'),
                 tickangle=-60,
