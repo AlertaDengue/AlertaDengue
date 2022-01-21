@@ -44,7 +44,7 @@ msgstr "SINAN data received"
 
 #: AlertaDengue/dados/charts/alerts.py:129
 msgid "Casos Notificados de "
-msgstr "Estimated cases "
+msgstr "Reported cases of "
 
 #: AlertaDengue/dados/charts/alerts.py:133
 #: AlertaDengue/dados/charts/alerts.py:149
@@ -57,23 +57,23 @@ msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
 
 #: AlertaDengue/dados/charts/alerts.py:145
 msgid "Alerta Verde de "
-msgstr "Green Level "
+msgstr "Green Level for "
 
 #: AlertaDengue/dados/charts/alerts.py:163
 msgid "Alerta Amarelo de "
-msgstr "Yellow Level "
+msgstr "Yellow Level for "
 
 #: AlertaDengue/dados/charts/alerts.py:181
 msgid "Alerta Laranja de "
-msgstr "Orange Level "
+msgstr "Orange Level for "
 
 #: AlertaDengue/dados/charts/alerts.py:199
 msgid "Alerta Vermelho de "
-msgstr "Red Level "
+msgstr "Red Level for "
 
 #: AlertaDengue/dados/charts/alerts.py:218
 msgid "Casos Estimados de "
-msgstr "Estimated cases "
+msgstr "Estimated cases of "
 
 #: AlertaDengue/dados/charts/alerts.py:222
 #, python-brace-format
@@ -1439,7 +1439,7 @@ msgid ""
 "      aumentada para a possivel circulação sustentada de arbovirus e para a\n"
 "      implementação de controle vetorial"
 msgstr ""
-"The figure below shows the reception weather indicator of the\n"
+"The figure below shows the weather receptiveness indicator of the\n"
 " municipality for the transmission of arboviruses. When the indicator is\n"
 " above the threshold (horizontal line), environmental conditions exist\n"
 " favorable to viral transmission. That means attention needs be\n"
@@ -1469,8 +1469,8 @@ msgstr ""
 "mosquitoes according to the population of the municipality using \n"
 "social networks. This indicator, which is most effective in cities \n"
 "larger, should be seen as an aid in the early detection of \n"
-"increase in cases. Currently, this indicator is more sensitivefor\n"
-"detect dengue than other arboviruses"
+"increase in cases. Currently, this indicator is more sensitive to\n"
+"the detection of dengue than other arboviruses"
 
 #: AlertaDengue/dados/templates/report_city.html:133
 msgid "Situação da Dengue"
@@ -1731,7 +1731,7 @@ msgid ""
 "parceira entre"
 msgstr ""
 "This was a project developed with support from SVS/MS and is operated "
-"aspartner between"
+"as a partnership between"
 
 #: AlertaDengue/dados/templates/report_city.html:322
 #: AlertaDengue/dados/templates/report_state.html:470
