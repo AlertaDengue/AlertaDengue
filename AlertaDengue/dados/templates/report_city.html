@@ -57,7 +57,6 @@
 </nav>
 {% endblock %}
 
-
 {% block title %}{% trans "Relatório da Situação das Arboviroses em " %} {{city_name}} -
 {{state_name}} {% endblock %}
 
@@ -78,32 +77,31 @@
     # ----------------------
     -->
     <p>
-      Data da última atualização : {{last_week}}/{{last_year}}
+      {% trans "Data da última atualização" %}: {{last_week}}/{{last_year}}
     </p>
     <p>
       <!--
       usar a cor correspondente ao nivel de
       alerta mais alto considerando as 3 doenças
       -->
-      Situação de alerta do município: {{max_alert_color}}
+      {% trans "Situação de alerta do município" %}: {{max_alert_color}}
     </p>
   </div>
 </div>
 
 <div class="row">
   <div class="col-md-12">
-      <h2>Condições climáticas para transmissão de arboviroses</h2>
+      <h3>{% trans "Condições climáticas para transmissão de arboviroses" %}</h3>
 
-      <p>
-      A figura abaixo mostra o indicador meteorológico de receptividade do
+      <p>{% blocktrans %}A figura abaixo mostra o indicador meteorológico de receptividade do
       município para a transmissão de arboviroses. Quando o indicador está
       acima do limiar (linha horizontal), existem condições ambientais
       favoraveis à transmissão viral. Isso significa que a atenção precisa ser
       aumentada para a possivel circulação sustentada de arbovirus e para a
-      implementação de controle vetorial.
-      </p>
+      implementação de controle vetorial{% endblocktrans %}.</p>
 
       {{chart_dengue_climate|safe}}
+
       <br/>&nbsp;
   </div>
 </div>
@@ -111,19 +109,18 @@
 {% if tweet_max > 0%}
 <div class="row">
   <div class="col-md-12">
-    <h2>Menção a arboviroses nas redes sociais</h2>
+    <h3>{% trans "Menção a arboviroses nas redes sociais" %}</h3>
 
-    <p>
-    A figura abaixo mostra a intensidade de menção de sintomas de arboviroses
+    <p>{% blocktrans %}A figura abaixo mostra a intensidade de menção de sintomas de arboviroses
     e presença de mosquitos de acordo com a população do município que usa
     redes sociais.
     Esse indicador, que é mais eficaz em cidades maiores, deve ser visto como
     um auxiliar na detecção precoce de aumento de casos. Atualmente,
     esse indicador é mais sensivel para detectar dengue do que outras
-    arboviroses.
-    </p>
+    arboviroses{% endblocktrans %}.</p>
 
     {{chart_dengue_tweets|safe}}
+
     <br/>&nbsp;
 
   </div>
@@ -133,36 +130,29 @@
 <div class="row">
   <div class="col-md-12">
 
-    <h2>Situação da Dengue</h2>
+    <h3>{% trans "Situação da Dengue" %}</h3>
 
-    {% if total_n_dengue > 0 %}
-    <p>
-      Esse ano, até essa semana, {{total_n_dengue}} casos de dengue foram registrados.
-      No ano passado, até essa semana, {{total_n_dengue_last_year}}
-      tinham sido registrados.
+    {% if total_n_dengue >= 0 %}
+    <p><i><b>
+      {% trans "Esse ano, até essa semana" %}, {{total_n_dengue}}
+      {% trans "casos de Dengue foram registrados" %}.
+      {% trans "No ano passado, até essa semana" %}, {{total_n_dengue_last_year}}
+      {% trans "tinham sido registrados" %}.</b></i></br>
 
-      A figura abaixo mostra a situação da dengue nos últimos dois anos.
+      {% blocktrans %}A figura abaixo mostra a situação da dengue nos últimos dois anos.
       As linhas horizontais correspondem aos limiares de incidência
       pré-epidêmicos, epidêmicos e pós-epidêmicos
-      (casos por 100.000 habitantes)
-
-      <!--
-      A figura do historico do alerta fica aqui, Falta colocar legenda.
-      Não entendi o que é a linha laranja.
-      As barras vão ficar coloridas conforme o alerta, certo?
-
-      Colocar a tabela, talvez só com 6 linhas aparecendo e permitir scroll
-      -->
-    </p>
+      (casos por 100.000 habitantes){% endblocktrans %}</p>
 
     {{chart_dengue_incidence|safe}}
+
     <br/>&nbsp;
+
     {{df_dengue|safe}}
 
-
     {% else %}
     <p>
-      Sem dados disponíveis para geração dessa seção.
+      {% trans "Sem dados disponíveis para geração dessa seção" %}.
     </p>
     {% endif %}
 
@@ -170,40 +160,32 @@
   </div>
 </div>
 
-
 <div class="row">
   <div class="col-md-12">
 
-    <h2>Situação da Chikungunya</h2>
+    <h3>{% trans "Situação da Chikungunya" %}</h3>
 
-    {% if total_n_chik > 0 %}
-    <p>
-      Esse ano, até essa semana, {{total_n_chik}} casos de dengue foram registrados.
-      No ano passado, até essa semana, {{total_n_chik_last_year}}
-      tinham sido registrados.
+    {% if total_n_chik >= 0 %}
+    <p><i><b>
+        {% trans "Esse ano, até essa semana" %}, {{total_n_chik}}
+        {% trans "casos de Chikungunya foram registrados" %}.
+        {% trans "No ano passado, até essa semana" %}, {{total_n_chik_last_year}}
+        {% trans "tinham sido registrados" %}.</b></i></br>
 
-      A figura abaixo mostra a situação da dengue nos últimos dois anos.
+      {% blocktrans %}A figura abaixo mostra a situação da chikungunya nos últimos dois anos.
       As linhas horizontais correspondem aos limiares de incidência
       pré-epidêmicos, epidêmicos e pós-epidêmicos
-      (casos por 100.000 habitantes)
-
-      <!--
-      A figura do historico do alerta fica aqui, Falta colocar legenda.
-      Não entendi o que é a linha laranja.
-      As barras vão ficar coloridas conforme o alerta, certo?
-
-      Colocar a tabela, talvez só com 6 linhas aparecendo e permitir scroll
-      -->
-    </p>
+      (casos por 100.000 habitantes){% endblocktrans %}</p>
 
     {{chart_chik_incidence|safe}}
-    <br/>&nbsp;
-    {{df_chik|safe}}
 
+    <br/>&nbsp;
+
+    {{df_chik|safe}}
 
     {% else %}
     <p>
-      Sem dados disponíveis para geração dessa seção.
+      {% trans "Sem dados disponíveis para geração dessa seção" %}.
     </p>
     {% endif %}
 
@@ -214,37 +196,30 @@
 <div class="row">
   <div class="col-md-12">
 
-    <h2>Situação da Zika</h2>
+    <h3>{% trans "Situação da Zika" %}</h3>
 
-    {% if total_n_zika > 0 %}
-    <p>
-      Esse ano, até essa semana, {{total_n_zika}} casos de dengue
-      foram registrados.
-      No ano passado, até essa semana, {{total_n_zika_last_year}}
-      tinham sido registrados.
+    {% if total_n_zika >= 0 %}
+    <p><i><b>
+      {% trans "Esse ano, até essa semana" %}, {{total_n_zika}}
+      {% trans "casos de Zika foram registrados" %}.
+      {% trans "No ano passado, até essa semana" %}, {{total_n_zika_last_year}}
+      {% trans "tinham sido registrados" %}.</b></i></br>
 
-      A figura abaixo mostra a situação da dengue nos últimos dois anos.
+      {% blocktrans %}A figura abaixo mostra a situação da zika nos últimos dois anos.
       As linhas horizontais correspondem aos limiares de incidência
       pré-epidêmicos, epidêmicos e pós-epidêmicos
-      (casos por 100.000 habitantes)
-
-      <!--
-      A figura do historico do alerta fica aqui, Falta colocar legenda.
-      Não entendi o que é a linha laranja.
-      As barras vão ficar coloridas conforme o alerta, certo?
-
-      Colocar a tabela, talvez só com 6 linhas aparecendo e permitir scroll
-      -->
-    </p>
+      (casos por 100.000 habitantes){% endblocktrans %}</p>
 
     {{chart_zika_incidence|safe}}
+
     <br/>&nbsp;
+
     {{df_zika|safe}}
 
 
     {% else %}
     <p>
-      Sem dados disponíveis para geração dessa seção.
+      {% trans "Sem dados disponíveis para geração dessa seção" %}.
     </p>
     {% endif %}
 
@@ -261,26 +236,24 @@
     # ---------------------
     -->
 
-    <h2>O código de Cores</h2>
+    <h3>{% trans "O código de Cores" %}</h3>
 
-    As cores indicam niveis de atenção
+    {% trans "As cores indicam niveis de atenção" %}
 
     <ul>
       <li class="bullet-green">
-        <strong>Verde:</strong> condições climáticas desfavoráveis, seja
-        por baixa temperatura ou baixa umidade, e baixa incidência de casos.
+        <strong>{% trans "Verde" %}:</strong> {% trans "condições climáticas desfavoráveis, seja" %}
+        {% trans "por baixa temperatura ou baixa umidade, e baixa incidência de casos" %}.
       </li>
       <li class="bullet-yellow">
-        <strong>Amarelo:</strong> condições climáticas propícias para
-        aumento da população do vetor e transmissão de arboviroses.
+        <strong>{% trans "Amarelo" %}:</strong> {% trans "condições climáticas propícias para" %}
+        {% trans "aumento da população do vetor e transmissão de arboviroses" %}.
       </li>
       <li class="bullet-orange">
-        <strong>Laranja:</strong> transmissão aumentada e sustentada
-        da arbovirose.
+        <strong>{% trans "Laranja" %}:</strong> {% trans "transmissão aumentada e sustentada da arbovirose" %}.
       </li>
       <li class="bullet-red">
-        <strong>Vermelho:</strong> incidência alta, acima dos 90%
-        históricos.
+        <strong>{% trans "Vermelho" %}:</strong> {% trans "incidência alta, acima dos 90% históricos" %}.
       </li>
     </ul>
   </div>
@@ -294,53 +267,46 @@
     # ----------------------------------------
     -->
 
-    <h2>Lista das variáveis apresentadas nas tabelas</h2>
+    <h3>{% trans "Lista das variáveis apresentadas nas tabelas" %}</h3>
 
     <ul>
-      <li><strong>SE:</strong> semana epidemiológica</li>
-      <li><strong>temperatura:</strong>
-        média das temperaturas mínimas da semana (em graus centígrados)
-      </li>
-      <li><strong>umid.max:</strong>
-        média da umidade relativa máxima da semana</li>
-      <li><strong>tweet:</strong>
-        número de tweets indicativos de casos de dengue na cidade.
-        Por enquanto só há para dengue.
-      </li>
-      <li><strong>casos notif:</strong>
-        casos notificados de dengue , zika ou chikungunya</li>
-      <li><strong>incidência:</strong>
-        casos notificados dividido pela população (por 100.000)
-      </li>
-      <li><strong>casos estimados:</strong>
-        estimativa do número de casos esperado para a semana,
-        com base no perfil de atraso de notificação do município.
-      </li>
-      <li><strong>pr(inc subir):</strong>
-        probabilidade de aumento de incidência. Acima de 90%
-        é um indicador importante para o alerta laranja.
-      </li>
-      <li><strong>nivel:</strong>
-        cor do alerta (verde, amarelo, laranja, vermelho)</li>
-    </ul>
+      <li><b>SE</b>:
+        {% trans "Semana epidemiológica" %}</li>
+      <li><b>temp.min</b>:
+        {% trans "Média das temperaturas mínimas diárias ao longo da semana" %}</li>
+      <li><b>umid.max</b>:
+        {% trans "Média da umidade relativa máxima diária do ar ao longo da semana" %}</li>
+      <li><b>tweet</b>:
+        {% trans "Número de mensagens mencionando sintomas de dengue em tweets geolocalizados. Fonte: Observatório da Dengue / UFMG" %}</li>
+      <li><b>casos notif</b>:
+        {% trans "Número de casos notificados por semana (Os valores são atualizados retrospectivamente todas as semanas)" %}</li>
+      <li><b>incidência</b>:
+        {% trans "Taxa de incidência estimada por 100.000" %}</li>
+      <li><b>casos_est</b> :
+        {% trans "Número estimado de casos por semana usando o modelo de nowcasting (nota: Os valores são atualizados retrospectivamente a cada semana)" %}</li>
+      <li><b>pr(inc subir)</b>:
+        {% trans "Probabilidade de (Rt> 1). Para emitir o alerta laranja, usamos o critério p_rt1> 0,95 por 3 semanas ou mais." %}</li>
+      <li><b>nivel</b>:
+        {% trans "Nível de alerta (1 = verde, 2 = amarelo, 3 = laranja, 4 = vermelho), mais detalhes, consulte (Saiba mais)" %}</li>
+      </ul>
   </div>
 </div>
 
 <div class="row">
   <div id="notes" class="col-md-12">
-    <h2>Notas</h2>
+    <h3>{% trans "Notas" %}</h3>
 
     <ul>
-      <li>Os dados do sinan mais recentes ainda não foram totalmente digitados.
+      <li>{% blocktrans %}Os dados do sinan mais recentes ainda não foram totalmente digitados.
         Estimamos o número esperado de casos notificados considerando o tempo
-        até os casos serem digitados.
+        até os casos serem digitados{% endblocktrans %}.
       </li>
-      <li>Os dados de redes sociais são coletados e
-        analisados pelo Observatório de Dengue (UFMG).
+      <li>{% blocktrans %}Os dados de redes sociais são coletados e
+        analisados pelo Observatório de Dengue (UFMG){% endblocktrans %}.
       </li>
-      <li>Algumas vezes, os casos da última semana ainda não estao disponíveis,
+      <li>{% blocktrans %}Algumas vezes, os casos da última semana ainda não estao disponíveis,
         nesse caso, usa-se uma estimação com base na tendência de variação da
-        série.
+        série{% endblocktrans %}.
       </li>
     </ul>
   </div>
@@ -348,26 +314,24 @@
 
 <div class="row">
   <div id="credits" class="col-md-12">
-    <h2>Créditos</h2>
+    <h3>{% trans "Créditos" %}</h3>
 
-    Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como
-    parceira entre:
+    {% trans "Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como parceira entre" %}:
 
     <ul>
-      <li>Programa de Computação Científica, Fundação Oswaldo Cruz, Rio de
-        Janeiro.
+      <li>{% trans "Programa de Computação Científica, Fundação Oswaldo Cruz, Rio de Janeiro" %}.
       </li>
-      <li>Escola de Matemática Aplicada, Fundação Getúlio Vargas.</li>
-      <li>Secretaria Estadual de Saúde do {{state_name}}.</li>
-      <li>Observatório de Dengue da UFMG.</li>
+      <li>{% trans "Escola de Matemática Aplicada, Fundação Getúlio Vargas" %}.</li>
+      <li>{% trans "Secretaria Estadual de Saúde do" %} {{state_name}}.</li>
+      <li>{% trans "Observatório de Dengue da UFMG" %}.</li>
     </ul>
   </div>
 </div>
 
 <div class="row">
   <div id="contact" class="col-md-12">
-    <h2>Contato</h2>
-    Para mais detalhes sobre o sistema de alerta InfoDengue, consultar:
+    <h3>{% trans "Contato" %}</h3>
+    {% trans "Para mais detalhes sobre o sistema de alerta InfoDengue, consultar" %}:
     <a href="http://info.dengue.mat.br">http://info.dengue.mat.br</a>
   </div>
 </div>
