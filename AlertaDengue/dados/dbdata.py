@@ -78,16 +78,10 @@ MAP_ZOOM = filter_active_states(_map_zoom)
 # Ibis utils
 
 
-def con_table(disease) -> con:
+def chart_home_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
     """
-    name: hist_uf_dengue_materialized_view
-    Creates the connection in the tables with the disease suffix.
-    Parameters
-    ----------
-    disease: str
-        option: dengue|chikungunya|zika
-    Returns
-    -------
+    PostgreSQLTable[table]
+    name: hist_uf_disease_materialized_view
     schema:
         uf : string
         municipio_geocodigo : int32
@@ -96,40 +90,28 @@ def con_table(disease) -> con:
         casos_est : float32
         casos : int32
         nivel : int16
-        receptivo : int16    ​
+        receptivo : int16
+    Parameters:
+    ----------
+        uf, disease
+    Returns
+    -------
+        Dataframe
     """
 
-    _disease = get_disease_suffix(disease, empty_for_dengue=False)
-    connect_table = con.table(f'hist_uf{_disease}_materialized_view')
-
-    return connect_table
-
-
-def chart_home_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
-
     # Connect table by disease
-    table_hist_uf = con_table(disease)
+    _disease = get_disease_suffix(disease, empty_for_dengue=False)
+    table_hist_uf = con.table(f'hist_uf{_disease}_materialized_view')
 
     cache_name = (
         "data_chart" + "_" + str(uf).replace(" ", "_") + "_" + str(disease)
     )
+
     res = cache.get(cache_name)
 
     if res is None:
-        keys = [
-            'SE',
-            'uf',
-            'data_iniSE',
-            'casos_est',
-            'casos',
-            'nivel',
-            'municipio_geocodigo',
-            'receptivo',
-        ]
-        proj = table_hist_uf[keys].sort_by(('data_iniSE', True))
-        df_hist_uf = proj[proj['uf'] == uf]
-
-        res = df_hist_uf.execute()
+        filter_hist_uf = table_hist_uf[table_hist_uf['uf'] == uf]
+        res = filter_hist_uf.sort_by(('data_iniSE', True)).execute()
 
         cache.set(
             cache_name, res, settings.QUERY_CACHE_TIMEOUT,

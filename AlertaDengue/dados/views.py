@@ -19,6 +19,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.views.generic.base import TemplateView, View
+from copy import deepcopy
 
 from gis.geotiff import convert_from_shapefile
 
@@ -889,28 +890,37 @@ class ChartsMainView(TemplateView):
 
             df = chart_home_data(uf=state_name, disease=d)
 
-            # scatterchart
             if d == 'dengue':
                 if not df.empty:
                     last_se[s] = (
                         str(df.SE.max())[4:] + "/" + str(df.SE.max())[:4]
                     )
-                    keys = ['uf', 'casos_est', 'casos']
-                    df_by_uf = df.groupby(['SE'])[keys].sum()
-                    scatter_chart = _create_scatter_chart(
-                        df=df_by_uf, uf=state_name, disease=d
-                    )
+
                 else:
                     last_se[s] = ''
-                    scatter_chart = no_data_chart
-                    empty_charts_count[d] += 1
+
+            # scatterchart
+            if df.casos_est.any():
+                df_cases = deepcopy(df)
+
+                keys = ['casos_est', 'casos']
+                df_by_uf = df_cases.groupby(['SE'])[keys].sum()
+
+                scatter_chart = _create_scatter_chart(
+                    df=df_by_uf, uf=state_name, disease=d
+                )
+            else:
+                scatter_chart = no_data_chart
+                empty_charts_count[d] += 1
 
             create_scatter_chart[d][s] = scatter_chart
 
             # indicatorchart
-            if not df.empty:
+            if df.casos.any():
+                df_receptivity = deepcopy(df)
+
                 indicator_chart = _create_indicator_chart(
-                    df=df, uf=state_name, disease=d
+                    df=df_receptivity, uf=state_name, disease=d
                 )
             else:
                 indicator_chart = no_data_chart
@@ -919,22 +929,26 @@ class ChartsMainView(TemplateView):
             create_indicator_chart[d][s] = indicator_chart
 
             # stackbarchart
-            df_alert = (
-                df.groupby(['SE', 'nivel'])['municipio_geocodigo']
-                .count()
-                .reset_index()
-            )
-            color_alert = {1: 'Green', 2: 'Yellow', 3: 'Orange', 4: 'Red'}
-            df_alert.nivel = df_alert.nivel.apply(
-                lambda v: f'{color_alert[v]} Alert'
-            )
-            this_year_week = df_alert.SE.max()
-            get_week = df_alert.SE >= this_year_week - 4
-            df_alert_uf = df_alert[get_week].sort_values(
-                by=['nivel'], ascending=False
-            )
+            df_nivel = deepcopy(df)
 
-            if not df_alert_uf.empty:
+            if not df_nivel.empty:
+                df_alert = (
+                    df_nivel.groupby(['SE', 'nivel'])['municipio_geocodigo']
+                    .count()
+                    .reset_index()
+                )
+
+                color_alert = {1: 'Green', 2: 'Yellow', 3: 'Orange', 4: 'Red'}
+                df_alert.nivel = df_alert.nivel.apply(
+                    lambda v: f'{color_alert[v]} Alert'
+                )
+
+                this_year_week = df_alert.SE.max()
+                get_week = df_alert.SE >= this_year_week - 53
+                df_alert_uf = df_alert[get_week].sort_values(
+                    by=['nivel'], ascending=False
+                )
+
                 stack_chart = _create_stack_chart(
                     df=df_alert_uf, uf=state_name, disease=d
                 )
