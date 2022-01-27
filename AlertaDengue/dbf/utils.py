@@ -7,7 +7,8 @@ from simpledbf import Dbf5
 
 from django.conf import settings
 
-DBFS_PQTDIR = settings.DOCKER_HOST_TMP_PQTDIR
+
+DBFS_PQTDIR = os.path.join(settings.TEMP_FILES_DIR, 'dbfs_parquet')
 
 expected_fields = [
     u'NU_ANO',
