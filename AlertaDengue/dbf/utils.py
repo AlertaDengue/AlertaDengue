@@ -5,7 +5,9 @@ import geopandas as gpd
 import pandas as pd
 from simpledbf import Dbf5
 
-DBFS_PQTDIR = '/MEDIA_ROOT/dbfs_parquet'
+from django.conf import settings
+
+DBFS_PQTDIR = settings.DOCKER_HOST_MEDIA_PQTDIR
 
 expected_fields = [
     u'NU_ANO',

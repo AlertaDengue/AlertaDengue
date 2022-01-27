@@ -33,7 +33,7 @@ services:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
     volumes:
       - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
-      - ${DOCKER_HOST_PQTDIR}:/MEDIA_ROOT/dbfs_parquet
+      - ${DOCKER_HOST_MEDIA_PQTDIR}:/MEDIA_ROOT/dbfs_parquet
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
       - ${DOCKER_HOST_MAPFILES_DIR}:/srv/deploy/maps
       - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
@@ -59,7 +59,7 @@ services:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
     volumes:
       - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
-      - ${DOCKER_HOST_MEDIA_ROOT}/dbfs_parquet:/MEDIA_ROOT/dbfs_parquet
+      - ${DOCKER_HOST_MEDIA_PQTDIR}:/MEDIA_ROOT/dbfs_parquet
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
     depends_on:
       - rabbitmq
