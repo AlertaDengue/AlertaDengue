@@ -7,7 +7,7 @@ from simpledbf import Dbf5
 
 from django.conf import settings
 
-DBFS_PQTDIR = settings.DOCKER_HOST_MEDIA_PQTDIR
+DBFS_PQTDIR = settings.DOCKER_HOST_TMP_PQTDIR
 
 expected_fields = [
     u'NU_ANO',
