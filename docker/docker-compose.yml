@@ -33,13 +33,13 @@ services:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
     volumes:
       - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
-      - ${DOCKER_HOST_MEDIA_ROOT}/dbfs_parquet:/MEDIA_ROOT/dbfs_parquet
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
       - ${DOCKER_HOST_MAPFILES_DIR}:/srv/deploy/maps
       - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
       - ${DOCKER_HOST_TIFFS_DIR}:/srv/deploy/tiffs
       - ${DOCKER_HOST_LOG_DIR}:/var/log/mapserver
       - ${DOCKER_HOST_INCIDENCE_MAPS}:/srv/deploy/AlertaDengue/static/img/incidence_maps
+      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
     depends_on:
       - rabbitmq
       - memcached
@@ -59,8 +59,8 @@ services:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
     volumes:
       - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
-      - ${DOCKER_HOST_MEDIA_ROOT}/dbfs_parquet:/MEDIA_ROOT/dbfs_parquet
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
     depends_on:
       - rabbitmq
       - memcached

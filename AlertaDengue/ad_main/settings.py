@@ -221,7 +221,7 @@ STATICFILES_DIRS = (os.path.abspath(os.path.join(CURRENT_DIR, 'static')),)
 # used to upload dbf
 MEDIA_ROOT = os.getenv('MEDIA_ROOT')
 IMPORTED_FILES_DIR = os.getenv('IMPORTED_FILES_DIR')
-DOCKER_HOST_PQDIR = os.getenv('DOCKER_HOST_PQDIR')
+TEMP_FILES_DIR = os.getenv('TEMP_FILES_DIR')
 
 MAPSERVER_URL = os.getenv('MAPSERVER_URL')
 MAPSERVER_LOG_PATH = os.getenv('MAPSERVER_LOG_PATH')

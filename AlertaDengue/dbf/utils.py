@@ -5,8 +5,10 @@ import geopandas as gpd
 import pandas as pd
 from simpledbf import Dbf5
 
+from django.conf import settings
 
-DBFS_PQDIR = '/MEDIA_ROOT/dbfs_parquet'
+
+DBFS_PQTDIR = os.path.join(settings.TEMP_FILES_DIR, 'dbfs_parquet')
 
 expected_fields = [
     u'NU_ANO',
@@ -21,6 +23,9 @@ expected_fields = [
     u'DT_NASC',
     u'NU_IDADE_N',
     u'CS_SEXO',
+    # u'RESUL_PCR',
+    u'CRITERIO',
+    u'CLASSI_FIN',
 ]
 
 synonyms = {u'ID_MUNICIP': [u'ID_MN_RESI']}
@@ -119,7 +124,7 @@ def chunk_dbf_toparquet(dbfname) -> glob:
         chunk_gen(1000, dbf.numrec)
     ):
         pq_fname = os.path.join(
-            f'{DBFS_PQDIR}', f'{fname_topath}-{chunk}.parquet'
+            f'{DBFS_PQTDIR}', f'{fname_topath}-{chunk}.parquet'
         )
         df_gpd = gpd.read_file(
             dbfname, rows=slice(lowerbound, upperbound), ignore_geometry=True,
@@ -127,5 +132,5 @@ def chunk_dbf_toparquet(dbfname) -> glob:
         df_gpd = _parse_fields(df_gpd)
         df_gpd[expected_fields].to_parquet(pq_fname)
 
-    fetch_pq_fname = os.path.join(f'{DBFS_PQDIR}', f'{fname_topath}')
+    fetch_pq_fname = os.path.join(f'{DBFS_PQTDIR}', f'{fname_topath}')
     return glob.glob(f'{fetch_pq_fname}*.parquet')

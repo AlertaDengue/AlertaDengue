@@ -177,7 +177,17 @@ class Sinan(object):
                     if (isinstance(row[11], type(pd.NaT)) or row[11] is None)
                     else date.fromordinal(row[11].to_pydatetime().toordinal())
                 )  # dt_nasc
-                row[13] = None if pd.isnull(row[13]) else int(row[13])
+                row[13] = (
+                    None if pd.isnull(row[13]) else int(row[13])
+                )  # nu_idade_n
+                # row[14] = None if pd.isnull(row[14]) else int(row[14])
+                # # resul_pcr
+                row[15] = (
+                    None if pd.isnull(row[15]) else int(row[15])
+                )  # criterio
+                row[16] = (
+                    None if pd.isnull(row[16]) else int(row[16])
+                )  # classi_fin
                 cursor.execute(insert_sql, row)
                 if (i % 1000 == 0) and (i > 0):
                     logger.info(
