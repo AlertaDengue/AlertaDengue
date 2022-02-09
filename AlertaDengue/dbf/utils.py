@@ -24,8 +24,8 @@ expected_fields = [
     u'NU_IDADE_N',
     u'CS_SEXO',
     # u'RESUL_PCR',
-    u'CRITERIO',
-    u'CLASSI_FIN',
+    # u'CRITERIO',
+    # u'CLASSI_FIN',
 ]
 
 synonyms = {u'ID_MUNICIP': [u'ID_MN_RESI']}
