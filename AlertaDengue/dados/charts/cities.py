@@ -117,7 +117,8 @@ class ReportCityCharts:
 
         figure.update_layout(
             title=(
-                _('Limiares de incidência:<br>')
+                _('Limiares de incidência:')
+                + '<br>'
                 + ''.ljust(8)
                 + _('pré epidêmico=')
                 + f'{threshold_pre_epidemic:.1f}'.ljust(8)
