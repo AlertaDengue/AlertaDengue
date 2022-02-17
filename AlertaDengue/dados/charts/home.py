@@ -3,7 +3,6 @@ Module for plotting in the homepage charts
 '''
 
 from copy import deepcopy
-
 import pandas as pd
 import plotly.express as px
 
@@ -31,7 +30,7 @@ def _create_scatter_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
     """
 
     df = deepcopy(df)
-    df['SE'] = df.index.map(lambda v: '{}'.format(str(v)[-2:]))
+    df['SE'] = df.index.map(lambda v: F'{str(v)[:4]}/{str(v)[-2:]}')
     traces = []
 
     traces.append(
@@ -41,8 +40,11 @@ def _create_scatter_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
             name=_("Registrados"),
             marker=dict(color='#BDC3C7', line=dict(color='#3A4750', width=1),),
             width=0.5,
+            text=df.index.map(lambda v: F'{str(v)[-2:]}'),
             hovertemplate=_(
-                '<br>SE %{x}<br>' '%{y:1f} Casos notificados' '<extra></extra>'
+                '<br>SE %{text}<br>'
+                '%{y:1f} Casos notificados'
+                '<extra></extra>'
             ),
         )
     )
@@ -53,8 +55,11 @@ def _create_scatter_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
             y=df['casos_est'],
             name=_("Estimados"),
             line=dict(color='#4169e1', width=4),
+            text=df.index.map(lambda v: F'{str(v)[-2:]}'),
             hovertemplate=_(
-                '<br>SE %{x}<br>' '%{y:1f} Casos estimados' '<extra></extra>'
+                '<br>SE %{text}<br>'
+                '%{y:1f} Casos estimados'
+                '<extra></extra>'
             ),
         )
     )
@@ -70,6 +75,7 @@ def _create_scatter_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
                 },
                 xaxis=dict(
                     title=_('Semana epidemiológica'),
+                    tickangle=-15,
                     showline=True,
                     showgrid=True,
                     showticklabels=True,
@@ -259,7 +265,6 @@ def _create_stack_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
     """
 
     df = deepcopy(df)
-    # import ipdb; ipdb.set_trace()
 
     color_map_alert_y = {
         'Green Alert': '#00e640',
@@ -272,7 +277,7 @@ def _create_stack_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
     fig = px.bar(
         df,
         y='municipio_geocodigo',
-        x=df["SE"].map(lambda v: '%s' % (str(v)[-2:])),
+        x=df.SE.map(lambda v: F'{str(v)[:4]}/{str(v)[-2:]}'),
         color="nivel",
         color_discrete_map=color_map_alert_y,
         hover_data={'nivel'},
@@ -287,7 +292,10 @@ def _create_stack_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
     )
 
     fig.update_traces(
-        hovertemplate=_('%{y} Cidades na semana %{x}<extra></extra>'),
+        customdata=df.SE.map(lambda v: F'{str(v)[-2:]}'),
+        hovertemplate=_(
+            '%{y} Cidades na semana %{customdata} <extra></extra>'
+        ),
     )
 
     fig.update_layout(
@@ -296,7 +304,6 @@ def _create_stack_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
             "font": {"family": "Helvetica", "size": 16},
             "x": 0.5,
         },
-        legend=dict(x=-2, y=0, font_size=10),
         showlegend=False,
         hovermode='x',
         hoverlabel=dict(font_size=12, font_family="Rockwell"),
@@ -309,6 +316,7 @@ def _create_stack_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
         width=310,
         xaxis=dict(
             title=_('Semana epidemiológica'),
+            tickangle=-15,
             showline=True,
             showgrid=True,
             showticklabels=True,

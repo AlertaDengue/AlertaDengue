@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-20 21:26+0000\n"
+"POT-Creation-Date: 2022-02-17 21:41+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -80,7 +80,7 @@ msgstr "Estimated cases of "
 msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
 
-#: AlertaDengue/dados/charts/alerts.py:233 AlertaDengue/dados/charts/home.py:81
+#: AlertaDengue/dados/charts/alerts.py:233 AlertaDengue/dados/charts/home.py:87
 #: AlertaDengue/dados/templates/alert_state/age.html:125
 #: AlertaDengue/dados/templates/alert_state/date.html:100
 #: AlertaDengue/dados/templates/alert_state/disease.html:122
@@ -142,8 +142,8 @@ msgid "Semana %{text}<br>%{y:1f} Incidências"
 msgstr "Week %{text}<br>%{y:1f} Incidences"
 
 #: AlertaDengue/dados/charts/cities.py:120
-msgid "<b>Limiares de incidência</b>:<br>"
-msgstr "<b>Incidence threshold</b>:<br>"
+msgid "Limiares de incidência:"
+msgstr "Incidence threshold:"
 
 #: AlertaDengue/dados/charts/cities.py:122
 msgid "pré epidêmico="
@@ -201,52 +201,50 @@ msgstr "Week %{text} : %{y} Tweets"
 msgid "Menções na mídia social"
 msgstr "Mentions on social media"
 
-#: AlertaDengue/dados/charts/home.py:41
+#: AlertaDengue/dados/charts/home.py:40
 msgid "Registrados"
 msgstr "Registered"
 
 #: AlertaDengue/dados/charts/home.py:45
-#, fuzzy, python-brace-format
-#| msgid "<br>SE %{x}<br>%{y:1f} Casos notificados"
-msgid "<br>SE %{x}<br>%{y:1f} Casos notificados<extra></extra>"
-msgstr "<br>Week %{x}<br>%{y:1f} Registered Cases"
+#, python-brace-format
+msgid "<br>SE %{text}<br>%{y:1f} Casos notificados<extra></extra>"
+msgstr "<br>Week %{text}<br>%{y:1f} Registered Cases<extra></extra>"
 
-#: AlertaDengue/dados/charts/home.py:54
+#: AlertaDengue/dados/charts/home.py:56
 msgid "Estimados"
 msgstr "Estimated"
 
-#: AlertaDengue/dados/charts/home.py:57
-#, fuzzy, python-brace-format
-#| msgid "<br>SE %{x}<br>%{y:1f} Casos estimados"
-msgid "<br>SE %{x}<br>%{y:1f} Casos estimados<extra></extra>"
-msgstr "<br>Week: %{x}<br>%{y:1f} Estimated Cases"
+#: AlertaDengue/dados/charts/home.py:60
+#, python-brace-format
+msgid "<br>SE %{text}<br>%{y:1f} Casos estimados<extra></extra>"
+msgstr "<br>Week: %{text}<br>%{y:1f} Estimated Cases<extra></extra>"
 
-#: AlertaDengue/dados/charts/home.py:67
+#: AlertaDengue/dados/charts/home.py:72
 msgid "Total de casos no estado"
 msgstr "Cumulative number of cases in the State"
 
-#: AlertaDengue/dados/charts/home.py:72 AlertaDengue/dados/charts/home.py:207
-#: AlertaDengue/dados/charts/home.py:311
+#: AlertaDengue/dados/charts/home.py:77 AlertaDengue/dados/charts/home.py:213
+#: AlertaDengue/dados/charts/home.py:318
 #: AlertaDengue/dados/templates/report_city.html:274
 #: AlertaDengue/dados/templates/services_api.html:205
 #: AlertaDengue/forecast/models.py:139
 msgid "Semana epidemiológica"
 msgstr "Epidemiological week"
 
-#: AlertaDengue/dados/charts/home.py:203
+#: AlertaDengue/dados/charts/home.py:209
 msgid "Cidades com clima favorável <br>para transmissão"
 msgstr "Cities with favorable environment <br>for transmission"
 
-#: AlertaDengue/dados/charts/home.py:290
+#: AlertaDengue/dados/charts/home.py:297
 #, python-brace-format
-msgid "%{y} Cidades na semana %{x}<extra></extra>"
-msgstr "%{y} Cities in the week %{x}<extra></extra>"
+msgid "%{y} Cidades na semana %{customdata} <extra></extra>"
+msgstr "%{y} Cities in the week %{customdata}<extra></extra>"
 
-#: AlertaDengue/dados/charts/home.py:295
+#: AlertaDengue/dados/charts/home.py:303
 msgid "Situação epidemiológica das cidades"
 msgstr "Epidemiological Situation"
 
-#: AlertaDengue/dados/charts/home.py:321
+#: AlertaDengue/dados/charts/home.py:328
 msgid "Número de cidades"
 msgstr "Number of cities"
 
@@ -1730,8 +1728,8 @@ msgid ""
 "Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como "
 "parceira entre"
 msgstr ""
-"This was a project developed with support from SVS/MS and is operated "
-"as a partnership between"
+"This was a project developed with support from SVS/MS and is operated as a "
+"partnership between"
 
 #: AlertaDengue/dados/templates/report_city.html:322
 #: AlertaDengue/dados/templates/report_state.html:470
@@ -2662,13 +2660,13 @@ msgstr "Estimated cases of %(disease_label)s in monitored cities"
 msgid "casos estimados"
 msgstr "estimated cases"
 
-#: AlertaDengue/dados/views.py:469 AlertaDengue/dados/views.py:599
+#: AlertaDengue/dados/views.py:470 AlertaDengue/dados/views.py:600
 msgid ""
 "A doença {} não está registrada em nosso banco de dados para o município de "
 "{}."
 msgstr "This disease {} is not registered in our database for {} municipality"
 
-#: AlertaDengue/dados/views.py:779
+#: AlertaDengue/dados/views.py:780
 msgid "desconhecida"
 msgstr "unknown"
 
@@ -2891,72 +2889,3 @@ msgstr "Your username, if you have forgotten it, is:"
 #: AlertaDengue/templates/registration/password_reset_email.html:10
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
-
-#, fuzzy
-#~| msgid "Semana %{text}<br>Incidência=%{y:1f}"
-#~ msgid "Semana %{text}<br>Incidência=%{y:1f}"
-#~ msgstr "Week: %{text} <br>%{y:1f} Incidence"
-
-#, fuzzy
-#~| msgid "Semana %{text} <br>Incidência=%{y:1f}"
-#~ msgid "Semana %{text} <br>Incidência=%{y:1f}"
-#~ msgstr "Week %{text} <br>Incidence=%{y:1f}"
-
-#, fuzzy
-#~| msgid "Semana %{text} : %{y:1f} Casos"
-#~ msgid "Semana %{text} : %{y:1f} Casos <extra></extra>"
-#~ msgstr "Week: %{text} <br>%{y} Estimated Cases"
-
-#, fuzzy
-#~| msgid "Semana %{text} : %{y:1f}°C"
-#~ msgid "Semana %{text} : %{y:1f}°C  <extra></extra>"
-#~ msgstr "%Week: %{text} : %{y:1f}°C"
-
-#, fuzzy
-#~| msgid "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
-#~ msgid "Semana %{text} : %{y} Tweets  <extra></extra>"
-#~ msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
-
-#~ msgid "verde"
-#~ msgstr "Green"
-
-#~ msgid "amarelo"
-#~ msgstr "Yellow"
-
-#~ msgid "laranja"
-#~ msgstr "Orange"
-
-#~ msgid "vermelho"
-#~ msgstr "Red"
-
-#~ msgid "pré epidêmico={threshold_pre_epidemic:.1f}"
-#~ msgstr "Pre-epidemic threshold={threshold_pre_epidemic}"
-
-#~ msgid "pós epidêmico={threshold_pos_epidemic:.1f}"
-#~ msgstr "threshold_epidemic={threshold_epidemic:.1f}"
-
-#~ msgid "epidêmico={threshold_epidemic:.1f}"
-#~ msgstr "threshold_epidemic={threshold_epidemic:.1f}"
-
-#~ msgid "epidêmico={:.1f}"
-#~ msgstr "Epidemic threshold={:.1f}"
-
-#~ msgid ""
-#~ "<b>Limiares de incidência</b>:<br>pré epidêmico={threshold_pre_epidemic}"
-#~ msgstr ""
-#~ "<b>Incidence</b>:<br>threshold_pre_epidemic={threshold_pre_epidemic}"
-
-#~ msgid ""
-#~ "\n"
-#~ "                </b>Limiares de incidência</b>:<br>\n"
-#~ "                pré epidêmico={threshold_pre_epidemic}\n"
-#~ "                pós epidêmico={threshold_pos_epidemic}\n"
-#~ "                epidêmico={threshold_epidemic}\n"
-#~ "                "
-#~ msgstr ""
-#~ "\n"
-#~ "                <b>Incidence thresholds</b>:<br>\n"
-#~ "                Pre-epidemic={threshold_pre_epidemic}\n"
-#~ "                Post-epidemic threshold={threshold_pos_epidemic}\n"
-#~ "                Epidemic threshold={threshold_epidemic}\n"
-#~ "                "
