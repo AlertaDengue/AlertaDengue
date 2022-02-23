@@ -1,26 +1,23 @@
-from sqlalchemy import create_engine
+from typing import Optional
+
+import ibis
+import pandas as pd
 
 # local
 from ad_main import settings
-from dados.dbdata import (  # noqa:F401
-    CID10,
-    STATE_NAME,
-    get_disease_suffix,
-    MRJ_GEOCODE,
+from dados.dbdata import CID10
+from sqlalchemy import create_engine
+
+PSQL_URI = "postgresql://{}:{}@{}:{}/{}".format(
+    settings.PSQL_USER,
+    settings.PSQL_PASSWORD,
+    settings.PSQL_HOST,
+    settings.PSQL_PORT,
+    settings.PSQL_DB,
 )
 
-import pandas as pd
-
-
-db_engine = create_engine(
-    "postgresql://{}:{}@{}:{}/{}".format(
-        settings.PSQL_USER,
-        settings.PSQL_PASSWORD,
-        settings.PSQL_HOST,
-        settings.PSQL_PORT,
-        settings.PSQL_DB,
-    )
-)
+db_engine = create_engine(PSQL_URI)
+con = ibis.postgres.connect(url=PSQL_URI)
 
 
 class NotificationQueries:
@@ -538,36 +535,47 @@ class NotificationQueries:
 
 class AlertCity:
     @staticmethod
-    def search(disease: str, geocode: int, ew_start: int, ew_end: int):
+    def search(
+        disease: str,
+        geocode: int,
+        ew_start: Optional[int] = None,
+        ew_end: Optional[int] = None,
+    ) -> ibis.expr:
         """
-
-        :param disease:
-        :param geocode:
-        :param ew_start:
-        :param ew_end:
-        :return:
-        """
+            Return an ibis expression with the history for a given disease.
+            Parameters
+            ----------
+            disease : str, {'dengue', 'chik', 'zika'}
+            geocodes : List[int]
+            ew_start : Optional[int]
+                The starting Year/Week, e.g.: 202202
+            ew_end : Optional[int]
+                The ending Year/Week, e.g.: 202205
+            Returns
+            -------
+            ibis.expr.types.Expr
+            """
         if disease not in CID10.keys():
             raise Exception(
                 'The diseases available are: %s.'
                 % ', '.join('`%s`' % k for k in CID10.keys())
             )
 
-        sql = '''
-        SELECT *, (
-          SELECT sum(casos)
-          FROM "Municipio"."Historico_alerta{0}"
-          WHERE municipio_geocodigo={1} AND "SE" BETWEEN {4}01 AND {4}54
-        ) AS notif_accum_year
-        FROM "Municipio"."Historico_alerta{0}"
-        WHERE municipio_geocodigo={1} AND "SE" BETWEEN {2} AND {3}
-        '''.format(
-            get_disease_suffix(disease),
-            geocode,
-            ew_start,
-            ew_end,
-            str(ew_end)[:4],
+        table_suffix = ''
+        if disease != 'dengue':
+            table_suffix = F'_{disease}'
+
+        schema_city = con.schema('Municipio')
+        t_hist = schema_city.table('Historico_alerta{}'.format(table_suffix))
+
+        if ew_start and ew_end:
+            pass
+        else:
+            ew_end = t_hist['SE'].max().execute()
+            ew_start = ew_end - 2
+
+        hist_filter = (t_hist['SE'].between(int(ew_start), int(ew_end))) & (
+            t_hist['municipio_geocodigo'] == geocode
         )
 
-        with db_engine.connect() as conn:
-            return pd.read_sql(sql, conn)
+        return t_hist.filter(hist_filter).sort_by(ibis.desc('SE'))

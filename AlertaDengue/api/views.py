@@ -1,16 +1,16 @@
+import datetime as dt
+import json
+import os
+from datetime import datetime
+from os.path import dirname, join
+
+from dados.episem import episem
 from django.http import HttpResponse
 from django.views.generic.base import View
-import datetime as dt
-from datetime import datetime
-import os
+from dotenv import load_dotenv
 
 # local
-from .db import NotificationQueries, STATE_NAME, AlertCity
-from dados.episem import episem
-
-import json
-from dotenv import load_dotenv
-from os.path import join, dirname
+from .db import STATE_NAME, AlertCity, NotificationQueries
 
 env_file = os.environ.get('ENV_FILE', '.env')
 
@@ -34,6 +34,12 @@ class _GetMethod:
             and default is None
         ):
             raise Exception(error_message)
+
+        # if param in self.request.GET:
+        #     print('Aqui pode tratar', param)
+
+        # else:
+        #     print('Não existe os parametros', param)
 
         result = (
             self.request.GET[param] if param in self.request.GET else default
@@ -111,7 +117,8 @@ class NotificationReducedCSV_View(View, _GetMethod):
 
 
 class AlertCityView(View, _GetMethod):
-    """"""
+    """
+    """
 
     request = None
 
@@ -120,9 +127,10 @@ class AlertCityView(View, _GetMethod):
         format = ''
 
         dt_now = dt.datetime.now()
-        dt_start = dt_now - dt.timedelta(weeks=int(os.getenv('WEEK_ND')))
+        dt_start = dt_now - dt.timedelta(weeks=int(2))
 
         # Epidemic Year Week default format = YYYYWW
+        # Used default to validate error_message
         year_end, week_end = (
             episem(dt_now, sep='')[:4],
             episem(dt_now, sep='')[-2:],
@@ -142,29 +150,27 @@ class AlertCityView(View, _GetMethod):
             format = self._get(
                 'format', error_message='Format sent is empty.'
             ).lower()
-
-            epiweek_start = self._get(
-                'epiweek_start',
+            ew_start = self._get(
+                'ew_start',
                 default=int(week_start),
                 cast=int,
                 error_message='Epidemic start week sent is empty.',
             )
-
-            epiweek_end = self._get(
-                'epiweek_end',
+            ew_end = self._get(
+                'ew_end',
                 default=int(week_end),
                 cast=int,
                 error_message='Epidemic end week sent is empty.',
             )
-
-            epiyear_start = self._get(
-                'epiyear_start',
+            ey_start = self._get(
+                'ey_start',
                 default=int(year_start),
                 cast=int,
                 error_message='Epidemic start year sent is empty.',
             )
-            epiyear_end = self._get(
-                'epiyear_end',
+
+            ey_end = self._get(
+                'ey_end',
                 default=int(year_end),
                 cast=int,
                 error_message='Epidemic end year sent is empty.',
@@ -175,24 +181,23 @@ class AlertCityView(View, _GetMethod):
                     'The output format available are: `csv` or `json`.'
                 )
 
-            # EpidemEpidemiological Week default format = YYYYWW
-            epi_yearweek_start = epiyear_start * 100 + epiweek_start
-            epi_yearweek_end = epiyear_end * 100 + epiweek_end
+            eyw_start = ey_start * 100 + ew_start
+            eyw_end = ey_end * 100 + ew_end
 
-            df = None
-
-            while True:
+            if self._get('ew_end'):
+                # Use the keyword arguments for infodengue website
                 df = AlertCity.search(
                     geocode=geocode,
                     disease=disease,
-                    ew_start=epi_yearweek_start,
-                    ew_end=epi_yearweek_end,
-                )
-                if not df.empty:
-                    break
-                epi_yearweek_start -= 3
+                    ew_start=eyw_start,
+                    ew_end=eyw_end,
+                ).execute()
+            else:
+                # Use the keyword arguments for mobile app
+                df = AlertCity.search(
+                    geocode=geocode, disease=disease,
+                ).execute()
 
-            # change all keys to lower case
             df.drop(
                 columns=['municipio_geocodigo', 'municipio_nome'],
                 inplace=True,
