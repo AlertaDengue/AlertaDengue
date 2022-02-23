@@ -35,12 +35,6 @@ class _GetMethod:
         ):
             raise Exception(error_message)
 
-        # if param in self.request.GET:
-        #     print('Aqui pode tratar', param)
-
-        # else:
-        #     print('Não existe os parametros', param)
-
         result = (
             self.request.GET[param] if param in self.request.GET else default
         )

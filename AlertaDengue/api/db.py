@@ -546,7 +546,7 @@ class AlertCity:
             Parameters
             ----------
             disease : str, {'dengue', 'chik', 'zika'}
-            geocodes : List[int]
+            geocode : int
             ew_start : Optional[int]
                 The starting Year/Week, e.g.: 202202
             ew_end : Optional[int]
