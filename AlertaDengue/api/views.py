@@ -1,4 +1,3 @@
-import datetime as dt
 import json
 from datetime import datetime
 
@@ -112,20 +111,6 @@ class AlertCityView(View, _GetMethod):
         self.request = request
         format = ''
 
-        dt_now = dt.datetime.now()
-        dt_start = dt_now - dt.timedelta(weeks=int(2))
-
-        # Epidemic Year Week default format = YYYYWW
-        # Used default to validate error_message
-        year_end, week_end = (
-            episem(dt_now, sep='')[:4],
-            episem(dt_now, sep='')[-2:],
-        )
-        year_start, week_start = (
-            episem(dt_start, sep='')[:4],
-            episem(dt_start, sep='')[-2:],
-        )
-
         try:
             disease = self._get(
                 'disease', error_message='Disease sent is empty.'
@@ -138,26 +123,26 @@ class AlertCityView(View, _GetMethod):
             ).lower()
             ew_start = self._get(
                 'ew_start',
-                default=int(week_start),
+                default=True,
                 cast=int,
                 error_message='Epidemic start week sent is empty.',
             )
             ew_end = self._get(
                 'ew_end',
-                default=int(week_end),
+                default=True,
                 cast=int,
                 error_message='Epidemic end week sent is empty.',
             )
             ey_start = self._get(
                 'ey_start',
-                default=int(year_start),
+                default=True,
                 cast=int,
                 error_message='Epidemic start year sent is empty.',
             )
 
             ey_end = self._get(
                 'ey_end',
-                default=int(year_end),
+                default=True,
                 cast=int,
                 error_message='Epidemic end year sent is empty.',
             )
@@ -195,9 +180,9 @@ class AlertCityView(View, _GetMethod):
                 result = df.to_csv(index=False)
         except Exception as e:
             if format == 'json':
-                result = F'{"error_message": {e}}'
+                result = '{"error_message": "%s"}' % e
             else:
-                result = F'[EE] error_message: {e}'
+                result = '[EE] error_message: %s' % e
 
         content_type = 'application/json' if format == 'json' else 'text/plain'
 
