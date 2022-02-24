@@ -5,7 +5,8 @@ import pandas as pd
 
 # local
 from ad_main import settings
-from dados.dbdata import CID10
+from dados.dbdata import CID10, STATE_NAME  # noqa:F401
+
 from sqlalchemy import create_engine
 
 PSQL_URI = "postgresql://{}:{}@{}:{}/{}".format(
@@ -557,8 +558,7 @@ class AlertCity:
             """
         if disease not in CID10.keys():
             raise Exception(
-                'The diseases available are: %s.'
-                % ', '.join('`%s`' % k for k in CID10.keys())
+                F'The diseases available are: {[k for k in CID10.keys()]}'
             )
 
         table_suffix = ''
@@ -566,7 +566,7 @@ class AlertCity:
             table_suffix = F'_{disease}'
 
         schema_city = con.schema('Municipio')
-        t_hist = schema_city.table('Historico_alerta{}'.format(table_suffix))
+        t_hist = schema_city.table(F'Historico_alerta{table_suffix}')
 
         if ew_start and ew_end:
             pass

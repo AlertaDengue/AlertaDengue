@@ -1,21 +1,13 @@
 import datetime as dt
 import json
-import os
 from datetime import datetime
-from os.path import dirname, join
 
 from dados.episem import episem
 from django.http import HttpResponse
 from django.views.generic.base import View
-from dotenv import load_dotenv
 
 # local
 from .db import STATE_NAME, AlertCity, NotificationQueries
-
-env_file = os.environ.get('ENV_FILE', '.env')
-
-env_path = join(dirname(dirname(dirname(__file__))), env_file)
-load_dotenv(env_path)
 
 
 class _GetMethod:
@@ -203,9 +195,9 @@ class AlertCityView(View, _GetMethod):
                 result = df.to_csv(index=False)
         except Exception as e:
             if format == 'json':
-                result = '{"error_message": "%s"}' % e
+                result = F'{"error_message": {e}}'
             else:
-                result = '[EE] error_message: %s' % e
+                result = F'[EE] error_message: {e}'
 
         content_type = 'application/json' if format == 'json' else 'text/plain'
 
