@@ -578,4 +578,11 @@ class AlertCity:
             t_hist['municipio_geocodigo'] == geocode
         )
 
-        return t_hist.filter(hist_filter).sort_by(ibis.desc('SE'))
+        t_hist_proj = t_hist[(hist_filter)]
+        t_hist_expr = t_hist_proj.mutate(
+            notif_accum_year=t_hist_proj.casos.sum()
+        )
+
+        # ibis.impala.compile(t_hist_expr)
+
+        return t_hist_expr.sort_by(ibis.desc('SE'))
