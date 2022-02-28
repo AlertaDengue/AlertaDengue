@@ -1,21 +1,12 @@
+import json
+from datetime import datetime
+
+from dados.episem import episem
 from django.http import HttpResponse
 from django.views.generic.base import View
-import datetime as dt
-from datetime import datetime
-import os
 
 # local
-from .db import NotificationQueries, STATE_NAME, AlertCity
-from dados.episem import episem
-
-import json
-from dotenv import load_dotenv
-from os.path import join, dirname
-
-env_file = os.environ.get('ENV_FILE', '.env')
-
-env_path = join(dirname(dirname(dirname(__file__))), env_file)
-load_dotenv(env_path)
+from .db import STATE_NAME, AlertCity, NotificationQueries
 
 
 class _GetMethod:
@@ -111,21 +102,14 @@ class NotificationReducedCSV_View(View, _GetMethod):
 
 
 class AlertCityView(View, _GetMethod):
-    """"""
+    """
+    """
 
     request = None
 
     def get(self, request):
         self.request = request
         format = ''
-
-        week_nd = int(os.getenv('WEEK_ND'))
-        dt_end = dt.datetime.now()
-        dt_start = dt_end - dt.timedelta(weeks=week_nd)
-        yw_end_default = episem(dt_end, sep='')
-        yw_start_default = episem(dt_start, sep='')
-        year_end, week_end = yw_end_default[:4], yw_end_default[-2:]
-        year_start, week_start = yw_start_default[:4], yw_start_default[-2:]
 
         try:
             disease = self._get(
@@ -139,26 +123,26 @@ class AlertCityView(View, _GetMethod):
             ).lower()
             ew_start = self._get(
                 'ew_start',
-                default=int(week_start),
+                default=True,
                 cast=int,
                 error_message='Epidemic start week sent is empty.',
             )
             ew_end = self._get(
                 'ew_end',
-                default=int(week_end),
+                default=True,
                 cast=int,
                 error_message='Epidemic end week sent is empty.',
             )
             ey_start = self._get(
                 'ey_start',
-                default=int(year_start),
+                default=True,
                 cast=int,
                 error_message='Epidemic start year sent is empty.',
             )
 
             ey_end = self._get(
                 'ey_end',
-                default=int(year_end),
+                default=True,
                 cast=int,
                 error_message='Epidemic end year sent is empty.',
             )
@@ -171,13 +155,20 @@ class AlertCityView(View, _GetMethod):
             eyw_start = ey_start * 100 + ew_start
             eyw_end = ey_end * 100 + ew_end
 
-            df = AlertCity.search(
-                geocode=geocode,
-                disease=disease,
-                ew_start=eyw_start,
-                ew_end=eyw_end,
-            )
-            # change all keys to lower case
+            if self._get('ew_end'):
+                # Use the keyword arguments for infodengue website
+                df = AlertCity.search(
+                    geocode=geocode,
+                    disease=disease,
+                    ew_start=eyw_start,
+                    ew_end=eyw_end,
+                ).execute()
+            else:
+                # Use the keyword arguments for mobile app
+                df = AlertCity.search(
+                    geocode=geocode, disease=disease,
+                ).execute()
+
             df.drop(
                 columns=['municipio_geocodigo', 'municipio_nome'],
                 inplace=True,
