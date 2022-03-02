@@ -163,8 +163,8 @@ class RegionalParameters:
             list(iterable)
         """
 
-        cond_t_municipio_uf = cls.t_municipio[cls.t_municipio.uf == state_name]
-        t_joined = cls.t_regional.join(cond_t_municipio_uf, cls.t_parameters)[
+        municipio_uf_filter = cls.t_municipio[cls.t_municipio.uf == state_name]
+        t_joined = cls.t_regional.join(municipio_uf_filter, cls.t_parameters)[
             cls.t_regional.nome
         ].distinct()
         df_regional_names = t_joined.execute()
@@ -220,17 +220,19 @@ class RegionalParameters:
 
             else:
                 # print(f'Add new cache_name: {cache_name}')
-                cond_t_municipio_uf = cls.t_municipio[
+                municipio_uf_filter = cls.t_municipio[
                     cls.t_municipio.uf == state_name
                 ]
-                cond_t_regional_name = cls.t_regional[
+                regional_name_filter = cls.t_regional[
                     cls.t_regional.nome == regional_name
                 ]
-                df_cities = cond_t_municipio_uf.join(
-                    cond_t_regional_name, cls.t_parameters
-                )[
-                    cond_t_municipio_uf.geocodigo, cond_t_municipio_uf.nome
-                ].execute()
+                df_cities = (
+                    municipio_uf_filter.join(
+                        regional_name_filter, cls.t_parameters
+                    )[municipio_uf_filter.geocodigo, municipio_uf_filter.nome]
+                    .sort_by('geocodigo')
+                    .execute()
+                )
 
                 for row in df_cities.to_dict(orient="records"):
                     cities_by_region[row['geocodigo']] = row['nome']
@@ -261,9 +263,11 @@ class RegionalParameters:
                 else:
                     state_names = [f"{state_name}"]
                 expr_t_municipio_uf = cls.t_municipio.uf.isin(state_names)
-                df_cities = cls.t_municipio[expr_t_municipio_uf][
-                    'geocodigo', 'nome'
-                ].execute()
+                df_cities = (
+                    cls.t_municipio[expr_t_municipio_uf]['geocodigo', 'nome']
+                    .sort_by('nome')
+                    .execute()
+                )
 
                 for row in df_cities.to_dict(orient="records"):
                     cities_by_region[row['geocodigo']] = row['nome']
