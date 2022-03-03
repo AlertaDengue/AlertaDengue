@@ -41,7 +41,7 @@ from .dbdata import (
     MRJ_GEOCODE,
     STATE_INITIAL,
     STATE_NAME,
-    chart_home_data,
+    data_hist_uf,
     Forecast,
     ReportCity,
     ReportState,
@@ -888,7 +888,7 @@ class ChartsMainView(TemplateView):
 
             count_cities[d][s] = notif_resume.count_cities_by_uf(state_name, d)
 
-            df = chart_home_data(uf=state_name, disease=d)
+            df = data_hist_uf(uf=state_name, disease=d).execute()
 
             if d == 'dengue':
                 if not df.empty:

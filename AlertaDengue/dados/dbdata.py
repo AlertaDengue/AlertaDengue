@@ -78,7 +78,7 @@ MAP_ZOOM = filter_active_states(_map_zoom)
 # Ibis utils
 
 
-def chart_home_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
+def data_hist_uf(uf: str, disease: str = 'dengue') -> pd.DataFrame:
     """
     PostgreSQLTable[table]
     name: hist_uf_disease_materialized_view
@@ -104,14 +104,13 @@ def chart_home_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
     table_hist_uf = con.table(f'hist_uf{_disease}_materialized_view')
 
     cache_name = (
-        "data_chart" + "_" + str(uf).replace(" ", "_") + "_" + str(disease)
+        "data_hist" + "_" + str(uf).replace(" ", "_") + "_" + str(disease)
     )
 
     res = cache.get(cache_name)
 
     if res is None:
-        filter_hist_uf = table_hist_uf[table_hist_uf['uf'] == uf]
-        res = filter_hist_uf.sort_by(('data_iniSE', True)).execute()
+        res = table_hist_uf.filter(table_hist_uf['uf'] == uf).sort_by('SE')
 
         cache.set(
             cache_name, res, settings.QUERY_CACHE_TIMEOUT,
@@ -230,7 +229,7 @@ class RegionalParameters:
                     municipio_uf_filter.join(
                         regional_name_filter, cls.t_parameters
                     )[municipio_uf_filter.geocodigo, municipio_uf_filter.nome]
-                    .sort_by('geocodigo')
+                    .sort_by('nome')
                     .execute()
                 )
 
