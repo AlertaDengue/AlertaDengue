@@ -220,13 +220,19 @@ class RegionalParameters:
 
             else:
                 # print(f'Add new cache_name: {cache_name}')
-                municipio_uf_filter = cls.t_municipio[
-                    cls.t_municipio.uf == state_name
+                municipio_proj = cls.t_municipio[
+                    'geocodigo', 'nome', 'uf', 'id_regional'
                 ]
-                regional_name_filter = cls.t_regional[
-                    cls.t_regional.nome == regional_name
-                ]
-                df_cities = (
+                municipio_uf_filter = municipio_proj[
+                    municipio_proj.uf == state_name
+                ].sort_by('id_regional')
+
+                regional_proj = cls.t_regional['id', 'nome']
+                regional_name_filter = regional_proj[
+                    regional_proj.nome == regional_name
+                ].sort_by('id')
+
+                cities_expr = (
                     municipio_uf_filter.join(
                         regional_name_filter, cls.t_parameters
                     )[municipio_uf_filter.geocodigo, municipio_uf_filter.nome]
@@ -234,7 +240,7 @@ class RegionalParameters:
                     .execute()
                 )
 
-                for row in df_cities.to_dict(orient="records"):
+                for row in cities_expr.to_dict(orient="records"):
                     cities_by_region[row['geocodigo']] = row['nome']
 
                 res = cities_by_region
@@ -256,20 +262,20 @@ class RegionalParameters:
             else:
                 # print(f'Add cache_name {cache_name}')
                 if state_name is None:
-                    state_names = [
-                        f"{state_name}" for state_name in STATE_NAME.values()
-                    ]
+                    state_names = [f"{state_name}"]
 
                 else:
                     state_names = [f"{state_name}"]
-                expr_t_municipio_uf = cls.t_municipio.uf.isin(state_names)
-                df_cities = (
-                    cls.t_municipio[expr_t_municipio_uf]['geocodigo', 'nome']
+
+                t_municipio_uf_expr = cls.t_municipio.uf.isin(state_names)
+
+                cities_expr = (
+                    cls.t_municipio[t_municipio_uf_expr]['geocodigo', 'nome']
                     .sort_by('nome')
                     .execute()
                 )
 
-                for row in df_cities.to_dict(orient="records"):
+                for row in cities_expr.to_dict(orient="records"):
                     cities_by_region[row['geocodigo']] = row['nome']
 
                 res = cities_by_region
