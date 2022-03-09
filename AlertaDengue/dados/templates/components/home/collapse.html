@@ -42,30 +42,30 @@
 </div>
 
 <script> //Chart columns are provided by template charts.html
-  $(document).ready(function(){
+  {% for key in states_name %}
 
-    {% for key,value in states_name.items %}
-
-    var requestCache = {};
-    function LoadDataFromApi(apiUrl) {
-      if (!requestCache[apiUrl]) {
-        requestCache[apiUrl] = $.ajax({
-            type: 'GET',
-            url: apiUrl,
-            dataType: "html"
-        });
+    $(document).ready(function(){
+      var requestCache = {};
+      function LoadDataFromApi(apiUrl) {
+        if (!requestCache[apiUrl]) {
+          requestCache[apiUrl] = $.ajax({
+              type: 'GET',
+              url: apiUrl,
+              dataType: "html"
+          });
+        }
+        return requestCache[apiUrl];
       }
-      return requestCache[apiUrl];
-    }
 
-    LoadDataFromApi("/chartshome/{{ key }}")
-      .then(function(data) {
-        $("#panel_{{ key }}").html(data);
-        // console.log(data);
-      });
+      LoadDataFromApi("/chartshome/{{ key }}")
+        .then(function(data) {
+          $("#panel_{{ key }}").html(data);
+          // console.log(data);
+        });
 
-    {% endfor %}
-  });
+    });
+
+  {% endfor %}
 </script>
 
 {% endblock %}

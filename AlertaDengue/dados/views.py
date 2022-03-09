@@ -37,7 +37,6 @@ from .charts.states import ReportStateCharts
 from .dbdata import (
     ALERT_COLOR,
     CID10,
-    DISEASES_NAMES,
     MRJ_GEOCODE,
     STATE_INITIAL,
     STATE_NAME,
@@ -813,9 +812,7 @@ class AlertaStateView(TemplateView):
 class ChartsMainView(TemplateView):
     template_name = 'components/home/charts.html'
 
-    _states_name = STATE_NAME
-
-    def get_img_map(self, s: str, d: str) -> str:
+    def get_img_map(self, state_abbv: str, disease: str) -> str:
 
         """
         Verify if file exists and return a string to path.
@@ -830,23 +827,25 @@ class ChartsMainView(TemplateView):
         image_path: str
         """
 
-        img_name = f'static/img/incidence_maps/state/incidence_{s}_{d}.png'
+        img_name = (
+            'static/img/incidence_maps/state/incidence_{}_{}.png'
+        ).format(state_abbv, disease)
 
         img_data = f"""
-                <div class='mt-4'>
-                    <img
-                    src='{img_name}'
-                    alt=''
-                    title='Mapa de {d} para o estado de {s}'
-                    style='width:100%'
-                    />
-                </div>"""
+            <div class='mt-4'>
+                <img
+                src='{img_name}'
+                alt=''
+                title='Mapa de {disease} para o estado de {state_abbv}'
+                style='width:100%'
+                />
+            </div>"""
 
         img_no_data = f"""
-                <div class='alert alert-primary' align='center'>
-                    <p>Não há dados suficientes para
-                    a geração do mapa sobre {d}</p>
-                </div>"""
+            <div class='alert alert-primary' align='center'>
+                <p>Não há dados suficientes para
+                a geração do mapa sobre {disease}</p>
+            </div>"""
 
         image_path = join(dirname(dirname(__file__)), img_name)
 
@@ -857,7 +856,6 @@ class ChartsMainView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ChartsMainView, self).get_context_data(**kwargs)
-        diseases = tuple(DISEASES_NAMES)
 
         create_scatter_chart = defaultdict(dict)
         create_indicator_chart = defaultdict(dict)
@@ -869,35 +867,38 @@ class ChartsMainView(TemplateView):
         states_alert = defaultdict(dict)
         notif_resume = dbdata.NotificationResume
 
-        s = context['state']
-        states_alert[s] = s
+        state_abbv = context['state']
+        state_name = STATE_NAME.get(state_abbv)
+        states_alert[state_abbv] = state_abbv
 
         # Use as an argument to fetch in database
-        state_name = self._states_name.get(s)
-
-        for d in diseases:
+        for disease in tuple(dbdata.DISEASES_NAMES):
             no_data_chart = f"""
                 <div class='alert alert-primary' align='center'>
                     Não há dados suficientes para a geração do
-                    gráfico sobre {d}
+                    gráfico sobre {disease}
                 </div>"""
 
-            empty_charts_count[d] = 0
+            empty_charts_count[disease] = 0
 
-            create_maps[d][s] = self.get_img_map(s, d)
+            create_maps[disease][state_abbv] = self.get_img_map(
+                state_abbv, disease
+            )
 
-            count_cities[d][s] = notif_resume.count_cities_by_uf(state_name, d)
+            count_cities[disease][
+                state_abbv
+            ] = notif_resume.count_cities_by_uf(state_name, disease)
 
-            df = data_hist_uf(uf=state_name, disease=d).execute()
+            df = data_hist_uf(uf=state_name, disease=disease).execute()
 
-            if d == 'dengue':
+            if disease == 'dengue':
                 if not df.empty:
-                    last_se[s] = (
+                    last_se[state_abbv] = (
                         str(df.SE.max())[4:] + "/" + str(df.SE.max())[:4]
                     )
 
                 else:
-                    last_se[s] = ''
+                    last_se[state_abbv] = ''
 
             # scatterchart
             if df.casos_est.any():
@@ -907,26 +908,26 @@ class ChartsMainView(TemplateView):
                 df_by_uf = df_cases.groupby(['SE'])[keys].sum()
 
                 scatter_chart = _create_scatter_chart(
-                    df=df_by_uf, uf=state_name, disease=d
+                    df=df_by_uf, uf=state_name, disease=disease,
                 )
             else:
                 scatter_chart = no_data_chart
-                empty_charts_count[d] += 1
+                empty_charts_count[disease] += 1
 
-            create_scatter_chart[d][s] = scatter_chart
+            create_scatter_chart[disease][state_abbv] = scatter_chart
 
             # indicatorchart
             if df.casos.any():
                 df_receptivity = deepcopy(df)
 
                 indicator_chart = _create_indicator_chart(
-                    df=df_receptivity, uf=state_name, disease=d
+                    df=df_receptivity, uf=state_name, disease=disease,
                 )
             else:
                 indicator_chart = no_data_chart
-                empty_charts_count[d] += 1
+                empty_charts_count[disease] += 1
 
-            create_indicator_chart[d][s] = indicator_chart
+            create_indicator_chart[disease][state_abbv] = indicator_chart
 
             # stackbarchart
             df_nivel = deepcopy(df)
@@ -950,13 +951,13 @@ class ChartsMainView(TemplateView):
                 )
 
                 stack_chart = _create_stack_chart(
-                    df=df_alert_uf, uf=state_name, disease=d
+                    df=df_alert_uf, uf=state_name, disease=disease,
                 )
             else:
                 stack_chart = no_data_chart
-                empty_charts_count[d] += 1
+                empty_charts_count[disease] += 1
 
-            create_stack_chart[d][s] = stack_chart
+            create_stack_chart[disease][state_abbv] = stack_chart
 
         context.update(
             {

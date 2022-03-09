@@ -41,7 +41,7 @@ DISEASES_NAMES = CID10.keys()
 ALERT_COLOR = {1: 'verde', 2: 'amarelo', 3: 'laranja', 4: 'vermelho'}
 ALERT_CODE = dict(zip(ALERT_COLOR.values(), ALERT_COLOR.keys()))
 
-STATE_NAMES = {
+ALL_STATE_NAMES = {
     'AC': ['Acre', [-8.77, -70.55], 6],
     'AL': ['Alagoas', [-9.71, -35.73], 6],
     'AM': ['Amazonas', [-3.07, -61.66], 6],
@@ -71,10 +71,10 @@ STATE_NAMES = {
     'TO': ['Tocantins', [-10.25, -48.25], 6],
 }
 
-STATE_NAME = {k: v[0] for k, v in STATE_NAMES.items()}
+STATE_NAME = {k: v[0] for k, v in ALL_STATE_NAMES.items()}
 STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
-MAP_CENTER = {k: v[1] for k, v in STATE_NAMES.items()}
-MAP_ZOOM = {k: v[2] for k, v in STATE_NAMES.items()}
+MAP_CENTER = {k: v[1] for k, v in ALL_STATE_NAMES.items()}
+MAP_ZOOM = {k: v[2] for k, v in ALL_STATE_NAMES.items()}
 
 # Ibis utils
 
@@ -111,7 +111,7 @@ def data_hist_uf(uf: str, disease: str = 'dengue') -> pd.DataFrame:
     res = cache.get(cache_name)
 
     if res is None:
-        res = table_hist_uf.filter(table_hist_uf['uf'] == uf).sort_by('SE')
+        res = table_hist_uf[table_hist_uf.uf == uf].sort_by('SE')
 
         cache.set(
             cache_name, res, settings.QUERY_CACHE_TIMEOUT,
