@@ -17,7 +17,6 @@ from ad_main import settings
 
 # local
 from dados.episem import episem, episem2date
-from dados.info_states import STATE_NAMES
 
 with cf.config_prefix('sql'):
     cf.set_option('default_limit', None)
@@ -42,43 +41,45 @@ DISEASES_NAMES = CID10.keys()
 ALERT_COLOR = {1: 'verde', 2: 'amarelo', 3: 'laranja', 4: 'vermelho'}
 ALERT_CODE = dict(zip(ALERT_COLOR.values(), ALERT_COLOR.keys()))
 
+ALL_STATE_NAMES = {
+    'AC': ['Acre', [-8.77, -70.55], 6],
+    'AL': ['Alagoas', [-9.71, -35.73], 6],
+    'AM': ['Amazonas', [-3.07, -61.66], 6],
+    'AP': ['Amapá', [1.41, -51.77], 6],
+    'BA': ['Bahia', [-12.96, -38.51], 6],
+    'CE': ['Ceará', [-3.71, -38.54], 6],
+    'DF': ['Distrito Federal', [-15.83, -47.86], 6],
+    'ES': ['Espírito Santo', [-19.19, -40.34], 6],
+    'GO': ['Goiás', [-16.64, -49.31], 6],
+    'MA': ['Maranhão', [-2.55, -44.3], 6],
+    'MG': ['Minas Gerais', [-18.1, -44.38], 6],
+    'MS': ['Mato Grosso do Sul', [-20.51, -54.54], 6],
+    'MT': ['Mato Grosso', [-12.64, -55.42], 6],
+    'PA': ['Pará', [-5.53, -52.29], 6],
+    'PB': ['Paraíba', [-7.06, -35.55], 6],
+    'PE': ['Pernambuco', [-8.28, -35.07], 6],
+    'PI': ['Piauí', [-8.28, -43.68], 6],
+    'PR': ['Paraná', [-24.89, -51.55], 6],
+    'RJ': ['Rio de Janeiro', [-22.84, -43.15], 6],
+    'RN': ['Rio Grande do Norte', [-5.22, -36.52], 6],
+    'RO': ['Rondônia', [-11.22, -62.8], 6],
+    'RR': ['Roraima', [1.89, -61.22], 6],
+    'RS': ['Rio Grande do Sul', [-30.01, -51.22], 6],
+    'SC': ['Santa Catarina', [-27.33, -49.44], 6],
+    'SE': ['Sergipe', [-10.9, -37.07], 6],
+    'SP': ['São Paulo', [-23.55, -46.64], 6],
+    'TO': ['Tocantins', [-10.25, -48.25], 6],
+}
 
-# Create the dictionaries for active states
-
-
-def filter_active_states(
-    data: dict, active_states: list = settings.ACTIVE_STATES
-) -> Callable:
-    """
-    Return a dictionary by active state abbreviation
-    Returns
-    -------
-    Callable
-    """
-
-    return {
-        key: value for (key, value) in data.items() if key in active_states
-    }
-
-
-_state_name = {}
-_map_center = {}
-_map_zoom = {}
-
-for state in STATE_NAMES:
-    _state_name[state['state_abbv']] = state['state_name']
-    _map_center[state['state_abbv']] = [state['lat'], state['long']]
-    _map_zoom[state['state_abbv']] = state['map_zoom']
-
-STATE_NAME = filter_active_states(_state_name)
+STATE_NAME = {k: v[0] for k, v in ALL_STATE_NAMES.items()}
 STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
-MAP_CENTER = filter_active_states(_map_center)
-MAP_ZOOM = filter_active_states(_map_zoom)
+MAP_CENTER = {k: v[1] for k, v in ALL_STATE_NAMES.items()}
+MAP_ZOOM = {k: v[2] for k, v in ALL_STATE_NAMES.items()}
 
 # Ibis utils
 
 
-def chart_home_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
+def data_hist_uf(uf: str, disease: str = 'dengue') -> pd.DataFrame:
     """
     PostgreSQLTable[table]
     name: hist_uf_disease_materialized_view
@@ -104,14 +105,13 @@ def chart_home_data(uf: str, disease: str = 'dengue') -> pd.DataFrame:
     table_hist_uf = con.table(f'hist_uf{_disease}_materialized_view')
 
     cache_name = (
-        "data_chart" + "_" + str(uf).replace(" ", "_") + "_" + str(disease)
+        "data_hist" + "_" + str(uf).replace(" ", "_") + "_" + str(disease)
     )
 
     res = cache.get(cache_name)
 
     if res is None:
-        filter_hist_uf = table_hist_uf[table_hist_uf['uf'] == uf]
-        res = filter_hist_uf.sort_by(('data_iniSE', True)).execute()
+        res = table_hist_uf[table_hist_uf.uf == uf].sort_by('SE')
 
         cache.set(
             cache_name, res, settings.QUERY_CACHE_TIMEOUT,
@@ -163,8 +163,8 @@ class RegionalParameters:
             list(iterable)
         """
 
-        cond_t_municipio_uf = cls.t_municipio[cls.t_municipio.uf == state_name]
-        t_joined = cls.t_regional.join(cond_t_municipio_uf, cls.t_parameters)[
+        municipio_uf_filter = cls.t_municipio[cls.t_municipio.uf == state_name]
+        t_joined = cls.t_regional.join(municipio_uf_filter, cls.t_parameters)[
             cls.t_regional.nome
         ].distinct()
         df_regional_names = t_joined.execute()
@@ -220,19 +220,27 @@ class RegionalParameters:
 
             else:
                 # print(f'Add new cache_name: {cache_name}')
-                cond_t_municipio_uf = cls.t_municipio[
-                    cls.t_municipio.uf == state_name
+                municipio_proj = cls.t_municipio[
+                    'geocodigo', 'nome', 'uf', 'id_regional'
                 ]
-                cond_t_regional_name = cls.t_regional[
-                    cls.t_regional.nome == regional_name
-                ]
-                df_cities = cond_t_municipio_uf.join(
-                    cond_t_regional_name, cls.t_parameters
-                )[
-                    cond_t_municipio_uf.geocodigo, cond_t_municipio_uf.nome
-                ].execute()
+                municipio_uf_filter = municipio_proj[
+                    municipio_proj.uf == state_name
+                ].sort_by('id_regional')
 
-                for row in df_cities.to_dict(orient="records"):
+                regional_proj = cls.t_regional['id', 'nome']
+                regional_name_filter = regional_proj[
+                    regional_proj.nome == regional_name
+                ].sort_by('id')
+
+                cities_expr = (
+                    municipio_uf_filter.join(
+                        regional_name_filter, cls.t_parameters
+                    )[municipio_uf_filter.geocodigo, municipio_uf_filter.nome]
+                    .sort_by('nome')
+                    .execute()
+                )
+
+                for row in cities_expr.to_dict(orient="records"):
                     cities_by_region[row['geocodigo']] = row['nome']
 
                 res = cities_by_region
@@ -254,18 +262,20 @@ class RegionalParameters:
             else:
                 # print(f'Add cache_name {cache_name}')
                 if state_name is None:
-                    state_names = [
-                        f"{state_name}" for state_name in STATE_NAME.values()
-                    ]
+                    state_names = [f"{state_name}"]
 
                 else:
                     state_names = [f"{state_name}"]
-                expr_t_municipio_uf = cls.t_municipio.uf.isin(state_names)
-                df_cities = cls.t_municipio[expr_t_municipio_uf][
-                    'geocodigo', 'nome'
-                ].execute()
 
-                for row in df_cities.to_dict(orient="records"):
+                t_municipio_uf_expr = cls.t_municipio.uf.isin(state_names)
+
+                cities_expr = (
+                    cls.t_municipio[t_municipio_uf_expr]['geocodigo', 'nome']
+                    .sort_by('nome')
+                    .execute()
+                )
+
+                for row in cities_expr.to_dict(orient="records"):
                     cities_by_region[row['geocodigo']] = row['nome']
 
                 res = cities_by_region

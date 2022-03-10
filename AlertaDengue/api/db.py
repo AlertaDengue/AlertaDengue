@@ -569,20 +569,25 @@ class AlertCity:
         t_hist = schema_city.table(F'Historico_alerta{table_suffix}')
 
         if ew_start and ew_end:
-            pass
+            t_hist_filter_bol = (
+                t_hist['SE'].between(int(ew_start), int(ew_end))
+            ) & (t_hist['municipio_geocodigo'] == geocode)
+
+            t_hist_filter_expr = t_hist.filter(t_hist_filter_bol).sort_by(
+                ibis.desc('SE')
+            )
+
         else:
-            ew_end = t_hist['SE'].max().execute()
-            ew_start = ew_end - 2
+            t_hist_filter_expr = (
+                t_hist.filter(t_hist['municipio_geocodigo'] == geocode)
+                .sort_by(ibis.desc('SE'))
+                .limit(3)
+            )
 
-        hist_filter = (t_hist['SE'].between(int(ew_start), int(ew_end))) & (
-            t_hist['municipio_geocodigo'] == geocode
+        t_hist_accum_expr = t_hist_filter_expr.mutate(
+            notif_accum_year=t_hist_filter_expr.casos.sum()
         )
 
-        t_hist_proj = t_hist[(hist_filter)]
-        t_hist_expr = t_hist_proj.mutate(
-            notif_accum_year=t_hist_proj.casos.sum()
-        )
+        # print(ibis.impala.compile(t_hist_accum_expr))
 
-        # ibis.impala.compile(t_hist_expr)
-
-        return t_hist_expr.sort_by(ibis.desc('SE'))
+        return t_hist_accum_expr
