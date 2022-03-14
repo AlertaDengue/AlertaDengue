@@ -5,7 +5,7 @@ import pandas as pd
 
 # local
 from ad_main import settings
-from dados.dbdata import CID10, STATE_NAME  # noqa:F401
+from dados.dbdata import CID10, STATE_NAME, get_disease_suffix  # noqa:F401
 
 from sqlalchemy import create_engine
 
@@ -546,7 +546,7 @@ class AlertCity:
             Return an ibis expression with the history for a given disease.
             Parameters
             ----------
-            disease : str, {'dengue', 'chik', 'zika'}
+            disease : str, {'dengue', 'chikungunya', 'zika'}
             geocode : int
             ew_start : Optional[int]
                 The starting Year/Week, e.g.: 202202
@@ -556,14 +556,15 @@ class AlertCity:
             -------
             ibis.expr.types.Expr
             """
+
         if disease not in CID10.keys():
             raise Exception(
                 F'The diseases available are: {[k for k in CID10.keys()]}'
             )
 
         table_suffix = ''
-        if disease != 'dengue':
-            table_suffix = F'_{disease}'
+        if disease != 'dengue' and disease != 'zika':
+            table_suffix = get_disease_suffix(disease)
 
         schema_city = con.schema('Municipio')
         t_hist = schema_city.table(F'Historico_alerta{table_suffix}')
