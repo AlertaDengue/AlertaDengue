@@ -49,7 +49,7 @@ from .dbdata import (
 )
 from .episem import episem, episem2date
 from .maps import get_city_info
-from .models import City, RegionalHealth
+from .models import City
 
 
 def get_static(static_dir):
@@ -1155,56 +1155,71 @@ class ReportCityView(TemplateView):
 
         city = City.objects.get(pk=int(geocode))
 
-        try:
-            regional_health = RegionalHealth.objects.get(
-                municipio_geocodigo=int(geocode)
-            )
-        except Exception:
-            return self.raise_error(context, error_message_city_doesnt_exist)
+        regional_get_param = RegionalParameters.get_station_data(
+            geocode=int(geocode), disease="dengue"
+        )[0]
 
-        station_id = regional_health.codigo_estacao_wu
-        var_climate = regional_health.varcli
-        u_crit = regional_health.ucrit
-        t_crit = regional_health.tcrit
-        threshold_pre_epidemic = regional_health.limiar_preseason
-        threshold_pos_epidemic = regional_health.limiar_posseason
-        threshold_epidemic = regional_health.limiar_epidemico
+        # TODO: Fix NA's in the parameters table
+        if regional_get_param[5] == "NA":
+            regional_get_param[5] = 0
 
-        climate_crit = None
+        threshold_pre_epidemic = regional_get_param[7]
+        threshold_pos_epidemic = regional_get_param[8]
+        threshold_epidemic = regional_get_param[9]
+
         tweet_max = 0
 
-        if var_climate.startswith("temp"):
-            climate_crit = t_crit
-            climate_title = "Temperatura"
-        elif var_climate.startswith("umid"):
-            climate_crit = u_crit
-            climate_title = "Umidade"
+        # Create the dictionary with climate variables
+
+        varcli_dict = {
+            "temp.min": ["°C temperatura mínima"],
+            "temp.med": ["°C temperatura média"],
+            "temp.max": ["°C temperatura máxima"],
+            "umid.min": ["% umidade mínima do ar"],
+            "umid.med": ["% umidade média do ar"],
+            "umid.max": ["% umidade máxima do ar"],
+        }
+
+        var_climate = {}
+        varcli_pair = {}
+
+        if regional_get_param[3]:
+            climate_title1 = regional_get_param[3]
+            climate_crit1 = regional_get_param[4]
+            varcli_pair[climate_title1] = climate_crit1
+            varcli_dict[regional_get_param[3].replace("_", ".")].append(
+                regional_get_param[4]
+            )
+
+        if regional_get_param[5]:
+            climate_title2 = regional_get_param[5]
+            climate_crit2 = regional_get_param[6]
+            varcli_pair[climate_title2] = climate_crit2
+            varcli_dict[regional_get_param[5].replace("_", ".")].append(
+                regional_get_param[6]
+            )
+
+        varcli_keys = [w.replace("_", ".") for w in list(varcli_pair.keys())]
+
+        for v in varcli_keys:
+            var_climate[v] = varcli_dict.get(v)
 
         df_dengue = ReportCity.read_disease_data(
+            disease="dengue",
             geocode=geocode,
-            disease_code=CID10["dengue"],
-            station_id=station_id,
             year_week=year_week,
-            var_climate=var_climate,
-            has_tweets=True,
         )
 
         df_chik = ReportCity.read_disease_data(
+            disease="chikungunya",
             geocode=geocode,
-            disease_code=CID10["chikungunya"],
-            station_id=station_id,
             year_week=year_week,
-            var_climate=var_climate,
-            has_tweets=False,
         )
 
         df_zika = ReportCity.read_disease_data(
+            disease="zika",
             geocode=geocode,
-            disease_code=CID10["zika"],
-            station_id=station_id,
             year_week=year_week,
-            var_climate=var_climate,
-            has_tweets=False,
         )
 
         # prepare empty variables
@@ -1226,15 +1241,21 @@ class ReportCityView(TemplateView):
 
         this_year = int(context["year_week"][:4])
 
+        climate_cols = [
+            "temp.min",
+            "temp.med",
+            "temp.max",
+            "umid.min",
+            "umid.med",
+            "umid.max",
+        ]
+
         if not df_dengue.empty:
             last_year_week_l.append(df_dengue.index.max())
 
             chart_dengue_climate = ReportCityCharts.create_climate_chart(
-                df=df_dengue,
-                year_week=year_week,
+                df=df_dengue.reset_index()[["SE", *climate_cols]],
                 var_climate=var_climate,
-                climate_crit=climate_crit,
-                climate_title=climate_title,
             )
 
             chart_dengue_incidence = ReportCityCharts.create_incidence_chart(
@@ -1257,17 +1278,14 @@ class ReportCityView(TemplateView):
                 & (df_dengue.index <= year_week - 100)
             ]["casos notif."].sum()
 
-            tweet_max = np.nanmax(df_dengue.tweets)
+            tweet_max = np.nanmax(df_dengue.tweet)
 
         if not df_chik.empty:
             last_year_week_l.append(df_chik.index.max())
 
             chart_chik_climate = ReportCityCharts.create_climate_chart(
-                df=df_chik,
-                year_week=year_week,
+                df=df_chik.reset_index()[["SE", *climate_cols]],
                 var_climate=var_climate,
-                climate_crit=climate_crit,
-                climate_title=climate_title,
             )
 
             chart_chik_incidence = ReportCityCharts.create_incidence_chart(
@@ -1291,11 +1309,8 @@ class ReportCityView(TemplateView):
             last_year_week_l.append(df_zika.index.max())
 
             chart_zika_climate = ReportCityCharts.create_climate_chart(
-                df=df_zika,
-                year_week=year_week,
+                df=df_zika.reset_index()[["SE", *climate_cols]],
                 var_climate=var_climate,
-                climate_crit=climate_crit,
-                climate_title=climate_title,
             )
 
             chart_zika_incidence = ReportCityCharts.create_incidence_chart(
@@ -1336,8 +1351,19 @@ class ReportCityView(TemplateView):
             classes="table table-striped table-bordered",
         )
 
+        cols_to_html = [
+            *varcli_keys,
+            "casos notif.",
+            "casos_est",
+            "incidência",
+            # 'pr(incid. subir)',
+            # 'tweet',
+            "nivel",
+        ]
+
         prepare_html = (
-            lambda df: df.iloc[-12:, :-2]
+            lambda df: df[cols_to_html]
+            .iloc[-12:, :]
             .reset_index()
             .sort_values(by="SE", ascending=[False])
             .to_html(**html_param)
