@@ -563,7 +563,7 @@ class AlertCity:
             )
 
         table_suffix = ''
-        if disease != 'dengue' and disease != 'zika':
+        if disease != 'dengue':
             table_suffix = get_disease_suffix(disease)
 
         schema_city = con.schema('Municipio')
@@ -581,7 +581,7 @@ class AlertCity:
         else:
             t_hist_filter_expr = (
                 t_hist.filter(t_hist['municipio_geocodigo'] == geocode)
-                .sort_by(ibis.desc('SE'))
+                .sort_by('SE')
                 .limit(3)
             )
 
