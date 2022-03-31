@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-21 16:22+0000\n"
+"POT-Creation-Date: 2022-03-31 13:09+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -331,103 +331,106 @@ msgstr ""
 msgid "InfoDengue"
 msgstr "InfoDengue"
 
-#: AlertaDengue/dados/templates/about.html:37
+#: AlertaDengue/dados/templates/about.html:31
+msgid "Sobre o InfoDengue"
+msgstr "About InfoDengue"
+
+#: AlertaDengue/dados/templates/about.html:34
 msgid ""
 "\n"
-"            O InfoDengue é um sistema de alerta para arboviroses baseado em "
-"dados\n"
-"            hı́bridos gerados por meio da análise integrada de dados "
-"minerados a partir da Web\n"
-"            social e de dados climáticosq e epidemiológicos."
+"                O InfoDengue é um sistema de alerta para arboviroses baseado "
+"em dados híbridos gerados por meio da análise integrada\n"
+"                de dados minerados a partir da web social e de dados "
+"climáticos e epidemiológicos"
 msgstr ""
 "\n"
 "InfoDengue is an alert system for arboviroses based on the continuous "
 "analysis of online, climate and epidemiological data."
 
-#: AlertaDengue/dados/templates/about.html:41
+#: AlertaDengue/dados/templates/about.html:37
 msgid ""
 "\n"
-"            Implementado em 2015, o sistema foi desenvolvido por "
-"pesquisadores do Programa de Computação Científica (Fundação Oswaldo Cruz, "
-"RJ)\n"
-"            e da Escola de Matemática Aplicada (Fundação Getúlio Vargas) com "
-"a forte colaboração da Secretaria Municipal\n"
-"            de Saúde do Rio de Janeiro, o Observatório da Dengue (UFMG) e "
-"pesquisadores da Universidade Federal\n"
-"            do Paraná e da Universidade Estadual do Oeste do Paraná."
+"                Em 2021, o sistema ganhou amplitude nacional com o apoio do "
+"Ministério da Saúde realizando análises em nível estadual.\n"
+"                Com isso, mais secretarias passaram a receber semanalmente "
+"os boletins do InfoDengue. Implementado em 2015,\n"
+"                o sistema foi desenvolvido por pesquisadores do Programa de "
+"Computação Científica (Fundação Oswaldo Cruz, RJ) e\n"
+"                da Escola de Matemática Aplicada (Fundação Getúlio Vargas) "
+"com a forte colaboração da Secretaria Municipal de Saúde do Rio de Janeiro,\n"
+"                o Observatório da Dengue/UFMG e pesquisadores da "
+"Universidade Federal do Paraná e da Universidade Estadual do Oeste do Paraná."
 msgstr ""
 "\n"
-"Implemented in 2015, the system was developed by researchers from the "
-"Scientific Computing Program(Fundação Oswaldo Cruz, RJ) and the School of "
-"Applied Mathematics (Fundação Getúlio Vargas)with the strong collaboration "
-"of the Rio de Janeiro Municipal Health Secretariat,the Observatory of Dengue "
-"(UFMG) and researchers from the Federal University of Paranáand the State "
-"University of Western Paraná."
+" In 2021, the system gained national breadth with the support of the "
+"Brazilian Health Ministry  performing analysis at the state level.  As a "
+"result, more Health Department began to receive weekly InfoDengue bulletins. "
+"Implemented in 2015,  the system was developed by researchers from the "
+"Scientific Computing Program(Fundação Oswaldo Cruz, RJ)  and the School of "
+"Applied Mathematics (Fundação Getúlio Vargas) with the strong collaboration "
+"of the  Rio de Janeiro Municipal Health Secretariat,the Observatory of "
+"Dengue (UFMG) and  researchers from the Federal University of Paraná and the "
+"State University of Western Paraná."
 
-#: AlertaDengue/dados/templates/about.html:46
+#: AlertaDengue/dados/templates/about.html:43
 msgid ""
 "\n"
-"            Desde 2016, outros municípios e estados aderiram ao sistema: "
-"Estado do Rio de Janeiro,\n"
-"            Estado do Paraná, Estado do Ceará, Estado do Espírito Santo, "
-"Regional de Saúde de Sete\n"
-"            Lagoas (MG) e a cidade de São José do Rio Preto (SP). A adesão "
-"pode ser feita por\n"
-"            municípios isolados, ou em grupo (regionais ou estados). Cada "
-"instância recebe um relatório de análise de\n"
-"            situação da dengue semanalmente. A versão pública do site é "
-"acessada por muitas pessoas e é comum recebemos\n"
-"             notícias de que essas informações são utilizadas\n"
-"            na definição de viagens e outras atividades."
+"                Embora desenvolva boletins com análises de casos de dengue, "
+"zika e chikungunya de todo o país, os estados ainda podem aderir ao "
+"sistema.\n"
+"                Acesse o como participar para integrar o InfoDengue. O "
+"estado participante recebe um relatório de análise de situação da dengue "
+"semanalmente.\n"
+"                A versão pública do site é acessada por muitas pessoas e é "
+"comum recebermos notícias de que essas informações são\n"
+"                utilizadas na definição de viagens e outras atividades."
 msgstr ""
 "\n"
-"Since 2016, other Brazilian municipalities and states have joined the "
-"system: Rio de Janeiro State, State of Paraná, State of Ceará, State of "
-"Espirito Santo, Health Regional of Sete Lagoas (MG) and the city of São José "
-"do Rio Preto (SP). Membership may be achieved by isolated municipalities, or "
-"in groups (regional or state). Each instance receives a dengue status "
-"analysis report weekly. The public version of the site is accessedby many "
-"people and we often receive news that this information is used in deciding "
-"on travel and other activities."
+" Although it develops bulletins with analyzes of dengue, zika and "
+"chikungunya cases  from across the country, states can still join the "
+"system. Access how to participate to  integrate InfoDengue. The "
+"participating state receives a weekly dengue status analysis report.  The "
+"public version of the site is accessed by many people and it is common for "
+"us to receive news  that this information is used in the definition of "
+"travel and other activities. "
 
-#: AlertaDengue/dados/templates/about.html:54
+#: AlertaDengue/dados/templates/about.html:48
 msgid ""
 "\n"
-"            Nossa rede de colaboradores cresceu e conta agora com a parceria "
-"de grupos de pesquisa internacionais que\n"
-"            buscam soluções para arboviroses em outros países. Por meio do "
-"compartilhamento de experiências e metodologias,\n"
-"            ampliamos a inovação e o conhecimento das arboviroses."
+"                Nossa rede de colaboradores cresceu e conta agora com a "
+"parceria de grupos de pesquisa internacionais que buscam soluções para\n"
+"                arboviroses em outros países e organizações da sociedade "
+"civil. Por meio do compartilhamento de experiências e metodologias,\n"
+"                ampliamos a inovação e o conhecimento das arboviroses."
 msgstr ""
 "\n"
-"Our network of collaborators has grown and now includes international "
-"research groupsseeking solutions for arboviruses in other countries. Through "
-"the sharing of experiences and methodologies,we seek innovation and new "
-"knowledge regarding the arboviruses."
+" Our network of collaborators has grown and now includes international "
+"research  groupsseeking solutions for arboviruses in other countries and "
+"civil society organizations.  By sharing experiences and methodologies, we "
+"expand innovation and knowledge of arboviruses. "
 
-#: AlertaDengue/dados/templates/about.html:58
+#: AlertaDengue/dados/templates/about.html:52
 msgid ""
 "\n"
-"            Vários desafios técnicos e científicos foram enfrentados durante "
-"o desenvolvimento do InfoDengue, resultando\n"
-"            em diversas teses e dissertações. Como os desafios não terminam, "
-"continuamos e continuaremos sempre investigando\n"
-"            novas soluções para gerar informação útil para a gestão e para o "
-"avanço do conhecimento das arboviroses e seu\n"
-"            controle."
+"                Vários desafios técnicos e científicos foram enfrentados "
+"durante o desenvolvimento do InfoDengue, resultando em diversas teses e\n"
+"                dissertações. Como os desafios não terminam, continuamos e "
+"continuaremos sempre investigando novas soluções para gerar\n"
+"                informação útil para a gestão e para o avanço do "
+"conhecimento das arboviroses e seu controle."
 msgstr ""
 "\n"
 "Several technical and scientific challenges were faced during the "
-"development of InfoDengue,resulting in several theses and dissertations. As "
+"development of InfoDengue, resulting in several theses and dissertations. As "
 "the challenges do not end, we continueand will always continue to "
-"investigate new solutions to generate useful information forthe management "
+"investigate new solutions to generate useful information for the management "
 "and advancement of knowledge of arboviruses and their control."
 
-#: AlertaDengue/dados/templates/about.html:66
+#: AlertaDengue/dados/templates/about.html:59
 msgid "O Sistema"
 msgstr "About the system"
 
-#: AlertaDengue/dados/templates/about.html:70
+#: AlertaDengue/dados/templates/about.html:62
 msgid ""
 "\n"
 "            O sistema InfoDengue é um pipeline de coleta, harmonização e "
@@ -444,19 +447,19 @@ msgstr ""
 "              \n"
 "            "
 
-#: AlertaDengue/dados/templates/about.html:74
+#: AlertaDengue/dados/templates/about.html:66
 msgid "/static/img/system_level_color.png"
 msgstr "/static/img/system_level_color_en.png"
 
-#: AlertaDengue/dados/templates/about.html:76
+#: AlertaDengue/dados/templates/about.html:68
 msgid "De onde vem os dados?"
 msgstr "Where does the data come from?"
 
-#: AlertaDengue/dados/templates/about.html:78
+#: AlertaDengue/dados/templates/about.html:70
 msgid "Casos de dengue, chikungunya e zika:"
 msgstr "Reported cases of dengue, zika or chikungunya."
 
-#: AlertaDengue/dados/templates/about.html:78
+#: AlertaDengue/dados/templates/about.html:70
 msgid ""
 "Essas são doenças de notificação obrigatória, isso é, o profissional\n"
 "            de saúde que diagnostica um caso suspeito precisa preencher uma "
@@ -477,11 +480,11 @@ msgstr ""
 "epidemiologicalcriteria. From the notified cases, the incidence indicators "
 "that feed the InfoDengue are calculated."
 
-#: AlertaDengue/dados/templates/about.html:85
+#: AlertaDengue/dados/templates/about.html:77
 msgid "Dados meteorológicos:"
 msgstr "Weather data:"
 
-#: AlertaDengue/dados/templates/about.html:85
+#: AlertaDengue/dados/templates/about.html:77
 msgid ""
 "A transmissão de arboviroses é muito influenciada pelo clima.\n"
 "            O mosquito transmissor, Aedes aegypti, requer temperatura alta e "
@@ -500,11 +503,11 @@ msgstr ""
 "obtained from<a href=\"https://estacoes.dengue.mat.br/\"> airport weather "
 "stations</a> as well as satellite images."
 
-#: AlertaDengue/dados/templates/about.html:91
+#: AlertaDengue/dados/templates/about.html:83
 msgid "Dados de menção à dengue nas redes sociais:"
 msgstr "Mention analysis of dengue in social networks"
 
-#: AlertaDengue/dados/templates/about.html:91
+#: AlertaDengue/dados/templates/about.html:83
 msgid ""
 "As pessoas em geral buscam informações ou contam sobre\n"
 "            seu estado de saúde nas redes sociais antes de buscarem ajuda "
@@ -524,11 +527,11 @@ msgstr ""
 "captures and analyzes tweets from geolocalized people for the mention of "
 "dengue symptoms."
 
-#: AlertaDengue/dados/templates/about.html:97
+#: AlertaDengue/dados/templates/about.html:89
 msgid "Dados demográficos:"
 msgstr "Demographic data:"
 
-#: AlertaDengue/dados/templates/about.html:97
+#: AlertaDengue/dados/templates/about.html:89
 msgid ""
 "Indicadores epidemiológicos precisam ser calculados em relação ao tamanho da "
 "população.\n"
@@ -539,15 +542,15 @@ msgstr ""
 "Epidemiological indicators require population size. Demographic data of "
 "Brazilian municipalities are updated each year in Infodengue, using estimates"
 
-#: AlertaDengue/dados/templates/about.html:102
+#: AlertaDengue/dados/templates/about.html:93
 msgid "O que o sistema faz"
 msgstr "What to do"
 
-#: AlertaDengue/dados/templates/about.html:104
+#: AlertaDengue/dados/templates/about.html:95
 msgid "Correção do atraso de notificação (nowcasting):"
 msgstr "Nowcasting"
 
-#: AlertaDengue/dados/templates/about.html:105
+#: AlertaDengue/dados/templates/about.html:96
 msgid ""
 " Os dados de notificação de doenças tem sempre um atraso.\n"
 "            Isso ocorre por vários motivos e inclui o tempo entre a pessoa "
@@ -578,7 +581,7 @@ msgstr ""
 "            calculate the expected number of cases each week. This process "
 "of nowcasting is described"
 
-#: AlertaDengue/dados/templates/about.html:115
+#: AlertaDengue/dados/templates/about.html:106
 msgid ""
 "A Figura abaixo (retirada de Bastos et al 2019) mostra em preto, a "
 "incidência verdadeira, em vermelho,\n"
@@ -591,11 +594,11 @@ msgstr ""
 "the true incidence, in red, that observed late and in gray the nowcasting. \n"
 "            For further technical details, see the publication.            "
 
-#: AlertaDengue/dados/templates/about.html:121
+#: AlertaDengue/dados/templates/about.html:111
 msgid "Detecção de transmissão sustentada:"
 msgstr "Sustained Transmission Detection"
 
-#: AlertaDengue/dados/templates/about.html:121
+#: AlertaDengue/dados/templates/about.html:111
 msgid ""
 "A estimação do número reprodutivo é importante em vários aspectos. Sequência "
 "de semanas com transmissão\n"
@@ -620,23 +623,11 @@ msgstr ""
 "            To estimate Rt from the incidence data, we developed our own "
 "methodology, described in"
 
-#: AlertaDengue/dados/templates/about.html:128
+#: AlertaDengue/dados/templates/about.html:118
 msgid "Análise de receptividade:"
 msgstr "Receptivity Analysis"
 
-#: AlertaDengue/dados/templates/about.html:128
-#, fuzzy, python-format
-#| msgid ""
-#| "A transmissão das arboviroses requer condições climáticas adequadas, que "
-#| "podem variar de lugar para lugar. No Rio de Janeiro,\n"
-#| "            por exemplo, temperatura maior que 22 graus é condição "
-#| "necessária para transmissão sustentada. Em Fortaleza, umidade máxima "
-#| "acima de 85%% é a condição \n"
-#| "            necessária. Nós ajustamos modelos de árvore de decisão, para "
-#| "avaliar que combinação de variáveis climáticas e ambientais são "
-#| "indicadoras de condições de \n"
-#| "            transmissão. Essa informação serve de alerta precoce de "
-#| "chegada da temporada da arbovirose."
+#: AlertaDengue/dados/templates/about.html:118
 msgid ""
 "A transmissão das arboviroses requer condições climáticas adequadas, que "
 "podem variar de lugar para lugar. No Rio de Janeiro,\n"
@@ -660,11 +651,11 @@ msgstr ""
 "warning of the arrival of the transmission season.\n"
 "            "
 
-#: AlertaDengue/dados/templates/about.html:133
+#: AlertaDengue/dados/templates/about.html:123
 msgid "Análise de menção a dengue nas redes sociais:"
 msgstr "Mention analysis of dengue in social networks"
 
-#: AlertaDengue/dados/templates/about.html:133
+#: AlertaDengue/dados/templates/about.html:123
 msgid ""
 "Indicadores de redes sociais calculados pelo Observatório da Dengue são "
 "usados como variáveis auxiliares\n"
@@ -675,11 +666,11 @@ msgstr ""
 "analysis methodology is described \n"
 "            "
 
-#: AlertaDengue/dados/templates/about.html:137
+#: AlertaDengue/dados/templates/about.html:127
 msgid "Detecção de situação atípica:"
 msgstr "Atypical Incidence Detection:"
 
-#: AlertaDengue/dados/templates/about.html:138
+#: AlertaDengue/dados/templates/about.html:128
 msgid ""
 "Para estimar limiares epidêmicos, nós utilizamos o Moving Epidemics Method "
 "(MEM)"
@@ -687,30 +678,7 @@ msgstr ""
 "To estimate epidemic thresholds for dengue, we adapted the Moving Epidemics "
 "Method (MEM)"
 
-#: AlertaDengue/dados/templates/about.html:139
-#, fuzzy, python-format
-#| msgid ""
-#| "que permite estimar\n"
-#| "            diversas grandezas de interesse com base em dados históricos "
-#| "locais como limiar pré- epidêmico, níveis de atividade típicas, valores "
-#| "esperados para \n"
-#| "            cada semana, etc. Como este limiar é obtido a partir do "
-#| "histórico de dados que alimenta o sistema, ele tem valores particulares "
-#| "para cada localidade. \n"
-#| "            Além destes limiares globais para a série temporal, a "
-#| "metodologia utilizada permite ainda obter estimativas para o número "
-#| "esperado de casos por semana, \n"
-#| "            juntamente de intervalos de confiança que permitem definir "
-#| "zonas de atividade semanal. Estas regiões são definidas de maneira "
-#| "similar aos níveis de atividade, \n"
-#| "            porém são calculados com base na distribuição típica de casos "
-#| "para cada semana. Tal construção identifica visualmente os padrões "
-#| "sazonais, uma vez que \n"
-#| "            apresentam a evolução temporal típica com base na mediana dos "
-#| "casos esperados para cada semana e intervalos de confiança inferior e "
-#| "superior \n"
-#| "            (utilizamos 10%% e 90%%, respectivamente), definindo "
-#| "corredores de atividade típica, como um diagrama de controle."
+#: AlertaDengue/dados/templates/about.html:129
 msgid ""
 "que permite estimar\n"
 "            diversas grandezas de interesse com base em dados históricos "
@@ -754,19 +722,19 @@ msgstr ""
 "activity corridors. as a control diagram.\n"
 "            "
 
-#: AlertaDengue/dados/templates/about.html:149
+#: AlertaDengue/dados/templates/about.html:138
 msgid "Código de Cores:"
 msgstr "Disease code"
 
-#: AlertaDengue/dados/templates/about.html:151
+#: AlertaDengue/dados/templates/about.html:140
 msgid "/static/img/table_color_level_pt.png"
 msgstr "/static/img/system_level_color_en.png"
 
-#: AlertaDengue/dados/templates/about.html:153
+#: AlertaDengue/dados/templates/about.html:142
 msgid "Implementação"
 msgstr "Implementation"
 
-#: AlertaDengue/dados/templates/about.html:154
+#: AlertaDengue/dados/templates/about.html:143
 msgid ""
 "Todos os códigos gerados para o InfoDengue, em sua maioria em R e Python, "
 "estão disponíveis em acesso aberto em​:"
@@ -775,30 +743,30 @@ msgstr ""
 "available at: \n"
 "            "
 
-#: AlertaDengue/dados/templates/about.html:159
+#: AlertaDengue/dados/templates/about.html:148
 msgid "Como citar o InfoDengue"
 msgstr "How to Participate in InfoDengue"
 
-#: AlertaDengue/dados/templates/about.html:181
+#: AlertaDengue/dados/templates/about.html:169
 msgid "Produções científicas associadas ao Infodengue"
 msgstr "Scientific productions associated with Infodengue"
 
-#: AlertaDengue/dados/templates/about.html:189
+#: AlertaDengue/dados/templates/about.html:177
 msgid "Eventos"
 msgstr "Events"
 
-#: AlertaDengue/dados/templates/about.html:196
+#: AlertaDengue/dados/templates/about.html:184
 msgid "Como colaborar"
 msgstr "How to Collaborate"
 
-#: AlertaDengue/dados/templates/about.html:199
+#: AlertaDengue/dados/templates/about.html:187
 msgid ""
 "Se sua cidade não está no Infodengue, entre em contato com a Secretaria de "
 "Saúde"
 msgstr ""
 "If your city in Brazil is not Infodengue, contact the Health Department"
 
-#: AlertaDengue/dados/templates/about.html:200
+#: AlertaDengue/dados/templates/about.html:188
 msgid ""
 "Se é um estudante ou pesquisador e gostaria de contribuir com análises e "
 "modelos, nos escreva"
@@ -806,11 +774,11 @@ msgstr ""
 "If you are a student or researcher and would like to contribute analysis and "
 "models, write us"
 
-#: AlertaDengue/dados/templates/about.html:201
+#: AlertaDengue/dados/templates/about.html:189
 msgid "Se quiser contribuir com patrocínios, escreva-nos"
 msgstr "If you would like to contribute sponsorships, write us"
 
-#: AlertaDengue/dados/templates/about.html:202
+#: AlertaDengue/dados/templates/about.html:190
 msgid ""
 "Se quiser aprender a usar o infodengue, tem sugestões, críticas ou se "
 "percebeu algum erro no site, escreva-nos"
@@ -818,29 +786,29 @@ msgstr ""
 "If you want to learn how to use infodengue, have suggestions, criticism or "
 "if you noticed any errors on the site, write us"
 
-#: AlertaDengue/dados/templates/about.html:203
+#: AlertaDengue/dados/templates/about.html:191
 msgid ""
 "Vencer as arboviroses é um trabalho de todos, toda colaboração é bem vinda!"
 msgstr ""
 "Overcoming arboviruses is everyone's job, all collaboration is welcome!"
 
-#: AlertaDengue/dados/templates/about.html:207
+#: AlertaDengue/dados/templates/about.html:195
 msgid "Videos relacionados"
 msgstr "Related Videos"
 
-#: AlertaDengue/dados/templates/about.html:213
+#: AlertaDengue/dados/templates/about.html:201
 msgid "Entenda o modelo mais usado para representar a pandemia de COVID-19"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:223
+#: AlertaDengue/dados/templates/about.html:211
 msgid "Curso PySUS - Aula 1"
 msgstr ""
 
-#: AlertaDengue/dados/templates/about.html:234
+#: AlertaDengue/dados/templates/about.html:222
 msgid "Mais videos da série no canal"
 msgstr "More videos of the series on the channel"
 
-#: AlertaDengue/dados/templates/about.html:236
+#: AlertaDengue/dados/templates/about.html:224
 msgid "A Matemática das Epidemias"
 msgstr "The Mathematics of Epidemics"
 

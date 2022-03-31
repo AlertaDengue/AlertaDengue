@@ -33,26 +33,26 @@
         <div class="card-body">
             <h5>{% blocktrans %}
                 O InfoDengue é um sistema de alerta para arboviroses baseado em dados híbridos gerados por meio da análise integrada
-                de dados minerados a partir da web social e de dados climáticos e epidemiológicos.</h5>
-
+                de dados minerados a partir da web social e de dados climáticos e epidemiológicos{% endblocktrans %}.</h5>
+                </br><p>{% blocktrans %}
                 Em 2021, o sistema ganhou amplitude nacional com o apoio do Ministério da Saúde realizando análises em nível estadual.
                 Com isso, mais secretarias passaram a receber semanalmente os boletins do InfoDengue. Implementado em 2015,
                 o sistema foi desenvolvido por pesquisadores do Programa de Computação Científica (Fundação Oswaldo Cruz, RJ) e
                 da Escola de Matemática Aplicada (Fundação Getúlio Vargas) com a forte colaboração da Secretaria Municipal de Saúde do Rio de Janeiro,
-                o Observatório da Dengue/UFMG e pesquisadores da Universidade Federal do Paraná e da Universidade Estadual do Oeste do Paraná.
-
+                o Observatório da Dengue/UFMG e pesquisadores da Universidade Federal do Paraná e da Universidade Estadual do Oeste do Paraná.{% endblocktrans %}</p>
+                <p>{% blocktrans %}
                 Embora desenvolva boletins com análises de casos de dengue, zika e chikungunya de todo o país, os estados ainda podem aderir ao sistema.
                 Acesse o como participar para integrar o InfoDengue. O estado participante recebe um relatório de análise de situação da dengue semanalmente.
                 A versão pública do site é acessada por muitas pessoas e é comum recebermos notícias de que essas informações são
-                utilizadas na definição de viagens e outras atividades.
-
+                utilizadas na definição de viagens e outras atividades.{% endblocktrans %}</p>
+                <p>{% blocktrans %}
                 Nossa rede de colaboradores cresceu e conta agora com a parceria de grupos de pesquisa internacionais que buscam soluções para
                 arboviroses em outros países e organizações da sociedade civil. Por meio do compartilhamento de experiências e metodologias,
-                ampliamos a inovação e o conhecimento das arboviroses.
-
+                ampliamos a inovação e o conhecimento das arboviroses.{% endblocktrans %}</p>
+                <p>{% blocktrans %}
                 Vários desafios técnicos e científicos foram enfrentados durante o desenvolvimento do InfoDengue, resultando em diversas teses e
                 dissertações. Como os desafios não terminam, continuamos e continuaremos sempre investigando novas soluções para gerar
-                informação útil para a gestão e para o avanço do conhecimento das arboviroses e seu controle.{% endblocktrans %}
+                informação útil para a gestão e para o avanço do conhecimento das arboviroses e seu controle.{% endblocktrans %}</p>
         </div>
 
         <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
@@ -61,7 +61,7 @@
         <div class="card-body">
             <h5>{% blocktrans %}
             O sistema InfoDengue é um pipeline de coleta, harmonização e análise de dados semi-automatizado,
-            que gera indicadores de situação epidemiológica da dengue e outras arboviroses a nível municipal.{% endblocktrans %}</h5><br>
+            que gera indicadores de situação epidemiológica da dengue e outras arboviroses a nível municipal.{% endblocktrans %}</h5></br>
 
             <center><img style="relative: left;" src={% trans "/static/img/system_level_color.png" %} alt="gibberish" width="400" /></center><br></br>
 
@@ -90,7 +90,6 @@
             Dados demográficos dos municípios brasileiros são atualizados a cada ano no Infodengue, utilizando as estimativas
             do{% endblocktrans %} <a href="https://www.ibge.gov.br/pt/inicio.html">IBGE.<a><br></br>
 
-
             <h5><b>{% trans "O que o sistema faz" %}?</b></h5>
 
             • <span style="background-color:orange">{% trans "Correção do atraso de notificação (nowcasting):" %}</span>
@@ -108,7 +107,6 @@
             aquela observada com atraso e, em cinza, o nowcasting. Para mais detalhes técnicos, ver a referida publicação.{% endblocktrans %}<br></br>
 
             <center><img style="relative: left;" src="/static/img/graph_weeks.png" alt="gibberish" width="700" /></center><br></br>
-
 
             • <span style="background-color:orange">{% trans "Detecção de transmissão sustentada:" %}</span> {% blocktrans %}A estimação do número reprodutivo é importante em vários aspectos. Sequência de semanas com transmissão
             crítica (Rt > 1) indica transmissão sustentada. Isso é, indica que estamos na fase de espalhamento da doença, e que ações adequadas para controle
@@ -136,7 +134,6 @@
             porém são calculados com base na distribuição típica de casos para cada semana. Tal construção identifica visualmente os padrões sazonais, uma vez que
             apresentam a evolução temporal típica com base na mediana dos casos esperados para cada semana e intervalos de confiança inferior e superior
             (utilizamos 10% e 90%, respectivamente), definindo corredores de atividade típica, como um diagrama de controle.{% endblocktrans %}<br></br>
-
 
             <h5><b>{% trans "Código de Cores:" %} </b></h5><p>
 
