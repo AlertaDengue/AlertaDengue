@@ -344,7 +344,7 @@ msgid ""
 "climáticos e epidemiológicos"
 msgstr ""
 "\n"
-" InfoDengue is an early warning system for arbovirosis in Brazil.  It relies "
+" InfoDengue is an early-warning system for arbovirosis in Brazil.  It relies "
 "on the continuous analysis of online, climate and epidemiological data"
 
 #: AlertaDengue/dados/templates/about.html:37
