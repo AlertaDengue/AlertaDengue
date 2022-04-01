@@ -818,9 +818,9 @@ class ChartsMainView(TemplateView):
         Verify if file exists and return a string to path.
         Parameters
         ----------
-        s: str
+        state_abbv: str
             State full name
-        d: str
+        disease: str
             option: dengue|chikungunya|zika
         Returns
         -------
@@ -885,11 +885,12 @@ class ChartsMainView(TemplateView):
                 state_abbv, disease
             )
 
+            # count_cities_by_uf('Santa Catarina', 'dengue')
             count_cities[disease][
                 state_abbv
             ] = notif_resume.count_cities_by_uf(state_name, disease)
 
-            df = data_hist_uf(uf=state_name, disease=disease).execute()
+            df = data_hist_uf(state_abbv=state_abbv, disease=disease).execute()
 
             if disease == 'dengue':
                 if not df.empty:
@@ -907,9 +908,7 @@ class ChartsMainView(TemplateView):
                 keys = ['casos_est', 'casos']
                 df_by_uf = df_cases.groupby(['SE'])[keys].sum()
 
-                scatter_chart = _create_scatter_chart(
-                    df=df_by_uf, uf=state_name, disease=disease,
-                )
+                scatter_chart = _create_scatter_chart(df=df_by_uf)
             else:
                 scatter_chart = no_data_chart
                 empty_charts_count[disease] += 1
@@ -921,7 +920,7 @@ class ChartsMainView(TemplateView):
                 df_receptivity = deepcopy(df)
 
                 indicator_chart = _create_indicator_chart(
-                    df=df_receptivity, uf=state_name, disease=disease,
+                    df=df_receptivity, state_abbv=state_abbv
                 )
             else:
                 indicator_chart = no_data_chart
@@ -950,9 +949,7 @@ class ChartsMainView(TemplateView):
                     by=['nivel'], ascending=False
                 )
 
-                stack_chart = _create_stack_chart(
-                    df=df_alert_uf, uf=state_name, disease=disease,
-                )
+                stack_chart = _create_stack_chart(df=df_alert_uf,)
             else:
                 stack_chart = no_data_chart
                 empty_charts_count[disease] += 1
