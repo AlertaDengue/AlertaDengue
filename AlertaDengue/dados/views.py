@@ -827,11 +827,12 @@ class ChartsMainView(TemplateView):
         image_path: str
         """
 
-        img_name = (
-            'static/img/incidence_maps/state/incidence_{}_{}.png'
-        ).format(state_abbv, disease)
+        # TODO: os.path | add cache
+        path_to_file = 'static/img/incidence_maps/state/incidence'
 
-        img_data = f"""
+        img_name = F'{path_to_file}_{state_abbv}_{disease}.png'
+
+        img_data = F"""
             <div class='mt-4'>
                 <img
                 src='{img_name}'

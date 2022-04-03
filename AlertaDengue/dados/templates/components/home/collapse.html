@@ -42,10 +42,11 @@
 </div>
 
 <script> //Chart columns are provided by template charts.html
-  {% for key in states_name %}
 
-    $(document).ready(function(){
-      var requestCache = {};
+  $(document).ready(function(){
+    var all_states = {{ states_name|safe }};
+    var requestCache = {};
+
       function LoadDataFromApi(apiUrl) {
         if (!requestCache[apiUrl]) {
           requestCache[apiUrl] = $.ajax({
@@ -56,16 +57,16 @@
         }
         return requestCache[apiUrl];
       }
-
-      LoadDataFromApi("/chartshome/{{ key }}")
+      $.each( all_states, function( state_abbv, state_name ) {
+        LoadDataFromApi("/chartshome/"+state_abbv)
         .then(function(data) {
-          $("#panel_{{ key }}").html(data);
+          $("#panel_"+state_abbv).html(data);
           // console.log(data);
+          // console.log("State: " + state_abbv);
         });
-
     });
+  });
 
-  {% endfor %}
 </script>
 
 {% endblock %}
