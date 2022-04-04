@@ -2,48 +2,207 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% trans "Como participar do InfoDengue" %}{% endblock %}
+{% block title %}{% trans "Participe" %}{% endblock %}
 
 {% block content %}
-    <div class="card" id="diseaseTabContent"
-        style="background-color: #e0eefd63;
-          margin-bottom: 20px;
-          border-radius: 7px">
+
+        <!-- start new content -->
+    <div class="container">
+
+        <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
+            <h3 id="section3" class="panel-title">{% trans "Como participar do InfoDengue" %}</h3>
+        </div>
 
         <div class="card-body">
+            <p><h5><b>{% trans "É muito fácil consultar ou participar do Sistema de Alerta InfoDengue" %}:</b></h5></p>
 
-          <div class="row">
-            <div class="col-md-12 w-100">
-                <h5><b>{% trans "É muito fácil consultar ou participar do Sistema de Alerta InfoDengue" %}:</b></h5>
+            • {% blocktrans %}Se você é cidadão e tem interesse nas informações atualizadas e rápidas sobre o nível
+            de alerta para arboviroses em seu município, baixe o aplicativo {% endblocktrans %}
+            <a href="https://play.google.com/store/apps/details?id=br.mat.dengue.infodengue_app">
+                {% trans "INFODENGUE na Play Store pelo seu celular" %}.</a></br>
+            </p>
+            • {% blocktrans %}Se você é membro de uma Secretaria de Saúde Municipal, ou cidadão, e tem interesse em informações detalhadas
+            sobre as condições de transmissão do seu município{% endblocktrans %},
+            <b>{% trans "basta digitar o nome do seu município na barra de pesquisa do site: " %}</b></br>
+            </p>
+            <img class="img-fluid img-thumbnail"
+                src={% trans '/static/img/join_us/search_city_pt.png' %}
+            /></p>
+            <b>{% blocktrans %}E depois clicar no nome da cidade  no Relatório de Situação das Arboviroses,
+            na parte inferior da página{% endblocktrans %}:</b></p>
+            {% comment %} ! src="{% static '/img/join_us/link_reports.png' %}" {% endcomment %}
+            <img class="img-fluid img-thumbnail"
+                src={% trans '/static/img/join_us/link_reports_pt.png' %}
+            /></p>
 
-                    • {% blocktrans %}Se você é cidadão e tem interesse nas informações atualizadas e rápidas sobre o nível
-                    de alerta para arboviroses em seu município, baixe o aplicativo {% endblocktrans %}
-                    <a href="https://play.google.com/store/apps/details?id=br.mat.dengue.infodengue_app">
-                        {% trans "INFODENGUE na Play Store pelo seu celular" %}.</a></br>
-                    </p>
-                    • {% blocktrans %}Se você é membro de uma Secretaria de Saúde Municipal, ou cidadão, e tem interesse em informações detalhadas
-                    sobre as condições de transmissão do seu município{% endblocktrans %},
-                    <b>{% trans "basta digitar o nome do seu município na barra de pesquisa do site: " %}</b></br>
-                    </p>
-                    <img class="img-fluid img-thumbnail"
-                        src={% trans '/static/img/join_us/search_city_pt.png' %}
-                    /></p>
-                    <b>{% blocktrans %}E depois clicar no nome da cidade  no Relatório de Situação das Arboviroses,
-                    na parte inferior da página{% endblocktrans %}:</b></p>
-                    {% comment %} ! src="{% static '/img/join_us/link_reports.png' %}" {% endcomment %}
-                    <img class="img-fluid img-thumbnail"
-                        src={% trans '/static/img/join_us/link_reports_pt.png' %}
-                    /></p>
+            <div class="row">
+                <div class="col-md-12 w-100">
+                    • <b>{% trans "O sistema infodengue atua a nível nacional" %}.</b>
+                    {% blocktrans %}Se voce é membro de uma Secretaria de Saúde Estadual
+                    que tem interesse em se tornar uma secretaria estadual parceira do projeto,
+                    para recebimento de boletins detalhados do seu estado, {% endblocktrans %}
+                    <a href="mailto:alerta_dengue@fiocruz.br">{% trans "entre em contato conosco" %}.</a>
+                </div>
             </div>
         </div>
-          <div class="row">
-            <div class="col-md-12 w-100">
-                • <b>{% trans "O sistema infodengue atua a nível nacional" %}.</b>
-                {% blocktrans %}Se voce é membro de uma Secretaria de Saúde Estadual
-                que tem interesse em se tornar uma secretaria estadual parceira do projeto,
-                para recebimento de boletins detalhados do seu estado, {% endblocktrans %}
-                <a href="mailto:alerta_dengue@fiocruz.br">{% trans "entre em contato conosco" %}.</a>
+
+        <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
+            <h3 id="section3" class="panel-title">{% trans "Como citar o InfoDengue" %}</h3>
+        </div>
+        <div class="card-body">
+            C. Codeco, F. Coelho, O. Cruz, S. Oliveira, T. Castro, L. Bastos, Infodengue:<br>
+            A nowcasting system for the surveillance of arboviruses in Brazil, Revue d'Épidémiologie et de Santé Publique,
+            Vol 66, Suppl 5, 2018, Page S386,<a href="https://www.sciencedirect.com/science/article/pii/S0398762018311088?via%3Dihub">​https://doi.org/10.1016/j.respe.2018.05.408.</a><br></br>
+
+            <b>@article</b>{CODECO2018S386,<br>
+            <b>title</b> = "Infodengue: A nowcasting system for the surveillance of arboviruses in Brazil",<br>
+            <b>journal</b> = "Revue d'Épidémiologie et de Santé Publique",<br>
+            <b>volume</b> = "66",<br>
+            <b>pages</b> = "S386",<br>
+            <b>year</b> = "2018",<br>
+            <b>note</b> = "European Congress of Epidemiology “Crises, epidemiological transitions and the role of epidemiologists”",<br>
+            <b>issn</b> = "0398-7620",<br>
+            <b>doi</b> = "https://doi.org/10.1016/j.respe.2018.05.408",<br>
+            <b>url</b> = "http://www.sciencedirect.com/science/article/pii/S0398762018311088",<br>
+            <b>author</b> = "C. Codeco and F. Coelho and O. Cruz and S. Oliveira and T. Castro and L. Bastos"}<br>
+        </div>
+
+        <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
+            <h3 id="section4" class="panel-title">{% trans "Produções científicas associadas ao Infodengue" %}</h3>
+        </div>
+        <div class="card-body">
+            • Infodengue: <a href="https://www.sciencedirect.com/science/article/pii/S0398762018311088?via%3Dihub">​
+                A nowcasting system for the surveillance of arboviruses in Brazil</a>
+        </div>
+
+        <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
+            <h3 id="section5" class="panel-title">{% trans "Eventos" %}</h3>
+        </div>
+        <div class="card-body">
+            • E-vigilância 2021: <a href="http://e-vigilancia.dengue.mat.br/">​ http://e-vigilancia.dengue.mat.br/</a>
+        </div>
+
+        <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
+            <h3 id="section6" class="panel-title">{% trans "Como colaborar" %}</h3>
+        </div>
+        <div class="card-body">
+            • {% trans "Se sua cidade não está no Infodengue, entre em contato com a Secretaria de Saúde" %}<br>
+            • {% trans "Se é um estudante ou pesquisador e gostaria de contribuir com análises e modelos, nos escreva" %}<br>
+            • {% trans "Se quiser contribuir com patrocínios, escreva-nos" %}<br>
+            • {% trans "Se quiser aprender a usar o infodengue, tem sugestões, críticas ou se percebeu algum erro no site, escreva-nos" %}<br></br>
+            <b>{% trans "Vencer as arboviroses é um trabalho de todos, toda colaboração é bem vinda!" %}</b>
+        </div>
+
+        <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
+            <h3 id="section6" class="panel-title">{% trans "Videos relacionados" %}</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 w-100">
+                    <p><small class="text-muted">{% trans "Entenda o modelo mais usado para representar a pandemia de COVID-19" %}</small></p>
+                    <div class="video-container">
+                        <iframe class="video-container iframe"
+                            src="https://www.youtube.com/embed/rNFoMqI36g8"
+                            frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+                <div class="col-md-6 w-100">
+                    <p><small class="text-muted">{% trans "Curso PySUS - Aula 1" %}</small></p>
+                    <div class="video-container">
+                        <iframe class="video-container iframe"
+                            src="https://www.youtube.com/embed/UU6rsyXn3p8"
+                            frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
             </div>
+        </br>
+            <b>{% trans "Mais videos da série no canal" %}:
+                <a href="https://www.youtube.com/channel/UCZFllLoI5kB4o_6w59YVzAA">
+            <b>{% trans "A Matemática das Epidemias" %}</a>
+        </div>
+        <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
+            <h3 id="section3" class="panel-title">{% trans "Como citar o InfoDengue" %}</h3>
+        </div>
+        <div class="card-body">
+            C. Codeco, F. Coelho, O. Cruz, S. Oliveira, T. Castro, L. Bastos, Infodengue:<br>
+            A nowcasting system for the surveillance of arboviruses in Brazil, Revue d'Épidémiologie et de Santé Publique,
+            Vol 66, Suppl 5, 2018, Page S386,<a href="https://www.sciencedirect.com/science/article/pii/S0398762018311088?via%3Dihub">​https://doi.org/10.1016/j.respe.2018.05.408.</a><br></br>
+
+            <b>@article</b>{CODECO2018S386,<br>
+            <b>title</b> = "Infodengue: A nowcasting system for the surveillance of arboviruses in Brazil",<br>
+            <b>journal</b> = "Revue d'Épidémiologie et de Santé Publique",<br>
+            <b>volume</b> = "66",<br>
+            <b>pages</b> = "S386",<br>
+            <b>year</b> = "2018",<br>
+            <b>note</b> = "European Congress of Epidemiology “Crises, epidemiological transitions and the role of epidemiologists”",<br>
+            <b>issn</b> = "0398-7620",<br>
+            <b>doi</b> = "https://doi.org/10.1016/j.respe.2018.05.408",<br>
+            <b>url</b> = "http://www.sciencedirect.com/science/article/pii/S0398762018311088",<br>
+            <b>author</b> = "C. Codeco and F. Coelho and O. Cruz and S. Oliveira and T. Castro and L. Bastos"}<br>
+        </div>
+
+        <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
+            <h3 id="section4" class="panel-title">{% trans "Produções científicas associadas ao Infodengue" %}</h3>
+        </div>
+        <div class="card-body">
+            • Infodengue: <a href="https://www.sciencedirect.com/science/article/pii/S0398762018311088?via%3Dihub">​
+                A nowcasting system for the surveillance of arboviruses in Brazil</a>
+        </div>
+
+        <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
+            <h3 id="section5" class="panel-title">{% trans "Eventos" %}</h3>
+        </div>
+        <div class="card-body">
+            • E-vigilância 2021: <a href="http://e-vigilancia.dengue.mat.br/">​ http://e-vigilancia.dengue.mat.br/</a>
+        </div>
+
+        <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
+            <h3 id="section6" class="panel-title">{% trans "Como colaborar" %}</h3>
+        </div>
+        <div class="card-body">
+            • {% trans "Se sua cidade não está no Infodengue, entre em contato com a Secretaria de Saúde" %}<br>
+            • {% trans "Se é um estudante ou pesquisador e gostaria de contribuir com análises e modelos, nos escreva" %}<br>
+            • {% trans "Se quiser contribuir com patrocínios, escreva-nos" %}<br>
+            • {% trans "Se quiser aprender a usar o infodengue, tem sugestões, críticas ou se percebeu algum erro no site, escreva-nos" %}<br></br>
+            <b>{% trans "Vencer as arboviroses é um trabalho de todos, toda colaboração é bem vinda!" %}</b>
+        </div>
+
+        <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
+            <h3 id="section6" class="panel-title">{% trans "Videos relacionados" %}</h3>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 w-100">
+                    <p><small class="text-muted">{% trans "Entenda o modelo mais usado para representar a pandemia de COVID-19" %}</small></p>
+                    <div class="video-container">
+                        <iframe class="video-container iframe"
+                            src="https://www.youtube.com/embed/rNFoMqI36g8"
+                            frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+                <div class="col-md-6 w-100">
+                    <p><small class="text-muted">{% trans "Curso PySUS - Aula 1" %}</small></p>
+                    <div class="video-container">
+                        <iframe class="video-container iframe"
+                            src="https://www.youtube.com/embed/UU6rsyXn3p8"
+                            frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </br>
+            <b>{% trans "Mais videos da série no canal" %}:
+                <a href="https://www.youtube.com/channel/UCZFllLoI5kB4o_6w59YVzAA">
+            <b>{% trans "A Matemática das Epidemias" %}</a>
         </div>
     </div>
+
 {% endblock %}
