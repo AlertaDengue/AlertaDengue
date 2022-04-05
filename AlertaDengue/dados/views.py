@@ -2,9 +2,9 @@ import datetime
 import json
 import locale
 import os
+from pathlib import Path
 import random
 from collections import OrderedDict, defaultdict
-from os.path import dirname, join
 from time import mktime
 from typing import Dict, List, Tuple
 
@@ -827,33 +827,39 @@ class ChartsMainView(TemplateView):
         image_path: str
         """
 
-        # TODO: os.path | add cache
-        path_to_file = 'static/img/incidence_maps/state/incidence'
+        path_to_file = Path(
+            settings.STATIC_ROOT
+            if settings.DEBUG
+            else settings.STATICFILES_DIRS[0]
+        )
 
-        img_name = F'{path_to_file}_{state_abbv}_{disease}.png'
+        img_name = Path(
+            "img",
+            "incidence_maps",
+            "state",
+            F"incidence_{state_abbv}_{disease}.png",
+        )
 
         img_data = F"""
             <div class='mt-4'>
                 <img
-                src='{img_name}'
+                src='{(Path(path_to_file.stem, img_name))}'
                 alt=''
                 title='Mapa de {disease} para o estado de {state_abbv}'
                 style='width:100%'
                 />
             </div>"""
 
-        img_no_data = f"""
+        img_no_data = F"""
             <div class='alert alert-primary' align='center'>
                 <p>Não há dados suficientes para
                 a geração do mapa sobre {disease}</p>
             </div>"""
 
-        image_path = join(dirname(dirname(__file__)), img_name)
+        image_path = Path(path_to_file, img_name)
 
-        if os.path.exists(image_path):
-            return img_data
-        else:
-            return img_no_data
+        # TODO: add cache
+        return img_data if image_path.exists() else img_no_data
 
     def get_context_data(self, **kwargs):
         context = super(ChartsMainView, self).get_context_data(**kwargs)
