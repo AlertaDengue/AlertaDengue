@@ -41,10 +41,10 @@
   </div>
 </div>
 
-<script> //Chart columns are provided by template charts.html
+<script type="text/javascript"> //Chart columns are provided by template charts.html
 
   $(document).ready(function(){
-    var all_states = {{ states_name|safe }};
+    var allStates = {{ states_abbv|safe }};
     var requestCache = {};
 
       function LoadDataFromApi(apiUrl) {
@@ -53,14 +53,15 @@
               type: 'GET',
               url: apiUrl,
               dataType: "html"
+
           });
         }
         return requestCache[apiUrl];
       }
-      $.each( all_states, function( state_abbv, state_name ) {
-        LoadDataFromApi("/chartshome/"+state_abbv)
+      $.each( allStates, function( i, state_abbv ) {
+        LoadDataFromApi("/chartshome/" + state_abbv)
         .then(function(data) {
-          $("#panel_"+state_abbv).html(data);
+          $("#panel_" + state_abbv).html(data);
           // console.log(data);
           // console.log("State: " + state_abbv);
         });
