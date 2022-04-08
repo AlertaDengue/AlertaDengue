@@ -851,11 +851,10 @@ class ChartsMainView(TemplateView):
                 a geração do mapa sobre {disease}</p>
             </div>"""
 
-        current_path = Path.cwd().as_posix()
-        img_name_str = img_name.as_posix()
-        img_to_show = Path(current_path, 'static', img_name_str)
+        current_path = Path.cwd()
+        img_to_show = current_path / 'static' / img_name
 
-        # TODO add cache | join poxis
+        # TODO add cache
         return img_data if img_to_show.exists() else img_no_data
 
     def get_context_data(self, **kwargs):
