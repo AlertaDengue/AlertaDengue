@@ -19,6 +19,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.views.generic.base import TemplateView, View
+from django.templatetags.static import static
 from copy import deepcopy
 
 from gis.geotiff import convert_from_shapefile
@@ -827,12 +828,6 @@ class ChartsMainView(TemplateView):
         image_path: str
         """
 
-        path_to_file = Path(
-            settings.STATIC_ROOT
-            if settings.DEBUG
-            else settings.STATICFILES_DIRS[0]
-        )
-
         img_name = Path(
             "img",
             "incidence_maps",
@@ -843,7 +838,7 @@ class ChartsMainView(TemplateView):
         img_data = F"""
             <div class='mt-4'>
                 <img
-                src='{(Path(path_to_file.stem, img_name))}'
+                src='{static(img_name)}'
                 alt=''
                 title='Mapa de {disease} para o estado de {state_abbv}'
                 style='width:100%'
@@ -856,10 +851,12 @@ class ChartsMainView(TemplateView):
                 a geração do mapa sobre {disease}</p>
             </div>"""
 
-        image_path = Path(path_to_file, img_name)
+        current_path = Path.cwd().as_posix()
+        img_name_str = img_name.as_posix()
+        img_to_show = Path(current_path, 'static', img_name_str)
 
-        # TODO: add cache
-        return img_data if image_path.exists() else img_no_data
+        # TODO add cache | join poxis
+        return img_data if img_to_show.exists() else img_no_data
 
     def get_context_data(self, **kwargs):
         context = super(ChartsMainView, self).get_context_data(**kwargs)

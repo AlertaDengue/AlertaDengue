@@ -28,6 +28,7 @@ def read_admins(value):
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
 PARENT_BASE_DIR = os.path.dirname(BASE_DIR)
 CURRENT_DIR = os.path.join(dirname(dirname(__file__)))
 DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, 'data'))
@@ -211,12 +212,17 @@ EMAIL_FROM_USER = os.getenv('EMAIL_FROM_USER')
 EMAIL_TO_ADDRESS = os.getenv('EMAIL_TO_ADDRESS')
 EMAIL_OUTLOOK_USER = os.getenv('EMAIL_OUTLOOK_USER')
 
-# Static files (CSS, JavaScript, Images)
+# URL to use when referring to static files located in STATIC_ROOT.
 STATIC_URL = '/static/'
-# up one level from settings.py
+
+# TODO: up one level from settings.py
+# collectstatic will collect static files for deployment.
 STATIC_ROOT = os.path.join(CURRENT_DIR, 'static_files')
-# static is on root level
-STATICFILES_DIRS = (os.path.abspath(os.path.join(CURRENT_DIR, 'static')),)
+
+# django will look for static files
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # used to upload dbf
 MEDIA_ROOT = os.getenv('MEDIA_ROOT')
