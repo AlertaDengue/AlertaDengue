@@ -851,8 +851,9 @@ class ChartsMainView(TemplateView):
                 a geração do mapa sobre {disease}</p>
             </div>"""
 
-        current_path = Path.cwd()
-        img_to_show = current_path / 'static' / img_name
+        img_to_show = (
+            Path(__file__).resolve().parent.parent / 'static' / img_name
+        )
 
         # TODO add cache
         return img_data if img_to_show.exists() else img_no_data
@@ -893,7 +894,7 @@ class ChartsMainView(TemplateView):
                 state_abbv
             ] = notif_resume.count_cities_by_uf(state_name, disease)
 
-            df = data_hist_uf(state_abbv=state_abbv, disease=disease).execute()
+            df = data_hist_uf(state_abbv=state_abbv, disease=disease)
 
             if disease == 'dengue':
                 if not df.empty:

@@ -109,8 +109,10 @@ def data_hist_uf(state_abbv: str, disease: str = 'dengue') -> pd.DataFrame:
     res = cache.get(cache_name)
 
     if res is None:
-        res = table_hist_uf[table_hist_uf.state_abbv == state_abbv].sort_by(
-            'SE'
+        res = (
+            table_hist_uf[table_hist_uf.state_abbv == state_abbv]
+            .sort_by('SE')
+            .execute()
         )
 
         cache.set(
