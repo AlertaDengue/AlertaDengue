@@ -2,9 +2,9 @@ import datetime
 import json
 import locale
 import os
+from pathlib import Path
 import random
 from collections import OrderedDict, defaultdict
-from os.path import dirname, join
 from time import mktime
 from typing import Dict, List, Tuple
 
@@ -19,6 +19,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from django.views.generic.base import TemplateView, View
+from django.templatetags.static import static
 from copy import deepcopy
 
 from gis.geotiff import convert_from_shapefile
@@ -818,41 +819,44 @@ class ChartsMainView(TemplateView):
         Verify if file exists and return a string to path.
         Parameters
         ----------
-        s: str
+        state_abbv: str
             State full name
-        d: str
+        disease: str
             option: dengue|chikungunya|zika
         Returns
         -------
         image_path: str
         """
 
-        img_name = (
-            'static/img/incidence_maps/state/incidence_{}_{}.png'
-        ).format(state_abbv, disease)
+        img_name = Path(
+            "img",
+            "incidence_maps",
+            "state",
+            F"incidence_{state_abbv}_{disease}.png",
+        )
 
-        img_data = f"""
+        img_data = F"""
             <div class='mt-4'>
                 <img
-                src='{img_name}'
+                src='{static(img_name)}'
                 alt=''
                 title='Mapa de {disease} para o estado de {state_abbv}'
                 style='width:100%'
                 />
             </div>"""
 
-        img_no_data = f"""
+        img_no_data = F"""
             <div class='alert alert-primary' align='center'>
                 <p>Não há dados suficientes para
                 a geração do mapa sobre {disease}</p>
             </div>"""
 
-        image_path = join(dirname(dirname(__file__)), img_name)
+        img_to_show = (
+            Path(__file__).resolve().parent.parent / 'static' / img_name
+        )
 
-        if os.path.exists(image_path):
-            return img_data
-        else:
-            return img_no_data
+        # TODO add cache
+        return img_data if img_to_show.exists() else img_no_data
 
     def get_context_data(self, **kwargs):
         context = super(ChartsMainView, self).get_context_data(**kwargs)
@@ -885,11 +889,12 @@ class ChartsMainView(TemplateView):
                 state_abbv, disease
             )
 
+            # count_cities_by_uf('Santa Catarina', 'dengue')
             count_cities[disease][
                 state_abbv
             ] = notif_resume.count_cities_by_uf(state_name, disease)
 
-            df = data_hist_uf(uf=state_name, disease=disease).execute()
+            df = data_hist_uf(state_abbv=state_abbv, disease=disease)
 
             if disease == 'dengue':
                 if not df.empty:
@@ -907,9 +912,7 @@ class ChartsMainView(TemplateView):
                 keys = ['casos_est', 'casos']
                 df_by_uf = df_cases.groupby(['SE'])[keys].sum()
 
-                scatter_chart = _create_scatter_chart(
-                    df=df_by_uf, uf=state_name, disease=disease,
-                )
+                scatter_chart = _create_scatter_chart(df=df_by_uf)
             else:
                 scatter_chart = no_data_chart
                 empty_charts_count[disease] += 1
@@ -921,7 +924,7 @@ class ChartsMainView(TemplateView):
                 df_receptivity = deepcopy(df)
 
                 indicator_chart = _create_indicator_chart(
-                    df=df_receptivity, uf=state_name, disease=disease,
+                    df=df_receptivity, state_abbv=state_abbv
                 )
             else:
                 indicator_chart = no_data_chart
@@ -950,9 +953,7 @@ class ChartsMainView(TemplateView):
                     by=['nivel'], ascending=False
                 )
 
-                stack_chart = _create_stack_chart(
-                    df=df_alert_uf, uf=state_name, disease=disease,
-                )
+                stack_chart = _create_stack_chart(df=df_alert_uf,)
             else:
                 stack_chart = no_data_chart
                 empty_charts_count[disease] += 1

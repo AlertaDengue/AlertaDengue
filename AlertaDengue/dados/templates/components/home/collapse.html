@@ -41,31 +41,33 @@
   </div>
 </div>
 
-<script> //Chart columns are provided by template charts.html
-  {% for key in states_name %}
+<script type="text/javascript"> //Chart columns are provided by template charts.html
 
-    $(document).ready(function(){
-      var requestCache = {};
+  $(document).ready(function(){
+    var allStates = {{ states_abbv|safe }};
+    var requestCache = {};
+
       function LoadDataFromApi(apiUrl) {
         if (!requestCache[apiUrl]) {
           requestCache[apiUrl] = $.ajax({
               type: 'GET',
               url: apiUrl,
               dataType: "html"
+
           });
         }
         return requestCache[apiUrl];
       }
-
-      LoadDataFromApi("/chartshome/{{ key }}")
+      $.each( allStates, function( i, state_abbv ) {
+        LoadDataFromApi("/chartshome/" + state_abbv)
         .then(function(data) {
-          $("#panel_{{ key }}").html(data);
+          $("#panel_" + state_abbv).html(data);
           // console.log(data);
+          // console.log("State: " + state_abbv);
         });
-
     });
+  });
 
-  {% endfor %}
 </script>
 
 {% endblock %}

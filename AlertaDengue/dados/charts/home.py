@@ -10,7 +10,7 @@ from django.utils.translation import gettext as _
 import plotly.graph_objs as go
 
 
-def _create_scatter_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
+def _create_scatter_chart(df: pd.DataFrame) -> str:
     """
     Create chart with historical data from data cases and cases_est.
 
@@ -138,7 +138,7 @@ def _create_scatter_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
     return fig.to_html(full_html=False, include_plotlyjs=False, config=config)
 
 
-def _create_indicator_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
+def _create_indicator_chart(df: pd.DataFrame, state_abbv: str) -> str:
     """
     Create the charts with the number of favorable cities for transmission
     when the receptivity is different from 0.
@@ -157,7 +157,8 @@ def _create_indicator_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
     """
 
     df = deepcopy(df)
-    filter_uf = df[(df['uf'] == uf)]
+    filter_uf = df[(df['state_abbv'] == state_abbv)]
+
     total_cities_uf = len(filter_uf.municipio_geocodigo.unique())
     receptivity_uf = filter_uf[filter_uf['receptivo'] != 0]
 
@@ -244,7 +245,7 @@ def _create_indicator_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
     return fig.to_html(full_html=False, include_plotlyjs=False, config=config)
 
 
-def _create_stack_chart(df: pd.DataFrame, uf: str, disease: str) -> str:
+def _create_stack_chart(df: pd.DataFrame) -> str:
     """
     Create chart of the epidemiological situation of cities
     by levels in the week.

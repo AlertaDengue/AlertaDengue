@@ -79,12 +79,12 @@ MAP_ZOOM = {k: v[2] for k, v in ALL_STATE_NAMES.items()}
 # Ibis utils
 
 
-def data_hist_uf(uf: str, disease: str = 'dengue') -> pd.DataFrame:
+def data_hist_uf(state_abbv: str, disease: str = 'dengue') -> pd.DataFrame:
     """
     PostgreSQLTable[table]
     name: hist_uf_disease_materialized_view
     schema:
-        uf : string
+        state_abbv : string
         municipio_geocodigo : int32
         SE : int32
         data_iniSE : date
@@ -104,14 +104,16 @@ def data_hist_uf(uf: str, disease: str = 'dengue') -> pd.DataFrame:
     _disease = get_disease_suffix(disease, empty_for_dengue=False)
     table_hist_uf = con.table(f'hist_uf{_disease}_materialized_view')
 
-    cache_name = (
-        "data_hist" + "_" + str(uf).replace(" ", "_") + "_" + str(disease)
-    )
+    cache_name = "data_hist" + "_" + str(state_abbv) + "_" + str(disease)
 
     res = cache.get(cache_name)
 
     if res is None:
-        res = table_hist_uf[table_hist_uf.uf == uf].sort_by('SE')
+        res = (
+            table_hist_uf[table_hist_uf.state_abbv == state_abbv]
+            .sort_by('SE')
+            .execute()
+        )
 
         cache.set(
             cache_name, res, settings.QUERY_CACHE_TIMEOUT,
