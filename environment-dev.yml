@@ -20,10 +20,10 @@ dependencies:
   - geopandas
   - geopy
   - gunicorn
-  - ibis-framework 1.4.*
+  - ibis-framework
   - make
   - numpy
-  - pandas <=1.1.5  # issue#385
+  - pandas
   - pip==21.3
   - plotly 4.*
   - psycopg2
@@ -34,7 +34,7 @@ dependencies:
   - pytz
   - rasterio
   - sh
-  - sqlalchemy <1.4
+  - sqlalchemy
   # develop
   - black
   - flake8
