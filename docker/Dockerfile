@@ -1,5 +1,11 @@
 FROM condaforge/mambaforge
 
+ARG HOST_UID
+ARG HOST_GID
+ARG SERVICES
+ENV ENV_NAME=alertadengue
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get -qq update --yes \
   && apt-get -qq install --yes --no-install-recommends \
   build-essential git make postgresql-client \
@@ -8,52 +14,43 @@ RUN apt-get -qq update --yes \
 
 #Set locale
 RUN sed -i -e "s/# pt_BR.*/pt_BR.UTF-8 UTF-8/" /etc/locale.gen \
-  && dpkg-reconfigure --frontend=noninteractive locales
-
-# Copy environment file to tmp/
-ARG PYTHON_VERSION
-COPY environment-${PYTHON_VERSION}.yml /tmp/environment.yml
-
-# Use environment to update the env base
-RUN conda update -n base -c defaults conda \
-  && mamba update --all --yes --quiet \
-  && mamba env update --file /tmp/environment.yml --name base \
-  && mamba clean -afy
+  && dpkg-reconfigure --frontend=noninteractive locales \
+  && update-locale LANG=pt_BR.UTF-8
 
 # Create deploy user
-ARG HOST_UID
-ARG HOST_GID
-COPY docker/prepare_permission.sh /prepare_permission.sh
-RUN /prepare_permission.sh \
-# New added for disable sudo password
-&& usermod -aG sudo deploy \
-&& echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+RUN addgroup --gid ${HOST_GID} deploy \
+  && useradd --uid ${HOST_UID} --gid ${HOST_GID} -ms /bin/bash deploy \
+  && echo "deploy ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/deploy \
+  && chmod 0440 /etc/sudoers.d/deploy \
+  && export ENV_NAME="$ENV_NAME" \
+  && mkdir -p /opt/conda /opt/services/logs /opt/services/AlertaDengue/ \
+  && chmod -R a+rwx /opt/conda /opt/services/AlertaDengue/ /tmp \
+  && chown deploy:deploy /tmp \
+  && echo 'source /opt/conda/bin/activate "$ENV_NAME" && exec "$@"' > /activate.sh \
+  && chmod +x /activate.sh \
+  && echo 'source activate "$ENV_NAME"' >  /home/deploy/.bashrc
+
+ENV PATH "$PATH:/home/deploy/.local/bin"
+ENV PATH /opt/conda/envs/$ENV_NAME/bin:$PATH
 
 ## Copy code to the container with permissions to user
-COPY --chown=deploy:deploy AlertaDengue  /srv/deploy/AlertaDengue
-COPY --chown=deploy:deploy requirements.txt /srv/deploy/
-COPY --chown=deploy:deploy .env.tmpl /srv/deploy/
+COPY --chown=deploy:deploy AlertaDengue  /opt/services/AlertaDengue
+COPY --chown=deploy env.tpl pyproject.toml poetry.lock  /opt/services/AlertaDengue/
+COPY --chown=deploy:deploy docker/entrypoint.sh /entrypoint.sh
+COPY --chown=deploy:deploy conda/environment.yaml /tmp/environment.yaml
 
-RUN mkdir /srv/deploy/logs \
-  && chown -R deploy:deploy /srv/deploy/logs
-
-# Create script activate environment
-RUN echo 'source /opt/conda/bin/activate base && exec "$@"' > activate.sh \
-&& chmod +x /activate.sh
-
-WORKDIR /srv/deploy/AlertaDengue
-
-# Configure cron for DBF request
-COPY docker/cron-tasks /etc/cron.d/cron-tasks
-RUN chmod 0644 /etc/cron.d/cron-tasks \
-  && crontab -u deploy /etc/cron.d/cron-tasks \
-  && echo "deploy"  > /etc/cron.allow \
-  && touch /var/log/cron.log \
-  && chown deploy:deploy /var/log/cron.log
-
-ADD docker/entrypoint.sh /entrypoint.sh
+# Use environment to update the env alertadengue
+RUN mamba env create -n $ENV_NAME \
+    --file /tmp/environment.yaml \
+  && cd /opt/services/AlertaDengue && poetry config virtualenvs.create false && poetry install --no-dev\
+  && conda clean --all \
+  && find /opt/conda/ -type f,l -name '*.a' -delete \
+  && find /opt/conda/ -type f,l -name '*.pyc' -delete \
+  && find /opt/conda/ -type f,l -name '*.js.map' -delete \
+  && rm -rf /opt/conda/pkgs
 
 USER deploy
+WORKDIR /opt/services/AlertaDengue
 
 ENTRYPOINT ["bash", "/activate.sh"]
 CMD ["/entrypoint.sh"]

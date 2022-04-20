@@ -39,6 +39,9 @@ env:
   EMAIL_HOST: 'smtp.gmail.com'
   EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
   EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+  HOST_UID: 1000
+  HOST_GID: 1000
+
 jobs:
   build:
 
@@ -61,12 +64,7 @@ jobs:
         wget https://dataverse.harvard.edu/api/access/datafile/5110797 -O docker/dev_dumps/latest_dengue.sql.gz
 
     - name: Create env
-      run: envsubst < .env.tmpl > .env_staging
-
-    - name: install dependencies
-      run: |
-        make install
-        python --version
+      run: envsubst < env.tpl > .env_staging
 
     - name: Build and Deploy staging_DB
       id: staging_db

@@ -44,7 +44,6 @@ services:
       context: ".."
       dockerfile: "docker/Dockerfile-dev"
       args:
-        PYTHON_VERSION: ${PYTHON_VERSION:-3.8}
         HOST_UID: ${HOST_UID}
         HOST_GID: ${HOST_GID}
     env_file:
@@ -73,12 +72,11 @@ services:
       - staging
     restart: always
 
-  staging_celery-worker:
+  staging_worker:
     build:
       context: ".."
       dockerfile: "docker/Dockerfile-celery"
       args:
-        PYTHON_VERSION: ${PYTHON_VERSION:-3.8}
         HOST_UID: ${HOST_UID}
         HOST_GID: ${HOST_GID}
     env_file:
