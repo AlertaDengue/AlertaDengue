@@ -1,4 +1,51 @@
-[tool.black]
-line-length = 79
-skip-string-normalization = true
-target-version = ["py36", "py37", "py38"]
+[tool.poetry]
+name = "AlertaDengue"
+version = "2.8.0"
+description = "Dengue alert"
+authors = ["infodengue"]
+license = "GNU General Public License v3"
+
+[tool.poetry.dependencies]
+Django = ">=3.1.8,<4"
+django-bootstrap4 = "^22.1"
+django-chunked-upload = "^2.0.0"
+django-cprofile-middleware = "^1.0.5"
+django-leaflet = "^0.28.2"
+django-maintenance-mode = "^0.16.3"
+django-pymemcache = "^1.0.0"
+dj-database-url = "^0.5.0"
+dj-static = "^0.0.6"
+dbfread = "^2.0.7"
+docker-compose = "^1.29.2"
+celery = "^5.2.6"
+fastparquet = "^0.8.1"
+Fiona = "^1.8.21"
+geojson = "^2.5.0"
+geopandas = "^0.10.2"
+geopy = "^2.2.0"
+gunicorn = "^20.1.0"
+ibis-framework = "<1.4.0"
+plotly = "^5.7.0"
+pyproj = "^3.3.0"
+python = ">=3.8,<3.11"
+python-dotenv = "^0.20.0"
+python-memcached = "^1.59"
+rasterio = "^1.2.10"
+sh = "^1.14.2"
+simpledbf = "^0.2.6"
+SQLAlchemy = "<1.4"
+
+[tool.poetry.dev-dependencies]
+django-extensions = "^3.1.5"
+black = "^22.3.0"
+flake8 = "^4.0.1"
+ipython = "^8.2.0"
+jupyterlab = "^3.3.4"
+matplotlib = "^3.5.1"
+mypy = "^0.942"
+Pillow = "^9.1.0"
+pre-commit = "^2.18.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

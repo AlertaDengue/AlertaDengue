@@ -1,0 +1,11 @@
+name: alertadengue
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - django >=3.1.8,<4
+  - gdal >=2.4.2
+  - pip
+  - python 3.9.*
+  - psycopg2-binary
+  - poetry
