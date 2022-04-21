@@ -5,10 +5,15 @@ description = "Dengue alert"
 authors = ["infodengue"]
 license = "GNU General Public License v3"
 
+#poetry build
+#packages = [
+#    { include = "AlertaDengue" }
+#]
+
 [tool.poetry.dependencies]
 Django = ">=3.1.8,<4"
 django-bootstrap4 = "^22.1"
-django-chunked-upload = "^2.0.0"
+django-chunked-upload = "<2.0.0"
 django-cprofile-middleware = "^1.0.5"
 django-leaflet = "^0.28.2"
 django-maintenance-mode = "^0.16.3"
@@ -34,6 +39,7 @@ rasterio = "^1.2.10"
 sh = "^1.14.2"
 simpledbf = "^0.2.6"
 SQLAlchemy = "<1.4"
+tables = "^3.7.0"
 
 [tool.poetry.dev-dependencies]
 django-extensions = "^3.1.5"
