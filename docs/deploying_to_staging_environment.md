@@ -9,7 +9,7 @@ to set the following environment variables in your local `.env` file
 * `PSQL_PASSWORD`
 * `PSQL_USER`
 * `PSQL_HOST=staging_db` - you need this value for `PSQL_HOST` as it will be the hostname for the database container
-* `STAGING_DATA_DIR` - this is where the db container will keep the postgres data directory
+* `STAGING_PG_DATA` - this is where the db container will keep the postgres data directory
 
 
 After that, all you need to do is `make deploy_staging` and

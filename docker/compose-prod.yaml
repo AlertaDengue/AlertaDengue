@@ -1,0 +1,68 @@
+version: "3"
+services:
+  memcached:
+    image: memcached:latest
+    hostname: memcached
+    ports:
+      - 11211:11211
+    entrypoint:
+      - memcached
+      - -m 64
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3
+    hostname: rabbitmq
+    restart: always
+
+  worker:
+    build:
+      context: ".."
+      dockerfile: "docker/Dockerfile-base"
+      args:
+        HOST_UID: ${HOST_UID}
+        HOST_GID: ${HOST_GID}
+    command: >
+      bash -c "/opt/services/AlertaDengue/run_celery_worker.sh"
+    env_file:
+      - ../.env
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+    volumes:
+      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
+    depends_on:
+      - rabbitmq
+      - memcached
+    restart: always
+
+  web:
+    build:
+      context: ".."
+      dockerfile: "docker/Dockerfile-web"
+      args:
+        IMAGE_BUILD: infodengue-prod_worker
+    command: >
+      bash -c "/entrypoint.sh"
+    env_file:
+      - ../.env
+    ports:
+      - 8000:8000
+    environment:
+      - MEMCACHED_HOST=memcached
+      - MEMCACHED_PORT=11211
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+    volumes:
+      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      - ${DOCKER_HOST_MAPFILES_DIR}:/srv/deploy/maps
+      - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
+      - ${DOCKER_HOST_TIFFS_DIR}:/srv/deploy/tiffs
+      - ${DOCKER_HOST_LOG_DIR}:/var/log/mapserver
+      - ${DOCKER_HOST_INCIDENCE_MAPS}:/srv/deploy/AlertaDengue/static/img/incidence_maps
+      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
+    depends_on:
+      - rabbitmq
+      - memcached
+    restart: always

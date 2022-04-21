@@ -33,23 +33,23 @@ RUN addgroup --gid ${HOST_GID} deploy \
 ENV PATH "$PATH:/home/deploy/.local/bin"
 ENV PATH /opt/conda/envs/$ENV_NAME/bin:$PATH
 
+USER deploy
+
 ## Copy code to the container with permissions to user
 COPY --chown=deploy:deploy AlertaDengue  /opt/services/AlertaDengue
 COPY --chown=deploy env.tpl pyproject.toml poetry.lock  /opt/services/AlertaDengue/
+COPY --chown=deploy:deploy docker/entrypoint.sh /entrypoint.sh
 COPY --chown=deploy:deploy conda/environment.yaml /tmp/environment.yaml
 
 # Use environment to update the env alertadengue
 RUN mamba env create -n $ENV_NAME \
     --file /tmp/environment.yaml \
-  && cd /opt/services/AlertaDengue && poetry config virtualenvs.create false && poetry install \
+  && cd /opt/services/AlertaDengue && poetry config virtualenvs.create false && poetry install --no-dev\
   && conda clean --all \
   && find /opt/conda/ -type f,l -name '*.a' -delete \
   && find /opt/conda/ -type f,l -name '*.pyc' -delete \
   && find /opt/conda/ -type f,l -name '*.js.map' -delete \
   && rm -rf /opt/conda/pkgs
 
-USER deploy
 WORKDIR /opt/services/AlertaDengue
-
 ENTRYPOINT ["bash", "/activate.sh"]
-CMD ["/opt/services/AlertaDengue/run_celery_worker.sh"]
