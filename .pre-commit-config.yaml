@@ -1,12 +1,38 @@
+default_language_version:
+  python: python3.9
+
+default_stages: [commit, push]
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v1.2.3
+    rev: v2.5.0
     hooks:
-     - id: flake8
-       types:
-         - python
-       args: ['--config=./AlertaDengue/setup.cfg']
-  - repo: https://github.com/psf/black
-    rev: 19.10b0
+      - id: check-yaml
+      - id: end-of-file-fixer
+        exclude: LICENSE
+
+  - repo: local
+    hooks:
+      - id: isort
+        name: isort
+        entry: isort --settings-path pyproject.toml
+        types: [python]
+        language: system
+        known_third_party: ad_main,bootstrap4,celery,chunked_upload,dados,dbf,dbfread,dj_static,django,dotenv,fiona,forecast,geojson,geopandas,geopy,gis,ibis,mock,numpy,pandas,plotly,psycopg2,pyproj,rasterio,setuptools,sh,shapely,simpledbf,sqlalchemy
+
+
+  - repo: local
     hooks:
       - id: black
+        name: black
+        entry: black --config pyproject.toml
+        types: [python]
+        language: system
+
+  - repo: local
+    hooks:
+      - id: flake8
+        name: flake8
+        entry: flake8
+        types: [python]
+        language: system

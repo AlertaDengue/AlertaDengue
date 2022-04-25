@@ -7,8 +7,17 @@ DOCKER=docker-compose \
 	--project-name infodengue-$(ENV) \
 	--file docker/compose-$(ENV).yaml
 
-# DOCKER
 
+
+# PREPARE ENVIRONMENT
+.PHONY:prepare-env
+prepare-env:
+	# source env_export.sh
+	# python generate_paths.py
+	envsubst < .env.tpl > .env
+
+
+# DOCKER
 .PHONY:docker-build
 docker-build:
 	$(DOCKER) build ${SERVICES}
@@ -25,7 +34,11 @@ docker-stop:
 docker-restart: docker-stop docker-start
 	echo "[II] Docker services restarted!"
 
-.PHONY:docker-restart
+.PHONY:docker-logs
+docker-logs:
+	$(DOCKER) logs --follow --tail 100 ${SERVICES}
+
+.PHONY:run-dev-db
 docker-run-dev-db:
 	$(DOCKER) run --rm db postgres -V
 
