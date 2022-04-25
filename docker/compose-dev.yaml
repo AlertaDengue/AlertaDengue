@@ -7,6 +7,8 @@ services:
       - 45004:45004
     expose:
       - 45004
+    networks:
+      - staging
     entrypoint:
       - memcached
       - -m 64
@@ -15,6 +17,8 @@ services:
   rabbitmq:
     image: rabbitmq:3
     hostname: rabbitmq
+    networks:
+      - staging
     restart: always
 
   db:
@@ -26,19 +30,36 @@ services:
     hostname: db
     ports:
       - 25432:25432
+    networks:
+      - staging
     volumes:
       - ${STAGING_PG_DATA}/data:/var/lib/postgresql/data
       - ./dev_dumps:/dumps
     restart: always
     command: -p 25432
 
-  worker:
+  base:
     build:
       context: ".."
       dockerfile: "docker/Dockerfile-base"
       args:
         HOST_UID: ${HOST_UID}
         HOST_GID: ${HOST_GID}
+    env_file:
+      - ../.env
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+      - PSQL_HOST=db
+      - PSQL_PORT=25432
+    networks:
+      - staging
+    volumes:
+      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
+
+  worker:
+    image: infodengue-dev_base:latest
     entrypoint: "/opt/services/AlertaDengue/run_celery_worker.sh"
     env_file:
       - ../.env
@@ -46,6 +67,8 @@ services:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
       - PSQL_HOST=db
       - PSQL_PORT=25432
+    networks:
+      - staging
     volumes:
       - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
@@ -61,7 +84,7 @@ services:
       context: ".."
       dockerfile: "docker/Dockerfile-web"
       args:
-        IMAGE_BUILD: infodengue-dev_worker
+        IMAGE_BUILD: infodengue-dev_base:latest
     entrypoint: "/entrypoint.sh"
     env_file:
       - ../.env
@@ -73,6 +96,8 @@ services:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
       - PSQL_HOST=db
       - PSQL_PORT=25432
+    networks:
+      - staging
     volumes:
       - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
@@ -83,3 +108,7 @@ services:
       - rabbitmq
       - memcached
     restart: always
+
+networks:
+  staging:
+      driver: bridge

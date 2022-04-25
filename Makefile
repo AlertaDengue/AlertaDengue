@@ -16,11 +16,14 @@ prepare-env:
 	# python generate_paths.py
 	envsubst < .env.tpl > .env
 
-
 # DOCKER
 .PHONY:docker-build
 docker-build:
 	$(DOCKER) build ${SERVICES}
+
+.PHONY:docker-start-ci
+docker-start-ci:
+	$(DOCKER) up -d --scale base=0
 
 .PHONY:docker-start
 docker-start:
@@ -43,8 +46,8 @@ docker-run-dev-db:
 	$(DOCKER) run --rm db postgres -V
 
 # Migrate databases and create shapefiles to synchronize with static_files
-.PHONY:docker-restart
-django-migrate: django-migrate
+.PHONY:django-migrate
+django-migrate: docker-run-dev-db
 	$(DOCKER) run --rm web python3 manage.py migrate --database=dados --noinput
 	$(DOCKER) run --rm web python3 manage.py migrate --database=infodengue --noinput
 	$(DOCKER) run --rm web python3 manage.py migrate forecast --database=forecast
@@ -63,20 +66,33 @@ test-infodengue-web:
 	#$(DOCKER) run --no-deps web bash ../docker/test.sh forecast
 
 .PHONY:test-infodengue-all
-test-infodengue-all: #deploy_staging
+test-infodengue-all:
 	$(DOCKER) run --rm web python3 manage.py test
+
+.PHONY: lint
+lint: ## formatting linter with poetry
+	pre-commit install
+	pre-commit run --all-files
 
 # [CRON] Uses for web services
 .PHONY:send-mail-partner
 send-mail-partner:
-	$(compose_cmd) run --rm web python manage.py send_mail
+	$(DOCKER) run --rm web python manage.py send_mail
 
-.PHONY:clean
-clean:
-	@find ./ -name '*.pyc' -exec rm -f {} \;
-	@find ./ -name '*.pyo' -exec rm -f {} \;
-	@find ./ -name '*~' -exec rm -f {} \;
-	rm -rf .cache
-	rm -rf build
-	rm -rf dist
-	rm -rf *.egg-info
+# Python
+.PHONY: clean
+clean: ## clean all artifacts
+	rm -fr build/
+	rm -fr dist/
+	rm -fr .eggs/
+	rm -fr .idea/
+	rm -fr */.eggs
+	rm -fr db
+	find . -name '*.egg-info' -exec rm -fr {} +
+	find . -name '*.egg' -exec rm -fr {} +
+	find . -name '*.pyc' -exec rm -f {} +
+	find . -name '*.pyo' -exec rm -f {} +
+	find . -name '*~' -exec rm -f {} +
+	find . -name '__pycache__' -exec rm -fr {} +
+	find . -name '*.ipynb_checkpoints' -exec rm -rf {} +
+	find . -name '*.pytest_cache' -exec rm -rf {} +

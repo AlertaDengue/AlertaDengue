@@ -15,24 +15,41 @@ services:
     hostname: rabbitmq
     restart: always
 
-  worker:
+  base:
     build:
       context: ".."
       dockerfile: "docker/Dockerfile-base"
       args:
         HOST_UID: ${HOST_UID}
         HOST_GID: ${HOST_GID}
-    command: >
-      bash -c "/opt/services/AlertaDengue/run_celery_worker.sh"
     env_file:
       - ../.env
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+      - PSQL_HOST=db
+      - PSQL_PORT=25432
+    volumes:
+      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
+    command: sh -c "echo start"
+    restart: always
+
+  worker:
+    image: infodengue-prod_base:latest
+    entrypoint: "/opt/services/AlertaDengue/run_celery_worker.sh"
+    env_file:
+      - ../.env
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+      - PSQL_HOST=db
+      - PSQL_PORT=25432
     volumes:
       - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
       - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
     depends_on:
+      - db
       - rabbitmq
       - memcached
     restart: always
@@ -42,9 +59,8 @@ services:
       context: ".."
       dockerfile: "docker/Dockerfile-web"
       args:
-        IMAGE_BUILD: infodengue-prod_worker
-    command: >
-      bash -c "/entrypoint.sh"
+        IMAGE_BUILD: infodengue-prod_base:latest
+    entrypoint: "/entrypoint.sh"
     env_file:
       - ../.env
     ports:

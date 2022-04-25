@@ -18,7 +18,6 @@ repos:
         entry: isort --settings-path pyproject.toml
         types: [python]
         language: system
-        known_third_party: ad_main,bootstrap4,celery,chunked_upload,dados,dbf,dbfread,dj_static,django,dotenv,fiona,forecast,geojson,geopandas,geopy,gis,ibis,mock,numpy,pandas,plotly,psycopg2,pyproj,rasterio,setuptools,sh,shapely,simpledbf,sqlalchemy
 
 
   - repo: local
