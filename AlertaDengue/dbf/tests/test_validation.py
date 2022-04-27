@@ -1,17 +1,15 @@
-from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-from django.core.files import File
-from django.test import TestCase
-from datetime import date
+import datetime
+import os
 import unittest
-
+from datetime import date
 
 # local
 from dbf.models import DBF
 from dbf.validation import is_valid_dbf
-
-import datetime
-import os
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.core.files import File
+from django.test import TestCase
 
 __all__ = ["DBFValidationTest"]
 
@@ -20,7 +18,7 @@ TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "data/")
 
 @unittest.skip("reason='Issue #416'")
 class DBFValidationTest(TestCase):
-    fixtures = ['users']
+    fixtures = ["users"]
 
     def _get_file_from_filename(self, filename):
         with open(os.path.join(TEST_DATA_DIR, filename), "rb") as fp:

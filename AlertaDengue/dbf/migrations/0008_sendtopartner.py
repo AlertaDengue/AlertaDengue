@@ -6,60 +6,60 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dbf', '0007_auto_20180124_2239'),
+        ("dbf", "0007_auto_20180124_2239"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SendToPartner',
+            name="SendToPartner",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.AutoField(
                         auto_created=True,
                         primary_key=True,
                         serialize=False,
-                        verbose_name='ID',
+                        verbose_name="ID",
                     ),
                 ),
                 (
-                    'geocode',
-                    models.CharField(help_text='geocodigo', max_length=7),
+                    "geocode",
+                    models.CharField(help_text="geocodigo", max_length=7),
                 ),
                 (
-                    'name',
+                    "name",
                     models.CharField(
-                        help_text='nome município|estado', max_length=50
+                        help_text="nome município|estado", max_length=50
                     ),
                 ),
                 (
-                    'state_abbreviation',
-                    models.CharField(help_text='uf', max_length=5),
+                    "state_abbreviation",
+                    models.CharField(help_text="uf", max_length=5),
                 ),
                 (
-                    'level',
+                    "level",
                     models.CharField(
-                        help_text='nível de atuação', max_length=10
+                        help_text="nível de atuação", max_length=10
                     ),
                 ),
                 (
-                    'contact',
+                    "contact",
                     models.CharField(
-                        help_text='nome do contato', max_length=50
+                        help_text="nome do contato", max_length=50
                     ),
                 ),
                 (
-                    'email',
-                    models.EmailField(help_text='e-mail', max_length=50),
+                    "email",
+                    models.EmailField(help_text="e-mail", max_length=50),
                 ),
                 (
-                    'status',
+                    "status",
                     models.BooleanField(
-                        choices=[(True, 'Enable'), (False, 'Disable')],
-                        help_text='Está ativo?',
+                        choices=[(True, "Enable"), (False, "Disable")],
+                        help_text="Está ativo?",
                     ),
                 ),
             ],
-            options={'verbose_name_plural': 'Send To Partners'},
+            options={"verbose_name_plural": "Send To Partners"},
         ),
     ]

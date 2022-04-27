@@ -1,17 +1,17 @@
+from datetime import datetime
+
+from ad_main.settings import RASTER_METEROLOGICAL_DATA_RANGE
+from dados.dbdata import CID10
 from django.core.management.base import BaseCommand
 
 # local
-
-from datetime import datetime
+from gis import mapfile
 
 # local
-from gis import mapfile
-from ad_main.settings import RASTER_METEROLOGICAL_DATA_RANGE
-from dados.dbdata import CID10
 
 
 class Command(BaseCommand):
-    help = 'Generate map files'
+    help = "Generate map files"
 
     def generate_mapfiles_alert(self):
         """
@@ -19,7 +19,7 @@ class Command(BaseCommand):
         :return:
         """
         for disease in CID10.keys():
-            print('>> Generating %s mapfile' % disease)
+            print(">> Generating %s mapfile" % disease)
             mf = mapfile.MapFileAlert(map_class=disease)
             mf.create_files()
 
@@ -29,7 +29,7 @@ class Command(BaseCommand):
         :return:
         """
         for c in RASTER_METEROLOGICAL_DATA_RANGE:
-            print('>> Generating %s mapfile' % c)
+            print(">> Generating %s mapfile" % c)
             mf = mapfile.MapFileMeteorological(
                 map_class=c, date_start=date_start
             )
@@ -38,12 +38,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         str_date_start = None  # TODO: receive str_date_start from command line
         if str_date_start:
-            date_start = datetime.strptime(str_date_start, '%Y-%m-%d')
+            date_start = datetime.strptime(str_date_start, "%Y-%m-%d")
             print('Start date "%s" defined.' % date_start)
         else:
             date_start = None
 
-        print('\nGenerating mapfiles alert')
+        print("\nGenerating mapfiles alert")
         self.generate_mapfiles_alert()
-        print('\nGenerating mapfiles meteorological')
+        print("\nGenerating mapfiles meteorological")
         self.generate_mapfiles_meteorological(date_start)

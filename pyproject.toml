@@ -57,3 +57,30 @@ isort = "^5.10.1"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+# https://github.com/psf/black
+target-version = ["py39"]
+line-length = 79
+color = true
+
+exclude = '''
+/(
+    \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | env
+    | venv
+    | migrations/*
+)/
+'''
+
+[tool.isort]
+profile = "black"
+src_paths = ["isort", "test"]

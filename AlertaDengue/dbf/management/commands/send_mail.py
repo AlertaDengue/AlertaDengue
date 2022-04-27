@@ -1,11 +1,11 @@
-from django.core.management.base import BaseCommand
 from datetime import datetime
 
 from dbf.tasks import send_mail_partner
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    help = '>>> Envia emails para as secretarias de saúde'
+    help = ">>> Envia emails para as secretarias de saúde"
 
     def send_email(self):
         send_mail_partner()

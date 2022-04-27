@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
+from dbf.sinan import Sinan
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
-
-from dbf.sinan import Sinan
 
 
 class Command(BaseCommand):

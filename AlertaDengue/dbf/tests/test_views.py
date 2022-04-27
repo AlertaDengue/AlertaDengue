@@ -1,18 +1,15 @@
 import os
-from django.contrib.auth.models import User
-from django.core.files.base import File
-from django.test import TestCase
 import unittest
-
-
-from django.urls import reverse
-
 from datetime import date
+
+from dbf.forms import DBFForm
 
 # local
 from dbf.models import DBF, DBFChunkedUpload
-from dbf.forms import DBFForm
-
+from django.contrib.auth.models import User
+from django.core.files.base import File
+from django.test import TestCase
+from django.urls import reverse
 
 __all__ = ["DBFUploadViewTest"]
 
@@ -22,8 +19,8 @@ TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "data/")
 
 @unittest.skip("reason='Issue #416'")
 class DBFUploadViewTest(TestCase):
-    databases = ['infodengue', 'default']
-    fixtures = ['AlertaDengue/dbf/fixtures/users.json']
+    databases = ["infodengue", "default"]
+    fixtures = ["AlertaDengue/dbf/fixtures/users.json"]
 
     def _create_dbf_from_test_data(
         self, uploaded_by, filename, export_date, notification_year
@@ -38,16 +35,16 @@ class DBFUploadViewTest(TestCase):
         return dbf
 
     def test_requires_login(self):
-        response = self.client.get(reverse('dbf:upload'))
+        response = self.client.get(reverse("dbf:upload"))
         self.assertEqual(response.status_code, 302)
-        self.assertIn('/accounts/login/', response.url)
+        self.assertIn("/accounts/login/", response.url)
 
     def test_shows_form_when_logged_in(self):
         self.client.login(username="user", password="user")
-        response = self.client.get(reverse('dbf:upload'))
+        response = self.client.get(reverse("dbf:upload"))
         self.assertEqual(response.status_code, 200)
-        self.assertIn('form', response.context)
-        self.assertIsInstance(response.context['form'], DBFForm)
+        self.assertIn("form", response.context)
+        self.assertIsInstance(response.context["form"], DBFForm)
 
     def test_context_has_last_uploaded_files(self):
         self.client.login(username="user", password="user")
@@ -57,10 +54,10 @@ class DBFUploadViewTest(TestCase):
             export_date=date.today(),
             notification_year=date.today().year,
         )
-        response = self.client.get(reverse('dbf:upload'))
+        response = self.client.get(reverse("dbf:upload"))
         self.assertEqual(response.status_code, 200)
-        self.assertIn('last_uploaded', response.context)
-        self.assertIn(dbf, response.context['last_uploaded'])
+        self.assertIn("last_uploaded", response.context)
+        self.assertIn(dbf, response.context["last_uploaded"])
 
     def test_context_does_not_include_files_uploaded_by_other_user(self):
         self.client.login(username="user", password="user")
@@ -70,17 +67,17 @@ class DBFUploadViewTest(TestCase):
             export_date=date.today(),
             notification_year=date.today().year,
         )
-        response = self.client.get(reverse('dbf:upload'))
+        response = self.client.get(reverse("dbf:upload"))
         self.assertEqual(response.status_code, 200)
-        self.assertIn('last_uploaded', response.context)
-        self.assertNotIn(dbf, response.context['last_uploaded'])
+        self.assertIn("last_uploaded", response.context)
+        self.assertNotIn(dbf, response.context["last_uploaded"])
 
     def test_redirects_to_success_url_when_form_is_valid(self):
         self.client.login(username="user", password="user")
         with open(os.path.join(TEST_DATA_DIR, "simple.dbf"), "rb") as fp:
             DBFChunkedUpload.objects.create(
                 id=1,
-                file=File(fp, name='cool_file'),
+                file=File(fp, name="cool_file"),
                 filename="cool_file",
                 user=User.objects.get(username="user"),
             )
@@ -92,7 +89,7 @@ class DBFUploadViewTest(TestCase):
                 "chunked_upload_id": 1,
                 "abbreviation": "RJ",
             }
-            response = self.client.post(reverse('dbf:upload'), data)
+            response = self.client.post(reverse("dbf:upload"), data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("dbf:upload_successful"))
 
@@ -105,7 +102,7 @@ class DBFUploadViewTest(TestCase):
         with open(os.path.join(TEST_DATA_DIR, "simple.dbf"), "rb") as fp:
             DBFChunkedUpload.objects.create(
                 id=1,
-                file=File(fp, name='cool_file'),
+                file=File(fp, name="cool_file"),
                 filename="cool_file",
                 user=regular_user,
             )
@@ -118,7 +115,7 @@ class DBFUploadViewTest(TestCase):
                 "chunked_upload_id": 1,
                 "abbreviation": "RJ",
             }
-            self.client.post(reverse('dbf:upload'), data)
+            self.client.post(reverse("dbf:upload"), data)
 
         admin = User.objects.get(username="admin")
         # The object was created ...
@@ -128,5 +125,5 @@ class DBFUploadViewTest(TestCase):
         # ... it was created with the current user's id instead.
         self.assertEqual(
             DBF.objects.all()[0].uploaded_by.id,
-            int(self.client.session['_auth_user_id']),
+            int(self.client.session["_auth_user_id"]),
         )

@@ -27,8 +27,8 @@ class DBFForm(forms.Form):
 
     def clean(self):
         cleaned_data = super(DBFForm, self).clean()
-        chunked_upload_id = cleaned_data.get('chunked_upload_id')
-        user = cleaned_data.get('uploaded_by')
+        chunked_upload_id = cleaned_data.get("chunked_upload_id")
+        user = cleaned_data.get("uploaded_by")
         # If the user tries to give the id of a chunked_upload by
         # another user, or an inexistent id, we raise a validation
         # error.
@@ -44,7 +44,7 @@ class DBFForm(forms.Form):
                 )
             )
         # This might be a performance problem for really large DBFs
-        is_valid_dbf(uploaded_file.file, cleaned_data['notification_year'])
+        is_valid_dbf(uploaded_file.file, cleaned_data["notification_year"])
         return cleaned_data
 
 

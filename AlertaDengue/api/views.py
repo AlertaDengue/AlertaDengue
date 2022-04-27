@@ -48,114 +48,113 @@ class NotificationReducedCSV_View(View, _GetMethod):
         """
         self.request = request
 
-        state_name = self._get('state_abv', default='').upper()
+        state_name = self._get("state_abv", default="").upper()
 
         if state_name not in self._state_name:
             return HttpResponse(
-                'ERROR: The parameter state_abv not found. '
-                + 'This parameter must have 2 letters (e.g. RJ).',
+                "ERROR: The parameter state_abv not found. "
+                + "This parameter must have 2 letters (e.g. RJ).",
                 content_type="text/plain",
                 status=404,
             )
 
         uf = self._state_name[state_name]
 
-        chart_type = self._get('chart_type')
+        chart_type = self._get("chart_type")
 
         notifQuery = NotificationQueries(
             uf=uf,
-            disease_values=self._get('diseases'),
-            age_values=self._get('ages'),
-            gender_values=self._get('genders'),
-            city_values=self._get('cities'),
-            initial_date=self._get('initial_date'),
-            final_date=self._get('final_date'),
+            disease_values=self._get("diseases"),
+            age_values=self._get("ages"),
+            gender_values=self._get("genders"),
+            city_values=self._get("cities"),
+            initial_date=self._get("initial_date"),
+            final_date=self._get("final_date"),
         )
 
         result = None
 
-        if chart_type == 'disease':
+        if chart_type == "disease":
             result = notifQuery.get_disease_dist().to_csv()
-        elif chart_type == 'age':
+        elif chart_type == "age":
             result = notifQuery.get_age_dist().to_csv()
-        elif chart_type == 'age_gender':
+        elif chart_type == "age_gender":
             result = notifQuery.get_age_gender_dist().to_csv()
-        elif chart_type == 'age_male':
+        elif chart_type == "age_male":
             result = notifQuery.get_age_male_dist().to_csv()
-        elif chart_type == 'age_female':
+        elif chart_type == "age_female":
             result = notifQuery.get_age_female_dist().to_csv()
-        elif chart_type == 'gender':
+        elif chart_type == "gender":
             result = notifQuery.get_gender_dist().to_csv()
-        elif chart_type == 'period':
+        elif chart_type == "period":
             result = notifQuery.get_period_dist().to_csv(
-                date_format='%Y-%m-%d'
+                date_format="%Y-%m-%d"
             )
-        elif chart_type == 'epiyears':
+        elif chart_type == "epiyears":
             # just filter by one disease
-            result = notifQuery.get_epiyears(uf, self._get('disease')).to_csv()
-        elif chart_type == 'total_cases':
+            result = notifQuery.get_epiyears(uf, self._get("disease")).to_csv()
+        elif chart_type == "total_cases":
             result = notifQuery.get_total_rows().to_csv()
-        elif chart_type == 'selected_cases':
+        elif chart_type == "selected_cases":
             result = notifQuery.get_selected_rows().to_csv()
 
         return HttpResponse(result, content_type="text/plain")
 
 
 class AlertCityView(View, _GetMethod):
-    """
-    """
+    """ """
 
     request = None
 
     def get(self, request):
         self.request = request
-        format = ''
+        format = ""
 
         try:
             disease = self._get(
-                'disease', error_message='Disease sent is empty.'
+                "disease", error_message="Disease sent is empty."
             ).lower()
             geocode = self._get(
-                'geocode', cast=int, error_message='GEO-Code sent is empty.'
+                "geocode", cast=int, error_message="GEO-Code sent is empty."
             )
             format = self._get(
-                'format', error_message='Format sent is empty.'
+                "format", error_message="Format sent is empty."
             ).lower()
             ew_start = self._get(
-                'ew_start',
+                "ew_start",
                 default=True,
                 cast=int,
-                error_message='Epidemic start week sent is empty.',
+                error_message="Epidemic start week sent is empty.",
             )
             ew_end = self._get(
-                'ew_end',
+                "ew_end",
                 default=True,
                 cast=int,
-                error_message='Epidemic end week sent is empty.',
+                error_message="Epidemic end week sent is empty.",
             )
             ey_start = self._get(
-                'ey_start',
+                "ey_start",
                 default=True,
                 cast=int,
-                error_message='Epidemic start year sent is empty.',
+                error_message="Epidemic start year sent is empty.",
             )
 
             ey_end = self._get(
-                'ey_end',
+                "ey_end",
                 default=True,
                 cast=int,
-                error_message='Epidemic end year sent is empty.',
+                error_message="Epidemic end year sent is empty.",
             )
 
-            if format not in ['csv', 'json']:
+            if format not in ["csv", "json"]:
                 raise Exception(
-                    'The output format available are: `csv` or `json`.'
+                    "The output format available are: `csv` or `json`."
                 )
 
             eyw_start = ey_start * 100 + ew_start
             eyw_end = ey_end * 100 + ew_end
 
-            if self._get('ew_end'):
+            if self._get("ew_end"):
                 # Use the keyword arguments for infodengue website
                 df = AlertCity.search(
                     geocode=geocode,
@@ -166,25 +165,26 @@ class AlertCityView(View, _GetMethod):
             else:
                 # Use the keyword arguments for mobile app
                 df = AlertCity.search(
-                    geocode=geocode, disease=disease,
+                    geocode=geocode,
+                    disease=disease,
                 ).execute()
 
             df.drop(
-                columns=['municipio_geocodigo', 'municipio_nome'],
+                columns=["municipio_geocodigo", "municipio_nome"],
                 inplace=True,
             )
 
-            if format == 'json':
-                result = df.to_json(orient='records')
+            if format == "json":
+                result = df.to_json(orient="records")
             else:
                 result = df.to_csv(index=False)
         except Exception as e:
-            if format == 'json':
+            if format == "json":
                 result = '{"error_message": "%s"}' % e
             else:
-                result = '[EE] error_message: %s' % e
+                result = "[EE] error_message: %s" % e
 
-        content_type = 'application/json' if format == 'json' else 'text/plain'
+        content_type = "application/json" if format == "json" else "text/plain"
 
         return HttpResponse(result, content_type=content_type)
 
@@ -198,17 +198,17 @@ class EpiYearWeekView(View, _GetMethod):
 
     def get(self, request):
         self.request = request
-        output_format = 'json'
+        output_format = "json"
 
         try:
             epidate_s = self._get(
-                'epidate', error_message='epidate sent is empty.'
+                "epidate", error_message="epidate sent is empty."
             )
 
-            epidate = datetime.strptime(epidate_s, '%Y-%m-%d')
-            epi_year_week = episem(epidate, sep='')
+            epidate = datetime.strptime(epidate_s, "%Y-%m-%d")
+            epi_year_week = episem(epidate, sep="")
 
-            if output_format == 'json':
+            if output_format == "json":
                 result = json.dumps(
                     dict(
                         epi_year_week=epi_year_week,
@@ -217,16 +217,16 @@ class EpiYearWeekView(View, _GetMethod):
                     )
                 )
             else:
-                result = '' % epi_year_week
+                result = "" % epi_year_week
 
         except Exception as e:
-            if output_format == 'json':
+            if output_format == "json":
                 result = '{"error_message": "%s"}' % e
             else:
-                result = '[EE] error_message: %s' % e
+                result = "[EE] error_message: %s" % e
 
         content_type = (
-            'application/json' if output_format == 'json' else 'text/plain'
+            "application/json" if output_format == "json" else "text/plain"
         )
 
         return HttpResponse(result, content_type=content_type)

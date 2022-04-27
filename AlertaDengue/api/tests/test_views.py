@@ -1,16 +1,15 @@
-from django.test import TestCase
+import io
+import os
+import unittest
 
+import django
+import pandas as pd
+from django.test import TestCase
 from django.urls import reverse
 
 # local
 from .. import settings
 from ..db import MRJ_GEOCODE
-
-import django
-import io
-import os
-import pandas as pd
-import unittest
 
 
 class TestApiView(TestCase):
@@ -23,8 +22,8 @@ class TestApiView(TestCase):
         :return:
         """
         response = self.client.get(
-            reverse('api:notif_reduced'),
-            {'state_abv': 'RJ', 'chart_type': 'disease'},
+            reverse("api:notif_reduced"),
+            {"state_abv": "RJ", "chart_type": "disease"},
         )
         self.assertEqual(response.status_code, 200)
 
@@ -35,13 +34,13 @@ class TestApiView(TestCase):
         :return:
         """
         response = self.client.get(
-            reverse('api:notif_reduced'), {'chart_type': 'disease'}
+            reverse("api:notif_reduced"), {"chart_type": "disease"}
         )
         self.assertEqual(response.status_code, 404)
         self.assertEqual(
             response.content,
-            b'ERROR: The parameter state_abv not found. '
-            + b'This parameter should have 2 letter (e.g. RJ).',
+            b"ERROR: The parameter state_abv not found. "
+            + b"This parameter should have 2 letter (e.g. RJ).",
         )
 
     @unittest.skip("Waiting for Rio de Janeiro data on database demo.")
@@ -49,72 +48,72 @@ class TestApiView(TestCase):
         geocode = MRJ_GEOCODE
         # test epidemic start week missing
         response = self.client.get(
-            reverse('api:alertcity'),
-            {'disease': 'dengue', 'geocode': geocode, 'format': 'json'},
+            reverse("api:alertcity"),
+            {"disease": "dengue", "geocode": geocode, "format": "json"},
         )
         self.assertEqual(response.status_code, 200)
         result = response.json()
-        assert result['error_message'] == 'Epidemic start week sent is empty.'
+        assert result["error_message"] == "Epidemic start week sent is empty."
 
         # test json format
         response = self.client.get(
-            reverse('api:alertcity'),
+            reverse("api:alertcity"),
             {
-                'disease': 'dengue',
-                'geocode': geocode,
-                'format': 'json',
-                'ew_start': 1,
-                'ew_end': 50,
-                'e_year': 2017,
+                "disease": "dengue",
+                "geocode": geocode,
+                "format": "json",
+                "ew_start": 1,
+                "ew_end": 50,
+                "e_year": 2017,
             },
         )
         self.assertEqual(response.status_code, 200)
         result = response.json()
-        assert 'error_message' not in result
+        assert "error_message" not in result
 
         for r in result:
-            assert 201701 <= r['se'] <= 201750
+            assert 201701 <= r["se"] <= 201750
 
         # test csv format
         response = self.client.get(
-            reverse('api:alertcity'),
+            reverse("api:alertcity"),
             {
-                'disease': 'dengue',
-                'geocode': geocode,
-                'format': 'csv',
-                'ew_start': '1',
-                'ew_end': '50',
-                'e_year': '2017',
+                "disease": "dengue",
+                "geocode": geocode,
+                "format": "csv",
+                "ew_start": "1",
+                "ew_end": "50",
+                "e_year": "2017",
             },
         )
         self.assertEqual(response.status_code, 200)
         buffer = io.BytesIO(response.content)
         df = pd.read_csv(buffer)
-        assert all(201701 <= df['se']) and all(df['se'] <= 201750)
+        assert all(201701 <= df["se"]) and all(df["se"] <= 201750)
 
     @unittest.skip("Waiting for Curitiba data on database demo.")
     def test_alert_curitiba(self):
         geocode = 4106902
         # test epidemic start week missing
         response = self.client.get(
-            reverse('api:alertcity'),
-            {'disease': 'dengue', 'geocode': geocode, 'format': 'json'},
+            reverse("api:alertcity"),
+            {"disease": "dengue", "geocode": geocode, "format": "json"},
         )
         self.assertEqual(response.status_code, 200)
         result = response.json()
 
-        assert result['error_message'] == 'Epidemic start week sent is empty.'
+        assert result["error_message"] == "Epidemic start week sent is empty."
 
         # test json format
         response = self.client.get(
-            reverse('api:alertcity'),
+            reverse("api:alertcity"),
             {
-                'disease': 'dengue',
-                'geocode': geocode,
-                'format': 'json',
-                'ew_start': 1,
-                'ew_end': 50,
-                'e_year': 2017,
+                "disease": "dengue",
+                "geocode": geocode,
+                "format": "json",
+                "ew_start": 1,
+                "ew_end": 50,
+                "e_year": 2017,
             },
         )
 
@@ -122,29 +121,29 @@ class TestApiView(TestCase):
 
         result = response.json()
 
-        assert 'error_message' not in result
+        assert "error_message" not in result
 
         for r in result:
-            assert 201701 <= r['SE'] <= 201750
+            assert 201701 <= r["SE"] <= 201750
 
         # test csv format
         response = self.client.get(
-            reverse('api:alertcity'),
+            reverse("api:alertcity"),
             {
-                'disease': 'dengue',
-                'geocode': geocode,
-                'format': 'csv',
-                'ew_start': '1',
-                'ew_end': '50',
-                'e_year': '2017',
+                "disease": "dengue",
+                "geocode": geocode,
+                "format": "csv",
+                "ew_start": "1",
+                "ew_end": "50",
+                "e_year": "2017",
             },
         )
         self.assertEqual(response.status_code, 200)
         buffer = io.BytesIO(response.content)
         df = pd.read_csv(buffer)
-        assert all(201701 <= df['SE']) and all(df['SE'] <= 201750)
+        assert all(201701 <= df["SE"]) and all(df["SE"] <= 201750)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     django.setup()
     unittest.main()

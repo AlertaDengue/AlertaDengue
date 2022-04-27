@@ -4,15 +4,14 @@ import shutil
 from datetime import datetime
 from email.mime.image import MIMEImage
 
+from ad_main import settings
 from celery import shared_task
+from dados.episem import episem
+from dbf.db import is_partner_active
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-
-from ad_main import settings
-from dados.episem import episem
-from dbf.db import is_partner_active
 
 from .models import DBF
 from .sinan import Sinan
@@ -80,10 +79,10 @@ class MissingConnectionException(Exception):
 
 def get_connection(label=None, **kwargs):
     if label is None:
-        label = getattr(settings, 'EMAIL_CONNECTION_DEFAULT', None)
+        label = getattr(settings, "EMAIL_CONNECTION_DEFAULT", None)
 
     try:
-        connections = getattr(settings, 'EMAIL_CONNECTIONS')
+        connections = getattr(settings, "EMAIL_CONNECTIONS")
         options = connections[label]
     except KeyError:
         raise MissingConnectionException(
@@ -95,32 +94,33 @@ def get_connection(label=None, **kwargs):
 
 
 def send_mail_partner(
-    fail_silently=False, connection=None,
+    fail_silently=False,
+    connection=None,
 ):
     mailing = is_partner_active()
     connection = get_connection()
     messages = []
 
-    dt_now = datetime.now().strftime('%Y-%m-%d')
-    year_week = episem(dt_now, sep='')
+    dt_now = datetime.now().strftime("%Y-%m-%d")
+    year_week = episem(dt_now, sep="")
     week = year_week[-2:]
     last_week = int(week) - 1
 
     for idx, row in mailing.iterrows():
-        subject = f'Informe de dados Infodengue SE{last_week}'
+        subject = f"Informe de dados Infodengue SE{last_week}"
         body = render_to_string(
             "email_secretarias.txt",
-            context={"name": row['contact'], "context_message": last_week},
+            context={"name": row["contact"], "context_message": last_week},
         )
         message = EmailMultiAlternatives(
-            subject, body, settings.EMAIL_OUTLOOK_USER, [row['email']]
+            subject, body, settings.EMAIL_OUTLOOK_USER, [row["email"]]
         )
         logging.info(f"Enviando email para: {row['email']},")
         fp = open(
             os.path.join(
-                settings.STATICFILES_DIRS[0], 'img/logo_signature.png'
+                settings.STATICFILES_DIRS[0], "img/logo_signature.png"
             ),
-            'rb',
+            "rb",
         )
         img_signature = MIMEImage(fp.read())
         fp.close()

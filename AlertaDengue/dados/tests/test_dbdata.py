@@ -1,18 +1,18 @@
 import datetime
 from unittest import TestCase
-from pandas._testing import assert_frame_equal
 
 from dados import dbdata
 from dados.dbdata import RegionalParameters
 from dados.tests import legacy  # noqa
+from pandas._testing import assert_frame_equal
 
 # Paramaters
 cities = [3304557]
 year_week_start = 202003
 year_week_end = 202003
-var_climate = 'temp_min'
+var_climate = "temp_min"
 year_week = 202002
-station_id = 'SBRJ'
+station_id = "SBRJ"
 
 
 class TestLoadAlerta(TestCase):
@@ -22,42 +22,42 @@ class TestLoadAlerta(TestCase):
 
     def test_load(self):
         self.assertIsInstance(self.series, dict)
-        self.assertIn('casos_est', self.series[str(self.cidade)].keys())
-        self.assertIn('casos', self.series[str(self.cidade)].keys())
+        self.assertIn("casos_est", self.series[str(self.cidade)].keys())
+        self.assertIn("casos", self.series[str(self.cidade)].keys())
         self.assertGreater(len(self.series), 0)
 
     def test_casos_are_ints(self):
         self.assertIsInstance(
-            self.series[str(self.cidade)]['casos'][0],
+            self.series[str(self.cidade)]["casos"][0],
             int,
-            '{}'.format(self.series[str(self.cidade)]['casos']),
+            "{}".format(self.series[str(self.cidade)]["casos"]),
         )
         self.assertIsInstance(
-            self.series[str(self.cidade)]['casos_est'][0],
+            self.series[str(self.cidade)]["casos_est"][0],
             int,
-            '{}'.format(self.series[str(self.cidade)]['casos_est']),
+            "{}".format(self.series[str(self.cidade)]["casos_est"]),
         )
         self.assertIsInstance(
-            self.series[str(self.cidade)]['casos_est_min'][0],
+            self.series[str(self.cidade)]["casos_est_min"][0],
             int,
-            '{}'.format(self.series[str(self.cidade)]['casos_est_min']),
+            "{}".format(self.series[str(self.cidade)]["casos_est_min"]),
         )
         self.assertIsInstance(
-            self.series[str(self.cidade)]['casos_est_max'][0],
+            self.series[str(self.cidade)]["casos_est_max"][0],
             int,
-            '{}'.format(self.series[str(self.cidade)]['casos_est_max']),
+            "{}".format(self.series[str(self.cidade)]["casos_est_max"]),
         )
 
     def test_dia_is_date(self):
         self.assertIsInstance(
-            self.series[str(self.cidade)]['dia'][0],
+            self.series[str(self.cidade)]["dia"][0],
             datetime.date,
-            '{}'.format(type(self.series[str(self.cidade)]['dia'][0])),
+            "{}".format(type(self.series[str(self.cidade)]["dia"][0])),
         )
 
     def test_alerta_is_between_0_and_3(self):
-        self.assertEqual(max(self.series[str(self.cidade)]['alerta']), 3)
-        self.assertEqual(min(self.series[str(self.cidade)]['alerta']), 0)
+        self.assertEqual(max(self.series[str(self.cidade)]["alerta"]), 3)
+        self.assertEqual(min(self.series[str(self.cidade)]["alerta"]), 0)
 
     def test_get_city_alert(self):
         (
@@ -84,14 +84,14 @@ class TestMunicipio(TestCase):
         muns = dbdata.get_all_active_cities()
         self.assertIsInstance(muns, list)
         self.assertGreater(len(muns), 0)
-        self.assertIn((3303302, 'Niterói'), muns)
+        self.assertIn((3303302, "Niterói"), muns)
 
 
 class TestReportState(TestCase):
     def test_read_disease_data(self):
-        '''
+        """
         Compare the structure of dataframes
-        '''
+        """
 
         df_sql_func = legacy.OldReportState._read_disease_data(
             cities, station_id, year_week, var_climate
@@ -113,7 +113,7 @@ class TestReportState(TestCase):
 class TestRegionalParameters(TestCase):
     def setUp(self):
 
-        state = 'RJ'
+        state = "RJ"
         self.state_name = dbdata.STATE_NAME[state]
 
     def test_load(self):
@@ -136,13 +136,13 @@ class TestRegionalParameters(TestCase):
 
         :return:
         """
-        cities = {3304557: 'Rio de Janeiro'}
+        cities = {3304557: "Rio de Janeiro"}
 
         var_climate = RegionalParameters.get_var_climate_info(cities.keys())
 
         self.assertIsInstance(var_climate, tuple)
-        self.assertIn('temp_min', var_climate)
-        self.assertEqual(var_climate[0], 'SBGL')
+        self.assertIn("temp_min", var_climate)
+        self.assertEqual(var_climate[0], "SBGL")
 
     def test_get_cities(self):
         """
@@ -153,5 +153,5 @@ class TestRegionalParameters(TestCase):
 
         self.assertIsInstance(cities, dict)
         self.assertEqual(len(cities), 3204)
-        self.assertIn('Rio de Janeiro', self.state_name)
-        self.assertEqual(cities[3304557], 'Rio de Janeiro')
+        self.assertIn("Rio de Janeiro", self.state_name)
+        self.assertEqual(cities[3304557], "Rio de Janeiro")

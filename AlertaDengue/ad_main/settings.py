@@ -94,7 +94,9 @@ MIDDLEWARE_CLASSES = (
 )
 
 if DEBUG:
-    MIDDLEWARE_CLASSES += ("django_cprofile_middleware.middleware.ProfilerMiddleware",)
+    MIDDLEWARE_CLASSES += (
+        "django_cprofile_middleware.middleware.ProfilerMiddleware",
+    )
     DJANGO_CPROFILE_MIDDLEWARE_REQUIRE_STAFF = False
 
 MIDDLEWARE = MIDDLEWARE_CLASSES
@@ -290,7 +292,9 @@ LOGGING = {
 }
 
 BOOTSTRAP4 = {
-    "form_renderers": {"default": "dbf.forms.FormRendererWithHiddenFieldErrors"}
+    "form_renderers": {
+        "default": "dbf.forms.FormRendererWithHiddenFieldErrors"
+    }
 }
 
 

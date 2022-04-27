@@ -4,10 +4,9 @@ from contextlib import contextmanager
 from tempfile import NamedTemporaryFile
 
 import dbfread
+from dbf.utils import expected_date_fields, expected_fields, synonyms
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
-
-from dbf.utils import expected_fields, synonyms, expected_date_fields
 
 
 @contextmanager
@@ -32,7 +31,7 @@ def is_valid_dbf(dbf_file, notification_year):
             )
 
         for field in dbf.fields:
-            if field.name in expected_date_fields and field.type != 'D':
+            if field.name in expected_date_fields and field.type != "D":
                 raise ValidationError(
                     {
                         "__all__": _(

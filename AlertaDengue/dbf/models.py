@@ -14,38 +14,38 @@ def current_year():
 
 class DBF(models.Model):
     ABBREVIATION = (
-        ('BR', 'Brasil'),
-        (None, '-----'),
-        ('AC', 'Acre'),
-        ('AL', 'Alagoas'),
-        ('AP', 'Amapá'),
-        ('AM', 'Amazonas'),
-        ('BA', 'Bahia'),
-        ('CE', 'Ceará'),
-        ('DF', 'Distrito Federal'),
-        ('ES', 'Espírito Santo'),
-        ('GO', 'Goiás'),
-        ('MA', 'Maranhão'),
-        ('MT', 'Mato Grosso'),
-        ('MS', 'Mato Grosso do Sul'),
-        ('MG', 'Minas Gerais'),
-        ('PA', 'Pará'),
-        ('PB', 'Paraíba'),
-        ('PR', 'Paraná'),
-        ('PE', 'Pernambuco'),
-        ('PI', 'Piauí'),
-        ('RJ', 'Rio de Janeiro'),
-        ('RN', 'Rio Grande do Norte'),
-        ('RS', 'Rio Grande do Sul'),
-        ('RO', 'Rondônia'),
-        ('RR', 'Roraima'),
-        ('SC', 'Santa Catarina'),
-        ('SP', 'São Paulo'),
-        ('SE', 'Sergipe'),
-        ('TO', 'Tocantins'),
+        ("BR", "Brasil"),
+        (None, "-----"),
+        ("AC", "Acre"),
+        ("AL", "Alagoas"),
+        ("AP", "Amapá"),
+        ("AM", "Amazonas"),
+        ("BA", "Bahia"),
+        ("CE", "Ceará"),
+        ("DF", "Distrito Federal"),
+        ("ES", "Espírito Santo"),
+        ("GO", "Goiás"),
+        ("MA", "Maranhão"),
+        ("MT", "Mato Grosso"),
+        ("MS", "Mato Grosso do Sul"),
+        ("MG", "Minas Gerais"),
+        ("PA", "Pará"),
+        ("PB", "Paraíba"),
+        ("PR", "Paraná"),
+        ("PE", "Pernambuco"),
+        ("PI", "Piauí"),
+        ("RJ", "Rio de Janeiro"),
+        ("RN", "Rio Grande do Norte"),
+        ("RS", "Rio Grande do Sul"),
+        ("RO", "Rondônia"),
+        ("RR", "Roraima"),
+        ("SC", "Santa Catarina"),
+        ("SP", "São Paulo"),
+        ("SE", "Sergipe"),
+        ("TO", "Tocantins"),
     )
 
-    uploaded_by = models.ForeignKey('auth.User', on_delete=models.DO_NOTHING)
+    uploaded_by = models.ForeignKey("auth.User", on_delete=models.DO_NOTHING)
     file = models.FileField()
     uploaded_at = models.DateTimeField(auto_now_add=True)
     export_date = models.DateField()
@@ -73,7 +73,7 @@ class DBF(models.Model):
         return "{} - {}".format(self.file, self.notification_year)
 
     class Meta:
-        app_label = 'dbf'
+        app_label = "dbf"
 
 
 class DBFChunkedUpload(ChunkedUpload):
@@ -91,26 +91,26 @@ class DBFChunkedUpload(ChunkedUpload):
 # Create your models here.
 class SendToPartner(models.Model):
     STATUS_CHOICES = [
-        (True, 'Enable'),
-        (False, 'Disable'),
+        (True, "Enable"),
+        (False, "Disable"),
     ]
 
-    geocode = models.CharField(help_text='geocodigo', max_length=7)
-    name = models.CharField(help_text='nome município|estado', max_length=50)
-    state_abbreviation = models.CharField(help_text='uf', max_length=5)
-    level = models.CharField(help_text='nível de atuação', max_length=10)
-    contact = models.CharField(help_text='nome do contato', max_length=50)
-    email = models.EmailField(help_text='e-mail', max_length=50)
+    geocode = models.CharField(help_text="geocodigo", max_length=7)
+    name = models.CharField(help_text="nome município|estado", max_length=50)
+    state_abbreviation = models.CharField(help_text="uf", max_length=5)
+    level = models.CharField(help_text="nível de atuação", max_length=10)
+    contact = models.CharField(help_text="nome do contato", max_length=50)
+    email = models.EmailField(help_text="e-mail", max_length=50)
     status = models.BooleanField(
-        null=False, choices=STATUS_CHOICES, help_text='Está ativo?'
+        null=False, choices=STATUS_CHOICES, help_text="Está ativo?"
     )
 
     def save_partner(self):
         self.save()
 
     class Meta:
-        app_label = 'dbf'
+        app_label = "dbf"
         verbose_name_plural = "Send To Partners"
 
     def __str__(self):
-        return f'{self.geocode}, {self.name}'
+        return f"{self.geocode}, {self.name}"
