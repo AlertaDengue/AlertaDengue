@@ -1,13 +1,6 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+name: build-alertadengue
 
-name: CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push, pull_request]
 
 env:
   ALLOWED_HOSTS: 'localhost'
@@ -44,18 +37,35 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9]
+        python-version: ["3.9"]
+    concurrency:
+      group: ci-${{ github.ref }}
+      cancel-in-progress: true
 
-    env:
-      COMPOSE_FILE: docker/staging-compose.yml
-      PYTHON_VERSION: ${{ matrix.python-version }}
+    defaults:
+      run:
+        shell: bash -l {0}
 
     steps:
     - uses: actions/checkout@v2
+
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+        miniconda-version: "latest"
+        mamba-version: "*"
+        environment-file: conda/environment.yaml
+        channels: conda-forge,nodefaults
+        activate-environment: alertadengue
+        use-mamba: true
+        miniforge-variant: Mambaforge
+
+
+    - name: Install dependencies
+      run: |
+        poetry install
 
     - name: Create env file
       run: envsubst < env.tpl > .env
