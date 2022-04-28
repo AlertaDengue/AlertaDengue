@@ -12,9 +12,14 @@ DOCKER=docker-compose \
 # PREPARE ENVIRONMENT
 .PHONY:prepare-env
 prepare-env:
-	# source env_export.sh
-	# python generate_paths.py
+	# source env_variables_export.sh
+	# python create_env_directories.py
 	envsubst < .env.tpl > .env
+
+# PREPARE CREATE GEOFILES FOR STATIC
+sync-static-geofiles:
+	python AlertaDengue/manage.py sync_geofiles
+	python AlertaDengue/manage.py collectstatic
 
 # DOCKER
 .PHONY:docker-build
