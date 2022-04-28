@@ -216,7 +216,7 @@ STATIC_URL = "/static/"
 
 # TODO: up one level from settings.py
 # collectstatic will collect static files for deployment.
-STATIC_ROOT = str(PARENT_BASE_DIR) + "/" + "static_files"
+STATIC_ROOT = PARENT_BASE_DIR / "static_files"
 
 # django will look for static files
 STATICFILES_DIRS = [
@@ -224,7 +224,6 @@ STATICFILES_DIRS = [
     # Collect files from Storage
     *[str(f) for f in list(DATA_DIR.glob("**/*data"))],
 ]
-
 # used to upload dbf
 MEDIA_ROOT = os.getenv("MEDIA_ROOT")
 IMPORTED_FILES_DIR = os.getenv("IMPORTED_FILES_DIR")

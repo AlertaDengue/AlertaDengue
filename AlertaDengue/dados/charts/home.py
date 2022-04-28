@@ -280,7 +280,7 @@ def _create_stack_chart(df: pd.DataFrame) -> str:
         HTML with Plotly chart.
     """
 
-    df = deepcopy(df)
+    df_alert = df.sort_values(by=["SE"], ascending=True).reset_index(drop=True)
 
     color_map_alert_y = {
         "Green Alert": "#00e640",
@@ -291,9 +291,9 @@ def _create_stack_chart(df: pd.DataFrame) -> str:
 
     # Trace
     fig = px.bar(
-        df,
+        df_alert,
         y="municipio_geocodigo",
-        x=df.SE.map(lambda v: f"{str(v)[:4]}/{str(v)[-2:]}"),
+        x=df_alert.SE.map(lambda v: f"{str(v)[:4]}/{str(v)[-2:]}"),
         color="nivel",
         color_discrete_map=color_map_alert_y,
         hover_data={"nivel"},
@@ -308,7 +308,7 @@ def _create_stack_chart(df: pd.DataFrame) -> str:
     )
 
     fig.update_traces(
-        customdata=df.SE.map(lambda v: f"{str(v)[-2:]}"),
+        customdata=df_alert.SE.map(lambda v: f"{str(v)[-2:]}"),
         hovertemplate=_(
             "%{y} Cidades na semana %{customdata} <extra></extra>"
         ),

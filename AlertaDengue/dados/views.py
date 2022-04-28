@@ -18,7 +18,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.templatetags.static import static
 from django.utils.translation import gettext as _
 from django.views.generic.base import TemplateView, View
 from gis.geotiff import convert_from_shapefile
@@ -53,6 +52,10 @@ from .models import City, RegionalHealth
 DBF = apps.get_model("dbf", "DBF")
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
+
+SERVE_STATIC = (
+    settings.STATIC_ROOT if settings.DEBUG else settings.STATICFILES_DIRS[0]
+)
 
 dados_alerta = dbdata.get_alerta_mrj()
 dados_alerta_chik = dbdata.get_alerta_mrj_chik()
@@ -276,18 +279,8 @@ class DataPublicServicesPageView(TemplateView):
 
         if service == "maps":
             if service_type is None:
-                _static_root = os.path.abspath(settings.STATIC_ROOT)
-                _static_dirs = os.path.abspath(settings.STATICFILES_DIRS[0])
 
-                path_root = (
-                    _static_root
-                    if os.path.exists(_static_root)
-                    else _static_dirs
-                )
-
-                geo_info_path = os.path.join(
-                    path_root, "geojson", "geo_info.json"
-                )
+                geo_info_path = SERVE_STATIC / "geojson" / "geo_info.json"
 
                 with open(geo_info_path) as f:
                     geo_info_json = json.load(f)
@@ -826,17 +819,18 @@ class ChartsMainView(TemplateView):
         image_path: str
         """
 
-        img_name = Path(
-            "img",
-            "incidence_maps",
-            "state",
-            f"incidence_{state_abbv}_{disease}.png",
+        img_name = (
+            Path(SERVE_STATIC.name)
+            / "img"
+            / "incidence_maps"
+            / "state"
+            / f"incidence_{state_abbv}_{disease}.png"
         )
 
         img_data = f"""
             <div class='mt-4'>
                 <img
-                src='{static(img_name)}'
+                src='{img_name}'
                 alt=''
                 title='Mapa de {disease} para o estado de {state_abbv}'
                 style='width:100%'
@@ -849,11 +843,8 @@ class ChartsMainView(TemplateView):
                 a geração do mapa sobre {disease}</p>
             </div>"""
 
-        img_to_show = (
-            Path(__file__).resolve().parent.parent / "static" / img_name
-        )
+        img_to_show = SERVE_STATIC.parent / img_name
 
-        # TODO add cache
         return img_data if img_to_show.exists() else img_no_data
 
     def get_context_data(self, **kwargs):

@@ -185,9 +185,9 @@ class Command(BaseCommand):
         geocodes = list(dict(dbdata.get_all_active_cities()).keys())
 
         SERVE_STATIC = (
-            settings.STATICFILES_DIRS[0]
+            settings.STATIC_ROOT
             if settings.DEBUG
-            else settings.STATIC_ROOT
+            else settings.STATICFILES_DIRS[0]
         )
 
         path_root = Path(settings.BASE_DIR) / SERVE_STATIC
