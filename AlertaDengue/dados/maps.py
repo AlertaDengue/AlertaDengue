@@ -1,5 +1,6 @@
-from .dbdata import db_engine
 import geojson
+
+from .dbdata import db_engine
 
 
 def get_city_geojson(municipio):
@@ -10,24 +11,24 @@ def get_city_geojson(municipio):
     """
     with db_engine.connect() as conn:
         head = r'{"type": "FeatureCollection", "features":['
-        tail = ']}'
+        tail = "]}"
 
         res = conn.execute(
-            '''
+            """
             select geocodigo, nome, geojson, populacao, uf
             from "Dengue_global"."Municipio" where geocodigo=%s
-            ''',
+            """,
             (municipio,),
         )
         datum = dict(res.fetchone().items())
-        feat = geojson.loads(datum['geojson'])
+        feat = geojson.loads(datum["geojson"])
 
-        feat['type'] = 'Feature'
+        feat["type"] = "Feature"
 
-        feat['properties'] = {
-            'geocodigo': datum['geocodigo'],
-            'nome': datum['nome'],
-            'populacao': datum['populacao'],
+        feat["properties"] = {
+            "geocodigo": datum["geocodigo"],
+            "nome": datum["nome"],
+            "populacao": datum["populacao"],
         }
 
         geoj = geojson.loads(head + geojson.dumps(feat) + tail)
@@ -43,10 +44,10 @@ def get_city_info(geocodigo):
     """
     with db_engine.connect() as conn:
         res = conn.execute(
-            '''
+            """
             select geocodigo, nome, populacao, uf
             from "Dengue_global"."Municipio" where geocodigo=%s
-            ''',
+            """,
             (geocodigo,),
         )
         datum = dict(res.fetchone().items())

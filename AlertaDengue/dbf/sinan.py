@@ -42,7 +42,7 @@ def add_dv(geocodigo):
     elif len(str(geocodigo)) == 6:
         return int(str(geocodigo) + str(calculate_digit(geocodigo)))
     else:
-        raise ValueError('geocode does not match!')
+        raise ValueError("geocode does not match!")
 
 
 class Sinan(object):
@@ -51,11 +51,11 @@ class Sinan(object):
     """
 
     db_config = {
-        'database': settings.PSQL_DB,
-        'user': settings.PSQL_USER,
-        'password': settings.PSQL_PASSWORD,
-        'host': settings.PSQL_HOST,
-        'port': settings.PSQL_PORT,
+        "database": settings.PSQL_DB,
+        "user": settings.PSQL_USER,
+        "password": settings.PSQL_PASSWORD,
+        "host": settings.PSQL_HOST,
+        "port": settings.PSQL_PORT,
     }
 
     def __init__(self, dbf_fname, ano, encoding="iso=8859-1"):
@@ -72,7 +72,7 @@ class Sinan(object):
         logger.info("Read parquet files and concatenate in pandas")
 
         chunks_list = [
-            pd.read_parquet(f, engine='fastparquet') for f in pq_files
+            pd.read_parquet(f, engine="fastparquet") for f in pq_files
         ]
 
         self.tabela = pd.concat(chunks_list, ignore_index=True)
@@ -86,8 +86,8 @@ class Sinan(object):
         Escopo temporal do banco
         :return: (data_inicio, data_fim)
         """
-        data_inicio = self.tabela['DT_NOTIFIC'].min()
-        data_fim = self.tabela['DT_NOTIFIC'].max()
+        data_inicio = self.tabela["DT_NOTIFIC"].min()
+        data_fim = self.tabela["DT_NOTIFIC"].max()
         return data_inicio, data_fim
 
     def _fill_missing_columns(self, col_names):
@@ -117,13 +117,13 @@ class Sinan(object):
             self._fill_missing_columns(col_names)
             df_names = [FIELD_MAP[n] for n in col_names]
             insert_sql = (
-                'INSERT INTO {}({}) VALUES ({}) on conflict '
-                'on CONSTRAINT casos_unicos do UPDATE SET {}'
+                "INSERT INTO {}({}) VALUES ({}) on conflict "
+                "on CONSTRAINT casos_unicos do UPDATE SET {}"
             ).format(
                 table_name,
-                ','.join(col_names),
-                ','.join(['%s' for i in col_names]),
-                ','.join(['{0}=excluded.{0}'.format(j) for j in col_names]),
+                ",".join(col_names),
+                ",".join(["%s" for i in col_names]),
+                ",".join(["{0}=excluded.{0}".format(j) for j in col_names]),
             )
             logger.info(f"Formatando linhas e inserindo em {table_name}")
             for row in self.tabela[df_names].iterrows():
@@ -158,7 +158,7 @@ class Sinan(object):
                     None if pd.isnull(row[7]) else int(row[7])
                 )  # bairro_bairro_id
                 row[8] = (
-                    None if row[8] == '' else add_dv(int(row[8]))
+                    None if row[8] == "" else add_dv(int(row[8]))
                 )  # municipio_geocodigo
                 row[9] = int(row[9])  # nu_notific
                 if row[10] is None:
@@ -198,7 +198,7 @@ class Sinan(object):
 
             connection.commit()
             logger.info(
-                'Sinan {} rows in {} fields inserted in the database'.format(
+                "Sinan {} rows in {} fields inserted in the database".format(
                     self.tabela.shape[0], self.tabela.shape[1]
                 )
             )

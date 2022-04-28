@@ -1,0 +1,12 @@
+name: alertadengue-test
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - django >=3.1.8,<4
+  - gdal 3.3.*
+  - make
+  - pip
+  - python 3.9.*
+  - psycopg2-binary
+  - poetry

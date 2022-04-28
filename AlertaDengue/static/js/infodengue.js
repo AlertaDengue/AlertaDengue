@@ -42,4 +42,3 @@ function fill_popup(feature, layer) {
     });
 
 }
-

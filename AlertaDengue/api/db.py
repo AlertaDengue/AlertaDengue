@@ -6,7 +6,6 @@ import pandas as pd
 # local
 from ad_main import settings
 from dados.dbdata import CID10, STATE_NAME, get_disease_suffix  # noqa:F401
-
 from sqlalchemy import create_engine
 
 PSQL_URI = "postgresql://{}:{}@{}:{}/{}".format(
@@ -22,7 +21,7 @@ con = ibis.postgres.connect(url=PSQL_URI)
 
 
 class NotificationQueries:
-    _age_field = '''
+    _age_field = """
         CASE
         WHEN nu_idade_n <= 4004 THEN '00-04 anos'
         WHEN nu_idade_n BETWEEN 4005 AND 4009 THEN '05-09 anos'
@@ -33,7 +32,7 @@ class NotificationQueries:
         WHEN nu_idade_n BETWEEN 4050 AND 4059 THEN '50-59 anos'
         WHEN nu_idade_n >=4060 THEN '60+ anos'
         ELSE NULL
-        END AS age'''
+        END AS age"""
     dist_filters = None
 
     def __init__(
@@ -53,19 +52,19 @@ class NotificationQueries:
         self.uf = uf
 
         self.dist_filters = [
-            ('uf', "uf='%s'" % uf),
-            ('', self._get_disease_filter(None)),  # min filter
-            ('', self._get_gender_filter(None)),  # min filter
-            ('', self._get_period_filter(None)),  # min filter
-            ('', self._get_age_filter(None)),  # min filter
-            ('disease', self._get_disease_filter(disease_values)),
-            ('gender', self._get_gender_filter(gender_values)),
-            ('age', self._get_age_filter(age_values)),
-            ('cities', self._get_city_filter(city_values)),
-            ('period', self._get_period_filter(initial_date, final_date)),
+            ("uf", "uf='%s'" % uf),
+            ("", self._get_disease_filter(None)),  # min filter
+            ("", self._get_gender_filter(None)),  # min filter
+            ("", self._get_period_filter(None)),  # min filter
+            ("", self._get_age_filter(None)),  # min filter
+            ("disease", self._get_disease_filter(disease_values)),
+            ("gender", self._get_gender_filter(gender_values)),
+            ("age", self._get_age_filter(age_values)),
+            ("cities", self._get_city_filter(city_values)),
+            ("period", self._get_period_filter(initial_date, final_date)),
         ]
 
-    def _process_filter(self, data_filter, exception_key=''):
+    def _process_filter(self, data_filter, exception_key=""):
         """
 
         :param data_filter:
@@ -73,7 +72,7 @@ class NotificationQueries:
         :return:
         """
         _f = [v for k, v in data_filter if not k == exception_key]
-        return ' AND '.join(filter(lambda x: x, _f))
+        return " AND ".join(filter(lambda x: x, _f))
 
     def _get_gender_filter(self, gender):
         """
@@ -85,14 +84,14 @@ class NotificationQueries:
             "cs_sexo IN ('F', 'M')"
             if gender is None
             else "cs_sexo IN ({})".format(
-                ','.join(
+                ",".join(
                     [
                         "'F'"
-                        if _gender == 'mulher'
+                        if _gender == "mulher"
                         else "'M'"
-                        if _gender == 'homem'
+                        if _gender == "homem"
                         else None
-                        for _gender in gender.lower().split(',')
+                        for _gender in gender.lower().split(",")
                     ]
                 )
             )
@@ -104,7 +103,7 @@ class NotificationQueries:
         :param city:
         :return:
         """
-        return '' if city is None else 'municipio_geocodigo IN(%s)' % city
+        return "" if city is None else "municipio_geocodigo IN(%s)" % city
 
     def _get_age_filter(self, age):
         """
@@ -114,12 +113,12 @@ class NotificationQueries:
         """
 
         if age is None:
-            return 'age IS NOT NULL'
+            return "age IS NOT NULL"
 
         _age = [
-            "'{}'".format(_age.replace('  ', '+ ')) for _age in age.split(',')
+            "'{}'".format(_age.replace("  ", "+ ")) for _age in age.split(",")
         ]
-        return "age IN ({})".format(','.join(_age))
+        return "age IN ({})".format(",".join(_age))
 
     def _get_period_filter(self, initial_date=None, final_date=None):
         """
@@ -128,15 +127,15 @@ class NotificationQueries:
         :param final_date:
         :return:
         """
-        common_filter = '''
+        common_filter = """
         dt_notific >= (CURRENT_DATE - INTERVAL '1 YEAR') - CAST(CONCAT(CAST(
           EXTRACT(DOW FROM (CURRENT_DATE-INTERVAL '1 YEAR')) AS VARCHAR),'DAY'
         ) AS INTERVAL) AND
-        '''
+        """
         return common_filter + (
-            '1=1'
+            "1=1"
             if not initial_date and not final_date
-            else 'dt_notific {} '.format(
+            else "dt_notific {} ".format(
                 ">= '{}'".format(initial_date)
                 if not final_date
                 else "<= '{}'".format(final_date)
@@ -151,15 +150,15 @@ class NotificationQueries:
         :param disease:
         :return:
         """
-        _diseases = ','.join(["'%s'" % cid for cid in CID10.values()])
+        _diseases = ",".join(["'%s'" % cid for cid in CID10.values()])
         return (
             "REPLACE(cid10_codigo, '.', '') IN (%s)" % (_diseases)
             if disease is None
             else "REPLACE(cid10_codigo, '.', '') IN ({})".format(
-                ','.join(
+                ",".join(
                     [
                         "'{}'".format(CID10[cid.lower()])
-                        for cid in disease.split(',')
+                        for cid in disease.split(",")
                     ]
                 )
             )
@@ -174,7 +173,7 @@ class NotificationQueries:
         _filt = filter(
             lambda x: x,
             [
-                '1=1',
+                "1=1",
                 self._get_gender_filter(None),
                 self._get_disease_filter(None),
                 self._get_age_filter(None),
@@ -182,9 +181,9 @@ class NotificationQueries:
             ],
         )
 
-        clean_filters = " uf='{}' AND ".format(self.uf) + ' AND '.join(_filt)
+        clean_filters = " uf='{}' AND ".format(self.uf) + " AND ".join(_filt)
 
-        sql = '''
+        sql = """
             SELECT
                 count(id) AS casos
             FROM (
@@ -197,12 +196,12 @@ class NotificationQueries:
                       ON notif.municipio_geocodigo = municipio.geocodigo
             ) AS tb
             WHERE {}
-            '''.format(
+            """.format(
             self._age_field, clean_filters
         )
 
         with db_engine.connect() as conn:
-            return pd.read_sql(sql, conn, 'casos')
+            return pd.read_sql(sql, conn, "casos")
 
     def get_selected_rows(self):
         """
@@ -211,7 +210,7 @@ class NotificationQueries:
         """
         _dist_filters = self._process_filter(self.dist_filters)
 
-        sql = '''
+        sql = """
             SELECT
                 count(id) AS casos
             FROM (
@@ -224,30 +223,30 @@ class NotificationQueries:
                       ON notif.municipio_geocodigo = municipio.geocodigo
             ) AS tb
             WHERE {}
-            '''.format(
+            """.format(
             self._age_field, _dist_filters
         )
 
         with db_engine.connect() as conn:
-            return pd.read_sql(sql, conn, 'casos')
+            return pd.read_sql(sql, conn, "casos")
 
     def get_disease_dist(self):
         """
 
         :return:
         """
-        _dist_filters = self._process_filter(self.dist_filters, 'disease')
+        _dist_filters = self._process_filter(self.dist_filters, "disease")
 
-        disease_label = ' CASE '
+        disease_label = " CASE "
 
         for cid_label, cid_id in CID10.items():
             disease_label += " WHEN cid10.codigo='{}' THEN '{}' \n".format(
                 cid_id, cid_label.title()
             )
 
-        disease_label += ' ELSE cid10.codigo END AS cid10_nome '
+        disease_label += " ELSE cid10.codigo END AS cid10_nome "
 
-        sql = '''
+        sql = """
         SELECT
             COALESCE(cid10_nome, NULL) AS category,
             count(id) AS casos
@@ -265,14 +264,14 @@ class NotificationQueries:
         ) AS tb
         WHERE {}
         GROUP BY cid10_nome;
-        '''.format(
+        """.format(
             disease_label, self._age_field, _dist_filters
         )
 
         with db_engine.connect() as conn:
             df_disease_dist = pd.read_sql(sql, conn)
 
-        return df_disease_dist.set_index('category', drop=True)
+        return df_disease_dist.set_index("category", drop=True)
 
     def get_age_dist(self):
         """
@@ -280,9 +279,9 @@ class NotificationQueries:
         :param dist_filters:
         :return:
         """
-        _dist_filters = self._process_filter(self.dist_filters, 'age')
+        _dist_filters = self._process_filter(self.dist_filters, "age")
 
-        sql = '''
+        sql = """
         SELECT
             age AS category,
             count(age) AS casos
@@ -298,12 +297,12 @@ class NotificationQueries:
         WHERE {}
         GROUP BY age
         ORDER BY age
-        '''.format(
+        """.format(
             self._age_field, _dist_filters
         )
 
         with db_engine.connect() as conn:
-            return pd.read_sql(sql, conn, 'category')
+            return pd.read_sql(sql, conn, "category")
 
     def get_age_gender_dist(self):
         """
@@ -311,9 +310,9 @@ class NotificationQueries:
         :param dist_filters:
         :return:
         """
-        _dist_filters = self._process_filter(self.dist_filters, 'age')
+        _dist_filters = self._process_filter(self.dist_filters, "age")
 
-        sql = '''
+        sql = """
         SELECT
             age AS category,
             --count(age) AS casos
@@ -333,12 +332,12 @@ class NotificationQueries:
         WHERE {}
         GROUP BY age
         ORDER BY age
-        '''.format(
+        """.format(
             self._age_field, _dist_filters
         )
 
         with db_engine.connect() as conn:
-            return pd.read_sql(sql, conn, 'category')
+            return pd.read_sql(sql, conn, "category")
 
     def get_age_male_dist(self):
         """
@@ -346,9 +345,9 @@ class NotificationQueries:
         :param dist_filters:
         :return:
         """
-        _dist_filters = self._process_filter(self.dist_filters, 'age')
+        _dist_filters = self._process_filter(self.dist_filters, "age")
 
-        sql = '''
+        sql = """
         SELECT
             age AS category,
             count(age) AS casos
@@ -364,12 +363,12 @@ class NotificationQueries:
         WHERE {} AND cs_sexo = 'M'
         GROUP BY age
         ORDER BY age
-        '''.format(
+        """.format(
             self._age_field, _dist_filters
         )
 
         with db_engine.connect() as conn:
-            return pd.read_sql(sql, conn, 'category')
+            return pd.read_sql(sql, conn, "category")
 
     def get_age_female_dist(self):
         """
@@ -377,9 +376,9 @@ class NotificationQueries:
         :param dist_filters:
         :return:
         """
-        _dist_filters = self._process_filter(self.dist_filters, 'age')
+        _dist_filters = self._process_filter(self.dist_filters, "age")
 
-        sql = '''
+        sql = """
         SELECT
             age AS category,
             count(age) AS casos
@@ -395,17 +394,17 @@ class NotificationQueries:
         WHERE {} AND cs_sexo = 'F'
         GROUP BY age
         ORDER BY age
-        '''.format(
+        """.format(
             self._age_field, _dist_filters
         )
 
         with db_engine.connect() as conn:
-            return pd.read_sql(sql, conn, 'category')
+            return pd.read_sql(sql, conn, "category")
 
     def get_gender_dist(self):
-        _dist_filters = self._process_filter(self.dist_filters, 'gender')
+        _dist_filters = self._process_filter(self.dist_filters, "gender")
 
-        sql = '''
+        sql = """
         SELECT
             (CASE COALESCE(cs_sexo, NULL)
              WHEN 'M' THEN 'Homem'
@@ -424,12 +423,12 @@ class NotificationQueries:
         ) AS tb
         WHERE {} AND cs_sexo IN ('F', 'M')
         GROUP BY cs_sexo;
-        '''.format(
+        """.format(
             self._age_field, _dist_filters
         )
 
         with db_engine.connect() as conn:
-            return pd.read_sql(sql, conn, 'category')
+            return pd.read_sql(sql, conn, "category")
 
     def get_epiyears(self, state_name, disease=None):
         """
@@ -439,14 +438,14 @@ class NotificationQueries:
         :return:
 
         """
-        disease_filter = ''
+        disease_filter = ""
 
         if disease is not None:
             disease_filter = (
                 " AND REPLACE(cid10_codigo, '.', '')='%s'" % CID10[disease]
             )
 
-        sql = '''
+        sql = """
         SELECT
           ano_notif,
           se_notif,
@@ -458,7 +457,7 @@ class NotificationQueries:
         WHERE uf='{}' {}
         GROUP BY ano_notif, se_notif
         ORDER BY ano_notif, se_notif
-        '''.format(
+        """.format(
             state_name, disease_filter
         )
 
@@ -466,14 +465,14 @@ class NotificationQueries:
             df = pd.read_sql(sql, conn)
 
         return pd.crosstab(
-            df['ano_notif'], df['se_notif'], df['casos'], aggfunc=sum
+            df["ano_notif"], df["se_notif"], df["casos"], aggfunc=sum
         ).T
 
     def get_period_dist(self):
-        _dist_filters = self._process_filter(self.dist_filters, 'period')
-        _dist_filters += ' AND {}'.format(self._get_period_filter())
+        _dist_filters = self._process_filter(self.dist_filters, "period")
+        _dist_filters += " AND {}".format(self._get_period_filter())
 
-        sql = '''
+        sql = """
         SELECT
             dt_week,
             count(dt_week) AS Casos
@@ -491,16 +490,16 @@ class NotificationQueries:
         WHERE {}
         GROUP BY dt_week
         ORDER BY dt_week
-        '''.format(
+        """.format(
             self._age_field, _dist_filters
         )
 
         with db_engine.connect() as conn:
-            df_alert_period = pd.read_sql(sql, conn, index_col='dt_week')
+            df_alert_period = pd.read_sql(sql, conn, index_col="dt_week")
 
-        df_alert_period.index.rename('category', inplace=True)
+        df_alert_period.index.rename("category", inplace=True)
 
-        sql = '''
+        sql = """
         SELECT
           (CURRENT_DATE - INTERVAL '1 YEAR') - CAST(CONCAT(CAST(
            EXTRACT(DOW FROM (CURRENT_DATE-INTERVAL '1 YEAR')) AS VARCHAR),'DAY'
@@ -508,26 +507,26 @@ class NotificationQueries:
           CURRENT_DATE - CAST(CONCAT(CAST(
             EXTRACT(DOW FROM CURRENT_DATE) AS VARCHAR), 'DAY'
           ) AS INTERVAL) AS dt_week_end
-        '''
+        """
 
         with db_engine.connect() as conn:
             df_period_bounds = pd.read_sql(sql, conn)
 
         if not df_period_bounds.dt_week_start[0] in df_alert_period.index:
             df = pd.DataFrame(
-                {'category': [df_period_bounds.dt_week_start[0]], 'casos': [0]}
+                {"category": [df_period_bounds.dt_week_start[0]], "casos": [0]}
             )
 
-            df = df.set_index('category')
+            df = df.set_index("category")
 
             df_alert_period = pd.concat([df, df_alert_period])
 
         if not df_period_bounds.dt_week_end[0] in df_alert_period.index:
             df = pd.DataFrame(
-                {'category': [df_period_bounds.dt_week_end[0]], 'casos': [0]}
+                {"category": [df_period_bounds.dt_week_end[0]], "casos": [0]}
             )
 
-            df = df.set_index('category')
+            df = df.set_index("category")
 
             df_alert_period = pd.concat([df_alert_period, df])
 
@@ -543,45 +542,45 @@ class AlertCity:
         ew_end: Optional[int] = None,
     ) -> ibis.expr:
         """
-            Return an ibis expression with the history for a given disease.
-            Parameters
-            ----------
-            disease : str, {'dengue', 'chikungunya', 'zika'}
-            geocode : int
-            ew_start : Optional[int]
-                The starting Year/Week, e.g.: 202202
-            ew_end : Optional[int]
-                The ending Year/Week, e.g.: 202205
-            Returns
-            -------
-            ibis.expr.types.Expr
-            """
+        Return an ibis expression with the history for a given disease.
+        Parameters
+        ----------
+        disease : str, {'dengue', 'chikungunya', 'zika'}
+        geocode : int
+        ew_start : Optional[int]
+            The starting Year/Week, e.g.: 202202
+        ew_end : Optional[int]
+            The ending Year/Week, e.g.: 202205
+        Returns
+        -------
+        ibis.expr.types.Expr
+        """
 
         if disease not in CID10.keys():
             raise Exception(
-                F'The diseases available are: {[k for k in CID10.keys()]}'
+                f"The diseases available are: {[k for k in CID10.keys()]}"
             )
 
-        table_suffix = ''
-        if disease != 'dengue' and disease != 'zika':
+        table_suffix = ""
+        if disease != "dengue" and disease != "zika":
             table_suffix = get_disease_suffix(disease)
 
-        schema_city = con.schema('Municipio')
-        t_hist = schema_city.table(F'Historico_alerta{table_suffix}')
+        schema_city = con.schema("Municipio")
+        t_hist = schema_city.table(f"Historico_alerta{table_suffix}")
 
         if ew_start and ew_end:
             t_hist_filter_bol = (
-                t_hist['SE'].between(int(ew_start), int(ew_end))
-            ) & (t_hist['municipio_geocodigo'] == geocode)
+                t_hist["SE"].between(int(ew_start), int(ew_end))
+            ) & (t_hist["municipio_geocodigo"] == geocode)
 
             t_hist_filter_expr = t_hist.filter(t_hist_filter_bol).sort_by(
-                ibis.desc('SE')
+                ibis.desc("SE")
             )
 
         else:
             t_hist_filter_expr = (
-                t_hist.filter(t_hist['municipio_geocodigo'] == geocode)
-                .sort_by(ibis.desc('SE'))
+                t_hist.filter(t_hist["municipio_geocodigo"] == geocode)
+                .sort_by(ibis.desc("SE"))
                 .limit(3)
             )
 

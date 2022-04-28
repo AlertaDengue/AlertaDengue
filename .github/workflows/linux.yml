@@ -1,13 +1,6 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+name: build-alertadengue
 
-name: CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push, pull_request]
 
 env:
   ALLOWED_HOSTS: 'localhost'
@@ -39,20 +32,43 @@ env:
   EMAIL_HOST: 'smtp.gmail.com'
   EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
   EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+  HOST_UID: 1000
+  HOST_GID: 1000
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8]
+        python-version: ["3.9"]
+    concurrency:
+      group: ci-${{ github.ref }}
+      cancel-in-progress: true
 
-    env:
-      COMPOSE_FILE: docker/staging-compose.yml
-      PYTHON_VERSION: ${{ matrix.python-version }}
+    defaults:
+      run:
+        shell: bash -l {0}
 
     steps:
     - uses: actions/checkout@v2
+
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+        miniconda-version: "latest"
+        mamba-version: "*"
+        environment-file: conda/environment.yaml
+        channels: conda-forge,nodefaults
+        activate-environment: alertadengue
+        use-mamba: true
+        miniforge-variant: Mambaforge
+
+
+    - name: Install dependencies
+      run: |
+        poetry install
+
+    - name: Create env file
+      run: envsubst < env.tpl > .env
 
     - name: Download data files from Dataverse
       run: |
@@ -60,41 +76,20 @@ jobs:
         wget https://dataverse.harvard.edu/api/access/datafile/4154429 -O docker/dev_dumps/latest_infodengue.sql.gz
         wget https://dataverse.harvard.edu/api/access/datafile/5110797 -O docker/dev_dumps/latest_dengue.sql.gz
 
-    - name: Create env
-      run: envsubst < .env.tmpl > .env_staging
-
-    - name: install dependencies
-      run: |
-        make install
-        python --version
-
-    - name: Build and Deploy staging_DB
+    - name: Build and deploy demo database
       id: staging_db
       run: |
-        make build_staging SERVICES_STAGING=staging_db
-        make start_staging SERVICES_STAGING=staging_db
-        docker ps
+         make docker-build SERVICES=db
+         make docker-start SERVICES=db
 
-    - name: Build staging_WEB
+    - name: Docker build all images
       run: |
-        make build_staging SERVICES_STAGING=staging_web
+        make docker-build
 
-    - name: Deploy staging_WEB
+    - name: Docker start web
       run: |
-        make start_staging SERVICES_STAGING=staging_web
+        make docker-start-ci
 
-    # - name: Migrate staging database
-      # run: |
-        # make migrate_staging
-
-    # - name: Generate MapFiles
-      # run: |
-        # make generate_maps_staging
-
-    - name: Run Flake8
+    - name: Linting
       run: |
-        make flake8_staging SERVICES_STAGING=staging_web
-
-    # - name: Run tests to APPs
-    #   run: |
-    #     make test_staging_web SERVICES_STAGING=staging_web
+        make lint

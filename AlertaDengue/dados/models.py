@@ -11,27 +11,27 @@ class City(models.Model):
     """
 
     geocode = models.IntegerField(
-        db_column='geocodigo',
+        db_column="geocodigo",
         null=False,
         primary_key=True,
-        help_text=_('Código do Município'),
+        help_text=_("Código do Município"),
     )
     name = models.CharField(
-        db_column='nome',
+        db_column="nome",
         null=False,
         max_length=128,
-        help_text=_('Nome do municipio'),
+        help_text=_("Nome do municipio"),
     )
     state = models.CharField(
-        db_column='uf',
+        db_column="uf",
         null=False,
         max_length=20,
-        help_text=_('Nome do estado'),
+        help_text=_("Nome do estado"),
     )
 
     class Meta:
-        db_table = 'Dengue_global\".\"Municipio'
-        app_label = 'dados'
+        db_table = 'Dengue_global"."Municipio'
+        app_label = "dados"
         verbose_name_plural = "cities"
 
     def __str__(self):
@@ -47,22 +47,22 @@ class CID10(models.Model):
     """
 
     code = models.CharField(
-        db_column='codigo',
+        db_column="codigo",
         null=False,
         primary_key=True,
         max_length=512,
-        help_text=_('Código do doença'),
+        help_text=_("Código do doença"),
     )
     name = models.CharField(
-        db_column='nome',
+        db_column="nome",
         null=False,
         max_length=512,
-        help_text=_('Nome da doença'),
+        help_text=_("Nome da doença"),
     )
 
     class Meta:
-        db_table = 'Dengue_global\".\"CID10'
-        app_label = 'dados'
+        db_table = 'Dengue_global"."CID10'
+        app_label = "dados"
         verbose_name_plural = "cities"
 
     def __str__(self):
@@ -82,54 +82,54 @@ class RegionalHealth(models.Model):
     """
 
     id = models.IntegerField(
-        db_column='id',
+        db_column="id",
         null=False,
         primary_key=True,
-        help_text=_('Código da Regional Saúde'),
+        help_text=_("Código da Regional Saúde"),
     )
     codigo_estacao_wu = models.CharField(
-        db_column='codigo_estacao_wu',
+        db_column="codigo_estacao_wu",
         null=False,
         max_length=16,
-        help_text=_('Código da Estação WU'),
+        help_text=_("Código da Estação WU"),
     )
     varcli = models.CharField(
-        db_column='varcli',
+        db_column="varcli",
         null=False,
         max_length=10,
-        help_text=_('Variável climática'),
+        help_text=_("Variável climática"),
     )
     ucrit = models.FloatField(
-        db_column='ucrit', null=False, help_text=_('Umidade Crítica')
+        db_column="ucrit", null=False, help_text=_("Umidade Crítica")
     )
     tcrit = models.FloatField(
-        db_column='tcrit', null=False, help_text=_('Temperatura Crítica')
+        db_column="tcrit", null=False, help_text=_("Temperatura Crítica")
     )
     limiar_preseason = models.FloatField(
-        db_column='limiar_preseason',
+        db_column="limiar_preseason",
         null=False,
-        help_text=_('Limiar pré-epidêmica'),
+        help_text=_("Limiar pré-epidêmica"),
     )
     limiar_posseason = models.FloatField(
-        db_column='limiar_posseason',
+        db_column="limiar_posseason",
         null=False,
-        help_text=_('Limiar pós-epidêmica'),
+        help_text=_("Limiar pós-epidêmica"),
     )
     limiar_epidemico = models.FloatField(
-        db_column='limiar_epidemico',
+        db_column="limiar_epidemico",
         null=False,
-        help_text=_('Limiar epidêmico'),
+        help_text=_("Limiar epidêmico"),
     )
     municipio_geocodigo = models.FloatField(
-        db_column='municipio_geocodigo',
+        db_column="municipio_geocodigo",
         null=False,
         unique=True,
-        help_text=_('Código do municipio'),
+        help_text=_("Código do municipio"),
     )
 
     class Meta:
-        db_table = 'Dengue_global\".\"regional_saude'
-        app_label = 'dados'
+        db_table = 'Dengue_global"."regional_saude'
+        app_label = "dados"
         verbose_name_plural = "regionais_saude"
 
     def __str__(self):

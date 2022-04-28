@@ -11,4 +11,3 @@ ADD COLUMN tcrit DOUBLE PRECISION NULL;
 
 ALTER TABLE "Dengue_global".regional_saude
 ADD COLUMN ucrit DOUBLE PRECISION NULL;
-

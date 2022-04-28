@@ -1,27 +1,27 @@
+import multiprocessing as mp
+import os
+import traceback as tb
 from copy import copy
 from datetime import datetime
 from glob import glob
-from rasterio import Affine
-from rasterio.features import rasterize
-from rasterio.transform import from_origin
-
-# local
-from ad_main.settings import (
-    SHAPEFILE_PATH,
-    RASTER_METEROLOGICAL_FACTOR_INCREASE,
-    DEBUG,
-    RASTER_PATH,
-)
-from dados.dbdata import RegionalParameters
 
 import fiona
 import geopy.distance
-import os
-import multiprocessing as mp
 import numpy as np
 import rasterio
 import rasterio.mask
-import traceback as tb
+
+# local
+from ad_main.settings import (
+    DEBUG,
+    RASTER_METEROLOGICAL_FACTOR_INCREASE,
+    RASTER_PATH,
+    SHAPEFILE_PATH,
+)
+from dados.dbdata import RegionalParameters
+from rasterio import Affine
+from rasterio.features import rasterize
+from rasterio.transform import from_origin
 
 
 def convert_from_shapefile(shapefile, rgb_color):
@@ -53,7 +53,7 @@ def convert_from_shapefile(shapefile, rgb_color):
     )
 
     shapes = [
-        [(geometry['geometry'], color)]
+        [(geometry["geometry"], color)]
         for k, geometry in shp.items()
         for color in rgb_color
     ]
@@ -71,13 +71,13 @@ def convert_from_shapefile(shapefile, rgb_color):
     )
 
     rasters = [rasterize(shape, **raster_args) for shape in shapes]
-    geotiff_path = '/tmp/%s.tif' % np.random.randint(100000, 999999)
+    geotiff_path = "/tmp/%s.tif" % np.random.randint(100000, 999999)
 
     with rasterio.open(
         geotiff_path,
-        mode='w',
+        mode="w",
         crs=shp.crs,
-        driver='GTiff',
+        driver="GTiff",
         # profile='GeoTIFF',
         dtype=dtype,
         count=3,
@@ -85,12 +85,12 @@ def convert_from_shapefile(shapefile, rgb_color):
         height=height,
         nodata=np.nan,
         transform=transform,
-        photometric='RGB',
+        photometric="RGB",
     ) as dst:
         for i in range(1, 4):
             dst.write_band(i, rasters[i - 1])
 
-    with open(geotiff_path, 'rb') as f:
+    with open(geotiff_path, "rb") as f:
         result = f.read()
 
     os.remove(geotiff_path)
@@ -98,9 +98,8 @@ def convert_from_shapefile(shapefile, rgb_color):
 
 
 def get_key_from_file_name(raster_name, to_lower=True):
-    """
-    """
-    if raster_name[-14:].count('_') == 2:
+    """ """
+    if raster_name[-14:].count("_") == 2:
         raster_key = raster_name[:-15]
     else:
         raster_key = raster_name[:-19]
@@ -112,14 +111,13 @@ def get_key_from_file_name(raster_name, to_lower=True):
 
 
 def get_date_from_file_name(raster_name, to_lower=True):
-    """
-    """
-    if raster_name[-14:].count('_') == 2:
+    """ """
+    if raster_name[-14:].count("_") == 2:
         dt = raster_name[-14:-4]
     else:
         dt = raster_name[-18:-8]
 
-    return datetime.strptime(dt, '%Y_%m_%d')
+    return datetime.strptime(dt, "%Y_%m_%d")
 
 
 def mask_raster_with_shapefile(
@@ -158,11 +156,11 @@ def mask_raster_with_shapefile(
 
     out_meta.update(
         {
-            'driver': "GTiff",
-            'height': out_image.shape[1],
-            'width': out_image.shape[2],
-            'transform': out_transform,
-            'dtype': img_type,
+            "driver": "GTiff",
+            "height": out_image.shape[1],
+            "width": out_image.shape[2],
+            "transform": out_transform,
+            "dtype": img_type,
         }
     )
 
@@ -196,13 +194,13 @@ def increase_resolution(raster_file_path: str, factor_increase: int):
         image = src.read(out=image_new).copy()
         meta = dict(src.profile)
 
-    aff = copy(meta['transform'])
-    meta['transform'] = Affine(
+    aff = copy(meta["transform"])
+    meta["transform"] = Affine(
         aff.a / res, aff.b, aff.c, aff.d, aff.e / res, aff.f
     )
-    meta['affine'] = meta['transform']
-    meta['width'] *= res
-    meta['height'] *= res
+    meta["affine"] = meta["transform"]
+    meta["width"] *= res
+    meta["height"] *= res
 
     with rasterio.open(raster_file_path, "w", **meta) as dst:
         dst.write(image)
@@ -219,8 +217,8 @@ class MeteorologicalRasterProcess:
             geocode, city_name = geo_info
             raster_output_dir_path = os.path.join(
                 RASTER_PATH,
-                'meteorological',
-                'city',
+                "meteorological",
+                "city",
                 self.raster_class,
                 str(geocode),
             )
@@ -230,13 +228,13 @@ class MeteorologicalRasterProcess:
                 os.makedirs(raster_output_dir_path, exist_ok=True)
 
             # check if shapefile exists
-            shapefile_path = os.path.join(SHAPEFILE_PATH, '%s.shp' % geocode)
+            shapefile_path = os.path.join(SHAPEFILE_PATH, "%s.shp" % geocode)
             if not os.path.exists(shapefile_path):
                 return
 
             raster_output_file_path = os.path.join(
                 raster_output_dir_path,
-                '%s.tif' % self.raster_date.strftime('%Y%m%d'),
+                "%s.tif" % self.raster_date.strftime("%Y%m%d"),
             )
 
             # apply mask on raster using shapefile by city
@@ -261,10 +259,10 @@ class MeteorologicalRasterProcess:
         except Exception:
             if DEBUG:
                 log_path = os.path.join(
-                    os.sep, 'tmp', 'raster_%s.log' % self.raster_class
+                    os.sep, "tmp", "raster_%s.log" % self.raster_class
                 )
-                with open(log_path, 'a') as f:
-                    f.write('%s: %s' % (datetime.now(), tb.format_exc()))
+                with open(log_path, "a") as f:
+                    f.write("%s: %s" % (datetime.now(), tb.format_exc()))
 
 
 class MeteorologicalRaster:
@@ -282,7 +280,7 @@ class MeteorologicalRaster:
         :return:
         """
         path_search = os.path.join(
-            RASTER_PATH, 'meteorological', 'country', raster_class, '*'
+            RASTER_PATH, "meteorological", "country", raster_class, "*"
         )
 
         cities = RegionalParameters.get_cities().items()
@@ -293,7 +291,7 @@ class MeteorologicalRaster:
             raster_name = raster_input_file_path.split(os.sep)[-1]
 
             # filter by tiff format
-            if not raster_name[-3:] == 'tif':
+            if not raster_name[-3:] == "tif":
                 continue
 
             # filter by date

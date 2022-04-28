@@ -1,14 +1,12 @@
 import os
-from os.path import join, dirname
-
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
+from os.path import dirname, join
 
 import pandas as pd
 from ad_main import settings
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
 
-
-env_file = os.environ.get('ENV_FILE', '.env')
+env_file = os.environ.get("ENV_FILE", ".env")
 dotenv_path = join(dirname(dirname(dirname(__file__))), env_file)
 load_dotenv(dotenv_path)
 
@@ -29,11 +27,11 @@ def is_partner_active():
         where status is True
     :return: pandas dataframe
     """
-    sql = '''
+    sql = """
       SELECT name, contact, email FROM dbf_sendtoPartner
       WHERE status = 'True'
       ORDER BY name
-    '''
+    """
 
     with db_engine.connect() as conn:
         return pd.read_sql(sql, conn)

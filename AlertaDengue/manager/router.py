@@ -14,10 +14,10 @@ class DatabaseAppsRouter(object):
     DATABASE_APPS_MAPPING = {'app1': 'db1', 'app2': 'db2'}
     """
 
-    core_apps = {'contenttypes', 'auth'}
+    core_apps = {"contenttypes", "auth"}
 
     def db_for_read(self, model, **hints):
-        """"Point all read operations to the specific database."""
+        """ "Point all read operations to the specific database."""
         db = None
         if model._meta.app_label in settings.DATABASE_APPS_MAPPING:
             db = settings.DATABASE_APPS_MAPPING[model._meta.app_label]
@@ -71,8 +71,8 @@ class DatabaseAppsRouter(object):
         apps_mapping = settings.DATABASE_APPS_MAPPING  # alias
         allow = True
 
-        if 'target_db' in hints:
-            return db == hints['target_db']
+        if "target_db" in hints:
+            return db == hints["target_db"]
 
         if db in apps_mapping.values() and app_label in apps_mapping:
             allow = apps_mapping[app_label] == db

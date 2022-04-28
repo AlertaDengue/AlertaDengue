@@ -12,13 +12,13 @@ urlpatterns = [
     ),
     re_path(r"^upload/$", views.Upload.as_view(), name="upload"),
     re_path(
-        r'^chunked_upload/?$',
+        r"^chunked_upload/?$",
         views.DBFChunkedUploadView.as_view(),
-        name='api_chunked_upload',
+        name="api_chunked_upload",
     ),
     re_path(
-        r'^chunked_upload_complete/?$',
+        r"^chunked_upload_complete/?$",
         views.DBFChunkedUploadCompleteView.as_view(),
-        name='api_chunked_upload_complete',
+        name="api_chunked_upload_complete",
     ),
 ]

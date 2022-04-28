@@ -4,33 +4,33 @@ from __future__ import unicode_literals
 
 import chunked_upload.models
 import chunked_upload.settings
+import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('dbf', '0001_initial'),
+        ("dbf", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DBFChunkedUpload',
+            name="DBFChunkedUpload",
             fields=[
                 (
-                    'id',
+                    "id",
                     models.AutoField(
                         auto_created=True,
                         primary_key=True,
                         serialize=False,
-                        verbose_name='ID',
+                        verbose_name="ID",
                     ),
                 ),
                 (
-                    'upload_id',
+                    "upload_id",
                     models.CharField(
                         default=chunked_upload.models.generate_upload_id,
                         editable=False,
@@ -39,31 +39,31 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    'file',
+                    "file",
                     models.FileField(
                         max_length=255,
                         upload_to=chunked_upload.settings.UPLOAD_PATH,
                     ),
                 ),
-                ('filename', models.CharField(max_length=255)),
-                ('offset', models.BigIntegerField(default=0)),
-                ('created_on', models.DateTimeField(auto_now_add=True)),
+                ("filename", models.CharField(max_length=255)),
+                ("offset", models.BigIntegerField(default=0)),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
                 (
-                    'status',
+                    "status",
                     models.PositiveSmallIntegerField(
-                        choices=[(1, 'Uploading'), (2, 'Complete')], default=1
+                        choices=[(1, "Uploading"), (2, "Complete")], default=1
                     ),
                 ),
-                ('completed_on', models.DateTimeField(blank=True, null=True)),
+                ("completed_on", models.DateTimeField(blank=True, null=True)),
                 (
-                    'user',
+                    "user",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name='chunked_uploads',
+                        related_name="chunked_uploads",
                         to=settings.AUTH_USER_MODEL,
                     ),
                 ),
             ],
-            options={'abstract': False},
+            options={"abstract": False},
         )
     ]

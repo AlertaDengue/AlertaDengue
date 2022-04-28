@@ -1,15 +1,15 @@
-from django.test import TestCase
+import os
+import unittest
 from datetime import datetime
 
-# local
-from AlertaDengue.gis import mapfile
+import numpy as np
+import pyproj
 from AlertaDengue.ad_main.settings import RASTER_METEROLOGICAL_DATA_RANGE
 from AlertaDengue.dados.dbdata import CID10
 
-import numpy as np
-import os
-import pyproj
-import unittest
+# local
+from AlertaDengue.gis import mapfile
+from django.test import TestCase
 
 
 class TestMapFile(TestCase):
@@ -22,7 +22,7 @@ class TestMapFile(TestCase):
         :return:
         """
         bounds = (1, 2, 3, 4)
-        assert mapfile.stringfy_boundaries(bounds=bounds, sep=' ') == '1 2 3 4'
+        assert mapfile.stringfy_boundaries(bounds=bounds, sep=" ") == "1 2 3 4"
 
     def test_calc_layer_width_by_boundaries(self):
         """
@@ -42,9 +42,9 @@ class TestMapFile(TestCase):
         cwd = os.path.dirname(__file__)
         cwd = os.path.dirname(cwd)
 
-        file_path = os.path.join(cwd, 'templates', 'mapfile', 'map.map')
+        file_path = os.path.join(cwd, "templates", "mapfile", "map.map")
         with open(file_path) as f:
-            assert mapfile.get_template_content('map.map') == f.read()
+            assert mapfile.get_template_content("map.map") == f.read()
 
     def test_transform_boundaries(self):
         """
@@ -77,7 +77,7 @@ class TestMapFile(TestCase):
 
         :return:
         """
-        date_start = datetime.strptime('2017-01-01', '%Y-%m-%d')
+        date_start = datetime.strptime("2017-01-01", "%Y-%m-%d")
 
         for c in RASTER_METEROLOGICAL_DATA_RANGE:
             mf = mapfile.MapFileMeteorological(
@@ -86,5 +86,5 @@ class TestMapFile(TestCase):
             mf.create_files()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
