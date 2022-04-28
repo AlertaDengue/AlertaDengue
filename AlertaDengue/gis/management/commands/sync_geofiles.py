@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 
 import fiona
 import geojson
@@ -24,7 +25,8 @@ class Command(BaseCommand):
         :param geocode:
         :return:
         """
-        f_name = os.path.join(f_path, "%s.json" % geocode)
+
+        f_name = f_path / f"{geocode}.json"
 
         geojson_city = geojson.dumps(maps.get_city_geojson(int(geocode)))
 
@@ -38,7 +40,8 @@ class Command(BaseCommand):
         )
 
     def get_geojson(self, f_path, geocode):
-        f_name = os.path.join(f_path, "%s.json" % geocode)
+
+        f_name = f_path / f"{geocode}.json"
 
         with open(f_name, "r") as f:
             return json.load(f)
@@ -49,8 +52,9 @@ class Command(BaseCommand):
         :param geocode:
         :return:
         """
-        geojson_path = os.path.join(f_path, "geojson", "%s.json" % geocode)
-        shpfile_path = os.path.join(f_path, "shapefile", "%s.shp" % geocode)
+
+        geojson_path = f_path / "geojson" / f"{geocode}.json"
+        shpfile_path = f_path / "shapefile" / f"{geocode}.shp"
 
         # creates the shapefile
         with fiona.open(geojson_path) as geojson_file:
@@ -70,17 +74,18 @@ class Command(BaseCommand):
         :param geocode:
         :return:
         """
-        geojson_simplified_path = os.path.join(
-            f_path, "geojson_simplified", "%s.json" % geocode
-        )
-        geojson_original_path = os.path.join(
-            f_path, "geojson", "%s.json" % geocode
+
+        geojson_simplified_path = Path(
+            f_path / "geojson_simplified" / f"{geocode}.json"
         )
 
-        geojson_simplified_dir_path = os.path.dirname(geojson_simplified_path)
-        os.makedirs(geojson_simplified_dir_path, mode=0o777, exist_ok=True)
+        geojson_original_path = Path(f_path / "geojson" / f"{geocode}.json")
 
-        if not os.path.exists(geojson_original_path):
+        geojson_simplified_dir_path = geojson_simplified_path.parent
+
+        geojson_simplified_dir_path.mkdir(parents=True, exist_ok=True)
+
+        if not geojson_original_path.exists():
             self.stdout.write(
                 self.style.WARNING(
                     "GeoJSON/simplified %s not synchronized!" % geocode
@@ -147,9 +152,8 @@ class Command(BaseCommand):
                 geojson_states[state_code]["features"].append(geojson_content)
 
         for state_code, geojson_state in geojson_states.items():
-            f_name = os.path.join(
-                geojson_simplified_path, "{}.json".format(state_code)
-            )
+            f_name = geojson_simplified_path / f"{state_code}.json"
+
             with open(f_name, "w") as f:
                 json.dump(geojson_state, f)
 
@@ -166,7 +170,8 @@ class Command(BaseCommand):
         :param geocode:
         :return:
         """
-        shpfile_path = os.path.join(f_path, "shapefile", "%s.shp" % geocode)
+
+        shpfile_path = f_path / "shapefile" / f"{geocode}.shp"
 
         gdf = gpd.read_file(shpfile_path)
 
@@ -179,24 +184,23 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         geocodes = list(dict(dbdata.get_all_active_cities()).keys())
 
-        _static_root = os.path.abspath(settings.STATIC_ROOT)
-        _static_dirs = os.path.abspath(settings.STATICFILES_DIRS[0])
-
-        path_root = (
-            _static_root if os.path.exists(_static_root) else _static_dirs
+        SERVE_STATIC = (
+            settings.STATICFILES_DIRS[0]
+            if settings.DEBUG
+            else settings.STATIC_ROOT
         )
 
-        f_geojson_path = os.path.join(path_root, "geojson")
-        f_geojson_simplified_path = os.path.join(
-            path_root, "geojson_simplified"
-        )
-        f_shapefile_path = os.path.join(path_root, "shapefile")
+        path_root = Path(settings.BASE_DIR) / SERVE_STATIC
 
-        if not os.path.exists(f_geojson_path):
-            os.makedirs(f_geojson_path, mode=0o777)
+        f_geojson_path = path_root / "geojson"
 
-        if not os.path.exists(f_shapefile_path):
-            os.makedirs(f_shapefile_path, mode=0o777)
+        f_geojson_simplified_path = path_root / "geojson_simplified"
+
+        f_shapefile_path = path_root / "shapefile"
+
+        f_geojson_path.mkdir(parents=True, exist_ok=True)
+
+        f_shapefile_path.mkdir(parents=True, exist_ok=True)
 
         geo_info = {}
 
@@ -206,6 +210,7 @@ class Command(BaseCommand):
             self.simplify_geojson(path_root, geocode)
             geo_info.update(self.extract_geo_info_table(path_root, geocode))
 
+        # f_geojson_simplified_path.mkdir(parents=True, exist_ok=True)
         self.create_geojson_by_state(f_geojson_simplified_path)
 
         with open(os.path.join(f_geojson_path, "geo_info.json"), "w") as f:

@@ -1,3 +1,6 @@
+.ONESHELL:
+
+
 SERVICES:=
 # options: dev, prod
 ENV:=dev
@@ -7,14 +10,13 @@ DOCKER=docker-compose \
 	--project-name infodengue-$(ENV) \
 	--file docker/compose-$(ENV).yaml
 
-
-
 # PREPARE ENVIRONMENT
 .PHONY:prepare-env
 prepare-env:
-	# source env_variables_export.sh
-	# python create_env_directories.py
-	envsubst < .env.tpl > .env
+	# SHELL := /usr/bin/sh
+	# source ../scripts/env_variables_export.sh
+	# python ../scripts/create_env_directories.py
+	envsubst < env.tpl > .env
 
 # PREPARE CREATE GEOFILES FOR STATIC
 sync-static-geofiles:
