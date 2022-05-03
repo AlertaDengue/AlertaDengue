@@ -185,12 +185,12 @@ class Command(BaseCommand):
         geocodes = list(dict(dbdata.get_all_active_cities()).keys())
 
         SERVE_STATIC = (
-            settings.STATIC_ROOT
+            settings.STATICFILES_DIRS[0]
             if settings.DEBUG
-            else settings.STATICFILES_DIRS[0]
+            else settings.STATIC_ROOT
         )
 
-        path_root = Path(settings.BASE_DIR) / SERVE_STATIC
+        path_root = Path(settings.APPS_DIR) / SERVE_STATIC
 
         f_geojson_path = path_root / "geojson"
 

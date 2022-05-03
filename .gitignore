@@ -29,7 +29,8 @@ authorized_keys
 .env_export.sh
 
 AlertaDengue/static/*
-AlertaDengue/static_files/*
+*staticfiles/*
+
 */incidence_maps/*
 /AlertaDengue/*.dbf
 /*.dbf

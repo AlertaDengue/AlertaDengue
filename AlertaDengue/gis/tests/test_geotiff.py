@@ -3,6 +3,7 @@ import shutil
 import unittest
 from datetime import datetime
 from glob import glob
+from pathlib import Path, PurePath
 
 import numpy as np
 import rasterio
@@ -15,7 +16,17 @@ from AlertaDengue.gis.geotiff import (
     increase_resolution,
     mask_raster_with_shapefile,
 )
+from django.contrib.staticfiles.finders import find
+from django.templatetags.static import static
 from django.test import TestCase
+
+
+def get_static(static_dir):
+    if not settings.DEBUG:
+        return Path(static(static_dir))
+    _app_dir = settings.APPS_DIR
+    path_to_find = PurePath(find(static_dir))
+    return str(path_to_find.relative_to(_app_dir))
 
 
 class TestGeoTiff(TestCase):
@@ -52,7 +63,8 @@ class TestGeoTiff(TestCase):
 
         :return:
         """
-        shapefile_path = "%s/static/shapefile" % settings.BASE_DIR
+        shapefile_path = get_static("shapefile")
+
         geocode = 3304557
         raster_dir_path = settings.RASTER_PATH
 
