@@ -5,7 +5,7 @@ import os
 import random
 from collections import OrderedDict, defaultdict
 from copy import deepcopy
-from pathlib import Path
+from pathlib import Path, PurePath
 from time import mktime
 from typing import Dict, List, Tuple
 
@@ -16,6 +16,7 @@ import pandas as pd
 from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.staticfiles.finders import find
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.templatetags.static import static
@@ -50,9 +51,19 @@ from .episem import episem, episem2date
 from .maps import get_city_info
 from .models import City, RegionalHealth
 
+
+def get_static(static_dir):
+    if not settings.DEBUG:
+        return Path(static(static_dir))
+    _app_dir = settings.APPS_DIR
+    path_to_find = PurePath(find(static_dir))
+    return str(path_to_find.relative_to(_app_dir))
+
+
 DBF = apps.get_model("dbf", "DBF")
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
+
 
 dados_alerta = dbdata.get_alerta_mrj()
 dados_alerta_chik = dbdata.get_alerta_mrj_chik()
@@ -276,18 +287,8 @@ class DataPublicServicesPageView(TemplateView):
 
         if service == "maps":
             if service_type is None:
-                _static_root = os.path.abspath(settings.STATIC_ROOT)
-                _static_dirs = os.path.abspath(settings.STATICFILES_DIRS[0])
 
-                path_root = (
-                    _static_root
-                    if os.path.exists(_static_root)
-                    else _static_dirs
-                )
-
-                geo_info_path = os.path.join(
-                    path_root, "geojson", "geo_info.json"
-                )
+                geo_info_path = get_static("geojson/geo_info.json")
 
                 with open(geo_info_path) as f:
                     geo_info_json = json.load(f)
@@ -836,25 +837,14 @@ class ChartsMainView(TemplateView):
         img_data = f"""
             <div class='mt-4'>
                 <img
-                src='{static(img_name)}'
+                src='{get_static(img_name)}'
                 alt=''
                 title='Mapa de {disease} para o estado de {state_abbv}'
                 style='width:100%'
                 />
             </div>"""
 
-        img_no_data = f"""
-            <div class='alert alert-primary' align='center'>
-                <p>Não há dados suficientes para
-                a geração do mapa sobre {disease}</p>
-            </div>"""
-
-        img_to_show = (
-            Path(__file__).resolve().parent.parent / "static" / img_name
-        )
-
-        # TODO add cache
-        return img_data if img_to_show.exists() else img_no_data
+        return img_data
 
     def get_context_data(self, **kwargs):
         context = super(ChartsMainView, self).get_context_data(**kwargs)
