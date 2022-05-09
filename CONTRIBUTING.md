@@ -1,139 +1,47 @@
-# AlertaDengue: Developing Info Dengue
+# Contributing with InfoDengue
 
-## Ubuntu Operating System
+### Pré-requisites
 
-Mount the environment using the conda package manager and Python 3
+- Postgresql [(see documentation)](https://www.postgresql.org/download/linux/ubuntu/);
+- Git [(see documentation)](https://git-scm.com/docs/gittutorial);
+- Docker [(see documentation)](https://docs.docker.com/engine/install/ubuntu/);
+- Poetry [(see documentation)](https://python-poetry.org/docs/);
+- IDE (recommended: [VSCODE](https://code.visualstudio.com/download), [VSCODIUM](https://vscodium.com/#install) or [PYCHARM](https://www.jetbrains.com/pycharm/download/)).
 
-## Miniconda3
+### Setting up the environment
 
-Download:
+ 1) Fork and clone both repositories:
+        > AlertaDengue: https://github.com/AlertaDengue/AlertaDengue
+        > Data: https://github.com/AlertaDengue/Data (Contains randomly generated data for testing and development, see more info [here](https://github.com/AlertaDengue/Data#readme))
+        
 
- ```sh
-wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh
- ```
+ 2) Open the repository AlertaDengue with your IDE and use [Miniforge](https://github.com/conda-forge/miniforge) to create and activate the working environment ```(alertadengue-dev)```:
+ 
+        $ mamba env create -f conda/environment.yaml
+        $ conda activate alertadengue-dev 
 
- Install:
+ 3) Install the environment dependencies with [Poetry](https://python-poetry.org/docs/):
+         
+         $ poetry install
 
-```sh
-chmod +x ~/miniconda.sh
-cd ~
-./miniconda.sh
-export PATH=~/miniconda3/bin:$PATH
-```
+### Setting up Git, GitHub
 
-Add channel:
+Finished the environment settings, you will need to configure the remotes Upstream and Origin within your local repository following the steps below, this will ensure you are working with the most updated version of the project. _For more details about commiting, check the Git Guides [here](https://github.com/git-guides)._
 
-```sh
-conda config --add channels conda-forge
-```
+1) Add Origin & Upstream:
 
-update:
 
-```sh
-conda update conda
-```
+        $ git remote add origin git@github.com:<user>/AlertaDengue.git
+        $ git remote add upstream git@github.com:AlertaDengue/AlertaDengue.git
+        
+2) Fetch all branches:
 
-## Info Dengue
+        $ git fetch --all
+        
+3) Commit & Create pull request
 
-Download the app:
-
-```sh
-cd ~
-git clone https://github.com/AlertaDengue/AlertaDengue.git
-```
-
-Create the virtual env and install the packages needed to run the application:
-
-```sh
-conda env create -f ~/AlertaDengue/AlertaDengue/AlertaDengue/environment-3.8.yml
-```
-
-Enable a virtual env "alertadengue":
-
-```sh
-conda activate alertadengue
-```
-
-Installs the archive packages "requirements-dev.txt":
-
-```sh
-conda install -f ~/AlertaDengue/AlertaDengue/AlertaDengue/requirements-dev.txt
-```
-
-Creates the settings file:
-
-```sh
-nano ~/AlertaDengue/AlertaDengue/AlertaDengue/AlertaDengue/settings.ini
-```
-
-Consider your local setting. Example:
-
-```sh
-[settings]
-ALLOWED_HOSTS=alerta.dengue.mat.br,info.dengue.mat.br,*
-SECRET_KEY=my-secret-key
-DEBUG=True
-
-DATABASE_URL=postgres://dengueadmin:dengueadmin@localhost:5432/infodengue
-
-PSQL_DB = dengue
-PSQL_PASSWORD = dengueadmin
-PSQL_HOST = localhost
-
-ADMIN=''
-CELERY_BROKER_URL = amqp://xmn:xmn@192.168.1.3:5672
-CELERY_TASK_ALWAYS_EAGER = True
-
-MAPSERVER_URL = http://172.17.0.2:80
-MAPFILE_PATH = /var/www/mapserver/mapfiles
-RASTER_PATH = /var/www/mapserver/tiffs
-
-MAPBOX_TOKEN = pk.eyJ1IjoieG1ubGFiIiwiYSI6ImNqZHhrNmcxbDBuZnUyd28xYTg5emVoeTcifQ.9CMl24WjXQ4iThxYYoc3XA
-```
-
-Install the location packages:
-
-```sh
-apt install -y locales && locale-gen pt_BR.UTF-8
-update-locale LANG=pt_BR.UTF-8
-```
-
-Access the application directory:
-
-```sh
-cd ~/AlertaDengue/AlertaDengue/
-```
-
-Synchronize geographic files:
-
-```sh
-python AlertaDengue/manage.py sync_geofiles
-```
-
-Generates the migration files:
-
-```sh
-python AlertaDengue/manage.py makemigrations
-```
-
-Performs migrations in the database:
-
-```sh
-python AlertaDengue/manage.py migrate
-```
-
-Test the applications: dados, api, gis, dbf e forecast
-
-```sh
-python AlertaDengue/manage.py test dados
-python AlertaDengue/manage.py test api
-python AlertaDengue/manage.py test gis
-python AlertaDengue/manage.py test dbf
-python AlertaDengue/manage.py test forecast
-```
-
-Run the application server:
-
-```sh
-python AlertaDengue/manage.py runserver
-```
+    When the changes in your branch are done (_please, read about [Best Practices](https://gist.github.com/luismts/495d982e8c5b1a0ced4a57cf3d93cf60) with Git before commiting_), it's time to push the commits to your fork and create a pull request so the maintainers can review and merge into the AlertaDengue repository. 
+        
+        $ git push
+        
+    Your IDE should redirect you to the GitHub page with your Pull Request specifying the commits and the files that you have worked on. Write a message telling us about all your changes and click on Create Pull Request. 
