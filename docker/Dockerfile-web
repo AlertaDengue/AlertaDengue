@@ -11,5 +11,6 @@ RUN chmod 0644 /etc/cron.d/cron-tasks \
   && touch /var/log/cron.log \
   && chown deploy:deploy /var/log/cron.log
 
-
 USER deploy
+
+EXPOSE 8000

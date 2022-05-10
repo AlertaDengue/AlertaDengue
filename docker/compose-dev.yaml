@@ -29,14 +29,14 @@ services:
       - ../.env
     hostname: db
     ports:
-      - 25432:25432
+      - ${PSQL_PORT}:${PSQL_PORT}
     networks:
       - staging
     volumes:
-      - ${STAGING_PG_DATA}/data:/var/lib/postgresql/data
+      - ${STAGING_PG_DATA}:/var/lib/postgresql/data
       - ./dev_dumps:/dumps
     restart: always
-    command: -p 25432
+    command: -p ${PSQL_PORT}
 
   base:
     build:
@@ -49,8 +49,8 @@ services:
       - ../.env
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
-      - PSQL_HOST=db
-      - PSQL_PORT=25432
+      - PSQL_HOST=${PSQL_HOST}
+      - PSQL_PORT=${PSQL_PORT}
     networks:
       - staging
     volumes:
@@ -65,8 +65,8 @@ services:
       - ../.env
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
-      - PSQL_HOST=db
-      - PSQL_PORT=25432
+      - PSQL_HOST=${PSQL_HOST}
+      - PSQL_PORT=${PSQL_PORT}
     networks:
       - staging
     volumes:
@@ -94,8 +94,8 @@ services:
       - MEMCACHED_HOST=memcached
       - MEMCACHED_PORT=45004
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
-      - PSQL_HOST=db
-      - PSQL_PORT=25432
+      - PSQL_HOST=${PSQL_HOST}
+      - PSQL_PORT=${PSQL_PORT}
     networks:
       - staging
     volumes:
