@@ -10,8 +10,9 @@ env:
   PSQL_DB: ${{ secrets.PSQL_DB }}
   PSQL_USER: ${{ secrets.PSQL_USER }}
   PSQL_PASSWORD: ${{ secrets.PSQL_PASSWORD }}
-  PSQL_HOST: staging_db
-  PSQL_PORT: ${{ secrets.PSQL_PORT }}
+  PSQL_HOST: db
+  PSQL_PORT: 25432
+  STAGING_PG_DATA: ../../Storage/staging_pg_data
   QUERY_CACHE_TIMEOUT: 86400
   MEMCACHED_HOST: ${{ secrets.MEMCACHED_HOST }}
   MEMCACHED_PORT: ${{ secrets.MEMCACHED_PORT }}
@@ -72,12 +73,13 @@ jobs:
 
     - name: Download data files from Dataverse
       run: |
-        mkdir -p docker/dev_dumps
+        mkdir -p docker/dev_dumps ../Storage/staging_pg_data
+        tree -L 1 ../
         wget https://dataverse.harvard.edu/api/access/datafile/4154429 -O docker/dev_dumps/latest_infodengue.sql.gz
         wget https://dataverse.harvard.edu/api/access/datafile/5110797 -O docker/dev_dumps/latest_dengue.sql.gz
 
     - name: Build and deploy demo database
-      id: staging_db
+      id: db_demo
       run: |
          make docker-build SERVICES=db
          make docker-start SERVICES=db
