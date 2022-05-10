@@ -58,31 +58,10 @@ services:
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
       - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
 
-  worker:
-    image: infodengue-dev_base:latest
-    entrypoint: "/opt/services/AlertaDengue/run_celery_worker.sh"
-    env_file:
-      - ../.env
-    environment:
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
-      - PSQL_HOST=${PSQL_HOST}
-      - PSQL_PORT=${PSQL_PORT}
-    networks:
-      - staging
-    volumes:
-      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
-      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
-      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
-    depends_on:
-      - db
-      - rabbitmq
-      - memcached
-    restart: always
-
   web:
     build:
       context: ".."
-      dockerfile: "docker/Dockerfile-web"
+      dockerfile: "docker/Dockerfile-dev"
       args:
         IMAGE_BUILD: infodengue-dev_base:latest
     entrypoint: "/entrypoint.sh"
@@ -105,6 +84,28 @@ services:
       - ${DOCKER_HOST_INCIDENCE_MAPS}:/srv/deploy/AlertaDengue/static/img/incidence_maps
       - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
     depends_on:
+      - rabbitmq
+      - memcached
+    restart: always
+
+  worker:
+    image: infodengue-dev_web:latest
+    entrypoint: "/opt/services/AlertaDengue/run_celery_worker.sh"
+    env_file:
+      - ../.env
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+      - PSQL_HOST=${PSQL_HOST}
+      - PSQL_PORT=${PSQL_PORT}
+    networks:
+      - staging
+    volumes:
+      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
+    depends_on:
+      - db
+      - web
       - rabbitmq
       - memcached
     restart: always

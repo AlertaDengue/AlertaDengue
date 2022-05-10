@@ -34,6 +34,3 @@ RUN mamba env create -n $ENV_NAME \
 
 
 EXPOSE 8080
-
-# ENTRYPOINT ["bash", "/activate.sh"]
-# CMD ["/srv/deploy/AlertaDengue/runwsgi.sh"]
