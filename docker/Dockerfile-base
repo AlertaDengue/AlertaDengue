@@ -25,7 +25,7 @@ RUN addgroup --gid ${HOST_GID} deploy \
   && export ENV_NAME="$ENV_NAME" \
   && mkdir -p /opt/conda /opt/services/logs /opt/services/AlertaDengue/ \
   && chmod -R a+rwx /opt/conda /opt/services/AlertaDengue/ /tmp \
-  && chown deploy:deploy /tmp \
+  && chown deploy:deploy /opt/services/ /tmp \
   && echo 'source /opt/conda/bin/activate "$ENV_NAME" && exec "$@"' > /activate.sh \
   && chmod +x /activate.sh \
   && echo 'source activate "$ENV_NAME"' >  /home/deploy/.bashrc
