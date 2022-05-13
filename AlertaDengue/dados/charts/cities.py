@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import pandas as pd
 import plotly.graph_objs as go
 from django.utils.translation import gettext as _
@@ -27,9 +29,6 @@ class ReportCityCharts:
         df = df.reset_index()[
             ["SE", "incidência", "casos notif.", "level_code"]
         ]
-
-        # 200 = 2 years
-        df = df[df.SE >= year_week - 200]
 
         df["SE"] = df.SE.map(lambda v: "%s/%s" % (str(v)[:4], str(v)[-2:]))
 
@@ -187,71 +186,127 @@ class ReportCityCharts:
         cls,
         df: pd.DataFrame,
         var_climate,
-        year_week,
-        climate_crit,
-        climate_title,
     ):
         """
         :param df:
         :param var_climate:
-        :param year_week:
-        :param climate_crit:
-        :param climate_title:
         :return:
         """
-        k = var_climate.replace("_", ".")
 
-        df_climate = df.reset_index()[["SE", k]]
-        df_climate = df_climate[df_climate.SE >= year_week - 200]
+        varcli_keys = list(var_climate.keys())
+        varcli_values = list(var_climate.values())
+
+        df_climate = deepcopy(df[["SE", *varcli_keys]])
 
         df_climate["SE"] = df_climate.SE.map(
             lambda v: "%s/%s" % (str(v)[:4], str(v)[-2:])
         )
 
-        df_climate["Limiar favorável transmissão"] = climate_crit
+        df_climate[f"threshold_{varcli_keys[0]}"] = var_climate.get(
+            varcli_keys[0]
+        )[1]
 
-        df_climate = df_climate.rename(
-            columns={"Limiar favorável transmissão": "threshold_transmission"}
-        )
-
-        df_climate[["SE", "threshold_transmission", k]].melt("SE")
-
-        if k == "temp.min":
-            varclim_title = "Temperatura"
-        elif k == "umid.max":
-            varclim_title = "Umidade relativa do ar"
-        else:
-            raise Exception("Climate variable not found.")
-
-        figure = go.Figure()
+        figure = make_subplots(specs=[[{"secondary_y": True}]])
 
         figure.add_trace(
             go.Scatter(
                 x=df_climate["SE"],
-                y=df_climate["threshold_transmission"],
-                name=_("Limiar Favorável"),
-                marker={"color": "rgb(51, 172, 255)"},
+                y=df_climate[varcli_keys[0]],
+                name=f"{varcli_keys[0]}",
+                # fill='tonextx',
+                marker={"color": "rgb(255, 204, 153)"},
                 text=df_climate.SE.map(lambda v: "{}".format(str(v)[-2:])),
                 hoverinfo="text",
-                hovertemplate=_("Semana %{text} : %{y:1f}°C")
-                + "<extra></extra>",
-            )
+                hovertemplate=("{}: {} <br>" "{}{}" "<extra></extra>").format(
+                    _("Semana"), "%{text}", "%{y:1f}", varcli_values[0][0]
+                ),
+            ),
+            secondary_y=False,
         )
 
         figure.add_trace(
             go.Scatter(
                 x=df_climate["SE"],
-                y=df_climate[k],
-                name=varclim_title,
+                y=df_climate[f"threshold_{varcli_keys[0]}"],
+                name=("{} {}{}").format(
+                    _("Limiar favorável"),
+                    varcli_values[0][1],
+                    varcli_values[0][0][0:2],
+                ),
                 marker={"color": "rgb(255,150,0)"},
                 text=df_climate.SE.map(lambda v: "{}".format(str(v)[-2:])),
                 hoverinfo="text",
-                hovertemplate=_("Semana %{text} : %{y:1f}°C")
-                + "<extra></extra>",
-            )
+                hovertemplate=(
+                    "{}: {} <br>" "{}: {}{}" "<extra></extra>"
+                ).format(
+                    _("Semana"),
+                    "%{text}",
+                    _("Limiar favorável"),
+                    "%{y:1f}",
+                    varcli_values[0][0][0:2],
+                ),
+            ),
+            secondary_y=False,
         )
 
+        if len(varcli_keys) == 2:
+
+            df_climate[f"threshold_{varcli_keys[1]}"] = var_climate.get(
+                varcli_keys[1]
+            )[1]
+            figure.add_trace(
+                go.Scatter(
+                    x=df_climate["SE"],
+                    y=df_climate[varcli_keys[1]],
+                    name=f"{varcli_keys[1]}",
+                    # fill='tonextx',
+                    marker={"color": "rgb(173, 216, 230)"},
+                    text=df_climate.SE.map(lambda v: f"{str(v)[-2:]}"),
+                    hoverinfo="text",
+                    hovertemplate=(
+                        "{}: {} <br>" "{}{}" "<extra></extra>"
+                    ).format(
+                        _("Semana"), "%{text}", "%{y:1f}", varcli_values[1][0]
+                    ),
+                ),
+                secondary_y=True,
+            )
+
+            figure.add_trace(
+                go.Scatter(
+                    x=df_climate["SE"],
+                    y=df_climate[f"threshold_{varcli_keys[1]}"],
+                    name=("{} {}{}").format(
+                        _("Limiar favorável"),
+                        varcli_values[1][1],
+                        varcli_values[1][0][0:2],
+                    ),
+                    marker={"color": "rgb(51, 172, 255)"},
+                    text=df_climate.SE.map(lambda v: "{}".format(str(v)[-2:])),
+                    hoverinfo="text",
+                    hovertemplate=(
+                        "{}: {} <br>" "{}: {}{}" "<extra></extra>"
+                    ).format(
+                        _("Semana"),
+                        "%{text}",
+                        _("Limiar favorável"),
+                        "%{y:1f}",
+                        varcli_values[1][0][0:2],
+                    ),
+                ),
+                secondary_y=True,
+            )
+
+            figure.update_yaxes(
+                title_text=f"{varcli_values[1][0]}", secondary_y=True
+            )
+
         figure.update_layout(
+            hovermode="x",
+            hoverlabel=dict(
+                font_size=12,
+                font_family="Rockwell",
+            ),
             title=_("Condições climáticas para transmissão"),
             xaxis=dict(
                 title=_("Período (Ano/Semana)"),
@@ -265,7 +320,7 @@ class ReportCityCharts:
                 gridcolor="rgb(176, 196, 222)",
             ),
             yaxis=dict(
-                title=varclim_title,
+                title=f"{varcli_values[0][0]}",
                 showline=True,
                 showgrid=True,
                 showticklabels=True,
@@ -274,12 +329,13 @@ class ReportCityCharts:
                 gridcolor="rgb(176, 196, 222)",
             ),
             showlegend=True,
+            margin=dict(l=90, r=10, t=130, b=20),
             legend=dict(
                 orientation="h",
-                yanchor="bottom",
-                xanchor="auto",
-                y=1.01,
-                x=1,
+                yanchor="middle",
+                xanchor="right",
+                y=1.10,
+                x=0.94,
                 font=dict(family="sans-serif", size=12, color="#000"),
                 bgcolor="#FFFFFF",
                 bordercolor="#E2E2E2",
@@ -288,7 +344,7 @@ class ReportCityCharts:
             plot_bgcolor="rgb(255, 255, 255)",
             paper_bgcolor="rgb(245, 246, 249)",
             width=1100,
-            height=450,
+            height=550,
         )
 
         return figure.to_html()
@@ -303,14 +359,15 @@ class ReportCityCharts:
         :param climate_title:
         :return:
         """
-        df_tweet = df.reset_index()[["SE", "tweets"]]
-        df_tweet = df_tweet[df_tweet.SE >= year_week - 200]
+
+        df_tweet = df.reset_index()[["SE", "tweet"]]
+        # df_tweet = df_tweet[df_tweet.SE >= year_week - 200]
 
         df_tweet["SE"] = df_tweet.SE.map(
             lambda v: "%s/%s" % (str(v)[:4], str(v)[-2:])
         )
 
-        df_tweet.rename(columns={"tweets": "menções"}, inplace=True)
+        df_tweet.rename(columns={"tweet": "menções"}, inplace=True)
 
         figure = go.Figure()
 
