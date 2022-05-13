@@ -1172,12 +1172,12 @@ class ReportCityView(TemplateView):
         # Create the dictionary with climate variables
 
         varcli_dict = {
-            "temp.min": ["°C temperatura mínima"],
-            "temp.med": ["°C temperatura média"],
-            "temp.max": ["°C temperatura máxima"],
-            "umid.min": ["% umidade mínima do ar"],
-            "umid.med": ["% umidade média do ar"],
-            "umid.max": ["% umidade máxima do ar"],
+            "temp.min": [_("°C temperatura mínima")],
+            "temp.med": [_("°C temperatura média")],
+            "temp.max": [_("°C temperatura máxima")],
+            "umid.min": [_("% umidade mínima do ar")],
+            "umid.med": [_("% umidade média do ar")],
+            "umid.max": [_("% umidade máxima do ar")],
         }
 
         var_climate = {}
@@ -1221,13 +1221,6 @@ class ReportCityView(TemplateView):
             geocode=geocode,
             year_week=year_week,
         )
-
-        # prepare empty variables
-        chart_dengue_climate = ""
-        chart_chik_climate = ""
-        chart_chik_incidence = ""
-        chart_zika_climate = ""
-        chart_zika_incidence = ""
 
         total_n_dengue = 0
         total_n_dengue_last_year = 0

@@ -217,9 +217,9 @@ class ReportCityCharts:
                 marker={"color": "rgb(255, 204, 153)"},
                 text=df_climate.SE.map(lambda v: "{}".format(str(v)[-2:])),
                 hoverinfo="text",
-                hovertemplate="Semana: %{text} <br>"
-                "%{y:1f}"
-                f"{varcli_values[0][0]}" + "<extra></extra>",
+                hovertemplate=("{}: {} <br>" "{}{}" "<extra></extra>").format(
+                    _("Semana"), "%{text}", "%{y:1f}", varcli_values[0][0]
+                ),
             ),
             secondary_y=False,
         )
@@ -228,17 +228,23 @@ class ReportCityCharts:
             go.Scatter(
                 x=df_climate["SE"],
                 y=df_climate[f"threshold_{varcli_keys[0]}"],
-                name=(
-                    f"Limiar favorável {varcli_values[0][1]}"
-                    f"{varcli_values[0][0]}"
+                name=("{} {}{}").format(
+                    _("Limiar favorável"),
+                    varcli_values[0][1],
+                    varcli_values[0][0][0:2],
                 ),
                 marker={"color": "rgb(255,150,0)"},
                 text=df_climate.SE.map(lambda v: "{}".format(str(v)[-2:])),
                 hoverinfo="text",
-                hovertemplate="Semana: %{text} <br>"
-                f"Limiar favorável: "
-                "%{y:1f}"
-                f"{varcli_values[0][0]}" + "<extra></extra>",
+                hovertemplate=(
+                    "{}: {} <br>" "{}: {}{}" "<extra></extra>"
+                ).format(
+                    _("Semana"),
+                    "%{text}",
+                    _("Limiar favorável"),
+                    "%{y:1f}",
+                    varcli_values[0][0][0:2],
+                ),
             ),
             secondary_y=False,
         )
@@ -248,7 +254,6 @@ class ReportCityCharts:
             df_climate[f"threshold_{varcli_keys[1]}"] = var_climate.get(
                 varcli_keys[1]
             )[1]
-            print(df_climate)
             figure.add_trace(
                 go.Scatter(
                     x=df_climate["SE"],
@@ -258,9 +263,11 @@ class ReportCityCharts:
                     marker={"color": "rgb(173, 216, 230)"},
                     text=df_climate.SE.map(lambda v: f"{str(v)[-2:]}"),
                     hoverinfo="text",
-                    hovertemplate="Semana: %{text} <br>"
-                    "%{y:1f}"
-                    f"{varcli_values[1][0]}" + "<extra></extra>",
+                    hovertemplate=(
+                        "{}: {} <br>" "{}{}" "<extra></extra>"
+                    ).format(
+                        _("Semana"), "%{text}", "%{y:1f}", varcli_values[1][0]
+                    ),
                 ),
                 secondary_y=True,
             )
@@ -269,17 +276,23 @@ class ReportCityCharts:
                 go.Scatter(
                     x=df_climate["SE"],
                     y=df_climate[f"threshold_{varcli_keys[1]}"],
-                    name=(
-                        f"Limiar favorável {varcli_values[1][1]}"
-                        f"{varcli_values[1][0]}"
+                    name=("{} {}{}").format(
+                        _("Limiar favorável"),
+                        varcli_values[1][1],
+                        varcli_values[1][0][0:2],
                     ),
                     marker={"color": "rgb(51, 172, 255)"},
                     text=df_climate.SE.map(lambda v: "{}".format(str(v)[-2:])),
                     hoverinfo="text",
-                    hovertemplate="Semana: %{text} <br>"
-                    f"Limiar favorável: "
-                    "%{y:1f}"
-                    f"{varcli_values[1][0]}" + "<extra></extra>",
+                    hovertemplate=(
+                        "{}: {} <br>" "{}: {}{}" "<extra></extra>"
+                    ).format(
+                        _("Semana"),
+                        "%{text}",
+                        _("Limiar favorável"),
+                        "%{y:1f}",
+                        varcli_values[1][0][0:2],
+                    ),
                 ),
                 secondary_y=True,
             )
@@ -294,9 +307,9 @@ class ReportCityCharts:
                 font_size=12,
                 font_family="Rockwell",
             ),
-            title="Condições climáticas para transmissão",
+            title=_("Condições climáticas para transmissão"),
             xaxis=dict(
-                title="Período (Ano/Semana)",
+                title=_("Período (Ano/Semana)"),
                 tickangle=-60,
                 nticks=len(df_climate) // 4,
                 showline=True,

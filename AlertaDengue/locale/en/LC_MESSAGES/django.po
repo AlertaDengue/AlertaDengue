@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-31 22:14+0000\n"
+"POT-Creation-Date: 2022-05-13 11:49+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -58,7 +58,7 @@ msgstr "Estimated cases of "
 msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
 
-#: AlertaDengue/dados/charts/alerts.py:233 AlertaDengue/dados/charts/home.py:87
+#: AlertaDengue/dados/charts/alerts.py:233 AlertaDengue/dados/charts/home.py:90
 #: AlertaDengue/dados/templates/alert_state/age.html:125
 #: AlertaDengue/dados/templates/alert_state/date.html:100
 #: AlertaDengue/dados/templates/alert_state/disease.html:122
@@ -69,112 +69,117 @@ msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
 msgid "Casos"
 msgstr "Cases"
 
-#: AlertaDengue/dados/charts/cities.py:39
-#: AlertaDengue/dados/charts/cities.py:90
+#: AlertaDengue/dados/charts/cities.py:37
+#: AlertaDengue/dados/charts/cities.py:88
 msgid "alerta verde"
 msgstr "Green Level"
 
-#: AlertaDengue/dados/charts/cities.py:40
-#: AlertaDengue/dados/charts/cities.py:91
+#: AlertaDengue/dados/charts/cities.py:38
+#: AlertaDengue/dados/charts/cities.py:89
 msgid "alerta amarelo"
 msgstr "Yellow Level"
 
-#: AlertaDengue/dados/charts/cities.py:41
-#: AlertaDengue/dados/charts/cities.py:92
+#: AlertaDengue/dados/charts/cities.py:39
+#: AlertaDengue/dados/charts/cities.py:90
 msgid "alerta laranja"
 msgstr "Orange Level"
 
-#: AlertaDengue/dados/charts/cities.py:42
-#: AlertaDengue/dados/charts/cities.py:93
+#: AlertaDengue/dados/charts/cities.py:40
+#: AlertaDengue/dados/charts/cities.py:91
 msgid "alerta vermelho"
 msgstr "Red Level"
 
-#: AlertaDengue/dados/charts/cities.py:44
-#: AlertaDengue/dados/charts/cities.py:67
+#: AlertaDengue/dados/charts/cities.py:42
+#: AlertaDengue/dados/charts/cities.py:65
 msgid "limiar epidêmico"
 msgstr "Epidemic threshold"
 
-#: AlertaDengue/dados/charts/cities.py:45
-#: AlertaDengue/dados/charts/cities.py:66
+#: AlertaDengue/dados/charts/cities.py:43
+#: AlertaDengue/dados/charts/cities.py:64
 msgid "limiar pós epidêmico"
 msgstr "Post-epimedic threshold"
 
-#: AlertaDengue/dados/charts/cities.py:46
-#: AlertaDengue/dados/charts/cities.py:65
+#: AlertaDengue/dados/charts/cities.py:44
+#: AlertaDengue/dados/charts/cities.py:63
 msgid "limiar pré epidêmico"
 msgstr "Pre-epidemic threshold"
 
-#: AlertaDengue/dados/charts/cities.py:54
+#: AlertaDengue/dados/charts/cities.py:52
 msgid "Notificações"
 msgstr "Reported cases"
 
-#: AlertaDengue/dados/charts/cities.py:58
+#: AlertaDengue/dados/charts/cities.py:56
 #, python-brace-format
 msgid "Semana %{text}<br>%{y:1f} Casos"
 msgstr "Week %{text}<br>%{y:1f} Cases"
 
-#: AlertaDengue/dados/charts/cities.py:83
-#: AlertaDengue/dados/charts/cities.py:112
+#: AlertaDengue/dados/charts/cities.py:81
+#: AlertaDengue/dados/charts/cities.py:110
 #, python-brace-format
 msgid "Semana %{text}<br>%{y:1f} Incidências"
 msgstr "Week %{text}<br>%{y:1f} Incidences"
 
-#: AlertaDengue/dados/charts/cities.py:120
+#: AlertaDengue/dados/charts/cities.py:118
 msgid "Limiares de incidência:"
 msgstr "Incidence threshold:"
 
-#: AlertaDengue/dados/charts/cities.py:123
+#: AlertaDengue/dados/charts/cities.py:121
 msgid "pré epidêmico="
 msgstr "    Pre-epidemic threshold="
 
-#: AlertaDengue/dados/charts/cities.py:125
+#: AlertaDengue/dados/charts/cities.py:123
 msgid "pós epidêmico="
 msgstr "    Post-epimedic threshold="
 
-#: AlertaDengue/dados/charts/cities.py:127
+#: AlertaDengue/dados/charts/cities.py:125
 msgid "epidêmico="
 msgstr "    Epidemic threshold="
 
-#: AlertaDengue/dados/charts/cities.py:132
-#: AlertaDengue/dados/charts/cities.py:258
-#: AlertaDengue/dados/charts/cities.py:334
+#: AlertaDengue/dados/charts/cities.py:130
+#: AlertaDengue/dados/charts/cities.py:302
+#: AlertaDengue/dados/charts/cities.py:380
 msgid "Período (Ano/Semana)"
 msgstr "Period: Year / Week"
 
-#: AlertaDengue/dados/charts/cities.py:147
+#: AlertaDengue/dados/charts/cities.py:145
 msgid "Incidência"
 msgstr "Incidence"
 
-#: AlertaDengue/dados/charts/cities.py:170
+#: AlertaDengue/dados/charts/cities.py:168
 msgid "Casos Notificados"
 msgstr "Reported cases"
 
-#: AlertaDengue/dados/charts/cities.py:233
-msgid "Limiar Favorável"
-msgstr "Favourable Threshold"
+#: AlertaDengue/dados/charts/cities.py:224
+#: AlertaDengue/dados/charts/cities.py:243
+#: AlertaDengue/dados/charts/cities.py:266
+#: AlertaDengue/dados/charts/cities.py:285
+#: AlertaDengue/dados/templates/alert_state/epiyears.html:27
+msgid "Semana"
+msgstr "Week"
 
-#: AlertaDengue/dados/charts/cities.py:237
-#: AlertaDengue/dados/charts/cities.py:250
-#, python-brace-format
-msgid "Semana %{text} : %{y:1f}°C"
-msgstr "Week %{text} : %{y:1f}°C"
+#: AlertaDengue/dados/charts/cities.py:235
+#: AlertaDengue/dados/charts/cities.py:243
+#: AlertaDengue/dados/charts/cities.py:277
+#: AlertaDengue/dados/charts/cities.py:285
+msgid "Limiar favorável"
+msgstr "Favorable Threshold"
 
-#: AlertaDengue/dados/charts/cities.py:256
+#: AlertaDengue/dados/charts/cities.py:300
 msgid "Condições climáticas para transmissão"
 msgstr "Climatic conditions for transmission"
 
-#: AlertaDengue/dados/charts/cities.py:322
+#: AlertaDengue/dados/charts/cities.py:368
 #: AlertaDengue/dados/charts/states.py:58
 #: AlertaDengue/dados/charts/states.py:126
 msgid "Menções em tweets"
 msgstr "Mentions in tweets"
 
-#: AlertaDengue/dados/charts/cities.py:326
+#: AlertaDengue/dados/charts/cities.py:372
 #, python-brace-format
 msgid "Semana %{text} : %{y} Tweets"
 msgstr "Week %{text} : %{y} Tweets"
 
-#: AlertaDengue/dados/charts/cities.py:332
+#: AlertaDengue/dados/charts/cities.py:378
 #: AlertaDengue/dados/charts/states.py:85
 msgid "Menções na mídia social"
 msgstr "Mentions on social media"
@@ -183,46 +188,46 @@ msgstr "Mentions on social media"
 msgid "Registrados"
 msgstr "Registered"
 
-#: AlertaDengue/dados/charts/home.py:45
+#: AlertaDengue/dados/charts/home.py:48
 #, python-brace-format
 msgid "<br>SE %{text}<br>%{y:1f} Casos notificados<extra></extra>"
 msgstr "<br>Week %{text}<br>%{y:1f} Registered Cases<extra></extra>"
 
-#: AlertaDengue/dados/charts/home.py:56
+#: AlertaDengue/dados/charts/home.py:59
 msgid "Estimados"
 msgstr "Estimated"
 
-#: AlertaDengue/dados/charts/home.py:60
+#: AlertaDengue/dados/charts/home.py:63
 #, python-brace-format
 msgid "<br>SE %{text}<br>%{y:1f} Casos estimados<extra></extra>"
 msgstr "<br>Week: %{text}<br>%{y:1f} Estimated Cases<extra></extra>"
 
-#: AlertaDengue/dados/charts/home.py:72
+#: AlertaDengue/dados/charts/home.py:75
 msgid "Total de casos no estado"
 msgstr "Cumulative number of cases in the State"
 
-#: AlertaDengue/dados/charts/home.py:77 AlertaDengue/dados/charts/home.py:213
-#: AlertaDengue/dados/charts/home.py:318
+#: AlertaDengue/dados/charts/home.py:80 AlertaDengue/dados/charts/home.py:223
+#: AlertaDengue/dados/charts/home.py:340
 #: AlertaDengue/dados/templates/report_city.html:274
 #: AlertaDengue/dados/templates/services_api.html:205
-#: AlertaDengue/forecast/models.py:139
+#: AlertaDengue/forecast/models.py:142
 msgid "Semana epidemiológica"
 msgstr "Epidemiological week"
 
-#: AlertaDengue/dados/charts/home.py:209
+#: AlertaDengue/dados/charts/home.py:219
 msgid "Cidades com clima favorável <br>para transmissão"
 msgstr "Cities with favorable environment <br>for transmission"
 
-#: AlertaDengue/dados/charts/home.py:297
+#: AlertaDengue/dados/charts/home.py:313
 #, python-brace-format
 msgid "%{y} Cidades na semana %{customdata} <extra></extra>"
 msgstr "%{y} Cities in the week %{customdata}<extra></extra>"
 
-#: AlertaDengue/dados/charts/home.py:303
+#: AlertaDengue/dados/charts/home.py:319
 msgid "Situação epidemiológica das cidades"
 msgstr "Epidemiological Situation"
 
-#: AlertaDengue/dados/charts/home.py:328
+#: AlertaDengue/dados/charts/home.py:350
 msgid "Número de cidades"
 msgstr "Number of cities"
 
@@ -242,7 +247,7 @@ msgstr "Reported cases"
 msgid "Período: Ano/Semana"
 msgstr "Period: Year / Week"
 
-#: AlertaDengue/dados/models.py:17 AlertaDengue/forecast/models.py:96
+#: AlertaDengue/dados/models.py:17 AlertaDengue/forecast/models.py:99
 msgid "Código do Município"
 msgstr "City Code"
 
@@ -387,21 +392,29 @@ msgid ""
 "conhecimento das arboviroses e seu controle."
 msgstr ""
 "\n"
-" In 2021, the system reached the national level with the support of the Brazilian Health Ministry. "
-" As a result, all municipalities began to receive weekly InfoDengue bulletins. "
-" Reports at the state level can be requested by the state health secretariats. "
-" Access the tab <a href=\"/participe\"> “how to participate” </a> to know more. Implemented in 2015, the system was developed by researchers "
-" from the Scientific Computing Program (Fundação Oswaldo Cruz, RJ) and the School of Applied Mathematics (Fundação Getúlio Vargas) "
-" with the strong collaboration of the Rio de Janeiro Municipal Health Secretariat, the Observatory of Dengue (UFMG) and researchers "
-" from the Federal University of Paraná and the State University of Western Paraná."
-" <p>\nThe Infodengue website is accessed by many people and it is common for us to receive news that this information is used in "
-" the definition of travel and other activities. "
-" <p>\nOur network of collaborators has grown and now includes international research groups seeking solutions for arboviruses in "
-" other countries and civil society organizations. By sharing experiences and methodologies, "
-" we expand our capacity to innovate on arbovirus surveillance. "
-" <p>\nThe several technical and scientific challenges faced during the development of InfoDengue resulted in theses and dissertations. "
-" As the challenges do not end, we continue and will always continue to investigate new solutions to generate useful "
-" information for the management and advancement of knowledge of arboviruses and their control. "
+" In 2021, the system reached the national level with the support of the "
+"Brazilian Health Ministry.  As a result, all municipalities began to receive "
+"weekly InfoDengue bulletins.  Reports at the state level can be requested by "
+"the state health secretariats.  Access the tab <a href=\"/participe\"> “how "
+"to participate” </a> to know more. Implemented in 2015, the system was "
+"developed by researchers  from the Scientific Computing Program (Fundação "
+"Oswaldo Cruz, RJ) and the School of Applied Mathematics (Fundação Getúlio "
+"Vargas)  with the strong collaboration of the Rio de Janeiro Municipal "
+"Health Secretariat, the Observatory of Dengue (UFMG) and researchers  from "
+"the Federal University of Paraná and the State University of Western Paraná. "
+"<p>\n"
+"The Infodengue website is accessed by many people and it is common for us to "
+"receive news that this information is used in  the definition of travel and "
+"other activities.  <p>\n"
+"Our network of collaborators has grown and now includes international "
+"research groups seeking solutions for arboviruses in  other countries and "
+"civil society organizations. By sharing experiences and methodologies,  we "
+"expand our capacity to innovate on arbovirus surveillance.  <p>\n"
+"The several technical and scientific challenges faced during the development "
+"of InfoDengue resulted in theses and dissertations.  As the challenges do "
+"not end, we continue and will always continue to investigate new solutions "
+"to generate useful  information for the management and advancement of "
+"knowledge of arboviruses and their control. "
 
 #: AlertaDengue/dados/templates/about.html:60
 msgid "O Sistema"
@@ -1065,10 +1078,6 @@ msgid ""
 msgstr ""
 "Click on the category (column) to <br/> change filter selection. The choice "
 "of disease <br/> implies on page reloading."
-
-#: AlertaDengue/dados/templates/alert_state/epiyears.html:27
-msgid "Semana"
-msgstr "Week"
 
 #: AlertaDengue/dados/templates/alert_state/epiyears.html:31
 msgid "Casos por semanas epidemiológicas"
@@ -2623,6 +2632,30 @@ msgstr "This disease {} is not registered in our database for {} municipality"
 msgid "desconhecida"
 msgstr "unknown"
 
+#: AlertaDengue/dados/views.py:1175
+msgid "°C temperatura mínima"
+msgstr "°C Minimum temperature"
+
+#: AlertaDengue/dados/views.py:1176
+msgid "°C temperatura média"
+msgstr "°C Average temperatures"
+
+#: AlertaDengue/dados/views.py:1177
+msgid "°C temperatura máxima"
+msgstr "°C Maximum temperature"
+
+#: AlertaDengue/dados/views.py:1178
+msgid "% umidade mínima do ar"
+msgstr "% Minimum air humidity"
+
+#: AlertaDengue/dados/views.py:1179
+msgid "% umidade média do ar"
+msgstr "% Average air humidity"
+
+#: AlertaDengue/dados/views.py:1180
+msgid "% umidade máxima do ar"
+msgstr "% Maximum air humidity"
+
 #: AlertaDengue/dbf/forms.py:19
 msgid "Data da exportação"
 msgstr "Exportation date"
@@ -2672,11 +2705,11 @@ msgstr "Last uploaded files:"
 msgid "Dados do SINAN recebidos"
 msgstr "SINAN data received"
 
-#: AlertaDengue/dbf/validation.py:31
+#: AlertaDengue/dbf/validation.py:30
 msgid "Este arquivo não parece um DBF válido "
 msgstr "This file does not look like a valid DBF"
 
-#: AlertaDengue/dbf/validation.py:39
+#: AlertaDengue/dbf/validation.py:38
 msgid ""
 "Espera-se que o campo {} seja do tipo 'D' (data), mas o tipo do campo neste "
 "arquivo é '{}'."
@@ -2684,7 +2717,7 @@ msgstr ""
 "It is expected that the field {} is of type 'D' (date), but the type of "
 "field in thisfile is '{}'."
 
-#: AlertaDengue/dbf/validation.py:55
+#: AlertaDengue/dbf/validation.py:54
 msgid ""
 "Este arquivo não contém {}, que é esperado em um arquivo válido do SINAN."
 msgstr ""
@@ -2710,67 +2743,67 @@ msgstr ""
 "was sent successfully. You will be informed by email ({}) once the import "
 "process is completed, "
 
-#: AlertaDengue/forecast/models.py:22
+#: AlertaDengue/forecast/models.py:21
 msgid "Geocode"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:28
+#: AlertaDengue/forecast/models.py:27
 msgid "Epidemiological Week"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:31
+#: AlertaDengue/forecast/models.py:30
 msgid "Predicted Week"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:56
+#: AlertaDengue/forecast/models.py:55
 msgid "Nome do Modelo de Previsão"
 msgstr "Forecast model name"
 
-#: AlertaDengue/forecast/models.py:60
+#: AlertaDengue/forecast/models.py:59
 msgid "URL do repositório github"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:64
+#: AlertaDengue/forecast/models.py:63
 msgid "ID do commit (github)"
 msgstr "Commit ID (github)"
 
-#: AlertaDengue/forecast/models.py:67
+#: AlertaDengue/forecast/models.py:68
 msgid "Data Inicio"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:70
+#: AlertaDengue/forecast/models.py:73
 msgid "Data Final"
 msgstr ""
 
-#: AlertaDengue/forecast/models.py:75
+#: AlertaDengue/forecast/models.py:78
 msgid "Está ativo?"
 msgstr "Is it activated?"
 
-#: AlertaDengue/forecast/models.py:100
+#: AlertaDengue/forecast/models.py:103
 msgid "Está Ativo?"
 msgstr "Is it activated?"
 
-#: AlertaDengue/forecast/models.py:105 AlertaDengue/forecast/models.py:159
+#: AlertaDengue/forecast/models.py:108 AlertaDengue/forecast/models.py:162
 msgid "Modelo de Previsão"
 msgstr "Forecast model"
 
-#: AlertaDengue/forecast/models.py:145
+#: AlertaDengue/forecast/models.py:148
 msgid "Cidade"
 msgstr "City"
 
-#: AlertaDengue/forecast/models.py:152
+#: AlertaDengue/forecast/models.py:155
 msgid "Doença"
 msgstr "Disease"
 
-#: AlertaDengue/forecast/models.py:165
+#: AlertaDengue/forecast/models.py:168
 msgid "Data da publicação da previsão"
 msgstr "Published forecast date"
 
-#: AlertaDengue/forecast/models.py:170
+#: AlertaDengue/forecast/models.py:173
 msgid "Data do inicio da semana da previsão"
 msgstr "Forecast week initial date"
 
-#: AlertaDengue/forecast/models.py:172
+#: AlertaDengue/forecast/models.py:175
 msgid "Casos Previstos"
 msgstr "Forecast cases"
 
@@ -2863,6 +2896,9 @@ msgstr "Your username, if you have forgotten it, is:"
 #: AlertaDengue/templates/registration/password_reset_email.html:10
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
+
+#~ msgid "Semana %{text} : %{y:1f}°C"
+#~ msgstr "Week %{text} : %{y:1f}°C"
 
 #~ msgid ""
 #~ "\n"
