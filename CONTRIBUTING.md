@@ -10,8 +10,8 @@
 
 ### Setting up the environment
 
- 1) Fork and clone both repositories:
-        > AlertaDengue: https://github.com/AlertaDengue/AlertaDengue
+ 1) Fork and clone both repositories:           
+        > AlertaDengue: https://github.com/AlertaDengue/AlertaDengue            
         > Data: https://github.com/AlertaDengue/Data (Contains randomly generated data for testing and development.)
         
  2) Configure Demo Database in your local machine:

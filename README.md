@@ -1,5 +1,5 @@
 # InfoDengue
-## _InfoDengue is an arboviruses alert system to every city of Brazil, the system is based on hybrid data generated through the analysis of climate and epidemiological data and social scraping_
+## _InfoDengue is an early-warning system to all states of Brazil, it relies on the continuous analysis of online, climate and epidemiological data_
 
 
 For more information, please visit our website [info.dengue.mat.br](https://info.dengue.mat.br) to visualize the current epidemiological situation in each state.
@@ -8,9 +8,9 @@ For more information, please visit our website [info.dengue.mat.br](https://info
 
 ### Check out below the softwares we use in the project:
 
-| <a href=https://www.djangoproject.com/><img width="210" height="100" alt="Django" src="https://i.imgur.com/Z9wo3bS.png"></a> | <img width="210" height="100" alt="postgis" src="https://i.imgur.com/pVEX2Gl.png">|<img width="210" height="100" alt="docker" src="https://i.ibb.co/Yp8B38R/docker.png"> |
+| <a href=https://www.djangoproject.com/><img width="298" height="100%" alt="Django" src="https://i.imgur.com/Z9wo3bS.png"></a> | <img width="298" height="100%" alt="postgis" src="https://i.imgur.com/pVEX2Gl.png">|<img width="298" height="100%" alt="docker" src="https://i.ibb.co/Yp8B38R/docker.png"> |
 |:-------------------------:|:-------------------------:|:-------------------------:|
-|<img width="210" height="100" alt="celery" src="https://i.ibb.co/L81p2zD/celery.png"> |  <img width="210" height="100" alt="nginx" src="https://i.ibb.co/2n5HZBg/nginx.png">|<img width="210" alt="plotly" src="https://i.ibb.co/r0HYsYH/plotly.png">|
+|<img width="298" height="100%" alt="celery" src="https://i.ibb.co/L81p2zD/celery.png"> |  <img width="298" height="100%" alt="nginx" src="https://i.ibb.co/2n5HZBg/nginx.png">|<img width="298" height="100%" alt="plotly" src="https://i.ibb.co/r0HYsYH/plotly.png">|
 
 ---
 
@@ -45,12 +45,9 @@ If you are a member of a Municipal Health Department, or a citizen, and you have
 ### Sponsors
 
 <div style="width: 100%; text-align: left; position: relative;">
-  <div style="display: inline-block;">
-    <a href="https://portal.fiocruz.br/"> <img width="210" alt="Fiocruz" src="https://institutolula.org/uploads/6862.png" />
-  </div>
-  <div style="position: absolute; right: 0; top: 0">
-    <a href="https://emap.fgv.br/"> <img src="https://bibliotecadigital.fgv.br/dspace/bitstream/id/329f55c1-0ed0-4a52-b8ef-1e250f60014a/?sequence=-1" alt="FGV EMAp" />
-  </div>
+    <a href="https://portal.fiocruz.br/"> <img width="250" alt="Fiocruz" src="https://institutolula.org/uploads/6862.png" />
+    <a href="https://emap.fgv.br/"> <img width="350" src="https://i.imgur.com/bdfNqNv.png" alt="FGV EMAp" align=right />
 </div>
+
 
 ---
