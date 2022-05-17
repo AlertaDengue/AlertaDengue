@@ -1,5 +1,8 @@
-# InfoDengue
-## _InfoDengue is an early-warning system to all states of Brazil, it relies on the continuous analysis of online, climate and epidemiological data_
+# AlertaDengue
+
+## This repository contains the main applications and services for the InfoDengue web portal.
+
+### InfoDengue is an early-warning system to all states of Brazil, the system is based on the continuous analysis of hybrid data generated through the research of climate and epidemiological data and social scraping.
 
 
 For more information, please visit our website [info.dengue.mat.br](https://info.dengue.mat.br) to visualize the current epidemiological situation in each state.
@@ -49,5 +52,6 @@ If you are a member of a Municipal Health Department, or a citizen, and you have
     <a href="https://emap.fgv.br/"> <img width="350" src="https://i.imgur.com/bdfNqNv.png" alt="FGV EMAp" align=right />
 </div>
 
-
 ---
+      
+      
