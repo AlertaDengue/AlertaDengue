@@ -11,9 +11,9 @@ For more information, please visit our website [info.dengue.mat.br](https://info
 
 ### Check out below the softwares we use in the project:
 
-| <a href=https://www.djangoproject.com/><img width="298" height="100%" alt="Django" src="https://i.imgur.com/Z9wo3bS.png"></a> | <img width="298" height="100%" alt="postgis" src="https://i.imgur.com/pVEX2Gl.png">|<img width="298" height="100%" alt="docker" src="https://i.ibb.co/Yp8B38R/docker.png"> |
+| <a href=https://www.djangoproject.com/><img width="298" height="100%" alt="Django" src="https://i.imgur.com/Z9wo3bS.png"></a> | <a href=https://postgis.net/documentation/><img width="298" height="100%" alt="postgis" src="https://i.imgur.com/pVEX2Gl.png">|<a href=https://docs.docker.com/get-started/><img width="298" height="100%" alt="docker" src="https://i.ibb.co/Yp8B38R/docker.png"> |
 |:-------------------------:|:-------------------------:|:-------------------------:|
-|<img width="298" height="100%" alt="celery" src="https://i.ibb.co/L81p2zD/celery.png"> |  <img width="298" height="100%" alt="nginx" src="https://i.ibb.co/2n5HZBg/nginx.png">|<img width="298" height="100%" alt="plotly" src="https://i.ibb.co/r0HYsYH/plotly.png">|
+|<a href=https://docs.celeryq.dev/en/stable/><img width="298" height="100%" alt="celery" src="https://i.ibb.co/L81p2zD/celery.png"> | <a href=https://docs.nginx.com/><img width="298" height="100%" alt="nginx" src="https://i.ibb.co/2n5HZBg/nginx.png">|<a href=https://plotly.com/><img width="298" height="100%" alt="plotly" src="https://i.ibb.co/r0HYsYH/plotly.png">|
 
 ---
 
