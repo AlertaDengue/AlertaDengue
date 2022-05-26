@@ -123,7 +123,7 @@ def chunk_dbf_toparquet(dbfname) -> glob:
     f_name = str(dbf.dbf)[:-4]
 
     if f_name.startswith("BR-DEN"):
-        expected_fields.extend(["RESUL_PCR_", "CLASSI_FIN"])
+        expected_fields.extend(["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"])
 
     for chunk, (lowerbound, upperbound) in enumerate(
         chunk_gen(1000, dbf.numrec)
