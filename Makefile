@@ -19,9 +19,10 @@ prepare-env:
 	envsubst < env.tpl > .env
 
 # PREPARE CREATE GEOFILES FOR STATIC
+.PHONY:sync-static-geofiles
 sync-static-geofiles:
 	python AlertaDengue/manage.py sync_geofiles
-	python AlertaDengue/manage.py collectstatic
+	python AlertaDengue/manage.py collectstatic --noinput
 
 # DOCKER
 .PHONY:docker-build
@@ -75,6 +76,7 @@ test-infodengue-web:
 .PHONY:test-infodengue-all
 test-infodengue-all:
 	$(DOCKER) run --rm web python3 manage.py test
+
 
 .PHONY: lint
 lint: ## formatting linter with poetry
