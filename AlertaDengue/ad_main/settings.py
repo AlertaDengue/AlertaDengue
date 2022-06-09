@@ -83,6 +83,7 @@ THIRD_PARTY_APPS = [
     "chunked_upload",
     "manager.router",
     "maintenance_mode",
+    "django_celery_results",
 ]
 
 LOCAL_APPS = [
@@ -306,12 +307,6 @@ RASTER_METEROLOGICAL_FACTOR_INCREASE = os.getenv(
     "RASTER_METEROLOGICAL_FACTOR_INCREASE"
 )  # VERIFICAR , default=4
 
-
-# CELERY
-# ------------------------------------------------------------------------------
-CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")  # Verificar ERROR CELERY
-CELERY_TASK_ALWAYS_EAGER = os.getenv("CELERY_TASK_ALWAYS_EAGER")
-
 # CACHES
 # ------------------------------------------------------------------------------
 MEMCACHED_HOST = os.getenv("MEMCACHED_HOST")
@@ -328,7 +323,7 @@ CACHES = {
             "max_pool_size": 4,
             "use_pooling": True,
         },
-    }
+    },
 }
 
 LOGGING = {
@@ -349,6 +344,15 @@ LOGGING = {
         }
     },
 }
+
+# CELERY
+# ------------------------------------------------------------------------------
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")  # Verificar ERROR CELERY
+CELERY_TASK_ALWAYS_EAGER = os.getenv("CELERY_TASK_ALWAYS_EAGER")
+CELERY_ACCEPT_CONTET = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_BACKEND = f"cache+memcached://{MEMCACHED_HOST}:{MEMCACHED_PORT}/"
+CELERY_CACHE_BACKEND = "default"
 
 # BOOTSTRAP4
 # ------------------------------------------------------------------------------
