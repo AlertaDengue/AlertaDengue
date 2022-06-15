@@ -9,7 +9,9 @@ RUN chmod 0644 /etc/cron.d/cron-tasks \
   && crontab -u deploy /etc/cron.d/cron-tasks \
   && echo "deploy"  > /etc/cron.allow \
   && touch /var/log/cron.log \
-  && chown deploy:deploy /var/log/cron.log
+  && touch /var/run/crond.pid \
+  && chown deploy:deploy /var/log/cron.log \
+  && chown deploy:deploy /var/run/crond.pid
 
 USER deploy
 
