@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from tempfile import NamedTemporaryFile
 
 import dbfread
-from dbf.utils import expected_date_fields, expected_fields, synonyms
+from dbf.utils import EXPECTED_DATE_FIELDS, EXPECTED_FIELDS, SYNONYMS_FIELDS
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
@@ -31,7 +31,7 @@ def is_valid_dbf(dbf_file, notification_year):
             )
 
         for field in dbf.fields:
-            if field.name in expected_date_fields and field.type != "D":
+            if field.name in EXPECTED_DATE_FIELDS and field.type != "D":
                 raise ValidationError(
                     {
                         "__all__": _(
@@ -42,9 +42,9 @@ def is_valid_dbf(dbf_file, notification_year):
                     }
                 )
 
-        for field in expected_fields:
+        for field in EXPECTED_FIELDS:
             if field not in dbf.field_names:
-                synonyms_for_this_field = synonyms.get(field, [])
+                synonyms_for_this_field = SYNONYMS_FIELDS.get(field, [])
                 if not any(
                     s in dbf.field_names for s in synonyms_for_this_field
                 ):

@@ -9,7 +9,7 @@ from simpledbf import Dbf5
 DBFS_PQTDIR = Path(settings.TEMP_FILES_DIR) / "dbfs_parquet"
 
 
-expected_fields = [
+EXPECTED_FIELDS = [
     "NU_ANO",
     "ID_MUNICIP",
     "ID_AGRAVO",
@@ -27,9 +27,13 @@ expected_fields = [
     # "CLASSI_FIN",
 ]
 
-synonyms = {"ID_MUNICIP": ["ID_MN_RESI"]}
+ALL_EXPECTED_FIELDS = EXPECTED_FIELDS.copy()
 
-expected_date_fields = ["DT_SIN_PRI", "DT_NOTIFIC", "DT_DIGITA", "DT_NASC"]
+ALL_EXPECTED_FIELDS.extend(["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"])
+
+SYNONYMS_FIELDS = {"ID_MUNICIP": ["ID_MN_RESI"]}
+
+EXPECTED_DATE_FIELDS = ["DT_SIN_PRI", "DT_NOTIFIC", "DT_DIGITA", "DT_NASC"]
 
 FIELD_MAP = {
     "dt_notific": "DT_NOTIFIC",
@@ -122,8 +126,10 @@ def chunk_dbf_toparquet(dbfname) -> glob:
 
     f_name = str(dbf.dbf)[:-4]
 
-    if f_name.startswith("BR-DEN"):
-        expected_fields.extend(["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"])
+    if f_name.startswith(("BR-DEN", "BR-CHIK")):
+        key_columns = ALL_EXPECTED_FIELDS
+    else:
+        key_columns = EXPECTED_FIELDS
 
     for chunk, (lowerbound, upperbound) in enumerate(
         chunk_gen(1000, dbf.numrec)
@@ -137,7 +143,7 @@ def chunk_dbf_toparquet(dbfname) -> glob:
         )
         df_gpd = _parse_fields(df_gpd)
 
-        df_gpd[expected_fields].to_parquet(pq_fname)
+        df_gpd[key_columns].to_parquet(pq_fname)
 
     fetch_pq_fname = DBFS_PQTDIR / f_name
 

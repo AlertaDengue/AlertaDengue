@@ -180,7 +180,7 @@ class Sinan(object):
                 row[13] = (
                     None if pd.isnull(row[13]) else int(row[13])
                 )  # nu_idade_n
-                # row[14] = None if pd.isnull(row[14]) else int(row[14])
+                row[14] = None if pd.isnull(row[14]) else int(row[14])
                 # # resul_pcr
                 row[15] = (
                     None if pd.isnull(row[15]) else int(row[15])
