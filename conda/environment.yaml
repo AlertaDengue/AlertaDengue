@@ -1,4 +1,4 @@
-name: alertadengue-test
+name: alertadengue
 channels:
   - conda-forge
   - nodefaults

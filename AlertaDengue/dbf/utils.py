@@ -1,14 +1,15 @@
 import glob
-import os
+from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
 from django.conf import settings
 from simpledbf import Dbf5
 
-DBFS_PQTDIR = os.path.join(settings.TEMP_FILES_DIR, "dbfs_parquet")
+DBFS_PQTDIR = Path(settings.TEMP_FILES_DIR) / "dbfs_parquet"
 
-expected_fields = [
+
+EXPECTED_FIELDS = [
     "NU_ANO",
     "ID_MUNICIP",
     "ID_AGRAVO",
@@ -21,14 +22,18 @@ expected_fields = [
     "DT_NASC",
     "NU_IDADE_N",
     "CS_SEXO",
-    # u'RESUL_PCR',
-    # u'CRITERIO',
-    # u'CLASSI_FIN',
+    # "RESUL_PCR_",
+    # "CRITERIO",
+    # "CLASSI_FIN",
 ]
 
-synonyms = {"ID_MUNICIP": ["ID_MN_RESI"]}
+ALL_EXPECTED_FIELDS = EXPECTED_FIELDS.copy()
 
-expected_date_fields = ["DT_SIN_PRI", "DT_NOTIFIC", "DT_DIGITA", "DT_NASC"]
+ALL_EXPECTED_FIELDS.extend(["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"])
+
+SYNONYMS_FIELDS = {"ID_MUNICIP": ["ID_MN_RESI"]}
+
+EXPECTED_DATE_FIELDS = ["DT_SIN_PRI", "DT_NOTIFIC", "DT_DIGITA", "DT_NASC"]
 
 FIELD_MAP = {
     "dt_notific": "DT_NOTIFIC",
@@ -45,7 +50,7 @@ FIELD_MAP = {
     "cs_sexo": "CS_SEXO",
     "dt_nasc": "DT_NASC",
     "nu_idade_n": "NU_IDADE_N",
-    "resul_pcr": "RESUL_PCR",
+    "resul_pcr": "RESUL_PCR_",
     "criterio": "CRITERIO",
     "classi_fin": "CLASSI_FIN",
 }
@@ -61,6 +66,7 @@ def _parse_fields(df: gpd) -> pd:
     -------
     dataframe
     """
+
     df = df.copy(deep=True)
 
     if "ID_MUNICIP" in df.columns:
@@ -117,20 +123,28 @@ def chunk_dbf_toparquet(dbfname) -> glob:
     """
 
     dbf = Dbf5(dbfname)
-    fname_topath = str(dbf.dbf)[:-4]
+
+    f_name = str(dbf.dbf)[:-4]
+
+    if f_name.startswith(("BR-DEN", "BR-CHIK")):
+        key_columns = ALL_EXPECTED_FIELDS
+    else:
+        key_columns = EXPECTED_FIELDS
+
     for chunk, (lowerbound, upperbound) in enumerate(
         chunk_gen(1000, dbf.numrec)
     ):
-        pq_fname = os.path.join(
-            f"{DBFS_PQTDIR}", f"{fname_topath}-{chunk}.parquet"
-        )
+        pq_fname = DBFS_PQTDIR / f"{f_name}-{chunk}.parquet"
+
         df_gpd = gpd.read_file(
             dbfname,
             rows=slice(lowerbound, upperbound),
             ignore_geometry=True,
         )
         df_gpd = _parse_fields(df_gpd)
-        df_gpd[expected_fields].to_parquet(pq_fname)
 
-    fetch_pq_fname = os.path.join(f"{DBFS_PQTDIR}", f"{fname_topath}")
+        df_gpd[key_columns].to_parquet(pq_fname)
+
+    fetch_pq_fname = DBFS_PQTDIR / f_name
+
     return glob.glob(f"{fetch_pq_fname}*.parquet")
