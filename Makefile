@@ -1,9 +1,10 @@
 .ONESHELL:
 
+include .env
 
 SERVICES:=
 # options: dev, prod
-ENV:=dev
+ENV:=$(ENV)
 
 DOCKER=docker-compose \
 	--env-file .env \
@@ -40,6 +41,10 @@ docker-start:
 .PHONY:docker-stop
 docker-stop:
 	$(DOCKER) stop ${SERVICES}
+
+.PHONY:docker-exec
+docker-exec:
+	$(DOCKER) exec ${SERVICES} bash
 
 .PHONY:docker-restart
 docker-restart: docker-stop docker-start

@@ -26,12 +26,15 @@ RUN addgroup --gid ${HOST_GID} deploy \
   && mkdir -p /opt/conda /opt/services/logs /opt/services/AlertaDengue/ \
   && chmod -R a+rwx /opt/conda /opt/services/AlertaDengue/ /tmp \
   && chown deploy:deploy /opt/services/ /tmp \
-  && echo 'source /opt/conda/bin/activate alertadengue && exec "$@"' > /activate.sh \
-  && chmod +x /activate.sh \
-  && echo 'source activate "$ENV_NAME"' >  /home/deploy/.bashrc
+  && echo 'source /opt/conda/bin/activate "$ENV_NAME" && exec "$@"' > /activate.sh \
+  && echo 'source activate "$ENV_NAME"' >  /home/deploy/.bashrc \
+  # Export ENV variables to use in Crontab
+  && printenv | sed 's/^\(.*\)$/export \1/g' >> /preload.sh \
+  && chmod +x /activate.sh
 
 ENV PATH "$PATH:/home/deploy/.local/bin"
 ENV PATH /opt/conda/envs/$ENV_NAME/bin:$PATH
+ENV PATH /opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 USER deploy
 
