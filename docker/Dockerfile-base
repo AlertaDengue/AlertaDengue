@@ -34,7 +34,6 @@ RUN addgroup --gid ${HOST_GID} deploy \
 
 ENV PATH "$PATH:/home/deploy/.local/bin"
 ENV PATH /opt/conda/envs/$ENV_NAME/bin:$PATH
-ENV PATH /opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 USER deploy
 
@@ -47,7 +46,7 @@ COPY --chown=deploy:deploy conda/environment.yaml /tmp/environment.yaml
 # Use environment to update the env alertadengue
 RUN mamba env create -n $ENV_NAME \
     --file /tmp/environment.yaml \
-  && cd /opt/services/AlertaDengue && poetry config virtualenvs.create false && poetry install --no-dev\
+  && cd /opt/services/AlertaDengue && poetry config virtualenvs.create false && poetry install --no-dev \
   && conda clean --all \
   && find /opt/conda/ -type f,l -name '*.a' -delete \
   && find /opt/conda/ -type f,l -name '*.pyc' -delete \

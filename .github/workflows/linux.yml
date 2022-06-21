@@ -35,6 +35,7 @@ env:
   EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
   HOST_UID: 1000
   HOST_GID: 1000
+  ENV: dev
 
 jobs:
   build:
