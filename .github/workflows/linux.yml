@@ -26,7 +26,7 @@ env:
   DOCKER_HOST_SHAPEFILES_DIR: /srv/deploy/shapefile
   DOCKER_HOST_TIFFS_DIR: /srv/deploy/tiffs
   DOCKER_HOST_LOG_DIR: /var/log/mapserver
-  DOCKER_HOST_INCIDENCE_MAPS: /srv/deploy/AlertaDengue/static/img/incidence_maps
+  DOCKER_HOST_INCIDENCE_MAPS: /opt/services/AlertaDengue/static/img/incidence_maps
   EMAIL_CONFIG: ${{ secrets.EMAIL_CONFIG }}
   EMAIL_PORT: 587
   EMAIL_CONNECTION_DEFAULT: 'outlook'
@@ -35,6 +35,7 @@ env:
   EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
   HOST_UID: 1000
   HOST_GID: 1000
+  ENV: dev
 
 jobs:
   build:

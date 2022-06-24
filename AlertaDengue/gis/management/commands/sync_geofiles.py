@@ -190,7 +190,7 @@ class Command(BaseCommand):
             else settings.STATIC_ROOT
         )
 
-        path_root = Path(settings.APPS_DIR) / SERVE_STATIC
+        path_root = Path(SERVE_STATIC)
 
         f_geojson_path = path_root / "geojson"
 
