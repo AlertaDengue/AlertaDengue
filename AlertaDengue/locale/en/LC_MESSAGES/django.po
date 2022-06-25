@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-13 11:49+0000\n"
+"POT-Creation-Date: 2022-06-25 11:48+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -136,8 +136,8 @@ msgid "epidêmico="
 msgstr "    Epidemic threshold="
 
 #: AlertaDengue/dados/charts/cities.py:130
-#: AlertaDengue/dados/charts/cities.py:302
-#: AlertaDengue/dados/charts/cities.py:380
+#: AlertaDengue/dados/charts/cities.py:312
+#: AlertaDengue/dados/charts/cities.py:390
 msgid "Período (Ano/Semana)"
 msgstr "Period: Year / Week"
 
@@ -149,37 +149,37 @@ msgstr "Incidence"
 msgid "Casos Notificados"
 msgstr "Reported cases"
 
-#: AlertaDengue/dados/charts/cities.py:224
-#: AlertaDengue/dados/charts/cities.py:243
-#: AlertaDengue/dados/charts/cities.py:266
-#: AlertaDengue/dados/charts/cities.py:285
+#: AlertaDengue/dados/charts/cities.py:221
+#: AlertaDengue/dados/charts/cities.py:242
+#: AlertaDengue/dados/charts/cities.py:269
+#: AlertaDengue/dados/charts/cities.py:290
 #: AlertaDengue/dados/templates/alert_state/epiyears.html:27
 msgid "Semana"
 msgstr "Week"
 
-#: AlertaDengue/dados/charts/cities.py:235
-#: AlertaDengue/dados/charts/cities.py:243
-#: AlertaDengue/dados/charts/cities.py:277
-#: AlertaDengue/dados/charts/cities.py:285
+#: AlertaDengue/dados/charts/cities.py:232
+#: AlertaDengue/dados/charts/cities.py:244
+#: AlertaDengue/dados/charts/cities.py:280
+#: AlertaDengue/dados/charts/cities.py:292
 msgid "Limiar favorável"
 msgstr "Favorable Threshold"
 
-#: AlertaDengue/dados/charts/cities.py:300
+#: AlertaDengue/dados/charts/cities.py:310
 msgid "Condições climáticas para transmissão"
 msgstr "Climatic conditions for transmission"
 
-#: AlertaDengue/dados/charts/cities.py:368
+#: AlertaDengue/dados/charts/cities.py:378
 #: AlertaDengue/dados/charts/states.py:58
 #: AlertaDengue/dados/charts/states.py:126
 msgid "Menções em tweets"
 msgstr "Mentions in tweets"
 
-#: AlertaDengue/dados/charts/cities.py:372
+#: AlertaDengue/dados/charts/cities.py:382
 #, python-brace-format
 msgid "Semana %{text} : %{y} Tweets"
 msgstr "Week %{text} : %{y} Tweets"
 
-#: AlertaDengue/dados/charts/cities.py:378
+#: AlertaDengue/dados/charts/cities.py:388
 #: AlertaDengue/dados/charts/states.py:85
 msgid "Menções na mídia social"
 msgstr "Mentions on social media"
@@ -233,8 +233,6 @@ msgstr "Number of cities"
 
 #: AlertaDengue/dados/charts/states.py:63
 #: AlertaDengue/dados/charts/states.py:78
-#, fuzzy, python-brace-format
-#| msgid "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
 msgid "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
 
@@ -331,6 +329,7 @@ msgid ""
 "Os serviços de AlertaDengue/Infodengue estão momentaneamente indisponíveis "
 "para manutenção programada."
 msgstr ""
+"AlertaDengue/InfoDengue services are momentarily unavailable for maintenance."
 
 #: AlertaDengue/dados/templates/about.html:4
 msgid "InfoDengue"
@@ -463,12 +462,12 @@ msgid ""
 "            indicadores de incidência que alimentam o InfoDengue."
 msgstr ""
 "These are notifiable diseases, that is, the health worker diagnosing a "
-"suspicious case needsto fill out a notification form that feeds a municipal "
-"database which is then consolidated atthe state level and finally, federally "
-"by the Ministry of Health. Only a fraction of these casesare laboratory "
-"confirmed, most receive final classification based on clinical and "
-"epidemiologicalcriteria. From the notified cases, the incidence indicators "
-"that feed the InfoDengue are calculated."
+"suspicious case needs to fill out a notification form that feeds a municipal "
+"database which is then consolidated at the state level and finally, "
+"federally by the Ministry of Health. Only a fraction of these cases are "
+"laboratory confirmed, most receive final classification based on clinical "
+"and epidemiological criteria. From the notified cases, the incidence "
+"indicators that feed the InfoDengue are calculated."
 
 #: AlertaDengue/dados/templates/about.html:78
 msgid "Dados meteorológicos:"
@@ -486,16 +485,16 @@ msgid ""
 "imagens de\n"
 "            satélite."
 msgstr ""
-"The transmission of arboviruses is greatly influenced by the climate.The "
-"transmitting mosquito, Aedes aegypti, requires high temperature and "
-"humidityto reproduce and live. The virus infecting the mosquito will also "
-"reproduce betterat higher temperatures. Temperature and humidity data are "
-"obtained from<a href=\"https://estacoes.dengue.mat.br/\"> airport weather "
-"stations</a> as well as satellite images."
+"The transmission of arboviruses is greatly influenced by the climate. The "
+"transmitting mosquito, Aedes aegypti, requires high temperature and humidity "
+"to reproduce and live. The virus infecting the mosquito will also reproduce "
+"better at higher temperatures. Temperature and humidity data are obtained "
+"from<a href=\"https://estacoes.dengue.mat.br/\"> airport weather stations</"
+"a> as well as satellite images."
 
 #: AlertaDengue/dados/templates/about.html:84
 msgid "Dados de menção à dengue nas redes sociais:"
-msgstr "Mention analysis of dengue in social networks"
+msgstr "Mention analysis of dengue in social networks:"
 
 #: AlertaDengue/dados/templates/about.html:84
 msgid ""
@@ -510,9 +509,9 @@ msgid ""
 "            geolocalizadas quanto à menção de sintomas de dengue."
 msgstr ""
 " People generally seek information or tell about their health status on "
-"social networksbefore seeking medical help. Thus, knowing the number of "
-"mentions of dengue in socialnetworks helps to identify when cases are "
-"increasing in the population.Infodengue has partnered with the <a href="
+"social networks before seeking medical help. Thus, knowing the number of "
+"mentions of dengue in social networks helps to identify when cases are "
+"increasing in the population. Infodengue has partnered with the <a href="
 "\"https://www.observatorio.inweb.org.br\">Dengue Observatory </a>hat "
 "captures and analyzes tweets from geolocalized people for the mention of "
 "dengue symptoms."
@@ -538,7 +537,7 @@ msgstr "What to do"
 
 #: AlertaDengue/dados/templates/about.html:96
 msgid "Correção do atraso de notificação (nowcasting):"
-msgstr "Nowcasting"
+msgstr "Nowcasting:"
 
 #: AlertaDengue/dados/templates/about.html:97
 msgid ""
@@ -586,7 +585,7 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:112
 msgid "Detecção de transmissão sustentada:"
-msgstr "Sustained Transmission Detection"
+msgstr "Sustained Transmission Detection:"
 
 #: AlertaDengue/dados/templates/about.html:112
 msgid ""
@@ -615,7 +614,7 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:119
 msgid "Análise de receptividade:"
-msgstr "Receptivity Analysis"
+msgstr "Receptivity Analysis:"
 
 #: AlertaDengue/dados/templates/about.html:119
 #, python-format
@@ -644,7 +643,7 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:124
 msgid "Análise de menção a dengue nas redes sociais:"
-msgstr "Mention analysis of dengue in social networks"
+msgstr "Mention analysis of dengue in social networks:"
 
 #: AlertaDengue/dados/templates/about.html:124
 msgid ""
@@ -670,11 +669,10 @@ msgstr ""
 "Method (MEM)"
 
 #: AlertaDengue/dados/templates/about.html:130
-#, python-format
 msgid ""
 "que permite estimar\n"
 "            diversas grandezas de interesse com base em dados históricos "
-"locais como limiar pré- epidêmico, níveis de atividade típicas, valores "
+"locais como limiar pré-epidêmico, níveis de atividade típicas, valores "
 "esperados para\n"
 "            cada semana, etc. Como este limiar é obtido a partir do "
 "histórico de dados que alimenta o sistema, ele tem valores particulares para "
@@ -711,7 +709,7 @@ msgstr ""
 "evolution based on the median of expected cases for each week and lower and "
 "upper confidence \n"
 "            intervals (we use 10%% and 90%%, respectively), defining "
-"activity corridors. as a control diagram.\n"
+"activity corridors as a control diagram.\n"
 "            "
 
 #: AlertaDengue/dados/templates/about.html:139
@@ -790,7 +788,7 @@ msgstr "Related Videos"
 
 #: AlertaDengue/dados/templates/about.html:202
 msgid "Entenda o modelo mais usado para representar a pandemia de COVID-19"
-msgstr ""
+msgstr "See the most used model to represent the COVID-19 pandemic"
 
 #: AlertaDengue/dados/templates/about.html:212
 msgid "Curso PySUS - Aula 1"
@@ -1402,8 +1400,8 @@ msgid ""
 msgstr ""
 "The figure below shows the weather receptiveness indicator of the\n"
 " municipality for the transmission of arboviruses. When the indicator is\n"
-" above the threshold (horizontal line), environmental conditions exist\n"
-" favorable to viral transmission. That means attention needs be\n"
+" above the threshold (horizontal line), the environmental conditions are \n"
+" favorable to viral transmission. That means attention needs to be\n"
 " augmented for the possible sustained circulation of arboviruses and for "
 "the\n"
 "vector control implementation"
@@ -1424,7 +1422,7 @@ msgid ""
 "    esse indicador é mais sensivel para detectar dengue do que outras\n"
 "    arboviroses"
 msgstr ""
-"The Figure below shows the time series of notified cases of \n"
+"The figure below shows the time series of notified cases of \n"
 "arboviruses in the last week. The mention curve refers to \n"
 "intensity of mention of symptoms of arboviruses and presence of \n"
 "mosquitoes according to the population of the municipality using \n"
@@ -1829,7 +1827,7 @@ msgstr "Index"
 
 #: AlertaDengue/dados/templates/report_state.html:199
 msgid "Regional"
-msgstr ""
+msgstr "Regional"
 
 #: AlertaDengue/dados/templates/report_state.html:212
 msgid ""
@@ -1897,14 +1895,14 @@ msgid ""
 "          arboviroses"
 msgstr ""
 "\n"
-"The Figure below shows the time series of notified cases of \n"
+"The figure below shows the time series of notified cases of \n"
 "arboviruses in the last week. The mention curve refers to \n"
-"intensity of mention of symptoms of arboviruses and presence of \n"
-"mosquitoes according to the population of the municipality using \n"
-"social networks. This indicator, which is most effective in cities \n"
-"larger, should be seen as an aid in the early detection of \n"
-"increase in cases. Currently, this indicator is more sensitivefor\n"
-"detect dengue than other arboviruses"
+"the intensity of reported symptoms of arboviruses and mosquitoes \n"
+"presence on social networks, according to the municipal population. \n"
+"This indicator, which is most effective in larger \n"
+"cities, should be seen as an aid in the early detection of \n"
+"increase in cases. Currently, this indicator is more sensitive \n"
+"detecting dengue than other arboviruses"
 
 #: AlertaDengue/dados/templates/report_state.html:407
 #: AlertaDengue/dados/templates/services_api.html:205
@@ -1965,8 +1963,6 @@ msgid "ICmin"
 msgstr "ICmin"
 
 #: AlertaDengue/dados/templates/report_state.html:426
-#, fuzzy, python-format
-#| msgid "número mínimo de casos estimados (IC 95%%)"
 msgid "número mínimo de casos estimados (IC 95%%)"
 msgstr "Lower 95% confidence bounds for the estimated number of cases."
 
@@ -1975,8 +1971,6 @@ msgid "ICmax"
 msgstr "ICmax"
 
 #: AlertaDengue/dados/templates/report_state.html:429
-#, fuzzy, python-format
-#| msgid "número máximo de casos estimados (IC 95%%)"
 msgid "número máximo de casos estimados (IC 95%%)"
 msgstr "Upper 95% confidence bounds for the estimated number of cases."
 
@@ -2184,7 +2178,6 @@ msgid "cases_est_min and cases_est_max"
 msgstr "cases_est_min and cases_est_max"
 
 #: AlertaDengue/dados/templates/services_api.html:207
-#, fuzzy, python-format
 #| msgid "Intervalo de credibilidade de 95%% do número estimado de casos"
 msgid "Intervalo de credibilidade de 95%% do número estimado de casos"
 msgstr "95% credible interval of the estimated number of cases"
@@ -2670,7 +2663,7 @@ msgstr "Incidence"
 
 #: AlertaDengue/dbf/forms.py:25
 msgid "Nome do município (opcional)"
-msgstr ""
+msgstr "City name"
 
 #: AlertaDengue/dbf/forms.py:42
 msgid "Houve um erro durante o envio do arquivo. Por favor, tente novamente."
@@ -2687,6 +2680,7 @@ msgstr "Invalid DBF file"
 #: AlertaDengue/dbf/sinan.py:168
 msgid "Existem nesse arquivo notificações que não incluem a coluna ID_AGRAVO."
 msgstr ""
+"There are notifications that don't include the ID_AGRAVO column in this file."
 
 #: AlertaDengue/dbf/templates/dbf_upload.html:66
 msgid "Envie aqui os dados atualizados do SINAN"
@@ -2724,11 +2718,6 @@ msgstr ""
 "This file does not contain {}, which is expected in a valid SINAN file."
 
 #: AlertaDengue/dbf/views.py:53
-#, fuzzy
-#| msgid ""
-#| "O arquivo {} exportado em {:%d/%m/%Y} com notificações do ano {} foi "
-#| "enviado com sucesso. Você será informado por email ({}) assim que o "
-#| "processo de importação for finalizado, "
 msgid ""
 "\n"
 "            O arquivo {dbf.file.name} exportado em {dbf.export_date:%d/%m/"
@@ -2739,6 +2728,7 @@ msgid ""
 "            importação for finalizado,\n"
 "            "
 msgstr ""
+"\n"
 "The file {} exported in {:% d /% m /% Y} with notifications of the year {} "
 "was sent successfully. You will be informed by email ({}) once the import "
 "process is completed, "
@@ -2769,11 +2759,11 @@ msgstr "Commit ID (github)"
 
 #: AlertaDengue/forecast/models.py:68
 msgid "Data Inicio"
-msgstr ""
+msgstr "Start date"
 
 #: AlertaDengue/forecast/models.py:73
 msgid "Data Final"
-msgstr ""
+msgstr "End date"
 
 #: AlertaDengue/forecast/models.py:78
 msgid "Está ativo?"
@@ -2809,11 +2799,11 @@ msgstr "Forecast cases"
 
 #: AlertaDengue/templates/base.html:62
 msgid "Início"
-msgstr "Start"
+msgstr "Home"
 
 #: AlertaDengue/templates/base.html:64
 msgid "Sobre nós"
-msgstr ""
+msgstr "About us"
 
 #: AlertaDengue/templates/base.html:78
 msgid "Encontre um município"
@@ -3000,7 +2990,7 @@ msgstr "Thank you for use InfoDengue"
 #~ msgstr ""
 #~ "\n"
 #~ " In 2021, the system gained national breadth with the support of the "
-#~ "Brazilian Health Ministry  performing analysis at the state level.  As a "
+#~ "Brazilian Health Ministry  performing analysis at the state level. As a "
 #~ "result, more Health Department began to receive weekly InfoDengue "
 #~ "bulletins. Implemented in 2015,  the system was developed by researchers "
 #~ "from the Scientific Computing Program(Fundação Oswaldo Cruz, RJ)  and the "
