@@ -1,7 +1,12 @@
-﻿-- Materialized View: public.uf_total_zika_view
-
+﻿--
+-- Materialized View: public.uf_total_zika_view
+--
+-- DROP MATERIALIZED VIEW
+--
 DROP MATERIALIZED VIEW IF EXISTS public.uf_total_zika_view;
-
+--
+-- CREATE MATERIALIZED VIEW
+--
 CREATE MATERIALIZED VIEW public.uf_total_zika_view AS
  SELECT "Municipio".uf,
     "Historico_alerta_zika"."data_iniSE" AS data,
@@ -13,3 +18,10 @@ CREATE MATERIALIZED VIEW public.uf_total_zika_view AS
   GROUP BY "Historico_alerta_zika"."data_iniSE", "Municipio".uf
   ORDER BY "Municipio".uf, "Historico_alerta_zika"."data_iniSE"
 WITH DATA;
+--
+--  CREATE INDEX: public.uf_total_zika_view_data_idx
+--
+CREATE INDEX uf_total_zika_view_data_idx
+  ON public.uf_total_zika_view
+  USING btree
+  (data);

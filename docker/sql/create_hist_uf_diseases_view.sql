@@ -1,10 +1,15 @@
--- Materialized View: public.uf_total_view
+--
 -- DISEASE: DENGUE
--- CREATE VIEW vista AS SELECT 'Hello World';
-
+-- Materialized View: public.hist_uf_dengue_materialized_view
+--
+-- DROP MATERIALIZED VIEW
+--
 DROP MATERIALIZED
 VIEW
 IF EXISTS public.hist_uf_dengue_materialized_view CASCADE;
+--
+-- CREATE MATERIALIZED VIEW
+--
 CREATE MATERIALIZED VIEW public.hist_uf_dengue_materialized_view
 AS
 SELECT upper(state.uf) AS state_abbv, city.uf AS state_name,
@@ -25,9 +30,23 @@ WHERE alerta."data_iniSE" >= (
             AS max_date FROM "Municipio"."Historico_alerta" AS alerta
         )
 ORDER BY alerta."data_iniSE";
+--
+-- CREATE INDEX: public.hist_uf_dengue_gc_idx
+--
+CREATE INDEX hist_uf_dengue_gc_idx ON public.hist_uf_dengue_materialized_view USING btree (municipio_geocodigo);
 
+
+--
+-- DISEASE: CHIKUNGUNYA
+-- Materialized View: public.hist_uf_chik_materialized_view
+--
+-- DROP MATERIALIZED VIEW
+--
 DROP MATERIALIZED VIEW
 IF EXISTS public.hist_uf_chik_materialized_view CASCADE;
+--
+-- CREATE MATERIALIZED VIEW
+--
 CREATE MATERIALIZED VIEW public.hist_uf_chik_materialized_view
 AS
 SELECT upper(state.uf) AS state_abbv, city.uf AS state_name,
@@ -48,9 +67,22 @@ WHERE alerta."data_iniSE" >= (
             AS max_date FROM "Municipio"."Historico_alerta_chik" AS alerta
         )
 ORDER BY alerta."data_iniSE";
+--
+-- CREATE INDEX: public.hist_uf_chik_gc_idx
+--
+CREATE INDEX hist_uf_chik_gc_idx ON public.hist_uf_chik_materialized_view USING btree (municipio_geocodigo);
 
+--
+-- DISEASE: ZIKA
+-- Materialized View: public.hist_uf_zika_materialized_view
+--
+-- DROP MATERIALIZED VIEW
+--
 DROP MATERIALIZED VIEW
 IF EXISTS public.hist_uf_zika_materialized_view CASCADE;
+--
+-- CREATE MATERIALIZED VIEW
+--
 CREATE MATERIALIZED VIEW public.hist_uf_zika_materialized_view
 AS
 SELECT upper(state.uf) AS state_abbv, city.uf AS state_name,
@@ -71,3 +103,7 @@ WHERE alerta."data_iniSE" >= (
             AS max_date FROM "Municipio"."Historico_alerta_zika" AS alerta
         )
 ORDER BY alerta."data_iniSE";
+--
+-- CREATE INDEX: public.hist_uf_zika_gc_idx
+--
+CREATE INDEX hist_uf_zika_gc_idx ON public.hist_uf_zika_materialized_view USING btree (municipio_geocodigo);
