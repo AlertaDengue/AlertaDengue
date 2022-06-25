@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-13 11:49+0000\n"
+"POT-Creation-Date: 2022-06-25 11:48+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -92,7 +92,7 @@ msgstr "Red Level"
 #: AlertaDengue/dados/charts/cities.py:42
 #: AlertaDengue/dados/charts/cities.py:65
 msgid "limiar epidêmico"
-msgstr "epidemic threshold"
+msgstr "Epidemic threshold"
 
 #: AlertaDengue/dados/charts/cities.py:43
 #: AlertaDengue/dados/charts/cities.py:64
@@ -136,8 +136,8 @@ msgid "epidêmico="
 msgstr "    Epidemic threshold="
 
 #: AlertaDengue/dados/charts/cities.py:130
-#: AlertaDengue/dados/charts/cities.py:302
-#: AlertaDengue/dados/charts/cities.py:380
+#: AlertaDengue/dados/charts/cities.py:312
+#: AlertaDengue/dados/charts/cities.py:390
 msgid "Período (Ano/Semana)"
 msgstr "Period: Year / Week"
 
@@ -149,37 +149,37 @@ msgstr "Incidence"
 msgid "Casos Notificados"
 msgstr "Reported cases"
 
-#: AlertaDengue/dados/charts/cities.py:224
-#: AlertaDengue/dados/charts/cities.py:243
-#: AlertaDengue/dados/charts/cities.py:266
-#: AlertaDengue/dados/charts/cities.py:285
+#: AlertaDengue/dados/charts/cities.py:221
+#: AlertaDengue/dados/charts/cities.py:242
+#: AlertaDengue/dados/charts/cities.py:269
+#: AlertaDengue/dados/charts/cities.py:290
 #: AlertaDengue/dados/templates/alert_state/epiyears.html:27
 msgid "Semana"
 msgstr "Week"
 
-#: AlertaDengue/dados/charts/cities.py:235
-#: AlertaDengue/dados/charts/cities.py:243
-#: AlertaDengue/dados/charts/cities.py:277
-#: AlertaDengue/dados/charts/cities.py:285
+#: AlertaDengue/dados/charts/cities.py:232
+#: AlertaDengue/dados/charts/cities.py:244
+#: AlertaDengue/dados/charts/cities.py:280
+#: AlertaDengue/dados/charts/cities.py:292
 msgid "Limiar favorável"
 msgstr "Favorable Threshold"
 
-#: AlertaDengue/dados/charts/cities.py:300
+#: AlertaDengue/dados/charts/cities.py:310
 msgid "Condições climáticas para transmissão"
 msgstr "Climatic conditions for transmission"
 
-#: AlertaDengue/dados/charts/cities.py:368
+#: AlertaDengue/dados/charts/cities.py:378
 #: AlertaDengue/dados/charts/states.py:58
 #: AlertaDengue/dados/charts/states.py:126
 msgid "Menções em tweets"
 msgstr "Mentions in tweets"
 
-#: AlertaDengue/dados/charts/cities.py:372
+#: AlertaDengue/dados/charts/cities.py:382
 #, python-brace-format
 msgid "Semana %{text} : %{y} Tweets"
 msgstr "Week %{text} : %{y} Tweets"
 
-#: AlertaDengue/dados/charts/cities.py:378
+#: AlertaDengue/dados/charts/cities.py:388
 #: AlertaDengue/dados/charts/states.py:85
 msgid "Menções na mídia social"
 msgstr "Mentions on social media"
@@ -233,8 +233,6 @@ msgstr "Number of cities"
 
 #: AlertaDengue/dados/charts/states.py:63
 #: AlertaDengue/dados/charts/states.py:78
-#, fuzzy, python-brace-format
-#| msgid "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
 msgid "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
 
@@ -465,11 +463,11 @@ msgid ""
 msgstr ""
 "These are notifiable diseases, that is, the health worker diagnosing a "
 "suspicious case needs to fill out a notification form that feeds a municipal "
-"database which is then consolidated at the state level and finally, federally "
-"by the Ministry of Health. Only a fraction of these cases are laboratory "
-"confirmed, most receive final classification based on clinical and "
-"epidemiological criteria. From the notified cases, the incidence indicators "
-"that feed the InfoDengue are calculated."
+"database which is then consolidated at the state level and finally, "
+"federally by the Ministry of Health. Only a fraction of these cases are "
+"laboratory confirmed, most receive final classification based on clinical "
+"and epidemiological criteria. From the notified cases, the incidence "
+"indicators that feed the InfoDengue are calculated."
 
 #: AlertaDengue/dados/templates/about.html:78
 msgid "Dados meteorológicos:"
@@ -488,11 +486,11 @@ msgid ""
 "            satélite."
 msgstr ""
 "The transmission of arboviruses is greatly influenced by the climate. The "
-"transmitting mosquito, Aedes aegypti, requires high temperature and "
-"humidity to reproduce and live. The virus infecting the mosquito will also "
-"reproduce better at higher temperatures. Temperature and humidity data are "
-"obtained from<a href=\"https://estacoes.dengue.mat.br/\"> airport weather "
-"stations</a> as well as satellite images."
+"transmitting mosquito, Aedes aegypti, requires high temperature and humidity "
+"to reproduce and live. The virus infecting the mosquito will also reproduce "
+"better at higher temperatures. Temperature and humidity data are obtained "
+"from<a href=\"https://estacoes.dengue.mat.br/\"> airport weather stations</"
+"a> as well as satellite images."
 
 #: AlertaDengue/dados/templates/about.html:84
 msgid "Dados de menção à dengue nas redes sociais:"
@@ -671,7 +669,6 @@ msgstr ""
 "Method (MEM)"
 
 #: AlertaDengue/dados/templates/about.html:130
-#, python-format
 msgid ""
 "que permite estimar\n"
 "            diversas grandezas de interesse com base em dados históricos "
@@ -2181,7 +2178,6 @@ msgid "cases_est_min and cases_est_max"
 msgstr "cases_est_min and cases_est_max"
 
 #: AlertaDengue/dados/templates/services_api.html:207
-#, fuzzy, python-format
 #| msgid "Intervalo de credibilidade de 95%% do número estimado de casos"
 msgid "Intervalo de credibilidade de 95%% do número estimado de casos"
 msgstr "95% credible interval of the estimated number of cases"
@@ -2683,7 +2679,8 @@ msgstr "Invalid DBF file"
 
 #: AlertaDengue/dbf/sinan.py:168
 msgid "Existem nesse arquivo notificações que não incluem a coluna ID_AGRAVO."
-msgstr "There are notifications that don't include the ID_AGRAVO column in this file."
+msgstr ""
+"There are notifications that don't include the ID_AGRAVO column in this file."
 
 #: AlertaDengue/dbf/templates/dbf_upload.html:66
 msgid "Envie aqui os dados atualizados do SINAN"
@@ -2721,11 +2718,6 @@ msgstr ""
 "This file does not contain {}, which is expected in a valid SINAN file."
 
 #: AlertaDengue/dbf/views.py:53
-#, fuzzy
-#| msgid ""
-#| "O arquivo {} exportado em {:%d/%m/%Y} com notificações do ano {} foi "
-#| "enviado com sucesso. Você será informado por email ({}) assim que o "
-#| "processo de importação for finalizado, "
 msgid ""
 "\n"
 "            O arquivo {dbf.file.name} exportado em {dbf.export_date:%d/%m/"
@@ -2736,6 +2728,7 @@ msgid ""
 "            importação for finalizado,\n"
 "            "
 msgstr ""
+"\n"
 "The file {} exported in {:% d /% m /% Y} with notifications of the year {} "
 "was sent successfully. You will be informed by email ({}) once the import "
 "process is completed, "
