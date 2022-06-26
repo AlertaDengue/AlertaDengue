@@ -1,24 +1,20 @@
 """
-Este módulo contem funções para interagir com o banco principal do projeto
- Alertadengue.
+This module contains functions to interact with the main database of the
+Alertadengue project.
 """
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 import ibis
 import numpy as np
 import pandas as pd
-from ad_main import settings
-
-# local
-from dados.episem import episem
+from django.conf import settings
 from django.core.cache import cache
-from ibis import config as cf
 from sqlalchemy import create_engine
 
-with cf.config_prefix("sql"):
-    cf.set_option("default_limit", None)
+# local
+from .episem import episem
 
 PSQL_URI = "postgresql://{}:{}@{}:{}/{}".format(
     settings.PSQL_USER,
@@ -99,15 +95,14 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
         Dataframe
     """
 
-    # Connect table by disease
-    _disease = get_disease_suffix(disease, empty_for_dengue=False)
-    table_hist_uf = con.table(f"hist_uf{_disease}_materialized_view")
-
     cache_name = "data_hist" + "_" + str(state_abbv) + "_" + str(disease)
 
     res = cache.get(cache_name)
 
     if res is None:
+        _disease = get_disease_suffix(disease, empty_for_dengue=False)
+        table_hist_uf = con.table(f"hist_uf{_disease}_materialized_view")
+
         res = (
             table_hist_uf[table_hist_uf.state_abbv == state_abbv]
             .sort_by("SE")
@@ -123,37 +118,13 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
     return res
 
 
-def get_epi_week_expr() -> Callable:
-    """
-    Return a UDF expression for epi_week function.
-    Returns
-    -------
-    Callable
-    """
-    return ibis.postgres.udf.existing_udf(
-        "epi_week", input_types=["date"], output_type="int64"
-    )
-
-
-def get_epiweek2date_expr() -> Callable:
-    """
-    Return a UDF expression for epiweek2date
-    Returns
-    -------
-    Callable
-    """
-    return ibis.postgres.udf.existing_udf(
-        "epiweek2date", input_types=["int64"], output_type="date"
-    )
-
-
 class RegionalParameters:
-    schema_dglob = con.schema("Dengue_global")
-    t_parameters = schema_dglob.table("parameters")
-    t_municipio = schema_dglob.table("Municipio")
-    t_estado = schema_dglob.table("estado")
-    t_regional = schema_dglob.table("regional")
-    t_regional_s = schema_dglob.table("regional_saude")
+
+    DB = settings.PSQL_DB
+    t_parameters = con.table("parameters", DB, "Dengue_global")
+    t_municipio = con.table("Municipio", DB, "Dengue_global")
+    t_estado = con.table("estado", DB, "Dengue_global")
+    t_regional = con.table("regional", DB, "Dengue_global")
 
     @classmethod
     def get_regional_names(cls, state_name: str) -> list:
@@ -322,7 +293,6 @@ class RegionalParameters:
         station_filter = (cls.t_parameters["cid10"] == CID10.get(disease)) & (
             cls.t_parameters["municipio_geocodigo"] == geocode
         )
-
         climate_expr = (
             cls.t_parameters[climate_keys].filter(station_filter).execute()
         )
@@ -1208,8 +1178,9 @@ class ReportCity:
         if disease != "dengue":
             table_suffix = get_disease_suffix(disease)  # F'_{disease}'
 
-        schema_city = con.schema("Municipio")
-        t_hist = schema_city.table(f"Historico_alerta{table_suffix}")
+        t_hist = con.table(
+            f"Historico_alerta{table_suffix}", settings.PSQL_DB, "Municipio"
+        )
 
         # 200 = 2 years
         ew_end = year_week
@@ -1250,9 +1221,8 @@ class ReportCity:
 
         return (
             t_hist_proj[hist_keys]
-            .sort_by(("SE", True))
-            .execute()
-            .set_index("SE")
+            # .sort_by(("SE", True))
+            .execute().set_index("SE")
         )
 
 
@@ -1260,344 +1230,77 @@ class ReportState:
     """Report State class."""
 
     @classmethod
-    def _get_hist_disease_expr(
+    def read_disease_data(
         cls,
         disease: str,
-        geocodes: List[int],
-        year_week_start: int,
-        year_week_end: int,
+        geocodes: int,
+        year_week: int,
     ) -> ibis.expr.types.Expr:
         """
         Return an ibis expression with the history for a given disease.
         Parameters
         ----------
         disease : str, {'dengue', 'chik', 'zika'}
-        geocodes : List[int]
-        year_week_start : int
+        geocode : int
+        year_week : int
             The starting Year/Week, e.g.: 202002
-        year_week_end : int
-            The ending Year/Week, e.g.: 202005
         Returns
         -------
         ibis.expr.types.Expr
         """
+
+        if disease not in CID10.keys():
+            raise Exception(
+                f"The diseases available are: {[k for k in CID10.keys()]}"
+            )
+
         table_suffix = ""
         if disease != "dengue":
-            table_suffix = "_{}".format(disease)
+            table_suffix = get_disease_suffix(disease)  # F'_{disease}'
 
-        schema_city = con.schema("Municipio")
-        t_hist = schema_city.table("Historico_alerta{}".format(table_suffix))
+        t_hist = con.table(
+            f"Historico_alerta{table_suffix}", settings.PSQL_DB, "Municipio"
+        )
 
-        case_level = (
+        # 200 = 2 years
+        ew_end = year_week
+        ew_start = ew_end - 200
+
+        t_hist_filter_bol = (t_hist["SE"].between(ew_start, ew_end)) & (
+            t_hist["municipio_geocodigo"].isin(geocodes)
+        )
+
+        t_hist_proj = t_hist.filter(t_hist_filter_bol).limit(200)
+
+        nivel = (
             ibis.case()
-            .when((t_hist.nivel.cast("string") == "1"), "verde")
-            .when((t_hist.nivel.cast("string") == "2"), "amarelo")
-            .when((t_hist.nivel.cast("string") == "3"), "laranja")
-            .when((t_hist.nivel.cast("string") == "4"), "vermelho")
+            .when((t_hist_proj.nivel.cast("string") == "1"), "verde")
+            .when((t_hist_proj.nivel.cast("string") == "2"), "amarelo")
+            .when((t_hist_proj.nivel.cast("string") == "3"), "laranja")
+            .when((t_hist_proj.nivel.cast("string") == "4"), "vermelho")
             .else_("-")
             .end()
-        ).name(f"nivel_{disease}")
+        ).name("nivel")
 
         hist_keys = [
-            t_hist.SE.name(f"SE_{disease}"),
-            t_hist.casos.name(f"casos_{disease}"),
-            t_hist.p_rt1.name(f"p_rt1_{disease}"),
-            t_hist.casos_est.name(f"casos_est_{disease}"),
-            t_hist.p_inc100k.name(f"p_inc100k_{disease}"),
-            t_hist.nivel.name(f"level_code_{disease}"),
-            case_level,
-            t_hist.municipio_geocodigo.name(f"geocode_{disease}"),
+            t_hist_proj.SE.name("SE"),
+            t_hist_proj.casos.name("casos notif."),
+            t_hist_proj.casos_est.name("casos_est"),
+            t_hist_proj.p_inc100k.name("incidência"),
+            t_hist_proj.p_rt1.name("pr(incid. subir)"),
+            t_hist_proj.tweet.name("tweet"),
+            t_hist_proj.tempmin.name("temp.min"),
+            t_hist_proj.tempmed.name("temp.med"),
+            t_hist_proj.tempmax.name("temp.max"),
+            t_hist_proj.umidmin.name("umid.min"),
+            t_hist_proj.umidmed.name("umid.med"),
+            t_hist_proj.umidmax.name("umid.max"),
+            nivel,
+            t_hist_proj.nivel.name("level_code"),
         ]
-
-        hist_filter = (
-            t_hist["SE"].between(year_week_start, year_week_end)
-        ) & (t_hist["municipio_geocodigo"].isin(geocodes))
-
-        return t_hist[hist_filter][hist_keys].sort_by(f"SE_{disease}")
-
-    @classmethod
-    def _get_twitter_expr(
-        cls, geocodes_list: List[int], year_week_start: int, year_week_end: int
-    ) -> ibis.expr.types.Expr:
-        """
-        Return a twitter expression for given parameters.
-        Parameters
-        ----------
-        geocodes_list : List[int]
-        year_week_start : int
-        year_week_end : int
-        Returns
-        -------
-        ibis.expr.types.Expr
-        """
-        schema_city = con.schema("Municipio")
-        epi_week_fn = get_epi_week_expr()
-
-        t_tweet = schema_city.table("Tweet")
-        filter_tweet_cities = t_tweet.Municipio_geocodigo.isin(geocodes_list)
-        t_tweet = t_tweet[filter_tweet_cities]
-        t_tweet = t_tweet.mutate(SE_twitter=epi_week_fn(t_tweet.data_dia))
-
-        expr_tweet = t_tweet.groupby(
-            [t_tweet.SE_twitter, t_tweet.Municipio_geocodigo]
-        ).aggregate(n_tweets=t_tweet.numero.sum())
-
-        filter_tweet = t_tweet.SE_twitter.between(
-            year_week_start, year_week_end
-        )
-
-        return expr_tweet[filter_tweet].sort_by(("SE_twitter", False))
-
-    @classmethod
-    def _get_climate_wu_expr(
-        cls, var_climate: str, station_id: str
-    ) -> ibis.expr.types.Expr:
-        """
-        Return an ibis expression for climate_wu for given parameters.
-        Parameters
-        ----------
-        var_climate : str, {'umid_max', 'temp_min'}
-        station_id : str
-        Returns
-        -------
-        ibis.expr.types.Expr
-        """
-        epi_week_fn = get_epi_week_expr()
-
-        schema_city = con.schema("Municipio")
-
-        t_climate_wu = schema_city.table("Clima_wu")
-
-        expr_filter = t_climate_wu.Estacao_wu_estacao_id == station_id
-        t_climate_wu = t_climate_wu[expr_filter]
-        t_climate_wu = t_climate_wu.mutate(
-            epiweek_climate=epi_week_fn(t_climate_wu.data_dia)
-        )
-
-        expr_climate_wu = t_climate_wu.groupby(
-            [t_climate_wu.epiweek_climate]
-        ).aggregate(
-            **{var_climate: t_climate_wu[var_climate].mean().name(var_climate)}
-        )
-
-        return expr_climate_wu.sort_by(t_climate_wu.epiweek_climate)
-
-    @classmethod
-    def _get_report_data(
-        cls,
-        geocodes_list: List[int],
-        year_week_start: int,
-        year_week_end: int,
-        var_climate: str,
-        station_id: str,
-    ) -> pd.DataFrame:
-        """Get Repor State Data.
-        Parameters
-        ----------
-        geocodes_list : List[int]
-        year_week_start : int
-            The starting Year/Week e.g.: 202002
-        year_week_end : int
-            The ending Year/Week e.g.: 202005
-        var_climate : str, {'umid_max', 'temp_min'}
-        station_id : str
-        Returns
-        -------
-        pd.DataFrame
-        """
-        hist_disease_expr = {}
-        hist_prev = None
-        joined_expr = None
-        previous_disease = None
-
-        for disease in DISEASES_SHORT:
-            hist_expr = cls._get_hist_disease_expr(
-                disease,
-                geocodes_list,
-                year_week_start,
-                year_week_end,
-            )
-            hist_disease_expr[disease] = hist_expr
-
-            if joined_expr is None:
-                joined_expr = hist_expr
-            else:
-                # todo: review join approach
-                hist_prev = hist_disease_expr[previous_disease]
-                joined_cond = (
-                    hist_prev[f"SE_{previous_disease}"]
-                    == hist_expr[f"SE_{disease}"]
-                ) & (
-                    hist_prev[f"geocode_{previous_disease}"]
-                    == hist_expr[f"geocode_{disease}"]
-                )
-                joined_expr = joined_expr.left_join(hist_expr, joined_cond)
-            previous_disease = disease
-
-        # twitter data
-        expr_tweet = cls._get_twitter_expr(
-            geocodes_list,
-            year_week_start,
-            year_week_end,
-        )
-        expr_dengue = hist_disease_expr["dengue"]
-
-        joined_expr = joined_expr.left_join(
-            expr_tweet,
-            (
-                (expr_tweet.Municipio_geocodigo == expr_dengue.geocode_dengue)
-                & (expr_tweet.SE_twitter == expr_dengue.SE_dengue)
-            ),
-        )
-
-        climate_wu_expr = cls._get_climate_wu_expr(var_climate, station_id)
-
-        joined_expr = joined_expr.left_join(
-            climate_wu_expr,
-            hist_disease_expr["dengue"].SE_dengue
-            == climate_wu_expr.epiweek_climate,
-        ).materialize()
-
-        epiweek2date_fn = get_epiweek2date_expr()
-
-        k = ["casos", "p_inc100k", "casos_est", "p_rt1", "nivel", "level_code"]
-        proj = [
-            joined_expr["{}_{}".format(v, d)]
-            for v in k
-            for d in DISEASES_SHORT
-        ]
-        proj.extend(
-            [
-                joined_expr[var_climate],
-                joined_expr["n_tweets"],
-                joined_expr["geocode_dengue"].name("geocode"),
-                joined_expr["SE_dengue"].name("SE"),
-                epiweek2date_fn(joined_expr.SE_dengue).name("init_date_week"),
-            ]
-        )
 
         return (
-            joined_expr[proj]
-            .sort_by(["SE", "geocode"])
-            .execute()
-            .set_index("SE", drop=False)
+            t_hist_proj[hist_keys]
+            # .sort_by(("SE", True))
+            .execute().set_index("SE")
         )
-
-    @classmethod
-    def _format_data(cls, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Format the data for plotting.
-        Parameters
-        ----------
-        df : pd.DataFrame
-        Returns
-        -------
-        pd.DataFrame
-        """
-        # make a copy
-        df = df.copy()
-        df.fillna(0, inplace=True)
-
-        if not df.empty:
-            dfs = []
-
-            # merge with a range date dataframe to keep empty week on the data
-            ts_date = pd.date_range(
-                df["init_date_week"].min(),
-                df["init_date_week"].max(),
-                freq="7D",
-            )
-            df_date = pd.DataFrame({"init_date_week": ts_date})
-
-            for geocode in df.geocode.unique():
-                df_ = df[df.geocode == geocode].sort_values("init_date_week")
-
-                df_date_ = df_date.set_index(
-                    df_.init_date_week.map(
-                        lambda x: int(episem(str(x)[:10], sep=""))
-                    ),
-                    drop=True,
-                )
-
-                df_.index.name = None
-                df_date_.index.name = None
-
-                df_["init_date_week"] = pd.to_datetime(
-                    df_["init_date_week"], errors="coerce"
-                )
-
-                dfs.append(
-                    pd.merge(
-                        df_,
-                        df_date_,
-                        how="outer",
-                        on="init_date_week",
-                    )
-                )
-
-            df = pd.concat(dfs)
-
-        df.sort_index(ascending=True, inplace=True)
-
-        for d in DISEASES_SHORT:
-            k = "p_rt1_{}".format(d)
-            df[k] = (df[k] * 100).fillna(0)
-            k = "casos_est_{}".format(d)
-            df[k] = df[k].fillna(0).round(0)
-            k = "p_inc100k_{}".format(d)
-            df[k] = df[k].fillna(0).round(0)
-
-            df.rename(
-                columns={
-                    "p_inc100k_{}".format(d): "incidência {}".format(d),
-                    "casos_{}".format(d): "casos notif. {}".format(d),
-                    "casos_est_{}".format(d): "casos est. {}".format(d),
-                    "p_rt1_{}".format(d): "pr(incid. subir) {}".format(d),
-                },
-                inplace=True,
-            )
-
-        df.n_tweets = df.n_tweets.fillna(0).round(0)
-
-        return df.rename(
-            columns={
-                "umid_max": "umid.max",
-                "temp_min": "temp.min",
-                "n_tweets": "tweets",
-            }
-        )
-
-    @classmethod
-    def read_disease_data(
-        cls,
-        cities: Dict[int, str],
-        station_id: str,
-        year_week: int,
-        var_climate: str,
-    ) -> pd.DataFrame:
-        """
-        Return a disease dataframe from given parameters.
-        Parameters
-        ----------
-        cities : dict[int, str]
-        station_id : str
-        year_week : int
-            The last Year/Week for searching reference.
-        var_climate : str, {'umid_max', 'temp_min'}
-        Returns
-        -------
-        pd.DataFrame
-        """
-        year_week_start = year_week - 100
-        year_week_end = year_week
-        geocodes_list = [v for v in cities]
-
-        df = cls._get_report_data(
-            geocodes_list=geocodes_list,
-            year_week_start=year_week_start,
-            year_week_end=year_week_end,
-            var_climate=var_climate,
-            station_id=station_id,
-        )
-
-        return cls._format_data(df)
