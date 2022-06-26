@@ -1,14 +1,13 @@
+from dados.dbdata import STATE_NAME
 from django import template
-
-from .. import dbdata
 
 register = template.Library()
 
 
 @register.inclusion_tag("components/home/collapse.html", takes_context=True)
 def collapse_component(context):
-    context["states_name"] = dbdata.STATE_NAME
-    context["states_abbv"] = list(dbdata.STATE_NAME.keys())
+    context["states_name"] = STATE_NAME
+    context["states_abbv"] = list(STATE_NAME.keys())
 
     return context
 

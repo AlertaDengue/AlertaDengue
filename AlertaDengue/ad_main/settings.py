@@ -312,7 +312,9 @@ RASTER_METEROLOGICAL_FACTOR_INCREASE = os.getenv(
 MEMCACHED_HOST = os.getenv("MEMCACHED_HOST")
 MEMCACHED_PORT = os.getenv("MEMCACHED_PORT")
 QUERY_CACHE_TIMEOUT = int(os.getenv("QUERY_CACHE_TIMEOUT"))
-
+CACHE_MIDDLEWARE_ALIAS = "default"
+CACHE_MIDDLEWARE_SECONDS = 600
+CACHE_MIDDLEWARE_KEY_PREFIX = "_"
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",

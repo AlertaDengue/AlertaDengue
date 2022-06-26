@@ -1,0 +1,23 @@
+{% load lookup %}
+{% load hashthis %}
+{% block content %}
+
+<div class="row justify-content-md-center">
+  <!-- Grid column -->
+  <div class="col-sm-12 mb-1 mb-xl-0">
+    <!-- Section: Live preview -->
+    <section>
+        <div class="container">
+            <div class="row">
+              <div class="">
+                {{ tweet_chart|lookup:'regional'| safe }}
+              </div>
+            </div>
+          </div>
+    </section>
+    <!-- Section: Live preview -->
+  </div>
+  <!-- Grid column -->
+</div>
+
+{% endblock %}

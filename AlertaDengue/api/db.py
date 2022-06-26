@@ -565,8 +565,11 @@ class AlertCity:
         if disease != "dengue" and disease != "zika":
             table_suffix = get_disease_suffix(disease)
 
-        schema_city = con.schema("Municipio")
-        t_hist = schema_city.table(f"Historico_alerta{table_suffix}")
+        # schema_city = con.schema("Municipio")
+        # t_hist = schema_city.table(f"Historico_alerta{table_suffix}")
+        t_hist = con.table(
+            f"Historico_alerta{table_suffix}", settings.PSQL_DB, "Municipio"
+        )
 
         if ew_start and ew_end:
             t_hist_filter_bol = (

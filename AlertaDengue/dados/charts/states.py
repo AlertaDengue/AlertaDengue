@@ -15,7 +15,8 @@ class ReportStateCharts:
 
     @classmethod
     def create_tweet_chart(
-        cls, df: pd.DataFrame, year_week: int, disease: str
+        cls,
+        df: pd.DataFrame,
     ) -> str:
         """
         Create chart with tweet information.
@@ -33,46 +34,31 @@ class ReportStateCharts:
             HTML with Plotly chart.
         """
         df = deepcopy(df)
-        ks_cases = ["casos notif. {}".format(disease)]
-
-        df_tweet = df.reset_index()[["SE", "tweets"] + ks_cases]
-        df_tweet = df_tweet[df_tweet.SE >= year_week - 200]
-        df_tweet.rename(columns={"tweets": "menções"}, inplace=True)
-
-        df_grp = (
-            df_tweet.groupby(df_tweet.SE)[["menções"] + ks_cases]
-            .sum()
-            .reset_index()
-        )
-
-        df_grp["SE"] = df_grp.SE.map(
-            lambda v: "%s/%s" % (str(v)[:4], str(v)[-2:])
-        )
 
         figure = make_subplots(specs=[[{"secondary_y": True}]])
 
         figure.add_trace(
             go.Scatter(
-                x=df_grp["SE"],
-                y=df_grp.iloc[:, 1],  # menções tweets
+                x=df.index.map(lambda v: "%s/%s" % (str(v)[:4], str(v)[-2:])),
+                y=df.iloc[:, 0],  # menções tweets
                 name=_("Menções em tweets"),
                 marker={"color": "rgb(51, 172, 255)"},
-                text=df_grp.SE.map(lambda v: "{}".format(str(v)[-2:])),
+                text=df.index.map(lambda v: "{}".format(str(v)[-2:])),
                 hoverinfo="text",
                 hovertemplate=_(
                     "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
                 ),
             ),
-            secondary_y=False,
+            # secondary_y=False,
         )
 
         figure.add_trace(
-            go.Scatter(
-                x=df_grp["SE"],
-                y=df_grp.iloc[:, 2],  # casos notif
-                name=_("Casos notificados"),
-                marker={"color": "rgb(255,150,0)"},
-                text=df_grp.SE.map(lambda v: "{}".format(str(v)[-2:])),
+            go.Bar(
+                x=df.index.map(lambda v: "%s/%s" % (str(v)[:4], str(v)[-2:])),
+                y=df.iloc[:, 1],  # casos notif
+                name=_("Casos notificados 1"),
+                marker={"color": "rgb(150,0,255)"},
+                text=df.index.map(lambda v: "{}".format(str(v)[-2:])),
                 hoverinfo="text",
                 hovertemplate=_(
                     "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
@@ -81,12 +67,41 @@ class ReportStateCharts:
             secondary_y=True,
         )
 
+        figure.add_trace(
+            go.Bar(
+                x=df.index.map(lambda v: "%s/%s" % (str(v)[:4], str(v)[-2:])),
+                y=df.iloc[:, 2],  # casos notif
+                name=_("Casos notificados 2"),
+                marker={"color": "rgb(255,150,0)"},
+                text=df.index.map(lambda v: "{}".format(str(v)[-2:])),
+                hoverinfo="text",
+                hovertemplate=_(
+                    "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
+                ),
+            ),
+            secondary_y=True,
+        )
+
+        figure.add_trace(
+            go.Bar(
+                x=df.index.map(lambda v: "%s/%s" % (str(v)[:4], str(v)[-2:])),
+                y=df.iloc[:, 3],  # casos notif
+                name=_("Casos notificados 3"),
+                marker={"color": "rgb(255,0,255)"},
+                text=df.index.map(lambda v: "{}".format(str(v)[-2:])),
+                hoverinfo="text",
+                hovertemplate=_(
+                    "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
+                ),
+            ),
+            secondary_y=True,
+        )
         figure.update_layout(
             title=_("Menções na mídia social"),
             xaxis=dict(
                 title=_("Período: Ano/Semana"),
                 tickangle=-60,
-                nticks=len(ks_cases) // 4,
+                # nticks=len(ks_cases) // 4,
                 showline=True,
                 showgrid=True,
                 showticklabels=True,
@@ -130,5 +145,4 @@ class ReportStateCharts:
             title_text="<b>{}</b>".format(_("Casos notificados")),
             secondary_y=True,
         )
-
         return figure.to_html()
