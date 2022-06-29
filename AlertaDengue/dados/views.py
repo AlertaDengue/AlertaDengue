@@ -6,11 +6,11 @@ import random
 from collections import OrderedDict, defaultdict
 from copy import deepcopy
 from pathlib import Path, PurePath
-from typing import Dict, List, Tuple
 
 import fiona
 import geojson
 import numpy as np
+import pandas as pd
 
 #
 from django.apps import apps
@@ -1377,7 +1377,7 @@ class ReportCityView(TemplateView):
         return context
 
 
-class ReportStateView(TemplateView):
+'''class ReportStateView(TemplateView):
     template_name = "report_state.html"
 
     def __init__(self, *args, **kwargs):
@@ -1418,10 +1418,6 @@ class ReportStateView(TemplateView):
                 state_name=STATE_NAME[state], regional_name=regional_name
             )
 
-            station_id, var_climate = RegionalParameters.get_var_climate_info(
-                cities.keys()
-            )
-
             df = ReportState.read_disease_data(
                 disease="dengue",
                 geocodes=cities.keys(),
@@ -1431,7 +1427,6 @@ class ReportStateView(TemplateView):
             last_year_week_ = df.index.max()
             if last_year_week is None or last_year_week_ > last_year_week:
                 last_year_week = last_year_week_
-            '''
             chart_cases_twitter = {}
 
             for d in diseases:
@@ -1452,7 +1447,6 @@ class ReportStateView(TemplateView):
 
                 chart_cases_twitter[d] = chart
 
-            '''
 
             notif = NotificationResume
             cities_alert = {}
@@ -1560,4 +1554,84 @@ class ReportStateView(TemplateView):
                 "diseases_name": ["Dengue", "Chikungunya", "Zika"],
             }
         )
+        return context
+'''
+
+
+class ReportStateView(TemplateView):
+    template_name = "report_state.html"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def raise_error(self, context, message):
+        """
+        :return:
+        """
+        self.template_name = "error.html"
+        context.update({"message": message})
+        return context
+
+    def get_data_chart(
+        self,
+        cities_by_geocodes: list,
+        year_week: int,
+        disease: str = "dengue",
+    ) -> pd:
+        """
+        Get regional data.
+        Parameters
+        ----------
+        regional_names : List[str]
+        state : str
+        year_week : int
+        diseases : List[str]
+        Returns
+        -------
+        Dataframe : data by regional name
+        """
+        df = ReportState.read_disease_data(
+            disease, list(cities_by_geocodes.keys()), year_week
+        )
+        last_year_week = df.index.max()
+        return df, last_year_week
+
+    def get_context_data(self, **kwargs):
+        """
+        :param kwargs:
+        :return:
+        """
+        context = super().get_context_data(**kwargs)
+        year_week = int(context["year_week"])
+        year, week = context["year_week"][:4], context["year_week"][-2:]
+        state = context["state"]
+
+        last_year_week = None
+
+        regional_info = ReportState.get_regional_info(state)
+
+        charts = {}
+
+        for k, v in regional_info.items():
+            df, last_year_week_ = self.get_data_chart(v, year_week)
+            charts[k] = df.to_html()
+
+        if last_year_week is None or last_year_week_ > last_year_week:
+            last_year_week = last_year_week_
+
+        last_year_week_s = str(last_year_week)
+        last_year = last_year_week_s[:4]
+        last_week = last_year_week_s[-2:]
+
+        context.update(
+            {
+                "year": year,
+                "week": week,
+                "last_year": last_year,
+                "last_week": last_week,
+                "state_name": STATE_NAME[state],
+                "charts": charts,
+            }
+        )
+
         return context

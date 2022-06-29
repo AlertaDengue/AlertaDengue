@@ -4,7 +4,7 @@ Alertadengue project.
 """
 from collections import defaultdict
 from datetime import datetime, timedelta
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import ibis
 import numpy as np
@@ -136,14 +136,31 @@ class RegionalParameters:
         -------
             list(iterable)
         """
+        cache_name = (
+            "regional_names_to" + "_" + str(state_name).replace(" ", "_")
+        )
+        res = cache.get(cache_name)
 
-        municipio_uf_filter = cls.t_municipio[cls.t_municipio.uf == state_name]
-        t_joined = cls.t_regional.join(municipio_uf_filter, cls.t_parameters)[
-            cls.t_regional.nome
-        ].distinct()
-        df_regional_names = t_joined.execute()
+        if res is None:
+            # print(f"add cache_name {cache_name}: ", res)
 
-        return df_regional_names["nome"].to_list()
+            municipio_uf_filter = cls.t_municipio[
+                cls.t_municipio.uf == state_name
+            ]
+            t_joined = cls.t_regional.join(
+                municipio_uf_filter, cls.t_parameters
+            )[cls.t_regional.nome].distinct()
+            df_regional_names = t_joined.execute()
+
+            res = df_regional_names["nome"].to_list()
+
+            cache.set(
+                cache_name,
+                res,
+                settings.QUERY_CACHE_TIMEOUT,
+            )
+
+        return res
 
     @classmethod
     def get_var_climate_info(cls, geocodes: list) -> Tuple[str]:
@@ -939,7 +956,7 @@ class NotificationResume:
 
 class Forecast:
     @staticmethod
-    def get_min_max_date(geocode: int, cid10: str) -> (str, str):
+    def get_min_max_date(geocode: int, cid10: str) -> (str):
         """
         :param geocode:
         :param cid10:
@@ -1233,7 +1250,7 @@ class ReportState:
     def read_disease_data(
         cls,
         disease: str,
-        geocodes: int,
+        geocodes: list,
         year_week: int,
     ) -> ibis.expr.types.Expr:
         """
@@ -1241,7 +1258,7 @@ class ReportState:
         Parameters
         ----------
         disease : str, {'dengue', 'chik', 'zika'}
-        geocode : int
+        geocodes : list[int]
         year_week : int
             The starting Year/Week, e.g.: 202002
         Returns
@@ -1263,10 +1280,9 @@ class ReportState:
         )
 
         # 200 = 2 years
-        ew_end = year_week
-        ew_start = ew_end - 200
+        ew_start = year_week - 200
 
-        t_hist_filter_bol = (t_hist["SE"].between(ew_start, ew_end)) & (
+        t_hist_filter_bol = (t_hist["SE"].between(ew_start, year_week)) & (
             t_hist["municipio_geocodigo"].isin(geocodes)
         )
 
@@ -1286,21 +1302,69 @@ class ReportState:
             t_hist_proj.SE.name("SE"),
             t_hist_proj.casos.name("casos notif."),
             t_hist_proj.casos_est.name("casos_est"),
-            t_hist_proj.p_inc100k.name("incidência"),
-            t_hist_proj.p_rt1.name("pr(incid. subir)"),
+            # t_hist_proj.p_inc100k.name("incidência"),
+            # t_hist_proj.p_rt1.name("pr(incid. subir)"),
             t_hist_proj.tweet.name("tweet"),
-            t_hist_proj.tempmin.name("temp.min"),
-            t_hist_proj.tempmed.name("temp.med"),
-            t_hist_proj.tempmax.name("temp.max"),
-            t_hist_proj.umidmin.name("umid.min"),
-            t_hist_proj.umidmed.name("umid.med"),
-            t_hist_proj.umidmax.name("umid.max"),
+            # t_hist_proj.tempmin.name("temp.min"),
+            # t_hist_proj.tempmed.name("temp.med"),
+            # t_hist_proj.tempmax.name("temp.max"),
+            # t_hist_proj.umidmin.name("umid.min"),
+            # t_hist_proj.umidmed.name("umid.med"),
+            # t_hist_proj.umidmax.name("umid.max"),
             nivel,
             t_hist_proj.nivel.name("level_code"),
         ]
 
         return (
             t_hist_proj[hist_keys]
-            # .sort_by(("SE", True))
-            .execute().set_index("SE")
+            .sort_by(("SE", False))
+            .execute()
+            .set_index("SE")
         )
+
+    @classmethod
+    def get_regional_info(
+        self,
+        state: str,
+        # diseases: List[str],
+    ) -> Tuple[Dict[str, Dict], str]:
+        """
+        Get regional information.
+        Parameters
+        ----------
+        regional_names : List[str]
+        state : str
+        year_week : int
+        diseases : List[str]
+        Returns
+        -------
+        Tuple[Dict[str, Dict], str]
+        """
+        cache_name = "cities_by_regional_to" + "_" + str(state)
+        res = cache.get(cache_name)
+
+        if res is None:
+            # print(f"add cache_name {cache_name}: ", res)
+
+            regionais_by_cities = {}
+
+            state_name = STATE_NAME[state]
+
+            regional_names = RegionalParameters.get_regional_names(state_name)
+
+            for regional_name in regional_names:
+                cities = RegionalParameters.get_cities(
+                    state_name=state_name, regional_name=regional_name
+                )
+
+                regionais_by_cities[regional_name] = cities
+
+                res = regionais_by_cities
+
+                cache.set(
+                    cache_name,
+                    res,
+                    settings.QUERY_CACHE_TIMEOUT,
+                )
+
+        return res
