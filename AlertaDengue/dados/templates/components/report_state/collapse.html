@@ -1,0 +1,43 @@
+{% load lookup %}
+{% load hashthis %}
+
+<!-- Start Component -->
+{% block regional_collapse_component %}
+
+<div id="accordion">
+
+  {% for key,value in charts.items %}
+
+    <div class="card">
+
+      <div id="flip_{{ key }}" class="collapse-style">
+          <button
+            class="collapse-effect text-left"
+            data-toggle="collapse"
+            data-target="#panel_{{ key | hashthis }}"
+            aria-expanded="true"
+            aria-controls="panel_{{ key | hashthis }}">
+            <span>{{ key }}</span>
+          </button>
+        </h5>
+      </div>
+
+      <div id="panel_{{ key | hashthis }}"
+        {% if key == 'Baixada Litorânea' %}
+          class="collapse show"
+          {% else %}
+          class="collapse"
+          {% endif %}
+          aria-labelledby="flip_{{ key }}"
+          data-parent="#accordion">
+          <div class="card-body">
+            {{ value | safe }}
+          </div>
+      </div>
+    </div>
+
+  {% endfor %}
+
+</div>
+
+{% endblock %}

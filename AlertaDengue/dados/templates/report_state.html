@@ -4,45 +4,14 @@
 {% load i18n %}
 {% load static %}
 {% load hashthis %}
+{% load report_state %}
 
 {% block extra_head %}
 
-<link rel="stylesheet"
-      type="text/css"
-      href="{% static '/libs/DataTables/datatables.min.css' %}"/>
+  <link href="{% static '/css/components.css' %}" rel="stylesheet" type="text/css">
+
 
 <style>
-      .box {
-        border: 1px #dfdfdf solid;
-        padding: 20px;
-        margin-bottom: 20px;
-        background-color: #f5f5f5;
-      }
-
-      .table tr td:nth-child(1){
-        background: #fafafa!important;
-        font-weight: bold;
-      }
-
-      .green-row td {
-        background: #8BFFB7;
-      }
-
-      .yellow-row td {
-        background: #FFEB5C;
-      }
-
-      .orange-row td {
-        background: #FFCE5C;
-      }
-
-      .red-row td {
-        background: #FF7C73;
-      }
-      .table.dataTable, .table td, .table th {
-        border-collapse: collapse !important;
-        border: 1px solid #aaaaaa!important;
-      }
 
 </style>
 {% endblock %}
@@ -62,14 +31,16 @@
 {% trans "Relatório Estadual da Situação das Arboviroses em " %}{{state_name}}
 {% endblock %}
 
-<!--
-# ----------------------
-#	MAIN BODY - FIRST PAGE
-# ----------------------
--->
 {% block content %}
+
 <div class="row">
   <div class="col-md-12">
+
+    <!--
+    # ----------------------
+    #	MAIN BODY - FIRST PAGE
+    # ----------------------
+    -->
     <p>
       {% trans "Data da última atualização" %} : {{ last_week }}/{{ last_year }}
     </p>
@@ -84,102 +55,37 @@
   </div>
 </div>
 
-<div class="row">
-  <div class="col-md-12 my-2">
-    <h3>{% trans "Índice" %}</h3>
-    <ul>
-    {% for regional_name in regional_names %}
-      <li><a href="#{{regional_name}}">{% trans "Regional" %} {{regional_name}}</a></li>
-    {% endfor %}
-    </ul>
+<!-- begin maps -->
+<div class="container">
+  <div class="row"
+    style="background-color: #e0eefd63;
+      border-radius: 14px;">
+
   </div>
 </div>
+<!-- end maps -->
 
-{% for regional_name in regional_names %}
-  <div class="row">
-    <div class="col-md-12 my-2">
-      <div class="row my-3">
-        <div class="col-md-12">
-          <h3 id="{{ regional_name }}">Regional {{ regional_name }}</h3>
-          <p>{% blocktrans %}
-            A tabela abaixo mostra os niveis de alerta em cada município da
-            Regional de Saúde. As cores indicam niveis de atenção, conforme
-            detalhado na {% endblocktrans %}<a href="#color-code">{% trans "tabela de cores" %}</a>.
-          </p>
-        </div>
+<!-- begin colapse -->
+<div class="container">
+  <div class="row justify-content-center"
+    style="background-color: #e0eefd63;
+      margin-bottom: 20px;
+      border-radius: 7px">
+    <div class="col-md-12 p-1">
+      <div class="card-primary">
+          {% regional_collapse_component %}
       </div>
+    </div>
+  </div>
+</div>
+<!-- end collapse-->
 
-      <div class="row my-3">
-        <div class="col-md-12">
-          <h4>{% trans "Alertas" %}</h4>
-          <table class="table table-striped table-bordered">
-            <thead>
-             <tr>
-               <th width="20%">{% trans "Município" %}</th>
-               {% for d in diseases_name%}
-               <td width="20%" align="center"><strong>{{ d }}</strong></td>
-               {% endfor %}
-             </tr>
-            </thead>
-              <tbody>
-                {% for city_geocode in regional_info|lookup:regional_name|lookup:'cities_geocode' %}
-                  <tr>
-                    <td>
-                      {{ regional_info|lookup:regional_name|lookup:'cities_name'|lookup:city_geocode }}
-                    </td>
-                    {% for d in diseases_code %}
-                      <td align="center">
-                        <span
-                          <!--
-                          # class="circle alert-{
-                            # { regional_info|lookup:regional_name|lookup:'cities_alert'|lookup:city_geocode|lookup:d }
-                            # }">&nbsp;
-                          -->
-                        </span>
-                      </td>
-                    {% endfor %}
-                  </tr>
-                {% endfor %}
-              </tbody>
-          </table>
-        </div>
-      </div>
+<!-- begin color code -->
+<div class="container">
+  <div class="row p-1">
+    <div class="col-md-12 p-2">
 
-      <div class="row">
-        <div class="col-md-12">
-          <h4>
-            {% trans "Resumo das últimas seis semanas epidemiológicas na Regional de Saúde" %}
-          </h4><br/>
-            {{ regional_info|lookup:regional_name|lookup:'table'|safe }}
-        </div>
-      </div>
-  {% endfor %}
-
-  <script>
-    $(document).ready(function(){
-      var cssClasses = {
-        'verde': 'green-row',
-        'amarelo': 'yellow-row',
-        'laranja': 'orange-row',
-        'vermelho': 'red-row'
-      }
-
-      $('.table tr').each(function(i, obj){
-        $(this).addClass(cssClasses[$('td:last-child', this).text()]);
-      });
-
-      $(document).ready( function () {
-        $('.table').DataTable({
-          "pageLength": 4,
-          "lengthMenu": [ 4, 8, 12 ],
-          "order": [[ 0, "desc" ]],
-          "searching": false,
-          "language": {
-            "url": "/static/libs/DataTables/i18n/pt_BR.json"
-          }
-        } );
-      } );
-    });
-  </script>
-
+  </div>
+</div>
+<!-- end color code -->
 {% endblock %}
