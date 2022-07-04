@@ -36,3 +36,5 @@ RUN mamba env create -n $ENV_NAME \
   && rm -rf /opt/conda/pkgs
 
 # EXPOSE 8080
+
+CMD ["/opt/services/AlertaDengue/runwsgi.sh"]
