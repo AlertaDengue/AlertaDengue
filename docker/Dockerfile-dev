@@ -20,6 +20,9 @@ RUN echo 'source /opt/conda/bin/activate "$ENV_NAME" && exec "$@"' > /activate.s
 ENV PATH "$PATH:/home/deploy/.local/bin"
 ENV PATH /opt/conda/envs/$ENV_NAME/bin:$PATH
 
+COPY --chown=deploy:deploy docker/test.sh /opt/services
+RUN chmod +x /opt/services/test.sh
+
 USER deploy
 
 # Use environment to update the env alertadengue
