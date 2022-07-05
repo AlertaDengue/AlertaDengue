@@ -474,7 +474,7 @@ static3 = "*"
 
 [[package]]
 name = "django"
-version = "3.2.13"
+version = "3.2.14"
 description = "A high-level Python Web framework that encourages rapid development and clean, pragmatic design."
 category = "main"
 optional = false
@@ -2607,8 +2607,8 @@ dj-static = [
     {file = "dj-static-0.0.6.tar.gz", hash = "sha256:032ec1c532617922e6e3e956d504a6fb1acce4fc1c7c94612d0fda21828ce8ef"},
 ]
 django = [
-    {file = "Django-3.2.13-py3-none-any.whl", hash = "sha256:b896ca61edc079eb6bbaa15cf6071eb69d6aac08cce5211583cfb41515644fdf"},
-    {file = "Django-3.2.13.tar.gz", hash = "sha256:6d93497a0a9bf6ba0e0b1a29cccdc40efbfc76297255b1309b3a884a688ec4b6"},
+    {file = "Django-3.2.14-py3-none-any.whl", hash = "sha256:a8681e098fa60f7c33a4b628d6fcd3fe983a0939ff1301ecacac21d0b38bad56"},
+    {file = "Django-3.2.14.tar.gz", hash = "sha256:677182ba8b5b285a4e072f3ac17ceee6aff1b5ce77fd173cc5b6a2d3dc022fcf"},
 ]
 django-bootstrap4 = [
     {file = "django-bootstrap4-22.1.tar.gz", hash = "sha256:fc9984f7238fbcd330ec5111bf0435083caa7192b022eedd53bfa4128bee318f"},
@@ -2675,6 +2675,7 @@ fastparquet = [
     {file = "fastparquet-0.8.1-cp310-cp310-musllinux_1_1_i686.whl", hash = "sha256:9ba4c5f719c1285b7874cbbce522a9466cd127c056502787ab8effadbd749227"},
     {file = "fastparquet-0.8.1-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:2b0155cbfa3099025c2ee1d601bd9a86efabd460acc98a639bde7ed449c75869"},
     {file = "fastparquet-0.8.1-cp310-cp310-win_amd64.whl", hash = "sha256:dc8a1b901954935e8d8b12591e6e4fa776359789f453613ca2bbe33ad51c75f6"},
+    {file = "fastparquet-0.8.1-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:9da0068cd780cc2bf7c1302a31623b9811c09f57e09b06256e65638c38b1b390"},
     {file = "fastparquet-0.8.1-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:1e57041edb9a691c37cdb2cd65075dc7e2ce6eb4ed589ae9c8b585329de5c9a9"},
     {file = "fastparquet-0.8.1-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d9045f255f3dcfd2c3b044dc5f4caaf849ed7fe59b45fd0ee95d1aeeca8ca65b"},
     {file = "fastparquet-0.8.1-cp37-cp37m-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:a32d6422d6b185d372763756b99a8ffaf4ee09b98b9f859cacf825d9a93019a7"},
