@@ -70,16 +70,16 @@ django-static-geofiles:
 	$(DOCKER) run --rm web python3 manage.py sync_geofiles
 	$(DOCKER) run --rm web python3 manage.py collectstatic --noinput
 
-.PHONY:docker-restart
-test-infodengue-web:
-	$(DOCKER) run --no-deps web bash ../docker/test.sh dados
-	$(DOCKER) run --no-deps web bash ../docker/test.sh dbf
-	$(DOCKER) run --no-deps web bash ../docker/test.sh gis
-	$(DOCKER) run --no-deps web bash ../docker/test.sh api
-	#$(DOCKER) run --no-deps web bash ../docker/test.sh forecast
+.PHONY:test-staging-web
+test-staging-web:
+	$(DOCKER) run --no-deps web bash /opt/services/test.sh dados
+	$(DOCKER) run --no-deps web bash /opt/services/test.sh dbf
+	$(DOCKER) run --no-deps web bash /opt/services/test.sh gis
+	$(DOCKER) run --no-deps web bash /opt/services/test.sh api
+	#$(DOCKER) run --no-deps web bash /opt/services/test.sh forecast
 
-.PHONY:test-infodengue-all
-test-infodengue-all:
+.PHONY:test-staging-all
+test-staging-all:
 	$(DOCKER) run --rm web python3 manage.py test
 
 

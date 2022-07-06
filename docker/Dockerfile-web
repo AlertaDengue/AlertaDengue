@@ -16,3 +16,5 @@ RUN chmod 0644 /etc/cron.d/cron-tasks \
 USER deploy
 
 # EXPOSE 8000
+
+CMD ["/opt/services/AlertaDengue/runwsgi.sh"]
