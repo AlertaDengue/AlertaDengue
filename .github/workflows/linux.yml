@@ -36,10 +36,12 @@ env:
   HOST_UID: 1000
   HOST_GID: 1000
   ENV: dev
+  STORAGE: /tmp/alertadengue/storage
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     strategy:
       matrix:
         python-version: ["3.9"]
@@ -58,11 +60,14 @@ jobs:
       with:
         miniconda-version: "latest"
         mamba-version: "*"
-        environment-file: conda/environment.yaml
+        environment-file: conda/dev.yaml
         channels: conda-forge,nodefaults
         activate-environment: alertadengue
         use-mamba: true
         miniforge-variant: Mambaforge
+
+    - name: prepare folders
+      run: mkdir -p ${STORAGE}
 
 
     - name: Install dependencies
@@ -79,19 +84,17 @@ jobs:
         wget https://dataverse.harvard.edu/api/access/datafile/4154429 -O docker/dev_dumps/latest_infodengue.sql.gz
         wget https://dataverse.harvard.edu/api/access/datafile/5110797 -O docker/dev_dumps/latest_dengue.sql.gz
 
-    - name: Build and deploy demo database
-      id: db_demo
+    - name: Build docker images
       run: |
-         make docker-build SERVICES=db
-         make docker-start SERVICES=db
-
-    - name: Docker build all images
-      run: |
-        make docker-build
+         make docker-build ENV=dev
 
     - name: Docker start web
       run: |
-        make docker-start-ci
+        make docker-start ENV=dev SERVICES=
+
+    - name: Docker waiting services
+      run: |
+        make docker-wait-all
 
     - name: Linting
       run: |

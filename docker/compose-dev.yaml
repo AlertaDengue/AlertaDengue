@@ -1,25 +1,12 @@
 version: "3.4"
 services:
   memcached:
-    image: memcached:latest
-    hostname: memcached
-    ports:
-      - 45004:45004
-    expose:
-      - 45004
     networks:
       - staging
-    entrypoint:
-      - memcached
-      - -m 64
-    restart: always
 
   rabbitmq:
-    image: rabbitmq:3
-    hostname: rabbitmq
     networks:
       - staging
-    restart: always
 
   db:
     build:
@@ -33,32 +20,15 @@ services:
     networks:
       - staging
     volumes:
-      - ${STAGING_PG_DATA}:/var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql/data
       - ./dev_dumps:/dumps
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     command: -p ${PSQL_PORT}
-
-  base:
-    build:
-      context: ".."
-      dockerfile: "docker/Dockerfile-base"
-      args:
-        HOST_UID: ${HOST_UID}
-        HOST_GID: ${HOST_GID}
-    profiles:
-      - donotstart
-    env_file:
-      - ../.env
-    environment:
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
-      - PSQL_HOST=${PSQL_HOST}
-      - PSQL_PORT=${PSQL_PORT}
-    networks:
-      - staging
-    volumes:
-      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
-      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
-      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
 
   web:
     build:
@@ -66,48 +36,17 @@ services:
       dockerfile: "docker/Dockerfile-dev"
       args:
         IMAGE_BUILD: infodengue-dev_base:latest
-    entrypoint: "/entrypoint.sh"
-    env_file:
-      - ../.env
     ports:
       - 8080:8000
-    environment:
-      - MEMCACHED_HOST=memcached
-      - MEMCACHED_PORT=45004
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
-      - PSQL_HOST=${PSQL_HOST}
-      - PSQL_PORT=${PSQL_PORT}
     networks:
       - staging
-    volumes:
-      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
-      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
-      - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
-      - ${DOCKER_HOST_INCIDENCE_MAPS}:/opt/services/AlertaDengue/static/img/incidence_maps
-      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
-    depends_on:
-      - rabbitmq
-      - memcached
-    restart: always
+    command: ["python", "manage.py", "runserver"]
 
   worker:
-    image: infodengue-dev_web:latest
-    entrypoint: "/opt/services/AlertaDengue/run_celery_worker.sh"
-    env_file:
-      - ../.env
-    environment:
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
-      - PSQL_HOST=${PSQL_HOST}
-      - PSQL_PORT=${PSQL_PORT}
     networks:
       - staging
-    volumes:
-      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
-      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
-      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
     depends_on:
       - db
-      - web
       - rabbitmq
       - memcached
     restart: always
@@ -115,3 +54,7 @@ services:
 networks:
   staging:
       driver: bridge
+
+
+volumes:
+  pg_data:

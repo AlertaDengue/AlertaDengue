@@ -34,7 +34,3 @@ RUN mamba env create -n $ENV_NAME \
   && find /opt/conda/ -type f,l -name '*.pyc' -delete \
   && find /opt/conda/ -type f,l -name '*.js.map' -delete \
   && rm -rf /opt/conda/pkgs
-
-# EXPOSE 8080
-
-CMD ["/opt/services/AlertaDengue/runwsgi.sh"]
