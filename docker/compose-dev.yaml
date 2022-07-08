@@ -1,4 +1,4 @@
-version: "3"
+version: "3.4"
 services:
   memcached:
     image: memcached:latest
@@ -45,6 +45,8 @@ services:
       args:
         HOST_UID: ${HOST_UID}
         HOST_GID: ${HOST_GID}
+    profiles:
+      - donotstart
     env_file:
       - ../.env
     environment:

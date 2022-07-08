@@ -32,7 +32,7 @@ docker-build:
 
 .PHONY:docker-start-ci
 docker-start-ci:
-	$(DOCKER) up -d --scale base=0
+	$(DOCKER) up -d
 
 .PHONY:docker-start
 docker-start:
