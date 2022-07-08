@@ -6,6 +6,17 @@
 -- Dumped from database version 9.6.12
 -- Dumped by pg_dump version 14.2
 
+
+DROP DATABASE denguedb;
+DROP USER dengueuser;
+
+CREATE DATABASE denguedb;
+CREATE ROLE dengueuser LOGIN PASSWORD 'denguepassword';
+
+GRANT ALL PRIVILEGES ON DATABASE denguedb TO dengueuser;
+
+\c denguedb
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -24,7 +35,7 @@ SET row_security = off;
 CREATE SCHEMA "Dengue_global";
 
 
-ALTER SCHEMA "Dengue_global" OWNER TO "Dengue";
+ALTER SCHEMA "Dengue_global" OWNER TO "dengueuser";
 
 --
 -- Name: Municipio; Type: SCHEMA; Schema: -; Owner: Dengue
@@ -33,7 +44,7 @@ ALTER SCHEMA "Dengue_global" OWNER TO "Dengue";
 CREATE SCHEMA "Municipio";
 
 
-ALTER SCHEMA "Municipio" OWNER TO "Dengue";
+ALTER SCHEMA "Municipio" OWNER TO "dengueuser";
 
 --
 -- Name: forecast; Type: SCHEMA; Schema: -; Owner: postgres
@@ -183,7 +194,7 @@ ALTER FUNCTION public.epiweek2date(epi_year_week integer, weekday integer) OWNER
 SET default_tablespace = '';
 
 --
--- Name: CID10; Type: TABLE; Schema: Dengue_global; Owner: administrador
+-- Name: CID10; Type: TABLE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE TABLE "Dengue_global"."CID10" (
@@ -192,10 +203,10 @@ CREATE TABLE "Dengue_global"."CID10" (
 );
 
 
-ALTER TABLE "Dengue_global"."CID10" OWNER TO administrador;
+ALTER TABLE "Dengue_global"."CID10" OWNER TO dengueuser;
 
 --
--- Name: Municipio; Type: TABLE; Schema: Dengue_global; Owner: administrador
+-- Name: Municipio; Type: TABLE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE TABLE "Dengue_global"."Municipio" (
@@ -208,17 +219,17 @@ CREATE TABLE "Dengue_global"."Municipio" (
 );
 
 
-ALTER TABLE "Dengue_global"."Municipio" OWNER TO administrador;
+ALTER TABLE "Dengue_global"."Municipio" OWNER TO dengueuser;
 
 --
--- Name: TABLE "Municipio"; Type: COMMENT; Schema: Dengue_global; Owner: administrador
+-- Name: TABLE "Municipio"; Type: COMMENT; Schema: Dengue_global; Owner: dengueuser
 --
 
 COMMENT ON TABLE "Dengue_global"."Municipio" IS 'Municipio integrado ao sistema de alerta';
 
 
 --
--- Name: alerta_regional_chik; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_chik; Type: TABLE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE TABLE "Dengue_global".alerta_regional_chik (
@@ -249,10 +260,10 @@ CREATE TABLE "Dengue_global".alerta_regional_chik (
 );
 
 
-ALTER TABLE "Dengue_global".alerta_regional_chik OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".alerta_regional_chik OWNER TO dengueuser;
 
 --
--- Name: alerta_regional_chik_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_chik_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Dengue_global".alerta_regional_chik_id_seq
@@ -263,17 +274,17 @@ CREATE SEQUENCE "Dengue_global".alerta_regional_chik_id_seq
     CACHE 1;
 
 
-ALTER TABLE "Dengue_global".alerta_regional_chik_id_seq OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".alerta_regional_chik_id_seq OWNER TO dengueuser;
 
 --
--- Name: alerta_regional_chik_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_chik_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Dengue_global".alerta_regional_chik_id_seq OWNED BY "Dengue_global".alerta_regional_chik.id;
 
 
 --
--- Name: alerta_regional_dengue; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_dengue; Type: TABLE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE TABLE "Dengue_global".alerta_regional_dengue (
@@ -304,10 +315,10 @@ CREATE TABLE "Dengue_global".alerta_regional_dengue (
 );
 
 
-ALTER TABLE "Dengue_global".alerta_regional_dengue OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".alerta_regional_dengue OWNER TO dengueuser;
 
 --
--- Name: alerta_regional_dengue_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_dengue_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Dengue_global".alerta_regional_dengue_id_seq
@@ -318,17 +329,17 @@ CREATE SEQUENCE "Dengue_global".alerta_regional_dengue_id_seq
     CACHE 1;
 
 
-ALTER TABLE "Dengue_global".alerta_regional_dengue_id_seq OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".alerta_regional_dengue_id_seq OWNER TO dengueuser;
 
 --
--- Name: alerta_regional_dengue_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_dengue_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Dengue_global".alerta_regional_dengue_id_seq OWNED BY "Dengue_global".alerta_regional_dengue.id;
 
 
 --
--- Name: alerta_regional_zika; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_zika; Type: TABLE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE TABLE "Dengue_global".alerta_regional_zika (
@@ -359,10 +370,10 @@ CREATE TABLE "Dengue_global".alerta_regional_zika (
 );
 
 
-ALTER TABLE "Dengue_global".alerta_regional_zika OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".alerta_regional_zika OWNER TO dengueuser;
 
 --
--- Name: alerta_regional_zika_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_zika_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Dengue_global".alerta_regional_zika_id_seq
@@ -373,17 +384,17 @@ CREATE SEQUENCE "Dengue_global".alerta_regional_zika_id_seq
     CACHE 1;
 
 
-ALTER TABLE "Dengue_global".alerta_regional_zika_id_seq OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".alerta_regional_zika_id_seq OWNER TO dengueuser;
 
 --
--- Name: alerta_regional_zika_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_zika_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Dengue_global".alerta_regional_zika_id_seq OWNED BY "Dengue_global".alerta_regional_zika.id;
 
 
 --
--- Name: estado; Type: TABLE; Schema: Dengue_global; Owner: administrador
+-- Name: estado; Type: TABLE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE TABLE "Dengue_global".estado (
@@ -395,10 +406,10 @@ CREATE TABLE "Dengue_global".estado (
 );
 
 
-ALTER TABLE "Dengue_global".estado OWNER TO administrador;
+ALTER TABLE "Dengue_global".estado OWNER TO dengueuser;
 
 --
--- Name: macroregional; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
+-- Name: macroregional; Type: TABLE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE TABLE "Dengue_global".macroregional (
@@ -409,10 +420,10 @@ CREATE TABLE "Dengue_global".macroregional (
 );
 
 
-ALTER TABLE "Dengue_global".macroregional OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".macroregional OWNER TO dengueuser;
 
 --
--- Name: macroregional_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
+-- Name: macroregional_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Dengue_global".macroregional_id_seq
@@ -423,17 +434,17 @@ CREATE SEQUENCE "Dengue_global".macroregional_id_seq
     CACHE 1;
 
 
-ALTER TABLE "Dengue_global".macroregional_id_seq OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".macroregional_id_seq OWNER TO dengueuser;
 
 --
--- Name: macroregional_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
+-- Name: macroregional_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Dengue_global".macroregional_id_seq OWNED BY "Dengue_global".macroregional.id;
 
 
 --
--- Name: parameters; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
+-- Name: parameters; Type: TABLE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE TABLE "Dengue_global".parameters (
@@ -453,10 +464,10 @@ CREATE TABLE "Dengue_global".parameters (
 );
 
 
-ALTER TABLE "Dengue_global".parameters OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".parameters OWNER TO dengueuser;
 
 --
--- Name: regional; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
+-- Name: regional; Type: TABLE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE TABLE "Dengue_global".regional (
@@ -467,10 +478,10 @@ CREATE TABLE "Dengue_global".regional (
 );
 
 
-ALTER TABLE "Dengue_global".regional OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".regional OWNER TO dengueuser;
 
 --
--- Name: regional_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
+-- Name: regional_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Dengue_global".regional_id_seq
@@ -481,17 +492,17 @@ CREATE SEQUENCE "Dengue_global".regional_id_seq
     CACHE 1;
 
 
-ALTER TABLE "Dengue_global".regional_id_seq OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".regional_id_seq OWNER TO dengueuser;
 
 --
--- Name: regional_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
+-- Name: regional_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Dengue_global".regional_id_seq OWNED BY "Dengue_global".regional.id;
 
 
 --
--- Name: regional_saude; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
+-- Name: regional_saude; Type: TABLE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE TABLE "Dengue_global".regional_saude (
@@ -511,10 +522,10 @@ CREATE TABLE "Dengue_global".regional_saude (
 );
 
 
-ALTER TABLE "Dengue_global".regional_saude OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".regional_saude OWNER TO dengueuser;
 
 --
--- Name: regional_saude_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
+-- Name: regional_saude_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Dengue_global".regional_saude_id_seq
@@ -525,17 +536,17 @@ CREATE SEQUENCE "Dengue_global".regional_saude_id_seq
     CACHE 1;
 
 
-ALTER TABLE "Dengue_global".regional_saude_id_seq OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".regional_saude_id_seq OWNER TO dengueuser;
 
 --
--- Name: regional_saude_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
+-- Name: regional_saude_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Dengue_global".regional_saude_id_seq OWNED BY "Dengue_global".regional_saude.id;
 
 
 --
--- Name: Bairro; Type: TABLE; Schema: Municipio; Owner: administrador
+-- Name: Bairro; Type: TABLE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE TABLE "Municipio"."Bairro" (
@@ -545,17 +556,17 @@ CREATE TABLE "Municipio"."Bairro" (
 );
 
 
-ALTER TABLE "Municipio"."Bairro" OWNER TO administrador;
+ALTER TABLE "Municipio"."Bairro" OWNER TO dengueuser;
 
 --
--- Name: TABLE "Bairro"; Type: COMMENT; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Bairro"; Type: COMMENT; Schema: Municipio; Owner: dengueuser
 --
 
 COMMENT ON TABLE "Municipio"."Bairro" IS 'Lista de bairros por localidade';
 
 
 --
--- Name: Clima_Satelite; Type: TABLE; Schema: Municipio; Owner: administrador
+-- Name: Clima_Satelite; Type: TABLE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE TABLE "Municipio"."Clima_Satelite" (
@@ -569,10 +580,10 @@ CREATE TABLE "Municipio"."Clima_Satelite" (
 );
 
 
-ALTER TABLE "Municipio"."Clima_Satelite" OWNER TO administrador;
+ALTER TABLE "Municipio"."Clima_Satelite" OWNER TO dengueuser;
 
 --
--- Name: TABLE "Clima_Satelite"; Type: COMMENT; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Clima_Satelite"; Type: COMMENT; Schema: Municipio; Owner: dengueuser
 --
 
 COMMENT ON TABLE "Municipio"."Clima_Satelite" IS 'Precipitação, temperatura e NVDI
@@ -580,7 +591,7 @@ COMMENT ON TABLE "Municipio"."Clima_Satelite" IS 'Precipitação, temperatura e 
 
 
 --
--- Name: Clima_Satelite_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
+-- Name: Clima_Satelite_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Municipio"."Clima_Satelite_id_seq"
@@ -591,17 +602,17 @@ CREATE SEQUENCE "Municipio"."Clima_Satelite_id_seq"
     CACHE 1;
 
 
-ALTER TABLE "Municipio"."Clima_Satelite_id_seq" OWNER TO administrador;
+ALTER TABLE "Municipio"."Clima_Satelite_id_seq" OWNER TO dengueuser;
 
 --
--- Name: Clima_Satelite_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
+-- Name: Clima_Satelite_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Municipio"."Clima_Satelite_id_seq" OWNED BY "Municipio"."Clima_Satelite".id;
 
 
 --
--- Name: Clima_cemaden; Type: TABLE; Schema: Municipio; Owner: administrador
+-- Name: Clima_cemaden; Type: TABLE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE TABLE "Municipio"."Clima_cemaden" (
@@ -613,17 +624,17 @@ CREATE TABLE "Municipio"."Clima_cemaden" (
 );
 
 
-ALTER TABLE "Municipio"."Clima_cemaden" OWNER TO administrador;
+ALTER TABLE "Municipio"."Clima_cemaden" OWNER TO dengueuser;
 
 --
--- Name: TABLE "Clima_cemaden"; Type: COMMENT; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Clima_cemaden"; Type: COMMENT; Schema: Municipio; Owner: dengueuser
 --
 
 COMMENT ON TABLE "Municipio"."Clima_cemaden" IS 'dados de clima - CEMADEN';
 
 
 --
--- Name: Clima_cemaden_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
+-- Name: Clima_cemaden_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Municipio"."Clima_cemaden_id_seq"
@@ -634,17 +645,17 @@ CREATE SEQUENCE "Municipio"."Clima_cemaden_id_seq"
     CACHE 1;
 
 
-ALTER TABLE "Municipio"."Clima_cemaden_id_seq" OWNER TO administrador;
+ALTER TABLE "Municipio"."Clima_cemaden_id_seq" OWNER TO dengueuser;
 
 --
--- Name: Clima_cemaden_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
+-- Name: Clima_cemaden_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Municipio"."Clima_cemaden_id_seq" OWNED BY "Municipio"."Clima_cemaden".id;
 
 
 --
--- Name: Clima_wu; Type: TABLE; Schema: Municipio; Owner: administrador
+-- Name: Clima_wu; Type: TABLE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE TABLE "Municipio"."Clima_wu" (
@@ -663,17 +674,17 @@ CREATE TABLE "Municipio"."Clima_wu" (
 );
 
 
-ALTER TABLE "Municipio"."Clima_wu" OWNER TO administrador;
+ALTER TABLE "Municipio"."Clima_wu" OWNER TO dengueuser;
 
 --
--- Name: TABLE "Clima_wu"; Type: COMMENT; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Clima_wu"; Type: COMMENT; Schema: Municipio; Owner: dengueuser
 --
 
 COMMENT ON TABLE "Municipio"."Clima_wu" IS 'série temporal de variaveis meteorologicas diarias do WU';
 
 
 --
--- Name: Clima_wu_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
+-- Name: Clima_wu_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Municipio"."Clima_wu_id_seq"
@@ -684,17 +695,17 @@ CREATE SEQUENCE "Municipio"."Clima_wu_id_seq"
     CACHE 1;
 
 
-ALTER TABLE "Municipio"."Clima_wu_id_seq" OWNER TO administrador;
+ALTER TABLE "Municipio"."Clima_wu_id_seq" OWNER TO dengueuser;
 
 --
--- Name: Clima_wu_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
+-- Name: Clima_wu_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Municipio"."Clima_wu_id_seq" OWNED BY "Municipio"."Clima_wu".id;
 
 
 --
--- Name: Estacao_cemaden; Type: TABLE; Schema: Municipio; Owner: administrador
+-- Name: Estacao_cemaden; Type: TABLE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE TABLE "Municipio"."Estacao_cemaden" (
@@ -707,17 +718,17 @@ CREATE TABLE "Municipio"."Estacao_cemaden" (
 );
 
 
-ALTER TABLE "Municipio"."Estacao_cemaden" OWNER TO administrador;
+ALTER TABLE "Municipio"."Estacao_cemaden" OWNER TO dengueuser;
 
 --
--- Name: TABLE "Estacao_cemaden"; Type: COMMENT; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Estacao_cemaden"; Type: COMMENT; Schema: Municipio; Owner: dengueuser
 --
 
 COMMENT ON TABLE "Municipio"."Estacao_cemaden" IS 'Metadados da estação do cemaden';
 
 
 --
--- Name: Estacao_wu; Type: TABLE; Schema: Municipio; Owner: administrador
+-- Name: Estacao_wu; Type: TABLE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE TABLE "Municipio"."Estacao_wu" (
@@ -729,17 +740,17 @@ CREATE TABLE "Municipio"."Estacao_wu" (
 );
 
 
-ALTER TABLE "Municipio"."Estacao_wu" OWNER TO administrador;
+ALTER TABLE "Municipio"."Estacao_wu" OWNER TO dengueuser;
 
 --
--- Name: TABLE "Estacao_wu"; Type: COMMENT; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Estacao_wu"; Type: COMMENT; Schema: Municipio; Owner: dengueuser
 --
 
 COMMENT ON TABLE "Municipio"."Estacao_wu" IS 'metadados das estacoes meteorologicas da WU';
 
 
 --
--- Name: Historico_alerta; Type: TABLE; Schema: Municipio; Owner: administrador
+-- Name: Historico_alerta; Type: TABLE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE TABLE "Municipio"."Historico_alerta" (
@@ -772,17 +783,17 @@ CREATE TABLE "Municipio"."Historico_alerta" (
 );
 
 
-ALTER TABLE "Municipio"."Historico_alerta" OWNER TO administrador;
+ALTER TABLE "Municipio"."Historico_alerta" OWNER TO dengueuser;
 
 --
--- Name: TABLE "Historico_alerta"; Type: COMMENT; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Historico_alerta"; Type: COMMENT; Schema: Municipio; Owner: dengueuser
 --
 
 COMMENT ON TABLE "Municipio"."Historico_alerta" IS 'Resultados  do alerta, conforme publicado.';
 
 
 --
--- Name: Historico_alerta_chik; Type: TABLE; Schema: Municipio; Owner: administrador
+-- Name: Historico_alerta_chik; Type: TABLE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE TABLE "Municipio"."Historico_alerta_chik" (
@@ -815,17 +826,17 @@ CREATE TABLE "Municipio"."Historico_alerta_chik" (
 );
 
 
-ALTER TABLE "Municipio"."Historico_alerta_chik" OWNER TO administrador;
+ALTER TABLE "Municipio"."Historico_alerta_chik" OWNER TO dengueuser;
 
 --
--- Name: TABLE "Historico_alerta_chik"; Type: COMMENT; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Historico_alerta_chik"; Type: COMMENT; Schema: Municipio; Owner: dengueuser
 --
 
 COMMENT ON TABLE "Municipio"."Historico_alerta_chik" IS 'Resultados  do alerta para chikungunya, conforme publicado.';
 
 
 --
--- Name: Historico_alerta_chik_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
+-- Name: Historico_alerta_chik_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Municipio"."Historico_alerta_chik_id_seq"
@@ -836,17 +847,17 @@ CREATE SEQUENCE "Municipio"."Historico_alerta_chik_id_seq"
     CACHE 1;
 
 
-ALTER TABLE "Municipio"."Historico_alerta_chik_id_seq" OWNER TO administrador;
+ALTER TABLE "Municipio"."Historico_alerta_chik_id_seq" OWNER TO dengueuser;
 
 --
--- Name: Historico_alerta_chik_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
+-- Name: Historico_alerta_chik_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Municipio"."Historico_alerta_chik_id_seq" OWNED BY "Municipio"."Historico_alerta_chik".id;
 
 
 --
--- Name: Historico_alerta_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
+-- Name: Historico_alerta_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Municipio"."Historico_alerta_id_seq"
@@ -857,10 +868,10 @@ CREATE SEQUENCE "Municipio"."Historico_alerta_id_seq"
     CACHE 1;
 
 
-ALTER TABLE "Municipio"."Historico_alerta_id_seq" OWNER TO administrador;
+ALTER TABLE "Municipio"."Historico_alerta_id_seq" OWNER TO dengueuser;
 
 --
--- Name: Historico_alerta_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
+-- Name: Historico_alerta_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Municipio"."Historico_alerta_id_seq" OWNED BY "Municipio"."Historico_alerta".id;
@@ -924,7 +935,7 @@ ALTER SEQUENCE "Municipio"."Historico_alerta_zika_id_seq" OWNED BY "Municipio"."
 
 
 --
--- Name: Localidade; Type: TABLE; Schema: Municipio; Owner: administrador
+-- Name: Localidade; Type: TABLE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE TABLE "Municipio"."Localidade" (
@@ -937,17 +948,17 @@ CREATE TABLE "Municipio"."Localidade" (
 );
 
 
-ALTER TABLE "Municipio"."Localidade" OWNER TO administrador;
+ALTER TABLE "Municipio"."Localidade" OWNER TO dengueuser;
 
 --
--- Name: TABLE "Localidade"; Type: COMMENT; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Localidade"; Type: COMMENT; Schema: Municipio; Owner: dengueuser
 --
 
 COMMENT ON TABLE "Municipio"."Localidade" IS 'Sub-unidades de analise no municipio';
 
 
 --
--- Name: Notificacao; Type: TABLE; Schema: Municipio; Owner: administrador
+-- Name: Notificacao; Type: TABLE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE TABLE "Municipio"."Notificacao" (
@@ -972,17 +983,17 @@ CREATE TABLE "Municipio"."Notificacao" (
 );
 
 
-ALTER TABLE "Municipio"."Notificacao" OWNER TO administrador;
+ALTER TABLE "Municipio"."Notificacao" OWNER TO dengueuser;
 
 --
--- Name: TABLE "Notificacao"; Type: COMMENT; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Notificacao"; Type: COMMENT; Schema: Municipio; Owner: dengueuser
 --
 
 COMMENT ON TABLE "Municipio"."Notificacao" IS 'Casos de notificacao de dengue';
 
 
 --
--- Name: Notificacao_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
+-- Name: Notificacao_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Municipio"."Notificacao_id_seq"
@@ -993,17 +1004,17 @@ CREATE SEQUENCE "Municipio"."Notificacao_id_seq"
     CACHE 1;
 
 
-ALTER TABLE "Municipio"."Notificacao_id_seq" OWNER TO administrador;
+ALTER TABLE "Municipio"."Notificacao_id_seq" OWNER TO dengueuser;
 
 --
--- Name: Notificacao_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
+-- Name: Notificacao_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Municipio"."Notificacao_id_seq" OWNED BY "Municipio"."Notificacao".id;
 
 
 --
--- Name: Ovitrampa; Type: TABLE; Schema: Municipio; Owner: administrador
+-- Name: Ovitrampa; Type: TABLE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE TABLE "Municipio"."Ovitrampa" (
@@ -1019,10 +1030,10 @@ CREATE TABLE "Municipio"."Ovitrampa" (
 );
 
 
-ALTER TABLE "Municipio"."Ovitrampa" OWNER TO administrador;
+ALTER TABLE "Municipio"."Ovitrampa" OWNER TO dengueuser;
 
 --
--- Name: Ovitrampa_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
+-- Name: Ovitrampa_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Municipio"."Ovitrampa_id_seq"
@@ -1033,17 +1044,17 @@ CREATE SEQUENCE "Municipio"."Ovitrampa_id_seq"
     CACHE 1;
 
 
-ALTER TABLE "Municipio"."Ovitrampa_id_seq" OWNER TO administrador;
+ALTER TABLE "Municipio"."Ovitrampa_id_seq" OWNER TO dengueuser;
 
 --
--- Name: Ovitrampa_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
+-- Name: Ovitrampa_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Municipio"."Ovitrampa_id_seq" OWNED BY "Municipio"."Ovitrampa".id;
 
 
 --
--- Name: Tweet; Type: TABLE; Schema: Municipio; Owner: administrador
+-- Name: Tweet; Type: TABLE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE TABLE "Municipio"."Tweet" (
@@ -1055,17 +1066,17 @@ CREATE TABLE "Municipio"."Tweet" (
 );
 
 
-ALTER TABLE "Municipio"."Tweet" OWNER TO administrador;
+ALTER TABLE "Municipio"."Tweet" OWNER TO dengueuser;
 
 --
--- Name: TABLE "Tweet"; Type: COMMENT; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Tweet"; Type: COMMENT; Schema: Municipio; Owner: dengueuser
 --
 
 COMMENT ON TABLE "Municipio"."Tweet" IS 'Série de tweets diários';
 
 
 --
--- Name: Tweet_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
+-- Name: Tweet_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Municipio"."Tweet_id_seq"
@@ -1076,17 +1087,17 @@ CREATE SEQUENCE "Municipio"."Tweet_id_seq"
     CACHE 1;
 
 
-ALTER TABLE "Municipio"."Tweet_id_seq" OWNER TO administrador;
+ALTER TABLE "Municipio"."Tweet_id_seq" OWNER TO dengueuser;
 
 --
--- Name: Tweet_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
+-- Name: Tweet_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Municipio"."Tweet_id_seq" OWNED BY "Municipio"."Tweet".id;
 
 
 --
--- Name: alerta_mrj; Type: TABLE; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj; Type: TABLE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE TABLE "Municipio".alerta_mrj (
@@ -1107,10 +1118,10 @@ CREATE TABLE "Municipio".alerta_mrj (
 );
 
 
-ALTER TABLE "Municipio".alerta_mrj OWNER TO dengueadmin;
+ALTER TABLE "Municipio".alerta_mrj OWNER TO dengueuser;
 
 --
--- Name: alerta_mrj_chik; Type: TABLE; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj_chik; Type: TABLE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE TABLE "Municipio".alerta_mrj_chik (
@@ -1131,10 +1142,10 @@ CREATE TABLE "Municipio".alerta_mrj_chik (
 );
 
 
-ALTER TABLE "Municipio".alerta_mrj_chik OWNER TO dengueadmin;
+ALTER TABLE "Municipio".alerta_mrj_chik OWNER TO dengueuser;
 
 --
--- Name: alerta_mrj_chik_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj_chik_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Municipio".alerta_mrj_chik_id_seq
@@ -1145,17 +1156,17 @@ CREATE SEQUENCE "Municipio".alerta_mrj_chik_id_seq
     CACHE 1;
 
 
-ALTER TABLE "Municipio".alerta_mrj_chik_id_seq OWNER TO dengueadmin;
+ALTER TABLE "Municipio".alerta_mrj_chik_id_seq OWNER TO dengueuser;
 
 --
--- Name: alerta_mrj_chik_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj_chik_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Municipio".alerta_mrj_chik_id_seq OWNED BY "Municipio".alerta_mrj_chik.id;
 
 
 --
--- Name: alerta_mrj_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE SEQUENCE "Municipio".alerta_mrj_id_seq
@@ -1166,10 +1177,10 @@ CREATE SEQUENCE "Municipio".alerta_mrj_id_seq
     CACHE 1;
 
 
-ALTER TABLE "Municipio".alerta_mrj_id_seq OWNER TO dengueadmin;
+ALTER TABLE "Municipio".alerta_mrj_id_seq OWNER TO dengueuser;
 
 --
--- Name: alerta_mrj_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER SEQUENCE "Municipio".alerta_mrj_id_seq OWNED BY "Municipio".alerta_mrj.id;
@@ -1239,7 +1250,7 @@ CREATE VIEW "Municipio".historico_casos AS
 ALTER TABLE "Municipio".historico_casos OWNER TO postgres;
 
 --
--- Name: auth_group; Type: TABLE; Schema: forecast; Owner: forecast
+-- Name: auth_group; Type: TABLE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE TABLE forecast.auth_group (
@@ -1248,10 +1259,10 @@ CREATE TABLE forecast.auth_group (
 );
 
 
-ALTER TABLE forecast.auth_group OWNER TO forecast;
+ALTER TABLE forecast.auth_group OWNER TO forecastuser;
 
 --
--- Name: auth_group_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecast
+-- Name: auth_group_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE SEQUENCE forecast.auth_group_id_seq
@@ -1262,17 +1273,17 @@ CREATE SEQUENCE forecast.auth_group_id_seq
     CACHE 1;
 
 
-ALTER TABLE forecast.auth_group_id_seq OWNER TO forecast;
+ALTER TABLE forecast.auth_group_id_seq OWNER TO forecastuser;
 
 --
--- Name: auth_group_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecast
+-- Name: auth_group_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecastuser
 --
 
 ALTER SEQUENCE forecast.auth_group_id_seq OWNED BY forecast.auth_group.id;
 
 
 --
--- Name: auth_group_permissions; Type: TABLE; Schema: forecast; Owner: forecast
+-- Name: auth_group_permissions; Type: TABLE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE TABLE forecast.auth_group_permissions (
@@ -1282,10 +1293,10 @@ CREATE TABLE forecast.auth_group_permissions (
 );
 
 
-ALTER TABLE forecast.auth_group_permissions OWNER TO forecast;
+ALTER TABLE forecast.auth_group_permissions OWNER TO forecastuser;
 
 --
--- Name: auth_group_permissions_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecast
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE SEQUENCE forecast.auth_group_permissions_id_seq
@@ -1296,17 +1307,17 @@ CREATE SEQUENCE forecast.auth_group_permissions_id_seq
     CACHE 1;
 
 
-ALTER TABLE forecast.auth_group_permissions_id_seq OWNER TO forecast;
+ALTER TABLE forecast.auth_group_permissions_id_seq OWNER TO forecastuser;
 
 --
--- Name: auth_group_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecast
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecastuser
 --
 
 ALTER SEQUENCE forecast.auth_group_permissions_id_seq OWNED BY forecast.auth_group_permissions.id;
 
 
 --
--- Name: auth_permission; Type: TABLE; Schema: forecast; Owner: forecast
+-- Name: auth_permission; Type: TABLE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE TABLE forecast.auth_permission (
@@ -1317,10 +1328,10 @@ CREATE TABLE forecast.auth_permission (
 );
 
 
-ALTER TABLE forecast.auth_permission OWNER TO forecast;
+ALTER TABLE forecast.auth_permission OWNER TO forecastuser;
 
 --
--- Name: auth_permission_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecast
+-- Name: auth_permission_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE SEQUENCE forecast.auth_permission_id_seq
@@ -1331,17 +1342,17 @@ CREATE SEQUENCE forecast.auth_permission_id_seq
     CACHE 1;
 
 
-ALTER TABLE forecast.auth_permission_id_seq OWNER TO forecast;
+ALTER TABLE forecast.auth_permission_id_seq OWNER TO forecastuser;
 
 --
--- Name: auth_permission_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecast
+-- Name: auth_permission_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecastuser
 --
 
 ALTER SEQUENCE forecast.auth_permission_id_seq OWNED BY forecast.auth_permission.id;
 
 
 --
--- Name: auth_user; Type: TABLE; Schema: forecast; Owner: forecast
+-- Name: auth_user; Type: TABLE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE TABLE forecast.auth_user (
@@ -1359,10 +1370,10 @@ CREATE TABLE forecast.auth_user (
 );
 
 
-ALTER TABLE forecast.auth_user OWNER TO forecast;
+ALTER TABLE forecast.auth_user OWNER TO forecastuser;
 
 --
--- Name: auth_user_groups; Type: TABLE; Schema: forecast; Owner: forecast
+-- Name: auth_user_groups; Type: TABLE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE TABLE forecast.auth_user_groups (
@@ -1372,10 +1383,10 @@ CREATE TABLE forecast.auth_user_groups (
 );
 
 
-ALTER TABLE forecast.auth_user_groups OWNER TO forecast;
+ALTER TABLE forecast.auth_user_groups OWNER TO forecastuser;
 
 --
--- Name: auth_user_groups_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecast
+-- Name: auth_user_groups_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE SEQUENCE forecast.auth_user_groups_id_seq
@@ -1386,17 +1397,17 @@ CREATE SEQUENCE forecast.auth_user_groups_id_seq
     CACHE 1;
 
 
-ALTER TABLE forecast.auth_user_groups_id_seq OWNER TO forecast;
+ALTER TABLE forecast.auth_user_groups_id_seq OWNER TO forecastuser;
 
 --
--- Name: auth_user_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecast
+-- Name: auth_user_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecastuser
 --
 
 ALTER SEQUENCE forecast.auth_user_groups_id_seq OWNED BY forecast.auth_user_groups.id;
 
 
 --
--- Name: auth_user_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecast
+-- Name: auth_user_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE SEQUENCE forecast.auth_user_id_seq
@@ -1407,17 +1418,17 @@ CREATE SEQUENCE forecast.auth_user_id_seq
     CACHE 1;
 
 
-ALTER TABLE forecast.auth_user_id_seq OWNER TO forecast;
+ALTER TABLE forecast.auth_user_id_seq OWNER TO forecastuser;
 
 --
--- Name: auth_user_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecast
+-- Name: auth_user_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecastuser
 --
 
 ALTER SEQUENCE forecast.auth_user_id_seq OWNED BY forecast.auth_user.id;
 
 
 --
--- Name: auth_user_user_permissions; Type: TABLE; Schema: forecast; Owner: forecast
+-- Name: auth_user_user_permissions; Type: TABLE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE TABLE forecast.auth_user_user_permissions (
@@ -1427,10 +1438,10 @@ CREATE TABLE forecast.auth_user_user_permissions (
 );
 
 
-ALTER TABLE forecast.auth_user_user_permissions OWNER TO forecast;
+ALTER TABLE forecast.auth_user_user_permissions OWNER TO forecastuser;
 
 --
--- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecast
+-- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE SEQUENCE forecast.auth_user_user_permissions_id_seq
@@ -1441,17 +1452,17 @@ CREATE SEQUENCE forecast.auth_user_user_permissions_id_seq
     CACHE 1;
 
 
-ALTER TABLE forecast.auth_user_user_permissions_id_seq OWNER TO forecast;
+ALTER TABLE forecast.auth_user_user_permissions_id_seq OWNER TO forecastuser;
 
 --
--- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecast
+-- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecastuser
 --
 
 ALTER SEQUENCE forecast.auth_user_user_permissions_id_seq OWNED BY forecast.auth_user_user_permissions.id;
 
 
 --
--- Name: chunked_upload_chunkedupload; Type: TABLE; Schema: forecast; Owner: forecast
+-- Name: chunked_upload_chunkedupload; Type: TABLE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE TABLE forecast.chunked_upload_chunkedupload (
@@ -1468,10 +1479,10 @@ CREATE TABLE forecast.chunked_upload_chunkedupload (
 );
 
 
-ALTER TABLE forecast.chunked_upload_chunkedupload OWNER TO forecast;
+ALTER TABLE forecast.chunked_upload_chunkedupload OWNER TO forecastuser;
 
 --
--- Name: chunked_upload_chunkedupload_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecast
+-- Name: chunked_upload_chunkedupload_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE SEQUENCE forecast.chunked_upload_chunkedupload_id_seq
@@ -1482,17 +1493,17 @@ CREATE SEQUENCE forecast.chunked_upload_chunkedupload_id_seq
     CACHE 1;
 
 
-ALTER TABLE forecast.chunked_upload_chunkedupload_id_seq OWNER TO forecast;
+ALTER TABLE forecast.chunked_upload_chunkedupload_id_seq OWNER TO forecastuser;
 
 --
--- Name: chunked_upload_chunkedupload_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecast
+-- Name: chunked_upload_chunkedupload_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecastuser
 --
 
 ALTER SEQUENCE forecast.chunked_upload_chunkedupload_id_seq OWNED BY forecast.chunked_upload_chunkedupload.id;
 
 
 --
--- Name: django_admin_log; Type: TABLE; Schema: forecast; Owner: forecast
+-- Name: django_admin_log; Type: TABLE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE TABLE forecast.django_admin_log (
@@ -1508,10 +1519,10 @@ CREATE TABLE forecast.django_admin_log (
 );
 
 
-ALTER TABLE forecast.django_admin_log OWNER TO forecast;
+ALTER TABLE forecast.django_admin_log OWNER TO forecastuser;
 
 --
--- Name: django_admin_log_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecast
+-- Name: django_admin_log_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE SEQUENCE forecast.django_admin_log_id_seq
@@ -1522,17 +1533,17 @@ CREATE SEQUENCE forecast.django_admin_log_id_seq
     CACHE 1;
 
 
-ALTER TABLE forecast.django_admin_log_id_seq OWNER TO forecast;
+ALTER TABLE forecast.django_admin_log_id_seq OWNER TO forecastuser;
 
 --
--- Name: django_admin_log_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecast
+-- Name: django_admin_log_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecastuser
 --
 
 ALTER SEQUENCE forecast.django_admin_log_id_seq OWNED BY forecast.django_admin_log.id;
 
 
 --
--- Name: django_content_type; Type: TABLE; Schema: forecast; Owner: forecast
+-- Name: django_content_type; Type: TABLE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE TABLE forecast.django_content_type (
@@ -1542,10 +1553,10 @@ CREATE TABLE forecast.django_content_type (
 );
 
 
-ALTER TABLE forecast.django_content_type OWNER TO forecast;
+ALTER TABLE forecast.django_content_type OWNER TO forecastuser;
 
 --
--- Name: django_content_type_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecast
+-- Name: django_content_type_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE SEQUENCE forecast.django_content_type_id_seq
@@ -1556,17 +1567,17 @@ CREATE SEQUENCE forecast.django_content_type_id_seq
     CACHE 1;
 
 
-ALTER TABLE forecast.django_content_type_id_seq OWNER TO forecast;
+ALTER TABLE forecast.django_content_type_id_seq OWNER TO forecastuser;
 
 --
--- Name: django_content_type_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecast
+-- Name: django_content_type_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecastuser
 --
 
 ALTER SEQUENCE forecast.django_content_type_id_seq OWNED BY forecast.django_content_type.id;
 
 
 --
--- Name: django_migrations; Type: TABLE; Schema: forecast; Owner: forecast
+-- Name: django_migrations; Type: TABLE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE TABLE forecast.django_migrations (
@@ -1577,10 +1588,10 @@ CREATE TABLE forecast.django_migrations (
 );
 
 
-ALTER TABLE forecast.django_migrations OWNER TO forecast;
+ALTER TABLE forecast.django_migrations OWNER TO forecastuser;
 
 --
--- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecast
+-- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE SEQUENCE forecast.django_migrations_id_seq
@@ -1591,17 +1602,17 @@ CREATE SEQUENCE forecast.django_migrations_id_seq
     CACHE 1;
 
 
-ALTER TABLE forecast.django_migrations_id_seq OWNER TO forecast;
+ALTER TABLE forecast.django_migrations_id_seq OWNER TO forecastuser;
 
 --
--- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecast
+-- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: forecast; Owner: forecastuser
 --
 
 ALTER SEQUENCE forecast.django_migrations_id_seq OWNED BY forecast.django_migrations.id;
 
 
 --
--- Name: django_session; Type: TABLE; Schema: forecast; Owner: forecast
+-- Name: django_session; Type: TABLE; Schema: forecast; Owner: forecastuser
 --
 
 CREATE TABLE forecast.django_session (
@@ -1611,7 +1622,7 @@ CREATE TABLE forecast.django_session (
 );
 
 
-ALTER TABLE forecast.django_session OWNER TO forecast;
+ALTER TABLE forecast.django_session OWNER TO forecastuser;
 
 --
 -- Name: forecast_cases; Type: TABLE; Schema: forecast; Owner: postgres
@@ -1724,7 +1735,7 @@ ALTER SEQUENCE forecast.forecast_model_id_seq OWNED BY forecast.forecast_model.i
 
 
 --
--- Name: auth_group; Type: TABLE; Schema: public; Owner: dengueadmin
+-- Name: auth_group; Type: TABLE; Schema: public; Owner: dengueuser
 --
 
 CREATE TABLE public.auth_group (
@@ -1733,10 +1744,10 @@ CREATE TABLE public.auth_group (
 );
 
 
-ALTER TABLE public.auth_group OWNER TO dengueadmin;
+ALTER TABLE public.auth_group OWNER TO dengueuser;
 
 --
--- Name: auth_group_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueadmin
+-- Name: auth_group_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueuser
 --
 
 CREATE SEQUENCE public.auth_group_id_seq
@@ -1747,17 +1758,17 @@ CREATE SEQUENCE public.auth_group_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_group_id_seq OWNER TO dengueadmin;
+ALTER TABLE public.auth_group_id_seq OWNER TO dengueuser;
 
 --
--- Name: auth_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueadmin
+-- Name: auth_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueuser
 --
 
 ALTER SEQUENCE public.auth_group_id_seq OWNED BY public.auth_group.id;
 
 
 --
--- Name: auth_group_permissions; Type: TABLE; Schema: public; Owner: dengueadmin
+-- Name: auth_group_permissions; Type: TABLE; Schema: public; Owner: dengueuser
 --
 
 CREATE TABLE public.auth_group_permissions (
@@ -1767,10 +1778,10 @@ CREATE TABLE public.auth_group_permissions (
 );
 
 
-ALTER TABLE public.auth_group_permissions OWNER TO dengueadmin;
+ALTER TABLE public.auth_group_permissions OWNER TO dengueuser;
 
 --
--- Name: auth_group_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueadmin
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueuser
 --
 
 CREATE SEQUENCE public.auth_group_permissions_id_seq
@@ -1781,17 +1792,17 @@ CREATE SEQUENCE public.auth_group_permissions_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_group_permissions_id_seq OWNER TO dengueadmin;
+ALTER TABLE public.auth_group_permissions_id_seq OWNER TO dengueuser;
 
 --
--- Name: auth_group_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueadmin
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueuser
 --
 
 ALTER SEQUENCE public.auth_group_permissions_id_seq OWNED BY public.auth_group_permissions.id;
 
 
 --
--- Name: auth_permission; Type: TABLE; Schema: public; Owner: dengueadmin
+-- Name: auth_permission; Type: TABLE; Schema: public; Owner: dengueuser
 --
 
 CREATE TABLE public.auth_permission (
@@ -1802,10 +1813,10 @@ CREATE TABLE public.auth_permission (
 );
 
 
-ALTER TABLE public.auth_permission OWNER TO dengueadmin;
+ALTER TABLE public.auth_permission OWNER TO dengueuser;
 
 --
--- Name: auth_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueadmin
+-- Name: auth_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueuser
 --
 
 CREATE SEQUENCE public.auth_permission_id_seq
@@ -1816,17 +1827,17 @@ CREATE SEQUENCE public.auth_permission_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_permission_id_seq OWNER TO dengueadmin;
+ALTER TABLE public.auth_permission_id_seq OWNER TO dengueuser;
 
 --
--- Name: auth_permission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueadmin
+-- Name: auth_permission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueuser
 --
 
 ALTER SEQUENCE public.auth_permission_id_seq OWNED BY public.auth_permission.id;
 
 
 --
--- Name: auth_user; Type: TABLE; Schema: public; Owner: dengueadmin
+-- Name: auth_user; Type: TABLE; Schema: public; Owner: dengueuser
 --
 
 CREATE TABLE public.auth_user (
@@ -1844,10 +1855,10 @@ CREATE TABLE public.auth_user (
 );
 
 
-ALTER TABLE public.auth_user OWNER TO dengueadmin;
+ALTER TABLE public.auth_user OWNER TO dengueuser;
 
 --
--- Name: auth_user_groups; Type: TABLE; Schema: public; Owner: dengueadmin
+-- Name: auth_user_groups; Type: TABLE; Schema: public; Owner: dengueuser
 --
 
 CREATE TABLE public.auth_user_groups (
@@ -1857,10 +1868,10 @@ CREATE TABLE public.auth_user_groups (
 );
 
 
-ALTER TABLE public.auth_user_groups OWNER TO dengueadmin;
+ALTER TABLE public.auth_user_groups OWNER TO dengueuser;
 
 --
--- Name: auth_user_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueadmin
+-- Name: auth_user_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueuser
 --
 
 CREATE SEQUENCE public.auth_user_groups_id_seq
@@ -1871,17 +1882,17 @@ CREATE SEQUENCE public.auth_user_groups_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_user_groups_id_seq OWNER TO dengueadmin;
+ALTER TABLE public.auth_user_groups_id_seq OWNER TO dengueuser;
 
 --
--- Name: auth_user_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueadmin
+-- Name: auth_user_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueuser
 --
 
 ALTER SEQUENCE public.auth_user_groups_id_seq OWNED BY public.auth_user_groups.id;
 
 
 --
--- Name: auth_user_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueadmin
+-- Name: auth_user_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueuser
 --
 
 CREATE SEQUENCE public.auth_user_id_seq
@@ -1892,17 +1903,17 @@ CREATE SEQUENCE public.auth_user_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_user_id_seq OWNER TO dengueadmin;
+ALTER TABLE public.auth_user_id_seq OWNER TO dengueuser;
 
 --
--- Name: auth_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueadmin
+-- Name: auth_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueuser
 --
 
 ALTER SEQUENCE public.auth_user_id_seq OWNED BY public.auth_user.id;
 
 
 --
--- Name: auth_user_user_permissions; Type: TABLE; Schema: public; Owner: dengueadmin
+-- Name: auth_user_user_permissions; Type: TABLE; Schema: public; Owner: dengueuser
 --
 
 CREATE TABLE public.auth_user_user_permissions (
@@ -1912,10 +1923,10 @@ CREATE TABLE public.auth_user_user_permissions (
 );
 
 
-ALTER TABLE public.auth_user_user_permissions OWNER TO dengueadmin;
+ALTER TABLE public.auth_user_user_permissions OWNER TO dengueuser;
 
 --
--- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueadmin
+-- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueuser
 --
 
 CREATE SEQUENCE public.auth_user_user_permissions_id_seq
@@ -1926,17 +1937,17 @@ CREATE SEQUENCE public.auth_user_user_permissions_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_user_user_permissions_id_seq OWNER TO dengueadmin;
+ALTER TABLE public.auth_user_user_permissions_id_seq OWNER TO dengueuser;
 
 --
--- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueadmin
+-- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueuser
 --
 
 ALTER SEQUENCE public.auth_user_user_permissions_id_seq OWNED BY public.auth_user_user_permissions.id;
 
 
 --
--- Name: chunked_upload_chunkedupload; Type: TABLE; Schema: public; Owner: dengueadmin
+-- Name: chunked_upload_chunkedupload; Type: TABLE; Schema: public; Owner: dengueuser
 --
 
 CREATE TABLE public.chunked_upload_chunkedupload (
@@ -1953,10 +1964,10 @@ CREATE TABLE public.chunked_upload_chunkedupload (
 );
 
 
-ALTER TABLE public.chunked_upload_chunkedupload OWNER TO dengueadmin;
+ALTER TABLE public.chunked_upload_chunkedupload OWNER TO dengueuser;
 
 --
--- Name: chunked_upload_chunkedupload_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueadmin
+-- Name: chunked_upload_chunkedupload_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueuser
 --
 
 CREATE SEQUENCE public.chunked_upload_chunkedupload_id_seq
@@ -1967,17 +1978,17 @@ CREATE SEQUENCE public.chunked_upload_chunkedupload_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.chunked_upload_chunkedupload_id_seq OWNER TO dengueadmin;
+ALTER TABLE public.chunked_upload_chunkedupload_id_seq OWNER TO dengueuser;
 
 --
--- Name: chunked_upload_chunkedupload_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueadmin
+-- Name: chunked_upload_chunkedupload_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueuser
 --
 
 ALTER SEQUENCE public.chunked_upload_chunkedupload_id_seq OWNED BY public.chunked_upload_chunkedupload.id;
 
 
 --
--- Name: dbf_dbf; Type: TABLE; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbf; Type: TABLE; Schema: public; Owner: dengueuser
 --
 
 CREATE TABLE public.dbf_dbf (
@@ -1992,10 +2003,10 @@ CREATE TABLE public.dbf_dbf (
 );
 
 
-ALTER TABLE public.dbf_dbf OWNER TO dengueadmin;
+ALTER TABLE public.dbf_dbf OWNER TO dengueuser;
 
 --
--- Name: dbf_dbf_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbf_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueuser
 --
 
 CREATE SEQUENCE public.dbf_dbf_id_seq
@@ -2006,17 +2017,17 @@ CREATE SEQUENCE public.dbf_dbf_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.dbf_dbf_id_seq OWNER TO dengueadmin;
+ALTER TABLE public.dbf_dbf_id_seq OWNER TO dengueuser;
 
 --
--- Name: dbf_dbf_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbf_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueuser
 --
 
 ALTER SEQUENCE public.dbf_dbf_id_seq OWNED BY public.dbf_dbf.id;
 
 
 --
--- Name: dbf_dbfchunkedupload; Type: TABLE; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbfchunkedupload; Type: TABLE; Schema: public; Owner: dengueuser
 --
 
 CREATE TABLE public.dbf_dbfchunkedupload (
@@ -2033,10 +2044,10 @@ CREATE TABLE public.dbf_dbfchunkedupload (
 );
 
 
-ALTER TABLE public.dbf_dbfchunkedupload OWNER TO dengueadmin;
+ALTER TABLE public.dbf_dbfchunkedupload OWNER TO dengueuser;
 
 --
--- Name: dbf_dbfchunkedupload_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbfchunkedupload_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueuser
 --
 
 CREATE SEQUENCE public.dbf_dbfchunkedupload_id_seq
@@ -2047,17 +2058,17 @@ CREATE SEQUENCE public.dbf_dbfchunkedupload_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.dbf_dbfchunkedupload_id_seq OWNER TO dengueadmin;
+ALTER TABLE public.dbf_dbfchunkedupload_id_seq OWNER TO dengueuser;
 
 --
--- Name: dbf_dbfchunkedupload_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbfchunkedupload_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueuser
 --
 
 ALTER SEQUENCE public.dbf_dbfchunkedupload_id_seq OWNED BY public.dbf_dbfchunkedupload.id;
 
 
 --
--- Name: django_admin_log; Type: TABLE; Schema: public; Owner: dengueadmin
+-- Name: django_admin_log; Type: TABLE; Schema: public; Owner: dengueuser
 --
 
 CREATE TABLE public.django_admin_log (
@@ -2073,10 +2084,10 @@ CREATE TABLE public.django_admin_log (
 );
 
 
-ALTER TABLE public.django_admin_log OWNER TO dengueadmin;
+ALTER TABLE public.django_admin_log OWNER TO dengueuser;
 
 --
--- Name: django_admin_log_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueadmin
+-- Name: django_admin_log_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueuser
 --
 
 CREATE SEQUENCE public.django_admin_log_id_seq
@@ -2087,17 +2098,17 @@ CREATE SEQUENCE public.django_admin_log_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.django_admin_log_id_seq OWNER TO dengueadmin;
+ALTER TABLE public.django_admin_log_id_seq OWNER TO dengueuser;
 
 --
--- Name: django_admin_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueadmin
+-- Name: django_admin_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueuser
 --
 
 ALTER SEQUENCE public.django_admin_log_id_seq OWNED BY public.django_admin_log.id;
 
 
 --
--- Name: django_content_type; Type: TABLE; Schema: public; Owner: dengueadmin
+-- Name: django_content_type; Type: TABLE; Schema: public; Owner: dengueuser
 --
 
 CREATE TABLE public.django_content_type (
@@ -2107,10 +2118,10 @@ CREATE TABLE public.django_content_type (
 );
 
 
-ALTER TABLE public.django_content_type OWNER TO dengueadmin;
+ALTER TABLE public.django_content_type OWNER TO dengueuser;
 
 --
--- Name: django_content_type_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueadmin
+-- Name: django_content_type_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueuser
 --
 
 CREATE SEQUENCE public.django_content_type_id_seq
@@ -2121,17 +2132,17 @@ CREATE SEQUENCE public.django_content_type_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.django_content_type_id_seq OWNER TO dengueadmin;
+ALTER TABLE public.django_content_type_id_seq OWNER TO dengueuser;
 
 --
--- Name: django_content_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueadmin
+-- Name: django_content_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueuser
 --
 
 ALTER SEQUENCE public.django_content_type_id_seq OWNED BY public.django_content_type.id;
 
 
 --
--- Name: django_migrations; Type: TABLE; Schema: public; Owner: dengueadmin
+-- Name: django_migrations; Type: TABLE; Schema: public; Owner: dengueuser
 --
 
 CREATE TABLE public.django_migrations (
@@ -2142,10 +2153,10 @@ CREATE TABLE public.django_migrations (
 );
 
 
-ALTER TABLE public.django_migrations OWNER TO dengueadmin;
+ALTER TABLE public.django_migrations OWNER TO dengueuser;
 
 --
--- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueadmin
+-- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueuser
 --
 
 CREATE SEQUENCE public.django_migrations_id_seq
@@ -2156,17 +2167,17 @@ CREATE SEQUENCE public.django_migrations_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.django_migrations_id_seq OWNER TO dengueadmin;
+ALTER TABLE public.django_migrations_id_seq OWNER TO dengueuser;
 
 --
--- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueadmin
+-- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueuser
 --
 
 ALTER SEQUENCE public.django_migrations_id_seq OWNED BY public.django_migrations.id;
 
 
 --
--- Name: django_session; Type: TABLE; Schema: public; Owner: dengueadmin
+-- Name: django_session; Type: TABLE; Schema: public; Owner: dengueuser
 --
 
 CREATE TABLE public.django_session (
@@ -2176,7 +2187,7 @@ CREATE TABLE public.django_session (
 );
 
 
-ALTER TABLE public.django_session OWNER TO dengueadmin;
+ALTER TABLE public.django_session OWNER TO dengueuser;
 
 --
 -- Name: hist_uf_chik_materialized_view; Type: MATERIALIZED VIEW; Schema: public; Owner: postgres
@@ -2257,7 +2268,7 @@ CREATE MATERIALIZED VIEW public.hist_uf_zika_materialized_view AS
 ALTER TABLE public.hist_uf_zika_materialized_view OWNER TO postgres;
 
 --
--- Name: uf_total_chik_view; Type: MATERIALIZED VIEW; Schema: public; Owner: administrador
+-- Name: uf_total_chik_view; Type: MATERIALIZED VIEW; Schema: public; Owner: dengueuser
 --
 
 CREATE MATERIALIZED VIEW public.uf_total_chik_view AS
@@ -2272,10 +2283,10 @@ CREATE MATERIALIZED VIEW public.uf_total_chik_view AS
   WITH NO DATA;
 
 
-ALTER TABLE public.uf_total_chik_view OWNER TO administrador;
+ALTER TABLE public.uf_total_chik_view OWNER TO dengueuser;
 
 --
--- Name: uf_total_view; Type: MATERIALIZED VIEW; Schema: public; Owner: administrador
+-- Name: uf_total_view; Type: MATERIALIZED VIEW; Schema: public; Owner: dengueuser
 --
 
 CREATE MATERIALIZED VIEW public.uf_total_view AS
@@ -2290,7 +2301,7 @@ CREATE MATERIALIZED VIEW public.uf_total_view AS
   WITH NO DATA;
 
 
-ALTER TABLE public.uf_total_view OWNER TO administrador;
+ALTER TABLE public.uf_total_view OWNER TO dengueuser;
 
 --
 -- Name: uf_total_zika_view; Type: MATERIALIZED VIEW; Schema: public; Owner: postgres
@@ -2311,77 +2322,77 @@ CREATE MATERIALIZED VIEW public.uf_total_zika_view AS
 ALTER TABLE public.uf_total_zika_view OWNER TO postgres;
 
 --
--- Name: alerta_regional_chik id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_chik id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".alerta_regional_chik ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".alerta_regional_chik_id_seq'::regclass);
 
 
 --
--- Name: alerta_regional_dengue id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_dengue id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".alerta_regional_dengue ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".alerta_regional_dengue_id_seq'::regclass);
 
 
 --
--- Name: alerta_regional_zika id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_zika id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".alerta_regional_zika ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".alerta_regional_zika_id_seq'::regclass);
 
 
 --
--- Name: macroregional id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: macroregional id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".macroregional ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".macroregional_id_seq'::regclass);
 
 
 --
--- Name: regional id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: regional id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".regional ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".regional_id_seq'::regclass);
 
 
 --
--- Name: regional_saude id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: regional_saude id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".regional_saude ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".regional_saude_id_seq'::regclass);
 
 
 --
--- Name: Clima_Satelite id; Type: DEFAULT; Schema: Municipio; Owner: administrador
+-- Name: Clima_Satelite id; Type: DEFAULT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Clima_Satelite" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Clima_Satelite_id_seq"'::regclass);
 
 
 --
--- Name: Clima_cemaden id; Type: DEFAULT; Schema: Municipio; Owner: administrador
+-- Name: Clima_cemaden id; Type: DEFAULT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Clima_cemaden" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Clima_cemaden_id_seq"'::regclass);
 
 
 --
--- Name: Clima_wu id; Type: DEFAULT; Schema: Municipio; Owner: administrador
+-- Name: Clima_wu id; Type: DEFAULT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Clima_wu" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Clima_wu_id_seq"'::regclass);
 
 
 --
--- Name: Historico_alerta id; Type: DEFAULT; Schema: Municipio; Owner: administrador
+-- Name: Historico_alerta id; Type: DEFAULT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Historico_alerta" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Historico_alerta_id_seq"'::regclass);
 
 
 --
--- Name: Historico_alerta_chik id; Type: DEFAULT; Schema: Municipio; Owner: administrador
+-- Name: Historico_alerta_chik id; Type: DEFAULT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Historico_alerta_chik" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Historico_alerta_chik_id_seq"'::regclass);
@@ -2395,35 +2406,35 @@ ALTER TABLE ONLY "Municipio"."Historico_alerta_zika" ALTER COLUMN id SET DEFAULT
 
 
 --
--- Name: Notificacao id; Type: DEFAULT; Schema: Municipio; Owner: administrador
+-- Name: Notificacao id; Type: DEFAULT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Notificacao" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Notificacao_id_seq"'::regclass);
 
 
 --
--- Name: Ovitrampa id; Type: DEFAULT; Schema: Municipio; Owner: administrador
+-- Name: Ovitrampa id; Type: DEFAULT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Ovitrampa" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Ovitrampa_id_seq"'::regclass);
 
 
 --
--- Name: Tweet id; Type: DEFAULT; Schema: Municipio; Owner: administrador
+-- Name: Tweet id; Type: DEFAULT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Tweet" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Tweet_id_seq"'::regclass);
 
 
 --
--- Name: alerta_mrj id; Type: DEFAULT; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj id; Type: DEFAULT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio".alerta_mrj ALTER COLUMN id SET DEFAULT nextval('"Municipio".alerta_mrj_id_seq'::regclass);
 
 
 --
--- Name: alerta_mrj_chik id; Type: DEFAULT; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj_chik id; Type: DEFAULT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio".alerta_mrj_chik ALTER COLUMN id SET DEFAULT nextval('"Municipio".alerta_mrj_chik_id_seq'::regclass);
@@ -2437,70 +2448,70 @@ ALTER TABLE ONLY "Municipio".alerta_mrj_zika ALTER COLUMN id SET DEFAULT nextval
 
 
 --
--- Name: auth_group id; Type: DEFAULT; Schema: forecast; Owner: forecast
+-- Name: auth_group id; Type: DEFAULT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_group ALTER COLUMN id SET DEFAULT nextval('forecast.auth_group_id_seq'::regclass);
 
 
 --
--- Name: auth_group_permissions id; Type: DEFAULT; Schema: forecast; Owner: forecast
+-- Name: auth_group_permissions id; Type: DEFAULT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_group_permissions ALTER COLUMN id SET DEFAULT nextval('forecast.auth_group_permissions_id_seq'::regclass);
 
 
 --
--- Name: auth_permission id; Type: DEFAULT; Schema: forecast; Owner: forecast
+-- Name: auth_permission id; Type: DEFAULT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_permission ALTER COLUMN id SET DEFAULT nextval('forecast.auth_permission_id_seq'::regclass);
 
 
 --
--- Name: auth_user id; Type: DEFAULT; Schema: forecast; Owner: forecast
+-- Name: auth_user id; Type: DEFAULT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_user ALTER COLUMN id SET DEFAULT nextval('forecast.auth_user_id_seq'::regclass);
 
 
 --
--- Name: auth_user_groups id; Type: DEFAULT; Schema: forecast; Owner: forecast
+-- Name: auth_user_groups id; Type: DEFAULT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_user_groups ALTER COLUMN id SET DEFAULT nextval('forecast.auth_user_groups_id_seq'::regclass);
 
 
 --
--- Name: auth_user_user_permissions id; Type: DEFAULT; Schema: forecast; Owner: forecast
+-- Name: auth_user_user_permissions id; Type: DEFAULT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_user_user_permissions ALTER COLUMN id SET DEFAULT nextval('forecast.auth_user_user_permissions_id_seq'::regclass);
 
 
 --
--- Name: chunked_upload_chunkedupload id; Type: DEFAULT; Schema: forecast; Owner: forecast
+-- Name: chunked_upload_chunkedupload id; Type: DEFAULT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.chunked_upload_chunkedupload ALTER COLUMN id SET DEFAULT nextval('forecast.chunked_upload_chunkedupload_id_seq'::regclass);
 
 
 --
--- Name: django_admin_log id; Type: DEFAULT; Schema: forecast; Owner: forecast
+-- Name: django_admin_log id; Type: DEFAULT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.django_admin_log ALTER COLUMN id SET DEFAULT nextval('forecast.django_admin_log_id_seq'::regclass);
 
 
 --
--- Name: django_content_type id; Type: DEFAULT; Schema: forecast; Owner: forecast
+-- Name: django_content_type id; Type: DEFAULT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.django_content_type ALTER COLUMN id SET DEFAULT nextval('forecast.django_content_type_id_seq'::regclass);
 
 
 --
--- Name: django_migrations id; Type: DEFAULT; Schema: forecast; Owner: forecast
+-- Name: django_migrations id; Type: DEFAULT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.django_migrations ALTER COLUMN id SET DEFAULT nextval('forecast.django_migrations_id_seq'::regclass);
@@ -2528,91 +2539,91 @@ ALTER TABLE ONLY forecast.forecast_model ALTER COLUMN id SET DEFAULT nextval('fo
 
 
 --
--- Name: auth_group id; Type: DEFAULT; Schema: public; Owner: dengueadmin
+-- Name: auth_group id; Type: DEFAULT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_group ALTER COLUMN id SET DEFAULT nextval('public.auth_group_id_seq'::regclass);
 
 
 --
--- Name: auth_group_permissions id; Type: DEFAULT; Schema: public; Owner: dengueadmin
+-- Name: auth_group_permissions id; Type: DEFAULT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_group_permissions ALTER COLUMN id SET DEFAULT nextval('public.auth_group_permissions_id_seq'::regclass);
 
 
 --
--- Name: auth_permission id; Type: DEFAULT; Schema: public; Owner: dengueadmin
+-- Name: auth_permission id; Type: DEFAULT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_permission ALTER COLUMN id SET DEFAULT nextval('public.auth_permission_id_seq'::regclass);
 
 
 --
--- Name: auth_user id; Type: DEFAULT; Schema: public; Owner: dengueadmin
+-- Name: auth_user id; Type: DEFAULT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_user ALTER COLUMN id SET DEFAULT nextval('public.auth_user_id_seq'::regclass);
 
 
 --
--- Name: auth_user_groups id; Type: DEFAULT; Schema: public; Owner: dengueadmin
+-- Name: auth_user_groups id; Type: DEFAULT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_user_groups ALTER COLUMN id SET DEFAULT nextval('public.auth_user_groups_id_seq'::regclass);
 
 
 --
--- Name: auth_user_user_permissions id; Type: DEFAULT; Schema: public; Owner: dengueadmin
+-- Name: auth_user_user_permissions id; Type: DEFAULT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_user_user_permissions ALTER COLUMN id SET DEFAULT nextval('public.auth_user_user_permissions_id_seq'::regclass);
 
 
 --
--- Name: chunked_upload_chunkedupload id; Type: DEFAULT; Schema: public; Owner: dengueadmin
+-- Name: chunked_upload_chunkedupload id; Type: DEFAULT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.chunked_upload_chunkedupload ALTER COLUMN id SET DEFAULT nextval('public.chunked_upload_chunkedupload_id_seq'::regclass);
 
 
 --
--- Name: dbf_dbf id; Type: DEFAULT; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbf id; Type: DEFAULT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.dbf_dbf ALTER COLUMN id SET DEFAULT nextval('public.dbf_dbf_id_seq'::regclass);
 
 
 --
--- Name: dbf_dbfchunkedupload id; Type: DEFAULT; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbfchunkedupload id; Type: DEFAULT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.dbf_dbfchunkedupload ALTER COLUMN id SET DEFAULT nextval('public.dbf_dbfchunkedupload_id_seq'::regclass);
 
 
 --
--- Name: django_admin_log id; Type: DEFAULT; Schema: public; Owner: dengueadmin
+-- Name: django_admin_log id; Type: DEFAULT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.django_admin_log ALTER COLUMN id SET DEFAULT nextval('public.django_admin_log_id_seq'::regclass);
 
 
 --
--- Name: django_content_type id; Type: DEFAULT; Schema: public; Owner: dengueadmin
+-- Name: django_content_type id; Type: DEFAULT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.django_content_type ALTER COLUMN id SET DEFAULT nextval('public.django_content_type_id_seq'::regclass);
 
 
 --
--- Name: django_migrations id; Type: DEFAULT; Schema: public; Owner: dengueadmin
+-- Name: django_migrations id; Type: DEFAULT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.django_migrations ALTER COLUMN id SET DEFAULT nextval('public.django_migrations_id_seq'::regclass);
 
 
 --
--- Name: CID10 CID10_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: administrador
+-- Name: CID10 CID10_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global"."CID10"
@@ -2620,7 +2631,7 @@ ALTER TABLE ONLY "Dengue_global"."CID10"
 
 
 --
--- Name: Municipio Municipio_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: administrador
+-- Name: Municipio Municipio_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global"."Municipio"
@@ -2628,7 +2639,7 @@ ALTER TABLE ONLY "Dengue_global"."Municipio"
 
 
 --
--- Name: alerta_regional_chik alertaregionalchik_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_chik alertaregionalchik_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".alerta_regional_chik
@@ -2636,7 +2647,7 @@ ALTER TABLE ONLY "Dengue_global".alerta_regional_chik
 
 
 --
--- Name: alerta_regional_dengue alertaregionaldengue_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_dengue alertaregionaldengue_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".alerta_regional_dengue
@@ -2644,7 +2655,7 @@ ALTER TABLE ONLY "Dengue_global".alerta_regional_dengue
 
 
 --
--- Name: alerta_regional_zika alertaregionalzika_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_zika alertaregionalzika_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".alerta_regional_zika
@@ -2652,7 +2663,7 @@ ALTER TABLE ONLY "Dengue_global".alerta_regional_zika
 
 
 --
--- Name: estado estado_pkey; Type: CONSTRAINT; Schema: Dengue_global; Owner: administrador
+-- Name: estado estado_pkey; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".estado
@@ -2660,7 +2671,7 @@ ALTER TABLE ONLY "Dengue_global".estado
 
 
 --
--- Name: macroregional macroregional_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: macroregional macroregional_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".macroregional
@@ -2668,7 +2679,7 @@ ALTER TABLE ONLY "Dengue_global".macroregional
 
 
 --
--- Name: parameters parameters_pkey; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: parameters parameters_pkey; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".parameters
@@ -2676,7 +2687,7 @@ ALTER TABLE ONLY "Dengue_global".parameters
 
 
 --
--- Name: regional regional_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: regional regional_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".regional
@@ -2684,7 +2695,7 @@ ALTER TABLE ONLY "Dengue_global".regional
 
 
 --
--- Name: regional_saude regional_saude_pkey; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: regional_saude regional_saude_pkey; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".regional_saude
@@ -2692,7 +2703,7 @@ ALTER TABLE ONLY "Dengue_global".regional_saude
 
 
 --
--- Name: regional_saude regional_saude_uq_municipio_geocodigo; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: regional_saude regional_saude_uq_municipio_geocodigo; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".regional_saude
@@ -2700,7 +2711,7 @@ ALTER TABLE ONLY "Dengue_global".regional_saude
 
 
 --
--- Name: Bairro Bairro_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Bairro Bairro_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Bairro"
@@ -2708,7 +2719,7 @@ ALTER TABLE ONLY "Municipio"."Bairro"
 
 
 --
--- Name: Clima_Satelite Clima_Satelite_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Clima_Satelite Clima_Satelite_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Clima_Satelite"
@@ -2716,7 +2727,7 @@ ALTER TABLE ONLY "Municipio"."Clima_Satelite"
 
 
 --
--- Name: Clima_cemaden Clima_cemaden_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Clima_cemaden Clima_cemaden_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Clima_cemaden"
@@ -2724,7 +2735,7 @@ ALTER TABLE ONLY "Municipio"."Clima_cemaden"
 
 
 --
--- Name: Clima_wu Clima_wu_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Clima_wu Clima_wu_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Clima_wu"
@@ -2732,7 +2743,7 @@ ALTER TABLE ONLY "Municipio"."Clima_wu"
 
 
 --
--- Name: Estacao_cemaden Estacao_cemaden_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Estacao_cemaden Estacao_cemaden_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Estacao_cemaden"
@@ -2740,7 +2751,7 @@ ALTER TABLE ONLY "Municipio"."Estacao_cemaden"
 
 
 --
--- Name: Estacao_wu Estacao_wu_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Estacao_wu Estacao_wu_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Estacao_wu"
@@ -2748,7 +2759,7 @@ ALTER TABLE ONLY "Municipio"."Estacao_wu"
 
 
 --
--- Name: Historico_alerta_chik Historico_alerta_chik_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Historico_alerta_chik Historico_alerta_chik_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Historico_alerta_chik"
@@ -2756,7 +2767,7 @@ ALTER TABLE ONLY "Municipio"."Historico_alerta_chik"
 
 
 --
--- Name: Historico_alerta Historico_alerta_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Historico_alerta Historico_alerta_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Historico_alerta"
@@ -2772,7 +2783,7 @@ ALTER TABLE ONLY "Municipio"."Historico_alerta_zika"
 
 
 --
--- Name: Localidade Localidade_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Localidade Localidade_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Localidade"
@@ -2780,7 +2791,7 @@ ALTER TABLE ONLY "Municipio"."Localidade"
 
 
 --
--- Name: Notificacao Notificacao_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Notificacao Notificacao_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Notificacao"
@@ -2788,7 +2799,7 @@ ALTER TABLE ONLY "Municipio"."Notificacao"
 
 
 --
--- Name: Ovitrampa Ovitrampa_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Ovitrampa Ovitrampa_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Ovitrampa"
@@ -2796,7 +2807,7 @@ ALTER TABLE ONLY "Municipio"."Ovitrampa"
 
 
 --
--- Name: Tweet Tweet_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Tweet Tweet_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Tweet"
@@ -2804,7 +2815,7 @@ ALTER TABLE ONLY "Municipio"."Tweet"
 
 
 --
--- Name: alerta_mrj_chik alerta_mrj_chik_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj_chik alerta_mrj_chik_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio".alerta_mrj_chik
@@ -2812,7 +2823,7 @@ ALTER TABLE ONLY "Municipio".alerta_mrj_chik
 
 
 --
--- Name: alerta_mrj alerta_mrj_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj alerta_mrj_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio".alerta_mrj
@@ -2828,7 +2839,7 @@ ALTER TABLE ONLY "Municipio".alerta_mrj_zika
 
 
 --
--- Name: Historico_alerta alertas_unicos; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Historico_alerta alertas_unicos; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Historico_alerta"
@@ -2836,7 +2847,7 @@ ALTER TABLE ONLY "Municipio"."Historico_alerta"
 
 
 --
--- Name: Historico_alerta_chik alertas_unicos_chik; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Historico_alerta_chik alertas_unicos_chik; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Historico_alerta_chik"
@@ -2852,7 +2863,7 @@ ALTER TABLE ONLY "Municipio"."Historico_alerta_zika"
 
 
 --
--- Name: Notificacao casos_unicos; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Notificacao casos_unicos; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Notificacao"
@@ -2860,7 +2871,7 @@ ALTER TABLE ONLY "Municipio"."Notificacao"
 
 
 --
--- Name: alerta_mrj previsao; Type: CONSTRAINT; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj previsao; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio".alerta_mrj
@@ -2868,7 +2879,7 @@ ALTER TABLE ONLY "Municipio".alerta_mrj
 
 
 --
--- Name: alerta_mrj_chik previsao_chik; Type: CONSTRAINT; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj_chik previsao_chik; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio".alerta_mrj_chik
@@ -2884,7 +2895,7 @@ ALTER TABLE ONLY "Municipio".alerta_mrj_zika
 
 
 --
--- Name: alerta_mrj unique_aps_se; Type: CONSTRAINT; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj unique_aps_se; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio".alerta_mrj
@@ -2892,7 +2903,7 @@ ALTER TABLE ONLY "Municipio".alerta_mrj
 
 
 --
--- Name: alerta_mrj_chik unique_chik_aps_se; Type: CONSTRAINT; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj_chik unique_chik_aps_se; Type: CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio".alerta_mrj_chik
@@ -2908,7 +2919,7 @@ ALTER TABLE ONLY "Municipio".alerta_mrj_zika
 
 
 --
--- Name: auth_group auth_group_name_key; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_group auth_group_name_key; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_group
@@ -2916,7 +2927,7 @@ ALTER TABLE ONLY forecast.auth_group
 
 
 --
--- Name: auth_group_permissions auth_group_permissions_group_id_permission_id_0cd325b0_uniq; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_group_permissions auth_group_permissions_group_id_permission_id_0cd325b0_uniq; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_group_permissions
@@ -2924,7 +2935,7 @@ ALTER TABLE ONLY forecast.auth_group_permissions
 
 
 --
--- Name: auth_group_permissions auth_group_permissions_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_group_permissions auth_group_permissions_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_group_permissions
@@ -2932,7 +2943,7 @@ ALTER TABLE ONLY forecast.auth_group_permissions
 
 
 --
--- Name: auth_group auth_group_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_group auth_group_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_group
@@ -2940,7 +2951,7 @@ ALTER TABLE ONLY forecast.auth_group
 
 
 --
--- Name: auth_permission auth_permission_content_type_id_codename_01ab375a_uniq; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_permission auth_permission_content_type_id_codename_01ab375a_uniq; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_permission
@@ -2948,7 +2959,7 @@ ALTER TABLE ONLY forecast.auth_permission
 
 
 --
--- Name: auth_permission auth_permission_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_permission auth_permission_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_permission
@@ -2956,7 +2967,7 @@ ALTER TABLE ONLY forecast.auth_permission
 
 
 --
--- Name: auth_user_groups auth_user_groups_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_user_groups auth_user_groups_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_user_groups
@@ -2964,7 +2975,7 @@ ALTER TABLE ONLY forecast.auth_user_groups
 
 
 --
--- Name: auth_user_groups auth_user_groups_user_id_group_id_94350c0c_uniq; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_user_groups auth_user_groups_user_id_group_id_94350c0c_uniq; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_user_groups
@@ -2972,7 +2983,7 @@ ALTER TABLE ONLY forecast.auth_user_groups
 
 
 --
--- Name: auth_user auth_user_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_user auth_user_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_user
@@ -2980,7 +2991,7 @@ ALTER TABLE ONLY forecast.auth_user
 
 
 --
--- Name: auth_user_user_permissions auth_user_user_permissions_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_user_user_permissions auth_user_user_permissions_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_user_user_permissions
@@ -2988,7 +2999,7 @@ ALTER TABLE ONLY forecast.auth_user_user_permissions
 
 
 --
--- Name: auth_user_user_permissions auth_user_user_permissions_user_id_permission_id_14a6b632_uniq; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_user_user_permissions auth_user_user_permissions_user_id_permission_id_14a6b632_uniq; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_user_user_permissions
@@ -2996,7 +3007,7 @@ ALTER TABLE ONLY forecast.auth_user_user_permissions
 
 
 --
--- Name: auth_user auth_user_username_key; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_user auth_user_username_key; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_user
@@ -3004,7 +3015,7 @@ ALTER TABLE ONLY forecast.auth_user
 
 
 --
--- Name: chunked_upload_chunkedupload chunked_upload_chunkedupload_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: chunked_upload_chunkedupload chunked_upload_chunkedupload_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.chunked_upload_chunkedupload
@@ -3012,7 +3023,7 @@ ALTER TABLE ONLY forecast.chunked_upload_chunkedupload
 
 
 --
--- Name: chunked_upload_chunkedupload chunked_upload_chunkedupload_upload_id_key; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: chunked_upload_chunkedupload chunked_upload_chunkedupload_upload_id_key; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.chunked_upload_chunkedupload
@@ -3020,7 +3031,7 @@ ALTER TABLE ONLY forecast.chunked_upload_chunkedupload
 
 
 --
--- Name: django_admin_log django_admin_log_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: django_admin_log django_admin_log_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.django_admin_log
@@ -3028,7 +3039,7 @@ ALTER TABLE ONLY forecast.django_admin_log
 
 
 --
--- Name: django_content_type django_content_type_app_label_model_76bd3d3b_uniq; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: django_content_type django_content_type_app_label_model_76bd3d3b_uniq; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.django_content_type
@@ -3036,7 +3047,7 @@ ALTER TABLE ONLY forecast.django_content_type
 
 
 --
--- Name: django_content_type django_content_type_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: django_content_type django_content_type_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.django_content_type
@@ -3044,7 +3055,7 @@ ALTER TABLE ONLY forecast.django_content_type
 
 
 --
--- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.django_migrations
@@ -3052,7 +3063,7 @@ ALTER TABLE ONLY forecast.django_migrations
 
 
 --
--- Name: django_session django_session_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: django_session django_session_pkey; Type: CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.django_session
@@ -3100,7 +3111,7 @@ ALTER TABLE ONLY forecast.forecast_model
 
 
 --
--- Name: auth_group auth_group_name_key; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_group auth_group_name_key; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_group
@@ -3108,7 +3119,7 @@ ALTER TABLE ONLY public.auth_group
 
 
 --
--- Name: auth_group_permissions auth_group_permissions_group_id_permission_id_0cd325b0_uniq; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_group_permissions auth_group_permissions_group_id_permission_id_0cd325b0_uniq; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_group_permissions
@@ -3116,7 +3127,7 @@ ALTER TABLE ONLY public.auth_group_permissions
 
 
 --
--- Name: auth_group_permissions auth_group_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_group_permissions auth_group_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_group_permissions
@@ -3124,7 +3135,7 @@ ALTER TABLE ONLY public.auth_group_permissions
 
 
 --
--- Name: auth_group auth_group_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_group auth_group_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_group
@@ -3132,7 +3143,7 @@ ALTER TABLE ONLY public.auth_group
 
 
 --
--- Name: auth_permission auth_permission_content_type_id_codename_01ab375a_uniq; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_permission auth_permission_content_type_id_codename_01ab375a_uniq; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_permission
@@ -3140,7 +3151,7 @@ ALTER TABLE ONLY public.auth_permission
 
 
 --
--- Name: auth_permission auth_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_permission auth_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_permission
@@ -3148,7 +3159,7 @@ ALTER TABLE ONLY public.auth_permission
 
 
 --
--- Name: auth_user_groups auth_user_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_user_groups auth_user_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_user_groups
@@ -3156,7 +3167,7 @@ ALTER TABLE ONLY public.auth_user_groups
 
 
 --
--- Name: auth_user_groups auth_user_groups_user_id_group_id_94350c0c_uniq; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_user_groups auth_user_groups_user_id_group_id_94350c0c_uniq; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_user_groups
@@ -3164,7 +3175,7 @@ ALTER TABLE ONLY public.auth_user_groups
 
 
 --
--- Name: auth_user auth_user_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_user auth_user_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_user
@@ -3172,7 +3183,7 @@ ALTER TABLE ONLY public.auth_user
 
 
 --
--- Name: auth_user_user_permissions auth_user_user_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_user_user_permissions auth_user_user_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_user_user_permissions
@@ -3180,7 +3191,7 @@ ALTER TABLE ONLY public.auth_user_user_permissions
 
 
 --
--- Name: auth_user_user_permissions auth_user_user_permissions_user_id_permission_id_14a6b632_uniq; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_user_user_permissions auth_user_user_permissions_user_id_permission_id_14a6b632_uniq; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_user_user_permissions
@@ -3188,7 +3199,7 @@ ALTER TABLE ONLY public.auth_user_user_permissions
 
 
 --
--- Name: auth_user auth_user_username_key; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_user auth_user_username_key; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_user
@@ -3196,7 +3207,7 @@ ALTER TABLE ONLY public.auth_user
 
 
 --
--- Name: chunked_upload_chunkedupload chunked_upload_chunkedupload_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: chunked_upload_chunkedupload chunked_upload_chunkedupload_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.chunked_upload_chunkedupload
@@ -3204,7 +3215,7 @@ ALTER TABLE ONLY public.chunked_upload_chunkedupload
 
 
 --
--- Name: chunked_upload_chunkedupload chunked_upload_chunkedupload_upload_id_key; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: chunked_upload_chunkedupload chunked_upload_chunkedupload_upload_id_key; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.chunked_upload_chunkedupload
@@ -3212,7 +3223,7 @@ ALTER TABLE ONLY public.chunked_upload_chunkedupload
 
 
 --
--- Name: dbf_dbf dbf_dbf_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbf dbf_dbf_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.dbf_dbf
@@ -3220,7 +3231,7 @@ ALTER TABLE ONLY public.dbf_dbf
 
 
 --
--- Name: dbf_dbfchunkedupload dbf_dbfchunkedupload_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbfchunkedupload dbf_dbfchunkedupload_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.dbf_dbfchunkedupload
@@ -3228,7 +3239,7 @@ ALTER TABLE ONLY public.dbf_dbfchunkedupload
 
 
 --
--- Name: dbf_dbfchunkedupload dbf_dbfchunkedupload_upload_id_key; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbfchunkedupload dbf_dbfchunkedupload_upload_id_key; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.dbf_dbfchunkedupload
@@ -3236,7 +3247,7 @@ ALTER TABLE ONLY public.dbf_dbfchunkedupload
 
 
 --
--- Name: django_admin_log django_admin_log_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: django_admin_log django_admin_log_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.django_admin_log
@@ -3244,7 +3255,7 @@ ALTER TABLE ONLY public.django_admin_log
 
 
 --
--- Name: django_content_type django_content_type_app_label_model_76bd3d3b_uniq; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: django_content_type django_content_type_app_label_model_76bd3d3b_uniq; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.django_content_type
@@ -3252,7 +3263,7 @@ ALTER TABLE ONLY public.django_content_type
 
 
 --
--- Name: django_content_type django_content_type_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: django_content_type django_content_type_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.django_content_type
@@ -3260,7 +3271,7 @@ ALTER TABLE ONLY public.django_content_type
 
 
 --
--- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: django_migrations django_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.django_migrations
@@ -3268,7 +3279,7 @@ ALTER TABLE ONLY public.django_migrations
 
 
 --
--- Name: django_session django_session_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: django_session django_session_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.django_session
@@ -3276,56 +3287,56 @@ ALTER TABLE ONLY public.django_session
 
 
 --
--- Name: Municipio_idx_gc; Type: INDEX; Schema: Dengue_global; Owner: administrador
+-- Name: Municipio_idx_gc; Type: INDEX; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE INDEX "Municipio_idx_gc" ON "Dengue_global"."Municipio" USING btree (geocodigo);
 
 
 --
--- Name: Municipio_idx_n; Type: INDEX; Schema: Dengue_global; Owner: administrador
+-- Name: Municipio_idx_n; Type: INDEX; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE INDEX "Municipio_idx_n" ON "Dengue_global"."Municipio" USING btree (nome);
 
 
 --
--- Name: estado_idx_gc; Type: INDEX; Schema: Dengue_global; Owner: administrador
+-- Name: estado_idx_gc; Type: INDEX; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE INDEX estado_idx_gc ON "Dengue_global".estado USING btree (geocodigo);
 
 
 --
--- Name: macroregional_idx_codigo; Type: INDEX; Schema: Dengue_global; Owner: dengueadmin
+-- Name: macroregional_idx_codigo; Type: INDEX; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE INDEX macroregional_idx_codigo ON "Dengue_global".macroregional USING btree (codigo);
 
 
 --
--- Name: parameters_idx_gc; Type: INDEX; Schema: Dengue_global; Owner: dengueadmin
+-- Name: parameters_idx_gc; Type: INDEX; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE INDEX parameters_idx_gc ON "Dengue_global".parameters USING btree (municipio_geocodigo);
 
 
 --
--- Name: regional_idx_codigo; Type: INDEX; Schema: Dengue_global; Owner: dengueadmin
+-- Name: regional_idx_codigo; Type: INDEX; Schema: Dengue_global; Owner: dengueuser
 --
 
 CREATE INDEX regional_idx_codigo ON "Dengue_global".regional USING btree (codigo);
 
 
 --
--- Name: Alerta_chik_idx_data; Type: INDEX; Schema: Municipio; Owner: administrador
+-- Name: Alerta_chik_idx_data; Type: INDEX; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE INDEX "Alerta_chik_idx_data" ON "Municipio"."Historico_alerta_chik" USING btree ("data_iniSE" DESC);
 
 
 --
--- Name: Alerta_idx_data; Type: INDEX; Schema: Municipio; Owner: administrador
+-- Name: Alerta_idx_data; Type: INDEX; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE INDEX "Alerta_idx_data" ON "Municipio"."Historico_alerta" USING btree ("data_iniSE" DESC);
@@ -3339,287 +3350,287 @@ CREATE INDEX "Alerta_zika_idx_data" ON "Municipio"."Historico_alerta_zika" USING
 
 
 --
--- Name: Clima_Satelite_idx_data; Type: INDEX; Schema: Municipio; Owner: administrador
+-- Name: Clima_Satelite_idx_data; Type: INDEX; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE INDEX "Clima_Satelite_idx_data" ON "Municipio"."Clima_Satelite" USING btree (id);
 
 
 --
--- Name: Dengue_idx_data; Type: INDEX; Schema: Municipio; Owner: administrador
+-- Name: Dengue_idx_data; Type: INDEX; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE INDEX "Dengue_idx_data" ON "Municipio"."Notificacao" USING btree (dt_notific DESC, se_notif DESC);
 
 
 --
--- Name: Tweets_idx_data; Type: INDEX; Schema: Municipio; Owner: administrador
+-- Name: Tweets_idx_data; Type: INDEX; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE INDEX "Tweets_idx_data" ON "Municipio"."Tweet" USING btree (data_dia DESC);
 
 
 --
--- Name: WU_idx_data; Type: INDEX; Schema: Municipio; Owner: administrador
+-- Name: WU_idx_data; Type: INDEX; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE INDEX "WU_idx_data" ON "Municipio"."Clima_wu" USING btree (data_dia DESC);
 
 
 --
--- Name: chuva_idx_data; Type: INDEX; Schema: Municipio; Owner: administrador
+-- Name: chuva_idx_data; Type: INDEX; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE INDEX chuva_idx_data ON "Municipio"."Clima_cemaden" USING btree (datahora DESC);
 
 
 --
--- Name: estacoes_idx; Type: INDEX; Schema: Municipio; Owner: administrador
+-- Name: estacoes_idx; Type: INDEX; Schema: Municipio; Owner: dengueuser
 --
 
 CREATE INDEX estacoes_idx ON "Municipio"."Clima_cemaden" USING btree ("Estacao_cemaden_codestacao");
 
 
 --
--- Name: auth_group_name_a6ea08ec_like; Type: INDEX; Schema: forecast; Owner: forecast
+-- Name: auth_group_name_a6ea08ec_like; Type: INDEX; Schema: forecast; Owner: forecastuser
 --
 
 CREATE INDEX auth_group_name_a6ea08ec_like ON forecast.auth_group USING btree (name varchar_pattern_ops);
 
 
 --
--- Name: auth_group_permissions_group_id_b120cbf9; Type: INDEX; Schema: forecast; Owner: forecast
+-- Name: auth_group_permissions_group_id_b120cbf9; Type: INDEX; Schema: forecast; Owner: forecastuser
 --
 
 CREATE INDEX auth_group_permissions_group_id_b120cbf9 ON forecast.auth_group_permissions USING btree (group_id);
 
 
 --
--- Name: auth_group_permissions_permission_id_84c5c92e; Type: INDEX; Schema: forecast; Owner: forecast
+-- Name: auth_group_permissions_permission_id_84c5c92e; Type: INDEX; Schema: forecast; Owner: forecastuser
 --
 
 CREATE INDEX auth_group_permissions_permission_id_84c5c92e ON forecast.auth_group_permissions USING btree (permission_id);
 
 
 --
--- Name: auth_permission_content_type_id_2f476e4b; Type: INDEX; Schema: forecast; Owner: forecast
+-- Name: auth_permission_content_type_id_2f476e4b; Type: INDEX; Schema: forecast; Owner: forecastuser
 --
 
 CREATE INDEX auth_permission_content_type_id_2f476e4b ON forecast.auth_permission USING btree (content_type_id);
 
 
 --
--- Name: auth_user_groups_group_id_97559544; Type: INDEX; Schema: forecast; Owner: forecast
+-- Name: auth_user_groups_group_id_97559544; Type: INDEX; Schema: forecast; Owner: forecastuser
 --
 
 CREATE INDEX auth_user_groups_group_id_97559544 ON forecast.auth_user_groups USING btree (group_id);
 
 
 --
--- Name: auth_user_groups_user_id_6a12ed8b; Type: INDEX; Schema: forecast; Owner: forecast
+-- Name: auth_user_groups_user_id_6a12ed8b; Type: INDEX; Schema: forecast; Owner: forecastuser
 --
 
 CREATE INDEX auth_user_groups_user_id_6a12ed8b ON forecast.auth_user_groups USING btree (user_id);
 
 
 --
--- Name: auth_user_user_permissions_permission_id_1fbb5f2c; Type: INDEX; Schema: forecast; Owner: forecast
+-- Name: auth_user_user_permissions_permission_id_1fbb5f2c; Type: INDEX; Schema: forecast; Owner: forecastuser
 --
 
 CREATE INDEX auth_user_user_permissions_permission_id_1fbb5f2c ON forecast.auth_user_user_permissions USING btree (permission_id);
 
 
 --
--- Name: auth_user_user_permissions_user_id_a95ead1b; Type: INDEX; Schema: forecast; Owner: forecast
+-- Name: auth_user_user_permissions_user_id_a95ead1b; Type: INDEX; Schema: forecast; Owner: forecastuser
 --
 
 CREATE INDEX auth_user_user_permissions_user_id_a95ead1b ON forecast.auth_user_user_permissions USING btree (user_id);
 
 
 --
--- Name: auth_user_username_6821ab7c_like; Type: INDEX; Schema: forecast; Owner: forecast
+-- Name: auth_user_username_6821ab7c_like; Type: INDEX; Schema: forecast; Owner: forecastuser
 --
 
 CREATE INDEX auth_user_username_6821ab7c_like ON forecast.auth_user USING btree (username varchar_pattern_ops);
 
 
 --
--- Name: chunked_upload_chunkedupload_upload_id_23703435_like; Type: INDEX; Schema: forecast; Owner: forecast
+-- Name: chunked_upload_chunkedupload_upload_id_23703435_like; Type: INDEX; Schema: forecast; Owner: forecastuser
 --
 
 CREATE INDEX chunked_upload_chunkedupload_upload_id_23703435_like ON forecast.chunked_upload_chunkedupload USING btree (upload_id varchar_pattern_ops);
 
 
 --
--- Name: chunked_upload_chunkedupload_user_id_70ff6dbf; Type: INDEX; Schema: forecast; Owner: forecast
+-- Name: chunked_upload_chunkedupload_user_id_70ff6dbf; Type: INDEX; Schema: forecast; Owner: forecastuser
 --
 
 CREATE INDEX chunked_upload_chunkedupload_user_id_70ff6dbf ON forecast.chunked_upload_chunkedupload USING btree (user_id);
 
 
 --
--- Name: django_admin_log_content_type_id_c4bce8eb; Type: INDEX; Schema: forecast; Owner: forecast
+-- Name: django_admin_log_content_type_id_c4bce8eb; Type: INDEX; Schema: forecast; Owner: forecastuser
 --
 
 CREATE INDEX django_admin_log_content_type_id_c4bce8eb ON forecast.django_admin_log USING btree (content_type_id);
 
 
 --
--- Name: django_admin_log_user_id_c564eba6; Type: INDEX; Schema: forecast; Owner: forecast
+-- Name: django_admin_log_user_id_c564eba6; Type: INDEX; Schema: forecast; Owner: forecastuser
 --
 
 CREATE INDEX django_admin_log_user_id_c564eba6 ON forecast.django_admin_log USING btree (user_id);
 
 
 --
--- Name: django_session_expire_date_a5c62663; Type: INDEX; Schema: forecast; Owner: forecast
+-- Name: django_session_expire_date_a5c62663; Type: INDEX; Schema: forecast; Owner: forecastuser
 --
 
 CREATE INDEX django_session_expire_date_a5c62663 ON forecast.django_session USING btree (expire_date);
 
 
 --
--- Name: django_session_session_key_c0390e0f_like; Type: INDEX; Schema: forecast; Owner: forecast
+-- Name: django_session_session_key_c0390e0f_like; Type: INDEX; Schema: forecast; Owner: forecastuser
 --
 
 CREATE INDEX django_session_session_key_c0390e0f_like ON forecast.django_session USING btree (session_key varchar_pattern_ops);
 
 
 --
--- Name: auth_group_name_a6ea08ec_like; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: auth_group_name_a6ea08ec_like; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX auth_group_name_a6ea08ec_like ON public.auth_group USING btree (name varchar_pattern_ops);
 
 
 --
--- Name: auth_group_permissions_group_id_b120cbf9; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: auth_group_permissions_group_id_b120cbf9; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX auth_group_permissions_group_id_b120cbf9 ON public.auth_group_permissions USING btree (group_id);
 
 
 --
--- Name: auth_group_permissions_permission_id_84c5c92e; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: auth_group_permissions_permission_id_84c5c92e; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX auth_group_permissions_permission_id_84c5c92e ON public.auth_group_permissions USING btree (permission_id);
 
 
 --
--- Name: auth_permission_content_type_id_2f476e4b; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: auth_permission_content_type_id_2f476e4b; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX auth_permission_content_type_id_2f476e4b ON public.auth_permission USING btree (content_type_id);
 
 
 --
--- Name: auth_user_groups_group_id_97559544; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: auth_user_groups_group_id_97559544; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX auth_user_groups_group_id_97559544 ON public.auth_user_groups USING btree (group_id);
 
 
 --
--- Name: auth_user_groups_user_id_6a12ed8b; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: auth_user_groups_user_id_6a12ed8b; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX auth_user_groups_user_id_6a12ed8b ON public.auth_user_groups USING btree (user_id);
 
 
 --
--- Name: auth_user_user_permissions_permission_id_1fbb5f2c; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: auth_user_user_permissions_permission_id_1fbb5f2c; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX auth_user_user_permissions_permission_id_1fbb5f2c ON public.auth_user_user_permissions USING btree (permission_id);
 
 
 --
--- Name: auth_user_user_permissions_user_id_a95ead1b; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: auth_user_user_permissions_user_id_a95ead1b; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX auth_user_user_permissions_user_id_a95ead1b ON public.auth_user_user_permissions USING btree (user_id);
 
 
 --
--- Name: auth_user_username_6821ab7c_like; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: auth_user_username_6821ab7c_like; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX auth_user_username_6821ab7c_like ON public.auth_user USING btree (username varchar_pattern_ops);
 
 
 --
--- Name: chunked_upload_chunkedupload_upload_id_23703435_like; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: chunked_upload_chunkedupload_upload_id_23703435_like; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX chunked_upload_chunkedupload_upload_id_23703435_like ON public.chunked_upload_chunkedupload USING btree (upload_id varchar_pattern_ops);
 
 
 --
--- Name: chunked_upload_chunkedupload_user_id_70ff6dbf; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: chunked_upload_chunkedupload_user_id_70ff6dbf; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX chunked_upload_chunkedupload_user_id_70ff6dbf ON public.chunked_upload_chunkedupload USING btree (user_id);
 
 
 --
--- Name: dbf_dbf_uploaded_by_id_ad662eb4; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbf_uploaded_by_id_ad662eb4; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX dbf_dbf_uploaded_by_id_ad662eb4 ON public.dbf_dbf USING btree (uploaded_by_id);
 
 
 --
--- Name: dbf_dbfchunkedupload_upload_id_e3989f45_like; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbfchunkedupload_upload_id_e3989f45_like; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX dbf_dbfchunkedupload_upload_id_e3989f45_like ON public.dbf_dbfchunkedupload USING btree (upload_id varchar_pattern_ops);
 
 
 --
--- Name: dbf_dbfchunkedupload_user_id_c7cc2beb; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbfchunkedupload_user_id_c7cc2beb; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX dbf_dbfchunkedupload_user_id_c7cc2beb ON public.dbf_dbfchunkedupload USING btree (user_id);
 
 
 --
--- Name: django_admin_log_content_type_id_c4bce8eb; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: django_admin_log_content_type_id_c4bce8eb; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX django_admin_log_content_type_id_c4bce8eb ON public.django_admin_log USING btree (content_type_id);
 
 
 --
--- Name: django_admin_log_user_id_c564eba6; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: django_admin_log_user_id_c564eba6; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX django_admin_log_user_id_c564eba6 ON public.django_admin_log USING btree (user_id);
 
 
 --
--- Name: django_session_expire_date_a5c62663; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: django_session_expire_date_a5c62663; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX django_session_expire_date_a5c62663 ON public.django_session USING btree (expire_date);
 
 
 --
--- Name: django_session_session_key_c0390e0f_like; Type: INDEX; Schema: public; Owner: dengueadmin
+-- Name: django_session_session_key_c0390e0f_like; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX django_session_session_key_c0390e0f_like ON public.django_session USING btree (session_key varchar_pattern_ops);
 
 
 --
--- Name: uf_total_chik_view_data_idx; Type: INDEX; Schema: public; Owner: administrador
+-- Name: uf_total_chik_view_data_idx; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX uf_total_chik_view_data_idx ON public.uf_total_chik_view USING btree (data);
 
 
 --
--- Name: uf_total_view_data_idx; Type: INDEX; Schema: public; Owner: administrador
+-- Name: uf_total_view_data_idx; Type: INDEX; Schema: public; Owner: dengueuser
 --
 
 CREATE INDEX uf_total_view_data_idx ON public.uf_total_view USING btree (data);
@@ -3633,7 +3644,7 @@ CREATE INDEX uf_total_zika_view_data_idx ON public.uf_total_zika_view USING btre
 
 
 --
--- Name: regional macroregional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: regional macroregional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".regional
@@ -3641,7 +3652,7 @@ ALTER TABLE ONLY "Dengue_global".regional
 
 
 --
--- Name: Municipio regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: administrador
+-- Name: Municipio regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global"."Municipio"
@@ -3649,7 +3660,7 @@ ALTER TABLE ONLY "Dengue_global"."Municipio"
 
 
 --
--- Name: alerta_regional_dengue regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_dengue regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".alerta_regional_dengue
@@ -3657,7 +3668,7 @@ ALTER TABLE ONLY "Dengue_global".alerta_regional_dengue
 
 
 --
--- Name: alerta_regional_chik regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_chik regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".alerta_regional_chik
@@ -3665,7 +3676,7 @@ ALTER TABLE ONLY "Dengue_global".alerta_regional_chik
 
 
 --
--- Name: alerta_regional_zika regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
+-- Name: alerta_regional_zika regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Dengue_global".alerta_regional_zika
@@ -3673,7 +3684,7 @@ ALTER TABLE ONLY "Dengue_global".alerta_regional_zika
 
 
 --
--- Name: Bairro Bairro_Localidade; Type: FK CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Bairro Bairro_Localidade; Type: FK CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Bairro"
@@ -3681,7 +3692,7 @@ ALTER TABLE ONLY "Municipio"."Bairro"
 
 
 --
--- Name: Ovitrampa Ovitrampa_Localidade; Type: FK CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Ovitrampa Ovitrampa_Localidade; Type: FK CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Ovitrampa"
@@ -3689,7 +3700,7 @@ ALTER TABLE ONLY "Municipio"."Ovitrampa"
 
 
 --
--- Name: Tweet Tweet_CID10; Type: FK CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Tweet Tweet_CID10; Type: FK CONSTRAINT; Schema: Municipio; Owner: dengueuser
 --
 
 ALTER TABLE ONLY "Municipio"."Tweet"
@@ -3697,7 +3708,7 @@ ALTER TABLE ONLY "Municipio"."Tweet"
 
 
 --
--- Name: auth_group_permissions auth_group_permissio_permission_id_84c5c92e_fk_auth_perm; Type: FK CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_group_permissions auth_group_permissio_permission_id_84c5c92e_fk_auth_perm; Type: FK CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_group_permissions
@@ -3705,7 +3716,7 @@ ALTER TABLE ONLY forecast.auth_group_permissions
 
 
 --
--- Name: auth_group_permissions auth_group_permissions_group_id_b120cbf9_fk_auth_group_id; Type: FK CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_group_permissions auth_group_permissions_group_id_b120cbf9_fk_auth_group_id; Type: FK CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_group_permissions
@@ -3713,7 +3724,7 @@ ALTER TABLE ONLY forecast.auth_group_permissions
 
 
 --
--- Name: auth_permission auth_permission_content_type_id_2f476e4b_fk_django_co; Type: FK CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_permission auth_permission_content_type_id_2f476e4b_fk_django_co; Type: FK CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_permission
@@ -3721,7 +3732,7 @@ ALTER TABLE ONLY forecast.auth_permission
 
 
 --
--- Name: auth_user_groups auth_user_groups_group_id_97559544_fk_auth_group_id; Type: FK CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_user_groups auth_user_groups_group_id_97559544_fk_auth_group_id; Type: FK CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_user_groups
@@ -3729,7 +3740,7 @@ ALTER TABLE ONLY forecast.auth_user_groups
 
 
 --
--- Name: auth_user_groups auth_user_groups_user_id_6a12ed8b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_user_groups auth_user_groups_user_id_6a12ed8b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_user_groups
@@ -3737,7 +3748,7 @@ ALTER TABLE ONLY forecast.auth_user_groups
 
 
 --
--- Name: auth_user_user_permissions auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm; Type: FK CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_user_user_permissions auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm; Type: FK CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_user_user_permissions
@@ -3745,7 +3756,7 @@ ALTER TABLE ONLY forecast.auth_user_user_permissions
 
 
 --
--- Name: auth_user_user_permissions auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: auth_user_user_permissions auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.auth_user_user_permissions
@@ -3753,7 +3764,7 @@ ALTER TABLE ONLY forecast.auth_user_user_permissions
 
 
 --
--- Name: chunked_upload_chunkedupload chunked_upload_chunkedupload_user_id_70ff6dbf_fk_auth_user_id; Type: FK CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: chunked_upload_chunkedupload chunked_upload_chunkedupload_user_id_70ff6dbf_fk_auth_user_id; Type: FK CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.chunked_upload_chunkedupload
@@ -3761,7 +3772,7 @@ ALTER TABLE ONLY forecast.chunked_upload_chunkedupload
 
 
 --
--- Name: django_admin_log django_admin_log_content_type_id_c4bce8eb_fk_django_co; Type: FK CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: django_admin_log django_admin_log_content_type_id_c4bce8eb_fk_django_co; Type: FK CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.django_admin_log
@@ -3769,7 +3780,7 @@ ALTER TABLE ONLY forecast.django_admin_log
 
 
 --
--- Name: django_admin_log django_admin_log_user_id_c564eba6_fk_auth_user_id; Type: FK CONSTRAINT; Schema: forecast; Owner: forecast
+-- Name: django_admin_log django_admin_log_user_id_c564eba6_fk_auth_user_id; Type: FK CONSTRAINT; Schema: forecast; Owner: forecastuser
 --
 
 ALTER TABLE ONLY forecast.django_admin_log
@@ -3817,7 +3828,7 @@ ALTER TABLE ONLY forecast.forecast_city
 
 
 --
--- Name: auth_group_permissions auth_group_permissio_permission_id_84c5c92e_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_group_permissions auth_group_permissio_permission_id_84c5c92e_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_group_permissions
@@ -3825,7 +3836,7 @@ ALTER TABLE ONLY public.auth_group_permissions
 
 
 --
--- Name: auth_group_permissions auth_group_permissions_group_id_b120cbf9_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_group_permissions auth_group_permissions_group_id_b120cbf9_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_group_permissions
@@ -3833,7 +3844,7 @@ ALTER TABLE ONLY public.auth_group_permissions
 
 
 --
--- Name: auth_permission auth_permission_content_type_id_2f476e4b_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_permission auth_permission_content_type_id_2f476e4b_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_permission
@@ -3841,7 +3852,7 @@ ALTER TABLE ONLY public.auth_permission
 
 
 --
--- Name: auth_user_groups auth_user_groups_group_id_97559544_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_user_groups auth_user_groups_group_id_97559544_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_user_groups
@@ -3849,7 +3860,7 @@ ALTER TABLE ONLY public.auth_user_groups
 
 
 --
--- Name: auth_user_groups auth_user_groups_user_id_6a12ed8b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_user_groups auth_user_groups_user_id_6a12ed8b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_user_groups
@@ -3857,7 +3868,7 @@ ALTER TABLE ONLY public.auth_user_groups
 
 
 --
--- Name: auth_user_user_permissions auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_user_user_permissions auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm; Type: FK CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_user_user_permissions
@@ -3865,7 +3876,7 @@ ALTER TABLE ONLY public.auth_user_user_permissions
 
 
 --
--- Name: auth_user_user_permissions auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: auth_user_user_permissions auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.auth_user_user_permissions
@@ -3873,7 +3884,7 @@ ALTER TABLE ONLY public.auth_user_user_permissions
 
 
 --
--- Name: chunked_upload_chunkedupload chunked_upload_chunkedupload_user_id_70ff6dbf_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: chunked_upload_chunkedupload chunked_upload_chunkedupload_user_id_70ff6dbf_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.chunked_upload_chunkedupload
@@ -3881,7 +3892,7 @@ ALTER TABLE ONLY public.chunked_upload_chunkedupload
 
 
 --
--- Name: dbf_dbf dbf_dbf_uploaded_by_id_ad662eb4_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbf dbf_dbf_uploaded_by_id_ad662eb4_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.dbf_dbf
@@ -3889,7 +3900,7 @@ ALTER TABLE ONLY public.dbf_dbf
 
 
 --
--- Name: dbf_dbfchunkedupload dbf_dbfchunkedupload_user_id_c7cc2beb_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: dbf_dbfchunkedupload dbf_dbfchunkedupload_user_id_c7cc2beb_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.dbf_dbfchunkedupload
@@ -3897,7 +3908,7 @@ ALTER TABLE ONLY public.dbf_dbfchunkedupload
 
 
 --
--- Name: django_admin_log django_admin_log_content_type_id_c4bce8eb_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: django_admin_log django_admin_log_content_type_id_c4bce8eb_fk_django_co; Type: FK CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.django_admin_log
@@ -3905,7 +3916,7 @@ ALTER TABLE ONLY public.django_admin_log
 
 
 --
--- Name: django_admin_log django_admin_log_user_id_c564eba6_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueadmin
+-- Name: django_admin_log django_admin_log_user_id_c564eba6_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueuser
 --
 
 ALTER TABLE ONLY public.django_admin_log
@@ -3913,301 +3924,301 @@ ALTER TABLE ONLY public.django_admin_log
 
 
 --
--- Name: TABLE "CID10"; Type: ACL; Schema: Dengue_global; Owner: administrador
+-- Name: TABLE "CID10"; Type: ACL; Schema: Dengue_global; Owner: dengueuser
 --
 
-GRANT ALL ON TABLE "Dengue_global"."CID10" TO "Dengue";
-GRANT ALL ON TABLE "Dengue_global"."CID10" TO dengue;
-
-
---
--- Name: TABLE "Municipio"; Type: ACL; Schema: Dengue_global; Owner: administrador
---
-
-GRANT ALL ON TABLE "Dengue_global"."Municipio" TO "Dengue";
-GRANT ALL ON TABLE "Dengue_global"."Municipio" TO dengue;
+GRANT ALL ON TABLE "Dengue_global"."CID10" TO "dengueuser";
+GRANT ALL ON TABLE "Dengue_global"."CID10" TO dengueuser;
 
 
 --
--- Name: TABLE estado; Type: ACL; Schema: Dengue_global; Owner: administrador
+-- Name: TABLE "Municipio"; Type: ACL; Schema: Dengue_global; Owner: dengueuser
 --
 
-GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE "Dengue_global".estado TO "Dengue";
-GRANT ALL ON TABLE "Dengue_global".estado TO dengue;
-
-
---
--- Name: TABLE macroregional; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
---
-
-GRANT ALL ON TABLE "Dengue_global".macroregional TO dengue;
+GRANT ALL ON TABLE "Dengue_global"."Municipio" TO "dengueuser";
+GRANT ALL ON TABLE "Dengue_global"."Municipio" TO dengueuser;
 
 
 --
--- Name: TABLE parameters; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
+-- Name: TABLE estado; Type: ACL; Schema: Dengue_global; Owner: dengueuser
 --
 
-GRANT ALL ON TABLE "Dengue_global".parameters TO dengue;
-
-
---
--- Name: TABLE regional; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
---
-
-GRANT ALL ON TABLE "Dengue_global".regional TO dengue;
+GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE "Dengue_global".estado TO "dengueuser";
+GRANT ALL ON TABLE "Dengue_global".estado TO dengueuser;
 
 
 --
--- Name: TABLE regional_saude; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
+-- Name: TABLE macroregional; Type: ACL; Schema: Dengue_global; Owner: dengueuser
 --
 
-GRANT ALL ON TABLE "Dengue_global".regional_saude TO dengue;
-GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE "Dengue_global".regional_saude TO "Dengue";
-
-
---
--- Name: SEQUENCE regional_saude_id_seq; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
---
-
-GRANT SELECT,USAGE ON SEQUENCE "Dengue_global".regional_saude_id_seq TO dengue;
+GRANT ALL ON TABLE "Dengue_global".macroregional TO dengueuser;
 
 
 --
--- Name: TABLE "Bairro"; Type: ACL; Schema: Municipio; Owner: administrador
+-- Name: TABLE parameters; Type: ACL; Schema: Dengue_global; Owner: dengueuser
 --
 
-GRANT ALL ON TABLE "Municipio"."Bairro" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Bairro" TO dengue;
-
-
---
--- Name: TABLE "Clima_Satelite"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Clima_Satelite" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Clima_Satelite" TO dengue;
+GRANT ALL ON TABLE "Dengue_global".parameters TO dengueuser;
 
 
 --
--- Name: SEQUENCE "Clima_Satelite_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
+-- Name: TABLE regional; Type: ACL; Schema: Dengue_global; Owner: dengueuser
 --
 
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_Satelite_id_seq" TO dengue;
-
-
---
--- Name: TABLE "Clima_cemaden"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Clima_cemaden" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Clima_cemaden" TO dengue;
+GRANT ALL ON TABLE "Dengue_global".regional TO dengueuser;
 
 
 --
--- Name: SEQUENCE "Clima_cemaden_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
+-- Name: TABLE regional_saude; Type: ACL; Schema: Dengue_global; Owner: dengueuser
 --
 
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_cemaden_id_seq" TO dengue;
-
-
---
--- Name: TABLE "Clima_wu"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Clima_wu" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Clima_wu" TO dengue;
+GRANT ALL ON TABLE "Dengue_global".regional_saude TO dengueuser;
+GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE "Dengue_global".regional_saude TO "dengueuser";
 
 
 --
--- Name: SEQUENCE "Clima_wu_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
+-- Name: SEQUENCE regional_saude_id_seq; Type: ACL; Schema: Dengue_global; Owner: dengueuser
 --
 
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_wu_id_seq" TO dengue;
-
-
---
--- Name: TABLE "Estacao_cemaden"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Estacao_cemaden" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Estacao_cemaden" TO dengue;
+GRANT SELECT,USAGE ON SEQUENCE "Dengue_global".regional_saude_id_seq TO dengueuser;
 
 
 --
--- Name: TABLE "Estacao_wu"; Type: ACL; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Bairro"; Type: ACL; Schema: Municipio; Owner: dengueuser
 --
 
-GRANT ALL ON TABLE "Municipio"."Estacao_wu" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Estacao_wu" TO dengue;
-
-
---
--- Name: TABLE "Historico_alerta"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Historico_alerta" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Historico_alerta" TO dengue;
+GRANT ALL ON TABLE "Municipio"."Bairro" TO "dengueuser";
+GRANT ALL ON TABLE "Municipio"."Bairro" TO dengueuser;
 
 
 --
--- Name: TABLE "Historico_alerta_chik"; Type: ACL; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Clima_Satelite"; Type: ACL; Schema: Municipio; Owner: dengueuser
 --
 
-GRANT ALL ON TABLE "Municipio"."Historico_alerta_chik" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Historico_alerta_chik" TO dengue;
-
-
---
--- Name: SEQUENCE "Historico_alerta_chik_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Historico_alerta_chik_id_seq" TO dengue;
+GRANT ALL ON TABLE "Municipio"."Clima_Satelite" TO "dengueuser";
+GRANT ALL ON TABLE "Municipio"."Clima_Satelite" TO dengueuser;
 
 
 --
--- Name: SEQUENCE "Historico_alerta_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
+-- Name: SEQUENCE "Clima_Satelite_id_seq"; Type: ACL; Schema: Municipio; Owner: dengueuser
 --
 
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Historico_alerta_id_seq" TO dengue;
+GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_Satelite_id_seq" TO dengueuser;
+
+
+--
+-- Name: TABLE "Clima_cemaden"; Type: ACL; Schema: Municipio; Owner: dengueuser
+--
+
+GRANT ALL ON TABLE "Municipio"."Clima_cemaden" TO "dengueuser";
+GRANT ALL ON TABLE "Municipio"."Clima_cemaden" TO dengueuser;
+
+
+--
+-- Name: SEQUENCE "Clima_cemaden_id_seq"; Type: ACL; Schema: Municipio; Owner: dengueuser
+--
+
+GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_cemaden_id_seq" TO dengueuser;
+
+
+--
+-- Name: TABLE "Clima_wu"; Type: ACL; Schema: Municipio; Owner: dengueuser
+--
+
+GRANT ALL ON TABLE "Municipio"."Clima_wu" TO "dengueuser";
+GRANT ALL ON TABLE "Municipio"."Clima_wu" TO dengueuser;
+
+
+--
+-- Name: SEQUENCE "Clima_wu_id_seq"; Type: ACL; Schema: Municipio; Owner: dengueuser
+--
+
+GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_wu_id_seq" TO dengueuser;
+
+
+--
+-- Name: TABLE "Estacao_cemaden"; Type: ACL; Schema: Municipio; Owner: dengueuser
+--
+
+GRANT ALL ON TABLE "Municipio"."Estacao_cemaden" TO "dengueuser";
+GRANT ALL ON TABLE "Municipio"."Estacao_cemaden" TO dengueuser;
+
+
+--
+-- Name: TABLE "Estacao_wu"; Type: ACL; Schema: Municipio; Owner: dengueuser
+--
+
+GRANT ALL ON TABLE "Municipio"."Estacao_wu" TO "dengueuser";
+GRANT ALL ON TABLE "Municipio"."Estacao_wu" TO dengueuser;
+
+
+--
+-- Name: TABLE "Historico_alerta"; Type: ACL; Schema: Municipio; Owner: dengueuser
+--
+
+GRANT ALL ON TABLE "Municipio"."Historico_alerta" TO "dengueuser";
+GRANT ALL ON TABLE "Municipio"."Historico_alerta" TO dengueuser;
+
+
+--
+-- Name: TABLE "Historico_alerta_chik"; Type: ACL; Schema: Municipio; Owner: dengueuser
+--
+
+GRANT ALL ON TABLE "Municipio"."Historico_alerta_chik" TO "dengueuser";
+GRANT ALL ON TABLE "Municipio"."Historico_alerta_chik" TO dengueuser;
+
+
+--
+-- Name: SEQUENCE "Historico_alerta_chik_id_seq"; Type: ACL; Schema: Municipio; Owner: dengueuser
+--
+
+GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Historico_alerta_chik_id_seq" TO dengueuser;
+
+
+--
+-- Name: SEQUENCE "Historico_alerta_id_seq"; Type: ACL; Schema: Municipio; Owner: dengueuser
+--
+
+GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Historico_alerta_id_seq" TO dengueuser;
 
 
 --
 -- Name: TABLE "Historico_alerta_zika"; Type: ACL; Schema: Municipio; Owner: postgres
 --
 
-GRANT ALL ON TABLE "Municipio"."Historico_alerta_zika" TO dengue;
+GRANT ALL ON TABLE "Municipio"."Historico_alerta_zika" TO dengueuser;
 
 
 --
 -- Name: SEQUENCE "Historico_alerta_zika_id_seq"; Type: ACL; Schema: Municipio; Owner: postgres
 --
 
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Historico_alerta_zika_id_seq" TO dengue;
+GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Historico_alerta_zika_id_seq" TO dengueuser;
 
 
 --
--- Name: TABLE "Localidade"; Type: ACL; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Localidade"; Type: ACL; Schema: Municipio; Owner: dengueuser
 --
 
-GRANT ALL ON TABLE "Municipio"."Localidade" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Localidade" TO dengue;
-
-
---
--- Name: TABLE "Notificacao"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Notificacao" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Notificacao" TO dengue;
+GRANT ALL ON TABLE "Municipio"."Localidade" TO "dengueuser";
+GRANT ALL ON TABLE "Municipio"."Localidade" TO dengueuser;
 
 
 --
--- Name: SEQUENCE "Notificacao_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Notificacao"; Type: ACL; Schema: Municipio; Owner: dengueuser
 --
 
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Notificacao_id_seq" TO dengue;
-
-
---
--- Name: TABLE "Ovitrampa"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Ovitrampa" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Ovitrampa" TO dengue;
+GRANT ALL ON TABLE "Municipio"."Notificacao" TO "dengueuser";
+GRANT ALL ON TABLE "Municipio"."Notificacao" TO dengueuser;
 
 
 --
--- Name: SEQUENCE "Ovitrampa_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
+-- Name: SEQUENCE "Notificacao_id_seq"; Type: ACL; Schema: Municipio; Owner: dengueuser
 --
 
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Ovitrampa_id_seq" TO dengue;
-
-
---
--- Name: TABLE "Tweet"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Tweet" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Tweet" TO dengue;
+GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Notificacao_id_seq" TO dengueuser;
 
 
 --
--- Name: SEQUENCE "Tweet_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Ovitrampa"; Type: ACL; Schema: Municipio; Owner: dengueuser
 --
 
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Tweet_id_seq" TO dengue;
-
-
---
--- Name: TABLE alerta_mrj; Type: ACL; Schema: Municipio; Owner: dengueadmin
---
-
-GRANT ALL ON TABLE "Municipio".alerta_mrj TO dengue;
+GRANT ALL ON TABLE "Municipio"."Ovitrampa" TO "dengueuser";
+GRANT ALL ON TABLE "Municipio"."Ovitrampa" TO dengueuser;
 
 
 --
--- Name: TABLE alerta_mrj_chik; Type: ACL; Schema: Municipio; Owner: dengueadmin
+-- Name: SEQUENCE "Ovitrampa_id_seq"; Type: ACL; Schema: Municipio; Owner: dengueuser
 --
 
-GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE "Municipio".alerta_mrj_chik TO "Dengue";
-GRANT ALL ON TABLE "Municipio".alerta_mrj_chik TO dengue;
-
-
---
--- Name: SEQUENCE alerta_mrj_chik_id_seq; Type: ACL; Schema: Municipio; Owner: dengueadmin
---
-
-GRANT SELECT,USAGE ON SEQUENCE "Municipio".alerta_mrj_chik_id_seq TO dengue;
+GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Ovitrampa_id_seq" TO dengueuser;
 
 
 --
--- Name: SEQUENCE alerta_mrj_id_seq; Type: ACL; Schema: Municipio; Owner: dengueadmin
+-- Name: TABLE "Tweet"; Type: ACL; Schema: Municipio; Owner: dengueuser
 --
 
-GRANT SELECT,USAGE ON SEQUENCE "Municipio".alerta_mrj_id_seq TO dengue;
+GRANT ALL ON TABLE "Municipio"."Tweet" TO "dengueuser";
+GRANT ALL ON TABLE "Municipio"."Tweet" TO dengueuser;
+
+
+--
+-- Name: SEQUENCE "Tweet_id_seq"; Type: ACL; Schema: Municipio; Owner: dengueuser
+--
+
+GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Tweet_id_seq" TO dengueuser;
+
+
+--
+-- Name: TABLE alerta_mrj; Type: ACL; Schema: Municipio; Owner: dengueuser
+--
+
+GRANT ALL ON TABLE "Municipio".alerta_mrj TO dengueuser;
+
+
+--
+-- Name: TABLE alerta_mrj_chik; Type: ACL; Schema: Municipio; Owner: dengueuser
+--
+
+GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE "Municipio".alerta_mrj_chik TO "dengueuser";
+GRANT ALL ON TABLE "Municipio".alerta_mrj_chik TO dengueuser;
+
+
+--
+-- Name: SEQUENCE alerta_mrj_chik_id_seq; Type: ACL; Schema: Municipio; Owner: dengueuser
+--
+
+GRANT SELECT,USAGE ON SEQUENCE "Municipio".alerta_mrj_chik_id_seq TO dengueuser;
+
+
+--
+-- Name: SEQUENCE alerta_mrj_id_seq; Type: ACL; Schema: Municipio; Owner: dengueuser
+--
+
+GRANT SELECT,USAGE ON SEQUENCE "Municipio".alerta_mrj_id_seq TO dengueuser;
 
 
 --
 -- Name: TABLE alerta_mrj_zika; Type: ACL; Schema: Municipio; Owner: postgres
 --
 
-GRANT ALL ON TABLE "Municipio".alerta_mrj_zika TO dengue;
+GRANT ALL ON TABLE "Municipio".alerta_mrj_zika TO dengueuser;
 
 
 --
 -- Name: SEQUENCE alerta_mrj_zika_id_seq; Type: ACL; Schema: Municipio; Owner: postgres
 --
 
-GRANT SELECT,USAGE ON SEQUENCE "Municipio".alerta_mrj_zika_id_seq TO dengue;
+GRANT SELECT,USAGE ON SEQUENCE "Municipio".alerta_mrj_zika_id_seq TO dengueuser;
 
 
 --
 -- Name: TABLE historico_casos; Type: ACL; Schema: Municipio; Owner: postgres
 --
 
-GRANT ALL ON TABLE "Municipio".historico_casos TO dengue;
+GRANT ALL ON TABLE "Municipio".historico_casos TO dengueuser;
 
 
 --
--- Name: TABLE uf_total_chik_view; Type: ACL; Schema: public; Owner: administrador
+-- Name: TABLE uf_total_chik_view; Type: ACL; Schema: public; Owner: dengueuser
 --
 
-GRANT SELECT,INSERT,REFERENCES,TRIGGER,UPDATE ON TABLE public.uf_total_chik_view TO "Dengue";
-
-
---
--- Name: TABLE uf_total_view; Type: ACL; Schema: public; Owner: administrador
---
-
-GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE public.uf_total_view TO "Dengue";
+GRANT SELECT,INSERT,REFERENCES,TRIGGER,UPDATE ON TABLE public.uf_total_chik_view TO "dengueuser";
 
 
 --
--- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: -; Owner: administrador
+-- Name: TABLE uf_total_view; Type: ACL; Schema: public; Owner: dengueuser
 --
 
-ALTER DEFAULT PRIVILEGES FOR ROLE administrador GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLES  TO "Dengue";
-ALTER DEFAULT PRIVILEGES FOR ROLE administrador GRANT SELECT ON TABLES  TO "Read_only";
+GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE public.uf_total_view TO "dengueuser";
+
+
+--
+-- Name: DEFAULT PRIVILEGES FOR TABLES; Type: DEFAULT ACL; Schema: -; Owner: dengueuser
+--
+
+ALTER DEFAULT PRIVILEGES FOR ROLE dengueuser GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLES  TO "dengueuser";
+ALTER DEFAULT PRIVILEGES FOR ROLE dengueuser GRANT SELECT ON TABLES  TO "Read_only";
 
 
 --
