@@ -1,0 +1,25 @@
+name: alertadengue
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - docker-compose
+  - gdal 3.3.*
+  - make
+  - pip
+  - python 3.9.*
+  - psycopg2
+  - poetry
+  # dev
+  - pre-commit
+  - black
+  - flake8
+  - mypy
+  - isort
+  - ipython
+  - jupyterlab
+  - matplotlib
+  - mypy
+  - Pillow
+  - pre-commit
+  - isort

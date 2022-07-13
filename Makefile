@@ -3,13 +3,17 @@
 include .env
 
 SERVICES:=
+SERVICE:=
 # options: dev, prod
 ENV:=$(ENV)
 
 DOCKER=docker-compose \
 	--env-file .env \
 	--project-name infodengue-$(ENV) \
+	--file docker/compose-base.yaml \
 	--file docker/compose-$(ENV).yaml
+
+CONSOLE:=bash
 
 # PREPARE ENVIRONMENT
 .PHONY:prepare-env
@@ -28,11 +32,8 @@ sync-static-geofiles:
 # DOCKER
 .PHONY:docker-build
 docker-build:
+	$(DOCKER) build base
 	$(DOCKER) build ${SERVICES}
-
-.PHONY:docker-start-ci
-docker-start-ci:
-	$(DOCKER) up -d --scale base=0
 
 .PHONY:docker-start
 docker-start:
@@ -52,7 +53,31 @@ docker-restart: docker-stop docker-start
 
 .PHONY:docker-logs
 docker-logs:
-	$(DOCKER) logs --follow --tail 100 ${SERVICES}
+	$(DOCKER) logs --tail 300 ${SERVICES}
+
+.PHONY:docker-logs-follow
+docker-logs-follow:
+	$(DOCKER) logs --follow --tail 300 ${SERVICES}
+
+.PHONY: docker-wait
+docker-wait:
+	ENV=${ENV} timeout 90 ./docker/scripts/healthcheck.sh ${SERVICE}
+
+.PHONY: docker-wait-all
+docker-wait-all:
+	$(MAKE) docker-wait ENV=${ENV} SERVICE="memcached"
+	$(MAKE) docker-wait ENV=${ENV} SERVICE="rabbitmq"
+	if [[ ${ENV} -eq "dev"]]; then $(MAKE) docker-wait ENV=${ENV} SERVICE="db"; fi
+	$(MAKE) docker-wait ENV=${ENV} SERVICE="web"
+	$(MAKE) docker-wait ENV=${ENV} SERVICE="worker"
+
+.PHONY:docker-console
+docker-console:
+	$(DOCKER) exec ${SERVICE} ${CONSOLE}
+
+.PHONY:docker-down
+docker-down:
+	$(DOCKER) down --volumes
 
 .PHONY:run-dev-db
 docker-run-dev-db:

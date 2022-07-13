@@ -3,10 +3,10 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - django >=3.1.8,<4
+  - docker-compose
   - gdal 3.3.*
   - make
   - pip
   - python 3.9.*
-  - psycopg2-binary
+  - psycopg2
   - poetry
