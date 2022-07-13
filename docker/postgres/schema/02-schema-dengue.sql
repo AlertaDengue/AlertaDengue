@@ -6,13 +6,6 @@
 -- Dumped from database version 9.6.12
 -- Dumped by pg_dump version 14.2
 
-
-DROP DATABASE denguedb;
-DROP USER dengueuser;
-
-CREATE DATABASE denguedb;
-CREATE ROLE dengueuser LOGIN PASSWORD 'denguepassword';
-
 GRANT ALL PRIVILEGES ON DATABASE denguedb TO dengueuser;
 
 \c denguedb

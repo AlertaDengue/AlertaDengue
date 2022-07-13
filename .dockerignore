@@ -1,6 +1,6 @@
 ci/*
 docs/*
-docker/dev_dumps/*
+docker/postgres/dumps/*
 notebooks_tmp/*
 notebooks/*
 rever/*

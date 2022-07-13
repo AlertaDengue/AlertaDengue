@@ -30,29 +30,16 @@ services:
   base:
     build:
       context: ".."
-      dockerfile: "docker/Dockerfile-base"
+      dockerfile: "docker/web/Dockerfile-base"
       args:
         HOST_UID: ${HOST_UID}
         HOST_GID: ${HOST_GID}
+        ENV: ${ENV}
     profiles:
       - donotstart
-    env_file:
-      - ../.env
-    environment:
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
-      - PSQL_HOST=${PSQL_HOST}
-      - PSQL_PORT=${PSQL_PORT}
-    volumes:
-      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
-      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
-      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
 
   web:
-    build:
-      context: ".."
-      dockerfile: "docker/Dockerfile-dev"
-      args:
-        IMAGE_BUILD: infodengue-dev_base:latest
+    # entrypoint: ["/entrypoint.sh"]
     env_file:
       - ../.env
     environment:
@@ -79,8 +66,8 @@ services:
       start_period: 10s  # requires docker-compose 3.4
 
   worker:
-    image: infodengue-dev_web:latest
-    entrypoint: "/opt/services/AlertaDengue/run_celery_worker.sh"
+    image: infodengue-dev_base:latest
+    entrypoint: ["/opt/services/celery-run.sh"]
     env_file:
       - ../.env
     environment:

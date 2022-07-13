@@ -3,6 +3,7 @@ FROM condaforge/mambaforge
 ARG HOST_UID
 ARG HOST_GID
 ARG SERVICES
+ARG ENV
 ENV ENV_NAME=alertadengue
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -40,18 +41,24 @@ USER deploy
 ## Copy code to the container with permissions to user
 COPY --chown=deploy:deploy AlertaDengue  /opt/services/AlertaDengue
 COPY --chown=deploy env.tpl pyproject.toml poetry.lock  /opt/services/AlertaDengue/
-COPY --chown=deploy:deploy conda/environment.yaml /tmp/environment.yaml
+COPY --chown=deploy:deploy conda/${ENV}.yaml /tmp/environment.yaml
+COPY --chown=deploy:deploy docker/scripts/poetry-install.sh /tmp/poetry-install.sh
+COPY --chown=deploy:deploy docker/web/entrypoint.sh /entrypoint.sh
+COPY --chown=deploy:deploy docker/celery/run.sh  /opt/services/celery-run.sh
+
+# Change shell to bash
+SHELL ["/bin/bash", "-c"]
 
 # Use environment to update the env alertadengue
 RUN mamba env create -n $ENV_NAME \
     --file /tmp/environment.yaml \
-  && cd /opt/services/AlertaDengue && poetry config virtualenvs.create false && poetry install --no-dev \
+  && cd /opt/services/AlertaDengue \
+  && . /tmp/poetry-install.sh \
   && conda clean --all \
   && find /opt/conda/ -type f,l -name '*.a' -delete \
   && find /opt/conda/ -type f,l -name '*.pyc' -delete \
   && find /opt/conda/ -type f,l -name '*.js.map' -delete \
   && rm -rf /opt/conda/pkgs
 
-COPY --chown=deploy:deploy docker/entrypoint.sh /entrypoint.sh
 WORKDIR /opt/services/AlertaDengue
 ENTRYPOINT ["bash", "/activate.sh"]

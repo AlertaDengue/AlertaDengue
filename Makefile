@@ -32,6 +32,7 @@ sync-static-geofiles:
 # DOCKER
 .PHONY:docker-build
 docker-build:
+	$(DOCKER) build base
 	$(DOCKER) build ${SERVICES}
 
 .PHONY:docker-start

@@ -4,7 +4,7 @@ FROM ${IMAGE_BUILD}
 USER root
 
 # Configure cron for DBF request
-COPY docker/cron-tasks /etc/cron.d/cron-tasks
+COPY docker/web/cron-tasks /etc/cron.d/cron-tasks
 RUN chmod 0644 /etc/cron.d/cron-tasks \
   && crontab -u deploy /etc/cron.d/cron-tasks \
   && echo "deploy"  > /etc/cron.allow \
@@ -14,5 +14,3 @@ RUN chmod 0644 /etc/cron.d/cron-tasks \
   && chown deploy:deploy /var/run/crond.pid
 
 USER deploy
-
-CMD ["/opt/services/AlertaDengue/runwsgi.sh"]

@@ -50,3 +50,6 @@ maintenance_mode_state.txt
 
 # Rever
 rever/
+
+#dump
+docker/postgres/dumps/*
