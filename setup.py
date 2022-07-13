@@ -64,7 +64,7 @@ def read(filename):
 
 setup(
     name="AlertaDengue",
-    version="2.9.0",
+    version='3.0.0',
     description="Dengue alert",
     long_description=readme + "\n\n" + history,
     author="FIOCRUZ",
