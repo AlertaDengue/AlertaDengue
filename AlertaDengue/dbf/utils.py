@@ -23,13 +23,11 @@ EXPECTED_FIELDS = [
     "NU_IDADE_N",
     "CS_SEXO",
     # "RESUL_PCR_",
-    "CRITERIO",
-    "CLASSI_FIN",
+    # "CRITERIO",
+    # "CLASSI_FIN",
 ]
 
 ALL_EXPECTED_FIELDS = EXPECTED_FIELDS.copy()
-
-ALL_EXPECTED_FIELDS.extend(["RESUL_PCR_"])
 
 SYNONYMS_FIELDS = {"ID_MUNICIP": ["ID_MN_RESI"]}
 
@@ -123,11 +121,13 @@ def chunk_dbf_toparquet(dbfname) -> glob:
     dbf = Dbf5(dbfname)
 
     f_name = str(dbf.dbf)[:-4]
-    print(f_name)
+
     if f_name.startswith(("BR-DEN", "BR-CHIK")):
-        key_columns = ALL_EXPECTED_FIELDS
+        ALL_EXPECTED_FIELDS.extend(["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"])
+    elif f_name.startswith("BR-ZIKA"):
+        ALL_EXPECTED_FIELDS.extend(["CRITERIO", "CLASSI_FIN"])
     else:
-        key_columns = EXPECTED_FIELDS
+        ALL_EXPECTED_FIELDS
 
     for chunk, (lowerbound, upperbound) in enumerate(
         chunk_gen(1000, dbf.numrec)
@@ -141,7 +141,7 @@ def chunk_dbf_toparquet(dbfname) -> glob:
         )
         df_gpd = _parse_fields(df_gpd)
 
-        df_gpd[key_columns].to_parquet(pq_fname)
+        df_gpd[ALL_EXPECTED_FIELDS].to_parquet(pq_fname)
 
     fetch_pq_fname = DBFS_PQTDIR / f_name
 

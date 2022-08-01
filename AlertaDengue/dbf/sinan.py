@@ -171,7 +171,7 @@ class Sinan(object):
                     None
                     if (isinstance(row[9], type(pd.NaT)) or row[9] is None)
                     else date.fromordinal(row[9].to_pydatetime().toordinal())
-                )  # print('DT_NASC', row[10])
+                )  # print('DT_NASC', row[9])
                 row[10] = (
                     None if pd.isnull(row[10]) else str(row[10])
                 )  # print('CS_SEXO', row[10])
