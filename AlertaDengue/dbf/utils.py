@@ -23,13 +23,13 @@ EXPECTED_FIELDS = [
     "NU_IDADE_N",
     "CS_SEXO",
     # "RESUL_PCR_",
-    # "CRITERIO",
-    # "CLASSI_FIN",
+    "CRITERIO",
+    "CLASSI_FIN",
 ]
 
 ALL_EXPECTED_FIELDS = EXPECTED_FIELDS.copy()
 
-ALL_EXPECTED_FIELDS.extend(["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"])
+ALL_EXPECTED_FIELDS.extend(["RESUL_PCR_"])
 
 SYNONYMS_FIELDS = {"ID_MUNICIP": ["ID_MN_RESI"]}
 
@@ -42,13 +42,11 @@ FIELD_MAP = {
     "dt_sin_pri": "DT_SIN_PRI",
     "se_sin_pri": "SEM_PRI",
     "dt_digita": "DT_DIGITA",
-    "bairro_nome": "NM_BAIRRO",
-    "bairro_bairro_id": "ID_BAIRRO",
     "municipio_geocodigo": "ID_MUNICIP",
     "nu_notific": "NU_NOTIFIC",
     "cid10_codigo": "ID_AGRAVO",
-    "cs_sexo": "CS_SEXO",
     "dt_nasc": "DT_NASC",
+    "cs_sexo": "CS_SEXO",
     "nu_idade_n": "NU_IDADE_N",
     "resul_pcr": "RESUL_PCR_",
     "criterio": "CRITERIO",
@@ -125,7 +123,7 @@ def chunk_dbf_toparquet(dbfname) -> glob:
     dbf = Dbf5(dbfname)
 
     f_name = str(dbf.dbf)[:-4]
-
+    print(f_name)
     if f_name.startswith(("BR-DEN", "BR-CHIK")):
         key_columns = ALL_EXPECTED_FIELDS
     else:
