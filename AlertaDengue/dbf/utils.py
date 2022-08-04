@@ -29,8 +29,6 @@ EXPECTED_FIELDS = [
 
 ALL_EXPECTED_FIELDS = EXPECTED_FIELDS.copy()
 
-ALL_EXPECTED_FIELDS.extend(["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"])
-
 SYNONYMS_FIELDS = {"ID_MUNICIP": ["ID_MN_RESI"]}
 
 EXPECTED_DATE_FIELDS = ["DT_SIN_PRI", "DT_NOTIFIC", "DT_DIGITA", "DT_NASC"]
@@ -42,13 +40,11 @@ FIELD_MAP = {
     "dt_sin_pri": "DT_SIN_PRI",
     "se_sin_pri": "SEM_PRI",
     "dt_digita": "DT_DIGITA",
-    "bairro_nome": "NM_BAIRRO",
-    "bairro_bairro_id": "ID_BAIRRO",
     "municipio_geocodigo": "ID_MUNICIP",
     "nu_notific": "NU_NOTIFIC",
     "cid10_codigo": "ID_AGRAVO",
-    "cs_sexo": "CS_SEXO",
     "dt_nasc": "DT_NASC",
+    "cs_sexo": "CS_SEXO",
     "nu_idade_n": "NU_IDADE_N",
     "resul_pcr": "RESUL_PCR_",
     "criterio": "CRITERIO",
@@ -127,9 +123,11 @@ def chunk_dbf_toparquet(dbfname) -> glob:
     f_name = str(dbf.dbf)[:-4]
 
     if f_name.startswith(("BR-DEN", "BR-CHIK")):
-        key_columns = ALL_EXPECTED_FIELDS
+        ALL_EXPECTED_FIELDS.extend(["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"])
+    elif f_name.startswith("BR-ZIKA"):
+        ALL_EXPECTED_FIELDS.extend(["CRITERIO", "CLASSI_FIN"])
     else:
-        key_columns = EXPECTED_FIELDS
+        ALL_EXPECTED_FIELDS
 
     for chunk, (lowerbound, upperbound) in enumerate(
         chunk_gen(1000, dbf.numrec)
@@ -143,7 +141,7 @@ def chunk_dbf_toparquet(dbfname) -> glob:
         )
         df_gpd = _parse_fields(df_gpd)
 
-        df_gpd[key_columns].to_parquet(pq_fname)
+        df_gpd[ALL_EXPECTED_FIELDS].to_parquet(pq_fname)
 
     fetch_pq_fname = DBFS_PQTDIR / f_name
 

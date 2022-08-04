@@ -133,35 +133,31 @@ class Sinan(object):
                     None
                     if isinstance(row[0], type(pd.NaT))
                     else date.fromordinal(row[0].to_pydatetime().toordinal())
-                )  # dt_notific
-                row[1] = int(str(int(row[1]))[-2:])  # se_notific
+                )  # print('DT_NOTIFIC', row[0])
+                row[1] = int(str(int(row[1]))[-2:])  # print('SEM_NOT', row[1])
                 row[2] = (
                     int(self.ano) if pd.isnull(row[2]) else int(row[2])
-                )  # ano_notific
+                )  # print('NU_ANO', row[2])
                 row[3] = (
                     None
                     if isinstance(row[3], type(pd.NaT))
                     else date.fromordinal(row[3].to_pydatetime().toordinal())
-                )  # dt_sin_pri
+                )  # print('DT_SIN_PRI', row[3])
                 row[4] = (
                     None if not row[4] else int(str(row[4])[-2:])
-                )  # se_sin_pri
+                )  # print('SEM_PRI', row[4])
                 row[5] = (
                     None
                     if isinstance(row[5], type(pd.NaT))
                     else date.fromordinal(row[5].to_pydatetime().toordinal())
-                )  # dt_digita
+                )  # print('DT_DIGITA', row[5])
                 row[6] = (
-                    None if pd.isnull(row[6]) else str(row[6])
-                )  # nm_bairro
+                    None if row[6] == "" else add_dv(int(row[6]))
+                )  # print('ID_MUNICIP', row[6])
                 row[7] = (
                     None if pd.isnull(row[7]) else int(row[7])
-                )  # bairro_bairro_id
-                row[8] = (
-                    None if row[8] == "" else add_dv(int(row[8]))
-                )  # municipio_geocodigo
-                row[9] = int(row[9])  # nu_notific
-                if row[10] is None:
+                )  # print('NU_NOTIFIC', row[7])
+                if row[8] is None:
                     if default_cid is None:
                         raise ValidationError(
                             _(
@@ -170,24 +166,27 @@ class Sinan(object):
                             )
                         )
                     else:
-                        row[10] = default_cid
-
-                row[11] = (
+                        row[8] = default_cid  # print('ID_AGRAVO', row[8])
+                row[9] = (
                     None
-                    if (isinstance(row[11], type(pd.NaT)) or row[11] is None)
-                    else date.fromordinal(row[11].to_pydatetime().toordinal())
-                )  # dt_nasc
+                    if (isinstance(row[9], type(pd.NaT)) or row[9] is None)
+                    else date.fromordinal(row[9].to_pydatetime().toordinal())
+                )  # print('DT_NASC', row[9])
+                row[10] = (
+                    None if pd.isnull(row[10]) else str(row[10])
+                )  # print('CS_SEXO', row[10])
+                row[11] = (
+                    None if pd.isnull(row[11]) else int(row[11])
+                )  # print('NU_IDADE_N', row[11])
+                row[12] = (
+                    None if pd.isnull(row[12]) else int(row[12])
+                )  # print('RESUL_PCR', row[12])
                 row[13] = (
                     None if pd.isnull(row[13]) else int(row[13])
-                )  # nu_idade_n
-                row[14] = None if pd.isnull(row[14]) else int(row[14])
-                # # resul_pcr
-                row[15] = (
-                    None if pd.isnull(row[15]) else int(row[15])
-                )  # criterio
-                row[16] = (
-                    None if pd.isnull(row[16]) else int(row[16])
-                )  # classi_fin
+                )  # print('CRITERIO', row[13])
+                row[14] = (
+                    None if pd.isnull(row[14]) else int(row[14])
+                )  # print('CLASSI_FIN', row[14])
                 cursor.execute(insert_sql, row)
                 if (i % 1000 == 0) and (i > 0):
                     logger.info(
