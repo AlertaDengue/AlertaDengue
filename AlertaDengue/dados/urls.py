@@ -7,9 +7,8 @@ from django.views.generic import TemplateView
 # local
 from .views import (
     AboutPageView,
-    AlertaGeoJSONView,
+    AlertaGeoJSONView, #TODO chop it out!
     AlertaMainView,
-    AlertaMRJPageView,
     AlertaMunicipioPageView,
     AlertaStateView,
     ChartsMainView,
@@ -29,10 +28,6 @@ from .views import (
 
 def redirect_alerta_dengue(request, state):
     return redirect("dados:alerta_uf", state=state, disease="dengue")
-
-
-def redirect_alert_rio_dengue(request):
-    return redirect("dados:mrj", disease="dengue")
 
 
 def redirect_alert_city_dengue(request, geocodigo):
@@ -117,13 +112,9 @@ urlpatterns = [
         AlertaStateView.as_view(),
         name="alerta_uf",
     ),
-    re_path(r"^alerta/rio/$", redirect_alert_rio_dengue),
+    re_path(r"^alert-city/%s[/]?$" % __geocode, redirect_alert_city_dengue),
     re_path(
-        r"^alerta/rio/%s$" % __disease, AlertaMRJPageView.as_view(), name="mrj"
-    ),
-    re_path(r"^alerta/%s[/]?$" % __geocode, redirect_alert_city_dengue),
-    re_path(
-        r"^alerta/%s/%s$" % (__geocode, __disease),
+        r"^alert-city/%s/%s$" % (__geocode, __disease),
         AlertaMunicipioPageView.as_view(),
         name="alerta_cidade",
     ),
