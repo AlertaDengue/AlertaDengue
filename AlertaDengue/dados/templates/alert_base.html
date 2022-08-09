@@ -52,7 +52,6 @@
         opacity: 0.7;
     }
 </style>
-<script src='/static/exp_PontosUnidadesBasicasSaudeMRJ2014wgs84.js'></script>
 <script src="/static/js/Autolinker.min.js"></script>
 <script src="/static/libs/jquery/jquery.sparkline.min.js"></script>
 <script src="/static/js/infodengue.js"></script>
@@ -378,12 +377,6 @@
 
         legend.addTo(map);
 
-        // fetch data about health units
-        function pop_PontosUnidadesBasicasSaudeMRJ2014wgs84(feature, layer) {
-            var popupContent = '<table><tr><th scope="row">Nome:</th><td>' + Autolinker.link(String(feature.properties.NOME_LEG)) + '</td></tr><tr><th scope="row">Logradouro:</th><td>' + Autolinker.link(String(feature.properties.LOGRADOURO)) + '</td></tr><tr><th scope="row">Número:</th><td>' + Autolinker.link(String(feature.properties.NUMERO)) + '</td></tr><tr><th scope="row">Complemento:</th><td>' + Autolinker.link(String(feature.properties.COMPLEMENT)) + '</td></tr><tr><th scope="row">Bairro:</th><td>' + Autolinker.link(String(feature.properties.BAIRRO)) + '</td></tr><tr><th scope="row">CEP:</th><td>' + Autolinker.link(String(feature.properties.CEP)) + '</td></tr><tr><th scope="row">Telefone:</th><td>' + Autolinker.link(String(feature.properties.TELEFONE)) + '</td></tr><tr><th scope="row">Tipo:</th><td>' + Autolinker.link(String(feature.properties.TP_UNIDADE)) + '</td></tr><tr><th scope="row">Classe:</th><td>' + Autolinker.link(String(feature.properties.CLASSE_UND)) + '</td></tr></table><p><a href="http://www.rio.rj.gov.br/web/sms/onde-ser-atendido">Onde posso ser atendido?</a></p>';
-            layer.bindPopup(popupContent);
-        }
-
         var CrossIcon = L.icon({
             iconUrl: '/static/img/32px-Red_Cross_icon.png',
             iconSize: [16, 16],
@@ -391,28 +384,12 @@
             popupAnchor: [8, -8]
         });
 
-        var exp_PontosUnidadesBasicasSaudeMRJ2014wgs84JSON = new L.geoJson(exp_PontosUnidadesBasicasSaudeMRJ2014wgs84, {
-            onEachFeature: pop_PontosUnidadesBasicasSaudeMRJ2014wgs84,
-            pointToLayer: function (feature, latlng) {
-                return L.marker(latlng, {
-                    icon: CrossIcon
-                })
-            }
-        });
-
-        features.addLayer(exp_PontosUnidadesBasicasSaudeMRJ2014wgs84JSON)
-
         // @override at alert_js_main_init
         var map_bounds = [];
 
         {% block alert_js_main_init %} {% endblock %}
 
-        if (geocode == '3304557') {
-            // override by alert_mrj
-            load_map_layer(dataurl, alerta, series_casos, casos_por_ap, bairros, map);
-        } else {
-            load_map_layer(dataurl, map);
-        }
+        load_map_layer(dataurl, map);
 
         info.addTo(map);
 
@@ -440,12 +417,9 @@
     <br>
 <div class="card-footer">
     <h4 id="section1" class="panel-title"><b>{% trans "Relatório da Situação das Arboviroses em" %}: </b>
-    {% if geocode == "3304557" %}
-        <a href="{% url 'dados:report_city' state=state_abv geocode=geocode year_week=yearweek %}"> {{ nome }} </a></h4>
-    {% else %}
-        <a href="{% url 'dados:report_city' state=state_abv geocode=geocode year_week=SE %}"> {{ nome }} </a></h4>
-    {% endif %}
 
+    <a href="{% url 'dados:report_city' state=state_abv geocode=geocode year_week=SE %}"> {{ nome }} </a></h4>
+ 
     <h4 id="section1" class="panel-title"><b>{% trans "Para mais detalhes, acesse a página de Estados" %}:</b>
     <a href="{% url 'dados:alerta_uf' disease=disease_code state=state_abv %}">{{state}}</a></h4>
 </div>

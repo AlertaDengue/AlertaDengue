@@ -38,7 +38,6 @@ from .charts.states import ReportStateCharts
 from .dbdata import (
     ALERT_COLOR,
     CID10,
-    MRJ_GEOCODE,
     STATE_INITIAL,
     STATE_NAME,
     Forecast,
@@ -63,14 +62,6 @@ def get_static(static_dir):
 DBF = apps.get_model("dbf", "DBF")
 
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
-
-
-dados_alerta = dbdata.get_alerta_mrj()
-dados_alerta_chik = dbdata.get_alerta_mrj_chik()
-dados_alerta_zika = dbdata.get_alerta_mrj_zika()
-
-with open(os.path.join(settings.STATICFILES_DIRS[0], "rio_aps.geojson")) as f:
-    polygons = geojson.load(f)
 
 
 def _get_disease_label(disease_code: str) -> str:
@@ -125,63 +116,6 @@ def get_last_color_alert(geocode, disease, color_type="rgb"):
     return hex_to_rgb(color_list[level])
 
 
-def get_alert(disease="dengue"):
-    """
-    Read the data and return the alert status of all APs.
-    returns a tuple with the following elements:
-    - alert: dictionary with the alert status per AP
-    - current: tuple with all variables from the last SE
-    - case_series: dictionary with 12-weeks case series per AP
-    - last_year: integer representing the total number of cases 52 weeks ago.
-    - obs_case_series
-    - min_max_est
-    :rtype : tuple
-    """
-    # dados_alerta and dados_alert_chick are global variables
-    df = (
-        dados_alerta
-        if disease == "dengue"
-        else dados_alerta_chik
-        if disease == "chikungunya"
-        else dados_alerta_zika
-        if disease == "zika"
-        else None
-    )
-
-    if df is None:
-        raise Exception("Doença não cadastrada.")
-
-    df = df.copy()
-    df.fillna(0, inplace=True)
-
-    last_SE = df.se.max()  # Last epidemiological week
-    current = df[df["se"] == last_SE]  # Current status
-
-    G = df.groupby("aps")
-    alert = defaultdict(lambda: 0)
-    case_series = {}  # estimated
-    obs_case_series = {}
-    min_max_est = {}
-    last_year = None
-
-    for ap in G.groups.keys():
-        # .tail()  # only calculates on the series tail
-        adf = G.get_group(ap).sort_values("data")
-
-        k = str(float(ap.split("AP")[-1]))
-
-        case_series[k] = [int(v) for v in adf.casos_est.iloc[-12:].values]
-        obs_case_series[k] = [int(v) for v in adf.casos.iloc[-12:].values]
-        alert[ap] = adf.nivel.iloc[-1]
-        last_year = int(adf.casos.iloc[-52])
-        min_max_est[ap] = (
-            adf.casos_estmin.iloc[-1],
-            adf.casos_estmax.iloc[-1],
-        )
-
-    return alert, current, case_series, last_year, obs_case_series, min_max_est
-
-
 def get_municipio(request):
     q = request.GET["q"]
     muns = dbdata.get_city(q)
@@ -189,40 +123,6 @@ def get_municipio(request):
         [{"geocodigo": g, "nome": n, "uf": u} for g, n, u in muns]
     )
     return HttpResponse(data, content_type="application/json")
-
-
-def load_series():
-    """
-    Monta as séries para visualização no site
-    """
-    series = defaultdict(lambda: defaultdict(lambda: []))
-    G = dados_alerta.groupby("aps")
-    for ap in G.groups.keys():
-        series[ap]["dia"] = [
-            int(mktime(datetime.datetime.strptime(d, "%Y-%m-%d").timetuple()))
-            if isinstance(d, str)
-            else None
-            for d in G.get_group(ap).data
-        ]
-        series[ap]["tweets"] = [
-            float(i) if not np.isnan(i) else None
-            for i in G.get_group(ap).tweets
-        ]
-        series[ap]["tmin"] = [
-            float(i) if not np.isnan(i) else None for i in G.get_group(ap).tmin
-        ]
-        series[ap]["casos_est"] = [
-            float(i) if not np.isnan(i) else None
-            for i in G.get_group(ap).casos_est
-        ]
-        series[ap]["casos"] = [
-            float(i) if not np.isnan(i) else None
-            for i in G.get_group(ap).casos
-        ]
-        series[ap]["alerta"] = [
-            c - 1 if not np.isnan(c) else None for c in G.get_group(ap).cor
-        ]
-    return series
 
 
 class _GetMethod:
@@ -367,170 +267,11 @@ class AlertCityPageBaseView(TemplateView, _GetMethod):
     pass
 
 
-class AlertaMRJPageView(AlertCityPageBaseView):
-    """
-    Rio de Janeiro Alert View
-    """
-
-    template_name = "alerta_mrj.html"
-
-    def get_context_data(self, **kwargs):
-        context = super(AlertaMRJPageView, self).get_context_data(**kwargs)
-
-        chart_alerts = AlertCitiesCharts()
-
-        disease_code = context["disease"]
-
-        disease_label = _get_disease_label(disease_code)
-
-        bairros_mrj = {
-            1.0: "AP 1: Centro e adjacências",
-            2.1: "AP 2.1: Zona Sul",
-            2.2: "AP 2.2: Tijuca e adjacências",
-            3.1: "AP 3.1: Bonsucesso e adjacências",
-            3.2: "AP 3.2: Meier e adjacências",
-            3.3: "AP 3.3: Madureira e adjacências",
-            4.0: "AP 4: Barra, Recreio e Jacarepaguá",
-            5.1: "AP 5.1: Bangu e adjacências",
-            5.2: "AP 5.2: Campo Grande e adjacências",
-            5.3: "AP 5.3: Santa Cruz e adjacências",
-        }
-
-        geocode = str(MRJ_GEOCODE)
-
-        city_info = get_city_info(geocode)
-
-        # forecast epiweek reference
-        forecast_date_min, forecast_date_max = Forecast.get_min_max_date(
-            geocode=geocode, cid10=CID10[disease_code]
-        )
-
-        forecast_date_ref = self._get("ref", forecast_date_max)
-
-        if forecast_date_ref is None:
-            epiweek = None
-        else:
-            epiweek = episem(forecast_date_ref).replace("W", "")
-
-        (
-            alert,
-            current,
-            case_series,
-            last_year,
-            observed_cases,
-            min_max_est,
-        ) = get_alert(disease_code)
-
-        if alert:
-            casos_ap = {}
-            alerta = {}
-
-            for ap, v in alert.items():
-                if ap not in current.aps:
-                    continue
-
-                _ap = float(ap.split("AP")[-1])
-
-                mask = current.aps == ap
-                _v = int(current[mask]["casos_est"].values.astype(int)[0])
-
-                casos_ap.update({_ap: _v})
-                alerta.update({_ap: int(v) - 1})
-
-            semana = str(current.se.iat[-1])[-2:]
-            segunda = current.data.iat[-1]
-            # estimated cases
-            total_series = sum(
-                np.array(list(case_series.values())), np.zeros(12, int)
-            )
-            # observed cases
-            total_observed_series = sum(
-                np.array(list(observed_cases.values())), np.zeros(12, int)
-            )
-        else:
-            casos_ap = {}
-            alerta = {}
-            semana = 0
-            segunda = datetime.datetime.now() - datetime.timedelta(7)
-            total_series = [0]
-            total_observed_series = [0]
-
-        try:
-            city_chart = chart_alerts.create_alert_chart(
-                geocode,
-                city_info["nome"],
-                disease_label,
-                disease_code,
-                epiweek,
-            )
-        except ValueError:
-            context = {
-                "message": _(
-                    "A doença {} não está registrada "
-                    "em nosso banco de dados para o município de {}."
-                ).format(disease_label, city_info["nome"])
-            }
-            self.template_name = "error.html"
-            return context
-
-        context.update(
-            {
-                "geocodigo": geocode,  # legacy
-                "geocode": geocode,
-                "state_abv": "RJ",
-                "state": city_info["uf"],
-                "nome": city_info["nome"],
-                "populacao": city_info["populacao"],
-                "incidencia": (
-                    total_observed_series[-1] / city_info["populacao"]
-                )
-                * 100000,  # casos/100000
-                "casos_por_ap": json.dumps(casos_ap),
-                "alerta": alerta,
-                "novos_casos": sum(casos_ap.values()),
-                "bairros": bairros_mrj,
-                "min_est": sum(i[0] for i in min_max_est.values()),
-                # 'min_est': sum(current.casos_estmin.values),
-                "max_est": sum(i[1] for i in min_max_est.values()),
-                # 'max_est': sum(current.casos_estmax.values),
-                "series_casos": case_series,
-                "SE": int(semana),
-                "WEEK": str(semana),
-                "yearweek": str(current.se.iat[0])[:],
-                "data1": segunda.strftime("%d de %B de %Y"),
-                "data2": (
-                    segunda + datetime.timedelta(6)
-                ),  # .strftime("%d de %B de %Y")
-                "last_year": last_year,
-                "look_back": len(total_series),
-                "total_series": ", ".join(map(str, total_series)),
-                "total_observed": total_observed_series[-1],
-                "total_observed_series": ", ".join(
-                    map(str, total_observed_series)
-                ),
-                "disease_label": disease_label,
-                "disease_code": disease_code,
-                "forecast_date_ref": forecast_date_ref,
-                "forecast_date_min": forecast_date_min,
-                "forecast_date_max": forecast_date_max,
-                "epiweek": epiweek,
-                "geojson_url": "/static/rio_aps.geojson",
-                "chart_alert": city_chart,
-            }
-        )
-        return context
-
-
 class AlertaMunicipioPageView(AlertCityPageBaseView):
     template_name = "alerta_municipio.html"
 
     def dispatch(self, request, *args, **kwargs):
         super(AlertaMunicipioPageView, self).get_context_data(**kwargs)
-
-        geocode = kwargs["geocodigo"]
-
-        if int(geocode) == MRJ_GEOCODE:  # Rio de Janeiro
-            return redirect("dados:mrj", disease="dengue", permanent=True)
 
         return super(AlertaMunicipioPageView, self).dispatch(
             request, *args, **kwargs
@@ -646,46 +387,6 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
         return context
 
 
-class AlertaGeoJSONView(View):
-    def get(self, request, *args, **kwargs):
-        return HttpResponse(geojson.dumps(polygons))
-
-
-class DetailsPageView(TemplateView):
-    template_name = "details.html"
-
-    def get_context_data(self, **kwargs):
-        context = super(DetailsPageView, self).get_context_data(**kwargs)
-        # messages.info(
-        #   self.request,
-        #   'O site do projeto Alerta Dengue está em construção.')
-        series = load_series()
-        aps = list(series.keys())
-        aps.sort()
-        ga = {}
-        ya = {}
-        oa = {}
-        ra = {}
-        for k, v in series.items():
-            ga[k] = [1 if a == 0 else None for a in v["alerta"]]
-            ya[k] = [1 if a == 1 else None for a in v["alerta"]]
-            oa[k] = [1 if a == 2 else None for a in v["alerta"]]
-            ra[k] = [1 if a == 3 else None for a in v["alerta"]]
-
-        context.update(
-            {
-                "APS": aps,
-                "green_alert": json.dumps(ga),
-                "yellow_alert": json.dumps(ya),
-                "casos": json.dumps(series),
-                "red_alert": json.dumps(ra),
-                "orange_alert": json.dumps(oa),
-                "xvalues": series["AP1"]["dia"],
-            }
-        )
-        return context
-
-
 class SinanCasesView(View):
     def get(self, request, year, sample):
         sample = int(sample)
@@ -737,8 +438,6 @@ class AlertaStateView(TemplateView):
         """
         context = super(AlertaStateView, self).get_context_data(**kwargs)
 
-        series_data_rj = None
-
         cities_alert = dbdata.NotificationResume.get_cities_alert_by_state(
             self._state_name[context["state"]], context["disease"]
         )
@@ -748,20 +447,6 @@ class AlertaStateView(TemplateView):
         )
 
         mun_dict = dict(cities_alert[["municipio_geocodigo", "nome"]].values)
-        is_just_rj = False
-
-        if (
-            not mun_dict
-            and context["state"] == "RJ"
-            and context["disease"] == "chikungunya"
-        ):
-            geo_id_rj = MRJ_GEOCODE
-            mun_dict = {geo_id_rj: "Rio de Janeiro"}
-            series_data_rj = dbdata.load_series(geo_id_rj, "chikungunya")[
-                str(MRJ_GEOCODE)
-            ]
-            alerts = {str(geo_id_rj): series_data_rj["alerta"][-1]}
-            is_just_rj = True
 
         mun_dict_ordered = OrderedDict(
             sorted(mun_dict.items(), key=lambda v: v[1])
@@ -781,12 +466,9 @@ class AlertaStateView(TemplateView):
             last_update = dbf.export_date
 
         if len(geo_ids) > 0:
-            if not is_just_rj:
-                cases_series_last_12 = dbdata.NotificationResume.tail_estimated_cases(  # noqa: E501
-                    geo_ids, 12
-                )
-            else:
-                cases_series_last_12 = {geo_id_rj: series_data_rj["casos_est"]}
+            cases_series_last_12 = dbdata.NotificationResume.tail_estimated_cases(  # noqa: E501
+                geo_ids, 12
+            )
         else:
             cases_series_last_12 = {}
 
