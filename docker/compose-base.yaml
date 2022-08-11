@@ -83,7 +83,7 @@ services:
       - memcached
     restart: always
     healthcheck:
-      test: ["CMD", "celery", "inspect", "-A", "alertadengue.tasks.celery_app:app", "ping"]
+      test: ["CMD", "celery", "-A", "ad_main.celeryapp:app", "inspect", "ping"]
       interval: 60s
       timeout: 10s
       retries: 5
