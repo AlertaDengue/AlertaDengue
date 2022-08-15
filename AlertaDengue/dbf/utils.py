@@ -22,12 +22,7 @@ EXPECTED_FIELDS = [
     "DT_NASC",
     "NU_IDADE_N",
     "CS_SEXO",
-    # "RESUL_PCR_",
-    # "CRITERIO",
-    # "CLASSI_FIN",
 ]
-
-ALL_EXPECTED_FIELDS = EXPECTED_FIELDS.copy()
 
 SYNONYMS_FIELDS = {"ID_MUNICIP": ["ID_MN_RESI"]}
 
@@ -103,7 +98,7 @@ def chunk_gen(chunksize, totalsize):
         yield (chunks * chunksize, (chunks * chunksize) + rest)
 
 
-def chunk_dbf_toparquet(dbfname) -> glob:
+def read_dbf(dbfname: str) -> pd.DataFrame:
     """
     name: Generator to read the dbf in chunks
     Filtering columns from the field_map dictionary on dataframe and export
@@ -118,31 +113,44 @@ def chunk_dbf_toparquet(dbfname) -> glob:
         .parquet list
     """
 
-    dbf = Dbf5(dbfname)
+    dbf = Dbf5(dbfname, codec="iso-8859-1")
 
     f_name = str(dbf.dbf)[:-4]
 
+    all_expecet_fields = EXPECTED_FIELDS.copy()
+
     if f_name.startswith(("BR-DEN", "BR-CHIK")):
-        ALL_EXPECTED_FIELDS.extend(["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"])
-    elif f_name.startswith("BR-ZIKA"):
-        ALL_EXPECTED_FIELDS.extend(["CRITERIO", "CLASSI_FIN"])
+        all_expecet_fields.extend(["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"])
+    elif f_name.startswith(("BR-ZIKA")):
+        all_expecet_fields.extend(["CRITERIO", "CLASSI_FIN"])
     else:
-        ALL_EXPECTED_FIELDS
+        all_expecet_fields
 
-    for chunk, (lowerbound, upperbound) in enumerate(
-        chunk_gen(1000, dbf.numrec)
-    ):
-        pq_fname = DBFS_PQTDIR / f"{f_name}-{chunk}.parquet"
+    pqt_to_dir = Path(DBFS_PQTDIR / f"{f_name}.parquet")
 
-        df_gpd = gpd.read_file(
-            dbfname,
-            rows=slice(lowerbound, upperbound),
-            ignore_geometry=True,
-        )
-        df_gpd = _parse_fields(df_gpd)
+    if not pqt_to_dir.is_dir():
+        print("Convert DBF to parquet...")
+        Path.mkdir(pqt_to_dir, parents=True, exist_ok=True)
+        for chunk, (lowerbound, upperbound) in enumerate(
+            chunk_gen(1000, dbf.numrec)
+        ):
 
-        df_gpd[ALL_EXPECTED_FIELDS].to_parquet(pq_fname)
+            pq_fname = f"{pqt_to_dir}/{f_name}-{chunk}.parquet"
 
-    fetch_pq_fname = DBFS_PQTDIR / f_name
+            df_gpd = gpd.read_file(
+                dbfname,
+                rows=slice(lowerbound, upperbound),
+                ignore_geometry=True,
+            )[all_expecet_fields]
 
-    return glob.glob(f"{fetch_pq_fname}*.parquet")
+            df_gpd = _parse_fields(df_gpd)
+
+            df_gpd.to_parquet(pq_fname)
+
+    fetch_pq_fname = glob.glob(f"{pqt_to_dir}/*.parquet")
+
+    chunks_list = [
+        pd.read_parquet(f, engine="fastparquet") for f in fetch_pq_fname
+    ]
+
+    return pd.concat(chunks_list, ignore_index=True)

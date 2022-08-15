@@ -1,6 +1,7 @@
 import logging
 from datetime import date
 
+import numpy as np
 import pandas as pd
 import psycopg2
 
@@ -10,7 +11,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 from psycopg2.extras import DictCursor
 
-from .utils import FIELD_MAP, chunk_dbf_toparquet
+from .utils import FIELD_MAP, read_dbf
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +46,22 @@ def add_dv(geocodigo):
         raise ValueError("geocode does not match!")
 
 
+@np.vectorize
+def fix_nu_notif(value: str) -> int:
+    """
+    Format special character to NU_NOTIF field.
+    """
+    try:
+        value = None if pd.isnull(value) else int(value)
+    except ValueError as e:
+        if "'" in value:
+            value = int(value.replace("'", ""))
+        else:
+            logger.error(e)
+
+    return value
+
+
 class Sinan(object):
     """
     Introspecta arquivo DBF do SINAN preparando-o para inserção em outro banco.
@@ -65,17 +82,9 @@ class Sinan(object):
         :param ano: Ano dos dados
         :return:
         """
-        logger.info("Formatting fields and save chunks dbf to parquet")
+        logger.info("Formatting fields and reading chunks from parquet files...")
 
-        pq_files = chunk_dbf_toparquet(dbf_fname)
-
-        logger.info("Read parquet files and concatenate in pandas")
-
-        chunks_list = [
-            pd.read_parquet(f, engine="fastparquet") for f in pq_files
-        ]
-
-        self.tabela = pd.concat(chunks_list, ignore_index=True)
+        self.tabela = read_dbf(dbf_fname)
         self.ano = ano
 
         logger.info(f"Instanciando SINAN ({dbf_fname}, {ano})")
@@ -115,7 +124,10 @@ class Sinan(object):
             cursor.execute(f"SELECT * FROM {table_name} LIMIT 1;")
             col_names = [c.name for c in cursor.description if c.name != "id"]
             self._fill_missing_columns(col_names)
-            df_names = [FIELD_MAP[n] for n in col_names]
+            valid_col_names = [FIELD_MAP[n] for n in col_names]
+
+            self.tabela["NU_NOTIFIC"] = fix_nu_notif(self.tabela.NU_NOTIFIC)
+
             insert_sql = (
                 "INSERT INTO {}({}) VALUES ({}) on conflict "
                 "on CONSTRAINT casos_unicos do UPDATE SET {}"
@@ -126,7 +138,7 @@ class Sinan(object):
                 ",".join(["{0}=excluded.{0}".format(j) for j in col_names]),
             )
             logger.info(f"Formatando linhas e inserindo em {table_name}")
-            for row in self.tabela[df_names].iterrows():
+            for row in self.tabela[valid_col_names].iterrows():
                 i = row[0]
                 row = row[1]
                 row[0] = (
