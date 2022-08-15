@@ -82,7 +82,9 @@ class Sinan(object):
         :param ano: Ano dos dados
         :return:
         """
-        logger.info("Formatting fields and reading chunks from parquet files...")
+        logger.info(
+            "Formatting fields and reading chunks from parquet files..."
+        )
 
         self.tabela = read_dbf(dbf_fname)
         self.ano = ano
