@@ -48,7 +48,7 @@ FIELD_MAP = {
 }
 
 
-def _parse_fields(f_name: str, df: gpd) -> pd:
+def _parse_fields(dbf_name: str, df: gpd) -> pd:
     """
     Rename columns and set type datetime when startswith "DT"
     Parameters
@@ -59,14 +59,14 @@ def _parse_fields(f_name: str, df: gpd) -> pd:
     dataframe
     """
 
-    all_expecet_fields = EXPECTED_FIELDS.copy()
+    all_expected_fields = EXPECTED_FIELDS.copy()
 
-    if f_name.startswith(("BR-DEN", "BR-CHIK")):
-        all_expecet_fields.extend(["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"])
-    elif f_name.startswith(("BR-ZIKA")):
-        all_expecet_fields.extend(["CRITERIO", "CLASSI_FIN"])
+    if dbf_name.startswith(("BR-DEN", "BR-CHIK")):
+        all_expected_fields.extend(["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"])
+    elif dbf_name.startswith(("BR-ZIKA")):
+        all_expected_fields.extend(["CRITERIO", "CLASSI_FIN"])
     else:
-        all_expecet_fields
+        all_expected_fields
 
     if "ID_MUNICIP" in df.columns:
         df = df.dropna(subset=["ID_MUNICIP"])
@@ -81,7 +81,7 @@ def _parse_fields(f_name: str, df: gpd) -> pd:
         except ValueError:
             df[col] = pd.to_datetime(df[col], errors="coerce")
 
-    return df[all_expecet_fields]
+    return df[all_expected_fields]
 
 
 def chunk_gen(chunksize, totalsize):
@@ -106,7 +106,7 @@ def chunk_gen(chunksize, totalsize):
         yield (chunks * chunksize, (chunks * chunksize) + rest)
 
 
-def read_dbf(dbfname: str) -> pd.DataFrame:
+def read_dbf(fname: str) -> pd.DataFrame:
     """
     name: Generator to read the dbf in chunks
     Filtering columns from the field_map dictionary on dataframe and export
@@ -121,32 +121,32 @@ def read_dbf(dbfname: str) -> pd.DataFrame:
         .parquet list
     """
 
-    dbf = Dbf5(dbfname, codec="iso-8859-1")
+    dbf = Dbf5(fname, codec="iso-8859-1")
 
-    f_name = str(dbf.dbf)[:-4]
+    dbf_name = str(dbf.dbf)[:-4]
 
-    pqt_to_dir = Path(DBFS_PQTDIR / f"{f_name}.parquet")
+    parquet_dir = Path(DBFS_PQTDIR / f"{dbf_name}.parquet")
 
-    if not pqt_to_dir.is_dir():
-        print("Convert DBF to parquet...")
-        Path.mkdir(pqt_to_dir, parents=True, exist_ok=True)
+    if not parquet_dir.is_dir():
+        print("Converting DBF to Parquet...")
+        Path.mkdir(parquet_dir, parents=True, exist_ok=True)
         for chunk, (lowerbound, upperbound) in enumerate(
             chunk_gen(1000, dbf.numrec)
         ):
 
-            pq_fname = f"{pqt_to_dir}/{f_name}-{chunk}.parquet"
+            parquet_fname = f"{parquet_dir}/{dbf_name}-{chunk}.parquet"
 
             df = gpd.read_file(
-                dbfname,
+                fname,
                 rows=slice(lowerbound, upperbound),
                 ignore_geometry=True,
             )
 
-            df = _parse_fields(f_name, df)
+            df = _parse_fields(dbf_name, df)
 
-            df.to_parquet(pq_fname)
+            df.to_parquet(parquet_fname)
 
-    fetch_pq_fname = glob.glob(f"{pqt_to_dir}/*.parquet")
+    fetch_pq_fname = glob.glob(f"{parquet_dir}/*.parquet")
 
     chunks_list = [
         pd.read_parquet(f, engine="fastparquet") for f in fetch_pq_fname

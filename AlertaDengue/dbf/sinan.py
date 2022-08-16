@@ -82,14 +82,14 @@ class Sinan(object):
         :param ano: Ano dos dados
         :return:
         """
-        logger.info(
-            "Formatting fields and reading chunks from parquet files..."
-        )
+        logger.info("Formatting fields and reading chunks from parquet files")
 
         self.tabela = read_dbf(dbf_fname)
         self.ano = ano
 
-        logger.info(f"Instanciando SINAN ({dbf_fname}, {ano})")
+        logger.info(
+            f"Starting the SINAN instantiation process ({dbf_fname}, {ano})"
+        )
 
     @property
     def time_span(self):
@@ -120,7 +120,7 @@ class Sinan(object):
         self, table_name='"Municipio"."Notificacao"', default_cid=None
     ):
         connection = self._get_postgres_connection()
-        logger.info("Escrevendo no PostgreSQL")
+        logger.info("Connecting to PostgreSQL database")
 
         with connection.cursor(cursor_factory=DictCursor) as cursor:
             cursor.execute(f"SELECT * FROM {table_name} LIMIT 1;")
@@ -139,7 +139,7 @@ class Sinan(object):
                 ",".join(["%s" for i in col_names]),
                 ",".join(["{0}=excluded.{0}".format(j) for j in col_names]),
             )
-            logger.info(f"Formatando linhas e inserindo em {table_name}")
+            logger.info(f"Formatting lines and inserting into {table_name}")
             for row in self.tabela[valid_col_names].iterrows():
                 i = row[0]
                 row = row[1]
@@ -204,14 +204,13 @@ class Sinan(object):
                 cursor.execute(insert_sql, row)
                 if (i % 1000 == 0) and (i > 0):
                     logger.info(
-                        f"{i} linhas inseridas. Commitando mudanças "
-                        "no banco"
+                        f"{i} lines inserted. Committing changes to the database..."
                     )
                     connection.commit()
 
             connection.commit()
             logger.info(
-                "Sinan {} rows in {} fields inserted in the database".format(
+                "SINAN {} rows in {} fields inserted in the database".format(
                     self.tabela.shape[0], self.tabela.shape[1]
                 )
             )
