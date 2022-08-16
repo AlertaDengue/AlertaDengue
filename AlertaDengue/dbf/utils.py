@@ -1,4 +1,5 @@
 import glob
+from copy import deepcopy
 from pathlib import Path
 
 import geopandas as gpd
@@ -22,12 +23,7 @@ EXPECTED_FIELDS = [
     "DT_NASC",
     "NU_IDADE_N",
     "CS_SEXO",
-    # "RESUL_PCR_",
-    # "CRITERIO",
-    # "CLASSI_FIN",
 ]
-
-ALL_EXPECTED_FIELDS = EXPECTED_FIELDS.copy()
 
 SYNONYMS_FIELDS = {"ID_MUNICIP": ["ID_MN_RESI"]}
 
@@ -52,7 +48,7 @@ FIELD_MAP = {
 }
 
 
-def _parse_fields(df: gpd) -> pd:
+def _parse_fields(dbf_name: str, df: gpd) -> pd:
     """
     Rename columns and set type datetime when startswith "DT"
     Parameters
@@ -63,7 +59,14 @@ def _parse_fields(df: gpd) -> pd:
     dataframe
     """
 
-    df = df.copy(deep=True)
+    all_expected_fields = EXPECTED_FIELDS.copy()
+
+    if dbf_name.startswith(("BR-DEN", "BR-CHIK")):
+        all_expected_fields.extend(["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"])
+    elif dbf_name.startswith(("BR-ZIKA")):
+        all_expected_fields.extend(["CRITERIO", "CLASSI_FIN"])
+    else:
+        all_expected_fields
 
     if "ID_MUNICIP" in df.columns:
         df = df.dropna(subset=["ID_MUNICIP"])
@@ -78,7 +81,7 @@ def _parse_fields(df: gpd) -> pd:
         except ValueError:
             df[col] = pd.to_datetime(df[col], errors="coerce")
 
-    return df
+    return df[all_expected_fields]
 
 
 def chunk_gen(chunksize, totalsize):
@@ -103,7 +106,7 @@ def chunk_gen(chunksize, totalsize):
         yield (chunks * chunksize, (chunks * chunksize) + rest)
 
 
-def chunk_dbf_toparquet(dbfname) -> glob:
+def read_dbf(fname: str) -> pd.DataFrame:
     """
     name: Generator to read the dbf in chunks
     Filtering columns from the field_map dictionary on dataframe and export
@@ -118,31 +121,35 @@ def chunk_dbf_toparquet(dbfname) -> glob:
         .parquet list
     """
 
-    dbf = Dbf5(dbfname)
+    dbf = Dbf5(fname, codec="iso-8859-1")
 
-    f_name = str(dbf.dbf)[:-4]
+    dbf_name = str(dbf.dbf)[:-4]
 
-    if f_name.startswith(("BR-DEN", "BR-CHIK")):
-        ALL_EXPECTED_FIELDS.extend(["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"])
-    elif f_name.startswith("BR-ZIKA"):
-        ALL_EXPECTED_FIELDS.extend(["CRITERIO", "CLASSI_FIN"])
-    else:
-        ALL_EXPECTED_FIELDS
+    parquet_dir = Path(DBFS_PQTDIR / f"{dbf_name}.parquet")
 
-    for chunk, (lowerbound, upperbound) in enumerate(
-        chunk_gen(1000, dbf.numrec)
-    ):
-        pq_fname = DBFS_PQTDIR / f"{f_name}-{chunk}.parquet"
+    if not parquet_dir.is_dir():
+        print("Converting DBF to Parquet...")
+        Path.mkdir(parquet_dir, parents=True, exist_ok=True)
+        for chunk, (lowerbound, upperbound) in enumerate(
+            chunk_gen(1000, dbf.numrec)
+        ):
 
-        df_gpd = gpd.read_file(
-            dbfname,
-            rows=slice(lowerbound, upperbound),
-            ignore_geometry=True,
-        )
-        df_gpd = _parse_fields(df_gpd)
+            parquet_fname = f"{parquet_dir}/{dbf_name}-{chunk}.parquet"
 
-        df_gpd[ALL_EXPECTED_FIELDS].to_parquet(pq_fname)
+            df = gpd.read_file(
+                fname,
+                rows=slice(lowerbound, upperbound),
+                ignore_geometry=True,
+            )
 
-    fetch_pq_fname = DBFS_PQTDIR / f_name
+            df = _parse_fields(dbf_name, df)
 
-    return glob.glob(f"{fetch_pq_fname}*.parquet")
+            df.to_parquet(parquet_fname)
+
+    fetch_pq_fname = glob.glob(f"{parquet_dir}/*.parquet")
+
+    chunks_list = [
+        pd.read_parquet(f, engine="fastparquet") for f in fetch_pq_fname
+    ]
+
+    return pd.concat(chunks_list, ignore_index=True)

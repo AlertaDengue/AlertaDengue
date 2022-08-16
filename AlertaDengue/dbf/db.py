@@ -2,7 +2,7 @@ import os
 from os.path import dirname, join
 
 import pandas as pd
-from ad_main import settings
+from django.conf import settings
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
