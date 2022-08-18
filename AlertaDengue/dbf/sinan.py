@@ -49,13 +49,17 @@ def add_dv(geocodigo):
 @np.vectorize
 def fix_nu_notif(value: str) -> int:
     """
-    Format special character to NU_NOTIF field.
+    Format special character for NU_NOTIF field.
     """
+
+    char_to_replace = {",": "", "'": "", ".": ""}
+
     try:
         value = None if pd.isnull(value) else int(value)
     except ValueError as e:
-        if "'" in value:
-            value = int(value.replace("'", ""))
+        if any(x in value for x in list(char_to_replace)):
+            # Replace multiple characters.
+            value = value.translate(str.maketrans(char_to_replace))
         else:
             logger.error(e)
 
@@ -204,7 +208,8 @@ class Sinan(object):
                 cursor.execute(insert_sql, row)
                 if (i % 1000 == 0) and (i > 0):
                     logger.info(
-                        f"{i} lines inserted. Committing changes to the database..."
+                        f"{i} lines inserted. "
+                        "Committing changes to the database..."
                     )
                     connection.commit()
 
