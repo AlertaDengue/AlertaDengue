@@ -4,7 +4,6 @@ import logging
 import time
 import traceback as tb
 from datetime import timedelta
-from glob import glob
 from pathlib import Path
 from typing import Optional, Union
 
@@ -51,35 +50,15 @@ MAP_FIELDS = {
 }
 
 COL_TO_RENAME = dict(zip(MAP_FIELDS.values(), MAP_FIELDS.keys()))
-COLNAME = list(MAP_FIELDS.values())
-
-# Input Variables
-while True:
-    try:
-        disease = str(input("Digite a doença: "))
-        if disease not in CID10.keys():
-            raise ValueError(
-                f"""
-                Please enter a valid disease!
-                The diseases available are: {[k for k in CID10.keys()]}
-                """
-            )
-        break
-    except ValueError as e:
-        logger.error(e)
-
-year = str(input("Digite o ano: "))
-
-FILE_NAME = Path(disease[:4].upper() + "BR" + year[-2:])
-FILE_PARQUET = Path(f"{FILE_NAME}.parquet")
+COL_NAMES = list(MAP_FIELDS.values())
 
 
 class Log:
     """
-    Generate the log file with the traceback in the path
+    Generate the log file with the traceback in the path.
     """
 
-    file_path = f"/tmp/pysus_{FILE_NAME}.log"
+    file_path = "/tmp/pysus_data_error.log"
     fd = None
 
     @classmethod
@@ -103,9 +82,10 @@ def calc_birth_date(
     unit: Union[np.str_, str] = "Y",
 ) -> datetime.date:
     """
-    Em tabelas do SINAN frequentemente a idade é representada como um inteiro que precisa ser parseado
-    para retornar a idade em uma unidade cronológica padrão.
-    :param unidade: unidade da idade: 'Y': anos, 'M' meses, 'D': dias, 'H': horas
+    Em tabelas do SINAN frequentemente a idade é representada
+    como um inteiro que precisa ser parseado para retornar a idade
+    em uma unidade cronológica padrão.
+    :param unidade: idade: 'Y': anos, 'M' meses, 'D': dias, 'H': horas
     :param idade: inteiro ou sequencia de inteiros codificados.
     :return:
     """
@@ -128,6 +108,8 @@ def calc_birth_date(
     if np.isnan(days_x_year):
         days_x_year = 1
 
+    # entered_date = datetime.datetime.strptime(value, "%Y-%m-%d")
+
     birth_date = value - timedelta(days=int(days_x_year))
 
     return birth_date
@@ -135,7 +117,7 @@ def calc_birth_date(
 
 def calculate_digit(dig):
     """
-    Calcula o digito verificador do geocódigo de município
+    Calcula o digito verificador do geocódigo de município.
     :param dig: geocódigo com 6 dígitos
     :return: dígito verificador
     """
@@ -186,117 +168,137 @@ def fill_cid(disease: str) -> str:
 
 
 @np.vectorize
-def slice_se(epiweek: str) -> Optional[int]:
+def slice_se(epiweek: str) -> Optional[str]:
     """
-    Get the epiweek from position -2.
+    Slice the week from epiweek.
     """
 
-    return None if epiweek == "" else int(str(epiweek)[-2:])
+    return None if epiweek == "" else str(epiweek)[-2:]
 
 
-def get_data(year: int, disease: str) -> pd.DataFrame:
-    """
-    Get data from PySUS or fetch data
-    from the parquet directory if it exists.
-    param:
-        year: str
-        disease: str
-    return pd.DataFrame
-    """
-    if not FILE_PARQUET.is_dir():
-        print("Execute download")
-        SINAN.download(int(year), disease, return_fname=True)
+class PySUS(object):
+    def __init__(self, year, disease):
+        """ """
 
-    for pf in glob(f"{FILE_NAME}.parquet/*.parquet"):
-        df = pd.read_parquet(pf)
+        self.FILE_NAME = Path(disease[:4].upper() + "BR" + year[-2:])
+        self.PARQUET_DIR = Path(f"{self.FILE_NAME}.parquet")
 
-    if "RESUL_PCR_" not in df.columns:
-        print("...adding the result_pcr column to", FILE_NAME)
-        df["RESUL_PCR_"] = 0
+        self.disease = disease
+        self.year = year
 
-    return df[COLNAME].rename(columns=COL_TO_RENAME)
+    def get_data(self, year: int, disease: str) -> pd.DataFrame:
+        """
+        Get data from PySUS or fetch data
+        from the parquet directory if it exists.
+        param:
+            year: str
+            disease: str
+        return pd.DataFrame
+        """
+        if not self.PARQUET_DIR.is_dir():
+            print("Downloading data from the API")
+            SINAN.download(int(year), disease, return_fname=True)
 
+        fetch_pq_fname = glob.glob(f"{self.FILE_NAME}.parquet/*.parquet")
 
-def parse_dataframe(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Adds the missing columns and parse the data
-    param: pd.DataFrame
-    return: pd.DataFrame
+        chunks_list = [pd.read_parquet(f) for f in fetch_pq_fname]
 
-    """
-    df.reset_index(drop=True)
-    df["nu_notific"] = df.index + 999999999
-    df["municipio_geocodigo"] = check_geocode(df.municipio_geocodigo)
-    df["cid10_codigo"] = fill_cid(df.cid10_codigo)  #'A92.'
-    df["dt_nasc"] = calc_birth_date(df.dt_notific, df.nu_idade_n, "Y")
-    df["dt_digita"] = df.dt_notific
-    df["se_notif"] = slice_se(df.se_notif)
-    df["se_sin_pri"] = slice_se(df.se_sin_pri)
-    df["criterio"] = (
-        pd.to_numeric(df["criterio"], errors="coerce").fillna(0).astype(int)
-    )
-    df["classi_fin"] = (
-        pd.to_numeric(df["classi_fin"], errors="coerce").fillna(0).astype(int)
-    )
-    df["resul_pcr"] = (
-        pd.to_numeric(df["resul_pcr"], errors="coerce").fillna(0).astype(int)
-    )
+        df = pd.concat(chunks_list, ignore_index=True)
 
-    return df
+        if "RESUL_PCR_" not in df.columns:
+            print("...adding the result_pcr column to", self.FILE_NAME)
+            df["RESUL_PCR_"] = 0
 
+        return df[COL_NAMES].rename(columns=COL_TO_RENAME)
 
-def save():
-    """
-    Get database connection and insert PySUS data from dataframe
-    """
-    Log.start()
-    connection = _get_postgres_connection()
+    def parse_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Adds the missing columns and parse the data.
+        param: pd.DataFrame
+        return: pd.DataFrame
 
-    join = lambda x: ", ".join(x)
+        """
+        df.reset_index(drop=True)
+        df["nu_notific"] = df.index + 999999999
+        df["municipio_geocodigo"] = check_geocode(df.municipio_geocodigo)
+        df["cid10_codigo"] = fill_cid(df.cid10_codigo)
+        df["dt_nasc"] = calc_birth_date(df.dt_notific, df.nu_idade_n, "Y")
+        df["dt_digita"] = df.dt_notific
+        df["se_notif"] = slice_se(df.se_notif)
+        df["se_sin_pri"] = slice_se(df.se_sin_pri)
+        df["criterio"] = (
+            pd.to_numeric(df["criterio"], errors="coerce")
+            .fillna(0)
+            .astype(int)
+        )
+        df["classi_fin"] = (
+            pd.to_numeric(df["classi_fin"], errors="coerce")
+            .fillna(0)
+            .astype(int)
+        )
+        df["resul_pcr"] = (
+            pd.to_numeric(df["resul_pcr"], errors="coerce")
+            .fillna(0)
+            .astype(int)
+        )
 
-    logger.info("Escrevendo no PostgreSQL")
+        return df
 
-    with connection.cursor(cursor_factory=DictCursor) as cursor:
+    def save(self):
+        """
+        Get database connection and insert PySUS data from dataframe.
+        """
+        Log.start()
+        connection = _get_postgres_connection()
 
-        table_name = '"Municipio"."Notificacao"'
-        cursor.execute(f"SELECT * FROM {table_name} LIMIT 1;")
-        col_names = [c.name for c in cursor.description if c.name != "id"]
+        join = lambda x: ", ".join(x)  # noqa F841
 
-    insert_sql = (
-        "INSERT INTO {}({}) VALUES ({}) on conflict "
-        "on CONSTRAINT casos_unicos do UPDATE SET {}"
-    ).format(
-        table_name,
-        ",".join(col_names),
-        ",".join(["%s" for i in col_names]),
-        ",".join(["{0}=excluded.{0}".format(j) for j in col_names]),
-    )
+        logger.info("Connecting to PostgreSQL database")
 
-    df_pysus = parse_dataframe(get_data(year, disease))
-
-    for row in df_pysus[col_names].iterrows():
         with connection.cursor(cursor_factory=DictCursor) as cursor:
 
-            i = row[0]
-            row = row[1]
+            table_name = '"Municipio"."Notificacao"'
+            cursor.execute(f"SELECT * FROM {table_name} LIMIT 1;")
+            col_names = [c.name for c in cursor.description if c.name != "id"]
 
-            try:
-                cursor.execute(insert_sql, row)
-            except:
-                Log.write(tb.format_exc() + "> " + row.to_json())
-
-            if (i % 1000 == 0) and (i > 0):
-                logger.info(
-                    f"{i} linhas inseridas. Commitando mudanças " "no banco"
-                )
-                connection.commit()
-
-        connection.commit()
-
-    logger.info(
-        "Sinan {} rows in {} fields inserted in the database".format(
-            df_pysus.shape[0], df_pysus.shape[1]
+        insert_sql = (
+            "INSERT INTO {}({}) VALUES ({}) on conflict "
+            "on CONSTRAINT casos_unicos do UPDATE SET {}"
+        ).format(
+            table_name,
+            ",".join(col_names),
+            ",".join(["%s" for i in col_names]),
+            ",".join(["{0}=excluded.{0}".format(j) for j in col_names]),
         )
-    )
 
-    Log.stop()
+        df_pysus = self.parse_dataframe(self.get_data(self.year, self.disease))
+
+        print(df_pysus.se_notif.min(), "->", df_pysus.se_notif.max())
+
+        for row in df_pysus[col_names].iterrows():
+            with connection.cursor(cursor_factory=DictCursor) as cursor:
+
+                i = row[0]
+                row = row[1]
+
+                try:
+                    cursor.execute(insert_sql, row)
+                except Exception:
+                    Log.write(tb.format_exc() + "> " + row.to_json())
+
+                if (i % 1000 == 0) and (i > 0):
+                    logger.info(
+                        f"{i} lines inserted."
+                        "Committing changes to the database..."
+                    )
+                    connection.commit()
+
+            connection.commit()
+
+        logger.info(
+            "Sinan {} rows in {} fields inserted in the database".format(
+                df_pysus.shape[0], df_pysus.shape[1]
+            )
+        )
+
+        Log.stop()
