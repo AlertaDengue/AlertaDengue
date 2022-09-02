@@ -26,7 +26,6 @@ class Test_LoadPySUS(TestCase):
             disease: str
         Return: pd.DataFrame
         """
-
         self.assertIsInstance(self.df, pd.DataFrame)
         self.assertIn("resul_pcr", self.df.columns)
         self.assertEquals(list(COL_TO_RENAME.values()), list(self.df.columns))
@@ -37,7 +36,6 @@ class Test_LoadPySUS(TestCase):
         DT_NASC field is missing in PySUS data.
         The value is taken from DT_NOTIFIC field.
         """
-
         age_dec = 4043
         value = date(2016, 3, 15)
         days_x_year = 43 * 365

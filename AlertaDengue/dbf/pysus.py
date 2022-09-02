@@ -5,7 +5,7 @@ import time
 import traceback as tb
 from datetime import timedelta
 from pathlib import Path
-from typing import Optional, Union
+from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -147,16 +147,6 @@ def add_dv(geocode: int) -> int:
         return print(len(geocode))
 
     raise ValueError(f"geocode:{geocode} does not match!")
-
-
-@np.vectorize
-def check_geocode(geocode: str) -> Optional[int]:
-    """
-    Define None value if the field is empty or
-    call add_dv function to add 7 digit to the geocode.
-    """
-
-    return None if geocode == "" else add_dv(geocode)
 
 
 @np.vectorize
