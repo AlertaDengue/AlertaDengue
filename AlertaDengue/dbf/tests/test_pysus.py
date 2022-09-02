@@ -1,13 +1,21 @@
+import collections.abc
 from datetime import date, timedelta
 
 import numpy as np
 import pandas as pd
-from dbf.pysus import COL_TO_RENAME, PySUS, calc_birth_date
+from dbf.pysus import COL_TO_RENAME, PySUS, add_se, calc_birth_date
 from django.test import TestCase
 
 
 class Test_LoadPySUS(TestCase):
     """_summary_"""
+
+    def setUp(self):
+        year = "2016"
+        disease = "zika"
+        pysus = PySUS(year, disease)
+
+        self.df = pysus.get_data(year, disease)
 
     def test_get_data(self):
         """
@@ -18,14 +26,10 @@ class Test_LoadPySUS(TestCase):
             disease: str
         Return: pd.DataFrame
         """
-        year = "2016"
-        disease = "zika"
-        pysus = PySUS(year, disease)
 
-        df = pysus.get_data(year, disease)
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertIn("resul_pcr", df.columns)
-        self.assertEquals(list(COL_TO_RENAME.values()), list(df.columns))
+        self.assertIsInstance(self.df, pd.DataFrame)
+        self.assertIn("resul_pcr", self.df.columns)
+        self.assertEquals(list(COL_TO_RENAME.values()), list(self.df.columns))
 
     def test_calc_birth_date(self):
         """
@@ -45,6 +49,15 @@ class Test_LoadPySUS(TestCase):
         self.assertIsInstance(value, date)
         self.assertIsInstance(birth_date, date)
         self.assertEqual(birthday, birth_fake)
+
+    def test_add_se(self):
+        """
+        Checks if epiweek is converted and inserted into se_notific fields.
+        """
+        epiweek = add_se(self.df.dt_notific)
+        self.assertIsInstance(epiweek, (collections.abc.Sequence, np.ndarray))
+        self.assertIn(52, epiweek)
+        # self.assertIn("201608", epiweek)
 
     def test_parse_dataframe(self):
         pass

@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import psycopg2
 from ad_main import settings
+from dados.episem import episem
 from psycopg2.extras import DictCursor
 from pysus.online_data import SINAN
 
@@ -168,12 +169,29 @@ def fill_cid(disease: str) -> str:
 
 
 @np.vectorize
-def slice_se(epiweek: str) -> Optional[str]:
+def add_se(
+    dt_notf: datetime.date,
+) -> int:
     """
-    Slice the week from epiweek.
+    Adds the SE field if it is empty
+        using episem function to convert string date to epiweek.
+    param
+        np.array: datetime.date
+    return
+        week: int
+    """
+    epiweek = episem(str(dt_notf), sep="")
+
+    return int(str(epiweek)[-2:])
+
+
+@np.vectorize
+def slice_se(epiweek: str, dt_notf: datetime.date):
+    """
+    Get the epiweek from position -2.
     """
 
-    return None if epiweek == "" else str(epiweek)[-2:]
+    return add_se(dt_notf) if epiweek == "" else int(str(epiweek)[-2:])
 
 
 class PySUS(object):
@@ -219,13 +237,17 @@ class PySUS(object):
 
         """
         df.reset_index(drop=True)
+
         df["nu_notific"] = df.index + 999999999
-        df["municipio_geocodigo"] = check_geocode(df.municipio_geocodigo)
+
+        df = df[df["municipio_geocodigo"].map(len) > 5].copy()
+        df["municipio_geocodigo"] = add_dv(df.municipio_geocodigo)
+
         df["cid10_codigo"] = fill_cid(df.cid10_codigo)
         df["dt_nasc"] = calc_birth_date(df.dt_notific, df.nu_idade_n, "Y")
         df["dt_digita"] = df.dt_notific
-        df["se_notif"] = slice_se(df.se_notif)
-        df["se_sin_pri"] = slice_se(df.se_sin_pri)
+        df["se_notif"] = slice_se(df.se_notif, df.dt_notific)
+        df["se_sin_pri"] = slice_se(df.se_sin_pri, df.dt_notific)
         df["criterio"] = (
             pd.to_numeric(df["criterio"], errors="coerce")
             .fillna(0)
@@ -302,3 +324,7 @@ class PySUS(object):
         )
 
         Log.stop()
+
+
+if __name__ == "__main__":
+    PySUS.save()
