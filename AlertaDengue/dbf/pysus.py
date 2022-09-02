@@ -10,6 +10,7 @@ from typing import Union
 import numpy as np
 import pandas as pd
 import psycopg2
+import psycopg2.extras as extras
 from ad_main import settings
 from dados.episem import episem
 from psycopg2.extras import DictCursor
@@ -144,7 +145,7 @@ def add_dv(geocode: int) -> int:
     elif len(str(geocode)) == 6:
         return int(str(geocode) + str(calculate_digit(geocode)))
     elif len(str(geocode)) == 0:
-        return print(len(geocode))
+        return logger.info(len(geocode))
 
     raise ValueError(f"geocode:{geocode} does not match!")
 
@@ -204,7 +205,7 @@ class PySUS(object):
         return pd.DataFrame
         """
         if not self.PARQUET_DIR.is_dir():
-            print("Downloading data from the API")
+            logger.info("Downloading data from the API...")
             SINAN.download(int(year), disease, return_fname=True)
 
         fetch_pq_fname = glob.glob(f"{self.FILE_NAME}.parquet/*.parquet")
@@ -214,7 +215,7 @@ class PySUS(object):
         df = pd.concat(chunks_list, ignore_index=True)
 
         if "RESUL_PCR_" not in df.columns:
-            print("...adding the result_pcr column to", self.FILE_NAME)
+            logger.info("...adding the result_pcr column to", self.FILE_NAME)
             df["RESUL_PCR_"] = 0
 
         return df[COL_NAMES].rename(columns=COL_TO_RENAME)
@@ -256,12 +257,45 @@ class PySUS(object):
 
         return df
 
-    def save(self):
+    def save_to_pgsql(self):
         """
         Get database connection and insert PySUS data from dataframe.
+        Only inserts data, does not update existing rows.
+        """
+        connection = _get_postgres_connection()
+
+        logger.info("Connecting to PostgreSQL database")
+
+        with connection.cursor(cursor_factory=DictCursor) as cursor:
+            table_name = '"Municipio"."Notificacao"'
+            df = self.parse_dataframe(self.get_data(self.year, self.disease))
+            tuples = [tuple(x) for x in df.to_numpy()]
+            cols = ",".join(list(df.columns))
+            insert_sql = "INSERT INTO %s(%s) VALUES %%s" % (table_name, cols)
+            try:
+                extras.execute_values(cursor, insert_sql, tuples)
+                connection.commit()
+            except (Exception, psycopg2.DatabaseError) as error:
+                logger.info(f"Error: {error}")
+                connection.rollback()
+                cursor.close()
+                return 1
+            cursor.close()
+            logger.info(
+                "Sinan {} rows in {} fields inserted in the database".format(
+                    df.shape[0], df.shape[1]
+                )
+            )
+
+    def upsert_to_pgsql(self):
+        """
+        Get database connection and insert PySUS data from dataframe.
+        Inserts or updates the row if it already exists.
         """
         Log.start()
         connection = _get_postgres_connection()
+
+        df_pysus = self.parse_dataframe(self.get_data(self.year, self.disease))
 
         join = lambda x: ", ".join(x)  # noqa F841
 
@@ -282,10 +316,6 @@ class PySUS(object):
             ",".join(["%s" for i in col_names]),
             ",".join(["{0}=excluded.{0}".format(j) for j in col_names]),
         )
-
-        df_pysus = self.parse_dataframe(self.get_data(self.year, self.disease))
-
-        print(df_pysus.se_notif.min(), "->", df_pysus.se_notif.max())
 
         for row in df_pysus[col_names].iterrows():
             with connection.cursor(cursor_factory=DictCursor) as cursor:
@@ -317,4 +347,4 @@ class PySUS(object):
 
 
 if __name__ == "__main__":
-    PySUS.save()
+    PySUS.save_to_pgsql()

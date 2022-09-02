@@ -60,5 +60,5 @@ class Test_LoadPySUS(TestCase):
     def test_parse_dataframe(self):
         pass
 
-    def test_save(self):
+    def test_upsert_to_pgsql(self):
         pass

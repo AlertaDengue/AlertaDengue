@@ -19,6 +19,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             pysus = PySUS(options["ano"], options["disease"])
-            pysus.save()
+            pysus.save_to_pgsql()
         except ValidationError as e:
             raise CommandError("Arquivo inválido: {}".format(e.message))
