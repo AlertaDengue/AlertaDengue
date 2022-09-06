@@ -31,9 +31,6 @@ PSQL_URI = "postgresql://{}:{}@{}:{}/{}".format(
 db_engine = create_engine(PSQL_URI)
 con = ibis.postgres.connect(url=PSQL_URI)
 
-# rio de janeiro city geocode
-MRJ_GEOCODE = 3304557
-
 CID10 = {"dengue": "A90", "chikungunya": "A92.0", "zika": "A928"}
 DISEASES_SHORT = ["dengue", "chik", "zika"]
 DISEASES_NAMES = CID10.keys()
@@ -443,36 +440,6 @@ def get_all_active_cities() -> List[Tuple[str, str]]:
     return res
 
 
-def get_alerta_mrj():
-    """
-    Fetch the alert table for the city of Rio de janeiro
-    :return: pandas dataframe
-    """
-    sql = 'select * from "Municipio".alerta_mrj;'
-    with db_engine.connect() as conn:
-        return pd.read_sql_query(sql, conn, index_col="id")
-
-
-def get_alerta_mrj_chik():
-    """
-    Fetch the alert table for the city of Rio de janeiro
-    :return: pandas dataframe
-    """
-    sql = 'select * from "Municipio".alerta_mrj_chik;'
-    with db_engine.connect() as conexao:
-        return pd.read_sql_query(sql, conexao, index_col="id")
-
-
-def get_alerta_mrj_zika():
-    """
-    Fetch the alert table for the city of Rio de janeiro
-    :return: pandas dataframe
-    """
-    sql = 'select * from "Municipio".alerta_mrj_zika;'
-    with db_engine.connect() as conexao:
-        return pd.read_sql_query(sql, conexao, index_col="id")
-
-
 def get_last_alert(geo_id, disease):
     """
     :param geo_id:
@@ -594,42 +561,18 @@ def load_cases_without_forecast(geocode: int, disease):
     :return:
     """
     with db_engine.connect() as conn:
-        if geocode == MRJ_GEOCODE:  # RJ city
-            table_name = "alerta" + get_disease_suffix(disease)
+        table_name = "Historico_alerta" + get_disease_suffix(disease)
 
-            data_alert = pd.read_sql_query(
-                """
-                SELECT
-                   data AS "data_iniSE",
-                   SUM(casos_estmin) AS casos_est_min,
-                   SUM(casos_est) as casos_est,
-                   SUM(casos_estmax) AS casos_est_max,
-                   SUM(casos) AS casos,
-                   MAX(nivel) AS nivel,
-                   se AS "SE",
-                   SUM(prt1) AS p_rt1
-                 FROM "Municipio".{}
-                 GROUP BY "data_iniSE", "SE"
-                """.format(
-                    table_name
-                ),
-                conn,
-                parse_dates=True,
-            )
-
-        else:
-            table_name = "Historico_alerta" + get_disease_suffix(disease)
-
-            data_alert = pd.read_sql_query(
-                """
-                SELECT * FROM "Municipio"."{}"
-                WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC
-                """.format(
-                    table_name, geocode
-                ),
-                conn,
-                parse_dates=True,
-            )
+        data_alert = pd.read_sql_query(
+            """
+            SELECT * FROM "Municipio"."{}"
+            WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC
+            """.format(
+                table_name, geocode
+            ),
+            conn,
+            parse_dates=True,
+        )
     return data_alert
 
 
@@ -1031,34 +974,14 @@ class Forecast:
         with db_engine.connect() as conn:
             df_forecast_model = pd.read_sql(sql, con=conn)
 
-        if geocode == MRJ_GEOCODE:  # RJ city
-            table_name = "alerta_mrj" + get_disease_suffix(disease)
+        table_name = "Historico_alerta" + get_disease_suffix(disease)
 
-            sql_alert = """
-            SELECT
-               data AS "data_iniSE",
-               SUM(casos_estmin) AS casos_est_min,
-               SUM(casos_est) as casos_est,
-               SUM(casos_estmax) AS casos_est_max,
-               SUM(casos) AS casos,
-               MAX(nivel) AS nivel,
-               se AS "SE",
-               SUM(prt1) AS p_rt1
-            FROM "Municipio".{}
-            GROUP BY "data_iniSE", "SE"
-            """.format(
-                table_name
-            )
-
-        else:
-            table_name = "Historico_alerta" + get_disease_suffix(disease)
-
-            sql_alert = """
-            SELECT * FROM "Municipio"."{}"
-            WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC
-            """.format(
-                table_name, geocode
-            )
+        sql_alert = """
+        SELECT * FROM "Municipio"."{}"
+        WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC
+        """.format(
+            table_name, geocode
+        )
 
         sql = """
         SELECT
