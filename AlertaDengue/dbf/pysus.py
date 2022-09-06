@@ -54,6 +54,24 @@ MAP_FIELDS = {
 COL_TO_RENAME = dict(zip(MAP_FIELDS.values(), MAP_FIELDS.keys()))
 COL_NAMES = list(MAP_FIELDS.values())
 
+dtypes = {
+    "dt_notific": "datetime64[ns]",
+    "se_notif": "int",
+    "ano_notif": "int",
+    "dt_sin_pri": "datetime64[ns]",
+    "se_sin_pri": "int",
+    "dt_digita": "datetime64[ns]",
+    "municipio_geocodigo": "int",
+    "nu_notific": "int",
+    "cid10_codigo": "string",
+    "dt_nasc": "datetime64[ns]",
+    "cs_sexo": "string",
+    "nu_idade_n": "int",
+    "resul_pcr": "int",
+    "criterio": "int",
+    "classi_fin": "int",
+}
+
 
 class Log:
     """
@@ -181,14 +199,18 @@ def slice_se(epiweek: str, dt_notf: datetime.date):
     """
     Get the epiweek from position -2.
     """
+    not_valid_char = ["-", ""]
 
-    return add_se(dt_notf) if epiweek == "" else int(str(epiweek)[-2:])
+    return (
+        add_se(dt_notf)
+        if any(x in epiweek for x in not_valid_char)
+        else int(str(epiweek)[-2:])
+    )
 
 
 class PySUS(object):
     def __init__(self, year, disease):
         """ """
-
         self.FILE_NAME = Path(disease[:4].upper() + "BR" + year[-2:])
         self.PARQUET_DIR = Path(f"{self.FILE_NAME}.parquet")
 
@@ -208,14 +230,27 @@ class PySUS(object):
             logger.info("Downloading data from the API...")
             SINAN.download(int(year), disease, return_fname=True)
 
-        fetch_pq_fname = glob.glob(f"{self.FILE_NAME}.parquet/*.parquet")
+        # fetch_pq_fname = glob.glob(f"{self.FILE_NAME}.parquet/*.parquet")
 
-        chunks_list = [pd.read_parquet(f) for f in fetch_pq_fname]
+        # chunks_list = [pd.read_parquet(f) for f in fetch_pq_fname]
 
-        df = pd.concat(chunks_list, ignore_index=True)
+        # logger.info("Concat the parquetfiles")
+
+        # df = pd.concat(chunks_list, ignore_index=True)
+
+        # fn = download(2020, "dengue", return_fname=True)
+        logger.info("Reading and concatenating parquet files...")
+        for i, f in enumerate(
+            glob.glob(f"{self.FILE_NAME}.parquet/*.parquet")
+        ):
+            print(i, f)
+            if i == 0:
+                df = pd.read_parquet(f)
+            else:
+                df = pd.concat([df, pd.read_parquet(f)], ignore_index=True)
 
         if "RESUL_PCR_" not in df.columns:
-            logger.info("...adding the result_pcr column to", self.FILE_NAME)
+            logger.info(f"...adding the result_pcr column to {self.FILE_NAME}")
             df["RESUL_PCR_"] = 0
 
         return df[COL_NAMES].rename(columns=COL_TO_RENAME)
@@ -227,35 +262,28 @@ class PySUS(object):
         return: pd.DataFrame
 
         """
-        df.reset_index(drop=True)
-
-        df["nu_notific"] = df.index + 999999999
+        logger.info("Parsing the dataframe...")
 
         df = df[df["municipio_geocodigo"].map(len) > 5].copy()
+        df.reset_index(drop=True)
+        df["nu_notific"] = df.index + 999999999
         df["municipio_geocodigo"] = add_dv(df.municipio_geocodigo)
-
         df["cid10_codigo"] = fill_cid(df.cid10_codigo)
         df["dt_nasc"] = calc_birth_date(df.dt_notific, df.nu_idade_n, "Y")
         df["dt_digita"] = df.dt_notific
         df["se_notif"] = slice_se(df.se_notif, df.dt_notific)
         df["se_sin_pri"] = slice_se(df.se_sin_pri, df.dt_notific)
-        df["criterio"] = (
-            pd.to_numeric(df["criterio"], errors="coerce")
-            .fillna(0)
-            .astype(int)
+        df["criterio"] = pd.to_numeric(df["criterio"], errors="coerce").fillna(
+            0
         )
-        df["classi_fin"] = (
-            pd.to_numeric(df["classi_fin"], errors="coerce")
-            .fillna(0)
-            .astype(int)
-        )
-        df["resul_pcr"] = (
-            pd.to_numeric(df["resul_pcr"], errors="coerce")
-            .fillna(0)
-            .astype(int)
-        )
+        df["classi_fin"] = pd.to_numeric(
+            df["classi_fin"], errors="coerce"
+        ).fillna(0)
+        df["resul_pcr"] = pd.to_numeric(
+            df["resul_pcr"], errors="coerce"
+        ).fillna(0)
 
-        return df
+        return df.astype(dtypes, errors="ignore")
 
     def save_to_pgsql(self):
         """
@@ -271,12 +299,15 @@ class PySUS(object):
             df = self.parse_dataframe(self.get_data(self.year, self.disease))
             tuples = [tuple(x) for x in df.to_numpy()]
             cols = ",".join(list(df.columns))
+            logger.info("Inserting data...")
             insert_sql = "INSERT INTO %s(%s) VALUES %%s" % (table_name, cols)
             try:
                 extras.execute_values(cursor, insert_sql, tuples)
                 connection.commit()
-            except (Exception, psycopg2.DatabaseError) as error:
-                logger.info(f"Error: {error}")
+            # except (Exception, psycopg2.DatabaseError) as error:
+            #     logger.info(f"Error: {error}")
+            except Exception:
+                print(tb.format_exc())
                 connection.rollback()
                 cursor.close()
                 return 1
@@ -344,7 +375,3 @@ class PySUS(object):
         )
 
         Log.stop()
-
-
-if __name__ == "__main__":
-    PySUS.save_to_pgsql()
