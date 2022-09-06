@@ -102,12 +102,16 @@ def calc_birth_date(
     unit: Union[np.str_, str] = "Y",
 ) -> datetime.date:
     """
-    Em tabelas do SINAN frequentemente a idade é representada
-    como um inteiro que precisa ser parseado para retornar a idade
-    em uma unidade cronológica padrão.
-    :param unidade: idade: 'Y': anos, 'M' meses, 'D': dias, 'H': horas
-    :param idade: inteiro ou sequencia de inteiros codificados.
-    :return:
+    In SINAN tables, age is often represented
+    as an integer that needs to be parsed to return the age
+    in a standard chronological unit.
+    Parameters
+    ----------
+        unit: age: 'Y': years, 'M' months, 'D': days, 'H': hours.
+        age: integer or sequence of encoded integers.
+    Returns
+    -------
+        birth_date:  date of birth.
     """
 
     fator = {"Y": 1.0, "M": 12.0, "D": 365.0, "H": 365 * 24.0}
@@ -135,11 +139,15 @@ def calc_birth_date(
     return birth_date
 
 
-def calculate_digit(dig):
+def calculate_digit(dig: int) -> int:
     """
-    Calcula o digito verificador do geocódigo de município.
-    :param dig: geocódigo com 6 dígitos
-    :return: dígito verificador
+    Calculates the check digit of the county geocode.
+    Parameters
+    ----------
+        dig: geocode with 6 digit.
+    Returns
+    -------
+        dv: geocode with 7 digit.
     """
     peso = [1, 2, 1, 2, 1, 2, 0]
     soma = 0
@@ -152,11 +160,15 @@ def calculate_digit(dig):
 
 
 @np.vectorize
-def add_dv(geocode: int) -> int:
+def add_dv(geocode: np.int64) -> int:
     """
-    Retorna o geocóodigo do município adicionando o digito verificador,
-    se necessário.
-    :param geocodigo: geocóodigo com 6 ou 7 dígitos
+    Returns the geocode of the municipality by adding the verifier digit.
+    Parameters
+    ----------
+        geocode: IBGE codes of municipalities in Brazil.
+    Returns
+    -------
+        geocode: geocode 7 digit.
     """
     if len(str(geocode)) == 7:
         return int(geocode)
@@ -169,25 +181,31 @@ def add_dv(geocode: int) -> int:
 
 
 @np.vectorize
-def fill_cid(disease: str) -> str:
+def fill_cid(disease: np.str_) -> str:
     """
     Change CID10 for chikungunya disease.
+    Parameters
+    ----------
+        disease: typo CID10 code
+    Returns
+    -------
+        disease: disease fixed
     """
 
     return "A92.0" if disease == "A92." else str(disease)
 
 
 @np.vectorize
-def add_se(
-    dt_notf: datetime.date,
-) -> int:
+def add_se(dt_notf: np.str_) -> int:
     """
-    Adds the SE field if it is empty
-        using episem function to convert string date to epiweek.
-    param
-        np.array: datetime.date
-    return
-        week: int
+    Adds the SE field if it is empty.
+    Execute episem function to convert string date to epiweek.
+    Parameters
+    ----------
+        dt_notf: yearweek.
+    Returns
+    -------
+        week: last two digits of the epidemiological week.
     """
     epiweek = episem(str(dt_notf), sep="")
 
@@ -195,9 +213,10 @@ def add_se(
 
 
 @np.vectorize
-def slice_se(epiweek: str, dt_notf: datetime.date):
+def slice_se(epiweek: np.str_, dt_notf: np.datetime64()):
     """
     Get the epiweek from position -2.
+    Removes the invalid character from the epidemiological week.
     """
     not_valid_char = ["-", ""]
 
@@ -210,7 +229,6 @@ def slice_se(epiweek: str, dt_notf: datetime.date):
 
 class PySUS(object):
     def __init__(self, year, disease):
-        """ """
         self.FILE_NAME = Path(disease[:4].upper() + "BR" + year[-2:])
         self.PARQUET_DIR = Path(f"{self.FILE_NAME}.parquet")
 
@@ -221,24 +239,18 @@ class PySUS(object):
         """
         Get data from PySUS or fetch data
         from the parquet directory if it exists.
-        param:
-            year: str
-            disease: str
-        return pd.DataFrame
+        Parameters
+        ----------
+            year: available year.
+            disease: disease name.
+        Returns
+        -------
+            df: dataframe with expected fields and renamed columns.
         """
         if not self.PARQUET_DIR.is_dir():
             logger.info("Downloading data from the API...")
             SINAN.download(int(year), disease, return_fname=True)
 
-        # fetch_pq_fname = glob.glob(f"{self.FILE_NAME}.parquet/*.parquet")
-
-        # chunks_list = [pd.read_parquet(f) for f in fetch_pq_fname]
-
-        # logger.info("Concat the parquetfiles")
-
-        # df = pd.concat(chunks_list, ignore_index=True)
-
-        # fn = download(2020, "dengue", return_fname=True)
         logger.info("Reading and concatenating parquet files...")
         for i, f in enumerate(
             glob.glob(f"{self.FILE_NAME}.parquet/*.parquet")
@@ -258,9 +270,12 @@ class PySUS(object):
     def parse_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         Adds the missing columns and parse the data.
-        param: pd.DataFrame
-        return: pd.DataFrame
-
+        Parameters
+        ----------
+          df: dataframe with expected columns.
+        Returns
+        -------
+          df: dataframe with data parse.
         """
         logger.info("Parsing the dataframe...")
 
@@ -304,8 +319,6 @@ class PySUS(object):
             try:
                 extras.execute_values(cursor, insert_sql, tuples)
                 connection.commit()
-            # except (Exception, psycopg2.DatabaseError) as error:
-            #     logger.info(f"Error: {error}")
             except Exception:
                 print(tb.format_exc())
                 connection.rollback()
