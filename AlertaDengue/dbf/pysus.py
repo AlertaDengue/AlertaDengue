@@ -105,13 +105,14 @@ def calc_birth_date(
     In SINAN tables, age is often represented
     as an integer that needs to be parsed to return the age
     in a standard chronological unit.
+    Calculate the date of birth.
     Parameters
     ----------
         unit: age: 'Y': years, 'M' months, 'D': days, 'H': hours.
         age: integer or sequence of encoded integers.
     Returns
     -------
-        birth_date:  date of birth.
+        birth_date: date of birth.
     """
 
     fator = {"Y": 1.0, "M": 12.0, "D": 365.0, "H": 365 * 24.0}
@@ -139,9 +140,9 @@ def calc_birth_date(
     return birth_date
 
 
-def calculate_digit(dig: int) -> int:
+def calculate_digit(dig: str) -> int:
     """
-    Calculates the check digit of the county geocode.
+    Calculates the check digit of the municipality geocode.
     Parameters
     ----------
         dig: geocode with 6 digit.
@@ -149,6 +150,7 @@ def calculate_digit(dig: int) -> int:
     -------
         dv: geocode with 7 digit.
     """
+
     peso = [1, 2, 1, 2, 1, 2, 0]
     soma = 0
     dig = str(dig)
@@ -160,7 +162,7 @@ def calculate_digit(dig: int) -> int:
 
 
 @np.vectorize
-def add_dv(geocode: np.int64) -> int:
+def add_dv(geocode: str) -> int:
     """
     Returns the geocode of the municipality by adding the verifier digit.
     Parameters
@@ -170,6 +172,7 @@ def add_dv(geocode: np.int64) -> int:
     -------
         geocode: geocode 7 digit.
     """
+
     if len(str(geocode)) == 7:
         return int(geocode)
     elif len(str(geocode)) == 6:
@@ -181,43 +184,45 @@ def add_dv(geocode: np.int64) -> int:
 
 
 @np.vectorize
-def fill_cid(disease: np.str_) -> str:
+def fill_cid(disease: str) -> str:
     """
-    Change CID10 for chikungunya disease.
+    Fix the CID10 code of chikungunya disease.
     Parameters
     ----------
-        disease: typo CID10 code
+        disease: Typographical error for disease code CID10.
     Returns
     -------
-        disease: disease fixed
+        disease: disease code CID10.
     """
 
     return "A92.0" if disease == "A92." else str(disease)
 
 
 @np.vectorize
-def add_se(dt_notf: np.str_) -> int:
+def add_se(dt_notf: datetime.date) -> int:
     """
     Adds the SE field if it is empty.
-    Execute episem function to convert string date to epiweek.
+    Return Brazilian corresponding epidemiological week.
     Parameters
     ----------
-        dt_notf: yearweek.
+        dt_notf: date of notification of symptoms.
     Returns
     -------
         week: last two digits of the epidemiological week.
     """
+
     epiweek = episem(str(dt_notf), sep="")
 
     return int(str(epiweek)[-2:])
 
 
 @np.vectorize
-def slice_se(epiweek: np.str_, dt_notf: np.datetime64()):
+def slice_se(epiweek: str, dt_notf: datetime.date) -> int:
     """
     Get the epiweek from position -2.
     Removes the invalid character from the epidemiological week.
     """
+
     not_valid_char = ["-", ""]
 
     return (

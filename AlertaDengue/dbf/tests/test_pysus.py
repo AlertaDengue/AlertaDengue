@@ -8,8 +8,6 @@ from django.test import TestCase
 
 
 class Test_LoadPySUS(TestCase):
-    """_summary_"""
-
     def setUp(self):
         year = "2016"
         disease = "zika"
@@ -21,10 +19,6 @@ class Test_LoadPySUS(TestCase):
         """
         Check if dataframe contain the expected fields.
         RESUL_PCR field is missing in PySUS data from ZIKA disease.
-        Param:
-            year: str
-            disease: str
-        Return: pd.DataFrame
         """
         self.assertIsInstance(self.df, pd.DataFrame)
         self.assertIn("resul_pcr", self.df.columns)
