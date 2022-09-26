@@ -90,7 +90,7 @@ jobs:
 
     - name: Docker start web
       run: |
-        make docker-start ENV=dev SERVICES=
+        make docker-start ENV=dev SERVICES=web
 
     - name: Docker waiting services
       run: |

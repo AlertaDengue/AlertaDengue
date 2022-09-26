@@ -6,11 +6,8 @@ authors = ["Flavio Codeco Coelho <fccoelho@gmail.com>"]
 license = "GNU General Public License v3"
 
 packages = [
-    { include = "ad_main", from = "AlertaDengue" },
-    { include = "dados", from = "AlertaDengue" },
-    { include = "dbf", from = "AlertaDengue" },
-    { include = "api", from = "AlertaDengue" },
-    { include = "gis", from = "AlertaDengue" },
+    { include = "ad_main/*.py", from = "AlertaDengue" },
+
 ]
 
 [tool.poetry.dependencies]
