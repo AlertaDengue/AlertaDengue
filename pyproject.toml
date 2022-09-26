@@ -1,14 +1,17 @@
 [tool.poetry]
 name = "AlertaDengue"
-version = "2.8.0"
-description = "Dengue alert"
-authors = ["infodengue"]
+version = "3.2.0"
+description = "AlertaDengue package"
+authors = ["Flavio Codeco Coelho <fccoelho@gmail.com>"]
 license = "GNU General Public License v3"
 
-#poetry build
-#packages = [
-#    { include = "AlertaDengue" }
-#]
+packages = [
+    { include = "ad_main", from = "AlertaDengue" },
+    { include = "dados", from = "AlertaDengue" },
+    { include = "dbf", from = "AlertaDengue" },
+    { include = "api", from = "AlertaDengue" },
+    { include = "gis", from = "AlertaDengue" },
+]
 
 [tool.poetry.dependencies]
 Django = ">=3.1.8,<4"
