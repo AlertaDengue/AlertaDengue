@@ -83,8 +83,8 @@ services:
       - memcached
     restart: always
     healthcheck:
-      test: ["CMD", "celery", "-A", "ad_main.celeryapp:app", "inspect", "ping"]
+      test: ["CMD-SHELL", 'celery --app ad_main.celeryapp.app inspect ping -d "celery@$${HOSTNAME}"']
       interval: 60s
       timeout: 10s
       retries: 5
-      start_period: 30s  # requires docker-compose 3.4
+      start_period: 30s

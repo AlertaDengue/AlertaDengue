@@ -40,7 +40,7 @@ USER deploy
 
 ## Copy code to the container with permissions to user
 COPY --chown=deploy:deploy AlertaDengue  /opt/services/AlertaDengue
-COPY --chown=deploy env.tpl pyproject.toml poetry.lock  /opt/services/AlertaDengue/
+COPY --chown=deploy env.tpl pyproject.toml poetry.lock  /opt/services/
 COPY --chown=deploy:deploy conda/${ENV}.yaml /tmp/environment.yaml
 COPY --chown=deploy:deploy docker/scripts/poetry-install.sh /tmp/poetry-install.sh
 COPY --chown=deploy:deploy docker/web/entrypoint.sh /entrypoint.sh
