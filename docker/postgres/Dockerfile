@@ -4,4 +4,4 @@ FROM mdillon/postgis:9.6
 # ADD docker/postgres/schema/* /docker-entrypoint-initdb.d/
 
 # Dump dump for development
-COPY docker/postgres/schema/* /docker-entrypoint-initdb.d/
+ADD docker/postgres/schema/* /docker-entrypoint-initdb.d/
