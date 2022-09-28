@@ -51,6 +51,11 @@ docker-exec:
 docker-restart: docker-stop docker-start
 	echo "[II] Docker services restarted!"
 
+#* Test docker build Ci
+.PHONY: docker-run-all
+docker-run-all: ## build and deploy all containers
+	$(DOCKER) up -d --build
+
 .PHONY:docker-logs
 docker-logs:
 	$(DOCKER) logs --tail 300 ${SERVICES}

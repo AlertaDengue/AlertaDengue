@@ -12,7 +12,6 @@ env:
   PSQL_DB: denguedb
   PSQL_USER: dengueuser
   PSQL_PASSWORD: denguepassword
-  STAGING_PG_DATA: ../../Storage/staging_pg_data
   QUERY_CACHE_TIMEOUT: 86400
   MEMCACHED_HOST: localhost
   MEMCACHED_PORT: 11211
@@ -86,11 +85,11 @@ jobs:
 
     - name: Build docker images
       run: |
-         make docker-build ENV=dev
+         make docker-build
 
     - name: Docker start web
       run: |
-        make docker-start ENV=dev
+        make docker-run-all
 
     - name: Docker waiting services
       run: |
