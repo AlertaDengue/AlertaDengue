@@ -18,7 +18,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles.finders import find
 from django.http import HttpResponse
-from django.shortcuts import redirect
+
+# from django.shortcuts import redirect
 from django.templatetags.static import static
 from django.utils.translation import gettext as _
 from django.views.generic.base import TemplateView, View
@@ -38,6 +39,9 @@ from .charts.states import ReportStateCharts
 from .dbdata import (
     ALERT_COLOR,
     CID10,
+    DISEASES_NAME,
+    MAP_CENTER,
+    MAP_ZOOM,
     STATE_INITIAL,
     STATE_NAME,
     Forecast,
@@ -49,7 +53,6 @@ from .dbdata import (
     get_city,
     get_city_alert,
     get_last_alert,
-    load_series,
 )
 from .episem import episem, episem2date
 from .maps import get_city_info
@@ -443,7 +446,7 @@ class AlertaStateView(TemplateView):
         """
         context = super(AlertaStateView, self).get_context_data(**kwargs)
 
-        cities_alert = dbdata.NotificationResume.get_cities_alert_by_state(
+        cities_alert = NotificationResume.get_cities_alert_by_state(
             self._state_name[context["state"]], context["disease"]
         )
 
@@ -471,8 +474,10 @@ class AlertaStateView(TemplateView):
             last_update = dbf.export_date
 
         if len(geo_ids) > 0:
-            cases_series_last_12 = dbdata.NotificationResume.tail_estimated_cases(  # noqa: E501
-                geo_ids, 12
+            cases_series_last_12 = (
+                NotificationResume.tail_estimated_cases(  # noqa: E501
+                    geo_ids, 12
+                )
             )
         else:
             cases_series_last_12 = {}
@@ -551,7 +556,7 @@ class ChartsMainView(TemplateView):
         states_alert[state_abbv] = state_abbv
 
         # Use as an argument to fetch in database
-        for disease in tuple(DISEASES_NAMES):
+        for disease in tuple(DISEASES_NAME):
             no_data_chart = f"""
                 <div class='alert alert-primary' align='center'>
                     Não há dados suficientes para a geração do

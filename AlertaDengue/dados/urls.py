@@ -1,5 +1,4 @@
 from dados.dbdata import STATE_NAME
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.urls import re_path
 from django.views.decorators.cache import cache_page
@@ -28,6 +27,7 @@ from .views import (
 
 def redirect_alerta_dengue(request, state):
     return redirect("dados:alerta_uf", state=state, disease="dengue")
+
 
 def redirect_alert_city_dengue(request, geocodigo):
     return redirect(

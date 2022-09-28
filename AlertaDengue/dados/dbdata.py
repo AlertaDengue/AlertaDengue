@@ -30,7 +30,7 @@ con = ibis.postgres.connect(url=PSQL_URI)
 
 CID10 = {"dengue": "A90", "chikungunya": "A92.0", "zika": "A928"}
 DISEASES_SHORT = ["dengue", "chik", "zika"]
-DISEASES_NAMES = CID10.keys()
+DISEASES_NAME = CID10.keys()
 ALERT_COLOR = {1: "verde", 2: "amarelo", 3: "laranja", 4: "vermelho"}
 ALERT_CODE = dict(zip(ALERT_COLOR.values(), ALERT_COLOR.keys()))
 
