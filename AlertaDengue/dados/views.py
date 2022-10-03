@@ -951,7 +951,7 @@ class ReportCityView(TemplateView):
                 threshold_epidemic=threshold_epidemic,
             )
 
-            chart_dengue_tweets = ReportCityCharts.df_data(
+            chart_dengue_tweets = ReportCityCharts.create_tweet_chart(
                 df=df_dengue, year_week=year_week
             )
             total_n_dengue = df_dengue[df_dengue.index // 100 == this_year][

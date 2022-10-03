@@ -5,7 +5,9 @@ Django settings for AlertaDengue project.
 import os
 from pathlib import Path
 
+import ibis
 from dotenv import load_dotenv
+from sqlalchemy import create_engine
 
 # using existing module to specify location of the .env file
 load_dotenv()
@@ -177,6 +179,35 @@ DATABASES = {
         "PORT": PSQL_PORT,
     },
 }
+
+PSQL_URI = f"postgresql://{PSQL_USER}:{PSQL_PASSWORD}@{PSQL_HOST}:{PSQL_PORT}/{PSQL_DB}"
+
+
+def get_ibis_conn():
+    """
+    Returns:
+        con_ibis: Driver connection for Ibis.
+    """
+    try:
+        connection = ibis.postgres.connect(url=PSQL_URI)
+    except ConnectionError as e:
+        print("Database error for Ibis connection")
+        raise e
+    return connection
+
+
+def get_sqla_conn():
+    """
+    Returns:
+        db_engine: URI with driver connection.
+    """
+    try:
+        connection = create_engine(PSQL_URI)
+    except ConnectionError as e:
+        print("Database error for Ibis connection")
+        raise e
+    return connection
+
 
 MIGRATION_MODULES = {"dados": None, "gis": None, "api": None}
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
