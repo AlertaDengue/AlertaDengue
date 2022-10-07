@@ -14,135 +14,287 @@ class ReportStateCharts:
     """Charts used by Report State."""
 
     @classmethod
+    def create_notific_chart(
+        cls,
+        df: pd.DataFrame,
+    ) -> str:
+        df = deepcopy(df)
+
+        df["SE"] = df.index.map(lambda v: f"{str(v)[:4]}/{str(v)[-2:]}")
+        traces = []
+
+        traces.append(
+            go.Bar(
+                x=df["SE"],
+                y=df.iloc[:, 1],
+                name=_("Registrados"),
+                marker=dict(
+                    color="#BDC3C7",
+                    line=dict(color="#3A4750", width=1),
+                ),
+                width=0.5,
+                text=df.index.map(lambda v: f"{str(v)[-2:]}"),
+                hovertemplate=_(
+                    "<br>SE %{text}<br>"
+                    "%{y:1f} Casos notificados"
+                    "<extra></extra>"
+                ),
+            )
+        )
+
+        dict_of_fig = dict(
+            {
+                "data": traces,
+                "layout": go.Layout(
+                    title={
+                        "text": _("Total de casos no estado"),
+                        "font": {"family": "Helvetica", "size": 16},
+                        "x": 0.5,
+                    },
+                    xaxis=dict(
+                        title=_("Semana epidemiológica"),
+                        tickangle=-15,
+                        showline=True,
+                        showgrid=True,
+                        showticklabels=True,
+                        linecolor="rgb(204, 204, 204)",
+                        linewidth=0,
+                        gridcolor="rgb(176, 196, 222)",
+                    ),
+                    yaxis=dict(
+                        title=_("Casos"),
+                        showline=True,
+                        showgrid=True,
+                        showticklabels=True,
+                        linecolor="rgb(204, 204, 204)",
+                        linewidth=0,
+                        gridcolor="rgb(176, 196, 222)",
+                    ),
+                    # yaxis={'title': _('Casos')},
+                    showlegend=True,
+                    legend=dict(
+                        orientation="h",
+                        yanchor="bottom",
+                        y=1.01,
+                        xanchor="left",
+                        # x=1,
+                    ),
+                    hovermode="x",
+                    hoverlabel=dict(
+                        # bgcolor="white",
+                        font_size=12,
+                        font_family="Rockwell",
+                    ),
+                    autosize=False,
+                    height=275,
+                    width=310,
+                    margin=dict(
+                        autoexpand=False,
+                        l=50,
+                        r=20,
+                        t=80,
+                        b=55,
+                    ),
+                    paper_bgcolor="rgba(0,0,0,0)",
+                    plot_bgcolor="rgba(0,0,0,0)",
+                    modebar={
+                        "orientation": "h",
+                        "bgcolor": "rgba(255 ,255 ,255 ,0.7)",
+                    },
+                ),
+            }
+        )
+
+        fig = go.Figure(dict_of_fig)
+
+        return fig.to_html()
+
+    @classmethod
+    def create_level_chart(
+        cls,
+        df: pd.DataFrame,
+    ) -> str:
+        df = deepcopy(df)
+        df["SE"] = df.index.map(lambda v: f"{str(v)[:4]}/{str(v)[-2:]}")
+        traces = []
+
+        traces.append(
+            go.Bar(
+                x=df["SE"],
+                y=df.iloc[:, 1],
+                name=_("Registrados"),
+                marker=dict(
+                    color="#BDC3C7",
+                    line=dict(color="#3A4750", width=1),
+                ),
+                width=0.5,
+                text=df.index.map(lambda v: f"{str(v)[-2:]}"),
+                hovertemplate=_(
+                    "<br>SE %{text}<br>"
+                    "%{y:1f} Casos notificados"
+                    "<extra></extra>"
+                ),
+            )
+        )
+
+        dict_of_fig = dict(
+            {
+                "data": traces,
+                "layout": go.Layout(
+                    title={
+                        "text": _("Total de casos no estado"),
+                        "font": {"family": "Helvetica", "size": 16},
+                        "x": 0.5,
+                    },
+                    xaxis=dict(
+                        title=_("Semana epidemiológica"),
+                        tickangle=-15,
+                        showline=True,
+                        showgrid=True,
+                        showticklabels=True,
+                        linecolor="rgb(204, 204, 204)",
+                        linewidth=0,
+                        gridcolor="rgb(176, 196, 222)",
+                    ),
+                    yaxis=dict(
+                        title=_("Casos"),
+                        showline=True,
+                        showgrid=True,
+                        showticklabels=True,
+                        linecolor="rgb(204, 204, 204)",
+                        linewidth=0,
+                        gridcolor="rgb(176, 196, 222)",
+                    ),
+                    # yaxis={'title': _('Casos')},
+                    showlegend=True,
+                    legend=dict(
+                        orientation="h",
+                        yanchor="bottom",
+                        y=1.01,
+                        xanchor="left",
+                        # x=1,
+                    ),
+                    hovermode="x",
+                    hoverlabel=dict(
+                        # bgcolor="white",
+                        font_size=12,
+                        font_family="Rockwell",
+                    ),
+                    autosize=False,
+                    height=275,
+                    width=310,
+                    margin=dict(
+                        autoexpand=False,
+                        l=50,
+                        r=20,
+                        t=80,
+                        b=55,
+                    ),
+                    paper_bgcolor="rgba(0,0,0,0)",
+                    plot_bgcolor="rgba(0,0,0,0)",
+                    modebar={
+                        "orientation": "h",
+                        "bgcolor": "rgba(255 ,255 ,255 ,0.7)",
+                    },
+                ),
+            }
+        )
+
+        fig = go.Figure(dict_of_fig)
+
+        return fig.to_html()
+
+    @classmethod
     def create_tweet_chart(
         cls,
         df: pd.DataFrame,
     ) -> str:
-        """
-        Create chart with tweet information.
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Dataframe with tweet information
-        year_week : int
-            Year and week desired filter e.g.: 202002
-        disease : str, {'dengue', 'chik', 'zika'}
-            Disease name
-        Returns
-        -------
-        str
-            HTML with Plotly chart.
-        """
         df = deepcopy(df)
+        df["SE"] = df.index.map(lambda v: f"{str(v)[:4]}/{str(v)[-2:]}")
+        traces = []
 
-        figure = make_subplots(specs=[[{"secondary_y": True}]])
-
-        figure.add_trace(
-            go.Scatter(
-                x=df.index.map(lambda v: "%s/%s" % (str(v)[:4], str(v)[-2:])),
-                y=df.iloc[:, 0],  # menções tweets
-                name=_("Menções em tweets"),
-                marker={"color": "rgb(51, 172, 255)"},
-                text=df.index.map(lambda v: "{}".format(str(v)[-2:])),
-                hoverinfo="text",
-                hovertemplate=_(
-                    "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
-                ),
-            ),
-            # secondary_y=False,
-        )
-
-        figure.add_trace(
+        traces.append(
             go.Bar(
-                x=df.index.map(lambda v: "%s/%s" % (str(v)[:4], str(v)[-2:])),
-                y=df.iloc[:, 1],  # casos notif
-                name=_("Casos notificados 1"),
-                marker={"color": "rgb(150,0,255)"},
-                text=df.index.map(lambda v: "{}".format(str(v)[-2:])),
-                hoverinfo="text",
-                hovertemplate=_(
-                    "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
+                x=df["SE"],
+                y=df.iloc[:, 1],
+                name=_("Registrados"),
+                marker=dict(
+                    color="#BDC3C7",
+                    line=dict(color="#3A4750", width=1),
                 ),
-            ),
-            secondary_y=True,
+                width=0.5,
+                text=df.index.map(lambda v: f"{str(v)[-2:]}"),
+                hovertemplate=_(
+                    "<br>SE %{text}<br>"
+                    "%{y:1f} Casos notificados"
+                    "<extra></extra>"
+                ),
+            )
         )
 
-        figure.add_trace(
-            go.Bar(
-                x=df.index.map(lambda v: "%s/%s" % (str(v)[:4], str(v)[-2:])),
-                y=df.iloc[:, 2],  # casos notif
-                name=_("Casos notificados 2"),
-                marker={"color": "rgb(255,150,0)"},
-                text=df.index.map(lambda v: "{}".format(str(v)[-2:])),
-                hoverinfo="text",
-                hovertemplate=_(
-                    "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
+        dict_of_fig = dict(
+            {
+                "data": traces,
+                "layout": go.Layout(
+                    title={
+                        "text": _("Total de casos no estado"),
+                        "font": {"family": "Helvetica", "size": 16},
+                        "x": 0.5,
+                    },
+                    xaxis=dict(
+                        title=_("Semana epidemiológica"),
+                        tickangle=-15,
+                        showline=True,
+                        showgrid=True,
+                        showticklabels=True,
+                        linecolor="rgb(204, 204, 204)",
+                        linewidth=0,
+                        gridcolor="rgb(176, 196, 222)",
+                    ),
+                    yaxis=dict(
+                        title=_("Casos"),
+                        showline=True,
+                        showgrid=True,
+                        showticklabels=True,
+                        linecolor="rgb(204, 204, 204)",
+                        linewidth=0,
+                        gridcolor="rgb(176, 196, 222)",
+                    ),
+                    # yaxis={'title': _('Casos')},
+                    showlegend=True,
+                    legend=dict(
+                        orientation="h",
+                        yanchor="bottom",
+                        y=1.01,
+                        xanchor="left",
+                        # x=1,
+                    ),
+                    hovermode="x",
+                    hoverlabel=dict(
+                        # bgcolor="white",
+                        font_size=12,
+                        font_family="Rockwell",
+                    ),
+                    autosize=False,
+                    height=275,
+                    width=310,
+                    margin=dict(
+                        autoexpand=False,
+                        l=50,
+                        r=20,
+                        t=80,
+                        b=55,
+                    ),
+                    paper_bgcolor="rgba(0,0,0,0)",
+                    plot_bgcolor="rgba(0,0,0,0)",
+                    modebar={
+                        "orientation": "h",
+                        "bgcolor": "rgba(255 ,255 ,255 ,0.7)",
+                    },
                 ),
-            ),
-            secondary_y=True,
+            }
         )
 
-        figure.add_trace(
-            go.Bar(
-                x=df.index.map(lambda v: "%s/%s" % (str(v)[:4], str(v)[-2:])),
-                y=df.iloc[:, 3],  # casos notif
-                name=_("Casos notificados 3"),
-                marker={"color": "rgb(255,0,255)"},
-                text=df.index.map(lambda v: "{}".format(str(v)[-2:])),
-                hoverinfo="text",
-                hovertemplate=_(
-                    "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
-                ),
-            ),
-            secondary_y=True,
-        )
-        figure.update_layout(
-            title=_("Menções na mídia social"),
-            xaxis=dict(
-                title=_("Período: Ano/Semana"),
-                tickangle=-60,
-                # nticks=len(ks_cases) // 4,
-                showline=True,
-                showgrid=True,
-                showticklabels=True,
-                linecolor="rgb(204, 204, 204)",
-                linewidth=0,
-                gridcolor="rgb(176, 196, 222)",
-            ),
-            yaxis=dict(
-                # title='',
-                showline=False,
-                showgrid=True,
-                showticklabels=True,
-                linecolor="rgb(204, 204, 204)",
-                linewidth=0,
-                gridcolor="rgb(176, 196, 222)",
-            ),
-            showlegend=True,
-            plot_bgcolor="rgb(255, 255, 255)",
-            paper_bgcolor="rgb(245, 246, 249)",
-            width=1100,
-            height=450,
-            legend=dict(
-                orientation="h",
-                yanchor="bottom",
-                xanchor="auto",
-                y=1.01,
-                x=0.95,
-                font=dict(family="sans-serif", size=12, color="#000"),
-                bgcolor="#FFFFFF",
-                bordercolor="#E2E2E2",
-                borderwidth=1,
-            ),
-        )
+        fig = go.Figure(dict_of_fig)
 
-        # Set y-axes titles
-        figure.update_yaxes(
-            title_text="<b>{}</b>".format(_("Menções em tweets")),
-            secondary_y=False,
-        )
-        figure.update_yaxes(
-            title_text="<b>{}</b>".format(_("Casos notificados")),
-            secondary_y=True,
-        )
-        return figure.to_html()
+        return fig.to_html()

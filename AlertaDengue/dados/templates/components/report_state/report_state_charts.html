@@ -1,19 +1,141 @@
 {% load lookup %}
+{% load i18n %}
+
 {% load hashthis %}
 {% block content %}
+
 
 <div class="row justify-content-md-center">
   <!-- Grid column -->
   <div class="col-sm-12 mb-1 mb-xl-0">
     <!-- Section: Live preview -->
     <section>
-        <div class="container">
-            <div class="row">
-              <div class="">
-                {{ tweet_chart|lookup:'regional'| safe }}
+      <ul class="nav nav-tabs"
+          id="diseaseTab"
+          role="tablist">
+        <li class="nav-item waves-effect waves-light">
+          <a class="nav-link active"
+            id="dengue-{{ state_abbv }}-tab"
+            data-toggle="tab"
+            href="#dengue-{{ state_abbv }}"
+            role="tab"
+            aria-controls="dengue-{{ state_abbv }}"
+            aria-selected="true"
+            title={% trans "Gráficos sobre Dengue" %}
+            >Dengue
+          </a>
+        </li>
+        <li class="nav-item waves-effect waves-light">
+          <a class="nav-link"
+            id="chikungunya-{{ state_abbv }}-tab"
+            data-toggle="tab"
+            href="#chikungunya-{{ state_abbv }}"
+            role="tab"
+            aria-controls="chikungunya-{{ state_abbv }}"
+            aria-selected="false"
+            title={% trans "Gráficos sobre Chikungunya" %}
+            >Chikungunya
+          </a>
+        </li>
+        <li class="nav-item waves-effect waves-light">
+          <a class="nav-link"
+            id="zika-{{ state_abbv }}-tab"
+            data-toggle="tab"
+            href="#zika-{{ state_abbv }}" role="tab"
+            aria-controls="zika-{{ state_abbv }}"
+            aria-selected="false"
+            title={% trans "Gráficos sobre Zika" %}
+            >Zika
+          </a>
+        </li>
+      </ul>
+
+      <div class="tab-content"
+        id="diseaseTabContent"
+        style="background-color: #e0eefd63;
+          margin-bottom: 20px;
+          border-radius: 7px"
+      >
+        <!-- Description -->
+        <h6><small class="px-3" style="color:#888888;">
+
+        </small></h6>
+        <div class="tab-pane fade active show"
+            id="dengue-{{ state_abbv }}"
+            role="tabpanel"
+            aria-labelledby="dengue-{{ state_abbv }}-tab">
+          <div class="row">
+            <div class="col">
+              <div class="p-1">
+              {{ notif_chart|lookup:'regional'| safe }}
+              </div>
+            </div>
+            <div class="col">
+              <div class="p-1">
+
+              {{ level_chart|lookup:'regional'| safe }}
+              </div>
+            </div>
+            <div class="col">
+              <div class="p-1">
+
+              {{ tweet_chart|lookup:'regional'| safe }}
               </div>
             </div>
           </div>
+        </div>
+        <div class="tab-pane fade"
+            id="chikungunya-{{ state_abbv }}"
+            role="tabpanel"
+            aria-labelledby="chikungunya-{{ state_abbv }}-tab">
+          <div class="row">
+            <div class="col">
+              <div class="p-1">
+              {{ notif_chart|lookup:'regional'| safe }}
+              </div>
+            </div>
+            <div class="col">
+              <div class="p-1">
+
+              {{ level_chart|lookup:'regional'| safe }}
+              </div>
+            </div>
+            <div class="col">
+              <div class="p-1">
+
+              {{ tweet_chart|lookup:'regional'| safe }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane fade"
+            id="zika-{{ state_abbv }}"
+            role="tabpanel"
+            aria-labelledby="zika-{{ state_abbv }}-tab">
+          <div class="row">
+            <div class="col">
+              <div class="p-1">
+              {{ notif_chart|lookup:'regional'| safe }}
+              </div>
+            </div>
+            <div class="col">
+              <div class="p-1">
+
+              {{ level_chart|lookup:'regional'| safe }}
+              </div>
+            </div>
+            <div class="col">
+              <div class="p-1">
+
+              {{ tweet_chart|lookup:'regional'| safe }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="align-buttom mt-2">
+        </div>
+      </div>
+
     </section>
     <!-- Section: Live preview -->
   </div>

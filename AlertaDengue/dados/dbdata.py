@@ -1218,27 +1218,27 @@ class ReportState:
         )
 
         # 200 = 2 years
-        ew_start = year_week - 100
+        ew_start = year_week - 10
 
         t_hist_filter_bol = (t_hist["SE"].between(ew_start, year_week)) & (
             t_hist["municipio_geocodigo"].isin(geocodes)
         )
 
-        t_hist_proj = t_hist.filter(t_hist_filter_bol).limit(100)
+        t_hist_proj = t_hist.filter(t_hist_filter_bol).limit(10)
 
-        # nivel = (
-        #     ibis.case()
-        #     .when((t_hist_proj.nivel.cast("string") == "1"), "verde")
-        #     .when((t_hist_proj.nivel.cast("string") == "2"), "amarelo")
-        #     .when((t_hist_proj.nivel.cast("string") == "3"), "laranja")
-        #     .when((t_hist_proj.nivel.cast("string") == "4"), "vermelho")
-        #     .else_("-")
-        #     .end()
-        # ).name("nivel")
+        nivel = (
+            ibis.case()
+            .when((t_hist_proj.nivel.cast("string") == "1"), "verde")
+            .when((t_hist_proj.nivel.cast("string") == "2"), "amarelo")
+            .when((t_hist_proj.nivel.cast("string") == "3"), "laranja")
+            .when((t_hist_proj.nivel.cast("string") == "4"), "vermelho")
+            .else_("-")
+            .end()
+        ).name("nivel")
 
         hist_keys = [
             t_hist_proj.SE.name("SE"),
-            t_hist_proj.tweet.name("tweet"),
+            # t_hist_proj.tweet.name("tweet"),
             t_hist_proj.casos.name("casos notif."),
             # t_hist_proj.casos_est.name("casos_est"),
             # t_hist_proj.p_inc100k.name("incidência"),
@@ -1249,8 +1249,8 @@ class ReportState:
             # t_hist_proj.umidmin.name("umid.min"),
             # t_hist_proj.umidmed.name("umid.med"),
             # t_hist_proj.umidmax.name("umid.max"),
-            # nivel,
-            # t_hist_proj.nivel.name("level_code"),
+            nivel,
+            t_hist_proj.nivel.name("level_code"),
         ]
 
         return (

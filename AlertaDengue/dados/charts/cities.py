@@ -350,7 +350,7 @@ class ReportCityCharts:
         return figure.to_html()
 
     @classmethod
-    def create_tweet_chart(cls, df: pd.DataFrame, year_week):
+    def create_notific_chart(cls, df: pd.DataFrame, year_week):
         """
         :param df:
         :param var_climate:

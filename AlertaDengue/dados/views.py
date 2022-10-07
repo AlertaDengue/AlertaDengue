@@ -951,7 +951,7 @@ class ReportCityView(TemplateView):
                 threshold_epidemic=threshold_epidemic,
             )
 
-            chart_dengue_tweets = ReportCityCharts.create_tweet_chart(
+            chart_dengue_tweets = ReportCityCharts.create_notific_chart(
                 df=df_dengue, year_week=year_week
             )
             total_n_dengue = df_dengue[df_dengue.index // 100 == this_year][
@@ -1103,6 +1103,7 @@ class ReportStateView(TemplateView):
             {
                 "state_name": STATE_NAME[state],
                 "regional_by_state": regional_by_state,
+                "state": state,
             }
         )
 
@@ -1111,41 +1112,6 @@ class ReportStateView(TemplateView):
 
 class ReportStateData(TemplateView):
     template_name = "components/report_state/report_state_charts.html"
-
-    def prepare_df(self, state_abbv, year_week):
-
-        df_cases = pd.DataFrame()
-
-        diseases = ["dengue", "chikungunya", "zika"]
-
-        cols_list = ["casos notif."]
-
-        for d in diseases:
-            df = (
-                ReportStateData()
-                .get_chart_data(state_abbv, d, year_week)
-                .reset_index()
-            )
-
-            df_disease_cols = deepcopy(df[cols_list])
-
-            df_disease_cols.rename(
-                columns={
-                    "casos notif.": f"casos notif. {d}",
-                },
-                inplace=True,
-            )
-
-            df_cases[df_disease_cols.columns] = df_disease_cols
-
-            if d == "dengue":
-                df_tweet_dengue = df[["SE", "tweet"]]
-
-        result = pd.concat([df_tweet_dengue, df_cases], axis=1)
-
-        return result.set_index("SE").sort_index(
-            axis=0, level=None, ascending=True
-        )
 
     def get_chart_data(
         self,
@@ -1171,23 +1137,134 @@ class ReportStateData(TemplateView):
 
         return df.head(10)
 
+    def df_cases(self, state_abbv, year_week):
+
+        df_cases = pd.DataFrame()
+
+        diseases = ["dengue", "chikungunya", "zika"]
+
+        cols_list = ["casos notif."]
+
+        for d in diseases:
+            df = self.get_chart_data(state_abbv, d, year_week).reset_index()
+
+            df_disease_cols = deepcopy(df.loc[:, ["SE", "casos notif."]])
+
+            df_disease_cols.rename(
+                columns={
+                    "casos notif.": f"casos_notif_{d}",
+                },
+                inplace=True,
+            )
+
+            df_cases[df_disease_cols.columns] = df_disease_cols
+
+            # if d == "dengue":
+            #     # df_tweet_dengue = df[["SE", "tweet"]]
+            #     df_tweet_dengue = df.loc[:, "SE"]
+        # breakpoint()
+        return df_cases
+
+        # return result.set_index("SE").sort_index(
+        #     axis=0, level=None, ascending=True
+        # )
+
+    def df_level(self, state_abbv, year_week):
+
+        df_level = pd.DataFrame()
+
+        diseases = ["dengue", "chikungunya", "zika"]
+
+        cols_list = ["casos notif."]
+
+        for d in diseases:
+            df = self.get_chart_data(state_abbv, d, year_week).reset_index()
+
+            df_disease_cols = deepcopy(df.loc[:, ["SE", "casos notif."]])
+
+            df_disease_cols.rename(
+                columns={
+                    "casos notif.": f"casos_notif_{d}",
+                },
+                inplace=True,
+            )
+
+            df_level[df_disease_cols.columns] = df_disease_cols
+
+            # if d == "dengue":
+            #     # df_tweet_dengue = df[["SE", "tweet"]]
+            #     df_tweet_dengue = df.loc[:, "SE"]
+        # breakpoint()
+        return df_level
+
+        # return result.set_index("SE").sort_index(
+        #     axis=0, level=None, ascending=True
+        # )
+
+    def df_tweet(self, state_abbv, year_week):
+
+        df_tweet = pd.DataFrame()
+
+        diseases = ["dengue", "chikungunya", "zika"]
+
+        cols_list = ["casos notif."]
+
+        for d in diseases:
+            df = self.get_chart_data(state_abbv, d, year_week).reset_index()
+
+            df_disease_cols = deepcopy(df.loc[:, ["SE", "casos notif."]])
+
+            df_disease_cols.rename(
+                columns={
+                    "casos notif.": f"casos_notif_{d}",
+                },
+                inplace=True,
+            )
+
+            df_tweet[df_disease_cols.columns] = df_disease_cols
+
+            # if d == "dengue":
+            #     # df_tweet_dengue = df[["SE", "tweet"]]
+            #     df_tweet_dengue = df.loc[:, "SE"]
+        # breakpoint()
+        return df_tweet
+
+        # return result.set_index("SE").sort_index(
+        #     axis=0, level=None, ascending=True
+        # )
+
     def get_context_data(self, **kwargs):
         # TODO: Need year_week from context
         context = super(ReportStateData, self).get_context_data(**kwargs)
         state_abbv = context["state"]
         year_week = 202102
         tweet_chart = defaultdict(dict)
+        level_chart = defaultdict(dict)
+        notif_chart = defaultdict(dict)
 
-        df_tweets = self.prepare_df(state_abbv, year_week)
+        df_cases = self.df_cases(state_abbv, year_week)
+        df_level = self.df_level(state_abbv, year_week)
+        df_tweet = self.df_tweet(state_abbv, year_week)
+
+        notif_chart["regional"] = ReportStateCharts.create_notific_chart(
+            df_cases
+        )
+
+        level_chart["regional"] = ReportStateCharts.create_level_chart(
+            df_level
+        )
 
         tweet_chart["regional"] = ReportStateCharts.create_tweet_chart(
-            df_tweets
+            df_tweet
         )
 
         context.update(
             {
                 "year_week": year_week,
+                "notif_chart": notif_chart,
+                "level_chart": level_chart,
                 "tweet_chart": tweet_chart,
+                "state_abbv": state_abbv,
             }
         )
 
