@@ -43,7 +43,7 @@ services:
     env_file:
       - ../.env
     environment:
-      - MEMCACHED_HOST=memcached
+      - MEMCACHED_HOST=memcachedi
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
       - PSQL_HOST=${PSQL_HOST}
       - PSQL_PORT=${PSQL_PORT}

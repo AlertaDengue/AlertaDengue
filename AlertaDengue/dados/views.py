@@ -10,7 +10,6 @@ from pathlib import Path, PurePath
 import fiona
 import geojson
 import numpy as np
-import pandas as pd
 
 #
 from django.apps import apps
@@ -1113,158 +1112,42 @@ class ReportStateView(TemplateView):
 class ReportStateData(TemplateView):
     template_name = "components/report_state/report_state_charts.html"
 
-    def get_chart_data(
-        self,
-        state: str,
-        disease: str,
-        year_week: int,
-    ) -> pd:
-        """
-        Fetch regional data.
-        Parameters
-        ----------
-        Returns
-        -------
-        Dataframe : data by regional name
-        """
-
-        regional_info = ReportState.get_regional_by_state(state)
-
-        for _, geocode_list in regional_info.items():  # noqa F402
-            df = ReportState.read_disease_data(
-                disease, list(geocode_list.keys()), year_week
-            )
-
-        return df.head(10)
-
-    def df_cases(self, state_abbv, year_week):
-
-        df_cases = pd.DataFrame()
-
-        diseases = ["dengue", "chikungunya", "zika"]
-
-        cols_list = ["casos notif."]
-
-        for d in diseases:
-            df = self.get_chart_data(state_abbv, d, year_week).reset_index()
-
-            df_disease_cols = deepcopy(df.loc[:, ["SE", "casos notif."]])
-
-            df_disease_cols.rename(
-                columns={
-                    "casos notif.": f"casos_notif_{d}",
-                },
-                inplace=True,
-            )
-
-            df_cases[df_disease_cols.columns] = df_disease_cols
-
-            # if d == "dengue":
-            #     # df_tweet_dengue = df[["SE", "tweet"]]
-            #     df_tweet_dengue = df.loc[:, "SE"]
-        # breakpoint()
-        return df_cases
-
-        # return result.set_index("SE").sort_index(
-        #     axis=0, level=None, ascending=True
-        # )
-
-    def df_level(self, state_abbv, year_week):
-
-        df_level = pd.DataFrame()
-
-        diseases = ["dengue", "chikungunya", "zika"]
-
-        cols_list = ["casos notif."]
-
-        for d in diseases:
-            df = self.get_chart_data(state_abbv, d, year_week).reset_index()
-
-            df_disease_cols = deepcopy(df.loc[:, ["SE", "casos notif."]])
-
-            df_disease_cols.rename(
-                columns={
-                    "casos notif.": f"casos_notif_{d}",
-                },
-                inplace=True,
-            )
-
-            df_level[df_disease_cols.columns] = df_disease_cols
-
-            # if d == "dengue":
-            #     # df_tweet_dengue = df[["SE", "tweet"]]
-            #     df_tweet_dengue = df.loc[:, "SE"]
-        # breakpoint()
-        return df_level
-
-        # return result.set_index("SE").sort_index(
-        #     axis=0, level=None, ascending=True
-        # )
-
-    def df_tweet(self, state_abbv, year_week):
-
-        df_tweet = pd.DataFrame()
-
-        diseases = ["dengue", "chikungunya", "zika"]
-
-        cols_list = ["casos notif."]
-
-        for d in diseases:
-            df = self.get_chart_data(state_abbv, d, year_week).reset_index()
-
-            df_disease_cols = deepcopy(df.loc[:, ["SE", "casos notif."]])
-
-            df_disease_cols.rename(
-                columns={
-                    "casos notif.": f"casos_notif_{d}",
-                },
-                inplace=True,
-            )
-
-            df_tweet[df_disease_cols.columns] = df_disease_cols
-
-            # if d == "dengue":
-            #     # df_tweet_dengue = df[["SE", "tweet"]]
-            #     df_tweet_dengue = df.loc[:, "SE"]
-        # breakpoint()
-        return df_tweet
-
-        # return result.set_index("SE").sort_index(
-        #     axis=0, level=None, ascending=True
-        # )
-
     def get_context_data(self, **kwargs):
         # TODO: Need year_week from context
         context = super(ReportStateData, self).get_context_data(**kwargs)
         state_abbv = context["state"]
+        regional = context["regional_name"].replace("_", " ")
         year_week = 202102
-        tweet_chart = defaultdict(dict)
         level_chart = defaultdict(dict)
         notif_chart = defaultdict(dict)
+        notif_chart = defaultdict(dict)
 
-        df_cases = self.df_cases(state_abbv, year_week)
-        df_level = self.df_level(state_abbv, year_week)
-        df_tweet = self.df_tweet(state_abbv, year_week)
+        notif_chart = defaultdict(dict)
+        level_chart = defaultdict(dict)
 
-        notif_chart["regional"] = ReportStateCharts.create_notific_chart(
-            df_cases
-        )
+        regional_info = ReportState.get_regional_by_state(state_abbv)
 
-        level_chart["regional"] = ReportStateCharts.create_level_chart(
-            df_level
-        )
-
-        tweet_chart["regional"] = ReportStateCharts.create_tweet_chart(
-            df_tweet
-        )
+        for d in CID10.keys():
+            notif_chart[d] = ReportStateCharts.create_notific_chart(
+                # df_cases
+                ReportState.create_report_state_data(
+                    list(regional_info[regional]), f"{d}", year_week
+                )
+            )
+            level_chart[d] = ReportStateCharts.create_level_chart(
+                # df_level
+                ReportState.create_report_state_data(
+                    list(regional_info[regional]), f"{d}", year_week
+                )
+            )
+            print(list(regional_info))
 
         context.update(
             {
                 "year_week": year_week,
+                "state_abbv": state_abbv,
                 "notif_chart": notif_chart,
                 "level_chart": level_chart,
-                "tweet_chart": tweet_chart,
-                "state_abbv": state_abbv,
             }
         )
 

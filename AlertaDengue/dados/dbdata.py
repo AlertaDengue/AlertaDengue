@@ -1184,89 +1184,13 @@ class ReportState:
     """Report State class."""
 
     @classmethod
-    def read_disease_data(
-        cls,
-        disease: str,
-        geocodes: list,
-        year_week: int,
-    ) -> ibis.expr.types.Expr:
-        """
-        Return an ibis expression with the history for a given disease.
-        Parameters
-        ----------
-        disease : str, {'dengue', 'chik', 'zika'}
-        geocodes : list[int]
-        year_week : int
-            The starting Year/Week, e.g.: 202002
-        Returns
-        -------
-        ibis.expr.types.Expr
-        """
-        con_ibis = get_ibis_conn()
-
-        if disease not in CID10.keys():
-            raise Exception(
-                f"The diseases available are: {[k for k in CID10.keys()]}"
-            )
-
-        table_suffix = ""
-        if disease != "dengue":
-            table_suffix = get_disease_suffix(disease)  # F'_{disease}'
-
-        t_hist = con_ibis.table(
-            f"Historico_alerta{table_suffix}", settings.PSQL_DB, "Municipio"
-        )
-
-        # 200 = 2 years
-        ew_start = year_week - 10
-
-        t_hist_filter_bol = (t_hist["SE"].between(ew_start, year_week)) & (
-            t_hist["municipio_geocodigo"].isin(geocodes)
-        )
-
-        t_hist_proj = t_hist.filter(t_hist_filter_bol).limit(10)
-
-        nivel = (
-            ibis.case()
-            .when((t_hist_proj.nivel.cast("string") == "1"), "verde")
-            .when((t_hist_proj.nivel.cast("string") == "2"), "amarelo")
-            .when((t_hist_proj.nivel.cast("string") == "3"), "laranja")
-            .when((t_hist_proj.nivel.cast("string") == "4"), "vermelho")
-            .else_("-")
-            .end()
-        ).name("nivel")
-
-        hist_keys = [
-            t_hist_proj.SE.name("SE"),
-            # t_hist_proj.tweet.name("tweet"),
-            t_hist_proj.casos.name("casos notif."),
-            # t_hist_proj.casos_est.name("casos_est"),
-            # t_hist_proj.p_inc100k.name("incidência"),
-            # t_hist_proj.p_rt1.name("pr(incid. subir)"),
-            # t_hist_proj.tempmin.name("temp.min"),
-            # t_hist_proj.tempmed.name("temp.med"),
-            # t_hist_proj.tempmax.name("temp.max"),
-            # t_hist_proj.umidmin.name("umid.min"),
-            # t_hist_proj.umidmed.name("umid.med"),
-            # t_hist_proj.umidmax.name("umid.max"),
-            nivel,
-            t_hist_proj.nivel.name("level_code"),
-        ]
-
-        return (
-            t_hist_proj[hist_keys]
-            .sort_by(("SE", False))
-            .execute()
-            .set_index("SE")
-        )
-
-    @classmethod
     def get_regional_by_state(self, state):
         """_summary_
 
         Returns:
             dict: Dict[int, str],: Dictionary with regional by states
         """
+        # TODO: USAR O ID DA REGIONAL
         cache_name = "regional_by_state_" + "_" + str(state)
         res = cache.get(cache_name)
 
@@ -1287,3 +1211,44 @@ class ReportState:
             )
 
         return res
+
+    @classmethod
+    def create_report_state_data(cls, geocodes, disease, year_week):
+        con_ibis = get_ibis_conn()
+
+        if disease not in CID10.keys():
+            raise Exception(
+                f"The diseases available are: {[k for k in CID10.keys()]}"
+            )
+
+        table_suffix = ""
+        if disease != "dengue":
+            table_suffix = get_disease_suffix(disease)  # F'_{disease}'
+
+        t_hist = con_ibis.table(
+            f"Historico_alerta{table_suffix}", settings.PSQL_DB, "Municipio"
+        )
+
+        #  200 = 2 years
+        ew_start = year_week - 20
+
+        t_hist_filter_bol = (t_hist["SE"].between(ew_start, year_week)) & (
+            t_hist["municipio_geocodigo"].isin(geocodes)
+        )
+
+        t_hist_proj = t_hist.filter(t_hist_filter_bol).limit(100)
+
+        cols_ = [
+            "SE",
+            "casos_est",
+            "casos",
+            "municipio_geocodigo",
+            "municipio_nome",
+        ]
+
+        return (
+            t_hist_proj[cols_]
+            .sort_by(("SE", False))
+            .execute()
+            # .set_index("SE")
+        )

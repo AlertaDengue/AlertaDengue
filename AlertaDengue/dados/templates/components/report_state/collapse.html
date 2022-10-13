@@ -69,10 +69,11 @@
       }
       $.each( allRegionals, function( i, regional_name ) {
         // console.log(encodeURIComponent(regional_name)) ;
+        // console.log(regional_name)  TODO: USAR O ID DA REGIONAL
         // const spacesReplaced = decodeURIComponent(regional_name).replaceAll('/', '&');
         const spacesReplaced = regional_name.replaceAll(' ', '_').replaceAll('/', '-');
 
-        console.log(spacesReplaced)
+        // console.log(spacesReplaced)
         loadDataFromApi("/fetchdata/" + state_abbv + "/"  + spacesReplaced)
         .then(function(data) {
           $("#panel_" + spacesReplaced).html(data);
