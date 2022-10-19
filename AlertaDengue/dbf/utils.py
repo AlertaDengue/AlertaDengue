@@ -80,7 +80,7 @@ def _parse_fields(dbf_name: str, df: gpd) -> pd:
         except ValueError:
             df[col] = pd.to_datetime(df[col], errors="coerce")
 
-    return df.loc[[all_expected_fields]]
+    return df.loc[:, all_expected_fields]
 
 
 def chunk_gen(chunksize, totalsize):
