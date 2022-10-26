@@ -41,7 +41,8 @@ state_abbv = "|".join(state for state in STATE_NAME.keys())
 
 __disease = "(?P<disease>dengue|chikungunya|zika)"
 __state_abbv = f"(?P<state>{state_abbv})"
-__regional_name = r"(?P<regional_name>(\w+\s*-*)+)"
+# __regional_id = r"(?P<regional_name>(\w+\s*-*)+)"
+__regional_id = r"(?P<regional_id>\d{5})"
 __geocode = r"(?P<geocodigo>\d{7})"
 __geocode_ = r"(?P<geocode>\d{7})"
 __year = r"(?P<year>\d{4})"
@@ -166,7 +167,7 @@ urlpatterns = [
         name="report_state",
     ),
     re_path(
-        r"^fetchdata/{}/{}$".format(__state_abbv, __regional_name),
+        r"^fetchdata/{}/{}$".format(__state_abbv, __regional_id),
         ReportStateData.as_view(),
         name="fetchdata",
     ),

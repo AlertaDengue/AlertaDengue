@@ -2,7 +2,6 @@
 This module contains functions to interact with the main database of the
 Alertadengue project.
 """
-import json
 from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import List, Optional, Tuple
@@ -1184,26 +1183,59 @@ class ReportState:
     """Report State class."""
 
     @classmethod
-    def get_regional_by_state(self, state):
-        """_summary_
-
-        Returns:
-            dict: Dict[int, str],: Dictionary with regional by states
+    def csv_get_regional_by_state(self, state: str) -> pd:
         """
-        # TODO: USAR O ID DA REGIONAL
+        Import CSV file with the municipalities of regional health by state.
+        Parameters
+        ----------
+            state: State abbreviation.
+        Returns:
+            df: df with the municipalities of the regionals filtered by state.
+        """
+        # TODO: Export CSV to JSON file.
+
         cache_name = "regional_by_state_" + "_" + str(state)
         res = cache.get(cache_name)
 
         if res is None:
-            # print(f"add cache_name {cache_name}: ", res)
-            regional_dict = (
-                settings.APPS_DIR / "data" / "regional_by_states.json"
+            regionais = pd.read_csv(
+                settings.APPS_DIR / "data" / "regionais_saude_name.csv"
             )
-            with open(regional_dict) as file:
-                # Load its content and make a new dictionary
-                regional_by_state = json.load(file)
 
-            res = regional_by_state[state]
+            cols = [
+                "UF",
+                "Município",
+                "Cód IBGE",
+                "Cód Região de Saúde",
+                "Nome da Região de Saúde",
+            ]
+
+            renamed_cols = {
+                "UF": "UF",
+                "Município": "municipio_nome",
+                "Cód IBGE": "municipio_geocodigo",
+                "Cód Região de Saúde": "id_regional",
+                "Nome da Região de Saúde": "nome_regional",
+            }
+            df_reg = regionais.loc[:, cols].rename(columns=renamed_cols)
+            from dbf import pysus
+
+            df_reg.municipio_geocodigo = pysus.add_dv(
+                df_reg.municipio_geocodigo
+            )
+
+            df = df_reg[df_reg.UF == state]
+
+            res = df.loc[
+                :,
+                [
+                    "id_regional",
+                    "nome_regional",
+                    "municipio_geocodigo",
+                    "municipio_nome",
+                ],
+            ]
+
             cache.set(
                 cache_name,
                 res,

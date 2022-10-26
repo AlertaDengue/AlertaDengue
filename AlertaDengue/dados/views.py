@@ -1096,12 +1096,17 @@ class ReportStateView(TemplateView):
         context = super().get_context_data(**kwargs)
         state = context["state"]
 
-        regional_by_state = ReportState.get_regional_by_state(state)
+        df = ReportState.csv_get_regional_by_state(state)
+
+        regional_dict = {
+            d["id_regional"]: d["nome_regional"]
+            for d in df.iloc[:, 0:2].to_dict(orient="records")
+        }
 
         context.update(
             {
                 "state_name": STATE_NAME[state],
-                "regional_by_state": regional_by_state,
+                "regional_dict": regional_dict,
                 "state": state,
             }
         )
@@ -1116,31 +1121,33 @@ class ReportStateData(TemplateView):
         # TODO: Need year_week from context
         context = super(ReportStateData, self).get_context_data(**kwargs)
         state_abbv = context["state"]
-        regional = context["regional_name"].replace("_", " ")
+        regional_id = int(context["regional_id"])
         year_week = 202102
-        level_chart = defaultdict(dict)
-        notif_chart = defaultdict(dict)
-        notif_chart = defaultdict(dict)
 
-        notif_chart = defaultdict(dict)
-        level_chart = defaultdict(dict)
+        level_chart = {}
+        notif_chart = {}
 
-        regional_info = ReportState.get_regional_by_state(state_abbv)
+        df = ReportState.csv_get_regional_by_state(state_abbv)
+
+        df_regional_filtered = df[df.id_regional == regional_id]
 
         for d in CID10.keys():
             notif_chart[d] = ReportStateCharts.create_notific_chart(
                 # df_cases
                 ReportState.create_report_state_data(
-                    list(regional_info[regional]), f"{d}", year_week
+                    df_regional_filtered.municipio_geocodigo.to_list(),
+                    f"{d}",
+                    year_week,
                 )
             )
             level_chart[d] = ReportStateCharts.create_level_chart(
                 # df_level
                 ReportState.create_report_state_data(
-                    list(regional_info[regional]), f"{d}", year_week
+                    df_regional_filtered.municipio_geocodigo.to_list(),
+                    f"{d}",
+                    year_week,
                 )
             )
-            print(list(regional_info))
 
         context.update(
             {

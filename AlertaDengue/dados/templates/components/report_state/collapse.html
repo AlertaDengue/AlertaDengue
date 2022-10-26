@@ -1,7 +1,6 @@
 
 
 {% load lookup %}
-{% load lookup %}
 
 {% load hashthis %}
 
@@ -10,7 +9,7 @@
 
 <div id="accordion">
 
-  {% for key,value in regional_by_state.items %}
+  {% for key,value in regional_dict.items %}
 
     <div class="card">
 
@@ -18,18 +17,17 @@
           <button
             class="collapse-effect text-left"
             data-toggle="collapse"
-            data-target="#panel_{{ key | unquote_str }}"
+            data-target="#panel_{{ key }}"
             aria-expanded="true"
-            aria-controls="panel_{{ key | unquote_str }}"
-
+            aria-controls="panel_{{ key }}"
           >
-            <span>{{ key }}</span>
+            <span>{{ value }}</span>
           </button>
-        </h5>
+
       </div>
 
-      <div id="panel_{{ key | unquote_str }}"
-      {% if key == 'Baixada Litorânea' %}
+      <div id="panel_{{ key }}"
+      {% if key == '12002' %}
           class="collapse show"
           {% else %}
           class="collapse"
@@ -52,7 +50,7 @@
 <script type="text/javascript"> //
 
   $(document).ready(function(){
-    const allRegionals = Object.keys({{ regional_by_state| safe }});
+    const allRegionals = Object.keys({{ regional_dict| safe }});
     const state_abbv = "{{ state }}";
     let requestCache = {};
 
@@ -67,18 +65,18 @@
         }
         return requestCache[apiUrl];
       }
-      $.each( allRegionals, function( i, regional_name ) {
+      $.each( allRegionals, function( i, regional_id ) {
         // console.log(encodeURIComponent(regional_name)) ;
         // console.log(regional_name)  TODO: USAR O ID DA REGIONAL
         // const spacesReplaced = decodeURIComponent(regional_name).replaceAll('/', '&');
-        const spacesReplaced = regional_name.replaceAll(' ', '_').replaceAll('/', '-');
+        // const spacesReplaced = regional_name.replaceAll(' ', '_').replaceAll('/', '-');
 
-        // console.log(spacesReplaced)
-        loadDataFromApi("/fetchdata/" + state_abbv + "/"  + spacesReplaced)
+        console.log(regional_id)
+        loadDataFromApi("/fetchdata/" + state_abbv + "/"  + regional_id)
         .then(function(data) {
-          $("#panel_" + spacesReplaced).html(data);
-            // console.log(spacesReplaced) ;
-          // console.log("State: " + regional_name);
+          $("#panel_" + regional_id).html(data);
+             // console.log(regional_id) ;
+             // console.log("State: " + regional_id);
         });
     });
   });
