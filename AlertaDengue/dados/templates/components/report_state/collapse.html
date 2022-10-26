@@ -27,18 +27,18 @@
       </div>
 
       <div id="panel_{{ key }}"
-      {% if key == '12002' %}
-          class="collapse show"
+          {% if key == '12002' %}
+              class="collapse show"
           {% else %}
-          class="collapse"
+              class="collapse"
           {% endif %}
           aria-labelledby="flip_{{ key }}"
           data-parent="#accordion">
           <div class="card-body">
-            <div class="spinner-border text-muted">
-            </div>
+            <div class="spinner-border text-muted"></div>
           </div>
       </div>
+
     </div>
 
   {% endfor %}
@@ -66,16 +66,10 @@
         return requestCache[apiUrl];
       }
       $.each( allRegionals, function( i, regional_id ) {
-        // console.log(encodeURIComponent(regional_name)) ;
-        // console.log(regional_name)  TODO: USAR O ID DA REGIONAL
-        // const spacesReplaced = decodeURIComponent(regional_name).replaceAll('/', '&');
-        // const spacesReplaced = regional_name.replaceAll(' ', '_').replaceAll('/', '-');
-
-        console.log(regional_id)
+        // console.log(regional_id)
         loadDataFromApi("/fetchdata/" + state_abbv + "/"  + regional_id)
         .then(function(data) {
           $("#panel_" + regional_id).html(data);
-             // console.log(regional_id) ;
              // console.log("State: " + regional_id);
         });
     });
