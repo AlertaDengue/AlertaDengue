@@ -1118,10 +1118,24 @@ class ReportStateData(TemplateView):
     template_name = "components/report_state/report_state_charts.html"
 
     def get_context_data(self, **kwargs):
+
         # TODO: Need year_week from context
+        # ---
+        # last_year_week = None
+        # last_year_week_ = df.SE.max()
+        # last_year_week = last_year_week_
+        # ---
+        # last_year_week_s = str(last_year_week)
+        # last_year = last_year_week_s[:4]
+        # last_week = last_year_week_s[-2:]
+        # ---
+        # year_week = int(context["year_week"])
+        # year, week = context["year_week"][:4], context["year_week"][-2:]
+
         context = super(ReportStateData, self).get_context_data(**kwargs)
         state_abbv = context["state"]
         regional_id = int(context["regional_id"])
+
         year_week = 202102
 
         level_chart = {}

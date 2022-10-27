@@ -1192,32 +1192,24 @@ class ReportState:
         Returns:
             df: df with the municipalities of the regionals filtered by state.
         """
-        # TODO: Export CSV to JSON file.
+        # TODO: Export CSV to JSON file: see #
 
         cache_name = "regional_by_state_" + "_" + str(state)
         res = cache.get(cache_name)
 
         if res is None:
-            regionais = pd.read_csv(
-                settings.APPS_DIR / "data" / "regionais_saude_name.csv"
+            df_reg = pd.read_csv(
+                settings.APPS_DIR / "data" / "regionais_saude_name.csv",
+                names=[
+                    "UF",
+                    "municipio_nome",
+                    "municipio_geocodigo",
+                    "id_regional",
+                    "nome_regional",
+                ],
+                skiprows=1,
             )
 
-            cols = [
-                "UF",
-                "Município",
-                "Cód IBGE",
-                "Cód Região de Saúde",
-                "Nome da Região de Saúde",
-            ]
-
-            renamed_cols = {
-                "UF": "UF",
-                "Município": "municipio_nome",
-                "Cód IBGE": "municipio_geocodigo",
-                "Cód Região de Saúde": "id_regional",
-                "Nome da Região de Saúde": "nome_regional",
-            }
-            df_reg = regionais.loc[:, cols].rename(columns=renamed_cols)
             from dbf import pysus
 
             df_reg.municipio_geocodigo = pysus.add_dv(

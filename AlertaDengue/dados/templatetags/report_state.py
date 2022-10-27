@@ -7,5 +7,4 @@ register = template.Library()
     "components/report_state/collapse.html", takes_context=True
 )
 def regional_collapse_component(context):
-
     return context
