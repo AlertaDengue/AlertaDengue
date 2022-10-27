@@ -707,6 +707,7 @@ def calculate_digit(dig):
     return dv
 
 
+@np.vectorize
 def add_dv(geocodigo):
     """
     Retorna o geocóodigo do município adicionando o digito verificador,
@@ -1210,11 +1211,7 @@ class ReportState:
                 skiprows=1,
             )
 
-            from dbf import pysus
-
-            df_reg.municipio_geocodigo = pysus.add_dv(
-                df_reg.municipio_geocodigo
-            )
+            df_reg.municipio_geocodigo = add_dv(df_reg.municipio_geocodigo)
 
             df = df_reg[df_reg.UF == state]
 
