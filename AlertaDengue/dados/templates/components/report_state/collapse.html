@@ -67,7 +67,7 @@
       }
       $.each( allRegionals, function( i, regional_id ) {
         // console.log(regional_id)
-        loadDataFromApi("/fetchdata/" + state_abbv + "/"  + regional_id)
+        loadDataFromApi("/fetchdata/" + state_abbv + "/"  + regional_id + "/{{ year_week }}" )
         .then(function(data) {
           $("#panel_" + regional_id).html(data);
              // console.log("State: " + regional_id);

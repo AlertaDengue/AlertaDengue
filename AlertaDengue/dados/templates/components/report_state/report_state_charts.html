@@ -15,11 +15,11 @@
           role="tablist">
         <li class="nav-item waves-effect waves-light">
           <a class="nav-link active"
-            id="dengue-{{ state_abbv }}-tab"
+            id="dengue-{{ state_abbv }}-{{ regional_id }}-tab"
             data-toggle="tab"
-            href="#dengue-{{ state_abbv }}"
+            href="#dengue-{{ state_abbv }}-{{ regional_id }}"
             role="tab"
-            aria-controls="dengue-{{ state_abbv }}"
+            aria-controls="dengue-{{ state_abbv }}-{{ regional_id }}"
             aria-selected="true"
             title={% trans "Gráficos sobre Dengue" %}
             >Dengue
@@ -27,11 +27,11 @@
         </li>
         <li class="nav-item waves-effect waves-light">
           <a class="nav-link"
-            id="chikungunya-{{ state_abbv }}-tab"
+            id="chikungunya-{{ state_abbv }}-{{ regional_id }}-tab"
             data-toggle="tab"
-            href="#chikungunya-{{ state_abbv }}"
+            href="#chikungunya-{{ state_abbv }}-{{ regional_id }}"
             role="tab"
-            aria-controls="chikungunya-{{ state_abbv }}"
+            aria-controls="chikungunya-{{ state_abbv }}-{{ regional_id }}"
             aria-selected="false"
             title={% trans "Gráficos sobre Chikungunya" %}
             >Chikungunya
@@ -39,10 +39,10 @@
         </li>
         <li class="nav-item waves-effect waves-light">
           <a class="nav-link"
-            id="zika-{{ state_abbv }}-tab"
+            id="zika-{{ state_abbv }}-{{ regional_id }}-tab"
             data-toggle="tab"
-            href="#zika-{{ state_abbv }}" role="tab"
-            aria-controls="zika-{{ state_abbv }}"
+            href="#zika-{{ state_abbv }}-{{ regional_id }}" role="tab"
+            aria-controls="zika-{{ state_abbv }}-{{ regional_id }}"
             aria-selected="false"
             title={% trans "Gráficos sobre Zika" %}
             >Zika
@@ -61,9 +61,9 @@
 
         </small></h6>
         <div class="tab-pane fade active show"
-            id="dengue-{{ state_abbv }}"
+            id="dengue-{{ state_abbv }}-{{ regional_id }}"
             role="tabpanel"
-            aria-labelledby="dengue-{{ state_abbv }}-tab">
+            aria-labelledby="dengue-{{ state_abbv }}-{{ regional_id }}-tab">
           <div class="row">
             <div class="col">
               <div class="p-1">
@@ -78,9 +78,9 @@
           </div>
         </div>
         <div class="tab-pane fade"
-            id="chikungunya-{{ state_abbv }}"
+            id="chikungunya-{{ state_abbv }}-{{ regional_id }}"
             role="tabpanel"
-            aria-labelledby="chikungunya-{{ state_abbv }}-tab">
+            aria-labelledby="chikungunya-{{ state_abbv }}-{{ regional_id }}-tab">
           <div class="row">
             <div class="col">
               <div class="p-1">
@@ -95,9 +95,9 @@
           </div>
         </div>
         <div class="tab-pane fade"
-            id="zika-{{ state_abbv }}"
+            id="zika-{{ state_abbv }}-{{ regional_id }}"
             role="tabpanel"
-            aria-labelledby="zika-{{ state_abbv }}-tab">
+            aria-labelledby="zika-{{ state_abbv }}-{{ regional_id }}-tab">
           <div class="row">
             <div class="col">
               <div class="p-1">

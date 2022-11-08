@@ -1088,55 +1088,15 @@ class ReportCityView(TemplateView):
         return context
 
 
-class ReportStateView(TemplateView):
-    template_name = "report_state.html"
-
-    def get_context_data(self, **kwargs):
-        context = super(ReportStateView, self).get_context_data(**kwargs)
-        context = super().get_context_data(**kwargs)
-        state = context["state"]
-
-        df = ReportState.csv_get_regional_by_state(state)
-
-        regional_dict = {
-            d["id_regional"]: d["nome_regional"]
-            for d in df.iloc[:, 0:2].to_dict(orient="records")
-        }
-
-        context.update(
-            {
-                "state_name": STATE_NAME[state],
-                "regional_dict": regional_dict,
-                "state": state,
-            }
-        )
-
-        return context
-
-
 class ReportStateData(TemplateView):
     template_name = "components/report_state/report_state_charts.html"
 
     def get_context_data(self, **kwargs):
 
-        # TODO: Need year_week from context
-        # ---
-        # last_year_week = None
-        # last_year_week_ = df.SE.max()
-        # last_year_week = last_year_week_
-        # ---
-        # last_year_week_s = str(last_year_week)
-        # last_year = last_year_week_s[:4]
-        # last_week = last_year_week_s[-2:]
-        # ---
-        # year_week = int(context["year_week"])
-        # year, week = context["year_week"][:4], context["year_week"][-2:]
-
         context = super(ReportStateData, self).get_context_data(**kwargs)
         state_abbv = context["state"]
+        year_week = int(context["year_week"])
         regional_id = int(context["regional_id"])
-
-        year_week = 202102
 
         level_chart = {}
         notif_chart = {}
@@ -1150,7 +1110,7 @@ class ReportStateData(TemplateView):
                 # df_cases
                 ReportState.create_report_state_data(
                     df_regional_filtered.municipio_geocodigo.to_list(),
-                    f"{d}",
+                    d,
                     year_week,
                 )
             )
@@ -1158,7 +1118,7 @@ class ReportStateData(TemplateView):
                 # df_level
                 ReportState.create_report_state_data(
                     df_regional_filtered.municipio_geocodigo.to_list(),
-                    f"{d}",
+                    d,
                     year_week,
                 )
             )
@@ -1169,6 +1129,40 @@ class ReportStateData(TemplateView):
                 "state_abbv": state_abbv,
                 "notif_chart": notif_chart,
                 "level_chart": level_chart,
+                "regional_id": regional_id,
+            }
+        )
+
+        return context
+
+
+class ReportStateView(TemplateView):
+    template_name = "report_state.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(ReportStateView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
+        # breakpoint()
+        state = context["state"]
+        last_year_week_s = context["year_week"]
+
+        last_year = last_year_week_s[:4]
+        last_week = last_year_week_s[-2:]
+
+        df = ReportState.csv_get_regional_by_state(state)
+
+        regional_dict = {
+            d["id_regional"]: d["nome_regional"]
+            for d in df.iloc[:, 0:2].to_dict(orient="records")
+        }
+
+        context.update(
+            {
+                "state_name": STATE_NAME[state],
+                "regional_dict": regional_dict,
+                "year_week": context["year_week"],
+                "last_year": last_year,
+                "last_week": last_week,
             }
         )
 

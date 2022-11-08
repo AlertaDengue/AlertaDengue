@@ -565,89 +565,6 @@ def load_cases_without_forecast(geocode: int, disease):
     return data_alert
 
 
-def load_serie_cities(geocodigos, doenca="dengue"):
-    """
-    Monta as séries do alerta para visualização no site
-    :param cidade: geocodigo da cidade desejada
-    :param doenca: dengue|chik|zika
-    :return: dictionary
-    """
-    db_engine = get_sqla_conn()
-
-    result = {}
-    _geocodigos = {}
-    aps = []
-    cidades = []
-
-    for cidade in geocodigos:
-        cache_key = "load_series-{}-{}".format(cidade, doenca)
-        _result = cache.get(cache_key)
-        ap = str(cidade)
-        aps.append(ap)
-
-        if _result is not None:
-            result.update(_result)
-        else:
-            cidades.append(add_dv(int(ap[:-1])))
-            _geocodigos[cidades[-1]] = cidade
-
-    if not cidades:
-        return result
-
-    sql = (
-        """
-    SELECT
-        id, municipio_geocodigo, casos_est, casos,
-        "data_iniSE", casos_est_min, casos_est_max,
-        nivel, "SE", p_rt1
-    FROM "Municipio"."Historico_alerta"
-    WHERE municipio_geocodigo IN ("""
-        + ("{}," * len(cidades))[:-1]
-        + """)
-    ORDER BY municipio_geocodigo ASC, "data_iniSE" ASC
-    """
-    ).format(*cidades)
-
-    with db_engine.connect() as conn:
-        dados_alerta = pd.read_sql_query(sql, conn, "id", parse_dates=True)
-
-    if len(dados_alerta) == 0:
-        raise NameError("Não foi possível obter os dados do Banco")
-
-    series = defaultdict(lambda: defaultdict(lambda: []))
-    for k, v in _geocodigos.items():
-        ap = str(v)
-        mask = dados_alerta.municipio_geocodigo == k
-        series[ap]["dia"] = dados_alerta[mask].data_iniSE.tolist()
-        series[ap]["casos_est_min"] = (
-            np.nan_to_num(dados_alerta[mask].casos_est_min)
-            .astype(int)
-            .tolist()
-        )
-        series[ap]["casos_est"] = (
-            np.nan_to_num(dados_alerta[mask].casos_est).astype(int).tolist()
-        )
-        series[ap]["casos_est_max"] = (
-            np.nan_to_num(dados_alerta[mask].casos_est_max)
-            .astype(int)
-            .tolist()
-        )
-        series[ap]["casos"] = (
-            np.nan_to_num(dados_alerta[mask].casos).astype(int).tolist()
-        )
-        series[ap]["alerta"] = (
-            dados_alerta[mask].nivel.astype(int) - 1
-        ).tolist()  # (1,4)->(0,3)
-        series[ap]["SE"] = (dados_alerta[mask].SE.astype(int)).tolist()
-        series[ap]["prt1"] = dados_alerta[mask].p_rt1.astype(float).tolist()
-        series[ap] = dict(series[ap])
-
-        cache_key = "load_series-{}-{}".format(ap, doenca)
-        cache.set(cache_key, {ap: series[ap]}, settings.QUERY_CACHE_TIMEOUT)
-
-    return series
-
-
 def get_city_alert(cidade, disease="dengue"):
     """
     Retorna vários indicadores de alerta a nível da cidade.
@@ -915,7 +832,7 @@ class Forecast:
         :param cid10:
         :return: tuple with min and max date (str) from the forecasts
         """
-        db_engine = get_ibis_conn()
+        db_engine = get_sqla_conn()
 
         sql = """
         SELECT
@@ -1213,7 +1130,7 @@ class ReportState:
 
             df_reg.municipio_geocodigo = add_dv(df_reg.municipio_geocodigo)
 
-            df = df_reg[df_reg.UF == state]
+            df = df_reg[df_reg.UF.eq(state)]
 
             res = df.loc[
                 :,
@@ -1263,6 +1180,7 @@ class ReportState:
             "SE",
             "casos_est",
             "casos",
+            "nivel",
             "municipio_geocodigo",
             "municipio_nome",
         ]

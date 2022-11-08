@@ -166,7 +166,9 @@ urlpatterns = [
         name="report_state",
     ),
     re_path(
-        r"^fetchdata/{}/{}$".format(__state_abbv, __regional_id),
+        r"^fetchdata/{}/{}/{}$".format(
+            __state_abbv, __regional_id, __year_week
+        ),
         ReportStateData.as_view(),
         name="fetchdata",
     ),
