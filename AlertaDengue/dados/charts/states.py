@@ -31,7 +31,7 @@ class ReportStateCharts:
             go.Bar(
                 x=df["SE"].map(lambda v: f"{str(v)[:4]}/{str(v)[-2:]}"),
                 y=df.casos,
-                name="Casos por municípios",
+                name=_("Casos por municípios"),
                 orientation="v",
                 marker=dict(
                     color="#5466c0",
@@ -44,13 +44,14 @@ class ReportStateCharts:
             {
                 "data": traces,
                 "layout": go.Layout(
+                    template="plotly",
                     title={
-                        "text": ("Total de casos por municípios na regional"),
+                        "text": _("Total de casos por cidades na regional"),
                         "font": {"family": "Helvetica", "size": 16},
                         "x": 0.5,
                     },
                     xaxis=dict(
-                        title=("Semana epidemiológica"),
+                        title=_("Semana epidemiológica"),
                         tickangle=-25,
                         showline=True,
                         showgrid=True,
@@ -60,7 +61,7 @@ class ReportStateCharts:
                         gridcolor="rgb(176, 196, 222)",
                     ),
                     yaxis=dict(
-                        title=("Total de Casos"),
+                        title=_("Total de Casos"),
                         showline=True,
                         showgrid=True,
                         showticklabels=True,
@@ -74,13 +75,11 @@ class ReportStateCharts:
                         yanchor="bottom",
                         y=1.01,
                         xanchor="left",
-                        # x=1,
                     ),
                     # hovermode="x",
                     hoverlabel=dict(
                         bgcolor="#4169e1",
                         font_size=12,
-                        # font_family="Rockwell",
                     ),
                     autosize=False,
                     height=375,
@@ -109,7 +108,7 @@ class ReportStateCharts:
             text=df["casos"],
             textposition="inside",
             textfont=dict(color="white"),
-            hovertemplate=(
+            hovertemplate=_(
                 "<br>SE: %{x}</br>"
                 "Munincipio: %{customdata} </br>"
                 "%{y:1f} Casos Notificados"
@@ -138,9 +137,26 @@ class ReportStateCharts:
         cls,
         df: pd.DataFrame,
     ) -> str:
-        df_alert = deepcopy(
-            df.sort_values(by=["SE"], ascending=True).reset_index(drop=True)
+        df_nivel = (
+            df.groupby(["SE", "nivel"])["municipio_geocodigo"]
+            .count()
+            .reset_index()
         )
+        color_alert = {1: "Green", 2: "Yellow", 3: "Orange", 4: "Red"}
+        df_nivel.nivel = df_nivel.nivel.apply(
+            lambda v: f"{color_alert[v]} Alert"
+        )
+
+        df_alert = df_nivel.sort_values(by=["SE"], ascending=True).reset_index(
+            drop=True
+        )
+
+        color_map_alert_y = {
+            "Green Alert": "#00e640",
+            "Yellow Alert": "#f0ff00",
+            "Orange Alert": "#f89406",
+            "Red Alert": "#f03434",
+        }
 
         # Trace
         fig = px.bar(
@@ -148,9 +164,9 @@ class ReportStateCharts:
             y="municipio_geocodigo",
             x=df_alert.SE.map(lambda v: f"{str(v)[:4]}/{str(v)[-2:]}"),
             color="nivel",
-            # color_discrete_map=color_map_alert_y,
-            color_continuous_scale=["green", "yellow", "orange", "red"],
+            color_discrete_map=color_map_alert_y,
             hover_data={"nivel"},
+            # layout=dict(template='plotly'),
             category_orders={
                 "nivel": [
                     "Green Alert",
@@ -169,8 +185,9 @@ class ReportStateCharts:
         )
 
         fig.update_layout(
+            template="plotly",
             title={
-                "text": _("Situação epidemiológica das cidades"),
+                "text": _("Situação epidemiológica das cidades na regional"),
                 "font": {"family": "Helvetica", "size": 16},
                 "x": 0.5,
             },
