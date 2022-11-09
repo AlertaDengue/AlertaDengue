@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-31 11:12+0000\n"
+"POT-Creation-Date: 2022-11-09 20:29+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -514,8 +514,8 @@ msgstr ""
 " People generally seek information or tell about their health status on "
 "social networks before seeking medical help. Thus, knowing the number of "
 "mentions of dengue in social networks helps to identify when cases are "
-"increasing in the population. Infodengue has partnered with the <a href="
-"\"https://www.observatorio.inweb.org.br\">Dengue Observatory </a>hat "
+"increasing in the population. Infodengue has partnered with the <a "
+"href=\"https://www.observatorio.inweb.org.br\">Dengue Observatory </a>hat "
 "captures and analyzes tweets from geolocalized people for the mention of "
 "dengue symptoms."
 
@@ -737,30 +737,175 @@ msgstr ""
 "available at: \n"
 "            "
 
-#: AlertaDengue/dados/templates/about.html:149
-msgid "Como citar o InfoDengue"
-msgstr "How to Participate in InfoDengue"
+#: AlertaDengue/dados/templates/about.html:150
+msgid "Projetos de pesquisa"
+msgstr "Research projects"
 
-#: AlertaDengue/dados/templates/about.html:170
+#: AlertaDengue/dados/templates/about.html:155
+#, fuzzy
+#| msgid ""
+#| "\n"
+#| "                EVIGILANCIA: monitoramento integrado e contínuo de "
+#| "arboviroses "
+msgid "EVIGILANCIA: monitoramento integrado e contínuo de arboviroses"
+msgstr "EVIGILANCIA: Continuous & integrated arboviruses monitoring"
+
+#: AlertaDengue/dados/templates/about.html:157
+msgid ""
+"\n"
+"                Este projeto visou a consolidação do sistema de alerta para "
+"arboviroses baseado em dados\n"
+"                hı́bridos gerados por meio da análise integrada de dados "
+"minerados a partir da Web\n"
+"                social e de dados climáticos e epidemiológicos, o Infodengue."
+msgstr ""
+"Evigilancia aimed to consolidate the alert system for arboviruses based on "
+"hybrid data generated through integrated data analysis, mined from web "
+"social and climatic and epidemiological data, the InfoDengue."
+
+#: AlertaDengue/dados/templates/about.html:161
+#: AlertaDengue/dados/templates/about.html:183
+#: AlertaDengue/dados/templates/about.html:201
+msgid "Financiamento:"
+msgstr ""
+
+#: AlertaDengue/dados/templates/about.html:165
+#, fuzzy
+#| msgid ""
+#| "\n"
+#| "                Prevendo epidemias de doenças transmitidas por mosquitos "
+msgid "Prevendo epidemias de doenças transmitidas por mosquitos"
+msgstr "Predicting epidemics of mosquito-borne diseases"
+
+#: AlertaDengue/dados/templates/about.html:167
+msgid ""
+"\n"
+"                Esse projeto visa fornecer projeções a médio prazo para a "
+"incidência de novos casos \n"
+"                de doenças transmitidas por mosquitos no Brasil. O projeto "
+"visa adaptar para a realidade \n"
+"                brasileira a experiência implementada no Vietnam onde "
+"propomos o uso de modelos hierárquicos \n"
+"                espaço-temporais bayesianos para prever a incidência de "
+"casos de dengue e o suporte de \n"
+"                variáveis auxiliares tais como variáveis climáticas (Colon-"
+"Gonzalez, Bastos, et al. 2021). \n"
+"                Neste projeto estenderemos a modelagem preditiva de dengue "
+"no Vietnam para as doenças transmitidas \n"
+"                por mosquito, na qual exploraremos, separadamente, as "
+"arboviroses no Brasil e a malária na \n"
+"                região Amazônica, que são doenças de grande impacto e "
+"relevância na saúde pública do país. \n"
+"                Os modelos a serem propostos serão construídos e validados "
+"usando dados abertos, e serão feitas \n"
+"                projeções a médio prazo, ou seja seis a doze meses à frente "
+"para as microrregiões de saúde. \n"
+"                O projeto priorizará o uso de dados abertos, além do uso e "
+"desenvolvimento de códigos em ambientes \n"
+"                livres, de tal forma que equipes de vigilância "
+"epidemiológica possam replicar e adaptar conforme \n"
+"                suas necessidades. Além das projeções, será desenvolvido em "
+"paralelo um dashboard específico para \n"
+"                cada doença, de tal forma que as previsões fiquem acessíveis "
+"a tomadores de decisão e para população \n"
+"                geral. "
+msgstr ""
+"This project aims to provide medium-term projections for the incidence of "
+"new cases of mosquito-borne diseases in Brazil. The project adapts to the "
+"Brazilian reality, the experience implemented in Vietnam, where we propose "
+"the use of Bayesian space-time hierarchical models to predict the incidence "
+"of dengue cases, and the support of auxiliary variables, such as climatic "
+"variables (Colon-Gonzalez, Bastos, et al. al. 2021). In this project, we "
+"will extend the predictive modeling of dengue in Vietnam to mosquito-borne "
+"diseases, in which we will separately explore arboviruses in Brazil and "
+"malaria in the Amazon region, which are diseases of great impact and "
+"relevance in the country's public health. The models to be proposed will be "
+"built and validated using open data, where medium-term projections will be "
+"made, that is, six to twelve months ahead for the health microregions. The "
+"project will prioritize the use of open data, in addition to the use and "
+"development of codes in free environments, so that epidemiological "
+"surveillance teams can replicate and adapt according to their needs. In "
+"addition to the projections, a specific dashboard for each disease will be "
+"developed in parallel, so that the forecasts are accessible to decision "
+"makers and the general population."
+
+#: AlertaDengue/dados/templates/about.html:187
+#, fuzzy
+#| msgid ""
+#| "\n"
+#| "                ARBOFRONTEIRA: Prevendo epidemias de doenças transmitidas "
+#| "por mosquitos no arco sul do país "
+msgid ""
+"ARBOFRONTEIRA: Prevendo epidemias de doenças transmitidas por mosquitos no "
+"arco sul do país"
+msgstr ""
+"ARBOFRONTEIRA: Predicting epidemics of mosquito-borne diseases in the "
+"southern arc of the country"
+
+#: AlertaDengue/dados/templates/about.html:189
+msgid ""
+"\n"
+"                O objetivo dessa proposta é gerar indicadores para a "
+"vigilância de arboviroses que sejam\n"
+"                específicos para a fronteira sul do país e guidelines para "
+"seu uso no fortalecimento da\n"
+"                vigilância desses municípios. Para isso, faz-se necessário "
+"compreender o processo de\n"
+"                expansão das arboviroses nos três países e identificar "
+"cenários futuros de expansão. Por\n"
+"                meio de modelos estatísticos e matemáticos, vamos investigar "
+"cenários possíveis de disseminação \n"
+"                das arboviroses e a importância de protocolos binacionais e "
+"trinacionais para\n"
+"                a maior precisão de ações de controle. Do ponto de vista "
+"prático, serão aplicados modelos\n"
+"                de nowcasting e de predição em dois pontos: a tríplice "
+"fronteira Foz do Iguaçu, Iguazu e\n"
+"                Ciudad del este; e na fronteira formada por Barracão (PR), "
+"Dionísio Cerqueira (SC) e Bernando de\n"
+"                Irigoyen (Arg). Os modelos serão incorporados ao Infodengue "
+"e serão disponibilizados\n"
+"                relatórios específicos para cada região."
+msgstr ""
+"The objective of this proposal is to generate indicators for the "
+"surveillance of arboviruses that are specific to the southern border of the "
+"country and guidelines for its use in strengthening the surveillance of "
+"these municipalities. For this, it is necessary to understand the process of "
+"expansion of arboviruses in the three countries and to identify future "
+"expansion scenarios. Per Through statistical and mathematical models, we "
+"will investigate possible scenarios for the spread of arboviruses and the "
+"importance of binational and trinational protocols to the highest precision "
+"of control actions. From a practical point of view, models will be applied "
+"of nowcasting and prediction at two points: the triple border Foz do Iguaçu, "
+"Iguazu and city of the east; and on the border formed by Barracão (PR), D "
+"Cerqueira (SC) and Bernardo de Irigoyen (Arg). The models will be "
+"incorporated into Infodengue and will be made available specific reports for "
+"each region."
+
+#: AlertaDengue/dados/templates/about.html:208
+msgid "Como citar o InfoDengue"
+msgstr "How to quote InfoDengue"
+
+#: AlertaDengue/dados/templates/about.html:229
 msgid "Produções científicas associadas ao Infodengue"
 msgstr "Scientific productions associated with Infodengue"
 
-#: AlertaDengue/dados/templates/about.html:178
+#: AlertaDengue/dados/templates/about.html:339
 msgid "Eventos"
 msgstr "Events"
 
-#: AlertaDengue/dados/templates/about.html:185
+#: AlertaDengue/dados/templates/about.html:346
 msgid "Como colaborar"
 msgstr "How to Collaborate"
 
-#: AlertaDengue/dados/templates/about.html:188
+#: AlertaDengue/dados/templates/about.html:349
 msgid ""
 "Se sua cidade não está no Infodengue, entre em contato com a Secretaria de "
 "Saúde"
 msgstr ""
 "If your city in Brazil is not Infodengue, contact the Health Department"
 
-#: AlertaDengue/dados/templates/about.html:189
+#: AlertaDengue/dados/templates/about.html:350
 msgid ""
 "Se é um estudante ou pesquisador e gostaria de contribuir com análises e "
 "modelos, nos escreva"
@@ -768,11 +913,11 @@ msgstr ""
 "If you are a student or researcher and would like to contribute analysis and "
 "models, write us"
 
-#: AlertaDengue/dados/templates/about.html:190
+#: AlertaDengue/dados/templates/about.html:351
 msgid "Se quiser contribuir com patrocínios, escreva-nos"
 msgstr "If you would like to contribute sponsorships, write us"
 
-#: AlertaDengue/dados/templates/about.html:191
+#: AlertaDengue/dados/templates/about.html:352
 msgid ""
 "Se quiser aprender a usar o infodengue, tem sugestões, críticas ou se "
 "percebeu algum erro no site, escreva-nos"
@@ -780,29 +925,29 @@ msgstr ""
 "If you want to learn how to use infodengue, have suggestions, criticism or "
 "if you noticed any errors on the site, write us"
 
-#: AlertaDengue/dados/templates/about.html:192
+#: AlertaDengue/dados/templates/about.html:353
 msgid ""
 "Vencer as arboviroses é um trabalho de todos, toda colaboração é bem vinda!"
 msgstr ""
 "Overcoming arboviruses is everyone's job, all collaboration is welcome!"
 
-#: AlertaDengue/dados/templates/about.html:196
+#: AlertaDengue/dados/templates/about.html:357
 msgid "Videos relacionados"
 msgstr "Related Videos"
 
-#: AlertaDengue/dados/templates/about.html:202
+#: AlertaDengue/dados/templates/about.html:363
 msgid "Entenda o modelo mais usado para representar a pandemia de COVID-19"
 msgstr "See the most used model to represent the COVID-19 pandemic"
 
-#: AlertaDengue/dados/templates/about.html:212
+#: AlertaDengue/dados/templates/about.html:373
 msgid "Curso PySUS - Aula 1"
-msgstr ""
+msgstr "PySUS Course - Lesson 1"
 
-#: AlertaDengue/dados/templates/about.html:223
+#: AlertaDengue/dados/templates/about.html:384
 msgid "Mais videos da série no canal"
 msgstr "More videos of the series on the channel"
 
-#: AlertaDengue/dados/templates/about.html:225
+#: AlertaDengue/dados/templates/about.html:386
 msgid "A Matemática das Epidemias"
 msgstr "The Mathematics of Epidemics"
 
@@ -1117,8 +1262,8 @@ msgid ""
 "%(prt)s%%"
 msgstr ""
 "<b>Chances of going into <span class=\"label label-warning\">Orange</span> "
-"or <span class=\"label label-danger\">red</span> alert next week:</b> %(prt)s"
-"%%"
+"or <span class=\"label label-danger\">red</span> alert next week:</b> "
+"%(prt)s%%"
 
 #: AlertaDengue/dados/templates/alerta_municipio.html:17
 msgid "Número de casos estimados na semana"
@@ -2674,7 +2819,7 @@ msgstr "Notification year can not be greater than current year"
 msgid "Arquivo DBF inválido"
 msgstr "Invalid DBF file"
 
-#: AlertaDengue/dbf/sinan.py:164
+#: AlertaDengue/dbf/sinan.py:182
 msgid "Existem nesse arquivo notificações que não incluem a coluna ID_AGRAVO."
 msgstr ""
 "There are notifications that don't include the ID_AGRAVO column in this file."
@@ -2683,11 +2828,11 @@ msgstr ""
 msgid "Envie aqui os dados atualizados do SINAN"
 msgstr "Send here the updated SINAN data"
 
-#: AlertaDengue/dbf/templates/dbf_upload.html:172
+#: AlertaDengue/dbf/templates/dbf_upload.html:173
 msgid "Enviar"
 msgstr "Send"
 
-#: AlertaDengue/dbf/templates/dbf_upload.html:179
+#: AlertaDengue/dbf/templates/dbf_upload.html:180
 #: AlertaDengue/dbf/templates/upload_successful.html:10
 msgid "Ultimos arquivos enviados:"
 msgstr "Last uploaded files:"
@@ -2883,6 +3028,9 @@ msgstr "Your username, if you have forgotten it, is:"
 #: AlertaDengue/templates/registration/password_reset_email.html:10
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
+
+#~ msgid "<b>Financiamento:</b> INOVA Fiocruz "
+#~ msgstr "<b>Sponsor:</b> INOVA Fiocruz "
 
 #~ msgid "O que fazer"
 #~ msgstr "What to do"
