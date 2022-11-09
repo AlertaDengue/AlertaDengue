@@ -71,6 +71,7 @@ def _create_scatter_chart(df: pd.DataFrame) -> str:
         {
             "data": traces,
             "layout": go.Layout(
+                template="plotly",
                 title={
                     "text": _("Total de casos no estado"),
                     "font": {"family": "Helvetica", "size": 16},
@@ -214,6 +215,7 @@ def _create_indicator_chart(df: pd.DataFrame, state_abbv: str) -> str:
         {
             "data": traces,
             "layout": go.Layout(
+                template="plotly",
                 title={
                     "text": f"{df_this_week} "
                     + _("Cidades com clima favorável <br>para transmissão"),

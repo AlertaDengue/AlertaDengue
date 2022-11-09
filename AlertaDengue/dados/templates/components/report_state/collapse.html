@@ -15,6 +15,7 @@
 
       <div id="flip_{{ key }}" class="collapse-style">
           <button
+           onclick="setTimeout(resizePlotly, 100);"
             class="collapse-effect text-left"
             data-toggle="collapse"
             data-target="#panel_{{ key }}"
@@ -23,11 +24,10 @@
           >
             <span>{{ value }}</span>
           </button>
-
       </div>
 
       <div id="panel_{{ key }}"
-          {% if key == '12002' %}
+          {% if key == 12002 %}
               class="collapse show"
           {% else %}
               class="collapse"
@@ -47,7 +47,7 @@
 
 {% endblock %}
 
-<script type="text/javascript"> //
+<script type="text/javascript">
 
   $(document).ready(function(){
     const allRegionals = Object.keys({{ regional_dict| safe }});
@@ -65,6 +65,7 @@
         }
         return requestCache[apiUrl];
       }
+
       $.each( allRegionals, function( i, regional_id ) {
         // console.log(regional_id)
         loadDataFromApi("/fetchdata/" + state_abbv + "/"  + regional_id + "/{{ year_week }}" )
@@ -74,5 +75,12 @@
         });
     });
   });
+
+  function resizePlotly() {
+    var doc = $(".tab-pane.active .plotly-graph-div");
+    for (var i = 0; i < doc.length; i++) {
+        Plotly.relayout(doc[i], {autosize: true});
+    }
+}
 
 </script>

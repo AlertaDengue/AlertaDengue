@@ -2,123 +2,72 @@
 {% load i18n %}
 
 {% load hashthis %}
+
 {% block content %}
 
+<div class="container mt-3">
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" data-toggle="tab" href="#dengue-{{ regional_id }}">Dengue</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#chikungunya-{{ regional_id }}">Chikungunya</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" href="#zika-{{ regional_id }}">Zika</a>
+    </li>
+  </ul>
 
-<div class="row justify-content-md-center">
-  <!-- Grid column -->
-  <div class="col-sm-12 mb-1 mb-xl-0">
-    <!-- Section: Live preview -->
-    <section>
-      <ul class="nav nav-tabs"
-          id="diseaseTab"
-          role="tablist">
-        <li class="nav-item waves-effect waves-light">
-          <a class="nav-link active"
-            id="dengue-{{ state_abbv }}-{{ regional_id }}-tab"
-            data-toggle="tab"
-            href="#dengue-{{ state_abbv }}-{{ regional_id }}"
-            role="tab"
-            aria-controls="dengue-{{ state_abbv }}-{{ regional_id }}"
-            aria-selected="true"
-            title={% trans "Gráficos sobre Dengue" %}
-            >Dengue
-          </a>
-        </li>
-        <li class="nav-item waves-effect waves-light">
-          <a class="nav-link"
-            id="chikungunya-{{ state_abbv }}-{{ regional_id }}-tab"
-            data-toggle="tab"
-            href="#chikungunya-{{ state_abbv }}-{{ regional_id }}"
-            role="tab"
-            aria-controls="chikungunya-{{ state_abbv }}-{{ regional_id }}"
-            aria-selected="false"
-            title={% trans "Gráficos sobre Chikungunya" %}
-            >Chikungunya
-          </a>
-        </li>
-        <li class="nav-item waves-effect waves-light">
-          <a class="nav-link"
-            id="zika-{{ state_abbv }}-{{ regional_id }}-tab"
-            data-toggle="tab"
-            href="#zika-{{ state_abbv }}-{{ regional_id }}" role="tab"
-            aria-controls="zika-{{ state_abbv }}-{{ regional_id }}"
-            aria-selected="false"
-            title={% trans "Gráficos sobre Zika" %}
-            >Zika
-          </a>
-        </li>
-      </ul>
+  <!-- Tab panes -->
+  <div class="tab-content">
 
-      <div class="tab-content"
-        id="diseaseTabContent"
-        style="background-color: #e0eefd63;
-          margin-bottom: 20px;
-          border-radius: 7px"
-      >
-        <!-- Description -->
-        <h6><small class="px-3" style="color:#888888;">
-
-        </small></h6>
-        <div class="tab-pane fade active show"
-            id="dengue-{{ state_abbv }}-{{ regional_id }}"
-            role="tabpanel"
-            aria-labelledby="dengue-{{ state_abbv }}-{{ regional_id }}-tab">
-          <div class="row">
-            <div class="col">
-              <div class="p-1">
-              {{ notif_chart|lookup:'dengue'| safe }}
-              </div>
-            </div>
-            <div class="col">
-              <div class="p-1">
-              {{ level_chart|lookup:'dengue'| safe }}
-              </div>
-            </div>
-          </div>
+    <div id="dengue-{{ regional_id }}" class="container tab-pane active"><br>
+      <div class="row">
+        <div class="col-6 col-sm-12 col-md-6">
+          {{ notif_chart|lookup:'dengue'| safe }}
         </div>
-        <div class="tab-pane fade"
-            id="chikungunya-{{ state_abbv }}-{{ regional_id }}"
-            role="tabpanel"
-            aria-labelledby="chikungunya-{{ state_abbv }}-{{ regional_id }}-tab">
-          <div class="row">
-            <div class="col">
-              <div class="p-1">
-              {{ notif_chart|lookup:'chikungunya'| safe }}
-              </div>
-            </div>
-            <div class="col">
-              <div class="p-1">
-              {{ level_chart|lookup:'chikungunya'| safe }}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="tab-pane fade"
-            id="zika-{{ state_abbv }}-{{ regional_id }}"
-            role="tabpanel"
-            aria-labelledby="zika-{{ state_abbv }}-{{ regional_id }}-tab">
-          <div class="row">
-            <div class="col">
-              <div class="p-1">
-              {{ notif_chart|lookup:'zika'| safe }}
-              </div>
-            </div>
-            <div class="col">
-              <div class="p-1">
-              {{ level_chart|lookup:'zika'| safe }}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="align-buttom mt-2">
+        <div class="col-6 col-sm-12 col-md-6">
+          {{ level_chart|lookup:'dengue'| safe }}
         </div>
       </div>
+    </div>
 
-    </section>
-    <!-- Section: Live preview -->
+    <div id="chikungunya-{{ regional_id }}" class="container tab-pane fade"><br>
+      <div class="row">
+        <div class="col-6 col-sm-12 col-md-6">
+          {{ notif_chart|lookup:'chikungunya'| safe }}
+        </div>
+        <div class="col-6 col-sm-12 col-md-6">
+          {{ level_chart|lookup:'chikungunya'| safe }}
+        </div>
+      </div>
+    </div>
+
+    <div id="zika-{{ regional_id }}" class="container tab-pane fade"><br>
+      <div class="row">
+        <div class="col-6 col-sm-12 col-md-6">
+          {{ notif_chart|lookup:'zika'| safe }}
+        </div>
+        <div class="col-6 col-sm-12 col-md-6">
+          {{ level_chart|lookup:'zika'| safe }}
+        </div>
+      </div>
+    </div>
+
   </div>
-  <!-- Grid column -->
+
 </div>
 
 {% endblock %}
+
+<script type="text/javascript">
+
+  $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (event) {
+    var doc = $(".tab-pane.active .plotly-graph-div");
+    for (var i = 0; i < doc.length; i++) {
+        Plotly.relayout(doc[i], {autosize: true});
+    }
+})
+
+</script>
