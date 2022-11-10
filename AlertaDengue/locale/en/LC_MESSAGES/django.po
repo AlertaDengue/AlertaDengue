@@ -234,8 +234,6 @@ msgstr "Number of cities"
 
 #: AlertaDengue/dados/charts/states.py:63
 #: AlertaDengue/dados/charts/states.py:78
-#, fuzzy, python-brace-format
-#| msgid "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
 msgid "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
 
@@ -742,11 +740,6 @@ msgid "Projetos de pesquisa"
 msgstr "Research projects"
 
 #: AlertaDengue/dados/templates/about.html:155
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "                EVIGILANCIA: monitoramento integrado e contínuo de "
-#| "arboviroses "
 msgid "EVIGILANCIA: monitoramento integrado e contínuo de arboviroses"
 msgstr "EVIGILANCIA: Continuous & integrated arboviruses monitoring"
 
@@ -759,6 +752,7 @@ msgid ""
 "minerados a partir da Web\n"
 "                social e de dados climáticos e epidemiológicos, o Infodengue."
 msgstr ""
+"\n"
 "Evigilancia aimed to consolidate the alert system for arboviruses based on "
 "hybrid data generated through integrated data analysis, mined from web "
 "social and climatic and epidemiological data, the InfoDengue."
@@ -770,10 +764,6 @@ msgid "Financiamento:"
 msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:165
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "                Prevendo epidemias de doenças transmitidas por mosquitos "
 msgid "Prevendo epidemias de doenças transmitidas por mosquitos"
 msgstr "Predicting epidemics of mosquito-borne diseases"
 
@@ -810,6 +800,7 @@ msgid ""
 "a tomadores de decisão e para população \n"
 "                geral. "
 msgstr ""
+"\n"
 "This project aims to provide medium-term projections for the incidence of "
 "new cases of mosquito-borne diseases in Brazil. The project adapts to the "
 "Brazilian reality, the experience implemented in Vietnam, where we propose "
@@ -830,11 +821,6 @@ msgstr ""
 "makers and the general population."
 
 #: AlertaDengue/dados/templates/about.html:187
-#, fuzzy
-#| msgid ""
-#| "\n"
-#| "                ARBOFRONTEIRA: Prevendo epidemias de doenças transmitidas "
-#| "por mosquitos no arco sul do país "
 msgid ""
 "ARBOFRONTEIRA: Prevendo epidemias de doenças transmitidas por mosquitos no "
 "arco sul do país"
@@ -867,6 +853,7 @@ msgid ""
 "e serão disponibilizados\n"
 "                relatórios específicos para cada região."
 msgstr ""
+"\n"
 "The objective of this proposal is to generate indicators for the "
 "surveillance of arboviruses that are specific to the southern border of the "
 "country and guidelines for its use in strengthening the surveillance of "
@@ -2094,8 +2081,6 @@ msgid "ICmin"
 msgstr "ICmin"
 
 #: AlertaDengue/dados/templates/report_state.html:426
-#, fuzzy, python-format
-#| msgid "número mínimo de casos estimados (IC 95%%)"
 msgid "número mínimo de casos estimados (IC 95%%)"
 msgstr "Lower 95% confidence bounds for the estimated number of cases."
 
@@ -2104,8 +2089,6 @@ msgid "ICmax"
 msgstr "ICmax"
 
 #: AlertaDengue/dados/templates/report_state.html:429
-#, fuzzy, python-format
-#| msgid "número máximo de casos estimados (IC 95%%)"
 msgid "número máximo de casos estimados (IC 95%%)"
 msgstr "Upper 95% confidence bounds for the estimated number of cases."
 
@@ -2313,8 +2296,6 @@ msgid "cases_est_min and cases_est_max"
 msgstr "cases_est_min and cases_est_max"
 
 #: AlertaDengue/dados/templates/services_api.html:207
-#, fuzzy, python-format
-#| msgid "Intervalo de credibilidade de 95%% do número estimado de casos"
 msgid "Intervalo de credibilidade de 95%% do número estimado de casos"
 msgstr "95% credible interval of the estimated number of cases"
 
@@ -2774,20 +2755,14 @@ msgid "°C temperatura máxima"
 msgstr "°C Maximum temperature"
 
 #: AlertaDengue/dados/views.py:860
-#, fuzzy, python-format
-#| msgid "% umidade mínima do ar"
 msgid "% umidade mínima do ar"
 msgstr "% Minimum air humidity"
 
 #: AlertaDengue/dados/views.py:861
-#, fuzzy, python-format
-#| msgid "% umidade média do ar"
 msgid "% umidade média do ar"
 msgstr "% Average air humidity"
 
 #: AlertaDengue/dados/views.py:862
-#, fuzzy, python-format
-#| msgid "% umidade máxima do ar"
 msgid "% umidade máxima do ar"
 msgstr "% Maximum air humidity"
 
