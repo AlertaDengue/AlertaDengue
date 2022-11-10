@@ -3018,10 +3018,3 @@ msgstr "Your username, if you have forgotten it, is:"
 #: AlertaDengue/templates/registration/password_reset_email.html:10
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
-
-#~ msgid "Situação epidemiológica dos municípios na regional"
-#~ msgstr "Epidemiological situation of cities in the regional health"
-
-#~ msgid ""
-#~ "Clique no nome do Município para acessar a página de relatório municipal."
-#~ msgstr "Click on the Municipality name to access the Municipal Report page."
