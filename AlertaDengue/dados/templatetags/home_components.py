@@ -7,7 +7,7 @@ register = template.Library()
 
 @register.inclusion_tag("components/home/collapse.html", takes_context=True)
 def collapse_component(context):
-    context["states_name"] = dict(sorted(dbdata.STATE_NAME.items(), key=lambda state: state[1]))
+    context["states_name"] = dbdata.STATE_NAME
     context["states_abbv"] = list(dbdata.STATE_NAME.keys())
 
     return context
