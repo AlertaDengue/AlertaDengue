@@ -811,9 +811,9 @@ sqlglot = {version = ">=4.5.0,<7", optional = true, markers = "extra == \"all\" 
 toolz = ">=0.11,<0.13"
 
 [package.extras]
-all = ["GeoAlchemy2 (>=0.6.3,<0.13)", "Shapely (>=1.6,<1.8.5)", "clickhouse-cityhash (>=1.0.2,<2)", "clickhouse-driver[numpy] (>=0.1,<0.3)", "dask[array,dataframe] (>=2021.10.0,<2022.8.0)", "datafusion (>=0.4,<0.7)", "duckdb (>=0.3.2,<1)", "duckdb-engine (>=0.1.8,<1)", "fsspec (>=2022.1.0)", "geopandas (>=0.6,<0.12)", "graphviz (>=0.16,<0.21)", "impyla[kerberos] (>=0.17,<0.19)", "lz4 (>=3.1.10,<5)", "psycopg2 (>=2.8.4,<3)", "pyarrow (>=1,<10)", "pymysql (>=1,<2)", "pyspark (>=3,<4)", "requests (>=2,<3)", "sqlalchemy (>=1.4,<2.0)", "sqlglot (>=4.5.0,<7)"]
+all = ["GeoAlchemy2 (>=0.6.3,<0.13)", "Shapely (>=1.6,<1.8.5)", "clickhouse-cityhash (>=1.0.2,<2)", "clickhouse-driver[numpy] (>=0.1,<0.3)", "dask[dataframe,array] (>=2021.10.0,<2022.8.0)", "datafusion (>=0.4,<0.7)", "duckdb (>=0.3.2,<1)", "duckdb-engine (>=0.1.8,<1)", "fsspec (>=2022.1.0)", "geopandas (>=0.6,<0.12)", "graphviz (>=0.16,<0.21)", "impyla[kerberos] (>=0.17,<0.19)", "lz4 (>=3.1.10,<5)", "psycopg2 (>=2.8.4,<3)", "pyarrow (>=1,<10)", "pymysql (>=1,<2)", "pyspark (>=3,<4)", "requests (>=2,<3)", "sqlalchemy (>=1.4,<2.0)", "sqlglot (>=4.5.0,<7)"]
 clickhouse = ["clickhouse-cityhash (>=1.0.2,<2)", "clickhouse-driver[numpy] (>=0.1,<0.3)", "lz4 (>=3.1.10,<5)", "sqlglot (>=4.5.0,<7)"]
-dask = ["dask[array,dataframe] (>=2021.10.0,<2022.8.0)", "pyarrow (>=1,<10)"]
+dask = ["dask[dataframe,array] (>=2021.10.0,<2022.8.0)", "pyarrow (>=1,<10)"]
 datafusion = ["datafusion (>=0.4,<0.7)"]
 duckdb = ["duckdb (>=0.3.2,<1)", "duckdb-engine (>=0.1.8,<1)", "pyarrow (>=1,<10)", "sqlalchemy (>=1.4,<2.0)", "sqlglot (>=4.5.0,<7)"]
 geospatial = ["GeoAlchemy2 (>=0.6.3,<0.13)", "Shapely (>=1.6,<1.8.5)", "geopandas (>=0.6,<0.12)"]
@@ -1480,7 +1480,7 @@ python-versions = "*"
 name = "plotly"
 version = "5.11.0"
 description = "An open-source, interactive data visualization library for Python"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -2039,7 +2039,7 @@ doc = ["ipython", "numpydoc", "sphinx (>=1.1)", "sphinx-rtd-theme"]
 name = "tenacity"
 version = "8.1.0"
 description = "Retry code until it succeeds"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -2201,7 +2201,7 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.9,<3.11"
-content-hash = "ea3a922aaaf0ace1345f506d4c8d1c1178f9a4f3f745a62d6c02cab532d6ab5f"
+content-hash = "e336e3ac6eec7e0f7916e4c7249714d87b15d7301d3803d3056bda77b067e3c0"
 
 [metadata.files]
 affine = [
