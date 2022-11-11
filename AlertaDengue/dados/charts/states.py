@@ -21,26 +21,51 @@ class ReportStateCharts:
         df: pd.DataFrame,
     ) -> str:
 
-        df = deepcopy(
+        df_cp = deepcopy(
             df.sort_values(by=["SE"], ascending=True).reset_index(drop=True)
         )
 
+        keys = ["casos_est", "casos"]
+        df = df_cp.groupby(["SE"])[keys].sum()
+
+        df["SE"] = df.index.map(lambda v: f"{str(v)[:4]}/{str(v)[-2:]}")
         traces = []
 
         traces.append(
             go.Bar(
-                x=df["SE"].map(lambda v: f"{str(v)[:4]}/{str(v)[-2:]}"),
-                y=df.casos,
-                name=_("Casos por municípios"),
-                orientation="v",
+                x=df["SE"],
+                y=df["casos"],
+                name=_("Registrados"),
                 marker=dict(
                     color="#5466c0",
                     line=dict(color="white", width=1),
-                ),  # text=df.SE.map(lambda v: f"{str(v)[-2:]}"),
+                ),
+                width=0.5,
+                text=df.index.map(lambda v: f"{str(v)[-2:]}"),
+                hovertemplate=_(
+                    "<br>SE %{text}<br>"
+                    "%{y:1f} Casos notificados"
+                    "<extra></extra>"
+                ),
+            )
+        )
+        traces.append(
+            go.Scatter(
+                mode="lines+markers",
+                x=df["SE"],
+                y=df["casos_est"],
+                name=_("Estimados"),
+                line=dict(color="#ffa500", width=4),
+                text=df.index.map(lambda v: f"{str(v)[-2:]}"),
+                hovertemplate=_(
+                    "<br>SE %{text}<br>"
+                    "%{y:1f} Casos estimados"
+                    "<extra></extra>"
+                ),
             )
         )
 
-        dict_of_figa = dict(
+        dict_of_fig = dict(
             {
                 "data": traces,
                 "layout": go.Layout(
@@ -61,7 +86,7 @@ class ReportStateCharts:
                         gridcolor="rgb(176, 196, 222)",
                     ),
                     yaxis=dict(
-                        title=_("Total de Casos"),
+                        title=_("Casos"),
                         showline=True,
                         showgrid=True,
                         showticklabels=True,
@@ -76,14 +101,12 @@ class ReportStateCharts:
                         y=1.01,
                         xanchor="left",
                     ),
-                    # hovermode="x",
+                    hovermode="x",
                     hoverlabel=dict(
-                        bgcolor="#4169e1",
                         font_size=12,
+                        font_family="Rockwell",
                     ),
                     autosize=True,
-                    # height=275,
-                    # width=350,
                     margin=dict(
                         autoexpand=False,
                         l=50,
@@ -101,20 +124,7 @@ class ReportStateCharts:
             }
         )
 
-        fig = go.Figure(dict_of_figa)
-
-        fig.update_traces(
-            customdata=df["municipio_nome"],
-            text=df["casos"],
-            textposition="inside",
-            textfont=dict(color="white"),
-            hovertemplate=_(
-                "<br>SE: %{x}</br>"
-                "Munincipio: %{customdata} </br>"
-                "%{y:1f} Casos Notificados"
-                "<extra></extra>"
-            ),
-        )
+        fig = go.Figure(dict_of_fig)
 
         config = {
             "modeBarButtonsToRemove": [

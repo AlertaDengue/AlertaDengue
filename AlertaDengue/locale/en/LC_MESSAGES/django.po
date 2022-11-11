@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-11 13:21+0000\n"
+"POT-Creation-Date: 2022-11-11 17:31+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -59,6 +59,7 @@ msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
 
 #: AlertaDengue/dados/charts/alerts.py:233 AlertaDengue/dados/charts/home.py:91
+#: AlertaDengue/dados/charts/states.py:89
 #: AlertaDengue/dados/templates/alert_state/age.html:125
 #: AlertaDengue/dados/templates/alert_state/date.html:100
 #: AlertaDengue/dados/templates/alert_state/disease.html:122
@@ -180,20 +181,20 @@ msgstr "Week %{text} : %{y} Tweets"
 msgid "Menções na mídia social"
 msgstr "Mentions on social media"
 
-#: AlertaDengue/dados/charts/home.py:40
+#: AlertaDengue/dados/charts/home.py:40 AlertaDengue/dados/charts/states.py:38
 msgid "Registrados"
 msgstr "Registered"
 
-#: AlertaDengue/dados/charts/home.py:48
+#: AlertaDengue/dados/charts/home.py:48 AlertaDengue/dados/charts/states.py:46
 #, python-brace-format
 msgid "<br>SE %{text}<br>%{y:1f} Casos notificados<extra></extra>"
 msgstr "<br>Week %{text}<br>%{y:1f} Registered Cases<extra></extra>"
 
-#: AlertaDengue/dados/charts/home.py:59
+#: AlertaDengue/dados/charts/home.py:59 AlertaDengue/dados/charts/states.py:57
 msgid "Estimados"
 msgstr "Estimated"
 
-#: AlertaDengue/dados/charts/home.py:63
+#: AlertaDengue/dados/charts/home.py:63 AlertaDengue/dados/charts/states.py:61
 #, python-brace-format
 msgid "<br>SE %{text}<br>%{y:1f} Casos estimados<extra></extra>"
 msgstr "<br>Week: %{text}<br>%{y:1f} Estimated Cases<extra></extra>"
@@ -203,8 +204,8 @@ msgid "Total de casos no estado"
 msgstr "Cumulative number of cases in the State"
 
 #: AlertaDengue/dados/charts/home.py:81 AlertaDengue/dados/charts/home.py:225
-#: AlertaDengue/dados/charts/home.py:342 AlertaDengue/dados/charts/states.py:54
-#: AlertaDengue/dados/charts/states.py:214
+#: AlertaDengue/dados/charts/home.py:342 AlertaDengue/dados/charts/states.py:79
+#: AlertaDengue/dados/charts/states.py:224
 #: AlertaDengue/dados/templates/report_city.html:80
 #: AlertaDengue/dados/templates/report_city.html:274
 #: AlertaDengue/dados/templates/report_state.html:43
@@ -218,7 +219,7 @@ msgid "Cidades com clima favorável <br>para transmissão"
 msgstr "Cities with favorable environment <br>for transmission"
 
 #: AlertaDengue/dados/charts/home.py:315
-#: AlertaDengue/dados/charts/states.py:183
+#: AlertaDengue/dados/charts/states.py:193
 #, python-brace-format
 msgid "%{y} Cidades na semana %{customdata} <extra></extra>"
 msgstr "%{y} Cities in the week %{customdata}<extra></extra>"
@@ -228,32 +229,15 @@ msgid "Situação epidemiológica das cidades"
 msgstr "Epidemiological Situation"
 
 #: AlertaDengue/dados/charts/home.py:352
-#: AlertaDengue/dados/charts/states.py:224
+#: AlertaDengue/dados/charts/states.py:234
 msgid "Número de cidades"
 msgstr "Number of cities"
 
-#: AlertaDengue/dados/charts/states.py:34
-msgid "Casos por municípios"
-msgstr "Cases by Cities"
-
-#: AlertaDengue/dados/charts/states.py:49
+#: AlertaDengue/dados/charts/states.py:74
 msgid "Total de casos por cidades na regional"
 msgstr "Cumulative number of cases by cities in the regional health"
 
-#: AlertaDengue/dados/charts/states.py:64
-msgid "Total de Casos"
-msgstr "Total Cases"
-
-#: AlertaDengue/dados/charts/states.py:112
-#, python-brace-format
-msgid ""
-"<br>SE: %{x}</br>Munincipio: %{customdata} </br>%{y:1f} Casos "
-"Notificados<extra></extra>"
-msgstr ""
-"<br>SE: %{x}</br>Municipalities: %{customdata} </br>%{y:1f} Registered "
-"Cases<extra></extra>"
-
-#: AlertaDengue/dados/charts/states.py:190
+#: AlertaDengue/dados/charts/states.py:200
 msgid "Situação epidemiológica das cidades na regional"
 msgstr "Epidemiological situation of cities in the regional health"
 
@@ -2551,7 +2535,7 @@ msgstr "°C Average temperatures"
 msgid "°C temperatura máxima"
 msgstr "°C Maximum temperature"
 
-#: AlertaDengue/dados/views.py:869y
+#: AlertaDengue/dados/views.py:869
 msgid "% umidade mínima do ar"
 msgstr "% Minimum air humidity"
 
@@ -2800,177 +2784,3 @@ msgstr "Your username, if you have forgotten it, is:"
 #: AlertaDengue/templates/registration/password_reset_email.html:10
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
-
-#~ msgid "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
-#~ msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
-
-#~ msgid "Casos notificados"
-#~ msgstr "Reported cases"
-
-#~ msgid "Período: Ano/Semana"
-#~ msgstr "Period: Year / Week"
-
-#~ msgid "Mapa Alerta Dengue"
-#~ msgstr "Dengue Level"
-
-#~ msgid "Mapa Alerta Chikungunya"
-#~ msgstr "Chikungunya Level"
-
-#~ msgid "Mapa Alerta Zika"
-#~ msgstr "Zika Level"
-
-#~ msgid "Índice"
-#~ msgstr "Index"
-
-#~ msgid "Regional"
-#~ msgstr "Regional"
-
-#~ msgid ""
-#~ "\n"
-#~ "            A tabela abaixo mostra os niveis de alerta em cada município "
-#~ "da\n"
-#~ "            Regional de Saúde. As cores indicam niveis de atenção, "
-#~ "conforme\n"
-#~ "            detalhado na "
-#~ msgstr ""
-#~ "\n"
-#~ "            The table below shows the alert levels in each municipality "
-#~ "in\n"
-#~ "            regional Health. The colors indicate levels of attention, as\n"
-#~ "            detailed in "
-
-#~ msgid "tabela de cores"
-#~ msgstr "Table of content"
-
-#~ msgid "Alertas"
-#~ msgstr "Levels"
-
-#~ msgid "Casos notificados de arboviroses na Regional de Saúde"
-#~ msgstr "Notified cases of arboviruses in the Regional Health"
-
-#~ msgid ""
-#~ "\n"
-#~ "            A Figura abaixo mostra a série temporal de casos notificados "
-#~ "de\n"
-#~ "            arboviroses na última semana. A curva de menções refere-se à\n"
-#~ "            intensidade de menção de sintomas de arboviroses e presença "
-#~ "de\n"
-#~ "            mosquitos de acordo com a população do município que usa\n"
-#~ "            redes sociais. Esse indicador, que é mais eficaz em cidades\n"
-#~ "            maiores, deve ser visto como um auxiliar na detecção precoce "
-#~ "de\n"
-#~ "            aumento de casos. Atualmente, esse indicador é mais sensivel "
-#~ "para\n"
-#~ "            detectar dengue do que outras arboviroses"
-#~ msgstr ""
-#~ "\n"
-#~ "The Figure below shows the time series of notified cases of \n"
-#~ "arboviruses in the last week. The mention curve refers to \n"
-#~ "intensity of mention of symptoms of arboviruses and presence of \n"
-#~ "mosquitoes according to the population of the municipality using \n"
-#~ "social networks. This indicator, which is most effective in cities \n"
-#~ "larger, should be seen as an aid in the early detection of \n"
-#~ "increase in cases. Currently, this indicator is more sensitivefor\n"
-#~ "detect dengue than other arboviruses"
-
-#~ msgid "Resumo das últimas seis semanas epidemiológicas na Regional de Saúde"
-#~ msgstr ""
-#~ "Summary of the last six epidemiological weeks in the Regional Health"
-
-#~ msgid ""
-#~ "\n"
-#~ "          A figura abaixo mostra a intensidade de menção de sintomas de "
-#~ "arboviroses\n"
-#~ "          e presença de mosquitos de acordo com a população do município "
-#~ "que usa\n"
-#~ "          redes sociais.\n"
-#~ "          Esse indicador, que é mais eficaz em cidades maiores, deve ser "
-#~ "visto como\n"
-#~ "          um auxiliar na detecção precoce de aumento de casos. "
-#~ "Atualmente,\n"
-#~ "          esse indicador é mais sensivel para detectar dengue do que "
-#~ "outras\n"
-#~ "          arboviroses"
-#~ msgstr ""
-#~ "\n"
-#~ "The figure below shows the time series of notified cases of \n"
-#~ "arboviruses in the last week. The mention curve refers to \n"
-#~ "the intensity of reported symptoms of arboviruses and mosquitoes \n"
-#~ "presence on social networks, according to the municipal population. \n"
-#~ "This indicator, which is most effective in larger \n"
-#~ "cities, should be seen as an aid in the early detection of \n"
-#~ "increase in cases. Currently, this indicator is more sensitive \n"
-#~ "detecting dengue than other arboviruses"
-
-#~ msgid "semana epidemiológica"
-#~ msgstr "Last EpiWeek."
-
-#~ msgid "temperatura"
-#~ msgstr "Temperature"
-
-#~ msgid "média das temperaturas mínimas da semana (em graus centígrados)"
-#~ msgstr "average minimum temperatures for the week (in degrees centigrade)."
-
-#~ msgid ""
-#~ "número de tweets indicativos de casos de dengue na cidade. Por enquanto "
-#~ "só há para dengue"
-#~ msgstr ""
-#~ "number of tweets indicating dengue cases in the city. Currently, only for "
-#~ "dengue"
-
-#~ msgid "casos notif"
-#~ msgstr "Estimated cases "
-
-#~ msgid "casos notificados de dengue, zika ou chikungunya"
-#~ msgstr "reported cases of dengue, zika or chikungunya."
-
-#~ msgid "incidência"
-#~ msgstr "Incidence"
-
-#~ msgid "incidência por 100.000 habitantes"
-#~ msgstr "incidence per 100,000 population."
-
-#~ msgid "casos preditos"
-#~ msgstr "Forecast cases"
-
-#~ msgid "número de casos estimados após correção pelo atraso de notificação"
-#~ msgstr "number of estimated cases after correction for notification delay."
-
-#~ msgid "ICmin"
-#~ msgstr "ICmin"
-
-#~ msgid "número mínimo de casos estimados (IC 95%%)"
-#~ msgstr "Lower 95% confidence bounds for the estimated number of cases."
-
-#~ msgid "ICmax"
-#~ msgstr "ICmax"
-
-#~ msgid "número máximo de casos estimados (IC 95%%)"
-#~ msgstr "Upper 95% confidence bounds for the estimated number of cases."
-
-#~ msgid "número reprodutivo efetivo (> 1 indica aumento de casos transmissão)"
-#~ msgstr ""
-#~ "effective reproductive number (> 1 indicates increase in transmission "
-#~ "cases)."
-
-#~ msgid "p(Rt1)"
-#~ msgstr "p(Rt1)"
-
-#~ msgid ""
-#~ "probabilidade do número reprodutivo ser maior que 1 (> 0.95 indica "
-#~ "aumento significativo de casos)"
-#~ msgstr ""
-#~ "probability that the reproductive number is greater than 1 (> 0.95 "
-#~ "indicates an increasesignificant of cases)."
-
-#~ msgid "cor do alerta (verde, amarelo, laranja, vermelho)"
-#~ msgstr "alert level (green, yellow, orange, red)."
-
-#~ msgid ""
-#~ "Algumas vezes, os casos da última semana ainda não estao disponíveis,\n"
-#~ "        nesse caso, usa-se uma estimação com base na tendência de "
-#~ "variação da série"
-#~ msgstr ""
-#~ "Sometimes, cases from the past week are not yet available, \n"
-#~ "in this case, an estimation based on the trend of variation is usedfrom "
-#~ "the series"
