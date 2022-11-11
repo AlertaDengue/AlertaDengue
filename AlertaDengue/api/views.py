@@ -185,8 +185,10 @@ class AlertCityView(View, _GetMethod):
                 result = "[EE] error_message: %s" % e
 
         content_type = "application/json" if format == "json" else "text/plain"
+        response = HttpResponse(result, content_type=content_type)
+        response['Content-Disposition'] = f'attachment; filename="{disease.upper()}{geocode}_{ew_start}-{ew_end}.{format}"'
 
-        return HttpResponse(result, content_type=content_type)
+        return response
 
 
 class EpiYearWeekView(View, _GetMethod):
