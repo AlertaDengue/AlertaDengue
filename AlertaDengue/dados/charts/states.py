@@ -5,88 +5,224 @@ Module for plotting charts in the states reports
 from copy import deepcopy
 
 import pandas as pd
+import plotly.express as px
 import plotly.graph_objs as go
 from django.utils.translation import gettext as _
-from plotly.subplots import make_subplots
+
+# from plotly.subplots import make_subplots
 
 
 class ReportStateCharts:
     """Charts used by Report State."""
 
     @classmethod
-    def create_tweet_chart(
-        cls, df: pd.DataFrame, year_week: int, disease: str
+    def create_notific_chart(
+        cls,
+        df: pd.DataFrame,
     ) -> str:
-        """
-        Create chart with tweet information.
-        Parameters
-        ----------
-        df : pd.DataFrame
-            Dataframe with tweet information
-        year_week : int
-            Year and week desired filter e.g.: 202002
-        disease : str, {'dengue', 'chik', 'zika'}
-            Disease name
-        Returns
-        -------
-        str
-            HTML with Plotly chart.
-        """
-        df = deepcopy(df)
-        ks_cases = ["casos notif. {}".format(disease)]
 
-        df_tweet = df.reset_index()[["SE", "tweets"] + ks_cases]
-        df_tweet = df_tweet[df_tweet.SE >= year_week - 200]
-        df_tweet.rename(columns={"tweets": "menções"}, inplace=True)
+        df_cp = deepcopy(
+            df.sort_values(by=["SE"], ascending=True).reset_index(drop=True)
+        )
 
-        df_grp = (
-            df_tweet.groupby(df_tweet.SE)[["menções"] + ks_cases]
-            .sum()
+        keys = ["casos_est", "casos"]
+        df = df_cp.groupby(["SE"])[keys].sum()
+
+        df["SE"] = df.index.map(lambda v: f"{str(v)[:4]}/{str(v)[-2:]}")
+        traces = []
+
+        traces.append(
+            go.Bar(
+                x=df["SE"],
+                y=df["casos"],
+                name=_("Registrados"),
+                marker=dict(
+                    color="#5466c0",
+                    line=dict(color="white", width=1),
+                ),
+                width=0.5,
+                text=df.index.map(lambda v: f"{str(v)[-2:]}"),
+                hovertemplate=_(
+                    "<br>SE %{text}<br>"
+                    "%{y:1f} Casos notificados"
+                    "<extra></extra>"
+                ),
+            )
+        )
+        traces.append(
+            go.Scatter(
+                mode="lines+markers",
+                x=df["SE"],
+                y=df["casos_est"],
+                name=_("Estimados"),
+                line=dict(color="#ffa500", width=4),
+                text=df.index.map(lambda v: f"{str(v)[-2:]}"),
+                hovertemplate=_(
+                    "<br>SE %{text}<br>"
+                    "%{y:1f} Casos estimados"
+                    "<extra></extra>"
+                ),
+            )
+        )
+
+        dict_of_fig = dict(
+            {
+                "data": traces,
+                "layout": go.Layout(
+                    template="plotly",
+                    title={
+                        "text": _("Total de casos por cidades na regional"),
+                        "font": {"family": "Helvetica", "size": 16},
+                        "x": 0.5,
+                    },
+                    xaxis=dict(
+                        title=_("Semana epidemiológica"),
+                        tickangle=-25,
+                        showline=True,
+                        showgrid=True,
+                        showticklabels=True,
+                        linecolor="rgb(204, 204, 204)",
+                        linewidth=0,
+                        gridcolor="rgb(176, 196, 222)",
+                    ),
+                    yaxis=dict(
+                        title=_("Casos"),
+                        showline=True,
+                        showgrid=True,
+                        showticklabels=True,
+                        linecolor="rgb(204, 204, 204)",
+                        linewidth=0,
+                        gridcolor="rgb(176, 196, 222)",
+                    ),
+                    showlegend=True,
+                    legend=dict(
+                        orientation="h",
+                        yanchor="bottom",
+                        y=1.01,
+                        xanchor="left",
+                    ),
+                    hovermode="x",
+                    hoverlabel=dict(
+                        font_size=12,
+                        font_family="Rockwell",
+                    ),
+                    autosize=True,
+                    margin=dict(
+                        autoexpand=False,
+                        l=50,
+                        r=20,
+                        t=80,
+                        b=55,
+                    ),
+                    paper_bgcolor="rgba(0,0,0,0)",
+                    plot_bgcolor="rgba(0,0,0,0)",
+                    modebar={
+                        "orientation": "h",
+                        "bgcolor": "rgba(255 ,255 ,255 ,0.7)",
+                    },
+                ),
+            }
+        )
+
+        fig = go.Figure(dict_of_fig)
+
+        config = {
+            "modeBarButtonsToRemove": [
+                "zoom2d",
+                "pan2d",
+                "select2d",
+                "lasso2d",
+                "autoScale2d",
+            ],
+            "displaylogo": False,
+            "responsive": True,
+        }
+
+        return fig.to_html(
+            full_html=False, include_plotlyjs=False, config=config
+        )
+
+    @classmethod
+    def create_level_chart(
+        cls,
+        df: pd.DataFrame,
+    ) -> str:
+        df_nivel = (
+            df.groupby(["SE", "nivel"])["municipio_geocodigo"]
+            .count()
             .reset_index()
         )
-
-        df_grp["SE"] = df_grp.SE.map(
-            lambda v: "%s/%s" % (str(v)[:4], str(v)[-2:])
+        color_alert = {1: "Green", 2: "Yellow", 3: "Orange", 4: "Red"}
+        df_nivel.nivel = df_nivel.nivel.apply(
+            lambda v: f"{color_alert[v]} Alert"
         )
 
-        figure = make_subplots(specs=[[{"secondary_y": True}]])
+        df_alert = df_nivel.sort_values(by=["SE"], ascending=True).reset_index(
+            drop=True
+        )
 
-        figure.add_trace(
-            go.Scatter(
-                x=df_grp["SE"],
-                y=df_grp.iloc[:, 1],  # menções tweets
-                name=_("Menções em tweets"),
-                marker={"color": "rgb(51, 172, 255)"},
-                text=df_grp.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hoverinfo="text",
-                hovertemplate=_(
-                    "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
-                ),
+        color_map_alert_y = {
+            "Green Alert": "#00e640",
+            "Yellow Alert": "#f0ff00",
+            "Orange Alert": "#f89406",
+            "Red Alert": "#f03434",
+        }
+
+        # Trace
+        fig = px.bar(
+            df_alert,
+            y="municipio_geocodigo",
+            x=df_alert.SE.map(lambda v: f"{str(v)[:4]}/{str(v)[-2:]}"),
+            color="nivel",
+            color_discrete_map=color_map_alert_y,
+            hover_data={"nivel"},
+            # layout=dict(template='plotly'),
+            category_orders={
+                "nivel": [
+                    "Green Alert",
+                    "Yellow Alert",
+                    "Orange Alert",
+                    "Red Alert",
+                ],
+            },
+        )
+
+        fig.update_traces(
+            customdata=df_alert.SE.map(lambda v: f"{str(v)[-2:]}"),
+            hovertemplate=_(
+                "%{y} Cidades na semana %{customdata} <extra></extra>"
             ),
-            secondary_y=False,
         )
 
-        figure.add_trace(
-            go.Scatter(
-                x=df_grp["SE"],
-                y=df_grp.iloc[:, 2],  # casos notif
-                name=_("Casos notificados"),
-                marker={"color": "rgb(255,150,0)"},
-                text=df_grp.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hoverinfo="text",
-                hovertemplate=_(
-                    "Semana %{text} : %{y} %{yaxis.title.text} <extra></extra>"
-                ),
+        fig.update_layout(
+            template="plotly",
+            title={
+                "text": _("Situação epidemiológica das cidades na regional"),
+                "font": {"family": "Helvetica", "size": 16},
+                "x": 0.5,
+            },
+            showlegend=False,
+            hovermode="x",
+            hoverlabel=dict(font_size=12, font_family="Rockwell"),
+            margin=dict(
+                autoexpand=False,
+                l=40,
+                r=20,
+                t=80,
+                b=55,
             ),
-            secondary_y=True,
-        )
-
-        figure.update_layout(
-            title=_("Menções na mídia social"),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            modebar={
+                "orientation": "h",
+                "bgcolor": "rgba(255 ,255 ,255 ,0.7)",
+            },
+            autosize=True,
+            # height=275,
+            # width=350,
             xaxis=dict(
-                title=_("Período: Ano/Semana"),
-                tickangle=-60,
-                nticks=len(ks_cases) // 4,
+                title=_("Semana epidemiológica"),
+                tickangle=-25,
                 showline=True,
                 showgrid=True,
                 showticklabels=True,
@@ -95,40 +231,31 @@ class ReportStateCharts:
                 gridcolor="rgb(176, 196, 222)",
             ),
             yaxis=dict(
-                # title='',
-                showline=False,
+                title=_("Número de cidades"),
+                showline=True,
                 showgrid=True,
                 showticklabels=True,
                 linecolor="rgb(204, 204, 204)",
                 linewidth=0,
                 gridcolor="rgb(176, 196, 222)",
             ),
-            showlegend=True,
-            plot_bgcolor="rgb(255, 255, 255)",
-            paper_bgcolor="rgb(245, 246, 249)",
-            width=1100,
-            height=450,
-            legend=dict(
-                orientation="h",
-                yanchor="bottom",
-                xanchor="auto",
-                y=1.01,
-                x=0.95,
-                font=dict(family="sans-serif", size=12, color="#000"),
-                bgcolor="#FFFFFF",
-                bordercolor="#E2E2E2",
-                borderwidth=1,
-            ),
         )
 
-        # Set y-axes titles
-        figure.update_yaxes(
-            title_text="<b>{}</b>".format(_("Menções em tweets")),
-            secondary_y=False,
-        )
-        figure.update_yaxes(
-            title_text="<b>{}</b>".format(_("Casos notificados")),
-            secondary_y=True,
-        )
+        for data in fig.data:
+            data["width"] = 0.45  # Change this value for bar widths
 
-        return figure.to_html()
+        config = {
+            "modeBarButtonsToRemove": [
+                "zoom2d",
+                "pan2d",
+                "select2d",
+                "lasso2d",
+                "autoScale2d",
+            ],
+            "displaylogo": False,
+            "responsive": True,
+        }
+
+        return fig.to_html(
+            full_html=False, include_plotlyjs=False, config=config
+        )

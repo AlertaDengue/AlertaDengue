@@ -1,6 +1,7 @@
 import geojson
+from ad_main.settings import get_sqla_conn
 
-from .dbdata import db_engine
+db_engine = get_sqla_conn()
 
 
 def get_city_geojson(municipio):
@@ -9,6 +10,7 @@ def get_city_geojson(municipio):
     :param municipio: geocódigo do municipio
     :return:
     """
+
     with db_engine.connect() as conn:
         head = r'{"type": "FeatureCollection", "features":['
         tail = "]}"
@@ -42,6 +44,7 @@ def get_city_info(geocodigo):
     :param geocodigo: geocódigo do município.
     :return:
     """
+
     with db_engine.connect() as conn:
         res = conn.execute(
             """

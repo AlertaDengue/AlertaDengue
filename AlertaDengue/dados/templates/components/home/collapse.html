@@ -1,4 +1,7 @@
 {% load lookup %}
+{% load cache %}
+
+{% cache 500 object_list %}
 
 <!-- Start Component -->
 {% block collapse_component %}
@@ -41,6 +44,9 @@
   </div>
 </div>
 
+{% endblock %}
+{% endcache %}
+
 <script type="text/javascript"> //Chart columns are provided by template charts.html
 
   $(document).ready(function(){
@@ -70,5 +76,6 @@
 
 </script>
 
-{% endblock %}
+
+
 <!-- End component -->

@@ -1,127 +1,17 @@
+
 {% extends 'base.html' %}
 {% load lookup %}
 {% load i18n %}
 {% load static %}
+{% load hashthis %}
+{% load report_state %}
 
 {% block extra_head %}
 
-{% load leaflet_tags %}
-{% leaflet_js %}
-{% leaflet_css %}
-{% leaflet_js plugins="ALL" %}
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-{% load report_state %}
-{% load hashthis %}
+  <link href="{% static '/css/components.css' %}" rel="stylesheet" type="text/css">
 
-<script src="{% static '/libs/jquery/jquery.sparkline.min.js' %}"
-            type="text/javascript"></script>
-
-<link rel="stylesheet"
-      type="text/css" href="{% static '/libs/DataTables/datatables.min.css' %}"/>
-
-<script type="text/javascript"
-        src="{% static '/libs/DataTables/datatables.min.js' %}"></script>
-
-<style>
-      .box {
-        border: 1px #dfdfdf solid;
-        padding: 20px;
-        margin-bottom: 20px;
-        background-color: #f5f5f5;
-      }
-
-      .table tr td:nth-child(1){
-        background: #fafafa!important;
-        font-weight: bold;
-      }
-
-      .green-row td {
-        background: #8BFFB7;
-      }
-
-      .yellow-row td {
-        background: #FFEB5C;
-      }
-
-      .orange-row td {
-        background: #FFCE5C;
-      }
-
-      .red-row td {
-        background: #FF7C73;
-      }
-      .table.dataTable, .table td, .table th {
-        border-collapse: collapse !important;
-        border: 1px solid #aaaaaa!important;
-      }
-
-      .circle:before {
-        content: ' \25CF';
-        font-size: 30px;
-        line-height: 20px;
-      }
-
-      .alert-1 {
-        color: green;
-      }
-
-      .alert-2 {
-        color: yellow;
-      }
-
-      .alert-3 {
-        color: orange;
-      }
-
-      .alert-4 {
-        color: red;
-      }
-
-      .alert-None {
-        color: white;
-      }
-
-      #main {
-          width: 100%;
-          height: 400px;
-      }
-
-      .info {
-          padding: 6px 8px;
-          font: 14px/16px Arial, Helvetica, sans-serif;
-          background: white;
-          background: rgba(255, 255, 255, 0.8);
-          box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-          border-radius: 5px;
-      }
-
-      .info h4, .info h6 {
-          margin: 0 0 5px;
-          color: #777;
-      }
-
-      .legend {
-          text-align: left;
-          line-height: 18px;
-          color: #555;
-      }
-
-      .legend i {
-          width: 18px;
-          height: 18px;
-          float: left;
-          margin-right: 8px;
-          opacity: 0.7;
-      }
-
-</style>
-<script src="{% static '/libs/plotlyjs/plotly-latest.min.js' %}"></script>
-
-<script>
-  function isInArray(el, array) {
-      return (array.indexOf(el) >= 0) ? true : false;
-  }
-</script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -135,16 +25,11 @@
 {% endblock %}
 
 
-{% block title %}{% trans "Relatório Estadual da Situação das Arboviroses em " %}
-{{state_name}} {% endblock %}
+{% block title %}
+{% trans "Relatório Estadual da Situação das Arboviroses em " %}{{state_name}}
+{% endblock %}
 
 {% block content %}
-
-<!--
-# ---------------------------------
-# 	CAIXA LATERAL - PRIMEIRA PAGINA
-# ---------------------------------
--->
 
 <div class="row">
   <div class="col-md-12">
@@ -168,347 +53,37 @@
   </div>
 </div>
 
-<div class="row my-3">
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-header">{% trans "Mapa Alerta Dengue" %}</div>
-      <div class="card-body p-0">{% map_chart_dengue %}</div>
+<!-- begin maps -->
+<div class="container">
+  <div class="row"
+    style="background-color: #e0eefd63;
+      border-radius: 14px;">
+
+  </div>
+</div>
+<!-- end maps -->
+
+<!-- begin colapse -->
+<div class="container">
+  <div class="row justify-content-center"
+    style="background-color: #e0eefd63;
+      margin-bottom: 20px;
+      border-radius: 7px">
+    <div class="col-md-12 p-1">
+      <div class="card-primary">
+          {% regional_collapse_component %}
+      </div>
     </div>
   </div>
+</div>
+<!-- end collapse-->
 
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-header">{% trans "Mapa Alerta Chikungunya" %}</div>
-      <div class="card-body p-0">{% map_chart_chik %}</div>
-    </div>
-  </div>
+<!-- begin color code -->
+<div class="container">
+  <div class="row p-1">
+    <div class="col-md-12 p-2">
 
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-header">{% trans "Mapa Alerta Zika" %}</div>
-      <div class="card-body p-0">{% map_chart_zika %}</div>
-    </div>
   </div>
 </div>
-
-<div class="row">
-  <div class="col-md-12 my-2">
-    <h3>{% trans "Índice" %}</h3>
-    <ul>
-    {% for regional_name in regional_names %}
-      <li><a href="#{{regional_name}}">{% trans "Regional" %} {{regional_name}}</a></li>
-    {% endfor %}
-    </ul>
-  </div>
-</div>
-
-{% for regional_name in regional_names %}
-  <div class="row">
-    <div class="col-md-12 my-2">
-
-      <div class="row my-3">
-        <div class="col-md-12">
-          <h3 id="{{ regional_name }}">Regional {{ regional_name }}</h3>
-          <p>{% blocktrans %}
-            A tabela abaixo mostra os niveis de alerta em cada município da
-            Regional de Saúde. As cores indicam niveis de atenção, conforme
-            detalhado na {% endblocktrans %}<a href="#color-code">{% trans "tabela de cores" %}</a>.
-          </p>
-        </div>
-      </div>
-
-      <div class="row my-3">
-        <div class="col-md-12">
-          <h4>{% trans "Alertas" %}</h4>
-          <table class="table table-striped table-bordered">
-            <thead>
-             <tr>
-               <th width="20%">{% trans "Município" %}</th>
-               {% for d in diseases_name%}
-               <td width="20%" align="center"><strong>{{ d }}</strong></td>
-               {% endfor %}
-             </tr>
-            </thead>
-            <tbody>
-            {% for city_geocode in regional_info|lookup:regional_name|lookup:'cities_geocode' %}
-            <tr>
-              <td>{{ regional_info|lookup:regional_name|lookup:'cities_name'|lookup:city_geocode }}</td>
-              {% for d in diseases_code %}
-              <td align="center">
-                <span
-                  class="circle alert-{{ regional_info|lookup:regional_name|lookup:'cities_alert'|lookup:city_geocode|lookup:d }}">&nbsp;
-                </span></td>
-              {% endfor %}
-            </tr>
-            </tbody>
-          {% endfor %}
-          </table>
-        </div>
-      </div>
-
-      <div class="row my-3">
-        <div class="col-md-12">
-          <h4>
-            {% trans "Casos notificados de arboviroses na Regional de Saúde" %}
-          </h4>
-
-          <p>{% blocktrans %}
-            A Figura abaixo mostra a série temporal de casos notificados de
-            arboviroses na última semana. A curva de menções refere-se à
-            intensidade de menção de sintomas de arboviroses e presença de
-            mosquitos de acordo com a população do município que usa
-            redes sociais. Esse indicador, que é mais eficaz em cidades
-            maiores, deve ser visto como um auxiliar na detecção precoce de
-            aumento de casos. Atualmente, esse indicador é mais sensivel para
-            detectar dengue do que outras arboviroses{% endblocktrans %}.
-          </p>
-
-        </div>
-      </div>
-
-      <div class="row my-3">
-        <div class="col-md-12 mb-2">
-          <ul class="nav nav-tabs" id="charts-tab-{{ regional_name | hashthis }}" role="tablist">
-            <li class="nav-item">
-              <a class="nav-link active"
-                 id="chart-dengue-tab-{{ regional_name | hashthis }}"
-                 data-toggle="tab"
-                 href="#chart-dengue-{{ regional_name | hashthis }}"
-                 role="tab"
-                 aria-controls="chart-dengue-{{ regional_name | hashthis }}"
-                 aria-selected="true">Dengue</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link"
-                 id="chart-chik-tab-{{ regional_name | hashthis }}"
-                 data-toggle="tab"
-                 href="#chart-chik-{{ regional_name | hashthis }}"
-                 role="tab"
-                 aria-controls="chart-chik-{{ regional_name | hashthis }}"
-                 aria-selected="false">Chikungunya</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link"
-                 id="chart-zika-tab-{{ regional_name | hashthis }}"
-                 data-toggle="tab"
-                 href="#chart-zika-{{ regional_name | hashthis }}"
-                 role="tab"
-                 aria-controls="chart-zika-{{ regional_name | hashthis }}"
-                 aria-selected="false">Zika</a>
-            </li>
-          </ul>
-
-          <div class="tab-content p-3"
-               id="charts-content-{{ regional_name | hashthis }}"
-               style="border: 1px solid #dfdfdf"
-          >
-            <div class="fade show active"
-                 id="chart-dengue-{{ regional_name | hashthis }}"
-                 role="tabpanel"
-                 aria-labelledby="chart-dengue-tab-{{ regional_name | hashthis }}"
-            >
-              {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'dengue' | safe}}
-            </div>
-            <div class="fade"
-                 id="chart-chik-{{ regional_name | hashthis }}"
-                 role="tabpanel"
-                 aria-labelledby="char-chik-tab-{{ regional_name | hashthis }}"
-            >
-              {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'chik' | safe}}
-            </div>
-            <div class="fade"
-                 id="chart-zika-{{ regional_name | hashthis }}"
-                 role="tabpanel"
-                 aria-labelledby="chart-zika-tab-{{ regional_name | hashthis }}"
-            >
-              {{ regional_info|lookup:regional_name|lookup:'chart_cases_twitter'|lookup:'zika' | safe}}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row my-3">
-        <div class="col-md-12">
-          <h4>
-            {% trans "Resumo das últimas seis semanas epidemiológicas na Regional de Saúde" %}
-          </h4><br/>
-          {{ regional_info|lookup:regional_name|lookup:'table'|safe }}
-        </div>
-      </div>
-
-      {% if tweet_max > 0%}
-      <div class="row my-3">
-        <div class="col-md-12">
-          <h4>{% trans "Menção a arboviroses nas redes sociais" %}</h4>
-
-          <p>{% blocktrans %}
-          A figura abaixo mostra a intensidade de menção de sintomas de arboviroses
-          e presença de mosquitos de acordo com a população do município que usa
-          redes sociais.
-          Esse indicador, que é mais eficaz em cidades maiores, deve ser visto como
-          um auxiliar na detecção precoce de aumento de casos. Atualmente,
-          esse indicador é mais sensivel para detectar dengue do que outras
-          arboviroses{% endblocktrans %}.
-          </p>
-
-          {{chart_dengue_tweets|safe}}
-          <br/>&nbsp;
-
-        </div>
-      </div>
-      {% endif %}
-    </div>
-  </div>
-{% endfor %}
-
-<div class="row">
-  <div class="col-md-2"></div>
-  <div id="color-code" class="col-md-8 box">
-    <!--
-    # ---------------------
-    # BOX - CODIGO DE CORES
-    # ---------------------
-    -->
-
-    <h3>{% trans "O código de Cores" %}</h3>
-
-    {% trans "As cores indicam niveis de atenção" %}
-
-    <ul>
-      <li class="bullet-green">
-        <strong>{% trans "Verde" %}:</strong> {% trans "condições climáticas desfavoráveis, seja" %}
-        {% trans "por baixa temperatura ou baixa umidade, e baixa incidência de casos" %}.
-      </li>
-      <li class="bullet-yellow">
-        <strong>{% trans "Amarelo" %}:</strong> {% trans "condições climáticas propícias para" %}
-        {% trans "aumento da população do vetor e transmissão de arboviroses" %}.
-      </li>
-      <li class="bullet-orange">
-        <strong>{% trans "Laranja" %}:</strong> {% trans "transmissão aumentada e sustentada da arbovirose" %}.
-      </li>
-      <li class="bullet-red">
-        <strong>{% trans "Vermelho" %}:</strong> {% trans "incidência alta, acima dos 90% históricos" %}.
-      </li>
-    </ul>
-  </div>
-</div>
-<br/>
-<div class="row">
-  <div id="var-tables" class="col-md-12">
-    <!--
-    # ----------------------------------------
-    # Variáves nas Tabelas, Créditos e Contato
-    # ----------------------------------------
-    -->
-
-    <h3>{% trans "Lista das variáveis apresentadas nas tabelas" %}</h3>
-
-    <ul>
-      <li><strong>{% trans "SE" %}:</strong>
-        {% trans "semana epidemiológica" %}
-      </li>
-      <li><strong>{% trans "temperatura" %}:</strong>
-        {% trans "média das temperaturas mínimas da semana (em graus centígrados)" %}
-      </li>
-      <li><strong>{% trans "tweet" %}:</strong>
-        {% trans "número de tweets indicativos de casos de dengue na cidade. Por enquanto só há para dengue" %}.
-      </li>
-      <li><strong>{% trans "casos notif" %}:</strong>
-        {% trans "casos notificados de dengue, zika ou chikungunya" %}
-      </li>
-      <li><strong>{% trans "incidência" %}:</strong>
-        {% trans "incidência por 100.000 habitantes" %}
-      </li>
-      <li><strong>{% trans "casos preditos" %}:</strong>
-        {% trans "número de casos estimados após correção pelo atraso de notificação" %}
-      </li>
-      <li><strong>{% trans "ICmin" %}:</strong>
-        {% trans "número mínimo de casos estimados (IC 95%)" %}
-      </li>
-      <li><strong>{% trans "ICmax" %}:</strong>
-        {% trans "número máximo de casos estimados (IC 95%)" %}
-      </li>
-      <li><strong>{% trans "Rt" %}:</strong>
-        {% trans "número reprodutivo efetivo (> 1 indica aumento de casos transmissão)" %}
-      </li>
-      <li><strong>{% trans "p(Rt1)" %}:</strong>
-        {% trans "probabilidade do número reprodutivo ser maior que 1 (> 0.95 indica aumento significativo de casos)" %}
-      </li>
-      <li><strong>{% trans "nivel" %}:</strong>
-        {% trans "cor do alerta (verde, amarelo, laranja, vermelho)" %}
-      </li>
-    </ul>
-  </div>
-</div>
-
-<div class="row">
-  <div id="notes" class="col-md-12">
-    <h3>{% trans "Notas" %}</h3>
-
-    <ul>
-      <li>{% blocktrans %}Os dados do sinan mais recentes ainda não foram totalmente digitados.
-        Estimamos o número esperado de casos notificados considerando o tempo
-        até os casos serem digitados{% endblocktrans %}.
-      </li>
-      <li>{% blocktrans %}Os dados de redes sociais são coletados e
-        analisados pelo Observatório de Dengue (UFMG){% endblocktrans %}.
-      </li>
-      <li>{% blocktrans %}Algumas vezes, os casos da última semana ainda não estao disponíveis,
-        nesse caso, usa-se uma estimação com base na tendência de variação da série{% endblocktrans %}.
-      </li>
-    </ul>
-  </div>
-</div>
-
-<div class="row">
-  <div id="credits" class="col-md-12">
-    <h3>{% trans "Créditos" %}</h3>
-
-    {% trans "Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como parceira entre" %}:
-
-    <ul>
-      <li>{% trans "Programa de Computação Científica, Fundação Oswaldo Cruz, Rio de Janeiro" %}.
-      </li>
-      <li>{% trans "Escola de Matemática Aplicada, Fundação Getúlio Vargas" %}.</li>
-      <li>{% trans "Secretaria Estadual de Saúde do" %} {{state_name}}.</li>
-      <li>{% trans "Observatório de Dengue da UFMG" %}.</li>
-    </ul>
-  </div>
-</div>
-
-<div class="row">
-  <div id="contact" class="col-md-12">
-    <h3>{% trans "Contato" %}</h3>
-    {% trans "Para mais detalhes sobre o sistema de alerta InfoDengue, consultar" %}:
-    <a href="http://info.dengue.mat.br">http://info.dengue.mat.br</a>
-  </div>
-</div>
-
-<script>
-  $(document).ready(function(){
-    var cssClasses = {
-      'verde': 'green-row',
-      'amarelo': 'yellow-row',
-      'laranja': 'orange-row',
-      'vermelho': 'red-row'
-    }
-
-    $('.table tr').each(function(i, obj){
-      $(this).addClass(cssClasses[$('td:last-child', this).text()]);
-    });
-
-    $('.datatables').DataTable({
-      "pageLength": 4,
-      "lengthMenu": [ 4, 8, 12 ],
-      "order": [[ 0, "desc" ]],
-      "searching": false,
-      "language": {
-        "url": "{% static '/libs/DataTables/i18n/pt_BR.json' %}"
-      }
-    });
-
-    $('.fade').addClass('tab-pane');
-  });
-</script>
-
+<!-- end color code -->
 {% endblock %}

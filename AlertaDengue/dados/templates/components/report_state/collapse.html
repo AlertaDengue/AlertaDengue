@@ -1,0 +1,86 @@
+
+
+{% load lookup %}
+
+{% load hashthis %}
+
+<!-- Start Component -->
+{% block regional_collapse_component %}
+
+<div id="accordion">
+
+  {% for key,value in regional_dict.items %}
+
+    <div class="card">
+
+      <div id="flip_{{ key }}" class="collapse-style">
+          <button
+           onclick="setTimeout(resizePlotly, 100);"
+            class="collapse-effect text-left"
+            data-toggle="collapse"
+            data-target="#panel_{{ key }}"
+            aria-expanded="true"
+            aria-controls="panel_{{ key }}"
+          >
+            <span>{{ value }}</span>
+          </button>
+      </div>
+
+      <div id="panel_{{ key }}"
+          {% if key == 12002 %}
+              class="collapse show"
+          {% else %}
+              class="collapse"
+          {% endif %}
+          aria-labelledby="flip_{{ key }}"
+          data-parent="#accordion">
+          <div class="card-body">
+            <div class="spinner-border text-muted"></div>
+          </div>
+      </div>
+
+    </div>
+
+  {% endfor %}
+
+</div>
+
+{% endblock %}
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+    const allRegionals = Object.keys({{ regional_dict| safe }});
+    const state_abbv = "{{ state }}";
+    let requestCache = {};
+
+      function loadDataFromApi(apiUrl) {
+        if (!requestCache[apiUrl]) {
+          requestCache[apiUrl] = $.ajax({
+              type: 'GET',
+              url: apiUrl,
+              dataType: "html"
+
+          });
+        }
+        return requestCache[apiUrl];
+      }
+
+      $.each( allRegionals, function( i, regional_id ) {
+        // console.log(regional_id)
+        loadDataFromApi("/fetchdata/" + state_abbv + "/"  + regional_id + "/{{ year_week }}" )
+        .then(function(data) {
+          $("#panel_" + regional_id).html(data);
+             // console.log("State: " + regional_id);
+        });
+    });
+  });
+
+  function resizePlotly() {
+    var doc = $(".tab-pane.active .plotly-graph-div");
+    for (var i = 0; i < doc.length; i++) {
+        Plotly.relayout(doc[i], {autosize: true});
+    }
+}
+
+</script>
