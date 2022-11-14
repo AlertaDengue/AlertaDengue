@@ -1100,28 +1100,28 @@ class ReportStateData(TemplateView):
 
         level_chart = {}
         notif_chart = {}
+        mun_by_regional = {}
 
         df = ReportState.csv_get_regional_by_state(state_abbv)
 
         df_regional_filtered = df[df.id_regional == regional_id]
 
         for d in CID10.keys():
+            df_muni_by_reg = ReportState.create_report_state_data(
+                df_regional_filtered.municipio_geocodigo.to_list(),
+                d,
+                year_week,
+            )
+
             notif_chart[d] = ReportStateCharts.create_notific_chart(
-                # df_cases
-                ReportState.create_report_state_data(
-                    df_regional_filtered.municipio_geocodigo.to_list(),
-                    d,
-                    year_week,
-                )
+                df_muni_by_reg
             )
+
             level_chart[d] = ReportStateCharts.create_level_chart(
-                # df_level
-                ReportState.create_report_state_data(
-                    df_regional_filtered.municipio_geocodigo.to_list(),
-                    d,
-                    year_week,
-                )
+                df_muni_by_reg
             )
+
+        mun_by_regional = list(df_muni_by_reg["municipio_nome"])
 
         context.update(
             {
@@ -1130,6 +1130,7 @@ class ReportStateData(TemplateView):
                 "notif_chart": notif_chart,
                 "level_chart": level_chart,
                 "regional_id": regional_id,
+                "cities": mun_by_regional,
             }
         )
 

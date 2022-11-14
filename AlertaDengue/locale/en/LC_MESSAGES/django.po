@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-11 17:31+0000\n"
+"POT-Creation-Date: 2022-11-14 13:28+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -205,7 +205,7 @@ msgstr "Cumulative number of cases in the State"
 
 #: AlertaDengue/dados/charts/home.py:81 AlertaDengue/dados/charts/home.py:225
 #: AlertaDengue/dados/charts/home.py:342 AlertaDengue/dados/charts/states.py:79
-#: AlertaDengue/dados/charts/states.py:224
+#: AlertaDengue/dados/charts/states.py:225
 #: AlertaDengue/dados/templates/report_city.html:80
 #: AlertaDengue/dados/templates/report_city.html:274
 #: AlertaDengue/dados/templates/report_state.html:43
@@ -219,7 +219,7 @@ msgid "Cidades com clima favorável <br>para transmissão"
 msgstr "Cities with favorable environment <br>for transmission"
 
 #: AlertaDengue/dados/charts/home.py:315
-#: AlertaDengue/dados/charts/states.py:193
+#: AlertaDengue/dados/charts/states.py:194
 #, python-brace-format
 msgid "%{y} Cidades na semana %{customdata} <extra></extra>"
 msgstr "%{y} Cities in the week %{customdata}<extra></extra>"
@@ -229,7 +229,7 @@ msgid "Situação epidemiológica das cidades"
 msgstr "Epidemiological Situation"
 
 #: AlertaDengue/dados/charts/home.py:352
-#: AlertaDengue/dados/charts/states.py:234
+#: AlertaDengue/dados/charts/states.py:235
 msgid "Número de cidades"
 msgstr "Number of cities"
 
@@ -237,7 +237,7 @@ msgstr "Number of cities"
 msgid "Total de casos por cidades na regional"
 msgstr "Cumulative number of cases by cities in the regional health"
 
-#: AlertaDengue/dados/charts/states.py:200
+#: AlertaDengue/dados/charts/states.py:201
 msgid "Situação epidemiológica das cidades na regional"
 msgstr "Epidemiological situation of cities in the regional health"
 
@@ -1273,7 +1273,7 @@ msgstr "Incidence Maps"
 
 #: AlertaDengue/dados/templates/components/home/charts.html:71
 msgid "Municípios monitorados"
-msgstr "Monitored cities"
+msgstr "Municipalities in the regional"
 
 #: AlertaDengue/dados/templates/components/home/charts.html:71
 msgid "Última atualização na SE"
@@ -1282,6 +1282,20 @@ msgstr "Weekly Epidemiological Update"
 #: AlertaDengue/dados/templates/components/home/charts.html:141
 msgid "Informações detalhadas sobre o Estado"
 msgstr "Detailed information about the State"
+
+#: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:43
+#: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:77
+#: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:111
+msgid "Municípios na regional"
+msgstr "Municipalities in the regional"
+
+#: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:52
+#: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:86
+#: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:120
+msgid ""
+"Clique no nome do Município para acessar a página de relatório municipal."
+msgstr ""
+"Click on the Municipality name to access the Municipal Report page."
 
 #: AlertaDengue/dados/templates/dashboard_cities.html:56
 #, python-format
@@ -2536,14 +2550,20 @@ msgid "°C temperatura máxima"
 msgstr "°C Maximum temperature"
 
 #: AlertaDengue/dados/views.py:869
+#, fuzzy, python-format
+#| msgid "% umidade mínima do ar"
 msgid "% umidade mínima do ar"
 msgstr "% Minimum air humidity"
 
 #: AlertaDengue/dados/views.py:870
+#, fuzzy, python-format
+#| msgid "% umidade média do ar"
 msgid "% umidade média do ar"
 msgstr "% Average air humidity"
 
 #: AlertaDengue/dados/views.py:871
+#, fuzzy, python-format
+#| msgid "% umidade máxima do ar"
 msgid "% umidade máxima do ar"
 msgstr "% Maximum air humidity"
 
