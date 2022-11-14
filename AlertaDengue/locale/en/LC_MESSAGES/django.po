@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-14 13:28+0000\n"
+"POT-Creation-Date: 2022-11-14 13:44+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -234,11 +234,11 @@ msgid "Número de cidades"
 msgstr "Number of cities"
 
 #: AlertaDengue/dados/charts/states.py:74
-msgid "Total de casos por cidades na regional"
+msgid "Total de casos por municípios na regional"
 msgstr "Cumulative number of cases by cities in the regional health"
 
 #: AlertaDengue/dados/charts/states.py:201
-msgid "Situação epidemiológica das cidades na regional"
+msgid "Situação epidemiológica dos municípios na regional"
 msgstr "Epidemiological situation of cities in the regional health"
 
 #: AlertaDengue/dados/models.py:17 AlertaDengue/forecast/models.py:99
@@ -1294,8 +1294,7 @@ msgstr "Municipalities in the regional"
 #: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:120
 msgid ""
 "Clique no nome do Município para acessar a página de relatório municipal."
-msgstr ""
-"Click on the Municipality name to access the Municipal Report page."
+msgstr "Click on the Municipality name to access the Municipal Report page."
 
 #: AlertaDengue/dados/templates/dashboard_cities.html:56
 #, python-format
