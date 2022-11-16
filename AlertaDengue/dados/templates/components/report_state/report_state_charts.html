@@ -45,11 +45,17 @@
         </p>
         <div class="collapse" id="-collapseName-dengue-{{ regional_id }}">
           <div class="card card-body">
-            <b>{{ cities }}</b>
+            <div class="col-12 container">
+              <h5 class="text-secondary">Municípios:</h5>
+              {% for key,value in cities.items %}
+                <a href="http://127.0.0.1:8000/report/{{ state_abbv }}/{{ key }}/{{ year_week }}">
+                  <b>| {{ value }} </b>
+                </a>
+              {% endfor %} <b>|</b>
+            </div>
           </div>
           <p
           class="text-secondary pl-2">
-            {% trans "Clique no nome do Município para acessar a página de relatório municipal." %}
           </p>
         </div>
     </div>
@@ -79,11 +85,17 @@
         </p>
         <div class="collapse" id="-collapseName-chik-{{ regional_id }}">
           <div class="card card-body">
-            <b>{{ cities }}</b>
+            <div class="col-12 container">
+              <h5 class="text-secondary">Municípios:</h5>
+              {% for key,value in cities.items %}
+                <a href="http://127.0.0.1:8000/report/{{ state_abbv }}/{{ key }}/{{ year_week }}">
+                  <b>| {{ value }} </b>
+                </a>
+              {% endfor %} <b>|</b>
+            </div>
           </div>
           <p
           class="text-secondary pl-2">
-            {% trans "Clique no nome do Município para acessar a página de relatório municipal." %}
           </p>
         </div>
     </div>
@@ -113,11 +125,17 @@
         </p>
         <div class="collapse" id="-collapseName-zika-{{ regional_id }}">
           <div class="card card-body">
-            <b>{{ cities }}</b>
+            <div class="col-12 container">
+              <h5 class="text-secondary">Municípios:</h5>
+              {% for key,value in cities.items %}
+                <a href="http://127.0.0.1:8000/report/{{ state_abbv }}/{{ key }}/{{ year_week }}">
+                  <b>| {{ value }} </b>
+                </a>
+              {% endfor %} <b>|</b>
+            </div>
           </div>
           <p
           class="text-secondary pl-2">
-            {% trans "Clique no nome do Município para acessar a página de relatório municipal." %}
           </p>
         </div>
     </div>

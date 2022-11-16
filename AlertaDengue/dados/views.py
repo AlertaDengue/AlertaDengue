@@ -1106,6 +1106,10 @@ class ReportStateData(TemplateView):
 
         df_regional_filtered = df[df.id_regional == regional_id]
 
+        mun_by_regional = df_regional_filtered.set_index(
+            "municipio_geocodigo"
+        )["municipio_nome"].to_dict()
+
         for d in CID10.keys():
             df_muni_by_reg = ReportState.create_report_state_data(
                 df_regional_filtered.municipio_geocodigo.to_list(),
@@ -1120,8 +1124,6 @@ class ReportStateData(TemplateView):
             level_chart[d] = ReportStateCharts.create_level_chart(
                 df_muni_by_reg
             )
-
-        mun_by_regional = list(df_muni_by_reg["municipio_nome"])
 
         context.update(
             {
