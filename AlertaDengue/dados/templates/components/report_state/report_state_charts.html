@@ -21,7 +21,6 @@
 
   <!-- Tab panes -->
   <div class="tab-content">
-
     <div id="dengue-{{ regional_id }}" class="container tab-pane active"><br>
       <div class="row">
         <div class="col-6 col-sm-12 col-md-6">
@@ -31,6 +30,34 @@
           {{ level_chart|lookup:'dengue'| safe }}
         </div>
       </div>
+      <div  class="my-3">
+        <p style="display: flex; justify-content: flex-end">
+          <a
+            class="btn btn-primary mb-2"
+            data-toggle="collapse"
+            href="#-collapseName-dengue-{{ regional_id }}"
+            role="button"
+            aria-expanded="false"
+            aria-controls="-collapseName-dengue-{{ regional_id }}"
+            >
+            {% trans "Municípios na regional" %}
+          </a>
+        </p>
+        <div class="collapse" id="-collapseName-dengue-{{ regional_id }}">
+          <div class="card card-body">
+            <div class="col-12 container">
+              <h5 class="text-secondary">{% trans "Municípios" %}:</h5>
+              {% for key,value in cities.items %}
+                <a href="http://127.0.0.1:8000/report/{{ state_abbv }}/{{ key }}/{{ year_week }}">
+                  <b>| {{ value }} </b>
+                </a>
+              {% endfor %} <b>|</b>
+            </div>
+          </div></br>
+          <p class="text-secondary pl-2">
+          </p>
+        </div>
+    </div>
     </div>
 
     <div id="chikungunya-{{ regional_id }}" class="container tab-pane fade"><br>
@@ -42,6 +69,34 @@
           {{ level_chart|lookup:'chikungunya'| safe }}
         </div>
       </div>
+      <div  class="my-3">
+        <p style="display: flex; justify-content: flex-end">
+          <a
+            class="btn btn-primary mb-2"
+            data-toggle="collapse"
+            href="#-collapseName-chik-{{ regional_id }}"
+            role="button"
+            aria-expanded="false"
+            aria-controls="-collapseName-chik-{{ regional_id }}"
+            >
+            {% trans "Municípios na regional" %}
+          </a>
+        </p>
+        <div class="collapse" id="-collapseName-chik-{{ regional_id }}">
+          <div class="card card-body">
+            <div class="col-12 container">
+              <h5 class="text-secondary">Municípios:</h5>
+              {% for key,value in cities.items %}
+                <a href="http://127.0.0.1:8000/report/{{ state_abbv }}/{{ key }}/{{ year_week }}">
+                  <b>| {{ value }} </b>
+                </a>
+              {% endfor %} <b>|</b>
+            </div>
+          </div></br>
+          <p class="text-secondary pl-2">
+          </p>
+        </div>
+    </div>
     </div>
 
     <div id="zika-{{ regional_id }}" class="container tab-pane fade"><br>
@@ -53,6 +108,34 @@
           {{ level_chart|lookup:'zika'| safe }}
         </div>
       </div>
+      <div  class="my-3">
+        <p style="display: flex; justify-content: flex-end">
+          <a
+            class="btn btn-primary mb-2"
+            data-toggle="collapse"
+            href="#-collapseName-zika-{{ regional_id }}"
+            role="button"
+            aria-expanded="false"
+            aria-controls="-collapseName-zika-{{ regional_id }}"
+            >
+            {% trans "Municípios na regional" %}
+          </a>
+        </p>
+        <div class="collapse" id="-collapseName-zika-{{ regional_id }}">
+          <div class="card card-body">
+            <div class="col-12 container">
+              <h5 class="text-secondary">Municípios:</h5>
+              {% for key,value in cities.items %}
+                <a href="http://127.0.0.1:8000/report/{{ state_abbv }}/{{ key }}/{{ year_week }}">
+                  <b>| {{ value }} </b>
+                </a>
+              {% endfor %} <b>|</b>
+            </div>
+          </div></br>
+          <p class="text-secondary pl-2">
+          </p>
+        </div>
+    </div>
     </div>
 
   </div>

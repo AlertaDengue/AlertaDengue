@@ -71,13 +71,13 @@ class ReportStateCharts:
                 "layout": go.Layout(
                     template="plotly",
                     title={
-                        "text": _("Total de casos por cidades na regional"),
+                        "text": _("Total de casos na regional de saúde"),
                         "font": {"family": "Helvetica", "size": 16},
                         "x": 0.5,
                     },
                     xaxis=dict(
                         title=_("Semana epidemiológica"),
-                        tickangle=-25,
+                        tickangle=-35,
                         showline=True,
                         showgrid=True,
                         showticklabels=True,
@@ -112,7 +112,7 @@ class ReportStateCharts:
                         l=50,
                         r=20,
                         t=80,
-                        b=55,
+                        b=75,
                     ),
                     paper_bgcolor="rgba(0,0,0,0)",
                     plot_bgcolor="rgba(0,0,0,0)",
@@ -160,6 +160,7 @@ class ReportStateCharts:
         df_alert = df_nivel.sort_values(by=["SE"], ascending=True).reset_index(
             drop=True
         )
+        # print(df.head())
 
         color_map_alert_y = {
             "Green Alert": "#00e640",
@@ -197,7 +198,7 @@ class ReportStateCharts:
         fig.update_layout(
             template="plotly",
             title={
-                "text": _("Situação epidemiológica das cidades na regional"),
+                "text": _("Situação epidemiológica na regional de saúde"),
                 "font": {"family": "Helvetica", "size": 16},
                 "x": 0.5,
             },
@@ -209,7 +210,7 @@ class ReportStateCharts:
                 l=40,
                 r=20,
                 t=80,
-                b=55,
+                b=75,
             ),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
@@ -222,7 +223,7 @@ class ReportStateCharts:
             # width=350,
             xaxis=dict(
                 title=_("Semana epidemiológica"),
-                tickangle=-25,
+                tickangle=-35,
                 showline=True,
                 showgrid=True,
                 showticklabels=True,
