@@ -71,7 +71,7 @@ class ReportStateCharts:
                 "layout": go.Layout(
                     template="plotly",
                     title={
-                        "text": _("Total de casos por municípios na regional"),
+                        "text": _("Total de casos na regional de saúde"),
                         "font": {"family": "Helvetica", "size": 16},
                         "x": 0.5,
                     },
@@ -198,9 +198,7 @@ class ReportStateCharts:
         fig.update_layout(
             template="plotly",
             title={
-                "text": _(
-                    "Situação epidemiológica dos municípios na regional"
-                ),
+                "text": _("Situação epidemiológica na regional de saúde"),
                 "font": {"family": "Helvetica", "size": 16},
                 "x": 0.5,
             },
