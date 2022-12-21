@@ -81,8 +81,8 @@ jobs:
       run: |
         mkdir -p containers/postgres/dumps
         tree -L 1 ../
-        wget https://dataverse.harvard.edu/api/access/datafile/4154429 -O docker/postgres/dumps/latest_infodengue.sql.gz
-        wget https://dataverse.harvard.edu/api/access/datafile/5110797 -O docker/postgres/dumps/latest_dengue.sql.gz
+        wget https://dataverse.harvard.edu/api/access/datafile/4154429 -O containers/postgres/dumps/latest_infodengue.sql.gz
+        wget https://dataverse.harvard.edu/api/access/datafile/5110797 -O containers/postgres/dumps/latest_dengue.sql.gz
 
     - name: Build docker images
       run: |

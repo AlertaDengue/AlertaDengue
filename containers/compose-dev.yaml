@@ -14,14 +14,20 @@ services:
       dockerfile: "containers/postgres/Dockerfile"
     env_file:
       - ../.env
+    environment:
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: "md5"
     hostname: db
-    ports:
-      - ${PSQL_PORT}:${PSQL_PORT}
     networks:
       - staging
+    ports:
+      - ${PSQL_PORT}:${PSQL_PORT}
+    expose:
+      - ${PSQL_PORT}
     volumes:
-      - pg_data:/var/lib/postgresql/data
-      - ./postgres/dumps:/dumps
+      - postgres_data:/var/lib/postgresql/data/
+      - ./dev_dumps:/dumps
+    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U postgres"]
@@ -48,10 +54,9 @@ services:
       - rabbitmq
     restart: always
 
+volumes:
+  postgres_data:
+
 networks:
   staging:
       driver: bridge
-
-
-volumes:
-  pg_data:
