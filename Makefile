@@ -66,7 +66,7 @@ container-logs-follow:
 	$(CONTAINER_APP) logs --follow --tail 300 ${SERVICES}
 
 .PHONY: container-wait
-container-wait:
+container-wait: $(eval SHELL:=/bin/bash)
 	ENV=${ENV} timeout 90 ./containers/scripts/healthcheck.sh ${SERVICE}
 
 .PHONY: container-wait-all
