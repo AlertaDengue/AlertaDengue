@@ -25,8 +25,9 @@ services:
     expose:
       - ${PSQL_PORT}
     volumes:
+      # SETUP: define between SCHEMAS or DUMPS
+      - ./postgres/setup/${PSQL_SETUP}:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data/
-      - ./dev_dumps:/dumps
     command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
     restart: always
     healthcheck:

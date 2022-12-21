@@ -67,7 +67,7 @@ container-logs-follow:
 
 .PHONY: container-wait
 container-wait:
-	ENV=${ENV} timeout 90 ./docker/scripts/healthcheck.sh ${SERVICE}
+	ENV=${ENV} timeout 90 ./containers/scripts/healthcheck.sh ${SERVICE}
 
 .PHONY: container-wait-all
 container-wait-all:

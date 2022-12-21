@@ -13,10 +13,4 @@ RUN apt-get update \
            postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts \
       && rm -rf /var/lib/apt/lists/*
 
-# Dump dump for development
-# COPY containers/postgres/postgres_setup/* /docker-entrypoint-initdb.d/
-
-# import the schemas for testing
-ADD containers/postgres/schema/* /docker-entrypoint-initdb.d/
-
 USER postgres
