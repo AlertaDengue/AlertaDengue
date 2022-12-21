@@ -35,7 +35,6 @@ AlertaDengue/static/*
 /AlertaDengue/*.dbf
 /*.dbf
 *.egg-info
-/docker/dev_dumps/
 /dist/
 /build/
 /tiffs/
@@ -52,4 +51,4 @@ maintenance_mode_state.txt
 rever/
 
 #dump
-docker/postgres/dumps/*
+containers/postgres/dumps/*
