@@ -2,11 +2,11 @@ version: "3.4"
 services:
   memcached:
     networks:
-      - staging
+      - default
 
   rabbitmq:
     networks:
-      - staging
+      - default
 
   db:
     build:
@@ -19,15 +19,14 @@ services:
       POSTGRES_HOST_AUTH_METHOD: "md5"
     hostname: db
     networks:
-      - staging
+      - default
     ports:
       - ${PSQL_PORT}:${PSQL_PORT}
     expose:
       - ${PSQL_PORT}
     volumes:
-      # SETUP: define between SCHEMAS or DUMPS
-      - ./postgres/setup/${PSQL_SETUP}:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data/
+      - ./postgres/dev_dumps:/dumps
     command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
     restart: always
     healthcheck:
@@ -45,12 +44,12 @@ services:
     ports:
       - 8080:8000
     networks:
-      - staging
+      - default
     command: ["python", "manage.py", "runserver"]
 
   worker:
     networks:
-      - staging
+      - default
     depends_on:
       - rabbitmq
     restart: always
@@ -59,5 +58,5 @@ volumes:
   postgres_data:
 
 networks:
-  staging:
+  default:
       driver: bridge

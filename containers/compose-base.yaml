@@ -61,7 +61,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
-      interval: 20s
+      interval: 10s
       timeout: 10s
       retries: 5
       start_period: 10s  # requires docker-compose 3.4
@@ -85,7 +85,7 @@ services:
     restart: always
     healthcheck:
       test: ["CMD-SHELL", 'celery --app ad_main.celeryapp.app inspect ping -d "celery@$${HOSTNAME}"']
-      interval: 60s
+      interval: 10s
       timeout: 10s
       retries: 5
       start_period: 30s

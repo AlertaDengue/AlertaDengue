@@ -1,5 +1,7 @@
-.ONESHELL:
-
+#* Variables
+SHELL:=/usr/bin/env bash
+ARGS:=
+CONSOLE:=bash
 include .env
 
 SERVICES:=
@@ -66,16 +68,16 @@ container-logs-follow:
 	$(CONTAINER_APP) logs --follow --tail 300 ${SERVICES}
 
 .PHONY: container-wait
-container-wait: $(eval SHELL:=/bin/bash)
+container-wait:
 	ENV=${ENV} timeout 90 ./containers/scripts/healthcheck.sh ${SERVICE}
 
 .PHONY: container-wait-all
 container-wait-all:
 	$(MAKE) container-wait ENV=${ENV} SERVICE="memcached"
 	$(MAKE) container-wait ENV=${ENV} SERVICE="rabbitmq"
-	if [[ ${ENV} -eq "dev"]]; then $(MAKE) container-wait ENV=${ENV} SERVICE="db"; fi
 	$(MAKE) container-wait ENV=${ENV} SERVICE="web"
 	$(MAKE) container-wait ENV=${ENV} SERVICE="worker"
+	$(MAKE) container-wait ENV=${ENV} SERVICE="db"
 
 .PHONY:container-console
 container-console:
