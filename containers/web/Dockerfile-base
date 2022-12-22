@@ -42,9 +42,9 @@ USER deploy
 COPY --chown=deploy:deploy AlertaDengue  /opt/services/AlertaDengue
 COPY --chown=deploy env.tpl pyproject.toml poetry.lock  /opt/services/
 COPY --chown=deploy:deploy conda/${ENV}.yaml /tmp/environment.yaml
-COPY --chown=deploy:deploy docker/scripts/poetry-install.sh /tmp/poetry-install.sh
-COPY --chown=deploy:deploy docker/web/entrypoint.sh /entrypoint.sh
-COPY --chown=deploy:deploy docker/celery/run.sh  /opt/services/celery-run.sh
+COPY --chown=deploy:deploy containers/scripts/poetry-install.sh /tmp/poetry-install.sh
+COPY --chown=deploy:deploy containers/web/entrypoint.sh /entrypoint.sh
+COPY --chown=deploy:deploy containers/celery/run.sh  /opt/services/celery-run.sh
 
 # Change shell to bash
 SHELL ["/bin/bash", "-c"]

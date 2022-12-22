@@ -2,26 +2,32 @@ version: "3.4"
 services:
   memcached:
     networks:
-      - staging
+      - default
 
   rabbitmq:
     networks:
-      - staging
+      - default
 
   db:
     build:
       context: ".."
-      dockerfile: "docker/postgres/Dockerfile"
+      dockerfile: "containers/postgres/Dockerfile"
     env_file:
       - ../.env
+    environment:
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: "md5"
     hostname: db
+    networks:
+      - default
     ports:
       - ${PSQL_PORT}:${PSQL_PORT}
-    networks:
-      - staging
+    expose:
+      - ${PSQL_PORT}
     volumes:
-      - pg_data:/var/lib/postgresql/data
-      - ./postgres/dumps:/dumps
+      - postgres_data:/var/lib/postgresql/data/
+      - ./postgres/dev_dumps:/dumps
+    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U postgres"]
@@ -38,20 +44,19 @@ services:
     ports:
       - 8080:8000
     networks:
-      - staging
+      - default
     command: ["python", "manage.py", "runserver"]
 
   worker:
     networks:
-      - staging
+      - default
     depends_on:
       - rabbitmq
     restart: always
 
-networks:
-  staging:
-      driver: bridge
-
-
 volumes:
-  pg_data:
+  postgres_data:
+
+networks:
+  default:
+      driver: bridge

@@ -1,5 +1,7 @@
-.ONESHELL:
-
+#* Variables
+SHELL:=/usr/bin/env bash
+ARGS:=
+CONSOLE:=bash
 include .env
 
 SERVICES:=
@@ -7,11 +9,11 @@ SERVICE:=
 # options: dev, prod
 ENV:=$(ENV)
 
-DOCKER=docker-compose \
+CONTAINER_APP=docker-compose \
 	--env-file .env \
 	--project-name infodengue-$(ENV) \
-	--file docker/compose-base.yaml \
-	--file docker/compose-$(ENV).yaml
+	--file containers/compose-base.yaml \
+	--file containers/compose-$(ENV).yaml
 
 CONSOLE:=bash
 
@@ -29,88 +31,89 @@ sync-static-geofiles:
 	python AlertaDengue/manage.py sync_geofiles
 	python AlertaDengue/manage.py collectstatic --noinput
 
-# DOCKER
-.PHONY:docker-build
-docker-build:
-	$(DOCKER) build base
-	$(DOCKER) build ${SERVICES}
+# CONTAINER_APP
 
-.PHONY:docker-start
-docker-start:
-	$(DOCKER) up -d ${SERVICES}
+.PHONY:container-build
+container-build:
+	$(CONTAINER_APP) build base
+	$(CONTAINER_APP) build ${SERVICES}
 
-.PHONY:docker-stop
-docker-stop:
-	$(DOCKER) stop ${SERVICES}
+.PHONY:container-start
+container-start:
+	$(CONTAINER_APP) up -d ${SERVICES}
 
-.PHONY:docker-exec
-docker-exec:
-	$(DOCKER) exec ${SERVICES} bash
+.PHONY:container-stop
+container-stop:
+	$(CONTAINER_APP) stop ${SERVICES}
 
-.PHONY:docker-restart
-docker-restart: docker-stop docker-start
+.PHONY:container-exec
+container-exec:
+	$(CONTAINER_APP) exec ${SERVICES} bash
+
+.PHONY:container-restart
+container-restart: container-stop container-start
 	echo "[II] Docker services restarted!"
 
-#* Test docker build Ci
-.PHONY: docker-run-all
-docker-run-all: ## build and deploy all containers
-	$(DOCKER) up -d --build
+#* Test containers build on Ci
+.PHONY: container-run-all
+container-run-all: ## build and deploy all containers
+	$(CONTAINER_APP) up -d --build
 
-.PHONY:docker-logs
-docker-logs:
-	$(DOCKER) logs --tail 300 ${SERVICES}
+.PHONY:container-logs
+container-logs:
+	$(CONTAINER_APP) logs --tail 300 ${SERVICES}
 
-.PHONY:docker-logs-follow
-docker-logs-follow:
-	$(DOCKER) logs --follow --tail 300 ${SERVICES}
+.PHONY:container-logs-follow
+container-logs-follow:
+	$(CONTAINER_APP) logs --follow --tail 300 ${SERVICES}
 
-.PHONY: docker-wait
-docker-wait:
-	ENV=${ENV} timeout 90 ./docker/scripts/healthcheck.sh ${SERVICE}
+.PHONY: container-wait
+container-wait:
+	ENV=${ENV} timeout 90 ./containers/scripts/healthcheck.sh ${SERVICE}
 
-.PHONY: docker-wait-all
-docker-wait-all:
-	$(MAKE) docker-wait ENV=${ENV} SERVICE="memcached"
-	$(MAKE) docker-wait ENV=${ENV} SERVICE="rabbitmq"
-	if [[ ${ENV} -eq "dev"]]; then $(MAKE) docker-wait ENV=${ENV} SERVICE="db"; fi
-	$(MAKE) docker-wait ENV=${ENV} SERVICE="web"
-	$(MAKE) docker-wait ENV=${ENV} SERVICE="worker"
+.PHONY: container-wait-all
+container-wait-all:
+	$(MAKE) container-wait ENV=${ENV} SERVICE="memcached"
+	$(MAKE) container-wait ENV=${ENV} SERVICE="rabbitmq"
+	$(MAKE) container-wait ENV=${ENV} SERVICE="web"
+	$(MAKE) container-wait ENV=${ENV} SERVICE="worker"
+	$(MAKE) container-wait ENV=${ENV} SERVICE="db"
 
-.PHONY:docker-console
-docker-console:
-	$(DOCKER) exec ${SERVICE} ${CONSOLE}
+.PHONY:container-console
+container-console:
+	$(CONTAINER_APP) exec ${SERVICE} ${CONSOLE}
 
-.PHONY:docker-down
-docker-down:
-	$(DOCKER) down --volumes
+.PHONY:container-down
+container-down:
+	$(CONTAINER_APP) down --volumes
 
 .PHONY:run-dev-db
-docker-run-dev-db:
-	$(DOCKER) run --rm db postgres -V
+container-run-dev-db:
+	$(CONTAINER_APP) run --rm db postgres -V
 
 # Migrate databases and create shapefiles to synchronize with static_files
 .PHONY:django-migrate
-django-migrate: docker-run-dev-db
-	$(DOCKER) run --rm web python3 manage.py migrate --database=dados --noinput
-	$(DOCKER) run --rm web python3 manage.py migrate --database=infodengue --noinput
-	$(DOCKER) run --rm web python3 manage.py migrate forecast --database=forecast
+django-migrate: container-run-dev-db
+	$(CONTAINER_APP) run --rm web python3 manage.py migrate --database=dados --noinput
+	$(CONTAINER_APP) run --rm web python3 manage.py migrate --database=infodengue --noinput
+	$(CONTAINER_APP) run --rm web python3 manage.py migrate forecast --database=forecast
 
 .PHONY:django-static-geofiles
 django-static-geofiles:
-	$(DOCKER) run --rm web python3 manage.py sync_geofiles
-	$(DOCKER) run --rm web python3 manage.py collectstatic --noinput
+	$(CONTAINER_APP) run --rm web python3 manage.py sync_geofiles
+	$(CONTAINER_APP) run --rm web python3 manage.py collectstatic --noinput
 
 .PHONY:test-staging-web
 test-staging-web:
-	$(DOCKER) run --no-deps web bash /opt/services/test.sh dados
-	$(DOCKER) run --no-deps web bash /opt/services/test.sh dbf
-	$(DOCKER) run --no-deps web bash /opt/services/test.sh gis
-	$(DOCKER) run --no-deps web bash /opt/services/test.sh api
-	#$(DOCKER) run --no-deps web bash /opt/services/test.sh forecast
+	$(CONTAINER_APP) run --no-deps web bash /opt/services/test.sh dados
+	$(CONTAINER_APP) run --no-deps web bash /opt/services/test.sh dbf
+	$(CONTAINER_APP) run --no-deps web bash /opt/services/test.sh gis
+	$(CONTAINER_APP) run --no-deps web bash /opt/services/test.sh api
+	#$(CONTAINER_APP) run --no-deps web bash /opt/services/test.sh forecast
 
 .PHONY:test-staging-all
 test-staging-all:
-	$(DOCKER) run --rm web python3 manage.py test
+	$(CONTAINER_APP) run --rm web python3 manage.py test
 
 
 .PHONY: lint
@@ -121,7 +124,7 @@ lint: ## formatting linter with poetry
 # [CRON] Uses for web services
 .PHONY:send-mail-partner
 send-mail-partner:
-	$(DOCKER) run --rm web python manage.py send_mail
+	$(CONTAINER_APP) run --rm web python manage.py send_mail
 
 # Python
 .PHONY: clean
