@@ -46,6 +46,7 @@ sh = "^1.14.2"
 simpledbf = "^0.2.6"
 tables = "^3.7.0"
 plotly = "^5.11.0"
+psycopg2 = "^2.9.5"
 
 [tool.poetry.dev-dependencies]
 django-extensions = "^3.1.5"
@@ -54,6 +55,10 @@ nodejs = "^0.1.1"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^2.21.0"
+black = "^22.12.0"
+flake8 = "^6.0.0"
+mypy = "^0.991"
+isort = "^5.11.4"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
