@@ -50,10 +50,10 @@ plotly = "^5.11.0"
 [tool.poetry.dev-dependencies]
 django-extensions = "^3.1.5"
 pytest = "^7.1.2"
-jupyter = "^1.0.0"
-ipywidgets = "^8.0.2"
-jupyterlab-widgets = "^3.0.3"
 nodejs = "^0.1.1"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^2.21.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
