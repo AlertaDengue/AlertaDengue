@@ -9,6 +9,8 @@ services:
         IMAGE_BUILD: infodengue-prod_base:latest
     env_file:
       - ../.env
+    volumes:
+      - ${DOCKER_HOST_STATIC}:/opt/services/staticfiles
     ports:
       - 8000:8000
     command: ["/opt/services/AlertaDengue/runwsgi.sh"]

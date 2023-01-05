@@ -2,11 +2,11 @@ version: "3.4"
 services:
   memcached:
     networks:
-      - default
+      - staging
 
   rabbitmq:
     networks:
-      - default
+      - staging
 
   db:
     build:
@@ -19,7 +19,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: "md5"
     hostname: db
     networks:
-      - default
+      - staging
     ports:
       - ${PSQL_PORT}:${PSQL_PORT}
     expose:
@@ -37,19 +37,21 @@ services:
     command: -p ${PSQL_PORT}
 
   web:
-    # entrypoint: ["/entrypoint.sh"]
     image: infodengue-dev_base:latest
+    hostname: infodengue-dev_web
     env_file:
       - ../.env
+    volumes:
+      - ${DOCKER_HOST_STATIC}:/opt/services/staticfiles
     ports:
-      - 8080:8000
+      - 8080:8080
     networks:
-      - default
-    command: ["python", "manage.py", "runserver"]
+      - staging
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8080"]
 
   worker:
     networks:
-      - default
+      - staging
     depends_on:
       - rabbitmq
     restart: always
@@ -58,5 +60,5 @@ volumes:
   postgres_data:
 
 networks:
-  default:
+  staging:
       driver: bridge

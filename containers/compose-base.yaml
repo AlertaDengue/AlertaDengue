@@ -39,7 +39,6 @@ services:
       - donotstart
 
   web:
-    # entrypoint: ["/entrypoint.sh"]
     env_file:
       - ../.env
     environment:
@@ -53,7 +52,6 @@ services:
       - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
       - ${DOCKER_HOST_INCIDENCE_MAPS}:/opt/services/AlertaDengue/static/img/incidence_maps
       - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
-      - ${DOCKER_HOST_STATIC}:/opt/services/staticfiles
     depends_on:
       - worker
       - rabbitmq
