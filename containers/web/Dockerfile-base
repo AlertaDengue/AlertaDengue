@@ -24,8 +24,8 @@ RUN addgroup --gid ${HOST_GID} deploy \
   && echo "deploy ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/deploy \
   && chmod 0440 /etc/sudoers.d/deploy \
   && export ENV_NAME="$ENV_NAME" \
-  && mkdir -p /opt/conda /opt/services/logs /opt/services/AlertaDengue/ \
-  && chmod -R a+rwx /opt/conda /opt/services/AlertaDengue/ /tmp \
+  && mkdir -p /opt/conda /opt/services/ \
+  && chmod -R a+rwx /opt/conda /opt/services /tmp \
   && chown deploy:deploy /opt/services/ /tmp \
   && echo 'source /opt/conda/bin/activate "$ENV_NAME" && exec "$@"' > /activate.sh \
   && echo 'source activate "$ENV_NAME"' >  /home/deploy/.bashrc \
@@ -40,10 +40,9 @@ USER deploy
 
 ## Copy code to the container with permissions to user
 COPY --chown=deploy:deploy AlertaDengue  /opt/services/AlertaDengue
-COPY --chown=deploy env.tpl pyproject.toml poetry.lock  /opt/services/
+COPY --chown=deploy env.tpl pyproject.toml poetry.lock README.md /opt/services/
 COPY --chown=deploy:deploy conda/${ENV}.yaml /tmp/environment.yaml
 COPY --chown=deploy:deploy containers/scripts/poetry-install.sh /tmp/poetry-install.sh
-COPY --chown=deploy:deploy containers/web/entrypoint.sh /entrypoint.sh
 COPY --chown=deploy:deploy containers/celery/run.sh  /opt/services/celery-run.sh
 
 # Change shell to bash
@@ -60,5 +59,9 @@ RUN mamba env create -n $ENV_NAME \
   && find /opt/conda/ -type f,l -name '*.js.map' -delete \
   && rm -rf /opt/conda/pkgs
 
+# setuptools # https://github.com/conda/conda/issues/11931
+RUN pip install --force-reinstall -U setuptools
+
 WORKDIR /opt/services/AlertaDengue
+
 ENTRYPOINT ["bash", "/activate.sh"]
