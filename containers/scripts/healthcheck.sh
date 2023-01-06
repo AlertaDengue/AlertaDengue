@@ -7,7 +7,7 @@ if [ -f ${PROJECT_DIR}/.env ]; then
     export $(cat ${PROJECT_DIR}/.env | grep -v '#' | sed 's/\r$//' | awk '/=/ {print $1}' )
 fi
 
-export CONTAINER_NAME=${1:-"UNKONWN"}
+export CONTAINER_NAME=${1:-""}
 export CONTAINER_NAME="infodengue-${ENV:-dev}_${CONTAINER_NAME}_1"
 
 echo "[II] Checking ${CONTAINER_NAME} ..."

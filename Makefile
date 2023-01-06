@@ -2,6 +2,8 @@
 SHELL:=/usr/bin/env bash
 ARGS:=
 CONSOLE:=bash
+TIMEOUT:=360
+
 include .env
 
 SERVICES:=
@@ -14,8 +16,6 @@ CONTAINER_APP=docker-compose \
 	--project-name infodengue-$(ENV) \
 	--file containers/compose-base.yaml \
 	--file containers/compose-$(ENV).yaml
-
-CONSOLE:=bash
 
 # PREPARE ENVIRONMENT
 .PHONY:prepare-env
@@ -69,7 +69,8 @@ container-logs-follow:
 
 .PHONY: container-wait
 container-wait:
-	ENV=${ENV} timeout 90 ./containers/scripts/healthcheck.sh ${SERVICE}
+	ENV=${ENV} timeout ${TIMEOUT} ./containers/scripts/healthcheck.sh ${SERVICE}
+
 
 .PHONY: container-wait-all
 container-wait-all:
@@ -77,7 +78,7 @@ container-wait-all:
 	$(MAKE) container-wait ENV=${ENV} SERVICE="rabbitmq"
 	$(MAKE) container-wait ENV=${ENV} SERVICE="web"
 	$(MAKE) container-wait ENV=${ENV} SERVICE="worker"
-	$(MAKE) container-wait ENV=${ENV} SERVICE="db"
+	if [[ ${ENV} -eq "dev"]]; then $(MAKE) docker-wait ENV=${ENV} SERVICE="db"; fi
 
 .PHONY:container-console
 container-console:
