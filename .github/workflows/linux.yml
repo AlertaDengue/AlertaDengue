@@ -85,23 +85,21 @@ jobs:
         wget https://dataverse.harvard.edu/api/access/datafile/4154429 -O containers/postgres/dev_dumps/latest_infodengue.sql.gz
         wget https://dataverse.harvard.edu/api/access/datafile/5110797 -O containers/postgres/dev_dumps/latest_dengue.sql.gz
 
+
     - name: Build and deploy demo database
       id: db
       run: |
-         make container-build SERVICES=db
-         make container-start SERVICES=db
+        make container-build-db
+        make container-start SERVICES=db
 
-    - name: Build docker images
+    - name: Docker start web
       run: |
-         make container-build web
+        make container-build SERVICES=web
+        make container-start SERVICES=web
 
     - name: List containers
       run: |
         docker ps -a
-
-    - name: Docker start web
-      run: |
-        make container-start web
 
     - name: Docker waiting services
       run: |

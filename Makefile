@@ -2,7 +2,7 @@
 SHELL:=/usr/bin/env bash
 ARGS:=
 CONSOLE:=bash
-TIMEOUT:=360
+TIMEOUT:=90
 
 include .env
 
@@ -32,6 +32,10 @@ sync-static-geofiles:
 	python AlertaDengue/manage.py collectstatic --noinput
 
 # CONTAINER_APP
+
+.PHONY:container-build-db
+container-build-db:
+	$(CONTAINER_APP) build db
 
 .PHONY:container-build
 container-build:
