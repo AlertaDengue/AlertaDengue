@@ -50,10 +50,13 @@ SHELL ["/bin/bash", "-c"]
 
 # Use environment to update the env alertadengue
 RUN mamba env create -n $ENV_NAME \
-    --file /tmp/environment.yaml \
-  && cd /opt/services/AlertaDengue \
-  && . /tmp/poetry-install.sh \
-  && conda clean --all \
+    --file /tmp/environment.yaml
+  
+RUN curl -sSL https://install.python-poetry.org | python3 -
+RUN cd /opt/services/AlertaDengue \
+    && . /tmp/poetry-install.sh
+
+RUN conda clean --all \
   && find /opt/conda/ -type f,l -name '*.a' -delete \
   && find /opt/conda/ -type f,l -name '*.pyc' -delete \
   && find /opt/conda/ -type f,l -name '*.js.map' -delete \

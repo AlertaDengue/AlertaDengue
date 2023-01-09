@@ -9,4 +9,3 @@ dependencies:
   - pip
   - python 3.9.*
   - psycopg2
-  - poetry
