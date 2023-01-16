@@ -93,7 +93,7 @@ jobs:
 
     - name: Build docker images
       run: |
-         make container-build web
+         make container-build
 
     - name: List containers
       run: |
@@ -101,7 +101,7 @@ jobs:
 
     - name: Docker start web
       run: |
-        make container-start web
+        make container-start SERVICES=web
 
     - name: Docker waiting services
       run: |
