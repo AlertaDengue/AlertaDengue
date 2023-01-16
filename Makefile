@@ -33,6 +33,10 @@ sync-static-geofiles:
 
 # CONTAINER_APP
 
+.PHONY:container-build-db
+container-build-db:
+	$(CONTAINER_APP) build db
+
 .PHONY:container-build
 container-build:
 	$(CONTAINER_APP) build base

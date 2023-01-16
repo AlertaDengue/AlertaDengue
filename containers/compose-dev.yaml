@@ -25,8 +25,8 @@ services:
     expose:
       - ${PSQL_PORT}
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
-      - ./postgres/dev_dumps:/dumps
+      - pg_data:/var/lib/postgresql/data/
+      - dumps:/dumps
     command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
     restart: always
     healthcheck:
@@ -57,7 +57,8 @@ services:
     restart: always
 
 volumes:
-  postgres_data:
+  pg_data:
+  dumps:
 
 networks:
   staging:
