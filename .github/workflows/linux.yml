@@ -95,17 +95,21 @@ jobs:
       run: |
          make container-build
 
-    - name: List containers
-      run: |
-        docker ps -a
-
     - name: Docker start web
       run: |
         make container-start SERVICES=web
 
+    - name: List containers
+      run: |
+        docker ps -a
+
     - name: Docker waiting services
       run: |
         make container-wait-all
+
+    - name: Setup tmate session
+      if: "${{ failure() }}"
+      uses: mxschmitt/action-tmate@v3
 
     - name: Linting
       run: |
