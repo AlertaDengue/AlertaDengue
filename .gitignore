@@ -53,3 +53,4 @@ rever/
 #dump
 *latest_dengue.sql.gz
 containers/postgres/setup/dumps/*
+staging_data/

@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
+  - GDAL
   - poetry
   - psycopg2-binary
   - python 3.9.*
