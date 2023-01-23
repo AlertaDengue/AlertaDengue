@@ -80,9 +80,9 @@ container-wait:
 container-wait-all:
 	$(MAKE) container-wait ENV=${ENV} SERVICE="memcached"
 	$(MAKE) container-wait ENV=${ENV} SERVICE="rabbitmq"
+	if [[ ${ENV} -eq "dev"]]; then $(MAKE) container-wait ENV=${ENV} SERVICE="db"; fi
 	$(MAKE) container-wait ENV=${ENV} SERVICE="web"
 	$(MAKE) container-wait ENV=${ENV} SERVICE="worker"
-	if [[ ${ENV} -eq "dev"]]; then $(MAKE) container-wait ENV=${ENV} SERVICE="db"; fi
 
 .PHONY:container-console
 container-console:

@@ -16,7 +16,7 @@ services:
       - ../.env
     environment:
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
-      POSTGRES_HOST_AUTH_METHOD: "md5"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
     hostname: db
     networks:
       - staging

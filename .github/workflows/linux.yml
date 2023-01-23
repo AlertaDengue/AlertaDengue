@@ -9,9 +9,9 @@ env:
   DEBUG: False
   PSQL_HOST: db
   PSQL_PORT: 25432
-  PSQL_DB: denguedb
-  PSQL_USER: dengueuser
-  PSQL_PASSWORD: denguepassword
+  PSQL_DB: postgres
+  PSQL_USER: postgres
+  PSQL_PASSWORD: postgres
   QUERY_CACHE_TIMEOUT: 86400
   MEMCACHED_HOST: localhost
   MEMCACHED_PORT: 11211
@@ -68,7 +68,6 @@ jobs:
 
     - name: prepare folders
       run: mkdir -p ${STORAGE}
-
 
     - name: Install dependencies
       run: |
