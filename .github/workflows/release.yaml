@@ -3,7 +3,12 @@
 
 name: release
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   main:
@@ -21,7 +26,6 @@ jobs:
         fetch-depth: 0
         submodules: recursive
 
-
     - uses: conda-incubator/setup-miniconda@v2
       with:
         miniconda-version: "latest"
@@ -35,7 +39,7 @@ jobs:
     - name: Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PYPI_TOKEN: ${{ secrets.PYPITOKENALERTADENGUE }}
+        PYPI_TOKEN: ${{ secrets.PYPIALERTADENGUETOKEN }}
       run: |
         poetry config pypi-token.pypi ${PYPI_TOKEN}
         npx --yes \
