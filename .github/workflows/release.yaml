@@ -21,7 +21,7 @@ jobs:
         shell: bash -l {0}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
         submodules: recursive
@@ -35,6 +35,10 @@ jobs:
         activate-environment: alertadengue
         use-mamba: true
         miniforge-variant: Mambaforge
+
+    - name: Install poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
 
     - name: Release
       env:
