@@ -16,7 +16,7 @@ services:
       - ../.env
     environment:
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
-      POSTGRES_HOST_AUTH_METHOD: "md5"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
     hostname: db
     networks:
       - staging
@@ -47,7 +47,13 @@ services:
       - 8080:8080
     networks:
       - staging
-    command: ["python", "manage.py", "runserver", "0.0.0.0:8080"]
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8080", "--noreload"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s  # requires docker-compose 3.4
 
   worker:
     networks:
