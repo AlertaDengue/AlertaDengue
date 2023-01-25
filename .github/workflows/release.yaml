@@ -41,11 +41,7 @@ jobs:
         node-version: 18
 
     - name: Release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PYPI_TOKEN: ${{ secrets.TOKENALERTADENGUEPYPI }}
       run: |
-        poetry config pypi-token.pypi ${PYPI_TOKEN}
         npx --yes \
           -p semantic-release \
           -p "@semantic-release/commit-analyzer" \

@@ -47,13 +47,6 @@
         }
       ],
       [
-        "@semantic-release/exec",
-        {
-          "prepareCmd": "poetry build",
-          "publishCmd": "poetry publish"
-        }
-      ],
-      [
         "@semantic-release/github",
         {
           "assets": ["dist/*.whl", "dist/*.tar.gz"]
