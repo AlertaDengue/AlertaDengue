@@ -36,14 +36,14 @@ jobs:
         use-mamba: true
         miniforge-variant: Mambaforge
 
-    - name: Install poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
 
     - name: Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PYPI_TOKEN: ${{ secrets.PYPIALERTADENGUETOKEN }}
+        PYPI_TOKEN: ${{ secrets.TOKENALERTADENGUEPYPI }}
       run: |
         poetry config pypi-token.pypi ${PYPI_TOKEN}
         npx --yes \
@@ -54,5 +54,4 @@ jobs:
           -p "@semantic-release/exec" \
           -p "@semantic-release/github" \
           -p "@semantic-release/git" \
-          -p "@google/semantic-release-replace-plugin" \
-          semantic-release --ci
+          -p "@google/semantic-release-r
