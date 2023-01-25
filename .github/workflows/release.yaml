@@ -17,10 +17,6 @@ jobs:
       run:
         shell: bash -l {0}
 
-    concurrency:
-      group: ci-release-${{ github.ref }}
-      cancel-in-progress: true
-
     steps:
     - uses: actions/checkout@v3
       with:
@@ -41,7 +37,25 @@ jobs:
       with:
         node-version: 18
 
+    - name: Test release
+      if: ${{ github.event_name != 'workflow_dispatch' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        npx --yes \
+          -p semantic-release \
+          -p conventional-changelog-conventionalcommits \
+          -p "@semantic-release/commit-analyzer" \
+          -p "@semantic-release/release-notes-generator" \
+          -p "@semantic-release/changelog" \
+          -p "@semantic-release/exec" \
+          -p "@semantic-release/github" \
+          -p "@semantic-release/git" \
+          -p "@google/semantic-release-replace-plugin" \
+          semantic-release --dry-run
+
     - name: Release
+      if: ${{ github.event_name == 'workflow_dispatch' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
