@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load footer_components %}
 
 {% block title %}{% trans "InfoDengue" %}{% endblock %}
 
@@ -380,11 +381,26 @@
                     </div>
                 </div>
             </div>
-        </br>
-            <b>{% trans "Mais videos da série no canal" %}:
-                <a href="https://www.youtube.com/channel/UCZFllLoI5kB4o_6w59YVzAA">
-            <b>{% trans "A Matemática das Epidemias" %}</a>
+            <div class="row">
+                <div class="col-md-12 w-100">
+                        </br>
+                        <b>{% trans "Mais videos da série no canal" %}:
+                            <a href="https://www.youtube.com/channel/UCZFllLoI5kB4o_6w59YVzAA">
+                        <b>{% trans "A Matemática das Epidemias" %}</a>
+                </div>
+            </div>
         </div>
 
     </div>
+
+    <!-- begin footer code -->
+    <div class="container">
+        <div class="row">
+        <div class="col-md-12">
+            {% githubsponsor_component %}
+        </div>
+        </div>
+    </div>
+    <!-- end footer code -->
+
 {% endblock %}

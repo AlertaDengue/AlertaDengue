@@ -1,0 +1,30 @@
+
+
+{% load lookup %}
+
+{% load hashthis %}
+
+<style>
+  .iframe-infodengue{
+    padding: 5px 5px;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    border: 10;
+    background-color: #e0eefd63;
+    text-align: center;
+  }
+  </style>
+
+<!-- Start Component -->
+{% block githubsponsor_component %}
+
+  <iframe
+      class="iframe-infodengue"
+      src="https://github.com/sponsors/AlertaDengue/card"
+      title="Sponsor AlertaDengue" align="middle" allowtransparency="true"
+      frameborder="0">
+  </iframe>
+
+
+{% endblock %}

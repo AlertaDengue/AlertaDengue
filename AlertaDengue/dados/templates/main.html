@@ -3,6 +3,7 @@
 {% load static %}
 {% load home_components %}
 {% load lookup %}
+{% load footer_components %}
 
 
 {% block extra_head %}
@@ -95,13 +96,16 @@
   </div>
 </div>
 <!-- end collapse-->
+</div>
 
-<!-- begin color code -->
+<!-- begin footer code -->
 <div class="container">
-  <div class="row p-1">
-    <div class="col-md-12 p-2">
-
+  <div class="row">
+  <div class="col-md-12">
+      {% githubsponsor_component %}
+  </div>
   </div>
 </div>
-<!-- end color code -->
+<!-- end footer code -->
+
 {% endblock %}
