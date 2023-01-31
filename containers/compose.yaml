@@ -1,0 +1,116 @@
+version: "3.4"
+services:
+  postgres:
+    build:
+      context: ".."
+      dockerfile: "containers/postgres/Dockerfile"
+    env_file:
+      - ../.env
+    environment:
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    hostname: postgres
+    networks:
+      - staging
+    ports:
+      - ${PSQL_PORT}:${PSQL_PORT}
+    expose:
+      - ${PSQL_PORT}
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+      - dumps:/dumps
+    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    command: -p ${PSQL_PORT}
+
+  memcached:
+    image: memcached:alpine
+    hostname: memcached
+    entrypoint:
+      - memcached
+      - -m 64
+    ports:
+      - ${MEMCACHED_PORT}:11211
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "11211"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s  # requires docker-compose 3.4
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3-alpine
+    hostname: rabbitmq
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "5672"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s  # requires docker-compose 3.4
+    restart: always    
+
+  web:
+    build:
+      context: ".."
+      dockerfile: "containers/web/Dockerfile"
+      args:
+          HOST_UID: ${HOST_UID}
+          HOST_GID: ${HOST_GID}
+    env_file:
+      - ../.env
+    environment:
+      - MEMCACHED_HOST=memcached
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+      - PSQL_HOST=${PSQL_HOST}
+      - PSQL_PORT=${PSQL_PORT}
+    volumes:
+      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
+      - ${DOCKER_HOST_INCIDENCE_MAPS}:/opt/services/AlertaDengue/static/img/incidence_maps
+      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
+    depends_on:
+      # - worker
+      - rabbitmq
+      - memcached
+    restart: always
+
+  worker:
+    image: staging_web:latest
+    entrypoint: ["/opt/services/celery-run.sh"]
+    env_file:
+      - ../.env
+    environment:
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+      - PSQL_HOST=${PSQL_HOST}
+      - PSQL_PORT=${PSQL_PORT}
+    volumes:
+      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
+    depends_on:
+      - rabbitmq
+      - memcached
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", 'celery --app ad_main.celeryapp.app inspect ping -d "celery@$${HOSTNAME}"']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+
+
+volumes:
+  pg_data:
+  dumps:
+
+networks:
+  staging:
+      driver: bridge
