@@ -1,6 +1,13 @@
 Release Notes
 ---
 
+## [3.3.1](https://github.com/AlertaDengue/AlertaDengue/compare/3.3.0...3.3.1) (2023-01-31)
+
+
+### Bug Fixes
+
+* **pyproject:** Update linting package versions ([#601](https://github.com/AlertaDengue/AlertaDengue/issues/601)) ([979d4f9](https://github.com/AlertaDengue/AlertaDengue/commit/979d4f99ced10a35f09b88a1fdf2ccc3eeed0f1d))
+
 ## [3.3.0](https://github.com/AlertaDengue/AlertaDengue/compare/3.2.0...3.3.0) (2023-01-26)
 
 
