@@ -1,9 +1,12 @@
 name: alertadengue
 channels:
   - conda-forge
-  - nodefaults
 dependencies:
   - gdal 3.3.*
+  - pip
   - poetry
   - psycopg2-binary
   - python 3.9.*
+  - pip:
+    - makim
+    - containers-sugar
