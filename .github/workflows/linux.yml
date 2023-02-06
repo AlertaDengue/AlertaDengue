@@ -83,11 +83,11 @@ jobs:
 
     - name: Build database
       run: |
-         makim build
+         containers-sugar build --group dev
 
     - name: Start database
       run: |
-         makim start
+         containers-sugar start --group dev
 
     - name: Setup tmate session
       if: "${{ failure() }}"

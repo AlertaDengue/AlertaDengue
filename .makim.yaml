@@ -1,39 +1,63 @@
 version: 1.0.0
 shell: bash
 groups:
-  - name: infodengue
+  - name: containers
     env-file: .env
     targets:
-      clean:
-        help: Use this target to clean up temporary files
-        args:
-          all:
-            type: bool
-            action: store-true
-            help: Remove all files that are tracked by git
+      static-geofiles:
         run: |
-          echo "remove file X"
-      build:
-        help: Build the program
-        args:
-          clean:
-            type: bool
-            action: store-true
+          # python3 AlertaDengue/manage.py sync_geofiles
+          python3 AlertaDengue/manage.py collectstatic --noinput
+
+      django-migrate:
         dependencies:
-          - target: clean
-            if: \${\{ args.clean == true \}\}
+          - target: containers.static-geofiles
         run: |
-          echo "Building service container..."
-          containers-sugar build --group dev
+          python3 AlertaDengue/manage.py runserver
+          # containers-sugar run --rm web python3 manage.py migrate --database=dados --noinput
+          # containers-sugar run --rm web python3 manage.py migrate --database=infodengue --noinput
+          # containers-sugar run --rm web python3 manage.py migrate forecast --database=forecast
 
-      stop:
-        help: Stop service container
+      container-wait:
         run: |
-          echo "Stop service..."
-          containers-sugar stop --group dev
+          ENV=${ENV} timeout ${TIMEOUT} ./containers/scripts/healthcheck.sh ${SERVICE}
 
-      start:
-        help: Starting service container
+      container-wait-all:
         run: |
-          echo "Starting database..."
-          containers-sugar start --group dev
+          container-wait ENV=${ENV} SERVICE="memcached"
+          container-wait ENV=${ENV} SERVICE="rabbitmq"
+          if [[ ${ENV} -eq "dev"]]; then $(MAKE) container-wait ENV=${ENV} SERVICE="db"; fi
+          container-wait ENV=${ENV} SERVICE="web"
+          container-wait ENV=${ENV} SERVICE="worker"
+
+      send-mail-partner:
+        run: |
+          containers-sugar run --rm web python manage.py send_mail
+
+      test-staging-web:
+        run: |
+          containers-sugar run --no-deps web bash /opt/services/test.sh dados
+          containers-sugar run --no-deps web bash /opt/services/test.sh dbf
+          containers-sugar run --no-deps web bash /opt/services/test.sh gis
+          containers-sugar run --no-deps web bash /opt/services/test.sh api
+
+      test-staging-all:
+        run: |
+          containers-sugar run --rm web python3 manage.py test
+
+      clean: ## clean all artifacts
+        run: |
+          rm -fr build/
+          rm -fr dist/
+          rm -fr .eggs/
+          rm -fr .idea/
+          rm -fr */.eggs
+          rm -fr db
+          find . -name '*.egg-info' -exec rm -fr {} +
+          find . -name '*.egg' -exec rm -fr {} +
+          find . -name '*.pyc' -exec rm -f {} +
+          find . -name '*.pyo' -exec rm -f {} +
+          find . -name '*~' -exec rm -f {} +
+          find . -name '__pycache__' -exec rm -fr {} +
+          find . -name '*.ipynb_checkpoints' -exec rm -rf {} +
+          find . -name '*.pytest_cache' -exec rm -rf {} +
