@@ -77,11 +77,11 @@ jobs:
     - name: Create env file
       run: envsubst < env.tpl > .env
 
-    # - name: Build and deploy demo database
-    #   id: db
-    #   run: |
-    #      make container-build-db
-    #      make container-start SERVICES=db
+    - name: Build and deploy demo database
+      id: db
+      run: |
+         makim build
+         makim start
 
     # - name: Build docker images
     #   run: |

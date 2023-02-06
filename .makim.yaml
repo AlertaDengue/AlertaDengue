@@ -19,22 +19,21 @@ groups:
           clean:
             type: bool
             action: store-true
-            help: if not set, the clean dependency will not be triggered.
         dependencies:
           - target: clean
             if: \${\{ args.clean == true \}\}
         run: |
-          echo "Stoping database..."
-          containers-sugar build  --group dev
+          echo "Building service container..."
+          containers-sugar build --group dev
 
       stop:
-        help: Stop services
+        help: Stop service container
         run: |
-          echo "Building database..."
-          containers-sugar stop  --group dev
+          echo "Stop service..."
+          containers-sugar stop --group dev
 
       start:
-        help: Build the program
+        help: Starting service container
         run: |
           echo "Starting database..."
-          containers-sugar start  --group dev
+          containers-sugar start --group dev
