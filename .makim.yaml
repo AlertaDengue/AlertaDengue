@@ -9,6 +9,11 @@ groups:
       manage_py: python AlertaDengue/manage.py
 
     targets:
+      runserver:
+        help: Run Django server on localhost
+        run: |
+          {{ manage_py }} runserver
+
       clean:
         help: Clean all artifacts
         run: |

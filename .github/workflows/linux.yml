@@ -81,13 +81,17 @@ jobs:
       run: |
          ls -la 
 
-    - name: Build database
+    - name: Build containers
       run: |
          containers-sugar build --group dev
 
-    - name: Start database
+    - name: Start containers
       run: |
          containers-sugar start --group dev
+
+    - name: Container wait
+      run: |
+         makim container-wait-all
 
     - name: Setup tmate session
       if: "${{ failure() }}"
