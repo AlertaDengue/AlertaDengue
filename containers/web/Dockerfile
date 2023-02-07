@@ -46,11 +46,8 @@ RUN addgroup --gid ${HOST_GID} deploy \
   && mkdir -p /opt/conda /opt/services/ \
   && chmod -R a+rwx /opt/conda /opt/services /tmp \
   && chown deploy:deploy /opt/services/ /tmp \
-  && echo 'source /opt/conda/bin/activate "$ENV_NAME" && exec "$@"' > /activate.sh \
   && echo 'source activate "$ENV_NAME"' >  /home/deploy/.bashrc \
-  # Export ENV variables to use in Crontab
-  && printenv | sed 's/^\(.*\)$/export \1/g' >> /preload.sh \
-  && chmod +x /activate.sh
+  && printenv | sed 's/^\(.*\)$/export \1/g' >> /preload.sh
 
 ENV PATH "$PATH:/home/deploy/.local/bin"
 ENV PATH /opt/conda/envs/$ENV_NAME/bin:$PATH
@@ -59,9 +56,10 @@ USER deploy
 
 # Copy code to the container with permissions to user
 COPY --chown=deploy:deploy AlertaDengue  /opt/services/AlertaDengue
-COPY --chown=deploy:deploy env.tpl pyproject.toml README.md /opt/services/
+COPY --chown=deploy:deploy .env.tpl pyproject.toml README.md /opt/services/
 COPY --chown=deploy:deploy conda/dev.yaml /tmp/environment.yaml
 COPY --chown=deploy:deploy containers/celery/run.sh  /opt/services/celery-run.sh
+COPY --chown=deploy:deploy containers/entrypoint.sh  /entrypoint.sh
 
 # Change shell to bash
 SHELL ["/bin/bash", "-c"]
@@ -81,4 +79,4 @@ WORKDIR /opt/services/AlertaDengue
 
 RUN bash /tmp/poetry-install.sh
 
-ENTRYPOINT ["bash", "/activate.sh"]
+ENTRYPOINT ["bash", "/entrypoint.sh"]

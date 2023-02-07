@@ -1,63 +1,74 @@
 version: 1.0.0
-shell: bash
+env-file: .env
 groups:
   - name: containers
-    env-file: .env
+
+    vars:
+      sugar_run: containers-sugar run --group $ENV --services web
+      sugar_run_rm: containers-sugar run --group $ENV --services web --extras=--rm
+      manage_py: python AlertaDengue/manage.py
+
     targets:
-      static-geofiles:
+      clean:
+        help: Clean all artifacts
         run: |
-          # python3 AlertaDengue/manage.py sync_geofiles
-          python3 AlertaDengue/manage.py collectstatic --noinput
+          for _path in ['build/', 'dist/', '.eggs/', '*/.eggs', 'db']:
+            rm -fr @(_path)
+
+          for _path in [
+            '*.egg-info', '*.egg', '*.pyc', '*.pyo',
+            '*~', '__pycache__', '*.ipynb_checkpoints', '*.pytest_cache'
+          ]:
+            find . -name '@(_path)' -exec rm -fr {} +
+
+      static-geofiles:
+        help: Generate static geofiles
+        run: |
+          # {{ sugar_run_rm }} --cmd "{{ manage_py }} sync_geofiles"
+          # {{ sugar_run_rm }} --cmd "{{ manage_py }} collectstatic --noinput"
+          {{ sugar_run_rm }} --cmd "which python"
 
       django-migrate:
         dependencies:
           - target: containers.static-geofiles
         run: |
-          python3 AlertaDengue/manage.py runserver
-          # containers-sugar run --rm web python3 manage.py migrate --database=dados --noinput
-          # containers-sugar run --rm web python3 manage.py migrate --database=infodengue --noinput
-          # containers-sugar run --rm web python3 manage.py migrate forecast --database=forecast
+          for cmd in [
+            "runserver",
+            "migrate --database=dados --noinput",
+            "migrate --database=infodengue --noinput",
+            "migrate forecast --database=forecast"
+          ]:
+            {{ sugar_run }} --extras="{{extras}}" --cmd "{{ manage_py }} @(cmd)"
 
       container-wait:
+        help: Wait for a service
+        args:
+          timeout:
+            help: Define the timeout for the healthcheck
+            type: integer
+            default: 90
+          service:
+            help: Service name that would be awaited
+            type: string
+
         run: |
-          ENV=${ENV} timeout ${TIMEOUT} ./containers/scripts/healthcheck.sh ${SERVICE}
+          timeout {{ args.timeout }} ./containers/scripts/healthcheck.sh {{ service }}
 
       container-wait-all:
         run: |
-          container-wait ENV=${ENV} SERVICE="memcached"
-          container-wait ENV=${ENV} SERVICE="rabbitmq"
-          if [[ ${ENV} -eq "dev"]]; then $(MAKE) container-wait ENV=${ENV} SERVICE="db"; fi
-          container-wait ENV=${ENV} SERVICE="web"
-          container-wait ENV=${ENV} SERVICE="worker"
+          if $ENV == "dev":
+            makim container-wait --services "db"
+
+          for service in ["memcached", "rabbitmq", "web", "work"]:
+            makim container-wait --services @(service)
 
       send-mail-partner:
         run: |
-          containers-sugar run --rm web python manage.py send_mail
-
+          {{ sugar_run }} "{{ manage_py }} send_mail'
       test-staging-web:
         run: |
-          containers-sugar run --no-deps web bash /opt/services/test.sh dados
-          containers-sugar run --no-deps web bash /opt/services/test.sh dbf
-          containers-sugar run --no-deps web bash /opt/services/test.sh gis
-          containers-sugar run --no-deps web bash /opt/services/test.sh api
-
+          for test_name in ['dados', 'dbf', 'gis', 'api']:
+            {{ sugar_run }} --extras '--no-deps' --cmd 'bash /opt/services/test.sh @(test_name)'
       test-staging-all:
         run: |
-          containers-sugar run --rm web python3 manage.py test
-
-      clean: ## clean all artifacts
-        run: |
-          rm -fr build/
-          rm -fr dist/
-          rm -fr .eggs/
-          rm -fr .idea/
-          rm -fr */.eggs
-          rm -fr db
-          find . -name '*.egg-info' -exec rm -fr {} +
-          find . -name '*.egg' -exec rm -fr {} +
-          find . -name '*.pyc' -exec rm -f {} +
-          find . -name '*.pyo' -exec rm -f {} +
-          find . -name '*~' -exec rm -f {} +
-          find . -name '__pycache__' -exec rm -fr {} +
-          find . -name '*.ipynb_checkpoints' -exec rm -rf {} +
-          find . -name '*.pytest_cache' -exec rm -rf {} +
+          {{ sugar_run_rm }} --cmd '{{manage_py}} test'
