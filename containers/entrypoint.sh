@@ -8,8 +8,8 @@ if [ $is_conda_in_path == 0 ]; then
   echo "[II] included conda to the PATH"
 fi
 
-echo -n "[II] activating arx ... "
-source activate arx
+echo -n "[II] activating alertadengue ... "
+source activate alertadengue
 echo "OK"
 
 if [ $# -ne 0 ]

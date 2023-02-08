@@ -1,6 +1,7 @@
 version: "3.4"
 services:
   postgres:
+    hostname: postgres
     build:
       context: ".."
       dockerfile: "containers/postgres/Dockerfile"
@@ -9,13 +10,8 @@ services:
     environment:
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: "trust"
-    hostname: postgres
-    networks:
-      - staging
     ports:
-      - ${PSQL_PORT}:${PSQL_PORT}
-    expose:
-      - ${PSQL_PORT}
+      - ${SERVICES_NUMBER}${PSQL_PORT}:${PSQL_PORT}
     volumes:
       - pg_data:/var/lib/postgresql/data/
       - dumps:/dumps
@@ -28,14 +24,46 @@ services:
       retries: 10
     command: -p ${PSQL_PORT}
 
+  dengue_db:
+    build:
+      context: ".."
+      dockerfile: "containers/postgres/Dockerfile"
+    env_file:
+      - ../.env_prod
+    environment:
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+    hostname: dengue_db
+    ports:
+      - ${PSQL_PORT}:${PSQL_PORT}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./dev_dumps:/dumps
+    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U ${PSQL_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # base:
+  #   build:
+  #     context: ".."
+  #     dockerfile: "containers/web/Dockerfile-base"
+  #     args:
+  #       HOST_UID: ${HOST_UID}
+  #       HOST_GID: ${HOST_GID}
+  #       ENV: ${ENV}
+  #   profiles:
+  #     - donotstart
+
   memcached:
     image: memcached:alpine
     hostname: memcached
     entrypoint:
       - memcached
       - -m 64
-    ports:
-      - ${MEMCACHED_PORT}:11211
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "11211"]
       interval: 10s
@@ -62,6 +90,8 @@ services:
       args:
           HOST_UID: ${HOST_UID}
           HOST_GID: ${HOST_GID}
+    ports:
+      - 8080:8000
     env_file:
       - ../.env
     environment:
@@ -80,6 +110,13 @@ services:
       - rabbitmq
       - memcached
     restart: always
+    command: ["/opt/services/AlertaDengue/runwsgi.sh"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s  # requires docker-compose 3.4
 
   worker:
     image: staging_web:latest
@@ -105,12 +142,6 @@ services:
       retries: 5
       start_period: 30s
 
-
-
 volumes:
   pg_data:
   dumps:
-
-networks:
-  staging:
-      driver: bridge
