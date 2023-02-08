@@ -97,18 +97,6 @@ jobs:
       if: "${{ failure() }}"
       uses: mxschmitt/action-tmate@v3
 
-    # - name: Build docker images
-    #   run: |
-    #      make container-build
-
-    # - name: Docker start web
-    #   run: |
-    #     make container-start SERVICES=web
-
-    # - name: Docker waiting services
-    #   run: |
-    #     make container-wait-all
-
     - name: Linting
       run: |
         make lint
