@@ -19,13 +19,12 @@ service-groups:
         - name: rabbitmq
           health-check: true
 
-
   - name: prod
-    project-name: alertadengue  # optional
+    project-name: infodengue  # optional
     compose-path: containers/compose.yaml
-    env-file: .env
+    env-file: .env_prod
     services:
-      default: memcached,rabbitmq,web,worker
+      default: memcached,rabbitmq,web,worker,denguedb
       list:
         - name: denguedb
           health-check: true

@@ -45,27 +45,28 @@ groups:
           ]:
             {{ sugar_run }} --extras="{{extras}}" --cmd "{{ manage_py }} @(cmd)"
 
-      container-wait:
+      wait:
         help: Wait for a service
         args:
           timeout:
             help: Define the timeout for the healthcheck
             type: integer
-            default: 90
+            default: 2
           service:
             help: Service name that would be awaited
             type: string
+            required: True
 
         run: |
-          timeout {{ args.timeout }} ./containers/scripts/healthcheck.sh {{ service }}
+          timeout {{ args.timeout }} ./containers/scripts/healthcheck.sh {{ args.service }}
 
-      container-wait-all:
+      wait-all:
         run: |
           if $ENV == "dev":
-            makim container-wait --services "db"
+            makim containers.wait --service "db"
 
           for service in ["memcached", "rabbitmq", "web", "work"]:
-            makim container-wait --services @(service)
+            makim containers.wait --service @(service)
 
       send-mail-partner:
         run: |
