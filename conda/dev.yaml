@@ -8,5 +8,5 @@ dependencies:
   - psycopg2-binary
   - python 3.9.*
   - pip:
-    - containers-sugar ==1.3.1
+    - containers-sugar ==1.4.0
     - makim ==1.5.0

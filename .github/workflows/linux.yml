@@ -75,7 +75,7 @@ jobs:
         poetry install
 
     - name: Create env file
-      run: envsubst < .env.tpl > .env
+      run: envsubst < .env.tpl > .env_dev
 
     - name: List directory
       run: |

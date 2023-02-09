@@ -6,7 +6,7 @@ services:
       context: ".."
       dockerfile: "containers/postgres/Dockerfile"
     env_file:
-      - ../.env
+      - ../.env_${ENV}
     environment:
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: "trust"
@@ -27,9 +27,9 @@ services:
   dengue_db:
     build:
       context: ".."
-      dockerfile: "containers/postgres/Dockerfile"
+      dockerfile: "containers/postgres/Dockerfile-prod"
     env_file:
-      - ../.env_prod
+      - ../.env_${ENV}
     environment:
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: "md5"
@@ -46,17 +46,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
-
-  # base:
-  #   build:
-  #     context: ".."
-  #     dockerfile: "containers/web/Dockerfile-base"
-  #     args:
-  #       HOST_UID: ${HOST_UID}
-  #       HOST_GID: ${HOST_GID}
-  #       ENV: ${ENV}
-  #   profiles:
-  #     - donotstart
 
   memcached:
     image: memcached:alpine
@@ -83,17 +72,24 @@ services:
       start_period: 10s  # requires docker-compose 3.4
     restart: always    
 
-  web:
+
+  base:
     build:
       context: ".."
-      dockerfile: "containers/web/Dockerfile"
+      dockerfile: "containers/web/Dockerfile-base"
       args:
-          HOST_UID: ${HOST_UID}
-          HOST_GID: ${HOST_GID}
+        HOST_UID: ${HOST_UID}
+        HOST_GID: ${HOST_GID}
+        ENV: ${ENV}
+    profiles:
+      - donotstart
+
+  web:
+    image: infodengue-${ENV}_base:latest
     ports:
-      - 8080:8000
+      - ${PORT_WEB}:8000
     env_file:
-      - ../.env
+      - ../.env_${ENV}
     environment:
       - MEMCACHED_HOST=memcached
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
@@ -119,10 +115,10 @@ services:
       start_period: 10s  # requires docker-compose 3.4
 
   worker:
-    image: staging_web:latest
+    image: infodengue-${ENV}_base:latest
     entrypoint: ["/opt/services/celery-run.sh"]
     env_file:
-      - ../.env
+      - ../.env_${ENV}
     environment:
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
       - PSQL_HOST=${PSQL_HOST}
@@ -145,3 +141,4 @@ services:
 volumes:
   pg_data:
   dumps:
+  postgres_data:

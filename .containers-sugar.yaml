@@ -4,7 +4,7 @@ service-groups:
   - name: dev
     project-name: staging  # optional
     compose-path: containers/compose.yaml
-    env-file: .env
+    env-file: .env_dev
     services:
       default: postgres,memcached,rabbitmq,web,worker
       list:

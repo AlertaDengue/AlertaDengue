@@ -1,5 +1,5 @@
 version: 1.0.0
-env-file: .env
+env-file: .env_dev
 groups:
   - name: containers
 
@@ -62,7 +62,7 @@ groups:
 
       wait-all:
         run: |
-          if $ENV == "dev":
+          if $ENV == "env_dev":
             makim containers.wait --service "db"
 
           for service in ["memcached", "rabbitmq", "web", "work"]:
