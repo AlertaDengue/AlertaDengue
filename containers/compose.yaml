@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: "trust"
     ports:
-      - ${SERVICES_NUMBER}${PSQL_PORT}:${PSQL_PORT}
+      - ${SERVICES_NUMBER}${PSQL_PORT}:5432
     volumes:
       - pg_data:/var/lib/postgresql/data/
       - dumps:/dumps

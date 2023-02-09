@@ -35,6 +35,8 @@ env:
   HOST_UID: 1000
   HOST_GID: 1000
   ENV: dev
+  SERVICES_NUMBER: 2
+  PORT_WEB: 8080
   STORAGE: /tmp/alertadengue/storage
   DOCKER_HOST_STATIC: /opt/services/AlertaDengue/staticfiles
 
