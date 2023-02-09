@@ -2,7 +2,7 @@ version: 1.0.0
 compose-app: docker-compose
 service-groups:
   - name: dev
-    project-name: staging  # optional
+    project-name: infodengue-dev  # optional
     compose-path: containers/compose.yaml
     env-file: .env_dev
     services:
@@ -20,7 +20,7 @@ service-groups:
           health-check: true
 
   - name: prod
-    project-name: infodengue  # optional
+    project-name: infodengue-prod  # optional
     compose-path: containers/compose.yaml
     env-file: .env_prod
     services:

@@ -1,5 +1,6 @@
 name: alertadengue
 channels:
+  - nodefaults
   - conda-forge
 dependencies:
   - gdal 3.3.*

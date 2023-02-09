@@ -93,7 +93,7 @@ jobs:
 
     - name: Container wait
       run: |
-         makim container-wait-all
+         makim wait-all
 
     - name: Setup tmate session
       if: "${{ failure() }}"

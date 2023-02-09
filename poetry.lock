@@ -594,17 +594,18 @@ test = ["flake8 (==3.7.8)", "hypothesis (==3.55.3)"]
 
 [[package]]
 name = "containers-sugar"
-version = "1.3.1"
+version = "1.4.0"
 description = "Simplify the usage of containers"
 category = "dev"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "containers_sugar-1.3.1-py3-none-any.whl", hash = "sha256:5a278e504182b65c5a5628aada42e6aa0a993c679635d8207c8f95a7e4dae2f6"},
-    {file = "containers_sugar-1.3.1.tar.gz", hash = "sha256:acd0943bef259ed2d1e7b8df0d12dbcc89998765c837a73519693c1a0001b4f6"},
+    {file = "containers_sugar-1.4.0-py3-none-any.whl", hash = "sha256:a7bc3d7366e02b238255b62891ef85dfd653359b030187fc3b51f38f6739a227"},
+    {file = "containers_sugar-1.4.0.tar.gz", hash = "sha256:80105c5d4840be4add98ea39b6214ca410ad28517feabb68788b9a35a714e48a"},
 ]
 
 [package.dependencies]
+colorama = ">=0.4.6,<0.5.0"
 docker-compose = ">=1.29.2,<2.0.0"
 podman-compose = ">=1.0.3,<2.0.0"
 pyyaml = "<6.0"
@@ -1584,18 +1585,20 @@ jinja2-time = "*"
 
 [[package]]
 name = "makim"
-version = "1.3.0"
+version = "1.5.0"
 description = "Simplify the usage of containers"
 category = "dev"
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "makim-1.3.0-py3-none-any.whl", hash = "sha256:d813354bd87476cc863d3405fca1f5c23c092010b9429b4a379baa6e2fbb6fc7"},
-    {file = "makim-1.3.0.tar.gz", hash = "sha256:f880846b75df139df6c21e93f4c0876fc47cd8186f965f5ea3ff94f2c32f342c"},
+    {file = "makim-1.5.0-py3-none-any.whl", hash = "sha256:1d71461b7c9511a920ad8daff6d2b5d3e80c129536d43bf72570c723e009ff36"},
+    {file = "makim-1.5.0.tar.gz", hash = "sha256:8eb0b770377c467892d46e930d9c779a3c87d5d1e25d2813f9d70d209b1e2717"},
 ]
 
 [package.dependencies]
+colorama = ">=0.4.6,<0.5.0"
 jinja2 = "<3.0.3"
+python-dotenv = ">=0.21.1,<0.22.0"
 pyyaml = "<6.0"
 sh = ">=1.14.3,<2.0.0"
 xonsh = ">=0.13.4,<0.14.0"
@@ -2449,14 +2452,14 @@ six = ">=1.5"
 
 [[package]]
 name = "python-dotenv"
-version = "0.20.0"
+version = "0.21.1"
 description = "Read key-value pairs from a .env file and set them as environment variables"
 category = "main"
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=3.7"
 files = [
-    {file = "python-dotenv-0.20.0.tar.gz", hash = "sha256:b7e3b04a59693c42c36f9ab1cc2acc46fa5df8c78e178fc33a8d4cd05c8d498f"},
-    {file = "python_dotenv-0.20.0-py3-none-any.whl", hash = "sha256:d92a187be61fe482e4fd675b6d52200e7be63a12b724abbf931a40ce4fa92938"},
+    {file = "python-dotenv-0.21.1.tar.gz", hash = "sha256:1c93de8f636cde3ce377292818d0e440b6e45a82f215c3744979151fa8151c49"},
+    {file = "python_dotenv-0.21.1-py3-none-any.whl", hash = "sha256:41e12e0318bebc859fcc4d97d4db8d20ad21721a6aa5047dd59f090391cb549a"},
 ]
 
 [package.extras]
@@ -3040,14 +3043,14 @@ doc = ["ipython", "numpydoc", "sphinx (>=1.1)", "sphinx-rtd-theme"]
 
 [[package]]
 name = "tenacity"
-version = "8.2.0"
+version = "8.2.1"
 description = "Retry code until it succeeds"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "tenacity-8.2.0-py3-none-any.whl", hash = "sha256:b723061a78ed0f4524190eae321d3d84100227d51c5677035b6615d91895e0d6"},
-    {file = "tenacity-8.2.0.tar.gz", hash = "sha256:a43bcd8910406e0884ca0db3db7bed581f389c1d05165e992a1ddabfc81df05e"},
+    {file = "tenacity-8.2.1-py3-none-any.whl", hash = "sha256:dd1b769ca7002fda992322939feca5bee4fa11f39146b0af14e0b8d9f27ea854"},
+    {file = "tenacity-8.2.1.tar.gz", hash = "sha256:c7bb4b86425b977726a7b49971542d4f67baf72096597d283f3ffd01f33b92df"},
 ]
 
 [package.extras]
@@ -3091,14 +3094,14 @@ files = [
 
 [[package]]
 name = "types-pyyaml"
-version = "6.0.12.4"
+version = "6.0.12.5"
 description = "Typing stubs for PyYAML"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-PyYAML-6.0.12.4.tar.gz", hash = "sha256:ade6e328a5a3df816c47c912c2e1e946ae2bace90744aa73111ee6834b03a314"},
-    {file = "types_PyYAML-6.0.12.4-py3-none-any.whl", hash = "sha256:de3bacfc4e0772d9b1baf007c37354f3c34c8952e90307d5155b6de0fc183a67"},
+    {file = "types-PyYAML-6.0.12.5.tar.gz", hash = "sha256:3b61b7a8111ce368eb366e4a13f3e94e568bc2ed6227e01520a50ee07993bf38"},
+    {file = "types_PyYAML-6.0.12.5-py3-none-any.whl", hash = "sha256:dcaf87b65b839e7b641721346ef8b12a87f94071e15205a64ac93ca0e0afc77a"},
 ]
 
 [[package]]
@@ -3220,4 +3223,4 @@ test = ["coverage (>=5.3.1)", "prompt-toolkit (>=3.0.29)", "pygments (>=2.2)", "
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "045eaba248f6205a03d7675aa95af03fb05ad0ff7a34f447e7137d0301918e77"
+content-hash = "85df31629c140bbf352c715b7f902e22c6ca885dfcb28059b8350767a4ce8583"

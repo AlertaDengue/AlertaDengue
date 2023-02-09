@@ -40,7 +40,7 @@ ibis-framework = {extras = ["postgres"], version = "^3.2.0"}
 pandas = "1.4.0"
 pyproj = "^3.3.0"
 python = ">=3.9,<3.11"
-python-dotenv = "^0.20.0"
+python-dotenv = ">=0.21.1,<0.22.0"
 python-memcached = "^1.59"
 rasterio = "^1.2.10"
 sh = "^1.14.2"

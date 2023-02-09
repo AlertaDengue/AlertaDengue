@@ -62,10 +62,10 @@ groups:
 
       wait-all:
         run: |
-          if $ENV == "env_dev":
-            makim containers.wait --service "db"
+          if $ENV == "dev":
+            makim containers.wait --service "postgres"
 
-          for service in ["memcached", "rabbitmq", "web", "work"]:
+          for service in ["postgres","memcached","rabbitmq","web","worker"]:
             makim containers.wait --service @(service)
 
       send-mail-partner:
