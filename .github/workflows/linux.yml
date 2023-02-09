@@ -7,8 +7,9 @@ env:
   ADMINS: Dev:dev@example.com
   SECRET_KEY: my-secret-key
   DEBUG: False
-  PSQL_HOST: db
-  PSQL_PORT: 25432
+  PSQL_HOST: postgres
+  PSQL_PORT: 5432
+  SERVICES_NUMBER: 2
   PSQL_DB: '${{ secrets.PSQL_DB }}'
   PSQL_USER: '${{ secrets.PSQL_USER }}'
   PSQL_PASSWORD: '${{ secrets.PSQL_PASSWORD }}'
@@ -35,7 +36,6 @@ env:
   HOST_UID: 1000
   HOST_GID: 1000
   ENV: dev
-  SERVICES_NUMBER: 2
   PORT_WEB: 8080
   STORAGE: /tmp/alertadengue/storage
   DOCKER_HOST_STATIC: /opt/services/AlertaDengue/staticfiles

@@ -35,7 +35,7 @@ services:
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: "md5"
     ports:
-      - ${PSQL_PORT}:${PSQL_PORT}
+      - ${SERVICES_NUMBER}${PSQL_PORT}:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data/
       - ./dev_dumps:/dumps
@@ -70,8 +70,7 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s  # requires docker-compose 3.4
-    restart: always    
-
+    restart: always
 
   base:
     build:
@@ -94,6 +93,23 @@ services:
     profiles:
       - donotstart
 
+  worker:
+    extends:
+      service: base
+    entrypoint: ["/opt/services/celery-run.sh"]
+    env_file:
+      - ../.env_${ENV}
+    depends_on:
+      - rabbitmq
+      - memcached
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", 'celery --app ad_main.celeryapp.app inspect ping -d "celery@$${HOSTNAME}"']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
   web:
     hostname: web
     extends:
@@ -114,23 +130,6 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s  # requires docker-compose 3.4
-
-  worker:
-    extends:
-      service: base
-    entrypoint: ["/opt/services/celery-run.sh"]
-    env_file:
-      - ../.env_${ENV}
-    depends_on:
-      - rabbitmq
-      - memcached
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", 'celery --app ad_main.celeryapp.app inspect ping -d "celery@$${HOSTNAME}"']
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
 
 volumes:
   pg_data:
