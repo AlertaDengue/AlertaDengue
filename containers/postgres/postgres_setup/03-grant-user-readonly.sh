@@ -4,7 +4,7 @@ set -e
 
 DB_NAME="$PSQL_DB"
 PSQL_CMD="psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER""
-DB_USER="$DB_USER"
+DB_USER="$PSQL_USER"
 
 echo "ALTER ROLE "${DB_USER}" WITH PASSWORD 'infodenguedev';" | ${PSQL_CMD}
 

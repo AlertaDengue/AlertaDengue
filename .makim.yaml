@@ -51,7 +51,7 @@ groups:
           timeout:
             help: Define the timeout for the healthcheck
             type: integer
-            default: 2
+            default: 30
           service:
             help: Service name that would be awaited
             type: string
