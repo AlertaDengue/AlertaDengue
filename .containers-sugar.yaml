@@ -1,0 +1,38 @@
+version: 1.0.0
+compose-app: docker-compose
+service-groups:
+  - name: dev
+    project-name: infodengue-dev  # optional
+    compose-path: containers/compose.yaml
+    env-file: .env_dev
+    services:
+      default: postgres,memcached,rabbitmq,web,worker
+      list:
+        - name: postgres
+          health-check: true
+        - name: web
+          health-check: true
+        - name: worker
+          health-check: true
+        - name: memcached
+          health-check: true
+        - name: rabbitmq
+          health-check: true
+
+  - name: prod
+    project-name: infodengue-prod  # optional
+    compose-path: containers/compose.yaml
+    env-file: .env_prod
+    services:
+      default: memcached,rabbitmq,web,worker,denguedb
+      list:
+        - name: denguedb
+          health-check: true
+        - name: web
+          health-check: true
+        - name: worker
+          health-check: true
+        - name: memcached
+          health-check: true
+        - name: rabbitmq
+          health-check: true

@@ -14,6 +14,5 @@ RUN apt-get update \
       && rm -rf /var/lib/apt/lists/*
 
 COPY containers/postgres/postgres_setup/* /docker-entrypoint-initdb.d/
-COPY containers/postgres/dev_dumps/* /dumps/
 
 USER postgres

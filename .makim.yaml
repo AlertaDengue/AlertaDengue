@@ -1,0 +1,80 @@
+version: 1.0.0
+env-file: .env_dev
+groups:
+  - name: containers
+
+    vars:
+      sugar_run: containers-sugar run --group $ENV --services web
+      sugar_run_rm: containers-sugar run --group $ENV --services web --extras=--rm
+      manage_py: python AlertaDengue/manage.py
+
+    targets:
+      runserver:
+        help: Run Django server on localhost
+        run: |
+          {{ manage_py }} runserver
+
+      clean:
+        help: Clean all artifacts
+        run: |
+          for _path in ['build/', 'dist/', '.eggs/', '*/.eggs', 'db']:
+            rm -fr @(_path)
+
+          for _path in [
+            '*.egg-info', '*.egg', '*.pyc', '*.pyo',
+            '*~', '__pycache__', '*.ipynb_checkpoints', '*.pytest_cache'
+          ]:
+            find . -name '@(_path)' -exec rm -fr {} +
+
+      static-geofiles:
+        help: Generate static geofiles
+        run: |
+          # {{ sugar_run_rm }} --cmd "{{ manage_py }} sync_geofiles"
+          # {{ sugar_run_rm }} --cmd "{{ manage_py }} collectstatic --noinput"
+          {{ sugar_run_rm }} --cmd "which python"
+
+      django-migrate:
+        dependencies:
+          - target: containers.static-geofiles
+        run: |
+          for cmd in [
+            "runserver",
+            "migrate --database=dados --noinput",
+            "migrate --database=infodengue --noinput",
+            "migrate forecast --database=forecast"
+          ]:
+            {{ sugar_run }} --extras="{{extras}}" --cmd "{{ manage_py }} @(cmd)"
+
+      wait:
+        help: Wait for a service
+        args:
+          timeout:
+            help: Define the timeout for the healthcheck
+            type: integer
+            default: 30
+          service:
+            help: Service name that would be awaited
+            type: string
+            required: True
+
+        run: |
+          timeout {{ args.timeout }} ./containers/scripts/healthcheck.sh {{ args.service }}
+
+      wait-all:
+        run: |
+          if $ENV == "dev":
+            makim containers.wait --service "postgres"
+
+          for service in ["postgres","memcached","rabbitmq","web","worker"]:
+            makim containers.wait --service @(service)
+
+      send-mail-partner:
+        run: |
+          {{ sugar_run }} "{{ manage_py }} send_mail'
+      test-staging-web:
+        run: |
+          for test_name in ['dados', 'dbf', 'gis', 'api']:
+            {{ sugar_run }} --extras '--no-deps' --cmd 'bash /opt/services/test.sh @(test_name)'
+      test-staging-all:
+        run: |
+          {{ sugar_run_rm }} --cmd '{{manage_py}} test'

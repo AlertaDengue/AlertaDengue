@@ -1,7 +1,0 @@
-SHELL=/bin/bash
-BASH_ENV=/preload.sh
-### Send email to partners at 08:00 on Monday
-0 8 * * 1 echo "Start task cron" >> /var/log/cron.log 2>&1
-0 8 * * 1 bash /activate.sh python /opt/services/AlertaDengue/manage.py send_mail >> /var/log/cron.log 2>&1
-### Clean parquet files at 03:00 on Sunday
-0 3 * * 0 rm -rf /MEDIA_ROOT/dbfs_parquet/./*

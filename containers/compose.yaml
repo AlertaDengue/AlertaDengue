@@ -1,0 +1,137 @@
+version: "3.4"
+services:
+  postgres:
+    hostname: postgres
+    build:
+      context: ".."
+      dockerfile: "containers/postgres/Dockerfile"
+    env_file:
+      - ../.env_${ENV}
+    environment:
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    ports:
+      - ${SERVICES_NUMBER}${PSQL_PORT}:5432
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+      - dumps:/dumps
+    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    command: -p ${PSQL_PORT}
+
+  dengue_db:
+    hostname: dengue_db
+    build:
+      context: ".."
+      dockerfile: "containers/postgres/Dockerfile-prod"
+    env_file:
+      - ../.env_${ENV}
+    environment:
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+    ports:
+      - ${SERVICES_NUMBER}${PSQL_PORT}:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./dev_dumps:/dumps
+    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U ${PSQL_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  memcached:
+    hostname: memcached
+    image: memcached:alpine
+    entrypoint:
+      - memcached
+      - -m 64
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "11211"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s  # requires docker-compose 3.4
+    restart: always
+
+  rabbitmq:
+    hostname: rabbitmq
+    image: rabbitmq:3-alpine
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "5672"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s  # requires docker-compose 3.4
+    restart: always
+
+  base:
+    build:
+      context: ".."
+      dockerfile: "containers/web/Dockerfile"
+      args:
+        HOST_UID: ${HOST_UID}
+        HOST_GID: ${HOST_GID}
+        ENV: ${ENV}
+    environment:
+      - MEMCACHED_HOST=memcached
+      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+      - PSQL_HOST=${PSQL_HOST}
+      - PSQL_PORT=${PSQL_PORT}
+    volumes:
+      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
+      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbfs_parquet
+    profiles:
+      - donotstart
+
+  worker:
+    extends:
+      service: base
+    entrypoint: ["/opt/services/celery-run.sh"]
+    env_file:
+      - ../.env_${ENV}
+    depends_on:
+      - rabbitmq
+      - memcached
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", 'celery --app ad_main.celeryapp.app inspect ping -d "celery@$${HOSTNAME}"']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  web:
+    hostname: web
+    extends:
+      service: base
+    ports:
+      - ${PORT_WEB}:8000
+    env_file:
+      - ../.env_${ENV}
+    depends_on:
+      # - worker
+      - rabbitmq
+      - memcached
+    restart: always
+    command: ["/opt/services/AlertaDengue/runwsgi.sh"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s  # requires docker-compose 3.4
+
+volumes:
+  pg_data:
+  dumps:
+  postgres_data:
