@@ -80,21 +80,17 @@ jobs:
     - name: Create env file
       run: envsubst < .env.tpl > .env_dev
 
-    - name: List directory
-      run: |
-         ls -la 
-
     - name: Build containers
       run: |
-         containers-sugar build --group dev
+        containers-sugar build --group dev
 
     - name: Start containers
       run: |
-         containers-sugar start --group dev
+        containers-sugar start --group dev
 
     - name: Container wait
       run: |
-         makim wait-all
+        makim wait-all
 
     - name: Setup tmate session
       if: "${{ failure() }}"
@@ -102,4 +98,5 @@ jobs:
 
     - name: Linting
       run: |
-        make lint
+        pre-commit install
+        pre-commit run --all-files
