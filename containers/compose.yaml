@@ -5,8 +5,10 @@ services:
     build:
       context: ".."
       dockerfile: "containers/postgres/Dockerfile"
+      args:
+        ENV: ${ENV}
     env_file:
-      - ../.env_${ENV}
+      - ../.env_dev
     environment:
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: "trust"
@@ -14,7 +16,8 @@ services:
       - ${SERVICES_NUMBER}${PSQL_PORT}:5432
     volumes:
       - pg_data:/var/lib/postgresql/data/
-      - dumps:/dumps
+      - /workspace/repos/infodengue/AlertaDengue/containers/postgres/:/postgres
+      - /workspace/repos/infodengue/AlertaDengue/containers/postgres/setup:/docker-entrypoint-initdb.d
     command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
     restart: always
     healthcheck:
@@ -28,9 +31,11 @@ services:
     hostname: dengue_db
     build:
       context: ".."
-      dockerfile: "containers/postgres/Dockerfile-prod"
+      dockerfile: "containers/postgres/Dockerfile"
+      args:
+        ENV: ${ENV}
     env_file:
-      - ../.env_${ENV}
+      - ../.env_prod
     environment:
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: "md5"
@@ -38,7 +43,7 @@ services:
       - ${SERVICES_NUMBER}${PSQL_PORT}:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-      - ./dev_dumps:/dumps
+      # - /workspace/repos/infodengue/AlertaDengue/containers/postgres/dumps:/docker-entrypoint-initdb.d/
     command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
     restart: always
     healthcheck:
@@ -80,6 +85,8 @@ services:
         HOST_UID: ${HOST_UID}
         HOST_GID: ${HOST_GID}
         ENV: ${ENV}
+    env_file:
+      - ../.env_${ENV}
     environment:
       - MEMCACHED_HOST=memcached
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672

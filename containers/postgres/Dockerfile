@@ -13,6 +13,7 @@ RUN apt-get update \
            postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts \
       && rm -rf /var/lib/apt/lists/*
 
-COPY containers/postgres/postgres_setup/* /docker-entrypoint-initdb.d/
 
 USER postgres
+
+# ENTRYPOINT ["bash", "/entrypoint.sh"]

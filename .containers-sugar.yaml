@@ -24,9 +24,9 @@ service-groups:
     compose-path: containers/compose.yaml
     env-file: .env_prod
     services:
-      default: memcached,rabbitmq,web,worker,denguedb
+      default: dengue_db
       list:
-        - name: denguedb
+        - name: dengue_db
           health-check: true
         - name: web
           health-check: true
