@@ -14,6 +14,7 @@ env:
   PSQL_DBF: dengue
   PSQL_USER: infodenguedev
   PSQL_PASSWORD: infodenguedev
+  POSTGRES_USER: postgres
   QUERY_CACHE_TIMEOUT: 86400
   MEMCACHED_HOST: localhost
   MEMCACHED_PORT: 11211
@@ -80,9 +81,13 @@ jobs:
     - name: Create env file
       run: envsubst < .env.tpl > .env_dev
 
-    - name: Build containers
+    - name: Start only DB
       run: |
-        containers-sugar build --group dev
+        containers-sugar start --group dev --services postgres
+
+    - name: See postgres container
+      run: |
+        docker ps
 
     - name: Start containers
       run: |

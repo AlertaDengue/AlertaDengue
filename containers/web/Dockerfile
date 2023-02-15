@@ -57,7 +57,7 @@ USER deploy
 # Copy code to the container with permissions to user
 COPY --chown=deploy:deploy AlertaDengue  /opt/services/AlertaDengue
 COPY --chown=deploy:deploy .env.tpl pyproject.toml README.md /opt/services/
-COPY --chown=deploy:deploy conda/dev.yaml /tmp/environment.yaml
+COPY --chown=deploy:deploy conda/"${ENV}".yaml /tmp/environment.yaml
 COPY --chown=deploy:deploy containers/celery/run.sh  /opt/services/celery-run.sh
 COPY --chown=deploy:deploy containers/entrypoint.sh  /entrypoint.sh
 
@@ -67,11 +67,11 @@ SHELL ["/bin/bash", "-c"]
 # Use environment to update the env alertadengue
 RUN mamba env create -n $ENV_NAME \
     --file /tmp/environment.yaml \
-  && conda clean --all \
+  && mamba clean --all \
   && find /opt/conda/ -type f,l -name '*.a' -delete \
   && find /opt/conda/ -type f,l -name '*.pyc' -delete \
-  && find /opt/conda/ -type f,l -name '*.js.map' -delete \
-  && rm -rf /opt/conda/pkgs /tmp/*
+  && find /opt/conda/ -type f,l -name '*.js.map' -delete
+  # && rm -rf /home/deploy/.conda/pkgs
 
 COPY --chown=deploy:deploy containers/scripts/poetry-install.sh /tmp/poetry-install.sh
 
