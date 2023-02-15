@@ -15,5 +15,3 @@ RUN apt-get update \
 
 
 USER postgres
-
-# ENTRYPOINT ["bash", "/entrypoint.sh"]

@@ -9,3 +9,5 @@ rever/*
 .coverage
 .vscode
 .pre-commit*
+
+containers/postgres/dumps/*
