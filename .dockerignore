@@ -1,6 +1,6 @@
 ci/*
 docs/*
-containers/postgres/dumps/*
+
 notebooks_tmp/*
 notebooks/*
 rever/*
@@ -9,3 +9,5 @@ rever/*
 .coverage
 .vscode
 .pre-commit*
+
+containers/postgres/dumps/*

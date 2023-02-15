@@ -1,10 +1,20 @@
 version: "3.4"
 services:
-  postgres:
-    hostname: postgres
+  base_postgres:
     build:
       context: ".."
       dockerfile: "containers/postgres/Dockerfile"
+      args:
+        ENV: ${ENV}
+    env_file:
+      - ../.env_${ENV}
+    profiles:
+      - donotstart
+
+  postgres:
+    hostname: postgres
+    extends:
+      service: base_postgres
     env_file:
       - ../.env_${ENV}
     environment:
@@ -13,8 +23,8 @@ services:
     ports:
       - ${SERVICES_NUMBER}${PSQL_PORT}:5432
     volumes:
-      - pg_data:/var/lib/postgresql/data/
-      - dumps:/dumps
+      - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
+      - ../containers/postgres/schemas/:/schemas/
     command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
     restart: always
     healthcheck:
@@ -26,9 +36,8 @@ services:
 
   dengue_db:
     hostname: dengue_db
-    build:
-      context: ".."
-      dockerfile: "containers/postgres/Dockerfile-prod"
+    extends:
+      service: base_postgres
     env_file:
       - ../.env_${ENV}
     environment:
@@ -37,15 +46,17 @@ services:
     ports:
       - ${SERVICES_NUMBER}${PSQL_PORT}:5432
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
-      - ./dev_dumps:/dumps
+      - pg_data:/var/lib/postgresql/data/
+      - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
+      - ../containers/postgres/dumps/:/dumps/
     command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U ${PSQL_USER}"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 20
+      retries: 10
+    command: -p ${PSQL_PORT}
 
   memcached:
     hostname: memcached
@@ -80,6 +91,8 @@ services:
         HOST_UID: ${HOST_UID}
         HOST_GID: ${HOST_GID}
         ENV: ${ENV}
+    env_file:
+      - ../.env_${ENV}
     environment:
       - MEMCACHED_HOST=memcached
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
