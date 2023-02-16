@@ -3,22 +3,30 @@ name: build-alertadengue
 on: [push, pull_request]
 
 env:
+  ENV: dev
+  SERVICES_NUMBER: 2
+  PORT_WEB: 8080
+  HOST_UID: 1000
+  HOST_GID: 1000
+  PG_RESTORE: schemas
+  PSQL_HOST: postgres
+  PSQL_PORT: 5432
+  PSQL_DB: dengue
+  PSQL_DBF: infodengue
+  PSQL_USER: infodenguedev
+  PSQL_PASSWORD: infodenguedev
+  POSTGRES_USER: postgres
+
   ALLOWED_HOSTS: 'localhost'
   ADMINS: Dev:dev@example.com
   SECRET_KEY: my-secret-key
   DEBUG: False
-  PSQL_HOST: postgres
-  PSQL_PORT: 5432
-  SERVICES_NUMBER: 2
-  PSQL_DB: dengue
-  PSQL_DBF: dengue
-  PSQL_USER: infodenguedev
-  PSQL_PASSWORD: infodenguedev
-  POSTGRES_USER: postgres
+
   QUERY_CACHE_TIMEOUT: 86400
   MEMCACHED_HOST: localhost
   MEMCACHED_PORT: 11211
   TEMP_FILES_DIR: /tmp
+
   MEDIA_ROOT: /MEDIA_ROOT
   IMPORTED_FILES_DIR: /IMPORTED_FILES
   DOCKER_HOST_MEDIA_ROOT: /MEDIA_ROOT
@@ -26,21 +34,17 @@ env:
   DOCKER_HOST_IMPORTED_FILES_DIR: /IMPORTED_FILES
   DOCKER_HOST_MAPFILES_DIR: /srv/deploy/maps
   DOCKER_HOST_SHAPEFILES_DIR: /srv/deploy/shapefile
-  DOCKER_HO ST_TIFFS_DIR: /srv/deploy/tiffs
-  DOCKER_HOST_LOG_DIR: /var/log/mapserver
   DOCKER_HOST_INCIDENCE_MAPS: /opt/services/AlertaDengue/static/img/incidence_maps
+
   EMAIL_CONFIG: ${{ secrets.EMAIL_CONFIG }}
   EMAIL_PORT: 587
   EMAIL_CONNECTION_DEFAULT: 'outlook'
   EMAIL_HOST: 'smtp.gmail.com'
   EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
   EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
-  HOST_UID: 1000
-  HOST_GID: 1000
-  ENV: dev
-  PORT_WEB: 8080
-  STORAGE: /tmp/alertadengue/storage
+
   DOCKER_HOST_STATIC: /opt/services/AlertaDengue/staticfiles
+  STORAGE: /tmp/alertadengue/storage
 
 jobs:
   build:
@@ -69,9 +73,6 @@ jobs:
         activate-environment: alertadengue
         use-mamba: true
         miniforge-variant: Mambaforge
-
-    - name: prepare folders
-      run: mkdir -p ${STORAGE}
 
     - name: Install dependencies
       run: |
