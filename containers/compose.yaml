@@ -24,7 +24,7 @@ services:
       - ${SERVICES_NUMBER}${PSQL_PORT}:5432
     volumes:
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
-      - ../containers/postgres/${DATABASE}/:/PG_RESTORE/
+      - ../containers/postgres/${PG_RESTORE}/:/${PG_RESTORE}/
     command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
     restart: always
     healthcheck:
