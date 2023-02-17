@@ -1,6 +1,13 @@
 Release Notes
 ---
 
+## [3.3.2](https://github.com/AlertaDengue/AlertaDengue/compare/3.3.1...3.3.2) (2023-02-17)
+
+
+### Bug Fixes
+
+* **workflow:** Minor updates ([#616](https://github.com/AlertaDengue/AlertaDengue/issues/616)) ([de50b99](https://github.com/AlertaDengue/AlertaDengue/commit/de50b997c8425f7f3a63ac2d9bb5bea67dfe9c40))
+
 ## [3.3.1](https://github.com/AlertaDengue/AlertaDengue/compare/3.3.0...3.3.1) (2023-01-31)
 
 
