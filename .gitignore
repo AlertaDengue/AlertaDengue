@@ -51,7 +51,7 @@ maintenance_mode_state.txt
 rever/
 
 #dump
-*latest_dengue.sql.gz
-containers/postgres/setup/dumps/*
-staging_data/
+*.sql.gz
 */dumps/
+containers/postgres/dumps/*
+staging_data/
