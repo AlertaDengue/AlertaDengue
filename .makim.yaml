@@ -2,11 +2,9 @@ version: 1.0.0
 env-file: .env_dev
 groups:
   - name: containers
-      # TODO:
-      # docker-compose --env-file .env_dev --project-name infodengue-dev --file containers/compose.yaml exec postgres
-      # /bin/bash -c "cp containers/scripts/grant-roles-readonly /tmp/grant-roles-readonly.sh"
     vars:
       sugar_exec: containers-sugar exec --group $ENV --services
+      sugar_run: containers-sugar run --group $ENV --services web
       sugar_run_rm: containers-sugar run --group $ENV --services web --extras=--rm
       manage_py: python manage.py
 
@@ -28,19 +26,20 @@ groups:
           ]:
             find . -name '@(_path)' -exec rm -fr {} +
 
-      role-permissions:
-        help: Give grant access for read-only
+      grant-role:
+        help: Grant read-only access to the database
         args:
           service:
-            help: Name of the db service that will modify access permissions
+            help: Database service name to modify access permissions
             type: string
-            required: True
+            required: False
           command:
-            help:
+            help: Script or command to be executed inside the container
             type: string
             required: False
         run: |
-          {{ sugar_exec }} {{ args.service }} {{ args.command }}
+          {{ sugar_exec }} {{ args.service }} --cmd "{{ args.command }}"
+
 
       static-geofiles:
         help: Generate static geofiles
