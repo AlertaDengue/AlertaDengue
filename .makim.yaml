@@ -2,11 +2,13 @@ version: 1.0.0
 env-file: .env_dev
 groups:
   - name: containers
-
+      # TODO:
+      # docker-compose --env-file .env_dev --project-name infodengue-dev --file containers/compose.yaml exec postgres
+      # /bin/bash -c "cp containers/scripts/grant-role-permissions.sh /tmp/permited.sh"
     vars:
       sugar_run: containers-sugar run --group $ENV --services web
       sugar_run_rm: containers-sugar run --group $ENV --services web --extras=--rm
-      manage_py: python AlertaDengue/manage.py
+      manage_py: python manage.py
 
     targets:
       runserver:
@@ -29,9 +31,9 @@ groups:
       static-geofiles:
         help: Generate static geofiles
         run: |
-          # {{ sugar_run_rm }} --cmd "{{ manage_py }} sync_geofiles"
-          # {{ sugar_run_rm }} --cmd "{{ manage_py }} collectstatic --noinput"
-          {{ sugar_run_rm }} --cmd "which python"
+          {{ sugar_run_rm }} --cmd "{{ manage_py }} sync_geofiles"
+          {{ sugar_run_rm }} --cmd "{{ manage_py }} collectstatic --noinput"
+          # {{ sugar_run_rm }} --cmd "which python"
 
       django-migrate:
         dependencies:
