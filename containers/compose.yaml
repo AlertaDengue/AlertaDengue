@@ -18,10 +18,11 @@ services:
     environment:
       PG_RESTORE: ${PG_RESTORE}
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
-      POSTGRES_HOST_AUTH_METHOD: "trust"
+      POSTGRES_HOST_AUTH_METHOD: "md5"
     ports:
       - ${SERVICES_NUMBER}${PSQL_PORT}:5432
     volumes:
+      - ../../pg:/var/lib/postgresql/data/:rw
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
       - ../containers/postgres/${PG_RESTORE}/:/${PG_RESTORE}/
     command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
@@ -147,4 +148,4 @@ services:
 volumes:
   pg_data:
   dumps:
-  postgres_data:
+  # postgres_data:
