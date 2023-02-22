@@ -16,15 +16,15 @@ services:
     env_file:
       - ../.env_${ENV}
     environment:
-      PG_RESTORE: ${PG_RESTORE}
+      PG_RESTORE_STAGING: ${PG_RESTORE_STAGING}
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: "md5"
     ports:
       - ${SERVICES_NUMBER}${PSQL_PORT}:5432
     volumes:
-      - ../../pg:/var/lib/postgresql/data/:rw
+      - ${PG_DATA_STAGING}:/var/lib/postgresql/data/:rw
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
-      - ../containers/postgres/${PG_RESTORE}/:/${PG_RESTORE}/
+      - ../containers/postgres/${PG_RESTORE_STAGING}/:/${PG_RESTORE_STAGING}/
     command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
     restart: always
     healthcheck:
@@ -41,7 +41,7 @@ services:
     env_file:
       - ../.env_${ENV}
     environment:
-      PG_RESTORE: ${PG_RESTORE}
+      PG_RESTORE_STAGING: ${PG_RESTORE_STAGING}
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: "md5"
     ports:

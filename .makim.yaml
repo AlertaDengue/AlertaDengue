@@ -40,7 +40,6 @@ groups:
         run: |
           {{ sugar_exec }} {{ args.service }} --cmd "{{ args.command }}"
 
-
       static-geofiles:
         help: Generate static geofiles
         run: |
@@ -86,10 +85,12 @@ groups:
       send-mail-partner:
         run: |
           {{ sugar_run }} "{{ manage_py }} send_mail'
+
       test-staging-web:
         run: |
           for test_name in ['dados', 'dbf', 'gis', 'api']:
             {{ sugar_run }} --extras '--no-deps' --cmd 'bash /opt/services/test.sh @(test_name)'
+
       test-staging-all:
         run: |
           {{ sugar_run_rm }} --cmd '{{manage_py}} test'
