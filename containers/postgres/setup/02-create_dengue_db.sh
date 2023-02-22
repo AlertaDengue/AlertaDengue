@@ -11,6 +11,6 @@ if [[ "${PG_RESTORE}" = "dumps" ]]; then
 else
     echo "[II] creating ${PG_RESTORE} for the demo database."
     psql -d ${PSQL_DB} < /"${PG_RESTORE}"/schemas_dengue.sql
-    echo "[II] giving access to the dev user."
-    ./"${PG_RESTORE}"/grant-user-readonly.sh
+    # echo "[II] giving access to the dev user."
+    # ./"${PG_RESTORE}"/grant-user-readonly.sh
 fi

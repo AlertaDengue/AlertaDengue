@@ -14,8 +14,14 @@ for dbname in "${PSQL_DB}" "${PSQL_DBF}"; do
 
 done
 
-# PostgreSQL roles
+# PostgreSQL change role password
 
-for dbusers in "dengueadmin" "infodenguedev"; do
+for dbusers in "$POSTGRES_USER" "infodenguedev"; do
+
+  if [[ "${dbusers}" = "infodenguedev" ]]; then
+    echo "ALTER ROLE "${dbusers}" WITH PASSWORD 'infodenguedev';" | ${PSQL_CMD}
+  else
     echo "ALTER ROLE "${dbusers}" WITH PASSWORD '"${PSQL_PASSWORD}"';" | ${PSQL_CMD}
+  fi
+
 done

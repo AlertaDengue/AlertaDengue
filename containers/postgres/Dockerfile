@@ -13,4 +13,6 @@ RUN apt-get update \
            postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts \
       && rm -rf /var/lib/apt/lists/*
 
-USER postgres
+COPY containers/scripts/grant-roles-readonly.sh /containers/scripts/grant-roles-readonly.sh
+
+# USER postgres
