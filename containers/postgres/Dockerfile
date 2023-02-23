@@ -13,4 +13,8 @@ RUN apt-get update \
            postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts \
       && rm -rf /var/lib/apt/lists/*
 
-USER postgres
+# makim grant-role --service "postgres" \
+      # --command "./tmp/grant-roles-readonly.sh"
+COPY containers/scripts/grant-roles-readonly.sh /tmp/grant-roles-readonly.sh
+
+# USER postgres

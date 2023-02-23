@@ -1,50 +1,48 @@
-name: build-alertadengue
+name: build
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 env:
+  ADMINS: Dev:dev@example.com
+  ALLOWED_HOSTS: "localhost"
+  DEBUG: False
+  DOCKER_HOST_IMPORTED_FILES_DIR: /IMPORTED_FILES
+  DOCKER_HOST_MEDIA_ROOT: /MEDIA_ROOT
+  DOCKER_HOST_SHAPEFILES_DIR: "../../staging_data/shapefiles"
+  DOCKER_HOST_STATIC: "../../staging_data/staticfiles"
+  DOCKER_HOST_TEMP_PARQUET_DIR: "../../staging_data/dbfs_parquet"
+  EMAIL_CONFIG: ${{ secrets.EMAIL_CONFIG }}
+  EMAIL_CONNECTION_DEFAULT: "outlook"
+  EMAIL_HOST: "smtp.gmail.com"
+  EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
+  EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
+  EMAIL_PORT: 587
   ENV: dev
-  SERVICES_NUMBER: 2
-  PORT_WEB: 8080
-  HOST_UID: 1000
   HOST_GID: 1000
-  PG_RESTORE: schemas
-  PSQL_HOST: postgres
-  PSQL_PORT: 5432
+  HOST_UID: 1000
+  IMPORTED_FILES_DIR: /IMPORTED_FILES
+  MEDIA_ROOT: /MEDIA_ROOT
+  MEMCACHED_HOST: "localhost"
+  MEMCACHED_PORT: 11211
+  PG_DATA_STAGING: "../../staging_data/postgres_data"
+  PG_RESTORE_STAGING: schemas
+  PORT_WEB: 8080
+  POSTGRES_USER: postgres
   PSQL_DB: dengue
   PSQL_DBF: infodengue
-  PSQL_USER: infodenguedev
+  PSQL_HOST: postgres
   PSQL_PASSWORD: infodenguedev
-  POSTGRES_USER: postgres
-
-  ALLOWED_HOSTS: 'localhost'
-  ADMINS: Dev:dev@example.com
-  SECRET_KEY: my-secret-key
-  DEBUG: False
-
+  PSQL_PORT: 5432
+  PSQL_USER: infodenguedev
   QUERY_CACHE_TIMEOUT: 86400
-  MEMCACHED_HOST: localhost
-  MEMCACHED_PORT: 11211
+  SECRET_KEY: my-secret-key
+  SERVICES_NUMBER: 2
+  STORAGE: "../../staging_data/"
   TEMP_FILES_DIR: /tmp
-
-  MEDIA_ROOT: /MEDIA_ROOT
-  IMPORTED_FILES_DIR: /IMPORTED_FILES
-  DOCKER_HOST_MEDIA_ROOT: /MEDIA_ROOT
-  DOCKER_HOST_TEMP_PARQUET_DIR: /tmp/dbfs_parquet
-  DOCKER_HOST_IMPORTED_FILES_DIR: /IMPORTED_FILES
-  DOCKER_HOST_MAPFILES_DIR: /srv/deploy/maps
-  DOCKER_HOST_SHAPEFILES_DIR: /srv/deploy/shapefile
-  DOCKER_HOST_INCIDENCE_MAPS: /opt/services/AlertaDengue/static/img/incidence_maps
-
-  EMAIL_CONFIG: ${{ secrets.EMAIL_CONFIG }}
-  EMAIL_PORT: 587
-  EMAIL_CONNECTION_DEFAULT: 'outlook'
-  EMAIL_HOST: 'smtp.gmail.com'
-  EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
-  EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
-
-  DOCKER_HOST_STATIC: /opt/services/AlertaDengue/staticfiles
-  STORAGE: /tmp/alertadengue/storage
 
 jobs:
   build:
@@ -73,6 +71,11 @@ jobs:
         activate-environment: alertadengue
         use-mamba: true
         miniforge-variant: Mambaforge
+
+    - name: Prepare volume for postgres
+      run: |
+        mkdir -p ../../staging_data/postgres_data
+        chmod 777 -R ../../staging_data/postgres_data
 
     - name: Install dependencies
       run: |
