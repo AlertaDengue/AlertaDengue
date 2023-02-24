@@ -47,7 +47,7 @@ services:
     ports:
       - ${SERVICES_NUMBER}${PSQL_PORT}:5432
     volumes:
-      - pg_data:/var/lib/postgresql/data/
+      - ${PG_DATA_PROD}:/var/lib/postgresql/data/:rw
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
       - ../containers/postgres/dumps/:/dumps/
     command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
@@ -146,6 +146,6 @@ services:
       start_period: 10s  # requires docker-compose 3.4
 
 volumes:
-  pg_data:
   dumps:
+  # pg_data:
   # postgres_data:
