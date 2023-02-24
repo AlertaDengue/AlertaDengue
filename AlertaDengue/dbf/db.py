@@ -1,15 +1,6 @@
-import os
-from os.path import dirname, join
-
 import pandas as pd
 from django.conf import settings
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
-
-env_file = os.environ.get("ENV_FILE", ".env")
-dotenv_path = join(dirname(dirname(dirname(__file__))), env_file)
-load_dotenv(dotenv_path)
-
 
 PSQL_URI = "postgresql://{}:{}@{}:{}/{}".format(
     settings.PSQL_USER,
