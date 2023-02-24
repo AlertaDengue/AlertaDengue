@@ -10,9 +10,11 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
 # using existing module to specify location of the .env file
-load_dotenv()
-env_path = Path(".") / ".env"
-load_dotenv(dotenv_path=env_path)
+ENV_DIR = Path(".")
+for envfile in ENV_DIR.glob(".env*"):
+    # print(envfile.name)
+    env_path = ENV_DIR.resolve() / envfile.name
+    load_dotenv(dotenv_path=env_path)
 
 
 def read_admins(value):
