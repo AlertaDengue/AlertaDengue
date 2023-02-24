@@ -11,7 +11,7 @@ from sqlalchemy import create_engine
 
 # using existing module to specify location of the .env file
 ENV_DIR = Path(".")
-for envfile in ENV_DIR.glob(".env*"):
+for envfile in ENV_DIR.glob(".env.*"):
     # print(envfile.name)
     env_path = ENV_DIR.resolve() / envfile.name
     load_dotenv(dotenv_path=env_path)

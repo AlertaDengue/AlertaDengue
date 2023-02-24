@@ -23,7 +23,7 @@ prepare-env:
 	# SHELL := /usr/bin/sh
 	# source ../scripts/env_variables_export.sh
 	# python ../scripts/create_env_directories.py
-	envsubst < .env.tpl > .env
+	envsubst < .env_default.tpl > .env
 
 # PREPARE CREATE GEOFILES FOR STATIC
 .PHONY:sync-static-geofiles

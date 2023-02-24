@@ -4,7 +4,7 @@ service-groups:
   - name: dev
     project-name: infodengue-dev  # optional
     compose-path: containers/compose.yaml
-    env-file: .env_dev
+    env-file: .env.dev
     services:
       default: postgres,memcached,rabbitmq,web,worker
       list:
@@ -22,7 +22,7 @@ service-groups:
   - name: prod
     project-name: infodengue-prod  # optional
     compose-path: containers/compose.yaml
-    env-file: .env_prod
+    env-file: .env.prod
     services:
       default: dengue_db,memcached,rabbitmq,web,worker
       list:

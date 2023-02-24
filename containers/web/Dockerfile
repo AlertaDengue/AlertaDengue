@@ -56,7 +56,7 @@ USER deploy
 
 # Copy code to the container with permissions to user
 COPY --chown=deploy:deploy AlertaDengue  /opt/services/AlertaDengue
-COPY --chown=deploy:deploy .env.tpl pyproject.toml README.md /opt/services/
+COPY --chown=deploy:deploy .env_default.tpl pyproject.toml README.md /opt/services/
 COPY --chown=deploy:deploy conda/"${ENV}".yaml /tmp/environment.yaml
 COPY --chown=deploy:deploy containers/celery/run.sh  /opt/services/celery-run.sh
 COPY --chown=deploy:deploy containers/entrypoint.sh  /entrypoint.sh

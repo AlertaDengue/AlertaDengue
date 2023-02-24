@@ -83,7 +83,7 @@ jobs:
         poetry install
 
     - name: Create env file
-      run: envsubst < .env.tpl > .env_dev
+      run: envsubst < .env_default.tpl > .env_dev
 
     - name: Start containers
       run: |
