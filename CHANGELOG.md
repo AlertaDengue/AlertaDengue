@@ -1,6 +1,13 @@
 Release Notes
 ---
 
+## [3.4.0](https://github.com/AlertaDengue/AlertaDengue/compare/3.3.2...3.4.0) (2023-02-24)
+
+
+### Features
+
+* **postgres:** Add script to change permissions for roles in database ([#617](https://github.com/AlertaDengue/AlertaDengue/issues/617)) ([8bfacdb](https://github.com/AlertaDengue/AlertaDengue/commit/8bfacdbd07afa1101e325be7e0e59bf11e620e8c))
+
 ## [3.3.2](https://github.com/AlertaDengue/AlertaDengue/compare/3.3.1...3.3.2) (2023-02-17)
 
 
