@@ -1,5 +1,5 @@
 version: 1.0.0
-env-file: .env_dev
+env-file: .env
 groups:
   - name: containers
     vars:
