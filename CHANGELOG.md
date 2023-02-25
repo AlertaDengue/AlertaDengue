@@ -1,6 +1,13 @@
 Release Notes
 ---
 
+## [3.5.0](https://github.com/AlertaDengue/AlertaDengue/compare/3.4.0...3.5.0) (2023-02-25)
+
+
+### Features
+
+* **postgres:** Add new volume to production database ([#619](https://github.com/AlertaDengue/AlertaDengue/issues/619)) ([5e9cb75](https://github.com/AlertaDengue/AlertaDengue/commit/5e9cb75c0f2a55060230c13a17c61644d99a5891))
+
 ## [3.4.0](https://github.com/AlertaDengue/AlertaDengue/compare/3.3.2...3.4.0) (2023-02-24)
 
 
