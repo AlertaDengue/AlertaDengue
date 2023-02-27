@@ -4,20 +4,11 @@ import ibis
 import pandas as pd
 
 # local
-from ad_main import settings
+from ad_main.settings import PSQL_DB, get_ibis_conn, get_sqla_conn
 from dados.dbdata import CID10, STATE_NAME, get_disease_suffix  # noqa:F401
-from sqlalchemy import create_engine
 
-PSQL_URI = "postgresql://{}:{}@{}:{}/{}".format(
-    settings.PSQL_USER,
-    settings.PSQL_PASSWORD,
-    settings.PSQL_HOST,
-    settings.PSQL_PORT,
-    settings.PSQL_DB,
-)
-
-db_engine = create_engine(PSQL_URI)
-con = ibis.postgres.connect(url=PSQL_URI)
+db_engine = get_sqla_conn()
+con_ibis = get_ibis_conn()
 
 
 class NotificationQueries:
@@ -565,10 +556,10 @@ class AlertCity:
         if disease != "dengue" and disease != "zika":
             table_suffix = get_disease_suffix(disease)
 
-        # schema_city = con.schema("Municipio")
+        # schema_city = con_ibis.schema("Municipio")
         # t_hist = schema_city.table(f"Historico_alerta{table_suffix}")
-        t_hist = con.table(
-            f"Historico_alerta{table_suffix}", settings.PSQL_DB, "Municipio"
+        t_hist = con_ibis.table(
+            f"Historico_alerta{table_suffix}", PSQL_DB, "Municipio"
         )
 
         if ew_start and ew_end:

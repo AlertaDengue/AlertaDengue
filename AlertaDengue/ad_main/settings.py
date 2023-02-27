@@ -4,6 +4,7 @@ Django settings for AlertaDengue project.
 
 import os
 from pathlib import Path
+from typing import Optional
 
 import ibis
 from dotenv import load_dotenv
@@ -180,8 +181,6 @@ DATABASES = {
     },
 }
 
-PSQL_URI = f"postgresql://{PSQL_USER}:{PSQL_PASSWORD}@{PSQL_HOST}:{PSQL_PORT}/{PSQL_DB}"
-
 
 def get_ibis_conn():
     """
@@ -189,20 +188,25 @@ def get_ibis_conn():
         con_ibis: Driver connection for Ibis.
     """
     try:
-        connection = ibis.postgres.connect(url=PSQL_URI)
+        connection = ibis.postgres.connect(
+            url=f"postgresql://{PSQL_USER}:{PSQL_PASSWORD}@{PSQL_HOST}:{PSQL_PORT}/{PSQL_DB}"
+        )
+
     except ConnectionError as e:
         print("Database error for Ibis connection")
         raise e
     return connection
 
 
-def get_sqla_conn():
+def get_sqla_conn(database: Optional[str] = PSQL_DB):
     """
     Returns:
         db_engine: URI with driver connection.
     """
     try:
-        connection = create_engine(PSQL_URI)
+        connection = create_engine(
+            f"postgresql://{PSQL_USER}:{PSQL_PASSWORD}@{PSQL_HOST}:{PSQL_PORT}/{database}"
+        )
     except ConnectionError as e:
         print("Database error for Ibis connection")
         raise e
