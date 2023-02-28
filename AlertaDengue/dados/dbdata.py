@@ -16,6 +16,10 @@ from django.core.cache import cache
 # local
 from .episem import episem
 
+DB_ENGINE = get_sqla_conn()
+IBIS_CONN = get_ibis_conn()
+
+
 CID10 = {"dengue": "A90", "chikungunya": "A92.0", "zika": "A928"}
 DISEASES_SHORT = ["dengue", "chik", "zika"]
 DISEASES_NAME = CID10.keys()
@@ -80,7 +84,6 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
     -------
         Dataframe
     """
-    con_ibis = get_ibis_conn()
 
     cache_name = "data_hist" + "_" + str(state_abbv) + "_" + str(disease)
 
@@ -88,7 +91,7 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
 
     if res is None:
         _disease = get_disease_suffix(disease, empty_for_dengue=False)
-        table_hist_uf = con_ibis.table(f"hist_uf{_disease}_materialized_view")
+        table_hist_uf = IBIS_CONN.table(f"hist_uf{_disease}_materialized_view")
 
         res = (
             table_hist_uf[table_hist_uf.state_abbv == state_abbv]
@@ -106,13 +109,12 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
 
 
 class RegionalParameters:
-    con_ibis = get_ibis_conn()
     DB = settings.PSQL_DB
 
-    t_parameters = con_ibis.table("parameters", DB, "Dengue_global")
-    t_municipio = con_ibis.table("Municipio", DB, "Dengue_global")
-    t_estado = con_ibis.table("estado", DB, "Dengue_global")
-    t_regional = con_ibis.table("regional", DB, "Dengue_global")
+    t_parameters = IBIS_CONN.table("parameters", DB, "Dengue_global")
+    t_municipio = IBIS_CONN.table("Municipio", DB, "Dengue_global")
+    t_estado = IBIS_CONN.table("estado", DB, "Dengue_global")
+    t_regional = IBIS_CONN.table("regional", DB, "Dengue_global")
 
     @classmethod
     def get_regional_names(cls, state_name: str) -> list:
@@ -342,9 +344,8 @@ def get_city_name_by_id(geocode: int):
     :param geocode:
     :return:
     """
-    db_engine = get_sqla_conn()
 
-    with db_engine.connect() as conn:
+    with DB_ENGINE.connect() as conn:
         res = conn.execute(
             """
             SELECT nome
@@ -361,12 +362,11 @@ def get_all_active_cities_state():
     Fetch from the database a list on names of active cities
     :return: list of tuples (geocode,name)
     """
-    db_engine = get_sqla_conn()
 
     res = cache.get("get_all_active_cities_state")
 
     if res is None:
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             res = conn.execute(
                 """
                 SELECT DISTINCT
@@ -401,12 +401,11 @@ def get_all_active_cities() -> List[Tuple[str, str]]:
     list_of_active_cities: List[Tuple[str, str]]
         List of city information (geocode, name)
     """
-    db_engine = get_sqla_conn()
 
     res = cache.get("get_all_active_cities")
 
     if res is None:
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             res = conn.execute(
                 """
             SELECT DISTINCT
@@ -430,7 +429,6 @@ def get_last_alert(geo_id, disease):
     :param disease:
     :return:
     """
-    db_engine = get_sqla_conn()
 
     table_name = "Historico_alerta" + get_disease_suffix(disease)
 
@@ -445,7 +443,7 @@ def get_last_alert(geo_id, disease):
         geo_id,
     )
 
-    with db_engine.connect() as conn:
+    with DB_ENGINE.connect() as conn:
         return pd.read_sql_query(sql, conn)
 
 
@@ -456,9 +454,8 @@ def get_city(query):
     :param query: substring of the city
     :return: list of dictionaries
     """
-    db_engine = get_sqla_conn()
 
-    with db_engine.connect() as conexao:
+    with DB_ENGINE.connect() as conexao:
         sql = (
             " SELECT distinct municipio_geocodigo, nome, uf"
             + ' FROM "Municipio"."Historico_alerta" AS alert'
@@ -547,9 +544,8 @@ def load_cases_without_forecast(geocode: int, disease):
     :param disease:
     :return:
     """
-    db_engine = get_sqla_conn()
 
-    with db_engine.connect() as conn:
+    with DB_ENGINE.connect() as conn:
         table_name = "Historico_alerta" + get_disease_suffix(disease)
 
         data_alert = pd.read_sql_query(
@@ -654,7 +650,6 @@ class NotificationResume:
         -------
         total_cities: int
         """
-        db_engine = get_sqla_conn()
 
         table_name = "Historico_alerta" + get_disease_suffix(disease)
 
@@ -671,7 +666,7 @@ class NotificationResume:
             uf,
         )
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             return pd.read_sql(sql, conn).astype(int).iloc[0]["count"]
 
     @staticmethod
@@ -681,7 +676,6 @@ class NotificationResume:
         :param n: the last n estimated cases
         :return: dict
         """
-        db_engine = get_sqla_conn()
 
         if len(geo_ids) < 1:
             raise Exception("GEO id list should have at least 1 code.")
@@ -706,7 +700,7 @@ class NotificationResume:
         if len(geo_ids) > 1:
             sql += ' ORDER BY municipio_geocodigo, "data_iniSE"'
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             df_case_series = pd.read_sql(sql, conn)
 
         return {
@@ -725,7 +719,6 @@ class NotificationResume:
         :param epi_year_week: int
         :return: tupla
         """
-        db_engine = get_sqla_conn()
 
         _disease = get_disease_suffix(disease)
 
@@ -770,12 +763,11 @@ class NotificationResume:
 
         sql = sql.format(_disease, state_name)
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             return pd.read_sql_query(sql, conn, "id", parse_dates=True)
 
     @staticmethod
     def get_4_weeks_variation(state_name, current_date):
-        db_engine = get_sqla_conn()
 
         # for variation_4_weeks
         se_current_year_1 = _episem(current_date)
@@ -820,7 +812,7 @@ class NotificationResume:
             "se_last_year_2": se_last_year_2,
         }
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             return pd.read_sql_query(sql, conn, parse_dates=True)
 
 
@@ -832,7 +824,6 @@ class Forecast:
         :param cid10:
         :return: tuple with min and max date (str) from the forecasts
         """
-        db_engine = get_sqla_conn()
 
         sql = """
         SELECT
@@ -849,7 +840,7 @@ class Forecast:
             geocode, cid10
         )
 
-        values = pd.read_sql_query(sql, db_engine).values.flat
+        values = pd.read_sql_query(sql, DB_ENGINE).values.flat
         return values[0], values[1]
 
     @staticmethod
@@ -860,7 +851,6 @@ class Forecast:
         :param epiweek:
         :return:
         """
-        db_engine = get_sqla_conn()
 
         # sql settings
         cid10 = CID10[disease]
@@ -888,7 +878,7 @@ class Forecast:
             epiweek,
         )
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             df_forecast_model = pd.read_sql(sql, con=conn)
 
         table_name = "Historico_alerta" + get_disease_suffix(disease)
@@ -1014,7 +1004,7 @@ class Forecast:
             "sql_alert": sql_alert,
         }
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             return pd.read_sql(sql, con=conn, parse_dates=True)
 
 
@@ -1038,7 +1028,6 @@ class ReportCity:
         -------
         ibis.expr.types.Expr
         """
-        con_ibis = get_ibis_conn()
 
         if disease not in CID10.keys():
             raise Exception(
@@ -1049,7 +1038,7 @@ class ReportCity:
         if disease != "dengue":
             table_suffix = get_disease_suffix(disease)  # F'_{disease}'
 
-        t_hist = con_ibis.table(
+        t_hist = IBIS_CONN.table(
             f"Historico_alerta{table_suffix}", settings.PSQL_DB, "Municipio"
         )
 
@@ -1152,7 +1141,6 @@ class ReportState:
 
     @classmethod
     def create_report_state_data(cls, geocodes, disease, year_week):
-        con_ibis = get_ibis_conn()
 
         if disease not in CID10.keys():
             raise Exception(
@@ -1163,7 +1151,7 @@ class ReportState:
         if disease != "dengue":
             table_suffix = get_disease_suffix(disease)  # F'_{disease}'
 
-        t_hist = con_ibis.table(
+        t_hist = IBIS_CONN.table(
             f"Historico_alerta{table_suffix}", settings.PSQL_DB, "Municipio"
         )
 

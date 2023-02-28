@@ -16,9 +16,9 @@ from ad_main.settings import (
 )
 
 # local
-from dados.dbdata import STATE_NAME
+from dados.dbdata import DB_ENGINE, STATE_NAME
 from dados.dbdata import NotificationResume as notif
-from dados.dbdata import RegionalParameters, db_engine
+from dados.dbdata import RegionalParameters
 from gis.geodf import extract_boundaries
 
 
@@ -276,7 +276,7 @@ class MapFileAlert(MapFile):
         alerts = {}
 
         for state_name in STATE_NAME.values():
-            with db_engine.connect() as conn:
+            with DB_ENGINE.connect() as conn:
                 sql = sql_template % state_name
                 result = conn.execute(sql).fetchall()
                 cities.update(dict(result))
