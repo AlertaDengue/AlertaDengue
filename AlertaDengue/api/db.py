@@ -7,8 +7,8 @@ import pandas as pd
 from ad_main.settings import PSQL_DB, get_ibis_conn, get_sqla_conn
 from dados.dbdata import CID10, STATE_NAME, get_disease_suffix  # noqa:F401
 
-db_engine = get_sqla_conn()
-con_ibis = get_ibis_conn()
+DB_ENGINE = get_sqla_conn()
+IBIS_CONN = get_ibis_conn()
 
 
 class NotificationQueries:
@@ -191,7 +191,7 @@ class NotificationQueries:
             self._age_field, clean_filters
         )
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             return pd.read_sql(sql, conn, "casos")
 
     def get_selected_rows(self):
@@ -218,7 +218,7 @@ class NotificationQueries:
             self._age_field, _dist_filters
         )
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             return pd.read_sql(sql, conn, "casos")
 
     def get_disease_dist(self):
@@ -259,7 +259,7 @@ class NotificationQueries:
             disease_label, self._age_field, _dist_filters
         )
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             df_disease_dist = pd.read_sql(sql, conn)
 
         return df_disease_dist.set_index("category", drop=True)
@@ -292,7 +292,7 @@ class NotificationQueries:
             self._age_field, _dist_filters
         )
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             return pd.read_sql(sql, conn, "category")
 
     def get_age_gender_dist(self):
@@ -327,7 +327,7 @@ class NotificationQueries:
             self._age_field, _dist_filters
         )
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             return pd.read_sql(sql, conn, "category")
 
     def get_age_male_dist(self):
@@ -358,7 +358,7 @@ class NotificationQueries:
             self._age_field, _dist_filters
         )
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             return pd.read_sql(sql, conn, "category")
 
     def get_age_female_dist(self):
@@ -389,7 +389,7 @@ class NotificationQueries:
             self._age_field, _dist_filters
         )
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             return pd.read_sql(sql, conn, "category")
 
     def get_gender_dist(self):
@@ -418,7 +418,7 @@ class NotificationQueries:
             self._age_field, _dist_filters
         )
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             return pd.read_sql(sql, conn, "category")
 
     def get_epiyears(self, state_name, disease=None):
@@ -452,7 +452,7 @@ class NotificationQueries:
             state_name, disease_filter
         )
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             df = pd.read_sql(sql, conn)
 
         return pd.crosstab(
@@ -485,7 +485,7 @@ class NotificationQueries:
             self._age_field, _dist_filters
         )
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             df_alert_period = pd.read_sql(sql, conn, index_col="dt_week")
 
         df_alert_period.index.rename("category", inplace=True)
@@ -500,7 +500,7 @@ class NotificationQueries:
           ) AS INTERVAL) AS dt_week_end
         """
 
-        with db_engine.connect() as conn:
+        with DB_ENGINE.connect() as conn:
             df_period_bounds = pd.read_sql(sql, conn)
 
         if not df_period_bounds.dt_week_start[0] in df_alert_period.index:
@@ -556,9 +556,9 @@ class AlertCity:
         if disease != "dengue" and disease != "zika":
             table_suffix = get_disease_suffix(disease)
 
-        # schema_city = con_ibis.schema("Municipio")
+        # schema_city = IBIS_CONN.schema("Municipio")
         # t_hist = schema_city.table(f"Historico_alerta{table_suffix}")
-        t_hist = con_ibis.table(
+        t_hist = IBIS_CONN.table(
             f"Historico_alerta{table_suffix}", PSQL_DB, "Municipio"
         )
 

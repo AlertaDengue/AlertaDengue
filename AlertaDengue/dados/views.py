@@ -1145,7 +1145,6 @@ class ReportStateView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ReportStateView, self).get_context_data(**kwargs)
         context = super().get_context_data(**kwargs)
-        # breakpoint()
         state = context["state"]
         last_year_week_s = context["year_week"]
 

@@ -182,14 +182,14 @@ DATABASES = {
 }
 
 
-def get_ibis_conn():
+def get_ibis_conn(database: Optional[str] = PSQL_DB):
     """
     Returns:
-        con_ibis: Driver connection for Ibis.
+        IBIS_CONN: Driver connection for Ibis.
     """
     try:
         connection = ibis.postgres.connect(
-            url=f"postgresql://{PSQL_USER}:{PSQL_PASSWORD}@{PSQL_HOST}:{PSQL_PORT}/{PSQL_DB}"
+            url=f"postgresql://{PSQL_USER}:{PSQL_PASSWORD}@{PSQL_HOST}:{PSQL_PORT}/{database}"
         )
 
     except ConnectionError as e:
@@ -201,7 +201,7 @@ def get_ibis_conn():
 def get_sqla_conn(database: Optional[str] = PSQL_DB):
     """
     Returns:
-        db_engine: URI with driver connection.
+        DB_ENGINE: URI with driver connection.
     """
     try:
         connection = create_engine(

@@ -1,7 +1,7 @@
 import pandas as pd
 from ad_main.settings import get_sqla_conn
 
-db_engine = get_sqla_conn(database="DBF")
+DB_ENGINE = get_sqla_conn(database="DBF")
 
 
 def is_partner_active():
@@ -16,5 +16,5 @@ def is_partner_active():
       ORDER BY name
     """
 
-    with db_engine.connect() as conn:
+    with DB_ENGINE.connect() as conn:
         return pd.read_sql(sql, conn)
