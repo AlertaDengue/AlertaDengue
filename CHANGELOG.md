@@ -1,6 +1,13 @@
 Release Notes
 ---
 
+## [3.6.0](https://github.com/AlertaDengue/AlertaDengue/compare/3.5.0...3.6.0) (2023-02-28)
+
+
+### Features
+
+* **settings:** Improve database connections ([#623](https://github.com/AlertaDengue/AlertaDengue/issues/623)) ([2393b04](https://github.com/AlertaDengue/AlertaDengue/commit/2393b04a1f17478ef39fbed9f78be6839b584776))
+
 ## [3.5.0](https://github.com/AlertaDengue/AlertaDengue/compare/3.4.0...3.5.0) (2023-02-25)
 
 
