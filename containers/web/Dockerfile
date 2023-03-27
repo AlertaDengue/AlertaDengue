@@ -78,5 +78,11 @@ COPY --chown=deploy:deploy containers/scripts/poetry-install.sh /tmp/poetry-inst
 WORKDIR /opt/services/AlertaDengue
 
 RUN bash /tmp/poetry-install.sh
+RUN mkdir -p /opt/services/scripts/
+RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/scripts/
+
+COPY containers/scripts/run_scripts.sh /opt/services/scripts/run_scripts.sh
+COPY containers/scripts/crontab_install.sh /opt/services/scripts/crontab_install.sh
+COPY containers/scripts/cronjob /etc/cron.d/cronjob
 
 ENTRYPOINT ["bash", "/entrypoint.sh"]

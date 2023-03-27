@@ -98,7 +98,7 @@ services:
       - MEMCACHED_HOST=memcached
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
       - PSQL_HOST=${PSQL_HOST}
-      - PSQL_PORT=${PSQL_PORT}
+      - PSQL_PORT=${SERVICES_NUMBER}${PSQL_PORT}
     volumes:
       - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
@@ -137,7 +137,9 @@ services:
       - rabbitmq
       - memcached
     restart: always
-    command: ["/opt/services/AlertaDengue/runwsgi.sh"]
+    entrypoint: [
+      "/opt/services/scripts/run_scripts.sh"
+      ]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 10s
