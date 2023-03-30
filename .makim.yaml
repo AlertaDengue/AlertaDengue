@@ -1,7 +1,8 @@
 version: 1.0.0
 env-file: .env
 groups:
-  - name: containers
+  default:
+    env-file: .env
     vars:
       sugar_exec: containers-sugar exec --group $ENV --services
       sugar_run: containers-sugar run --group $ENV --services web
@@ -13,18 +14,6 @@ groups:
         help: Run Django server on localhost
         run: |
           {{ manage_py }} runserver
-
-      clean:
-        help: Clean all artifacts
-        run: |
-          for _path in ['build/', 'dist/', '.eggs/', '*/.eggs', 'db']:
-            rm -fr @(_path)
-
-          for _path in [
-            '*.egg-info', '*.egg', '*.pyc', '*.pyo',
-            '*~', '__pycache__', '*.ipynb_checkpoints', '*.pytest_cache'
-          ]:
-            find . -name '@(_path)' -exec rm -fr {} +
 
       grant-role:
         help: Grant read-only access to the database
@@ -86,6 +75,16 @@ groups:
         run: |
           {{ sugar_run }} "{{ manage_py }} send_mail'
 
+      update_episcanner:
+        shell: python
+        help: Create parquet files for episcanner
+        run: |
+          from epi_scanner.settings import STATES
+          from epi_scanner.management import fetch_data
+          print("Running...")
+          for state in STATES:
+              fetch_data.data_to_parquet(state)
+
       test-staging-web:
         run: |
           for test_name in ['dados', 'dbf', 'gis', 'api']:
@@ -94,3 +93,16 @@ groups:
       test-staging-all:
         run: |
           {{ sugar_run_rm }} --cmd '{{manage_py}} test'
+
+
+      clean:
+        help: Clean all artifacts
+        run: |
+          for _path in ['build/', 'dist/', '.eggs/', '*/.eggs', 'db']:
+            rm -fr @(_path)
+
+          for _path in [
+            '*.egg-info', '*.egg', '*.pyc', '*.pyo',
+            '*~', '__pycache__', '*.ipynb_checkpoints', '*.pytest_cache'
+          ]:
+            find . -name '@(_path)' -exec rm -fr {} +
