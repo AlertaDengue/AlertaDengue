@@ -140,6 +140,8 @@ services:
     entrypoint: [
       "/opt/services/scripts/run_scripts.sh"
       ]
+    volumes:
+      - ${HOST_EPISCANNER_DATA_DIR}/:${CTNR_EPISCANNER_DATA_DIR}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 10s

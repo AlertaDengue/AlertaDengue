@@ -11,11 +11,6 @@ LABEL org.opencontainers.image.description="AlertaDengue package"
 # it is the default, but using it here to have it explicitly
 USER root
 
-SHELL ["/bin/bash", "-c"]
-# Use bash in Dockerfile RUN commands and make sure bashrc is sourced when
-# executing commands with /bin/bash -c
-# Needed to have the micromamba activate command configured etc.
-
 ARG HOST_UID
 ARG HOST_GID
 ARG SERVICES
@@ -49,6 +44,10 @@ RUN addgroup --gid ${HOST_GID} deploy \
 ENV PATH "$PATH:/home/deploy/.local/bin"
 ENV PATH /opt/conda/envs/$ENV_NAME/bin:$PATH
 
+# Create script activate environment
+RUN echo 'source /opt/conda/bin/activate alertadengue && exec "$@"' > /activate.sh
+RUN chmod +x /activate.sh
+
 USER deploy
 
 # Change shell to bash
@@ -77,12 +76,22 @@ RUN bash /tmp/poetry-install.sh
 RUN mkdir -p /opt/services/scripts/
 RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/scripts/
 
+RUN mkdir -p /opt/services/episcanner/data
+RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/episcanner/data
+COPY --chown=${HOST_UID}:${HOST_GID} ./.env.episcanner /opt/services/AlertaDengue/.env
+
+# TODO: Waiting for an Episcanner package
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/Episcanner-0.1.0.tar.gz  /opt/services/scripts/Episcanner-0.1.0.tar.gz
+RUN pip install /opt/services/scripts/Episcanner-0.1.0.tar.gz
+
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/run_scripts.sh /opt/services/scripts/run_scripts.sh
+
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/crontab_install.sh /opt/services/scripts/crontab_install.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/cronjob /etc/cron.d/cronjob
 
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/celery/run.sh  /opt/services/celery-run.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/entrypoint.sh  /entrypoint.sh
 
+COPY --chown=${HOST_UID}:${HOST_GID} .makim.yaml  /opt/services/AlertaDengue/.makim.yaml
 
 ENTRYPOINT ["bash", "/entrypoint.sh"]
