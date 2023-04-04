@@ -7,7 +7,7 @@ dependencies:
   - pip
   - poetry
   - psycopg2-binary
-  - python 3.9.*
+  - python 3.10.*
   - pip:
     - containers-sugar ==1.4.1
     - makim ==1.5.0
