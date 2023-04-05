@@ -2,7 +2,7 @@
 SHELL:=/usr/bin/env bash
 ARGS:=
 CONSOLE:=bash
-TIMEOUT:=60
+TIMEOUT:=180
 
 include .env
 
@@ -34,7 +34,7 @@ container-wait:
 container-wait-all:
 	$(MAKE) container-wait ENV=${ENV} SERVICE="memcached"
 	$(MAKE) container-wait ENV=${ENV} SERVICE="rabbitmq"
-	if [[ ${ENV} -eq "dev"]]; then $(MAKE) container-wait ENV=${ENV} SERVICE="db"; fi
+	if [[ "${ENV}" == "dev" ]]; then make container-wait ENV=dev SERVICE="db"; fi
 	$(MAKE) container-wait ENV=${ENV} SERVICE="web"
 	$(MAKE) container-wait ENV=${ENV} SERVICE="worker"
 
