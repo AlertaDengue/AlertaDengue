@@ -92,6 +92,6 @@ COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/crontab_install.sh /op
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/cronjob /etc/cron.d/cronjob
 
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/celery/run.sh  /opt/services/celery-run.sh
-COPY --chown=${HOST_UID}:${HOST_GID} ./containers/entrypoint.sh  /entrypoint.sh
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/entrypoint.sh  /entrypoint.sh
 
 ENTRYPOINT ["bash", "/entrypoint.sh"]
