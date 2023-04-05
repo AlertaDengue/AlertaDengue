@@ -78,20 +78,20 @@ RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/scripts/
 
 RUN mkdir -p /opt/services/episcanner/data
 RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/episcanner/data
-COPY --chown=${HOST_UID}:${HOST_GID} ./.env.episcanner /opt/services/AlertaDengue/.env
 
-# TODO: Waiting for an Episcanner package
+# TODO: Waiting for a packet from Episcanner
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/Episcanner-0.1.0.tar.gz  /opt/services/scripts/Episcanner-0.1.0.tar.gz
 RUN pip install /opt/services/scripts/Episcanner-0.1.0.tar.gz
 
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/run_scripts.sh /opt/services/scripts/run_scripts.sh
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/export-env.sh /opt/services/scripts/export-env.sh
+COPY --chown=${HOST_UID}:${HOST_GID} .env_episcanner.tpl /opt/services/AlertaDengue/
+COPY --chown=${HOST_UID}:${HOST_GID} .makim.yaml  /opt/services/AlertaDengue/.makim.yaml
 
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/crontab_install.sh /opt/services/scripts/crontab_install.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/cronjob /etc/cron.d/cronjob
 
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/celery/run.sh  /opt/services/celery-run.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/entrypoint.sh  /entrypoint.sh
-
-COPY --chown=${HOST_UID}:${HOST_GID} .makim.yaml  /opt/services/AlertaDengue/.makim.yaml
 
 ENTRYPOINT ["bash", "/entrypoint.sh"]

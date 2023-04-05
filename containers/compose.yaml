@@ -138,7 +138,7 @@ services:
       - memcached
     restart: always
     entrypoint: [
-      "/opt/services/scripts/run_scripts.sh"
+      "/opt/services/scripts/run_scripts.sh",
       ]
     volumes:
       - ${HOST_EPISCANNER_DATA_DIR}/:${CTNR_EPISCANNER_DATA_DIR}
