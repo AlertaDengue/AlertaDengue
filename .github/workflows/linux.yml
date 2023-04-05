@@ -7,27 +7,40 @@ on:
     branches: [ main ]
 
 env:
+
   ADMINS: Dev:dev@example.com
   ALLOWED_HOSTS: "localhost"
   DEBUG: False
+  ENV: dev
+  HOST_GID: 1000
+  HOST_UID: 1000
+  SECRET_KEY: my-secret-key
+
   DOCKER_HOST_IMPORTED_FILES_DIR: /IMPORTED_FILES
   DOCKER_HOST_MEDIA_ROOT: /MEDIA_ROOT
   DOCKER_HOST_SHAPEFILES_DIR: "../../staging_data/shapefiles"
   DOCKER_HOST_STATIC: "../../staging_data/staticfiles"
   DOCKER_HOST_TEMP_PARQUET_DIR: "../../staging_data/dbfs_parquet"
+
+  WORK_DIR: /opt/services/episcanner
+  CTNR_EPISCANNER_DATA_DIR: /opt/services/episcanner/data
+  HOST_EPISCANNER_DATA_DIR: ../../staging_data/episcanner/data
+
+  STORAGE: "../../staging_data/"
+  TEMP_FILES_DIR: /tmp
+
   EMAIL_CONFIG: ${{ secrets.EMAIL_CONFIG }}
   EMAIL_CONNECTION_DEFAULT: "outlook"
   EMAIL_HOST: "smtp.gmail.com"
   EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
   EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
   EMAIL_PORT: 587
-  ENV: dev
-  HOST_GID: 1000
-  HOST_UID: 1000
+
   IMPORTED_FILES_DIR: /IMPORTED_FILES
   MEDIA_ROOT: /MEDIA_ROOT
   MEMCACHED_HOST: "localhost"
   MEMCACHED_PORT: 11211
+
   PG_DATA_STAGING: "../../staging_data/postgres_data"
   PG_RESTORE_STAGING: schemas
   PORT_WEB: 8080
@@ -39,10 +52,8 @@ env:
   PSQL_PORT: 5432
   PSQL_USER: infodenguedev
   QUERY_CACHE_TIMEOUT: 86400
-  SECRET_KEY: my-secret-key
   SERVICES_NUMBER: 2
-  STORAGE: "../../staging_data/"
-  TEMP_FILES_DIR: /tmp
+
 
 jobs:
   build:
