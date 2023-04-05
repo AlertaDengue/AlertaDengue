@@ -102,7 +102,7 @@ jobs:
 
     - name: Container wait
       run: |
-        makim wait-all
+         make container-wait-all
 
     - name: Linting
       run: |
