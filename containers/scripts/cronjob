@@ -1,7 +1,9 @@
 SHELL=/bin/bash
 
 ### Send email to partners at 08:00 on Monday
-# * * * * *
+0 8 * * 1 echo "Start task cron" >> /var/log/cron.log 2>&1
+0 8 * * 1 bash -c "cd /opt/services/AlertaDengue/ && /activate.sh python manage.py send_mail >> /var/log/cron.log 2>&1"
 ## Update parquet files for episcanner
 * * * * * echo "Start cron task" >> /var/log/cron.log 2>&1
-15 03 * * * bash -c "cd /opt/services/AlertaDengue/ && /activate.sh makim update_episcanner >> /var/log/cron.log 2>&1"
+15 3 * * 1 bash -c "cd /opt/services/AlertaDengue/ && /activate.sh makim update_episcanner >> /var/log/cron.log 2>&1"
+##
