@@ -22,9 +22,9 @@ env:
   DOCKER_HOST_STATIC: "../../staging_data/staticfiles"
   DOCKER_HOST_TEMP_PARQUET_DIR: "../../staging_data/dbfs_parquet"
 
-  WORK_DIR: /opt/services/episcanner
-  CTNR_EPISCANNER_DATA_DIR: /opt/services/episcanner/data
-  HOST_EPISCANNER_DATA_DIR: ../../staging_data/episcanner/data
+  WORK_DIR: /opt/services/epi_scanner
+  CTNR_EPISCANNER_DATA_DIR: /opt/services/epi_scanner/data
+  HOST_EPISCANNER_DATA_DIR: ../../staging_data/epi_scanner/data
 
   STORAGE: "../../staging_data/"
   TEMP_FILES_DIR: /tmp

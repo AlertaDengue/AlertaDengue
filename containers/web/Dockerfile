@@ -76,8 +76,8 @@ RUN bash /tmp/poetry-install.sh
 RUN mkdir -p /opt/services/scripts/
 RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/scripts/
 
-RUN mkdir -p /opt/services/episcanner/data
-RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/episcanner/data
+RUN mkdir -p /opt/services/epi_scanner/data
+RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/epi_scanner/data
 
 # TODO: Waiting for a packet from Episcanner
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/Episcanner-0.1.0.tar.gz  /opt/services/scripts/Episcanner-0.1.0.tar.gz
