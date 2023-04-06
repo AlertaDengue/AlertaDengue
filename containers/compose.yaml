@@ -20,7 +20,7 @@ services:
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: "md5"
     ports:
-      - ${SERVICES_NUMBER}${PSQL_PORT}:5432
+      - ${PSQL_PORT}:5432
     volumes:
       - ${PG_DATA_STAGING}:/var/lib/postgresql/data/:rw
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
@@ -45,7 +45,7 @@ services:
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: "md5"
     ports:
-      - ${SERVICES_NUMBER}${PSQL_PORT}:5432
+      - ${PSQL_PORT}:5432
     volumes:
       - ${PG_DATA_PROD}:/var/lib/postgresql/data/:rw
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
@@ -98,7 +98,7 @@ services:
       - MEMCACHED_HOST=memcached
       - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
       - PSQL_HOST=${PSQL_HOST}
-      - PSQL_PORT=${SERVICES_NUMBER}${PSQL_PORT}
+      - PSQL_PORT=${PSQL_PORT}
     volumes:
       - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
