@@ -49,7 +49,7 @@ env:
   PSQL_DBF: infodengue
   PSQL_HOST: postgres
   PSQL_PASSWORD: infodenguedev
-  PSQL_PORT: 5432
+  PSQL_PORT: 25432
   PSQL_USER: infodenguedev
   QUERY_CACHE_TIMEOUT: 86400
   SERVICES_NUMBER: 2
@@ -105,8 +105,8 @@ jobs:
          make container-wait-all
 
     - name: Setup tmate session
-        if: "${{ failure() }}"
-        uses: mxschmitt/action-tmate@v3
+      if: "${{ failure() }}"
+      uses: mxschmitt/action-tmate@v3
 
     - name: Linting
       run: |
