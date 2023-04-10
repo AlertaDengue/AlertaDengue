@@ -11,11 +11,6 @@ LABEL org.opencontainers.image.description="AlertaDengue package"
 # it is the default, but using it here to have it explicitly
 USER root
 
-SHELL ["/bin/bash", "-c"]
-# Use bash in Dockerfile RUN commands and make sure bashrc is sourced when
-# executing commands with /bin/bash -c
-# Needed to have the micromamba activate command configured etc.
-
 ARG HOST_UID
 ARG HOST_GID
 ARG SERVICES
@@ -31,7 +26,6 @@ RUN apt-get -qq update --yes \
     /var/cache/apt/archives \
     /tmp/*
 
-
 # Set locale
 RUN sed -i -e "s/# pt_BR.*/pt_BR.UTF-8 UTF-8/" /etc/locale.gen \
   && dpkg-reconfigure --frontend=noninteractive locales \
@@ -45,24 +39,21 @@ RUN addgroup --gid ${HOST_GID} deploy \
   && export ENV_NAME="$ENV_NAME" \
   && mkdir -p /opt/conda /opt/services/ \
   && chmod -R a+rwx /opt/conda /opt/services /tmp \
-  && chown deploy:deploy /opt/services/ /tmp \
-  && echo 'source activate "$ENV_NAME"' >  /home/deploy/.bashrc \
-  && printenv | sed 's/^\(.*\)$/export \1/g' >> /preload.sh
-
+  && chown ${HOST_UID}:${HOST_GID} /opt/services/ /tmp \
+  && echo 'source activate "$ENV_NAME"' >  /home/deploy/.bashrc
 ENV PATH "$PATH:/home/deploy/.local/bin"
 ENV PATH /opt/conda/envs/$ENV_NAME/bin:$PATH
 
-USER deploy
+# Create script activate environment
+RUN echo 'source /opt/conda/bin/activate alertadengue && exec "$@"' > /activate.sh
+RUN chmod +x /activate.sh
 
-# Copy code to the container with permissions to user
-COPY --chown=deploy:deploy AlertaDengue  /opt/services/AlertaDengue
-COPY --chown=deploy:deploy .env.tpl pyproject.toml README.md /opt/services/
-COPY --chown=deploy:deploy conda/"${ENV}".yaml /tmp/environment.yaml
-COPY --chown=deploy:deploy containers/celery/run.sh  /opt/services/celery-run.sh
-COPY --chown=deploy:deploy containers/entrypoint.sh  /entrypoint.sh
+USER deploy
 
 # Change shell to bash
 SHELL ["/bin/bash", "-c"]
+
+COPY --chown=${HOST_UID}:${HOST_GID} conda/"${ENV}".yaml /tmp/environment.yaml
 
 # Use environment to update the env alertadengue
 RUN mamba env create -n $ENV_NAME \
@@ -73,10 +64,34 @@ RUN mamba env create -n $ENV_NAME \
   && find /opt/conda/ -type f,l -name '*.js.map' -delete
   # && rm -rf /home/deploy/.conda/pkgs
 
-COPY --chown=deploy:deploy containers/scripts/poetry-install.sh /tmp/poetry-install.sh
+COPY --chown=${HOST_UID}:${HOST_GID} ./AlertaDengue  /opt/services/AlertaDengue
 
 WORKDIR /opt/services/AlertaDengue
 
+COPY --chown=${HOST_UID}:${HOST_GID} .env.tpl pyproject.toml README.md /opt/services/
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/poetry-install.sh /tmp/poetry-install.sh
+
 RUN bash /tmp/poetry-install.sh
+
+RUN mkdir -p /opt/services/scripts/
+RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/scripts/
+
+RUN mkdir -p /opt/services/epi_scanner/data
+RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/epi_scanner/data
+
+# TODO: Waiting for a packet from Episcanner
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/Episcanner-0.1.0.tar.gz  /opt/services/scripts/Episcanner-0.1.0.tar.gz
+RUN pip install /opt/services/scripts/Episcanner-0.1.0.tar.gz
+
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/run_scripts.sh /opt/services/scripts/run_scripts.sh
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/export-env.sh /opt/services/scripts/export-env.sh
+COPY --chown=${HOST_UID}:${HOST_GID} .env_episcanner.tpl /opt/services/AlertaDengue/
+COPY --chown=${HOST_UID}:${HOST_GID} .makim.yaml  /opt/services/AlertaDengue/.makim.yaml
+
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/crontab_install.sh /opt/services/scripts/crontab_install.sh
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/cronjob /etc/cron.d/cronjob
+
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/celery/run.sh  /opt/services/celery-run.sh
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/entrypoint.sh  /entrypoint.sh
 
 ENTRYPOINT ["bash", "/entrypoint.sh"]

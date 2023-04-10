@@ -12,7 +12,7 @@ export CONTAINER_NAME="infodengue-${ENV:-dev}_${CONTAINER_NAME}_1"
 
 echo "[II] Checking ${CONTAINER_NAME} ..."
 
-while [ "`docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}`" != "healthy" ];
+while [ "`docker inspect -f {{.State.Health.Status}} ${CONTAINER_NAME}`" != "healthy" ]
 do
     echo "[II] Waiting for ${CONTAINER_NAME} ..."
     sleep 5;

@@ -1,45 +1,49 @@
 version: 1.0.0
 env-file: .env
 groups:
-  - name: containers
+  default:
+    env-file: .env
     vars:
+      py_v: python --version
+      sugar_build: containers-sugar build --group $ENV
+      sugar_start: containers-sugar start --group $ENV
+      sugar_down: containers-sugar stop --group $ENV
       sugar_exec: containers-sugar exec --group $ENV --services
       sugar_run: containers-sugar run --group $ENV --services web
       sugar_run_rm: containers-sugar run --group $ENV --services web --extras=--rm
       manage_py: python manage.py
 
     targets:
+
+      # DEVELOPMENT
       runserver:
         help: Run Django server on localhost
         run: |
-          {{ manage_py }} runserver
+          cd AlertaDengue/ \
+          && {{ manage_py }} runserver
 
-      clean:
-        help: Clean all artifacts
+      container-build:
+        help: Build containers
         run: |
-          for _path in ['build/', 'dist/', '.eggs/', '*/.eggs', 'db']:
-            rm -fr @(_path)
+          {{ sugar_build }}
 
-          for _path in [
-            '*.egg-info', '*.egg', '*.pyc', '*.pyo',
-            '*~', '__pycache__', '*.ipynb_checkpoints', '*.pytest_cache'
-          ]:
-            find . -name '@(_path)' -exec rm -fr {} +
-
-      grant-role:
-        help: Grant read-only access to the database
-        args:
-          service:
-            help: Database service name to modify access permissions
-            type: string
-            required: False
-          command:
-            help: Script or command to be executed inside the container
-            type: string
-            required: False
+      container-start:
+        help: Start all containers
         run: |
-          {{ sugar_exec }} {{ args.service }} --cmd "{{ args.command }}"
+          {{ sugar_start }}
 
+      container-exec:
+        help:
+        run: |
+          {{ sugar_exec }} {{ args.service }}
+
+      container-stop:
+        help: Start all containers
+        run: |
+          {{ sugar_down }}
+
+
+      # DJANGO
       static-geofiles:
         help: Generate static geofiles
         run: |
@@ -59,6 +63,12 @@ groups:
           ]:
             {{ sugar_run }} --extras="{{extras}}" --cmd "{{ manage_py }} @(cmd)"
 
+      send-mail-partner:
+        run: |
+          {{ sugar_run }} "{{ manage_py }} send_mail'
+
+
+      # CI
       wait:
         help: Wait for a service
         args:
@@ -82,10 +92,6 @@ groups:
           for service in ["postgres","memcached","rabbitmq","web","worker"]:
             makim containers.wait --service @(service)
 
-      send-mail-partner:
-        run: |
-          {{ sugar_run }} "{{ manage_py }} send_mail'
-
       test-staging-web:
         run: |
           for test_name in ['dados', 'dbf', 'gis', 'api']:
@@ -94,3 +100,43 @@ groups:
       test-staging-all:
         run: |
           {{ sugar_run_rm }} --cmd '{{manage_py}} test'
+
+
+      # EPISCANNER
+      update_episcanner:
+        help: Create parquet files for episcanner
+        run: |
+          from epi_scanner.settings import STATES
+          from epi_scanner.management import fetch_data
+          for state in STATES:
+              fetch_data.data_to_parquet(state)
+
+
+      # DATABASE 
+      grant-role:
+        help: Grant read-only access to the database
+        args:
+          service:
+            help: Database service name to modify access permissions
+            type: string
+            required: False
+          command:
+            help: Script or command to be executed inside the container
+            type: string
+            required: False
+        run: |
+          {{ sugar_exec }} {{ args.service }} --cmd "{{ args.command }}"
+
+
+      # PYTHON
+      clean:
+        help: Clean all artifacts
+        run: |
+          for _path in ['build/', 'dist/', '.eggs/', '*/.eggs', 'db']:
+            rm -fr @(_path)
+
+          for _path in [
+            '*.egg-info', '*.egg', '*.pyc', '*.pyo',
+            '*~', '__pycache__', '*.ipynb_checkpoints', '*.pytest_cache'
+          ]:
+            find . -name '@(_path)' -exec rm -fr {} +

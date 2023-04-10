@@ -20,7 +20,7 @@ services:
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: "md5"
     ports:
-      - ${SERVICES_NUMBER}${PSQL_PORT}:5432
+      - ${PSQL_PORT}:5432
     volumes:
       - ${PG_DATA_STAGING}:/var/lib/postgresql/data/:rw
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
@@ -45,7 +45,7 @@ services:
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
       POSTGRES_HOST_AUTH_METHOD: "md5"
     ports:
-      - ${SERVICES_NUMBER}${PSQL_PORT}:5432
+      - ${PSQL_PORT}:5432
     volumes:
       - ${PG_DATA_PROD}:/var/lib/postgresql/data/:rw
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
@@ -137,7 +137,11 @@ services:
       - rabbitmq
       - memcached
     restart: always
-    command: ["/opt/services/AlertaDengue/runwsgi.sh"]
+    entrypoint: [
+      "/opt/services/scripts/run_scripts.sh",
+      ]
+    volumes:
+      - ${HOST_EPISCANNER_DATA_DIR}/:${CTNR_EPISCANNER_DATA_DIR}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 10s

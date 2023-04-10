@@ -16,7 +16,7 @@ packages = [
 [tool.poetry.dependencies]
 Django = ">=3.2.18,<4"
 Fiona = "^1.8.21"
-SQLAlchemy = "^1.4.41"
+SQLAlchemy = "<2.0"
 celery = "^5.2.6"
 certifi = "^2022.9.24"
 click = "<8.1.5"
