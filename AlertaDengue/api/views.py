@@ -186,9 +186,12 @@ class AlertCityView(View, _GetMethod):
 
         content_type = "application/json" if format == "json" else "text/plain"
         response = HttpResponse(result, content_type=content_type)
-        response[
-            "Content-Disposition"
-        ] = f'attachment; filename="{disease}_{ew_start}-{ew_end}.{format}"'
+
+        if format == "csv":
+            response["Content-Disposition"] = (
+                "attachment;"
+                f' filename="{disease}_{ew_start}-{ew_end}.{format}"'
+            )
 
         return response
 
