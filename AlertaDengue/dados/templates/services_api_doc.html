@@ -1,7 +1,26 @@
-<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load lookup %}
+
+{% block extra_head %}
+<meta property="og:image"
+      content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+<meta property="og:image:secure_url"
+      content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+
+<script src="/static/js/infodengue.js"
+        type="text/javascript"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="/static/css/notebook.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+
+{% endblock %}
+{% block title %}{% trans "Dados" %}: API{% endblock %}
+
+{% block content %}
 
 <title>API</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 
@@ -15102,6 +15121,13 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
     init_mathjax();
     </script>
     <!-- End of mathjax configuration --></head>
+
+<div class="container">
+<div class="row">
+<div class="col-md-12 column">
+
+<div tabindex="-1" id="notebook" class="border-box-sizing">
+<div class="" id="notebook-container">
 <body class="jp-Notebook" data-jp-theme-light="true" data-jp-theme-name="JupyterLab Light">
 
 <div  class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
@@ -15130,11 +15156,11 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
+    <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 </pre></div>
 
-     </div>
+    </div>
 </div>
 </div>
 </div>
@@ -15213,7 +15239,7 @@ semana 1 e 50 do ano de 2017, em formato <code>CSV</code>:</p>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[22]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
+    <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 3304557 = Rio de Janeiro city geocode</span>
 <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://info.dengue.mat.br/api/alertcity&#39;</span>
 <span class="n">search_filter</span> <span class="o">=</span> <span class="p">(</span>
@@ -15224,7 +15250,7 @@ semana 1 e 50 do ano de 2017, em formato <code>CSV</code>:</p>
 <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 
-     </div>
+    </div>
 </div>
 </div>
 </div>
@@ -15423,7 +15449,7 @@ semana 1 e 50 do ano de 2017, em formato <code>CSV</code>:</p>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[26]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
+    <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 4106902 = Curitiba city geocode</span>
 <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://info.dengue.mat.br/api/alertcity&#39;</span>
 <span class="n">search_filter</span> <span class="o">=</span> <span class="p">(</span>
@@ -15434,7 +15460,7 @@ semana 1 e 50 do ano de 2017, em formato <code>CSV</code>:</p>
 <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 
-     </div>
+    </div>
 </div>
 </div>
 </div>
@@ -15644,7 +15670,7 @@ semana 1 e 50 do ano de 2017, em formato <code>CSV</code>:</p>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[27]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
+    <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">urllib.request</span>
 <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span>
     <span class="s1">&#39;https://info.dengue.mat.br/api/alertcity?&#39;</span>
@@ -15654,7 +15680,7 @@ semana 1 e 50 do ano de 2017, em formato <code>CSV</code>:</p>
 <span class="p">)</span>
 </pre></div>
 
-     </div>
+    </div>
 </div>
 </div>
 </div>
@@ -15700,7 +15726,7 @@ semana 1 e 50 do ano de 2017, em formato <code>CSV</code>:</p>
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
+    <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">params</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;&#39;</span><span class="p">,</span>
     <span class="s1">&#39;disease=dengue&#39;</span><span class="p">,</span>
@@ -15726,7 +15752,7 @@ semana 1 e 50 do ano de 2017, em formato <code>CSV</code>:</p>
     <span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
 </pre></div>
 
-     </div>
+    </div>
 </div>
 </div>
 </div>
@@ -15775,14 +15801,14 @@ Columns: [[EE] error_message: Epidemic year sent is empty.]
 Index: []
 --------------------------------------------------------------------------------
 http://localhost:8000/api/alertcity?&amp;disease=dengue&amp;geocode=3304557&amp;format=csv&amp;ew_start=1&amp;ew_end=50&amp;e_year=2017
-       id  aps      se        data  tweets  casos  casos_est  casos_estmin  \
+      id  aps      se        data  tweets  casos  casos_est  casos_estmin  \
 0  190034  2.1  201724  2017-06-11      12      1        1.0           1.0   
 1  213390  2.1  201733  2017-08-13      13      5        5.0           5.0   
 2  217372  2.1  201734  2017-08-20      15      2        2.0           2.0   
 3  225358  2.1  201737  2017-09-10      12      3        3.0           3.0   
 4  229380  2.1  201738  2017-09-17      22      4        4.0           4.0   
 
-   casos_estmax     tmin        rt      prt1       inc  nivel  
+  casos_estmax     tmin        rt      prt1       inc  nivel  
 0           1.0  18.8571  0.349526  0.137641  0.180933      1  
 1           5.0  19.7143  1.777530  0.797493  0.904665      1  
 2           2.0  18.2857  0.664763  0.311178  0.361866      1  
@@ -15820,12 +15846,14 @@ http://localhost:8000/api/alertcity?&amp;disease=dengue&amp;geocode=3304557&amp;
 </div>
 </div>
 </div>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}
 </body>
-
-
-
-
-
-
-
-</html>
