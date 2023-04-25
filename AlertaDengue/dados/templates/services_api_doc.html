@@ -20,6 +20,23 @@
 {% endblock %}
 {% block title %}{% trans "Dados" %}: API{% endblock %}
 
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="/services">{% trans "Dados" %}</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href='/services/api'>{% trans "API" %}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <a href='/services/api/doc'>{% trans "doc" %}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">{{ services }}</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block content %}
 
 <title>API</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
@@ -1244,107 +1261,7 @@ a{
   margin-top:10px; }
   .bp3-alert-footer .bp3-button{
     margin-left:10px; }
-.bp3-breadcrumbs{
-  -webkit-box-align:center;
-      -ms-flex-align:center;
-          align-items:center;
-  cursor:default;
-  display:-webkit-box;
-  display:-ms-flexbox;
-  display:flex;
-  -ms-flex-wrap:wrap;
-      flex-wrap:wrap;
-  height:30px;
-  list-style:none;
-  margin:0;
-  padding:0; }
-  .bp3-breadcrumbs > li{
-    -webkit-box-align:center;
-        -ms-flex-align:center;
-            align-items:center;
-    display:-webkit-box;
-    display:-ms-flexbox;
-    display:flex; }
-    .bp3-breadcrumbs > li::after{
-      background:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill-rule='evenodd' clip-rule='evenodd' d='M10.71 7.29l-4-4a1.003 1.003 0 00-1.42 1.42L8.59 8 5.3 11.29c-.19.18-.3.43-.3.71a1.003 1.003 0 001.71.71l4-4c.18-.18.29-.43.29-.71 0-.28-.11-.53-.29-.71z' fill='%235C7080'/%3e%3c/svg%3e");
-      content:"";
-      display:block;
-      height:16px;
-      margin:0 5px;
-      width:16px; }
-    .bp3-breadcrumbs > li:last-of-type::after{
-      display:none; }
 
-.bp3-breadcrumb,
-.bp3-breadcrumb-current,
-.bp3-breadcrumbs-collapsed{
-  -webkit-box-align:center;
-      -ms-flex-align:center;
-          align-items:center;
-  display:-webkit-inline-box;
-  display:-ms-inline-flexbox;
-  display:inline-flex;
-  font-size:16px; }
-
-.bp3-breadcrumb,
-.bp3-breadcrumbs-collapsed{
-  color:#5c7080; }
-
-.bp3-breadcrumb:hover{
-  text-decoration:none; }
-
-.bp3-breadcrumb.bp3-disabled{
-  color:rgba(92, 112, 128, 0.6);
-  cursor:not-allowed; }
-
-.bp3-breadcrumb .bp3-icon{
-  margin-right:5px; }
-
-.bp3-breadcrumb-current{
-  color:inherit;
-  font-weight:600; }
-  .bp3-breadcrumb-current .bp3-input{
-    font-size:inherit;
-    font-weight:inherit;
-    vertical-align:baseline; }
-
-.bp3-breadcrumbs-collapsed{
-  background:#ced9e0;
-  border:none;
-  border-radius:3px;
-  cursor:pointer;
-  margin-right:2px;
-  padding:1px 5px;
-  vertical-align:text-bottom; }
-  .bp3-breadcrumbs-collapsed::before{
-    background:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cg fill='%235C7080'%3e%3ccircle cx='2' cy='8.03' r='2'/%3e%3ccircle cx='14' cy='8.03' r='2'/%3e%3ccircle cx='8' cy='8.03' r='2'/%3e%3c/g%3e%3c/svg%3e") center no-repeat;
-    content:"";
-    display:block;
-    height:16px;
-    width:16px; }
-  .bp3-breadcrumbs-collapsed:hover{
-    background:#bfccd6;
-    color:#182026;
-    text-decoration:none; }
-
-.bp3-dark .bp3-breadcrumb,
-.bp3-dark .bp3-breadcrumbs-collapsed{
-  color:#a7b6c2; }
-
-.bp3-dark .bp3-breadcrumbs > li::after{
-  color:#a7b6c2; }
-
-.bp3-dark .bp3-breadcrumb.bp3-disabled{
-  color:rgba(167, 182, 194, 0.6); }
-
-.bp3-dark .bp3-breadcrumb-current{
-  color:#f5f8fa; }
-
-.bp3-dark .bp3-breadcrumbs-collapsed{
-  background:rgba(16, 22, 26, 0.4); }
-  .bp3-dark .bp3-breadcrumbs-collapsed:hover{
-    background:rgba(16, 22, 26, 0.6);
-    color:#f5f8fa; }
 .bp3-button{
   display:-webkit-inline-box;
   display:-ms-inline-flexbox;
@@ -13115,31 +13032,6 @@ h6:hover .jp-InternalAnchorLink {
   padding: 0px;
   box-shadow: none;
   justify-content: flex-start;
-}
-
-.jp-BreadCrumbs {
-  flex: 0 0 auto;
-  margin: 8px 12px 8px 12px;
-}
-
-.jp-BreadCrumbs-item {
-  margin: 0px 2px;
-  padding: 0px 2px;
-  border-radius: var(--jp-border-radius);
-  cursor: pointer;
-}
-
-.jp-BreadCrumbs-item:hover {
-  background-color: var(--jp-layout-color2);
-}
-
-.jp-BreadCrumbs-item:first-child {
-  margin-left: 0px;
-}
-
-.jp-BreadCrumbs-item.jp-mod-dropTarget {
-  background-color: var(--jp-brand-color2);
-  opacity: 0.7;
 }
 
 /*-----------------------------------------------------------------------------
