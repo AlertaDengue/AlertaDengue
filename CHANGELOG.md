@@ -1,6 +1,13 @@
 Release Notes
 ---
 
+## [3.6.1](https://github.com/AlertaDengue/AlertaDengue/compare/3.6.0...3.6.1) (2023-04-26)
+
+
+### Bug Fixes
+
+* **django:** fix broken iframe and add pysus to the API tutorial ([#630](https://github.com/AlertaDengue/AlertaDengue/issues/630)) ([3b41f7b](https://github.com/AlertaDengue/AlertaDengue/commit/3b41f7b3976eea157a6f5e132e3864a2776204e2))
+
 ## [3.6.0](https://github.com/AlertaDengue/AlertaDengue/compare/3.5.0...3.6.0) (2023-02-28)
 
 
