@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-26 16:38+0000\n"
+"POT-Creation-Date: 2023-04-26 17:46+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1990,8 +1990,8 @@ msgstr "Reported cases of %(disease_label)s"
 
 #: AlertaDengue/dados/templates/services.html:24
 #: AlertaDengue/dados/templates/services_api.html:73
-#: AlertaDengue/dados/templates/services_api_doc.html:49
-#: AlertaDengue/dados/templates/services_api_doc.html:63
+#: AlertaDengue/dados/templates/services_api_doc.html:51
+#: AlertaDengue/dados/templates/services_api_doc.html:64
 #: AlertaDengue/dados/templates/services_maps.html:69
 #: AlertaDengue/dados/templates/services_maps_doc.html:47
 #: AlertaDengue/dados/templates/services_tutorial.html:28
@@ -2012,7 +2012,7 @@ msgstr "Here you can find the data shown in the figures and tables of the site"
 
 #: AlertaDengue/dados/templates/services_api.html:76
 #: AlertaDengue/dados/templates/services_api.html:83
-#: AlertaDengue/dados/templates/services_api_doc.html:52
+#: AlertaDengue/dados/templates/services_api_doc.html:54
 msgid "API"
 msgstr ""
 
@@ -2257,11 +2257,11 @@ msgstr "notif_accum_year"
 msgid "Número acumulado de casos no ano"
 msgstr "Accumulated number of cases per year"
 
-#: AlertaDengue/dados/templates/services_api_doc.html:55
+#: AlertaDengue/dados/templates/services_api_doc.html:57
 msgid "Doc"
 msgstr ""
 
-#: AlertaDengue/dados/templates/services_api_doc.html:80
+#: AlertaDengue/dados/templates/services_api_doc.html:81
 msgid "Tabela de conteúdo"
 msgstr "Table of content"
 
@@ -2375,7 +2375,22 @@ msgstr "Python language"
 
 #: AlertaDengue/dados/templates/services_tutorial.html:59
 msgid "Extraindo dados com PySUS"
+msgstr "Fetching data with PySUS"
+
+#: AlertaDengue/dados/templates/services_tutorial.html:63
+msgid ""
+"é um pacote Python para extrair dados da saúde. Com esta ferramenta, é "
+"possível fazer o download das semanas epidemiológicas com scripts em Python. "
+"Tutoriais sobre a utilização do PySUS para extração dos dados no sistema "
+"InfoDengue pode ser encontrada na "
 msgstr ""
+"is a Python package to extract health data from DataSUS. It is also possible "
+"tofetch epidemiological weeks from Infodengue API with this tool. "
+"Walkthroughs about the PySUS usage can be found at its "
+
+#: AlertaDengue/dados/templates/services_tutorial.html:63
+msgid "documentação oficial do PySUS"
+msgstr "official documentation"
 
 #: AlertaDengue/dados/templates/state_cities.html:179
 msgid "Dados de"
