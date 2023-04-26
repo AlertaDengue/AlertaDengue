@@ -43,6 +43,24 @@
 <!-- End of mathjax configuration -->
 
 {% endblock %}
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="/services">{% trans "Dados" %}</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href='/services/api'>{% trans "API" %}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <a href='/services/api/doc'>{% trans "Doc" %}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">{{ services }}</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block title %}{% trans "Dados" %}: API{% endblock %}
 
 {% block content %}

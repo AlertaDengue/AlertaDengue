@@ -32,7 +32,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-    command: -p ${PSQL_PORT}
 
   dengue_db:
     hostname: dengue_db
@@ -57,7 +56,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-    command: -p ${PSQL_PORT}
 
   memcached:
     hostname: memcached
