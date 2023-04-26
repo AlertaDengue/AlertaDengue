@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-25 19:10+0000\n"
+"POT-Creation-Date: 2023-04-26 16:38+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1990,7 +1990,8 @@ msgstr "Reported cases of %(disease_label)s"
 
 #: AlertaDengue/dados/templates/services.html:24
 #: AlertaDengue/dados/templates/services_api.html:73
-#: AlertaDengue/dados/templates/services_api_doc.html:21
+#: AlertaDengue/dados/templates/services_api_doc.html:49
+#: AlertaDengue/dados/templates/services_api_doc.html:63
 #: AlertaDengue/dados/templates/services_maps.html:69
 #: AlertaDengue/dados/templates/services_maps_doc.html:47
 #: AlertaDengue/dados/templates/services_tutorial.html:28
@@ -2011,6 +2012,7 @@ msgstr "Here you can find the data shown in the figures and tables of the site"
 
 #: AlertaDengue/dados/templates/services_api.html:76
 #: AlertaDengue/dados/templates/services_api.html:83
+#: AlertaDengue/dados/templates/services_api_doc.html:52
 msgid "API"
 msgstr ""
 
@@ -2255,6 +2257,14 @@ msgstr "notif_accum_year"
 msgid "Número acumulado de casos no ano"
 msgstr "Accumulated number of cases per year"
 
+#: AlertaDengue/dados/templates/services_api_doc.html:55
+msgid "Doc"
+msgstr ""
+
+#: AlertaDengue/dados/templates/services_api_doc.html:80
+msgid "Tabela de conteúdo"
+msgstr "Table of content"
+
 #: AlertaDengue/dados/templates/services_maps.html:69
 msgid "Mapas"
 msgstr "Maps"
@@ -2362,6 +2372,10 @@ msgstr "R language"
 #: AlertaDengue/dados/templates/services_tutorial.html:54
 msgid "Linguagem Python."
 msgstr "Python language"
+
+#: AlertaDengue/dados/templates/services_tutorial.html:59
+msgid "Extraindo dados com PySUS"
+msgstr ""
 
 #: AlertaDengue/dados/templates/state_cities.html:179
 msgid "Dados de"
@@ -3015,6 +3029,3 @@ msgstr "Thank you for use InfoDengue"
 #~ "Sometimes, cases from the past week are not yet available, \n"
 #~ "in this case, an estimation based on the trend of variation is usedfrom "
 #~ "the series"
-
-#~ msgid "Tabela de conteúdo"
-#~ msgstr "Table of content"
