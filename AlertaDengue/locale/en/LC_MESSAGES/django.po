@@ -2385,7 +2385,7 @@ msgid ""
 "InfoDengue pode ser encontrada na "
 msgstr ""
 "is a Python package to extract health data from DataSUS. It is also possible "
-"tofetch epidemiological weeks from Infodengue API with this tool. "
+"to fetch epidemiological weeks from Infodengue API with this tool. "
 "Walkthroughs about the PySUS usage can be found at its "
 
 #: AlertaDengue/dados/templates/services_tutorial.html:63
