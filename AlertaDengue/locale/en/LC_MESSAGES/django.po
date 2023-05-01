@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-19 18:45+0000\n"
+"POT-Creation-Date: 2023-06-20 17:19+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2537,41 +2537,41 @@ msgstr "Estimated cases of %(disease_label)s in monitored cities"
 msgid "casos estimados"
 msgstr "estimated cases"
 
-#: AlertaDengue/dados/views.py:338
+#: AlertaDengue/dados/views.py:328
 msgid ""
 "A doença {} não está registrada em nosso banco de dados para o município de "
 "{}."
 msgstr "This disease {} is not registered in our database for {} municipality"
 
-#: AlertaDengue/dados/views.py:462
+#: AlertaDengue/dados/views.py:452
 msgid "desconhecida"
 msgstr "unknown"
 
-#: AlertaDengue/dados/views.py:855
+#: AlertaDengue/dados/views.py:845
 msgid "°C temperatura mínima"
 msgstr "°C Minimum temperature"
 
-#: AlertaDengue/dados/views.py:856
+#: AlertaDengue/dados/views.py:846
 msgid "°C temperatura média"
 msgstr "°C Average temperatures"
 
-#: AlertaDengue/dados/views.py:857
+#: AlertaDengue/dados/views.py:847
 msgid "°C temperatura máxima"
 msgstr "°C Maximum temperature"
 
-#: AlertaDengue/dados/views.py:858
+#: AlertaDengue/dados/views.py:848
 #, fuzzy, python-format
 #| msgid "% umidade mínima do ar"
 msgid "% umidade mínima do ar"
 msgstr "% Minimum air humidity"
 
-#: AlertaDengue/dados/views.py:859
+#: AlertaDengue/dados/views.py:849
 #, fuzzy, python-format
 #| msgid "% umidade média do ar"
 msgid "% umidade média do ar"
 msgstr "% Average air humidity"
 
-#: AlertaDengue/dados/views.py:860
+#: AlertaDengue/dados/views.py:850
 #, fuzzy, python-format
 #| msgid "% umidade máxima do ar"
 msgid "% umidade máxima do ar"
@@ -2735,27 +2735,50 @@ msgstr "Home"
 msgid "Sobre nós"
 msgstr "About us"
 
+#: AlertaDengue/templates/base.html:59
+msgid ""
+"Links para páginas com informações adicionais, ferramentas e outras seções "
+"úteis do site"
+msgstr ""
+
 #: AlertaDengue/templates/base.html:60
+msgid "Recursos"
+msgstr ""
+
+#: AlertaDengue/templates/base.html:67
+msgid ""
+"Aplicação que utiliza dados atualizados de incidência de arboviroses, como "
+"Dengue e Chikungunya, do Infodengue para analisar a expansão da onda no "
+"território nacional brasileiro."
+msgstr ""
+
+#: AlertaDengue/templates/base.html:74
+msgid ""
+"E-vigilância é um evento que tem como objetivo discutir as tecnologias, "
+"metodologias e desafios relacionados à vigilância em saúde."
+msgstr ""
+
+#: AlertaDengue/templates/base.html:80
 msgid "Envie dados atualizados"
 msgstr "Send updated data"
 
-#: AlertaDengue/templates/base.html:65
+#: AlertaDengue/templates/base.html:85
 msgid "Account "
 msgstr "Account "
 
-#: AlertaDengue/templates/base.html:70
+#: AlertaDengue/templates/base.html:90
 msgid "Logout"
 msgstr "Logout"
 
-#: AlertaDengue/templates/base.html:73
+#: AlertaDengue/templates/base.html:93
 msgid "Change password"
 msgstr "Change password"
 
-#: AlertaDengue/templates/base.html:79
+#: AlertaDengue/templates/base.html:99
 msgid "Login"
 msgstr "Login"
 
-#: AlertaDengue/templates/base.html:112
+#: AlertaDengue/templates/base.html:132
 msgid ""
 "Pin a fixed-height footer to the bottom\n"
 "            of the viewport in desktop browsers with this\n"

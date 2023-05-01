@@ -56,23 +56,22 @@
                                         {% searchbox_component %}
                                     </li>
                                     <li class="py-2 dropdown">
-                                        <a class="py-2 dropdown-toggle" href="#" id="recursosDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Links para páginas com informações adicionais, ferramentas e outras seções úteis do site">
-                                            Recursos
-                                        </a>
+                                        <a class="py-2 dropdown-toggle" href="#" id="recursosDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="{% trans 'Links para páginas com informações adicionais, ferramentas e outras seções úteis do site' %}">
+                                            {% trans "Recursos" %}                                        </a>
                                         <div class="dropdown-menu" aria-labelledby="recursosDropdown">
                                             <a class="dropdown-item"
                                                href="/epi-scanner"
                                                target="_blank"
-                                               onclick="alert('Você será redirecionado para uma nova aba.')"
+                                               onclick="alert('You will be redirected to a new tab!')"
                                                style="text-decoration: none;"
-                                               title="Aplicação que utiliza dados atualizados de incidência de arboviroses, como Dengue e Chikungunya, do Infodengue para analisar a expansão da onda no território nacional brasileiro.">Episcanner
+                                               title="{% trans 'Aplicação que utiliza dados atualizados de incidência de arboviroses, como Dengue e Chikungunya, do Infodengue para analisar a expansão da onda no território nacional brasileiro.' %}">Episcanner
                                             </a>
                                             <a class="dropdown-item"
                                                href="https://e-vigilancia.dengue.mat.br/"
                                                target="_blank"
-                                               onclick="alert('Você será redirecionado para uma nova aba.')"
+                                               onclick="alert('You will be redirected to a new tab!')"
                                                style="text-decoration: none;"
-                                               title="E-vigilância é um evento que tem como objetivo discutir as tecnologias, metodologias e desafios relacionados à vigilância em saúde.">E-vigilância
+                                               title="{% trans 'E-vigilância é um evento que tem como objetivo discutir as tecnologias, metodologias e desafios relacionados à vigilância em saúde.' %}">E-vigilância
                                             </a>
                                         </div>
                                     </li>
