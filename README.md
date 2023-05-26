@@ -40,7 +40,6 @@ If you are a member of a Municipal Health Department, or a citizen, and you have
 
 ## Where the data comes from
 - Dengue, Chikungunya and Zika data are provided by [SINAN](http://portalsinan.saude.gov.br/) as a notification form that feeds a municipal database, which is then consolidated at the state level and finally, federally by the Ministry of Health. Only a fraction of these cases are laboratory confirmed, most receive final classification based on clinical and epidemiological criteria. From the notified cases, the incidence indicators that feed the InfoDengue are calculated.
-- InfoDengue has partnered with the [Dengue Observatory](https://www.observatorio.inweb.org.br/), that captures and analyzes tweets from geolocalized people for the mention of dengue symptoms on social media.
 - Weather and climate data are obtained from [REDEMET](https://www.redemet.aer.mil.br/) in the airports all over Brazil.
 - Epidemiological indicators require population size. Demographic data of Brazilian cities are updated each year in Infodengue using estimates [IBGE](https://www.ibge.gov.br/pt/inicio.html).
 

@@ -495,14 +495,9 @@ def load_series(cidade, disease: str = "dengue", epiweek: int = 0):
         if len(dados_alerta) == 0:
             return {ap: None}
 
-        # tweets = pd.read_sql_query('select * from "Municipio"."Tweet"
-        # where "Municipio_geocodigo"={}'.format(cidade), parse_dates=True)
         series = defaultdict(lambda: defaultdict(lambda: []))
+
         series[ap]["dia"] = dados_alerta.data_iniSE.tolist()
-        # series[ap]['tweets'] = [float(i) if not np.isnan(i) else
-        # None for i in tweets.numero]
-        # series[ap]['tmin'] = [float(i) if not np.isnan(i) else
-        # None for i in G.get_group(ap).tmin]
 
         series[ap]["casos_est_min"] = _nan_to_num_int_list(
             dados_alerta.casos_est_min
@@ -549,12 +544,10 @@ def load_cases_without_forecast(geocode: int, disease):
         table_name = "Historico_alerta" + get_disease_suffix(disease)
 
         data_alert = pd.read_sql_query(
-            """
-            SELECT * FROM "Municipio"."{}"
-            WHERE municipio_geocodigo={} ORDER BY "data_iniSE" ASC
-            """.format(
-                table_name, geocode
-            ),
+            f"""
+            SELECT * FROM "Municipio"."{table_name}"
+            WHERE municipio_geocodigo={geocode} ORDER BY "data_iniSE" ASC
+            """,
             conn,
             parse_dates=True,
         )
@@ -1068,7 +1061,6 @@ class ReportCity:
             t_hist_proj.casos_est.name("casos_est"),
             t_hist_proj.p_inc100k.name("incidência"),
             t_hist_proj.p_rt1.name("pr(incid. subir)"),
-            t_hist_proj.tweet.name("tweet"),
             t_hist_proj.tempmin.name("temp.min"),
             t_hist_proj.tempmed.name("temp.med"),
             t_hist_proj.tempmax.name("temp.max"),
