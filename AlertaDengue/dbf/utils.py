@@ -134,6 +134,40 @@ def select_expected_fields(dbf_name: str) -> List[str]:
     return all_expected_fields
 
 
+'''
+def drop_duplicates_from_dataframe(
+    df: pd.DataFrame, subset: List[str]
+    ) -> pd.DataFrame:
+    """
+    Removes duplicated rows from a pandas DataFrame
+    based on a given subset of columns.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The pandas DataFrame to remove duplicates from
+    subset : List[str]
+        The subset of columns to check for duplicates
+
+    Returns
+    -------
+    pd.DataFrame
+        A pandas DataFrame with duplicated rows removed
+    """
+
+    drop_mask = df.duplicated(subset=subset)
+    dropped_data = df[drop_mask]
+    dropped_count = dropped_data.shape[0]
+    dropped_data.to_csv("duplicate_values.csv")
+    if dropped_count > 0:
+        logger.info(f"Dropped {dropped_count} rows due to duplicate values.")
+
+    df = df[~drop_mask]
+
+    return df
+'''
+
+
 def read_dbf(fname: str) -> pd.DataFrame:
     """
     Generator to read the DBF in chunks.
@@ -166,6 +200,18 @@ def read_dbf(fname: str) -> pd.DataFrame:
                 ignore_geometry=True,
             )
             df = _parse_fields(dbf_name, df)
+
+            # Remove duplicate rows
+            """
+            subset_columns = [
+                "ID_AGRAVO",
+                "ID_MUNICIP",
+                "NU_NOTIFIC",
+                "SEM_NOT",
+            ]
+            df = drop_duplicates_from_dataframe(df, subset_columns)
+            """
+
             df.to_parquet(parquet_fname)
 
     fetch_pq_fname = glob.glob(f"{parquet_dir}/*.parquet")

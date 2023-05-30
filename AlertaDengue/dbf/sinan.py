@@ -1,3 +1,5 @@
+# import copy
+# import datetime
 import logging
 from typing import Any, List, Optional, Tuple, Union
 
@@ -9,7 +11,7 @@ import psycopg2
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
-from psycopg2.extras import DictCursor, execute_values
+from psycopg2.extras import DictCursor
 
 from .utils import FIELD_MAP, read_dbf
 
@@ -388,18 +390,18 @@ class Sinan(object):
             self._fill_missing_columns(col_names)
             valid_col_names = [FIELD_MAP[n] for n in col_names]
 
+            # Insert Query data
             insert_sql = (
-                "INSERT INTO {}({}) VALUES %s on conflict "
-                "on CONSTRAINT casos_unicos do UPDATE SET {}"
-            ).format(
-                table_name,
-                ",".join(col_names),
-                ",".join(["{0}=excluded.{0}".format(j) for j in col_names]),
+                f"INSERT INTO {table_name}({','.join(col_names)}) "
+                f"VALUES ({','.join(['%s' for _ in col_names])}) "
+                f"ON CONFLICT ON CONSTRAINT casos_unicos DO UPDATE SET "
+                f"{','.join([f'{j}=excluded.{j}' for j in col_names])}"
             )
 
             logger.info("Parsing rows and converting data types...")
+
             df = parse_data(
-                self.tabela[valid_col_names], default_cid, self.ano
+                self.tabela[valid_col_names], f"{default_cid}", self.ano
             )
 
             logger.info(
@@ -409,10 +411,11 @@ class Sinan(object):
             try:
                 # Execute the INSERT statement
                 rows = [tuple(row) for row in df.itertuples(index=False)]
-                execute_values(cursor, insert_sql, rows, page_size=1000)
+                cursor.executemany(insert_sql, rows)
                 connection.commit()
             except psycopg2.errors.StringDataRightTruncation as e:
-                # Extract the field causing the error from the error message
+                # Handle the error accordingly (e.g., modify the field length,
+                # truncate the value, etc.)
                 error_message = str(e)
                 field_start_index = error_message.find('"') + 1
                 field_end_index = error_message.find('"', field_start_index)
@@ -421,11 +424,9 @@ class Sinan(object):
                         error_message[field_start_index:field_end_index]
                     }"""
                 )
-                # Handle the error accordingly (e.g., modify the field length,
-                # truncate the value, etc.)
 
             logger.info(
                 "Inserted {} rows with {} fields into the '{}' table.".format(
-                    self.tabela.shape[0], self.tabela.shape[1], table_name
+                    df.shape[0], df.shape[1], table_name
                 )
             )
