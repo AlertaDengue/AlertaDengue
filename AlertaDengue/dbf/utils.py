@@ -396,10 +396,9 @@ def select_expected_fields(dbf_name: str) -> List[str]:
     return all_expected_fields
 
 
-'''
 def drop_duplicates_from_dataframe(
     df: pd.DataFrame, subset: List[str]
-    ) -> pd.DataFrame:
+) -> pd.DataFrame:
     """
     Removes duplicated rows from a pandas DataFrame
     based on a given subset of columns.
@@ -427,7 +426,6 @@ def drop_duplicates_from_dataframe(
     df = df[~drop_mask]
 
     return df
-'''
 
 
 def chunk_gen(chunksize: int, totalsize: int):
@@ -487,17 +485,6 @@ def read_dbf(fname: str) -> pd.DataFrame:
                 ignore_geometry=True,
             )
             df = _parse_fields(dbf_name, df)
-
-            # Remove duplicate rows
-            """
-            subset_columns = [
-                "ID_AGRAVO",
-                "ID_MUNICIP",
-                "NU_NOTIFIC",
-                "SEM_NOT",
-            ]
-            df = drop_duplicates_from_dataframe(df, subset_columns)
-            """
 
             df.to_parquet(parquet_fname)
 

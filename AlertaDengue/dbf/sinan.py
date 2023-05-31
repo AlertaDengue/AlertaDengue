@@ -2,7 +2,12 @@ import logging
 from typing import Any, List, Optional, Tuple
 
 import psycopg2
-from dbf.utils import FIELD_MAP, parse_data, read_dbf
+from dbf.utils import (  # NOQA E501
+    FIELD_MAP,
+    drop_duplicates_from_dataframe,
+    parse_data,
+    read_dbf,
+)
 from django.conf import settings
 from psycopg2.extras import DictCursor
 
@@ -133,6 +138,15 @@ class Sinan(object):
             df = parse_data(
                 self.tabela[valid_col_names], f"{default_cid}", self.ano
             )
+
+            # Remove duplicate rows
+            subset_columns = [
+                "ID_AGRAVO",
+                "ID_MUNICIP",
+                "NU_NOTIFIC",
+                "DT_NOTIFIC",
+            ]
+            df = drop_duplicates_from_dataframe(df, subset_columns)
 
             logger.info(
                 f"Starting iteration to upsert data into {table_name}..."
