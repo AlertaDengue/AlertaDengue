@@ -1,74 +1,23 @@
 import logging
-from datetime import date
+from typing import Any, List, Optional, Tuple
 
-import numpy as np
-import pandas as pd
 import psycopg2
-
-# from dbfread import DBF
+from dbf.utils import (  # NOQA E501
+    FIELD_MAP,
+    drop_duplicates_from_dataframe,
+    parse_data,
+    read_dbf,
+)
 from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
 from psycopg2.extras import DictCursor
-
-from .utils import FIELD_MAP, read_dbf
 
 logger = logging.getLogger(__name__)
 
 
-def calculate_digit(dig):
-    """
-    Calcula o digito verificador do geocódigo de município
-    :param dig: geocódigo com 6 dígitos
-    :return: dígito verificador
-    """
-    peso = [1, 2, 1, 2, 1, 2, 0]
-    soma = 0
-    dig = str(dig)
-    for i in range(6):
-        valor = int(dig[i]) * peso[i]
-        soma += sum([int(d) for d in str(valor)]) if valor > 9 else valor
-    dv = 0 if soma % 10 == 0 else (10 - (soma % 10))
-    return dv
-
-
-def add_dv(geocodigo):
-    """
-    Retorna o geocóodigo do município adicionando o digito verificador,
-    se necessário.
-    :param geocodigo: geocóodigo com 6 ou 7 dígitos
-    """
-    if len(str(geocodigo)) == 7:
-        return geocodigo
-    elif len(str(geocodigo)) == 6:
-        return int(str(geocodigo) + str(calculate_digit(geocodigo)))
-    else:
-        raise ValueError("geocode does not match!")
-
-
-@np.vectorize
-def fix_nu_notif(value: str) -> int:
-    """
-    Format special character for NU_NOTIF field.
-    """
-
-    char_to_replace = {",": "", "'": "", ".": ""}
-
-    try:
-        value = None if pd.isnull(value) else int(value)
-    except ValueError as e:
-        if any(x in value for x in list(char_to_replace)):
-            # Replace multiple characters.
-            value = value.translate(str.maketrans(char_to_replace))
-        else:
-            logger.error(e)
-
-    return value
-
-
 class Sinan(object):
     """
-    Introspecta arquivo DBF do SINAN preparando-o para inserção em outro banco.
+    Introspects a SINAN DBF file, perform data cleaning and type conversion,
+    and prepare the data for insertion into another database.
     """
 
     db_config = {
@@ -79,12 +28,15 @@ class Sinan(object):
         "port": settings.PSQL_PORT,
     }
 
-    def __init__(self, dbf_fname, ano, encoding="iso=8859-1"):
+    def __init__(
+        self, dbf_fname: str, ano: int, encoding: str = "iso=8859-1"
+    ) -> None:
         """
-        Instancia Objeto SINAN carregando-o a partir do arquivo indicado
-        :param dbf_fname: Nome do arquivo dbf do Sinan
-        :param ano: Ano dos dados
-        :return:
+        Instantiates a SINAN object by loading data from the specified file.
+        :param dbf_fname: The name of the Sinan dbf file (str)
+        :param ano: The year of the data (int)
+        :param encoding: The file encoding (str)
+        :return: None
         """
         logger.info("Formatting fields and reading chunks from parquet files")
 
@@ -92,39 +44,80 @@ class Sinan(object):
         self.ano = ano
 
         logger.info(
-            f"Starting the SINAN instantiation process ({dbf_fname}, {ano})"
+            f"""Starting the SINAN instantiation process for the {ano} year
+            using the {dbf_fname} file.
+            """
         )
 
     @property
-    def time_span(self):
+    def time_span(self) -> Tuple[str, str]:
         """
-        Escopo temporal do banco
-        :return: (data_inicio, data_fim)
+        Returns the temporal scope of the database as
+            a tuple of start and end dates.
+        Returns
+        -------
+            A tuple containing start and end dates in string format
+              (data_inicio, data_fim).
         """
+
         data_inicio = self.tabela["DT_NOTIFIC"].min()
         data_fim = self.tabela["DT_NOTIFIC"].max()
+
         return data_inicio, data_fim
 
-    def _fill_missing_columns(self, col_names):
+    def _fill_missing_columns(self, col_names: List[str]) -> None:
         """
-        checks if the table to be inserted contains all columns required in
-            the database model.
-        If not create this columns filled with Null values, to allow for
-            database insertion.
-        :param col_names:
+        Check if the table to be inserted contains all columns
+            required in the database model.
+        If not, create these columns filled with Null values to allow
+            for database insertion.
+        Parameters
+        ----------
+        col_names : numpy.ndarray
+            A numpy array of column names to check.
+        Returns
+        -------
+        None
         """
+
         for nm in col_names:
             if FIELD_MAP[nm] not in self.tabela.columns:
                 self.tabela[FIELD_MAP[nm]] = None
 
-    def _get_postgres_connection(self):
+    def _get_postgres_connection(self) -> Any:
+        """
+        Returns a connection to a Postgres database.
+        Parameters
+        ----------
+            self (object): The instance of the class calling this method.
+        Returns
+        -------
+            Any: A connection to the Postgres database.
+        """
+
         return psycopg2.connect(**self.db_config)
 
     def save_to_pgsql(
-        self, table_name='"Municipio"."Notificacao"', default_cid=None
-    ):
+        self,
+        table_name: str = '"Municipio"."Notificacao"',
+        default_cid: Optional[Any] = None,
+    ) -> None:
+        """
+        Save data to PostgreSQL table.
+        Parameters
+        ----------
+            self (object): The class object.
+            table_name (str): The name of the table to save data to
+                Defaults to '"Municipio"."Notificacao"'.
+            default_cid (Any, optional): The default value
+                for the 'cid' column. Defaults to None.
+        Returns
+        -------
+            None
+        """
+
+        logger.info("Establishing connection to PostgreSQL database...")
         connection = self._get_postgres_connection()
-        logger.info("Connecting to PostgreSQL database")
 
         with connection.cursor(cursor_factory=DictCursor) as cursor:
             cursor.execute(f"SELECT * FROM {table_name} LIMIT 1;")
@@ -132,90 +125,52 @@ class Sinan(object):
             self._fill_missing_columns(col_names)
             valid_col_names = [FIELD_MAP[n] for n in col_names]
 
-            self.tabela["NU_NOTIFIC"] = fix_nu_notif(self.tabela.NU_NOTIFIC)
-
+            # Insert Query data
             insert_sql = (
-                "INSERT INTO {}({}) VALUES ({}) on conflict "
-                "on CONSTRAINT casos_unicos do UPDATE SET {}"
-            ).format(
-                table_name,
-                ",".join(col_names),
-                ",".join(["%s" for i in col_names]),
-                ",".join(["{0}=excluded.{0}".format(j) for j in col_names]),
+                f"INSERT INTO {table_name}({','.join(col_names)}) "
+                f"VALUES ({','.join(['%s' for _ in col_names])}) "
+                f"ON CONFLICT ON CONSTRAINT casos_unicos DO UPDATE SET "
+                f"{','.join([f'{j}=excluded.{j}' for j in col_names])}"
             )
-            logger.info(f"Formatting lines and inserting into {table_name}")
-            for row in self.tabela[valid_col_names].iterrows():
-                i = row[0]
-                row = row[1]
-                row[0] = (
-                    None
-                    if isinstance(row[0], type(pd.NaT))
-                    else date.fromordinal(row[0].to_pydatetime().toordinal())
-                )  # print('DT_NOTIFIC', row[0])
-                row[1] = int(str(int(row[1]))[-2:])  # print('SEM_NOT', row[1])
-                row[2] = (
-                    int(self.ano) if pd.isnull(row[2]) else int(row[2])
-                )  # print('NU_ANO', row[2])
-                row[3] = (
-                    None
-                    if isinstance(row[3], type(pd.NaT))
-                    else date.fromordinal(row[3].to_pydatetime().toordinal())
-                )  # print('DT_SIN_PRI', row[3])
-                row[4] = (
-                    None if not row[4] else int(str(row[4])[-2:])
-                )  # print('SEM_PRI', row[4])
-                row[5] = (
-                    None
-                    if isinstance(row[5], type(pd.NaT))
-                    else date.fromordinal(row[5].to_pydatetime().toordinal())
-                )  # print('DT_DIGITA', row[5])
-                row[6] = (
-                    None if row[6] == "" else add_dv(int(row[6]))
-                )  # print('ID_MUNICIP', row[6])
-                row[7] = (
-                    None if pd.isnull(row[7]) else int(row[7])
-                )  # print('NU_NOTIFIC', row[7])
-                if row[8] is None:
-                    if default_cid is None:
-                        raise ValidationError(
-                            _(
-                                "Existem nesse arquivo notificações "
-                                "que não incluem a coluna ID_AGRAVO."
-                            )
-                        )
-                    else:
-                        row[8] = default_cid  # print('ID_AGRAVO', row[8])
-                row[9] = (
-                    None
-                    if (isinstance(row[9], type(pd.NaT)) or row[9] is None)
-                    else date.fromordinal(row[9].to_pydatetime().toordinal())
-                )  # print('DT_NASC', row[9])
-                row[10] = (
-                    None if pd.isnull(row[10]) else str(row[10])
-                )  # print('CS_SEXO', row[10])
-                row[11] = (
-                    None if pd.isnull(row[11]) else int(row[11])
-                )  # print('NU_IDADE_N', row[11])
-                row[12] = (
-                    None if pd.isnull(row[12]) else int(row[12])
-                )  # print('RESUL_PCR', row[12])
-                row[13] = (
-                    None if pd.isnull(row[13]) else int(row[13])
-                )  # print('CRITERIO', row[13])
-                row[14] = (
-                    None if pd.isnull(row[14]) else int(row[14])
-                )  # print('CLASSI_FIN', row[14])
-                cursor.execute(insert_sql, row)
-                if (i % 1000 == 0) and (i > 0):
-                    logger.info(
-                        f"{i} lines inserted. "
-                        "Committing changes to the database..."
-                    )
-                    connection.commit()
 
-            connection.commit()
+            logger.info("Parsing rows and converting data types...")
+
+            df = parse_data(
+                self.tabela[valid_col_names], f"{default_cid}", self.ano
+            )
+
+            # Remove duplicate rows
+            subset_columns = [
+                "ID_AGRAVO",
+                "ID_MUNICIP",
+                "NU_NOTIFIC",
+                "DT_NOTIFIC",
+            ]
+            df = drop_duplicates_from_dataframe(df, subset_columns)
+
             logger.info(
-                "SINAN {} rows in {} fields inserted in the database".format(
-                    self.tabela.shape[0], self.tabela.shape[1]
+                f"Starting iteration to upsert data into {table_name}..."
+            )
+
+            try:
+                # Execute the INSERT statement
+                rows = [tuple(row) for row in df.itertuples(index=False)]
+                cursor.executemany(insert_sql, rows)
+                connection.commit()
+            except psycopg2.errors.StringDataRightTruncation as e:
+                # Handle the error accordingly (e.g., modify the field length,
+                # truncate the value, etc.)
+                error_message = str(e)
+                field_start_index = error_message.find('"') + 1
+                field_end_index = error_message.find('"', field_start_index)
+                logger.error(
+                    f"""Field causing the error: {
+                        error_message[field_start_index:field_end_index]
+                    }"""
+                )
+
+            logger.info(
+                "Inserted {} rows with {} fields into the '{}' table.".format(
+                    df.shape[0], df.shape[1], table_name
                 )
             )

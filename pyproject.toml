@@ -47,6 +47,9 @@ sh = "^1.14.2"
 simpledbf = "^0.2.6"
 tables = "^3.7.0"
 plotly = "^5.11.0"
+dask = "^2023.5.0"
+dask-geopandas = "^0.3.1"
+pyogrio = "^0.6.0"
 
 
 
