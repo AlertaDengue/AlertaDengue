@@ -2,7 +2,7 @@ version: 1.0.0
 compose-app: docker-compose
 service-groups:
   - name: dev
-    project-name: infodengue-dev  # optional
+    project-name: infodengue-dev
     compose-path: containers/compose.yaml
     env-file: .env
     services:
@@ -20,7 +20,7 @@ service-groups:
           health-check: true
 
   - name: prod
-    project-name: infodengue-prod  # optional
+    project-name: infodengue-prod
     compose-path: containers/compose.yaml
     env-file: .env
     services:
@@ -35,4 +35,14 @@ service-groups:
         - name: memcached
           health-check: true
         - name: rabbitmq
+          health-check: true
+
+  - name: minio
+    project-name: infodengue-prod
+    compose-path: containers/compose.yaml
+    env-file: .env
+    services:
+      default: minio
+      list:
+        - name: minio
           health-check: true

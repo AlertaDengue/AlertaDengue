@@ -54,6 +54,16 @@ env:
   QUERY_CACHE_TIMEOUT: 86400
   SERVICES_NUMBER: 2
 
+  MINIO_USERNAME: developer
+  MINIO_GROUPNAME: developer
+  MINIO_GID: 1000
+  MINIO_UID: 1000
+  MINIO_ROOT_USER: developer
+  MINIO_ROOT_PASSWORD: developer
+  MINIO_PORT_1: 9000
+  MINIO_PORT_2: 9090
+  MINIO_ENDPOINT: http://minio:9090
+
 
 jobs:
   build:
