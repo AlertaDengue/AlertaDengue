@@ -396,34 +396,53 @@ def select_expected_fields(dbf_name: str) -> List[str]:
     return all_expected_fields
 
 
-def drop_duplicates_from_dataframe(
-    df: pd.DataFrame, subset: List[str]
-) -> pd.DataFrame:
+def drop_duplicates_from_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Removes duplicated rows from a pandas DataFrame
-    based on a given subset of columns.
+    Remove duplicates from a pandas DataFrame based on the provided conditions.
+
+    The function checks if the data has duplicate values.
+    If the first condition (SEM_NOT) is met, it saves the data to a CSV file
+    and returns the original DataFrame without any changes.
+    If the second condition (DT_NOTIFIC) is met,
+    it drops the duplicate rows from the DataFrame and
+    returns it without the duplicate values.
 
     Parameters
     ----------
     df : pd.DataFrame
-        The pandas DataFrame to remove duplicates from
-    subset : List[str]
-        The subset of columns to check for duplicates
+        The pandas DataFrame to remove duplicates from.
 
     Returns
     -------
     pd.DataFrame
-        A pandas DataFrame with duplicated rows removed
+        A pandas DataFrame with duplicates removed.
     """
 
-    drop_mask = df.duplicated(subset=subset)
-    dropped_data = df[drop_mask]
-    dropped_count = dropped_data.shape[0]
-    dropped_data.to_csv("duplicate_values.csv")
-    if dropped_count > 0:
-        logger.info(f"Dropped {dropped_count} rows due to duplicate values.")
+    duplicate_se_notific_mask = df.duplicated(
+        subset=["ID_AGRAVO", "NU_NOTIFIC", "ID_MUNICIP", "SEM_NOT"]
+    )
+    if duplicate_se_notific_mask.any():
+        print("Duplicates found for the same epiweek!")
+        df_se_notific = df[duplicate_se_notific_mask]
+        df_se_notific.to_csv("duplicate_values_SE_NOT.csv", index=False)
+        if df_se_notific.shape[0] > 0:
+            print(
+                f"Saved {df_se_notific.shape[0]} rows due to duplicate values (Condition SEM_NOT)."  # NOQA E999
+            )
 
-    df = df[~drop_mask]
+    duplicate_dt_notific_mask = df.duplicated(
+        subset=["ID_AGRAVO", "NU_NOTIFIC", "ID_MUNICIP", "DT_NOTIFIC"]
+    )
+    if duplicate_dt_notific_mask.any():
+        print("Duplicates found for the same notification date")
+        df_dt_notific = df[duplicate_dt_notific_mask]
+        df_dt_notific.to_csv("duplicate_values_DT_NOT.csv", index=False)
+        if df_dt_notific.shape[0] > 0:
+            print(
+                f"Saved {df_dt_notific.shape[0]} rows due to duplicate values (Condition DT_NOTIFIC)."  # NOQA E999
+            )
+
+        df = df[~duplicate_dt_notific_mask]
 
     return df
 
@@ -469,7 +488,7 @@ def read_dbf(fname: str) -> pd.DataFrame:
     """
     dbf = Dbf5(fname, codec="iso-8859-1")
     dbf_name = str(dbf.dbf)[:-4]
-    parquet_dir = Path(DBFS_PQTDIR / f"{dbf_name}.parquet")
+    parquet_dir = Path(DBFS_PQTDIR / f"{dbf_name}")
 
     if not parquet_dir.is_dir():
         logger.info("Converting DBF file to Parquet format...")

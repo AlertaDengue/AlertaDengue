@@ -140,13 +140,7 @@ class Sinan(object):
             )
 
             # Remove duplicate rows
-            subset_columns = [
-                "ID_AGRAVO",
-                "ID_MUNICIP",
-                "NU_NOTIFIC",
-                "DT_NOTIFIC",
-            ]
-            df = drop_duplicates_from_dataframe(df, subset_columns)
+            df = drop_duplicates_from_dataframe(df)
 
             logger.info(
                 f"Starting iteration to upsert data into {table_name}..."
