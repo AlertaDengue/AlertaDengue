@@ -15,7 +15,8 @@ from simpledbf import Dbf5
 logger = logging.getLogger(__name__)
 
 
-DBFS_PQTDIR = Path(settings.TEMP_FILES_DIR) / "dbfs_parquet"
+DBF_CSV_DIR = Path(settings.TEMP_FILES_DIR) / "csv"
+DBF_PQT_DIR = Path(settings.TEMP_FILES_DIR) / "dbfs_parquet"
 
 
 EXPECTED_FIELDS = [
@@ -396,7 +397,9 @@ def select_expected_fields(dbf_name: str) -> List[str]:
     return all_expected_fields
 
 
-def drop_duplicates_from_dataframe(df: pd.DataFrame) -> pd.DataFrame:
+def drop_duplicates_from_dataframe(
+    df: pd.DataFrame, default_cid_name: str, year: int
+) -> pd.DataFrame:
     """
     Remove duplicates from a pandas DataFrame based on the provided conditions.
 
@@ -422,11 +425,15 @@ def drop_duplicates_from_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         subset=["ID_AGRAVO", "NU_NOTIFIC", "ID_MUNICIP", "SEM_NOT"]
     )
     if duplicate_se_notific_mask.any():
-        print("Duplicates found for the same epiweek!")
+        logger.info("Duplicates found for the same epiweek!")
         df_se_notific = df[duplicate_se_notific_mask]
-        df_se_notific.to_csv("duplicate_values_SE_NOT.csv", index=False)
+        df_se_notific.to_csv(
+            DBF_PQT_DIR
+            / f"duplicate_values_SE_NOT_{year}_{default_cid_name}.csv",
+            index=False,
+        )
         if df_se_notific.shape[0] > 0:
-            print(
+            logger.info(
                 f"Saved {df_se_notific.shape[0]} rows due to duplicate values (Condition SEM_NOT)."  # NOQA E999
             )
 
@@ -434,11 +441,15 @@ def drop_duplicates_from_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         subset=["ID_AGRAVO", "NU_NOTIFIC", "ID_MUNICIP", "DT_NOTIFIC"]
     )
     if duplicate_dt_notific_mask.any():
-        print("Duplicates found for the same notification date")
+        logger.info("Duplicates found for the same notification date")
         df_dt_notific = df[duplicate_dt_notific_mask]
-        df_dt_notific.to_csv("duplicate_values_DT_NOT.csv", index=False)
+        df_dt_notific.to_csv(
+            DBF_PQT_DIR
+            / f"duplicate_values_DT_NOT_{year}_{default_cid_name}.csv",
+            index=False,
+        )
         if df_dt_notific.shape[0] > 0:
-            print(
+            logger.info(
                 f"Saved {df_dt_notific.shape[0]} rows due to duplicate values (Condition DT_NOTIFIC)."  # NOQA E999
             )
 
@@ -488,7 +499,7 @@ def read_dbf(fname: str) -> pd.DataFrame:
     """
     dbf = Dbf5(fname, codec="iso-8859-1")
     dbf_name = str(dbf.dbf)[:-4]
-    parquet_dir = Path(DBFS_PQTDIR / f"{dbf_name}")
+    parquet_dir = DBF_PQT_DIR / f"{dbf_name}"
 
     if not parquet_dir.is_dir():
         logger.info("Converting DBF file to Parquet format...")
@@ -508,6 +519,9 @@ def read_dbf(fname: str) -> pd.DataFrame:
             df.to_parquet(parquet_fname)
 
     fetch_pq_fname = glob.glob(f"{parquet_dir}/*.parquet")
+    if len(fetch_pq_fname) == 0:
+        raise ValueError("No Parquet files found in the specified directory.")
+
     chunks_list = [
         dd.read_parquet(f, engine="fastparquet") for f in fetch_pq_fname
     ]
