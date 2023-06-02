@@ -15,9 +15,13 @@ from simpledbf import Dbf5
 logger = logging.getLogger(__name__)
 
 
-DBF_CSV_DIR = Path(settings.TEMP_FILES_DIR) / "csv"
-DBF_PQT_DIR = Path(settings.TEMP_FILES_DIR) / "dbfs_parquet"
+temp_files_dir = Path(settings.TEMP_FILES_DIR)
 
+DBF_CSV_DIR = temp_files_dir / "dbf_duplicated_csv"
+DBF_CSV_DIR.mkdir(parents=True, exist_ok=True)
+
+DBF_PQT_DIR = temp_files_dir / "dbf_parquet"
+DBF_PQT_DIR.mkdir(parents=True, exist_ok=True)
 
 EXPECTED_FIELDS = [
     "NU_ANO",
@@ -428,7 +432,7 @@ def drop_duplicates_from_dataframe(
         logger.info("Duplicates found for the same epiweek!")
         df_se_notific = df[duplicate_se_notific_mask]
         df_se_notific.to_csv(
-            DBF_PQT_DIR
+            DBF_CSV_DIR
             / f"duplicate_values_SE_NOT_{year}_{default_cid_name}.csv",
             index=False,
         )
@@ -444,7 +448,7 @@ def drop_duplicates_from_dataframe(
         logger.info("Duplicates found for the same notification date")
         df_dt_notific = df[duplicate_dt_notific_mask]
         df_dt_notific.to_csv(
-            DBF_PQT_DIR
+            DBF_CSV_DIR
             / f"duplicate_values_DT_NOT_{year}_{default_cid_name}.csv",
             index=False,
         )

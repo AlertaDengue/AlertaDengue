@@ -54,7 +54,7 @@ def copy_file_to_final_destination(dbf):
         dbf.notification_year,
     )
     src = dbf.file.path
-    dest = os.path.join(settings.IMPORTED_FILES_DIR, new_filename)
+    dest = os.path.join(settings.IMPORTED_FILES, new_filename)
     shutil.copy(src, dest)
 
 
