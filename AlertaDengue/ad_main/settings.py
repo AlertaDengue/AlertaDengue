@@ -282,13 +282,13 @@ STATICFILES_FINDERS = [
 # MEDIA
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#media-root
-MEDIA_ROOT = str(APPS_DIR / "media")
+# MEDIA_ROOT = str(APPS_DIR / "media")
 # https://docs.djangoproject.com/en/dev/ref/settings/#media-url
 MEDIA_URL = "/img/"
 
 # used to upload dbf
 MEDIA_ROOT = os.getenv("MEDIA_ROOT")
-IMPORTED_FILES_DIR = os.getenv("IMPORTED_FILES_DIR")
+IMPORTED_FILES = os.getenv("IMPORTED_FILES")
 TEMP_FILES_DIR = os.getenv("TEMP_FILES_DIR")
 
 # Storage destination path between production and development are not the same

@@ -27,7 +27,8 @@ env:
   HOST_EPISCANNER_DATA_DIR: ../../staging_data/epi_scanner/data
 
   STORAGE: "../../staging_data/"
-  TEMP_FILES_DIR: /tmp
+  TEMP_FILES_DIR: "/tmp"
+  DOCKER_HOST_TEMP_PARQUET_DIR: "/tmp/"
 
   EMAIL_CONFIG: ${{ secrets.EMAIL_CONFIG }}
   EMAIL_CONNECTION_DEFAULT: "outlook"
@@ -36,7 +37,7 @@ env:
   EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
   EMAIL_PORT: 587
 
-  IMPORTED_FILES_DIR: /IMPORTED_FILES
+  IMPORTED_FILES: /IMPORTED_FILES
   MEDIA_ROOT: /MEDIA_ROOT
   MEMCACHED_HOST: "localhost"
   MEMCACHED_PORT: 11211
@@ -93,10 +94,12 @@ jobs:
         use-mamba: true
         miniforge-variant: Mambaforge
 
-    - name: Prepare volume for postgres
+    - name: Prepare data volumes
       run: |
         mkdir -p ../../staging_data/postgres_data
         chmod 777 -R ../../staging_data/postgres_data
+        mkdir -p /tmp/dbf_duplicated_csv
+        chmod 777 -R /tmp/dbf_duplicated_csv
 
     - name: Install dependencies
       run: |

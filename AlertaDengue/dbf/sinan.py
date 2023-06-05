@@ -63,7 +63,7 @@ class Sinan(object):
         data_inicio = self.tabela["DT_NOTIFIC"].min()
         data_fim = self.tabela["DT_NOTIFIC"].max()
 
-        return data_inicio, data_fim
+        return data_inicio, data_fim  # type: ignore
 
     def _fill_missing_columns(self, col_names: List[str]) -> None:
         """
@@ -115,6 +115,7 @@ class Sinan(object):
         -------
             None
         """
+        self.default_cid = default_cid
 
         logger.info("Establishing connection to PostgreSQL database...")
         connection = self._get_postgres_connection()
@@ -136,17 +137,15 @@ class Sinan(object):
             logger.info("Parsing rows and converting data types...")
 
             df = parse_data(
-                self.tabela[valid_col_names], f"{default_cid}", self.ano
+                self.tabela[valid_col_names],
+                default_cid,  # type: ignore
+                self.ano,
             )
 
             # Remove duplicate rows
-            subset_columns = [
-                "ID_AGRAVO",
-                "ID_MUNICIP",
-                "NU_NOTIFIC",
-                "DT_NOTIFIC",
-            ]
-            df = drop_duplicates_from_dataframe(df, subset_columns)
+            df = drop_duplicates_from_dataframe(
+                df, default_cid, self.ano  # type: ignore
+            )
 
             logger.info(
                 f"Starting iteration to upsert data into {table_name}..."
