@@ -72,25 +72,6 @@
 
                         },
                         { // Secondary yAxis
-                            gridLineWidth: 1,
-                            type: "logarithmic",
-                            title: {
-                                text: 'Tweets',
-                                style: {
-                                    color: '#4572A7'
-                                }
-                            },
-                            labels: {
-                                formatter: function () {
-                                    return this.value + ' tweets';
-                                },
-                                style: {
-                                    color: '#4572A7'
-                                }
-                            }
-
-                        },
-                        { // Tertiary yAxis
                             gridLineWidth: 0,
                             type: "logarithmic",
                             title: {
@@ -134,23 +115,6 @@
                             tooltip: {
                                 valueSuffix: ' °C'
                             }
-                        },
-                        {
-                            name: 'Tweets',
-                            type: 'spline',
-                            color: '#4572A7',
-                            pointInterval: 7 * 24 * 3600 * 1000,
-                            pointStart: {{ xvalues.0 }}*1000 + tzo, //Date.UTC(2009, 12, 27),
-                            yAxis: 1,
-                            data: dados['{{ ap }}'].tweets,
-                            marker: {
-                                enabled: false
-                            },
-                            dashStyle: 'shortdot',
-                            tooltip: {
-                                valueSuffix: ' tweets'
-                            }
-
                         },
                         {
                             name: 'Casos de Dengue',

@@ -106,27 +106,6 @@
   </div>
 </div>
 
-{% if tweet_max > 0%}
-<div class="row">
-  <div class="col-md-12">
-    <h3>{% trans "Menção a arboviroses nas redes sociais" %}</h3>
-
-    <p>{% blocktrans %}A figura abaixo mostra a intensidade de menção de sintomas de arboviroses
-    e presença de mosquitos de acordo com a população do município que usa
-    redes sociais.
-    Esse indicador, que é mais eficaz em cidades maiores, deve ser visto como
-    um auxiliar na detecção precoce de aumento de casos. Atualmente,
-    esse indicador é mais sensivel para detectar dengue do que outras
-    arboviroses{% endblocktrans %}.</p>
-
-    {{chart_dengue_tweets|safe}}
-
-    <br/>&nbsp;
-
-  </div>
-</div>
-{% endif %}
-
 <div class="row">
   <div class="col-md-12">
 
@@ -286,9 +265,6 @@
         {% trans "Média da umidade relativa diária do ar ao longo da semana" %}</li>        
       <li><b>umid.max</b>:
         {% trans "Média da umidade relativa máxima diária do ar ao longo da semana" %}</li>
-        
-      <li><b>tweet</b>:
-        {% trans "Número de mensagens mencionando sintomas de dengue em tweets geolocalizados. Fonte: Observatório da Dengue / UFMG" %}</li>
       <li><b>casos notif</b>:
         {% trans "Número de casos notificados por semana (Os valores são atualizados retrospectivamente todas as semanas)" %}</li>
       <li><b>incidência</b>:
@@ -311,9 +287,6 @@
       <li>{% blocktrans %}Os dados do sinan mais recentes ainda não foram totalmente digitados.
         Estimamos o número esperado de casos notificados considerando o tempo
         até os casos serem digitados{% endblocktrans %}.
-      </li>
-      <li>{% blocktrans %}Os dados de redes sociais são coletados e
-        analisados pelo Observatório de Dengue (UFMG){% endblocktrans %}.
       </li>
       <li>{% blocktrans %}Algumas vezes, os casos da última semana ainda não estao disponíveis,
         nesse caso, usa-se uma estimação com base na tendência de variação da

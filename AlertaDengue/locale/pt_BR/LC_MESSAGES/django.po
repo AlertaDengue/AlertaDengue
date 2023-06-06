@@ -164,17 +164,6 @@ msgstr ""
 msgid "Condições climáticas para transmissão"
 msgstr ""
 
-#: AlertaDengue/dados/charts/cities.py:378
-#: AlertaDengue/dados/charts/states.py:58
-#: AlertaDengue/dados/charts/states.py:126
-msgid "Menções em tweets"
-msgstr ""
-
-#: AlertaDengue/dados/charts/cities.py:382
-#, python-brace-format
-msgid "Semana %{text} : %{y} Tweets"
-msgstr ""
-
 #: AlertaDengue/dados/charts/cities.py:388
 #: AlertaDengue/dados/charts/states.py:85
 msgid "Menções na mídia social"
@@ -444,19 +433,6 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:84
 msgid "Dados de menção à dengue nas redes sociais:"
-msgstr ""
-
-#: AlertaDengue/dados/templates/about.html:84
-msgid ""
-"As pessoas em geral buscam informações ou contam sobre\n"
-"            seu estado de saúde nas redes sociais antes de buscarem ajuda "
-"médica. Assim, conhecer o número de menções\n"
-"            à dengue nas redes sociais ajuda a identificar quando os casos "
-"estão aumentando na população.\n"
-"            O Infodengue tem parceria com o <a href=\"https://www."
-"observatorio.inweb.org.br\">Observatório da Dengue</a> que captura e analisa "
-"tweets de pessoas\n"
-"            geolocalizadas quanto à menção de sintomas de dengue."
 msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:90
@@ -1376,13 +1352,6 @@ msgstr ""
 msgid "Média da umidade relativa máxima diária do ar ao longo da semana"
 msgstr ""
 
-#: AlertaDengue/dados/templates/report_city.html:280
-#: AlertaDengue/dados/templates/services_api.html:215
-msgid ""
-"Número de mensagens mencionando sintomas de dengue em tweets geolocalizados. "
-"Fonte: Observatório da Dengue / UFMG"
-msgstr ""
-
 #: AlertaDengue/dados/templates/report_city.html:282
 #: AlertaDengue/dados/templates/services_api.html:208
 msgid ""
@@ -1658,17 +1627,6 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/report_state.html:411
 msgid "média das temperaturas mínimas da semana (em graus centígrados)"
-msgstr ""
-
-#: AlertaDengue/dados/templates/report_state.html:413
-#: AlertaDengue/dados/templates/services_api.html:215
-msgid "tweet"
-msgstr ""
-
-#: AlertaDengue/dados/templates/report_state.html:414
-msgid ""
-"número de tweets indicativos de casos de dengue na cidade. Por enquanto só "
-"há para dengue"
 msgstr ""
 
 #: AlertaDengue/dados/templates/report_state.html:416
