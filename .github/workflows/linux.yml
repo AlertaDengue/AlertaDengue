@@ -20,11 +20,8 @@ env:
   DOCKER_HOST_MEDIA_ROOT: /MEDIA_ROOT
   DOCKER_HOST_SHAPEFILES_DIR: "../../staging_data/shapefiles"
   DOCKER_HOST_STATIC: "../../staging_data/staticfiles"
-  DOCKER_HOST_TEMP_PARQUET_DIR: "../../staging_data/dbfs_parquet"
 
   WORK_DIR: /opt/services/epi_scanner
-  CTNR_EPISCANNER_DATA_DIR: /opt/services/epi_scanner/data
-  HOST_EPISCANNER_DATA_DIR: ../../staging_data/epi_scanner/data
 
   STORAGE: "../../staging_data/"
   TEMP_FILES_DIR: "/tmp"
@@ -42,6 +39,7 @@ env:
   MEMCACHED_HOST: "localhost"
   MEMCACHED_PORT: 11211
 
+  PG_DATA_PROD: "../../staging_data/postgres_data"
   PG_DATA_STAGING: "../../staging_data/postgres_data"
   PG_RESTORE_STAGING: schemas
   PORT_WEB: 8080
@@ -64,6 +62,8 @@ env:
   MINIO_PORT_1: 9000
   MINIO_PORT_2: 9090
   MINIO_ENDPOINT: http://minio:9090
+  HOST_MINIO_DATA_DIR: "../../staging_data/data"
+
 
 
 jobs:
