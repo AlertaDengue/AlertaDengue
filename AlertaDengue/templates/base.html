@@ -4,25 +4,6 @@
 {% load i18n %}
 {% load searchbox_component %}
 
-{% block header_extra_base%}
-<style type="text/css">
-    .tt-hint {
-        font-size: 18px;
-        line-height: 1.33;
-    }
-    #remote .tt-dropdown-menu {
-          max-height: 150px;
-          overflow-y: auto;
-    }
-
-    .twitter-typeahead .tt-query, .twitter-typeahead .tt-hint {
-        height: 45px;
-        padding: 10px 16px;
-    }
-
-</style>
-{% endblock %}
-
 {% block bootstrap4_content %}
 <!-- Wrap all page content here -->
 <div id="wrap">
@@ -118,34 +99,6 @@
       $(document).ready(function(){
         document.getElementsByTagName("title")[0].innerText = 'Situação Epidemiológica';
       });
-    </script>
-    <script type="application/javascript">
-            var citiesDisplay = new Bloodhound({
-                    datumTokenizer: Bloodhound.tokenizers.whitespace,
-                    queryTokenizer: Bloodhound.tokenizers.whitespace,
-                    remote: {
-                        url: "{% url 'dados:get_city' %}",
-                        replace: function(url, query) {
-                            return url + "?q=" + query;
-                        }
-                    }
-                });
-            citiesDisplay.initialize();
-            $('#remote .twitter-typeahead').typeahead({
-                hint: true,
-                minLength: 1,
-                highlight: true},
-                {name: 'cities-display',
-                display: function(sugg){
-                    return sugg.nome+' - '+sugg.uf
-                },
-                source: citiesDisplay,
-            });
-            $('#remote').bind('typeahead:select', function(ev, suggestion){
-                //alert(suggestion.geocodigo);
-                window.location.href = '/alerta/'+suggestion.geocodigo.toString()
-            });
-
     </script>
     <!-- Begin page content -->
 

@@ -21,7 +21,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -qq update --yes \
   && apt-get -qq install --yes --no-install-recommends \
     build-essential git make postgresql-client vim \
-    ca-certificates wget locales cron sudo \
+    ca-certificates wget locales cron sudo psycopg2 sqlalchemy \
   && rm -rf /var/lib/apt/lists/* \
     /var/cache/apt/archives \
     /tmp/*

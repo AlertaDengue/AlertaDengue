@@ -55,4 +55,3 @@ rever/
 */dumps/
 containers/postgres/dumps/*
 staging_data/
-*Storage
