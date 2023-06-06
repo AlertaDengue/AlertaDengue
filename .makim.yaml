@@ -102,16 +102,6 @@ groups:
           {{ sugar_run_rm }} --cmd '{{manage_py}} test'
 
 
-      # EPISCANNER
-      update_episcanner:
-        help: Create parquet files for episcanner
-        run: |
-          from epi_scanner.settings import STATES
-          from epi_scanner.management import fetch_data
-          for state in STATES:
-              fetch_data.data_to_parquet(state)
-
-
       # DATABASE 
       grant-role:
         help: Grant read-only access to the database
