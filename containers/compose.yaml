@@ -103,7 +103,7 @@ services:
       - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
       - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/
       # Add to development
-      - ../AlertaDengue:/opt/services/AlertaDengue
+      # - ../AlertaDengue:/opt/services/AlertaDengue
     profiles:
       - donotstart
 
