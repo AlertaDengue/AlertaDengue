@@ -2,6 +2,7 @@
 {% load static %}
 {% load bootstrap4 %}
 {% load i18n %}
+{% load searchbox_component %}
 
 {% block header_extra_base%}
 <style type="text/css">
@@ -71,14 +72,7 @@
                                     <li class="py-2"><a href="{% url 'dados:report' %}">
                                         {% trans "Relatórios" %}</a></li>
                                     <li style="overflow: visible">
-                                        <div id="remote" class="twitter-typeahead"
-                                            style="overflow-y: auto; max-height: 150px; overflow: visible">
-                                        <input type="text"
-                                                class="form-control input-lg typeahead twitter-typeahead tt-dropdown-menu"
-                                                placeholder="{% blocktrans %}Encontre um município{% endblocktrans %} ..."
-                                                name="q"
-                                                style="position: relative" />
-                                        </div>
+                                        {% searchbox_component %}
                                     </li>
                                     {% if user.is_authenticated %}
                                     <li class="py-2"><a href="{% url 'dbf:upload' %}">

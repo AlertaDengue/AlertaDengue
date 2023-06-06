@@ -1,0 +1,24 @@
+{% block searchbox_component %}
+<input 
+    class="form-control" 
+    list="searchbarOptions" 
+    id="searchbar" 
+    placeholder="{% blocktrans %}Encontre um município{% endblocktrans %}"
+>
+<datalist id="searchbarOptions">
+    {% for city in options_cities %}
+        <option value="{{ city.name }} - {{ city.state }}" data-geocode="{{ city.geocode }}"></option>
+    {% endfor %}
+</datalist>
+
+<script>
+    document.getElementById('searchbar').addEventListener('change', function() {
+        var selectedOption = document.querySelector('option[value="' + this.value + '"]');
+        var selectedGeocode = selectedOption.getAttribute('data-geocode');
+    
+        if (selectedGeocode) {
+            window.location.href = '/alerta/' + selectedGeocode.toString();
+        }
+    });
+</script>
+{% endblock %}

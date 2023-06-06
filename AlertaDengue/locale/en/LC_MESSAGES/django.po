@@ -1242,6 +1242,10 @@ msgstr "Municipalities by regional"
 msgid "Municípios"
 msgstr "Municipalities"
 
+#: AlertaDengue/dados/templates/components/searchbox/searchbox.html:6
+msgid "Encontre um município"
+msgstr "Search by city"
+
 #: AlertaDengue/dados/templates/dashboard_cities.html:56
 #, python-format
 msgid ""
@@ -1388,7 +1392,7 @@ msgid "Mapas estaduais"
 msgstr "State map views"
 
 #: AlertaDengue/dados/templates/main.html:65
-#: AlertaDengue/templates/base.html:68
+#: AlertaDengue/templates/base.html:69
 msgid "Participe"
 msgstr "Join us"
 
@@ -1443,7 +1447,7 @@ msgstr ""
 #: AlertaDengue/dados/templates/report_filter_state.html:52
 #: AlertaDengue/dados/templates/report_filter_state.html:60
 #: AlertaDengue/dados/templates/report_state.html:20
-#: AlertaDengue/templates/base.html:72
+#: AlertaDengue/templates/base.html:73
 msgid "Relatórios"
 msgstr "Report"
 
@@ -1908,7 +1912,7 @@ msgstr "Reported cases of %(disease_label)s"
 #: AlertaDengue/dados/templates/services_tutorial.html:28
 #: AlertaDengue/dados/templates/services_tutorial_Python.html:174
 #: AlertaDengue/dados/templates/services_tutorial_R.html:174
-#: AlertaDengue/templates/base.html:70
+#: AlertaDengue/templates/base.html:71
 msgid "Dados"
 msgstr "Data"
 
@@ -2336,7 +2340,7 @@ msgstr "Filter description"
 msgid "Por favor, aguarde."
 msgstr "Please, wait."
 
-#: AlertaDengue/dados/templates/team.html:5 AlertaDengue/templates/base.html:66
+#: AlertaDengue/dados/templates/team.html:5 AlertaDengue/templates/base.html:67
 msgid "Equipe"
 msgstr "Team"
 
@@ -2712,39 +2716,35 @@ msgstr "Forecast week initial date"
 msgid "Casos Previstos"
 msgstr "Forecast cases"
 
-#: AlertaDengue/templates/base.html:62
+#: AlertaDengue/templates/base.html:63
 msgid "Início"
 msgstr "Home"
 
-#: AlertaDengue/templates/base.html:64
+#: AlertaDengue/templates/base.html:65
 msgid "Sobre nós"
 msgstr "About us"
 
-#: AlertaDengue/templates/base.html:78
-msgid "Encontre um município"
-msgstr "Search by city"
-
-#: AlertaDengue/templates/base.html:85
+#: AlertaDengue/templates/base.html:79
 msgid "Envie dados atualizados"
 msgstr "Send updated data"
 
-#: AlertaDengue/templates/base.html:90
+#: AlertaDengue/templates/base.html:84
 msgid "Account "
 msgstr "Account "
 
-#: AlertaDengue/templates/base.html:95
+#: AlertaDengue/templates/base.html:89
 msgid "Logout"
 msgstr "Logout"
 
-#: AlertaDengue/templates/base.html:98
+#: AlertaDengue/templates/base.html:92
 msgid "Change password"
 msgstr "Change password"
 
-#: AlertaDengue/templates/base.html:104
+#: AlertaDengue/templates/base.html:98
 msgid "Login"
 msgstr "Login"
 
-#: AlertaDengue/templates/base.html:165
+#: AlertaDengue/templates/base.html:159
 msgid ""
 "Pin a fixed-height footer to the bottom\n"
 "            of the viewport in desktop browsers with this\n"
