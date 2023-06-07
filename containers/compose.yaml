@@ -82,7 +82,7 @@ services:
       start_period: 10s  # requires docker-compose 3.4
     restart: always
 
-  base:
+  web:
     build:
       context: ".."
       dockerfile: "containers/web/Dockerfile"
@@ -104,46 +104,13 @@ services:
       - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/
       # Add to development
       # - ../AlertaDengue:/opt/services/AlertaDengue
-    profiles:
-      - donotstart
-
-  worker:
-    extends:
-      service: base
-    entrypoint: ["/opt/services/celery-run.sh"]
-    env_file:
-      - ../.env
-    depends_on:
-      - rabbitmq
-      - memcached
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", 'celery --app ad_main.celeryapp.app inspect ping -d "celery@$${HOSTNAME}"']
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-
-  web:
     hostname: web
-    extends:
-      service: base
     ports:
       - ${PORT_WEB}:8000
-    env_file:
-      - ../.env
-    environment:
-      - PSQL_HOST=${PSQL_HOST}
-      - PSQL_PORT=${PSQL_PORT}
     depends_on:
-      # - dengue_db
-      - worker
       - rabbitmq
       - memcached
     restart: always
-    entrypoint: [
-      "/opt/services/scripts/run_scripts.sh",
-      ]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 10s
