@@ -36,7 +36,6 @@ container-wait-all:
 	$(MAKE) container-wait ENV=${ENV} SERVICE="rabbitmq"
 	if [[ "${ENV}" == "dev" ]]; then make container-wait ENV=dev SERVICE="postgres"; fi
 	$(MAKE) container-wait ENV=${ENV} SERVICE="web"
-	$(MAKE) container-wait ENV=${ENV} SERVICE="worker"
 
 # 
 .PHONY:test-staging-all

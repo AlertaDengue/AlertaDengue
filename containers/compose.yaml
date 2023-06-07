@@ -83,6 +83,7 @@ services:
     restart: always
 
   web:
+    hostname: web
     build:
       context: ".."
       dockerfile: "containers/web/Dockerfile"
@@ -104,7 +105,6 @@ services:
       - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/
       # Add to development
       # - ../AlertaDengue:/opt/services/AlertaDengue
-    hostname: web
     ports:
       - ${PORT_WEB}:8000
     depends_on:

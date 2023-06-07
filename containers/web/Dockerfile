@@ -80,10 +80,10 @@ RUN mkdir -p /opt/services/epi_scanner/data
 RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/epi_scanner/data
 
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/services_run.sh /opt/services/AlertaDengue/services_run.sh
-COPY --chown=${HOST_UID}:${HOST_GID} .env_episcanner.tpl /opt/services/AlertaDengue/
 COPY --chown=${HOST_UID}:${HOST_GID} .makim.yaml  /opt/services/AlertaDengue/.makim.yaml
 
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/crontab_setup.sh /opt/services/crontab_setup.sh
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/cronjob /etc/cron.d/cronjob
 
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/celery.sh  /opt/services/celery.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/entrypoint.sh  /entrypoint.sh

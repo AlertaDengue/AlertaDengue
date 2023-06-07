@@ -51,7 +51,6 @@ env:
   PSQL_PORT: 25432
   PSQL_USER: infodenguedev
   QUERY_CACHE_TIMEOUT: 86400
-  SERVICES_NUMBER: 2
 
   MINIO_USERNAME: developer
   MINIO_GROUPNAME: developer
