@@ -384,13 +384,17 @@ LOGGING = {
 
 # CELERY
 # ------------------------------------------------------------------------------
-CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")  # Verificar ERROR CELERY
-CELERY_TASK_ALWAYS_EAGER = os.getenv("CELERY_TASK_ALWAYS_EAGER")
-CELERY_ACCEPT_CONTET = ["json"]
-CELERY_TASK_SERIALIZER = "json"
-CELERY_RESULT_BACKEND = f"cache+memcached://{MEMCACHED_HOST}:{MEMCACHED_PORT}/"
-CELERY_CACHE_BACKEND = "default"
+broker_url = os.getenv("CELERY_BROKER_URL")
+broker_connection_retry = True
+task_always_eager = os.getenv("CELERY_TASK_ALWAYS_EAGER")
+accept_content = ["json"]
+task_serializer = "json"
+result_backend = f"cache+memcached://{MEMCACHED_HOST}:{MEMCACHED_PORT}/"
+cache_backend = "default"
+broker_connection_retry_on_startup = True
 
+
+# broker_connection_retry_on_startup to True
 # BOOTSTRAP4
 # ------------------------------------------------------------------------------
 # https://django-bootstrap4.readthedocs.io/en/latest/settings.html
