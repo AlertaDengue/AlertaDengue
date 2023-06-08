@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.6 (Debian 14.6-1.pgdg110+1)
--- Dumped by pg_dump version 15.1
+-- Dumped from database version 15.3 (Ubuntu 15.3-0ubuntu0.23.04.1)
+-- Dumped by pg_dump version 15.3 (Ubuntu 15.3-0ubuntu0.23.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -19,8 +19,6 @@ SET row_security = off;
 --
 -- Name: Dengue_global; Type: SCHEMA; Schema: -; Owner: Dengue
 --
-
-\c dengue
 
 CREATE SCHEMA "Dengue_global";
 
@@ -53,6 +51,15 @@ ALTER SCHEMA forecast OWNER TO postgres;
 
 
 ALTER SCHEMA public OWNER TO dengueadmin;
+
+--
+-- Name: weather; Type: SCHEMA; Schema: -; Owner: dengueadmin
+--
+
+CREATE SCHEMA weather;
+
+
+ALTER SCHEMA weather OWNER TO dengueadmin;
 
 --
 -- Name: adminpack; Type: EXTENSION; Schema: -; Owner: -
@@ -1272,46 +1279,6 @@ ALTER SEQUENCE "Municipio".alerta_mrj_zika_id_seq OWNED BY "Municipio".alerta_mr
 
 
 --
--- Name: copernicus_br; Type: TABLE; Schema: Municipio; Owner: dengueadmin
---
-
-CREATE TABLE "Municipio".copernicus_br (
-    date timestamp without time zone,
-    geocodigo bigint,
-    temp_min real,
-    temp_med real,
-    temp_max real,
-    precip_min real,
-    precip_med real,
-    precip_max real,
-    pressao_min real,
-    pressao_med real,
-    pressao_max real,
-    umid_min real,
-    umid_med real,
-    umid_max real
-);
-
-
-ALTER TABLE "Municipio".copernicus_br OWNER TO dengueadmin;
-
---
--- Name: copernicus_foz; Type: TABLE; Schema: Municipio; Owner: dengueadmin
---
-
-CREATE TABLE "Municipio".copernicus_foz (
-    date timestamp without time zone,
-    geocodigo bigint,
-    temp real,
-    precip real,
-    pressao real,
-    umid real
-);
-
-
-ALTER TABLE "Municipio".copernicus_foz OWNER TO dengueadmin;
-
---
 -- Name: historico_casos; Type: VIEW; Schema: Municipio; Owner: postgres
 --
 
@@ -1328,30 +1295,6 @@ CREATE VIEW "Municipio".historico_casos AS
 
 
 ALTER TABLE "Municipio".historico_casos OWNER TO postgres;
-
---
--- Name: weather_copernicus; Type: TABLE; Schema: Municipio; Owner: dengueadmin
---
-
-CREATE TABLE "Municipio".weather_copernicus (
-    date timestamp without time zone,
-    geocodigo bigint,
-    temp_min real,
-    temp_med real,
-    temp_max real,
-    precip_min real,
-    precip_med real,
-    precip_max real,
-    pressao_min real,
-    pressao_med real,
-    pressao_max real,
-    umid_min real,
-    umid_med real,
-    umid_max real
-);
-
-
-ALTER TABLE "Municipio".weather_copernicus OWNER TO dengueadmin;
 
 --
 -- Name: auth_group; Type: TABLE; Schema: forecast; Owner: forecast
@@ -2423,6 +2366,93 @@ CREATE MATERIALIZED VIEW public.uf_total_zika_view AS
 ALTER TABLE public.uf_total_zika_view OWNER TO postgres;
 
 --
+-- Name: copernicus_brasil; Type: TABLE; Schema: weather; Owner: dengueadmin
+--
+
+CREATE TABLE weather.copernicus_brasil (
+    index integer NOT NULL,
+    date date NOT NULL,
+    geocodigo bigint NOT NULL,
+    temp_min real NOT NULL,
+    temp_med real NOT NULL,
+    temp_max real NOT NULL,
+    precip_min real NOT NULL,
+    precip_med real NOT NULL,
+    precip_max real NOT NULL,
+    precip_tot real NOT NULL,
+    pressao_min real NOT NULL,
+    pressao_med real NOT NULL,
+    pressao_max real NOT NULL,
+    umid_min real NOT NULL,
+    umid_med real NOT NULL,
+    umid_max real NOT NULL
+);
+
+
+ALTER TABLE weather.copernicus_brasil OWNER TO dengueadmin;
+
+--
+-- Name: copernicus_brasil_index_seq; Type: SEQUENCE; Schema: weather; Owner: dengueadmin
+--
+
+CREATE SEQUENCE weather.copernicus_brasil_index_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE weather.copernicus_brasil_index_seq OWNER TO dengueadmin;
+
+--
+-- Name: copernicus_brasil_index_seq; Type: SEQUENCE OWNED BY; Schema: weather; Owner: dengueadmin
+--
+
+ALTER SEQUENCE weather.copernicus_brasil_index_seq OWNED BY weather.copernicus_brasil.index;
+
+
+--
+-- Name: copernicus_foz_do_iguacu; Type: TABLE; Schema: weather; Owner: dengueadmin
+--
+
+CREATE TABLE weather.copernicus_foz_do_iguacu (
+    index integer NOT NULL,
+    datetime timestamp without time zone NOT NULL,
+    geocodigo bigint NOT NULL,
+    temp real NOT NULL,
+    precip real NOT NULL,
+    pressao real NOT NULL,
+    umid real NOT NULL
+);
+
+
+ALTER TABLE weather.copernicus_foz_do_iguacu OWNER TO dengueadmin;
+
+--
+-- Name: copernicus_foz_do_iguacu_index_seq; Type: SEQUENCE; Schema: weather; Owner: dengueadmin
+--
+
+CREATE SEQUENCE weather.copernicus_foz_do_iguacu_index_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE weather.copernicus_foz_do_iguacu_index_seq OWNER TO dengueadmin;
+
+--
+-- Name: copernicus_foz_do_iguacu_index_seq; Type: SEQUENCE OWNED BY; Schema: weather; Owner: dengueadmin
+--
+
+ALTER SEQUENCE weather.copernicus_foz_do_iguacu_index_seq OWNED BY weather.copernicus_foz_do_iguacu.index;
+
+
+--
 -- Name: alerta_regional_chik id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueadmin
 --
 
@@ -2721,6 +2751,20 @@ ALTER TABLE ONLY public.django_content_type ALTER COLUMN id SET DEFAULT nextval(
 --
 
 ALTER TABLE ONLY public.django_migrations ALTER COLUMN id SET DEFAULT nextval('public.django_migrations_id_seq'::regclass);
+
+
+--
+-- Name: copernicus_brasil index; Type: DEFAULT; Schema: weather; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY weather.copernicus_brasil ALTER COLUMN index SET DEFAULT nextval('weather.copernicus_brasil_index_seq'::regclass);
+
+
+--
+-- Name: copernicus_foz_do_iguacu index; Type: DEFAULT; Schema: weather; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY weather.copernicus_foz_do_iguacu ALTER COLUMN index SET DEFAULT nextval('weather.copernicus_foz_do_iguacu_index_seq'::regclass);
 
 
 --
@@ -3388,6 +3432,22 @@ ALTER TABLE ONLY public.django_session
 
 
 --
+-- Name: copernicus_brasil copernicus_brasil_pkey; Type: CONSTRAINT; Schema: weather; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY weather.copernicus_brasil
+    ADD CONSTRAINT copernicus_brasil_pkey PRIMARY KEY (date, geocodigo);
+
+
+--
+-- Name: copernicus_foz_do_iguacu copernicus_foz_do_iguacu_pkey; Type: CONSTRAINT; Schema: weather; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY weather.copernicus_foz_do_iguacu
+    ADD CONSTRAINT copernicus_foz_do_iguacu_pkey PRIMARY KEY (index);
+
+
+--
 -- Name: Municipio_idx_gc; Type: INDEX; Schema: Dengue_global; Owner: administrador
 --
 
@@ -3486,31 +3546,10 @@ CREATE INDEX chuva_idx_data ON "Municipio"."Clima_cemaden" USING btree (datahora
 
 
 --
--- Name: date_idx; Type: INDEX; Schema: Municipio; Owner: dengueadmin
---
-
-CREATE INDEX date_idx ON "Municipio".copernicus_br USING btree (date);
-
-
---
 -- Name: estacoes_idx; Type: INDEX; Schema: Municipio; Owner: administrador
 --
 
 CREATE INDEX estacoes_idx ON "Municipio"."Clima_cemaden" USING btree ("Estacao_cemaden_codestacao");
-
-
---
--- Name: geocodigo_idx; Type: INDEX; Schema: Municipio; Owner: dengueadmin
---
-
-CREATE INDEX geocodigo_idx ON "Municipio".copernicus_br USING btree (geocodigo);
-
-
---
--- Name: ix_Municipio_weather_copernicus_date; Type: INDEX; Schema: Municipio; Owner: dengueadmin
---
-
-CREATE INDEX "ix_Municipio_weather_copernicus_date" ON "Municipio".weather_copernicus USING btree (date);
 
 
 --
@@ -4053,11 +4092,41 @@ ALTER TABLE ONLY public.django_admin_log
 
 
 --
+-- Name: SCHEMA "Dengue_global"; Type: ACL; Schema: -; Owner: Dengue
+--
+
+GRANT USAGE ON SCHEMA "Dengue_global" TO "Read_only";
+GRANT USAGE ON SCHEMA "Dengue_global" TO infodenguedev;
+
+
+--
+-- Name: SCHEMA "Municipio"; Type: ACL; Schema: -; Owner: Dengue
+--
+
+GRANT USAGE ON SCHEMA "Municipio" TO infodenguedev;
+
+
+--
+-- Name: SCHEMA forecast; Type: ACL; Schema: -; Owner: postgres
+--
+
+GRANT USAGE ON SCHEMA forecast TO infodenguedev;
+
+
+--
 -- Name: SCHEMA public; Type: ACL; Schema: -; Owner: dengueadmin
 --
 
 REVOKE USAGE ON SCHEMA public FROM PUBLIC;
 GRANT ALL ON SCHEMA public TO PUBLIC;
+GRANT USAGE ON SCHEMA public TO infodenguedev;
+
+
+--
+-- Name: SCHEMA weather; Type: ACL; Schema: -; Owner: dengueadmin
+--
+
+GRANT USAGE ON SCHEMA weather TO infodenguedev;
 
 
 --
@@ -4066,6 +4135,8 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 
 GRANT ALL ON TABLE "Dengue_global"."CID10" TO "Dengue";
 GRANT ALL ON TABLE "Dengue_global"."CID10" TO dengue;
+GRANT SELECT ON TABLE "Dengue_global"."CID10" TO "Read_only";
+GRANT SELECT ON TABLE "Dengue_global"."CID10" TO infodenguedev;
 
 
 --
@@ -4074,6 +4145,53 @@ GRANT ALL ON TABLE "Dengue_global"."CID10" TO dengue;
 
 GRANT ALL ON TABLE "Dengue_global"."Municipio" TO "Dengue";
 GRANT ALL ON TABLE "Dengue_global"."Municipio" TO dengue;
+GRANT SELECT ON TABLE "Dengue_global"."Municipio" TO "Read_only";
+GRANT SELECT ON TABLE "Dengue_global"."Municipio" TO infodenguedev;
+
+
+--
+-- Name: TABLE alerta_regional_chik; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE "Dengue_global".alerta_regional_chik TO "Read_only";
+GRANT SELECT ON TABLE "Dengue_global".alerta_regional_chik TO infodenguedev;
+
+
+--
+-- Name: SEQUENCE alerta_regional_chik_id_seq; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
+--
+
+GRANT SELECT ON SEQUENCE "Dengue_global".alerta_regional_chik_id_seq TO "Read_only";
+
+
+--
+-- Name: TABLE alerta_regional_dengue; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE "Dengue_global".alerta_regional_dengue TO "Read_only";
+GRANT SELECT ON TABLE "Dengue_global".alerta_regional_dengue TO infodenguedev;
+
+
+--
+-- Name: SEQUENCE alerta_regional_dengue_id_seq; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
+--
+
+GRANT SELECT ON SEQUENCE "Dengue_global".alerta_regional_dengue_id_seq TO "Read_only";
+
+
+--
+-- Name: TABLE alerta_regional_zika; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE "Dengue_global".alerta_regional_zika TO "Read_only";
+GRANT SELECT ON TABLE "Dengue_global".alerta_regional_zika TO infodenguedev;
+
+
+--
+-- Name: SEQUENCE alerta_regional_zika_id_seq; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
+--
+
+GRANT SELECT ON SEQUENCE "Dengue_global".alerta_regional_zika_id_seq TO "Read_only";
 
 
 --
@@ -4082,6 +4200,8 @@ GRANT ALL ON TABLE "Dengue_global"."Municipio" TO dengue;
 
 GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE "Dengue_global".estado TO "Dengue";
 GRANT ALL ON TABLE "Dengue_global".estado TO dengue;
+GRANT SELECT ON TABLE "Dengue_global".estado TO "Read_only";
+GRANT SELECT ON TABLE "Dengue_global".estado TO infodenguedev;
 
 
 --
@@ -4089,6 +4209,15 @@ GRANT ALL ON TABLE "Dengue_global".estado TO dengue;
 --
 
 GRANT ALL ON TABLE "Dengue_global".macroregional TO dengue;
+GRANT SELECT ON TABLE "Dengue_global".macroregional TO "Read_only";
+GRANT SELECT ON TABLE "Dengue_global".macroregional TO infodenguedev;
+
+
+--
+-- Name: SEQUENCE macroregional_id_seq; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
+--
+
+GRANT SELECT ON SEQUENCE "Dengue_global".macroregional_id_seq TO "Read_only";
 
 
 --
@@ -4096,6 +4225,8 @@ GRANT ALL ON TABLE "Dengue_global".macroregional TO dengue;
 --
 
 GRANT ALL ON TABLE "Dengue_global".parameters TO dengue;
+GRANT SELECT ON TABLE "Dengue_global".parameters TO "Read_only";
+GRANT SELECT ON TABLE "Dengue_global".parameters TO infodenguedev;
 
 
 --
@@ -4103,6 +4234,15 @@ GRANT ALL ON TABLE "Dengue_global".parameters TO dengue;
 --
 
 GRANT ALL ON TABLE "Dengue_global".regional TO dengue;
+GRANT SELECT ON TABLE "Dengue_global".regional TO "Read_only";
+GRANT SELECT ON TABLE "Dengue_global".regional TO infodenguedev;
+
+
+--
+-- Name: SEQUENCE regional_id_seq; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
+--
+
+GRANT SELECT ON SEQUENCE "Dengue_global".regional_id_seq TO "Read_only";
 
 
 --
@@ -4111,6 +4251,8 @@ GRANT ALL ON TABLE "Dengue_global".regional TO dengue;
 
 GRANT ALL ON TABLE "Dengue_global".regional_saude TO dengue;
 GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE "Dengue_global".regional_saude TO "Dengue";
+GRANT SELECT ON TABLE "Dengue_global".regional_saude TO "Read_only";
+GRANT SELECT ON TABLE "Dengue_global".regional_saude TO infodenguedev;
 
 
 --
@@ -4118,6 +4260,7 @@ GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE "Dengue_global".
 --
 
 GRANT SELECT,USAGE ON SEQUENCE "Dengue_global".regional_saude_id_seq TO dengue;
+GRANT SELECT ON SEQUENCE "Dengue_global".regional_saude_id_seq TO "Read_only";
 
 
 --
@@ -4126,6 +4269,7 @@ GRANT SELECT,USAGE ON SEQUENCE "Dengue_global".regional_saude_id_seq TO dengue;
 
 GRANT ALL ON TABLE "Municipio"."Bairro" TO "Dengue";
 GRANT ALL ON TABLE "Municipio"."Bairro" TO dengue;
+GRANT SELECT ON TABLE "Municipio"."Bairro" TO infodenguedev;
 
 
 --
@@ -4134,6 +4278,7 @@ GRANT ALL ON TABLE "Municipio"."Bairro" TO dengue;
 
 GRANT ALL ON TABLE "Municipio"."Clima_Satelite" TO "Dengue";
 GRANT ALL ON TABLE "Municipio"."Clima_Satelite" TO dengue;
+GRANT SELECT ON TABLE "Municipio"."Clima_Satelite" TO infodenguedev;
 
 
 --
@@ -4149,6 +4294,7 @@ GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_Satelite_id_seq" TO dengue;
 
 GRANT ALL ON TABLE "Municipio"."Clima_cemaden" TO "Dengue";
 GRANT ALL ON TABLE "Municipio"."Clima_cemaden" TO dengue;
+GRANT SELECT ON TABLE "Municipio"."Clima_cemaden" TO infodenguedev;
 
 
 --
@@ -4164,6 +4310,7 @@ GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_cemaden_id_seq" TO dengue;
 
 GRANT ALL ON TABLE "Municipio"."Clima_wu" TO "Dengue";
 GRANT ALL ON TABLE "Municipio"."Clima_wu" TO dengue;
+GRANT SELECT ON TABLE "Municipio"."Clima_wu" TO infodenguedev;
 
 
 --
@@ -4179,6 +4326,7 @@ GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_wu_id_seq" TO dengue;
 
 GRANT ALL ON TABLE "Municipio"."Estacao_cemaden" TO "Dengue";
 GRANT ALL ON TABLE "Municipio"."Estacao_cemaden" TO dengue;
+GRANT SELECT ON TABLE "Municipio"."Estacao_cemaden" TO infodenguedev;
 
 
 --
@@ -4187,6 +4335,7 @@ GRANT ALL ON TABLE "Municipio"."Estacao_cemaden" TO dengue;
 
 GRANT ALL ON TABLE "Municipio"."Estacao_wu" TO "Dengue";
 GRANT ALL ON TABLE "Municipio"."Estacao_wu" TO dengue;
+GRANT SELECT ON TABLE "Municipio"."Estacao_wu" TO infodenguedev;
 
 
 --
@@ -4195,6 +4344,7 @@ GRANT ALL ON TABLE "Municipio"."Estacao_wu" TO dengue;
 
 GRANT ALL ON TABLE "Municipio"."Historico_alerta" TO "Dengue";
 GRANT ALL ON TABLE "Municipio"."Historico_alerta" TO dengue;
+GRANT SELECT ON TABLE "Municipio"."Historico_alerta" TO infodenguedev;
 
 
 --
@@ -4203,6 +4353,7 @@ GRANT ALL ON TABLE "Municipio"."Historico_alerta" TO dengue;
 
 GRANT ALL ON TABLE "Municipio"."Historico_alerta_chik" TO "Dengue";
 GRANT ALL ON TABLE "Municipio"."Historico_alerta_chik" TO dengue;
+GRANT SELECT ON TABLE "Municipio"."Historico_alerta_chik" TO infodenguedev;
 
 
 --
@@ -4224,6 +4375,7 @@ GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Historico_alerta_id_seq" TO dengue;
 --
 
 GRANT ALL ON TABLE "Municipio"."Historico_alerta_zika" TO dengue;
+GRANT SELECT ON TABLE "Municipio"."Historico_alerta_zika" TO infodenguedev;
 
 
 --
@@ -4239,6 +4391,7 @@ GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Historico_alerta_zika_id_seq" TO den
 
 GRANT ALL ON TABLE "Municipio"."Localidade" TO "Dengue";
 GRANT ALL ON TABLE "Municipio"."Localidade" TO dengue;
+GRANT SELECT ON TABLE "Municipio"."Localidade" TO infodenguedev;
 
 
 --
@@ -4247,6 +4400,14 @@ GRANT ALL ON TABLE "Municipio"."Localidade" TO dengue;
 
 GRANT ALL ON TABLE "Municipio"."Notificacao" TO "Dengue";
 GRANT ALL ON TABLE "Municipio"."Notificacao" TO dengue;
+GRANT SELECT ON TABLE "Municipio"."Notificacao" TO infodenguedev;
+
+
+--
+-- Name: TABLE "Notificacao__20220806"; Type: ACL; Schema: Municipio; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE "Municipio"."Notificacao__20220806" TO infodenguedev;
 
 
 --
@@ -4262,6 +4423,7 @@ GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Notificacao_id_seq" TO dengue;
 
 GRANT ALL ON TABLE "Municipio"."Ovitrampa" TO "Dengue";
 GRANT ALL ON TABLE "Municipio"."Ovitrampa" TO dengue;
+GRANT SELECT ON TABLE "Municipio"."Ovitrampa" TO infodenguedev;
 
 
 --
@@ -4277,6 +4439,7 @@ GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Ovitrampa_id_seq" TO dengue;
 
 GRANT ALL ON TABLE "Municipio"."Tweet" TO "Dengue";
 GRANT ALL ON TABLE "Municipio"."Tweet" TO dengue;
+GRANT SELECT ON TABLE "Municipio"."Tweet" TO infodenguedev;
 
 
 --
@@ -4291,6 +4454,7 @@ GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Tweet_id_seq" TO dengue;
 --
 
 GRANT ALL ON TABLE "Municipio".alerta_mrj TO dengue;
+GRANT SELECT ON TABLE "Municipio".alerta_mrj TO infodenguedev;
 
 
 --
@@ -4299,6 +4463,7 @@ GRANT ALL ON TABLE "Municipio".alerta_mrj TO dengue;
 
 GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE "Municipio".alerta_mrj_chik TO "Dengue";
 GRANT ALL ON TABLE "Municipio".alerta_mrj_chik TO dengue;
+GRANT SELECT ON TABLE "Municipio".alerta_mrj_chik TO infodenguedev;
 
 
 --
@@ -4320,6 +4485,7 @@ GRANT SELECT,USAGE ON SEQUENCE "Municipio".alerta_mrj_id_seq TO dengue;
 --
 
 GRANT ALL ON TABLE "Municipio".alerta_mrj_zika TO dengue;
+GRANT SELECT ON TABLE "Municipio".alerta_mrj_zika TO infodenguedev;
 
 
 --
@@ -4334,6 +4500,238 @@ GRANT SELECT,USAGE ON SEQUENCE "Municipio".alerta_mrj_zika_id_seq TO dengue;
 --
 
 GRANT ALL ON TABLE "Municipio".historico_casos TO dengue;
+GRANT SELECT ON TABLE "Municipio".historico_casos TO infodenguedev;
+
+
+--
+-- Name: TABLE auth_group; Type: ACL; Schema: forecast; Owner: forecast
+--
+
+GRANT SELECT ON TABLE forecast.auth_group TO infodenguedev;
+
+
+--
+-- Name: TABLE auth_group_permissions; Type: ACL; Schema: forecast; Owner: forecast
+--
+
+GRANT SELECT ON TABLE forecast.auth_group_permissions TO infodenguedev;
+
+
+--
+-- Name: TABLE auth_permission; Type: ACL; Schema: forecast; Owner: forecast
+--
+
+GRANT SELECT ON TABLE forecast.auth_permission TO infodenguedev;
+
+
+--
+-- Name: TABLE auth_user; Type: ACL; Schema: forecast; Owner: forecast
+--
+
+GRANT SELECT ON TABLE forecast.auth_user TO infodenguedev;
+
+
+--
+-- Name: TABLE auth_user_groups; Type: ACL; Schema: forecast; Owner: forecast
+--
+
+GRANT SELECT ON TABLE forecast.auth_user_groups TO infodenguedev;
+
+
+--
+-- Name: TABLE auth_user_user_permissions; Type: ACL; Schema: forecast; Owner: forecast
+--
+
+GRANT SELECT ON TABLE forecast.auth_user_user_permissions TO infodenguedev;
+
+
+--
+-- Name: TABLE chunked_upload_chunkedupload; Type: ACL; Schema: forecast; Owner: forecast
+--
+
+GRANT SELECT ON TABLE forecast.chunked_upload_chunkedupload TO infodenguedev;
+
+
+--
+-- Name: TABLE django_admin_log; Type: ACL; Schema: forecast; Owner: forecast
+--
+
+GRANT SELECT ON TABLE forecast.django_admin_log TO infodenguedev;
+
+
+--
+-- Name: TABLE django_content_type; Type: ACL; Schema: forecast; Owner: forecast
+--
+
+GRANT SELECT ON TABLE forecast.django_content_type TO infodenguedev;
+
+
+--
+-- Name: TABLE django_migrations; Type: ACL; Schema: forecast; Owner: forecast
+--
+
+GRANT SELECT ON TABLE forecast.django_migrations TO infodenguedev;
+
+
+--
+-- Name: TABLE django_session; Type: ACL; Schema: forecast; Owner: forecast
+--
+
+GRANT SELECT ON TABLE forecast.django_session TO infodenguedev;
+
+
+--
+-- Name: TABLE forecast_cases; Type: ACL; Schema: forecast; Owner: postgres
+--
+
+GRANT SELECT ON TABLE forecast.forecast_cases TO infodenguedev;
+
+
+--
+-- Name: TABLE forecast_city; Type: ACL; Schema: forecast; Owner: postgres
+--
+
+GRANT SELECT ON TABLE forecast.forecast_city TO infodenguedev;
+
+
+--
+-- Name: TABLE forecast_model; Type: ACL; Schema: forecast; Owner: postgres
+--
+
+GRANT SELECT ON TABLE forecast.forecast_model TO infodenguedev;
+
+
+--
+-- Name: TABLE auth_group; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.auth_group TO infodenguedev;
+
+
+--
+-- Name: TABLE auth_group_permissions; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.auth_group_permissions TO infodenguedev;
+
+
+--
+-- Name: TABLE auth_permission; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.auth_permission TO infodenguedev;
+
+
+--
+-- Name: TABLE auth_user; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.auth_user TO infodenguedev;
+
+
+--
+-- Name: TABLE auth_user_groups; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.auth_user_groups TO infodenguedev;
+
+
+--
+-- Name: TABLE auth_user_user_permissions; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.auth_user_user_permissions TO infodenguedev;
+
+
+--
+-- Name: TABLE chunked_upload_chunkedupload; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.chunked_upload_chunkedupload TO infodenguedev;
+
+
+--
+-- Name: TABLE dbf_dbf; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.dbf_dbf TO infodenguedev;
+
+
+--
+-- Name: TABLE dbf_dbfchunkedupload; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.dbf_dbfchunkedupload TO infodenguedev;
+
+
+--
+-- Name: TABLE django_admin_log; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.django_admin_log TO infodenguedev;
+
+
+--
+-- Name: TABLE django_content_type; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.django_content_type TO infodenguedev;
+
+
+--
+-- Name: TABLE django_migrations; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.django_migrations TO infodenguedev;
+
+
+--
+-- Name: TABLE django_session; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.django_session TO infodenguedev;
+
+
+--
+-- Name: TABLE geography_columns; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.geography_columns TO infodenguedev;
+
+
+--
+-- Name: TABLE geometry_columns; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.geometry_columns TO infodenguedev;
+
+
+--
+-- Name: TABLE hist_uf_chik_materialized_view; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.hist_uf_chik_materialized_view TO infodenguedev;
+
+
+--
+-- Name: TABLE hist_uf_dengue_materialized_view; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.hist_uf_dengue_materialized_view TO infodenguedev;
+
+
+--
+-- Name: TABLE hist_uf_zika_materialized_view; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.hist_uf_zika_materialized_view TO infodenguedev;
+
+
+--
+-- Name: TABLE spatial_ref_sys; Type: ACL; Schema: public; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE public.spatial_ref_sys TO infodenguedev;
 
 
 --
@@ -4341,6 +4739,7 @@ GRANT ALL ON TABLE "Municipio".historico_casos TO dengue;
 --
 
 GRANT SELECT,INSERT,REFERENCES,TRIGGER,UPDATE ON TABLE public.uf_total_chik_view TO "Dengue";
+GRANT SELECT ON TABLE public.uf_total_chik_view TO infodenguedev;
 
 
 --
@@ -4348,6 +4747,14 @@ GRANT SELECT,INSERT,REFERENCES,TRIGGER,UPDATE ON TABLE public.uf_total_chik_view
 --
 
 GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE public.uf_total_view TO "Dengue";
+GRANT SELECT ON TABLE public.uf_total_view TO infodenguedev;
+
+
+--
+-- Name: TABLE uf_total_zika_view; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT ON TABLE public.uf_total_zika_view TO infodenguedev;
 
 
 --

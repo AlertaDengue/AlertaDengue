@@ -56,9 +56,9 @@ SHELL ["/bin/bash", "-c"]
 COPY --chown=${HOST_UID}:${HOST_GID} conda/"${ENV}".yaml /tmp/environment.yaml
 
 # Use environment to update the env alertadengue
-RUN mamba env create -n $ENV_NAME \
+RUN conda env create -n $ENV_NAME \
     --file /tmp/environment.yaml \
-  && mamba clean --all \
+  && conda clean --all \
   && find /opt/conda/ -type f,l -name '*.a' -delete \
   && find /opt/conda/ -type f,l -name '*.pyc' -delete \
   && find /opt/conda/ -type f,l -name '*.js.map' -delete
