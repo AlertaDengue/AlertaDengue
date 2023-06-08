@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 echo "[INFO] Load variables..."
-envsubst < .env.tpl > AlertaDengue/.env
+envsubst < /opt/services/.env.tpl > /opt/services/AlertaDengue/.env
 
 echo "[INFO] Configuring crontab..."
 sudo chmod 0644  /etc/cron.d/cronjob
