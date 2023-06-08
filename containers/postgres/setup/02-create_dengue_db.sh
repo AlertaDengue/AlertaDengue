@@ -13,6 +13,7 @@ elif [[ "${PG_RESTORE_STAGING}" = "schemas" ]]
 then
     echo "[II] creating ${PG_RESTORE_STAGING} for the demo database."
     psql -d ${PSQL_DB} < /"${PG_RESTORE_STAGING}"/schemas_dengue.sql
+    psql -d ${PSQL_DBF} < /"${PG_RESTORE_STAGING}"/schemas_infodengue.sql
 else
     echo "[ERR]: ${PG_RESTORE_STAGING} is not a valid dump file! You have to choose between schemas or dumps"
 fi
