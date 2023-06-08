@@ -253,7 +253,6 @@ CREATE TABLE "Dengue_global".alerta_regional_chik (
     p_inc100k real,
     uf character varying(2),
     nivel smallint,
-    tweet numeric(5,0),
     rt numeric(5,0),
     pop numeric(7,0),
     tempmin numeric(4,0),
@@ -308,7 +307,6 @@ CREATE TABLE "Dengue_global".alerta_regional_dengue (
     p_inc100k real,
     uf character varying(2),
     nivel smallint,
-    tweet numeric(5,0),
     rt numeric(5,0),
     pop numeric(7,0),
     tempmin numeric(4,0),
@@ -363,7 +361,6 @@ CREATE TABLE "Dengue_global".alerta_regional_zika (
     p_inc100k real,
     uf character varying(2),
     nivel smallint,
-    tweet numeric(5,0),
     rt numeric(5,0),
     pop numeric(7,0),
     tempmin numeric(4,0),
@@ -776,7 +773,6 @@ CREATE TABLE "Municipio"."Historico_alerta" (
     id bigint NOT NULL,
     versao_modelo character varying(40),
     municipio_nome character varying(128),
-    tweet numeric(5,0) DEFAULT NULL::numeric,
     "Rt" numeric(5,0) DEFAULT NULL::numeric,
     pop numeric,
     tempmin numeric,
@@ -824,7 +820,6 @@ CREATE TABLE "Municipio"."Historico_alerta_chik" (
     id bigint NOT NULL,
     versao_modelo character varying(40),
     municipio_nome character varying(128),
-    tweet numeric(5,0) DEFAULT NULL::numeric,
     "Rt" numeric(5,0) DEFAULT NULL::numeric,
     pop numeric,
     tempmin numeric,
@@ -914,7 +909,6 @@ CREATE TABLE "Municipio"."Historico_alerta_zika" (
     id bigint NOT NULL,
     versao_modelo character varying(40),
     municipio_nome character varying(128),
-    tweet numeric(5,0) DEFAULT NULL::numeric,
     "Rt" numeric(5,0) DEFAULT NULL::numeric,
     pop numeric,
     tempmin numeric,
@@ -1099,50 +1093,6 @@ ALTER TABLE "Municipio"."Ovitrampa_id_seq" OWNER TO administrador;
 
 ALTER SEQUENCE "Municipio"."Ovitrampa_id_seq" OWNED BY "Municipio"."Ovitrampa".id;
 
-
---
--- Name: Tweet; Type: TABLE; Schema: Municipio; Owner: administrador
---
-
-CREATE TABLE "Municipio"."Tweet" (
-    id bigint NOT NULL,
-    "Municipio_geocodigo" integer NOT NULL,
-    data_dia date NOT NULL,
-    numero integer NOT NULL,
-    "CID10_codigo" character varying(5) NOT NULL
-);
-
-
-ALTER TABLE "Municipio"."Tweet" OWNER TO administrador;
-
---
--- Name: TABLE "Tweet"; Type: COMMENT; Schema: Municipio; Owner: administrador
---
-
-COMMENT ON TABLE "Municipio"."Tweet" IS 'Série de tweets diários';
-
-
---
--- Name: Tweet_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
---
-
-CREATE SEQUENCE "Municipio"."Tweet_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE "Municipio"."Tweet_id_seq" OWNER TO administrador;
-
---
--- Name: Tweet_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
---
-
-ALTER SEQUENCE "Municipio"."Tweet_id_seq" OWNED BY "Municipio"."Tweet".id;
-
-
 --
 -- Name: alerta_mrj; Type: TABLE; Schema: Municipio; Owner: dengueadmin
 --
@@ -1152,7 +1102,6 @@ CREATE TABLE "Municipio".alerta_mrj (
     aps character varying(6) NOT NULL,
     se integer NOT NULL,
     data date NOT NULL,
-    tweets integer,
     casos integer,
     casos_est real,
     casos_estmin real,
@@ -1176,7 +1125,6 @@ CREATE TABLE "Municipio".alerta_mrj_chik (
     aps character varying(6) NOT NULL,
     se integer NOT NULL,
     data date NOT NULL,
-    tweets integer,
     casos integer,
     casos_est real,
     casos_estmin real,
@@ -1242,7 +1190,6 @@ CREATE TABLE "Municipio".alerta_mrj_zika (
     aps character varying(6) NOT NULL,
     se integer NOT NULL,
     data date NOT NULL,
-    tweets integer,
     casos integer,
     casos_est real,
     casos_estmin real,
@@ -2551,13 +2498,6 @@ ALTER TABLE ONLY "Municipio"."Ovitrampa" ALTER COLUMN id SET DEFAULT nextval('"M
 
 
 --
--- Name: Tweet id; Type: DEFAULT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Tweet" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Tweet_id_seq"'::regclass);
-
-
---
 -- Name: alerta_mrj id; Type: DEFAULT; Schema: Municipio; Owner: dengueadmin
 --
 
@@ -2949,14 +2889,6 @@ ALTER TABLE ONLY "Municipio"."Notificacao"
 
 ALTER TABLE ONLY "Municipio"."Ovitrampa"
     ADD CONSTRAINT "Ovitrampa_pk" PRIMARY KEY (id);
-
-
---
--- Name: Tweet Tweet_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Tweet"
-    ADD CONSTRAINT "Tweet_pk" PRIMARY KEY (id);
 
 
 --
@@ -3525,13 +3457,6 @@ CREATE INDEX "Dengue_idx_data" ON "Municipio"."Notificacao" USING btree (dt_noti
 
 
 --
--- Name: Tweets_idx_data; Type: INDEX; Schema: Municipio; Owner: administrador
---
-
-CREATE INDEX "Tweets_idx_data" ON "Municipio"."Tweet" USING btree (data_dia DESC);
-
-
---
 -- Name: WU_idx_data; Type: INDEX; Schema: Municipio; Owner: administrador
 --
 
@@ -3865,14 +3790,6 @@ ALTER TABLE ONLY "Municipio"."Bairro"
 
 ALTER TABLE ONLY "Municipio"."Ovitrampa"
     ADD CONSTRAINT "Ovitrampa_Localidade" FOREIGN KEY ("Localidade_id") REFERENCES "Municipio"."Localidade"(id);
-
-
---
--- Name: Tweet Tweet_CID10; Type: FK CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Tweet"
-    ADD CONSTRAINT "Tweet_CID10" FOREIGN KEY ("CID10_codigo") REFERENCES "Dengue_global"."CID10"(codigo);
 
 
 --
@@ -4431,22 +4348,6 @@ GRANT SELECT ON TABLE "Municipio"."Ovitrampa" TO infodenguedev;
 --
 
 GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Ovitrampa_id_seq" TO dengue;
-
-
---
--- Name: TABLE "Tweet"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Tweet" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Tweet" TO dengue;
-GRANT SELECT ON TABLE "Municipio"."Tweet" TO infodenguedev;
-
-
---
--- Name: SEQUENCE "Tweet_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Tweet_id_seq" TO dengue;
 
 
 --

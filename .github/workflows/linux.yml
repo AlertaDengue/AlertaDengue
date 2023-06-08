@@ -20,13 +20,10 @@ env:
   DOCKER_HOST_MEDIA_ROOT: /MEDIA_ROOT
   DOCKER_HOST_SHAPEFILES_DIR: "../../staging_data/shapefiles"
   DOCKER_HOST_STATIC: "../../staging_data/staticfiles"
-
+  DOCKER_HOST_TEMP_PARQUET_DIR: "/tmp/"
   WORK_DIR: /opt/services/epi_scanner
-
   STORAGE: "../../staging_data/"
   TEMP_FILES_DIR: "/tmp"
-  DOCKER_HOST_TEMP_PARQUET_DIR: "/tmp/"
-
   EMAIL_CONFIG: ${{ secrets.EMAIL_CONFIG }}
   EMAIL_CONNECTION_DEFAULT: "outlook"
   EMAIL_HOST: "smtp.gmail.com"
@@ -62,8 +59,6 @@ env:
   MINIO_PORT_2: 9090
   MINIO_ENDPOINT: http://minio:9090
   HOST_MINIO_DATA_DIR: "../../staging_data/data"
-
-
 
 jobs:
   build:

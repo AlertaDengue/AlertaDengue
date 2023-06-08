@@ -153,9 +153,6 @@ class AboutPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AboutPageView, self).get_context_data(**kwargs)
-        # messages.info(
-        #   self.request,
-        #   'O site do projeto Alerta Dengue está em construção.')
         return context
 
 
@@ -164,9 +161,6 @@ class TeamPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(TeamPageView, self).get_context_data(**kwargs)
-        # messages.info(
-        #   self.request,
-        #   'O site do projeto Alerta Dengue está em construção.')
         return context
 
 
@@ -175,9 +169,6 @@ class JoininPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(JoininPageView, self).get_context_data(**kwargs)
-        # messages.info(
-        #   self.request,
-        #   'O site do projeto Alerta Dengue está em construção.')
         return context
 
 
@@ -858,8 +849,6 @@ class ReportCityView(TemplateView):
         threshold_pos_epidemic = regional_get_param[8]
         threshold_epidemic = regional_get_param[9]
 
-        tweet_max = 0
-
         # Create the dictionary with climate variables
 
         varcli_dict = {
@@ -950,9 +939,6 @@ class ReportCityView(TemplateView):
                 threshold_epidemic=threshold_epidemic,
             )
 
-            chart_dengue_tweets = ReportCityCharts.create_notific_chart(
-                df=df_dengue, year_week=year_week
-            )
             total_n_dengue = df_dengue[df_dengue.index // 100 == this_year][
                 "casos notif."
             ].sum()
@@ -961,8 +947,6 @@ class ReportCityView(TemplateView):
                 (df_dengue.index // 100 == year_week // 100 - 1)
                 & (df_dengue.index <= year_week - 100)
             ]["casos notif."].sum()
-
-            tweet_max = np.nanmax(df_dengue.tweet)
 
         if not df_chik.empty:
             last_year_week_l.append(df_chik.index.max())
@@ -1041,7 +1025,6 @@ class ReportCityView(TemplateView):
             "casos_est",
             "incidência",
             # 'pr(incid. subir)',
-            # 'tweet',
             "nivel",
         ]
 
@@ -1069,7 +1052,6 @@ class ReportCityView(TemplateView):
                 "df_chik": prepare_html(df_chik),
                 "df_zika": prepare_html(df_zika),
                 "chart_dengue_climate": chart_dengue_climate,
-                "chart_dengue_tweets": chart_dengue_tweets,
                 "chart_dengue_incidence": chart_dengue_incidence,
                 "chart_chik_climate": chart_chik_climate,
                 "chart_chik_incidence": chart_chik_incidence,
@@ -1082,7 +1064,6 @@ class ReportCityView(TemplateView):
                 "total_n_zika": total_n_zika,
                 "total_n_zika_last_year": total_n_zika_last_year,
                 "max_alert_color": max_alert_color.title(),
-                "tweet_max": tweet_max,
             }
         )
         return context
