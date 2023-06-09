@@ -39,7 +39,7 @@ env:
   PG_DATA_PROD: "../../staging_data/postgres_data"
   PG_DATA_STAGING: "../../staging_data/postgres_data"
   PG_RESTORE_STAGING: schemas
-  PORT_WEB: 8080
+  PORT_WEB: 8000
   POSTGRES_USER: postgres
   PSQL_DB: dengue
   PSQL_DBF: infodengue
