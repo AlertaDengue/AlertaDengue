@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-26 19:36+0000\n"
+"POT-Creation-Date: 2023-06-12 11:31+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -690,16 +690,17 @@ msgstr "EVIGILANCIA: Continuous & integrated arboviruses monitoring"
 #: AlertaDengue/dados/templates/about.html:148
 msgid ""
 "\n"
-"                Este projeto visou a consolidação do sistema de alerta para "
-"arboviroses baseado em dados\n"
+"                Este projeto visou a consolidação do sistema de alerta "
+"para arboviroses baseado em dados\n"
 "                hı́bridos gerados por meio da análise integrada de dados "
 "minerados a partir da Web\n"
-"                social e de dados climáticos e epidemiológicos, o Infodengue."
+"                social e de dados climáticos e epidemiológicos, o "
+"Infodengue."
 msgstr ""
 "\n"
 "Evigilancia aimed to consolidate the alert system for arboviruses based on "
 "hybrid data generated through integrated data analysis, mined from web "
-"social and climatic and epidemiological data, the InfoDengue."
+"climatic and epidemiological data, the InfoDengue."
 
 #: AlertaDengue/dados/templates/about.html:152
 #: AlertaDengue/dados/templates/about.html:174
@@ -2596,10 +2597,16 @@ msgstr "Notification year can not be greater than current year"
 msgid "Arquivo DBF inválido"
 msgstr "Invalid DBF file"
 
-#: AlertaDengue/dbf/sinan.py:182
-msgid "Existem nesse arquivo notificações que não incluem a coluna ID_AGRAVO."
-msgstr ""
-"There are notifications that don't include the ID_AGRAVO column in this file."
+#: AlertaDengue/dbf/templates/dbf_all_upload.html:5
+#: AlertaDengue/dbf/templates/upload_successful.html:5
+msgid "Dados do SINAN recebidos"
+msgstr "SINAN data received"
+
+#: AlertaDengue/dbf/templates/dbf_all_upload.html:11
+#: AlertaDengue/dbf/templates/dbf_upload.html:180
+#: AlertaDengue/dbf/templates/upload_successful.html:10
+msgid "Ultimos arquivos enviados:"
+msgstr "Last uploaded files:"
 
 #: AlertaDengue/dbf/templates/dbf_upload.html:66
 msgid "Envie aqui os dados atualizados do SINAN"
@@ -2609,14 +2616,10 @@ msgstr "Send here the updated SINAN data"
 msgid "Enviar"
 msgstr "Send"
 
-#: AlertaDengue/dbf/templates/dbf_upload.html:180
-#: AlertaDengue/dbf/templates/upload_successful.html:10
-msgid "Ultimos arquivos enviados:"
-msgstr "Last uploaded files:"
-
-#: AlertaDengue/dbf/templates/upload_successful.html:5
-msgid "Dados do SINAN recebidos"
-msgstr "SINAN data received"
+#: AlertaDengue/dbf/utils.py:181
+msgid "Existem nesse arquivo notificações que não incluem a coluna ID_AGRAVO."
+msgstr ""
+"There are notifications that don't include the ID_AGRAVO column in this file."
 
 #: AlertaDengue/dbf/validation.py:30
 msgid "Este arquivo não parece um DBF válido "
