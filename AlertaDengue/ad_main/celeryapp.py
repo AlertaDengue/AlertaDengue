@@ -8,8 +8,6 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ad_main.settings")
 
 app = Celery(
     "ad_main",
-    broker=os.getenv("CELERY_BROKER_URL"),
-    backend=os.getenv("CELERY_BACKEND"),  #
     include=["dbf.tasks"],
 )
 

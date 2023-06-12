@@ -39,7 +39,7 @@ env:
   PG_DATA_PROD: "../../staging_data/postgres_data"
   PG_DATA_STAGING: "../../staging_data/postgres_data"
   PG_RESTORE_STAGING: schemas
-  PORT_WEB: 8080
+  PORT_WEB: 8000
   POSTGRES_USER: postgres
   PSQL_DB: dengue
   PSQL_DBF: infodengue
@@ -48,7 +48,6 @@ env:
   PSQL_PORT: 25432
   PSQL_USER: infodenguedev
   QUERY_CACHE_TIMEOUT: 86400
-  SERVICES_NUMBER: 2
 
   MINIO_USERNAME: developer
   MINIO_GROUPNAME: developer
@@ -103,6 +102,14 @@ jobs:
 
     - name: Create env file
       run: envsubst < .env.tpl > .env
+
+    - name: Build postgres database
+      run: |
+        containers-sugar --group dev build --services postgres
+
+    - name: Start postgres database
+      run: |
+        containers-sugar --group dev start --services postgres
 
     - name: Start containers
       run: |

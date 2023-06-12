@@ -56,9 +56,9 @@ SHELL ["/bin/bash", "-c"]
 COPY --chown=${HOST_UID}:${HOST_GID} conda/"${ENV}".yaml /tmp/environment.yaml
 
 # Use environment to update the env alertadengue
-RUN mamba env create -n $ENV_NAME \
+RUN conda env create -n $ENV_NAME \
     --file /tmp/environment.yaml \
-  && mamba clean --all \
+  && conda clean --all \
   && find /opt/conda/ -type f,l -name '*.a' -delete \
   && find /opt/conda/ -type f,l -name '*.pyc' -delete \
   && find /opt/conda/ -type f,l -name '*.js.map' -delete
@@ -79,14 +79,13 @@ RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/scripts/
 RUN mkdir -p /opt/services/epi_scanner/data
 RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/epi_scanner/data
 
-COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/run_scripts.sh /opt/services/scripts/run_scripts.sh
-COPY --chown=${HOST_UID}:${HOST_GID} .env_episcanner.tpl /opt/services/AlertaDengue/
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/services_run.sh /opt/services/AlertaDengue/services_run.sh
 COPY --chown=${HOST_UID}:${HOST_GID} .makim.yaml  /opt/services/AlertaDengue/.makim.yaml
 
-COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/crontab_install.sh /opt/services/scripts/crontab_install.sh
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/crontab_setup.sh /opt/services/crontab_setup.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/cronjob /etc/cron.d/cronjob
 
-COPY --chown=${HOST_UID}:${HOST_GID} ./containers/celery/run.sh  /opt/services/celery-run.sh
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/celery.sh  /opt/services/celery.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/entrypoint.sh  /entrypoint.sh
 
-ENTRYPOINT ["bash", "/entrypoint.sh"]
+ENTRYPOINT ["bash", "/entrypoint.sh", "/opt/services/AlertaDengue/services_run.sh"]
