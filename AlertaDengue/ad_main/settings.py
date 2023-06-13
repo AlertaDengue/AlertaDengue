@@ -390,7 +390,6 @@ task_always_eager = os.getenv("CELERY_TASK_ALWAYS_EAGER")
 accept_content = ["json"]
 task_serializer = "json"
 result_backend = f"cache+memcached://{MEMCACHED_HOST}:{MEMCACHED_PORT}/"
-cache_backend = "default"
 broker_connection_retry_on_startup = True
 
 
