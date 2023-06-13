@@ -1,0 +1,19 @@
+version: "3.4"
+services:
+
+  web:
+    extends:
+      service: base
+    tty: true
+    # command: ./manage.py runserver 0:3000
+    ports:
+      - 8080:8080
+    restart: always
+    volumes:
+      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
+      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/
+      # Add to development
+      # - ../AlertaDengue/dados:/opt/services/AlertaDengue/dados
+    command: python manage.py runserver 0.0.0.0:8080
