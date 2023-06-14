@@ -1,75 +1,57 @@
 version: 1.0.0
 env-file: .env
 groups:
-  default:
+
+  # DJANGO
+  django:
     env-file: .env
     vars:
-      py_v: python --version
-      sugar_build: containers-sugar build --group $ENV
-      sugar_start: containers-sugar start --group $ENV
-      sugar_down: containers-sugar stop --group $ENV
-      sugar_exec: containers-sugar exec --group $ENV --services
-      sugar_run: containers-sugar run --group $ENV --services web
-      sugar_run_rm: containers-sugar run --group $ENV --services web --extras=--rm
+      sugar_run_rm: kxgr run --service web --options --rm
       manage_py: python manage.py
-
     targets:
-
-      # DEVELOPMENT
-      runserver:
-        help: Run Django server on localhost
+      # DEV MODE
+      run:
+        help: Wait for a service
+        args:
+          subcommand:
+            help: Run a specific django subcommand
+            type: string
+            default: runserver
         run: |
-          cd AlertaDengue/ \
-          && {{ manage_py }} runserver
-
-      container-build:
-        help: Build containers
-        run: |
-          {{ sugar_build }}
-
-      container-start:
-        help: Start all containers
-        run: |
-          {{ sugar_start }}
-
-      container-exec:
-        help:
-        run: |
-          {{ sugar_exec }} {{ args.service }}
-
-      container-stop:
-        help: Start all containers
-        run: |
-          {{ sugar_down }}
-
-
-      # DJANGO
+          cd AlertaDengue &
+          {{ vars.manage_py }} {{ args.subcommand }}
+      # CONTAINER
       static-geofiles:
         help: Generate static geofiles
         run: |
-          {{ sugar_run_rm }} --cmd "{{ manage_py }} sync_geofiles"
-          {{ sugar_run_rm }} --cmd "{{ manage_py }} collectstatic --noinput"
-          # {{ sugar_run_rm }} --cmd "which python"
-
-      django-migrate:
-        dependencies:
-          - target: containers.static-geofiles
+          {{ vars.sugar_run_rm }} --entrypoint "/entrypoint.sh" --cmd {{ vars.manage_py }} sync_geofiles
+          {{ vars.sugar_run_rm }} --entrypoint "/entrypoint.sh" --cmd {{ vars.manage_py }} collectstatic --noinput
+      migrate:
         run: |
           for cmd in [
-            "runserver",
-            "migrate --database=dados --noinput",
-            "migrate --database=infodengue --noinput",
-            "migrate forecast --database=forecast"
+            "--database=dados",
+            "--database=infodengue",
+            # "--database=forecast"
           ]:
-            {{ sugar_run }} --extras="{{extras}}" --cmd "{{ manage_py }} @(cmd)"
-
+            {{ vars.sugar_run_rm }} --entrypoint "/entrypoint.sh" --cmd {{ vars.manage_py }} migrate  --noinput @(cmd)
       send-mail-partner:
         run: |
-          {{ sugar_run }} "{{ manage_py }} send_mail'
+          {{ vars.sugar_run_rm }} --cmd {{ vars.manage_py }} send_mail
+      # TESTS
+      test-staging-web:
+        run: |
+          for test_name in ['dados', 'dbf', 'gis', 'api']:
+            {{ vars.sugar_run_rm }} --entrypoint "/entrypoint.sh" --cmd . /opt/services/test.sh @(test_name)
+      test-staging-all:
+        run: |
+          {{ vars.sugar_run_rm }} --entrypoint "/entrypoint.sh" --cmd {{ vars.manage_py }} test --noinput
 
-
+  develop:
+    env-file: .env
+    help: "group"
+    targets:
       # CI
-      wait:
+      container-wait:
         help: Wait for a service
         args:
           timeout:
@@ -80,53 +62,40 @@ groups:
             help: Service name that would be awaited
             type: string
             required: True
-
         run: |
           timeout {{ args.timeout }} ./containers/scripts/healthcheck.sh {{ args.service }}
-
-      wait-all:
+      container-wait-all:
         run: |
-          if $ENV == "dev":
-            makim containers.wait --service "postgres"
+          # if $ENV == "dev":
+          #   makim develop.container-wait --service "postgres"
 
-          for service in ["postgres","memcached","rabbitmq","web","worker"]:
-            makim containers.wait --service @(service)
+          for service in ["postgres","memcached","rabbitmq","web"]:
+            makim develop.container-wait --service @(service)
 
-      test-staging-web:
-        run: |
-          for test_name in ['dados', 'dbf', 'gis', 'api']:
-            {{ sugar_run }} --extras '--no-deps' --cmd 'bash /opt/services/test.sh @(test_name)'
-
-      test-staging-all:
-        run: |
-          {{ sugar_run_rm }} --cmd '{{manage_py}} test'
-
-
-      # DATABASE 
-      grant-role:
-        help: Grant read-only access to the database
-        args:
-          service:
-            help: Database service name to modify access permissions
-            type: string
-            required: False
-          command:
-            help: Script or command to be executed inside the container
-            type: string
-            required: False
-        run: |
-          {{ sugar_exec }} {{ args.service }} --cmd "{{ args.command }}"
-
-
-      # PYTHON
       clean:
         help: Clean all artifacts
+        shell: python
+        args:
+          path:
+            help: Define the files to remove
+            type: string
+            default: ""
         run: |
-          for _path in ['build/', 'dist/', '.eggs/', '*/.eggs', 'db']:
-            rm -fr @(_path)
+          import shutil
+          from pathlib import Path
 
-          for _path in [
-            '*.egg-info', '*.egg', '*.pyc', '*.pyo',
-            '*~', '__pycache__', '*.ipynb_checkpoints', '*.pytest_cache'
-          ]:
-            find . -name '@(_path)' -exec rm -fr {} +
+          base_dir = Path(".")
+
+          list_to_cache_files = [
+            'build/', 'dist/', '.eggs/', '*/.eggs', 'db',
+            '*.egg-info', '*.egg', '*.pyc', '*.pyo', '*~', 
+            '__pycache__', '*.ipynb_checkpoints', '*.pytest_cache'
+          ]
+
+          for item in list_to_cache_files:
+              files = base_dir.glob(f'**/{item}')
+              for file in files:
+                  if file.is_dir():
+                      shutil.rmtree(file)
+                  else:
+                      file.unlink()
