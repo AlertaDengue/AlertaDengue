@@ -106,11 +106,15 @@ class Command(BaseCommand):
 
             shp_min = multipolygon.simplify(0.005)
             with open(geojson_simplified_path, "w") as f:
+                properties = shp[0]["properties"]
+                properties_serializable = {
+                    key: str(value) for key, value in properties.items()
+                }
                 geojson_geometry = shapely.geometry.mapping(shp_min)
                 geojson_content = {
                     "type": "Feature",
                     "id": str(geocode),
-                    "properties": shp[0]["properties"],
+                    "properties": properties_serializable,
                     "geometry": geojson_geometry,
                 }
                 json.dump(geojson_content, f)
