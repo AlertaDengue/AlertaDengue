@@ -21,12 +21,12 @@ def searchbox_component(context):
         return context
 
     options_cities = []
-    for state_name in STATE_NAME.values():
+    for uf, state_name in STATE_NAME.items():
         for (
             geocode,
             city_name,
         ) in RegionalParameters.get_cities(state_name=state_name).items():
-            options_cities.append(City(geocode, city_name, state_name))
+            options_cities.append(City(geocode, city_name, uf))
 
     cache.set(
         cache_name,

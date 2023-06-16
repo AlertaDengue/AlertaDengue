@@ -1,25 +1,24 @@
 {% load i18n %}
 {% block searchbox_component %}
-<input 
-    class="form-control" 
-    list="searchbarOptions" 
-    id="searchbar" 
-    placeholder="{% blocktrans %}Encontre um município{% endblocktrans %}"
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<select
+  class="js-example-basic-single" 
+  data-control="select2"
+  id="searchbox"
 >
-<datalist id="searchbarOptions">
     {% for city in options_cities %}
-        <option value="{{ city.name }} - {{ city.state }}" data-geocode="{{ city.geocode }}"></option>
+      <option value="{{ city.geocode }}">{{ city.name }} - {{ city.state }}</option>
     {% endfor %}
-</datalist>
+</select>
 
 <script>
-    document.getElementById('searchbar').addEventListener('change', function() {
-        var selectedOption = document.querySelector('option[value="' + this.value + '"]');
-        var selectedGeocode = selectedOption.getAttribute('data-geocode');
-    
-        if (selectedGeocode) {
-            window.location.href = '/alerta/' + selectedGeocode.toString();
-        }
+  $(document).ready(function() {
+    $("#searchbox").select2({
+      placeholder: {text: "{% blocktrans %}Encontre um município{% endblocktrans %}"}},
+      width: "220px"
     });
+  });
 </script>
 {% endblock %}
