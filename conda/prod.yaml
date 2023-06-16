@@ -11,5 +11,5 @@ dependencies:
   - python 3.10.*
   - urllib3 = 1.26.15 # https://github.com/psf/requests/issues/1096
   - pip:
-    - containers-sugar ==1.7.0
+    - containers-sugar ==1.7.1
     - makim ==1.8.1

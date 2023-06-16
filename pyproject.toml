@@ -52,7 +52,7 @@ dask-geopandas = "^0.3.1"
 pyogrio = "^0.6.0"
 urllib3 = "1.26.16"
 makim = "1.8.1"
-containers-sugar = "1.7.0"
+containers-sugar = "1.7.1"
 
 
 
