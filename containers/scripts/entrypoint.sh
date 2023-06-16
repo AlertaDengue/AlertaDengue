@@ -19,4 +19,5 @@ echo "[INFO] activate alertadengue"
 conda activate alertadengue
 
 echo "Running: ${@}"
-$("${@}")
+
+exec "$@"

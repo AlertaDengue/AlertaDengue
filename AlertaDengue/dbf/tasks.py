@@ -5,7 +5,9 @@ from datetime import datetime
 from email.mime.image import MIMEImage
 
 from ad_main import settings
-from celery import shared_task
+
+# from .celery import app
+from ad_main.celeryapp import app
 from dados.episem import episem
 from dbf.db import is_partner_active
 from django.core import mail
@@ -58,7 +60,7 @@ def copy_file_to_final_destination(dbf):
     shutil.copy(src, dest)
 
 
-@shared_task
+@app.task(name="import_dbf_to_database")
 def import_dbf_to_database(dbf_id):
     dbf = DBF.objects.get(id=dbf_id)
     try:
@@ -93,6 +95,7 @@ def get_connection(label=None, **kwargs):
     return mail.get_connection(**options)
 
 
+@app.task(name="send_mail_partner")
 def send_mail_partner(
     fail_silently=False,
     connection=None,

@@ -1,44 +1,34 @@
 version: 1.0.0
 compose-app: docker-compose
+env-file: .env
+defaults:
+  group: {{ env.ENV }}
+
 service-groups:
   - name: dev
     project-name: infodengue-dev
-    compose-path: containers/compose.yaml
+    compose-path:
+      - containers/compose.yaml
+      - containers/compose-dev.yaml
     env-file: .env
     services:
-      default: postgres,memcached,rabbitmq,web
-      list:
+      default: memcached,rabbitmq,web
+      available:
         - name: postgres
-          health-check: true
         - name: web
-          health-check: true
         - name: memcached
-          health-check: true
         - name: rabbitmq
-          health-check: true
+        - name: minio
 
   - name: prod
     project-name: infodengue-prod
     compose-path: containers/compose.yaml
     env-file: .env
     services:
-      default: dengue_db,web,memcached,rabbitmq
-      list:
+      default: memcached,rabbitmq,web
+      available:
         - name: dengue_db
-          health-check: true
         - name: web
-          health-check: true
         - name: memcached
-          health-check: true
         - name: rabbitmq
-          health-check: true
-
-  - name: minio
-    project-name: infodengue-prod
-    compose-path: containers/compose.yaml
-    env-file: .env
-    services:
-      default: minio
-      list:
         - name: minio
-          health-check: true

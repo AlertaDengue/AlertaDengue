@@ -1,0 +1,50 @@
+version: "3.4"
+services:
+
+
+  postgres:
+    hostname: postgres
+    extends:
+      service: base_postgres
+    env_file:
+      - ../.env
+    environment:
+      PG_RESTORE_STAGING: ${PG_RESTORE_STAGING}
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+    ports:
+      - ${PSQL_PORT}:25432
+    volumes:
+      - ${PG_DATA_STAGING}:/var/lib/postgresql/data/
+      - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
+      - ../containers/postgres/${PG_RESTORE_STAGING}/:/${PG_RESTORE_STAGING}/
+    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  web:
+    extends:
+      service: base
+    tty: true
+    # command: ./manage.py runserver 0:3000
+    ports:
+      - 8080:8080
+    restart: always
+    volumes:
+      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
+      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/
+      # Add to development
+      # - ../AlertaDengue/dados:/opt/services/AlertaDengue/dados
+    command: python manage.py runserver 0.0.0.0:8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s  # requires docker-compose 3.4

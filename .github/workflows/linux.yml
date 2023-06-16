@@ -105,15 +105,16 @@ jobs:
 
     - name: Build postgres database
       run: |
-        containers-sugar --group dev build --services postgres
+        kxgr build --services postgres
 
     - name: Start postgres database
       run: |
-        containers-sugar --group dev start --services postgres
+        kxgr ext start --services postgres --options -d
 
     - name: Start containers
       run: |
-        containers-sugar start --group dev
+        kxgr build
+        kxgr ext start --service web --options -d
 
     - name: Container wait
       run: |
