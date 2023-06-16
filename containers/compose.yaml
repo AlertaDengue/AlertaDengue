@@ -9,30 +9,6 @@ services:
     profiles:
       - donotstart
 
-  postgres:
-    hostname: postgres
-    extends:
-      service: base_postgres
-    env_file:
-      - ../.env
-    environment:
-      PG_RESTORE_STAGING: ${PG_RESTORE_STAGING}
-      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
-      POSTGRES_HOST_AUTH_METHOD: "md5"
-    ports:
-      - ${PSQL_PORT}:5432
-    volumes:
-      - ../../pg_staging_data:/var/lib/postgresql/data/
-      - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
-      - ../containers/postgres/${PG_RESTORE_STAGING}/:/${PG_RESTORE_STAGING}/
-    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-
   dengue_db:
     hostname: dengue_db
     extends:
@@ -110,7 +86,7 @@ services:
     extends:
       service: base
     ports:
-      - ${PORT_WEB}:8000
+      - 8000:8000
     env_file:
       - ../.env
     depends_on:

@@ -20,4 +20,4 @@ conda activate alertadengue
 
 echo "Running: ${@}"
 
-$@
+exec "$@"
