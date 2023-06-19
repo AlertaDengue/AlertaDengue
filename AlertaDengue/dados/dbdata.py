@@ -6,7 +6,6 @@ import json
 import unicodedata
 from collections import defaultdict
 from datetime import datetime, timedelta
-from difflib import get_close_matches
 from typing import List, Optional, Tuple
 
 import ibis
@@ -465,35 +464,6 @@ def get_last_alert(geo_id, disease):
 
     with DB_ENGINE.connect() as conn:
         return pd.read_sql_query(sql, conn)
-
-
-def get_city(query):
-    """
-    Fetch city geocode, name and state from the database,
-    matching the substring query
-    :param query: substring of the city
-    :return: list of tuples
-    """
-    # Normalize cities names
-    norm_muns = [
-        (i["geocode"], normalize_str(i["name"])) for i in MUNICIPALITIES
-    ]
-
-    # Get normalized matches
-    matches = get_close_matches(
-        normalize_str(query), [c for g, c in norm_muns], n=7, cutoff=0.7
-    )
-
-    # Extract geocodes from matches
-    geocodes = [
-        i[0] for i in list(filter(lambda mun: mun[1] in matches, norm_muns))
-    ]
-
-    return [
-        (m["geocode"], m["name"], STATE_NAME[m["uf"]])
-        for m in MUNICIPALITIES
-        if m["geocode"] in geocodes
-    ]
 
 
 def load_series(cidade, disease: str = "dengue", epiweek: int = 0):
