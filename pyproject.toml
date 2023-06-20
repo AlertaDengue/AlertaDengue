@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "alertadengue"
-version = "3.6.1"  # changed by semantic-release
+version = "3.7.0"  # changed by semantic-release
 description = "AlertaDengue Package"
 authors = ["Flavio Codeco Coelho <fccoelho@gmail.com>"]
 license = "GNU General Public License v3"
