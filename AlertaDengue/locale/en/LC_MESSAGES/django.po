@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-20 17:24+0000\n"
+"POT-Creation-Date: 2023-06-20 17:53+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2743,7 +2743,7 @@ msgstr ""
 
 #: AlertaDengue/templates/base.html:60
 msgid "Recursos"
-msgstr ""
+msgstr "Resources"
 
 #: AlertaDengue/templates/base.html:67
 msgid ""
@@ -2751,6 +2751,9 @@ msgid ""
 "Dengue e Chikungunya, do Infodengue para analisar a expansão da onda no "
 "território nacional brasileiro."
 msgstr ""
+"Application that uses updated data on the incidence of arboviruses, such as "
+"Dengue and Chikungunya, from Infodengue to analyze the spread of the "
+"epidemic in the Brazilian national territory."
 
 #: AlertaDengue/templates/base.html:74
 msgid ""
@@ -2766,28 +2769,37 @@ msgid ""
 "E-vigilância é um evento que tem como objetivo discutir as tecnologias, "
 "metodologias e desafios relacionados à vigilância em saúde."
 msgstr ""
+"E-vigilância is an event that aims to discuss the technologies, "
+"methodologies, and challenges related to health surveillance."
 
-#: AlertaDengue/templates/base.html:87
+#: AlertaDengue/templates/base.html:88
+msgid ""
+"PySUS reúne um conjunto de utilitários para lidar com bancos de dados "
+"públicos publicados pelo DATASUS do Brasil."
+msgstr ""
+"PySUS collects a set of utilities for handling with public databases published by Brazil's DATASUS."
+
+#: AlertaDengue/templates/base.html:94
 msgid "Envie dados atualizados"
 msgstr "Send updated data"
 
-#: AlertaDengue/templates/base.html:92
+#: AlertaDengue/templates/base.html:99
 msgid "Account "
 msgstr "Account "
 
-#: AlertaDengue/templates/base.html:97
+#: AlertaDengue/templates/base.html:104
 msgid "Logout"
 msgstr "Logout"
 
-#: AlertaDengue/templates/base.html:100
+#: AlertaDengue/templates/base.html:107
 msgid "Change password"
 msgstr "Change password"
 
-#: AlertaDengue/templates/base.html:106
+#: AlertaDengue/templates/base.html:113
 msgid "Login"
 msgstr "Login"
 
-#: AlertaDengue/templates/base.html:139
+#: AlertaDengue/templates/base.html:146
 msgid ""
 "Pin a fixed-height footer to the bottom\n"
 "            of the viewport in desktop browsers with this\n"
