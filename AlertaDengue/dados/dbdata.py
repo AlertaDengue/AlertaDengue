@@ -2,6 +2,8 @@
 This module contains functions to interact with the main database of the
 Alertadengue project.
 """
+import json
+import unicodedata
 from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import List, Optional, Tuple
@@ -9,7 +11,7 @@ from typing import List, Optional, Tuple
 import ibis
 import numpy as np
 import pandas as pd
-from ad_main.settings import get_ibis_conn, get_sqla_conn
+from ad_main.settings import APPS_DIR, get_ibis_conn, get_sqla_conn
 from django.conf import settings
 from django.core.cache import cache
 
@@ -60,6 +62,10 @@ STATE_NAME = {k: v[0] for k, v in ALL_STATE_NAMES.items()}
 STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
 MAP_CENTER = {k: v[1] for k, v in ALL_STATE_NAMES.items()}
 MAP_ZOOM = {k: v[2] for k, v in ALL_STATE_NAMES.items()}
+
+with open(APPS_DIR / "data" / "municipalities.json", "r") as muns:
+    _mun_decoded = muns.read().encode().decode("utf-8-sig")
+    MUNICIPALITIES = json.loads(_mun_decoded)
 
 # Ibis utils
 
@@ -323,6 +329,19 @@ def _episem(dt):
     return episem(dt, sep="")
 
 
+def normalize_str(string: str) -> str:
+    """
+    São Tomé -> sao tome
+    """
+    non_ascii = (
+        unicodedata.normalize("NFKD", string)
+        .encode("ascii", "ignore")
+        .decode()
+    )
+    string = non_ascii.lower()
+    return string
+
+
 def get_disease_suffix(disease: str, empty_for_dengue: bool = True):
     """
     :param disease:
@@ -445,28 +464,6 @@ def get_last_alert(geo_id, disease):
 
     with DB_ENGINE.connect() as conn:
         return pd.read_sql_query(sql, conn)
-
-
-def get_city(query):
-    """
-    Fetch city geocode, name and state from the database,
-    matching the substring query
-    :param query: substring of the city
-    :return: list of dictionaries
-    """
-
-    with DB_ENGINE.connect() as conexao:
-        sql = (
-            " SELECT distinct municipio_geocodigo, nome, uf"
-            + ' FROM "Municipio"."Historico_alerta" AS alert'
-            + '  INNER JOIN "Dengue_global"."Municipio" AS city'
-            + "  ON alert.municipio_geocodigo=city.geocodigo"
-            + " WHERE nome ilike(%s);"
-        )
-
-        result = conexao.execute(sql, ("%" + query + "%",))
-
-    return result.fetchall()
 
 
 def load_series(cidade, disease: str = "dengue", epiweek: int = 0):

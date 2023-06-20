@@ -31,6 +31,7 @@ env:
   EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
   EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
   EMAIL_PORT: 587
+  EMAIL_BACKEND: django.core.mail.backends.console.EmailBackend
 
   IMPORTED_FILES: /IMPORTED_FILES
   MEDIA_ROOT: /MEDIA_ROOT

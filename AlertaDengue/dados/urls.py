@@ -21,7 +21,6 @@ from .views import (
     ReportView,
     SinanCasesView,
     TeamPageView,
-    get_municipio,
 )
 
 
@@ -129,7 +128,6 @@ urlpatterns = [
         AlertaMunicipioPageView.as_view(),
         name="alerta_cidade",
     ),
-    re_path(r"^getcity/$", get_municipio, name="get_city"),
     re_path(
         r"^sinan/(\d{4})/(\d{1,2})",
         cache_page(60 * 60 * 60 * 24)(SinanCasesView.as_view()),

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-26 19:36+0000\n"
+"POT-Creation-Date: 2023-06-19 18:45+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -688,18 +688,27 @@ msgid "EVIGILANCIA: monitoramento integrado e contínuo de arboviroses"
 msgstr "EVIGILANCIA: Continuous & integrated arboviruses monitoring"
 
 #: AlertaDengue/dados/templates/about.html:148
+#, fuzzy
+#| msgid ""
+#| "\n"
+#| "                Este projeto visou a consolidação do sistema de alerta "
+#| "para arboviroses baseado em dados\n"
+#| "                hı́bridos gerados por meio da análise integrada de dados "
+#| "minerados a partir da Web\n"
+#| "                social e de dados climáticos e epidemiológicos, o "
+#| "Infodengue."
 msgid ""
 "\n"
 "                Este projeto visou a consolidação do sistema de alerta para "
 "arboviroses baseado em dados\n"
 "                hı́bridos gerados por meio da análise integrada de dados "
-"minerados a partir da Web\n"
-"                social e de dados climáticos e epidemiológicos, o Infodengue."
+"minerados a partir de dados regionais\n"
+"                climáticos e epidemiológicos, o Infodengue."
 msgstr ""
 "\n"
 "Evigilancia aimed to consolidate the alert system for arboviruses based on "
 "hybrid data generated through integrated data analysis, mined from web "
-"social and climatic and epidemiological data, the InfoDengue."
+"climatic and epidemiological data, the InfoDengue."
 
 #: AlertaDengue/dados/templates/about.html:152
 #: AlertaDengue/dados/templates/about.html:174
@@ -1242,6 +1251,10 @@ msgstr "Municipalities by regional"
 msgid "Municípios"
 msgstr "Municipalities"
 
+#: AlertaDengue/dados/templates/components/searchbox/searchbox.html:19
+msgid "Encontre um município"
+msgstr "Search by city"
+
 #: AlertaDengue/dados/templates/dashboard_cities.html:56
 #, python-format
 msgid ""
@@ -1388,7 +1401,7 @@ msgid "Mapas estaduais"
 msgstr "State map views"
 
 #: AlertaDengue/dados/templates/main.html:65
-#: AlertaDengue/templates/base.html:68
+#: AlertaDengue/templates/base.html:50
 msgid "Participe"
 msgstr "Join us"
 
@@ -1443,7 +1456,7 @@ msgstr ""
 #: AlertaDengue/dados/templates/report_filter_state.html:52
 #: AlertaDengue/dados/templates/report_filter_state.html:60
 #: AlertaDengue/dados/templates/report_state.html:20
-#: AlertaDengue/templates/base.html:72
+#: AlertaDengue/templates/base.html:54
 msgid "Relatórios"
 msgstr "Report"
 
@@ -1908,7 +1921,7 @@ msgstr "Reported cases of %(disease_label)s"
 #: AlertaDengue/dados/templates/services_tutorial.html:28
 #: AlertaDengue/dados/templates/services_tutorial_Python.html:174
 #: AlertaDengue/dados/templates/services_tutorial_R.html:174
-#: AlertaDengue/templates/base.html:70
+#: AlertaDengue/templates/base.html:52
 msgid "Dados"
 msgstr "Data"
 
@@ -2336,7 +2349,7 @@ msgstr "Filter description"
 msgid "Por favor, aguarde."
 msgstr "Please, wait."
 
-#: AlertaDengue/dados/templates/team.html:5 AlertaDengue/templates/base.html:66
+#: AlertaDengue/dados/templates/team.html:5 AlertaDengue/templates/base.html:48
 msgid "Equipe"
 msgstr "Team"
 
@@ -2592,10 +2605,16 @@ msgstr "Notification year can not be greater than current year"
 msgid "Arquivo DBF inválido"
 msgstr "Invalid DBF file"
 
-#: AlertaDengue/dbf/sinan.py:182
-msgid "Existem nesse arquivo notificações que não incluem a coluna ID_AGRAVO."
-msgstr ""
-"There are notifications that don't include the ID_AGRAVO column in this file."
+#: AlertaDengue/dbf/templates/dbf_all_upload.html:5
+#: AlertaDengue/dbf/templates/upload_successful.html:5
+msgid "Dados do SINAN recebidos"
+msgstr "SINAN data received"
+
+#: AlertaDengue/dbf/templates/dbf_all_upload.html:11
+#: AlertaDengue/dbf/templates/dbf_upload.html:180
+#: AlertaDengue/dbf/templates/upload_successful.html:10
+msgid "Ultimos arquivos enviados:"
+msgstr "Last uploaded files:"
 
 #: AlertaDengue/dbf/templates/dbf_upload.html:66
 msgid "Envie aqui os dados atualizados do SINAN"
@@ -2605,14 +2624,10 @@ msgstr "Send here the updated SINAN data"
 msgid "Enviar"
 msgstr "Send"
 
-#: AlertaDengue/dbf/templates/dbf_upload.html:180
-#: AlertaDengue/dbf/templates/upload_successful.html:10
-msgid "Ultimos arquivos enviados:"
-msgstr "Last uploaded files:"
-
-#: AlertaDengue/dbf/templates/upload_successful.html:5
-msgid "Dados do SINAN recebidos"
-msgstr "SINAN data received"
+#: AlertaDengue/dbf/utils.py:181
+msgid "Existem nesse arquivo notificações que não incluem a coluna ID_AGRAVO."
+msgstr ""
+"There are notifications that don't include the ID_AGRAVO column in this file."
 
 #: AlertaDengue/dbf/validation.py:30
 msgid "Este arquivo não parece um DBF válido "
@@ -2712,39 +2727,35 @@ msgstr "Forecast week initial date"
 msgid "Casos Previstos"
 msgstr "Forecast cases"
 
-#: AlertaDengue/templates/base.html:62
+#: AlertaDengue/templates/base.html:44
 msgid "Início"
 msgstr "Home"
 
-#: AlertaDengue/templates/base.html:64
+#: AlertaDengue/templates/base.html:46
 msgid "Sobre nós"
 msgstr "About us"
 
-#: AlertaDengue/templates/base.html:78
-msgid "Encontre um município"
-msgstr "Search by city"
-
-#: AlertaDengue/templates/base.html:85
+#: AlertaDengue/templates/base.html:60
 msgid "Envie dados atualizados"
 msgstr "Send updated data"
 
-#: AlertaDengue/templates/base.html:90
+#: AlertaDengue/templates/base.html:65
 msgid "Account "
 msgstr "Account "
 
-#: AlertaDengue/templates/base.html:95
+#: AlertaDengue/templates/base.html:70
 msgid "Logout"
 msgstr "Logout"
 
-#: AlertaDengue/templates/base.html:98
+#: AlertaDengue/templates/base.html:73
 msgid "Change password"
 msgstr "Change password"
 
-#: AlertaDengue/templates/base.html:104
+#: AlertaDengue/templates/base.html:79
 msgid "Login"
 msgstr "Login"
 
-#: AlertaDengue/templates/base.html:165
+#: AlertaDengue/templates/base.html:112
 msgid ""
 "Pin a fixed-height footer to the bottom\n"
 "            of the viewport in desktop browsers with this\n"

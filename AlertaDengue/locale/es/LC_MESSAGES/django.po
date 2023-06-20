@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-26 19:38+0000\n"
+"POT-Creation-Date: 2023-06-19 18:45+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -582,8 +582,8 @@ msgid ""
 "                Este projeto visou a consolidação do sistema de alerta para "
 "arboviroses baseado em dados\n"
 "                hı́bridos gerados por meio da análise integrada de dados "
-"minerados a partir da Web\n"
-"                social e de dados climáticos e epidemiológicos, o Infodengue."
+"minerados a partir de dados regionais\n"
+"                climáticos e epidemiológicos, o Infodengue."
 msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:152
@@ -1063,6 +1063,10 @@ msgstr ""
 msgid "Municípios"
 msgstr "Código de la municipalidad"
 
+#: AlertaDengue/dados/templates/components/searchbox/searchbox.html:19
+msgid "Encontre um município"
+msgstr ""
+
 #: AlertaDengue/dados/templates/dashboard_cities.html:56
 #, python-format
 msgid ""
@@ -1191,7 +1195,7 @@ msgid "Mapas estaduais"
 msgstr ""
 
 #: AlertaDengue/dados/templates/main.html:65
-#: AlertaDengue/templates/base.html:68
+#: AlertaDengue/templates/base.html:50
 msgid "Participe"
 msgstr ""
 
@@ -1247,7 +1251,7 @@ msgstr ""
 #: AlertaDengue/dados/templates/report_filter_state.html:52
 #: AlertaDengue/dados/templates/report_filter_state.html:60
 #: AlertaDengue/dados/templates/report_state.html:20
-#: AlertaDengue/templates/base.html:72
+#: AlertaDengue/templates/base.html:54
 msgid "Relatórios"
 msgstr ""
 
@@ -1679,7 +1683,7 @@ msgstr ""
 #: AlertaDengue/dados/templates/services_tutorial.html:28
 #: AlertaDengue/dados/templates/services_tutorial_Python.html:174
 #: AlertaDengue/dados/templates/services_tutorial_R.html:174
-#: AlertaDengue/templates/base.html:70
+#: AlertaDengue/templates/base.html:52
 msgid "Dados"
 msgstr ""
 
@@ -2085,7 +2089,7 @@ msgstr ""
 msgid "Por favor, aguarde."
 msgstr ""
 
-#: AlertaDengue/dados/templates/team.html:5 AlertaDengue/templates/base.html:66
+#: AlertaDengue/dados/templates/team.html:5 AlertaDengue/templates/base.html:48
 msgid "Equipe"
 msgstr "Equipo"
 
@@ -2355,8 +2359,15 @@ msgstr ""
 msgid "Arquivo DBF inválido"
 msgstr ""
 
-#: AlertaDengue/dbf/sinan.py:182
-msgid "Existem nesse arquivo notificações que não incluem a coluna ID_AGRAVO."
+#: AlertaDengue/dbf/templates/dbf_all_upload.html:5
+#: AlertaDengue/dbf/templates/upload_successful.html:5
+msgid "Dados do SINAN recebidos"
+msgstr ""
+
+#: AlertaDengue/dbf/templates/dbf_all_upload.html:11
+#: AlertaDengue/dbf/templates/dbf_upload.html:180
+#: AlertaDengue/dbf/templates/upload_successful.html:10
+msgid "Ultimos arquivos enviados:"
 msgstr ""
 
 #: AlertaDengue/dbf/templates/dbf_upload.html:66
@@ -2367,13 +2378,8 @@ msgstr ""
 msgid "Enviar"
 msgstr ""
 
-#: AlertaDengue/dbf/templates/dbf_upload.html:180
-#: AlertaDengue/dbf/templates/upload_successful.html:10
-msgid "Ultimos arquivos enviados:"
-msgstr ""
-
-#: AlertaDengue/dbf/templates/upload_successful.html:5
-msgid "Dados do SINAN recebidos"
+#: AlertaDengue/dbf/utils.py:181
+msgid "Existem nesse arquivo notificações que não incluem a coluna ID_AGRAVO."
 msgstr ""
 
 #: AlertaDengue/dbf/validation.py:30
@@ -2467,39 +2473,35 @@ msgstr ""
 msgid "Casos Previstos"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:62
+#: AlertaDengue/templates/base.html:44
 msgid "Início"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:64
+#: AlertaDengue/templates/base.html:46
 msgid "Sobre nós"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:78
-msgid "Encontre um município"
-msgstr ""
-
-#: AlertaDengue/templates/base.html:85
+#: AlertaDengue/templates/base.html:60
 msgid "Envie dados atualizados"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:90
+#: AlertaDengue/templates/base.html:65
 msgid "Account "
 msgstr ""
 
-#: AlertaDengue/templates/base.html:95
+#: AlertaDengue/templates/base.html:70
 msgid "Logout"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:98
+#: AlertaDengue/templates/base.html:73
 msgid "Change password"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:104
+#: AlertaDengue/templates/base.html:79
 msgid "Login"
 msgstr ""
 
-#: AlertaDengue/templates/base.html:165
+#: AlertaDengue/templates/base.html:112
 msgid ""
 "Pin a fixed-height footer to the bottom\n"
 "            of the viewport in desktop browsers with this\n"

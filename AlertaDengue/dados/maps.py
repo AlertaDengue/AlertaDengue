@@ -16,11 +16,11 @@ def get_city_geojson(municipio):
         tail = "]}"
 
         res = conn.execute(
+            f"""
+            SELECT geocodigo, nome, geojson, populacao, uf
+            FROM "Dengue_global"."Municipio"
+            WHERE geocodigo={municipio}
             """
-            select geocodigo, nome, geojson, populacao, uf
-            from "Dengue_global"."Municipio" where geocodigo=%s
-            """,
-            (municipio,),
         )
         datum = dict(res.fetchone().items())
         feat = geojson.loads(datum["geojson"])
@@ -47,11 +47,11 @@ def get_city_info(geocodigo):
 
     with DB_ENGINE.connect() as conn:
         res = conn.execute(
+            f"""
+            SELECT geocodigo, nome, populacao, uf
+            FROM "Dengue_global"."Municipio"
+            WHERE geocodigo={geocodigo}
             """
-            select geocodigo, nome, populacao, uf
-            from "Dengue_global"."Municipio" where geocodigo=%s
-            """,
-            (geocodigo,),
         )
         datum = dict(res.fetchone().items())
 

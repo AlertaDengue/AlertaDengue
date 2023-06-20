@@ -49,7 +49,6 @@ from .dbdata import (
     ReportCity,
     ReportState,
     data_hist_uf,
-    get_city,
     get_city_alert,
     get_last_alert,
 )
@@ -121,15 +120,6 @@ def get_last_color_alert(geocode, disease, color_type="rgb"):
         return color_list[level]
 
     return hex_to_rgb(color_list[level])
-
-
-def get_municipio(request):
-    q = request.GET["q"]
-    muns = get_city(q)
-    data = json.dumps(
-        [{"geocodigo": g, "nome": n, "uf": u} for g, n, u in muns]
-    )
-    return HttpResponse(data, content_type="application/json")
 
 
 class _GetMethod:
