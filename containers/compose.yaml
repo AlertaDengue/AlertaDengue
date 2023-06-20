@@ -33,6 +33,30 @@ services:
       timeout: 5s
       retries: 10
 
+  postgres:
+    hostname: postgres
+    extends:
+      service: base_postgres
+    env_file:
+      - ../.env
+    environment:
+      PG_RESTORE_STAGING: ${PG_RESTORE_STAGING}
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+    ports:
+      - ${PSQL_PORT}:25432
+    volumes:
+      - ${PG_DATA_STAGING}:/var/lib/postgresql/data/
+      - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
+      - ../containers/postgres/${PG_RESTORE_STAGING}/:/${PG_RESTORE_STAGING}/
+    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   memcached:
     hostname: memcached
     image: memcached:alpine
@@ -85,17 +109,25 @@ services:
     hostname: web
     extends:
       service: base
-    ports:
-      - 8000:8000
     env_file:
       - ../.env
+    ports:
+      - ${WEB_PORT}:${WEB_PORT}
     depends_on:
       - rabbitmq
       - memcached
     restart: always
-    command: ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "ad_main.wsgi:application", "--timeout", "9640"]
+    command:
+      - sh
+      - -c
+      - |
+        if [ "${ENV}" = "prod" ]; then
+          gunicorn -w 4 -b 0.0.0.0:8000 ad_main.wsgi:application --timeout 9640;
+        else
+          python manage.py runserver 0.0.0.0:${WEB_PORT};
+        fi
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      test: ["CMD", "curl", "-f", "http://localhost:${WEB_PORT}"]
       interval: 10s
       timeout: 10s
       retries: 5
