@@ -12,6 +12,7 @@ env:
   ALLOWED_HOSTS: "localhost"
   DEBUG: False
   ENV: dev
+  WEB_PORT: 8080
   HOST_GID: 1000
   HOST_UID: 1000
   SECRET_KEY: my-secret-key
