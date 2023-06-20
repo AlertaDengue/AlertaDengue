@@ -55,6 +55,40 @@
                                     <li style="overflow: visible">
                                         {% searchbox_component %}
                                     </li>
+                                    <li class="py-2 dropdown">
+                                        <a class="py-2 dropdown-toggle" href="#" id="recursosDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="{% trans 'Links para páginas com informações adicionais, ferramentas e outras seções úteis do site' %}">
+                                            {% trans "Recursos" %}                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="recursosDropdown">
+                                            <a class="dropdown-item"
+                                               href="/epi-scanner"
+                                               target="_blank"
+                                               onclick="alert('You will be redirected to a new tab!')"
+                                               style="text-decoration: none;"
+                                               title="{% trans 'Aplicação que utiliza dados atualizados de incidência de arboviroses, como Dengue e Chikungunya, do Infodengue para analisar a expansão da onda no território nacional brasileiro.' %}">Episcanner
+                                            </a>
+                                            <a class="dropdown-item"
+                                               href="/alertflow"
+                                               target="_blank"
+                                               onclick="alert('You will be redirected to a new tab!')"
+                                               style="text-decoration: none;"
+                                               title="{% trans 'O AlertFlow é um sistema de gerenciamento de fluxo de trabalho projetado para o projeto Alertadenge.' %}">AlertFlow
+                                            </a>
+                                            <a class="dropdown-item"
+                                               href="https://e-vigilancia.dengue.mat.br/"
+                                               target="_blank"
+                                               onclick="alert('You will be redirected to a new tab!')"
+                                               style="text-decoration: none;"
+                                               title="{% trans 'E-vigilância é um evento que tem como objetivo discutir as tecnologias, metodologias e desafios relacionados à vigilância em saúde.' %}">E-vigilância
+                                            </a>
+                                            <a class="dropdown-item"
+                                            href="https://readthedocs.org/projects/pysus/"
+                                            target="_blank"
+                                               onclick="alert('You will be redirected to a new tab!')"
+                                               style="text-decoration: none;"
+                                               title="{% trans 'PySUS reúne um conjunto de utilitários para lidar com bancos de dados públicos publicados pelo DATASUS do Brasil.' %}">PySUS
+                                            </a>
+                                        </div>
+                                    </li>
                                     {% if user.is_authenticated %}
                                     <li class="py-2"><a href="{% url 'dbf:upload' %}">
                                         {% trans "Envie dados atualizados" %}
