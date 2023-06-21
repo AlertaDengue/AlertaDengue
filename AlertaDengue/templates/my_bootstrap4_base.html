@@ -2,49 +2,46 @@
 {% load bootstrap4 %}
 {% load i18n %}
 {% load static %}
-<html>
-<head lang="pt-BR">
-    <meta charset=”UTF-8”>
-    <title>{% block bootstrap4_title %}{% endblock %}</title>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+    <title>{% block bootstrap4_title %}{% endblock %}</title>
     <link rel="icon" href="{% static '/img/favicon.ico' %}" type="image/x-icon">
-
     <link href="{% static '/css/infodengue.css' %}" rel="stylesheet" type="text/css">
-
-    <script src="{% static '/libs/jquery/jquery-3.3.1.js' %}" type="text/javascript"></script>
 
     {% bootstrap_css %}
     {% bootstrap_javascript %}
+    <script src="{% static '/libs/jquery/jquery-3.3.1.js' %}" type="text/javascript"></script>
     <script src="/static/js/typeahead.bundle.min.js" type="text/javascript"></script>
-
-    <link rel="shortcut icon" href="{% static '/img/favicon.ico' %}"
-          type="image/x-icon">
 
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-{% block bootstrap4_content %}{% endblock %}
+<div id="wrap">
+    {% block bootstrap4_content %}{% endblock %}
+</div>
 
 <div id="footer">&nbsp;</div>
+
 <script>
     (function (i, s, o, g, r, a, m) {
         i['GoogleAnalyticsObject'] = r;
         i[r] = i[r] || function () {
-            (i[r].q = i[r].q || []).push(arguments)
+            (i[r].q = i[r].q || []).push(arguments);
         }, i[r].l = 1 * new Date();
         a = s.createElement(o),
-                m = s.getElementsByTagName(o)[0];
+            m = s.getElementsByTagName(o)[0];
         a.async = 1;
         a.src = g;
-        m.parentNode.insertBefore(a, m)
+        m.parentNode.insertBefore(a, m);
     })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
     ga('create', 'UA-58700914-1', 'auto');
     ga('send', 'pageview');
 
-    if (typeof Highcharts != 'undefined') {
-        if ('{% blocktrans %}linguagem{% endblocktrans %}' == 'linguagem') {
+    if (typeof Highcharts !== 'undefined') {
+        if ('{% blocktrans %}linguagem{% endblocktrans %}' === 'linguagem') {
             Highcharts.setOptions({
                 lang: {
                     months: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
@@ -64,7 +61,7 @@
                     rangeSelectorZoom: 'Zoom',
                     resetZoom: 'Limpar Zoom',
                     resetZoomTitle: 'Voltar Zoom para nível 1:1',
-                }
+                },
             });
         }
 
@@ -74,9 +71,8 @@
                 this.hide();
             });
             $(chart.rangeSelector.divRelative).hide();
-        };
+        }
     }
-
 </script>
 
 </body>
