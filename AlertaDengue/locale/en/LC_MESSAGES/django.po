@@ -2740,6 +2740,8 @@ msgid ""
 "Links para páginas com informações adicionais, ferramentas e outras seções "
 "úteis do site"
 msgstr ""
+"Links to pages with additional information, "
+"tools, and other useful sections of the website."
 
 #: AlertaDengue/templates/base.html:60
 msgid "Recursos"
