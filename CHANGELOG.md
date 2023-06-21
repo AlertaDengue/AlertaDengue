@@ -1,6 +1,13 @@
 Release Notes
 ---
 
+## [3.8.0](https://github.com/AlertaDengue/AlertaDengue/compare/3.7.0...3.8.0) (2023-06-21)
+
+
+### Features
+
+* Add new style to change color of selected item in select2 dropdown ([#649](https://github.com/AlertaDengue/AlertaDengue/issues/649)) ([2ab8993](https://github.com/AlertaDengue/AlertaDengue/commit/2ab89937570e52bfd0e74b4417b07188f768af16))
+
 ## [3.7.0](https://github.com/AlertaDengue/AlertaDengue/compare/3.6.1...3.7.0) (2023-06-20)
 
 
