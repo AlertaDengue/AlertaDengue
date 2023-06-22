@@ -17,10 +17,8 @@ service-groups:
         - name: web
         - name: memcached
         - name: rabbitmq
-      collectors: minio,collector
-      available:
         - name: minio
-        - name: collector
+        - name: worker
 
   - name: prod
     project-name: infodengue-prod
@@ -34,3 +32,4 @@ service-groups:
         - name: memcached
         - name: rabbitmq
         - name: minio
+        - name: worker

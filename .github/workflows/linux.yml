@@ -62,7 +62,7 @@ env:
   MINIO_PORT_1: 9000
   MINIO_PORT_2: 9090
   MINIO_ENDPOINT: http://minio:9090
-  HOST_MINIO_DATA_DIR: "../../staging_data/data"
+  HOST_MINIO_DATA_DIR: "../../staging_data/minio"
 
 jobs:
   build:
@@ -95,7 +95,8 @@ jobs:
     - name: Prepare data volumes
       run: |
         mkdir -p ../../staging_data/postgres_data
-        chmod 777 -R ../../staging_data/postgres_data
+        mkdir -p ../../staging_data/minio
+        chmod 777 -R ../../staging_data/
         mkdir -p /tmp/dbf_duplicated_csv
         chmod 777 -R /tmp/dbf_duplicated_csv
 
@@ -117,8 +118,8 @@ jobs:
 
     - name: Start containers
       run: |
-        kxgr build
-        kxgr ext start --service web --options -d
+        kxgr build --group dev --all
+        kxgr ext start --group dev --all --options -d
 
     - name: Container wait
       run: |

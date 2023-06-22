@@ -151,7 +151,7 @@ services:
       - minio
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", 'celery --app ad_main.celeryapp.app inspect ping -d "celery@$${HOSTNAME}"']
+      test: ["CMD-SHELL", 'celery --app ad_main.celeryapp.app status']
       interval: 10s
       timeout: 10s
       retries: 5
