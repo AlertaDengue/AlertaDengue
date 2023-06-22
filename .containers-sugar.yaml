@@ -9,7 +9,6 @@ service-groups:
     project-name: infodengue-dev
     compose-path:
       - containers/compose.yaml
-      # - containers/compose-dev.yaml
     env-file: .env
     services:
       default: memcached,rabbitmq,web
@@ -18,7 +17,10 @@ service-groups:
         - name: web
         - name: memcached
         - name: rabbitmq
+      collectors: minio,collector
+      available:
         - name: minio
+        - name: collector
 
   - name: prod
     project-name: infodengue-prod
