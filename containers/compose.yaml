@@ -1,5 +1,31 @@
 version: "3.4"
 services:
+
+  memcached:
+    hostname: memcached
+    image: memcached:alpine
+    entrypoint:
+      - memcached
+      - -m 64
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "11211"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s  # requires docker-compose 3.4
+    restart: always
+
+  rabbitmq:
+    hostname: rabbitmq
+    image: rabbitmq:3-alpine
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "5672"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s  # requires docker-compose 3.4
+    restart: always
+
   base_postgres:
     build:
       context: ".."
@@ -57,31 +83,6 @@ services:
       timeout: 5s
       retries: 10
 
-  memcached:
-    hostname: memcached
-    image: memcached:alpine
-    entrypoint:
-      - memcached
-      - -m 64
-    healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "11211"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 10s  # requires docker-compose 3.4
-    restart: always
-
-  rabbitmq:
-    hostname: rabbitmq
-    image: rabbitmq:3-alpine
-    healthcheck:
-      test: ["CMD", "nc", "-z", "localhost", "5672"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 10s  # requires docker-compose 3.4
-    restart: always
-
   base:
     build:
       context: ".."
@@ -137,6 +138,7 @@ services:
       start_period: 10s  # requires docker-compose 3.4
 
   worker:
+    hostname: worker
     extends:
       service: base
     entrypoint: ["bash", "/entrypoint.sh", "/opt/services/run_services.sh"]
@@ -158,6 +160,7 @@ services:
       start_period: 30s
 
   minio:
+    hostname: minio
     platform: linux/amd64
     image: quay.io/minio/minio
     restart: unless-stopped
@@ -170,29 +173,27 @@ services:
       MINIO_UID: ${HOST_GID}
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-      MINIO_PORT_1: 9000
-      MINIO_PORT_2: 9090
+      MINIO_PORT_1: ${MINIO_PORT_1}
+      MINIO_PORT_2: ${MINIO_PORT_2}
       # MINIO_ENDPOINT: http://minio:9090
     command: [
       "server",
       "/opt/services/collector/data",
       "--console-address",
-      ":9090"
+      ":${MINIO_PORT_2}"
     ]
     ports:
-      - ${MINIO_PORT_1}:9000
-      - ${MINIO_PORT_2}:9090
+      - ${MINIO_PORT_1}:${MINIO_PORT_1}
+      - ${MINIO_PORT_2}:${MINIO_PORT_2}
     volumes:
       - ${HOST_MINIO_DATA_DIR}:/opt/services/collector
       # - ${HOST_MINIO_DATA_DIR}:/data
-
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "http://localhost:${MINIO_PORT_1}/minio/health/live"]
       interval: 60s
       timeout: 10s
       retries: 5
       start_period: 40s  # requires docker-compose 3.4
-
 
 volumes:
   dumps:
