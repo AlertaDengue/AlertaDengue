@@ -1,8 +1,12 @@
+#!/usr/bin/env python3
+
 import datetime
 import os
 import time
 from pathlib import Path
 
+from dbf.sinan import Sinan
+from django.core.exceptions import ValidationError
 from loguru import logger
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
@@ -34,11 +38,21 @@ class FileHandler(FileSystemEventHandler):
 
         logger.info(event.src_path)
         if event.is_directory:
-            file_name = os.path.basename(event.src_path)
+            self.file_name = os.path.basename(event.src_path)
             today = datetime.datetime.today()
-            year = today.year
-            logger.info(f"New file created: {file_name}, {today}, {year}")
+            self.year = today.year
+            self.default_cid = "chikungunya"
+            logger.info(
+                f"New file created: {self.file_name}, {today}, {self.year}"
+            )
             return
+
+    def insert_dbf(self, *args, **options):
+        try:
+            sinan = Sinan(options[self.filename], options[self.year])
+            sinan.save_to_pgsql(default_cid=options[self.default_cid])
+        except ValidationError as e:
+            logger.info(f"File not valid: {e.message}")
 
 
 if __name__ == "__main__":
