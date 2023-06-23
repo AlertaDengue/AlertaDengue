@@ -42,9 +42,9 @@ services:
     env_file:
       - ../.env
     environment:
-      PG_RESTORE_STAGING: ${PG_RESTORE_STAGING}
-      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
-      POSTGRES_HOST_AUTH_METHOD: "md5"
+      - PG_RESTORE_STAGING=${PG_RESTORE_STAGING}
+      - POSTGRES_PASSWORD=${PSQL_PASSWORD}
+      - POSTGRES_HOST_AUTH_METHOD="md5"
     ports:
       - ${PSQL_PORT}:5432
     volumes:
@@ -66,9 +66,9 @@ services:
     env_file:
       - ../.env
     environment:
-      PG_RESTORE_STAGING: ${PG_RESTORE_STAGING}
-      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
-      POSTGRES_HOST_AUTH_METHOD: "md5"
+      - PG_RESTORE_STAGING= ${PG_RESTORE_STAGING}
+      - POSTGRES_PASSWORD= ${PSQL_PASSWORD}
+      - POSTGRES_HOST_AUTH_METHOD="md5"
     ports:
       - ${PSQL_PORT}:25432
     volumes:
@@ -130,6 +130,9 @@ services:
           python3 /opt/services/AlertaDengue/manage.py collectstatic --noinput
           python manage.py runserver 0.0.0.0:${WEB_PORT};
         fi
+    volumes:
+      # Development
+      # - ${PWD}/AlertaDengue/dbf:/opt/services/AlertaDengue/dbf
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${WEB_PORT}"]
       interval: 10s
@@ -145,6 +148,11 @@ services:
     command: ["python3", "/opt/services/AlertaDengue/dbf/collector.py"]
     env_file:
       - ../.env
+    environment:
+     - MINIO_ENDPOINT=minio:9000
+     - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+     - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+     - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
     volumes:
       - ${HOST_MINIO_DATA_DIR}:/opt/services/collector
     depends_on:
@@ -162,20 +170,15 @@ services:
   minio:
     hostname: minio
     platform: linux/amd64
-    image: quay.io/minio/minio
+    image: minio/minio
     restart: unless-stopped
     env_file:
       - ../.env
     environment:
-      MINIO_USERNAME: ${MINIO_USERNAME}
-      MINIO_GROUPNAME: ${MINIO_GROUPNAME}
-      MINIO_GID: ${HOST_UID}
-      MINIO_UID: ${HOST_GID}
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-      MINIO_PORT_1: ${MINIO_PORT_1}
-      MINIO_PORT_2: ${MINIO_PORT_2}
-      # MINIO_ENDPOINT: http://minio:9090
+     - MINIO_ENDPOINT=minio:9000
+     - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+     - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+     - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
     command: [
       "server",
       "/opt/services/collector/data",
@@ -187,7 +190,6 @@ services:
       - ${MINIO_PORT_2}:${MINIO_PORT_2}
     volumes:
       - ${HOST_MINIO_DATA_DIR}:/opt/services/collector
-      # - ${HOST_MINIO_DATA_DIR}:/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${MINIO_PORT_1}/minio/health/live"]
       interval: 60s
