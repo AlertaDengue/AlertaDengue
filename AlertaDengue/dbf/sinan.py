@@ -1,4 +1,3 @@
-import logging
 from typing import Any, List, Optional, Tuple
 
 import psycopg2
@@ -9,9 +8,8 @@ from dbf.utils import (  # NOQA E501
     read_dbf,
 )
 from django.conf import settings
+from loguru import logger
 from psycopg2.extras import DictCursor
-
-logger = logging.getLogger(__name__)
 
 
 class Sinan(object):
