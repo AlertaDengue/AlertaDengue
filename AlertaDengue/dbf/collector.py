@@ -12,6 +12,10 @@ from watchdog.observers import Observer
 
 ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent
 
+MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
+MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY")
+MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
+MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
 
 class FileHandler(FileSystemEventHandler):
     """
@@ -20,8 +24,7 @@ class FileHandler(FileSystemEventHandler):
 
     def __init__(self):
         super().__init__()
-        self.file_name2 = ""
-        self.year = 0
+        self.year = 2023
         self.default_cid = "zika"
 
     def on_created(self, event):
@@ -35,19 +38,17 @@ class FileHandler(FileSystemEventHandler):
         """
         self.file_path = Path(event.src_path)
         self.file_name = self.file_path.name
-        logger.info(f"Event source path: {self.file_path}")
         self.insert_dbf()
 
     def insert_dbf(self):
         """
         Method to insert DBF data into the database.
         """
-        MINIO_BUCKET_NAME = "dbf"
         try:
             minio_client = Minio(
-                "minio:9000",
-                access_key="?",
-                secret_key="?????",
+                MINIO_ENDPOINT,
+                access_key=MINIO_ACCESS_KEY,
+                secret_key=MINIO_SECRET_KEY,
                 secure=False,
             )
 
@@ -68,19 +69,18 @@ class FileHandler(FileSystemEventHandler):
 
             # Remove the temporary file
             temp_file.close()
-            os.remove(temp_file.name)
+            Path(temp_file.name).unlink()
 
         except ValidationError as e:
             logger.info(f"File not valid: {e.message}")
 
 
 if __name__ == "__main__":
-    logger.debug(ROOT_DIR)
     logger.add(
         "file.log", rotation="500 MB"
     )  # Add a file logger with rotation
     observer = Observer()
-    observer.schedule(FileHandler(), path="/opt/services/collector/data/dbf")
+    observer.schedule(FileHandler(), path=ROOT_DIR / "collector" / "data" / "dbf")
     observer.start()
     try:
         while True:

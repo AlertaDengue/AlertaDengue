@@ -130,9 +130,9 @@ services:
           python3 /opt/services/AlertaDengue/manage.py collectstatic --noinput
           python manage.py runserver 0.0.0.0:${WEB_PORT};
         fi
-    volumes:
+    # volumes:
       # Development
-      # - ${PWD}/AlertaDengue/dbf:/opt/services/AlertaDengue/dbf
+      # - ${ROOT_DIR}/AlertaDengue/dbf:/opt/services/AlertaDengue/dbf
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${WEB_PORT}"]
       interval: 10s
