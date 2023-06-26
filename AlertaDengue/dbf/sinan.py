@@ -1,13 +1,13 @@
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional
 
 import psycopg2
-from dbf.utils import (  # NOQA E501
+from ad_main.settings import get_sqla_conn
+from dbf.utils import (
     FIELD_MAP,
     drop_duplicates_from_dataframe,
     parse_data,
     read_dbf,
 )
-from django.conf import settings
 from loguru import logger
 from psycopg2.extras import DictCursor
 
@@ -18,82 +18,43 @@ class Sinan(object):
     and prepare the data for insertion into another database.
     """
 
-    db_config = {
-        "database": settings.PSQL_DB,
-        "user": settings.PSQL_USER,
-        "password": settings.PSQL_PASSWORD,
-        "host": settings.PSQL_HOST,
-        "port": settings.PSQL_PORT,
-    }
-
     def __init__(
-        self, dbf_fname: str, ano: int, encoding: str = "iso=8859-1"
+        self, dbf_fname: str, year: int, encoding: str = "iso=8859-1"
     ) -> None:
         """
         Instantiates a SINAN object by loading data from the specified file.
         :param dbf_fname: The name of the Sinan dbf file (str)
-        :param ano: The year of the data (int)
+        :param year: The year of the data (int)
         :param encoding: The file encoding (str)
         :return: None
         """
+
+        logger.info("Establishing connection to PostgreSQL database...")
+        self.db_engine = get_sqla_conn(database="dengue")
+
         logger.info("Formatting fields and reading chunks from parquet files")
 
-        self.tabela = read_dbf(dbf_fname)
-        self.ano = ano
-
-        logger.info(
-            f"""Starting the SINAN instantiation process for the {ano} year
-            using the {dbf_fname} file.
-            """
-        )
-
-    @property
-    def time_span(self) -> Tuple[str, str]:
-        """
-        Returns the temporal scope of the database as
-            a tuple of start and end dates.
-        Returns
-        -------
-            A tuple containing start and end dates in string format
-              (data_inicio, data_fim).
-        """
-
-        data_inicio = self.tabela["DT_NOTIFIC"].min()
-        data_fim = self.tabela["DT_NOTIFIC"].max()
-
-        return data_inicio, data_fim  # type: ignore
+        self.table = read_dbf(dbf_fname)
+        self.year = year
+        self.dbf_fname = dbf_fname
 
     def _fill_missing_columns(self, col_names: List[str]) -> None:
         """
         Check if the table to be inserted contains all columns
-            required in the database model.
+        required in the database model.
         If not, create these columns filled with Null values to allow
-            for database insertion.
+        for database insertion.
         Parameters
         ----------
-        col_names : numpy.ndarray
-            A numpy array of column names to check.
+        col_names : List[str]
+            A list of column names to check.
         Returns
         -------
         None
         """
-
         for nm in col_names:
-            if FIELD_MAP[nm] not in self.tabela.columns:
-                self.tabela[FIELD_MAP[nm]] = None
-
-    def _get_postgres_connection(self) -> Any:
-        """
-        Returns a connection to a Postgres database.
-        Parameters
-        ----------
-            self (object): The instance of the class calling this method.
-        Returns
-        -------
-            Any: A connection to the Postgres database.
-        """
-
-        return psycopg2.connect(**self.db_config)
+            if FIELD_MAP[nm] not in self.table.columns:
+                self.table[FIELD_MAP[nm]] = None
 
     def save_to_pgsql(
         self,
@@ -104,21 +65,24 @@ class Sinan(object):
         Save data to PostgreSQL table.
         Parameters
         ----------
-            self (object): The class object.
-            table_name (str): The name of the table to save data to
-                Defaults to '"Municipio"."Notificacao"'.
-            default_cid (Any, optional): The default value
-                for the 'cid' column. Defaults to None.
+        table_name : str, optional
+            The name of the table to save data to,
+            by default '"Municipio"."Notificacao"'
+        default_cid : Any, optional
+            The default value for the 'cid' column, by default None
         Returns
         -------
-            None
+        None
         """
         self.default_cid = default_cid
 
-        logger.info("Establishing connection to PostgreSQL database...")
-        connection = self._get_postgres_connection()
+        logger.info(
+            f"Starting the SINAN transaction process for the {self.year} year "
+            f"using the {self.dbf_fname} file."
+        )
 
-        with connection.cursor(cursor_factory=DictCursor) as cursor:
+        with self.db_engine.begin() as conn:
+            cursor = conn.connection.cursor(cursor_factory=DictCursor)
             cursor.execute(f"SELECT * FROM {table_name} LIMIT 1;")
             col_names = [c.name for c in cursor.description if c.name != "id"]
             self._fill_missing_columns(col_names)
@@ -132,28 +96,29 @@ class Sinan(object):
                 f"{','.join([f'{j}=excluded.{j}' for j in col_names])}"
             )
 
-            logger.info("Parsing rows and converting data types...")
-
-            df = parse_data(
-                self.tabela[valid_col_names],
-                default_cid,  # type: ignore
-                self.ano,
-            )
-
-            # Remove duplicate rows
-            df = drop_duplicates_from_dataframe(
-                df, default_cid, self.ano  # type: ignore
-            )
-
-            logger.info(
-                f"Starting iteration to upsert data into {table_name}..."
-            )
-
             try:
+                # Parse data
+                df_parsed = parse_data(
+                    self.table[valid_col_names],
+                    default_cid,
+                    self.year,
+                )
+
+                # Remove duplicate rows
+                df_without_duplicates = drop_duplicates_from_dataframe(
+                    df_parsed, default_cid, self.year
+                )
+
+                logger.info(
+                    f"Starting iteration to upsert data into {table_name}..."
+                )
                 # Execute the INSERT statement
-                rows = [tuple(row) for row in df.itertuples(index=False)]
+                rows = [
+                    tuple(row)
+                    for row in df_without_duplicates.itertuples(index=False)
+                ]
                 cursor.executemany(insert_sql, rows)
-                connection.commit()
+                conn.connection.commit()
             except psycopg2.errors.StringDataRightTruncation as e:
                 # Handle the error accordingly (e.g., modify the field length,
                 # truncate the value, etc.)
@@ -167,7 +132,7 @@ class Sinan(object):
                 )
 
             logger.info(
-                "Inserted {} rows with {} fields into the '{}' table.".format(
-                    df.shape[0], df.shape[1], table_name
-                )
+                f"Inserted {df_without_duplicates.shape[0]} rows with "
+                f"{df_without_duplicates.shape[1]} fields into "
+                f"{table_name} table."
             )

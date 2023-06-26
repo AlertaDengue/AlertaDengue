@@ -1,5 +1,4 @@
 import glob
-import logging
 from pathlib import Path
 from typing import List, Union
 
@@ -10,10 +9,8 @@ import pandas as pd
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from loguru import logger
 from simpledbf import Dbf5
-
-logger = logging.getLogger(__name__)
-
 
 temp_files_dir = Path(settings.TEMP_FILES_DIR)
 
@@ -226,20 +223,20 @@ def convert_sem_not(col: np.ndarray) -> np.ndarray:
 
 
 @np.vectorize
-def convert_nu_ano(ano: str, col: pd.Series) -> np.ndarray:
+def convert_nu_ano(year: str, col: pd.Series) -> np.ndarray:
     """
-    Convert the given 'ano' string to an integer if 'col' is NaN,
+    Convert the given 'year' string to an integer if 'col' is NaN,
     otherwise convert 'col' to an integer.
     Parameters
     ----------
-        ano: A string representing the year.
+        year: A string representing the year.
         col: A pandas series representing a column of a dataframe.
     Returns
     -------
         A numpy array of integers.
     """
 
-    return int(ano) if pd.isnull(col) else int(col)
+    return int(year) if pd.isnull(col) else int(col)
 
 
 @np.vectorize
@@ -262,18 +259,19 @@ def convert_sem_pri(col: str) -> int:
         return int(str(col)[-2:])
 
 
-def parse_data(df: pd.DataFrame, default_cid: str, ano: int) -> pd.DataFrame:
+def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
     """
     Parse and convert data types for COVID-19 notification data.
     Parameters
     ----------
         df (pandas.core.frame.DataFrame): The dataframe to parse.
         default_cid (str): The default CID code.
-        ano (int): The year of the notification data.
+        year (int): The year of the notification data.
     Returns
     -------
         pandas.core.frame.DataFrame: The parsed dataframe.
     """
+    logger.info("Parsing rows and converting data types...")
 
     df["NU_NOTIFIC"] = fix_nu_notif(df.NU_NOTIFIC)
 
@@ -314,7 +312,7 @@ def parse_data(df: pd.DataFrame, default_cid: str, ano: int) -> pd.DataFrame:
 
     df["SEM_PRI"] = convert_sem_pri(df.SEM_PRI)
 
-    df["NU_ANO"] = convert_nu_ano(ano, df.NU_ANO)
+    df["NU_ANO"] = convert_nu_ano(year, df.NU_ANO)
 
     df["SEM_NOT"] = convert_sem_not(df.SEM_NOT)
 
@@ -349,26 +347,6 @@ def _parse_fields(dbf_name: str, df: gpd.GeoDataFrame) -> pd.DataFrame:
             df[col] = pd.to_datetime(df[col], errors="coerce")
 
     return df
-
-
-# def fill_missing_columns(df, col_names: List[str]) -> None:
-#     """
-#     Check if the table to be inserted contains all columns
-#         required in the database model.
-#     If not, create these columns filled with Null values to allow
-#         for database insertion.
-#     Parameters
-#     ----------
-#     col_names : numpy.ndarray
-#         A numpy array of column names to check.
-#     Returns
-#     -------
-#     None
-#     """
-
-#     for nm in col_names:
-#         if FIELD_MAP[nm] not in df.columns:
-#             df[FIELD_MAP[nm]] = None
 
 
 def select_expected_fields(dbf_name: str) -> List[str]:
@@ -424,6 +402,7 @@ def drop_duplicates_from_dataframe(
     pd.DataFrame
         A pandas DataFrame with duplicates removed.
     """
+    logger.info("Removing duplicates...")
 
     duplicate_se_notific_mask = df.duplicated(
         subset=["ID_AGRAVO", "NU_NOTIFIC", "ID_MUNICIP", "SEM_NOT"]

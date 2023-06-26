@@ -10,12 +10,13 @@ from minio import Minio
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent
+ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 
 MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
 MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY")
 MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
 MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
+
 
 class FileHandler(FileSystemEventHandler):
     """
@@ -58,10 +59,10 @@ class FileHandler(FileSystemEventHandler):
 
             file_data = response.data
 
-            # Save the DBF data to a temporary file
             with tempfile.NamedTemporaryFile(
                 suffix=".dbf", delete=False
             ) as temp_file:
+                logger.info("Saving the DBF data to a temporary file")
                 temp_file.write(file_data)
 
             sinan = Sinan(temp_file.name, self.year)
@@ -80,7 +81,11 @@ if __name__ == "__main__":
         "file.log", rotation="500 MB"
     )  # Add a file logger with rotation
     observer = Observer()
-    observer.schedule(FileHandler(), path=ROOT_DIR / "collector" / "data" / "dbf")
+    observer.schedule(
+        FileHandler(),
+        # path=Path(ROOT_DIR / "collector" / "data" / "dbf")
+        path="/opt/services/collector/data/dbf",
+    )
     observer.start()
     try:
         while True:
