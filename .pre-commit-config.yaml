@@ -12,40 +12,25 @@ repos:
 
   - repo: local
     hooks:
-    - entry: black
-      exclude: ^$
-      files: ""
-      id: black
-      language: system
-      name: black
-      pass_filenames: true
-      stages:
-        - commit
-      types:
-        - python
-        - file
-        - python
-      types_or: []
-    - entry: flake8
-      exclude: ^$
-      files: ""
-      id: flake8
-      language: python
-      name: flake8
-      pass_filenames: true
-      stages:
-        - commit
-      types:
-        - python
-      types_or: []
-    - entry: isort
-      exclude: "^.*/js/.*$"
-      files: ""
-      id: isort
-      language: python
-      name: isort
-      pass_filenames: true
-      stages:
-        - commit
-      types:
-        - python
+      - id: black
+        name: black
+        entry: black
+        language: system
+        files: ""
+        exclude: ^$
+        types: [python, file, python]
+        stages: [commit]
+        pass_filenames: true
+        args: ["--line-length", "79"]
+
+      - id: isort
+        name: isort
+        entry: isort
+        language: python
+        files: ""
+        exclude: ^.*/js/.*$
+        types: [python]
+        stages: [commit]
+        pass_filenames: true
+        additional_dependencies: ["black"]
+        args: ["--profile", "black", "-l", "79"]
