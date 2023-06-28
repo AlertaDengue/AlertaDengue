@@ -55,8 +55,8 @@ env:
 
   MINIO_USERNAME: developer
   MINIO_GROUPNAME: developer
-  MINIO_GID: 1000
   MINIO_UID: 1000
+  MINIO_GID: 1000
   MINIO_ROOT_USER: developer
   MINIO_ROOT_PASSWORD: developer
   MINIO_PORT_1: 9000

@@ -175,6 +175,8 @@ services:
     env_file:
       - ../.env
     environment:
+     - MINIO_UID=${MINIO_UID}
+     - MINIO_GID=${MINIO_GID}
      - MINIO_ENDPOINT=minio:${MINIO_PORT_1}
      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
