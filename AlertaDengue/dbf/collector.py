@@ -13,8 +13,8 @@ from watchdog.observers import Observer
 ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 
 MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
-MINIO_ACCESS_KEY = os.getenv("MINIO_ACCESS_KEY")
-MINIO_SECRET_KEY = os.getenv("MINIO_SECRET_KEY")
+MINIO_ROOT_USER = os.getenv("MINIO_ROOT_USER")
+MINIO_ROOT_PASSWORD = os.getenv("MINIO_ROOT_PASSWORD")
 MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
 
 
@@ -48,8 +48,8 @@ class FileHandler(FileSystemEventHandler):
         try:
             minio_client = Minio(
                 MINIO_ENDPOINT,
-                access_key=MINIO_ACCESS_KEY,
-                secret_key=MINIO_SECRET_KEY,
+                access_key=MINIO_ROOT_USER,
+                secret_key=MINIO_ROOT_PASSWORD,
                 secure=False,
             )
 
