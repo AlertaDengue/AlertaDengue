@@ -123,7 +123,7 @@ jobs:
 
     - name: Container wait
       run: |
-         make container-wait-all
+        makim develop.container-wait
 
     - name: Setup tmate session
       if: "${{ failure() }}"
