@@ -171,6 +171,9 @@ services:
     hostname: minio
     platform: linux/amd64
     image: minio/minio
+    mem_limit: 16g
+    mem_reservation: 4g
+    cpus: "4.0"
     restart: unless-stopped
     env_file:
       - ../.env
