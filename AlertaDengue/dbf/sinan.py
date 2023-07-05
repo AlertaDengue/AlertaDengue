@@ -63,6 +63,7 @@ class Sinan(object):
     ) -> None:
         """
         Save data to PostgreSQL table.
+
         Parameters
         ----------
         table_name : str, optional
@@ -70,25 +71,36 @@ class Sinan(object):
             by default '"Municipio"."Notificacao"'
         default_cid : Any, optional
             The default value for the 'cid' column, by default None
+
         Returns
         -------
         None
         """
+
+        # Set the default_cid attribute
         self.default_cid = default_cid
 
+        # Log the start of the transaction process
         logger.info(
             f"Starting the SINAN transaction process for the {self.year} year "
             f"using the {self.dbf_fname} file."
         )
 
+        # Start a transaction and create a cursor
         with self.db_engine.begin() as conn:
             cursor = conn.connection.cursor(cursor_factory=DictCursor)
+
+            # Execute a query to get the column names of the table
             cursor.execute(f"SELECT * FROM {table_name} LIMIT 1;")
             col_names = [c.name for c in cursor.description if c.name != "id"]
+
+            # Fill missing columns in the table
             self._fill_missing_columns(col_names)
+
+            # Create a list of valid column names based on FIELD_MAP
             valid_col_names = [FIELD_MAP[n] for n in col_names]
 
-            # Insert Query data
+            # Create the insert query
             insert_sql = (
                 f"INSERT INTO {table_name}({','.join(col_names)}) "
                 f"VALUES ({','.join(['%s' for _ in col_names])}) "
@@ -97,31 +109,35 @@ class Sinan(object):
             )
 
             try:
-                # Parse data
+                # Parse the data using the parse_data function
                 df_parsed = parse_data(
                     self.table[valid_col_names],
                     default_cid,
                     self.year,
                 )
 
-                # Remove duplicate rows
+                # Remove duplicate rows from the parsed data
                 df_without_duplicates = drop_duplicates_from_dataframe(
                     df_parsed, default_cid, self.year
                 )
 
+                # Log the start of the upsert iteration
                 logger.info(
                     f"Starting iteration to upsert data into {table_name}..."
                 )
-                # Execute the INSERT statement
+
+                # Execute the insert statement for each row in the dataframe
                 rows = [
                     tuple(row)
                     for row in df_without_duplicates.itertuples(index=False)
                 ]
                 cursor.executemany(insert_sql, rows)
+
+                # Commit the transaction
                 conn.connection.commit()
+
             except psycopg2.errors.StringDataRightTruncation as e:
-                # Handle the error accordingly (e.g., modify the field length,
-                # truncate the value, etc.)
+                # Handle the error caused by string data right truncation
                 error_message = str(e)
                 field_start_index = error_message.find('"') + 1
                 field_end_index = error_message.find('"', field_start_index)
@@ -131,6 +147,7 @@ class Sinan(object):
                     }"""
                 )
 
+            # Log the number of rows and fields inserted
             logger.info(
                 f"Inserted {df_without_duplicates.shape[0]} rows with "
                 f"{df_without_duplicates.shape[1]} fields into "
