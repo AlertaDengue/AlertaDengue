@@ -432,3 +432,10 @@ LEAFLET_CONFIG = {
     },
     "RESET_VIEW": False,
 }
+
+# MINIO
+# ------------------------------------------------------------------------------
+MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
+MINIO_ROOT_USER = os.getenv("MINIO_ROOT_USER")
+MINIO_ROOT_PASSWORD = os.getenv("MINIO_ROOT_PASSWORD")
+MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")

@@ -6,18 +6,12 @@ from pathlib import Path
 from typing import Optional
 
 from dbf.sinan import Sinan
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from loguru import logger
 from minio import Minio
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers import Observer
-
-ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
-
-MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
-MINIO_ROOT_USER = os.getenv("MINIO_ROOT_USER")
-MINIO_ROOT_PASSWORD = os.getenv("MINIO_ROOT_PASSWORD")
-MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
 
 
 class FileHandler(FileSystemEventHandler):
@@ -46,9 +40,12 @@ class FileHandler(FileSystemEventHandler):
         self.file_name = self.file_path.name
 
         # Insert the file into the database
-        self.insert_dbf(year=self.year)
+        self.insert_dbf_from_minio(year=self.year)
 
-    def insert_dbf(self, year: int, default_cid: Optional[str] = None) -> None:
+    # @app.task(name="insert_dbf_from_minio")
+    def insert_dbf_from_minio(
+        self, year: int, default_cid: Optional[str] = None
+    ) -> None:
         """
         Insert DBF data into the database.
 
@@ -67,15 +64,16 @@ class FileHandler(FileSystemEventHandler):
         try:
             # Create a Minio client
             minio_client = Minio(
-                MINIO_ENDPOINT,
-                access_key=MINIO_ROOT_USER,
-                secret_key=MINIO_ROOT_PASSWORD,
+                settings.MINIO_ENDPOINT,
+                access_key=settings.MINIO_ROOT_USER,
+                secret_key=settings.MINIO_ROOT_PASSWORD,
                 secure=False,
             )
 
             # Get the DBF data from the Minio bucket
             response = minio_client.get_object(
-                bucket_name=MINIO_BUCKET_NAME, object_name=str(self.file_name)
+                bucket_name=settings.MINIO_BUCKET_NAME,
+                object_name=str(self.file_name),
             )
 
             # Read the file data
@@ -93,7 +91,6 @@ class FileHandler(FileSystemEventHandler):
 
             # Save the data to the PostgreSQL database
             sinan.save_to_pgsql(default_cid=default_cid)
-
             # Remove the temporary file
             temp_file.close()
             Path(temp_file.name).unlink()
