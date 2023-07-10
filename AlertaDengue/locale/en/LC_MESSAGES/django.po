@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-21 16:39+0000\n"
+"POT-Creation-Date: 2023-07-10 05:29-0300\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -573,7 +573,8 @@ msgstr ""
 msgid "Análise de receptividade:"
 msgstr "Receptivity Analysis:"
 
-#: AlertaDengue/dados/templates/about.html:114"
+#: AlertaDengue/dados/templates/about.html:114
+#, python-format
 msgid ""
 "A transmissão das arboviroses requer condições climáticas adequadas, que "
 "podem variar de lugar para lugar. No Rio de Janeiro,\n"
@@ -610,6 +611,7 @@ msgstr ""
 "Method (MEM)"
 
 #: AlertaDengue/dados/templates/about.html:121
+#, python-format
 msgid ""
 "que permite estimar\n"
 "        diversas grandezas de interesse com base em dados históricos locais "
@@ -1226,6 +1228,38 @@ msgstr "Weekly Epidemiological Update"
 msgid "Informações detalhadas sobre o Estado"
 msgstr "Detailed information about the State"
 
+#: AlertaDengue/dados/templates/components/home/e_vigilancia.html:13
+msgid "E-Vigilância 2023"
+msgstr "E-Vigilancia 2023"
+
+#: AlertaDengue/dados/templates/components/home/e_vigilancia.html:14
+msgid ""
+" O E-Vigilância 2023 é um simpósio que visa reunir e fortalecer a comunidade "
+"de pesquisadores, estudantes, profissionais de saúde e empreendedores de "
+"diferentes setores.\n"
+"                    Juntos, iremos compartilhar iniciativas inovadoras já "
+"bem sucedidas ou que possam ser incorporadas na administração pública, "
+"especificamente no monitoramento e controle de doenças transmissíveis. \n"
+"                    O tema dessa edição será "
+msgstr ""
+"Welcome to E-Surveillance 2023, a symposium dedicated to uniting and strengthening the global community "
+"of researchers, students, health professionals, and entrepreneurs from "
+"different sectors.\n"
+"                    Our primary focus is to share innovative initiatives for "
+"monitoring and controlling communicable diseases under the theme"
+
+#: AlertaDengue/dados/templates/components/home/e_vigilancia.html:16
+msgid "Inovações para uma saúde integral e única"
+msgstr "Innovations for a Comprehensive One Health"
+
+#: AlertaDengue/dados/templates/components/home/e_vigilancia.html:19
+msgid "Fechar"
+msgstr "Close"
+
+#: AlertaDengue/dados/templates/components/home/e_vigilancia.html:20
+msgid "Saiba mais"
+msgstr "Learn more"
+
 #: AlertaDengue/dados/templates/components/main/footer.html:30
 msgid ""
 "A organização Alertadengue reúne Epidemiologistas, Cientistas de dados, e "
@@ -1354,7 +1388,7 @@ msgstr "Contact us"
 msgid "Situação de casos estimados"
 msgstr "Estimated cases"
 
-#: AlertaDengue/dados/templates/main.html:35
+#: AlertaDengue/dados/templates/main.html:37
 msgid ""
 "\n"
 "          Análise integrada de dados\n"
@@ -1364,52 +1398,52 @@ msgstr ""
 "\n"
 " Integrated analysis of epidemiological and climate data"
 
-#: AlertaDengue/dados/templates/main.html:42
+#: AlertaDengue/dados/templates/main.html:44
 msgid "Atualização semanal"
 msgstr "Weekly update"
 
-#: AlertaDengue/dados/templates/main.html:44
+#: AlertaDengue/dados/templates/main.html:46
 msgid "Incidência estimada"
 msgstr "Estimated incidence"
 
-#: AlertaDengue/dados/templates/main.html:45
+#: AlertaDengue/dados/templates/main.html:47
 msgid "Cidades com condições favoráveis para transmissão"
 msgstr "Cities with favorable environment for transmission"
 
-#: AlertaDengue/dados/templates/main.html:46
+#: AlertaDengue/dados/templates/main.html:48
 msgid "Cidades em níveis de atenção"
 msgstr "Attention level of municipalities"
 
-#: AlertaDengue/dados/templates/main.html:57
+#: AlertaDengue/dados/templates/main.html:59
 msgid "Funcionalidades"
 msgstr "Features"
 
-#: AlertaDengue/dados/templates/main.html:59
+#: AlertaDengue/dados/templates/main.html:61
 msgid "Relatórios municipais"
 msgstr "Municipal reports"
 
-#: AlertaDengue/dados/templates/main.html:60
+#: AlertaDengue/dados/templates/main.html:62
 msgid "Mapas estaduais"
 msgstr "State map views"
 
-#: AlertaDengue/dados/templates/main.html:65
+#: AlertaDengue/dados/templates/main.html:67
 #: AlertaDengue/templates/base.html:60
 msgid "Participe"
 msgstr "Join us"
 
-#: AlertaDengue/dados/templates/main.html:67
+#: AlertaDengue/dados/templates/main.html:69
 msgid "Existem várias formas de participar"
 msgstr "There are many ways to participate"
 
-#: AlertaDengue/dados/templates/main.html:69
+#: AlertaDengue/dados/templates/main.html:71
 msgid "Clique e saiba como participar do Infodengue"
 msgstr "How to Participate in InfoDengue"
 
-#: AlertaDengue/dados/templates/main.html:71
+#: AlertaDengue/dados/templates/main.html:73
 msgid "Confira aqui!"
 msgstr "Check here!"
 
-#: AlertaDengue/dados/templates/main.html:82
+#: AlertaDengue/dados/templates/main.html:84
 msgid "Situação Epidemiológica"
 msgstr "Epidemiological Situation"
 
@@ -2540,14 +2574,20 @@ msgid "°C temperatura máxima"
 msgstr "°C Maximum temperature"
 
 #: AlertaDengue/dados/views.py:848
+#, fuzzy, python-format
+#| msgid "% umidade mínima do ar"
 msgid "% umidade mínima do ar"
 msgstr "% Minimum air humidity"
 
 #: AlertaDengue/dados/views.py:849
+#, fuzzy, python-format
+#| msgid "% umidade média do ar"
 msgid "% umidade média do ar"
 msgstr "% Average air humidity"
 
 #: AlertaDengue/dados/views.py:850
+#, fuzzy, python-format
+#| msgid "% umidade máxima do ar"
 msgid "% umidade máxima do ar"
 msgstr "% Maximum air humidity"
 
