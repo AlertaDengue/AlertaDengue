@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-10 06:01-0300\n"
+"POT-Creation-Date: 2023-07-10 08:16-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1063,11 +1063,11 @@ msgid ""
 "especificamente no monitoramento e controle de doenças transmissíveis. \n"
 "                    O tema dessa edição será "
 msgstr ""
-"E-Vigilancia 2023 es un simposio diseñado para unir y fortalecer a la comunidad "
-"de investigadores, estudiantes, profesionales de la salud y emprendedores de "
-"diversos sectores.\n"
-"                    Juntos, compartiremos  iniciativas innovadoras "
-"para el seguimiento y control de enfermedades transmisibles, centrado en el tema "
+"E-Vigilancia 2023 es un simposio diseñado para unir y fortalecer a la "
+"comunidad de investigadores, estudiantes, profesionales de la salud y "
+"emprendedores de diversos sectores.\n"
+"                    Juntos, compartiremos  iniciativas innovadoras para el "
+"seguimiento y control de enfermedades transmisibles, centrado en el tema "
 
 #: AlertaDengue/dados/templates/components/home/e_vigilancia.html:16
 msgid "Inovações para uma saúde integral e única"
@@ -1090,8 +1090,8 @@ msgid ""
 msgstr ""
 "La organización Alertadengue reúne epidemiólogos, científicos de datos y "
 "estudiantes que colaboran con las entidades gubernamentales de salud para "
-"ayudar en la gestión de enfermedades transmitidas por mosquitos como el dengue, zika y "
-"Chikungunya."
+"ayudar en la gestión de enfermedades transmitidas por mosquitos como el "
+"dengue, zika y Chikungunya."
 
 #: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:43
 #: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:82
@@ -1107,7 +1107,7 @@ msgstr "Código de la municipalidad"
 
 #: AlertaDengue/dados/templates/components/searchbox/searchbox.html:19
 msgid "Encontre um município"
-msgstr ""
+msgstr "Encuentra un municipio"
 
 #: AlertaDengue/dados/templates/dashboard_cities.html:56
 #, python-format
@@ -1134,11 +1134,11 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/joinin.html:6
 msgid "Como participar do InfoDengue"
-msgstr ""
+msgstr "Cómo participar en InfoDengue"
 
 #: AlertaDengue/dados/templates/joinin.html:19
 msgid "É muito fácil consultar ou participar do Sistema de Alerta InfoDengue"
-msgstr ""
+msgstr "Es muy fácil consultar o participar en el Sistema de Alerta InfoDengue"
 
 #: AlertaDengue/dados/templates/joinin.html:21
 msgid ""
@@ -1147,10 +1147,13 @@ msgid ""
 "                de alerta para arboviroses em seu município, baixe o "
 "aplicativo "
 msgstr ""
+"Si eres ciudadano y estás interesado en obtener información actualizada y "
+"rápida sobre el nivel de alerta de arbovirosis en tu municipio, descarga la "
+"aplicación"
 
 #: AlertaDengue/dados/templates/joinin.html:24
 msgid "INFODENGUE na Play Store pelo seu celular"
-msgstr ""
+msgstr "INFODENGUE en Play Store en tu celular"
 
 #: AlertaDengue/dados/templates/joinin.html:26
 msgid ""
@@ -1158,14 +1161,19 @@ msgid ""
 "interesse em informações detalhadas\n"
 "                sobre as condições de transmissão do seu município"
 msgstr ""
+"Si eres miembro de una Secretaría de Salud Municipal o ciudadano y estás "
+"interesado en obtener información detallada sobre las condiciones de "
+"transmisión de tu municipio"
 
 #: AlertaDengue/dados/templates/joinin.html:28
 msgid "basta digitar o nome do seu município na barra de pesquisa do site: "
 msgstr ""
+"simplemente ingresa el nombre de tu municipio en la barra de búsqueda del "
+"sitio:"
 
 #: AlertaDengue/dados/templates/joinin.html:31
 msgid "/static/img/join_us/search_city_pt.png"
-msgstr ""
+msgstr "/static/img/join_us/search_city_es.png"
 
 #: AlertaDengue/dados/templates/joinin.html:33
 msgid ""
@@ -1173,6 +1181,8 @@ msgid ""
 "Arboviroses,\n"
 "                na parte inferior da página"
 msgstr ""
+"Luego haz clic en el nombre de la ciudad en el Informe de Situación de "
+"Arbovirosis en la parte inferior de la página"
 
 #: AlertaDengue/dados/templates/joinin.html:38
 msgid "/static/img/join_us/link_reports_pt.png"
@@ -1180,7 +1190,7 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/joinin.html:42
 msgid "O sistema infodengue atua a nível nacional"
-msgstr ""
+msgstr "El sistema infodengue opera a nivel nacional"
 
 #: AlertaDengue/dados/templates/joinin.html:43
 msgid ""
@@ -1189,10 +1199,13 @@ msgid ""
 "parceira do projeto,\n"
 "                    para recebimento de boletins detalhados do seu estado, "
 msgstr ""
+"Si eres miembro de una Secretaría de Salud Estatal que está interesada en "
+"convertirse en una entidad estatal asociada al proyecto para recibir "
+"boletines detallados de tu estado, contáctanos"
 
 #: AlertaDengue/dados/templates/joinin.html:46
 msgid "entre em contato conosco"
-msgstr ""
+msgstr "contáctanos"
 
 #: AlertaDengue/dados/templates/main.html:21
 #, fuzzy
@@ -2506,21 +2519,23 @@ msgstr ""
 
 #: AlertaDengue/templates/base.html:45
 msgid "Início"
-msgstr ""
+msgstr "Inicio"
 
 #: AlertaDengue/templates/base.html:50
 msgid "Sobre nós"
-msgstr ""
+msgstr "Sobre nosotros"
 
 #: AlertaDengue/templates/base.html:77
 msgid ""
 "Links para páginas com informações adicionais, ferramentas e outras seções "
 "úteis do site"
 msgstr ""
+"Enlaces a páginas con información adicional, herramientas y otras secciones "
+"útiles del sitio"
 
 #: AlertaDengue/templates/base.html:78
 msgid "Recursos"
-msgstr ""
+msgstr "Recursos"
 
 #: AlertaDengue/templates/base.html:85
 msgid ""
@@ -2528,44 +2543,53 @@ msgid ""
 "Dengue e Chikungunya, do Infodengue para analisar a expansão da onda no "
 "território nacional brasileiro."
 msgstr ""
+"Aplicación que utiliza datos actualizados de incidencia de arbovirosis, como "
+"Dengue y Chikungunya, de Infodengue para analizar la expansión de la ola en "
+"el territorio nacional brasileño."
 
 #: AlertaDengue/templates/base.html:92
 msgid ""
 "O AlertFlow é um sistema de gerenciamento de fluxo de trabalho projetado "
 "para o projeto Alertadenge."
 msgstr ""
+"AlertFlow es un sistema de gestión de flujo de trabajo diseñado para el "
+"proyecto Alertadenge."
 
 #: AlertaDengue/templates/base.html:99
 msgid ""
 "E-vigilância é um evento que tem como objetivo discutir as tecnologias, "
 "metodologias e desafios relacionados à vigilância em saúde."
 msgstr ""
+"E-vigilancia es un evento que tiene como objetivo discutir las tecnologías, "
+"metodologías y desafíos relacionados con la vigilancia en salud."
 
 #: AlertaDengue/templates/base.html:106
 msgid ""
 "PySUS reúne um conjunto de utilitários para lidar com bancos de dados "
 "públicos publicados pelo DATASUS do Brasil."
 msgstr ""
+"PySUS reúne un conjunto de utilidades para trabajar con bases de datos "
+"públicas publicadas por DATASUS de Brasil."
 
 #: AlertaDengue/templates/base.html:113
 msgid "Envie dados atualizados"
-msgstr ""
+msgstr "Envía datos actualizados"
 
 #: AlertaDengue/templates/base.html:118
 msgid "Account "
-msgstr ""
+msgstr "Cuenta"
 
 #: AlertaDengue/templates/base.html:124
 msgid "Logout"
-msgstr ""
+msgstr "Cerrar sesión"
 
 #: AlertaDengue/templates/base.html:129
 msgid "Change password"
-msgstr ""
+msgstr "Cambiar contraseña"
 
 #: AlertaDengue/templates/base.html:137
 msgid "Login"
-msgstr ""
+msgstr "Iniciar sesión"
 
 #: AlertaDengue/templates/base.html:165
 msgid ""
