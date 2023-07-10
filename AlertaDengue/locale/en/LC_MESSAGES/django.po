@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-10 08:16-0300\n"
+"POT-Creation-Date: 2023-07-11 07:37-0300\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1389,61 +1389,55 @@ msgid "Situação de casos estimados"
 msgstr "Estimated cases"
 
 #: AlertaDengue/dados/templates/main.html:37
-msgid ""
-"\n"
-"          Análise integrada de dados\n"
-"          epidemiológicos e climáticos\n"
-"          "
-msgstr ""
-"\n"
-" Integrated analysis of epidemiological and climate data"
+msgid "Análise integrada de dados epidemiológicos e climáticos"
+msgstr " Integrated analysis of epidemiological and climate data"
 
-#: AlertaDengue/dados/templates/main.html:44
+#: AlertaDengue/dados/templates/main.html:41
 msgid "Atualização semanal"
 msgstr "Weekly update"
 
-#: AlertaDengue/dados/templates/main.html:46
+#: AlertaDengue/dados/templates/main.html:43
 msgid "Incidência estimada"
 msgstr "Estimated incidence"
 
-#: AlertaDengue/dados/templates/main.html:47
+#: AlertaDengue/dados/templates/main.html:44
 msgid "Cidades com condições favoráveis para transmissão"
 msgstr "Cities with favorable environment for transmission"
 
-#: AlertaDengue/dados/templates/main.html:48
+#: AlertaDengue/dados/templates/main.html:45
 msgid "Cidades em níveis de atenção"
 msgstr "Attention level of municipalities"
 
-#: AlertaDengue/dados/templates/main.html:59
+#: AlertaDengue/dados/templates/main.html:56
 msgid "Funcionalidades"
 msgstr "Features"
 
-#: AlertaDengue/dados/templates/main.html:61
+#: AlertaDengue/dados/templates/main.html:58
 msgid "Relatórios municipais"
 msgstr "Municipal reports"
 
-#: AlertaDengue/dados/templates/main.html:62
+#: AlertaDengue/dados/templates/main.html:59
 msgid "Mapas estaduais"
 msgstr "State map views"
 
-#: AlertaDengue/dados/templates/main.html:67
+#: AlertaDengue/dados/templates/main.html:64
 #: AlertaDengue/templates/base.html:60
 msgid "Participe"
 msgstr "Join us"
 
-#: AlertaDengue/dados/templates/main.html:69
+#: AlertaDengue/dados/templates/main.html:66
 msgid "Existem várias formas de participar"
 msgstr "There are many ways to participate"
 
-#: AlertaDengue/dados/templates/main.html:71
+#: AlertaDengue/dados/templates/main.html:68
 msgid "Clique e saiba como participar do Infodengue"
 msgstr "How to Participate in InfoDengue"
 
-#: AlertaDengue/dados/templates/main.html:73
+#: AlertaDengue/dados/templates/main.html:70
 msgid "Confira aqui!"
 msgstr "Check here!"
 
-#: AlertaDengue/dados/templates/main.html:84
+#: AlertaDengue/dados/templates/main.html:81
 msgid "Situação Epidemiológica"
 msgstr "Epidemiological Situation"
 
