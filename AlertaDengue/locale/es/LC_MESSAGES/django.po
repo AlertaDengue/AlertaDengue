@@ -1224,7 +1224,7 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/joinin.html:38
 msgid "/static/img/join_us/link_reports_pt.png"
-msgstr ""
+msgstr "/static/img/join_us/link_reports_es.png"
 
 #: AlertaDengue/dados/templates/joinin.html:42
 msgid "O sistema infodengue atua a nível nacional"
@@ -1730,42 +1730,42 @@ msgstr ""
 #: AlertaDengue/dados/templates/series_plot.html:23
 #, python-format
 msgid "Séries de dados e Alertas anteriores para %(nome)s"
-msgstr ""
+msgstr "Series de datos y alertas anteriores para %(nome)s"
 
 #: AlertaDengue/dados/templates/series_plot.html:37
 msgid "Pessoas"
-msgstr ""
+msgstr "Personas"
 
 #: AlertaDengue/dados/templates/series_plot.html:87
 #, python-format
 msgid "Casos Estimados de %(disease_label)s"
-msgstr ""
+msgstr "Casos estimados de %(disease_label)s"
 
 #: AlertaDengue/dados/templates/series_plot.html:105
 #, python-format
 msgid "Casos previstos de %(disease_label)s (%(title)s)"
-msgstr ""
+msgstr "Casos previstos de %(disease_label)s (%(title)s)"
 
 #: AlertaDengue/dados/templates/series_plot.html:122
 msgid "Alerta Vermelho"
-msgstr ""
+msgstr "Alerta Rojo"
 
 #: AlertaDengue/dados/templates/series_plot.html:137
 msgid "Alerta laranja"
-msgstr ""
+msgstr "Alerta naranja"
 
 #: AlertaDengue/dados/templates/series_plot.html:152
 msgid "Alerta Amarelo"
-msgstr ""
+msgstr "Alerta Amarillo"
 
 #: AlertaDengue/dados/templates/series_plot.html:167
 msgid "Alerta verde"
-msgstr ""
+msgstr "Alerta verde"
 
 #: AlertaDengue/dados/templates/series_plot.html:181
 #, python-format
 msgid "Casos Notificados de %(disease_label)s"
-msgstr ""
+msgstr "Casos notificados de %(disease_label)s"
 
 #: AlertaDengue/dados/templates/services.html:24
 #: AlertaDengue/dados/templates/services_api.html:73
@@ -1778,199 +1778,200 @@ msgstr ""
 #: AlertaDengue/dados/templates/services_tutorial_R.html:174
 #: AlertaDengue/templates/base.html:65
 msgid "Dados"
-msgstr ""
+msgstr "Datos"
 
 #: AlertaDengue/dados/templates/services.html:31
 msgid "Serviços de Dados Públicos"
-msgstr ""
+msgstr "Servicios de Datos Públicos"
 
 #: AlertaDengue/dados/templates/services.html:38
 msgid ""
 "Aqui podem ser encontrados os dados mostrados nas figuras e tabelas do site"
-msgstr ""
+msgstr "Aquí se pueden encontrar los datos mostrados en las figuras y tablas del sitio"
 
 #: AlertaDengue/dados/templates/services_api.html:76
 #: AlertaDengue/dados/templates/services_api.html:83
 #: AlertaDengue/dados/templates/services_api_doc.html:54
 msgid "API"
-msgstr ""
+msgstr "API"
 
 #: AlertaDengue/dados/templates/services_api.html:93
 msgid "Para mais informações, acesse a documentação do serviço da API."
-msgstr ""
+msgstr "Para más información, acceda a la documentación del servicio de la API."
 
 #: AlertaDengue/dados/templates/services_api.html:98
 msgid "Filtro Município (código IBGE, nome do município ou U.F.)"
-msgstr ""
+msgstr "Filtro Municipio (código IBGE, nombre del municipio o U.F.)"
 
 #: AlertaDengue/dados/templates/services_api.html:102
 msgid "Digite aqui o filtro desejado para a consulta de municípios"
-msgstr ""
+msgstr "Escriba aquí el filtro deseado para la consulta de municipios"
 
 #: AlertaDengue/dados/templates/services_api.html:107
 msgid ""
 "Digite o código IBGE, nome do município ou U.F. para buscar o município "
 "desejado."
 msgstr ""
+"Escriba el código IBGE, el nombre del municipio o U.F. para buscar el municipio deseado."
 
 #: AlertaDengue/dados/templates/services_api.html:117
 #: AlertaDengue/dados/templates/services_maps.html:103
 msgid "Selecione municipio(s)"
-msgstr ""
+msgstr "Seleccione municipio(s)"
 
 #: AlertaDengue/dados/templates/services_api.html:123
 msgid "Selecione o município desejado"
-msgstr ""
+msgstr "Seleccione el municipio deseado"
 
 #: AlertaDengue/dados/templates/services_api.html:133
 msgid "Data da Semana Epidemiológica de início da consulta"
-msgstr ""
+msgstr "Fecha de inicio de la Semana Epidemiológica de la consulta"
 
 #: AlertaDengue/dados/templates/services_api.html:140
 msgid "Selecione um dia da Semana Epidemiológica de início da consulta"
-msgstr ""
+msgstr "Seleccione un día de la Semana Epidemiológica de inicio de la consulta"
 
 #: AlertaDengue/dados/templates/services_api.html:145
 #: AlertaDengue/dados/templates/services_api.html:173
 msgid "Data da Semana Epidemiológica de término da consulta"
-msgstr ""
+msgstr "Fecha de finalización de la Semana Epidemiológica de la consulta"
 
 #: AlertaDengue/dados/templates/services_api.html:152
 msgid "Selecione um dia da Semana Epidemiológica de término da consulta"
-msgstr ""
+msgstr "Seleccione un día de la Semana Epidemiológica de finalización de la consulta"
 
 #: AlertaDengue/dados/templates/services_api.html:157
 msgid "Arbovirose"
-msgstr ""
+msgstr "Arbovirus"
 
 #: AlertaDengue/dados/templates/services_api.html:168
 msgid "Selecione a arbovirose para a consulta"
-msgstr ""
+msgstr "Seleccione el arbovirus para la consulta"
 
 #: AlertaDengue/dados/templates/services_api.html:182
 msgid "Selecione o formato do arquivo de saída"
-msgstr ""
+msgstr "Seleccione el formato del archivo de salida"
 
 #: AlertaDengue/dados/templates/services_api.html:192
 msgid "Download"
-msgstr ""
+msgstr "Descargar"
 
 #: AlertaDengue/dados/templates/services_api.html:196
 msgid "Mostrar Dicionário de Dados"
-msgstr ""
+msgstr "Mostrar Diccionario de Datos"
 
 #: AlertaDengue/dados/templates/services_api.html:202
 msgid "Dicionário de Dados"
-msgstr ""
+msgstr "Diccionario de Datos"
 
 #: AlertaDengue/dados/templates/services_api.html:204
 msgid "data_ini_SE"
-msgstr ""
+msgstr "Fecha_ini_SE"
 
 #: AlertaDengue/dados/templates/services_api.html:204
 msgid "Primeiro dia da semana epidemiológica (Domingo)"
-msgstr ""
+msgstr "Primer día de la semana epidemiológica (Domingo)"
 
 #: AlertaDengue/dados/templates/services_api.html:205
 msgid "SE"
-msgstr ""
+msgstr "SE"
 
 #: AlertaDengue/dados/templates/services_api.html:206
 msgid "casos_est"
-msgstr ""
+msgstr "casos_est"
 
 #: AlertaDengue/dados/templates/services_api.html:207
 msgid "cases_est_min and cases_est_max"
-msgstr ""
+msgstr "cases_est_min y cases_est_max"
 
 #: AlertaDengue/dados/templates/services_api.html:207
 #, python-format
 msgid "Intervalo de credibilidade de 95%% do número estimado de casos"
-msgstr ""
+msgstr "Intervalo de credibilidad del 95%% del número estimado de casos"
 
 #: AlertaDengue/dados/templates/services_api.html:209
 msgid "p_rt1"
-msgstr ""
+msgstr "p_rt1"
 
 #: AlertaDengue/dados/templates/services_api.html:210
 msgid "p_inc100k"
-msgstr ""
+msgstr "p_inc100k"
 
 #: AlertaDengue/dados/templates/services_api.html:211
 msgid "Localidade_id"
-msgstr ""
+msgstr "Localidade_id"
 
 #: AlertaDengue/dados/templates/services_api.html:211
 msgid "Divisão submunicipal (atualmente implementada apenas no Rio de Janeiro)"
-msgstr ""
+msgstr "División submunicipal (actualmente implementada solo en Río de Janeiro)"
 
 #: AlertaDengue/dados/templates/services_api.html:212
 msgid "nivel"
-msgstr ""
+msgstr "nivel"
 
 #: AlertaDengue/dados/templates/services_api.html:213
 msgid "id"
-msgstr ""
+msgstr "id"
 
 #: AlertaDengue/dados/templates/services_api.html:213
 msgid "Índice numérico"
-msgstr ""
+msgstr "Índice numérico"
 
 #: AlertaDengue/dados/templates/services_api.html:214
 msgid "versao_modelo"
-msgstr ""
+msgstr "versao_modelo"
 
 #: AlertaDengue/dados/templates/services_api.html:214
 msgid "Versão do modelo (uso interno)"
-msgstr ""
+msgstr "Versión del modelo (uso interno)"
 
 #: AlertaDengue/dados/templates/services_api.html:215
 msgid "Rt"
-msgstr ""
+msgstr "Rt"
 
 #: AlertaDengue/dados/templates/services_api.html:215
 msgid "Estimativa pontual do número reprodutivo de casos, ver "
-msgstr ""
+msgstr "Estimación puntual del número reproductivo de casos, ver "
 
 #: AlertaDengue/dados/templates/services_api.html:215
 msgid "Saiba Mais"
-msgstr ""
+msgstr "Más información"
 
 #: AlertaDengue/dados/templates/services_api.html:216
 msgid "pop"
-msgstr ""
+msgstr "pop"
 
 #: AlertaDengue/dados/templates/services_api.html:216
 msgid "População estimada (IBGE)"
-msgstr ""
+msgstr "Población estimada (IBGE)"
 
 #: AlertaDengue/dados/templates/services_api.html:217
 msgid "tempmin"
-msgstr ""
+msgstr "tempmin"
 
 #: AlertaDengue/dados/templates/services_api.html:218
 msgid "tempmed"
-msgstr ""
+msgstr "tempmed"
 
 #: AlertaDengue/dados/templates/services_api.html:219
 msgid "tempmax"
-msgstr ""
+msgstr "tempmax"
 
 #: AlertaDengue/dados/templates/services_api.html:220
 msgid "umidmin"
-msgstr ""
+msgstr "umidmin"
 
 #: AlertaDengue/dados/templates/services_api.html:221
 msgid "umidmed"
-msgstr ""
+msgstr "umidmed"
 
 #: AlertaDengue/dados/templates/services_api.html:222
 msgid "umidmax"
-msgstr ""
+msgstr "umidmax"
 
 #: AlertaDengue/dados/templates/services_api.html:223
 msgid "receptivo"
-msgstr ""
+msgstr "receptivo"
 
 #: AlertaDengue/dados/templates/services_api.html:223
 msgid ""
@@ -1979,30 +1980,37 @@ msgid ""
 "semana passada, 3 = favorável por pelo menos três semanas (suficiente para "
 "completar um ciclo de transmissão)"
 msgstr ""
+"Indica receptividad climática, es decir, las condiciones para alta capacidad "
+"vectorial. 0 = desfavorable, 1 = favorable, 2 = favorable esta semana y la "
+"anterior, 3 = favorable durante al menos tres semanas (suficiente para "
+"completar un ciclo de transmisión)"
 
 #: AlertaDengue/dados/templates/services_api.html:224
 msgid "transmissao"
-msgstr ""
+msgstr "transmissao"
 
 #: AlertaDengue/dados/templates/services_api.html:224
 msgid ""
 "Evidência de transmissão sustentada: 0 = nenhuma evidência, 1 = possível, 2 "
 "= provável, 3 = altamente provável"
 msgstr ""
+"Evidencia de transmisión sostenida: 0 = ninguna evidencia, 1 = posible, 2 "
+"= probable, 3 = altamente probable"
 
 #: AlertaDengue/dados/templates/services_api.html:225
 msgid "nivel_inc"
-msgstr ""
+msgstr "nivel_inc"
 
 #: AlertaDengue/dados/templates/services_api.html:225
 msgid ""
 "Incidência estimada abaixo do limiar pré-epidemia, 1 = acima do limiar pré-"
 "epidemia, mas abaixo do limiar epidêmico, 2 = acima do limiar epidêmico"
 msgstr ""
+"Incidencia estimada por debajo del umbral pre-epidémico, 1 = por encima del umbral pre-epidémico, pero por debajo del umbral epidémico, 2 = por encima del umbral epidémico"
 
 #: AlertaDengue/dados/templates/services_api.html:226
 msgid "notif_accum_year"
-msgstr ""
+msgstr "notif_accum_year"
 
 #: AlertaDengue/dados/templates/services_api.html:226
 #, fuzzy
@@ -2012,123 +2020,125 @@ msgstr "Número de casos estimados en la semana"
 
 #: AlertaDengue/dados/templates/services_api_doc.html:57
 msgid "Doc"
-msgstr ""
+msgstr "Doc"
 
 #: AlertaDengue/dados/templates/services_api_doc.html:81
 msgid "Tabela de conteúdo"
-msgstr ""
+msgstr "Tabla de contenido"
 
 #: AlertaDengue/dados/templates/services_maps.html:69
 msgid "Mapas"
-msgstr ""
+msgstr "Mapas"
 
 #: AlertaDengue/dados/templates/services_maps.html:79
-msgid "Para mais informações, acesse a documentação do serviço de mapas."
-msgstr ""
+msgid
+
+"Para mais informações, acesse a documentação do serviço de mapas."
+msgstr "Para más información, acceda a la documentación del servicio de mapas."
 
 #: AlertaDengue/dados/templates/services_maps.html:84
 msgid "Filtro Código IBGE"
-msgstr ""
+msgstr "Filtro Código IBGE"
 
 #: AlertaDengue/dados/templates/services_maps.html:88
 msgid "Digite aqui para filtrar as opções do código IBGE."
-msgstr ""
+msgstr "Ingrese aquí para filtrar las opciones del código IBGE."
 
 #: AlertaDengue/dados/templates/services_maps.html:93
 msgid ""
 "Digite o código IBGE ou parte dele para buscar o código IBGE disponível."
-msgstr ""
+msgstr "Ingrese el código IBGE o parte de él para buscar el código IBGE disponible."
 
 #: AlertaDengue/dados/templates/services_maps.html:98
 msgid "Código IBGE"
-msgstr ""
+msgstr "Código IBGE"
 
 #: AlertaDengue/dados/templates/services_maps.html:108
 msgid "Selecione o código IBGE da cidade desejada"
-msgstr ""
+msgstr "Seleccione el código IBGE de la ciudad deseada"
 
 #: AlertaDengue/dados/templates/services_maps.html:119
 msgid "Mapa"
-msgstr ""
+msgstr "Mapa"
 
 #: AlertaDengue/dados/templates/services_maps.html:132
 msgid "NDVI"
-msgstr ""
+msgstr "NDVI"
 
 #: AlertaDengue/dados/templates/services_maps.html:135
 msgid "LST Dia"
-msgstr ""
+msgstr "LST Día"
 
 #: AlertaDengue/dados/templates/services_maps.html:138
 msgid "LST Noite"
-msgstr ""
+msgstr "LST Noche"
 
 #: AlertaDengue/dados/templates/services_maps.html:141
 msgid "Umidade Relativa"
-msgstr ""
+msgstr "Humedad Relativa"
 
 #: AlertaDengue/dados/templates/services_maps.html:144
 msgid "Umidade Específica"
-msgstr ""
+msgstr "Humedad Específica"
 
 #: AlertaDengue/dados/templates/services_maps.html:147
 msgid "Precipitação"
-msgstr ""
+msgstr "Precipitación"
 
 #: AlertaDengue/dados/templates/services_maps.html:152
 msgid "Selecione o tipo de mapa desejado"
-msgstr ""
+msgstr "Seleccione el tipo de mapa deseado"
 
 #: AlertaDengue/dados/templates/services_maps.html:156
 msgid "Tipo de imagem de saída"
-msgstr ""
+msgstr "Tipo de imagen de salida"
 
 #: AlertaDengue/dados/templates/services_maps.html:166
 msgid "Selecione o Tipo de imagem de saída"
-msgstr ""
+msgstr "Seleccione el Tipo de imagen de salida"
 
 #: AlertaDengue/dados/templates/services_maps.html:170
 msgid "Dimensão de ajuste:"
-msgstr ""
+msgstr "Dimensión de ajuste:"
 
 #: AlertaDengue/dados/templates/services_maps.html:179
 msgid "Dimensão de ajuste da imagem"
-msgstr ""
+msgstr "Dimensión de ajuste de la imagen"
 
 #: AlertaDengue/dados/templates/services_maps.html:183
 msgid "Valor da dimensão selecionada"
-msgstr ""
+msgstr "Valor de la dimensión seleccionada"
 
 #: AlertaDengue/dados/templates/services_maps.html:191
 msgid "Selecione o valor para a dimensão informada"
-msgstr ""
+msgstr "Seleccione el valor para la dimensión informada"
 
 #: AlertaDengue/dados/templates/services_maps.html:200
 msgid "Gerar URL do serviço"
-msgstr ""
+msgstr "Generar URL del servicio"
 
 #: AlertaDengue/dados/templates/services_tutorial.html:31
 #: AlertaDengue/dados/templates/services_tutorial.html:38
 #: AlertaDengue/dados/templates/services_tutorial_Python.html:177
 #: AlertaDengue/dados/templates/services_tutorial_R.html:177
 msgid "Tutorial"
-msgstr ""
+msgstr "Tutorial"
 
 #: AlertaDengue/dados/templates/services_tutorial.html:46
 msgid "Visualizações a partir da tabela de dados do Infodengue"
-msgstr ""
+msgstr "Visualizaciones a partir de la tabla de datos del Infodengue"
 
 #: AlertaDengue/dados/templates/services_tutorial.html:49
 msgid "Linguagem R."
-msgstr ""
+msgstr "Lenguaje R."
 
 #: AlertaDengue/dados/templates/services_tutorial.html:54
 msgid "Linguagem Python."
-msgstr ""
+msgstr "Lenguaje Python."
 
 #: AlertaDengue/dados/templates/services_tutorial.html:59
 msgid "Extraindo dados com PySUS"
-msgstr ""
+msgstr "Extrayendo datos con PySUS"
 
 #: AlertaDengue/dados/templates/services_tutorial.html:63
 msgid ""
@@ -2137,10 +2147,14 @@ msgid ""
 "Tutoriais sobre a utilização do PySUS para extração dos dados no sistema "
 "InfoDengue pode ser encontrada na "
 msgstr ""
+"es un paquete de Python para extraer datos de salud. Con esta herramienta, es "
+"posible descargar las semanas epidemiológicas con scripts en Python. "
+"Puedes encontrar tutoriales sobre cómo usar PySUS para extraer datos en el sistema "
+"InfoDengue en la "
 
 #: AlertaDengue/dados/templates/services_tutorial.html:63
 msgid "documentação oficial do PySUS"
-msgstr ""
+msgstr "documentación oficial de PySUS"
 
 #: AlertaDengue/dados/templates/state_cities.html:179
 msgid "Dados de"
