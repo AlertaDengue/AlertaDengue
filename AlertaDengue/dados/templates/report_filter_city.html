@@ -51,15 +51,15 @@ function openReport() {
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/report">{% trans "Relatórios" %}</a></li>
-      <li class="breadcrumb-item active" aria-current="page">{% trans "Municipal" %}</li>
+      <li class="breadcrumb-item"><a href="/report">{% translate "Relatórios" %}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{% translate "Municipal" %}</li>
       <li class="breadcrumb-item active" aria-current="page">{{ state }}</li>
   </ol>
 </nav>
 {% endblock %}
 
 
-{% block title %}{% trans "Relatórios" %} / {{ state }}{% endblock %}
+{% block title %}{% translate "Relatórios" %} / {{ state }}{% endblock %}
 
 {% block content %}
 
@@ -68,33 +68,33 @@ function openReport() {
     <div class="col-md-12">
       <!-- field:start -->
       <div class="form-group">
-        <label for="geocode">{% trans "Município" %}</label>
+        <label for="geocode">{% translate "Município" %}</label>
         <select id="geocode" class="form-control"
                 style="width:400px;"
                 required="required"
         >
-          <option value="">{% trans "Selecione um município" %}</option>
+          <option value="">{% translate "Selecione um município" %}</option>
           {{options_cities|safe}}
         </select>
         <small id="geocodeHelp" class="form-text text-muted">
-          {% trans "Selecione o município desejado para a consulta" %}
+          {% translate "Selecione o município desejado para a consulta" %}
         </small>
       </div>
       <div class="form-group">
-        <label for="epidate">{% trans "Data da Semana Epidemiológica" %}</label>
+        <label for="epidate">{% translate "Data da Semana Epidemiológica" %}</label>
         <input type="date" class="form-control"
                id="epidate"
                value="{{date_query}}"
                aria-describedby="dateHelp"
                required="required" style="width:200px;">
         <small id="dateHelp" class="form-text text-muted">
-          {% trans "Selecione um dia da Semana Epidemiológica desejada" %}
+          {% translate "Selecione um dia da Semana Epidemiológica desejada" %}
         </small>
       </div>
       <!-- field:end -->
       <div class="form-group">
         <button class="btn btn-primary" type="submit">
-          {% trans "Abrir Relatório" %}
+          {% translate "Abrir Relatório" %}
         </button>
       </div>
     </div>

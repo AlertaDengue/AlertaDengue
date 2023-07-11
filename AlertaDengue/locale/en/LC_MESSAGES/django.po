@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-11 07:37-0300\n"
+"POT-Creation-Date: 2023-07-11 13:43-0300\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -65,7 +65,6 @@ msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
 #: AlertaDengue/dados/templates/alert_state/disease.html:122
 #: AlertaDengue/dados/templates/alert_state/epiyears.html:39
 #: AlertaDengue/dados/templates/alert_state/gender.html:113
-#: AlertaDengue/dados/templates/total_series.html:28
 msgid "Casos"
 msgstr "Cases"
 
@@ -2363,7 +2362,7 @@ msgstr "Last update"
 msgid "Descrição de filtro"
 msgstr "Filter description"
 
-#: AlertaDengue/dados/templates/state_cities.html:312
+#: AlertaDengue/dados/templates/state_cities.html:310
 msgid "Por favor, aguarde."
 msgstr "Please, wait."
 
@@ -2535,15 +2534,6 @@ msgstr ""
 #: AlertaDengue/dados/templates/team.html:97
 msgid "Entre em contato conosco"
 msgstr "Contact us"
-
-#: AlertaDengue/dados/templates/total_series.html:19
-#, python-format
-msgid "Casos Estimados de %(disease_label)s nos municípios monitorados"
-msgstr "Estimated cases of %(disease_label)s in monitored cities"
-
-#: AlertaDengue/dados/templates/total_series.html:68
-msgid "casos estimados"
-msgstr "estimated cases"
 
 #: AlertaDengue/dados/views.py:328
 msgid ""
@@ -2849,24 +2839,31 @@ msgstr "Forgotten your password or username?"
 msgid "Log in"
 msgstr "Log in"
 
-#: AlertaDengue/templates/registration/password_reset_email.html:2
+#: AlertaDengue/templates/registration/password_reset_email.html:4
 msgid ""
 "Voce está recebendo esse e-mail por que pediu que sua senha no InfoDengue "
 "fosse redefinida."
 msgstr ""
 "You are receiving this email because you requested to reset your password."
 
-#: AlertaDengue/templates/registration/password_reset_email.html:4
+#: AlertaDengue/templates/registration/password_reset_email.html:6
 msgid "Por favor, visite a página a seguir e escolha uma nova senha:"
 msgstr "Please visit the following page and choose a new password:"
 
-#: AlertaDengue/templates/registration/password_reset_email.html:8
+#: AlertaDengue/templates/registration/password_reset_email.html:10
 msgid "Seu nome de usuário, caso você tenha esquecido, é:"
 msgstr "Your username, if you have forgotten it, is:"
 
-#: AlertaDengue/templates/registration/password_reset_email.html:10
+#: AlertaDengue/templates/registration/password_reset_email.html:12
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
+
+#, python-format
+#~ msgid "Casos Estimados de %(disease_label)s nos municípios monitorados"
+#~ msgstr "Estimated cases of %(disease_label)s in monitored cities"
+
+#~ msgid "casos estimados"
+#~ msgstr "estimated cases"
 
 #~ msgid "conosco"
 #~ msgstr " "

@@ -17,15 +17,15 @@
 {% endblock %}
 
 
-{% block title %}<br><a href="{% url 'home' %}">{% trans "Mapa de Casos" %}</a>{% endblock %}
+{% block title %}<br><a href="{% url 'home' %}">{% translate "Mapa de Casos" %}</a>{% endblock %}
 
 {% block content %}
     <div id="progress" style="display: none">
         <div id="progress-bar" style="display: none"></div>
     </div>
 
-    <h1>{% trans "Casos de Dengue no município do Rio de Janeiro, em <b id="ano">2010</b> segundo SINAN." %}</h1>
-    <b>{% trans "Year: " %}</b> <select id="year">
+    <h1>{% translate "Casos de Dengue no município do Rio de Janeiro, em <b id="ano">2010</b> segundo SINAN." %}</h1>
+    <b>{% translate "Year: " %}</b> <select id="year">
     <option value="2010">2010</option>
     <option value="2011">2011</option>
     <option value="2012">2012</option>

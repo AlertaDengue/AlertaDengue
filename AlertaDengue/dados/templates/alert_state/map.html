@@ -23,10 +23,10 @@
     var info = L.control();
     var legend = L.control({position: 'bottomright'});
     var alertLevels = [
-        {name: '{% blocktrans %}Baixo Risco{% endblocktrans %}', color: '#0D6B0D'},
-        {name: '{% blocktrans %}Atenção{% endblocktrans %}', color: '#C8D20F'},
-        {name: '{% blocktrans %}Transmissão{% endblocktrans %}', color: '#E45205'},
-        {name: '{% blocktrans %}Epidemia{% endblocktrans %}', color: '#FF0205'},
+        {name: '{% blocktranslate %}Baixo Risco{% endblocktranslate %}', color: '#0D6B0D'},
+        {name: '{% blocktranslate %}Atenção{% endblocktranslate %}', color: '#C8D20F'},
+        {name: '{% blocktranslate %}Transmissão{% endblocktranslate %}', color: '#E45205'},
+        {name: '{% blocktranslate %}Epidemia{% endblocktranslate %}', color: '#FF0205'},
     ];
 
     $('.totalsparkline').sparkline('html', {
@@ -172,10 +172,10 @@
 
         info.update = function (props) {
             this._div.innerHTML = '' +
-                '<h6>{% blocktrans %}Total de casos de arboviroses na semana{% endblocktrans %}:</h6>' +
+                '<h6>{% blocktranslate %}Total de casos de arboviroses na semana{% endblocktranslate %}:</h6>' +
                 (props ?
                  '<b>'+ props.nome + ':' + props.casos + '</b><br />' :
-                 '{% blocktrans %}Passe o mouse sobre o mapa{% endblocktrans %}');
+                 '{% blocktranslate %}Passe o mouse sobre o mapa{% endblocktranslate %}');
         };
 
         info.addTo(map);
@@ -186,7 +186,7 @@
                         return '<i style="background:' + alertLevel.color +
                             ';"></i> ' + alertLevel.name;
                     }).reverse();
-            labels.push('O: {% blocktrans %}Unidades de Saúde{% endblocktrans %}');
+            labels.push('O: {% blocktranslate %}Unidades de Saúde{% endblocktranslate %}');
             div.innerHTML = labels.join('<br/>');
             return div;
         };
@@ -210,12 +210,12 @@
 
             /*layer.bindPopup(
                 "<b>" + mun_dict[geo_id] + "</b>" + "<br>" +
-                "{% blocktrans %}Casos estimados{% endblocktrans %}: " + feature.properties.casos +
-                "<br>{% blocktrans %}Últimas semanas{% endblocktrans %}: <span class='inlinesparkline'>" +
+                "{% blocktranslate %}Casos estimados{% endblocktranslate %}: " + feature.properties.casos +
+                "<br>{% blocktranslate %}Últimas semanas{% endblocktranslate %}: <span class='inlinesparkline'>" +
                 feature.properties.series + "</span><br>" +
                 "<br>" +
                 "<a href=/alerta/" + geo_id.toString() +
-                "/><u>{% blocktrans %}Mais detalhes{% endblocktrans %}</u></a>"
+                "/><u>{% blocktranslate %}Mais detalhes{% endblocktranslate %}</u></a>"
             );*/
 
             layer.setStyle(selected_style(feature))

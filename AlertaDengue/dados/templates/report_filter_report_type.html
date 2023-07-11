@@ -39,13 +39,13 @@ function openReport() {
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
       <li class="breadcrumb-item active" aria-current="page">
-          <a href="/report">{% trans "Relatórios" %}</a>
+          <a href="/report">{% translate "Relatórios" %}</a>
       </li>
   </ol>
 </nav>
 {% endblock %}
 
-{% block title %}{% trans "Relatórios" %}{% endblock %}
+{% block title %}{% translate "Relatórios" %}{% endblock %}
 
 {% block content %}
 
@@ -54,37 +54,37 @@ function openReport() {
     <div class="col-md-12">
       <!-- field:start -->
       <div class="form-group">
-        <label for="report-type">{% trans "Tipo de Relatório" %}:</label>
+        <label for="report-type">{% translate "Tipo de Relatório" %}:</label>
         <select id="report-type" class="form-control"
                 style="width:400px;"
                 required="required"
         >
-          <option value="city">{% trans "Municipal" %}</option>
-          <option value="state">{% trans "Estadual" %}</option>
+          <option value="city">{% translate "Municipal" %}</option>
+          <option value="state">{% translate "Estadual" %}</option>
         </select>
         <small id="report-typeHelp" class="form-text text-muted">
-          {% trans "Selecione o tipo do relatório" %}
+          {% translate "Selecione o tipo do relatório" %}
         </small>
       </div>
 
       <div class="form-group">
-        <label for="state">{% trans "Unidade Federal" %}:</label>
+        <label for="state">{% translate "Unidade Federal" %}:</label>
         <select id="state" class="form-control"
                 style="width:400px;"
                 required="required"
         >
-          <option value="">{% trans "Selecione uma Unidade Federal" %}</option>
+          <option value="">{% translate "Selecione uma Unidade Federal" %}</option>
           {{options_states|safe}}
         </select>
         <small id="stateHelp" class="form-text text-muted">
-          {% trans "Selecione a Unidade Federal desejada para a consulta" %}
+          {% translate "Selecione a Unidade Federal desejada para a consulta" %}
         </small>
       </div>
 
       <!-- field:end -->
       <div class="form-group">
         <button class="btn btn-primary" type="submit">
-          {% trans "Abrir Relatório" %}
+          {% translate "Abrir Relatório" %}
         </button>
       </div>
     </div>

@@ -20,7 +20,7 @@ $(function () {
             zoomType: 'xy'
         },
         title: {
-            text: '{% blocktrans %}Séries de dados e Alertas anteriores para {{ nome }}{% endblocktrans %}'
+            text: '{% blocktranslate %}Séries de dados e Alertas anteriores para {{ nome }}{% endblocktranslate %}'
         },
         xAxis: [
             {
@@ -34,14 +34,14 @@ $(function () {
                 gridLineWidth: 1,
                 //type: "linear",
                 title: {
-                    text: '{% blocktrans %}Pessoas{% endblocktrans %}',
+                    text: '{% blocktranslate %}Pessoas{% endblocktranslate %}',
                     style: {
                         color: '#4572A7'
                     }
                 },
                 labels: {
                     formatter: function () {
-                        return this.value + ' {% blocktrans %}casos{% endblocktrans %}';
+                        return this.value + ' {% blocktranslate %}casos{% endblocktranslate %}';
                     },
                     style: {
                         color: '#4572A7'
@@ -84,7 +84,7 @@ $(function () {
         },
         series: [
             {
-                name: '{% blocktrans %}Casos Estimados de {{disease_label}}{% endblocktrans %}',
+                name: '{% blocktranslate %}Casos Estimados de {{disease_label}}{% endblocktranslate %}',
                 color: '#AA4643',
                 type: 'spline',
                 animation: true,
@@ -94,7 +94,7 @@ $(function () {
                 data: dados.casos_est,
                 dashStyle: 'shortdot',
                 tooltip: {
-                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
+                    valueSuffix: ' {% blocktranslate %}casos{% endblocktranslate %}'
                 }
 
             },
@@ -102,7 +102,7 @@ $(function () {
             {% for k, title in forecast_models %}
 
             {
-                name: '{% blocktrans %}Casos previstos de {{disease_label}} ({{title}}){% endblocktrans %}',
+                name: '{% blocktranslate %}Casos previstos de {{disease_label}} ({{title}}){% endblocktranslate %}',
                 //color: '#AAAA43',
                 type: 'spline',
                 animation: true,
@@ -112,14 +112,14 @@ $(function () {
                 data: dados.{{k}},
                 dashStyle: 'shortdot',
                 tooltip: {
-                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
+                    valueSuffix: ' {% blocktranslate %}casos{% endblocktranslate %}'
                 }
 
             },
             {% endfor %}
 
             {
-                name: '{% blocktrans %}Alerta Vermelho{% endblocktrans %}',
+                name: '{% blocktranslate %}Alerta Vermelho{% endblocktranslate %}',
                 color: '#FB4949',
                 type: 'areaspline',
                 animation: true,
@@ -129,12 +129,12 @@ $(function () {
                 data: {{ vermelho }},
                 tooltip: {
                     enabled: false,
-                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
+                    valueSuffix: ' {% blocktranslate %}casos{% endblocktranslate %}'
                 }
 
             },
             {
-                name: '{% blocktrans %}Alerta laranja{% endblocktrans %}',
+                name: '{% blocktranslate %}Alerta laranja{% endblocktranslate %}',
                 color: '#FFA858',
                 type: 'areaspline',
                 animation: true,
@@ -144,12 +144,12 @@ $(function () {
                 data: {{ laranja }},
                 tooltip: {
                     enabled: false,
-                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
+                    valueSuffix: ' {% blocktranslate %}casos{% endblocktranslate %}'
                 }
 
             },
             {
-                name: '{% blocktrans %}Alerta Amarelo{% endblocktrans %}',
+                name: '{% blocktranslate %}Alerta Amarelo{% endblocktranslate %}',
                 color: '#FBFC49',
                 type: 'areaspline',
                 animation: true,
@@ -159,12 +159,12 @@ $(function () {
                 data: {{ amarelo }},
                 tooltip: {
                     enabled: false,
-                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
+                    valueSuffix: ' {% blocktranslate %}casos{% endblocktranslate %}'
                 }
 
             },
             {
-                name: '{% blocktrans %}Alerta verde{% endblocktrans %}',
+                name: '{% blocktranslate %}Alerta verde{% endblocktranslate %}',
                 color: '#48FD48',
                 type: 'areaspline',
                 animation: true,
@@ -174,11 +174,11 @@ $(function () {
                 data: {{ verde }},
                 tooltip: {
                     enabled: false,
-                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
+                    valueSuffix: ' {% blocktranslate %}casos{% endblocktranslate %}'
                 }
             },
             {
-                name: '{% blocktrans %}Casos Notificados de {{disease_label}}{% endblocktrans %}',
+                name: '{% blocktranslate %}Casos Notificados de {{disease_label}}{% endblocktranslate %}',
                 type: 'spline',
                 animation: true,
                 color: '#4572A7',
@@ -190,7 +190,7 @@ $(function () {
                     enabled: false
                 },
                 tooltip: {
-                    valueSuffix: ' {% blocktrans %}casos{% endblocktrans %}'
+                    valueSuffix: ' {% blocktranslate %}casos{% endblocktranslate %}'
                 }
 
             }

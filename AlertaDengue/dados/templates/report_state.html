@@ -17,8 +17,8 @@
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/report">{% trans "Relatórios" %}</a></li>
-      <li class="breadcrumb-item"><a href="/report">{% trans "Estadual" %}</a></li>
+      <li class="breadcrumb-item"><a href="/report">{% translate "Relatórios" %}</a></li>
+      <li class="breadcrumb-item"><a href="/report">{% translate "Estadual" %}</a></li>
       <li class="breadcrumb-item active"><a href="/report/{{ state }}/state">{{ state }}</a></li>
   </ol>
 </nav>
@@ -26,7 +26,7 @@
 
 
 {% block title %}
-{% trans "Relatório Estadual da Situação das Arboviroses em " %}{{state_name}}
+{% translate "Relatório Estadual da Situação das Arboviroses em " %}{{state_name}}
 {% endblock %}
 
 {% block content %}
@@ -40,16 +40,16 @@
     # ----------------------
     -->
     <p>
-      {% trans "Semana epidemiológica" %} : {{ last_week }}/{{ last_year }}
+      {% translate "Semana epidemiológica" %} : {{ last_week }}/{{ last_year }}
     </p>
-    <p>{% blocktrans %}
+    <p>{% blocktranslate %}
       Esse é o relatório resumido da situação de alerta de arboviroses no
       estado, detalhado por Regional de Saúde. Para acessar estatísticas
-      gerais do estado, consulte a{% endblocktrans %}
-      <a href="/alerta/{{ state }}/dengue" target="__blank__">{% trans "página de estados" %}</a>.
-      {% trans "E para consultar um município específico, consulte a" %}
-      <a href="/report/{{ state }}/city" target="__blank__">{% trans "página de relatórios municipais" %}</a>,
-      {% trans "ou clique no nome do município na lista que aparece ao clicar no botão" %} <i>{% trans "Municipios por regional" %}</i>.
+      gerais do estado, consulte a{% endblocktranslate %}
+      <a href="/alerta/{{ state }}/dengue" target="__blank__">{% translate "página de estados" %}</a>.
+      {% translate "E para consultar um município específico, consulte a" %}
+      <a href="/report/{{ state }}/city" target="__blank__">{% translate "página de relatórios municipais" %}</a>,
+      {% translate "ou clique no nome do município na lista que aparece ao clicar no botão" %} <i>{% translate "Municipios por regional" %}</i>.
     </p>
   </div>
 </div>

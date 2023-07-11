@@ -21,10 +21,10 @@
     var info_zika = L.control();
     var legend_zika = L.control({position: 'bottomright'});
     var alertLevels_zika = [
-        {name: '{% blocktrans %}Baixo Risco{% endblocktrans %}', color: '#0D6B0D'},
-        {name: '{% blocktrans %}Atenção{% endblocktrans %}', color: '#C8D20F'},
-        {name: '{% blocktrans %}Transmissão{% endblocktrans %}', color: '#E45205'},
-        {name: '{% blocktrans %}Epidemia{% endblocktrans %}', color: '#FF0205'},
+        {name: '{% blocktranslate %}Baixo Risco{% endblocktranslate %}', color: '#0D6B0D'},
+        {name: '{% blocktranslate %}Atenção{% endblocktranslate %}', color: '#C8D20F'},
+        {name: '{% blocktranslate %}Transmissão{% endblocktranslate %}', color: '#E45205'},
+        {name: '{% blocktranslate %}Epidemia{% endblocktranslate %}', color: '#FF0205'},
     ];
 
     $('.totalsparkline').sparkline('html', {
@@ -121,10 +121,10 @@
 
         info_zika.update = function (props) {
             this._div.innerHTML = '' +
-                '<h6>{% blocktrans %}Alerta Zika{% endblocktrans %}:</h6>' +
+                '<h6>{% blocktranslate %}Alerta Zika{% endblocktranslate %}:</h6>' +
                 (props ?
                  '<b>'+ props.nome + '</b><br />' :
-                 '{% blocktrans %}Passe o mouse sobre o mapa{% endblocktrans %}');
+                 '{% blocktranslate %}Passe o mouse sobre o mapa{% endblocktranslate %}');
         };
 
         info_zika.addTo(map);
@@ -135,7 +135,7 @@
                         return '<i style="background:' + alertLevel.color +
                             ';"></i> ' + alertLevel.name;
                     }).reverse();
-            labels.push('O: {% blocktrans %}Unidades de Saúde{% endblocktrans %}');
+            labels.push('O: {% blocktranslate %}Unidades de Saúde{% endblocktranslate %}');
             div.innerHTML = labels.join('<br/>');
             return div;
         };

@@ -97,7 +97,7 @@ $(document).ready(function () {
                 },
             },
             title: {
-                text: '{% blocktrans %}Distribuição por gênero{% endblocktrans %}'
+                text: '{% blocktranslate %}Distribuição por gênero{% endblocktranslate %}'
             },
             subtitle: {
                 text: chart_footer,
@@ -110,7 +110,7 @@ $(document).ready(function () {
             yAxis: {
                 min: 0,
                 title: {
-                    text: '{% blocktrans %}Casos{% endblocktrans %}'
+                    text: '{% blocktranslate %}Casos{% endblocktranslate %}'
                 }
             },
             xAxis: {
@@ -126,7 +126,7 @@ $(document).ready(function () {
                 shared: true,
                 useHTML: true,
                 //headerFormat: '<b>{point.key}</b><br/>',
-                footerFormat: '<small>**{% blocktrans %}Clique na categoria (coluna) para <br/>alterar seleção de filtro.{% endblocktrans %}</small>',
+                footerFormat: '<small>**{% blocktranslate %}Clique na categoria (coluna) para <br/>alterar seleção de filtro.{% endblocktranslate %}</small>',
             },
             /*series: [{
                 "name": "Casos",

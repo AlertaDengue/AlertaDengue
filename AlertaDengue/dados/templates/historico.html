@@ -19,7 +19,7 @@
 {% block title %}Séries Históricas{% endblock %}
 
 {% block content %}
-    <h4>{% trans "O Alerta de Dengue e calculado usando dados que incluem os apresentados abaixo." %}</h4>
+    <h4>{% translate "O Alerta de Dengue e calculado usando dados que incluem os apresentados abaixo." %}</h4>
     {% for ap in APS %}
         <div id="historico-chart-{{ ap }}" style="min-width: 500px; height: 400px; margin: 10px" data-highcharts-chart="{{ forloop.counter0 }}"></div>
     {% endfor %}
