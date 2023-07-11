@@ -188,11 +188,12 @@
                                 plot_chart_date(data_period, {'subtitle': desc_period});
 
                                 $('#filter-display').text(
-                                '{% translate "Casos de" %} ' + _get_diseases_selected().join(', ') +
-                                ' {% translate "entre" %} ' + start + ' {% translate "e" %} ' + end + ', ' +
-                                ' {% translate "sexo" %}: ' + _get_genders_selected().join(', ') + ', ' +
-                                ' {% translate "idades" %}: ' + _get_ages_selected().join(', ')
+                                    '{% translate "Casos de" %} ' + _get_diseases_selected().join(', ') +
+                                    ' {% translate "entre" %} ' + start + ' {% translate "e" %} ' + end + ', ' +
+                                    ' {% translate "sexo" %}: ' + _get_genders_selected().join(', ') + ', ' +
+                                    ' {% translate "idades" %}: ' + _get_ages_selected().join(', ')
                             );
+
                             ignore_chart = '';
 
                             //console.log((performance.now() - start)/1000);

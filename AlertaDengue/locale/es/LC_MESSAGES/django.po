@@ -2381,43 +2381,43 @@ msgstr "documentación oficial de PySUS"
 
 #: AlertaDengue/dados/templates/state_cities.html:179
 msgid "Dados de"
-msgstr ""
+msgstr "Datos de"
 
 #: AlertaDengue/dados/templates/state_cities.html:179
 msgid "a"
-msgstr ""
+msgstr "a"
 
 #: AlertaDengue/dados/templates/state_cities.html:191
 msgid "Casos de"
-msgstr ""
+msgstr "Casos de"
 
 #: AlertaDengue/dados/templates/state_cities.html:192
 msgid "entre"
-msgstr ""
+msgstr "entre"
 
 #: AlertaDengue/dados/templates/state_cities.html:192
 msgid "e"
-msgstr ""
+msgstr "y"
 
 #: AlertaDengue/dados/templates/state_cities.html:193
 msgid "sexo"
-msgstr ""
+msgstr "género"
 
 #: AlertaDengue/dados/templates/state_cities.html:194
 msgid "idades"
-msgstr ""
+msgstr "edades"
 
 #: AlertaDengue/dados/templates/state_cities.html:218
 msgid "Última atualização"
-msgstr ""
+msgstr "Última actualización"
 
 #: AlertaDengue/dados/templates/state_cities.html:226
 msgid "Descrição de filtro"
-msgstr ""
+msgstr "Descripción del filtro"
 
 #: AlertaDengue/dados/templates/state_cities.html:309
 msgid "Por favor, aguarde."
-msgstr ""
+msgstr "Por favor, espere."
 
 #: AlertaDengue/dados/templates/team.html:6 AlertaDengue/templates/base.html:55
 msgid "Equipe"
