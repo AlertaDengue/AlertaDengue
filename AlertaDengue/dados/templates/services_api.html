@@ -5,18 +5,18 @@
 
 {% block extra_head %}
 <meta property="og:image"
-      content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+      content="{% static '/img/screenshot.png' %}"/>
 <meta property="og:image:secure_url"
-      content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+      content="{% static '/img/screenshot.png' %}"/>
 
 
-<script src="/static/libs/bootstrap-select/bootstrap-select.min.js"
+<script src="{% static '/libs/bootstrap-select/bootstrap-select.min.js' %}"
         type="text/javascript"></script>
 
-<script src="/static/js/infodengue.js"
+<script src="{% static '/js/infodengue.js' %}"
         type="text/javascript"></script>
 
-<link href="/static/libs/bootstrap-select/bootstrap-select.min.css"
+<link href="{% static '/libs/bootstrap-select/bootstrap-select.min.css' %}"
         type="text/css" rel="stylesheet" />
 
 

@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
 
 {% block extra_head %}
 
 <link rel="stylesheet"
-      type="text/css" href="/static/libs/DataTables/datatables.min.css"/>
+      type="text/css" href="{% static '/libs/DataTables/datatables.min.css' %}"/>
 
 <script type="text/javascript"
-        src="/static/libs/DataTables/datatables.min.js"></script>
+        src="{% static '/libs/DataTables/datatables.min.js' %}"></script>
 
 <style>
       .box {
@@ -43,7 +44,7 @@
       }
 
 </style>
-<script src="/static/libs/plotlyjs/plotly-latest.min.js"></script>
+<script src="{% static '/libs/plotlyjs/plotly-latest.min.js' %}"></script>
 {% endblock %}
 
 {% block breadcrumbs %}

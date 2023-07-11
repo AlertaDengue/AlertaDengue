@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
+
 {% block extra_head %}
     {% load leaflet_tags %}
     {% leaflet_js %}
@@ -10,9 +12,9 @@
             height: 600px;
         }
     </style>
-    <script src="/static/js/heatmap.js"></script>
-    <script src="/static/js/heatmap-leaflet.js"></script>
-    <script src="/static/js/QuadTree.js"></script>
+    <script src="{% static '/js/heatmap.js' %}"></script>
+    <script src="{% static '/js/heatmap-leaflet.js' %}"></script>
+    <script src="{% static '/js/QuadTree.js' %}"></script>
 
 {% endblock %}
 

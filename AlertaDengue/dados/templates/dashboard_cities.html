@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
 {% block extra_head %}
-    {% load static %}
     {% load series %}
-    <meta property="og:image" content="http://info.dengue.mat.br/static/img/screenshot.png"/>
-    <meta property="og:image:secure_url" content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+    <meta property="og:image" content="{% static '/img/screenshot.png' %}"/>
+    <meta property="og:image:secure_url" content="{% static '/img/screenshot.png' %}"/>
     <style>
         .leaflet-container {
             height: 400px;
@@ -45,11 +45,11 @@
             opacity: 0.7;
         }
     </style>
-    <script src="/static/js/Autolinker.min.js"></script>
-    <script src="/static/libs/jquery/jquery.sparkline.min.js"></script>
-    <script src="/static/js/highstock.js"></script>
-    <script src="/static/js/modules/exporting.js"></script>
-    <script src="/static/js/infodengue.js"></script>
+    <script src="{% static '/js/Autolinker.min.js' %}"></script>
+    <script src="{% static '/libs/jquery/jquery.sparkline.min.js' %}"></script>
+    <script src="{% static '/js/highstock.js' %}"></script>
+    <script src="{% static '/js/modules/exporting.js' %}"></script>
+    <script src="{% static '/js/infodengue.js' %}"></script>
 
 {% endblock %}
 

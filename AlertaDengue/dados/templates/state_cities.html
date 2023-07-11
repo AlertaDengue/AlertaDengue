@@ -12,9 +12,9 @@
     {% leaflet_js plugins="ALL" %}
 
     <meta property="og:image"
-          content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+          content="{% static '/img/screenshot.png' %}"/>
     <meta property="og:image:secure_url"
-          content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+          content="{% static '/img/screenshot.png' %}"/>
     <script src="{% static '/js/Autolinker.min.js' %}" type="text/javascript"></script>
     <script src="{% static '/libs/jquery/jquery.sparkline.min.js' %}"
             type="text/javascript"></script>
@@ -187,13 +187,12 @@
                             if (ignore_chart != 'date')
                                 plot_chart_date(data_period, {'subtitle': desc_period});
 
-                            $('#filter-display').text(
+                                $('#filter-display').text(
                                 '{% translate "Casos de" %} ' + _get_diseases_selected().join(', ') +
                                 ' {% translate "entre" %} ' + start + ' {% translate "e" %} ' + end + ', ' +
                                 ' {% translate "sexo" %}: ' + _get_genders_selected().join(', ') + ', ' +
                                 ' {% translate "idades" %}: ' + _get_ages_selected().join(', ')
                             );
-
                             ignore_chart = '';
 
                             //console.log((performance.now() - start)/1000);

@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
+
 {% block extra_head %}
     {% load leaflet_tags %}
     {% leaflet_js %}
@@ -10,9 +12,9 @@
             height: 600px;
         }
     </style>
-    <script src="/static/js/heatmap.js"></script>
-    <script src="/static/js/heatmap-leaflet.js"></script>
-    <script src="/static/js/QuadTree.js"></script>
+    <script src="{% static '/js/heatmap.js' %}"></script>
+    <script src="{% static '/js/heatmap-leaflet.js' %}"></script>
+    <script src="{% static '/js/QuadTree.js' %}"></script>
 
 {% endblock %}
 
@@ -28,7 +30,7 @@
     <p>{% translate "Modelo GAM espacial da positividade de ovitrampas no município do Rio de Janeiro." %}</p>
   </div>
 
-  <img src="/static/mapa_ovitrampas.png" width="900px">
+  <img src="{% static '/mapa_ovitrampas.png" width="900px">
 </div>
 
 <script>

@@ -8,9 +8,9 @@
 
 {% block extra_head %}
   <meta property="og:image"
-    content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+    content="{% static '/img/screenshot.png' %}"/>
   <meta property="og:image:secure_url"
-    content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+    content="{% static '/img/screenshot.png' %}"/>
 
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 

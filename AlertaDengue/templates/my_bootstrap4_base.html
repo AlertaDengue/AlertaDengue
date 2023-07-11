@@ -2,6 +2,7 @@
 {% load bootstrap4 %}
 {% load i18n %}
 {% load static %}
+
 <html>
 <head lang="pt-BR">
     <meta charset=”UTF-8”>
@@ -16,7 +17,7 @@
 
     {% bootstrap_css %}
     {% bootstrap_javascript %}
-    <script src="/static/js/typeahead.bundle.min.js" type="text/javascript"></script>
+    <script src="{% static '/js/typeahead.bundle.min.js' %}" type="text/javascript"></script>
 
     <link rel="shortcut icon" href="{% static '/img/favicon.ico' %}"
           type="image/x-icon">

@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load static %}
 
 <!-- Start Component -->
 {% block evigilancia_component %}
@@ -7,7 +8,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header" style="padding: 0;">
-                <img src="/static/img/header_evigilancia.png" class="img-fluid" alt="Terceira edição E-vigilância. Clique para saber mais!" style="width: 100%; height: auto; margin: 0;">
+                <img src="{% static '/img/header_evigilancia.png' %}" class="img-fluid" alt="Terceira edição E-vigilância. Clique para saber mais!" style="width: 100%; height: auto; margin: 0;">
             </div>
             <div class="modal-body" id="dynamic-content">
                 <h4 align="center"><b>{% translate "E-Vigilância 2023" %}</b></h4>
