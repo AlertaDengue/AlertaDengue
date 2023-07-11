@@ -63,27 +63,27 @@ msgstr ""
 #: AlertaDengue/dados/templates/alert_state/epiyears.html:39
 #: AlertaDengue/dados/templates/alert_state/gender.html:113
 msgid "Casos"
-msgstr ""
+msgstr "Casos"
 
 #: AlertaDengue/dados/charts/cities.py:37
 #: AlertaDengue/dados/charts/cities.py:88
 msgid "alerta verde"
-msgstr ""
+msgstr "alerta verde"
 
 #: AlertaDengue/dados/charts/cities.py:38
 #: AlertaDengue/dados/charts/cities.py:89
 msgid "alerta amarelo"
-msgstr ""
+msgstr "alerta amarillo"
 
 #: AlertaDengue/dados/charts/cities.py:39
 #: AlertaDengue/dados/charts/cities.py:90
 msgid "alerta laranja"
-msgstr ""
+msgstr "alerta naranja"
 
 #: AlertaDengue/dados/charts/cities.py:40
 #: AlertaDengue/dados/charts/cities.py:91
 msgid "alerta vermelho"
-msgstr ""
+msgstr "alerta rojo"
 
 #: AlertaDengue/dados/charts/cities.py:42
 #: AlertaDengue/dados/charts/cities.py:65
@@ -142,7 +142,7 @@ msgstr ""
 
 #: AlertaDengue/dados/charts/cities.py:168 AlertaDengue/dados/charts/home.py:54
 msgid "Casos Notificados"
-msgstr ""
+msgstr "Casos Notificados"
 
 #: AlertaDengue/dados/charts/cities.py:221
 #: AlertaDengue/dados/charts/cities.py:242
@@ -165,7 +165,7 @@ msgstr ""
 
 #: AlertaDengue/dados/charts/home.py:40 AlertaDengue/dados/charts/states.py:38
 msgid "Registrados"
-msgstr ""
+msgstr "Registrados"
 
 #: AlertaDengue/dados/charts/home.py:51 AlertaDengue/dados/charts/home.py:70
 #: AlertaDengue/dados/templates/services_api.html:205
@@ -174,17 +174,15 @@ msgstr "SE"
 
 #: AlertaDengue/dados/charts/home.py:63 AlertaDengue/dados/charts/states.py:57
 msgid "Estimados"
-msgstr ""
+msgstr "Estimados"
 
 #: AlertaDengue/dados/charts/home.py:73
-#, fuzzy
-#| msgid "Casos estimados"
 msgid "Casos Estimados"
 msgstr "Casos Estimados"
 
 #: AlertaDengue/dados/charts/home.py:84
 msgid "Total de casos no estado"
-msgstr ""
+msgstr "Total de casos en el estado"
 
 #: AlertaDengue/dados/charts/home.py:89 AlertaDengue/dados/charts/home.py:233
 #: AlertaDengue/dados/charts/home.py:354 AlertaDengue/dados/charts/states.py:79
@@ -195,26 +193,24 @@ msgstr ""
 #: AlertaDengue/dados/templates/services_api.html:205
 #: AlertaDengue/forecast/models.py:142
 msgid "Semana epidemiológica"
-msgstr ""
+msgstr "Semana epidemiológica"
 
 #: AlertaDengue/dados/charts/home.py:229
 msgid "Cidades com clima favorável <br>para transmissão"
-msgstr ""
+msgstr "Ciudades con clima favorable <br>para la transmisión"
 
 #: AlertaDengue/dados/charts/home.py:325
-#, fuzzy
-#| msgid "Casos por semana"
 msgid "Cidades na Semana"
-msgstr "Casos por semana"
+msgstr "Ciudades en la semana"
 
 #: AlertaDengue/dados/charts/home.py:333
 msgid "Situação epidemiológica das cidades"
-msgstr "Epidemiología"
+msgstr "Situación epidemiológica de las ciudades"
 
 #: AlertaDengue/dados/charts/home.py:364
 #: AlertaDengue/dados/charts/states.py:235
 msgid "Número de cidades"
-msgstr ""
+msgstr "Número de ciudades"
 
 #: AlertaDengue/dados/charts/states.py:46
 #, python-brace-format
