@@ -1015,35 +1015,35 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/components/home/charts.html:22
 msgid "Gráficos sobre Dengue"
-msgstr ""
+msgstr "Gráficos sobre Dengue"
 
 #: AlertaDengue/dados/templates/components/home/charts.html:34
 msgid "Gráficos sobre Chikungunya"
-msgstr ""
+msgstr "Gráficos sobre Chikungunya"
 
 #: AlertaDengue/dados/templates/components/home/charts.html:45
 msgid "Gráficos sobre Zika"
-msgstr ""
+msgstr "Gráficos sobre Zika"
 
 #: AlertaDengue/dados/templates/components/home/charts.html:56
 msgid "Veja o mapa de incidência das doenças no estado"
-msgstr ""
+msgstr "Ver el mapa de incidencia de enfermedades en el estado"
 
 #: AlertaDengue/dados/templates/components/home/charts.html:57
 msgid "Mapa incidência"
-msgstr ""
+msgstr "Mapa de incidencia"
 
 #: AlertaDengue/dados/templates/components/home/charts.html:71
 msgid "Municípios monitorados"
-msgstr ""
+msgstr "Municipios monitoreados"
 
 #: AlertaDengue/dados/templates/components/home/charts.html:71
 msgid "Última atualização na SE"
-msgstr ""
+msgstr "Última actualización en SE"
 
 #: AlertaDengue/dados/templates/components/home/charts.html:141
 msgid "Informações detalhadas sobre o Estado"
-msgstr ""
+msgstr "Información detallada sobre el estado"
 
 #: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:43
 #: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:82

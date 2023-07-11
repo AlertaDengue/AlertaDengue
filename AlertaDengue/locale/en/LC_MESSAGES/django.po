@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-11 14:57-0300\n"
+"POT-Creation-Date: 2023-07-11 19:58-0300\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -58,7 +58,7 @@ msgstr "Estimated cases of "
 msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
 msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
 
-#: AlertaDengue/dados/charts/alerts.py:233 AlertaDengue/dados/charts/home.py:91
+#: AlertaDengue/dados/charts/alerts.py:233 AlertaDengue/dados/charts/home.py:99
 #: AlertaDengue/dados/charts/states.py:89
 #: AlertaDengue/dados/templates/alert_state/age.html:125
 #: AlertaDengue/dados/templates/alert_state/date.html:100
@@ -143,9 +143,9 @@ msgstr "Period: Year / Week"
 msgid "Incidência"
 msgstr "Incidence"
 
-#: AlertaDengue/dados/charts/cities.py:168
+#: AlertaDengue/dados/charts/cities.py:168 AlertaDengue/dados/charts/home.py:54
 msgid "Casos Notificados"
-msgstr "Reported cases"
+msgstr "Reported Cases"
 
 #: AlertaDengue/dados/charts/cities.py:221
 #: AlertaDengue/dados/charts/cities.py:242
@@ -170,26 +170,25 @@ msgstr "Climatic conditions for transmission"
 msgid "Registrados"
 msgstr "Registered"
 
-#: AlertaDengue/dados/charts/home.py:48 AlertaDengue/dados/charts/states.py:46
-#, python-brace-format
-msgid "<br>SE %{text}<br>%{y:1f} Casos notificados<extra></extra>"
-msgstr "<br>Week %{text}<br>%{y:1f} Registered Cases<extra></extra>"
+#: AlertaDengue/dados/charts/home.py:51 AlertaDengue/dados/charts/home.py:70
+#: AlertaDengue/dados/templates/services_api.html:205
+msgid "SE"
+msgstr "EW"
 
-#: AlertaDengue/dados/charts/home.py:59 AlertaDengue/dados/charts/states.py:57
+#: AlertaDengue/dados/charts/home.py:63 AlertaDengue/dados/charts/states.py:57
 msgid "Estimados"
 msgstr "Estimated"
 
-#: AlertaDengue/dados/charts/home.py:63 AlertaDengue/dados/charts/states.py:61
-#, python-brace-format
-msgid "<br>SE %{text}<br>%{y:1f} Casos estimados<extra></extra>"
-msgstr "<br>Week: %{text}<br>%{y:1f} Estimated Cases<extra></extra>"
+#: AlertaDengue/dados/charts/home.py:73
+msgid "Casos Estimados"
+msgstr "Estimated Cases"
 
-#: AlertaDengue/dados/charts/home.py:76
+#: AlertaDengue/dados/charts/home.py:84
 msgid "Total de casos no estado"
 msgstr "Cumulative number of cases in the State"
 
-#: AlertaDengue/dados/charts/home.py:81 AlertaDengue/dados/charts/home.py:225
-#: AlertaDengue/dados/charts/home.py:342 AlertaDengue/dados/charts/states.py:79
+#: AlertaDengue/dados/charts/home.py:89 AlertaDengue/dados/charts/home.py:233
+#: AlertaDengue/dados/charts/home.py:354 AlertaDengue/dados/charts/states.py:79
 #: AlertaDengue/dados/charts/states.py:225
 #: AlertaDengue/dados/templates/report_city.html:81
 #: AlertaDengue/dados/templates/report_city.html:254
@@ -199,28 +198,41 @@ msgstr "Cumulative number of cases in the State"
 msgid "Semana epidemiológica"
 msgstr "Epidemiological week"
 
-#: AlertaDengue/dados/charts/home.py:221
+#: AlertaDengue/dados/charts/home.py:229
 msgid "Cidades com clima favorável <br>para transmissão"
 msgstr "Cities with favorable environment <br>for transmission"
 
-#: AlertaDengue/dados/charts/home.py:315
-#: AlertaDengue/dados/charts/states.py:194
-#, python-brace-format
-msgid "%{y} Cidades na semana %{customdata} <extra></extra>"
-msgstr "%{y} Cities in the week %{customdata}<extra></extra>"
+#: AlertaDengue/dados/charts/home.py:325
+msgid "Cidades na Semana"
+msgstr "Cities in the Week"
 
-#: AlertaDengue/dados/charts/home.py:321
+#: AlertaDengue/dados/charts/home.py:333
 msgid "Situação epidemiológica das cidades"
 msgstr "Epidemiological Situation"
 
-#: AlertaDengue/dados/charts/home.py:352
+#: AlertaDengue/dados/charts/home.py:364
 #: AlertaDengue/dados/charts/states.py:235
 msgid "Número de cidades"
 msgstr "Number of cities"
 
+#: AlertaDengue/dados/charts/states.py:46
+#, python-brace-format
+msgid "<br>SE %{text}<br>%{y:1f} Casos notificados<extra></extra>"
+msgstr "<br>Week %{text}<br>%{y:1f} Registered Cases<extra></extra>"
+
+#: AlertaDengue/dados/charts/states.py:61
+#, python-brace-format
+msgid "<br>SE %{text}<br>%{y:1f} Casos estimados<extra></extra>"
+msgstr "<br>Week: %{text}<br>%{y:1f} Estimated Cases<extra></extra>"
+
 #: AlertaDengue/dados/charts/states.py:74
 msgid "Total de casos na regional de saúde"
 msgstr "Cumulative number of cases in the State"
+
+#: AlertaDengue/dados/charts/states.py:194
+#, python-brace-format
+msgid "%{y} Cidades na semana %{customdata} <extra></extra>"
+msgstr "%{y} Cities in the week %{customdata}<extra></extra>"
 
 #: AlertaDengue/dados/charts/states.py:201
 msgid "Situação epidemiológica na regional de saúde"
@@ -2035,10 +2047,6 @@ msgstr ""
 msgid "Primeiro dia da semana epidemiológica (Domingo)"
 msgstr "First day of the epidemiological week (Sunday)"
 
-#: AlertaDengue/dados/templates/services_api.html:205
-msgid "SE"
-msgstr "EW"
-
 # #: AlertaDengue/dados/templates/services_api.html:205
 # msgid "SE"
 # msgstr "EW"
@@ -2354,15 +2362,15 @@ msgstr "sex"
 msgid "idades"
 msgstr "ages"
 
-#: AlertaDengue/dados/templates/state_cities.html:218
+#: AlertaDengue/dados/templates/state_cities.html:219
 msgid "Última atualização"
 msgstr "Last update"
 
-#: AlertaDengue/dados/templates/state_cities.html:226
+#: AlertaDengue/dados/templates/state_cities.html:227
 msgid "Descrição de filtro"
 msgstr "Filter description"
 
-#: AlertaDengue/dados/templates/state_cities.html:309
+#: AlertaDengue/dados/templates/state_cities.html:310
 msgid "Por favor, aguarde."
 msgstr "Please, wait."
 

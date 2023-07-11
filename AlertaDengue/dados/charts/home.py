@@ -10,7 +10,7 @@ import plotly.graph_objs as go
 from django.utils.translation import gettext as _
 
 
-def _create_scatter_chart(df: pd.DataFrame) -> str:
+def _create_scatter_chart(df: pd.DataFrame) -> go.Figure:
     """
     Create chart with historical data from data cases and cases_est.
 
@@ -44,11 +44,15 @@ def _create_scatter_chart(df: pd.DataFrame) -> str:
             ),
             width=0.5,
             text=df.index.map(lambda v: f"{str(v)[-2:]}"),
-            hovertemplate=_(
-                "<br>SE %{text}<br>"
-                "%{y:1f} Casos notificados"
-                "<extra></extra>"
-            ),
+            hovertemplate="%(label1)s %(week)s <br>"
+            "%(cases)s %(label2)s"
+            "<extra></extra>"
+            % {
+                "label1": _("SE"),
+                "week": "%{text}",
+                "cases": "%{y:1f}",
+                "label2": _("Casos Notificados"),
+            },
         )
     )
     traces.append(
@@ -59,11 +63,15 @@ def _create_scatter_chart(df: pd.DataFrame) -> str:
             name=_("Estimados"),
             line=dict(color="#4169e1", width=4),
             text=df.index.map(lambda v: f"{str(v)[-2:]}"),
-            hovertemplate=_(
-                "<br>SE %{text}<br>"
-                "%{y:1f} Casos estimados"
-                "<extra></extra>"
-            ),
+            hovertemplate="%(label1)s %(week)s <br>"
+            "%(cases)s %(label2)s"
+            "<extra></extra>"
+            % {
+                "label1": _("SE"),
+                "week": "%{text}",
+                "cases": "%{y:1f}",
+                "label2": _("Casos Estimados"),
+            },
         )
     )
 
@@ -148,7 +156,7 @@ def _create_scatter_chart(df: pd.DataFrame) -> str:
     return fig.to_html(full_html=False, include_plotlyjs=False, config=config)
 
 
-def _create_indicator_chart(df: pd.DataFrame, state_abbv: str) -> str:
+def _create_indicator_chart(df: pd.DataFrame, state_abbv: str) -> go.Figure:
     """
     Create the charts with the number of favorable cities for transmission
     when the receptivity is different from 0.
@@ -262,7 +270,7 @@ def _create_indicator_chart(df: pd.DataFrame, state_abbv: str) -> str:
     return fig.to_html(full_html=False, include_plotlyjs=False, config=config)
 
 
-def _create_stack_chart(df: pd.DataFrame) -> str:
+def _create_stack_chart(df: pd.DataFrame) -> go.Figure:
     """
     Create chart of the epidemiological situation of cities
     by levels in the week.
@@ -311,9 +319,13 @@ def _create_stack_chart(df: pd.DataFrame) -> str:
 
     fig.update_traces(
         customdata=df_alert.SE.map(lambda v: f"{str(v)[-2:]}"),
-        hovertemplate=_(
-            "%{y} Cidades na semana %{customdata} <extra></extra>"
-        ),
+        hovertemplate="%(cases)s %(label2)s %(week)s <br>"
+        "<extra></extra>"
+        % {
+            "label2": _("Cidades na Semana"),
+            "week": "%{customdata}",
+            "cases": "%{y:1f}",
+        },
     )
 
     fig.update_layout(
