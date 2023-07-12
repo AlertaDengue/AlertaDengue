@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-12 09:28-0300\n"
+"POT-Creation-Date: 2023-07-12 10:01-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,37 +67,37 @@ msgid "Casos"
 msgstr "Casos"
 
 #: AlertaDengue/dados/charts/cities.py:43
-#: AlertaDengue/dados/charts/cities.py:108
+#: AlertaDengue/dados/charts/cities.py:107
 msgid "alerta verde"
 msgstr "alerta verde"
 
 #: AlertaDengue/dados/charts/cities.py:44
-#: AlertaDengue/dados/charts/cities.py:109
+#: AlertaDengue/dados/charts/cities.py:108
 msgid "alerta amarelo"
 msgstr "alerta amarillo"
 
 #: AlertaDengue/dados/charts/cities.py:45
-#: AlertaDengue/dados/charts/cities.py:110
+#: AlertaDengue/dados/charts/cities.py:109
 msgid "alerta laranja"
 msgstr "alerta naranja"
 
 #: AlertaDengue/dados/charts/cities.py:46
-#: AlertaDengue/dados/charts/cities.py:111
+#: AlertaDengue/dados/charts/cities.py:110
 msgid "alerta vermelho"
 msgstr "alerta rojo"
 
 #: AlertaDengue/dados/charts/cities.py:48
-#: AlertaDengue/dados/charts/cities.py:78
+#: AlertaDengue/dados/charts/cities.py:77
 msgid "limiar epidêmico"
 msgstr "Umbral epidémico"
 
 #: AlertaDengue/dados/charts/cities.py:49
-#: AlertaDengue/dados/charts/cities.py:77
+#: AlertaDengue/dados/charts/cities.py:76
 msgid "limiar pós epidêmico"
 msgstr "Umbral post epidémico"
 
 #: AlertaDengue/dados/charts/cities.py:50
-#: AlertaDengue/dados/charts/cities.py:76
+#: AlertaDengue/dados/charts/cities.py:75
 msgid "limiar pré epidêmico"
 msgstr "Umbral pre epidémico"
 
@@ -108,9 +108,9 @@ msgstr "Notificaciones"
 #: AlertaDengue/dados/charts/cities.py:65
 #: AlertaDengue/dados/charts/cities.py:97
 #: AlertaDengue/dados/charts/cities.py:133
-#: AlertaDengue/dados/charts/cities.py:251
-#: AlertaDengue/dados/charts/cities.py:276
-#: AlertaDengue/dados/charts/cities.py:305
+#: AlertaDengue/dados/charts/cities.py:253
+#: AlertaDengue/dados/charts/cities.py:277
+#: AlertaDengue/dados/charts/cities.py:306
 #: AlertaDengue/dados/charts/cities.py:331
 #: AlertaDengue/dados/templates/alert_state/epiyears.html:27
 msgid "Semana"
@@ -121,11 +121,11 @@ msgstr "Semana"
 msgid "Incidências"
 msgstr "Incidencias"
 
-#: AlertaDengue/dados/charts/cities.py:146
+#: AlertaDengue/dados/charts/cities.py:144
 msgid "Limiares de incidência"
 msgstr "Umbrales de incidencia"
 
-#: AlertaDengue/dados/charts/cities.py:149
+#: AlertaDengue/dados/charts/cities.py:148
 msgid "pré epidêmico"
 msgstr "pre epidémico"
 
@@ -133,32 +133,32 @@ msgstr "pre epidémico"
 msgid "pós epidêmico"
 msgstr "pre epidémico"
 
-#: AlertaDengue/dados/charts/cities.py:153
+#: AlertaDengue/dados/charts/cities.py:154
 msgid "epidêmico"
 msgstr "epidémico"
 
-#: AlertaDengue/dados/charts/cities.py:158
-#: AlertaDengue/dados/charts/cities.py:354
+#: AlertaDengue/dados/charts/cities.py:160
+#: AlertaDengue/dados/charts/cities.py:353
 msgid "Período (Ano/Semana)"
 msgstr "Período (Año/Semana)"
 
-#: AlertaDengue/dados/charts/cities.py:173
+#: AlertaDengue/dados/charts/cities.py:175
 msgid "Incidência"
 msgstr "Incidencia"
 
-#: AlertaDengue/dados/charts/cities.py:196 AlertaDengue/dados/charts/home.py:54
+#: AlertaDengue/dados/charts/cities.py:198 AlertaDengue/dados/charts/home.py:54
 #: AlertaDengue/dados/charts/states.py:71
 msgid "Casos Notificados"
 msgstr "Casos Notificados"
 
-#: AlertaDengue/dados/charts/cities.py:266
-#: AlertaDengue/dados/charts/cities.py:278
-#: AlertaDengue/dados/charts/cities.py:321
+#: AlertaDengue/dados/charts/cities.py:267
+#: AlertaDengue/dados/charts/cities.py:279
+#: AlertaDengue/dados/charts/cities.py:320
 #: AlertaDengue/dados/charts/cities.py:333
 msgid "Limiar favorável"
 msgstr "Umbral favorable"
 
-#: AlertaDengue/dados/charts/cities.py:352
+#: AlertaDengue/dados/charts/cities.py:351
 msgid "Condições climáticas para transmissão"
 msgstr "Condiciones climáticas para transmisión"
 
@@ -1683,8 +1683,6 @@ msgid "Vermelho"
 msgstr "Rojo"
 
 #: AlertaDengue/dados/templates/report_city.html:236
-#, fuzzy, python-format
-#| msgid "incidência alta, acima dos 90% históricos"
 msgid "incidência alta, acima dos 90%% históricos"
 msgstr "incidencia alta, por encima del 90% histórico"
 
@@ -2251,10 +2249,8 @@ msgid "notif_accum_year"
 msgstr "notif_accum_year"
 
 #: AlertaDengue/dados/templates/services_api.html:226
-#, fuzzy
-#| msgid "Número de casos estimados na semana"
 msgid "Número acumulado de casos no ano"
-msgstr "Número de casos estimados en la semana"
+msgstr "Número de casos acumulados en el año"
 
 #: AlertaDengue/dados/templates/services_api_doc.html:57
 msgid "Doc"
@@ -2539,10 +2535,6 @@ msgid "Alunos"
 msgstr "Estudiantes"
 
 #: AlertaDengue/dados/templates/team.html:59
-#, fuzzy
-#| msgid ""
-#| "Aluno de doutorado do Programa de Epidemiologia em Saúde Pública - ENSP/"
-#| "Fiocruz"
 msgid ""
 "Aluna de doutorado do Programa de Epidemiologia em Saúde Pública - ENSP/"
 "Fiocruz"
@@ -2650,11 +2642,6 @@ msgstr "% humedad media del aire"
 #, python-format
 msgid "% umidade máxima do ar"
 msgstr "% humedad máxima del aire"
-
-#: AlertaDengue/dados/views.py:1004
-#, python-format
-msgid "%(month)s"
-msgstr "%(Amarillo)s"
 
 #: AlertaDengue/dbf/forms.py:19
 msgid "Data da exportação"
@@ -2925,40 +2912,3 @@ msgstr "Tu nombre de usuario, en caso de que lo hayas olvidado, es:"
 #: AlertaDengue/templates/registration/password_reset_email.html:12
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Gracias por usar InfoDengue"
-
-#~ msgid "Municipio"
-#~ msgstr "Municipio"
-
-#~ msgid "Abrir Informe"
-#~ msgstr "Abrir Informe"
-
-#~ msgid "Tipo de Informe"
-#~ msgstr "Tipo de Informe"
-
-#~ msgid "Seleccione el tipo de informe"
-#~ msgstr "Seleccione el tipo de informe"
-
-#, fuzzy
-#~| msgid "Temperatura Crítica"
-#~ msgid "temperatura"
-#~ msgstr "Temperatura Crítica"
-
-#, fuzzy, python-format
-#~| msgid "Número de casos estimados na semana"
-#~ msgid "número mínimo de casos estimados (IC 95%%)"
-#~ msgstr "Número de casos estimados en la semana"
-
-#, fuzzy, python-format
-#~| msgid "Número de casos estimados na semana"
-#~ msgid "número máximo de casos estimados (IC 95%%)"
-#~ msgstr "Número de casos estimados en la semana"
-
-#~ msgid "Full Stack TI"
-#~ msgstr "Full Stack TI"
-
-#~ msgid ""
-#~ "Aluna de graduação do Programa de Matemática Aplicada da FGV e PIBIC da "
-#~ "Fiocruz"
-#~ msgstr ""
-#~ "Estudiante de pregrado del \"Programa de Matemática Aplicada da FGV e "
-#~ "PIBIC da Fiocruz\""

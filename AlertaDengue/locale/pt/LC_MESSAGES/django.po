@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-12 09:12-0300\n"
+"POT-Creation-Date: 2023-07-12 10:01-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,37 +68,37 @@ msgid "Casos"
 msgstr ""
 
 #: AlertaDengue/dados/charts/cities.py:43
-#: AlertaDengue/dados/charts/cities.py:108
+#: AlertaDengue/dados/charts/cities.py:107
 msgid "alerta verde"
 msgstr ""
 
 #: AlertaDengue/dados/charts/cities.py:44
-#: AlertaDengue/dados/charts/cities.py:109
+#: AlertaDengue/dados/charts/cities.py:108
 msgid "alerta amarelo"
 msgstr ""
 
 #: AlertaDengue/dados/charts/cities.py:45
-#: AlertaDengue/dados/charts/cities.py:110
+#: AlertaDengue/dados/charts/cities.py:109
 msgid "alerta laranja"
 msgstr ""
 
 #: AlertaDengue/dados/charts/cities.py:46
-#: AlertaDengue/dados/charts/cities.py:111
+#: AlertaDengue/dados/charts/cities.py:110
 msgid "alerta vermelho"
 msgstr ""
 
 #: AlertaDengue/dados/charts/cities.py:48
-#: AlertaDengue/dados/charts/cities.py:78
+#: AlertaDengue/dados/charts/cities.py:77
 msgid "limiar epidêmico"
 msgstr ""
 
 #: AlertaDengue/dados/charts/cities.py:49
-#: AlertaDengue/dados/charts/cities.py:77
+#: AlertaDengue/dados/charts/cities.py:76
 msgid "limiar pós epidêmico"
 msgstr ""
 
 #: AlertaDengue/dados/charts/cities.py:50
-#: AlertaDengue/dados/charts/cities.py:76
+#: AlertaDengue/dados/charts/cities.py:75
 msgid "limiar pré epidêmico"
 msgstr ""
 
@@ -109,9 +109,9 @@ msgstr ""
 #: AlertaDengue/dados/charts/cities.py:65
 #: AlertaDengue/dados/charts/cities.py:97
 #: AlertaDengue/dados/charts/cities.py:133
-#: AlertaDengue/dados/charts/cities.py:251
-#: AlertaDengue/dados/charts/cities.py:276
-#: AlertaDengue/dados/charts/cities.py:305
+#: AlertaDengue/dados/charts/cities.py:253
+#: AlertaDengue/dados/charts/cities.py:277
+#: AlertaDengue/dados/charts/cities.py:306
 #: AlertaDengue/dados/charts/cities.py:331
 #: AlertaDengue/dados/templates/alert_state/epiyears.html:27
 msgid "Semana"
@@ -122,11 +122,11 @@ msgstr ""
 msgid "Incidências"
 msgstr ""
 
-#: AlertaDengue/dados/charts/cities.py:146
+#: AlertaDengue/dados/charts/cities.py:144
 msgid "Limiares de incidência"
 msgstr ""
 
-#: AlertaDengue/dados/charts/cities.py:149
+#: AlertaDengue/dados/charts/cities.py:148
 msgid "pré epidêmico"
 msgstr ""
 
@@ -134,32 +134,32 @@ msgstr ""
 msgid "pós epidêmico"
 msgstr ""
 
-#: AlertaDengue/dados/charts/cities.py:153
+#: AlertaDengue/dados/charts/cities.py:154
 msgid "epidêmico"
 msgstr ""
 
-#: AlertaDengue/dados/charts/cities.py:158
-#: AlertaDengue/dados/charts/cities.py:354
+#: AlertaDengue/dados/charts/cities.py:160
+#: AlertaDengue/dados/charts/cities.py:353
 msgid "Período (Ano/Semana)"
 msgstr ""
 
-#: AlertaDengue/dados/charts/cities.py:173
+#: AlertaDengue/dados/charts/cities.py:175
 msgid "Incidência"
 msgstr ""
 
-#: AlertaDengue/dados/charts/cities.py:196 AlertaDengue/dados/charts/home.py:54
+#: AlertaDengue/dados/charts/cities.py:198 AlertaDengue/dados/charts/home.py:54
 #: AlertaDengue/dados/charts/states.py:71
 msgid "Casos Notificados"
 msgstr ""
 
-#: AlertaDengue/dados/charts/cities.py:266
-#: AlertaDengue/dados/charts/cities.py:278
-#: AlertaDengue/dados/charts/cities.py:321
+#: AlertaDengue/dados/charts/cities.py:267
+#: AlertaDengue/dados/charts/cities.py:279
+#: AlertaDengue/dados/charts/cities.py:320
 #: AlertaDengue/dados/charts/cities.py:333
 msgid "Limiar favorável"
 msgstr ""
 
-#: AlertaDengue/dados/charts/cities.py:352
+#: AlertaDengue/dados/charts/cities.py:351
 msgid "Condições climáticas para transmissão"
 msgstr ""
 
