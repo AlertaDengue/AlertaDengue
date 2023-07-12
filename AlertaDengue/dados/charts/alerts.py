@@ -122,6 +122,7 @@ class AlertCitiesCharts:
         fig = go.Figure()
 
         fig.add_trace(
+            # Notified cases
             go.Scatter(
                 x=pd.to_datetime(df_dados.dia, unit="s"),
                 y=df_dados.casos,
@@ -129,88 +130,113 @@ class AlertCitiesCharts:
                 name=_("Casos Notificados de ") + disease_label,
                 line={"color": "#4572A7"},
                 text=df_dados.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hovertemplate=_(
-                    "%{x} <br>"
-                    "Semana: %{text} <br>"
-                    "%{y} Casos Estimados"
-                    "<extra></extra>"
-                ),
+                hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
+                "%(cases)s %(label2)s"
+                "<extra></extra>"
+                % {
+                    "label0": "%{x}",
+                    "label1": _("SE"),
+                    "week": "%{text}",
+                    "cases": "%{y:1f}",
+                    "label2": _("Casos Estimados"),
+                },
             )
         )
 
         fig.add_trace(
+            # Green alert
             go.Scatter(
                 x=pd.to_datetime(df_verde.dia, unit="s"),
                 y=df_verde.casos,
                 name=_("Alerta Verde de ") + disease_label,
                 marker={"color": "#48FD48"},
                 text=df_verde.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hovertemplate=_(
-                    "%{x} <br>"
-                    "Semana: %{text} <br>"
-                    "%{y} Casos Estimados"
-                    "<extra></extra>"
-                ),
+                hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
+                "%(cases)s %(label2)s"
+                "<extra></extra>"
+                % {
+                    "label0": "%{x}",
+                    "label1": _("SE"),
+                    "week": "%{text}",
+                    "cases": "%{y:1f}",
+                    "label2": _("Casos Estimados"),
+                },
                 stackgroup="one",
                 fill=None,
             )
         )
 
         fig.add_trace(
+            # Yellow alert
             go.Scatter(
                 x=pd.to_datetime(df_amarelo.dia, unit="s"),
                 y=df_amarelo.casos,
                 name=_("Alerta Amarelo de ") + disease_label,
                 marker={"color": "#FBFC49"},
                 text=df_amarelo.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hovertemplate=_(
-                    "%{x} <br>"
-                    "Semana: %{text} <br>"
-                    "%{y} Casos Estimados"
-                    "<extra></extra>"
-                ),
+                hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
+                "%(cases)s %(label2)s"
+                "<extra></extra>"
+                % {
+                    "label0": "%{x}",
+                    "label1": _("SE"),
+                    "week": "%{text}",
+                    "cases": "%{y:1f}",
+                    "label2": _("Casos Estimados"),
+                },
                 stackgroup="one",
                 line=dict(width=0),
             )
         )
 
         fig.add_trace(
+            # Orange alert
             go.Scatter(
                 x=pd.to_datetime(df_laranja.dia, unit="s"),
                 y=df_laranja.casos,
                 name=_("Alerta Laranja de ") + disease_label,
                 marker={"color": "#FFA858"},
                 text=df_laranja.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hovertemplate=_(
-                    "%{x} <br>"
-                    "Semana: %{text} <br>"
-                    "%{y} Casos Estimados"
-                    "<extra></extra>"
-                ),
+                hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
+                "%(cases)s %(label2)s"
+                "<extra></extra>"
+                % {
+                    "label0": "%{x}",
+                    "label1": _("SE"),
+                    "week": "%{text}",
+                    "cases": "%{y:1f}",
+                    "label2": _("Casos Estimados"),
+                },
                 stackgroup="one",
                 line=dict(width=0),
             )
         )
 
         fig.add_trace(
+            # Red alert
             go.Scatter(
                 x=pd.to_datetime(df_vermelho.dia, unit="s"),
                 y=df_vermelho.casos,
                 name=_("Alerta Vermelho de ") + disease_label,
                 marker={"color": "#FB4949"},
                 text=df_vermelho.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hovertemplate=_(
-                    "%{x} <br>"
-                    "Semana: %{text} <br>"
-                    "%{y} Casos Estimados"
-                    "<extra></extra>"
-                ),
+                hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
+                "%(cases)s %(label2)s"
+                "<extra></extra>"
+                % {
+                    "label0": "%{x}",
+                    "label1": _("SE"),
+                    "week": "%{text}",
+                    "cases": "%{y:1f}",
+                    "label2": _("Casos Estimados"),
+                },
                 stackgroup="one",
                 line=dict(width=0),
             )
         )
 
         fig.add_trace(
+            # Estimated cases
             go.Scatter(
                 x=pd.to_datetime(df_dados.dia, unit="s"),
                 y=df_dados.casos_est,
@@ -218,9 +244,16 @@ class AlertCitiesCharts:
                 name=_("Casos Estimados de ") + disease_label,
                 line={"color": "#AA4643", "dash": "dot"},
                 text=df_dados.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hovertemplate=_(
-                    "%{x} <br>" "Semana: %{text} <br>" "%{y} Casos Estimados"
-                ),
+                hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
+                "%(cases)s %(label2)s"
+                "<extra></extra>"
+                % {
+                    "label0": "%{x}",
+                    "label1": _("SE"),
+                    "week": "%{text}",
+                    "cases": "%{y:1f}",
+                    "label2": _("Casos Estimados"),
+                },
             )
         )
 

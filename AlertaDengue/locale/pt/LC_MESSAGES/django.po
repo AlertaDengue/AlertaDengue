@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-12 10:01-0300\n"
+"POT-Creation-Date: 2023-07-12 12:18-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,41 +22,49 @@ msgstr ""
 msgid "Casos Notificados de "
 msgstr ""
 
-#: AlertaDengue/dados/charts/alerts.py:133
-#: AlertaDengue/dados/charts/alerts.py:149
-#: AlertaDengue/dados/charts/alerts.py:167
-#: AlertaDengue/dados/charts/alerts.py:185
-#: AlertaDengue/dados/charts/alerts.py:203
-#, python-brace-format
-msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados<extra></extra>"
+#: AlertaDengue/dados/charts/alerts.py:136
+#: AlertaDengue/dados/charts/alerts.py:155
+#: AlertaDengue/dados/charts/alerts.py:176
+#: AlertaDengue/dados/charts/alerts.py:197
+#: AlertaDengue/dados/charts/alerts.py:218
+#: AlertaDengue/dados/charts/alerts.py:240 AlertaDengue/dados/charts/home.py:51
+#: AlertaDengue/dados/charts/home.py:70 AlertaDengue/dados/charts/states.py:68
+#: AlertaDengue/dados/charts/states.py:89
+#: AlertaDengue/dados/templates/services_api.html:205
+msgid "SE"
 msgstr ""
 
-#: AlertaDengue/dados/charts/alerts.py:145
+#: AlertaDengue/dados/charts/alerts.py:139
+#: AlertaDengue/dados/charts/alerts.py:158
+#: AlertaDengue/dados/charts/alerts.py:179
+#: AlertaDengue/dados/charts/alerts.py:200
+#: AlertaDengue/dados/charts/alerts.py:221
+#: AlertaDengue/dados/charts/alerts.py:243 AlertaDengue/dados/charts/home.py:73
+#: AlertaDengue/dados/charts/states.py:92
+msgid "Casos Estimados"
+msgstr ""
+
+#: AlertaDengue/dados/charts/alerts.py:148
 msgid "Alerta Verde de "
 msgstr ""
 
-#: AlertaDengue/dados/charts/alerts.py:163
+#: AlertaDengue/dados/charts/alerts.py:169
 msgid "Alerta Amarelo de "
 msgstr ""
 
-#: AlertaDengue/dados/charts/alerts.py:181
+#: AlertaDengue/dados/charts/alerts.py:190
 msgid "Alerta Laranja de "
 msgstr ""
 
-#: AlertaDengue/dados/charts/alerts.py:199
+#: AlertaDengue/dados/charts/alerts.py:211
 msgid "Alerta Vermelho de "
 msgstr ""
 
-#: AlertaDengue/dados/charts/alerts.py:218
+#: AlertaDengue/dados/charts/alerts.py:233
 msgid "Casos Estimados de "
 msgstr ""
 
-#: AlertaDengue/dados/charts/alerts.py:222
-#, python-brace-format
-msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
-msgstr ""
-
-#: AlertaDengue/dados/charts/alerts.py:233
+#: AlertaDengue/dados/charts/alerts.py:254
 #: AlertaDengue/dados/charts/cities.py:68 AlertaDengue/dados/charts/home.py:99
 #: AlertaDengue/dados/charts/states.py:119
 #: AlertaDengue/dados/templates/alert_state/age.html:125
@@ -167,19 +175,8 @@ msgstr ""
 msgid "Registrados"
 msgstr ""
 
-#: AlertaDengue/dados/charts/home.py:51 AlertaDengue/dados/charts/home.py:70
-#: AlertaDengue/dados/charts/states.py:68
-#: AlertaDengue/dados/charts/states.py:89
-#: AlertaDengue/dados/templates/services_api.html:205
-msgid "SE"
-msgstr ""
-
 #: AlertaDengue/dados/charts/home.py:63 AlertaDengue/dados/charts/states.py:82
 msgid "Estimados"
-msgstr ""
-
-#: AlertaDengue/dados/charts/home.py:73 AlertaDengue/dados/charts/states.py:92
-msgid "Casos Estimados"
 msgstr ""
 
 #: AlertaDengue/dados/charts/home.py:84

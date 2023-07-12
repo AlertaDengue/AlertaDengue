@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-12 10:01-0300\n"
+"POT-Creation-Date: 2023-07-12 12:32-0300\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -20,45 +20,53 @@ msgstr ""
 "X-Source-Language: pt_BR\n"
 "X-Generator: Poedit 1.8.7.1\n"
 
-#: AlertaDengue/dados/charts/alerts.py:129
+#: AlertaDengue/dados/charts/alerts.py:130
 msgid "Casos Notificados de "
 msgstr "Reported cases of "
 
-#: AlertaDengue/dados/charts/alerts.py:133
-#: AlertaDengue/dados/charts/alerts.py:149
-#: AlertaDengue/dados/charts/alerts.py:167
-#: AlertaDengue/dados/charts/alerts.py:185
-#: AlertaDengue/dados/charts/alerts.py:203
-#, python-brace-format
-msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados<extra></extra>"
-msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
+#: AlertaDengue/dados/charts/alerts.py:138
+#: AlertaDengue/dados/charts/alerts.py:159
+#: AlertaDengue/dados/charts/alerts.py:182
+#: AlertaDengue/dados/charts/alerts.py:205
+#: AlertaDengue/dados/charts/alerts.py:228
+#: AlertaDengue/dados/charts/alerts.py:252 AlertaDengue/dados/charts/home.py:51
+#: AlertaDengue/dados/charts/home.py:70 AlertaDengue/dados/charts/states.py:68
+#: AlertaDengue/dados/charts/states.py:89
+#: AlertaDengue/dados/templates/services_api.html:205
+msgid "SE"
+msgstr "EW"
 
-#: AlertaDengue/dados/charts/alerts.py:145
+#: AlertaDengue/dados/charts/alerts.py:141
+#: AlertaDengue/dados/charts/alerts.py:162
+#: AlertaDengue/dados/charts/alerts.py:185
+#: AlertaDengue/dados/charts/alerts.py:208
+#: AlertaDengue/dados/charts/alerts.py:231
+#: AlertaDengue/dados/charts/alerts.py:255 AlertaDengue/dados/charts/home.py:73
+#: AlertaDengue/dados/charts/states.py:92
+msgid "Casos Estimados"
+msgstr "Estimated Cases"
+
+#: AlertaDengue/dados/charts/alerts.py:151
 msgid "Alerta Verde de "
 msgstr "Green Level for "
 
-#: AlertaDengue/dados/charts/alerts.py:163
+#: AlertaDengue/dados/charts/alerts.py:174
 msgid "Alerta Amarelo de "
 msgstr "Yellow Level for "
 
-#: AlertaDengue/dados/charts/alerts.py:181
+#: AlertaDengue/dados/charts/alerts.py:197
 msgid "Alerta Laranja de "
 msgstr "Orange Level for "
 
-#: AlertaDengue/dados/charts/alerts.py:199
+#: AlertaDengue/dados/charts/alerts.py:220
 msgid "Alerta Vermelho de "
 msgstr "Red Level for "
 
-#: AlertaDengue/dados/charts/alerts.py:218
+#: AlertaDengue/dados/charts/alerts.py:244
 msgid "Casos Estimados de "
 msgstr "Estimated cases of "
 
-#: AlertaDengue/dados/charts/alerts.py:222
-#, python-brace-format
-msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
-msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
-
-#: AlertaDengue/dados/charts/alerts.py:233
+#: AlertaDengue/dados/charts/alerts.py:266
 #: AlertaDengue/dados/charts/cities.py:68 AlertaDengue/dados/charts/home.py:99
 #: AlertaDengue/dados/charts/states.py:119
 #: AlertaDengue/dados/templates/alert_state/age.html:125
@@ -169,20 +177,9 @@ msgstr "Climatic conditions for transmission"
 msgid "Registrados"
 msgstr "Registered"
 
-#: AlertaDengue/dados/charts/home.py:51 AlertaDengue/dados/charts/home.py:70
-#: AlertaDengue/dados/charts/states.py:68
-#: AlertaDengue/dados/charts/states.py:89
-#: AlertaDengue/dados/templates/services_api.html:205
-msgid "SE"
-msgstr "EW"
-
 #: AlertaDengue/dados/charts/home.py:63 AlertaDengue/dados/charts/states.py:82
 msgid "Estimados"
 msgstr "Estimated"
-
-#: AlertaDengue/dados/charts/home.py:73 AlertaDengue/dados/charts/states.py:92
-msgid "Casos Estimados"
-msgstr "Estimated Cases"
 
 #: AlertaDengue/dados/charts/home.py:84
 msgid "Total de casos no estado"
@@ -2071,6 +2068,8 @@ msgid "cases_est_min and cases_est_max"
 msgstr "cases_est_min and cases_est_max"
 
 #: AlertaDengue/dados/templates/services_api.html:207
+#, fuzzy, python-format
+#| msgid "Intervalo de credibilidade de 95%% do número estimado de casos"
 msgid "Intervalo de credibilidade de 95%% do número estimado de casos"
 msgstr "95% credible interval of the estimated number of cases"
 
@@ -2576,14 +2575,20 @@ msgid "°C temperatura máxima"
 msgstr "°C Maximum temperature"
 
 #: AlertaDengue/dados/views.py:848
+#, fuzzy, python-format
+#| msgid "% umidade mínima do ar"
 msgid "% umidade mínima do ar"
 msgstr "% Minimum air humidity"
 
 #: AlertaDengue/dados/views.py:849
+#, fuzzy, python-format
+#| msgid "% umidade média do ar"
 msgid "% umidade média do ar"
 msgstr "% Average air humidity"
 
 #: AlertaDengue/dados/views.py:850
+#, fuzzy, python-format
+#| msgid "% umidade máxima do ar"
 msgid "% umidade máxima do ar"
 msgstr "% Maximum air humidity"
 
@@ -2869,3 +2874,11 @@ msgstr "Your username, if you have forgotten it, is:"
 #: AlertaDengue/templates/registration/password_reset_email.html:12
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
+
+#, python-brace-format
+#~ msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados<extra></extra>"
+#~ msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases<extra></extra>"
+
+#, python-brace-format
+#~ msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
+#~ msgstr "%{x} <br>Week: %{text} <br>%{y} Estimated Cases"
