@@ -156,7 +156,7 @@ def _create_scatter_chart(df: pd.DataFrame) -> go.Figure:
     return fig.to_html(full_html=False, include_plotlyjs=False, config=config)
 
 
-def _create_indicator_chart(df: pd.DataFrame, state_abbv: str) -> go.Figure:
+def _create_indicator_chart(df: pd.DataFrame, state_abbv: str) -> go.Indicator:
     """
     Create the charts with the number of favorable cities for transmission
     when the receptivity is different from 0.
@@ -270,7 +270,7 @@ def _create_indicator_chart(df: pd.DataFrame, state_abbv: str) -> go.Figure:
     return fig.to_html(full_html=False, include_plotlyjs=False, config=config)
 
 
-def _create_stack_chart(df: pd.DataFrame) -> go.Figure:
+def _create_stack_chart(df: pd.DataFrame) -> px.bar():
     """
     Create chart of the epidemiological situation of cities
     by levels in the week.

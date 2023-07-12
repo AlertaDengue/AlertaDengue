@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-11 19:58-0300\n"
+"POT-Creation-Date: 2023-07-12 07:12-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,7 +56,7 @@ msgid "%{x} <br>Semana: %{text} <br>%{y} Casos Estimados"
 msgstr ""
 
 #: AlertaDengue/dados/charts/alerts.py:233 AlertaDengue/dados/charts/home.py:99
-#: AlertaDengue/dados/charts/states.py:89
+#: AlertaDengue/dados/charts/states.py:120
 #: AlertaDengue/dados/templates/alert_state/age.html:125
 #: AlertaDengue/dados/templates/alert_state/date.html:100
 #: AlertaDengue/dados/templates/alert_state/disease.html:122
@@ -141,6 +141,7 @@ msgid "Incidência"
 msgstr ""
 
 #: AlertaDengue/dados/charts/cities.py:168 AlertaDengue/dados/charts/home.py:54
+#: AlertaDengue/dados/charts/states.py:72
 msgid "Casos Notificados"
 msgstr "Casos Notificados"
 
@@ -163,20 +164,22 @@ msgstr ""
 msgid "Condições climáticas para transmissão"
 msgstr ""
 
-#: AlertaDengue/dados/charts/home.py:40 AlertaDengue/dados/charts/states.py:38
+#: AlertaDengue/dados/charts/home.py:40 AlertaDengue/dados/charts/states.py:58
 msgid "Registrados"
 msgstr "Registrados"
 
 #: AlertaDengue/dados/charts/home.py:51 AlertaDengue/dados/charts/home.py:70
+#: AlertaDengue/dados/charts/states.py:69
+#: AlertaDengue/dados/charts/states.py:90
 #: AlertaDengue/dados/templates/services_api.html:205
 msgid "SE"
 msgstr "SE"
 
-#: AlertaDengue/dados/charts/home.py:63 AlertaDengue/dados/charts/states.py:57
+#: AlertaDengue/dados/charts/home.py:63 AlertaDengue/dados/charts/states.py:83
 msgid "Estimados"
 msgstr "Estimados"
 
-#: AlertaDengue/dados/charts/home.py:73
+#: AlertaDengue/dados/charts/home.py:73 AlertaDengue/dados/charts/states.py:93
 msgid "Casos Estimados"
 msgstr "Casos Estimados"
 
@@ -185,8 +188,9 @@ msgid "Total de casos no estado"
 msgstr "Total de casos en el estado"
 
 #: AlertaDengue/dados/charts/home.py:89 AlertaDengue/dados/charts/home.py:233
-#: AlertaDengue/dados/charts/home.py:354 AlertaDengue/dados/charts/states.py:79
-#: AlertaDengue/dados/charts/states.py:225
+#: AlertaDengue/dados/charts/home.py:354
+#: AlertaDengue/dados/charts/states.py:110
+#: AlertaDengue/dados/charts/states.py:269
 #: AlertaDengue/dados/templates/report_city.html:81
 #: AlertaDengue/dados/templates/report_city.html:254
 #: AlertaDengue/dados/templates/report_state.html:43
@@ -200,42 +204,26 @@ msgid "Cidades com clima favorável <br>para transmissão"
 msgstr "Ciudades con clima favorable <br>para la transmisión"
 
 #: AlertaDengue/dados/charts/home.py:325
+#: AlertaDengue/dados/charts/states.py:237
 msgid "Cidades na Semana"
-msgstr "Ciudades en la semana"
+msgstr "Ciudades en la Semana"
 
 #: AlertaDengue/dados/charts/home.py:333
 msgid "Situação epidemiológica das cidades"
 msgstr "Situación epidemiológica de las ciudades"
 
 #: AlertaDengue/dados/charts/home.py:364
-#: AlertaDengue/dados/charts/states.py:235
+#: AlertaDengue/dados/charts/states.py:279
 msgid "Número de cidades"
 msgstr "Número de ciudades"
 
-#: AlertaDengue/dados/charts/states.py:46
-#, python-brace-format
-msgid "<br>SE %{text}<br>%{y:1f} Casos notificados<extra></extra>"
-msgstr ""
-
-#: AlertaDengue/dados/charts/states.py:61
-#, python-brace-format
-msgid "<br>SE %{text}<br>%{y:1f} Casos estimados<extra></extra>"
-msgstr ""
-
-#: AlertaDengue/dados/charts/states.py:74
+#: AlertaDengue/dados/charts/states.py:105
 msgid "Total de casos na regional de saúde"
-msgstr ""
+msgstr "Total de casos en la regional de salud"
 
-#: AlertaDengue/dados/charts/states.py:194
-#, python-brace-format
-msgid "%{y} Cidades na semana %{customdata} <extra></extra>"
-msgstr ""
-
-#: AlertaDengue/dados/charts/states.py:201
-#, fuzzy
-#| msgid "Epidemiologia"
+#: AlertaDengue/dados/charts/states.py:245
 msgid "Situação epidemiológica na regional de saúde"
-msgstr "Epidemiología"
+msgstr "Situación epidemiológica en la regional de salud"
 
 #: AlertaDengue/dados/models.py:17 AlertaDengue/forecast/models.py:99
 msgid "Código do Município"
@@ -684,7 +672,7 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:130
 msgid "Código de Cores:"
-msgstr "Código de los Colores:"
+msgstr "Código de Colores:"
 
 #: AlertaDengue/dados/templates/about.html:132
 msgid "/static/img/table_color_level_pt.png"
@@ -1326,13 +1314,11 @@ msgstr ""
 #: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:82
 #: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:121
 msgid "Municípios na regional"
-msgstr ""
+msgstr "Municipios por regional"
 
 #: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:49
-#, fuzzy
-#| msgid "Código do Município"
 msgid "Municípios"
-msgstr "Código de la municipalidad"
+msgstr "Municipios"
 
 #: AlertaDengue/dados/templates/components/searchbox/searchbox.html:19
 msgid "Encontre um município"
@@ -1918,7 +1904,7 @@ msgid ""
 msgstr ""
 "\n"
 " Este es el informe resumido de la situación de alerta de arbovirosis en \n"
-" el estado, detallado por Región de Salud. Para acceder a estadísticas\n"
+" el estado, detallado por Regional de Salud. Para acceder a estadísticas\n"
 " generales del estado, consulte la"
 
 #: AlertaDengue/dados/templates/report_state.html:49

@@ -19,18 +19,37 @@ class ReportStateCharts:
     def create_notific_chart(
         cls,
         df: pd.DataFrame,
-    ) -> str:
+    ) -> go.Figure:
+        """
+        Create a notification chart using a DataFrame.
 
+        Parameters
+        ----------
+            df (pd.DataFrame): The input DataFrame.
+
+        Returns
+        -------
+            go.Figure[str]: The generated notification chart.
+        """
+
+        # Create a deep copy of the DataFrame and sort it
+        # by 'SE' column in ascending order
         df_cp = deepcopy(
             df.sort_values(by=["SE"], ascending=True).reset_index(drop=True)
         )
 
+        # Group the DataFrame by 'SE' column and sum
+        # the 'casos_est' and 'casos' columns
         keys = ["casos_est", "casos"]
         df = df_cp.groupby(["SE"])[keys].sum()
 
+        # Format the 'SE' index column to display as 'yyyy/mm'
         df["SE"] = df.index.map(lambda v: f"{str(v)[:4]}/{str(v)[-2:]}")
+
+        # Create a list to hold the plotly traces
         traces = []
 
+        # Create a bar trace for the 'casos' column
         traces.append(
             go.Bar(
                 x=df["SE"],
@@ -42,13 +61,19 @@ class ReportStateCharts:
                 ),
                 width=0.5,
                 text=df.index.map(lambda v: f"{str(v)[-2:]}"),
-                hovertemplate=_(
-                    "<br>SE %{text}<br>"
-                    "%{y:1f} Casos notificados"
-                    "<extra></extra>"
-                ),
+                hovertemplate="%(label1)s %(week)s <br>"
+                "%(cases)s %(label2)s"
+                "<extra></extra>"
+                % {
+                    "label1": _("SE"),
+                    "week": "%{text}",
+                    "cases": "%{y:1f}",
+                    "label2": _("Casos Notificados"),
+                },
             )
         )
+
+        # Create a scatter trace for the 'casos_est' column
         traces.append(
             go.Scatter(
                 mode="lines+markers",
@@ -57,14 +82,19 @@ class ReportStateCharts:
                 name=_("Estimados"),
                 line=dict(color="#ffa500", width=4),
                 text=df.index.map(lambda v: f"{str(v)[-2:]}"),
-                hovertemplate=_(
-                    "<br>SE %{text}<br>"
-                    "%{y:1f} Casos estimados"
-                    "<extra></extra>"
-                ),
+                hovertemplate="%(label1)s %(week)s <br>"
+                "%(cases)s %(label2)s"
+                "<extra></extra>"
+                % {
+                    "label1": _("SE"),
+                    "week": "%{text}",
+                    "cases": "%{y:1f}",
+                    "label2": _("Casos Estimados"),
+                },
             )
         )
 
+        # Create a dictionary to hold the figure data and layout
         dict_of_fig = dict(
             {
                 "data": traces,
@@ -123,7 +153,6 @@ class ReportStateCharts:
                 ),
             }
         )
-
         fig = go.Figure(dict_of_fig)
 
         config = {
@@ -146,7 +175,19 @@ class ReportStateCharts:
     def create_level_chart(
         cls,
         df: pd.DataFrame,
-    ) -> str:
+    ) -> px.bar:
+        """
+        Create a level chart using a DataFrame.
+
+        Parameters
+        ----------
+            df (pd.DataFrame): The input DataFrame.
+
+        Returns
+        -------
+            px.bar(): The generated level chart.
+        """
+
         df_nivel = (
             df.groupby(["SE", "nivel"])["municipio_geocodigo"]
             .count()
@@ -190,9 +231,13 @@ class ReportStateCharts:
 
         fig.update_traces(
             customdata=df_alert.SE.map(lambda v: f"{str(v)[-2:]}"),
-            hovertemplate=_(
-                "%{y} Cidades na semana %{customdata} <extra></extra>"
-            ),
+            hovertemplate="%(cases)s %(label2)s %(week)s <br>"
+            "<extra></extra>"
+            % {
+                "cases": "%{y:1f}",
+                "label2": _("Cidades na Semana"),
+                "week": "%{customdata}",
+            },
         )
 
         fig.update_layout(
