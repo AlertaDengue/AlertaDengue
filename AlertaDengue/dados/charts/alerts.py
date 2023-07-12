@@ -127,7 +127,7 @@ class AlertCitiesCharts:
                 x=pd.to_datetime(df_dados.dia, unit="s"),
                 y=df_dados.casos,
                 mode="lines",
-                name=_("Casos Notificados de ") + disease_label,
+                name=_("Casos Notificados"),
                 line={"color": "#4572A7"},
                 text=df_dados.SE.map(lambda v: "{}".format(str(v)[-2:])),
                 hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
@@ -148,7 +148,7 @@ class AlertCitiesCharts:
             go.Scatter(
                 x=pd.to_datetime(df_verde.dia, unit="s"),
                 y=df_verde.casos,
-                name=_("Alerta Verde de ") + disease_label,
+                name=_("Alerta Verde"),
                 marker={"color": "#48FD48"},
                 text=df_verde.SE.map(lambda v: "{}".format(str(v)[-2:])),
                 hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
@@ -171,7 +171,7 @@ class AlertCitiesCharts:
             go.Scatter(
                 x=pd.to_datetime(df_amarelo.dia, unit="s"),
                 y=df_amarelo.casos,
-                name=_("Alerta Amarelo de ") + disease_label,
+                name=_("Alerta Amarelo"),
                 marker={"color": "#FBFC49"},
                 text=df_amarelo.SE.map(lambda v: "{}".format(str(v)[-2:])),
                 hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
@@ -194,7 +194,7 @@ class AlertCitiesCharts:
             go.Scatter(
                 x=pd.to_datetime(df_laranja.dia, unit="s"),
                 y=df_laranja.casos,
-                name=_("Alerta Laranja de ") + disease_label,
+                name=_("Alerta Laranja"),
                 marker={"color": "#FFA858"},
                 text=df_laranja.SE.map(lambda v: "{}".format(str(v)[-2:])),
                 hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
@@ -217,7 +217,7 @@ class AlertCitiesCharts:
             go.Scatter(
                 x=pd.to_datetime(df_vermelho.dia, unit="s"),
                 y=df_vermelho.casos,
-                name=_("Alerta Vermelho de ") + disease_label,
+                name=_("Alerta Vermelho de "),
                 marker={"color": "#FB4949"},
                 text=df_vermelho.SE.map(lambda v: "{}".format(str(v)[-2:])),
                 hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
@@ -241,7 +241,7 @@ class AlertCitiesCharts:
                 x=pd.to_datetime(df_dados.dia, unit="s"),
                 y=df_dados.casos_est,
                 mode="lines",
-                name=_("Casos Estimados de ") + disease_label,
+                name=_("Casos Estimados"),
                 line={"color": "#AA4643", "dash": "dot"},
                 text=df_dados.SE.map(lambda v: "{}".format(str(v)[-2:])),
                 hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
@@ -258,12 +258,47 @@ class AlertCitiesCharts:
         )
 
         fig.update_layout(
-            xaxis=go.layout.XAxis(
-                rangeselector=dict(buttons=list([dict(step="all")])),
-                rangeslider=dict(visible=True),
+            xaxis=dict(
+                title=_("Mês/Ano"),
+                tickangle=-15,
+                showline=True,
+                showgrid=True,
+                showticklabels=True,
+                linecolor="rgb(204, 204, 204)",
+                linewidth=2,
+                gridcolor="rgb(176, 196, 222)",
+                rangeslider=dict(visible=False),
                 type="date",
             ),
             yaxis=dict(title=_("Casos"), gridcolor="rgb(220, 220, 220)"),
-            plot_bgcolor="rgb(255, 255, 255)",
+            showlegend=True,
+            legend=dict(
+                orientation="h",
+                yanchor="top",
+                y=1.20,
+                xanchor="left",
+                # x=1,
+            ),
+            hoverlabel=dict(
+                # bgcolor="white",
+                font_size=12,
+                font_family="Rockwell",
+            ),
+            autosize=True,
+            # height=275,
+            # width=310,
+            margin=dict(
+                autoexpand=True,
+                # l=50,
+                # r=20,
+                t=20,
+                # b=150,
+            ),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            modebar={
+                "orientation": "v",
+                "bgcolor": "rgba(255 ,255 ,255 ,0.7)",
+            },
         )
         return fig.to_html()
