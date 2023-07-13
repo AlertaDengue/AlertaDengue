@@ -8,14 +8,10 @@
 dataurl ;
 {% endblock %}
 
-{% block info_panel %}
-  <h3>{% blocktrans with prt=prt1|floatformat %}<b>Chance de alerta <span class="label label-warning">laranja</span> ou <span class="label label-danger">vermelho</span> na próxima semana:</b> {{ prt }}%{% endblocktrans %}</h3>
-{% endblock %}
-
 {% block alert_js_main_init %}
 info.update = function (props) {
-    this._div.innerHTML = '<h4>{% blocktrans %}Número de casos estimados na semana{% endblocktrans %}:</h4>' + (props ?
-            '<b>' + props.casos + '</b><br />' : '{% blocktrans %}Passe o mouse sobre o mapa{% endblocktrans %}');
+    this._div.innerHTML = '<h4>{% blocktranslate %}Número de casos estimados na semana{% endblocktranslate %}:</h4>' + (props ?
+            '<b>' + props.casos + '</b><br />' : '{% blocktranslate %}Passe o mouse sobre o mapa{% endblocktranslate %}');
 };
 
 get_map_bounds = function() {return geojson.getBounds();};

@@ -40,13 +40,13 @@
             aria-expanded="false"
             aria-controls="-collapseName-dengue-{{ regional_id }}"
             >
-            {% trans "Municípios na regional" %}
+            {% translate "Municípios na regional" %}
           </a>
         </p>
         <div class="collapse" id="-collapseName-dengue-{{ regional_id }}">
           <div class="card card-body">
             <div class="col-12 container">
-              <h5 class="text-secondary">{% trans "Municípios" %}:</h5>
+              <h5 class="text-secondary">{% translate "Municípios" %}:</h5>
               {% for key,value in cities.items %}
                 <a href="https://info.dengue.mat.br/report/{{ state_abbv }}/{{ key }}/{{ year_week }}">
                   <b>| {{ value }} </b>
@@ -79,7 +79,7 @@
             aria-expanded="false"
             aria-controls="-collapseName-chik-{{ regional_id }}"
             >
-            {% trans "Municípios na regional" %}
+            {% translate "Municípios na regional" %}
           </a>
         </p>
         <div class="collapse" id="-collapseName-chik-{{ regional_id }}">
@@ -118,7 +118,7 @@
             aria-expanded="false"
             aria-controls="-collapseName-zika-{{ regional_id }}"
             >
-            {% trans "Municípios na regional" %}
+            {% translate "Municípios na regional" %}
           </a>
         </p>
         <div class="collapse" id="-collapseName-zika-{{ regional_id }}">

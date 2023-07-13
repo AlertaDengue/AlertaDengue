@@ -5,18 +5,18 @@
 
 {% block extra_head %}
 <meta property="og:image"
-      content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+      content="{% static '/img/screenshot.png' %}"/>
 <meta property="og:image:secure_url"
-      content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+      content="{% static '/img/screenshot.png' %}"/>
 
 
-<script src="/static/libs/bootstrap-select/bootstrap-select.min.js"
+<script src="{% static '/libs/bootstrap-select/bootstrap-select.min.js' %}"
         type="text/javascript"></script>
 
-<script src="/static/js/infodengue.js"
+<script src="{% static '/js/infodengue.js' %}"
         type="text/javascript"></script>
 
-<link href="/static/libs/bootstrap-select/bootstrap-select.min.css"
+<link href="{% static '/libs/bootstrap-select/bootstrap-select.min.css' %}"
         type="text/css" rel="stylesheet" />
 
 
@@ -66,7 +66,7 @@
 
 {% endblock %}
 
-{% block title %}{% trans "Dados" %}: {% trans "Mapas" %}{% endblock %}
+{% block title %}{% translate "Dados" %}: {% translate "Mapas" %}{% endblock %}
 
 {% block content %}
 
@@ -76,84 +76,84 @@
         <div class="col-md-6">
             <div class="form-group">
                 <a href="{% url 'dados:data_public_services' %}maps/doc">
-                    {% trans "Para mais informações, acesse a documentação do serviço de mapas." %}
+                    {% translate "Para mais informações, acesse a documentação do serviço de mapas." %}
                 </a>
             </div>
 
             <div class="form-group">
-                <label for="geocode-search">{% trans "Filtro Código IBGE" %}:</label>
+                <label for="geocode-search">{% translate "Filtro Código IBGE" %}:</label>
 
                 <input id="geocode-search" type="text" maxlength="7"
                        class="form-control  input-sm"
-                       placeholder='{% trans "Digite aqui para filtrar as opções do código IBGE." %}'
+                       placeholder='{% translate "Digite aqui para filtrar as opções do código IBGE." %}'
                        aria-describedby="geocode-searchHelp"
                 />
 
                 <small id="geocode-searchHelp" class="form-text text-muted">
-                  {% trans "Digite o código IBGE ou parte dele para buscar o código IBGE disponível." %}
+                  {% translate "Digite o código IBGE ou parte dele para buscar o código IBGE disponível." %}
                 </small>
             </div>
 
             <div class="form-group">
-                <label for="geocode">{% trans "Código IBGE" %}:</label>
+                <label for="geocode">{% translate "Código IBGE" %}:</label>
 
                 <select id="geocode"
                         class="form-control"
                         data-live-search="true"
-                        data-title="{% blocktrans %}Selecione municipio(s){% endblocktrans %}"
+                        data-title="{% blocktranslate %}Selecione municipio(s){% endblocktranslate %}"
                         data-actions-box="true"
                         data-selected-text-format="static"
                         aria-describedby="geocodeHelp"
                 >
-                    <option value="">{% trans "Selecione o código IBGE da cidade desejada" %}</option>>
+                    <option value="">{% translate "Selecione o código IBGE da cidade desejada" %}</option>>
                     {% for k in geocodes %}
                     <option value="{{k}}">{{k}}</option>
                     {% endfor %}
                 </select>
 
                 <small id="geocodeHelp" class="form-text text-muted">
-                  {% trans "Selecione o município desejado para a consulta" %}
+                  {% translate "Selecione o município desejado para a consulta" %}
                 </small>
             </div>
             <div class="form-group">
-                <label for="map">{% trans "Mapa" %}:</label>
+                <label for="map">{% translate "Mapa" %}:</label>
 
                 <select id="map" aria-describedby="mapHelp" class="form-control" >
                     <option value="/maps/alert/dengue.map">
-                        {% trans "Alerta Dengue" %}
+                        {% translate "Alerta Dengue" %}
                     </option>
                     <option value="/maps/alert/chikungunya.map">
-                        {% trans "Alerta Chikungunya" %}
+                        {% translate "Alerta Chikungunya" %}
                     </option>
                     <option value="/maps/alert/zika.map">
-                        {% trans "Alerta Zika" %}
+                        {% translate "Alerta Zika" %}
                     </option>
                     <option value="/maps/meteorological/ndvi.map">
-                        {% trans "NDVI" %}
+                        {% translate "NDVI" %}
                     </option>
                     <option value="/maps/meteorological/lst_day_1km.map">
-                        {% trans "LST Dia" %}
+                        {% translate "LST Dia" %}
                     </option>
                     <option value="/maps/meteorological/lst_night_1km.map">
-                        {% trans "LST Noite" %}
+                        {% translate "LST Noite" %}
                     </option>
                     <option value="/maps/meteorological/relative_humidity_2m_above_ground.map">
-                        {% trans "Umidade Relativa" %}
+                        {% translate "Umidade Relativa" %}
                     </option>
                     <option value="/maps/meteorological/specific_humidity_2m_above_ground.map">
-                        {% trans "Umidade Específica" %}
+                        {% translate "Umidade Específica" %}
                     </option>
                     <option value="/maps/meteorological/precipitation">
-                        {% trans "Precipitação" %}
+                        {% translate "Precipitação" %}
                     </option>
                 </select>
 
                 <small id="mapHelp" class="form-text text-muted">
-                  {% trans "Selecione o tipo de mapa desejado" %}
+                  {% translate "Selecione o tipo de mapa desejado" %}
                 </small>
             </div>
             <div class="form-group">
-                <label>{% trans "Tipo de imagem de saída" %}:</label>
+                <label>{% translate "Tipo de imagem de saída" %}:</label>
                 <select id="image-format"
                         class="form-control"
                         aria-describedby="image-formHelp"
@@ -163,11 +163,11 @@
                     <option value="kml">KML</option>
                 </select>
                 <small id="image-formatHelp" class="form-text text-muted">
-                  {% trans "Selecione o Tipo de imagem de saída" %}
+                  {% translate "Selecione o Tipo de imagem de saída" %}
                 </small>
             </div>
             <div class="form-group">
-                <label>{% trans "Dimensão de ajuste:" %}:</label>
+                <label>{% translate "Dimensão de ajuste:" %}:</label>
                 <select id="dimension-name"
                         class="form-control"
                         aria-describedby="dimension-nameHelp"
@@ -176,11 +176,11 @@
                     <option value="height">Height (px)</option>
                 </select>
                 <small id="dimension-nameHelp" class="form-text text-muted">
-                  {% trans "Dimensão de ajuste da imagem" %}
+                  {% translate "Dimensão de ajuste da imagem" %}
                 </small>
             </div>
             <div class="form-group">
-                <label>{% trans "Valor da dimensão selecionada" %}:</label>
+                <label>{% translate "Valor da dimensão selecionada" %}:</label>
                 <input id="dimension-value" value="800"
                        class="form-control"
                        maxlength="6"
@@ -188,7 +188,7 @@
                        aria-describedby="dimension-valueHelp"
                 />
                 <small id="dimension-valueHelp" class="form-text text-muted">
-                  {% trans "Selecione o valor para a dimensão informada" %}
+                  {% translate "Selecione o valor para a dimensão informada" %}
                 </small>
             </div>
             <div class="row">
@@ -197,7 +197,7 @@
             </div>
             <div class="form-group">
                 <input type="button" class="btn btn-primary hidden"
-                       value='{% trans "Gerar URL do serviço" %}'
+                       value='{% translate "Gerar URL do serviço" %}'
                        onclick="generate_url();"
                 />
             </div>

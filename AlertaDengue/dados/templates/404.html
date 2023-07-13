@@ -5,11 +5,11 @@
 
 {% block extra_head %}
 <meta property="og:image"
-      content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+      content="{% static '/img/screenshot.png' %}"/>
 <meta property="og:image:secure_url"
-      content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+      content="{% static '/img/screenshot.png' %}"/>
 
-<script src="/static/js/infodengue.js"
+<script src="{% static '/js/infodengue.js' %}"
         type="text/javascript"></script>
 
 <style type="text/css"></style>
@@ -21,20 +21,20 @@ function goBack() {
 </script>
 
 {% endblock %}
-{% block title %}{% trans "Página não encontrada" %}{% endblock %}
+{% block title %}{% translate "Página não encontrada" %}{% endblock %}
 
 {% block content %}
 
 <div class="container">
     <div class="row">
         <div class="col-md-12 column">
-           <h5> {% trans "A página ou os dados que você procura não existem ou não estão disponiveis no momento" %}.</h5>
+           <h5> {% translate "A página ou os dados que você procura não existem ou não estão disponiveis no momento" %}.</h5>
             <p>
             <ul>
-                <li><h5><a href="../">{% trans "Voltar a homepage" %}</a></h5></li>
+                <li><h5><a href="../">{% translate "Voltar a homepage" %}</a></h5></li>
             </ul>
             <ul>
-                <li><h5><a href="mailto:alerta_dengue@fiocruz.br">{% trans "Fale conosco" %}</a></h5></li>
+                <li><h5><a href="mailto:alerta_dengue@fiocruz.br">{% translate "Fale conosco" %}</a></h5></li>
             </ul>
         </div>
     </div>

@@ -5,15 +5,15 @@
 
 {% block extra_head %}
 <meta property="og:image"
-      content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+      content="{% static '/img/screenshot.png' %}"/>
 <meta property="og:image:secure_url"
-      content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+      content="{% static '/img/screenshot.png' %}"/>
 
-<script src="/static/js/infodengue.js"
+<script src="{% static '/js/infodengue.js' %}"
         type="text/javascript"></script>
 
 <!-- Custom stylesheet, it must be in the same directory as the html file -->
-<link rel="stylesheet" href="/static/css/notebook.css">
+<link rel="stylesheet" href="{% static '/css/notebook.css' %}" type="text/css">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 
@@ -48,20 +48,20 @@
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
       <li class="breadcrumb-item">
-        <a href="/services">{% trans "Dados" %}</a>
+        <a href="/services">{% translate "Dados" %}</a>
       </li>
       <li class="breadcrumb-item">
-        <a href='/services/api'>{% trans "API" %}</a>
+        <a href='/services/api'>{% translate "API" %}</a>
       </li>
       <li class="breadcrumb-item active" aria-current="page">
-        <a href='/services/api/doc'>{% trans "Doc" %}</a>
+        <a href='/services/api/doc'>{% translate "Doc" %}</a>
       </li>
       <li class="breadcrumb-item active" aria-current="page">{{ services }}</li>
   </ol>
 </nav>
 {% endblock %}
 
-{% block title %}{% trans "Dados" %}: API{% endblock %}
+{% block title %}{% translate "Dados" %}: API{% endblock %}
 
 {% block content %}
 
@@ -78,7 +78,7 @@
                         <div class="inner_cell">
                             <div class="text_cell_render border-box-sizing rendered_html">
                                 <p>
-                                <h1>{% trans "Tabela de conteúdo" %}<span
+                                <h1>{% translate "Tabela de conteúdo" %}<span
                                         class="tocSkip"></span></h1></p>
                                 <div class="toc" style="margin-top: 1em;">
                                     <ul class="toc-item">

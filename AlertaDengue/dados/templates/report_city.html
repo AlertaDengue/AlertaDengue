@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
 
 {% block extra_head %}
 
 <link rel="stylesheet"
-      type="text/css" href="/static/libs/DataTables/datatables.min.css"/>
+      type="text/css" href="{% static '/libs/DataTables/datatables.min.css' %}"/>
 
 <script type="text/javascript"
-        src="/static/libs/DataTables/datatables.min.js"></script>
+        src="{% static '/libs/DataTables/datatables.min.js' %}"></script>
 
 <style>
       .box {
@@ -43,21 +44,21 @@
       }
 
 </style>
-<script src="/static/libs/plotlyjs/plotly-latest.min.js"></script>
+<script src="{% static '/libs/plotlyjs/plotly-latest.min.js' %}"></script>
 {% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="/report">{% trans "Relatórios" %}</a></li>
-      <li class="breadcrumb-item"><a href="/report">{% trans "Municipal" %}</a></li>
+      <li class="breadcrumb-item"><a href="/report">{% translate "Relatórios" %}</a></li>
+      <li class="breadcrumb-item"><a href="/report">{% translate "Municipal" %}</a></li>
       <li class="breadcrumb-item"><a href="/report/{{ state }}/city">{{ state }}</a></li>
       <li class="breadcrumb-item active" aria-current="page">{{ city_name }}</li>
   </ol>
 </nav>
 {% endblock %}
 
-{% block title %}{% trans "Relatório da Situação das Arboviroses em " %} {{city_name}} -
+{% block title %}{% translate "Relatório da Situação das Arboviroses em " %} {{city_name}} -
 {{state_name}} {% endblock %}
 
 {% block content %}
@@ -77,28 +78,28 @@
     # ----------------------
     -->
     <p>
-      {% trans "Semana epidemiológica" %}: {{last_week}}/{{last_year}}
+      {% translate "Semana epidemiológica" %}: {{last_week}}/{{last_year}}
     </p>
     <p>
       <!--
       usar a cor correspondente ao nivel de
       alerta mais alto considerando as 3 doenças
       -->
-      {% trans "Situação de alerta do município" %}: {{max_alert_color}}
+      {% translate "Situação de alerta do município" %}: {{max_alert_color}}
     </p>
   </div>
 </div>
 
 <div class="row">
   <div class="col-md-12">
-      <h3>{% trans "Condições climáticas para transmissão de arboviroses" %}</h3>
+      <h3>{% translate "Condições climáticas para transmissão de arboviroses" %}</h3>
 
-      <p>{% blocktrans %}A figura abaixo mostra o indicador meteorológico de receptividade do
+      <p>{% blocktranslate %}A figura abaixo mostra o indicador meteorológico de receptividade do
       município para a transmissão de arboviroses. Quando o indicador está
       acima do limiar (linha horizontal), existem condições ambientais
       favoraveis à transmissão viral. Isso significa que a atenção precisa ser
       aumentada para a possivel circulação sustentada de arbovirus e para a
-      implementação de controle vetorial{% endblocktrans %}.</p>
+      implementação de controle vetorial{% endblocktranslate %}.</p>
 
       {{chart_dengue_climate|safe}}
 
@@ -109,19 +110,19 @@
 <div class="row">
   <div class="col-md-12">
 
-    <h3>{% trans "Situação da Dengue" %}</h3>
+    <h3>{% translate "Situação da Dengue" %}</h3>
 
     {% if total_n_dengue >= 0 %}
     <p><i><b>
-      {% trans "Esse ano, até essa semana" %}, {{total_n_dengue}}
-      {% trans "casos de Dengue foram registrados" %}.
-      {% trans "No ano passado, até essa semana" %}, {{total_n_dengue_last_year}}
-      {% trans "tinham sido registrados" %}.</b></i></br>
+      {% translate "Esse ano, até essa semana" %}, {{total_n_dengue}}
+      {% translate "casos de Dengue foram registrados" %}.
+      {% translate "No ano passado, até essa semana" %}, {{total_n_dengue_last_year}}
+      {% translate "tinham sido registrados" %}.</b></i></br>
 
-      {% blocktrans %}A figura abaixo mostra a situação da dengue nos últimos dois anos.
+      {% blocktranslate %}A figura abaixo mostra a situação da dengue nos últimos dois anos.
       As linhas horizontais correspondem aos limiares de incidência
       pré-epidêmicos, epidêmicos e pós-epidêmicos
-      (casos por 100.000 habitantes){% endblocktrans %}</p>
+      (casos por 100.000 habitantes){% endblocktranslate %}</p>
 
     {{chart_dengue_incidence|safe}}
 
@@ -131,7 +132,7 @@
 
     {% else %}
     <p>
-      {% trans "Sem dados disponíveis para geração dessa seção" %}.
+      {% translate "Sem dados disponíveis para geração dessa seção" %}.
     </p>
     {% endif %}
 
@@ -142,19 +143,19 @@
 <div class="row">
   <div class="col-md-12">
 
-    <h3>{% trans "Situação da Chikungunya" %}</h3>
+    <h3>{% translate "Situação da Chikungunya" %}</h3>
 
     {% if total_n_chik >= 0 %}
     <p><i><b>
-        {% trans "Esse ano, até essa semana" %}, {{total_n_chik}}
-        {% trans "casos de Chikungunya foram registrados" %}.
-        {% trans "No ano passado, até essa semana" %}, {{total_n_chik_last_year}}
-        {% trans "tinham sido registrados" %}.</b></i></br>
+        {% translate "Esse ano, até essa semana" %}, {{total_n_chik}}
+        {% translate "casos de Chikungunya foram registrados" %}.
+        {% translate "No ano passado, até essa semana" %}, {{total_n_chik_last_year}}
+        {% translate "tinham sido registrados" %}.</b></i></br>
 
-      {% blocktrans %}A figura abaixo mostra a situação da chikungunya nos últimos dois anos.
+      {% blocktranslate %}A figura abaixo mostra a situação da chikungunya nos últimos dois anos.
       As linhas horizontais correspondem aos limiares de incidência
       pré-epidêmicos, epidêmicos e pós-epidêmicos
-      (casos por 100.000 habitantes){% endblocktrans %}</p>
+      (casos por 100.000 habitantes){% endblocktranslate %}</p>
 
     {{chart_chik_incidence|safe}}
 
@@ -164,7 +165,7 @@
 
     {% else %}
     <p>
-      {% trans "Sem dados disponíveis para geração dessa seção" %}.
+      {% translate "Sem dados disponíveis para geração dessa seção" %}.
     </p>
     {% endif %}
 
@@ -175,19 +176,19 @@
 <div class="row">
   <div class="col-md-12">
 
-    <h3>{% trans "Situação da Zika" %}</h3>
+    <h3>{% translate "Situação da Zika" %}</h3>
 
     {% if total_n_zika >= 0 %}
     <p><i><b>
-      {% trans "Esse ano, até essa semana" %}, {{total_n_zika}}
-      {% trans "casos de Zika foram registrados" %}.
-      {% trans "No ano passado, até essa semana" %}, {{total_n_zika_last_year}}
-      {% trans "tinham sido registrados" %}.</b></i></br>
+      {% translate "Esse ano, até essa semana" %}, {{total_n_zika}}
+      {% translate "casos de Zika foram registrados" %}.
+      {% translate "No ano passado, até essa semana" %}, {{total_n_zika_last_year}}
+      {% translate "tinham sido registrados" %}.</b></i></br>
 
-      {% blocktrans %}A figura abaixo mostra a situação da zika nos últimos dois anos.
+      {% blocktranslate %}A figura abaixo mostra a situação da zika nos últimos dois anos.
       As linhas horizontais correspondem aos limiares de incidência
       pré-epidêmicos, epidêmicos e pós-epidêmicos
-      (casos por 100.000 habitantes){% endblocktrans %}</p>
+      (casos por 100.000 habitantes){% endblocktranslate %}</p>
 
     {{chart_zika_incidence|safe}}
 
@@ -198,7 +199,7 @@
 
     {% else %}
     <p>
-      {% trans "Sem dados disponíveis para geração dessa seção" %}.
+      {% translate "Sem dados disponíveis para geração dessa seção" %}.
     </p>
     {% endif %}
 
@@ -215,24 +216,24 @@
     # ---------------------
     -->
 
-    <h3>{% trans "O código de Cores" %}</h3>
+    <h3>{% translate "O código de Cores" %}</h3>
 
-    {% trans "As cores indicam niveis de atenção" %}
+    {% translate "As cores indicam niveis de atenção" %}
 
     <ul>
       <li class="bullet-green">
-        <strong>{% trans "Verde" %}:</strong> {% trans "condições climáticas desfavoráveis, seja" %}
-        {% trans "por baixa temperatura ou baixa umidade, e baixa incidência de casos" %}.
+        <strong>{% translate "Verde" %}:</strong> {% translate "condições climáticas desfavoráveis, seja" %}
+        {% translate "por baixa temperatura ou baixa umidade, e baixa incidência de casos" %}.
       </li>
       <li class="bullet-yellow">
-        <strong>{% trans "Amarelo" %}:</strong> {% trans "condições climáticas propícias para" %}
-        {% trans "aumento da população do vetor e transmissão de arboviroses" %}.
+        <strong>{% translate "Amarelo" %}:</strong> {% translate "condições climáticas propícias para" %}
+        {% translate "aumento da população do vetor e transmissão de arboviroses" %}.
       </li>
       <li class="bullet-orange">
-        <strong>{% trans "Laranja" %}:</strong> {% trans "transmissão aumentada e sustentada da arbovirose" %}.
+        <strong>{% translate "Laranja" %}:</strong> {% translate "transmissão aumentada e sustentada da arbovirose" %}.
       </li>
       <li class="bullet-red">
-        <strong>{% trans "Vermelho" %}:</strong> {% trans "incidência alta, acima dos 90% históricos" %}.
+        <strong>{% translate "Vermelho" %}:</strong> {% translate "incidência alta, acima dos 90% históricos" %}.
       </li>
     </ul>
   </div>
@@ -246,51 +247,51 @@
     # ----------------------------------------
     -->
 
-    <h3>{% trans "Lista das variáveis apresentadas nas tabelas" %}</h3>
+    <h3>{% translate "Lista das variáveis apresentadas nas tabelas" %}</h3>
 
     <ul>
       <li><b>SE</b>:
-        {% trans "Semana epidemiológica" %}</li>
+        {% translate "Semana epidemiológica" %}</li>
 
       <li><b>temp.min</b>:
-        {% trans "Média das temperaturas mínimas diárias ao longo da semana" %}</li>
+        {% translate "Média das temperaturas mínimas diárias ao longo da semana" %}</li>
       <li><b>temp.med</b>:
-        {% trans "Média das temperaturas diárias ao longo da semana" %}</li>
+        {% translate "Média das temperaturas diárias ao longo da semana" %}</li>
       <li><b>temp.max</b>:
-        {% trans "Média das temperaturas máximas diárias ao longo da semana" %}</li>
+        {% translate "Média das temperaturas máximas diárias ao longo da semana" %}</li>
 
       <li><b>umid.min</b>:
-        {% trans "Média da umidade relativa mínima diária do ar ao longo da semana" %}</li>
+        {% translate "Média da umidade relativa mínima diária do ar ao longo da semana" %}</li>
       <li><b>umid.med</b>:
-        {% trans "Média da umidade relativa diária do ar ao longo da semana" %}</li>        
+        {% translate "Média da umidade relativa diária do ar ao longo da semana" %}</li>        
       <li><b>umid.max</b>:
-        {% trans "Média da umidade relativa máxima diária do ar ao longo da semana" %}</li>
+        {% translate "Média da umidade relativa máxima diária do ar ao longo da semana" %}</li>
       <li><b>casos notif</b>:
-        {% trans "Número de casos notificados por semana (Os valores são atualizados retrospectivamente todas as semanas)" %}</li>
+        {% translate "Número de casos notificados por semana (Os valores são atualizados retrospectivamente todas as semanas)" %}</li>
       <li><b>incidência</b>:
-        {% trans "Taxa de incidência estimada por 100.000" %}</li>
+        {% translate "Taxa de incidência estimada por 100.000" %}</li>
       <li><b>casos_est</b> :
-        {% trans "Número estimado de casos por semana usando o modelo de nowcasting (nota: Os valores são atualizados retrospectivamente a cada semana)" %}</li>
+        {% translate "Número estimado de casos por semana usando o modelo de nowcasting (nota: Os valores são atualizados retrospectivamente a cada semana)" %}</li>
       <li><b>pr(inc subir)</b>:
-        {% trans "Probabilidade de (Rt> 1). Para emitir o alerta laranja, usamos o critério p_rt1> 0,95 por 3 semanas ou mais." %}</li>
+        {% translate "Probabilidade de (Rt> 1). Para emitir o alerta laranja, usamos o critério p_rt1> 0,95 por 3 semanas ou mais." %}</li>
       <li><b>nivel</b>:
-        {% trans "Nível de alerta (1 = verde, 2 = amarelo, 3 = laranja, 4 = vermelho), mais detalhes, consulte (Saiba mais)" %}</li>
+        {% translate "Nível de alerta (1 = verde, 2 = amarelo, 3 = laranja, 4 = vermelho), mais detalhes, consulte (Saiba mais)" %}</li>
       </ul>
   </div>
 </div>
 
 <div class="row">
   <div id="notes" class="col-md-12">
-    <h3>{% trans "Notas" %}</h3>
+    <h3>{% translate "Notas" %}</h3>
 
     <ul>
-      <li>{% blocktrans %}Os dados do sinan mais recentes ainda não foram totalmente digitados.
+      <li>{% blocktranslate %}Os dados do sinan mais recentes ainda não foram totalmente digitados.
         Estimamos o número esperado de casos notificados considerando o tempo
-        até os casos serem digitados{% endblocktrans %}.
+        até os casos serem digitados{% endblocktranslate %}.
       </li>
-      <li>{% blocktrans %}Algumas vezes, os casos da última semana ainda não estao disponíveis,
+      <li>{% blocktranslate %}Algumas vezes, os casos da última semana ainda não estao disponíveis,
         nesse caso, usa-se uma estimação com base na tendência de variação da
-        série{% endblocktrans %}.
+        série{% endblocktranslate %}.
       </li>
     </ul>
   </div>
@@ -298,24 +299,24 @@
 
 <div class="row">
   <div id="credits" class="col-md-12">
-    <h3>{% trans "Créditos" %}</h3>
+    <h3>{% translate "Créditos" %}</h3>
 
-    {% trans "Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como parceira entre" %}:
+    {% translate "Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como parceira entre" %}:
 
     <ul>
-      <li>{% trans "Programa de Computação Científica, Fundação Oswaldo Cruz, Rio de Janeiro" %}.
+      <li>{% translate "Programa de Computação Científica, Fundação Oswaldo Cruz, Rio de Janeiro" %}.
       </li>
-      <li>{% trans "Escola de Matemática Aplicada, Fundação Getúlio Vargas" %}.</li>
-      <li>{% trans "Secretaria Estadual de Saúde do" %} {{state_name}}.</li>
-      <li>{% trans "Observatório de Dengue da UFMG" %}.</li>
+      <li>{% translate "Escola de Matemática Aplicada, Fundação Getúlio Vargas" %}.</li>
+      <li>{% translate "Secretaria Estadual de Saúde do" %} {{state_name}}.</li>
+      <li>{% translate "Observatório de Dengue da UFMG" %}.</li>
     </ul>
   </div>
 </div>
 
 <div class="row">
   <div id="contact" class="col-md-12">
-    <h3>{% trans "Contato" %}</h3>
-    {% trans "Para mais detalhes sobre o sistema de alerta InfoDengue, consultar" %}:
+    <h3>{% translate "Contato" %}</h3>
+    {% translate "Para mais detalhes sobre o sistema de alerta InfoDengue, consultar" %}:
     <a href="http://info.dengue.mat.br">http://info.dengue.mat.br</a>
   </div>
 </div>
@@ -323,10 +324,10 @@
 <script>
   $(document).ready(function(){
     var cssClasses = {
-      'verde': 'green-row',
-      'amarelo': 'yellow-row',
-      'laranja': 'orange-row',
-      'vermelho': 'red-row'
+      '{% translate "verde" %}': 'green-row',
+      '{% translate "amarelo" %}': 'yellow-row',
+      '{% translate "laranja" %}': 'orange-row',
+      '{% translate "vermelho" %}': 'red-row'
     }
 
     $('.table tr').each(function(i, obj){

@@ -2,13 +2,13 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% trans "Dados do SINAN recebidos" %}{% endblock %}
+{% block title %}{% translate "Dados do SINAN recebidos" %}{% endblock %}
 
 {% block content %}
     <div class="panel panel-default">
         <div class="panel-body">
             <h4>Files uploaded from "MINIO"</h4>
-          <p>{% trans "Ultimos arquivos enviados:" %}</p>
+          <p>{% translate "Ultimos arquivos enviados:" %}</p>
           <ul>
             {% for upload in last_uploaded %}
               <li>{{ upload }}</li>

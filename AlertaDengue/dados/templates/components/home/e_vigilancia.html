@@ -1,0 +1,27 @@
+{% load i18n %}
+{% load static %}
+
+<!-- Start Component -->
+{% block evigilancia_component %}
+
+<div class="modal fade bd-example-modal-lg show" id="evigiModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="padding: 0;">
+                <img src="{% static '/img/header_evigilancia.png' %}" class="img-fluid" alt="Terceira edição E-vigilância. Clique para saber mais!" style="width: 100%; height: auto; margin: 0;">
+            </div>
+            <div class="modal-body" id="dynamic-content">
+                <h4 align="center"><b>{% translate "E-Vigilância 2023" %}</b></h4>
+                <p> &nbsp;&nbsp; {% blocktranslate %} O E-Vigilância 2023 é um simpósio que visa reunir e fortalecer a comunidade de pesquisadores, estudantes, profissionais de saúde e empreendedores de diferentes setores.
+                    Juntos, iremos compartilhar iniciativas inovadoras já bem sucedidas ou que possam ser incorporadas na administração pública, especificamente no monitoramento e controle de doenças transmissíveis. 
+                    O tema dessa edição será {% endblocktranslate %} <b>{% translate "Inovações para uma saúde integral e única" %}.</b></p>
+            </div>
+            <div class="modal-footer">
+                <a class="btn" data-dismiss="modal">{% translate "Fechar" %}</a>
+                <a href="https://e-vigilancia.dengue.mat.br/" target="_blank" class="btn btn-primary">{% translate "Saiba mais" %}</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

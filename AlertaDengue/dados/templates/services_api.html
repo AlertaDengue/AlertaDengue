@@ -5,18 +5,18 @@
 
 {% block extra_head %}
 <meta property="og:image"
-      content="http://info.dengue.mat.br/static/img/screenshot.png"/>
+      content="{% static '/img/screenshot.png' %}"/>
 <meta property="og:image:secure_url"
-      content="https://info.dengue.mat.br/static/img/screenshot.png"/>
+      content="{% static '/img/screenshot.png' %}"/>
 
 
-<script src="/static/libs/bootstrap-select/bootstrap-select.min.js"
+<script src="{% static '/libs/bootstrap-select/bootstrap-select.min.js' %}"
         type="text/javascript"></script>
 
-<script src="/static/js/infodengue.js"
+<script src="{% static '/js/infodengue.js' %}"
         type="text/javascript"></script>
 
-<link href="/static/libs/bootstrap-select/bootstrap-select.min.css"
+<link href="{% static '/libs/bootstrap-select/bootstrap-select.min.css' %}"
         type="text/css" rel="stylesheet" />
 
 
@@ -70,17 +70,17 @@
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
       <li class="breadcrumb-item">
-        <a href="/services">{% trans "Dados" %}</a>
+        <a href="/services">{% translate "Dados" %}</a>
       </li>
       <li class="breadcrumb-item active" aria-current="page">
-        <a href='/services/api'>{% trans "API" %}</a>
+        <a href='/services/api'>{% translate "API" %}</a>
       </li>
       <li class="breadcrumb-item active" aria-current="page">{{ services }}</li>
   </ol>
 </nav>
 {% endblock %}
 
-{% block title %}{% trans "API" %}{% endblock %}
+{% block title %}{% translate "API" %}{% endblock %}
 
 {% block content %}
 
@@ -90,71 +90,71 @@
         <div class="col-md-6">
             <div class="form-group">
                 <a href="{% url 'dados:data_public_services' %}api/doc">
-                    {% trans "Para mais informações, acesse a documentação do serviço da API." %}
+                    {% translate "Para mais informações, acesse a documentação do serviço da API." %}
                 </a>
             </div>
 
             <div class="form-group">
-                <label for="geocode-search">{% trans "Filtro Município (código IBGE, nome do município ou U.F.)" %}:</label>
+                <label for="geocode-search">{% translate "Filtro Município (código IBGE, nome do município ou U.F.)" %}:</label>
 
                 <input id="geocode-search" type="text" maxlength="30"
                        class="form-control  input-sm"
-                       placeholder='{% trans "Digite aqui o filtro desejado para a consulta de municípios" %}'
+                       placeholder='{% translate "Digite aqui o filtro desejado para a consulta de municípios" %}'
                        aria-describedby="geocode-searchHelp"
                 />
 
                 <small id="geocode-searchHelp" class="form-text text-muted">
-                  {% trans "Digite o código IBGE, nome do município ou U.F. para buscar o município desejado." %}
+                  {% translate "Digite o código IBGE, nome do município ou U.F. para buscar o município desejado." %}
                 </small>
             </div>
 
             <div class="form-group">
-                <label for="geocode">{% trans "Município" %}:</label>
+                <label for="geocode">{% translate "Município" %}:</label>
 
                 <select id="geocode"
                         class="form-control"
                         data-live-search="true"
-                        data-title="{% blocktrans %}Selecione municipio(s){% endblocktrans %}"
+                        data-title="{% blocktranslate %}Selecione municipio(s){% endblocktranslate %}"
                         data-actions-box="true"
                         data-selected-text-format="static"
                         aria-describedby="geocodeHelp"
                         required="required"
                 >
-                    <option value="">{% trans "Selecione o município desejado" %}</option>
+                    <option value="">{% translate "Selecione o município desejado" %}</option>
                     {{options_cities|safe}}
                 </select>
 
                 <small id="geocodeHelp" class="form-text text-muted">
-                  {% trans "Selecione o município desejado para a consulta" %}
+                  {% translate "Selecione o município desejado para a consulta" %}
                 </small>
             </div>
 
             <div class="form-group">
-                <label for="epidate_start">{% trans "Data da Semana Epidemiológica de início da consulta" %}</label>
+                <label for="epidate_start">{% translate "Data da Semana Epidemiológica de início da consulta" %}</label>
                 <input type="date" class="form-control"
                        id="epidate_start"
                        value="{{date_query_start}}"
                        aria-describedby="date_startHelp"
                        required="required" style="width:200px;">
                 <small id="date_startHelp" class="form-text text-muted">
-                  {% trans "Selecione um dia da Semana Epidemiológica de início da consulta" %}
+                  {% translate "Selecione um dia da Semana Epidemiológica de início da consulta" %}
                 </small>
             </div>
 
             <div class="form-group">
-                <label for="epidate_end">{% trans "Data da Semana Epidemiológica de término da consulta" %}</label>
+                <label for="epidate_end">{% translate "Data da Semana Epidemiológica de término da consulta" %}</label>
                 <input type="date" class="form-control"
                        id="epidate_end"
                        value="{{date_query_end}}"
                        aria-describedby="date_endHelp"
                        required="required" style="width:200px;">
                 <small id="date_endHelp" class="form-text text-muted">
-                  {% trans "Selecione um dia da Semana Epidemiológica de término da consulta" %}
+                  {% translate "Selecione um dia da Semana Epidemiológica de término da consulta" %}
                 </small>
             </div>
 
             <div class="form-group">
-                <label for="disease">{% trans "Arbovirose" %}</label>
+                <label for="disease">{% translate "Arbovirose" %}</label>
                 <select id="disease"
                         class="form-control"
                         aria-describedby="diseaseHelp"
@@ -165,12 +165,12 @@
                     <option value="zika">Zika</option>
                 </select>
                 <small id="diseaseHelp" class="form-text text-muted">
-                  {% trans "Selecione a arbovirose para a consulta" %}
+                  {% translate "Selecione a arbovirose para a consulta" %}
                 </small>
             </div>
 
             <div class="form-group">
-                <label for="format">{% trans "Data da Semana Epidemiológica de término da consulta" %}</label>
+                <label for="format">{% translate "Data da Semana Epidemiológica de término da consulta" %}</label>
                 <select id="format"
                         class="form-control"
                         aria-describedby="formatHelp"
@@ -179,7 +179,7 @@
                     <option value="json">JSON</option>
                 </select>
                 <small id="formatHelp" class="form-text text-muted">
-                  {% trans "Selecione o formato do arquivo de saída" %}
+                  {% translate "Selecione o formato do arquivo de saída" %}
                 </small>
             </div>
 
@@ -189,41 +189,41 @@
             </div>
             <div class="form-group">
                 <input type="submit" class="btn btn-primary"
-                       value='{% trans "Download" %}'
+                       value='{% translate "Download" %}'
                 />
 
             <a class="btn btn-primary" data-toggle="collapse" href="#expan_dict" role="button" aria-expanded="false" aria-controls="expan_dict">
-                {% trans "Mostrar Dicionário de Dados" %}
+                {% translate "Mostrar Dicionário de Dados" %}
             </a>
             </div>
             <div class="collapse" id="expan_dict">
             <div class="card card-body">
 
-                <h5><b>{% trans "Dicionário de Dados" %}</b></h5>
+                <h5><b>{% translate "Dicionário de Dados" %}</b></h5>
                 <ul>
-                <p><li><b>{% trans "data_ini_SE" %}</b> : {% trans "Primeiro dia da semana epidemiológica (Domingo)" %}</p></li>
-                <p><li><b>{% trans "SE" %}</b>: {% trans "Semana epidemiológica" %}</p></li>
-                <p><li><b>{% trans "casos_est" %}</b> : {% trans "Número estimado de casos por semana usando o modelo de nowcasting (nota: Os valores são atualizados retrospectivamente a cada semana)" %}</p></li>
-                <p><li><b>{% trans "cases_est_min and cases_est_max" %}</b>: {% trans "Intervalo de credibilidade de 95% do número estimado de casos" %}</p></li>
-                <p><li><b>{% trans "casos" %}</b>: {% trans "Número de casos notificados por semana (Os valores são atualizados retrospectivamente todas as semanas)" %}</p></li>
-                <p><li><b>{% trans "p_rt1" %}</b>: {% trans "Probabilidade de (Rt> 1). Para emitir o alerta laranja, usamos o critério p_rt1> 0,95 por 3 semanas ou mais." %}</p></li>
-                <p><li><b>{% trans "p_inc100k" %}</b>: {% trans "Taxa de incidência estimada por 100.000" %}</p></li>
-                <p><li><b>{% trans "Localidade_id" %}</b>: {% trans "Divisão submunicipal (atualmente implementada apenas no Rio de Janeiro)" %}</p></li>
-                <p><li><b>{% trans "nivel" %}</b>: {% trans "Nível de alerta (1 = verde, 2 = amarelo, 3 = laranja, 4 = vermelho), mais detalhes, consulte (Saiba mais)" %}</p></li>
-                <p><li><b>{% trans "id" %}</b>: {% trans "Índice numérico" %}</a></p></li>
-                <p><li><b>{% trans "versao_modelo" %}</b>: {% trans "Versão do modelo (uso interno)" %}</p></li>
-                <p><li><b>{% trans "Rt" %}</b>: {% trans "Estimativa pontual do número reprodutivo de casos, ver " %}<a href="/informacoes/">{% trans "Saiba Mais" %}</a></p></li>
-                <p><li><b>{% trans "pop" %}</b>: {% trans "População estimada (IBGE)" %}</p></li>
-                <p><li><b>{% trans "tempmin" %}</b>: {% trans "Média das temperaturas mínimas diárias ao longo da semana" %}</p></li>
-                <p><li><b>{% trans "tempmed" %}</b>: {% trans "Média das temperaturas diárias ao longo da semana" %}</p></li>
-                <p><li><b>{% trans "tempmax" %}</b>: {% trans "Média das temperaturas máximas diárias ao longo da semana" %}</p></li>
-                <p><li><b>{% trans "umidmin" %}</b>: {% trans "Média da umidade relativa mínima diária do ar ao longo da semana" %}</p></li>
-                <p><li><b>{% trans "umidmed" %}</b>: {% trans "Média da umidade relativa diária do ar ao longo da semana" %}</p></li>
-                <p><li><b>{% trans "umidmax" %}</b>: {% trans "Média da umidade relativa máxima diária do ar ao longo da semana" %}</p></li>
-                <p><li><b>{% trans "receptivo" %}</b>: {% trans "Indica receptividade climática, ou seja, condições para alta capacidade vetorial. 0 = desfavorável, 1 = favorável, 2 = favorável nesta semana e na semana passada, 3 = favorável por pelo menos três semanas (suficiente para completar um ciclo de transmissão)" %}</p></li>
-                <p><li><b>{% trans "transmissao" %}</b>: {% trans "Evidência de transmissão sustentada: 0 = nenhuma evidência, 1 = possível, 2 = provável, 3 = altamente provável" %}</p></li>
-                <p><li><b>{% trans "nivel_inc" %}</b>: {% trans "Incidência estimada abaixo do limiar pré-epidemia, 1 = acima do limiar pré-epidemia, mas abaixo do limiar epidêmico, 2 = acima do limiar epidêmico" %}</p></li>
-                <p><li><b>{% trans "notif_accum_year" %}</b>: {% trans "Número acumulado de casos no ano" %}</p></li>
+                <p><li><b>{% translate "data_ini_SE" %}</b> : {% translate "Primeiro dia da semana epidemiológica (Domingo)" %}</p></li>
+                <p><li><b>{% translate "SE" %}</b>: {% translate "Semana epidemiológica" %}</p></li>
+                <p><li><b>{% translate "casos_est" %}</b> : {% translate "Número estimado de casos por semana usando o modelo de nowcasting (nota: Os valores são atualizados retrospectivamente a cada semana)" %}</p></li>
+                <p><li><b>{% translate "cases_est_min and cases_est_max" %}</b>: {% translate "Intervalo de credibilidade de 95% do número estimado de casos" %}</p></li>
+                <p><li><b>{% translate "casos" %}</b>: {% translate "Número de casos notificados por semana (Os valores são atualizados retrospectivamente todas as semanas)" %}</p></li>
+                <p><li><b>{% translate "p_rt1" %}</b>: {% translate "Probabilidade de (Rt> 1). Para emitir o alerta laranja, usamos o critério p_rt1> 0,95 por 3 semanas ou mais." %}</p></li>
+                <p><li><b>{% translate "p_inc100k" %}</b>: {% translate "Taxa de incidência estimada por 100.000" %}</p></li>
+                <p><li><b>{% translate "Localidade_id" %}</b>: {% translate "Divisão submunicipal (atualmente implementada apenas no Rio de Janeiro)" %}</p></li>
+                <p><li><b>{% translate "nivel" %}</b>: {% translate "Nível de alerta (1 = verde, 2 = amarelo, 3 = laranja, 4 = vermelho), mais detalhes, consulte (Saiba mais)" %}</p></li>
+                <p><li><b>{% translate "id" %}</b>: {% translate "Índice numérico" %}</a></p></li>
+                <p><li><b>{% translate "versao_modelo" %}</b>: {% translate "Versão do modelo (uso interno)" %}</p></li>
+                <p><li><b>{% translate "Rt" %}</b>: {% translate "Estimativa pontual do número reprodutivo de casos, ver " %}<a href="/informacoes/">{% translate "Saiba Mais" %}</a></p></li>
+                <p><li><b>{% translate "pop" %}</b>: {% translate "População estimada (IBGE)" %}</p></li>
+                <p><li><b>{% translate "tempmin" %}</b>: {% translate "Média das temperaturas mínimas diárias ao longo da semana" %}</p></li>
+                <p><li><b>{% translate "tempmed" %}</b>: {% translate "Média das temperaturas diárias ao longo da semana" %}</p></li>
+                <p><li><b>{% translate "tempmax" %}</b>: {% translate "Média das temperaturas máximas diárias ao longo da semana" %}</p></li>
+                <p><li><b>{% translate "umidmin" %}</b>: {% translate "Média da umidade relativa mínima diária do ar ao longo da semana" %}</p></li>
+                <p><li><b>{% translate "umidmed" %}</b>: {% translate "Média da umidade relativa diária do ar ao longo da semana" %}</p></li>
+                <p><li><b>{% translate "umidmax" %}</b>: {% translate "Média da umidade relativa máxima diária do ar ao longo da semana" %}</p></li>
+                <p><li><b>{% translate "receptivo" %}</b>: {% translate "Indica receptividade climática, ou seja, condições para alta capacidade vetorial. 0 = desfavorável, 1 = favorável, 2 = favorável nesta semana e na semana passada, 3 = favorável por pelo menos três semanas (suficiente para completar um ciclo de transmissão)" %}</p></li>
+                <p><li><b>{% translate "transmissao" %}</b>: {% translate "Evidência de transmissão sustentada: 0 = nenhuma evidência, 1 = possível, 2 = provável, 3 = altamente provável" %}</p></li>
+                <p><li><b>{% translate "nivel_inc" %}</b>: {% translate "Incidência estimada abaixo do limiar pré-epidemia, 1 = acima do limiar pré-epidemia, mas abaixo do limiar epidêmico, 2 = acima do limiar epidêmico" %}</p></li>
+                <p><li><b>{% translate "notif_accum_year" %}</b>: {% translate "Número acumulado de casos no ano" %}</p></li>
                 </ul>
 
             </div>

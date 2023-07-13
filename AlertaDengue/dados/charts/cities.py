@@ -15,17 +15,23 @@ class ReportCityCharts:
         threshold_pre_epidemic: float,
         threshold_pos_epidemic: float,
         threshold_epidemic: float,
-    ):
+    ) -> go.Figure:
         """
-        @see: https://stackoverflow.com/questions/45526734/
-            hide-legend-entries-in-a-plotly-figure
-        :param df:
-        :param year_week:
-        :param threshold_pre_epidemic: float,
-        :param threshold_pos_epidemic: float
-        :param threshold_epidemic: float
-        :return:
+        Creates an incidence chart based on the given DataFrame and thresholds.
+
+        Parameters
+        ----------
+        df (pd.DataFrame): The DataFrame containing the data for the chart.
+        year_week (int): The year and week number for the chart.
+        threshold_pre_epidemic (float): The threshold for pre-epidemic level.
+        threshold_pos_epidemic (float): The threshold for post-epidemic level.
+        threshold_epidemic (float): The threshold for epidemic level.
+
+        Returns
+        -------
+            str: The HTML representation of the chart.
         """
+
         df = df.reset_index()[
             ["SE", "incidência", "casos notif.", "level_code"]
         ]
@@ -53,8 +59,14 @@ class ReportCityCharts:
                 marker={"color": "rgb(33,33,33)"},
                 text=df.SE.map(lambda v: "{}".format(str(v)[-2:])),
                 hoverinfo="text",
-                hovertemplate=_("Semana %{text}<br>%{y:1f} Casos")
-                + "<extra></extra>",
+                hovertemplate="%(label1)s %(week)s <br> %(cases)s %(label2)s"
+                "<extra></extra>"
+                % {
+                    "label1": _("Semana"),
+                    "week": "%{text}",
+                    "cases": "%{y:1f}",
+                    "label2": _("Casos"),
+                },
             ),
             secondary_y=True,
         )
@@ -78,8 +90,15 @@ class ReportCityCharts:
                     text=df.SE.map(lambda v: "{}".format(str(v)[-2:])),
                     hoverinfo="text",
                     hovertext=df["incidência"],
-                    hovertemplate=_("Semana %{text}<br>%{y:1f} Incidências")
-                    + "<extra></extra>",
+                    hovertemplate="%(label1)s %(week)s <br>"
+                    "%(cases)s %(label2)s"
+                    "<extra></extra>"
+                    % {
+                        "label1": _("Semana"),
+                        "week": "%{text}",
+                        "cases": "%{y:.0f}",
+                        "label2": _("Incidências"),
+                    },
                 ),
                 secondary_y=False,
             )
@@ -107,22 +126,33 @@ class ReportCityCharts:
                     name=k.title(),
                     text=df.SE.map(lambda v: "{}".format(str(v)[-2:])),
                     hoverinfo="text",
-                    hovertemplate=_("Semana %{text}<br>%{y:1f} Incidências")
-                    + "<extra></extra>",
+                    hovertemplate="%(label1)s %(week)s <br>"
+                    "%(cases)s %(label2)s"
+                    "<extra></extra>"
+                    % {
+                        "label1": _("Semana"),
+                        "week": "%{text}",
+                        "cases": "%{y:.0f}",
+                        "label2": _("Incidências"),
+                    },
                 ),
                 secondary_y=False,
             )
 
         figure.update_layout(
             title=(
-                _("Limiares de incidência:")
+                _("Limiares de incidência")
+                + ":"
                 + "<br>"
                 + "".ljust(8)
-                + _("pré epidêmico=")
+                + _("pré epidêmico")
+                + "="
                 + f"{threshold_pre_epidemic:.1f}".ljust(8)
-                + _("pós epidêmico=")
+                + _("pós epidêmico")
+                + "="
                 + f"{threshold_pos_epidemic:.1f}".ljust(8)
-                + _("epidêmico=")
+                + _("epidêmico")
+                + "="
                 + f"{threshold_epidemic:.1f}"
             ),
             font=dict(family="sans-serif", size=12, color="#000"),
@@ -207,7 +237,7 @@ class ReportCityCharts:
         )[1]
 
         figure = make_subplots(specs=[[{"secondary_y": True}]])
-
+        # Temperature
         figure.add_trace(
             go.Scatter(
                 x=df_climate["SE"],
@@ -217,13 +247,18 @@ class ReportCityCharts:
                 marker={"color": "rgb(255, 204, 153)"},
                 text=df_climate.SE.map(lambda v: "{}".format(str(v)[-2:])),
                 hoverinfo="text",
-                hovertemplate=("{}: {} <br>" "{}{}" "<extra></extra>").format(
-                    _("Semana"), "%{text}", "%{y:1f}", varcli_values[0][0]
-                ),
+                hovertemplate="%(label1)s %(week)s <br>%(cases)s %(label2)s"
+                "<extra></extra>"
+                % {
+                    "label1": _("Semana"),
+                    "week": "%{text}",
+                    "cases": "%{y:.1f}",
+                    "label2": varcli_values[0][0],
+                },
             ),
             secondary_y=False,
         )
-
+        # Temperature treshold
         figure.add_trace(
             go.Scatter(
                 x=df_climate["SE"],
@@ -236,15 +271,15 @@ class ReportCityCharts:
                 marker={"color": "rgb(255,150,0)"},
                 text=df_climate.SE.map(lambda v: "{}".format(str(v)[-2:])),
                 hoverinfo="text",
-                hovertemplate=(
-                    "{}: {} <br>" "{}: {}{}" "<extra></extra>"
-                ).format(
-                    _("Semana"),
-                    "%{text}",
-                    _("Limiar favorável"),
-                    "%{y:1f}",
-                    varcli_values[0][0][0:2],
-                ),
+                hovertemplate="%(label1)s %(week)s <br>%(label2)s: %(cases)s°C"
+                "<extra></extra>"
+                % {
+                    "label1": _("Semana"),
+                    "week": "%{text}",
+                    "label2": _("Limiar favorável"),
+                    "cases": "%{y:.1f}",
+                    # "varcli": varcli_values[0][0],
+                },
             ),
             secondary_y=False,
         )
@@ -254,6 +289,7 @@ class ReportCityCharts:
             df_climate[f"threshold_{varcli_keys[1]}"] = var_climate.get(
                 varcli_keys[1]
             )[1]
+            # Humidity
             figure.add_trace(
                 go.Scatter(
                     x=df_climate["SE"],
@@ -263,15 +299,19 @@ class ReportCityCharts:
                     marker={"color": "rgb(173, 216, 230)"},
                     text=df_climate.SE.map(lambda v: f"{str(v)[-2:]}"),
                     hoverinfo="text",
-                    hovertemplate=(
-                        "{}: {} <br>" "{}{}" "<extra></extra>"
-                    ).format(
-                        _("Semana"), "%{text}", "%{y:1f}", varcli_values[1][0]
-                    ),
+                    hovertemplate="%(label1)s: %(week)s <br>"
+                    "%(cases)s %(varcli)s"
+                    "<extra></extra>"
+                    % {
+                        "label1": _("Semana"),
+                        "week": "%{text}",
+                        "cases": "%{y:.1f}",
+                        "varcli": varcli_values[1][0],
+                    },
                 ),
                 secondary_y=True,
             )
-
+            # Humidity treshold
             figure.add_trace(
                 go.Scatter(
                     x=df_climate["SE"],
@@ -284,15 +324,16 @@ class ReportCityCharts:
                     marker={"color": "rgb(51, 172, 255)"},
                     text=df_climate.SE.map(lambda v: "{}".format(str(v)[-2:])),
                     hoverinfo="text",
-                    hovertemplate=(
-                        "{}: {} <br>" "{}: {}{}" "<extra></extra>"
-                    ).format(
-                        _("Semana"),
-                        "%{text}",
-                        _("Limiar favorável"),
-                        "%{y:1f}",
-                        varcli_values[1][0][0:2],
-                    ),
+                    hovertemplate="%(label1)s %(week)s <br>"
+                    "%(label2)s: %(cases)s%%"
+                    "<extra></extra>"
+                    % {
+                        "label1": _("Semana"),
+                        "week": "%{text}",
+                        "label2": _("Limiar favorável"),
+                        "cases": "%{y:.1f}",
+                        # "varcli": varcli_values[1][0][0:2],
+                    },
                 ),
                 secondary_y=True,
             )
