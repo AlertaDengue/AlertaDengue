@@ -5,6 +5,7 @@ import os
 import random
 from collections import OrderedDict, defaultdict
 from copy import deepcopy
+from datetime import timedelta
 from pathlib import Path, PurePath
 
 import fiona
@@ -16,11 +17,13 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles.finders import find
+from django.core.cache import cache
 from django.http import HttpResponse
 
 # from django.shortcuts import redirect
 from django.templatetags.static import static
 from django.utils.translation import gettext as _
+from django.views.decorators.cache import cache_page
 from django.views.generic.base import TemplateView, View
 
 # local
@@ -258,33 +261,35 @@ class AlertCityPageBaseView(TemplateView, _GetMethod):
 class AlertaMunicipioPageView(AlertCityPageBaseView):
     template_name = "alerta_municipio.html"
 
-    def dispatch(self, request, *args, **kwargs):
-        super(AlertaMunicipioPageView, self).get_context_data(**kwargs)
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super().as_view(**initkwargs)
+        return cache_page(60 * 15)(view)  # Cache the view for 15 minutes
 
-        return super(AlertaMunicipioPageView, self).dispatch(
-            request, *args, **kwargs
-        )
+    def dispatch(self, request, *args, **kwargs):
+        super().get_context_data(**kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(AlertaMunicipioPageView, self).get_context_data(
-            **kwargs
-        )
-
+        context = super().get_context_data(**kwargs)
         chart_alerts = AlertCitiesCharts()
 
         disease_code = context["disease"]
-
         disease_label = _get_disease_label(disease_code)
-
         geocode = context["geocodigo"]
 
-        city_info = get_city_info(geocode)
+        # Fetch city info from cache or database
+        city_info = cache.get(f"city_info:{geocode}")
+        if city_info is None:
+            city_info = get_city_info(geocode)
+            cache.set(
+                f"city_info:{geocode}", city_info, 60 * 60 * 24
+            )  # Cache for 24 hours
 
-        # forecast epiweek reference
+        # Fetch forecast epiweek reference
         forecast_date_min, forecast_date_max = Forecast.get_min_max_date(
             geocode=geocode, cid10=CID10[disease_code]
         )
-
         forecast_date_ref = self._get("ref", forecast_date_max)
 
         if forecast_date_ref is None:
@@ -353,8 +358,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
                 "SE": SE,
                 "WEEK": str(SE)[4:],
                 "data1": dia.strftime("%d de %B de %Y"),
-                # .strftime("%d de %B de %Y")
-                "data2": (dia + datetime.timedelta(6)),
+                "data2": dia + timedelta(6),
                 "last_year": last_year,
                 "look_back": len(total_series),
                 "total_series": ", ".join(map(str, total_series)),
@@ -368,7 +372,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
                 "forecast_date_min": forecast_date_min,
                 "forecast_date_max": forecast_date_max,
                 "epiweek": epiweek,
-                "geojson_url": "/static/geojson/%s.json" % geocode,
+                "geojson_url": f"/static/geojson/{geocode}.json",
                 "chart_alert": city_chart,
             }
         )
@@ -419,6 +423,8 @@ class AlertaStateView(TemplateView):
 
     _state_name = STATE_NAME
 
+    from django.core.cache import cache
+
     def get_context_data(self, **kwargs):
         """
         :param kwargs:
@@ -426,9 +432,18 @@ class AlertaStateView(TemplateView):
         """
         context = super(AlertaStateView, self).get_context_data(**kwargs)
 
-        cities_alert = NotificationResume.get_cities_alert_by_state(
-            self._state_name[context["state"]], context["disease"]
-        )
+        # Check if the data is in cache
+        cache_key = f"cities_alert_{context['state']}_{context['disease']}"
+        cities_alert = cache.get(cache_key)
+
+        if cities_alert is None:
+            # If the data is not in cache, fetch it from the database
+            cities_alert = NotificationResume.get_cities_alert_by_state(
+                self._state_name[context["state"]], context["disease"]
+            )
+
+            # Store the data in cache for future requests
+            cache.set(cache_key, cities_alert)
 
         alerts = dict(
             cities_alert[["municipio_geocodigo", "level_alert"]].values

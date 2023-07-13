@@ -14,6 +14,7 @@ import pandas as pd
 from ad_main.settings import APPS_DIR, get_ibis_conn, get_sqla_conn
 from django.conf import settings
 from django.core.cache import cache
+from sqlalchemy import text
 
 # local
 from .episem import episem
@@ -660,11 +661,18 @@ class NotificationResume:
             return pd.read_sql(sql, conn).astype(int).iloc[0]["count"]
 
     @staticmethod
-    def tail_estimated_cases(geo_ids, n=12):
+    def tail_estimated_cases(geo_ids: list, n: int) -> pd.DataFrame:
         """
-        :param geo_ids: list of city geo ids
-        :param n: the last n estimated cases
-        :return: dict
+        Return the last n days of estimated cases for a list of geocodes.
+
+        Parameters
+        ----------
+        geo_ids: list
+            List of geocodes
+            n: int  default: 12
+        Returns
+        -------
+            df_case_series: pd.DataFrame
         """
 
         if len(geo_ids) < 1:
@@ -685,13 +693,17 @@ class NotificationResume:
             + ")"
         )
 
-        sql = " UNION ".join([sql_template.format(gid) for gid in geo_ids])
+        sql_statements = [
+            str(text(sql_template.format(gid, n))) for gid in geo_ids
+        ]
+
+        sql = " UNION ".join(sql_statements)
 
         if len(geo_ids) > 1:
             sql += ' ORDER BY municipio_geocodigo, "data_iniSE"'
 
         with DB_ENGINE.connect() as conn:
-            df_case_series = pd.read_sql(sql, conn)
+            df_case_series = pd.read_sql(text(sql), conn)
 
         return {
             k: v.casos_est.values.tolist()

@@ -116,18 +116,24 @@ urlpatterns = [
         DataPublicServicesPageView.as_view(),
         name="data_public_services_type",
     ),
-    re_path(r"^alerta/%s[/]?$" % __state_abbv, redirect_alerta_dengue),
+    re_path(
+        r"^alerta/%s[/]?$" % __state_abbv,
+        cache_page(60 * 60 * 8)(redirect_alerta_dengue),
+    ),  # Caches the view for the specified number of seconds (8 hours)
     re_path(
         r"^alerta/%s/%s$" % (__state_abbv, __disease),
-        cache_page(60 * 60)(AlertaStateView.as_view()),
+        cache_page(60 * 60 * 8)(AlertaStateView.as_view()),
         name="alerta_uf",
-    ),
-    re_path(r"^alerta/%s[/]?$" % __geocode, redirect_alert_city_dengue),
+    ),  # Caches the view for the specified number of seconds (8 hours)
+    re_path(
+        r"^alerta/%s[/]?$" % __geocode,
+        cache_page(60 * 60 * 8)(redirect_alert_city_dengue),
+    ),  # Caches the view for the specified number of seconds (8 hours).
     re_path(
         r"^alerta/%s/%s$" % (__geocode, __disease),
-        AlertaMunicipioPageView.as_view(),
+        cache_page(60 * 60 * 8)(AlertaMunicipioPageView.as_view()),
         name="alerta_cidade",
-    ),
+    ),  # Caches the view for the specified number of seconds (8 hours)
     re_path(
         r"^sinan/(\d{4})/(\d{1,2})",
         cache_page(60 * 60 * 60 * 24)(SinanCasesView.as_view()),
