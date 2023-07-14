@@ -5,7 +5,7 @@ Alertadengue project.
 import json
 import unicodedata
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import List, Optional, Tuple
 
 import ibis
@@ -193,7 +193,6 @@ class RegionalParameters:
         cities_by_region = {}
 
         if regional_name is not None and state_name is not None:
-
             cache_name = (
                 str(regional_name).replace(" ", "_")
                 + "_"
@@ -768,6 +767,8 @@ class NotificationResume:
         with DB_ENGINE.connect() as conn:
             return pd.read_sql_query(sql, conn, "id", parse_dates=True)
 
+
+'''
     @staticmethod
     def get_4_weeks_variation(state_name, current_date):
 
@@ -817,10 +818,12 @@ class NotificationResume:
         with DB_ENGINE.connect() as conn:
             return pd.read_sql_query(sql, conn, parse_dates=True)
 
+'''
+
 
 class Forecast:
     @staticmethod
-    def get_min_max_date(geocode: int, cid10: str) -> (str):
+    def get_min_max_date(geocode: int, cid10: str) -> str:
         """
         :param geocode:
         :param cid10:
@@ -1142,7 +1145,6 @@ class ReportState:
 
     @classmethod
     def create_report_state_data(cls, geocodes, disease, year_week):
-
         if disease not in CID10.keys():
             raise Exception(
                 f"The diseases available are: {[k for k in CID10.keys()]}"

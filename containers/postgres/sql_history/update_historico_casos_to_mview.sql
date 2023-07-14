@@ -15,7 +15,7 @@ CREATE MATERIALIZED VIEW "Municipio".historico_casos AS
 
 -- Create the index on the view
 CREATE INDEX historico_casos_data_iniSE_idx ON "Municipio".historico_casos ("data_iniSE" DESC);
-CREATE INDEX historico_casos_municipio_geocodigo_idx ON "Municipio".historico_casos (municipio_geocodigo);
+CREATE INDEX historico_casos_municipio_geocodigo_idx ON "Municipio".historico_casos (municipio_geocodigo DESC);
 
 -- Refresh the view to populate all data
 REFRESH MATERIALIZED VIEW "Municipio".historico_casos;
