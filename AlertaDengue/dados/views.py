@@ -9,7 +9,6 @@ from datetime import timedelta
 from pathlib import Path, PurePath
 
 import fiona
-import geojson
 import numpy as np
 
 #
@@ -264,7 +263,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
     @classmethod
     def as_view(cls, **initkwargs):
         view = super().as_view(**initkwargs)
-        return cache_page(60 * 15)(view)  # Cache the view for 15 minutes
+        return cache_page(60 * 60 * 8)(view)  # Cache the view for 15 minutes
 
     def dispatch(self, request, *args, **kwargs):
         super().get_context_data(**kwargs)
@@ -420,10 +419,7 @@ class SinanCasesView(View):
 
 class AlertaStateView(TemplateView):
     template_name = "state_cities.html"
-
     _state_name = STATE_NAME
-
-    from django.core.cache import cache
 
     def get_context_data(self, **kwargs):
         """
@@ -432,29 +428,20 @@ class AlertaStateView(TemplateView):
         """
         context = super(AlertaStateView, self).get_context_data(**kwargs)
 
-        # Check if the data is in cache
-        cache_key = f"cities_alert_{context['state']}_{context['disease']}"
-        cities_alert = cache.get(cache_key)
+        state_name = self._state_name[context["state"]]
+        disease = context["disease"]
 
-        if cities_alert is None:
-            # If the data is not in cache, fetch it from the database
-            cities_alert = NotificationResume.get_cities_alert_by_state(
-                self._state_name[context["state"]], context["disease"]
-            )
-
-            # Store the data in cache for future requests
-            cache.set(cache_key, cities_alert)
+        cities_alert = NotificationResume.get_cities_alert_by_state(
+            state_name, disease
+        )
 
         alerts = dict(
             cities_alert[["municipio_geocodigo", "level_alert"]].values
         )
-
         mun_dict = dict(cities_alert[["municipio_geocodigo", "nome"]].values)
-
         mun_dict_ordered = OrderedDict(
             sorted(mun_dict.items(), key=lambda v: v[1])
         )
-
         geo_ids = list(mun_dict.keys())
 
         dbf = (
@@ -469,10 +456,8 @@ class AlertaStateView(TemplateView):
             last_update = dbf.export_date
 
         if len(geo_ids) > 0:
-            cases_series_last_12 = (
-                NotificationResume.tail_estimated_cases(  # noqa: E501
-                    geo_ids, 12
-                )
+            cases_series_last_12 = NotificationResume.tail_estimated_cases(
+                geo_ids, 12
             )
         else:
             cases_series_last_12 = {}
@@ -480,19 +465,19 @@ class AlertaStateView(TemplateView):
         context.update(
             {
                 "state_abv": context["state"],
-                "state": self._state_name[context["state"]],
+                "state": state_name,
                 "map_center": MAP_CENTER[context["state"]],
                 "map_zoom": MAP_ZOOM[context["state"]],
                 "mun_dict": mun_dict,
                 "mun_dict_ordered": mun_dict_ordered,
                 "geo_ids": geo_ids,
                 "alerts_level": alerts,
-                # estimated cases is used to show a chart of the last 12 events
                 "case_series": cases_series_last_12,
                 "disease_label": context["disease"].title(),
                 "last_update": last_update,
             }
         )
+
         return context
 
 
@@ -685,38 +670,48 @@ class GeoTiffView(View):
 
 
 class GeoJsonView(View):
-    """"""
-
     def get(self, request, geocodigo, disease):
-        """
-        :param kwargs:
-        :return:
-        """
-        geocode = geocodigo
+        cache_key = f"geojson_{geocodigo}"
+        geojson = cache.get(cache_key)  # NOQA F811
 
-        # load shapefile
-        for path in (settings.STATIC_ROOT, settings.STATICFILES_DIRS[0]):
-            if not os.path.isdir(path):
-                continue
-            geojson_path = os.path.join(path, "geojson", "%s.json" % geocode)
+        if not geojson:
+            # Get the path of the GeoJSON file
+            geojson_path = self.get_geojson_path(geocodigo)
 
-        hex_color = get_last_color_alert(geocode, disease, color_type="hex")
+            # Load the GeoJSON file
+            with open(geojson_path) as f:
+                geojson_data = json.load(f)
 
-        with open(geojson_path) as f:
-            geojson_data = geojson.load(f)
+            # Modify the properties of the GeoJSON with the alert color
+            hex_color = self.get_last_color_alert(
+                geocodigo, disease, color_type="hex"
+            )
+            geojson_data["features"][0]["properties"]["fill"] = hex_color
 
-        geojson_data["features"][0]["properties"]["fill"] = hex_color
-        result = geojson.dumps(geojson_data)
+            # Serialize the GeoJSON to a string
+            geojson = json.dumps(geojson_data)
 
-        response = HttpResponse(
-            result, content_type="application/force-download"
-        )
+            # Store in cache for a certain period of time (e.g., 1 hour)
+            cache.set(cache_key, geojson, timeout=3600)
 
-        response["Content-Disposition"] = (
-            "attachment; filename=%s.json" % geocode
-        )
-
+        # Create the HTTP response with the GeoJSON
+        response = HttpResponse(geojson, content_type="application/json")
+        response[
+            "Content-Disposition"
+        ] = f"attachment; filename={geocodigo}.json"
         return response
+
+    def get_geojson_path(self, geocodigo):
+        for path in (
+            Path(settings.STATIC_ROOT),
+            Path(settings.STATICFILES_DIRS[0]),
+        ):
+            geojson_path = path / "geojson" / f"{geocodigo}.json"
+            if geojson_path.is_file():
+                return str(geojson_path)
+
+        # If the file is not found, return an empty path
+        return ""
 
 
 class ReportView(TemplateView):

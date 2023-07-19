@@ -3,6 +3,7 @@ This module contains functions to interact with the main database of the
 Alertadengue project.
 """
 import json
+import logging
 import unicodedata
 from collections import defaultdict
 from datetime import datetime
@@ -14,10 +15,13 @@ import pandas as pd
 from ad_main.settings import APPS_DIR, get_ibis_conn, get_sqla_conn
 from django.conf import settings
 from django.core.cache import cache
+from django.utils.text import slugify
 from sqlalchemy import text
 
 # local
 from .episem import episem
+
+logger = logging.getLogger(__name__)
 
 DB_ENGINE = get_sqla_conn()
 IBIS_CONN = get_ibis_conn()
@@ -718,10 +722,20 @@ class NotificationResume:
         :param state_name: State name
         :param disease: dengue|chikungunya|zika
         :param epi_year_week: int
-        :return: tupla
+        :return: DataFrame
         """
-
         _disease = get_disease_suffix(disease)
+
+        cache_key = (
+            f"cities_alert_{slugify(state_name, allow_unicode=True)}_{disease}"
+        )
+        cities_alert = cache.get(cache_key)
+
+        if cities_alert is not None:
+            logger.info("Cache found for key: %s", cache_key)
+            return cities_alert
+
+        logger.info("Cache NOT found for key: %s", cache_key)
 
         sql = """
         SELECT
@@ -765,7 +779,12 @@ class NotificationResume:
         sql = sql.format(_disease, state_name)
 
         with DB_ENGINE.connect() as conn:
-            return pd.read_sql_query(sql, conn, "id", parse_dates=True)
+            cities_alert = pd.read_sql_query(sql, conn, "id", parse_dates=True)
+
+        cache.set(cache_key, cities_alert, settings.QUERY_CACHE_TIMEOUT)
+        logger.info("Cache set for key: %s", cache_key)
+
+        return cities_alert
 
 
 '''
