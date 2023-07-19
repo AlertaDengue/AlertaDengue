@@ -3,9 +3,10 @@ This module contains functions to interact with the main database of the
 Alertadengue project.
 """
 import json
+import logging
 import unicodedata
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import List, Optional, Tuple
 
 import ibis
@@ -14,9 +15,13 @@ import pandas as pd
 from ad_main.settings import APPS_DIR, get_ibis_conn, get_sqla_conn
 from django.conf import settings
 from django.core.cache import cache
+from django.utils.text import slugify
+from sqlalchemy import text
 
 # local
 from .episem import episem
+
+logger = logging.getLogger(__name__)
 
 DB_ENGINE = get_sqla_conn()
 IBIS_CONN = get_ibis_conn()
@@ -192,7 +197,6 @@ class RegionalParameters:
         cities_by_region = {}
 
         if regional_name is not None and state_name is not None:
-
             cache_name = (
                 str(regional_name).replace(" ", "_")
                 + "_"
@@ -660,11 +664,18 @@ class NotificationResume:
             return pd.read_sql(sql, conn).astype(int).iloc[0]["count"]
 
     @staticmethod
-    def tail_estimated_cases(geo_ids, n=12):
+    def tail_estimated_cases(geo_ids: list, n: int) -> pd.DataFrame:
         """
-        :param geo_ids: list of city geo ids
-        :param n: the last n estimated cases
-        :return: dict
+        Return the last n days of estimated cases for a list of geocodes.
+
+        Parameters
+        ----------
+        geo_ids: list
+            List of geocodes
+            n: int  default: 12
+        Returns
+        -------
+            df_case_series: pd.DataFrame
         """
 
         if len(geo_ids) < 1:
@@ -685,13 +696,17 @@ class NotificationResume:
             + ")"
         )
 
-        sql = " UNION ".join([sql_template.format(gid) for gid in geo_ids])
+        sql_statements = [
+            str(text(sql_template.format(gid, n))) for gid in geo_ids
+        ]
+
+        sql = " UNION ".join(sql_statements)
 
         if len(geo_ids) > 1:
             sql += ' ORDER BY municipio_geocodigo, "data_iniSE"'
 
         with DB_ENGINE.connect() as conn:
-            df_case_series = pd.read_sql(sql, conn)
+            df_case_series = pd.read_sql(text(sql), conn)
 
         return {
             k: v.casos_est.values.tolist()
@@ -707,10 +722,20 @@ class NotificationResume:
         :param state_name: State name
         :param disease: dengue|chikungunya|zika
         :param epi_year_week: int
-        :return: tupla
+        :return: DataFrame
         """
-
         _disease = get_disease_suffix(disease)
+
+        cache_key = (
+            f"cities_alert_{slugify(state_name, allow_unicode=True)}_{disease}"
+        )
+        cities_alert = cache.get(cache_key)
+
+        if cities_alert is not None:
+            logger.info("Cache found for key: %s", cache_key)
+            return cities_alert
+
+        logger.info("Cache NOT found for key: %s", cache_key)
 
         sql = """
         SELECT
@@ -754,8 +779,15 @@ class NotificationResume:
         sql = sql.format(_disease, state_name)
 
         with DB_ENGINE.connect() as conn:
-            return pd.read_sql_query(sql, conn, "id", parse_dates=True)
+            cities_alert = pd.read_sql_query(sql, conn, "id", parse_dates=True)
 
+        cache.set(cache_key, cities_alert, settings.QUERY_CACHE_TIMEOUT)
+        logger.info("Cache set for key: %s", cache_key)
+
+        return cities_alert
+
+
+'''
     @staticmethod
     def get_4_weeks_variation(state_name, current_date):
 
@@ -805,10 +837,12 @@ class NotificationResume:
         with DB_ENGINE.connect() as conn:
             return pd.read_sql_query(sql, conn, parse_dates=True)
 
+'''
+
 
 class Forecast:
     @staticmethod
-    def get_min_max_date(geocode: int, cid10: str) -> (str):
+    def get_min_max_date(geocode: int, cid10: str) -> str:
         """
         :param geocode:
         :param cid10:
@@ -1130,7 +1164,6 @@ class ReportState:
 
     @classmethod
     def create_report_state_data(cls, geocodes, disease, year_week):
-
         if disease not in CID10.keys():
             raise Exception(
                 f"The diseases available are: {[k for k in CID10.keys()]}"
