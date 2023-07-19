@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-12 15:26-0300\n"
+"POT-Creation-Date: 2023-07-19 11:52-0300\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -61,8 +61,6 @@ msgid "Alerta Amarelo"
 msgstr "Yellow Level"
 
 #: AlertaDengue/dados/charts/alerts.py:197
-#, fuzzy
-#| msgid "Alerta laranja"
 msgid "Alerta Laranja"
 msgstr "Orange Level"
 
@@ -911,6 +909,7 @@ msgid "Selecione a doença a ser visualizada:"
 msgstr "Select the disease to be shown"
 
 #: AlertaDengue/dados/templates/alert_base.html:107
+#, python-format
 msgid ""
 "<b>Chance de alerta\n"
 "                <span class=\"label label-warning\">laranja</span> ou \n"
@@ -928,15 +927,15 @@ msgstr ""
 "%(prt)s%%\n"
 "                "
 
-#: AlertaDengue/dados/templates/alert_base.html:125
+#: AlertaDengue/dados/templates/alert_base.html:129
 msgid "Níveis de Atenção"
 msgstr "Attention Levels"
 
-#: AlertaDengue/dados/templates/alert_base.html:133
+#: AlertaDengue/dados/templates/alert_base.html:137
 msgid "Nível Verde"
 msgstr "Green Level"
 
-#: AlertaDengue/dados/templates/alert_base.html:140
+#: AlertaDengue/dados/templates/alert_base.html:144
 msgid ""
 "Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições\n"
 "                            ideais para a reprodução do Mosquito."
@@ -944,11 +943,12 @@ msgstr ""
 "No risk. When the map is green, there is neither transmission nor good "
 "conditions for mosquito reproduction."
 
-#: AlertaDengue/dados/templates/alert_base.html:151
+#: AlertaDengue/dados/templates/alert_base.html:155
 msgid "Nível Amarelo"
 msgstr "Yellow Level"
 
-#: AlertaDengue/dados/templates/alert_base.html:158
+#: AlertaDengue/dados/templates/alert_base.html:162
+#, python-format
 msgid ""
 "Estação da %(disease_label)s. No nível amarelo, temos condições climáticas\n"
 "                            propícias à reprodução do mosquito. Mas ainda "
@@ -959,11 +959,12 @@ msgstr ""
 "conditions for mosquito breeding. But still without significant transmission "
 "of the disease."
 
-#: AlertaDengue/dados/templates/alert_base.html:168
+#: AlertaDengue/dados/templates/alert_base.html:172
 msgid "Nível Laranja"
 msgstr "Orange Level"
 
-#: AlertaDengue/dados/templates/alert_base.html:174
+#: AlertaDengue/dados/templates/alert_base.html:178
+#, python-format
 msgid ""
 "Transmissão de %(disease_label)s. No nível laranja, já observamos uma "
 "incidência\n"
@@ -975,11 +976,12 @@ msgstr ""
 "a pronounced incidence of %(disease_label)s, but we can not yet confidently "
 "say that we will have an epidemic."
 
-#: AlertaDengue/dados/templates/alert_base.html:184
+#: AlertaDengue/dados/templates/alert_base.html:188
 msgid "Nível Vermelho"
 msgstr "Red Level"
 
-#: AlertaDengue/dados/templates/alert_base.html:189
+#: AlertaDengue/dados/templates/alert_base.html:193
+#, python-format
 msgid ""
 "Epidemia. Neste nível estamos em plena epidemia. Todo o cuidado é pouco, e\n"
 "                            precisamos ficar atentos aos sintomas da "
@@ -990,12 +992,12 @@ msgstr ""
 "short, and we need to be aware of %(disease_label)s symptoms and seek the "
 "doctor immediately in case of suspected %(disease_label)s."
 
-#: AlertaDengue/dados/templates/alert_base.html:200
-#: AlertaDengue/dados/templates/alert_state/map.html:213
+#: AlertaDengue/dados/templates/alert_base.html:204
 msgid "Casos estimados"
 msgstr "Estimated cases"
 
-#: AlertaDengue/dados/templates/alert_base.html:202
+#: AlertaDengue/dados/templates/alert_base.html:206
+#, python-format
 msgid ""
 " São estimados entre <b>%(min_est)s</b> e <b>%(max_est)s novos casos</b> na "
 "Semana\n"
@@ -1008,62 +1010,62 @@ msgstr ""
 "                 %(SE)s: %(data1)s to %(data2)s. With %(total_observed)s "
 "officially notified cases so far "
 
-#: AlertaDengue/dados/templates/alert_base.html:205
+#: AlertaDengue/dados/templates/alert_base.html:209
 #, python-format
 msgid " Últimas %(look_back)s semanas: "
 msgstr " Previous %(look_back)s weeks: "
 
-#: AlertaDengue/dados/templates/alert_base.html:215
+#: AlertaDengue/dados/templates/alert_base.html:219
 msgid ""
 "Suspeita de um\n"
 "                criadouro?"
 msgstr "Want to report a breeding site?"
 
-#: AlertaDengue/dados/templates/alert_base.html:218
+#: AlertaDengue/dados/templates/alert_base.html:222
 msgid "Em caso de suspeita de criadouro de mosquitos, "
 msgstr "In case of suspected breeding of mosquitoes,"
 
-#: AlertaDengue/dados/templates/alert_base.html:222
+#: AlertaDengue/dados/templates/alert_base.html:226
 msgid "contacte a "
 msgstr "contact the"
 
-#: AlertaDengue/dados/templates/alert_base.html:224
+#: AlertaDengue/dados/templates/alert_base.html:228
 msgid "central de apoio ao cidadão: 1746."
 msgstr "contact the citizen support center: 1746"
 
-#: AlertaDengue/dados/templates/alert_base.html:227
+#: AlertaDengue/dados/templates/alert_base.html:231
 msgid "contacte a central de apoio ao cidadão: 1746."
 msgstr "contact the citizen support center: 1746"
 
-#: AlertaDengue/dados/templates/alert_base.html:231
-#: AlertaDengue/dados/templates/alert_base.html:243
-#: AlertaDengue/dados/templates/alert_base.html:246
+#: AlertaDengue/dados/templates/alert_base.html:235
+#: AlertaDengue/dados/templates/alert_base.html:247
+#: AlertaDengue/dados/templates/alert_base.html:250
 msgid "contacte a secretaria de saúde de sua cidade"
 msgstr "contact your local health department"
 
-#: AlertaDengue/dados/templates/alert_base.html:236
+#: AlertaDengue/dados/templates/alert_base.html:240
 msgid "contacte a secretaria de saúde de sua cidade."
 msgstr "contact your local health department."
 
-#: AlertaDengue/dados/templates/alert_base.html:240
+#: AlertaDengue/dados/templates/alert_base.html:244
 msgid "contacte a central de apoio ao cidadão: 0800.285.0880"
 msgstr "contact the citizen support center: 0800.285.0880"
 
-#: AlertaDengue/dados/templates/alert_base.html:273
+#: AlertaDengue/dados/templates/alert_base.html:277
 msgid ""
 "Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www."
 "riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros "
 "para o mosquito!</a>"
 msgstr ""
 
-#: AlertaDengue/dados/templates/alert_base.html:274
+#: AlertaDengue/dados/templates/alert_base.html:278
 msgid ""
 "Uma vez por semana, aplique os <a href=\"http://www.riocontradengue.com.br/"
 "Site/Conteudo/Checklist.aspx\">“10 minutos Contra a dengue”!</a>"
 msgstr ""
 
-#: AlertaDengue/dados/templates/alert_base.html:275
-#: AlertaDengue/dados/templates/alert_base.html:276
+#: AlertaDengue/dados/templates/alert_base.html:279
+#: AlertaDengue/dados/templates/alert_base.html:280
 msgid ""
 "Fique <a href=\"http://www.riocontradengue.rj.gov.br/Site/Conteudo/"
 "FiqueAtento.aspx\">atento aos sintomas da Dengue!</a> Procure um médico caso "
@@ -1073,40 +1075,40 @@ msgstr ""
 "aspx\">attention to the Dengue symptoms!</a> Consult a doctor in any case of "
 "suspected Dengue."
 
-#: AlertaDengue/dados/templates/alert_base.html:290
-#: AlertaDengue/dados/templates/alert_state/map.html:26
+#: AlertaDengue/dados/templates/alert_base.html:294
+#: AlertaDengue/dados/templates/alert_state/map.html:28
 #: AlertaDengue/dados/templates/report_state/map_chik.html:24
 #: AlertaDengue/dados/templates/report_state/map_dengue.html:24
 #: AlertaDengue/dados/templates/report_state/map_zika.html:24
 msgid "Baixo Risco"
 msgstr "Low Risk"
 
-#: AlertaDengue/dados/templates/alert_base.html:291
-#: AlertaDengue/dados/templates/alert_state/map.html:27
+#: AlertaDengue/dados/templates/alert_base.html:295
+#: AlertaDengue/dados/templates/alert_state/map.html:29
 #: AlertaDengue/dados/templates/report_state/map_chik.html:25
 #: AlertaDengue/dados/templates/report_state/map_dengue.html:25
 #: AlertaDengue/dados/templates/report_state/map_zika.html:25
 msgid "Atenção"
 msgstr "Attention"
 
-#: AlertaDengue/dados/templates/alert_base.html:292
-#: AlertaDengue/dados/templates/alert_state/map.html:28
+#: AlertaDengue/dados/templates/alert_base.html:296
+#: AlertaDengue/dados/templates/alert_state/map.html:30
 #: AlertaDengue/dados/templates/report_state/map_chik.html:26
 #: AlertaDengue/dados/templates/report_state/map_dengue.html:26
 #: AlertaDengue/dados/templates/report_state/map_zika.html:26
 msgid "Transmissão"
 msgstr "Transmission"
 
-#: AlertaDengue/dados/templates/alert_base.html:293
-#: AlertaDengue/dados/templates/alert_state/map.html:29
+#: AlertaDengue/dados/templates/alert_base.html:297
+#: AlertaDengue/dados/templates/alert_state/map.html:31
 #: AlertaDengue/dados/templates/report_state/map_chik.html:27
 #: AlertaDengue/dados/templates/report_state/map_dengue.html:27
 #: AlertaDengue/dados/templates/report_state/map_zika.html:27
 msgid "Epidemia"
 msgstr "Epidemic"
 
-#: AlertaDengue/dados/templates/alert_base.html:302
-#: AlertaDengue/dados/templates/alert_base.html:360
+#: AlertaDengue/dados/templates/alert_base.html:306
+#: AlertaDengue/dados/templates/alert_base.html:364
 #: AlertaDengue/dados/templates/series_plot.html:44
 #: AlertaDengue/dados/templates/series_plot.html:97
 #: AlertaDengue/dados/templates/series_plot.html:115
@@ -1119,16 +1121,16 @@ msgstr "Epidemic"
 msgid "casos"
 msgstr "cases"
 
-#: AlertaDengue/dados/templates/alert_base.html:394
-#: AlertaDengue/dados/templates/alert_base.html:419
-#: AlertaDengue/dados/templates/alert_state/map.html:189
+#: AlertaDengue/dados/templates/alert_base.html:398
+#: AlertaDengue/dados/templates/alert_base.html:423
+#: AlertaDengue/dados/templates/alert_state/map.html:181
 #: AlertaDengue/dados/templates/report_state/map_chik.html:138
 #: AlertaDengue/dados/templates/report_state/map_dengue.html:138
 #: AlertaDengue/dados/templates/report_state/map_zika.html:138
 msgid "Unidades de Saúde"
 msgstr "Healt Unities"
 
-#: AlertaDengue/dados/templates/alert_base.html:418
+#: AlertaDengue/dados/templates/alert_base.html:422
 msgid "Áreas de Planejamento"
 msgstr "Planning areas"
 
@@ -1170,25 +1172,17 @@ msgstr "Cases per epidemiological week"
 msgid "Distribuição por gênero"
 msgstr "Distribution by gender"
 
-#: AlertaDengue/dados/templates/alert_state/map.html:175
+#: AlertaDengue/dados/templates/alert_state/map.html:167
 msgid "Total de casos de arboviroses na semana"
 msgstr "Total reported / estimated cases in the week"
 
-#: AlertaDengue/dados/templates/alert_state/map.html:178
+#: AlertaDengue/dados/templates/alert_state/map.html:170
 #: AlertaDengue/dados/templates/alerta_municipio.html:14
 #: AlertaDengue/dados/templates/report_state/map_chik.html:127
 #: AlertaDengue/dados/templates/report_state/map_dengue.html:127
 #: AlertaDengue/dados/templates/report_state/map_zika.html:127
 msgid "Passe o mouse sobre o mapa"
 msgstr "Move the mouse over the map"
-
-#: AlertaDengue/dados/templates/alert_state/map.html:214
-msgid "Últimas semanas"
-msgstr "Previous weeks: "
-
-#: AlertaDengue/dados/templates/alert_state/map.html:218
-msgid "Mais detalhes"
-msgstr "More details"
 
 #: AlertaDengue/dados/templates/alerta_municipio.html:13
 msgid "Número de casos estimados na semana"
@@ -2066,6 +2060,8 @@ msgid "cases_est_min and cases_est_max"
 msgstr "cases_est_min and cases_est_max"
 
 #: AlertaDengue/dados/templates/services_api.html:207
+#, fuzzy, python-format
+#| msgid "Intervalo de credibilidade de 95%% do número estimado de casos"
 msgid "Intervalo de credibilidade de 95%% do número estimado de casos"
 msgstr "95% credible interval of the estimated number of cases"
 
@@ -2339,43 +2335,49 @@ msgstr ""
 msgid "documentação oficial do PySUS"
 msgstr "official documentation"
 
-#: AlertaDengue/dados/templates/state_cities.html:179
+#: AlertaDengue/dados/templates/state_cities.html:100
+#, fuzzy
+#| msgid "Selecione o tipo de mapa desejado"
+msgid "Selecione no filtro o período desejado"
+msgstr "Select the kind of desired map."
+
+#: AlertaDengue/dados/templates/state_cities.html:162
 msgid "Dados de"
 msgstr "Data of"
 
-#: AlertaDengue/dados/templates/state_cities.html:179
+#: AlertaDengue/dados/templates/state_cities.html:162
 msgid "a"
 msgstr "and"
 
-#: AlertaDengue/dados/templates/state_cities.html:191
+#: AlertaDengue/dados/templates/state_cities.html:170
 msgid "Casos de"
 msgstr "Cases of"
 
-#: AlertaDengue/dados/templates/state_cities.html:192
+#: AlertaDengue/dados/templates/state_cities.html:172
 msgid "entre"
 msgstr "between"
 
-#: AlertaDengue/dados/templates/state_cities.html:192
+#: AlertaDengue/dados/templates/state_cities.html:174
 msgid "e"
 msgstr "and"
 
-#: AlertaDengue/dados/templates/state_cities.html:193
+#: AlertaDengue/dados/templates/state_cities.html:177
 msgid "sexo"
 msgstr "sex"
 
-#: AlertaDengue/dados/templates/state_cities.html:194
+#: AlertaDengue/dados/templates/state_cities.html:180
 msgid "idades"
 msgstr "ages"
 
-#: AlertaDengue/dados/templates/state_cities.html:219
+#: AlertaDengue/dados/templates/state_cities.html:204
 msgid "Última atualização"
 msgstr "Last update"
 
-#: AlertaDengue/dados/templates/state_cities.html:227
+#: AlertaDengue/dados/templates/state_cities.html:212
 msgid "Descrição de filtro"
 msgstr "Filter description"
 
-#: AlertaDengue/dados/templates/state_cities.html:310
+#: AlertaDengue/dados/templates/state_cities.html:295
 msgid "Por favor, aguarde."
 msgstr "Please, wait."
 
@@ -2548,37 +2550,43 @@ msgstr ""
 msgid "Entre em contato conosco"
 msgstr "Contact us"
 
-#: AlertaDengue/dados/views.py:328
+#: AlertaDengue/dados/views.py:332
 msgid ""
 "A doença {} não está registrada em nosso banco de dados para o município de "
 "{}."
 msgstr "This disease {} is not registered in our database for {} municipality"
 
-#: AlertaDengue/dados/views.py:452
+#: AlertaDengue/dados/views.py:454
 msgid "desconhecida"
 msgstr "unknown"
 
-#: AlertaDengue/dados/views.py:845
+#: AlertaDengue/dados/views.py:855
 msgid "°C temperatura mínima"
 msgstr "°C Minimum temperature"
 
-#: AlertaDengue/dados/views.py:846
+#: AlertaDengue/dados/views.py:856
 msgid "°C temperatura média"
 msgstr "°C Average temperatures"
 
-#: AlertaDengue/dados/views.py:847
+#: AlertaDengue/dados/views.py:857
 msgid "°C temperatura máxima"
 msgstr "°C Maximum temperature"
 
-#: AlertaDengue/dados/views.py:848
+#: AlertaDengue/dados/views.py:858
+#, fuzzy, python-format
+#| msgid "% umidade mínima do ar"
 msgid "% umidade mínima do ar"
 msgstr "% Minimum air humidity"
 
-#: AlertaDengue/dados/views.py:849
+#: AlertaDengue/dados/views.py:859
+#, fuzzy, python-format
+#| msgid "% umidade média do ar"
 msgid "% umidade média do ar"
 msgstr "% Average air humidity"
 
-#: AlertaDengue/dados/views.py:850
+#: AlertaDengue/dados/views.py:860
+#, fuzzy, python-format
+#| msgid "% umidade máxima do ar"
 msgid "% umidade máxima do ar"
 msgstr "% Maximum air humidity"
 
@@ -2864,6 +2872,12 @@ msgstr "Your username, if you have forgotten it, is:"
 #: AlertaDengue/templates/registration/password_reset_email.html:12
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
+
+#~ msgid "Últimas semanas"
+#~ msgstr "Previous weeks: "
+
+#~ msgid "Mais detalhes"
+#~ msgstr "More details"
 
 #~ msgid "Casos Notificados de "
 #~ msgstr "Reported cases of "
