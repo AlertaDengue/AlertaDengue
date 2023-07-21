@@ -14,15 +14,10 @@ packages = [
 
 
 [tool.poetry.dependencies]
-Django = ">=3.2.18,<4"
-Fiona = "^1.8.21"
-SQLAlchemy = "<2.0"
-celery = "^5.2.6"
-certifi = "^2022.9.24"
-click = "<8.1.5"
+dask = "^2023.5.0"
+dask-geopandas = "^0.3.1"
 dbfread = "^2.0.7"
-dj-database-url = "^0.5.0"
-dj-static = "^0.0.6"
+django = ">=3.2.18,<4"
 django-bootstrap4 = "^22.1"
 django-celery-results = "^2.3.1"
 django-chunked-upload = "<2.0.0"
@@ -30,14 +25,16 @@ django-cprofile-middleware = "^1.0.5"
 django-leaflet = "^0.28.2"
 django-maintenance-mode = "^0.16.3"
 django-pymemcache = "^1.0.0"
-docker-compose = "^1.29.2"
+dj-static = "^0.0.6"
+celery = "^5.2.6"
 fastparquet = "^0.8.1"
+Fiona = "^1.8.21"
 geojson = "^2.5.0"
 geopandas = "^0.10.2"
 geopy = "^2.2.0"
 gunicorn = "^20.1.0"
 ibis-framework = {extras = ["postgres"], version = "^3.2.0"}
-pandas = "1.4.0"
+plotly = "^5.11.0"
 pyproj = "^3.3.0"
 python = ">=3.9,<3.11"
 python-dotenv = ">=0.21.1,<0.22.0"
@@ -45,32 +42,26 @@ python-memcached = "^1.59"
 rasterio = "^1.2.10"
 sh = ">=2.0.0"
 simpledbf = "^0.2.6"
+SQLAlchemy = "<2.0"
 tables = "^3.7.0"
-plotly = "^5.11.0"
-dask = "^2023.5.0"
-dask-geopandas = "^0.3.1"
-pyogrio = "^0.6.0"
-urllib3 = "1.26.16"
-makim = "1.8.1"
-containers-sugar = "1.7.1"
 
 
-
-[tool.poetry.group.development.dependencies]
+[tool.poetry.group.dev.dependencies]
 black = "^22.12.0"
+containers-sugar = "^1.9.0"
+compose-go = "^2.20.2"
 django-extensions = "^3.2.1"
 flake8 = "^6.0.0"
 isort = "^5.11.4"
 mypy = "^0.991"
+make = "^0.1.6.post2"
+makim = "^1.8.2"
 pre-commit = "^2.21.0"
 pytest = "^7.2.1"
-make = "^0.1.6.post2"
-
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
 
 [tool.black]
 # https://github.com/psf/black

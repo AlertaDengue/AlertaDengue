@@ -1,0 +1,1 @@
+git+https://github.com/osl-package-recipes/compose-go.git@v2.20.1#egg=compose-go
