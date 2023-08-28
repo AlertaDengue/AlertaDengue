@@ -101,6 +101,7 @@ services:
     volumes:
       - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      - ${DOCKER_HOST_DBF_SINAN}:/DBF_SINAN
       - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
       - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/
     profiles:
@@ -117,6 +118,7 @@ services:
     depends_on:
       - rabbitmq
       - memcached
+      - worker
     restart: always
     entrypoint: ["bash", "/entrypoint.sh"]
     command:
@@ -158,7 +160,6 @@ services:
     depends_on:
       - rabbitmq
       - memcached
-      - minio
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", 'celery --app ad_main.celeryapp.app status']

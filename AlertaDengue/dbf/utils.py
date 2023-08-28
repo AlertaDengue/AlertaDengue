@@ -13,13 +13,15 @@ from django.utils.translation import ugettext_lazy as _
 from loguru import logger
 from simpledbf import Dbf5
 
+# Directories
 temp_files_dir = Path(settings.TEMP_FILES_DIR)
-
-DBF_CSV_DIR = temp_files_dir / "dbf_duplicated_csv"
-DBF_CSV_DIR.mkdir(parents=True, exist_ok=True)
-
+dbf_sinan = Path(settings.DBF_SINAN)
+DBF_CSV_DIR = dbf_sinan / "dbf_duplicated_csv"
 DBF_PQT_DIR = temp_files_dir / "dbf_parquet"
-DBF_PQT_DIR.mkdir(parents=True, exist_ok=True)
+
+# Create directories if they don't exist
+for directory in [DBF_CSV_DIR, DBF_PQT_DIR]:
+    directory.mkdir(parents=True, exist_ok=True)
 
 EXPECTED_FIELDS = [
     "NU_ANO",
