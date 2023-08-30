@@ -287,7 +287,7 @@ STATICFILES_FINDERS = [
 MEDIA_URL = "/img/"
 
 # used to upload dbf
-DBF_SINAN = os.getenv("DBF_SINAN")
+DBF_DUPLICATED_CSV = os.getenv("DBF_DUPLICATED_CSV")
 MEDIA_ROOT = os.getenv("MEDIA_ROOT")
 IMPORTED_FILES = os.getenv("IMPORTED_FILES")
 TEMP_FILES_DIR = os.getenv("TEMP_FILES_DIR")

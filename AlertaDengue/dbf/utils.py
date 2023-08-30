@@ -15,14 +15,13 @@ from simpledbf import Dbf5
 
 # Directories
 temp_files_dir = Path(settings.TEMP_FILES_DIR)
-dbf_sinan = Path(settings.DBF_SINAN)
-DBF_CSV_DIR = dbf_sinan / "dbf_duplicated_csv"
+
+DBF_DUPLICATED_CSV_DIR = Path(settings.DBF_DUPLICATED_CSV)
 DBF_PQT_DIR = temp_files_dir / "dbf_parquet"
 
 # Create directories if they don't exist
-for directory in [DBF_CSV_DIR, DBF_PQT_DIR]:
-    directory.mkdir(parents=True, exist_ok=True)
-
+# for directory in [DBF_DUPLICATED_CSV_DIR, DBF_PQT_DIR]:
+#     directory.mkdir(parents=True, exist_ok=True)
 EXPECTED_FIELDS = [
     "NU_ANO",
     "ID_MUNICIP",
@@ -417,7 +416,7 @@ def drop_duplicates_from_dataframe(
         logger.info("Duplicates found for the same epiweek!")
         df_se_notific = df[duplicate_se_notific_mask]
         df_se_notific.to_csv(
-            DBF_CSV_DIR
+            DBF_DUPLICATED_CSV_DIR
             / f"duplicate_values_SE_NOT_{year}_{default_cid_name}.csv",
             index=False,
         )
@@ -433,7 +432,7 @@ def drop_duplicates_from_dataframe(
         logger.info("Duplicates found for the same notification date")
         df_dt_notific = df[duplicate_dt_notific_mask]
         df_dt_notific.to_csv(
-            DBF_CSV_DIR
+            DBF_DUPLICATED_CSV_DIR
             / f"duplicate_values_DT_NOT_{year}_{default_cid_name}.csv",
             index=False,
         )
