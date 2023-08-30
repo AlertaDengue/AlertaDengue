@@ -11,7 +11,7 @@ service-groups:
       - containers/compose.yaml
     env-file: .env
     services:
-      default: memcached,rabbitmq,web
+      default: memcached,rabbitmq,web,worker
       available:
         - name: postgres
         - name: web
@@ -25,7 +25,7 @@ service-groups:
     compose-path: containers/compose.yaml
     env-file: .env
     services:
-      default: memcached,rabbitmq,web
+      default: memcached,rabbitmq,web,worker
       available:
         - name: dengue_db
         - name: web
