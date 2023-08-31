@@ -3,6 +3,7 @@ import os
 import shutil
 from datetime import datetime
 from email.mime.image import MIMEImage
+from pathlib import Path
 
 from ad_main import settings
 
@@ -49,6 +50,9 @@ def send_failure_email(dbf, message):
 
 
 def copy_file_to_final_destination(dbf):
+
+    imported_files = str(Path(settings.DBF_SINAN) / "imported")
+
     new_filename = "{}_{}_{}_{}.dbf".format(
         dbf.abbreviation,
         dbf.municipio,
@@ -56,7 +60,7 @@ def copy_file_to_final_destination(dbf):
         dbf.notification_year,
     )
     src = dbf.file.path
-    dest = os.path.join(settings.IMPORTED_FILES, new_filename)
+    dest = os.path.join(imported_files, new_filename)
     shutil.copy(src, dest)
 
 

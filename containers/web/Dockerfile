@@ -37,9 +37,9 @@ RUN addgroup --gid ${HOST_GID} deploy \
   && echo "deploy ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/deploy \
   && chmod 0440 /etc/sudoers.d/deploy \
   && export ENV_NAME="$ENV_NAME" \
-  && mkdir -p /opt/conda /opt/services/ \
+  && mkdir -p /opt/conda /opt/services/ /tmp/dbf_parquet \
+  && chown ${HOST_UID}:${HOST_GID} /opt/services/ /tmp/dbf_parquet \
   && chmod -R a+rwx /opt/conda /opt/services /tmp \
-  && chown ${HOST_UID}:${HOST_GID} /opt/services/ /tmp \
   && echo 'source activate "$ENV_NAME"' >  /home/deploy/.bashrc
 ENV PATH "$PATH:/home/deploy/.local/bin"
 ENV PATH /opt/conda/envs/$ENV_NAME/bin:$PATH

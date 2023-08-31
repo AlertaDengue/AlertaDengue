@@ -101,7 +101,7 @@ services:
     volumes:
       - ${DOCKER_HOST_UPLOADED_FILES_DIR}:/MEDIA_ROOT
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
-      - ${DOCKER_HOST_DBF_DUPLICATED_CSV}:/MEDIA_ROOT/:rw
+      - ${DOCKER_HOST_DBF_SINAN}:/DBF_SINAN
       - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
       - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbf_parquet
     profiles:
