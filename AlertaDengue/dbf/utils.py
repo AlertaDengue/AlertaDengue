@@ -1,7 +1,7 @@
+import datetime as dt
 import glob
-import logging
 from pathlib import Path
-from typing import List, Union
+from typing import Any, Iterator, List, Optional, Tuple, Union
 
 import dask.dataframe as dd
 import geopandas as gpd
@@ -10,18 +10,13 @@ import pandas as pd
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from loguru import logger
 from simpledbf import Dbf5
 
-logger = logging.getLogger(__name__)
-
-
+# Directories
 temp_files_dir = Path(settings.TEMP_FILES_DIR)
-
-DBF_CSV_DIR = temp_files_dir / "dbf_duplicated_csv"
-DBF_CSV_DIR.mkdir(parents=True, exist_ok=True)
-
-DBF_PQT_DIR = temp_files_dir / "dbf_parquet"
-DBF_PQT_DIR.mkdir(parents=True, exist_ok=True)
+dbf_sinan_dir = Path(settings.DBF_SINAN) / "dbf_duplicated_csv"
+dbf_pqt_dir = temp_files_dir / "dbf_parquet"
 
 EXPECTED_FIELDS = [
     "NU_ANO",
@@ -103,54 +98,58 @@ def add_dv(geocode: str) -> int:
         return int(geocode)
     elif len(str(geocode)) == 6:
         return int(str(geocode) + str(calculate_digit(geocode)))
-    elif len(str(geocode)) == 0:
-        return logger.info(len(geocode))
 
     raise ValueError(f"geocode:{geocode} does not match!")
 
 
 @np.vectorize
-def fix_nu_notif(value: str) -> int:
+def fix_nu_notif(value: Union[str, None]) -> Optional[int]:
     """
     Formats NU_NOTIF field value.
     Parameters
     ----------
-        value (str): Value of NU_NOTIF field.
+        value: Union[str, None]
+            Value of NU_NOTIF field.
     Returns
     -------
-        int: Formatted NU_NOTIF field value.
-    Raises:
-    -------
+        Optional[int]: Formatted NU_NOTIF field value.
+    Raises
+    ------
         ValueError: If value cannot be converted to int.
     """
-
     char_to_replace = {",": "", "'": "", ".": ""}
+    if value is None:
+        return None
 
     try:
-        value = None if pd.isnull(value) else int(value)
-    except ValueError as e:
-        if any(x in value for x in list(char_to_replace)):
-            # Replace multiple characters.
-            value = value.translate(str.maketrans(char_to_replace))
-        else:
-            logger.error(e)
+        return int(value)
+    except ValueError:
+        # Replace multiple characters.
+        for char, replacement in char_to_replace.items():
+            value = value.replace(char, replacement)
 
-    return value
+        try:
+            return int(value)
+        except ValueError:
+            logger.error(f"Invalid NU_NOTIF value: {value}")
+            return None
 
 
 @np.vectorize
-def convert_data_types(col: any, dtype: type) -> any:
+def convert_data_types(
+    col: Union[pd.Series, Any], dtype: type
+) -> Optional[Any]:
     """
-    Converts column data types to the specified type.
+    Convert the data type of the given column to the specified dtype.
     Parameters
     ----------
-        col (any): The column to convert.
+        col (Union[pd.Series, Any]): The column to convert.
         dtype (type): The data type to convert the column to.
+
     Returns
     -------
-        any: The converted column.
+        Optional[Any]: The converted column, or None if the column is null.
     """
-
     if pd.isnull(col):
         return None
     elif dtype == str:
@@ -158,11 +157,11 @@ def convert_data_types(col: any, dtype: type) -> any:
     elif dtype == int:
         return int(col or 0)
     else:
-        return dtype.type(col)
+        return dtype(col)
 
 
 @np.vectorize
-def fill_id_agravo(col: np.ndarray, default_cid: str) -> np.ndarray:
+def fill_id_agravo(col: str, default_cid: str) -> str:
     """
     Fills missing values in col with default_cid.
     Parameters
@@ -171,7 +170,7 @@ def fill_id_agravo(col: np.ndarray, default_cid: str) -> np.ndarray:
         default_cid (str): A default value to fill in the missing values.
     Returns
     -------
-        np.ndarray: A numpy array with missing values filled using default_cid.
+        str: String with missing values filled using default_cid.
     """
 
     if col is None:
@@ -189,57 +188,57 @@ def fill_id_agravo(col: np.ndarray, default_cid: str) -> np.ndarray:
 
 
 @np.vectorize
-def convert_date(col: Union[pd.Series, np.ndarray]) -> np.ndarray:
+def convert_date(col: Union[pd.Series, dt.datetime]) -> Optional[pd.Series]:
     """
     Convert a column of dates to datetime.date objects.
-
     Parameters
     ----------
     col : Union[pd.Series, np.ndarray]
-        A pandas.Series or numpy.ndarray containing date strings.
+        A pandas.Series or numpy array containing date strings.
 
     Returns
     -------
-    np.ndarray
-        A numpy.ndarray of datetime.date objects.
+    Optional[np.ndarray]
+        A Any of datetime.date objects, or None if the input is null.
     """
 
     if pd.isnull(col):
         return None
     else:
-        return pd.Timestamp(col).to_pydatetime().date()
+        return pd.to_datetime(col).to_pydatetime().date()
 
 
 @np.vectorize
-def convert_sem_not(col: np.ndarray) -> np.ndarray:
+def convert_sem_not(col: np.ndarray[int]) -> np.ndarray[int]:
     """
     Converts a given column of integers to its last two digits.
     Parameters
     ----------
-        col (numpy.ndarray): A column of integers to be converted.
+    col : numpy.ndarray[int]
+        A column of integers to be converted.
     Returns
     -------
-        numpy.ndarray: A column of integers with only its last two digits.
+    numpy.ndarray[int]
+        A column of integers with only its last two digits.
     """
-
     return int(str(int(col))[-2:])
 
 
 @np.vectorize
-def convert_nu_ano(ano: str, col: pd.Series) -> np.ndarray:
+def convert_nu_ano(year: str, col: pd.Series) -> int:
     """
-    Convert the given 'ano' string to an integer if 'col' is NaN,
+    Convert the given 'year' string to an integer if 'col' is NaN,
     otherwise convert 'col' to an integer.
     Parameters
     ----------
-        ano: A string representing the year.
+        year: A string representing the year.
         col: A pandas series representing a column of a dataframe.
     Returns
     -------
-        A numpy array of integers.
+        int: A column of integers.
     """
 
-    return int(ano) if pd.isnull(col) else int(col)
+    return int(year) if pd.isnull(col) else int(col)
 
 
 @np.vectorize
@@ -253,27 +252,27 @@ def convert_sem_pri(col: str) -> int:
     Returns
     -------
         int: The last two digits of the string as an integer.
-
     """
 
-    if not col:
-        return None
-    else:
-        return int(str(col)[-2:])
+    if col:
+        col = str(col)[-2:]
+
+    return int(col)
 
 
-def parse_data(df: pd.DataFrame, default_cid: str, ano: int) -> pd.DataFrame:
+def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
     """
-    Parse and convert data types for COVID-19 notification data.
+    Parse and convert data types for the notification data.
     Parameters
     ----------
         df (pandas.core.frame.DataFrame): The dataframe to parse.
         default_cid (str): The default CID code.
-        ano (int): The year of the notification data.
+        year (int): The year of the notification data.
     Returns
     -------
         pandas.core.frame.DataFrame: The parsed dataframe.
     """
+    logger.info("Parsing rows and converting data types...")
 
     df["NU_NOTIFIC"] = fix_nu_notif(df.NU_NOTIFIC)
 
@@ -314,7 +313,7 @@ def parse_data(df: pd.DataFrame, default_cid: str, ano: int) -> pd.DataFrame:
 
     df["SEM_PRI"] = convert_sem_pri(df.SEM_PRI)
 
-    df["NU_ANO"] = convert_nu_ano(ano, df.NU_ANO)
+    df["NU_ANO"] = convert_nu_ano(year, df.NU_ANO)
 
     df["SEM_NOT"] = convert_sem_not(df.SEM_NOT)
 
@@ -351,54 +350,37 @@ def _parse_fields(dbf_name: str, df: gpd.GeoDataFrame) -> pd.DataFrame:
     return df
 
 
-# def fill_missing_columns(df, col_names: List[str]) -> None:
-#     """
-#     Check if the table to be inserted contains all columns
-#         required in the database model.
-#     If not, create these columns filled with Null values to allow
-#         for database insertion.
-#     Parameters
-#     ----------
-#     col_names : numpy.ndarray
-#         A numpy array of column names to check.
-#     Returns
-#     -------
-#     None
-#     """
-
-#     for nm in col_names:
-#         if FIELD_MAP[nm] not in df.columns:
-#             df[FIELD_MAP[nm]] = None
-
-
-def select_expected_fields(dbf_name: str) -> List[str]:
+def list_expected_fields(dbf_fields: List[Tuple[str, str]]) -> List[str]:
     """
-    Selects the expected fields based on the fname.
+    Return a list of expected fields based on the FIELD_MAP and dbf_fields.
     Parameters
     ----------
-    dbf_name : str
-        The filename used to determine the expected fields.
+        dbf_fields (List[tuple]): A list of tuples representing the fields in the dbf file.
     Returns
     -------
-    List[str]
-        The list of expected fields.
-    Notes
-    -----
-    The function checks the dbf_name to determine the expected fields.
-    If dbf_name starts with "BR-DEN" or "BR-CHIK", additional fields
-    "RESUL_PCR_", "CRITERIO", and "CLASSI_FIN" are included.
-    If dbf_name starts with "BR-ZIKA", fields "CRITERIO" and "CLASSI_FIN"
-    are included. For other cases, the list of expected fields remains
-    unchanged.
+        List[str]: A list of expected fields.
     """
-    all_expected_fields = EXPECTED_FIELDS.copy()
+    expected_fields = list(FIELD_MAP.values())
+    existing_fields = [
+        field[0] for field in dbf_fields if field[0] in expected_fields
+    ]
+    missing_fields = [
+        field for field in expected_fields if field not in existing_fields
+    ]
 
-    if dbf_name.startswith(("BR-DEN", "BR-CHIK")):
-        all_expected_fields.extend(["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"])
-    elif dbf_name.startswith(("BR-ZIKA")):
-        all_expected_fields.extend(["CRITERIO", "CLASSI_FIN"])
+    try:
+        expected_fields += missing_fields
 
-    return all_expected_fields
+        if missing_fields:
+            expected_fields += existing_fields
+            logger.info(
+                f"Added {len(missing_fields)} new fields for the DBF columns!"
+            )
+
+    except Exception as e:
+        logger.error(e)
+
+    return expected_fields
 
 
 def drop_duplicates_from_dataframe(
@@ -406,24 +388,22 @@ def drop_duplicates_from_dataframe(
 ) -> pd.DataFrame:
     """
     Remove duplicates from a pandas DataFrame based on the provided conditions.
-
     The function checks if the data has duplicate values.
     If the first condition (SEM_NOT) is met, it saves the data to a CSV file
     and returns the original DataFrame without any changes.
     If the second condition (DT_NOTIFIC) is met,
     it drops the duplicate rows from the DataFrame and
     returns it without the duplicate values.
-
     Parameters
     ----------
     df : pd.DataFrame
         The pandas DataFrame to remove duplicates from.
-
     Returns
     -------
     pd.DataFrame
         A pandas DataFrame with duplicates removed.
     """
+    logger.info("Removing duplicates...")
 
     duplicate_se_notific_mask = df.duplicated(
         subset=["ID_AGRAVO", "NU_NOTIFIC", "ID_MUNICIP", "SEM_NOT"]
@@ -432,7 +412,7 @@ def drop_duplicates_from_dataframe(
         logger.info("Duplicates found for the same epiweek!")
         df_se_notific = df[duplicate_se_notific_mask]
         df_se_notific.to_csv(
-            DBF_CSV_DIR
+            dbf_sinan_dir
             / f"duplicate_values_SE_NOT_{year}_{default_cid_name}.csv",
             index=False,
         )
@@ -448,7 +428,7 @@ def drop_duplicates_from_dataframe(
         logger.info("Duplicates found for the same notification date")
         df_dt_notific = df[duplicate_dt_notific_mask]
         df_dt_notific.to_csv(
-            DBF_CSV_DIR
+            dbf_sinan_dir
             / f"duplicate_values_DT_NOT_{year}_{default_cid_name}.csv",
             index=False,
         )
@@ -462,19 +442,16 @@ def drop_duplicates_from_dataframe(
     return df
 
 
-def chunk_gen(chunksize: int, totalsize: int):
+def chunk_gen(chunksize: int, totalsize: int) -> Iterator[Tuple[int, int]]:
     """
-    Create chunks.
+    Generate chunks.
     Parameters
     ----------
-    chunksize : int
-        Size of each chunk.
-    totalsize : int
-        Total size of the data.
+        chunksize (int): Size of each chunk.
+        totalsize (int): Total size of the data.
     Yields
     ------
-    tuple
-        A tuple containing the lowerbound and upperbound indices of each chunk.
+        Tuple[int, int]: A tuple containing the lowerbound and upperbound indices of each chunk.
     """
     chunks = totalsize // chunksize
 
@@ -503,7 +480,9 @@ def read_dbf(fname: str) -> pd.DataFrame:
     """
     dbf = Dbf5(fname, codec="iso-8859-1")
     dbf_name = str(dbf.dbf)[:-4]
-    parquet_dir = DBF_PQT_DIR / f"{dbf_name}"
+    dbf_fields = dbf.fields
+    expeceted_cols = list_expected_fields(dbf_fields)
+    parquet_dir = dbf_pqt_dir / f"{dbf_name}"
 
     if not parquet_dir.is_dir():
         logger.info("Converting DBF file to Parquet format...")
@@ -514,12 +493,11 @@ def read_dbf(fname: str) -> pd.DataFrame:
             parquet_fname = f"{parquet_dir}/{dbf_name}-{chunk}.parquet"
             df = gpd.read_file(
                 fname,
-                include_fields=select_expected_fields(dbf_name),
+                include_fields=expeceted_cols,
                 rows=slice(lowerbound, upperbound),
                 ignore_geometry=True,
             )
             df = _parse_fields(dbf_name, df)
-
             df.to_parquet(parquet_fname)
 
     fetch_pq_fname = glob.glob(f"{parquet_dir}/*.parquet")

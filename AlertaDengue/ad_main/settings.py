@@ -287,6 +287,7 @@ STATICFILES_FINDERS = [
 MEDIA_URL = "/img/"
 
 # used to upload dbf
+DBF_SINAN = os.getenv("DBF_SINAN")
 MEDIA_ROOT = os.getenv("MEDIA_ROOT")
 IMPORTED_FILES = os.getenv("IMPORTED_FILES")
 TEMP_FILES_DIR = os.getenv("TEMP_FILES_DIR")
@@ -432,3 +433,10 @@ LEAFLET_CONFIG = {
     },
     "RESET_VIEW": False,
 }
+
+# MINIO
+# ------------------------------------------------------------------------------
+MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
+MINIO_ROOT_USER = os.getenv("MINIO_ROOT_USER")
+MINIO_ROOT_PASSWORD = os.getenv("MINIO_ROOT_PASSWORD")
+MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")

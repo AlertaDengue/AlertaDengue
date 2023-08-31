@@ -1,61 +1,5 @@
 version: "3.4"
 services:
-  base_postgres:
-    build:
-      context: ".."
-      dockerfile: "containers/postgres/Dockerfile"
-    env_file:
-      - ../.env
-    profiles:
-      - donotstart
-
-  dengue_db:
-    hostname: dengue_db
-    extends:
-      service: base_postgres
-    env_file:
-      - ../.env
-    environment:
-      PG_RESTORE_STAGING: ${PG_RESTORE_STAGING}
-      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
-      POSTGRES_HOST_AUTH_METHOD: "md5"
-    ports:
-      - ${PSQL_PORT}:5432
-    volumes:
-      - ${PG_DATA_PROD}:/var/lib/postgresql/data/:rw
-      - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
-      - ../containers/postgres/dumps/:/dumps/
-    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U ${PSQL_USER}"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-
-  postgres:
-    hostname: postgres
-    extends:
-      service: base_postgres
-    env_file:
-      - ../.env
-    environment:
-      PG_RESTORE_STAGING: ${PG_RESTORE_STAGING}
-      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
-      POSTGRES_HOST_AUTH_METHOD: "md5"
-    ports:
-      - ${PSQL_PORT}:25432
-    volumes:
-      - ${PG_DATA_STAGING}:/var/lib/postgresql/data/
-      - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
-      - ../containers/postgres/${PG_RESTORE_STAGING}/:/${PG_RESTORE_STAGING}/
-    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
 
   memcached:
     hostname: memcached
@@ -82,6 +26,63 @@ services:
       start_period: 10s  # requires docker-compose 3.4
     restart: always
 
+  base_postgres:
+    build:
+      context: ".."
+      dockerfile: "containers/postgres/Dockerfile"
+    env_file:
+      - ../.env
+    profiles:
+      - donotstart
+
+  dengue_db:
+    hostname: dengue_db
+    extends:
+      service: base_postgres
+    env_file:
+      - ../.env
+    environment:
+      - PG_RESTORE_STAGING=${PG_RESTORE_STAGING}
+      - POSTGRES_PASSWORD=${PSQL_PASSWORD}
+      - POSTGRES_HOST_AUTH_METHOD="md5"
+    ports:
+      - ${PSQL_PORT}:5432
+    volumes:
+      - ${PG_DATA_PROD}:/var/lib/postgresql/data/:rw
+      - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
+      - ../containers/postgres/dumps/:/dumps/
+    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U ${PSQL_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  postgres:
+    hostname: postgres
+    extends:
+      service: base_postgres
+    env_file:
+      - ../.env
+    environment:
+      - PG_RESTORE_STAGING= ${PG_RESTORE_STAGING}
+      - POSTGRES_PASSWORD= ${PSQL_PASSWORD}
+      - POSTGRES_HOST_AUTH_METHOD="md5"
+    ports:
+      - ${PSQL_PORT}:25432
+    volumes:
+      - ${PG_DATA_STAGING}:/var/lib/postgresql/data/
+      - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
+      - ../containers/postgres/${PG_RESTORE_STAGING}/:/${PG_RESTORE_STAGING}/
+    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   base:
     build:
       context: ".."
@@ -98,10 +99,11 @@ services:
       - PSQL_HOST=${PSQL_HOST}
       - PSQL_PORT=${PSQL_PORT}
     volumes:
-      - ${DOCKER_HOST_MEDIA_ROOT}:/MEDIA_ROOT
+      - ${DOCKER_HOST_UPLOADED_FILES_DIR}:/MEDIA_ROOT
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
+      - ${DOCKER_HOST_DBF_SINAN}:/DBF_SINAN
       - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
-      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/
+      - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbf_parquet
     profiles:
       - donotstart
 
@@ -116,16 +118,23 @@ services:
     depends_on:
       - rabbitmq
       - memcached
+      - worker
     restart: always
+    entrypoint: ["bash", "/entrypoint.sh"]
     command:
       - sh
       - -c
       - |
         if [ "${ENV}" = "prod" ]; then
-          gunicorn -w 4 -b 0.0.0.0:8000 ad_main.wsgi:application --timeout 9640;
+          python3 /opt/services/AlertaDengue/manage.py collectstatic --noinput
+          gunicorn -w 4 -b 0.0.0.0:${WEB_PORT} ad_main.wsgi:application --timeout 9640;
         else
+          python3 /opt/services/AlertaDengue/manage.py collectstatic --noinput
           python manage.py runserver 0.0.0.0:${WEB_PORT};
         fi
+    # volumes:
+      # Development
+      # - ${ROOT_DIR}/AlertaDengue/dbf:/opt/services/AlertaDengue/dbf
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${WEB_PORT}"]
       interval: 10s
@@ -133,35 +142,62 @@ services:
       retries: 5
       start_period: 10s  # requires docker-compose 3.4
 
+  worker:
+    hostname: worker
+    extends:
+      service: base
+    entrypoint: ["bash", "/entrypoint.sh", "/opt/services/run_services.sh"]
+    command: ["python3", "/opt/services/AlertaDengue/dbf/collector.py"]
+    env_file:
+      - ../.env
+    environment:
+     - MINIO_ENDPOINT=minio:${MINIO_PORT_1}
+     - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+     - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+     - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
+    volumes:
+      - ${HOST_MINIO_DATA_DIR}:/opt/services/collector
+    depends_on:
+      - rabbitmq
+      - memcached
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", 'celery --app ad_main.celeryapp.app status']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
   minio:
+    hostname: minio
     platform: linux/amd64
-    image: quay.io/minio/minio
+    image: minio/minio
+    mem_limit: 16g
+    mem_reservation: 4g
+    cpus: "2.0"
     restart: unless-stopped
     env_file:
       - ../.env
     environment:
-      MINIO_USERNAME: ${MINIO_USERNAME}
-      MINIO_GROUPNAME: ${MINIO_GROUPNAME}
-      MINIO_GID: ${HOST_UID}
-      MINIO_UID: ${HOST_GID}
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-      MINIO_PORT_1: 9000
-      MINIO_PORT_2: 9090
-      # MINIO_ENDPOINT: http://minio:9090
+     - MINIO_UID=${MINIO_UID}
+     - MINIO_GID=${MINIO_GID}
+     - MINIO_ENDPOINT=minio:${MINIO_PORT_1}
+     - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+     - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+     - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
     command: [
       "server",
-      "/data",
+      "/opt/services/collector/data",
       "--console-address",
-      ":9090"
+      ":${MINIO_PORT_2}"
     ]
     ports:
-      - ${MINIO_PORT_1}:9000
-      - ${MINIO_PORT_2}:9090
+      - ${MINIO_PORT_1}:${MINIO_PORT_1}
+      - ${MINIO_PORT_2}:${MINIO_PORT_2}
     volumes:
-      - ${HOST_MINIO_DATA_DIR}:/data
+      - ${HOST_MINIO_DATA_DIR}:/opt/services/collector
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "http://localhost:${MINIO_PORT_1}/minio/health/live"]
       interval: 60s
       timeout: 10s
       retries: 5

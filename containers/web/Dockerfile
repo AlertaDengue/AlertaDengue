@@ -21,7 +21,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -qq update --yes \
   && apt-get -qq install --yes --no-install-recommends \
     build-essential git make postgresql-client vim \
-    ca-certificates wget locales cron sudo \
+    ca-certificates wget locales cron sudo inotify-tools \
   && rm -rf /var/lib/apt/lists/* \
     /var/cache/apt/archives \
     /tmp/*
@@ -37,9 +37,9 @@ RUN addgroup --gid ${HOST_GID} deploy \
   && echo "deploy ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/deploy \
   && chmod 0440 /etc/sudoers.d/deploy \
   && export ENV_NAME="$ENV_NAME" \
-  && mkdir -p /opt/conda /opt/services/ \
+  && mkdir -p /opt/conda /opt/services/ /tmp/dbf_parquet \
+  && chown ${HOST_UID}:${HOST_GID} /opt/services/ /tmp/dbf_parquet \
   && chmod -R a+rwx /opt/conda /opt/services /tmp \
-  && chown ${HOST_UID}:${HOST_GID} /opt/services/ /tmp \
   && echo 'source activate "$ENV_NAME"' >  /home/deploy/.bashrc
 ENV PATH "$PATH:/home/deploy/.local/bin"
 ENV PATH /opt/conda/envs/$ENV_NAME/bin:$PATH
@@ -76,10 +76,8 @@ RUN bash /tmp/poetry-install.sh
 RUN mkdir -p /opt/services/scripts/
 RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/scripts/
 
-RUN mkdir -p /opt/services/epi_scanner/data
-RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/epi_scanner/data
-
-COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/services_run.sh /opt/services/services_run.sh
+RUN mkdir -p /opt/services/collector
+RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/collector
 
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/crontab_setup.sh /opt/services/crontab_setup.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/cronjob /etc/cron.d/cronjob
@@ -87,6 +85,7 @@ COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/cronjob /etc/cron.d/cr
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/celery.sh  /opt/services/celery.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/entrypoint.sh  /entrypoint.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/test.sh /opt/services/test.sh
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/run_services.sh /opt/services/run_services.sh
 
 # The command specified in the Compose file will be executed
-ENTRYPOINT ["bash", "/entrypoint.sh", "/opt/services/services_run.sh"]
+# ENTRYPOINT ["/entrypoint.sh"]

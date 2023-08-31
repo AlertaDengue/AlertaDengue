@@ -9,26 +9,27 @@ service-groups:
     project-name: infodengue-dev
     compose-path:
       - containers/compose.yaml
-      # - containers/compose-dev.yaml
     env-file: .env
     services:
-      default: memcached,rabbitmq,web
+      default: memcached,rabbitmq,web,worker
       available:
         - name: postgres
         - name: web
         - name: memcached
         - name: rabbitmq
         - name: minio
+        - name: worker
 
   - name: prod
     project-name: infodengue-prod
     compose-path: containers/compose.yaml
     env-file: .env
     services:
-      default: memcached,rabbitmq,web
+      default: memcached,rabbitmq,web,worker
       available:
         - name: dengue_db
         - name: web
         - name: memcached
         - name: rabbitmq
         - name: minio
+        - name: worker
