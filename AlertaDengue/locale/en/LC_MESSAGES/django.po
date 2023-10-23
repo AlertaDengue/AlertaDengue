@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-19 11:52-0300\n"
+"POT-Creation-Date: 2023-10-23 19:40+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -981,22 +981,23 @@ msgid "Nível Vermelho"
 msgstr "Red Level"
 
 #: AlertaDengue/dados/templates/alert_base.html:193
-#, python-format
 msgid ""
-"Epidemia. Neste nível estamos em plena epidemia. Todo o cuidado é pouco, e\n"
+"Atividade aumentada. Neste nível tem-se alta\n"
+"                            atividade de transmissão e contágio. Todo o "
+"cuidado é pouco, e\n"
 "                            precisamos ficar atentos aos sintomas da "
 "%(disease_label)s e procurar o médico imediatamente em\n"
 "                            caso suspeita de %(disease_label)s."
 msgstr ""
-"Epidemic. At this level we are in the middle of an epidemic. All care is "
+"High activity. At this level we have intense viral activity. All care is "
 "short, and we need to be aware of %(disease_label)s symptoms and seek the "
 "doctor immediately in case of suspected %(disease_label)s."
 
-#: AlertaDengue/dados/templates/alert_base.html:204
+#: AlertaDengue/dados/templates/alert_base.html:205
 msgid "Casos estimados"
 msgstr "Estimated cases"
 
-#: AlertaDengue/dados/templates/alert_base.html:206
+#: AlertaDengue/dados/templates/alert_base.html:207
 #, python-format
 msgid ""
 " São estimados entre <b>%(min_est)s</b> e <b>%(max_est)s novos casos</b> na "
@@ -1010,62 +1011,62 @@ msgstr ""
 "                 %(SE)s: %(data1)s to %(data2)s. With %(total_observed)s "
 "officially notified cases so far "
 
-#: AlertaDengue/dados/templates/alert_base.html:209
+#: AlertaDengue/dados/templates/alert_base.html:210
 #, python-format
 msgid " Últimas %(look_back)s semanas: "
 msgstr " Previous %(look_back)s weeks: "
 
-#: AlertaDengue/dados/templates/alert_base.html:219
+#: AlertaDengue/dados/templates/alert_base.html:220
 msgid ""
 "Suspeita de um\n"
 "                criadouro?"
 msgstr "Want to report a breeding site?"
 
-#: AlertaDengue/dados/templates/alert_base.html:222
+#: AlertaDengue/dados/templates/alert_base.html:223
 msgid "Em caso de suspeita de criadouro de mosquitos, "
 msgstr "In case of suspected breeding of mosquitoes,"
 
-#: AlertaDengue/dados/templates/alert_base.html:226
+#: AlertaDengue/dados/templates/alert_base.html:227
 msgid "contacte a "
 msgstr "contact the"
 
-#: AlertaDengue/dados/templates/alert_base.html:228
+#: AlertaDengue/dados/templates/alert_base.html:229
 msgid "central de apoio ao cidadão: 1746."
 msgstr "contact the citizen support center: 1746"
 
-#: AlertaDengue/dados/templates/alert_base.html:231
+#: AlertaDengue/dados/templates/alert_base.html:232
 msgid "contacte a central de apoio ao cidadão: 1746."
 msgstr "contact the citizen support center: 1746"
 
-#: AlertaDengue/dados/templates/alert_base.html:235
-#: AlertaDengue/dados/templates/alert_base.html:247
-#: AlertaDengue/dados/templates/alert_base.html:250
+#: AlertaDengue/dados/templates/alert_base.html:236
+#: AlertaDengue/dados/templates/alert_base.html:248
+#: AlertaDengue/dados/templates/alert_base.html:251
 msgid "contacte a secretaria de saúde de sua cidade"
 msgstr "contact your local health department"
 
-#: AlertaDengue/dados/templates/alert_base.html:240
+#: AlertaDengue/dados/templates/alert_base.html:241
 msgid "contacte a secretaria de saúde de sua cidade."
 msgstr "contact your local health department."
 
-#: AlertaDengue/dados/templates/alert_base.html:244
+#: AlertaDengue/dados/templates/alert_base.html:245
 msgid "contacte a central de apoio ao cidadão: 0800.285.0880"
 msgstr "contact the citizen support center: 0800.285.0880"
 
-#: AlertaDengue/dados/templates/alert_base.html:277
+#: AlertaDengue/dados/templates/alert_base.html:278
 msgid ""
 "Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www."
 "riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros "
 "para o mosquito!</a>"
 msgstr ""
 
-#: AlertaDengue/dados/templates/alert_base.html:278
+#: AlertaDengue/dados/templates/alert_base.html:279
 msgid ""
 "Uma vez por semana, aplique os <a href=\"http://www.riocontradengue.com.br/"
 "Site/Conteudo/Checklist.aspx\">“10 minutos Contra a dengue”!</a>"
 msgstr ""
 
-#: AlertaDengue/dados/templates/alert_base.html:279
 #: AlertaDengue/dados/templates/alert_base.html:280
+#: AlertaDengue/dados/templates/alert_base.html:281
 msgid ""
 "Fique <a href=\"http://www.riocontradengue.rj.gov.br/Site/Conteudo/"
 "FiqueAtento.aspx\">atento aos sintomas da Dengue!</a> Procure um médico caso "
@@ -1075,7 +1076,7 @@ msgstr ""
 "aspx\">attention to the Dengue symptoms!</a> Consult a doctor in any case of "
 "suspected Dengue."
 
-#: AlertaDengue/dados/templates/alert_base.html:294
+#: AlertaDengue/dados/templates/alert_base.html:295
 #: AlertaDengue/dados/templates/alert_state/map.html:28
 #: AlertaDengue/dados/templates/report_state/map_chik.html:24
 #: AlertaDengue/dados/templates/report_state/map_dengue.html:24
@@ -1083,7 +1084,7 @@ msgstr ""
 msgid "Baixo Risco"
 msgstr "Low Risk"
 
-#: AlertaDengue/dados/templates/alert_base.html:295
+#: AlertaDengue/dados/templates/alert_base.html:296
 #: AlertaDengue/dados/templates/alert_state/map.html:29
 #: AlertaDengue/dados/templates/report_state/map_chik.html:25
 #: AlertaDengue/dados/templates/report_state/map_dengue.html:25
@@ -1091,7 +1092,7 @@ msgstr "Low Risk"
 msgid "Atenção"
 msgstr "Attention"
 
-#: AlertaDengue/dados/templates/alert_base.html:296
+#: AlertaDengue/dados/templates/alert_base.html:297
 #: AlertaDengue/dados/templates/alert_state/map.html:30
 #: AlertaDengue/dados/templates/report_state/map_chik.html:26
 #: AlertaDengue/dados/templates/report_state/map_dengue.html:26
@@ -1099,16 +1100,13 @@ msgstr "Attention"
 msgid "Transmissão"
 msgstr "Transmission"
 
-#: AlertaDengue/dados/templates/alert_base.html:297
-#: AlertaDengue/dados/templates/alert_state/map.html:31
-#: AlertaDengue/dados/templates/report_state/map_chik.html:27
+#: AlertaDengue/dados/templates/alert_base.html:298
 #: AlertaDengue/dados/templates/report_state/map_dengue.html:27
-#: AlertaDengue/dados/templates/report_state/map_zika.html:27
-msgid "Epidemia"
-msgstr "Epidemic"
+msgid "Atividade aumentada"
+msgstr "High activity"
 
-#: AlertaDengue/dados/templates/alert_base.html:306
-#: AlertaDengue/dados/templates/alert_base.html:364
+#: AlertaDengue/dados/templates/alert_base.html:307
+#: AlertaDengue/dados/templates/alert_base.html:365
 #: AlertaDengue/dados/templates/series_plot.html:44
 #: AlertaDengue/dados/templates/series_plot.html:97
 #: AlertaDengue/dados/templates/series_plot.html:115
@@ -1121,8 +1119,8 @@ msgstr "Epidemic"
 msgid "casos"
 msgstr "cases"
 
-#: AlertaDengue/dados/templates/alert_base.html:398
-#: AlertaDengue/dados/templates/alert_base.html:423
+#: AlertaDengue/dados/templates/alert_base.html:399
+#: AlertaDengue/dados/templates/alert_base.html:424
 #: AlertaDengue/dados/templates/alert_state/map.html:181
 #: AlertaDengue/dados/templates/report_state/map_chik.html:138
 #: AlertaDengue/dados/templates/report_state/map_dengue.html:138
@@ -1130,7 +1128,7 @@ msgstr "cases"
 msgid "Unidades de Saúde"
 msgstr "Healt Unities"
 
-#: AlertaDengue/dados/templates/alert_base.html:422
+#: AlertaDengue/dados/templates/alert_base.html:423
 msgid "Áreas de Planejamento"
 msgstr "Planning areas"
 
@@ -1171,6 +1169,12 @@ msgstr "Cases per epidemiological week"
 #: AlertaDengue/dados/templates/alert_state/gender.html:100
 msgid "Distribuição por gênero"
 msgstr "Distribution by gender"
+
+#: AlertaDengue/dados/templates/alert_state/map.html:31
+#: AlertaDengue/dados/templates/report_state/map_chik.html:27
+#: AlertaDengue/dados/templates/report_state/map_zika.html:27
+msgid "Atividade Aumentada"
+msgstr "High Activity"
 
 #: AlertaDengue/dados/templates/alert_state/map.html:167
 msgid "Total de casos de arboviroses na semana"
@@ -2637,7 +2641,7 @@ msgstr "Send here the updated SINAN data"
 msgid "Enviar"
 msgstr "Send"
 
-#: AlertaDengue/dbf/utils.py:181
+#: AlertaDengue/dbf/utils.py:180
 msgid "Existem nesse arquivo notificações que não incluem a coluna ID_AGRAVO."
 msgstr ""
 "There are notifications that don't include the ID_AGRAVO column in this file."
@@ -2872,6 +2876,9 @@ msgstr "Your username, if you have forgotten it, is:"
 #: AlertaDengue/templates/registration/password_reset_email.html:12
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Thank you for use InfoDengue"
+
+#~ msgid "Epidemia"
+#~ msgstr "Epidemic"
 
 #~ msgid "Últimas semanas"
 #~ msgstr "Previous weeks: "

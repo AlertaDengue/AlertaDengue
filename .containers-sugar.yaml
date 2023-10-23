@@ -11,7 +11,7 @@ service-groups:
       - containers/compose.yaml
     env-file: .env
     services:
-      default: memcached,rabbitmq,web,worker
+      default: memcached,rabbitmq,web,worker,postgres
       available:
         - name: postgres
         - name: web

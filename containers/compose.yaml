@@ -51,6 +51,7 @@ services:
       - ${PG_DATA_PROD}:/var/lib/postgresql/data/:rw
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
       - ../containers/postgres/dumps/:/dumps/
+    user: ${HOST_UID}:${HOST_GID}
     command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
     restart: always
     healthcheck:
@@ -66,8 +67,8 @@ services:
     env_file:
       - ../.env
     environment:
-      - PG_RESTORE_STAGING= ${PG_RESTORE_STAGING}
-      - POSTGRES_PASSWORD= ${PSQL_PASSWORD}
+      - PG_RESTORE_STAGING=${PG_RESTORE_STAGING}
+      - POSTGRES_PASSWORD=${PSQL_PASSWORD}
       - POSTGRES_HOST_AUTH_METHOD="md5"
     ports:
       - ${PSQL_PORT}:25432
@@ -75,6 +76,7 @@ services:
       - ${PG_DATA_STAGING}:/var/lib/postgresql/data/
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
       - ../containers/postgres/${PG_RESTORE_STAGING}/:/${PG_RESTORE_STAGING}/
+    user: ${HOST_UID}:${HOST_GID}
     command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
     restart: always
     healthcheck:
@@ -104,6 +106,7 @@ services:
       - ${DOCKER_HOST_DBF_SINAN}:/DBF_SINAN
       - ${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile
       - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbf_parquet
+    user: ${HOST_UID}:${HOST_GID}
     profiles:
       - donotstart
 
@@ -121,6 +124,7 @@ services:
       - worker
     restart: always
     entrypoint: ["bash", "/entrypoint.sh"]
+    user: ${HOST_UID}:${HOST_GID}
     command:
       - sh
       - -c
@@ -157,6 +161,7 @@ services:
      - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
     volumes:
       - ${HOST_MINIO_DATA_DIR}:/opt/services/collector
+    user: ${HOST_UID}:${HOST_GID}
     depends_on:
       - rabbitmq
       - memcached
@@ -190,12 +195,13 @@ services:
       "/opt/services/collector/data",
       "--console-address",
       ":${MINIO_PORT_2}"
-    ]
+      ]
     ports:
       - ${MINIO_PORT_1}:${MINIO_PORT_1}
       - ${MINIO_PORT_2}:${MINIO_PORT_2}
     volumes:
       - ${HOST_MINIO_DATA_DIR}:/opt/services/collector
+    user: ${HOST_UID}:${HOST_GID}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${MINIO_PORT_1}/minio/health/live"]
       interval: 60s
