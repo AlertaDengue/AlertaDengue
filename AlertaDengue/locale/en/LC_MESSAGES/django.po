@@ -981,13 +981,6 @@ msgid "Nível Vermelho"
 msgstr "Red Level"
 
 #: AlertaDengue/dados/templates/alert_base.html:193
-#, fuzzy, python-format
-#| msgid ""
-#| "Epidemia. Neste nível estamos em plena epidemia. Todo o cuidado é pouco, "
-#| "e\n"
-#| "                            precisamos ficar atentos aos sintomas da "
-#| "%(disease_label)s e procurar o médico imediatamente em\n"
-#| "                            caso suspeita de %(disease_label)s."
 msgid ""
 "Atividade aumentada. Neste nível tem-se alta\n"
 "                            atividade de transmissão e contágio. Todo o "
