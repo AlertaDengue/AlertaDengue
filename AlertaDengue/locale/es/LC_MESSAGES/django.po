@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-23 18:45+0000\n"
+"POT-Creation-Date: 2023-10-23 19:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1024,8 +1024,8 @@ msgid ""
 "%(disease_label)s e procurar o médico imediatamente em\n"
 "                            caso suspeita de %(disease_label)s."
 msgstr ""
-"Mayor actividad. En este nivel hay alta actividad de transmisión y contagio. Debemos tener mucho "
-"cuidado y\n"
+"Mayor actividad. En este nivel hay alta actividad de transmisión y contagio. "
+"Debemos tener mucho cuidado y\n"
 " estar atentos a los síntomas de %(disease_label)s y buscar atención médica "
 "de inmediato\n"
 " en caso de sospecha de %(disease_label)s."
@@ -1145,8 +1145,9 @@ msgid "Transmissão"
 msgstr "Transmisión"
 
 #: AlertaDengue/dados/templates/alert_base.html:298
-msgid "Atibidade aumentada"
-msgstr ""
+#: AlertaDengue/dados/templates/report_state/map_dengue.html:27
+msgid "Atividade aumentada"
+msgstr "Mayor actividad"
 
 #: AlertaDengue/dados/templates/alert_base.html:307
 #: AlertaDengue/dados/templates/alert_base.html:365
@@ -1960,10 +1961,6 @@ msgstr "Municipios por regional"
 #: AlertaDengue/dados/templates/services_maps.html:126
 msgid "Alerta Chikungunya"
 msgstr "Alerta de Chikungunya"
-
-#: AlertaDengue/dados/templates/report_state/map_dengue.html:27
-msgid "Atividade aumentada"
-msgstr "Mayor actividad"
 
 #: AlertaDengue/dados/templates/report_state/map_zika.html:124
 #: AlertaDengue/dados/templates/services_maps.html:129
