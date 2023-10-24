@@ -1,11 +1,14 @@
-from typing import Optional
+from typing import Optional, List, Union
+from django.db.models import Q, Sum
 
 import ibis
 import pandas as pd
 
 # local
 from ad_main.settings import PSQL_DB, get_ibis_conn, get_sqla_conn
-from dados.dbdata import CID10, STATE_NAME, get_disease_suffix  # noqa:F401
+from dados.dbdata import CID10, get_disease_suffix  # noqa:F401
+
+from .models import HistoricoAlerta, HistoricoAlertaChik, HistoricoAlertaZika
 
 DB_ENGINE = get_sqla_conn()
 IBIS_CONN = get_ibis_conn()
@@ -531,7 +534,7 @@ class AlertCity:
         geocode: int,
         ew_start: Optional[int] = None,
         ew_end: Optional[int] = None,
-    ) -> ibis.expr:
+    ) -> List[Union[HistoricoAlerta, HistoricoAlertaChik, HistoricoAlertaZika]]:
         """
         Return an ibis expression with the history for a given disease.
         Parameters
@@ -544,44 +547,43 @@ class AlertCity:
             The ending Year/Week, e.g.: 202205
         Returns
         -------
-        ibis.expr.types.Expr
+        list containing objects of one of the models:
+            - HistoricoAlerta (dengue)
+            - HistoricoAlertaChik (chikungunya)
+            - HistoricoAlertaZika (zika)
         """
 
-        if disease not in CID10.keys():
-            raise Exception(
-                f"The diseases available are: {[k for k in CID10.keys()]}"
+        diseases = {
+            "dengue": HistoricoAlerta,
+            "chickungunya": HistoricoAlertaChik,
+            "zika": HistoricoAlertaZika,
+        }
+
+        if disease not in diseases:
+            raise NotImplementedError(
+                f"The diseases available are: {list(diseases)}"
             )
 
-        table_suffix = ""
-        if disease != "dengue" and disease != "zika":
-            table_suffix = get_disease_suffix(disease)
-
-        # schema_city = IBIS_CONN.schema("Municipio")
-        # t_hist = schema_city.table(f"Historico_alerta{table_suffix}")
-        t_hist = IBIS_CONN.table(
-            f"Historico_alerta{table_suffix}", PSQL_DB, "Municipio"
-        )
+        t_hist = diseases[disease].objects.using('dados')
 
         if ew_start and ew_end:
-            t_hist_filter_bol = (
-                t_hist["SE"].between(int(ew_start), int(ew_end))
-            ) & (t_hist["municipio_geocodigo"] == geocode)
-
-            t_hist_filter_expr = t_hist.filter(t_hist_filter_bol).sort_by(
-                ibis.desc("SE")
+            t_hist_filter = Q(
+                SE__gte=int(ew_start),
+                SE__lte=int(ew_end),
+                municipio_geocodigo=geocode
             )
-
+        elif not ew_start and not ew_end:
+            t_hist_filter = Q(
+                municipio_geocodigo=geocode
+            )
         else:
-            t_hist_filter_expr = (
-                t_hist.filter(t_hist["municipio_geocodigo"] == geocode)
-                .sort_by(ibis.desc("SE"))
-                .limit(3)
+            raise NotImplementedError(
+                "Query must be a date range or only the geocode"
             )
 
-        t_hist_accum_expr = t_hist_filter_expr.mutate(
-            notif_accum_year=t_hist_filter_expr.casos.sum()
+        return (
+            t_hist
+            .filter(t_hist_filter)
+            .annotate(notif_accum_year=Sum('casos'))
+            .order_by("-SE")
         )
-
-        # print(ibis.impala.compile(t_hist_accum_expr))
-
-        return t_hist_accum_expr

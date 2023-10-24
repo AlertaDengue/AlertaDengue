@@ -346,6 +346,7 @@ def normalize_str(string: str) -> str:
     return string
 
 
+# TODO: REMOVE IT
 def get_disease_suffix(disease: str, empty_for_dengue: bool = True):
     """
     :param disease:
@@ -362,6 +363,7 @@ def get_disease_suffix(disease: str, empty_for_dengue: bool = True):
     )
 
 
+# TODO: REMOVE IT
 def get_city_name_by_id(geocode: int):
     """
     :param geocode:
@@ -380,6 +382,7 @@ def get_city_name_by_id(geocode: int):
         return res.fetchone()[0]
 
 
+# TODO: REFACTOR IT // only dengue?
 def get_all_active_cities_state():
     """
     Fetch from the database a list on names of active cities
@@ -416,6 +419,7 @@ def get_all_active_cities_state():
     return res
 
 
+# TODO: REFACTOR IT // only dengue?
 def get_all_active_cities() -> List[Tuple[str, str]]:
     """
     Return a list of names and geo codes for the active cities.
