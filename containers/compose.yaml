@@ -14,6 +14,8 @@ services:
       retries: 5
       start_period: 10s  # requires docker-compose 3.4
     restart: always
+    networks:
+      - infodengue
 
   rabbitmq:
     hostname: rabbitmq
@@ -59,6 +61,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      - infodengue
 
   postgres:
     hostname: postgres
@@ -84,6 +88,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      - infodengue
 
   base:
     build:
@@ -145,6 +151,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s  # requires docker-compose 3.4
+    networks:
+      - infodengue
 
   worker:
     hostname: worker
@@ -172,6 +180,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
+    networks:
+      - infodengue
 
   minio:
     hostname: minio
@@ -208,6 +218,12 @@ services:
       timeout: 10s
       retries: 5
       start_period: 40s  # requires docker-compose 3.4
+    networks:
+      - infodengue
 
 volumes:
   dumps:
+
+networks:
+  infodengue:
+    driver: bridge
