@@ -7,7 +7,8 @@ from django.http import HttpResponse
 from django.views.generic.base import View
 
 # local
-from .db import STATE_NAME, AlertCity, NotificationQueries
+from dados.dbdata import STATE_NAME
+from .db import AlertCity, NotificationQueries
 
 
 class _GetMethod:
