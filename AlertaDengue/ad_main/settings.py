@@ -137,7 +137,10 @@ PSQL_HOST = os.getenv("PSQL_HOST")
 PSQL_PASSWORD = os.getenv("PSQL_PASSWORD")
 PSQL_PORT = os.getenv("PSQL_PORT")
 
-DATABASE_ROUTERS = ["manager.router.DatabaseAppsRouter"]
+DATABASE_ROUTERS = [
+    "manager.router.DatabaseAppsRouter",
+    "api.routers.MunicipioRouter"
+]
 
 DATABASE_APPS_MAPPING = {
     "dados": "dados",
@@ -213,7 +216,7 @@ def get_sqla_conn(database: Optional[str] = PSQL_DB):
     return connection
 
 
-MIGRATION_MODULES = {"dados": None, "gis": None, "api": None}
+MIGRATION_MODULES = {"dados": None, "gis": None}
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # SECURITY

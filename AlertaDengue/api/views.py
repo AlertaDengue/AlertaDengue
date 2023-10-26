@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 from datetime import datetime
 
 from dados.episem import episem
@@ -6,7 +7,8 @@ from django.http import HttpResponse
 from django.views.generic.base import View
 
 # local
-from .db import STATE_NAME, AlertCity, NotificationQueries
+from dados.dbdata import STATE_NAME
+from .db import AlertCity, NotificationQueries
 
 
 class _GetMethod:
@@ -156,19 +158,20 @@ class AlertCityView(View, _GetMethod):
 
             if self._get("ew_end"):
                 # Use the keyword arguments for infodengue website
-                df = AlertCity.search(
+                data = AlertCity.search(
                     geocode=geocode,
                     disease=disease,
                     ew_start=eyw_start,
                     ew_end=eyw_end,
-                ).execute()
+                )
             else:
                 # Use the keyword arguments for mobile app
-                df = AlertCity.search(
+                data = AlertCity.search(
                     geocode=geocode,
                     disease=disease,
-                ).execute()
+                )
 
+            df = pd.DataFrame(data.values())
             df.drop(
                 columns=["municipio_geocodigo", "municipio_nome"],
                 inplace=True,

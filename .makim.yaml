@@ -39,6 +39,7 @@ groups:
           for cmd in [
             "--database=dados",
             "--database=infodengue",
+            "api",
             # "--database=forecast"
           ]:
             {{ vars.sugar_run_rm }} --entrypoint "/entrypoint.sh" --cmd {{ vars.manage_py }} migrate --noinput @(cmd)
