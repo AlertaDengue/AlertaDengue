@@ -80,26 +80,49 @@ def calculate_digit(dig: str) -> int:
 @np.vectorize
 def add_dv(geocode: str) -> int:
     """
-    Returns the geocode of the municipality by adding the verifier digit.
+    Return the geocode of the municipality with the verifier digit added.
+
     If the input geocode is already 7 digits long, it is returned as is.
-    If the input geocode is 6 digits long, the verifier digit is calculated
-        and appended to the end.
-    If the input geocode is 0 digits long, a log message is printed
-        and 0 is returned.
+    If the input geocode is 6 digits long, the verifier digit is calculated and appended.
+
     Parameters
     ----------
-        geocode: IBGE codes of municipalities in Brazil.
+    geocode (str): The 6-digit or 7-digit IBGE code of municipalities in Brazil.
+
     Returns
     -------
-        geocode: geocode 7 digit.
+    int: The geocode with a verifier digit (7 digits).
+
+    Note:
+    If the input geocode consists of 6 digits and is found in the list of geocodes
+    that do not correspond to the official IBGE geocodes, it will be corrected
+    based on predefined corrections before adding the verifier digit.
+
     """
+    if not geocode:
+        raise ValueError("Geocode cannot be empty (zero).")
 
-    if len(str(geocode)) == 7:
-        return int(geocode)
-    elif len(str(geocode)) == 6:
-        return int(str(geocode) + str(calculate_digit(geocode)))
+    corrections = {
+        "220191": "2201919",
+        "220198": "2201988",
+        "220225": "2202251",
+        "261153": "2611533",
+        "311783": "3117836",
+        "315213": "3152131",
+        "430587": "4305871",
+        "520393": "5203939",
+        "520396": "5203962",
+    }
 
-    raise ValueError(f"geocode:{geocode} does not match!")
+    formatted_geocode = corrections.get(geocode, geocode)
+
+    if len(formatted_geocode) == 6:
+        return int(formatted_geocode + str(calculate_digit(formatted_geocode)))
+
+    if len(formatted_geocode) == 7:
+        return int(formatted_geocode)
+
+    raise ValueError(f"Geocode: {formatted_geocode} does not match!")
 
 
 @np.vectorize
