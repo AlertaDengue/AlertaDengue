@@ -2,8 +2,8 @@ version: "3.4"
 services:
 
   memcached:
-    hostname: infodengue-memcached
     container_name: infodengue-memcached
+    hostname: infodengue-memcached
     image: memcached:alpine
     entrypoint:
       - memcached
@@ -19,15 +19,15 @@ services:
       - infodengue
 
   rabbitmq:
-    hostname: infodengue-rabbitmq
     container_name: infodengue-rabbitmq
+    hostname: infodengue-rabbitmq
     image: rabbitmq:3-alpine
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "5672"]
       interval: 10s
       timeout: 10s
       retries: 5
-      start_period: 10s  # requires docker-compose 3.4
+      start_period: 10s
     restart: always
     networks:
       - infodengue
@@ -42,8 +42,8 @@ services:
       - donotstart
 
   postgres:
-    hostname: infodengue-postgres
     container_name: infodengue-postgres
+    hostname: infodengue-postgres
     extends:
       service: base_postgres
     env_file:
@@ -59,7 +59,7 @@ services:
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
       - ../containers/postgres/dumps/:/dumps/
     user: ${HOST_UID}:${HOST_GID}
-    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
+    command: -p ${PSQL_PORT}
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U ${PSQL_USER}"]
@@ -70,8 +70,8 @@ services:
       - infodengue
 
   stagingdb:
-    hostname: infodengue-stagingdb
     container_name: infodengue-stagingdb
+    hostname: infodengue-stagingdb
     extends:
       service: base_postgres
     env_file:
@@ -80,24 +80,26 @@ services:
       - PG_RESTORE_STAGING=${PG_RESTORE_STAGING}
       - POSTGRES_PASSWORD=${PSQL_PASSWORD}
       - POSTGRES_HOST_AUTH_METHOD="md5"
-    ports:
-      - ${PSQL_PORT}:25432
+      - PGDATA=/var/lib/postgresql/data
+    user: ${HOST_UID}:${HOST_GID}
     volumes:
-      - ${PG_DATA_STAGING}:/var/lib/postgresql/data/
+      - ${PG_DATA_STAGING}:/var/lib/postgresql/data
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
       - ../containers/postgres/${PG_RESTORE_STAGING}/:/${PG_RESTORE_STAGING}/
-    user: ${HOST_UID}:${HOST_GID}
-    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
+    command: -p ${PSQL_PORT}
     restart: always
+    ports:
+      - ${PSQL_PORT}:25432
+    networks:
+      - infodengue
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U postgres"]
       interval: 10s
       timeout: 5s
-      retries: 10
-    networks:
-      - infodengue
+      retries: 1
 
   base:
+    container_name: infodengue-base
     build:
       context: ".."
       dockerfile: "containers/web/Dockerfile"
@@ -123,8 +125,8 @@ services:
       - donotstart
 
   web:
-    hostname: infodengue-web
     container_name: infodengue-web
+    hostname: infodengue-web
     extends:
       service: base
     env_file:
@@ -149,21 +151,18 @@ services:
           python3 /opt/services/AlertaDengue/manage.py collectstatic --noinput
           python manage.py runserver 0.0.0.0:${WEB_PORT};
         fi
-    # volumes:
-      # Development
-      # - ${ROOT_DIR}/AlertaDengue/dbf:/opt/services/AlertaDengue/dbf
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${WEB_PORT}"]
       interval: 10s
       timeout: 10s
       retries: 5
-      start_period: 10s  # requires docker-compose 3.4
+      start_period: 10s
     networks:
       - infodengue
 
   worker:
-    hostname: infodengue-worker
     container_name: infodengue-worker
+    hostname: infodengue-worker
     extends:
       service: base
     entrypoint: ["bash", "/entrypoint.sh", "/opt/services/run_services.sh"]
@@ -190,7 +189,6 @@ services:
       start_period: 30s
     networks:
       - infodengue
-
 
 volumes:
   dumps:

@@ -39,8 +39,8 @@ env:
   PSQL_DEV_USER: infodenguedev
   PSQL_DEV_PASSWORD: infodenguedev
   PG_RESTORE_STAGING: schemas
-  PG_DATA_PROD: "../staging_data/postgres_data"
-  PG_DATA_STAGING: "/../staging_data/postgres_data"
+  PG_DATA_PROD: "../../staging_data/postgres_data"
+  PG_DATA_STAGING: "../../staging_data/postgres_data"
 
   DBF_SINAN: /DBF_SINAN
   IMPORTED_FILES: /IMPORTED_FILES
