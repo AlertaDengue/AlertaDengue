@@ -36,6 +36,9 @@ services:
     build:
       context: ".."
       dockerfile: "containers/postgres/Dockerfile"
+      args:
+        HOST_UID: ${HOST_UID}
+        HOST_GID: ${HOST_GID}
     env_file:
       - ../.env
     profiles:
@@ -49,16 +52,17 @@ services:
     env_file:
       - ../.env
     environment:
+      - PGDATA=/var/lib/postgresql/data
       - PG_RESTORE_STAGING=${PG_RESTORE_STAGING}
       - POSTGRES_PASSWORD=${PSQL_PASSWORD}
       - POSTGRES_HOST_AUTH_METHOD="md5"
     ports:
       - ${PSQL_PORT}:5432
+    user: ${HOST_UID}:${HOST_GID}
     volumes:
-      - ${PG_DATA_PROD}:/var/lib/postgresql/data/:rw
+      - ${PG_DATA_PROD}:/var/lib/postgresql/data
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
       - ../containers/postgres/dumps/:/dumps/
-    user: ${HOST_UID}:${HOST_GID}
     command: -p ${PSQL_PORT}
     restart: always
     healthcheck:
@@ -77,10 +81,10 @@ services:
     env_file:
       - ../.env
     environment:
+      - PGDATA=/var/lib/postgresql/data
       - PG_RESTORE_STAGING=${PG_RESTORE_STAGING}
       - POSTGRES_PASSWORD=${PSQL_PASSWORD}
       - POSTGRES_HOST_AUTH_METHOD="md5"
-      - PGDATA=/var/lib/postgresql/data
     user: ${HOST_UID}:${HOST_GID}
     volumes:
       - ${PG_DATA_STAGING}:/var/lib/postgresql/data
