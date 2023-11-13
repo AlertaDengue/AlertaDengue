@@ -82,9 +82,9 @@ groups:
       container-wait-all:
         run: |
           # if $ENV == "dev":
-          #   makim develop.container-wait --service "postgres"
+          #   makim develop.container-wait --service "stagingdb"
 
-          for service in ["postgres", "memcached", "rabbitmq", "web"]:
+          for service in ["stagingdb", "memcached", "rabbitmq", "web", "worker"]:
             makim develop.container-wait --service @(service)
 
       clean:

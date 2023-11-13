@@ -170,16 +170,11 @@ services:
     extends:
       service: base
     entrypoint: ["bash", "/entrypoint.sh", "/opt/services/run_services.sh"]
-    command: ["python3", "/opt/services/AlertaDengue/dbf/collector.py"]
+    # command: ["python3", "/opt/services/AlertaDengue/dbf/collector.py"]
     env_file:
       - ../.env
-    environment:
-     - MINIO_ENDPOINT=minio:${MINIO_PORT_1}
-     - MINIO_ROOT_USER=${MINIO_ROOT_USER}
-     - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
-     - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
-    volumes:
-      - ${HOST_MINIO_DATA_DIR}:/opt/services/collector
+    # volumes:
+    #   - ${HOST_MINIO_DATA_DIR}:/opt/services/collector
     user: ${HOST_UID}:${HOST_GID}
     depends_on:
       - rabbitmq

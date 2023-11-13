@@ -13,8 +13,8 @@ env:
   DEBUG: False
   ENV: dev
   WEB_PORT: 8080
-  HOST_GID: 1000
-  HOST_UID: 1000
+  HOST_GID: 1001 # runner
+  HOST_UID: 124 # Docker
   SECRET_KEY: my-secret-key
   PORT_WEB: 8000
 
@@ -32,40 +32,29 @@ env:
   POSTGRES_USER: postgres
   PSQL_DB: dengue
   PSQL_DBF: infodengue
-  PSQL_HOST: postgres
+  PSQL_HOST: stagingdb
   PSQL_PASSWORD: infodenguedev
   PSQL_PORT: 25432
   PSQL_USER: infodenguedev
   PSQL_DEV_USER: infodenguedev
   PSQL_DEV_PASSWORD: infodenguedev
   PG_RESTORE_STAGING: schemas
-  PG_DATA_PROD: "../../staging_data/postgres_data"
-  PG_DATA_STAGING: "../../staging_data/postgres_data"
+  PG_DATA_PROD: "../../staging_data/pg_data"
+  PG_DATA_STAGING: "../../../staging_data/pg_data"
 
   DBF_SINAN: /DBF_SINAN
   IMPORTED_FILES: /IMPORTED_FILES
   MEDIA_ROOT: /MEDIA_ROOT
-  DOCKER_HOST_DBF_SINAN: "../staging_data/sftp2/alertadengue/sinan"
-  DOCKER_HOST_IMPORTED_FILES_DIR: "../staging_data/sftp2/alertadengue/sinan/imported"
-  DOCKER_HOST_UPLOADED_FILES_DIR: "../staging_data/sftp2/alertadengue"
+  DOCKER_HOST_DBF_SINAN: "../../staging_data/sftp2/alertadengue/sinan"
+  DOCKER_HOST_IMPORTED_FILES_DIR: "../../staging_data/sftp2/alertadengue/sinan/imported"
+  DOCKER_HOST_UPLOADED_FILES_DIR: "../../staging_data/sftp2/alertadengue/sinan/uploaded"
 
-  DOCKER_HOST_SHAPEFILES_DIR: "../staging_data/shapefiles"
+  DOCKER_HOST_SHAPEFILES_DIR: "../../staging_data/shapefiles"
   DOCKER_HOST_TEMP_PARQUET_DIR: "/tmp/dbf_parquet"
 
-  DOCKER_HOST_STATIC: "../staging_data/staticfiles"
-  STORAGE: "../staging_data/"
+  DOCKER_HOST_STATIC: "../../staging_data/staticfiles"
+  STORAGE: "../../staging_data/"
   TEMP_FILES_DIR: "/tmp"
-
-  MINIO_USERNAME: developer
-  MINIO_GROUPNAME: developer
-  MINIO_UID: 1000
-  MINIO_GID: 1000
-  MINIO_ROOT_USER: developer
-  MINIO_ROOT_PASSWORD: developer
-  MINIO_PORT_1: 9000
-  MINIO_PORT_2: 9090
-  MINIO_ENDPOINT: http://minio:9090
-  HOST_MINIO_DATA_DIR: "../staging_data/minio"
 
 jobs:
   build:
@@ -97,13 +86,9 @@ jobs:
 
     - name: Prepare data volumes
       run: |
-        mkdir -p ../staging_data/postgres_data
-        mkdir -p ../staging_data/minio
-        mkdir -p /tmp/dbf_parquet
-        chmod 777 -R /tmp/dbf_parquet
-        chmod 777 -R ../staging_data/
-        mkdir -p /tmp/dbf_duplicated_csv
-        chmod 777 -R /tmp/dbf_duplicated_csv
+        sudo install -d -o 1000 -g 1000 ../../staging_data/pg_data
+        sudo install -d -o 1000 -g 1000 /tmp/dbf_parquet
+        sudo install -d -o 1000 -g 1000 /tmp/dbf_duplicated_csv
 
     - name: Install dependencies
       run: |
@@ -115,11 +100,11 @@ jobs:
 
     - name: Build postgres database
       run: |
-        kxgr build --services postgres
+        kxgr build --services stagingdb
 
     - name: Start postgres database
       run: |
-        kxgr ext start --services postgres --options -d
+        kxgr ext start --services stagingdb --options -d
 
     - name: Start containers
       run: |
