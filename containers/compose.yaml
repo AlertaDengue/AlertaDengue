@@ -183,43 +183,6 @@ services:
     networks:
       - infodengue
 
-  minio:
-    hostname: minio
-    platform: linux/amd64
-    image: minio/minio
-    mem_limit: 16g
-    mem_reservation: 4g
-    cpus: "2.0"
-    restart: unless-stopped
-    env_file:
-      - ../.env
-    environment:
-     - MINIO_UID=${MINIO_UID}
-     - MINIO_GID=${MINIO_GID}
-     - MINIO_ENDPOINT=minio:${MINIO_PORT_1}
-     - MINIO_ROOT_USER=${MINIO_ROOT_USER}
-     - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
-     - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
-    command: [
-      "server",
-      "/opt/services/collector/data",
-      "--console-address",
-      ":${MINIO_PORT_2}"
-      ]
-    ports:
-      - ${MINIO_PORT_1}:${MINIO_PORT_1}
-      - ${MINIO_PORT_2}:${MINIO_PORT_2}
-    volumes:
-      - ${HOST_MINIO_DATA_DIR}:/opt/services/collector
-    user: ${HOST_UID}:${HOST_GID}
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${MINIO_PORT_1}/minio/health/live"]
-      interval: 60s
-      timeout: 10s
-      retries: 5
-      start_period: 40s  # requires docker-compose 3.4
-    networks:
-      - infodengue
 
 volumes:
   dumps:
