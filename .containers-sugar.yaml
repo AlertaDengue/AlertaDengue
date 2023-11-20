@@ -4,16 +4,16 @@ env-file: .env
 defaults:
   group: {{ env.ENV }}
 
-service-groups:
+groups:
   - name: dev
     project-name: infodengue-dev
     compose-path:
       - containers/compose.yaml
     env-file: .env
     services:
-      default: memcached,rabbitmq,web,worker
+      default: memcached,rabbitmq,web,worker,stagingdb
       available:
-        # - name: stagingdb
+        - name: stagingdb
         - name: web
         - name: memcached
         - name: rabbitmq
