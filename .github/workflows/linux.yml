@@ -32,7 +32,7 @@ env:
   POSTGRES_USER: postgres
   PSQL_DB: dengue
   PSQL_DBF: infodengue
-  PSQL_HOST: stagingdb
+  PSQL_HOST: infodengue-stagingdb
   PSQL_PASSWORD: infodenguedev
   PSQL_PORT: 25432
   PSQL_USER: infodenguedev
@@ -100,16 +100,16 @@ jobs:
 
     - name: Build postgres database
       run: |
-        kxgr build --services stagingdb
+        sugar build --services stagingdb
 
     - name: Start postgres database
       run: |
-        kxgr ext start --services stagingdb --options -d
+        sugar ext start --services stagingdb --options -d
 
     - name: Start containers
       run: |
-        kxgr build --group dev --all
-        kxgr ext start --group dev --all --options -d
+        sugar build --group dev --all
+        sugar ext start --group dev --all --options -d
 
     - name: Container wait
       run: |
