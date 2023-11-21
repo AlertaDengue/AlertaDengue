@@ -2,8 +2,8 @@ version: "3.4"
 services:
 
   memcached:
-    container_name: infodengue-memcached
-    hostname: infodengue-memcached
+    container_name: infodengue-${ENV}-memcached
+    hostname: infodengue-${ENV}-memcached
     image: memcached:alpine
     entrypoint:
       - memcached
@@ -19,8 +19,8 @@ services:
       - infodengue
 
   rabbitmq:
-    container_name: infodengue-rabbitmq
-    hostname: infodengue-rabbitmq
+    container_name: infodengue-${ENV}-rabbitmq
+    hostname: infodengue-${ENV}-rabbitmq
     image: rabbitmq:3-alpine
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "5672"]
@@ -45,17 +45,16 @@ services:
       - donotstart
 
   postgres:
-    container_name: infodengue-postgres
-    hostname: infodengue-postgres
+    container_name: infodengue-${ENV}-postgres
+    hostname: infodengue-${ENV}-postgres
     extends:
       service: base_postgres
     env_file:
       - ../.env
     environment:
-      - PGDATA=/var/lib/postgresql/data
-      - PG_RESTORE_STAGING=${PG_RESTORE_STAGING}
-      - POSTGRES_PASSWORD=${PSQL_PASSWORD}
-      - POSTGRES_HOST_AUTH_METHOD="md5"
+      PG_RESTORE_STAGING: ${PG_RESTORE_STAGING}
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: "md5"
     ports:
       - ${PSQL_PORT}:5432
     user: ${HOST_UID}:${HOST_GID}
@@ -74,17 +73,16 @@ services:
       - infodengue
 
   stagingdb:
-    container_name: infodengue-stagingdb
-    hostname: infodengue-stagingdb
+    container_name: infodengue-${ENV}-stagingdb
+    hostname: infodengue-${ENV}-stagingdb
     extends:
       service: base_postgres
     env_file:
       - ../.env
     environment:
-      - PGDATA=/var/lib/postgresql/data
-      - PG_RESTORE_STAGING=${PG_RESTORE_STAGING}
-      - POSTGRES_PASSWORD=${PSQL_PASSWORD}
-      - POSTGRES_HOST_AUTH_METHOD="md5"
+      PG_RESTORE_STAGING: ${PG_RESTORE_STAGING}
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: "md5"
     user: ${HOST_UID}:${HOST_GID}
     volumes:
       - ${PG_DATA_STAGING}:/var/lib/postgresql/data
@@ -103,7 +101,7 @@ services:
       retries: 1
 
   base:
-    container_name: infodengue-base
+    container_name: infodengue-${ENV}-base
     build:
       context: ".."
       dockerfile: "containers/web/Dockerfile"
@@ -115,7 +113,7 @@ services:
       - ../.env
     environment:
       - MEMCACHED_HOST=memcached
-      - CELERY_BROKER_URL=amqp://guest:guest@infodengue-rabbitmq:5672
+      - CELERY_BROKER_URL=amqp://guest:guest@infodengue-${ENV}-rabbitmq:5672
       - PSQL_HOST=${PSQL_HOST}
       - PSQL_PORT=${PSQL_PORT}
     volumes:
@@ -129,8 +127,8 @@ services:
       - donotstart
 
   web:
-    container_name: infodengue-web
-    hostname: infodengue-web
+    container_name: infodengue-${ENV}-web
+    hostname: infodengue-${ENV}-web
     extends:
       service: base
     env_file:
@@ -165,8 +163,8 @@ services:
       - infodengue
 
   worker:
-    container_name: infodengue-worker
-    hostname: infodengue-worker
+    container_name: infodengue-${ENV}-worker
+    hostname: infodengue-${ENV}-worker
     extends:
       service: base
     entrypoint: ["bash", "/entrypoint.sh", "/opt/services/run_services.sh"]

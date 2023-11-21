@@ -17,7 +17,7 @@ packages = [
 dask = "^2023.5.0"
 dask-geopandas = "^0.3.1"
 dbfread = "^2.0.7"
-django = ">=3.2.18,<4"
+django = "^3.2.23"
 django-bootstrap4 = "^22.1"
 django-celery-results = "^2.3.1"
 django-chunked-upload = "<2.0.0"
@@ -47,6 +47,7 @@ simpledbf = "^0.2.6"
 SQLAlchemy = "<2.0"
 tables = "^3.7.0"
 watchdog = "^3.0.0"
+containers-sugar = "1.9.1"
 
 
 [tool.poetry.group.dev.dependencies]
