@@ -7,7 +7,7 @@ groups:
     env-file: .env
     help: Run Django commands and manage the development server.
     vars:
-      sugar_run_rm: kxgr run --service web --options --rm
+      sugar_run_rm: sugar run --service web --options --rm
       manage_py: python manage.py
     targets:
       # DEV MODE
@@ -81,10 +81,7 @@ groups:
 
       container-wait-all:
         run: |
-          # if $ENV == "dev":
-          #   makim develop.container-wait --service "postgres"
-
-          for service in ["postgres", "memcached", "rabbitmq", "web"]:
+          for service in ["stagingdb", "memcached", "rabbitmq", "web", "worker"]:
             makim develop.container-wait --service @(service)
 
       clean:

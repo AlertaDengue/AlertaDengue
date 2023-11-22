@@ -2,7 +2,8 @@ version: "3.4"
 services:
 
   memcached:
-    hostname: memcached
+    container_name: infodengue-${ENV}-memcached
+    hostname: infodengue-${ENV}-memcached
     image: memcached:alpine
     entrypoint:
       - memcached
@@ -12,49 +13,56 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
-      start_period: 10s  # requires docker-compose 3.4
+      start_period: 10s
     restart: always
     networks:
       - infodengue
 
   rabbitmq:
-    hostname: rabbitmq
+    container_name: infodengue-${ENV}-rabbitmq
+    hostname: infodengue-${ENV}-rabbitmq
     image: rabbitmq:3-alpine
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "5672"]
       interval: 10s
       timeout: 10s
       retries: 5
-      start_period: 10s  # requires docker-compose 3.4
+      start_period: 10s
     restart: always
+    networks:
+      - infodengue
 
   base_postgres:
     build:
       context: ".."
       dockerfile: "containers/postgres/Dockerfile"
+      args:
+        HOST_UID: ${HOST_UID}
+        HOST_GID: ${HOST_GID}
     env_file:
       - ../.env
     profiles:
       - donotstart
 
-  dengue_db:
-    hostname: dengue_db
+  postgres:
+    container_name: infodengue-${ENV}-postgres
+    hostname: infodengue-${ENV}-postgres
     extends:
       service: base_postgres
     env_file:
       - ../.env
     environment:
-      - PG_RESTORE_STAGING=${PG_RESTORE_STAGING}
-      - POSTGRES_PASSWORD=${PSQL_PASSWORD}
-      - POSTGRES_HOST_AUTH_METHOD="md5"
+      PG_RESTORE_STAGING: ${PG_RESTORE_STAGING}
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: "md5"
     ports:
       - ${PSQL_PORT}:5432
+    user: ${HOST_UID}:${HOST_GID}
     volumes:
-      - ${PG_DATA_PROD}:/var/lib/postgresql/data/:rw
+      - ${PG_DATA_PROD}:/var/lib/postgresql/data
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
       - ../containers/postgres/dumps/:/dumps/
-    user: ${HOST_UID}:${HOST_GID}
-    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
+    command: -p ${PSQL_PORT}
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U ${PSQL_USER}"]
@@ -64,34 +72,36 @@ services:
     networks:
       - infodengue
 
-  postgres:
-    hostname: postgres
+  stagingdb:
+    container_name: infodengue-${ENV}-stagingdb
+    hostname: infodengue-${ENV}-stagingdb
     extends:
       service: base_postgres
     env_file:
       - ../.env
     environment:
-      - PG_RESTORE_STAGING=${PG_RESTORE_STAGING}
-      - POSTGRES_PASSWORD=${PSQL_PASSWORD}
-      - POSTGRES_HOST_AUTH_METHOD="md5"
-    ports:
-      - ${PSQL_PORT}:25432
+      PG_RESTORE_STAGING: ${PG_RESTORE_STAGING}
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+    user: ${HOST_UID}:${HOST_GID}
     volumes:
-      - ${PG_DATA_STAGING}:/var/lib/postgresql/data/
+      - ${PG_DATA_STAGING}:/var/lib/postgresql/data
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
       - ../containers/postgres/${PG_RESTORE_STAGING}/:/${PG_RESTORE_STAGING}/
-    user: ${HOST_UID}:${HOST_GID}
-    command: -p ${PSQL_PORT} # postgres -c max_wal_size=3GB
+    command: -p ${PSQL_PORT}
     restart: always
+    ports:
+      - ${PSQL_PORT}:25432
+    networks:
+      - infodengue
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -p ${PSQL_PORT} -U postgres"]
       interval: 10s
       timeout: 5s
-      retries: 10
-    networks:
-      - infodengue
+      retries: 1
 
   base:
+    container_name: infodengue-${ENV}-base
     build:
       context: ".."
       dockerfile: "containers/web/Dockerfile"
@@ -103,7 +113,7 @@ services:
       - ../.env
     environment:
       - MEMCACHED_HOST=memcached
-      - CELERY_BROKER_URL=amqp://guest:guest@rabbitmq:5672
+      - CELERY_BROKER_URL=amqp://guest:guest@infodengue-${ENV}-rabbitmq:5672
       - PSQL_HOST=${PSQL_HOST}
       - PSQL_PORT=${PSQL_PORT}
     volumes:
@@ -117,7 +127,8 @@ services:
       - donotstart
 
   web:
-    hostname: web
+    container_name: infodengue-${ENV}-web
+    hostname: infodengue-${ENV}-web
     extends:
       service: base
     env_file:
@@ -142,33 +153,26 @@ services:
           python3 /opt/services/AlertaDengue/manage.py collectstatic --noinput
           python manage.py runserver 0.0.0.0:${WEB_PORT};
         fi
-    # volumes:
-      # Development
-      # - ${ROOT_DIR}/AlertaDengue/dbf:/opt/services/AlertaDengue/dbf
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${WEB_PORT}"]
       interval: 10s
       timeout: 10s
       retries: 5
-      start_period: 10s  # requires docker-compose 3.4
+      start_period: 10s
     networks:
       - infodengue
 
   worker:
-    hostname: worker
+    container_name: infodengue-${ENV}-worker
+    hostname: infodengue-${ENV}-worker
     extends:
       service: base
     entrypoint: ["bash", "/entrypoint.sh", "/opt/services/run_services.sh"]
-    command: ["python3", "/opt/services/AlertaDengue/dbf/collector.py"]
+    # command: ["python3", "/opt/services/AlertaDengue/dbf/collector.py"]
     env_file:
       - ../.env
-    environment:
-     - MINIO_ENDPOINT=minio:${MINIO_PORT_1}
-     - MINIO_ROOT_USER=${MINIO_ROOT_USER}
-     - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
-     - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
-    volumes:
-      - ${HOST_MINIO_DATA_DIR}:/opt/services/collector
+    # volumes:
+    #   - ${HOST_MINIO_DATA_DIR}:/opt/services/collector
     user: ${HOST_UID}:${HOST_GID}
     depends_on:
       - rabbitmq
@@ -180,44 +184,6 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
-    networks:
-      - infodengue
-
-  minio:
-    hostname: minio
-    platform: linux/amd64
-    image: minio/minio
-    mem_limit: 16g
-    mem_reservation: 4g
-    cpus: "2.0"
-    restart: unless-stopped
-    env_file:
-      - ../.env
-    environment:
-     - MINIO_UID=${MINIO_UID}
-     - MINIO_GID=${MINIO_GID}
-     - MINIO_ENDPOINT=minio:${MINIO_PORT_1}
-     - MINIO_ROOT_USER=${MINIO_ROOT_USER}
-     - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
-     - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
-    command: [
-      "server",
-      "/opt/services/collector/data",
-      "--console-address",
-      ":${MINIO_PORT_2}"
-      ]
-    ports:
-      - ${MINIO_PORT_1}:${MINIO_PORT_1}
-      - ${MINIO_PORT_2}:${MINIO_PORT_2}
-    volumes:
-      - ${HOST_MINIO_DATA_DIR}:/opt/services/collector
-    user: ${HOST_UID}:${HOST_GID}
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${MINIO_PORT_1}/minio/health/live"]
-      interval: 60s
-      timeout: 10s
-      retries: 5
-      start_period: 40s  # requires docker-compose 3.4
     networks:
       - infodengue
 
