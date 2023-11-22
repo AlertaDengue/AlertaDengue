@@ -122,10 +122,6 @@ jobs:
       run: |
           makim develop.container-wait-all
 
-    - name: Setup tmate session
-      if: "${{ failure() }}"
-      uses: mxschmitt/action-tmate@v3
-
     - name: Linting
       run: |
         pre-commit install
