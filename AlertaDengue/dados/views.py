@@ -17,7 +17,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles.finders import find
 from django.core.cache import cache
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse, Http404
 
 # from django.shortcuts import redirect
 from django.templatetags.static import static
@@ -88,7 +88,7 @@ def hex_to_rgb(value):
     value = value.lstrip("#")
     lv = len(value)
     return tuple(
-        int(value[i : i + lv // 3], 16)
+        int(value[i: i + lv // 3], 16)
         for i in range(0, lv, lv // 3)  # noqa: E203
     )
 
@@ -146,6 +146,25 @@ class AboutPageView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AboutPageView, self).get_context_data(**kwargs)
         return context
+
+
+def download_technical_report_pdf(request):
+    pdf_path = os.path.join(
+        settings.MEDIA_ROOT, 'templates/about/technical-report.pdf'
+    )
+
+    if not os.path.exists(pdf_path):
+        raise Http404("Technical Report PDF not found")
+
+    pdf_output = (
+        "RELATÓRIO TÉCNICO 02_23 clima e arboviroses - projeções para "
+        "2024-26out2023.pdf"
+    )
+
+    with open(pdf_path, 'rb') as pdf_file:
+        response = FileResponse(pdf_file, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{pdf_output}"'
+        return response
 
 
 class TeamPageView(TemplateView):
@@ -485,7 +504,6 @@ class ChartsMainView(TemplateView):
     template_name = "components/home/charts.html"
 
     def get_img_map(self, state_abbv: str, disease: str) -> str:
-
         """
         Verify if file exists and return a string to path.
         Parameters
