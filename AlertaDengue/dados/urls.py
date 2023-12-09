@@ -7,6 +7,7 @@ from django.views.generic import TemplateView
 # local
 from .views import (
     AboutPageView,
+    download_technical_report_pdf,
     AlertaMainView,
     AlertaMunicipioPageView,
     AlertaStateView,
@@ -62,6 +63,11 @@ urlpatterns = [
         r"^informacoes/$",
         cache_page(60 * 60 * 60 * 24)(AboutPageView.as_view()),
         name="about",
+    ),
+    re_path(
+        r'^download_technical_report_pdf/$',
+        download_technical_report_pdf,
+        name='download_technical_report_pdf'
     ),
     re_path(
         r"^equipe/$",
