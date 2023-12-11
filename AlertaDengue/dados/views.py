@@ -17,7 +17,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles.finders import find
 from django.core.cache import cache
-from django.http import HttpResponse, FileResponse, Http404
+from django.http import HttpResponse, Http404
 
 # from django.shortcuts import redirect
 from django.templatetags.static import static
@@ -148,7 +148,7 @@ class AboutPageView(TemplateView):
         return context
 
 
-def download_technical_report_pdf(request):
+def download_technical_report_pdf(request, *args, **kwargs):
     pdf_path = os.path.join(
         settings.MEDIA_ROOT, 'templates/about/technical-report.pdf'
     )
@@ -162,7 +162,10 @@ def download_technical_report_pdf(request):
     )
 
     with open(pdf_path, 'rb') as pdf_file:
-        response = FileResponse(pdf_file, content_type='application/pdf')
+        response = HttpResponse(
+            pdf_file.read(),
+            content_type='application/pdf'
+        )
         response['Content-Disposition'] = f'attachment; filename="{pdf_output}"'
         return response
 
