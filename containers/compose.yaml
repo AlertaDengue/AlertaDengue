@@ -8,6 +8,11 @@ services:
     entrypoint:
       - memcached
       - -m 64
+    ports:
+      - ${MEMCACHED_PORT}:11211
+    expose:
+      - ${MEMCACHED_PORT}
+
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "11211"]
       interval: 10s
