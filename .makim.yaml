@@ -63,6 +63,8 @@ groups:
   develop:
     env-file: .env
     help: Development tasks and utilities.
+    vars:
+      manage_py: python AlertaDengue/manage.py
     targets:
       # CI
       container-wait:
@@ -87,6 +89,8 @@ groups:
       clean:
         help: Clean all generated artifacts from the project.
         shell: python
+        dependencies:
+          - target: develop.clear_cache
         args:
           path:
             help: Specify the path of the files to remove.
@@ -111,3 +115,13 @@ groups:
                       shutil.rmtree(file)
                   else:
                       file.unlink()
+
+      clear_cache:
+        help: Clear all Django cache
+        args:
+          subcommand:
+            help: Specify a Django subcommand to run.
+            type: string
+            default: clearcache
+        run: |
+          {{ vars.manage_py }} {{ args.subcommand }}
