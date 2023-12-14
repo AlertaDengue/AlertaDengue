@@ -1027,7 +1027,7 @@ msgstr "Gráficos sobre Zika"
 
 #: AlertaDengue/dados/templates/components/home/charts.html:56
 msgid "Veja o mapa de incidência das doenças no estado"
-msgstr "Ver el mapa de incidencia de enfermedades en el estado"
+msgstr ""
 
 #: AlertaDengue/dados/templates/components/home/charts.html:57
 msgid "Mapa incidência"
@@ -1035,15 +1035,15 @@ msgstr "Mapa de incidencia"
 
 #: AlertaDengue/dados/templates/components/home/charts.html:71
 msgid "Municípios monitorados"
-msgstr "Municipios monitoreados"
+msgstr ""
 
 #: AlertaDengue/dados/templates/components/home/charts.html:71
 msgid "Última atualização na SE"
-msgstr "Última actualización en SE"
+msgstr ""
 
 #: AlertaDengue/dados/templates/components/home/charts.html:141
 msgid "Informações detalhadas sobre o Estado"
-msgstr "Información detallada sobre el estado"
+msgstr ""
 
 #: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:43
 #: AlertaDengue/dados/templates/components/report_state/report_state_charts.html:82
