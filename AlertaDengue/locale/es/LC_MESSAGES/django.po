@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-14 13:11+0000\n"
+"POT-Creation-Date: 2023-12-21 09:31+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -686,11 +686,11 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:140
 msgid "Relatórios Técnicos"
-msgstr "Informes municipales"
+msgstr "Informes técnicos"
 
 #: AlertaDengue/dados/templates/about.html:144
 msgid "Reflexões sobre o risco de arboviroses em 2024"
-msgstr ""
+msgstr "Reflexiones sobre el riesgo de arbovirus en 2024"
 
 #: AlertaDengue/dados/templates/about.html:148
 msgid "Projetos de pesquisa"
@@ -1424,60 +1424,80 @@ msgstr ""
 msgid "entre em contato conosco"
 msgstr "contáctanos"
 
-#: AlertaDengue/dados/templates/main.html:21
+#: AlertaDengue/dados/templates/main.html:26
 msgid "Situação de casos estimados"
 msgstr "Situación de casos estimados"
 
-#: AlertaDengue/dados/templates/main.html:36
+#: AlertaDengue/dados/templates/main.html:39
 msgid "Análise integrada de dados epidemiológicos e climáticos"
 msgstr "Análisis integrado de datos epidemiológicos y climáticos"
 
-#: AlertaDengue/dados/templates/main.html:40
+#: AlertaDengue/dados/templates/main.html:45
 msgid "Atualização semanal"
 msgstr "Actualización semanal"
 
-#: AlertaDengue/dados/templates/main.html:42
+#: AlertaDengue/dados/templates/main.html:47
 msgid "Incidência estimada"
 msgstr "Incidencia estimada"
 
-#: AlertaDengue/dados/templates/main.html:43
+#: AlertaDengue/dados/templates/main.html:48
 msgid "Cidades com condições favoráveis para transmissão"
 msgstr "Ciudades con condiciones favorables para la transmisión"
 
-#: AlertaDengue/dados/templates/main.html:44
+#: AlertaDengue/dados/templates/main.html:49
 msgid "Cidades em níveis de atenção"
 msgstr "Ciudades en niveles de atención"
 
-#: AlertaDengue/dados/templates/main.html:55
+#: AlertaDengue/dados/templates/main.html:64
 msgid "Funcionalidades"
 msgstr "Funcionalidades"
 
-#: AlertaDengue/dados/templates/main.html:57
+#: AlertaDengue/dados/templates/main.html:66
+#: AlertaDengue/dados/templates/main.html:67
 msgid "Relatórios municipais"
 msgstr "Informes municipales"
 
-#: AlertaDengue/dados/templates/main.html:58
-msgid "Mapas estaduais"
-msgstr "Mapas estatales"
+#: AlertaDengue/dados/templates/main.html:69
+#: AlertaDengue/dados/templates/main.html:70
+msgid "Relatórios estaduais"
+msgstr "Informes estatales"
 
-#: AlertaDengue/dados/templates/main.html:63
+#: AlertaDengue/dados/templates/main.html:73
+#: AlertaDengue/dados/templates/main.html:74
+msgid "Relatórios técnicos"
+msgstr "Informes técnicos"
+
+#: AlertaDengue/dados/templates/main.html:75
+#: AlertaDengue/dados/templates/main.html:76
+#: AlertaDengue/dados/templates/services_api.html:76
+#: AlertaDengue/dados/templates/services_api.html:83
+#: AlertaDengue/dados/templates/services_api_doc.html:54
+msgid "API"
+msgstr "API"
+
+#: AlertaDengue/dados/templates/main.html:77
+#: AlertaDengue/dados/templates/main.html:78
+msgid "Tutoriais"
+msgstr "Tutoriales"
+
+#: AlertaDengue/dados/templates/main.html:83
 #: AlertaDengue/templates/base.html:60
 msgid "Participe"
 msgstr "Participa"
 
-#: AlertaDengue/dados/templates/main.html:65
+#: AlertaDengue/dados/templates/main.html:84
 msgid "Existem várias formas de participar"
 msgstr "Existen varias formas de participar"
 
-#: AlertaDengue/dados/templates/main.html:67
+#: AlertaDengue/dados/templates/main.html:85
 msgid "Clique e saiba como participar do Infodengue"
 msgstr "Haz clic y descubre cómo participar en InfoDengue"
 
-#: AlertaDengue/dados/templates/main.html:69
+#: AlertaDengue/dados/templates/main.html:86
 msgid "Confira aqui!"
 msgstr "¡Consulta aquí!"
 
-#: AlertaDengue/dados/templates/main.html:80
+#: AlertaDengue/dados/templates/main.html:95
 msgid "Situação Epidemiológica"
 msgstr "Situación Epidemiológica"
 
@@ -1687,6 +1707,8 @@ msgid "Vermelho"
 msgstr "Rojo"
 
 #: AlertaDengue/dados/templates/report_city.html:236
+#, fuzzy, python-format
+#| msgid "incidência alta, acima dos 90%% históricos"
 msgid "incidência alta, acima dos 90%% históricos"
 msgstr "incidencia alta, por encima del 90% histórico"
 
@@ -2014,12 +2036,6 @@ msgid ""
 msgstr ""
 "Aquí se pueden encontrar los datos mostrados en las figuras y tablas del "
 "sitio"
-
-#: AlertaDengue/dados/templates/services_api.html:76
-#: AlertaDengue/dados/templates/services_api.html:83
-#: AlertaDengue/dados/templates/services_api_doc.html:54
-msgid "API"
-msgstr "API"
 
 #: AlertaDengue/dados/templates/services_api.html:93
 msgid "Para mais informações, acesse a documentação do serviço da API."
@@ -2908,6 +2924,9 @@ msgstr "Tu nombre de usuario, en caso de que lo hayas olvidado, es:"
 #: AlertaDengue/templates/registration/password_reset_email.html:12
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Gracias por usar InfoDengue"
+
+#~ msgid "Mapas estaduais"
+#~ msgstr "Mapas estatales"
 
 #~ msgid "Epidemia"
 #~ msgstr "Epidemia"

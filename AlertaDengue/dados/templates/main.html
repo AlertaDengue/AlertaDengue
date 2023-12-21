@@ -5,105 +5,117 @@
 {% load lookup %}
 {% load footer_components %}
 
-
 {% block extra_head %}
-  <meta property="og:image"
-    content="{% static '/img/screenshot.png' %}"/>
-  <meta property="og:image:secure_url"
-    content="{% static '/img/screenshot.png' %}"/>
+<meta property="og:image" content="{% static '/img/screenshot.png' %}" />
+<meta property="og:image:secure_url" content="{% static '/img/screenshot.png' %}" />
 
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-  <link href="{% static '/css/components.css' %}" rel="stylesheet" type="text/css">
+<link href="{% static '/css/components.css' %}" rel="stylesheet" type="text/css">
+
+<style>
+.custom-list {
+    list-style-type: disc;
+    padding-left: 20px; /* Adjust the padding as needed */
+    font-style: italic;
+}
+</style>
 {% endblock %}
 
 {% block title %}
-  {% translate "Situação de casos estimados" %}
+{% translate "Situação de casos estimados" %}
 {% endblock %}
 
 {% block content %}
 
-
-<!-- begin maps -->
+<!-- begin main layer -->
 <div class="container">
-  <div class="row"
-    style="background-color: #e0eefd63;
-      border-radius: 14px;">
-    <div class="col-md-4 col-sm-6 mb-1">
-      <div class="h-40 border-0 p-3 mt-5 ">
-        <h5>
-        <p class="text-muted text-center font-italic">
-          {% translate "Análise integrada de dados epidemiológicos e climáticos" %}
-        </p></h5>
-      </div>
-      <div class="h-60 border-0 p-5 ms-3">
-          <h3><small>{% translate "Atualização semanal" %}:</small></h3>
-          <p class="text-muted">
-            <li class="text-muted">{% translate "Incidência estimada" %} (nowcasting)</li>
-            <li class="text-muted">{% translate "Cidades com condições favoráveis para transmissão" %}</li>
-            <li class="text-muted">{% translate "Cidades em níveis de atenção" %}</li>
-          </p>
-      </div>
+    <div class="row mt-12 ms-5 mb-4" style="background-color: #e0eefd63; border-radius: 7px;
+        border: 1px; box-shadow: 2px 2px 7px #c9e4ff69; padding-bottom: 20px;">
+        <div class="col-md-4 col-sm-6 mb-1">
+            <div class="h-1 p-0 mt-5">
+                <h4>
+                    <p class="text-muted text-center font-italic">
+                        {% translate "Análise integrada de dados epidemiológicos e climáticos" %}
+                    </p>
+                </h4>
+            </div>
+
+            <div class="h-0 p-4 mt-2">
+                <h3><small>{% translate "Atualização semanal" %}</small></h3>
+                <p class="text-muted">
+                    <span class="text-muted">{% translate "Incidência estimada" %} (nowcasting)</span><br>
+                    <span class="text-muted">{% translate "Cidades com condições favoráveis para transmissão" %}</span><br>
+                    <span class="text-muted">{% translate "Cidades em níveis de atenção" %}</span><br>
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6 mb-1">
+            <div class="h-0 p-0 mt-3">
+                <div class="border-0 mb-4 mt-0">
+                    {% carousel_component %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-sm-6 mb-1">
+            <div class="h-0 p-0 mt-5">
+                <h3><small class="">{% translate "Funcionalidades" %}</small></h3>
+                <ul class="custom-list text-muted" style="font-size: normal;">
+                    <li><a href="report/" target="_blank" title="{% translate 'Relatórios municipais' %}"
+                            style="color: inherit; text-decoration: none;">{% translate "Relatórios municipais" %}</a>
+                    </li>
+                    <li><a href="report/" target="_blank" title="{% translate 'Relatórios estaduais' %}"
+                            style="color: inherit; text-decoration: none;">{% translate "Relatórios estaduais" %}</a>
+                    </li>
+                    <li><a href="informacoes/#section1.1" target="_blank"
+                            title="{% translate 'Relatórios técnicos' %}" style="color: inherit; text-decoration: none;">
+                            {% translate "Relatórios técnicos" %}</a></li>
+                    <li><a href="services/api" target="_blank" title="{% translate 'API' %}"
+                            style="color: inherit; text-decoration: none;">{% translate "API" %}</a></li>
+                    <li><a href="services/tutorial" target="_blank" title="{% translate 'Tutoriais' %}"
+                            style="color: inherit; text-decoration: none;">{% translate "Tutoriais" %}</a></li>
+                </ul>
+            </div>
+
+            <div class="h-0 p-0 mt-5">
+                <h3><small class="">{% translate "Participe" %}</small></h3>
+                <p class="text-muted">{% translate "Existem várias formas de participar" %}<br>
+                    <span class=""><a href="participe/" title={% translate "Clique e saiba como participar do Infodengue" %}
+                            style="font-size: small;"><i>{% translate "Confira aqui!" %}</i></a></span>
+                </p>
+            </div>
+        </div>
     </div>
-    <div class="col-md-4 col-sm-6 mb-4">
-      <div class="h-100 border-0 mb-4 mt-3">
-        {% carousel_component %}
-      </div>
-    </div>
-    <div class="col-md-4 col-sm-6 mb-4">
-      <div class="h-40 border-0 p-4 mt-5">
-        <h3><small class="">{% translate "Funcionalidades" %}:</small></h3>
-        <p class="text-muted">
-            <li class="text-muted">{% translate "Relatórios municipais" %} </li>
-            <li class="text-muted">{% translate "Mapas estaduais" %} </li>
-            <li class="text-muted">API </li>
-        </p>
-      </div>
-      <div class="h-60 border-0 p-4">
-        <h3><small class="">{% translate "Participe" %}:</small></h3>
-        <p class="text-muted">
-          {% translate "Existem várias formas de participar" %}<br/>
-            <span class=""><a href="participe/"
-              title={% translate "Clique e saiba como participar do Infodengue" %}
-              style="font-size: small;"
-              >{% translate "Confira aqui!" %}
-            </a>
-          </span>
-        </p>
-      </div>
-    </div>
-  </div>
 </div>
-<!-- end maps -->
+<!-- end main layer -->
 
 <div class="page-header align-title mt-4" style="margin-bottom: 20px;">
-  <h3>{% translate "Situação Epidemiológica" %}</h3>
+    <h3>{% translate "Situação Epidemiológica" %}</h3>
 </div>
 
-<!-- begin colapse -->
+<!-- begin collapse states -->
 <div class="container">
-  <div class="row justify-content-center"
-    style="background-color: #e0eefd63;
-      margin-bottom: 20px;
-      border-radius: 7px">
-    <div class="col-md-12 p-1">
-      <div class="card-primary" >
-          {% collapse_component %}
-      </div>
+    <div class="row justify-content-center"
+        style="background-color: #e0eefd63; margin-bottom: 20px; border-radius: 7px">
+        <div class="col-md-12 p-1">
+            <div class="card-primary">
+                {% collapse_component %}
+            </div>
+        </div>
     </div>
-  </div>
 </div>
-<!-- end collapse-->
+<!-- end collapse states-->
 </div>
-
 
 <!-- begin footer code -->
 <div class="container">
-  <div class="row">
-  <div class="col-md-12">
-      {% githubsponsor_component %}
-  </div>
-  </div>
+    <div class="row">
+        <div class="col-md-12">
+            {% githubsponsor_component %}
+        </div>
+    </div>
 </div>
 <!-- end footer code -->
 
