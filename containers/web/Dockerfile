@@ -85,7 +85,6 @@ COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/cronjob /etc/cron.d/cr
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/celery.sh  /opt/services/celery.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/entrypoint.sh  /entrypoint.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/test.sh /opt/services/test.sh
-COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/run_services.sh /opt/services/run_services.sh
 
 # The command specified in the Compose file will be executed
 # ENTRYPOINT ["/entrypoint.sh"]
