@@ -172,7 +172,7 @@ services:
     hostname: infodengue-${ENV}-worker
     extends:
       service: base
-    entrypoint: ["bash", "/entrypoint.sh", "/opt/services/run_services.sh"]
+    entrypoint: ["bash", "/entrypoint.sh", "/opt/services/celery.sh"]
     # command: ["python3", "/opt/services/AlertaDengue/dbf/collector.py"]
     env_file:
       - ../.env
