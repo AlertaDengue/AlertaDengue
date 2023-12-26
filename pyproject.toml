@@ -60,6 +60,7 @@ pyscopg2 = "^66.0.2"
 pyarrow = "^11.0.0"
 lmfit = "^1.1.0"
 pandas = ">=2.1.0"
+psycopg2 = "^2.9.9"
 
 
 [tool.poetry.group.dev.dependencies]

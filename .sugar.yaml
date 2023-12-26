@@ -11,12 +11,13 @@ groups:
       - containers/compose.yaml
     env-file: .env
     services:
-      default: memcached,rabbitmq,web,worker,stagingdb
+      default: memcached,rabbitmq,redis,web,worker,stagingdb
       available:
         - name: stagingdb
         - name: web
         - name: memcached
         - name: rabbitmq
+        - name: redis
         - name: worker
 
   prod:
