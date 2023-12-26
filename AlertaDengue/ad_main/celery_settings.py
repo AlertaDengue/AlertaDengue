@@ -2,7 +2,6 @@ import os
 
 from django.conf import settings
 
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ad_main.settings")
 
 ENV = "dev" if settings.DEBUG else "prod"
