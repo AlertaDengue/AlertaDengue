@@ -867,6 +867,20 @@ files = [
 ]
 
 [[package]]
+name = "django-extensions"
+version = "3.2.3"
+description = "Extensions for Django"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "django-extensions-3.2.3.tar.gz", hash = "sha256:44d27919d04e23b3f40231c4ab7af4e61ce832ef46d610cc650d53e68328410a"},
+    {file = "django_extensions-3.2.3-py3-none-any.whl", hash = "sha256:9600b7562f79a92cbf1fde6403c04fee314608fefbb595502e34383ae8203401"},
+]
+
+[package.dependencies]
+Django = ">=3.2"
+
+[[package]]
 name = "django-leaflet"
 version = "0.28.3"
 description = "Use Leaflet in your django projects"
@@ -3686,4 +3700,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "20f56bcd2c55353fd9a7cd9259291ecd646ce8c894b83702cbb274be7dc7c3b2"
+content-hash = "8e7b93da7e8cd4297963fdfaf9e9f6f6a19ba5f4472b4be59472b890d518fa04"
