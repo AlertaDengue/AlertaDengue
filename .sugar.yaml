@@ -5,7 +5,7 @@ defaults:
   group: {{ env.ENV }}
 
 groups:
-  - name: dev
+  dev:
     project-name: infodengue-dev
     compose-path:
       - containers/compose.yaml
@@ -19,7 +19,7 @@ groups:
         - name: rabbitmq
         - name: worker
 
-  - name: prod
+  prod:
     project-name: infodengue-prod
     compose-path: containers/compose.yaml
     env-file: .env
