@@ -53,7 +53,7 @@ USER deploy
 # Change shell to bash
 SHELL ["/bin/bash", "-c"]
 
-COPY --chown=${HOST_UID}:${HOST_GID} conda/"${ENV}".yaml /tmp/environment.yaml
+COPY --chown=${HOST_UID}:${HOST_GID} conda/base.yaml /tmp/environment.yaml
 
 # Use environment to update the env alertadengue
 RUN conda env create -n $ENV_NAME \

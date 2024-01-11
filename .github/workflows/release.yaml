@@ -27,7 +27,7 @@ jobs:
       with:
         miniconda-version: "latest"
         mamba-version: "*"
-        environment-file: conda/dev.yaml
+        environment-file: conda/base.yaml
         channels: conda-forge,nodefaults
         activate-environment: alertadengue
         use-mamba: true

@@ -567,14 +567,14 @@ class AlertCity:
                 t_hist["SE"].between(int(ew_start), int(ew_end))
             ) & (t_hist["municipio_geocodigo"] == geocode)
 
-            t_hist_filter_expr = t_hist.filter(t_hist_filter_bol).sort_by(
+            t_hist_filter_expr = t_hist.filter(t_hist_filter_bol).order_by(
                 ibis.desc("SE")
             )
 
         else:
             t_hist_filter_expr = (
                 t_hist.filter(t_hist["municipio_geocodigo"] == geocode)
-                .sort_by(ibis.desc("SE"))
+                .order_by(ibis.desc("SE"))
                 .limit(3)
             )
 

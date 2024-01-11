@@ -106,7 +106,7 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
 
         res = (
             table_hist_uf[table_hist_uf.state_abbv == state_abbv]
-            .sort_by("SE")
+            .order_by("SE")
             .execute()
         )
 
@@ -216,18 +216,18 @@ class RegionalParameters:
                 ]
                 municipio_uf_filter = municipio_proj[
                     municipio_proj.uf == state_name
-                ].sort_by("id_regional")
+                ].order_by("id_regional")
 
                 regional_proj = cls.t_regional["id", "nome"]
                 regional_name_filter = regional_proj[
                     regional_proj.nome == regional_name
-                ].sort_by("id")
+                ].order_by("id")
 
                 cities_expr = (
                     municipio_uf_filter.join(
                         regional_name_filter, cls.t_parameters
                     )[municipio_uf_filter.geocodigo, municipio_uf_filter.nome]
-                    .sort_by("nome")
+                    .order_by("nome")
                     .execute()
                 )
 
@@ -264,7 +264,7 @@ class RegionalParameters:
 
                 cities_expr = (
                     cls.t_municipio[t_municipio_uf_expr]["geocodigo", "nome"]
-                    .sort_by("nome")
+                    .order_by("nome")
                     .execute()
                 )
 
@@ -1104,7 +1104,7 @@ class ReportCity:
 
         return (
             t_hist_proj[hist_keys]
-            # .sort_by(("SE", True))
+            # .order_by(("SE", True))
             .execute().set_index("SE")
         )
 
@@ -1197,7 +1197,7 @@ class ReportState:
 
         return (
             t_hist_proj[cols_]
-            .sort_by(("SE", False))
+            .order_by(("SE", False))
             .execute()
             # .set_index("SE")
         )
