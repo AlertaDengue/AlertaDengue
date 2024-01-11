@@ -7,7 +7,6 @@ from django.views.generic import TemplateView
 # local
 from .views import (
     AboutPageView,
-    download_technical_report_pdf,
     AlertaMainView,
     AlertaMunicipioPageView,
     AlertaStateView,
@@ -22,6 +21,7 @@ from .views import (
     ReportView,
     SinanCasesView,
     TeamPageView,
+    download_technical_report_pdf,
 )
 
 
@@ -65,9 +65,9 @@ urlpatterns = [
         name="about",
     ),
     re_path(
-        r'^download_technical_report_pdf/$',
+        r"^download_technical_report_pdf/$",
         download_technical_report_pdf,
-        name='download_technical_report_pdf'
+        name="download_technical_report_pdf",
     ),
     re_path(
         r"^equipe/$",

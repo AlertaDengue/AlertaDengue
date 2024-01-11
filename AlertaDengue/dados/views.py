@@ -17,7 +17,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles.finders import find
 from django.core.cache import cache
-from django.http import HttpResponse, Http404
+from django.http import Http404, HttpResponse
 
 # from django.shortcuts import redirect
 from django.templatetags.static import static
@@ -88,7 +88,7 @@ def hex_to_rgb(value):
     value = value.lstrip("#")
     lv = len(value)
     return tuple(
-        int(value[i: i + lv // 3], 16)
+        int(value[i : i + lv // 3], 16)
         for i in range(0, lv, lv // 3)  # noqa: E203
     )
 
@@ -150,7 +150,7 @@ class AboutPageView(TemplateView):
 
 def download_technical_report_pdf(request, *args, **kwargs):
     pdf_path = os.path.join(
-        settings.MEDIA_ROOT, 'templates/about/technical-report.pdf'
+        settings.MEDIA_ROOT, "templates/about/technical-report.pdf"
     )
 
     if not os.path.exists(pdf_path):
@@ -161,12 +161,13 @@ def download_technical_report_pdf(request, *args, **kwargs):
         "2024-26out2023.pdf"
     )
 
-    with open(pdf_path, 'rb') as pdf_file:
+    with open(pdf_path, "rb") as pdf_file:
         response = HttpResponse(
-            pdf_file.read(),
-            content_type='application/pdf'
+            pdf_file.read(), content_type="application/pdf"
         )
-        response['Content-Disposition'] = f'attachment; filename="{pdf_output}"'
+        response[
+            "Content-Disposition"
+        ] = f'attachment; filename="{pdf_output}"'
         return response
 
 
