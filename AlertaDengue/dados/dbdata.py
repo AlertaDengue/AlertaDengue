@@ -778,7 +778,19 @@ class NotificationResume:
         sql = sql.format(_disease, state_name)
 
         with DB_ENGINE.connect() as conn:
-            cities_alert = pd.read_sql_query(sql, conn, "id", parse_dates=True)
+            result = conn.execute(sql)
+            rows = result.fetchall()
+
+        cities_alert = pd.DataFrame(
+            rows,
+            columns=[
+                "id",
+                "municipio_geocodigo",
+                "nome",
+                "data_iniSE",
+                "level_alert",
+            ],
+        )
 
         cache.set(cache_key, cities_alert, settings.QUERY_CACHE_TIMEOUT)
         logger.info("Cache set for key: %s", cache_key)
