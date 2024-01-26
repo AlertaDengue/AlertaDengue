@@ -544,14 +544,19 @@ def load_cases_without_forecast(geocode: int, disease):
     with DB_ENGINE.connect() as conn:
         table_name = "Historico_alerta" + get_disease_suffix(disease)
 
-        data_alert = pd.read_sql_query(
+        result = conn.execute(
             f"""
             SELECT * FROM "Municipio"."{table_name}"
             WHERE municipio_geocodigo={geocode} ORDER BY "data_iniSE" ASC
-            """,
-            conn,
-            parse_dates=True,
+            """
         )
+
+        data_alert = pd.DataFrame(result.fetchall(), columns=result.keys())
+
+        # Convert relevant columns to datetime
+        data_alert["data_iniSE"] = pd.to_datetime(data_alert["data_iniSE"])
+        # Add more columns if needed
+
     return data_alert
 
 
@@ -862,20 +867,23 @@ class Forecast:
 
         sql = """
         SELECT
-          TO_CHAR(MIN(init_date_epiweek), 'YYYY-MM-DD') AS epiweek_min,
-          TO_CHAR(MAX(init_date_epiweek), 'YYYY-MM-DD') AS epiweek_max
+            TO_CHAR(MIN(init_date_epiweek), 'YYYY-MM-DD') AS epiweek_min,
+            TO_CHAR(MAX(init_date_epiweek), 'YYYY-MM-DD') AS epiweek_max
         FROM
-          forecast.forecast_cases AS f
-          INNER JOIN forecast.forecast_city AS fc
+            forecast.forecast_cases AS f
+            INNER JOIN forecast.forecast_city AS fc
             ON (f.geocode = fc.geocode AND fc.active=TRUE)
-          INNER JOIN forecast.forecast_model AS fm
+            INNER JOIN forecast.forecast_model AS fm
             ON (fc.forecast_model_id = fm.id AND fm.active = TRUE)
         WHERE f.geocode={} AND cid10='{}'
         """.format(
             geocode, cid10
         )
 
-        values = pd.read_sql_query(sql, DB_ENGINE).values.flat
+        with DB_ENGINE.connect() as connection:
+            result = connection.execute(sql)
+            values = result.fetchone()
+
         return values[0], values[1]
 
     @staticmethod
@@ -892,29 +900,30 @@ class Forecast:
 
         sql = """
         SELECT DISTINCT ON (forecast_cases.forecast_model_id)
-          forecast_cases.forecast_model_id,
-          forecast_model.name AS forecast_model_name,
-          forecast_cases.published_date
+        forecast_cases.forecast_model_id,
+        forecast_model.name AS forecast_model_name,
+        forecast_cases.published_date
         FROM
-          forecast.forecast_cases
-          INNER JOIN forecast.forecast_model
+        forecast.forecast_cases
+        INNER JOIN forecast.forecast_model
             ON (
-              forecast_cases.forecast_model_id =
-              forecast_model.id
+            forecast_cases.forecast_model_id =
+            forecast_model.id
             )
         WHERE
-          cid10 = '%s'
-          AND geocode = %s
-          AND epiweek = %s
+        cid10 = %s
+        AND geocode = %s
+        AND epiweek = %s
         ORDER BY forecast_model_id, published_date DESC
-        """ % (
-            cid10,
-            geocode,
-            epiweek,
-        )
+        """
 
         with DB_ENGINE.connect() as conn:
-            df_forecast_model = pd.read_sql(sql, con=conn)
+            result = conn.execute(sql, (cid10, geocode, epiweek))
+            df_forecast_model = pd.DataFrame(
+                result.fetchall(), columns=result.keys()
+            )
+
+        # return df_forecast_model
 
         table_name = "Historico_alerta" + get_disease_suffix(disease)
 
@@ -1040,7 +1049,8 @@ class Forecast:
         }
 
         with DB_ENGINE.connect() as conn:
-            return pd.read_sql(sql, con=conn, parse_dates=True)
+            result = conn.execute(sql)
+            return pd.DataFrame(result.fetchall(), columns=result.keys())
 
 
 class ReportCity:
