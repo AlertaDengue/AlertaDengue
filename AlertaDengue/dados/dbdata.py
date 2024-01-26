@@ -12,6 +12,7 @@ from typing import List, Optional, Tuple
 import ibis
 import numpy as np
 import pandas as pd
+
 from ad_main.settings import APPS_DIR, get_ibis_conn, get_sqla_conn
 from django.conf import settings
 from django.core.cache import cache
@@ -647,21 +648,19 @@ class NotificationResume:
 
         table_name = "Historico_alerta" + get_disease_suffix(disease)
 
-        sql = """
-        SELECT COALESCE(COUNT(municipio_geocodigo), 0) AS count
-        FROM (
-            SELECT DISTINCT municipio_geocodigo
-            FROM "Municipio"."%s") AS alerta
-        INNER JOIN "Dengue_global"."Municipio" AS municipio
-          ON alerta.municipio_geocodigo = municipio.geocodigo
-        WHERE uf='%s'
-        """ % (
-            table_name,
-            uf,
-        )
+        sql = text(f"""
+            SELECT COALESCE(COUNT(DISTINCT a.municipio_geocodigo), 0) AS count
+            FROM "Municipio"."{table_name}" AS a
+            INNER JOIN "Dengue_global"."Municipio" AS b
+            ON a.municipio_geocodigo = b.geocodigo
+            WHERE uf= :uf
+        """)
 
         with DB_ENGINE.connect() as conn:
-            return pd.read_sql(sql, conn).astype(int).iloc[0]["count"]
+            result = conn.execute(sql, uf=uf)
+            total_cities = result.scalar()
+            return int(total_cities)
+
 
     @staticmethod
     def tail_estimated_cases(geo_ids: list, n: int) -> pd.DataFrame:
