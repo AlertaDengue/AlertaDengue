@@ -668,54 +668,51 @@ class NotificationResume:
             return int(total_cities)
 
     @staticmethod
-    def tail_estimated_cases(geo_ids: list, n: int) -> pd.DataFrame:
+    def tail_estimated_cases(geo_ids: list, n: int) -> dict:
         """
-        Return the last n days of estimated cases for a list of geocodes.
+        Fetch the last 'n' estimated cases for each municipality in the given 'geo_ids'.
 
-        Parameters
-        ----------
-        geo_ids: list
-            List of geocodes
-            n: int  default: 12
-        Returns
-        -------
-            df_case_series: pd.DataFrame
+        Parameters:
+        - geo_ids (list): List of municipality geo-codes.
+        - n (int): Number of cases to retrieve.
+
+        Returns:
+        - dict: A dictionary mapping municipality geo-codes to lists of last 'n' estimated cases.
+        """
+        if not geo_ids or n < 1:
+            raise ValueError(
+                "Invalid input. Ensure geo_ids is not empty and n is a positive integer."
+            )
+
+        sql_template = """
+            SELECT
+                municipio_geocodigo, "data_iniSE", casos_est
+            FROM
+                "Municipio".historico_casos
+            WHERE
+                municipio_geocodigo = %s
+            ORDER BY
+                "data_iniSE" DESC
+            LIMIT %s
         """
 
-        if len(geo_ids) < 1:
-            raise Exception("GEO id list should have at least 1 code.")
-
-        sql_template = (
-            """(
-        SELECT
-            municipio_geocodigo, "data_iniSE", casos_est
-        FROM
-            "Municipio".historico_casos
-        WHERE
-            municipio_geocodigo={}
-        ORDER BY
-            "data_iniSE" DESC
-        LIMIT """
-            + str(n)
-            + ")"
-        )
-
-        sql_statements = [
-            str(text(sql_template.format(gid, n))) for gid in geo_ids
-        ]
-
-        sql = " UNION ".join(sql_statements)
-
-        if len(geo_ids) > 1:
-            sql += ' ORDER BY municipio_geocodigo, "data_iniSE"'
+        result_dict = {}
 
         with DB_ENGINE.connect() as conn:
-            df_case_series = pd.read_sql(text(sql), conn)
+            for geo_id in geo_ids:
+                # Use parameterized query to avoid SQL injection
+                sql = conn.execute(sql_template, (geo_id, n))
+                df_case_series = pd.DataFrame(
+                    sql.fetchall(),
+                    columns=["municipio_geocodigo", "data_iniSE", "casos_est"],
+                )
+                # breakpoint()
+                if not df_case_series.empty:
+                    result_dict[geo_id] = df_case_series[
+                        "casos_est"
+                    ].values.tolist()
 
-        return {
-            k: v.casos_est.values.tolist()
-            for k, v in df_case_series.groupby(by="municipio_geocodigo")
-        }
+        return result_dict
 
     @staticmethod
     def get_cities_alert_by_state(
