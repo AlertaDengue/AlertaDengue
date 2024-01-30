@@ -10,6 +10,7 @@ from dados.dbdata import CID10, STATE_NAME, get_disease_suffix  # noqa:F401
 DB_ENGINE = get_sqla_conn()
 IBIS_CONN = get_ibis_conn()
 
+
 class AlertCity:
     @staticmethod
     def search(
