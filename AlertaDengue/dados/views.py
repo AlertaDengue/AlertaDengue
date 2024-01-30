@@ -439,8 +439,7 @@ class SinanCasesView(View):
         # json.loads(cases)
         return HttpResponse(cases, content_type="application/json")
 
-
-class AlertaStateView(TemplateView):
+class AlertaStateViewNew(TemplateView):
     template_name = "state_cities.html"
     _state_name = STATE_NAME
 
@@ -449,55 +448,18 @@ class AlertaStateView(TemplateView):
         :param kwargs:
         :return:
         """
-        context = super(AlertaStateView, self).get_context_data(**kwargs)
+        context = super(AlertaStateViewNew, self).get_context_data(**kwargs)
 
+        # breakpoint()
         state_name = self._state_name[context["state"]]
         disease = context["disease"]
-
-        cities_alert = NotificationResume.get_cities_alert_by_state(
-            state_name, disease
-        )
-
-        alerts = dict(
-            cities_alert[["municipio_geocodigo", "level_alert"]].values
-        )
-        mun_dict = dict(cities_alert[["municipio_geocodigo", "nome"]].values)
-        mun_dict_ordered = OrderedDict(
-            sorted(mun_dict.items(), key=lambda v: v[1])
-        )
-        geo_ids = list(mun_dict.keys())
-
-        dbf = (
-            DBF.objects.filter(abbreviation=context["state"])
-            .order_by("export_date")
-            .last()
-        )
-
-        if dbf is None:
-            last_update = _("desconhecida")
-        else:
-            last_update = dbf.export_date
-
-        if len(geo_ids) > 0:
-            cases_series_last_12 = NotificationResume.tail_estimated_cases(
-                geo_ids, 12
-            )
-        else:
-            cases_series_last_12 = {}
 
         context.update(
             {
                 "state_abv": context["state"],
                 "state": state_name,
-                "map_center": MAP_CENTER[context["state"]],
-                "map_zoom": MAP_ZOOM[context["state"]],
-                "mun_dict": mun_dict,
-                "mun_dict_ordered": mun_dict_ordered,
-                "geo_ids": geo_ids,
-                "alerts_level": alerts,
-                "case_series": cases_series_last_12,
                 "disease_label": context["disease"].title(),
-                "last_update": last_update,
+                "last_update": '12-01-2024',
             }
         )
 
@@ -655,6 +617,7 @@ class ChartsMainView(TemplateView):
                 "no_data_chart": no_data_chart,
                 "empty_charts_count": empty_charts_count,
                 "states_alert": states_alert,
+                "disease": "zika"
             }
         )
         return context
