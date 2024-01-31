@@ -1,27 +1,18 @@
 {% extends 'base.html' %}
-{% load i18n %}
-{% load static %}
+{% load i18n static alert_state %}
 
-
-{% load alert_state %}
-
-{% block extra_head %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js" type="text/javascript"></script>
-{% endblock %}
 {% block title %}{{ state }}{% endblock %}
 
 {% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <small>{% blocktranslate %}Última atualização{% endblocktranslate %}: {{ last_update }}</small>
+            </div>
+        </div>
 
-<div class="container-fluid">
-
-    <div class="row">
-        <small>{% blocktranslate %}Última atualização{% endblocktranslate %}: {{ last_update }}</small>
-        <br />&nbsp;
+        <div class="row mt-3"> <!-- Added margin-top for spacing -->
+            {% vis_altair %}
+        </div>
     </div>
-
-    <div class="row">
-    {% vis_altair %}
-    </div>
-
-</div>
 {% endblock %}

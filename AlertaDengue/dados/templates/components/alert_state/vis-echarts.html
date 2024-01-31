@@ -1,12 +1,21 @@
 {% block vis_altair %}
-<ul>
-{% for key,value in CID10.items %}
+<div class="container-fluid">
+    <div class="row mb-3"> <!-- Added margin-bottom for spacing -->
+        <div class="col-12">
+            <ul>
+                {% for key, value in CID10.items %}
+                    <li>{{ value }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 
-<li>{{ value }}</li></p>
-
-{% endfor %}
-</ul>
-<div>
-    {{ chart_altair_html | safe }}
+    <div class="row">
+        <div class="col-sm-12 col-md-12"> <!-- Responsive for small and medium screens -->
+            {{ altair_line_chart | safe }}
+        </div>
+    </div>
+    
+    
 </div>
 {% endblock %}
