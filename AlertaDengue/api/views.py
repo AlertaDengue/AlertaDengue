@@ -8,6 +8,7 @@ from django.views.generic.base import View
 # local
 from .db import STATE_NAME, AlertCity
 
+
 class _GetMethod:
     """"""
 
@@ -30,6 +31,7 @@ class _GetMethod:
         )
 
         return result if cast is None or result is None else cast(result)
+
 
 class AlertCityView(View, _GetMethod):
     """ """

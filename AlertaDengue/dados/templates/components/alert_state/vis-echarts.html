@@ -1,0 +1,12 @@
+{% block vis_altair %}
+<ul>
+{% for key,value in CID10.items %}
+
+<li>{{ value }}</li></p>
+
+{% endfor %}
+</ul>
+<div>
+    {{ chart_altair_html | safe }}
+</div>
+{% endblock %}

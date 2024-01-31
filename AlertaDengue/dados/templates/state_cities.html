@@ -1,17 +1,27 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load static %}
-{% load lookup %}
-{% get_current_language as LANGUAGE_CODE %}
 
 
+{% load alert_state %}
+
+{% block extra_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js" type="text/javascript"></script>
+{% endblock %}
 {% block title %}{{ state }}{% endblock %}
 
 {% block content %}
+
 <div class="container-fluid">
-    <!-- chart-plot:begin -->
+
     <div class="row">
         <small>{% blocktranslate %}Última atualização{% endblocktranslate %}: {{ last_update }}</small>
         <br />&nbsp;
     </div>
+
+    <div class="row">
+    {% vis_altair %}
+    </div>
+
+</div>
 {% endblock %}

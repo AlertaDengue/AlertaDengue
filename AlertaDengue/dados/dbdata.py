@@ -663,6 +663,7 @@ class NotificationResume:
         with DB_ENGINE.connect() as conn:
             return pd.read_sql(sql, conn).astype(int).iloc[0]["count"]
 
+
 class Forecast:
     @staticmethod
     def get_min_max_date(geocode: int, cid10: str) -> str:

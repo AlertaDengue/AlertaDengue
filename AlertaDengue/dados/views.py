@@ -439,6 +439,7 @@ class SinanCasesView(View):
         # json.loads(cases)
         return HttpResponse(cases, content_type="application/json")
 
+
 class AlertaStateViewNew(TemplateView):
     template_name = "state_cities.html"
     _state_name = STATE_NAME
@@ -459,7 +460,7 @@ class AlertaStateViewNew(TemplateView):
                 "state_abv": context["state"],
                 "state": state_name,
                 "disease_label": context["disease"].title(),
-                "last_update": '12-01-2024',
+                "last_update": "12-01-2024",
             }
         )
 
@@ -617,7 +618,6 @@ class ChartsMainView(TemplateView):
                 "no_data_chart": no_data_chart,
                 "empty_charts_count": empty_charts_count,
                 "states_alert": states_alert,
-                "disease": "zika"
             }
         )
         return context
