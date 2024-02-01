@@ -1,0 +1,17 @@
+{% load i18n %}
+
+<div class="container">
+    {% block breadcrumbs %}{% endblock %}
+    <div class="page-header my-4 align-title">
+        <h3>{% block title %}(no title){% endblock %}</h3>
+    </div>
+    {% block content %}
+    <p class="lead">
+        {% blocktranslate %}Pin a fixed-height footer to the bottom of the viewport
+        in desktop browsers with this custom HTML and CSS.
+         A fixed navbar has been added within <code>#wrap</code>
+         with <code>padding-top: 60px;</code> on the <code>.container</code>
+        {% endblocktranslate %}
+    </p>
+    {% endblock %}
+</div>
