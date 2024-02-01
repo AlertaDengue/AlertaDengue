@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+from typing import List, Tuple
 
 import fiona
 import geojson
@@ -10,10 +11,50 @@ import shapely
 # local
 from dados import dbdata, maps
 from django.conf import settings
+from django.core.cache import cache
 from django.core.management.base import BaseCommand
 from shapely.geometry import MultiPolygon, shape
+from sqlalchemy.engine import Engine
 
 from ...geodf import extract_boundaries
+
+
+def get_all_active_cities(db_engine: Engine) -> List[Tuple[str, str]]:
+    """
+    Retrieve a list of active city names and their geocodes.
+
+    Parameters
+    ----------
+    db_engine : Engine
+        The database engine to use for the query.
+
+    Returns
+    -------
+    List[Tuple[str, str]]
+        List of city information (geocode, name)
+    """
+
+    # Check if the result is already cached
+    res = cache.get("get_all_active_cities")
+
+    if res is None:
+        # If not cached, query the database and cache the result
+        with db_engine.connect() as conn:
+            res = conn.execute(
+                """
+                SELECT DISTINCT
+                  hist.municipio_geocodigo,
+                  city.nome
+                FROM "Municipio"."Historico_alerta" AS hist
+                  INNER JOIN "Dengue_global"."Municipio" AS city
+                    ON (hist.municipio_geocodigo=city.geocodigo)
+                """
+            )
+            res = res.fetchall()
+            cache.set(
+                "get_all_active_cities", res, settings.QUERY_CACHE_TIMEOUT
+            )
+    return res
 
 
 class Command(BaseCommand):
@@ -186,7 +227,7 @@ class Command(BaseCommand):
         return {geocode: {"bounds": bounds, "width": width, "height": height}}
 
     def handle(self, *args, **options):
-        geocodes = list(dict(dbdata.get_all_active_cities()).keys())
+        geocodes = list(dict(get_all_active_cities()).keys())
 
         SERVE_STATIC = (
             settings.STATICFILES_DIRS[0]

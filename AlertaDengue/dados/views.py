@@ -623,6 +623,7 @@ class ChartsMainView(TemplateView):
         return context
 
 
+# Check if it's necessary
 class GeoTiffView(View):
     def get(self, request, geocodigo, disease):
         """
