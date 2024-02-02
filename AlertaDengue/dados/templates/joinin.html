@@ -1,65 +1,43 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load static %}
-{% load footer_components %}
 
 {% block title %}{% translate "Como participar do InfoDengue" %}{% endblock %}
 
+{% block extra_head %}
+<link href="{% static 'css/participe_styles.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-
-    <div class="card" id="diseaseTabContent"
-        style="background-color: #e0eefd63;
-            margin-bottom: 20px;
-            border-radius: 7px">
-
-        <div class="card-body">
-
-            <div class="col-md-12 w-100">
-
-                <h5><b>{% translate "É muito fácil consultar ou participar do Sistema de Alerta InfoDengue" %}:</b></h5>
-
-                • {% blocktranslate %}Se você é cidadão e tem interesse nas informações atualizadas e rápidas sobre o nível
-                de alerta para arboviroses em seu município, baixe o aplicativo {% endblocktranslate %}
-                <a href="https://play.google.com/store/apps/details?id=br.mat.dengue.infodengue_app">
-                    {% translate "INFODENGUE na Play Store pelo seu celular" %}.</a></br>
-                </p>
-                • {% blocktranslate %}Se você é membro de uma Secretaria de Saúde Municipal, ou cidadão, e tem interesse em informações detalhadas
-                sobre as condições de transmissão do seu município{% endblocktranslate %},
-                <b>{% translate "basta digitar o nome do seu município na barra de pesquisa do site: " %}</b></br>
-                </p>
-                <img class="img-fluid img-thumbnail"
-                    src={% translate '/static/img/join_us/search_city_pt.png' %}
-                /></p>
-                <b>{% blocktranslate %}E depois clicar no nome da cidade  no Relatório de Situação das Arboviroses,
-                na parte inferior da página{% endblocktranslate %}:</b></p>
-                {% comment %} ! src="{% static '/img/join_us/link_reports.png' %}" {% endcomment %}
-                <img class="img-fluid img-thumbnail"
-                    src={% translate '/static/img/join_us/link_reports_pt.png' %}
-                /></p>
-
-                <div class="col-md-12 w-100">
-                    • <b>{% translate "O sistema infodengue atua a nível nacional" %}.</b>
-                    {% blocktranslate %}Se voce é membro de uma Secretaria de Saúde Estadual
-                    que tem interesse em se tornar uma secretaria estadual parceira do projeto,
-                    para recebimento de boletins detalhados do seu estado, {% endblocktranslate %}
+<div class="card" id="diseaseTabContent">
+    <div class="card-body">
+        <div class="col-md-12 w-100">
+            <h5 class="participe-title">{% translate "É muito fácil consultar ou participar do Sistema de Alerta InfoDengue" %}:</h5>
+            <ul class="participe-list">
+                <li>
+                    {% blocktranslate %}Se você é cidadão e tem interesse nas informações atualizadas e rápidas sobre o nível de alerta para arboviroses em seu município, baixe o aplicativo{% endblocktranslate %}
+                    <a href="https://play.google.com/store/apps/details?id=br.mat.dengue.infodengue_app">
+                        {% translate "INFODENGUE na Play Store pelo seu celular" %}.
+                    </a>
+                </li>
+                <li>
+                    {% blocktranslate %}Se você é membro de uma Secretaria de Saúde Municipal, ou cidadão, e tem interesse em informações detalhadas sobre as condições de transmissão do seu município{% endblocktranslate %},
+                    <strong>{% translate "basta digitar o nome do seu município na barra de pesquisa do site: " %}</strong>
+                    <div class="image-container">
+                        <img class="img-fluid img-thumbnail" src="{% static 'img/join_us/search_city_pt.png' %}">
+                    </div>
+                    <strong>{% blocktranslate %}E depois clicar no nome da cidade no Relatório de Situação das Arboviroses, na parte inferior da página{% endblocktranslate %}:</strong>
+                    <div class="image-container">
+                        <img class="img-fluid img-thumbnail" src="{% static 'img/join_us/link_reports_pt.png' %}">
+                    </div>
+                </li>
+                <li>
+                    <strong>{% translate "O sistema infodengue atua a nível nacional" %}.</strong>
+                    {% blocktranslate %}Se voce é membro de uma Secretaria de Saúde Estadual que tem interesse em se tornar uma secretaria estadual parceira do projeto, para recebimento de boletins detalhados do seu estado,{% endblocktranslate %}
                     <a href="mailto:alerta_dengue@fiocruz.br">{% translate "entre em contato conosco" %}.</a>
-                </div>
-
-            </div>
-        
+                </li>
+            </ul>
         </div>
     </div>
-
 </div>
-
-
-<!-- begin footer code -->
-<div class="container">
-  <div class="row">
-    <div class="col-md-12">
-        {% githubsponsor_component %}
-    </div>
-  </div>
-</div>
-    <!-- end footer code -->
 {% endblock %}

@@ -1,35 +1,17 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% load footer_components %}
 {% load static %}
+
 {% block title %}{% translate "InfoDengue" %}{% endblock %}
 
+{% block extra_head %}
+<link href="{% static '/css/about_styles.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-
-<style>
-    .video-container {
-        overflow: hidden;
-        position: relative;
-        width:50%;
-    }
-
-    .video-container::after {
-        padding-top: 56.25%;
-        display: block;
-        content: '';
-    }
-
-    .video-container iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-    }
-</style>
-
-    <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
-        <h3 id="section1" class="panel-title">{% translate "Sobre o InfoDengue" %}</h3>
+<div class="card mb-3" style="background-color: #e0eefd63; border-radius: 7px">
+    <div class="card-header">
+        <h3 id="section1">{% translate "Sobre o InfoDengue" %}</h3>
     </div>
     <div class="card-body">
         <h5>{% blocktranslate %}
@@ -366,15 +348,5 @@
     </div>
 
 </div>
-
-<!-- begin footer code -->
-<div class="container">
-  <div class="row">
-    <div class="col-md-12">
-        {% githubsponsor_component %}
-    </div>
-  </div>
-</div>
-  <!-- end footer code -->
 
 {% endblock %}

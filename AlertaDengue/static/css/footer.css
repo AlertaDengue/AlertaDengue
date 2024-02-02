@@ -1,0 +1,12 @@
+/* styles.css */
+.iframe-infodengue {
+    padding: 5px;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    background-color: #2e94d7f6;
+    text-align: center;
+}
+.logo {
+    width: 50%;
+}
