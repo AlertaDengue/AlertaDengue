@@ -2,7 +2,7 @@
 .video-container {
     overflow: hidden;
     position: relative;
-    width: 50%;
+    width:50%;
 }
 
 .video-container::after {

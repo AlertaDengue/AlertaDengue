@@ -1,8 +1,6 @@
 import altair as alt
 import pandas as pd
 from django import template
-from vega_datasets import data
-from vega_datasets import data as vega_data
 
 register = template.Library()
 

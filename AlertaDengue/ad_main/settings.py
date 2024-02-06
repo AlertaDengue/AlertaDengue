@@ -207,8 +207,9 @@ def get_sqla_conn(database: Optional[str] = PSQL_DB):
         connection = create_engine(
             f"postgresql://{PSQL_USER}:{PSQL_PASSWORD}@{PSQL_HOST}:{PSQL_PORT}/{database}"
         )
+
     except ConnectionError as e:
-        print("Database error for Ibis connection")
+        print("Database error for SQLAlchemy connection")
         raise e
     return connection
 

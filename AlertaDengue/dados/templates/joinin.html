@@ -2,11 +2,11 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% translate "Como participar do InfoDengue" %}{% endblock %}
-
 {% block extra_head %}
-<link href="{% static 'css/participe_styles.css' %}" rel="stylesheet">
+<link href="{% static '/css/participe_styles.css' %}" rel="stylesheet">
 {% endblock %}
+
+{% block title %}{% translate "Como participar do InfoDengue" %}{% endblock %}
 
 {% block content %}
 <div class="card" id="diseaseTabContent">
@@ -24,11 +24,11 @@
                     {% blocktranslate %}Se você é membro de uma Secretaria de Saúde Municipal, ou cidadão, e tem interesse em informações detalhadas sobre as condições de transmissão do seu município{% endblocktranslate %},
                     <strong>{% translate "basta digitar o nome do seu município na barra de pesquisa do site: " %}</strong>
                     <div class="image-container">
-                        <img class="img-fluid img-thumbnail" src="{% static 'img/join_us/search_city_pt.png' %}">
+                        <img class="img-fluid img-thumbnail" src="{% static '/img/join_us/search_city_pt.png' %}">
                     </div>
                     <strong>{% blocktranslate %}E depois clicar no nome da cidade no Relatório de Situação das Arboviroses, na parte inferior da página{% endblocktranslate %}:</strong>
                     <div class="image-container">
-                        <img class="img-fluid img-thumbnail" src="{% static 'img/join_us/link_reports_pt.png' %}">
+                        <img class="img-fluid img-thumbnail" src="{% static '/img/join_us/link_reports_pt.png' %}">
                     </div>
                 </li>
                 <li>

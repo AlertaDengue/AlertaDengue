@@ -2,16 +2,14 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% translate "InfoDengue" %}{% endblock %}
-
 {% block extra_head %}
 <link href="{% static '/css/about_styles.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-<div class="card mb-3" style="background-color: #e0eefd63; border-radius: 7px">
-    <div class="card-header">
-        <h3 id="section1">{% translate "Sobre o InfoDengue" %}</h3>
+
+    <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
+        <h3 id="section1" class="panel-title">{% translate "Sobre o InfoDengue" %}</h3>
     </div>
     <div class="card-body">
         <h5>{% blocktranslate %}

@@ -1,17 +1,16 @@
 {% load i18n %}
+{% load static %}
 
-<div class="container">
-    {% block breadcrumbs %}{% endblock %}
-    <div class="page-header my-4 align-title">
-        <h3>{% block title %}(no title){% endblock %}</h3>
+<div class="row iframe-infodengue text-white">
+    <div class="col-md-2">
+        <img src="{% static '/img/logo-infodengue.png' %}" alt="{% trans 'Infodengue Logo' %}" class="img-fluid logo">
     </div>
-    {% block content %}
-    <p class="lead">
-        {% blocktranslate %}Pin a fixed-height footer to the bottom of the viewport
-        in desktop browsers with this custom HTML and CSS.
-         A fixed navbar has been added within <code>#wrap</code>
-         with <code>padding-top: 60px;</code> on the <code>.container</code>
-        {% endblocktranslate %}
-    </p>
-    {% endblock %}
+    <div class="col-md-8 text-md">
+        <p class="mb-0">{% trans "A organização Alertadengue reúne Epidemiologistas, Cientistas de dados, e estudantes, que atuam em parceria com os órgão governamentais de Saúde para ajudar a gestão de doenças transmitidas por mosquitos como a dengue, zika e Chikungunya." %}</p>
+    </div>
+    <div class="col-md-2 d-flex justify-content-end align-items-start">
+        <a href="https://github.com/sponsors/AlertaDengue?o=esc" target="_blank" class="btn btn-primary mt-3">
+            {% include 'components/github_icon.html' %} {% trans 'Sponsor' %}
+        </a>
+    </div>
 </div>

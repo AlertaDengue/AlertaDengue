@@ -1,33 +1,43 @@
-<!DOCTYPE html>
-{% extends 'bootstrap.html' %}
+<!DOCTYPE HTML>
 {% load static %}
-{% load bootstrap4 %}
 {% load i18n %}
-{% load searchbox_component %}
-
-{% block bootstrap4_content %}
+{% load bootstrap4 %}
 
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="{% static '/img/favicon.ico' %}" type="image/x-icon">
+    <!-- Custom Stylesheets -->
+    <link href="{% static '/css/infodengue.css' %}" rel="stylesheet">
+    <link href="{% static '/css/footer.css' %}" rel="stylesheet">
+    <!-- Bootstrap CSS -->
     {% bootstrap_css %}
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <div class="container container-fluid">
-        {% include 'components/header.html' %}
-        <div class="row clearfix">
-            <div class="col-md-12 column">
-                {% include 'components/navbar.html' %}
-                <div id="wrap">
-                    {% block content %}{% endblock %}
-                </div>
-                {% include 'components/footer.html' %}
-                {% bootstrap_javascript %}
+    <div class="container-fluid d-flex flex-column min-vh-100">
+        <div class="container">
+            {% include 'components/header.html' %}
+            {% include 'components/navbar.html' %}
+        </div>
+        <main role="main" class="flex-fill">
+            <div class="container py-4">
+                {% block title %}{% endblock %}
+                {% block breadcrumbs %}{% endblock %}
+                {% block content %}
+                <!-- Main content goes here -->
+                {% endblock %}
             </div>
-        </div>   
+        </main>
+        <footer class="footer py-4">
+            <div class="container">
+                {% include 'components/footer.html' %}
+            </div>
+        </footer>
     </div>
+    <!-- Bootstrap and jQuery scripts -->
+    <script src="{% static '/libs/jquery/jquery-3.3.1.js' %}"></script>
+    {% bootstrap_javascript %}
 </body>
 </html>
-{% endblock %}
