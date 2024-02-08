@@ -1,17 +1,20 @@
 {% load i18n %}
 {% block searchbox_component %}
+
+{% block extra_head %}
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{% endblock %}
 
-  <select
-    class="js-select2"
-    id="searchbox"
-  >
-      <option></option>
-      {% for city in options_cities %}
-        <option value="{{ city.geocode }}">{{ city.name }} - {{ city.state }}</option>
-      {% endfor %}
-  </select>
+<select
+  class="js-select2"
+  id="searchbox"
+>
+    <option></option>
+    {% for city in options_cities %}
+      <option value="{{ city.geocode }}">{{ city.name }} - {{ city.state }}</option>
+    {% endfor %}
+</select>
 
 <script>
   $(document).ready(function() {
@@ -26,77 +29,4 @@
   });
 </script>
 
-<style>
-
-.select2.select2-container .select2-selection {
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-  height: 28px;
-  outline: none;
-  transition: all .15s ease-in-out;
-  position: relative;
-  margin-top: -1%;
-}
-
-.select2.select2-container .select2-selection .select2-selection__rendered {
-  color: #000000;
-  line-height: 25px;
-  padding-right: 28px;
-}
-
-.select2.select2-container .select2-selection .select2-selection__arrow {
-  border-left: 1px solid #ccc;
-  -webkit-border-radius: 0 3px 3px 0;
-  -moz-border-radius: 0 3px 3px 0;
-  border-radius: 0 3px 3px 0;
-  height: 24px;
-  width: 18px;
-}
-
-.select2.select2-container.select2-container--open .select2-selection.select2-selection--single {
-  background: #f8f8f8;
-}
-
-.select2.select2-container.select2-container--open .select2-selection.select2-selection--single .select2-selection__arrow {
-  -webkit-border-radius: 0 3px 0 0;
-  -moz-border-radius: 0 3px 0 0;
-  border-radius: 0 3px 0 0;
-  background: #cfcfcf;
-}
-
-.select2-container .select2-dropdown {
-  background: transparent;
-  border: none;
-}
-
-.select2-container .select2-dropdown .select2-search {
-  padding: 0;
-}
-
-.select2-container .select2-dropdown .select2-search input {
-  outline: none;
-  border: 1px solid #d7d7d7;
-  border-bottom: none;
-  padding: 4px 6px;
-}
-
-.select2-container .select2-dropdown .select2-results {
-  padding: 0;
-}
-
-.select2-container .select2-dropdown .select2-results ul {
-  background: #fff;
-  border: 1px solid #dcdcdc;
-  font-size: medium;
-  color: #000000;
-}
-
-.select2-container .select2-dropdown .select2-results ul .select2-results__option--highlighted[aria-selected] {
-  background-color: #dcdbdb9c;
-  font-size: medium;
-  color: #000000;
-}
-
-</style>
 {% endblock %}

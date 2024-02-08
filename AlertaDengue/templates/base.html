@@ -8,11 +8,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" href="{% static '/img/favicon.ico' %}" type="image/x-icon">
+
     <!-- Custom Stylesheets -->
     <link href="{% static '/css/infodengue.css' %}" rel="stylesheet">
     <link href="{% static '/css/footer.css' %}" rel="stylesheet">
-    <!-- Bootstrap CSS -->
+
+    <!-- Additional Scripts -->
+    <script src="{% static '/libs/jquery/jquery-3.3.1.js' %}"></script>
+    <script src="{% static '/js/typeahead.bundle.min.js' %}"></script>
+
+    <!-- Bootstrap CSS and JS -->
     {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -36,8 +44,5 @@
             </div>
         </footer>
     </div>
-    <!-- Bootstrap and jQuery scripts -->
-    <script src="{% static '/libs/jquery/jquery-3.3.1.js' %}"></script>
-    {% bootstrap_javascript %}
 </body>
 </html>
