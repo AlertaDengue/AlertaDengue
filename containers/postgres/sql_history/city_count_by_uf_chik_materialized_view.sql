@@ -1,4 +1,4 @@
-CREATE MATERIALIZED VIEW public.city_count_by_uf_chik_materialized_view AS
+CREATE MATERIALIZED VIEW public.city_count_by_uf_chikungunya_materialized_view AS
 SELECT
     b.uf,
     'chikungunya' AS disease,

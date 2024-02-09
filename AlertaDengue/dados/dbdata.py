@@ -672,11 +672,6 @@ def add_dv(geocodigo):
         raise ValueError("geocode does not match!")
 
 
-# TODO
-from sqlalchemy import create_engine, text
-from sqlalchemy.engine.base import Engine
-
-
 class NotificationResume:
     @staticmethod
     def count_cities_by_uf(
@@ -685,19 +680,19 @@ class NotificationResume:
         """
         Return the total number of cities measured for a given state and disease.
         """
-        # Nome da materialized view baseado na doença
         view_name = f"public.city_count_by_uf_{disease}_materialized_view"
 
-        # Prepara a consulta SQL para acessar a materialized view correta
-        sql = f"""
-        SELECT city_count
-        FROM {view_name}
-        WHERE uf = :uf
+        sql_text = text(
+            f"""
+            SELECT city_count
+            FROM {view_name}
+            WHERE uf = :uf
         """
+        )
 
         try:
             with db_engine.connect() as conn:
-                result = conn.execute(sql, {"uf": uf}).fetchone()
+                result = conn.execute(sql_text, {"uf": uf}).fetchone()
                 return int(result[0]) if result else 0
         except Exception as e:
             print(
