@@ -363,41 +363,42 @@ def get_disease_suffix(disease: str, empty_for_dengue: bool = True):
     )
 
 
-# from sqlalchemy.engine import Engine
+# TODO: check if this works and is necessary
 
-# def get_city_name_by_id(geocode: int, db_engine: Engine) -> str:
-#     """
-#     Get the name of a city by its geocode.
+'''
+def get_city_name_by_id(geocode: int, db_engine: Engine) -> str:
+    """
+    Get the name of a city by its geocode.
 
-#     Parameters
-#     ----------
-#     geocode : int
-#         The geocode of the city.
-#     db_engine : Engine
-#         The database engine to use for the query.
+    Parameters
+    ----------
+    geocode : int
+        The geocode of the city.
+    db_engine : Engine
+        The database engine to use for the query.
 
-#     Returns
-#     -------
-#     str
-#         The name of the city.
-#     """
+    Returns
+    -------
+    str
+        The name of the city.
+    """
 
-#     with db_engine.connect() as conn:
-#         res = conn.execute(
-#             f"""
-#             SELECT nome
-#             FROM "Dengue_global"."Municipio"
-#             WHERE geocodigo={geocode};
-#         """
-#         )
-#         return res.fetchone()[0]
+    with db_engine.connect() as conn:
+        res = conn.execute(
+            f"""
+            SELECT nome
+            FROM "Dengue_global"."Municipio"
+            WHERE geocodigo={geocode};
+        """
+        )
+        return res.fetchone()[0]
 
-
+'''
 from typing import List, Tuple
 
 from sqlalchemy.engine import Engine
 
-
+'''
 def get_all_active_cities_state(
     db_engine: Engine,
 ) -> List[Tuple[str, str, str, str]]:
@@ -445,6 +446,8 @@ def get_all_active_cities_state(
                 settings.QUERY_CACHE_TIMEOUT,
             )
     return res
+
+'''
 
 
 def get_last_alert(geo_id, disease, db_engine: Engine = DB_ENGINE):
@@ -669,6 +672,11 @@ def add_dv(geocodigo):
         raise ValueError("geocode does not match!")
 
 
+# TODO
+from sqlalchemy import create_engine, text
+from sqlalchemy.engine.base import Engine
+
+
 class NotificationResume:
     @staticmethod
     def count_cities_by_uf(
@@ -676,41 +684,26 @@ class NotificationResume:
     ) -> int:
         """
         Return the total number of cities measured for a given state and disease.
-
-        Parameters
-        ----------
-        uf : str
-            State abbreviation.
-        disease : str, optional
-            The disease to query (default is "dengue").
-        db_engine : Engine
-            Database engine object for connection.
-
-        Returns
-        -------
-        int
-            The total number of cities.
-
         """
-        table_name = "Historico_alerta" + get_disease_suffix(disease)
+        # Nome da materialized view baseado na doença
+        view_name = f"public.city_count_by_uf_{disease}_materialized_view"
 
-        sql = text(
-            f"""
-            SELECT COALESCE(COUNT(DISTINCT a.municipio_geocodigo), 0) AS count
-            FROM "Municipio"."{table_name}" AS a
-            INNER JOIN "Dengue_global"."Municipio" AS b
-            ON a.municipio_geocodigo = b.geocodigo
-            WHERE uf= :uf
+        # Prepara a consulta SQL para acessar a materialized view correta
+        sql = f"""
+        SELECT city_count
+        FROM {view_name}
+        WHERE uf = :uf
         """
-        )
 
-        with db_engine.connect() as conn:
-            result = conn.execute(sql, uf=uf)
-            total_cities = result.scalar()
-            return int(total_cities)
-
-
-from sqlalchemy.engine.base import Engine
+        try:
+            with db_engine.connect() as conn:
+                result = conn.execute(sql, {"uf": uf}).fetchone()
+                return int(result[0]) if result else 0
+        except Exception as e:
+            print(
+                f"Error executing count_cities_by_uf for {disease} in {uf}: {e}"
+            )
+            return 0
 
 
 class Forecast:
