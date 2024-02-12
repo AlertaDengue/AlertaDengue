@@ -3,8 +3,30 @@
 {% load static %}
 
 {% block extra_head %}
+
+<script>
+  function openReport() {
+    var epidate = $('#epidate').val();
+    var url = '/api/epi_year_week?epidate=' + epidate;
+ 
+    $.ajax({
+        dataType: 'json',
+        url: url,
+        success: function(data) {
+          window.location.href = (
+            '/report/{{state}}/' +
+            data['epi_year_week']
+          );
+        }
+    });
+ 
+    return false;
+  }
+ 
+</script>
+
 <link href="{% static '/css/report_styles.css' %}" rel="stylesheet">
-<script src="{% static '/js/report_script.js' %}"></script>
+
 {% endblock %}
 
 {% block breadcrumbs %}

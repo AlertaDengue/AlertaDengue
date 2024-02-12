@@ -3,8 +3,19 @@
 {% load static %}
 
 {% block extra_head %}
+
+<script>
+  function openReport() {
+    var state_initial = $('#state option:selected').val();
+    var report_type = $('#report-type option:selected').val();
+    window.location.href = '/report/' +  state_initial + '/' + report_type;
+    return false;
+  }
+  
+ </script>
+
 <link href="{% static '/css/report_styles.css' %}" rel="stylesheet"> <!-- or 'css/new_styles.css' -->
-<script src="{% static '/js/report_type_script.js' %}" defer></script>
+
 {% endblock %}
 
 {% block breadcrumbs %}
