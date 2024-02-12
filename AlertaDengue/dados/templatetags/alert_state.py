@@ -1,25 +1,20 @@
-# imports.py
+from typing import Optional
+
 import altair as alt
 import pandas as pd
 from ad_main.settings import get_sqla_conn
 from dados.dbdata import CID10  # Ensure this is correctly imported
 from django import template
 from sqlalchemy import text
-from typing_extensions import Optional
 
-# Initialize Django template library
 register = template.Library()
 
-# Database engine for SQL operations
 DB_ENGINE = get_sqla_conn()
 
 
 def get_epiyears(
     state_name: str, disease: Optional[str] = None, db_engine=DB_ENGINE
 ) -> pd.DataFrame:
-    """
-    Fetches epidemiological data for a specified state and disease from the database.
-    """
     parameters = {"state_name": state_name}
     disease_filter = ""
 
@@ -42,66 +37,85 @@ def get_epiyears(
         result = conn.execute(text(sql_text), parameters)
         df = pd.DataFrame(result.fetchall(), columns=result.keys())
 
-    return pd.crosstab(
-        df["ano_notif"], df["se_notif"], df["casos"], aggfunc="sum"
-    ).T
-
-
-def transform_data(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.reset_index()
-    long_df = df.melt(
-        id_vars=["se_notif"], var_name="ano_notif", value_name="casos"
+    df.columns = df.columns.map(str)  # Ensure column names are strings
+    return (
+        pd.crosstab(
+            df["se_notif"], df["ano_notif"], df["casos"], aggfunc="sum"
+        )
+        .reset_index()
+        .rename_axis(None, axis=1)
     )
 
-    long_df["ano_notif"] = long_df["ano_notif"].astype(str)
-    long_df["se_notif_str"] = long_df["se_notif"].astype(str)
 
-    # Correctly format the week to be compatible with %W (which expects week number as 00-53)
-    # Pad single-digit week numbers with a leading zero for correct datetime parsing
-    long_df["se_notif_str"] = long_df["se_notif_str"].str.zfill(2)
-
-    # Adjusted to correctly handle datetime conversion with week numbers
-    long_df["date"] = pd.to_datetime(
-        long_df["ano_notif"] + long_df["se_notif_str"] + "1", format="%Y%U%w"
+def transform_data_for_altair(df: pd.DataFrame) -> pd.DataFrame:
+    # Ensure 'se_notif' is of type string for Altair compatibility
+    df["se_notif"] = df["se_notif"].astype(str)
+    # Melt the DataFrame so each row represents a single observation
+    melted_df = df.melt(
+        id_vars="se_notif", var_name="Year", value_name="Cases"
     )
-
-    long_df = long_df.drop(columns=["se_notif_str"])
-
-    return long_df
+    return melted_df
 
 
-def generate_altair_line_chart(state_name: str, disease: str) -> str:
-    """
-    Generates an Altair line chart HTML for the specified state and disease.
-    """
-    df = get_epiyears(state_name, disease, DB_ENGINE)
-    source_df = transform_data(df)
+def generate_altair_line_chart(
+    df: pd.DataFrame, state_name: str, disease: str
+) -> alt.Chart:
+    source_df = transform_data_for_altair(df)
+
+    # Interactive selector
+    selection = alt.selection_point(fields=["Year"], bind="legend")
 
     chart = (
         alt.Chart(source_df)
         .mark_line(interpolate="monotone")
-        .encode(x="date:T", y="casos:Q", color="ano_notif:N")
-        .properties(width="container")
+        .encode(
+            x=alt.X(
+                "se_notif:Q",
+                title="Epidemiological Week",
+                axis=alt.Axis(labelAngle=-90),
+                scale=alt.Scale(domain=(1, 53)),
+            ),
+            y=alt.Y("Cases:Q", title="Total Cases"),
+            color=alt.Color(
+                "Year:N",
+                legend=alt.Legend(title="Year", orient="bottom"),
+                scale=alt.Scale(scheme="category20"),
+            ),
+            tooltip=["Year", "se_notif", "Cases"],
+            opacity=alt.condition(
+                selection, alt.value(1), alt.value(0.2)
+            ),  # Opacity Selector
+        )
+        .properties(
+            title=f"Cases per Epidemiological Week for {state_name} - {disease}",
+            width="container",
+            height=300,
+        )
+        .add_params(selection)
+        .configure_legend(
+            orient="bottom",
+            titleAnchor="middle",
+        )
     )
 
-    return chart.to_html()
+    return chart
 
 
 @register.inclusion_tag(
     "components/alert_state/vis-echarts.html", takes_context=True
 )
-def vis_altair(context: dict) -> dict:
-    """
-    Django template tag to generate context for Altair visualization.
-    """
-    state_name = context.get("state_name", "Santa Catarina")
+def vis_altair(context: dict):
+    state_name = context.get("state", "Santa Catarina")
     disease = context.get("disease", "dengue")
-    altair_line_chart_html = generate_altair_line_chart(state_name, disease)
+    df = get_epiyears(state_name, disease, DB_ENGINE)
+    altair_chart_html = generate_altair_line_chart(
+        df, state_name, disease
+    ).to_html()
 
+    # Update context
     context.update(
         {
-            "CID10": CID10,
-            "altair_line_chart": altair_line_chart_html,
+            "altair_line_chart": altair_chart_html,
         }
     )
     return context
@@ -111,7 +125,4 @@ def vis_altair(context: dict) -> dict:
     "components/alert_state/epi-years.html", takes_context=True
 )
 def epi_years(context: dict) -> dict:
-    """
-    Django template tag for displaying epidemiological years data.
-    """
     return context
