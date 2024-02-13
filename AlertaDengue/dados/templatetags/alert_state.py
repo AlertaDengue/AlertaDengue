@@ -102,20 +102,20 @@ def generate_altair_line_chart(
 
 
 @register.inclusion_tag(
-    "components/alert_state/vis-echarts.html", takes_context=True
+    "components/alert_state/altair-chart.html", takes_context=True
 )
-def vis_altair(context: dict):
+def altair_chart_component(context: dict):
     state_name = context.get("state", "Santa Catarina")
     disease = context.get("disease", "dengue")
     df = get_epiyears(state_name, disease, DB_ENGINE)
-    altair_chart_html = generate_altair_line_chart(
+    epiyears_notific_chart_html = generate_altair_line_chart(
         df, state_name, disease
     ).to_html()
 
     # Update context
     context.update(
         {
-            "altair_line_chart": altair_chart_html,
+            "epiyears_notific_chart": epiyears_notific_chart_html,
         }
     )
     return context
