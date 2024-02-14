@@ -15,9 +15,10 @@ import pandas as pd
 from ad_main.settings import APPS_DIR, get_ibis_conn, get_sqla_conn
 from django.conf import settings
 from django.core.cache import cache
-from django.utils.text import slugify
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
+from typing import List, Optional, Tuple
+
 
 # local
 from .episem import episem
@@ -671,6 +672,43 @@ def add_dv(geocodigo):
     else:
         raise ValueError("geocode does not match!")
 
+def get_epiyears(
+    state_name: str,
+    disease: Optional[str] = None,
+    db_engine: Engine = DB_ENGINE,
+) -> List[Tuple]:
+    """
+    Retrieve epidemiological years data from the database.
+
+    Parameters:
+    state_name (str): Name of the state.
+    disease (Optional[str]): Disease name, defaults to None.
+    db_engine (Engine): Database engine, defaults to DB_ENGINE.
+
+    Returns:
+    List[Tuple]: List of tuples containing the retrieved data.
+    """
+    parameters = {"state_name": state_name}
+    disease_filter = ""
+
+    if disease:
+        disease_code = CID10.get(disease, "")
+        parameters["disease_code"] = disease_code
+        disease_filter = " AND disease_code = :disease_code"
+
+    sql_text_query = """
+    SELECT ano_notif, se_notif, casos
+    FROM public.epiyear_summary
+    WHERE uf = :state_name{disease_filter}
+    ORDER BY ano_notif, se_notif
+    """.format(
+        disease_filter=disease_filter
+    )
+
+    with db_engine.connect() as conn:
+        result = conn.execute(text(sql_text_query), parameters)
+        data = [tuple(row) for row in result.fetchall()]
+    return data
 
 class NotificationResume:
     @staticmethod

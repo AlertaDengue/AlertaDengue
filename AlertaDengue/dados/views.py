@@ -440,30 +440,121 @@ class SinanCasesView(View):
         return HttpResponse(cases, content_type="application/json")
 
 
+import altair as alt
+import pandas as pd
+from dados.dbdata import get_epiyears
+from django.views.generic import TemplateView
+
+
 class AlertaStateViewNew(TemplateView):
-    template_name = "state_cities.html"
-    _state_name = STATE_NAME
+    """
+    A view for generating an Altair line chart for epidemiological data.
+    """
 
-    def get_context_data(self, **kwargs):
-        """
-        :param kwargs:
-        :return:
-        """
-        context = super(AlertaStateViewNew, self).get_context_data(**kwargs)
+    template_name = "alert_state.html"
+    _state_name = (
+        STATE_NAME  # Ensure STATE_NAME is defined or imported correctly
+    )
 
-        # breakpoint()
+    def transform_data_for_altair(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Transform the input DataFrame for Altair compatibility.
+
+        Parameters:
+        df (pd.DataFrame): The input DataFrame.
+
+        Returns:
+        pd.DataFrame: The transformed DataFrame.
+        """
+        df.reset_index(inplace=True)  # Ensure 'se_notif' is a column
+        melted_df = df.melt(
+            id_vars="se_notif", var_name="Year", value_name="Cases"
+        )
+        return melted_df
+
+    def generate_altair_line_chart(
+        self, df: pd.DataFrame, state_name: str, disease: str
+    ) -> alt.Chart:
+        """
+        Generate an Altair line chart from the DataFrame.
+
+        Parameters:
+        df (pd.DataFrame): The DataFrame to plot.
+        state_name (str): The state name for the chart title.
+        disease (str): The disease name for the chart title.
+
+        Returns:
+        alt.Chart: The generated Altair chart.
+        """
+        # The function transform_data_for_altair is called before this function with the correct DataFrame.
+        selection = alt.selection_point(fields=["Year"], bind="legend")
+
+        chart = (
+            alt.Chart(df)
+            .mark_line(interpolate="monotone")
+            .encode(
+                x=alt.X(
+                    "se_notif:Q",
+                    title="Epidemiological Week",
+                    axis=alt.Axis(labelAngle=-90),
+                    scale=alt.Scale(domain=(1, 53)),
+                ),
+                y=alt.Y("Cases:Q", title="Total Cases"),
+                color=alt.Color(
+                    "Year:N",
+                    legend=alt.Legend(title="Year", orient="bottom"),
+                    scale=alt.Scale(scheme="category20"),
+                ),
+                tooltip=["Year", "se_notif", "Cases"],
+                opacity=alt.condition(
+                    selection, alt.value(1), alt.value(0.2)
+                ),  # Opacity Selector
+            )
+            .properties(
+                title=f"Cases per Epidemiological Week for {state_name} - {disease}",
+                width="container",
+                height=300,
+            )
+            .add_params(selection)
+            .configure_legend(
+                orient="bottom",
+                titleAnchor="middle",
+            )
+        )
+
+        return chart
+
+    def get_context_data(self, **kwargs) -> dict:
+        """
+        Get the context data for the template.
+
+        Parameters:
+        **kwargs: Keyword arguments from the URL.
+
+        Returns:
+        dict: Context data for the template.
+        """
+        context = super().get_context_data(**kwargs)
         state_name = self._state_name[context["state"]]
-        disease = context["disease"]
-
+        disease = context.get(
+            "disease", ""
+        ).lower()  # Assuming 'disease' key exists and converting to uppercase for consistency
+        data = get_epiyears(state_name, disease)
+        df = pd.DataFrame(
+            data, columns=["ano_notif", "se_notif", "casos"]
+        ).pivot(index="se_notif", columns="ano_notif", values="casos")
+        df.fillna(0, inplace=True)  # Handle missing values if any
+        source_df = self.transform_data_for_altair(df)
+        chart = self.generate_altair_line_chart(source_df, state_name, disease)
         context.update(
             {
                 "state_abv": context["state"],
                 "state": state_name,
-                "disease_label": context["disease"].title(),
+                "disease_label": disease,
                 "last_update": "12-01-2024",
+                "chart": chart.to_html(),  # Add the chart to the context
             }
         )
-
         return context
 
 
