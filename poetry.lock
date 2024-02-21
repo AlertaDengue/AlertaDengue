@@ -1093,7 +1093,7 @@ files = [
 
 [[package]]
 name = "episcanner-downloader"
-version = "1.0.2"
+version = "1.0.3"
 description = "Dashboard quickstart template"
 optional = false
 python-versions = ">=3.9,<3.11"
@@ -1109,7 +1109,6 @@ loguru = "^0.7.0"
 pandas = ">=2.1.0"
 psutil = "^5.9.2"
 pyarrow = "^11.0.0"
-pyscopg2 = "^66.0.2"
 python-dotenv = "^1.0.0"
 SQLAlchemy = "<2.0"
 typing-extensions = "^4.4.0"
@@ -1119,7 +1118,7 @@ urllib3 = "1.26.15"
 type = "git"
 url = "https://github.com/AlertaDengue/episcanner-downloader"
 reference = "HEAD"
-resolved_reference = "a23b5bd503f9d9cd77883698fc00c84afd159a0c"
+resolved_reference = "27972a3f642527252e3f7c0b1b2de8e10fde0eb9"
 
 [[package]]
 name = "epiweeks"
@@ -3256,16 +3255,6 @@ files = [
 
 [package.dependencies]
 certifi = "*"
-
-[[package]]
-name = "pyscopg2"
-version = "66.0.3"
-description = "A package to prevent Dependency Confusion attacks against Yandex."
-optional = false
-python-versions = "*"
-files = [
-    {file = "pyscopg2-66.0.3.tar.gz", hash = "sha256:0c79b7a605d4b343434de93fde91dad928a48ae4a673dc96f5a626f2e0b72ed0"},
-]
 
 [[package]]
 name = "pytest"
