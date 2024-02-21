@@ -1093,11 +1093,7 @@ files = [
 
 [[package]]
 name = "episcanner-downloader"
-<<<<<<< HEAD
 version = "1.0.2"
-=======
-version = "1.0.1"
->>>>>>> 6facb95 (Implement episcanner tasks)
 description = "Dashboard quickstart template"
 optional = false
 python-versions = ">=3.9,<3.11"
@@ -1121,15 +1117,9 @@ urllib3 = "1.26.15"
 
 [package.source]
 type = "git"
-<<<<<<< HEAD
 url = "https://github.com/AlertaDengue/episcanner-downloader"
 reference = "HEAD"
 resolved_reference = "a23b5bd503f9d9cd77883698fc00c84afd159a0c"
-=======
-url = "https://github.com/luabida/episcanner-downloader"
-reference = "update-deps"
-resolved_reference = "823b368ff53d182dee5cc89b116e1896fb0423fa"
->>>>>>> 6facb95 (Implement episcanner tasks)
 
 [[package]]
 name = "epiweeks"
@@ -4654,4 +4644,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "fcea1c361548a04cdd71253b0362a74f8943be200ff544152e65da71bbb65a96"
+content-hash = "08542795f7dc67b91b25ed807f81a148fb94d27cc145def914cd68998e35c78e"
