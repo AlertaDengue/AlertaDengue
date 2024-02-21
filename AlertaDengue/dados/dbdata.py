@@ -834,10 +834,10 @@ class Forecast:
         sql = """
         SELECT
             (CASE
-             WHEN tb_cases."data_iniSE" IS NOT NULL
+             WHEN tb_cases."data_iniSE" IS NOT Null
                THEN tb_cases."data_iniSE"
              %(forecast_date_ini_epiweek)s
-             ELSE NULL
+             ELSE Null
              END
             ) AS "data_iniSE",
             tb_cases.casos_est_min,
@@ -846,9 +846,9 @@ class Forecast:
             tb_cases.casos,
             tb_cases.nivel,
             (CASE
-             WHEN tb_cases."SE" IS NOT NULL THEN tb_cases."SE"
+             WHEN tb_cases."SE" IS NOT Null THEN tb_cases."SE"
              %(forecast_epiweek)s
-             ELSE NULL
+             ELSE Null
              END
             ) AS "SE",
             tb_cases.p_rt1
@@ -914,7 +914,7 @@ class Forecast:
             # forecast date ini selection
             forecast_date_ini_epiweek += (
                 """
-            WHEN forecast%(model_id)s.init_date_epiweek IS NOT NULL
+            WHEN forecast%(model_id)s.init_date_epiweek IS NOT Null
                THEN forecast%(model_id)s.init_date_epiweek
             """
                 % forecast_config
@@ -923,7 +923,7 @@ class Forecast:
             # forecast epiweek selection
             forecast_epiweek += (
                 """
-            WHEN forecast%(model_id)s.epiweek IS NOT NULL
+            WHEN forecast%(model_id)s.epiweek IS NOT Null
                THEN forecast%(model_id)s.epiweek
             """
                 % forecast_config
