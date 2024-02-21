@@ -56,7 +56,6 @@ episcanner-downloader = { git = "https://github.com/AlertaDengue/episcanner-down
 epiweeks = "^2.3.0"
 duckdb = "^0.9.2"
 urllib3 = "1.26.15"
-pyscopg2 = "^66.0.2"
 pyarrow = "^11.0.0"
 lmfit = "^1.1.0"
 pandas = ">=2.1.0"
