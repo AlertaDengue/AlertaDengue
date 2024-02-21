@@ -30,11 +30,7 @@ geojson = "^2.5.0"
 geopandas = "^0.12.0"
 geopy = "^2.2.0"
 gunicorn = "^20.1.0"
-<<<<<<< HEAD
-ibis-framework = {version = "7.2.0", extras = ["postgres"]}
-=======
-ibis-framework = "^7.2.0"
->>>>>>> d35f0ce (Include episcanner dep)
+ibis-framework = "^8.0.0"
 loguru = "^0.7.0"
 plotly = "^5.11.0"
 pyproj = "^3.3.0"
