@@ -8,8 +8,11 @@ from copy import deepcopy
 from datetime import timedelta
 from pathlib import Path, PurePath
 
+import altair as alt
 import fiona
 import numpy as np
+import pandas as pd
+from dados.dbdata import get_epiyears
 
 #
 from django.apps import apps
@@ -23,6 +26,7 @@ from django.http import Http404, HttpResponse
 from django.templatetags.static import static
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_page
+from django.views.generic import TemplateView
 from django.views.generic.base import TemplateView, View
 
 # local
@@ -37,7 +41,7 @@ from .charts.home import (
     _create_stack_chart,
 )
 from .charts.states import ReportStateCharts
-from .dbdata import (
+from .dbdata import (  # get_notification_cases,
     ALERT_COLOR,
     CID10,
     DISEASES_NAME,
@@ -440,67 +444,138 @@ class SinanCasesView(View):
         return HttpResponse(cases, content_type="application/json")
 
 
-class AlertaStateView(TemplateView):
-    template_name = "state_cities.html"
-    _state_name = STATE_NAME
+class AlertaStateViewNew(TemplateView):
+    """
+    A view for generating an Altair line chart for epidemiological data.
+    """
 
-    def get_context_data(self, **kwargs):
+    template_name = "alert_state.html"
+    _state_name = (
+        STATE_NAME  # Ensure STATE_NAME is defined or imported correctly
+    )
+
+    def transform_data_for_altair(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        :param kwargs:
-        :return:
+        Transform the input DataFrame for Altair compatibility.
+
+        Parameters:
+        df (pd.DataFrame): The input DataFrame.
+
+        Returns:
+        pd.DataFrame: The transformed DataFrame.
         """
-        context = super(AlertaStateView, self).get_context_data(**kwargs)
-
-        state_name = self._state_name[context["state"]]
-        disease = context["disease"]
-
-        cities_alert = NotificationResume.get_cities_alert_by_state(
-            state_name, disease
+        df.reset_index(inplace=True)  # Ensure 'se_notif' is a column
+        melted_df = df.melt(
+            id_vars="se_notif", var_name="Year", value_name="Cases"
         )
+        return melted_df
 
-        alerts = dict(
-            cities_alert[["municipio_geocodigo", "level_alert"]].values
-        )
-        mun_dict = dict(cities_alert[["municipio_geocodigo", "nome"]].values)
-        mun_dict_ordered = OrderedDict(
-            sorted(mun_dict.items(), key=lambda v: v[1])
-        )
-        geo_ids = list(mun_dict.keys())
+    def generate_altair_line_chart(
+        self, df: pd.DataFrame, state_name: str, disease: str
+    ) -> alt.Chart:
+        """
+        Generate an Altair line chart from the DataFrame.
 
-        dbf = (
-            DBF.objects.filter(abbreviation=context["state"])
-            .order_by("export_date")
-            .last()
-        )
+        Parameters:
+        df (pd.DataFrame): The DataFrame to plot.
+        state_name (str): The state name for the chart title.
+        disease (str): The disease name for the chart title.
 
-        if dbf is None:
-            last_update = _("desconhecida")
-        else:
-            last_update = dbf.export_date
+        Returns:
+        alt.Chart: The generated Altair chart.
+        """
+        # The function transform_data_for_altair is called before this function with the correct DataFrame.
+        selection = alt.selection_point(fields=["Year"], bind="legend")
 
-        if len(geo_ids) > 0:
-            cases_series_last_12 = NotificationResume.tail_estimated_cases(
-                geo_ids, 12
+        chart = (
+            alt.Chart(df)
+            .mark_line(interpolate="monotone")
+            .encode(
+                x=alt.X(
+                    "se_notif:Q",
+                    title="Epidemiological Week",
+                    axis=alt.Axis(labelAngle=-90),
+                    scale=alt.Scale(domain=(1, 53)),
+                ),
+                y=alt.Y("Cases:Q", title="Total Cases"),
+                color=alt.Color(
+                    "Year:N",
+                    legend=alt.Legend(title="Year", orient="bottom"),
+                    scale=alt.Scale(scheme="category20"),
+                ),
+                tooltip=["Year", "se_notif", "Cases"],
+                opacity=alt.condition(
+                    selection, alt.value(1), alt.value(0.2)
+                ),  # Opacity Selector
             )
-        else:
-            cases_series_last_12 = {}
+            .properties(
+                title=f"Cases per Epidemiological Week for {state_name} - {disease}",
+                width="container",
+                height=300,
+            )
+            .add_params(selection)
+            .configure_legend(
+                orient="bottom",
+                titleAnchor="middle",
+            )
+        )
+
+        return chart
+
+    def get_context_data(self, **kwargs) -> dict:
+        """
+        Get the context data for the template.
+
+        Parameters:
+        **kwargs: Keyword arguments from the URL.
+
+        Returns:
+        dict: Context data for the template.
+        """
+        context = super().get_context_data(**kwargs)
+        state_name = self._state_name[context["state"]]
+        disease = context.get("disease", "").lower()
+        data = get_epiyears(state_name, disease)
+        df = pd.DataFrame(
+            data, columns=["ano_notif", "se_notif", "casos"]
+        ).pivot(index="se_notif", columns="ano_notif", values="casos")
+        df.fillna(0, inplace=True)  # Handle missing values if any
+        source_df = self.transform_data_for_altair(df)
+        chart = self.generate_altair_line_chart(source_df, state_name, disease)
+
+        # # Load GeoJSON data
+        # with open("staticfiles/geojson_simplified/1100015.json") as f:
+        #     geojson_data = json.load(f)
+
+        # cases_data = pd.DataFrame(get_notification_cases())
+
+        # Generate the Altair map
+        map = (
+            alt.Chart(
+                alt.InlineData(
+                    values=geojson_data,
+                    format=alt.DataFormat(property="features", type="json"),
+                )
+            )
+            .mark_geoshape()
+            .encode(color="cases:Q")
+            .transform_lookup(
+                lookup="id",
+                from_=alt.LookupData(cases_data, "geocode", ["cases"]),
+            )
+            .properties(title="Notification Cases by City")
+        ).to_json(indent=None)
 
         context.update(
             {
                 "state_abv": context["state"],
                 "state": state_name,
-                "map_center": MAP_CENTER[context["state"]],
-                "map_zoom": MAP_ZOOM[context["state"]],
-                "mun_dict": mun_dict,
-                "mun_dict_ordered": mun_dict_ordered,
-                "geo_ids": geo_ids,
-                "alerts_level": alerts,
-                "case_series": cases_series_last_12,
-                "disease_label": context["disease"].title(),
-                "last_update": last_update,
+                "disease_label": disease,
+                "last_update": "12-01-2024",
+                "chart": chart.to_html(),
+                "map": map,
             }
         )
-
         return context
 
 
@@ -660,6 +735,7 @@ class ChartsMainView(TemplateView):
         return context
 
 
+# Check if it's necessary
 class GeoTiffView(View):
     def get(self, request, geocodigo, disease):
         """

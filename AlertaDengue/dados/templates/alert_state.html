@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load i18n static alert_state %}
+
+{% block title %}{{ state }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Row para o gráfico -->
+    <div class="row mt-3">
+        <div class="col-12">
+            {{ chart|safe }}
+        </div>
+    </div>
+    <!-- Row para o mapa -->
+
+</div>
+{% endblock %}

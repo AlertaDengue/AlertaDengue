@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
-{% load i18n %}
 {% load static %}
-{% load footer_components %}
+{% load i18n %}
 
 {% block title %}{% translate "Equipe" %}{% endblock %}
 
@@ -100,13 +99,4 @@
     </div>
 </div>
 
-<!-- begin footer code -->
-<div class="container">
-  <div class="row">
-    <div class="col-md-12">
-        {% githubsponsor_component %}
-    </div>
-  </div>
-</div>
-    <!-- end footer code -->
 {% endblock %}

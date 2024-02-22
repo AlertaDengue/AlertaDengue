@@ -15,8 +15,8 @@ import pandas as pd
 from ad_main.settings import APPS_DIR, get_ibis_conn, get_sqla_conn
 from django.conf import settings
 from django.core.cache import cache
-from django.utils.text import slugify
 from sqlalchemy import text
+from sqlalchemy.engine.base import Engine
 
 # local
 from .episem import episem
@@ -362,34 +362,64 @@ def get_disease_suffix(disease: str, empty_for_dengue: bool = True):
     )
 
 
-def get_city_name_by_id(geocode: int):
+# TODO: check if this works and is necessary
+
+'''
+def get_city_name_by_id(geocode: int, db_engine: Engine) -> str:
     """
-    :param geocode:
-    :return:
+    Get the name of a city by its geocode.
+
+    Parameters
+    ----------
+    geocode : int
+        The geocode of the city.
+    db_engine : Engine
+        The database engine to use for the query.
+
+    Returns
+    -------
+    str
+        The name of the city.
     """
 
-    with DB_ENGINE.connect() as conn:
+    with db_engine.connect() as conn:
         res = conn.execute(
-            """
+            f"""
             SELECT nome
             FROM "Dengue_global"."Municipio"
-            WHERE geocodigo=%s;
+            WHERE geocodigo={geocode};
         """
-            % geocode
         )
         return res.fetchone()[0]
 
+'''
+from typing import List, Tuple
 
-def get_all_active_cities_state():
-    """
-    Fetch from the database a list on names of active cities
-    :return: list of tuples (geocode,name)
-    """
+from sqlalchemy.engine import Engine
 
+'''
+def get_all_active_cities_state(
+    db_engine: Engine,
+) -> List[Tuple[str, str, str, str]]:
+    """
+    Fetches a list of names of active cities from the database.
+
+    Parameters
+    ----------
+    db_engine : Engine
+        The database engine instance to execute the query.
+
+    Returns
+    -------
+    List[Tuple[str, str, str, str]]
+        A list of tuples containing municipality geocode, start date, city name, and state.
+    """
+    # Check if the result is cached
     res = cache.get("get_all_active_cities_state")
 
     if res is None:
-        with DB_ENGINE.connect() as conn:
+        # If not cached, fetch the data from the database
+        with db_engine.connect() as conn:
             res = conn.execute(
                 """
                 SELECT DISTINCT
@@ -408,6 +438,7 @@ def get_all_active_cities_state():
                 """
             )
             res = res.fetchall()
+            # Cache the result with a timeout
             cache.set(
                 "get_all_active_cities_state",
                 res,
@@ -415,69 +446,68 @@ def get_all_active_cities_state():
             )
     return res
 
+'''
 
-def get_all_active_cities() -> List[Tuple[str, str]]:
+
+def get_last_alert(geo_id, disease, db_engine: Engine = DB_ENGINE):
     """
-    Return a list of names and geo codes for the active cities.
+    Get the last alert level for a specific municipality and disease.
+
+    Parameters
+    ----------
+    geo_id : str
+        The geocode of the municipality.
+    disease : str
+        The name of the disease.
+    db_engine : sqlalchemy.engine.Engine, optional
+        The database engine, defaults to DB_ENGINE.
+
     Returns
     -------
-    list_of_active_cities: List[Tuple[str, str]]
-        List of city information (geocode, name)
-    """
-
-    res = cache.get("get_all_active_cities")
-
-    if res is None:
-        with DB_ENGINE.connect() as conn:
-            res = conn.execute(
-                """
-            SELECT DISTINCT
-              hist.municipio_geocodigo,
-              city.nome
-            FROM "Municipio"."Historico_alerta" AS hist
-              INNER JOIN "Dengue_global"."Municipio" AS city
-                ON (hist.municipio_geocodigo=city.geocodigo)
-            """
-            )
-            res = res.fetchall()
-            cache.set(
-                "get_all_active_cities", res, settings.QUERY_CACHE_TIMEOUT
-            )
-    return res
-
-
-def get_last_alert(geo_id, disease):
-    """
-    :param geo_id:
-    :param disease:
-    :return:
+    pandas.DataFrame
+        The last alert level for the specified municipality and disease.
     """
 
     table_name = "Historico_alerta" + get_disease_suffix(disease)
 
-    sql = """
+    sql = f"""
     SELECT nivel
-    FROM "Municipio"."%s"
-    WHERE municipio_geocodigo=%s
+    FROM "Municipio"."{table_name}"
+    WHERE municipio_geocodigo="{geo_id}"
     ORDER BY "data_iniSE" DESC
     LIMIT 1
-    """ % (
-        table_name,
-        geo_id,
-    )
+    """
 
-    with DB_ENGINE.connect() as conn:
+    with db_engine.connect() as conn:
         return pd.read_sql_query(sql, conn)
 
 
-def load_series(cidade, disease: str = "dengue", epiweek: int = 0):
+def load_series(
+    cidade,
+    disease: str = "dengue",
+    epiweek: int = 0,
+    db_engine: Engine = DB_ENGINE,
+):
     """
-    Monta as séries do alerta para visualização no site
-    :param cidade: geocodigo da cidade desejada
-    :param disease: dengue|chikungunya|zika
-    :param epiweek:
-    :return: dictionary
+    Loads the alert series for visualization on the website.
+
+    Parameters
+    ----------
+    cidade : int
+        The city code for which to retrieve the alert series.
+    disease : str, optional
+        The disease code (CID10) for which to retrieve the alert series. Defaults to "dengue".
+    epiweek: int, optional
+        The epidemiological week for which to retrieve the alert series. Defaults to 0.
+    db_engine : Engine, optional
+        The database engine to use for the query. Defaults to DB_ENGINE.
+
+    Returns
+    -------
+    dictionary
+        The alert series data.
     """
+
     cache_key = "load_series-{}-{}".format(cidade, disease)
     result = cache.get(cache_key)
 
@@ -534,24 +564,36 @@ def load_series(cidade, disease: str = "dengue", epiweek: int = 0):
     return result
 
 
-def load_cases_without_forecast(geocode: int, disease):
+def load_cases_without_forecast(
+    geocode: int, disease, db_engine: Engine = DB_ENGINE
+):
     """
-    :param geocode:
-    :param disease:
-    :return:
+    Parameters
+    ----------
+    geocode : int
+        The geocode for which to retrieve forecast dates.
+    disease : str
+        The disease code (CID10) for which to retrieve forecast dates.
+    db_engine : Engine
+        The database engine to use for the query.
     """
 
-    with DB_ENGINE.connect() as conn:
+    with db_engine.connect() as conn:
         table_name = "Historico_alerta" + get_disease_suffix(disease)
 
-        data_alert = pd.read_sql_query(
+        result = conn.execute(
             f"""
             SELECT * FROM "Municipio"."{table_name}"
             WHERE municipio_geocodigo={geocode} ORDER BY "data_iniSE" ASC
-            """,
-            conn,
-            parse_dates=True,
+            """
         )
+
+        data_alert = pd.DataFrame(result.fetchall(), columns=result.keys())
+
+        # Convert relevant columns to datetime
+        data_alert["data_iniSE"] = pd.to_datetime(data_alert["data_iniSE"])
+        # Add more columns if needed
+
     return data_alert
 
 
@@ -629,246 +671,120 @@ def add_dv(geocodigo):
         raise ValueError("geocode does not match!")
 
 
+def get_epiyears(
+    state_name: str,
+    disease: Optional[str] = None,
+    db_engine: Engine = DB_ENGINE,
+) -> List[Tuple]:
+    """
+    Retrieve epidemiological years data from the database.
+
+    Parameters:
+    state_name (str): Name of the state.
+    disease (Optional[str]): Disease name, defaults to None.
+    db_engine (Engine): Database engine, defaults to DB_ENGINE.
+
+    Returns:
+    List[Tuple]: List of tuples containing the retrieved data.
+    """
+    parameters = {"state_name": state_name}
+    disease_filter = ""
+
+    if disease:
+        disease_code = CID10.get(disease, "")
+        parameters["disease_code"] = disease_code
+        disease_filter = " AND disease_code = :disease_code"
+
+    sql_text_query = """
+    SELECT ano_notif, se_notif, casos
+    FROM public.epiyear_summary_materialized_view
+    WHERE uf = :state_name{disease_filter}
+    ORDER BY ano_notif, se_notif
+    """.format(
+        disease_filter=disease_filter
+    )
+
+    with db_engine.connect() as conn:
+        result = conn.execute(text(sql_text_query), parameters)
+        data = [tuple(row) for row in result.fetchall()]
+    return data
+
+
 class NotificationResume:
     @staticmethod
-    def count_cities_by_uf(uf: str, disease: str = "dengue") -> int:
+    def count_cities_by_uf(
+        uf: str, disease: str = "dengue", db_engine: Engine = DB_ENGINE
+    ) -> int:
         """
-        Return the total of the measured cities by given state and disease.
-        Parameters
-        ----------
-        uf: str
-            State abbreviation
-        disease: str
-            option: dengue|chikungunya|zika
-        Returns
-        -------
-        total_cities: int
+        Return the total number of cities measured for a given state and disease.
         """
+        view_name = f"public.city_count_by_uf_{disease}_materialized_view"
 
-        table_name = "Historico_alerta" + get_disease_suffix(disease)
-
-        sql = """
-        SELECT COALESCE(COUNT(municipio_geocodigo), 0) AS count
-        FROM (
-            SELECT DISTINCT municipio_geocodigo
-            FROM "Municipio"."%s") AS alerta
-        INNER JOIN "Dengue_global"."Municipio" AS municipio
-          ON alerta.municipio_geocodigo = municipio.geocodigo
-        WHERE uf='%s'
-        """ % (
-            table_name,
-            uf,
+        sql_text = text(
+            f"""
+            SELECT city_count
+            FROM {view_name}
+            WHERE uf = :uf
+        """
         )
 
-        with DB_ENGINE.connect() as conn:
-            return pd.read_sql(sql, conn).astype(int).iloc[0]["count"]
-
-    @staticmethod
-    def tail_estimated_cases(geo_ids: list, n: int) -> pd.DataFrame:
-        """
-        Return the last n days of estimated cases for a list of geocodes.
-
-        Parameters
-        ----------
-        geo_ids: list
-            List of geocodes
-            n: int  default: 12
-        Returns
-        -------
-            df_case_series: pd.DataFrame
-        """
-
-        if len(geo_ids) < 1:
-            raise Exception("GEO id list should have at least 1 code.")
-
-        sql_template = (
-            """(
-        SELECT
-            municipio_geocodigo, "data_iniSE", casos_est
-        FROM
-            "Municipio".historico_casos
-        WHERE
-            municipio_geocodigo={}
-        ORDER BY
-            "data_iniSE" DESC
-        LIMIT """
-            + str(n)
-            + ")"
-        )
-
-        sql_statements = [
-            str(text(sql_template.format(gid, n))) for gid in geo_ids
-        ]
-
-        sql = " UNION ".join(sql_statements)
-
-        if len(geo_ids) > 1:
-            sql += ' ORDER BY municipio_geocodigo, "data_iniSE"'
-
-        with DB_ENGINE.connect() as conn:
-            df_case_series = pd.read_sql(text(sql), conn)
-
-        return {
-            k: v.casos_est.values.tolist()
-            for k, v in df_case_series.groupby(by="municipio_geocodigo")
-        }
-
-    @staticmethod
-    def get_cities_alert_by_state(
-        state_name, disease="dengue", epi_year_week: int = None
-    ):
-        """
-        Retorna vários indicadores de alerta a nível da cidade.
-        :param state_name: State name
-        :param disease: dengue|chikungunya|zika
-        :param epi_year_week: int
-        :return: DataFrame
-        """
-        _disease = get_disease_suffix(disease)
-
-        cache_key = (
-            f"cities_alert_{slugify(state_name, allow_unicode=True)}_{disease}"
-        )
-        cities_alert = cache.get(cache_key)
-
-        if cities_alert is not None:
-            logger.info("Cache found for key: %s", cache_key)
-            return cities_alert
-
-        logger.info("Cache NOT found for key: %s", cache_key)
-
-        sql = """
-        SELECT
-            hist_alert.id,
-            hist_alert.municipio_geocodigo,
-            municipio.nome,
-            hist_alert."data_iniSE",
-            (hist_alert.nivel-1) AS level_alert
-        FROM
-            "Municipio"."Historico_alerta{0}" AS hist_alert
-        """
-
-        if epi_year_week is None:
-            sql += """
-            INNER JOIN (
-                SELECT geocodigo, MAX("data_iniSE") AS "data_iniSE"
-                FROM
-                    "Municipio"."Historico_alerta{0}" AS alerta
-                    INNER JOIN "Dengue_global"."Municipio" AS municipio
-                        ON alerta.municipio_geocodigo = municipio.geocodigo
-                WHERE uf='{1}'
-                GROUP BY geocodigo
-            ) AS recent_alert ON (
-                recent_alert.geocodigo=hist_alert.municipio_geocodigo
-                AND recent_alert."data_iniSE"=hist_alert."data_iniSE"
+        try:
+            with db_engine.connect() as conn:
+                result = conn.execute(sql_text, {"uf": uf}).fetchone()
+                return int(result[0]) if result else 0
+        except Exception as e:
+            print(
+                f"Error executing count_cities_by_uf for {disease} in {uf}: {e}"
             )
-            """
-
-        sql += """
-            INNER JOIN "Dengue_global"."Municipio" AS municipio ON (
-                hist_alert.municipio_geocodigo = municipio.geocodigo
-            )
-        """
-
-        if epi_year_week is not None:
-            sql += (
-                ' WHERE hist_alert."SE" = {}'.format(epi_year_week)
-                + " AND uf='{1}'"
-            )
-
-        sql = sql.format(_disease, state_name)
-
-        with DB_ENGINE.connect() as conn:
-            cities_alert = pd.read_sql_query(sql, conn, "id", parse_dates=True)
-
-        cache.set(cache_key, cities_alert, settings.QUERY_CACHE_TIMEOUT)
-        logger.info("Cache set for key: %s", cache_key)
-
-        return cities_alert
-
-
-'''
-    @staticmethod
-    def get_4_weeks_variation(state_name, current_date):
-
-        # for variation_4_weeks
-        se_current_year_1 = _episem(current_date)
-        se_current_year_2 = _episem(current_date - timedelta(days=0, weeks=3))
-        se_last_year_1 = _episem(current_date - timedelta(days=0, weeks=52))
-        se_last_year_2 = _episem(current_date - timedelta(days=0, weeks=55))
-
-        sql = """
-        SELECT
-            casos_corrente-casos_passado AS casos,
-            casos_est_corrente-casos_est_passado AS casos_est
-        FROM
-            (SELECT
-                COALESCE(SUM(alerta.casos), 0) AS casos_corrente,
-                COALESCE(SUM(alerta.casos_est), 0) AS casos_est_corrente
-            FROM "Municipio".historico_casos AS alerta
-                INNER JOIN "Dengue_global"."Municipio" AS municipio
-                    ON alerta.municipio_geocodigo = municipio.geocodigo
-                        AND uf ='%(state_name)s'
-            WHERE
-                alerta."SE" <= %(se_current_year_1)s
-                AND alerta."SE" >= %(se_current_year_2)s
-            ) AS tb_casos
-            INNER JOIN (
-                SELECT
-                    COALESCE(SUM(alerta.casos), 0) AS casos_passado,
-                    COALESCE(SUM(alerta.casos_est), 0) AS casos_est_passado
-                FROM "Municipio".historico_casos AS alerta
-                    INNER JOIN "Dengue_global"."Municipio" AS municipio
-                        ON alerta.municipio_geocodigo = municipio.geocodigo
-                          AND uf ='%(state_name)s'
-                WHERE
-                    alerta."SE" <= %(se_last_year_1)s
-                AND alerta."SE" >= %(se_last_year_2)s
-            ) AS tb_casos_passado
-                ON (1=1)
-        """ % {
-            "state_name": state_name,
-            "se_current_year_1": se_current_year_1,
-            "se_current_year_2": se_current_year_2,
-            "se_last_year_1": se_last_year_1,
-            "se_last_year_2": se_last_year_2,
-        }
-
-        with DB_ENGINE.connect() as conn:
-            return pd.read_sql_query(sql, conn, parse_dates=True)
-
-'''
+            return 0
 
 
 class Forecast:
     @staticmethod
-    def get_min_max_date(geocode: int, cid10: str) -> str:
+    def get_min_max_date(
+        geocode: int, cid10: str, db_engine: Engine = DB_ENGINE
+    ) -> tuple[str, str]:
         """
-        :param geocode:
-        :param cid10:
-        :return: tuple with min and max date (str) from the forecasts
-        """
+        Retrieves the minimum and maximum date from the forecasts
+        for a given geocode and disease code (CID10).
 
-        sql = """
+        Parameters
+        ----------
+        geocode : int
+            The geocode for which to retrieve forecast dates.
+        cid10 : str
+            The disease code (CID10) for which to retrieve forecast dates.
+        db_engine : Engine
+            The database engine to use for the query.
+
+        Returns
+        -------
+        tuple[str, str]
+            A tuple containing the minimum and maximum forecast dates as strings in 'YYYY-MM-DD' format.
+        """
+        sql = f"""
         SELECT
-          TO_CHAR(MIN(init_date_epiweek), 'YYYY-MM-DD') AS epiweek_min,
-          TO_CHAR(MAX(init_date_epiweek), 'YYYY-MM-DD') AS epiweek_max
+            TO_CHAR(MIN(init_date_epiweek), 'YYYY-MM-DD') AS epiweek_min,
+            TO_CHAR(MAX(init_date_epiweek), 'YYYY-MM-DD') AS epiweek_max
         FROM
-          forecast.forecast_cases AS f
-          INNER JOIN forecast.forecast_city AS fc
+            forecast.forecast_cases AS f
+            INNER JOIN forecast.forecast_city AS fc
             ON (f.geocode = fc.geocode AND fc.active=TRUE)
-          INNER JOIN forecast.forecast_model AS fm
+            INNER JOIN forecast.forecast_model AS fm
             ON (fc.forecast_model_id = fm.id AND fm.active = TRUE)
-        WHERE f.geocode={} AND cid10='{}'
-        """.format(
-            geocode, cid10
-        )
+        WHERE f.geocode={geocode} AND cid10='{cid10}'
+        """
 
-        values = pd.read_sql_query(sql, DB_ENGINE).values.flat
+        with db_engine.connect() as connection:
+            result = connection.execute(sql)
+            values = result.fetchone()
+
         return values[0], values[1]
 
     @staticmethod
-    def load_cases(geocode: int, disease: str, epiweek: int):
+    def load_cases(
+        geocode: int, disease: str, epiweek: int, db_engine: Engine = DB_ENGINE
+    ):
         """
         :param geocode:
         :param disease:
@@ -881,29 +797,30 @@ class Forecast:
 
         sql = """
         SELECT DISTINCT ON (forecast_cases.forecast_model_id)
-          forecast_cases.forecast_model_id,
-          forecast_model.name AS forecast_model_name,
-          forecast_cases.published_date
+        forecast_cases.forecast_model_id,
+        forecast_model.name AS forecast_model_name,
+        forecast_cases.published_date
         FROM
-          forecast.forecast_cases
-          INNER JOIN forecast.forecast_model
+        forecast.forecast_cases
+        INNER JOIN forecast.forecast_model
             ON (
-              forecast_cases.forecast_model_id =
-              forecast_model.id
+            forecast_cases.forecast_model_id =
+            forecast_model.id
             )
         WHERE
-          cid10 = '%s'
-          AND geocode = %s
-          AND epiweek = %s
+        cid10 = %s
+        AND geocode = %s
+        AND epiweek = %s
         ORDER BY forecast_model_id, published_date DESC
-        """ % (
-            cid10,
-            geocode,
-            epiweek,
-        )
+        """
 
-        with DB_ENGINE.connect() as conn:
-            df_forecast_model = pd.read_sql(sql, con=conn)
+        with db_engine.connect() as conn:
+            result = conn.execute(sql, (cid10, geocode, epiweek))
+            df_forecast_model = pd.DataFrame(
+                result.fetchall(), columns=result.keys()
+            )
+
+        # return df_forecast_model
 
         table_name = "Historico_alerta" + get_disease_suffix(disease)
 
@@ -1028,8 +945,9 @@ class Forecast:
             "sql_alert": sql_alert,
         }
 
-        with DB_ENGINE.connect() as conn:
-            return pd.read_sql(sql, con=conn, parse_dates=True)
+        with db_engine.connect() as conn:
+            result = conn.execute(sql)
+            return pd.DataFrame(result.fetchall(), columns=result.keys())
 
 
 class ReportCity:

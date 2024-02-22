@@ -1,0 +1,23 @@
+/* participe_styles.css */
+#diseaseTabContent {
+    background-color: #e0eefd63;
+    margin-bottom: 20px;
+    border-radius: 7px;
+}
+
+.participe-title {
+    font-weight: bold;
+}
+
+.participe-list {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.participe-list li {
+    margin-bottom: 1rem;
+}
+
+.image-container {
+    margin: 1rem 0;
+}

@@ -1,175 +1,48 @@
-{% extends 'bootstrap.html' %}
+<!DOCTYPE HTML>
 {% load static %}
-{% load bootstrap4 %}
 {% load i18n %}
-{% load searchbox_component %}
+{% load bootstrap4 %}
 
-{% block bootstrap4_content %}
-<!-- Wrap all page content here -->
-<div id="wrap">
-    <div class="view">
-        <!-- Fixed navbar -->
-        <div class="container container-fluid">
-            <div class="row clearfix">
-                <div class="col-md-12 column">
-                <!-- logo bar -->
-                    <div class="float-left">
-                        <a href="/">
-                            <img class="media-object" src="{% static '/img/info-dengue-logo-multicidades.png' %}" alt="INFO-DENGUE">
-                        </a>
-                    </div>
-                    <div class="float-right">
-                        <a href="http://www.procc.fiocruz.br">
-                            <img class="media-object" src="{% static '/img/fiocruz.gif' %}" height="83px" alt="FIOCRUZ">
-                        </a>
-                    </div>
-                    <div class="float-right">
-                        <a href="http://emap.fgv.br">
-                            <img class="media-object" src="{% static '/img/emap.jpg' %}" height="83px" alt="EMAP">
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="row clearfix mb-3">
-                <div class="col-md-12">
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="{% static '/img/favicon.ico' %}" type="image/x-icon">
 
-                    <nav class="navbar navbar-light navbar-custom navbar-expand-md rounded py-1">
-                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
+    <!-- Custom Stylesheets -->
+    <link href="{% static '/css/infodengue.css' %}" rel="stylesheet">
+    <link href="{% static '/css/footer.css' %}" rel="stylesheet">
 
-                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                            <ul class="navbar-nav mr-auto">
-                                <li class="py-2">
-                                    <a href="{% url 'dados:main' %}">
-                                        {% translate "Início" %}
-                                    </a>
-                                </li>
-                                <li class="py-2">
-                                    <a href="{% url 'dados:about' %}">
-                                        {% translate "Sobre nós" %}
-                                    </a>
-                                </li>
-                                <li class="py-2">
-                                    <a href="{% url 'dados:team' %}">
-                                        {% translate "Equipe" %}
-                                    </a>
-                                </li>
-                                <li class="py-2">
-                                    <a href="{% url 'dados:joinin' %}">
-                                        {% translate "Participe" %}
-                                    </a>
-                                </li>
-                                <li class="py-2">
-                                    <a href="{% url 'dados:data_public_services' %}">
-                                        {% translate "Dados" %}
-                                    </a>
-                                </li>
-                                <li class="py-2">
-                                    <a href="{% url 'dados:report' %}">
-                                        {% translate "Relatórios" %}
-                                    </a>
-                                </li>
-                                <li class="py-2" style="overflow: visible">
-                                    {% searchbox_component %}
-                                </li>
-                                <li class="py-2 dropdown">
-                                    <a class="py-2 dropdown-toggle" href="#" id="recursosDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="{% translate 'Links para páginas com informações adicionais, ferramentas e outras seções úteis do site' %}">
-                                        {% translate "Recursos" %}                                        </a>
-                                    <div class="dropdown-menu" aria-labelledby="recursosDropdown">
-                                        <a class="dropdown-item"
-                                           href="/epi-scanner"
-                                           target="_blank"
-                                           onclick="alert('You will be redirected to a new tab!')"
-                                           style="text-decoration: none;"
-                                           title="{% translate 'Aplicação que utiliza dados atualizados de incidência de arboviroses, como Dengue e Chikungunya, do Infodengue para analisar a expansão da onda no território nacional brasileiro.' %}">Episcanner
-                                        </a>
-                                        <a class="dropdown-item"
-                                           href="/alertflow"
-                                           target="_blank"
-                                           onclick="alert('You will be redirected to a new tab!')"
-                                           style="text-decoration: none;"
-                                           title="{% translate 'O AlertFlow é um sistema de gerenciamento de fluxo de trabalho projetado para o projeto Alertadenge.' %}">AlertFlow
-                                        </a>
-                                        <a class="dropdown-item"
-                                           href="https://e-vigilancia.dengue.mat.br/"
-                                           target="_blank"
-                                           onclick="alert('You will be redirected to a new tab!')"
-                                           style="text-decoration: none;"
-                                           title="{% translate 'E-vigilância é um evento que tem como objetivo discutir as tecnologias, metodologias e desafios relacionados à vigilância em saúde.' %}">E-vigilância
-                                        </a>
-                                        <a class="dropdown-item"
-                                        href="https://readthedocs.org/projects/pysus/"
-                                        target="_blank"
-                                           onclick="alert('You will be redirected to a new tab!')"
-                                           style="text-decoration: none;"
-                                           title="{% translate 'PySUS reúne um conjunto de utilitários para lidar com bancos de dados públicos publicados pelo DATASUS do Brasil.' %}">PySUS
-                                        </a>
-                                    </div>
-                                </li>
-                                {% if user.is_authenticated %}
-                                    <li class="py-2">
-                                        <a href="{% url 'dbf:upload' %}">
-                                            {% translate "Envie dados atualizados" %}
-                                        </a>
-                                    </li>
-                                    <li class="dropdown py-2">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                            {% translate "Account " %}
-                                            <b class="caret"></b>
-                                        </a>
-                                        <ul class="dropdown-menu">
-                                            <li>
-                                                <a href="{% url 'logout' %}">
-                                                    {% translate "Logout" %}
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="{% url 'password_change' %}">
-                                                    {% translate "Change password" %}
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                {% else %}
-                                    <li class="py-2">
-                                        <a href="{% url 'login' %}">
-                                            {% translate "Login" %}
-                                        </a>
-                                    </li>
-                                {% endif %}
-                            </ul>
-                        </div>
-                    </nav>
+    <!-- Additional Scripts -->
+    <script src="{% static '/libs/jquery/jquery-3.3.1.js' %}"></script>
+    <script src="{% static '/js/typeahead.bundle.min.js' %}"></script>
 
-                </div>
-            </div>
+    <!-- Bootstrap CSS and JS -->
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="container-fluid d-flex flex-column min-vh-100">
+        <div class="container">
+            {% include 'components/header.html' %}
+            {% include 'components/navbar.html' %}
         </div>
+        <main role="main" class="flex-fill">
+            <div class="container py-4">
+                <h3>{% block title %}{% endblock %}</h3>
+                {% block breadcrumbs %}{% endblock %}
+                {% block content %}
+                <!-- Main content goes here -->
+                {% endblock %}
+            </div>
+        </main>
+        <footer class="footer py-4">
+            <div class="container">
+                {% include 'components/footer.html' %}
+            </div>
+        </footer>
     </div>
-
-    <script type="application/javascript">
-        $(document).ready(function(){
-            document.getElementsByTagName("title")[0].innerText = 'Situação Epidemiológica';
-        });
-    </script>
-    <!-- Begin page content -->
-
-    <div class="container">
-        {% block breadcrumbs %}{% endblock %}
-        <div class="page-header my-4 align-title">
-            <h3>{% block title %}(no title){% endblock %}</h3>
-        </div>
-        {% bootstrap_messages %}
-        {% block content %}
-        <p class="lead">
-            {% blocktranslate %}Pin a fixed-height footer to the bottom of the viewport
-            in desktop browsers with this custom HTML and CSS.
-             A fixed navbar has been added within <code>#wrap</code>
-             with <code>padding-top: 60px;</code> on the <code>.container</code>
-            {% endblocktranslate %}
-        </p>
-        {% endblock %}
-    </div>
-</div>
-
-{% endblock %}
+</body>
+</html>

@@ -1,0 +1,8 @@
+/* main_styles.css */
+.custom-list {
+    list-style-type: disc;
+    padding-left: 20px; /* Adjust the padding as needed */
+    font-style: italic;
+}
+
+/* Add other styles here as needed, e.g., for .container, .row, .col-md-12.column */

@@ -1,51 +1,31 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load static %}
+
 {% block extra_head %}
-<style>
-      .col-header{
-        text-align: right;
-        vertical-align: bottom;
-        font-size: 16px;
-        font-weight: bold;
-      }
-
-      .col-field{
-        text-align: left;
-        vertical-align: middle;
-      }
-
-      .c {
-        text-align: center;
-      }
-
-      .pt-2 {
-        padding-top: 20px;
-      }
-</style>
-
 <script>
-function openReport() {
-  var geocode = $('#geocode option:selected').val();
-  var epidate = $('#epidate').val();
-  var url = '/api/epi_year_week?epidate=' + epidate;
+  function openReport() {
+    var geocode = $('#geocode option:selected').val();
+    var epidate = $('#epidate').val();
+    var url = '/api/epi_year_week?epidate=' + epidate;
 
-  $.ajax({
-      dataType: 'json',
-      url: url,
-      success: function(data) {
-        window.location.href = (
-          '/report/{{state}}/' +
-          geocode + '/' +
-          data['epi_year_week']
-        );
-      }
-  });
+    $.ajax({
+        dataType: 'json',
+        url: url,
+        success: function(data) {
+          window.location.href = (
+            '/report/{{state}}/' +
+            geocode + '/' +
+            data['epi_year_week']
+          );
+        }
+    });
+ 
+    return false;
+  }
 
-  return false;
-}
-
-</script>
-
+  </script>
+<link href="{% static '/css/report_styles.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -58,23 +38,17 @@ function openReport() {
 </nav>
 {% endblock %}
 
-
 {% block title %}{% translate "Relatórios" %} / {{ state }}{% endblock %}
 
 {% block content %}
-
 <form id="form-report" onsubmit="return openReport();">
   <div class="row">
     <div class="col-md-12">
-      <!-- field:start -->
       <div class="form-group">
         <label for="geocode">{% translate "Município" %}</label>
-        <select id="geocode" class="form-control"
-                style="width:400px;"
-                required="required"
-        >
+        <select id="geocode" class="form-control" required style="width:400px;">
           <option value="">{% translate "Selecione um município" %}</option>
-          {{options_cities|safe}}
+          {{ options_cities|safe }}
         </select>
         <small id="geocodeHelp" class="form-text text-muted">
           {% translate "Selecione o município desejado para a consulta" %}
@@ -82,16 +56,11 @@ function openReport() {
       </div>
       <div class="form-group">
         <label for="epidate">{% translate "Data da Semana Epidemiológica" %}</label>
-        <input type="date" class="form-control"
-               id="epidate"
-               value="{{date_query}}"
-               aria-describedby="dateHelp"
-               required="required" style="width:200px;">
+        <input type="date" class="form-control" id="epidate" value="{{ date_query }}" required style="width:200px;">
         <small id="dateHelp" class="form-text text-muted">
           {% translate "Selecione um dia da Semana Epidemiológica desejada" %}
         </small>
       </div>
-      <!-- field:end -->
       <div class="form-group">
         <button class="btn btn-primary" type="submit">
           {% translate "Abrir Relatório" %}
@@ -100,5 +69,4 @@ function openReport() {
     </div>
   </div>
 </form>
-
 {% endblock %}

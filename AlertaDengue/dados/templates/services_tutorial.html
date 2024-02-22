@@ -4,32 +4,18 @@
 {% load lookup %}
 
 {% block extra_head %}
-<meta property="og:image"
-      content="{% static '/img/screenshot.png' %}"/>
-<meta property="og:image:secure_url"
-      content="{% static '/img/screenshot.png' %}"/>
-
-
-<script src="{% static '/libs/bootstrap-select/bootstrap-select.min.js' %}"
-        type="text/javascript"></script>
-
-<script src="{% static '/js/infodengue.js' %}"
-        type="text/javascript"></script>
-
-<link href="{% static '/libs/bootstrap-select/bootstrap-select.min.css' %}"
-        type="text/css" rel="stylesheet" />
-
+<meta property="og:image" content="{% static '/img/screenshot.png' %}"/>
+<meta property="og:image:secure_url" content="{% static '/img/screenshot.png' %}"/>
+<script src="{% static '/libs/bootstrap-select/bootstrap-select.min.js' %}" type="text/javascript"></script>
+<script src="{% static '/js/infodengue.js' %}" type="text/javascript"></script>
+<link href="{% static '/libs/bootstrap-select/bootstrap-select.min.css' %}" rel="stylesheet" />
 {% endblock %}
 
 {% block breadcrumbs %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-      <li class="breadcrumb-item">
-        <a href="/services">{% translate "Dados" %}</a>
-      </li>
-      <li class="breadcrumb-item active" aria-current="page">
-        <a href='/services/tutorial'>{% translate "Tutorial" %}</a>
-      </li>
+      <li class="breadcrumb-item"><a href="/services">{% translate "Dados" %}</a></li>
+      <li class="breadcrumb-item active" aria-current="page"><a href='/services/tutorial'>{% translate "Tutorial" %}</a></li>
       <li class="breadcrumb-item active" aria-current="page">{{ services }}</li>
   </ol>
 </nav>
@@ -38,33 +24,26 @@
 {% block title %}{% translate "Tutorial" %}{% endblock %}
 
 {% block content %}
-
 <div class="container">
     <div class="row">
-        <div class="col-md-12 column">
-            <div tabindex="-1" id="notebook" class="border-box-sizing">
-                <h5>{% translate "Visualizações a partir da tabela de dados do Infodengue" %}</h5>
-                <li><span>
-                    <a href="{% url 'dados:data_public_services' %}tutorial/R">
-                        {% translate "Linguagem R." %}
-                    </a>
-                </span></li>
-                <li><span>
-                    <a href="{% url 'dados:data_public_services' %}tutorial/Python">
-                        {% translate "Linguagem Python." %}
-                    </a>
-                </span></li>
-                <li><span>
-                    <a class="text" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                        {% translate "Extraindo dados com PySUS" %}
-                    </a>
-                        <div class="collapse" id="collapseExample">
-                    <div class="card card-body">
-                        <p><a href="https://github.com/AlertaDengue/PySUS">PySUS</a> {% translate "é um pacote Python para extrair dados da saúde. Com esta ferramenta, é possível fazer o download das semanas epidemiológicas com scripts em Python. Tutoriais sobre a utilização do PySUS para extração dos dados no sistema InfoDengue pode ser encontrada na " %}<a href="https://pysus.readthedocs.io/en/latest/Infodengue.html">{% translate "documentação oficial do PySUS" %}</a></p>
+        <div class="col-md-12">
+            <h5>{% translate "Visualizações a partir da tabela de dados do Infodengue" %}</h5>
+            <ul>
+                <li>
+                    <a href="{% url 'dados:data_public_services' %}tutorial/R">{% translate "Linguagem R." %}</a>
+                </li>
+                <li>
+                    <a href="{% url 'dados:data_public_services' %}tutorial/Python">{% translate "Linguagem Python." %}</a>
+                </li>
+                <li>
+                    <a class="text" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">{% translate "Extraindo dados com PySUS" %}</a>
+                    <div class="collapse" id="collapseExample">
+                        <div class="card card-body">
+                            <p><a href="https://github.com/AlertaDengue/PySUS">PySUS</a> {% translate "é um pacote Python para extrair dados da saúde. Com esta ferramenta, é possível fazer o download das semanas epidemiológicas com scripts em Python. Tutoriais sobre a utilização do PySUS para extração dos dados no sistema InfoDengue pode ser encontrada na " %}<a href="https://pysus.readthedocs.io/en/latest/Infodengue.html">{% translate "documentação oficial do PySUS" %}</a>.</p>
+                        </div>
                     </div>
-                    </div>
-                </span></li>
-            </div>
+                </li>
+            </ul>
         </div>
     </div>
 </div>

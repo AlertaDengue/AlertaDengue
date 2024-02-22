@@ -4,17 +4,9 @@
 {% load lookup %}
 
 {% block extra_head %}
-<meta property="og:image"
-      content="{% static '/img/screenshot.png' %}"/>
-<meta property="og:image:secure_url"
-      content="{% static '/img/screenshot.png' %}"/>
-
-<script src="{% static '/js/infodengue.js' %}"
-        type="text/javascript"></script>
-
-<style type="text/css"></style>
-<script></script>
-
+<meta property="og:image" content="{% static '/img/screenshot.png' %}"/>
+<meta property="og:image:secure_url" content="{% static '/img/screenshot.png' %}"/>
+<script src="{% static '/js/infodengue.js' %}" type="text/javascript"></script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -31,20 +23,15 @@
 {% block title %}{% translate "Serviços de Dados Públicos" %}{% endblock %}
 
 {% block content %}
-
 <div class="container">
     <div class="row">
         <div class="col-md-12 column">
             <h5>{% translate "Aqui podem ser encontrados os dados mostrados nas figuras e tabelas do site" %}</h5>
-            <p>
             <ul>
                 <li><h5><a href="./api">API</a></h5></li>
-            </ul>
-            <ul>
                 <li><h5><a href="./tutorial">Tutorial</a></h5></li>
             </ul>
         </div>
     </div>
 </div>
-
 {% endblock %}
