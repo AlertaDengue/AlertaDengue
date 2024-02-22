@@ -17,8 +17,6 @@ from django.conf import settings
 from django.core.cache import cache
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
-from typing import List, Optional, Tuple
-
 
 # local
 from .episem import episem
@@ -672,6 +670,7 @@ def add_dv(geocodigo):
     else:
         raise ValueError("geocode does not match!")
 
+
 def get_epiyears(
     state_name: str,
     disease: Optional[str] = None,
@@ -698,7 +697,7 @@ def get_epiyears(
 
     sql_text_query = """
     SELECT ano_notif, se_notif, casos
-    FROM public.epiyear_summary
+    FROM public.epiyear_summary_materialized_view
     WHERE uf = :state_name{disease_filter}
     ORDER BY ano_notif, se_notif
     """.format(
@@ -709,6 +708,7 @@ def get_epiyears(
         result = conn.execute(text(sql_text_query), parameters)
         data = [tuple(row) for row in result.fetchall()]
     return data
+
 
 class NotificationResume:
     @staticmethod

@@ -8,8 +8,11 @@ from copy import deepcopy
 from datetime import timedelta
 from pathlib import Path, PurePath
 
+import altair as alt
 import fiona
 import numpy as np
+import pandas as pd
+from dados.dbdata import get_epiyears
 
 #
 from django.apps import apps
@@ -23,6 +26,7 @@ from django.http import Http404, HttpResponse
 from django.templatetags.static import static
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_page
+from django.views.generic import TemplateView
 from django.views.generic.base import TemplateView, View
 
 # local
@@ -37,7 +41,7 @@ from .charts.home import (
     _create_stack_chart,
 )
 from .charts.states import ReportStateCharts
-from .dbdata import (
+from .dbdata import (  # get_notification_cases,
     ALERT_COLOR,
     CID10,
     DISEASES_NAME,
@@ -440,12 +444,6 @@ class SinanCasesView(View):
         return HttpResponse(cases, content_type="application/json")
 
 
-import altair as alt
-import pandas as pd
-from dados.dbdata import get_epiyears
-from django.views.generic import TemplateView
-
-
 class AlertaStateViewNew(TemplateView):
     """
     A view for generating an Altair line chart for epidemiological data.
@@ -536,9 +534,7 @@ class AlertaStateViewNew(TemplateView):
         """
         context = super().get_context_data(**kwargs)
         state_name = self._state_name[context["state"]]
-        disease = context.get(
-            "disease", ""
-        ).lower()  # Assuming 'disease' key exists and converting to uppercase for consistency
+        disease = context.get("disease", "").lower()
         data = get_epiyears(state_name, disease)
         df = pd.DataFrame(
             data, columns=["ano_notif", "se_notif", "casos"]
@@ -546,13 +542,38 @@ class AlertaStateViewNew(TemplateView):
         df.fillna(0, inplace=True)  # Handle missing values if any
         source_df = self.transform_data_for_altair(df)
         chart = self.generate_altair_line_chart(source_df, state_name, disease)
+
+        # # Load GeoJSON data
+        # with open("staticfiles/geojson_simplified/1100015.json") as f:
+        #     geojson_data = json.load(f)
+
+        # cases_data = pd.DataFrame(get_notification_cases())
+
+        # Generate the Altair map
+        map = (
+            alt.Chart(
+                alt.InlineData(
+                    values=geojson_data,
+                    format=alt.DataFormat(property="features", type="json"),
+                )
+            )
+            .mark_geoshape()
+            .encode(color="cases:Q")
+            .transform_lookup(
+                lookup="id",
+                from_=alt.LookupData(cases_data, "geocode", ["cases"]),
+            )
+            .properties(title="Notification Cases by City")
+        ).to_json(indent=None)
+
         context.update(
             {
                 "state_abv": context["state"],
                 "state": state_name,
                 "disease_label": disease,
                 "last_update": "12-01-2024",
-                "chart": chart.to_html(),  # Add the chart to the context
+                "chart": chart.to_html(),
+                "map": map,
             }
         )
         return context
