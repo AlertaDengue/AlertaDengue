@@ -86,6 +86,9 @@ class AlertCityView(View, _GetMethod):
             eyw_start = ey_start * 100 + ew_start
             eyw_end = ey_end * 100 + ew_end
 
+            print(eyw_start)
+            print(eyw_end)
+
             if self._get("ew_end"):
                 # Use the keyword arguments for infodengue website
                 df = AlertCity.search(
@@ -111,6 +114,7 @@ class AlertCityView(View, _GetMethod):
             else:
                 result = df.to_csv(index=False)
         except Exception as e:
+            print(e)
             if format == "json":
                 result = '{"error_message": "%s"}' % e
             else:

@@ -9,6 +9,7 @@ groups:
     project-name: infodengue-dev
     compose-path:
       - containers/compose.yaml
+      - containers/compose-dev.yaml
     env-file: .env
     services:
       default: memcached,rabbitmq,redis,web,worker,stagingdb
