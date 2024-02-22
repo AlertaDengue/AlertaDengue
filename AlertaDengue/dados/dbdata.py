@@ -2,6 +2,8 @@
 This module contains functions to interact with the main database of the
 Alertadengue project.
 """
+from sqlalchemy.engine import Engine
+from typing import List, Tuple
 import json
 import logging
 import unicodedata
@@ -393,9 +395,7 @@ def get_city_name_by_id(geocode: int, db_engine: Engine) -> str:
         return res.fetchone()[0]
 
 '''
-from typing import List, Tuple
 
-from sqlalchemy.engine import Engine
 
 '''
 def get_all_active_cities_state(
@@ -473,13 +473,14 @@ def get_last_alert(geo_id, disease, db_engine: Engine = DB_ENGINE):
     sql = f"""
     SELECT nivel
     FROM "Municipio"."{table_name}"
-    WHERE municipio_geocodigo="{geo_id}"
+    WHERE municipio_geocodigo={geo_id}
     ORDER BY "data_iniSE" DESC
     LIMIT 1
     """
 
     with db_engine.connect() as conn:
-        return pd.read_sql_query(sql, conn)
+        data = conn.execute(sql).fetchall()
+        return pd.DataFrame(data)
 
 
 def load_series(
