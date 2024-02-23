@@ -26,10 +26,11 @@ groups:
     compose-path: containers/compose.yaml
     env-file: .env
     services:
-      default: memcached,rabbitmq,web,worker
+      default: memcached,rabbitmq,redis,web,worker
       available:
         - name: postgres
         - name: web
         - name: memcached
         - name: rabbitmq
+        - name: redis
         - name: worker
