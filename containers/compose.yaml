@@ -200,7 +200,8 @@ services:
     # command: ["python3", "/opt/services/AlertaDengue/dbf/collector.py"]
     env_file:
       - ../.env
-    # volumes:
+    volumes:
+      - ${EPISCANNER_HOST_DIR}:/opt/services/episcanner
     #   - ${HOST_MINIO_DATA_DIR}:/opt/services/collector
     user: ${HOST_UID}:${HOST_GID}
     depends_on:

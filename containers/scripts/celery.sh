@@ -6,9 +6,6 @@ set +ex
 # Set the Django settings module to ad_main.settings
 export DJANGO_SETTINGS_MODULE=ad_main.settings
 
-# Execute the provided command in the background
-exec "$@" &
-
 echo "[INFO] Starting celery..."
 celery \
   --app=ad_main.celeryapp:app \

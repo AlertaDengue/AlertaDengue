@@ -20,11 +20,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get -qq update --yes \
   && apt-get -qq install --yes --no-install-recommends \
-    build-essential git make postgresql-client vim \
-    ca-certificates wget locales cron sudo inotify-tools \
+  build-essential git make postgresql-client vim \
+  ca-certificates wget locales cron sudo inotify-tools \
   && rm -rf /var/lib/apt/lists/* \
-    /var/cache/apt/archives \
-    /tmp/*
+  /var/cache/apt/archives \
+  /tmp/*
 
 # Set locale
 RUN sed -i -e "s/# pt_BR.*/pt_BR.UTF-8 UTF-8/" /etc/locale.gen \
@@ -37,7 +37,7 @@ RUN addgroup --gid ${HOST_GID} deploy \
   && echo "deploy ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/deploy \
   && chmod 0440 /etc/sudoers.d/deploy \
   && export ENV_NAME="$ENV_NAME" \
-  && mkdir -p /opt/conda /opt/services/ /tmp/dbf_parquet \
+  && mkdir -p /opt/conda /opt/services/ /tmp/dbf_parquet /opt/services/episcanner \
   && chown ${HOST_UID}:${HOST_GID} /opt/services/ /tmp/dbf_parquet \
   && chmod -R a+rwx /opt/conda /opt/services /tmp \
   && echo 'source activate "$ENV_NAME"' >  /home/deploy/.bashrc
@@ -57,12 +57,12 @@ COPY --chown=${HOST_UID}:${HOST_GID} conda/base.yaml /tmp/environment.yaml
 
 # Use environment to update the env alertadengue
 RUN conda env create -n $ENV_NAME \
-    --file /tmp/environment.yaml \
+  --file /tmp/environment.yaml \
   && conda clean --all \
   && find /opt/conda/ -type f,l -name '*.a' -delete \
   && find /opt/conda/ -type f,l -name '*.pyc' -delete \
   && find /opt/conda/ -type f,l -name '*.js.map' -delete
-  # && rm -rf /home/deploy/.conda/pkgs
+# && rm -rf /home/deploy/.conda/pkgs
 
 COPY --chown=${HOST_UID}:${HOST_GID} ./AlertaDengue  /opt/services/AlertaDengue
 
