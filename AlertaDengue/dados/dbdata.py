@@ -17,6 +17,7 @@ import pandas as pd
 from ad_main.settings import APPS_DIR, get_ibis_conn, get_sqla_conn
 from django.conf import settings
 from django.core.cache import cache
+import ibis.expr.datatypes as dt
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 
@@ -109,8 +110,11 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
         res = (
             table_hist_uf[table_hist_uf.state_abbv == state_abbv]
             .order_by("SE")
-            .execute()
         )
+
+        res = res.mutate(
+            data_iniSE=res.data_iniSE.cast(dt.timestamp)
+        ).execute()
 
         cache.set(
             cache_name,
