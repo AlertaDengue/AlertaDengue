@@ -135,29 +135,34 @@ def fix_nu_notif(value: Union[str, None]) -> Optional[int]:
             return None
 
 
-@np.vectorize
-def convert_data_types(
-    col: Union[pd.Series, Any], dtype: type
-) -> Optional[Any]:
+def convert_data_types(col: pd.Series, dtype: type) -> pd.Series:
     """
-    Convert the data type of the given column to the specified dtype.
+    Convert the data type of the given pandas Series to the specified dtype,
+    handling missing values appropriately.
+
     Parameters
     ----------
-        col (Union[pd.Series, Any]): The column to convert.
-        dtype (type): The data type to convert the column to.
+    col : pd.Series
+        The pandas Series to convert.
+    dtype : type
+        The target data type to convert the Series to. Supported types are `int`, `float`, and `str`.
 
     Returns
     -------
-        Optional[Any]: The converted column, or None if the column is null.
+    pd.Series
+        The converted Series with the specified data type.
     """
-    if pd.isnull(col):
-        return None
+    if dtype == int:
+        # Convert to numeric first to handle strings that represent numbers, NaNs will become float
+        col = pd.to_numeric(col, errors="coerce").fillna(0).astype(int)
+    elif dtype == float:
+        col = pd.to_numeric(col, errors="coerce").fillna(0.0)
     elif dtype == str:
-        return str(col)
-    elif dtype == int:
-        return int(col or 0)
+        col = col.fillna("").astype(str)
     else:
-        return dtype(col)
+        raise ValueError(f"Unsupported dtype: {dtype}")
+
+    return col
 
 
 @np.vectorize
@@ -290,24 +295,21 @@ def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
 
     df["NU_IDADE_N"] = convert_data_types(df.NU_IDADE_N, int)
 
-    if "RESUL_PCR_" in df.columns:
-        df["RESUL_PCR_"] = convert_data_types(
-            df.RESUL_PCR_.fillna(value=0), int
-        )
-    else:
-        df["RESUL_PCR_"] = 0
-
-    if "CRITERIO" in df.columns:
-        df["CRITERIO"] = convert_data_types(df.CRITERIO.fillna(value=0), int)
-    else:
-        df["CRITERIO"] = 0
-
-    if "CLASSI_FIN" in df.columns:
-        df["CLASSI_FIN"] = convert_data_types(
-            df.CLASSI_FIN.fillna(value=0), int
-        )
-    else:
-        df["CLASSI_FIN"] = 0
+    df["RESUL_PCR_"] = (
+        convert_data_types(df["RESUL_PCR_"], int)
+        if "RESUL_PCR_" in df.columns
+        else 0
+    )
+    df["CRITERIO"] = (
+        convert_data_types(df["CRITERIO"], int)
+        if "CRITERIO" in df.columns
+        else 0
+    )
+    df["CLASSI_FIN"] = (
+        convert_data_types(df["CLASSI_FIN"], int)
+        if "CLASSI_FIN" in df.columns
+        else 0
+    )
 
     df["ID_AGRAVO"] = fill_id_agravo(df.ID_AGRAVO, default_cid)
 
