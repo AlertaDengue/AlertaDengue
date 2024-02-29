@@ -68,7 +68,7 @@ COPY --chown=${HOST_UID}:${HOST_GID} ./AlertaDengue  /opt/services/AlertaDengue
 
 WORKDIR /opt/services/AlertaDengue
 
-COPY --chown=${HOST_UID}:${HOST_GID} .env.tpl pyproject.toml README.md /opt/services/
+COPY --chown=${HOST_UID}:${HOST_GID} .env.tpl pyproject.toml poetry.lock README.md /opt/services/
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/poetry-install.sh /tmp/poetry-install.sh
 
 RUN bash /tmp/poetry-install.sh
