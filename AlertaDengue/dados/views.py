@@ -10,9 +10,9 @@ from pathlib import Path, PurePath
 
 import altair as alt
 import fiona
+import geopandas as gpd
 import numpy as np
 import pandas as pd
-from dados.dbdata import get_epiyears
 
 #
 from django.apps import apps
@@ -41,14 +41,14 @@ from .charts.home import (
     _create_stack_chart,
 )
 from .charts.states import ReportStateCharts
-from .dbdata import (  # get_notification_cases,
+from .dbdata import (
     ALERT_COLOR,
     CID10,
     DISEASES_NAME,
-    MAP_CENTER,
-    MAP_ZOOM,
+    MAP_CODE,
     STATE_INITIAL,
     STATE_NAME,
+    AlertaState,
     Forecast,
     NotificationResume,
     RegionalParameters,
@@ -56,6 +56,7 @@ from .dbdata import (  # get_notification_cases,
     ReportState,
     data_hist_uf,
     get_city_alert,
+    get_epiyears,
     get_last_alert,
 )
 from .episem import episem, episem2date
@@ -522,6 +523,47 @@ class AlertaStateViewNew(TemplateView):
 
         return chart
 
+    def altair_map(self, df: pd.DataFrame, estado_sigla: str):
+        """
+        Create and display an Altair map of municipalities of a specific state.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            DataFrame containing municipality data.
+        estado_sigla : str
+            State code to filter municipalities.
+
+        Returns
+        -------
+        alt.Chart
+            An Altair chart of the map for the filtered municipalities.
+        """
+        # Filter the DataFrame by the first two digits of 'codarea'
+        estado_gdf = gpd.GeoDataFrame(
+            df[df["codarea"].str.startswith(estado_sigla)], geometry="geometry"
+        )
+
+        # Convert the filtered GeoDataFrame to GeoJSON
+        json_features = json.loads(estado_gdf.to_json())
+
+        # Create the visualization with Altair
+        chart = (
+            alt.Chart(alt.Data(values=json_features["features"]))
+            .mark_geoshape()
+            .encode(
+                # Additional configurations, like color, can be added here
+            )
+            .properties(
+                title=f"Municipality Polygons of State {estado_sigla}",
+                width=500,
+                height=500,
+            )
+            .project("identity")
+        )  # Keeps the original projection; adjust as necessary
+
+        return chart
+
     def get_context_data(self, **kwargs) -> dict:
         """
         Get the context data for the template.
@@ -543,28 +585,16 @@ class AlertaStateViewNew(TemplateView):
         source_df = self.transform_data_for_altair(df)
         chart = self.generate_altair_line_chart(source_df, state_name, disease)
 
-        # # Load GeoJSON data
-        # with open("staticfiles/geojson_simplified/1100015.json") as f:
-        #     geojson_data = json.load(f)
+        alerta = AlertaState()
+        data = alerta.fetch_data()
+        alerta.convert_wkb_to_geometry(data)
 
-        # cases_data = pd.DataFrame(get_notification_cases())
+        code_area = str(MAP_CODE.get(context["state"]))
 
-        # Generate the Altair map
-        map = (
-            alt.Chart(
-                alt.InlineData(
-                    values=geojson_data,
-                    format=alt.DataFormat(property="features", type="json"),
-                )
-            )
-            .mark_geoshape()
-            .encode(color="cases:Q")
-            .transform_lookup(
-                lookup="id",
-                from_=alt.LookupData(cases_data, "geocode", ["cases"]),
-            )
-            .properties(title="Notification Cases by City")
-        ).to_json(indent=None)
+        map_chart = self.altair_map(data, code_area)
+        map_chart_json = map_chart.to_json()
+
+        alt.renderers.enable("html")
 
         context.update(
             {
@@ -573,7 +603,7 @@ class AlertaStateViewNew(TemplateView):
                 "disease_label": disease,
                 "last_update": "12-01-2024",
                 "chart": chart.to_html(),
-                "map": map,
+                "map": map_chart_json,
             }
         )
         return context

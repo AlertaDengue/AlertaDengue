@@ -13,8 +13,7 @@ def render_altair_chart(context):
 
 @register.simple_tag
 def render_altair_map(context):
-    chart = context.get("map", None)
-    if chart:
-        return chart
+    map = context.get("map", None)
+    if map:
+        return map
     return ""
-    # return f'<div id="vis"></div><script type="text/javascript">var spec = {chart_json}; vegaEmbed("#vis", spec);</script>'
