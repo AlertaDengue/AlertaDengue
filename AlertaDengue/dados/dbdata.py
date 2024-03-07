@@ -9,13 +9,15 @@ from collections import defaultdict
 from datetime import datetime
 from typing import List, Optional, Tuple
 
+import altair as alt
 import ibis
 import numpy as np
 import pandas as pd
 from ad_main.settings import APPS_DIR, get_ibis_conn, get_sqla_conn
 from django.conf import settings
 from django.core.cache import cache
-from sqlalchemy import text
+from shapely.wkb import loads
+from sqlalchemy import create_engine, text
 from sqlalchemy.engine.base import Engine
 
 # local
@@ -34,39 +36,39 @@ ALERT_COLOR = {1: "verde", 2: "amarelo", 3: "laranja", 4: "vermelho"}
 ALERT_CODE = dict(zip(ALERT_COLOR.values(), ALERT_COLOR.keys()))
 
 ALL_STATE_NAMES = {
-    "AC": ["Acre", [-8.77, -70.55], 6],
-    "AL": ["Alagoas", [-9.71, -35.73], 6],
-    "AM": ["Amazonas", [-3.07, -61.66], 6],
-    "AP": ["Amapá", [1.41, -51.77], 6],
-    "BA": ["Bahia", [-12.96, -38.51], 6],
-    "CE": ["Ceará", [-3.71, -38.54], 6],
-    "DF": ["Distrito Federal", [-15.83, -47.86], 6],
-    "ES": ["Espírito Santo", [-19.19, -40.34], 6],
-    "GO": ["Goiás", [-16.64, -49.31], 6],
-    "MA": ["Maranhão", [-2.55, -44.3], 6],
-    "MG": ["Minas Gerais", [-18.1, -44.38], 6],
-    "MS": ["Mato Grosso do Sul", [-20.51, -54.54], 6],
-    "MT": ["Mato Grosso", [-12.64, -55.42], 6],
-    "PA": ["Pará", [-5.53, -52.29], 6],
-    "PB": ["Paraíba", [-7.06, -35.55], 6],
-    "PE": ["Pernambuco", [-8.28, -35.07], 6],
-    "PI": ["Piauí", [-8.28, -43.68], 6],
-    "PR": ["Paraná", [-24.89, -51.55], 6],
-    "RJ": ["Rio de Janeiro", [-22.84, -43.15], 6],
-    "RN": ["Rio Grande do Norte", [-5.22, -36.52], 6],
-    "RO": ["Rondônia", [-11.22, -62.8], 6],
-    "RR": ["Roraima", [1.89, -61.22], 6],
-    "RS": ["Rio Grande do Sul", [-30.01, -51.22], 6],
-    "SC": ["Santa Catarina", [-27.33, -49.44], 6],
-    "SE": ["Sergipe", [-10.9, -37.07], 6],
-    "SP": ["São Paulo", [-23.55, -46.64], 6],
-    "TO": ["Tocantins", [-10.25, -48.25], 6],
+    "AC": ["Acre", [-8.77, -70.55], 12],
+    "AL": ["Alagoas", [-9.71, -35.73], 27],
+    "AM": ["Amazonas", [-3.07, -61.66], 13],
+    "AP": ["Amapá", [1.41, -51.77], 16],
+    "BA": ["Bahia", [-12.96, -38.51], 29],
+    "CE": ["Ceará", [-3.71, -38.54], 23],
+    "DF": ["Distrito Federal", [-15.83, -47.86], 53],
+    "ES": ["Espírito Santo", [-19.19, -40.34], 32],
+    "GO": ["Goiás", [-16.64, -49.31], 52],
+    "MA": ["Maranhão", [-2.55, -44.3], 21],
+    "MG": ["Minas Gerais", [-18.1, -44.38], 31],
+    "MS": ["Mato Grosso do Sul", [-20.51, -54.54], 50],
+    "MT": ["Mato Grosso", [-12.64, -55.42], 51],
+    "PA": ["Pará", [-5.53, -52.29], 15],
+    "PB": ["Paraíba", [-7.06, -35.55], 25],
+    "PE": ["Pernambuco", [-8.28, -35.07], 26],
+    "PI": ["Piauí", [-8.28, -43.68], 22],
+    "PR": ["Paraná", [-24.89, -51.55], 41],
+    "RJ": ["Rio de Janeiro", [-22.84, -43.15], 33],
+    "RN": ["Rio Grande do Norte", [-5.22, -36.52], 24],
+    "RO": ["Rondônia", [-11.22, -62.8], 11],
+    "RR": ["Roraima", [1.89, -61.22], 14],
+    "RS": ["Rio Grande do Sul", [-30.01, -51.22], 43],
+    "SC": ["Santa Catarina", [-27.33, -49.44], 42],
+    "SE": ["Sergipe", [-10.9, -37.07], 28],
+    "SP": ["São Paulo", [-23.55, -46.64], 35],
+    "TO": ["Tocantins", [-10.25, -48.25], 17],
 }
 
 STATE_NAME = {k: v[0] for k, v in ALL_STATE_NAMES.items()}
 STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
 MAP_CENTER = {k: v[1] for k, v in ALL_STATE_NAMES.items()}
-MAP_ZOOM = {k: v[2] for k, v in ALL_STATE_NAMES.items()}
+MAP_CODE = {k: v[2] for k, v in ALL_STATE_NAMES.items()}
 
 with open(APPS_DIR / "data" / "municipalities.json", "r") as muns:
     _mun_decoded = muns.read().encode().decode("utf-8-sig")
@@ -671,45 +673,6 @@ def add_dv(geocodigo):
         raise ValueError("geocode does not match!")
 
 
-def get_epiyears(
-    state_name: str,
-    disease: Optional[str] = None,
-    db_engine: Engine = DB_ENGINE,
-) -> List[Tuple]:
-    """
-    Retrieve epidemiological years data from the database.
-
-    Parameters:
-    state_name (str): Name of the state.
-    disease (Optional[str]): Disease name, defaults to None.
-    db_engine (Engine): Database engine, defaults to DB_ENGINE.
-
-    Returns:
-    List[Tuple]: List of tuples containing the retrieved data.
-    """
-    parameters = {"state_name": state_name}
-    disease_filter = ""
-
-    if disease:
-        disease_code = CID10.get(disease, "")
-        parameters["disease_code"] = disease_code
-        disease_filter = " AND disease_code = :disease_code"
-
-    sql_text_query = """
-    SELECT ano_notif, se_notif, casos
-    FROM public.epiyear_summary_materialized_view
-    WHERE uf = :state_name{disease_filter}
-    ORDER BY ano_notif, se_notif
-    """.format(
-        disease_filter=disease_filter
-    )
-
-    with db_engine.connect() as conn:
-        result = conn.execute(text(sql_text_query), parameters)
-        data = [tuple(row) for row in result.fetchall()]
-    return data
-
-
 class NotificationResume:
     @staticmethod
     def count_cities_by_uf(
@@ -948,6 +911,100 @@ class Forecast:
         with db_engine.connect() as conn:
             result = conn.execute(sql)
             return pd.DataFrame(result.fetchall(), columns=result.keys())
+
+
+class AlertaState:
+    @classmethod
+    def get_epi_years(
+        cls,
+        state_name: str,
+        disease: Optional[str] = None,
+        db_engine: Engine = DB_ENGINE,
+    ) -> List[Tuple]:
+        """
+        Retrieve epidemiological years data for a given state and disease from the database.
+
+        Parameters
+        ----------
+        state_name : str
+            The name of the state.
+        disease : Optional[str], optional
+            The name of the disease, by default None.
+        db_engine : Engine, optional
+            The database engine to use for the connection, by default DB_ENGINE.
+
+        Returns
+        -------
+        List[Tuple]
+            A list of tuples containing the retrieved epidemiological data.
+        """
+        parameters = {"state_name": state_name}
+        disease_filter = ""
+
+        if disease:
+            disease_code = CID10.get(disease, "")
+            parameters["disease_code"] = disease_code
+            disease_filter = " AND disease_code = :disease_code"
+
+        sql_text_query = f"""
+        SELECT ano_notif, se_notif, casos
+        FROM public.epiyear_summary_materialized_view
+        WHERE uf = :state_name{disease_filter}
+        ORDER BY ano_notif, se_notif
+        """
+
+        with db_engine.connect() as conn:
+            result = conn.execute(text(sql_text_query), parameters)
+            data = [tuple(row) for row in result.fetchall()]
+        return data
+
+    @classmethod
+    def fetch_mun_geometry(cls, db_engine: Engine = DB_ENGINE) -> pd.DataFrame:
+        """
+        Fetch municipal area codes and their geometries from the database.
+
+        Parameters
+        ----------
+        db_engine : Engine
+            The database connection engine.
+
+        Returns
+        -------
+        pd.DataFrame
+            A DataFrame containing area codes and geometries.
+        """
+        query = "SELECT codarea, geom FROM municipios_geo_br"
+
+        with db_engine.connect() as conn:
+            result = conn.execute(text(query))
+            data = [dict(row) for row in result.fetchall()]
+
+        return pd.DataFrame(data)
+
+    @classmethod
+    def convert_wkb_to_geometry(
+        cls, df: pd.DataFrame, geom_col: str = "geom"
+    ) -> pd.DataFrame:
+        """
+        Convert Well-Known Binary (WKB) data to geometry objects within a DataFrame.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            The DataFrame containing WKB data in one of its columns.
+        geom_col : str
+            The column name in `df` that contains the WKB data.
+
+        Returns
+        -------
+        pd.DataFrame
+            The original DataFrame with a 'geometry' column added containing geometry objects.
+        """
+        df["geometry"] = df[geom_col].apply(
+            lambda x: loads(bytes.fromhex(x), hex=True)
+        )
+
+        return df
 
 
 class ReportCity:
