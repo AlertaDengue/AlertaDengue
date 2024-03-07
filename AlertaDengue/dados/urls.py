@@ -9,7 +9,7 @@ from .views import (
     AboutPageView,
     AlertaMainView,
     AlertaMunicipioPageView,
-    AlertaStateViewNew,
+    AlertStateView,
     ChartsMainView,
     DataPublicServicesPageView,
     GeoJsonView,
@@ -128,7 +128,7 @@ urlpatterns = [
     ),  # Caches the view for the specified number of seconds (8 hours)
     re_path(
         r"^alerta/%s/%s$" % (__state_abbv, __disease),
-        cache_page(60 * 60 * 8)(AlertaStateViewNew.as_view()),
+        cache_page(60 * 60 * 8)(AlertStateView.as_view()),
         name="alerta_uf",
     ),  # Caches the view for the specified number of seconds (8 hours)
     re_path(

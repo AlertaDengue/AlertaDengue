@@ -5,7 +5,21 @@
 
 {% block content %}
 <div class="container-fluid">
-    <!-- Map chart -->
+    <!-- Chart Container -->
+    <div class="row mt-3">
+        <div class="col-12">
+            <div id="dummy_chart_view"></div>
+        </div>
+    </div>
+
+
+
+    <!-- Chart Container -->
+    <div class="row mt-3">
+        <div class="col-12">
+            <div id="chart_view"></div> <!-- Container for the Altair chart -->
+        </div>
+    </div>
 
     <!-- Map Container -->
     <div class="row mt-3">
@@ -16,16 +30,25 @@
 
 <!-- Loading Vega Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
-<script src="https://cdn.jsdelivr.net/npm/vega-lite@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 
 <script type="text/javascript">
     // Rendering the Altair Chart
-
-
+        const chartSpec = {{ line_chart|safe }};
+        vegaEmbed('#chart_view', chartSpec);
+    
+        const dummyChartSpec = {{ dummy_chart|safe }};
+        vegaEmbed('#dummy_chart_view', dummyChartSpec);
+    
+    
     // Rendering the Altair Map
-    const mapSpec = {{ map|safe }};
+    const mapSpec = {{ map_geom|safe }};
     vegaEmbed('#map_view', mapSpec);
+</script>
+<script type="text/javascript">
+    console.log({{ line_chart|safe }});
+    console.log({{ map_geom|safe }});
 </script>
 
 {% endblock %}

@@ -673,45 +673,6 @@ def add_dv(geocodigo):
         raise ValueError("geocode does not match!")
 
 
-def get_epiyears(
-    state_name: str,
-    disease: Optional[str] = None,
-    db_engine: Engine = DB_ENGINE,
-) -> List[Tuple]:
-    """
-    Retrieve epidemiological years data from the database.
-
-    Parameters:
-    state_name (str): Name of the state.
-    disease (Optional[str]): Disease name, defaults to None.
-    db_engine (Engine): Database engine, defaults to DB_ENGINE.
-
-    Returns:
-    List[Tuple]: List of tuples containing the retrieved data.
-    """
-    parameters = {"state_name": state_name}
-    disease_filter = ""
-
-    if disease:
-        disease_code = CID10.get(disease, "")
-        parameters["disease_code"] = disease_code
-        disease_filter = " AND disease_code = :disease_code"
-
-    sql_text_query = """
-    SELECT ano_notif, se_notif, casos
-    FROM public.epiyear_summary_materialized_view
-    WHERE uf = :state_name{disease_filter}
-    ORDER BY ano_notif, se_notif
-    """.format(
-        disease_filter=disease_filter
-    )
-
-    with db_engine.connect() as conn:
-        result = conn.execute(text(sql_text_query), parameters)
-        data = [tuple(row) for row in result.fetchall()]
-    return data
-
-
 class NotificationResume:
     @staticmethod
     def count_cities_by_uf(
@@ -954,23 +915,64 @@ class Forecast:
 
 class AlertaState:
     @classmethod
-    def fetch_data(cls, db_engine: Engine = DB_ENGINE):
+    def get_epi_years(
+        cls,
+        state_name: str,
+        disease: Optional[str] = None,
+        db_engine: Engine = DB_ENGINE,
+    ) -> List[Tuple]:
         """
-        Fetch data from the database using an SQL query and return a DataFrame.
+        Retrieve epidemiological years data for a given state and disease from the database.
 
         Parameters
         ----------
-        engine
+        state_name : str
+            The name of the state.
+        disease : Optional[str], optional
+            The name of the disease, by default None.
+        db_engine : Engine, optional
+            The database engine to use for the connection, by default DB_ENGINE.
+
+        Returns
+        -------
+        List[Tuple]
+            A list of tuples containing the retrieved epidemiological data.
+        """
+        parameters = {"state_name": state_name}
+        disease_filter = ""
+
+        if disease:
+            disease_code = CID10.get(disease, "")
+            parameters["disease_code"] = disease_code
+            disease_filter = " AND disease_code = :disease_code"
+
+        sql_text_query = f"""
+        SELECT ano_notif, se_notif, casos
+        FROM public.epiyear_summary_materialized_view
+        WHERE uf = :state_name{disease_filter}
+        ORDER BY ano_notif, se_notif
+        """
+
+        with db_engine.connect() as conn:
+            result = conn.execute(text(sql_text_query), parameters)
+            data = [tuple(row) for row in result.fetchall()]
+        return data
+
+    @classmethod
+    def fetch_mun_geometry(cls, db_engine: Engine = DB_ENGINE) -> pd.DataFrame:
+        """
+        Fetch municipal area codes and their geometries from the database.
+
+        Parameters
+        ----------
+        db_engine : Engine
             The database connection engine.
-        query : str
-            SQL query to fetch data.
 
         Returns
         -------
         pd.DataFrame
-            DataFrame containing the fetched data.
+            A DataFrame containing area codes and geometries.
         """
-
         query = "SELECT codarea, geom FROM municipios_geo_br"
 
         with db_engine.connect() as conn:
@@ -982,21 +984,21 @@ class AlertaState:
     @classmethod
     def convert_wkb_to_geometry(
         cls, df: pd.DataFrame, geom_col: str = "geom"
-    ):
+    ) -> pd.DataFrame:
         """
-        Convert WKB data to geometry using the specified column.
+        Convert Well-Known Binary (WKB) data to geometry objects within a DataFrame.
 
         Parameters
         ----------
         df : pd.DataFrame
-            DataFrame containing WKB data.
+            The DataFrame containing WKB data in one of its columns.
         geom_col : str
-            Name of the column containing WKB data.
+            The column name in `df` that contains the WKB data.
 
         Returns
         -------
-        None
-            Modifies the DataFrame in-place, adding a 'geometry' column with converted geometries.
+        pd.DataFrame
+            The original DataFrame with a 'geometry' column added containing geometry objects.
         """
         df["geometry"] = df[geom_col].apply(
             lambda x: loads(bytes.fromhex(x), hex=True)
