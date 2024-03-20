@@ -17,9 +17,11 @@ from shapely.geometry import MultiPolygon, shape
 from sqlalchemy.engine import Engine
 
 from ...geodf import extract_boundaries
+from ad_main.settings import get_sqla_conn
 
+DB_ENGINE = get_sqla_conn()
 
-def get_all_active_cities(db_engine: Engine) -> List[Tuple[str, str]]:
+def get_all_active_cities(db_engine: Engine = DB_ENGINE) -> List[Tuple[str, str]]:
     """
     Retrieve a list of active city names and their geocodes.
 

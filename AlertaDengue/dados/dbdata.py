@@ -18,6 +18,8 @@ from django.core.cache import cache
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 
+# from sqlalchemy.engine import Engine
+
 # local
 from .episem import episem
 
@@ -393,13 +395,9 @@ def get_city_name_by_id(geocode: int, db_engine: Engine) -> str:
         return res.fetchone()[0]
 
 '''
-from typing import List, Tuple
 
-from sqlalchemy.engine import Engine
-
-'''
 def get_all_active_cities_state(
-    db_engine: Engine,
+    db_engine: Engine = DB_ENGINE,
 ) -> List[Tuple[str, str, str, str]]:
     """
     Fetches a list of names of active cities from the database.
@@ -445,9 +443,6 @@ def get_all_active_cities_state(
                 settings.QUERY_CACHE_TIMEOUT,
             )
     return res
-
-'''
-
 
 def get_last_alert(geo_id, disease, db_engine: Engine = DB_ENGINE):
     """
