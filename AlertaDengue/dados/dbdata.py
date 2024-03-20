@@ -2,8 +2,6 @@
 This module contains functions to interact with the main database of the
 Alertadengue project.
 """
-from sqlalchemy.engine import Engine
-from typing import List, Tuple
 import json
 import logging
 import unicodedata
@@ -17,7 +15,7 @@ import pandas as pd
 from ad_main.settings import APPS_DIR, get_ibis_conn, get_sqla_conn
 from django.conf import settings
 from django.core.cache import cache
-import ibis.expr.datatypes as dt
+from django.utils.text import slugify
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 
@@ -110,11 +108,8 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
         res = (
             table_hist_uf[table_hist_uf.state_abbv == state_abbv]
             .order_by("SE")
+            .execute()
         )
-
-        res = res.mutate(
-            data_iniSE=res.data_iniSE.cast(dt.timestamp)
-        ).execute()
 
         cache.set(
             cache_name,
@@ -401,9 +396,8 @@ def get_city_name_by_id(geocode: int, db_engine: Engine) -> str:
 '''
 
 
-'''
 def get_all_active_cities_state(
-    db_engine: Engine,
+    db_engine: Engine = DB_ENGINE,
 ) -> List[Tuple[str, str, str, str]]:
     """
     Fetches a list of names of active cities from the database.
@@ -450,8 +444,6 @@ def get_all_active_cities_state(
             )
     return res
 
-'''
-
 
 def get_last_alert(geo_id, disease, db_engine: Engine = DB_ENGINE):
     """
@@ -477,14 +469,13 @@ def get_last_alert(geo_id, disease, db_engine: Engine = DB_ENGINE):
     sql = f"""
     SELECT nivel
     FROM "Municipio"."{table_name}"
-    WHERE municipio_geocodigo={geo_id}
+    WHERE municipio_geocodigo="{geo_id}"
     ORDER BY "data_iniSE" DESC
     LIMIT 1
     """
 
     with db_engine.connect() as conn:
-        data = conn.execute(sql).fetchall()
-        return pd.DataFrame(data)
+        return pd.read_sql_query(sql, conn)
 
 
 def load_series(
@@ -750,17 +741,25 @@ class NotificationResume:
         db_engine: Engine = DB_ENGINE,
         epi_year_week: int = None,
     ):
-
         """
         Retorna vários indicadores de alerta a nível da cidade.
         :param state_name: State name
         :param disease: dengue|chikungunya|zika
         :param epi_year_week: int
-        :return: tupla
+        :return: DataFrame
         """
-        db_engine = get_sqla_conn()
-
         _disease = get_disease_suffix(disease)
+
+        cache_key = (
+            f"cities_alert_{slugify(state_name, allow_unicode=True)}_{disease}"
+        )
+        cities_alert = cache.get(cache_key)
+
+        if cities_alert is not None:
+            logger.info("Cache found for key: %s", cache_key)
+            return cities_alert
+
+        logger.info("Cache NOT found for key: %s", cache_key)
 
         sql = """
         SELECT
@@ -803,9 +802,17 @@ class NotificationResume:
 
         sql = sql.format(_disease, state_name)
 
+        # with DB_ENGINE.connect() as conn:
+        #     cities_alert = pd.read_sql_query(sql, conn, "id", parse_dates=True)
+
         with db_engine.connect() as conn:
             result = conn.execute(sql, "id", parse_dates=True)
-            return pd.DataFrame(result.fetchall())
+            cities_alert = pd.DataFrame(result.fetchall())
+
+        cache.set(cache_key, cities_alert, settings.QUERY_CACHE_TIMEOUT)
+        logger.info("Cache set for key: %s", cache_key)
+
+        return cities_alert
 
     @staticmethod
     def tail_estimated_cases(geo_ids, n=12, db_engine: Engine = DB_ENGINE):
@@ -943,10 +950,10 @@ class Forecast:
         sql = """
         SELECT
             (CASE
-             WHEN tb_cases."data_iniSE" IS NOT Null
+             WHEN tb_cases."data_iniSE" IS NOT NULL
                THEN tb_cases."data_iniSE"
              %(forecast_date_ini_epiweek)s
-             ELSE Null
+             ELSE NULL
              END
             ) AS "data_iniSE",
             tb_cases.casos_est_min,
@@ -955,9 +962,9 @@ class Forecast:
             tb_cases.casos,
             tb_cases.nivel,
             (CASE
-             WHEN tb_cases."SE" IS NOT Null THEN tb_cases."SE"
+             WHEN tb_cases."SE" IS NOT NULL THEN tb_cases."SE"
              %(forecast_epiweek)s
-             ELSE Null
+             ELSE NULL
              END
             ) AS "SE",
             tb_cases.p_rt1
@@ -1023,7 +1030,7 @@ class Forecast:
             # forecast date ini selection
             forecast_date_ini_epiweek += (
                 """
-            WHEN forecast%(model_id)s.init_date_epiweek IS NOT Null
+            WHEN forecast%(model_id)s.init_date_epiweek IS NOT NULL
                THEN forecast%(model_id)s.init_date_epiweek
             """
                 % forecast_config
@@ -1032,7 +1039,7 @@ class Forecast:
             # forecast epiweek selection
             forecast_epiweek += (
                 """
-            WHEN forecast%(model_id)s.epiweek IS NOT Null
+            WHEN forecast%(model_id)s.epiweek IS NOT NULL
                THEN forecast%(model_id)s.epiweek
             """
                 % forecast_config
