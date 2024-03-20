@@ -84,7 +84,7 @@ $(document).ready(function () {
                 },
             },
             title: {
-                text: '{% blocktrans %}Casos por semana{% endblocktrans %}'
+                text: '{% blocktranslate %}Casos por semana{% endblocktranslate %}'
             },
             subtitle: {
                 text: chart_footer,
@@ -97,7 +97,7 @@ $(document).ready(function () {
             yAxis: {
                 min: 0,
                 title: {
-                    text: '{% blocktrans %}Casos{% endblocktrans %}'
+                    text: '{% blocktranslate %}Casos{% endblocktranslate %}'
                 }
             },
             legend: {
@@ -109,7 +109,7 @@ $(document).ready(function () {
             tooltip: {
                 shared: true,
                 useHTML: true,
-                footerFormat: '<small>**{% blocktrans %}Para alterar o zoom do gráfico,<br/>utilize os controles da parte inferior.{% endblocktrans %}</small>',
+                footerFormat: '<small>**{% blocktranslate %}Para alterar o zoom do gráfico,<br/>utilize os controles da parte inferior.{% endblocktranslate %}</small>',
             },
             /*series: [{
                 'name': 'casos',
