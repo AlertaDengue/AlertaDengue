@@ -173,32 +173,36 @@ class NotificationQueries:
         """
         _dist_filters = self._process_filter(self.dist_filters, "disease")
 
-        disease_label = " CASE "
+        disease_label = "CASE"
 
         for cid_label, cid_id in CID10.items():
             disease_label += " WHEN cid10.codigo='{}' THEN '{}' \n".format(
                 cid_id, cid_label.title()
             )
 
-        disease_label += " ELSE cid10.codigo END AS cid10_nome "
+        disease_label += "ELSE cid10.codigo END AS cid10_nome"
 
         sql = """
         SELECT
             COALESCE(cid10_nome, NULL) AS category,
-            count(id) AS casos
+            COUNT(id) AS casos
         FROM (
             SELECT
-                *,
-                {},
-                {}
+                notif.*,
+                CASE
+                    WHEN cid10.codigo = 'A90' THEN 'Dengue'
+                    WHEN cid10.codigo = 'A92.0' THEN 'Chikungunya'
+                    WHEN cid10.codigo = 'A928' THEN 'Zika'
+                    ELSE 'Other'
+                END AS cid10_nome
             FROM
                 "Municipio"."Notificacao" AS notif
-                INNER JOIN "Dengue_global"."Municipio" AS municipio
-                  ON notif.municipio_geocodigo = municipio.geocodigo
-                LEFT JOIN "Dengue_global"."CID10" AS cid10
-                  ON REPLACE(notif.cid10_codigo, '.', '')=cid10.codigo
+            INNER JOIN "Dengue_global"."Municipio" AS municipio
+                ON notif.municipio_geocodigo = municipio.geocodigo
+            LEFT JOIN "Dengue_global"."CID10" AS cid10
+                ON notif.cid10_codigo = cid10.codigo
         ) AS tb
-        WHERE {}
+        WHERE cid10_nome IN ('Dengue', 'Chikungunya', 'Zika')
         GROUP BY cid10_nome;
         """.format(
             disease_label, self._age_field, _dist_filters
