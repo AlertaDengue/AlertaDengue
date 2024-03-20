@@ -99,6 +99,8 @@
         var ignore_chart = false;
         var chart_footer = '{% translate "Selecione no filtro o período desejado" %}';
         var initialize_page_id = null;
+        var lastUpdate = '{{ last_update|date:"Y-m-d" }}';  // Format as needed
+
 
         initialize_page_id = window.setInterval(function () {
             if (
@@ -149,15 +151,23 @@
                     data_gender,
                     data_period
                 ) {
+                    // Use lastUpdate for the end date
                     var format = d3.timeFormat('%d/%m/%Y');
+                    var format_date = d3.timeFormat('%d %B %Y');
+
+                    // Parse lastUpdate as a Date object
+                    var endDate = new Date(lastUpdate);
+
+                    // Now you can format endDate as needed
+                    var end = format(endDate);  // For use in your existing code
+                    var fim = format_date(endDate);  // For display
+
+                    // You may need to adjust how you determine the start date
+                    // Assuming you still calculate it from the chart extremes:
                     var extremes = date_chart.xAxis[0].getExtremes(),
                         start = format(new Date(extremes.min)),
-                        end = format(new Date(extremes.max));
+                        inicio = format_date(new Date(extremes.min));
 
-                    var format_date = d3.timeFormat('%d %B %Y');
-                    var extremes_date = date_chart.xAxis[0].getExtremes(),
-                        inicio = format_date(new Date(extremes_date.min)),
-                        fim = format_date(new Date(extremes_date.max));
                     var desc_period =
                         '{% translate "Dados de" %} ' + inicio + ' {% translate "a" %} ' + fim;
 

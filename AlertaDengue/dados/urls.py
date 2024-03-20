@@ -9,7 +9,7 @@ from .views import (
     AboutPageView,
     AlertaMainView,
     AlertaMunicipioPageView,
-    AlertaStateViewNew,
+    AlertaStateView,
     ChartsMainView,
     DataPublicServicesPageView,
     GeoJsonView,
@@ -53,6 +53,11 @@ __report_type = "(?P<report_type>city|state)"
 
 
 urlpatterns = [
+    re_path(
+        r"^alerta/%s/%s$" % (__state_abbv, __disease),
+        cache_page(60 * 60)(AlertaStateView.as_view()),
+        name="alerta_uf",
+    ),
     re_path(r"^$", cache_page(60 * 60)(AlertaMainView.as_view()), name="main"),
     re_path(
         r"^chartshome/{}$".format(__state_abbv),
@@ -125,11 +130,6 @@ urlpatterns = [
     re_path(
         r"^alerta/%s[/]?$" % __state_abbv,
         cache_page(60 * 60 * 8)(redirect_alerta_dengue),
-    ),  # Caches the view for the specified number of seconds (8 hours)
-    re_path(
-        r"^alerta/%s/%s$" % (__state_abbv, __disease),
-        cache_page(60 * 60 * 8)(AlertaStateViewNew.as_view()),
-        name="alerta_uf",
     ),  # Caches the view for the specified number of seconds (8 hours)
     re_path(
         r"^alerta/%s[/]?$" % __geocode,
