@@ -96,6 +96,7 @@ LOCAL_APPS = [
     "forecast",
     "dbf.apps.DbfConfig",
     "api",
+    "upload"
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
