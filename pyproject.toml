@@ -66,10 +66,10 @@ django-extensions = "^3.2.3"
 django-maintenance-mode = "^0.16.3"
 flake8 = "^6.0.0"
 isort = "^5.11.4"
-makim = "^1.8.2"
 mypy = "^0.991"
 pre-commit = "^2.21.0"
 pytest = "^7.2.1"
+makim = ">=1.14"
 
 [build-system]
 requires = ["poetry-core>=1.9.0"]
