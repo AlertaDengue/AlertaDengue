@@ -88,13 +88,23 @@ class NotificationQueries:
         return common_filter + f"dt_notific {date_filter}"
 
     def _get_disease_filter(self, disease):
+        """
+        Generates a SQL filter condition for diseases based on input.
+
+        Parameters:
+        - disease: A string of comma-separated disease codes or None.
+
+        Returns:
+        - A string representing the SQL condition to filter by the specified diseases.
+        """
         if disease is None:
             diseases = "','".join(CID10.values())
-            return f"REPLACE(cid10_codigo, '.', '') IN ('{diseases}')"
-        diseases = "','".join(
-            CID10.get(d.lower(), "") for d in disease.split(",")
-        )
-        return f"REPLACE(cid10_codigo, '.', '') IN ('{diseases}')"
+            return f"cid10_codigo IN ('{diseases}')"
+        else:
+            diseases = "','".join(
+                CID10.get(d.lower(), "") for d in disease.split(",")
+            )
+            return f"cid10_codigo IN ('{diseases}')"
 
     def get_total_rows(self, db_engine: Engine = DB_ENGINE):
         """
@@ -132,8 +142,8 @@ class NotificationQueries:
         )
 
         with db_engine.connect() as conn:
-            result = conn.execute(sql)
-            return pd.DataFrame(result.fetchall(), columns=["casos"])
+            result = conn.execute(sql, "casos")
+            return pd.DataFrame(result.fetchall())
 
     def get_selected_rows(self, db_engine: Engine = DB_ENGINE):
         """
@@ -162,8 +172,8 @@ class NotificationQueries:
         )
 
         with db_engine.connect() as conn:
-            result = conn.execute(sql)
-            return pd.DataFrame(result.fetchall(), columns=["casos"])
+            result = conn.execute(sql, "casos")
+            return pd.DataFrame(result.fetchall())
 
     def get_disease_dist(self, db_engine: Engine = DB_ENGINE) -> pd.DataFrame:
         """
@@ -183,33 +193,31 @@ class NotificationQueries:
 
         disease_label += " ELSE cid10.codigo END AS cid10_nome "
 
-        sql = """
+        sql = f"""
         SELECT
             COALESCE(cid10_nome, NULL) AS category,
             count(id) AS casos
         FROM (
             SELECT
                 *,
-                {},
-                {}
+                {disease_label},
+                {self._age_field}
             FROM
                 "Municipio"."Notificacao" AS notif
-                INNER JOIN "Dengue_global"."Municipio" AS municipio
-                  ON notif.municipio_geocodigo = municipio.geocodigo
-                LEFT JOIN "Dengue_global"."CID10" AS cid10
-                  ON REPLACE(notif.cid10_codigo, '.', '')=cid10.codigo
+            INNER JOIN "Dengue_global"."Municipio" AS municipio
+                ON notif.municipio_geocodigo = municipio.geocodigo
+            LEFT JOIN "Dengue_global"."CID10" AS cid10
+                ON notif.cid10_codigo = cid10.codigo
         ) AS tb
-        WHERE {}
+        WHERE {_dist_filters}
         GROUP BY cid10_nome;
-        """.format(
-            disease_label, self._age_field, _dist_filters
-        )
+        """
 
         with db_engine.connect() as conn:
             result = conn.execute(sql)
             df_disease_dist = pd.DataFrame(result.fetchall())
 
-            return df_disease_dist.set_index("category", drop=True)
+        return df_disease_dist.set_index("category", drop=True)
 
     def _get_age_distribution(
         self, db_engine: Engine, gender_filter: str = ""
