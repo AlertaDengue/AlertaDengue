@@ -444,6 +444,7 @@ class SinanCasesView(View):
         return HttpResponse(cases, content_type="application/json")
 
 
+'''
 class AlertaStateViewNew(TemplateView):
     """
     A view for generating an Altair line chart for epidemiological data.
@@ -577,6 +578,8 @@ class AlertaStateViewNew(TemplateView):
             }
         )
         return context
+
+'''
 
 
 class ChartsMainView(TemplateView):
@@ -1247,4 +1250,61 @@ class ReportStateView(TemplateView):
             }
         )
 
+        return context
+
+
+class AlertaStateView(TemplateView):
+    template_name = "state_cities.html"
+
+    _state_name = STATE_NAME
+
+    def get_context_data(self, **kwargs):
+        """
+        :param kwargs:
+        :return:
+        """
+        context = super(AlertaStateView, self).get_context_data(**kwargs)
+
+        cities_alert = NotificationResume.get_cities_alert_by_state(
+            self._state_name[context["state"]], context["disease"]
+        )
+
+        last_update = cities_alert.data_iniSE.max()
+        alerts = dict(
+            cities_alert[["municipio_geocodigo", "level_alert"]].values
+        )
+
+        mun_dict = dict(cities_alert[["municipio_geocodigo", "nome"]].values)
+
+        mun_dict_ordered = OrderedDict(
+            sorted(mun_dict.items(), key=lambda v: v[1])
+        )
+
+        geo_ids = list(mun_dict.keys())
+
+        if len(geo_ids) > 0:
+            cases_series_last_12 = (
+                NotificationResume.tail_estimated_cases(  # noqa: E501
+                    geo_ids, 12
+                )
+            )
+        else:
+            cases_series_last_12 = {}
+
+        context.update(
+            {
+                "state_abv": context["state"],
+                "state": self._state_name[context["state"]],
+                "map_center": MAP_CENTER[context["state"]],
+                "map_zoom": MAP_ZOOM[context["state"]],
+                "mun_dict": mun_dict,
+                "mun_dict_ordered": mun_dict_ordered,
+                "geo_ids": geo_ids,
+                "alerts_level": alerts,
+                # estimated cases is used to show a chart of the last 12 events
+                "case_series": cases_series_last_12,
+                "disease_label": context["disease"].title(),
+                "last_update": last_update,
+            }
+        )
         return context

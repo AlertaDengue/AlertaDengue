@@ -24,6 +24,9 @@ from sqlalchemy.engine.base import Engine
 # local
 from .episem import episem
 
+# from sqlalchemy.engine import Engine
+
+
 logger = logging.getLogger(__name__)
 
 DB_ENGINE = get_sqla_conn()
@@ -401,9 +404,8 @@ def get_city_name_by_id(geocode: int, db_engine: Engine) -> str:
 '''
 
 
-'''
 def get_all_active_cities_state(
-    db_engine: Engine,
+    db_engine: Engine = DB_ENGINE,
 ) -> List[Tuple[str, str, str, str]]:
     """
     Fetches a list of names of active cities from the database.
@@ -449,8 +451,6 @@ def get_all_active_cities_state(
                 settings.QUERY_CACHE_TIMEOUT,
             )
     return res
-
-'''
 
 
 def get_last_alert(geo_id, disease, db_engine: Engine = DB_ENGINE):
@@ -742,6 +742,110 @@ class NotificationResume:
                 f"Error executing count_cities_by_uf for {disease} in {uf}: {e}"
             )
             return 0
+
+    @staticmethod
+    def get_cities_alert_by_state(
+        state_name,
+        disease="dengue",
+        db_engine: Engine = DB_ENGINE,
+        epi_year_week: int = None,
+    ):
+
+        """
+        Retorna vários indicadores de alerta a nível da cidade.
+        :param state_name: State name
+        :param disease: dengue|chikungunya|zika
+        :param epi_year_week: int
+        :return: tupla
+        """
+        db_engine = get_sqla_conn()
+
+        _disease = get_disease_suffix(disease)
+
+        sql = """
+        SELECT
+            hist_alert.id,
+            hist_alert.municipio_geocodigo,
+            municipio.nome,
+            hist_alert."data_iniSE",
+            (hist_alert.nivel-1) AS level_alert
+        FROM
+            "Municipio"."Historico_alerta{0}" AS hist_alert
+        """
+
+        if epi_year_week is None:
+            sql += """
+            INNER JOIN (
+                SELECT geocodigo, MAX("data_iniSE") AS "data_iniSE"
+                FROM
+                    "Municipio"."Historico_alerta{0}" AS alerta
+                    INNER JOIN "Dengue_global"."Municipio" AS municipio
+                        ON alerta.municipio_geocodigo = municipio.geocodigo
+                WHERE uf='{1}'
+                GROUP BY geocodigo
+            ) AS recent_alert ON (
+                recent_alert.geocodigo=hist_alert.municipio_geocodigo
+                AND recent_alert."data_iniSE"=hist_alert."data_iniSE"
+            )
+            """
+
+        sql += """
+            INNER JOIN "Dengue_global"."Municipio" AS municipio ON (
+                hist_alert.municipio_geocodigo = municipio.geocodigo
+            )
+        """
+
+        if epi_year_week is not None:
+            sql += (
+                ' WHERE hist_alert."SE" = {}'.format(epi_year_week)
+                + " AND uf='{1}'"
+            )
+
+        sql = sql.format(_disease, state_name)
+
+        with db_engine.connect() as conn:
+            result = conn.execute(sql, "id", parse_dates=True)
+            return pd.DataFrame(result.fetchall())
+
+    @staticmethod
+    def tail_estimated_cases(geo_ids, n=12, db_engine: Engine = DB_ENGINE):
+        """
+        :param geo_ids: list of city geo ids
+        :param n: the last n estimated cases
+        :return: dict
+        """
+
+        if len(geo_ids) < 1:
+            raise Exception("GEO id list should have at least 1 code.")
+
+        sql_template = (
+            """(
+        SELECT
+            municipio_geocodigo, "data_iniSE", casos_est
+        FROM
+            "Municipio".historico_casos
+        WHERE
+            municipio_geocodigo={}
+        ORDER BY
+            "data_iniSE" DESC
+        LIMIT """
+            + str(n)
+            + ")"
+        )
+
+        sql = " UNION ".join([sql_template.format(gid) for gid in geo_ids])
+
+        if len(geo_ids) > 1:
+            sql += ' ORDER BY municipio_geocodigo, "data_iniSE"'
+
+        with db_engine.connect() as conn:
+            result = conn.execute(sql)
+            df_case_series = pd.DataFrame(result.fetchall())
+
+            return {
+                k: v.casos_est.values.tolist()
+                for k, v in df_case_series.groupby(by="municipio_geocodigo")
+            }
 
 
 class Forecast:

@@ -1,0 +1,177 @@
+{% load i18n %}
+<div id="age-chart" class="chart-default"></div>
+<script type="application/javascript">
+var age_chart;
+var age_categories;
+
+function age_click_bar(i) {
+    age_chart.series[0].data[i].select(null, true);
+    age_chart.series[1].data[i].select(null, true);
+    plots_refresh('age');
+}
+
+function _get_ages_selected() {
+    // categories selection
+    var categories_selected = age_chart.getSelectedPoints().map(function(d){
+        return d.name
+    });
+
+    // inverted select
+    categories_selected = age_categories.filter(
+        n => categories_selected.indexOf(n) < 0
+    );
+
+    if (categories_selected.length == 0) {
+        for (j in age_chart.series[0].data) {
+            age_chart.series[0].data[j].select(true, true);
+            age_chart.series[1].data[j].select(true, true);
+        }
+    }
+
+    return categories_selected;
+}
+
+function get_ages_selected() {
+    return '&ages=' + _get_ages_selected().join(',');
+}
+
+function plot_chart_age(data_male, data_female, config) {
+    var _counter_female = new Array(age_categories.length).fill(0);
+    var _counter_male = new Array(age_categories.length).fill(0);
+
+    for (i in data_male) {
+        for (j in age_categories) {
+            if (data_male[i].category == age_categories[j]) {
+                _counter_male[j] = parseInt(data_male[i].casos);
+            }
+        }
+    }
+
+    for (i in data_female) {
+        for (j in age_categories) {
+            if (data_female[i].category == age_categories[j]) {
+                _counter_female[j] = parseInt(data_female[i].casos);
+            }
+        }
+    }
+    // set data
+    age_chart.series[0].setData(_counter_female);
+    age_chart.series[1].setData(_counter_male);
+    // settings
+    age_chart.setTitle(null, { text: config['subtitle']});
+}
+
+$(document).ready(function () {
+    // Create the chart
+    var url = '/api/notif_reduced?chart_type=age_gender' +
+        '&diseases={{disease_label}}' +
+        '&state_abv=' + state_abv;
+
+    $.get(url, function(csv) {
+        age_chart = Highcharts.chart('age-chart', {
+            chart: {
+                type: 'column',
+                spacingBottom: 20,
+                spacingTop: 0,
+                spacingLeft: 0,
+                spacingRight: 0,
+                events: {
+                    load: function(event) {
+                        //When is chart ready?
+                        age_categories = this.series[0].data.map(x => x.name);
+                    }
+                }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    dataLabels: {
+                        enabled: false,
+                        //color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                        style: {
+                            fontWeight: 'bold',
+                        }
+                    },
+                    cursor: 'pointer',
+                    //color: '#dfdfdf',
+                    point: {
+                        events: {
+                            click: function(event){
+                                i = event.point.index;
+                                //this.slice(null);
+                                //this.select(null, true);
+                                age_chart.series[0].data[i].select(null, true);
+                                age_chart.series[1].data[i].select(null, true);
+                                plots_refresh('age');
+                            }
+                        }
+                    }
+                }
+            },
+            title: {
+                text: '{% blocktrans %}Distribuição por Idade{% endblocktrans %}'
+            },
+            subtitle: {
+                text: chart_footer,
+                verticalAlign: 'bottom',
+                floating: true,
+                align: 'center',
+                x: 0,
+                y: 17
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: '{% blocktrans %}Casos{% endblocktrans %}'
+                }
+            },
+            xAxis: {
+                categories: age_categories
+            },
+            legend: {
+                enabled: false
+            },
+            credits: {
+                enabled: false
+            },
+            tooltip: {
+                shared: true,
+                useHTML: true,
+                //headerFormat: '<b>{point.key}</b><br/>',
+                footerFormat: '<small>**{% blocktrans %}Clique na categoria (coluna) para <br/>alterar seleção de filtro.{% endblocktrans %}</small>',
+            },
+            series: [
+                {
+                    //"name": "Mulher (casos)",
+                    //"data": [0, 0, 0, 0, 0, 0, 0, 0],
+                    color: '#E41B17',
+                    states: {
+                        select: {
+                            color: '#dfdfdf',
+                            borderColor: '#ffffff'
+                        }
+                    },
+                }, {
+                    //"name": "Homem (casos)",
+                    //"data": [0, 0, 0, 0, 0, 0, 0, 0],
+                    color: '#112C51',
+                    states: {
+                        select: {
+                            color: '#dfdfdf',
+                            borderColor: '#ffffff'
+                        }
+                    },
+                }
+            ],
+            data: {
+                csv: csv
+            },
+        });
+
+        $('#age-chart .highcharts-xaxis-labels text').on('click', function () {
+            age_click_bar($(this).index());
+        });
+    }); // get
+}); // ready
+
+</script>
