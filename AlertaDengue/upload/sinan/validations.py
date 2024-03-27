@@ -45,7 +45,7 @@ def validade_year(year: int) -> None:
 
 
 def validate_fields(columns: list[str]) -> None:
-    if not all([c in EXPECTED_FIELDS.values() for c in columns]):
+    if not all([c in columns for c in EXPECTED_FIELDS.values()]):
         raise ValidationError(
             "Required field(s): "
             f"{list(set(EXPECTED_FIELDS.values()).difference(set(columns)))} "

@@ -152,7 +152,7 @@ class SINAN(models.Model):
         parse_error: bool = False,
         error_residue: Optional[str] = None,
         uploaded_by: Optional[User] = None,  # pyright: ignore
-        uploaded_at=datetime.now().date
+        uploaded_at=datetime.now().date()
     ):
         file = Path(filepath)
 
@@ -218,52 +218,6 @@ class SINAN(models.Model):
         dir.mkdir(exist_ok=True, parents=True)
         return dir.absolute()
 
-    def parse(self):
-        self.status = Status.CHUNKING
-        self.save()
-
-        fpath = Path(self.filepath)
-
-        try:
-            if fpath.suffix == ".csv":
-                sniffer = csv.Sniffer()
-                with open(self.filepath, "r") as f:
-                    data = f.read(10240)
-                    sep = sniffer.sniff(data).delimiter
-                ...  # TODO:
-            elif fpath.suffix == ".dbf":
-                ...  # TODO:
-            else:
-                raise NotImplementedError(f"Unknown file type {fpath.suffix}")
-
-        except Exception as e:
-            self.status = Status.ERROR
-            self.save()
-
-            chunks_dir = Path(self.chunks_dir)
-
-            for chunk in list(chunks_dir.glob("*.parquet")):
-                chunk.unlink(missing_ok=True)
-
-            raise e
-
-        return self
-
-    def upload(self):
-        if self.status != Status.WAITING_INSERT:
-            raise ValueError("Chunks are not ready to insert")
-
-        self.status = Status.INSERTING
-        self.save()
-
-        try:
-            ...  # TODO
-        except Exception as e:
-            self.status = Status.ERROR
-            self.save()
-
-            raise e
-
 
 def move_file_to_final_destination(
     file_path: str,
@@ -288,10 +242,17 @@ def move_file_to_final_destination(
     if not file.exists():
         raise FileNotFoundError(f"{str(file)} not found")
 
-    dest_filename = "-".join(list(filter(
-        lambda x: x,  # filters out None's
-        [uf, disease, str(geocode), str(notification_year), str(export_date)]
-    ))) + file.suffix.lower()
+    file_specs = [
+        uf,
+        disease.upper(),
+        str(geocode) if geocode else None,
+        str(notification_year),
+        str(export_date)
+    ]
+
+    dest_filename = "-".join(
+        [s for s in file_specs if s is not None]
+    ) + file.suffix.lower()
 
     dest = dest_dir / dest_filename
 

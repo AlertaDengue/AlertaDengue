@@ -1,16 +1,20 @@
+import os
 import csv
 import dask.dataframe as dd
 from pathlib import Path
 from loguru import logger
+import geopandas as gpd
 
 from django.utils.translation import gettext_lazy as _
 from celery import shared_task
 from celery.result import AsyncResult
+from simpledbf import Dbf5
 
 from .models import SINAN, Status
 from .sinan.utils import (
     sinan_drop_duplicates_from_dataframe,
-    sinan_parse_fields
+    sinan_parse_fields,
+    chunk_gen
 )
 
 
@@ -67,8 +71,33 @@ def chunk_csv_file(file_path: str, sep: str) -> list[str]:
 
 
 @shared_task
-def chunk_dbf_file(file_path: str) -> list[str]:
-    ...
+def chunk_dbf_file(file_path: str, chunks_dir: str) -> None:
+    logger.info("Converting DBF file to Parquet chunks")
+
+    dbf = Dbf5(file_path, codec="iso-8859-1")
+    dbf_name = str(dbf.dbf)[:-4]
+
+    if not os.path.exists(chunks_dir):
+        os.mkdir(chunks_dir)
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"{file_path} does not exist")
+
+    for chunk, (lowerbound, upperbound) in enumerate(
+        chunk_gen(1000, dbf.numrec)
+    ):
+        parquet_fname = os.path.join(chunks_dir, f"{dbf_name}-{chunk}.parquet")
+        df = gpd.read_file(
+            file_path,
+            rows=slice(lowerbound, upperbound),
+            ignore_geometry=True,
+            engine="fastparquet"
+        )
+        df.to_parquet(parquet_fname)
+
+    fetch_pq_fname = list(Path(chunks_dir).glob("*.parquet"))
+    if len(fetch_pq_fname) == 0:
+        raise ValueError(f"No Parquet chunks were parsed on {chunks_dir}")
 
 
 @shared_task
@@ -90,6 +119,8 @@ def insert_sinan_chunks_on_database(sinan_pk: str) -> bool:
                 df, sinan.filename  # pyright: ignore
             )
             df = sinan_parse_fields(df, sinan)
+
+            ...  # TODO
 
     except Exception as e:
         logger.error(f"Error reading {sinan.filename} chunks: {str(e)}")

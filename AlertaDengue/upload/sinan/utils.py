@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional, Union, Iterator, Tuple
 from pathlib import Path
 
 import pandas as pd
@@ -360,3 +360,26 @@ def fill_id_agravo(col: str, default_cid: str) -> str:
             return default_cid
     else:
         return col
+
+
+def chunk_gen(chunksize: int, totalsize: int) -> Iterator[Tuple[int, int]]:
+    """
+    Generate chunks.
+    Parameters
+    ----------
+        chunksize (int): Size of each chunk.
+        totalsize (int): Total size of the data.
+    Yields
+    ------
+        Tuple[int, int]: A tuple containing the lowerbound and upperbound 
+        indices of each chunk.
+    """
+    chunks = totalsize // chunksize
+
+    for i in range(chunks):
+        yield i * chunksize, (i + 1) * chunksize
+
+    rest = totalsize % chunksize
+
+    if rest:
+        yield chunks * chunksize, chunks * chunksize + rest
