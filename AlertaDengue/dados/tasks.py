@@ -29,8 +29,7 @@ DATA_DIR = "/opt/services/episcanner"
 
 @app.task
 def episcanner_all_states(
-    year: int,
-    disease: Literal["dengue", "zika", "chik"]
+    year: int, disease: Literal["dengue", "zika", "chik"]
 ):
     """
     Runs EpiScanner for all states for disease & year and exports

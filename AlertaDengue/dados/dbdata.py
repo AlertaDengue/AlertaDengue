@@ -2,8 +2,6 @@
 This module contains functions to interact with the main database of the
 Alertadengue project.
 """
-from sqlalchemy.engine import Engine
-from typing import List, Tuple
 import json
 import logging
 import unicodedata
@@ -17,7 +15,7 @@ import pandas as pd
 from ad_main.settings import APPS_DIR, get_ibis_conn, get_sqla_conn
 from django.conf import settings
 from django.core.cache import cache
-import ibis.expr.datatypes as dt
+from django.utils.text import slugify
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 
@@ -110,11 +108,8 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
         res = (
             table_hist_uf[table_hist_uf.state_abbv == state_abbv]
             .order_by("SE")
+            .execute()
         )
-
-        res = res.mutate(
-            data_iniSE=res.data_iniSE.cast(dt.timestamp)
-        ).execute()
 
         cache.set(
             cache_name,
@@ -401,9 +396,8 @@ def get_city_name_by_id(geocode: int, db_engine: Engine) -> str:
 '''
 
 
-'''
 def get_all_active_cities_state(
-    db_engine: Engine,
+    db_engine: Engine = DB_ENGINE,
 ) -> List[Tuple[str, str, str, str]]:
     """
     Fetches a list of names of active cities from the database.
@@ -450,8 +444,6 @@ def get_all_active_cities_state(
             )
     return res
 
-'''
-
 
 def get_last_alert(geo_id, disease, db_engine: Engine = DB_ENGINE):
     """
@@ -477,14 +469,13 @@ def get_last_alert(geo_id, disease, db_engine: Engine = DB_ENGINE):
     sql = f"""
     SELECT nivel
     FROM "Municipio"."{table_name}"
-    WHERE municipio_geocodigo={geo_id}
+    WHERE municipio_geocodigo="{geo_id}"
     ORDER BY "data_iniSE" DESC
     LIMIT 1
     """
 
     with db_engine.connect() as conn:
-        data = conn.execute(sql).fetchall()
-        return pd.DataFrame(data)
+        return pd.read_sql_query(sql, conn)
 
 
 def load_series(
@@ -743,6 +734,126 @@ class NotificationResume:
             )
             return 0
 
+    @staticmethod
+    def get_cities_alert_by_state(
+        state_name,
+        disease="dengue",
+        db_engine: Engine = DB_ENGINE,
+        epi_year_week: int = None,
+    ):
+        """
+        Retorna vários indicadores de alerta a nível da cidade.
+        :param state_name: State name
+        :param disease: dengue|chikungunya|zika
+        :param epi_year_week: int
+        :return: DataFrame
+        """
+        _disease = get_disease_suffix(disease)
+
+        cache_key = (
+            f"cities_alert_{slugify(state_name, allow_unicode=True)}_{disease}"
+        )
+        cities_alert = cache.get(cache_key)
+
+        if cities_alert is not None:
+            logger.info("Cache found for key: %s", cache_key)
+            return cities_alert
+
+        logger.info("Cache NOT found for key: %s", cache_key)
+
+        sql = """
+        SELECT
+            hist_alert.id,
+            hist_alert.municipio_geocodigo,
+            municipio.nome,
+            hist_alert."data_iniSE",
+            (hist_alert.nivel-1) AS level_alert
+        FROM
+            "Municipio"."Historico_alerta{0}" AS hist_alert
+        """
+
+        if epi_year_week is None:
+            sql += """
+            INNER JOIN (
+                SELECT geocodigo, MAX("data_iniSE") AS "data_iniSE"
+                FROM
+                    "Municipio"."Historico_alerta{0}" AS alerta
+                    INNER JOIN "Dengue_global"."Municipio" AS municipio
+                        ON alerta.municipio_geocodigo = municipio.geocodigo
+                WHERE uf='{1}'
+                GROUP BY geocodigo
+            ) AS recent_alert ON (
+                recent_alert.geocodigo=hist_alert.municipio_geocodigo
+                AND recent_alert."data_iniSE"=hist_alert."data_iniSE"
+            )
+            """
+
+        sql += """
+            INNER JOIN "Dengue_global"."Municipio" AS municipio ON (
+                hist_alert.municipio_geocodigo = municipio.geocodigo
+            )
+        """
+
+        if epi_year_week is not None:
+            sql += (
+                ' WHERE hist_alert."SE" = {}'.format(epi_year_week)
+                + " AND uf='{1}'"
+            )
+
+        sql = sql.format(_disease, state_name)
+
+        # with DB_ENGINE.connect() as conn:
+        #     cities_alert = pd.read_sql_query(sql, conn, "id", parse_dates=True)
+
+        with db_engine.connect() as conn:
+            result = conn.execute(sql, "id", parse_dates=True)
+            cities_alert = pd.DataFrame(result.fetchall())
+
+        cache.set(cache_key, cities_alert, settings.QUERY_CACHE_TIMEOUT)
+        logger.info("Cache set for key: %s", cache_key)
+
+        return cities_alert
+
+    @staticmethod
+    def tail_estimated_cases(geo_ids, n=12, db_engine: Engine = DB_ENGINE):
+        """
+        :param geo_ids: list of city geo ids
+        :param n: the last n estimated cases
+        :return: dict
+        """
+
+        if len(geo_ids) < 1:
+            raise Exception("GEO id list should have at least 1 code.")
+
+        sql_template = (
+            """(
+        SELECT
+            municipio_geocodigo, "data_iniSE", casos_est
+        FROM
+            "Municipio".historico_casos
+        WHERE
+            municipio_geocodigo={}
+        ORDER BY
+            "data_iniSE" DESC
+        LIMIT """
+            + str(n)
+            + ")"
+        )
+
+        sql = " UNION ".join([sql_template.format(gid) for gid in geo_ids])
+
+        if len(geo_ids) > 1:
+            sql += ' ORDER BY municipio_geocodigo, "data_iniSE"'
+
+        with db_engine.connect() as conn:
+            result = conn.execute(sql)
+            df_case_series = pd.DataFrame(result.fetchall())
+
+            return {
+                k: v.casos_est.values.tolist()
+                for k, v in df_case_series.groupby(by="municipio_geocodigo")
+            }
+
 
 class Forecast:
     @staticmethod
@@ -839,10 +950,10 @@ class Forecast:
         sql = """
         SELECT
             (CASE
-             WHEN tb_cases."data_iniSE" IS NOT Null
+             WHEN tb_cases."data_iniSE" IS NOT NULL
                THEN tb_cases."data_iniSE"
              %(forecast_date_ini_epiweek)s
-             ELSE Null
+             ELSE NULL
              END
             ) AS "data_iniSE",
             tb_cases.casos_est_min,
@@ -851,9 +962,9 @@ class Forecast:
             tb_cases.casos,
             tb_cases.nivel,
             (CASE
-             WHEN tb_cases."SE" IS NOT Null THEN tb_cases."SE"
+             WHEN tb_cases."SE" IS NOT NULL THEN tb_cases."SE"
              %(forecast_epiweek)s
-             ELSE Null
+             ELSE NULL
              END
             ) AS "SE",
             tb_cases.p_rt1
@@ -919,7 +1030,7 @@ class Forecast:
             # forecast date ini selection
             forecast_date_ini_epiweek += (
                 """
-            WHEN forecast%(model_id)s.init_date_epiweek IS NOT Null
+            WHEN forecast%(model_id)s.init_date_epiweek IS NOT NULL
                THEN forecast%(model_id)s.init_date_epiweek
             """
                 % forecast_config
@@ -928,7 +1039,7 @@ class Forecast:
             # forecast epiweek selection
             forecast_epiweek += (
                 """
-            WHEN forecast%(model_id)s.epiweek IS NOT Null
+            WHEN forecast%(model_id)s.epiweek IS NOT NULL
                THEN forecast%(model_id)s.epiweek
             """
                 % forecast_config

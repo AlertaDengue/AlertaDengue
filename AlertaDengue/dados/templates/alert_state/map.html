@@ -1,0 +1,288 @@
+{% load i18n %}
+{% load leaflet_tags %}
+{% load lookup %}
+{% load static %}
+
+{% leaflet_map "main" callback="main_map_init" %}
+
+<script type="text/javascript">
+    function isInArray(el, array) {
+        return (array.indexOf(el) >= 0) ? true : false;
+    }
+    var _filter_city;
+
+    var mun_dict = {{ mun_dict|safe }};
+    var alerta = {{ alerts_level|safe }};
+    var case_series = {{ case_series|safe }};
+    var recomendacoes;
+
+    var municipios = L.featureGroup();
+    var geo_ids = {{ geo_ids }};
+
+    var features = L.layerGroup();
+    var info = L.control();
+    var legend = L.control({position: 'bottomright'});
+    var alertLevels = [
+        {name: '{% blocktrans %}Baixo Risco{% endblocktrans %}', color: '#0D6B0D'},
+        {name: '{% blocktrans %}Atenção{% endblocktrans %}', color: '#C8D20F'},
+        {name: '{% blocktrans %}Transmissão{% endblocktrans %}', color: '#E45205'},
+        {name: '{% blocktrans %}Epidemia{% endblocktrans %}', color: '#FF0205'},
+    ];
+
+    $('.totalsparkline').sparkline('html', {
+        type: 'bar',
+        width: "auto",
+        heigth: "auto",
+        barWidth: "15px",
+        barColor: "White",
+        tooltipSuffix: " casos"
+    });
+
+    function get_cities_selected() {
+        _filter_city = [];
+        $('#cities option:selected').each(function(){
+            _filter_city.push(parseInt(this.value));
+        });
+
+        if (_filter_city.length == 0) {
+            return '';
+        }
+
+        return '&cities=' + _filter_city.join(',');
+    }
+
+    function select_switch(feature) {
+        var geo_id = feature.properties.geocodigo;
+        var result;
+
+        get_cities_selected();
+
+        if (_filter_city.indexOf(geo_id) >= 0) {
+            $('#cities option[value=' + geo_id + ']').removeAttr('selected');
+            result = {
+                weight: 1,
+                fillOpacity: 0.2,
+            };
+        } else {
+            $('#cities option[value=' + geo_id + ']').prop('selected', true);
+            result = {
+                weight: 2,
+                fillOpacity: 0.9,
+            };
+        }
+
+        $('#cities').selectpicker('refresh');
+
+        _filter_city = [];
+        get_cities_selected();
+
+        return result;
+    }
+
+    function style(feature) {
+        var i = +feature.properties.alerta || 0;
+        return {
+            weight: 1,
+            opacity: 0.9,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.9,
+            fillColor: alertLevels[i].color
+        };
+    }
+
+    function selected_style(feature) {
+        var i = +feature.properties.alerta || 0;
+        return {
+            weight: 2,
+            opacity: 0.9,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.9,
+            fillColor: alertLevels[i].color
+        };
+    }
+
+    function highlightFeature(e) {
+        var layer = e.target;
+        /*
+        layer.setStyle({
+            weight: 5,
+            color: '#666',
+            dashArray: '',
+            fillOpacity: 0.7
+        });*/
+        if (!L.Browser.ie && !L.Browser.opera) {
+            layer.bringToFront();
+        }
+        info.update(layer.feature.properties);
+
+        renderSparkline(e);
+
+        layer.bringToBack()
+    }
+
+    function resetHighlight(e) {
+        //geojson.resetStyle(e.target);
+        info.update();
+    }
+
+    function renderSparkline(e) {
+        $('.inlinesparkline').sparkline('html', {
+            type: 'bar',
+            width: "14em",
+            heigth: "5em",
+            barWidth: "9em",
+            tooltipSuffix: " casos"
+        });
+    }
+
+    function main_map_init(map, options) {
+        $(document).data('map', map);
+
+        map.setView(
+            new L.latLng(
+                {{map_center|lookup:0|safe}}, {{map_center|lookup:1|safe}}
+            ), {{map_zoom}}
+        );
+
+        //map._layersMaxZoom=13
+        recomendacoes = {
+            0: "Hora de arrumar o quintal, cobrir caixas d'água, <a " +
+               "href='http://www.riocontradengue.rj.gov.br/Site/Conteudo" +
+               "/Eliminar.aspx'>Não deixe criadouros para o mosquito!</a>",
+            1: 'Uma vez por semana, aplique os <a href="http://www.' +
+               'riocontradengue.com.br/Site/Conteudo/Checklist.aspx">' +
+               '“10 minutos Contra a dengue”!</a>',
+            2: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site' +
+               '/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!' +
+               '</a> Procure um médico caso suspeite de dengue.',
+            3: 'Fique <a href="http://www.riocontradengue.rj.gov.br/Site' +
+               '/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!' +
+               '</a> Procure um médico caso suspeite de dengue.'
+        };
+
+        // control that shows state info on hover
+
+        info.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'info');
+            this.update();
+            return this._div;
+        };
+
+        info.update = function (props) {
+            this._div.innerHTML = '' +
+                '<h6>{% blocktrans %}Total de casos de arboviroses na semana{% endblocktrans %}:</h6>' +
+                (props ?
+                 '<b>'+ props.nome + ':' + props.casos + '</b><br />' :
+                 '{% blocktrans %}Passe o mouse sobre o mapa{% endblocktrans %}');
+        };
+
+        info.addTo(map);
+
+        legend.onAdd = function () {
+            var div = L.DomUtil.create('div', 'info legend'),
+                    labels = alertLevels.map(function (alertLevel) {
+                        return '<i style="background:' + alertLevel.color +
+                            ';"></i> ' + alertLevel.name;
+                    }).reverse();
+            labels.push('O: {% blocktrans %}Unidades de Saúde{% endblocktrans %}');
+            div.innerHTML = labels.join('<br/>');
+            return div;
+        };
+
+        legend.addTo(map);
+
+        function fill_details(feature, layer){
+            geo_id = parseInt(feature.properties.geocodigo);
+
+            feature.properties.alerta = alerta[geo_id];
+
+            if (Object.keys(case_series).length > 0) {
+                feature.properties.series = case_series[geo_id];
+                feature.properties.casos = (
+                    case_series[geo_id][case_series[geo_id].length -1]
+                );
+            } else {
+                feature.properties.series = [];
+                feature.properties.casos = null;
+            }
+
+            /*layer.bindPopup(
+                "<b>" + mun_dict[geo_id] + "</b>" + "<br>" +
+                "{% blocktrans %}Casos estimados{% endblocktrans %}: " + feature.properties.casos +
+                "<br>{% blocktrans %}Últimas semanas{% endblocktrans %}: <span class='inlinesparkline'>" +
+                feature.properties.series + "</span><br>" +
+                "<br>" +
+                "<a href=/alerta/" + geo_id.toString() +
+                "/><u>{% blocktrans %}Mais detalhes{% endblocktrans %}</u></a>"
+            );*/
+
+            layer.setStyle(selected_style(feature))
+            layer.on({
+                mouseover: highlightFeature,
+                mouseout: resetHighlight,
+                //popupopen: renderSparkline,
+                click: function(){
+                    layer.setStyle(select_switch(feature));
+                    plots_refresh();
+                }
+            });
+        };
+
+        for (var i=0; i < geo_ids.length; i++){
+            var gc = geo_ids[i];
+            $.getJSON('{% static "/geojson_simplified/" %}' + gc.toString() + '.json', function(data){
+                geojson = L.geoJson(
+                    data, {style: selected_style, onEachFeature: fill_details}
+                );
+                municipios.addLayer(geojson, true);
+            });
+        };
+
+        municipios.addTo(map);
+
+        var overlayMaps = {
+            'Municípios': municipios
+        };
+
+        var controls = L.control.layers(null, overlayMaps, {collapsed: true});
+
+        controls.addTo(map);
+
+        map.touchZoom.disable();
+        map.doubleClickZoom.disable();
+        map.boxZoom.disable();
+        map.keyboard.disable();
+        map.touchZoom.disable();
+        map.doubleClickZoom.disable();
+
+    }
+
+    function apply_cities_selection() {
+        _filter_city = [];
+        $('#cities option:selected').each(function(){
+            _filter_city.push(parseInt(this.value));
+        });
+
+        municipios.eachLayer(function (layer) {
+            for (i in layer._layers) {
+                features = layer._layers[i].feature;
+
+                if (_filter_city.indexOf(features.properties.geocodigo) >= 0) {
+                    layer._layers[i].setStyle({
+                        weight: 2,
+                        fillOpacity: 0.9,
+                    });
+                } else {
+                    layer._layers[i].setStyle({
+                        weight: 1,
+                        fillOpacity: 0.2,
+                    });
+                }
+          }
+        });
+
+        plots_refresh();
+    }
+</script>
