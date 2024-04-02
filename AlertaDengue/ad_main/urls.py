@@ -15,4 +15,5 @@ urlpatterns = [
     re_path(r"^admin/doc/", include("django.contrib.admindocs.urls")),
     re_path(r"^dbf/", include("dbf.urls")),
     re_path(r"^api/", include("api.urls")),
+    re_path(r"^upload/", include("upload.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

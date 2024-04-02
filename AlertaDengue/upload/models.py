@@ -18,8 +18,6 @@ from upload.sinan.validations import (
     validate_file_exists,
     validade_file_type,
     validade_year,
-    validate_residue_file_exists,
-    validate_residue_file_name,
     validate_fields,
 )
 
@@ -67,12 +65,12 @@ class Diseases(models.TextChoices):
 class Status(models.TextChoices):
     WAITING_CHUNK = "waiting_chunk", _("Aguardando chunk")  # pyright: ignore
     CHUNKING = "chunking", _("Processando chunks")  # pyright: ignore
-    WAITING_INSERT = "waiting_insert", _(
-        "Aguardando inserção"
-    )  # pyright: ignore
     INSERTING = "inserting", _("Inserindo dados")  # pyright: ignore
     ERROR = "error", _("Erro")  # pyright: ignore
     FINISHED = "finished", _("Finalizado")  # pyright: ignore
+    FINISHED_MISPARSED = "finished_misparsed", _(
+        "Finalizado com erro"
+    )  # pyright: ignore
 
 
 class SINAN(models.Model):
@@ -115,23 +113,29 @@ class SINAN(models.Model):
         default=Status.WAITING_CHUNK,
         help_text=_("Upload status of the file")
     )
+    status_error = models.TextField(
+        null=True,
+        blank=False,
+        help_text=_(
+            "If Status ERROR, the traceback will be stored in status_error"
+        )
+    )
     parse_error = models.BooleanField(
         null=False,
         default=False,
         help_text=_(
             "An parse error ocurred when reading data, "
-            "moved errored rows to `error_residue` file. "
+            "moved errored rows to `misparsed_file` file. "
             "This error doesn't change the status to ERROR"
         ))
-    error_residue = models.FileField(
+    misparsed_file = models.FileField(
         null=True,
         default=None,
         help_text=_(
             "Absolute CSV file path containing failed rows from data parsing, "
             "before being uploaded to database. The filename format format is "
-            "RESIDUE_{filename} and it requires further human verification"
+            "MISPARSED_{filename} and it requires further human verification"
         ),
-        validators=[validate_residue_file_name, validate_residue_file_exists]
     )
     uploaded_by = models.ForeignKey(
         "auth.User",
@@ -149,47 +153,66 @@ class SINAN(models.Model):
         uf: UFs = UFs.BR,
         municipio: Optional[int] = None,
         status: Status = Status.WAITING_CHUNK,
+        status_error: Optional[str] = None,
         parse_error: bool = False,
-        error_residue: Optional[str] = None,
+        misparsed_file: Optional[str] = None,
         uploaded_by: Optional[User] = None,  # pyright: ignore
         uploaded_at=datetime.now().date()
     ):
         file = Path(filepath)
 
         if not file.is_absolute():
-            raise ValidationError("File path must be absolute")
+            status = Status.ERROR
+            status_error = "File path must be absolute"
 
-        file = Path(move_file_to_final_destination(
-            file_path=str(file.absolute()),
-            disease=disease,
-            uf=uf,
-            notification_year=notification_year,
-            export_date=uploaded_at,
-            geocode=municipio,
-        ))
+        try:
+            file = Path(move_file_to_final_destination(
+                file_path=str(file.absolute()),
+                disease=disease,
+                uf=uf,
+                notification_year=notification_year,
+                export_date=uploaded_at,
+                geocode=municipio,
+            ))
+        except Exception as e:
+            status = Status.ERROR
+            status_error = f"File could not be moved: {e}"
 
-        if file.suffix == ".csv":
-            sniffer = csv.Sniffer()
+        columns: list = []
+        try:
+            if file.suffix == ".csv":
+                sniffer = csv.Sniffer()
 
-            with open(file.absolute(), "r", newline='') as f:
-                data = f.read(10240)
-                sep = sniffer.sniff(data).delimiter
+                with open(file.absolute(), "r", newline='') as f:
+                    data = f.read(10240)
+                    sep = sniffer.sniff(data).delimiter
 
-            columns = pd.read_csv(
-                file.absolute(),
-                index_col=0,
-                nrows=0,
-                sep=sep
-            ).columns.to_list()
+                columns = pd.read_csv(
+                    file.absolute(),
+                    index_col=0,
+                    nrows=0,
+                    sep=sep
+                ).columns.to_list()
 
-        elif file.suffix == ".dbf":
-            dbf = Dbf5(file.absolute(), codec="iso-8859-1")
-            columns = [col[0] for col in dbf.fields]
+            elif file.suffix == ".dbf":
+                dbf = Dbf5(file.absolute(), codec="iso-8859-1")
+                columns = [col[0] for col in dbf.fields]
 
-        else:
-            raise NotImplementedError(f"Unknown file type {file.suffix}")
+            elif file.suffix == ".parquet":
+                raise NotImplementedError("TODO")  # TODO
 
-        validate_fields(columns)
+            else:
+                raise NotImplementedError(f"Unknown file type {file.suffix}")
+
+        except Exception as e:
+            status = Status.ERROR
+            status_error = f"Data fields could not be extracted: {e}"
+
+        try:
+            validate_fields(columns)
+        except Exception as e:
+            status = Status.ERROR
+            status_error = f"Invalid data field(s) error: {e}"
 
         sinan = cls(
             filename=file.name,
@@ -199,8 +222,9 @@ class SINAN(models.Model):
             uf=uf,
             municipio=municipio,
             status=status,
+            status_error=status_error,
             parse_error=parse_error,
-            error_residue=error_residue,
+            misparsed_file=misparsed_file,
             uploaded_by=uploaded_by,
             uploaded_at=uploaded_at
         )
@@ -225,12 +249,14 @@ def move_file_to_final_destination(
     uf: str,
     notification_year: int,
     export_date: date,
+    dest_dir: Optional[Path] = Path(settings.DBF_SINAN) / "imported",
     geocode: Optional[int] = None,
 ) -> str:
     if not settings.DBF_SINAN:
         raise NotADirectoryError("DBF_SINAN directory is None")
 
-    dest_dir = Path(settings.DBF_SINAN) / "imported"
+    if not dest_dir or not dest_dir.exists():
+        raise NotADirectoryError("dest_dir must be specified")
 
     dest_dir.mkdir(exist_ok=True, parents=True)
 

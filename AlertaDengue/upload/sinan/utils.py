@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 import numpy as np
+from dask import dataframe as dd
 from loguru import logger
 from django.utils.translation import gettext_lazy as _
 
@@ -141,6 +142,7 @@ def sinan_parse_fields(df: pd.DataFrame, sinan_obj) -> pd.DataFrame:
     """
     if "ID_MUNICIP" in df.columns:
         df = df.dropna(subset=["ID_MUNICIP"])
+
     elif "ID_MN_RESI" in df.columns:
         df = df.dropna(subset=["ID_MN_RESI"])
         df["ID_MUNICIP"] = df.ID_MN_RESI

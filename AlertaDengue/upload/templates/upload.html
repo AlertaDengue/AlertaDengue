@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5"> <h1>Upload Files</h1>
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3">
+      <label for="files" class="form-label">Select Files</label>
+      <input type="file" class="form-control" id="files" name="files" multiple>
+      <div class="form-text">You can select multiple files.</div>
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+  </form>
+  {% if messages %}
+    <ul class="list-group mt-3">
+      {% for message in messages %}
+        <li class="list-group-item {{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>
+{% endblock %}

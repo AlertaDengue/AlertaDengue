@@ -1,14 +1,18 @@
 import os
 import csv
-import dask.dataframe as dd
 from pathlib import Path
-from loguru import logger
-import geopandas as gpd
+from django.core.mail import send_mail
 
-from django.utils.translation import gettext_lazy as _
+import pandas as pd
+import geopandas as gpd
+import dask.dataframe as dd
+from loguru import logger
 from celery import shared_task
 from celery.result import AsyncResult
 from simpledbf import Dbf5
+
+from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 
 from .models import SINAN, Status
 from .sinan.utils import (
@@ -27,41 +31,52 @@ def process_sinan_file(sinan_pk: str) -> bool:
 
     fpath = Path(sinan.filepath)
 
-    if fpath.suffix == ".csv":
-        sniffer = csv.Sniffer()
+    try:
+        if fpath.suffix == ".csv":
+            sniffer = csv.Sniffer()
 
-        with open(fpath, "r") as f:
-            data = f.read(10240)
-            sep = sniffer.sniff(data).delimiter
+            with open(fpath, "r") as f:
+                data = f.read(10240)
+                sep = sniffer.sniff(data).delimiter
 
-        result: AsyncResult = chunk_csv_file.delay(  # pyright: ignore
-            str(fpath), sep=sep
-        )
+            result: AsyncResult = chunk_csv_file.delay(  # pyright: ignore
+                str(fpath), sep=sep
+            )
 
-    elif fpath.suffix == ".dbf":
-        result: AsyncResult = chunk_dbf_file.delay(  # pyright: ignore
-            str(fpath)
-        )
+        elif fpath.suffix == ".dbf":
+            result: AsyncResult = chunk_dbf_file.delay(  # pyright: ignore
+                str(fpath)
+            )
 
-    else:
-        raise NotImplementedError(f"Unknown file type {fpath.suffix}")
+        else:
+            raise NotImplementedError(f"Unknown file type {fpath.suffix}")
+
+    except Exception as e:
+        sinan.status = Status.ERROR
+        sinan.status_error = f"Error chunking file: {e}"
+        sinan.save()
+        return False
 
     chunks = result.get(follow_parents=True)
 
     if chunks:
         logger.debug(f"Parsed {len(chunks)} chunks for {sinan.filename}")
-        inserted: AsyncResult = insert_sinan_chunk_on_database.delay(  # pyright: ignore
-            sinan_pk
+        inserted: AsyncResult = (
+            insert_sinan_chunks_on_database
+            .delay(sinan_pk)  # pyright: ignore
         )
 
         if not inserted.get(follow_parents=True):
             error_msg = f"Chunks insert task for {sinan.filename} failed"
             logger.error(error_msg)
-            raise InterruptedError(error_msg)
+            return False
 
         return True
 
     logger.error(f"No chunks parsed for {sinan.filename}")
+    sinan.status = Status.ERROR
+    sinan.status_error = f"No chunks were parsed"
+    sinan.save()
     return False
 
 
@@ -94,42 +109,61 @@ def chunk_dbf_file(file_path: str, chunks_dir: str) -> None:
             engine="fastparquet"
         )
         df.to_parquet(parquet_fname)
-
-    fetch_pq_fname = list(Path(chunks_dir).glob("*.parquet"))
-    if len(fetch_pq_fname) == 0:
-        raise ValueError(f"No Parquet chunks were parsed on {chunks_dir}")
+        logger.info(f"Chunk {parquet_fname} parsed for {dbf_name}")
 
 
 @shared_task
 def insert_sinan_chunks_on_database(sinan_pk: str) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 
-    logger.debug(f"Inserting {sinan.filename} to database")
+    misparsed_csv_file = (
+        Path(str(settings.DBF_SINAN)) / "residue_csvs" /
+        f"RESIDUE_{Path(sinan.filename).with_suffix('.csv')}"
+    )
+
+    misparsed_csv_file.touch()
+
+    sinan.misparsed_file = str(misparsed_csv_file.absolute())
     sinan.status = Status.INSERTING
     sinan.save()
 
     chunks_list = [chunk for chunk in Path(sinan.chunks_dir).glob("*.parquet")]
 
-    try:
-        for chunk in chunks_list:
-            df = dd.read_parquet(  # pyright: ignore
-                str(chunk.absolute()), engine="fastparquet"
-            )
-            df = sinan_drop_duplicates_from_dataframe(
-                df, sinan.filename  # pyright: ignore
-            )
-            df = sinan_parse_fields(df, sinan)
+    columns = []
 
-            ...  # TODO
+    for chunk in chunks_list:
+        try:
+            df: dd = dd.read_parquet(  # pyright: ignore
+                str(chunk.absolute()),
+                engine="fastparquet"
+            )
+        except Exception as e:
+            misparsed_csv_file.unlink(missing_ok=True)
+            sinan.status = Status.ERROR
+            sinan.misparsed_file = None
+            sinan.status_error = f"Error reading chunks: {e}"
+            sinan.save()
+            return False
 
-    except Exception as e:
-        logger.error(f"Error reading {sinan.filename} chunks: {str(e)}")
-        sinan.status = Status.ERROR
+        columns = list(df.columns)  # pyright: ignore
+
+        df = sinan_drop_duplicates_from_dataframe(
+            df,  # pyright: ignore
+            sinan.filename
+        )
+        df = sinan_parse_fields(
+            df,  # pyright: ignore
+            sinan
+        )
+
+    pd.DataFrame(columns=columns).to_csv(misparsed_csv_file, index=False)
+
+    if sinan.status == Status.FINISHED_MISPARSED:
+        # send_mail() # TODO: send mail with link to misparsed csv file
+        ...
+    else:
+        misparsed_csv_file.unlink(missing_ok=True)
+        sinan.misparsed_file = None
         sinan.save()
-
-        for chunk in chunks_list:
-            chunk.unlink(missing_ok=True)
-
-        raise e
 
     return True
