@@ -148,81 +148,97 @@ def sinan_parse_fields(df: pd.DataFrame, sinan_obj) -> pd.DataFrame:
         df["ID_MUNICIP"] = df.ID_MN_RESI
         del df["ID_MN_RESI"]
 
-    for col in filter(lambda x: x in EXPECTED_DATE_FIELDS, df.columns):
-        df[col] = df[col].apply(
-            lambda row: sinan_parse_date_field(row, sinan_obj)
-        )
-        df = df.dropna(subset=[col])
-
-    df["NU_NOTIFIC"] = df["NU_NOTIFIC"].apply(fix_nu_notif)
-    df["ID_MUNICIP"] = df["ID_MUNICIP"].apply(add_dv)
-
     df["CS_SEXO"] = np.where(
         df["CS_SEXO"].isin(["M", "F"]), df["CS_SEXO"], "I"
     ).astype(str)
 
-    df["RESUL_PCR_"] = (
-        convert_data_types(df["RESUL_PCR_"], int)  # pyright: ignore
-        if "RESUL_PCR_" in df.columns
-        else 0
-    )
-    df["CRITERIO"] = (
-        convert_data_types(df["CRITERIO"], int)  # pyright: ignore
-        if "CRITERIO" in df.columns
-        else 0
-    )
-    df["CLASSI_FIN"] = (
-        convert_data_types(df["CLASSI_FIN"], int)  # pyright: ignore
-        if "CLASSI_FIN" in df.columns
-        else 0
-    )
+    valid_rows: list[pd.Series] = []
+    misparsed_rows: list[pd.Series] | list = []
 
-    df["ID_AGRAVO"] = df["ID_AGRAVO"].apply(
-        lambda x: fill_id_agravo(x, DISEASE_CID[sinan_obj.disease])
-    )
+    for _, row in df.iterrows():
+        try:
+            valid_rows.append(sinan_parse_row(row, sinan_obj))
+        except:
+            misparsed_rows.append(row)
 
-    df["SEM_PRI"] = df["SEM_PRI"].apply(
-        lambda x: str(x)[-2:] if x else x
-    )
+    df = pd.DataFrame(valid_rows, columns=df.columns)
+    df = df.reset_index(drop=True)
 
-    df["NU_ANO"] = df["NU_ANO"].apply(
-        lambda x: sinan_obj.notification_year if pd.isnull(x) else int(x)
-    )
+    misparsed_df = pd.DataFrame(misparsed_rows, columns=df.columns)
 
-    df["SEM_NOT"] = df["SEM_NOT"].apply(lambda x: int(str(int(x))[-2:]))
+    if not misparsed_df.empty:
+        sinan_obj.parse_error = True
+
+        logger.warning(
+            f"Parsing residues found for {sinan_obj.filename}, please check "
+            f"{sinan_obj.misparsed_file} manually."
+        )
+
+        misparsed_df.to_csv(
+            sinan_obj.misparsed_file,
+            index=False,
+            mode="a",
+        )
 
     return df
+
+
+def sinan_parse_row(row: pd.Series, sinan_obj) -> pd.Series:
+    for col in EXPECTED_DATE_FIELDS:
+        row[col] = pd.to_datetime(row[col])
+
+    row["NU_NOTIFIC"] = map(fix_nu_notif, row["NU_NOTIFIC"])
+    row["ID_MUNICIP"] = map(add_dv, row["ID_MUNICIP"])
+
+    for col in ["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"]:
+        try:
+            row[col] = pd.to_numeric(row[col])
+        except ValueError:
+            row[col] = 0
+
+    if row["ID_AGRAVO"] not in list(DISEASE_CID.values()):
+        row["ID_AGRAVO"] = DISEASE_CID[sinan_obj.disease]
+
+    if row["SEM_PRI"] != None:
+        row["SEM_PRI"] = str(row["SEM_PRI"])[-2:]
+
+    if row["NU_ANO"] in [None, np.nan, "", 0]:
+        row["NU_ANO"] = sinan_obj.notification_year
+    else:
+        row["NU_ANO"] = int(row["NU_ANO"])
+
+    row["SEM_NOT"] = int(str(int(row["SEM_NOT"]))[-2:])
+
+    return row
 
 
 def sinan_parse_date_field(value, sinan_obj) -> Optional[pd.Timestamp]:
     try:
         value = pd.to_datetime(value)
-    except pd.errors.OutOfBoundsDatetime:
+        return value
+    except Exception as e:
         sinan_obj.parse_error = True
-
-        residue_csv_file = (
-            residue_sinan_dir /
-            f"RESIDUE_{Path(sinan_obj.filename).with_suffix('.csv')}"
-        )
 
         logger.warning(
             f"Parsing residues found for {sinan_obj.filename}, please check "
-            f"{residue_csv_file} manually"
+            f"{sinan_obj.misparsed_file} manually. Error: {e}"
         )
 
-        with open(str(residue_csv_file.absolute()), "a") as f:
-            value.to_csv(
-                f,
-                index=False,
-                mode="a",
-                header=(not f.tell())
+        try:
+            with open(sinan_obj.misparsed_file, "a") as f:
+                value.to_csv(
+                    f,
+                    index=False,
+                    mode="a",
+                    header=(not f.tell())
+                )
+        except Exception as e:
+            logger.error(
+                "Error exporting misparsed residue to "
+                f"{sinan_obj.misparsed_file}: {e}"
             )
-
-        sinan_obj.error_residue = str(residue_csv_file)
         sinan_obj.save()
-        return None
-
-    return value
+    return None
 
 
 def fix_nu_notif(value: Union[str, None]) -> Optional[int]:
@@ -295,73 +311,15 @@ def add_dv(geocode: str) -> int:
         geocode: geocode 7 digit.
     """
 
+    if "." in str(geocode):
+        geocode = str(int(float(geocode)))
+
     if len(str(geocode)) == 7:
         return int(geocode)
     elif len(str(geocode)) == 6:
         return int(str(geocode) + str(calculate_digit(geocode)))
 
     raise ValueError(_(f"geocode:{geocode} does not match!"))
-
-
-def convert_data_types(col: pd.Series, dtype: type) -> pd.Series:
-    """
-    Convert the data type of the given pandas Series to the specified dtype,
-    handling missing values appropriately.
-
-    Parameters
-    ----------
-    col : pd.Series
-        The pandas Series to convert.
-    dtype : type
-        The target data type to convert the Series to. Supported types are `int`, `float`, and `str`.
-
-    Returns
-    -------
-    pd.Series
-        The converted Series with the specified data type.
-    """
-    if dtype == int:
-        # Convert to numeric first to handle strings that represent numbers,
-        # NaNs will become float
-        col = pd.to_numeric(
-            col, errors="coerce"
-        ).fillna(0).astype(int)  # pyright: ignore
-    elif dtype == float:
-        col = pd.to_numeric(
-            col, errors="coerce"
-        ).fillna(0.0)  # pyright: ignore
-    elif dtype == str:
-        col = col.fillna("").astype(str)
-    else:
-        raise ValueError(_(f"Unsupported dtype: {dtype}"))
-
-    return col
-
-
-def fill_id_agravo(col: str, default_cid: str) -> str:
-    """
-    Fills missing values in col with default_cid.
-    Parameters
-    ----------
-        col (np.ndarray): A numpy array with missing values.
-        default_cid (str): A default value to fill in the missing values.
-    Returns
-    -------
-        str: String with missing values filled using default_cid.
-    """
-
-    if col is None:
-        if default_cid is None:
-            raise ValueError(
-                _(
-                    "Existem nesse arquivo notificações que não incluem "
-                    "a coluna ID_AGRAVO."
-                )
-            )
-        else:
-            return default_cid
-    else:
-        return col
 
 
 def chunk_gen(chunksize: int, totalsize: int) -> Iterator[Tuple[int, int]]:

@@ -3,7 +3,7 @@ from django.views import View
 from django.contrib import messages
 
 
-class Upload(View):
+class UploadSINAN(View):
     template_name = "upload.html"
 
     def get(self, request):

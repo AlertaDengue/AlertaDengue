@@ -62,7 +62,7 @@ def process_sinan_file(sinan_pk: str) -> bool:
     if chunks:
         logger.debug(f"Parsed {len(chunks)} chunks for {sinan.filename}")
         inserted: AsyncResult = (
-            insert_sinan_chunks_on_database
+            parse_insert_chunks_on_database
             .delay(sinan_pk)  # pyright: ignore
         )
 
@@ -113,7 +113,7 @@ def chunk_dbf_file(file_path: str, chunks_dir: str) -> None:
 
 
 @shared_task
-def insert_sinan_chunks_on_database(sinan_pk: str) -> bool:
+def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 
     misparsed_csv_file = (
@@ -151,6 +151,7 @@ def insert_sinan_chunks_on_database(sinan_pk: str) -> bool:
             df,  # pyright: ignore
             sinan.filename
         )
+
         df = sinan_parse_fields(
             df,  # pyright: ignore
             sinan
