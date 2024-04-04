@@ -3,23 +3,28 @@ import csv
 from pathlib import Path
 from django.core.mail import send_mail
 
+import psycopg2
 import pandas as pd
 import geopandas as gpd
 import dask.dataframe as dd
 from loguru import logger
+from simpledbf import Dbf5
 from celery import shared_task
 from celery.result import AsyncResult
-from simpledbf import Dbf5
+from psycopg2.extras import DictCursor
 
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
+from ad_main.settings import get_sqla_conn
 from .models import SINAN, Status
 from .sinan.utils import (
     sinan_drop_duplicates_from_dataframe,
     sinan_parse_fields,
     chunk_gen
 )
+
+DB_ENGINE = get_sqla_conn(database="dengue")
 
 
 @shared_task
@@ -49,7 +54,12 @@ def process_sinan_file(sinan_pk: str) -> bool:
             )
 
         else:
-            raise NotImplementedError(f"Unknown file type {fpath.suffix}")
+            err = f"Unknown file type {fpath.suffix}"
+            logger.error(err)
+            sinan.status = Status.ERROR
+            sinan.status_error = err
+            sinan.save()
+            return False
 
     except Exception as e:
         sinan.status = Status.ERROR
@@ -67,10 +77,7 @@ def process_sinan_file(sinan_pk: str) -> bool:
         )
 
         if not inserted.get(follow_parents=True):
-            error_msg = f"Chunks insert task for {sinan.filename} failed"
-            logger.error(error_msg)
             return False
-
         return True
 
     logger.error(f"No chunks parsed for {sinan.filename}")
@@ -129,42 +136,120 @@ def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
 
     chunks_list = [chunk for chunk in Path(sinan.chunks_dir).glob("*.parquet")]
 
-    columns = []
+    uploaded: bool = False
+    with DB_ENGINE.begin() as conn:  # pyright: ignore
+        for chunk in chunks_list:
+            try:
+                df: dd = dd.read_parquet(  # pyright: ignore
+                    str(chunk.absolute()),
+                    engine="fastparquet"
+                )
+            except Exception as e:
+                err = f"Error reading chunks for {sinan.filename}: {e}"
+                logger.error(err)
+                misparsed_csv_file.unlink(missing_ok=True)
+                sinan.status = Status.ERROR
+                sinan.misparsed_file = None
+                sinan.status_error = err
+                sinan.save()
+                return False
 
-    for chunk in chunks_list:
-        try:
-            df: dd = dd.read_parquet(  # pyright: ignore
-                str(chunk.absolute()),
-                engine="fastparquet"
+            try:
+                df = sinan_drop_duplicates_from_dataframe(
+                    df,  # pyright: ignore
+                    sinan.filename
+                )
+            except Exception as e:
+                err = f"Error dropping duplicates from {sinan.filename}: {e}"
+                logger.error(err)
+                sinan.status = Status.ERROR
+                sinan.misparsed_file = None
+                sinan.status_error = err
+                sinan.save()
+                return False
+
+            # Can't throw any exception
+            df = sinan_parse_fields(
+                df,  # pyright: ignore
+                sinan
             )
-        except Exception as e:
-            misparsed_csv_file.unlink(missing_ok=True)
-            sinan.status = Status.ERROR
-            sinan.misparsed_file = None
-            sinan.status_error = f"Error reading chunks: {e}"
-            sinan.save()
+
+            uploaded = save_to_pgsql(
+                df,  # pyright: ignore
+                sinan,
+                conn
+            )
+
+        if uploaded:
+            conn.connection.commit()
+
+            if sinan.parse_error:
+                sinan.status = Status.FINISHED_MISPARSED
+                # send_mail() # TODO: send mail with link to misparsed csv file
+                return True
+            else:
+                sinan.status = Status.FINISHED
+                misparsed_csv_file.unlink(missing_ok=True)
+                sinan.misparsed_file = None
+                sinan.save()
+                # send_mail(): # TODO: send successful insert email
+                return True
+        else:
+            # send_mail(): # TODO: send failed insert email
             return False
 
-        columns = list(df.columns)  # pyright: ignore
 
-        df = sinan_drop_duplicates_from_dataframe(
-            df,  # pyright: ignore
-            sinan.filename
+def save_to_pgsql(
+    df: pd.DataFrame, sinan_obj: SINAN, conn
+) -> bool:
+    # Log the start of the transaction process
+    logger.info(
+        f"Starting the SINAN transaction process for {sinan_obj.filename}"
+    )
+
+    # Start a transaction and create a cursor
+    try:
+        cursor = conn.connection.cursor(cursor_factory=DictCursor)
+
+        # Execute a query to get the column names of the table
+        cursor.execute(
+            f"SELECT * FROM {sinan_obj.table_schema} LIMIT 1;"
+        )
+        col_names = [c.name for c in cursor.description if c.name != "id"]
+
+        # Create the insert query
+        insert_sql = (
+            f"INSERT INTO {sinan_obj.table_schema}({','.join(col_names)}) "
+            f"VALUES ({','.join(['%s' for _ in col_names])}) "
+            f"ON CONFLICT ON CONSTRAINT casos_unicos DO UPDATE SET "
+            f"{','.join([f'{j}=excluded.{j}' for j in col_names])}"
         )
 
-        df = sinan_parse_fields(
-            df,  # pyright: ignore
-            sinan
+        # Execute the insert statement for each row in the dataframe
+        rows = [
+            tuple(row)
+            for row in df.itertuples(index=False)
+        ]
+        cursor.executemany(insert_sql, rows)
+
+    except Exception as e:
+        error_message = str(e)
+        field_start_index = error_message.find('"') + 1
+        field_end_index = error_message.find('"', field_start_index)
+        err = (
+            f"""Error inserting {sinan_obj.filename} chunk in database.
+                Field causing the error: {
+                error_message[field_start_index:field_end_index]
+                }\n {e}
+            """
         )
-
-    pd.DataFrame(columns=columns).to_csv(misparsed_csv_file, index=False)
-
-    if sinan.status == Status.FINISHED_MISPARSED:
-        # send_mail() # TODO: send mail with link to misparsed csv file
-        ...
-    else:
-        misparsed_csv_file.unlink(missing_ok=True)
-        sinan.misparsed_file = None
-        sinan.save()
+        logger.error(err)
+        sinan_obj.status = Status.ERROR
+        sinan_obj.status_error = err
+        sinan_obj.parse_error = False
+        Path(sinan_obj.misparsed_file).unlink()
+        sinan_obj.misparsed_file = None
+        sinan_obj.save()
+        return False
 
     return True

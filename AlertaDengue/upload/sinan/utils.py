@@ -168,6 +168,7 @@ def sinan_parse_fields(df: pd.DataFrame, sinan_obj) -> pd.DataFrame:
 
     if not misparsed_df.empty:
         sinan_obj.parse_error = True
+        sinan_obj.save()
 
         logger.warning(
             f"Parsing residues found for {sinan_obj.filename}, please check "
@@ -210,35 +211,6 @@ def sinan_parse_row(row: pd.Series, sinan_obj) -> pd.Series:
     row["SEM_NOT"] = int(str(int(row["SEM_NOT"]))[-2:])
 
     return row
-
-
-def sinan_parse_date_field(value, sinan_obj) -> Optional[pd.Timestamp]:
-    try:
-        value = pd.to_datetime(value)
-        return value
-    except Exception as e:
-        sinan_obj.parse_error = True
-
-        logger.warning(
-            f"Parsing residues found for {sinan_obj.filename}, please check "
-            f"{sinan_obj.misparsed_file} manually. Error: {e}"
-        )
-
-        try:
-            with open(sinan_obj.misparsed_file, "a") as f:
-                value.to_csv(
-                    f,
-                    index=False,
-                    mode="a",
-                    header=(not f.tell())
-                )
-        except Exception as e:
-            logger.error(
-                "Error exporting misparsed residue to "
-                f"{sinan_obj.misparsed_file}: {e}"
-            )
-        sinan_obj.save()
-    return None
 
 
 def fix_nu_notif(value: Union[str, None]) -> Optional[int]:
