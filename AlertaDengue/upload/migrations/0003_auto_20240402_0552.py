@@ -10,23 +10,22 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='sinan',
-            name='error_misparsed',
-        ),
         migrations.AddField(
             model_name='sinan',
             name='misparsed_file',
-            field=models.FileField(default=None, help_text='Absolute CSV file path containing failed rows from data parsing, before being uploaded to database. The filename format format is MISPARSED_{filename} and it requires further human verification', null=True, upload_to=''),
+            field=models.FileField(
+                default=None, help_text='Absolute CSV file path containing failed rows from data parsing, before being uploaded to database. The filename format format is MISPARSED_{filename} and it requires further human verification', null=True, upload_to=''),
         ),
         migrations.AlterField(
             model_name='sinan',
             name='parse_error',
-            field=models.BooleanField(default=False, help_text="An parse error ocurred when reading data, moved errored rows to `misparsed_file` file. This error doesn't change the status to ERROR"),
+            field=models.BooleanField(
+                default=False, help_text="An parse error ocurred when reading data, moved errored rows to `misparsed_file` file. This error doesn't change the status to ERROR"),
         ),
         migrations.AlterField(
             model_name='sinan',
             name='status',
-            field=models.TextField(choices=[('waiting_chunk', 'Aguardando chunk'), ('chunking', 'Processando chunks'), ('inserting', 'Inserindo dados'), ('error', 'Erro'), ('finished', 'Finalizado'), ('finished_misparsed', 'Finalizado com erro')], default='waiting_chunk', help_text='Upload status of the file'),
+            field=models.TextField(choices=[('waiting_chunk', 'Aguardando chunk'), ('chunking', 'Processando chunks'), ('inserting', 'Inserindo dados'), (
+                'error', 'Erro'), ('finished', 'Finalizado'), ('finished_misparsed', 'Finalizado com erro')], default='waiting_chunk', help_text='Upload status of the file'),
         ),
     ]

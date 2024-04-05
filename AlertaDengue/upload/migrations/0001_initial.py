@@ -19,13 +19,13 @@ class Migration(migrations.Migration):
             name='SINAN',
             fields=[
                 ('filename', models.CharField(help_text='Name of the file with suffix', max_length=100,
-                 primary_key=True, serialize=False, validators=[upload.sinan.validations.validade_file_type])),
+                 primary_key=True, serialize=False, validators=[upload.sinan.validations.validate_file_type])),
                 ('filepath', models.FileField(help_text='Absolute data file path, Null if deleted after insert',
                  null=True, upload_to='', validators=[upload.sinan.validations.validate_file_exists])),
                 ('disease', models.CharField(choices=[('dengue', 'Dengue'), (
                     'chik', 'Chigungunya'), ('zika', 'Zika')], default='dengue', max_length=50)),
                 ('notification_year', models.IntegerField(
-                    validators=[upload.sinan.validations.validade_year])),
+                    validators=[upload.sinan.validations.validate_year])),
                 ('uf', models.CharField(choices=[('BR', 'Brasil'), ('AC', 'Acre'), ('AL', 'Alagoas'), ('AP', 'Amapá'), ('AM', 'Amazonas'), ('BA', 'Bahia'), ('CE', 'Ceará'), ('ES', 'Espírito Santo'), ('GO', 'Goiás'), ('MA', 'Maranhão'), ('MT', 'Mato Grosso'), ('MS', 'Mato Grosso do Sul'), ('MG', 'Minas Gerais'), ('PA', 'Pará'), ('PB', 'Paraíba'), (
                     'PR', 'Paraná'), ('PE', 'Pernambuco'), ('PI', 'Piauí'), ('RJ', 'Rio de Janeiro'), ('RN', 'Rio Grande do Norte'), ('RS', 'Rio Grande do Sul'), ('RO', 'Rondônia'), ('RR', 'Roraima'), ('SC', 'Santa Catarina'), ('SP', 'São Paulo'), ('SE', 'Sergipe'), ('TO', 'Tocantins'), ('DF', 'Distrito Federal')], default='BR', max_length=2)),
                 ('municipio', models.IntegerField(null=True)),
@@ -33,8 +33,6 @@ class Migration(migrations.Migration):
                     'inserting', 'Inserindo dados'), ('error', 'Erro'), ('finished', 'Finalizado')], default='waiting_chunk', help_text='Upload status of the file')),
                 ('parse_error', models.BooleanField(default=False,
                  help_text="An parse error ocurred when reading data, moved errored rows to `error_misparsed` file. This error doesn't change the status to ERROR")),
-                ('error_misparsed', models.FileField(default=None, help_text='Absolute CSV file path containing failed rows from data parsing, before being uploaded to database. The filename format format is MISPARSED_{filename} and it requires further human verification', null=True, upload_to='', validators=[
-                 upload.sinan.validations.validate_misparsed_file_name, upload.sinan.validations.validate_misparsed_file_exists])),
                 ('uploaded_at', models.DateField()),
                 ('uploaded_by', models.ForeignKey(
                     null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),

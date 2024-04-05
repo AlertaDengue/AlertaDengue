@@ -9,15 +9,14 @@ from simpledbf import Dbf5
 
 from django.db import models
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 
 from ad_main.settings import get_sqla_conn
 from upload.sinan.validations import (
     validate_file_exists,
-    validade_file_type,
-    validade_year,
+    validate_file_type,
+    validate_year,
     validate_fields,
 )
 
@@ -82,7 +81,7 @@ class SINAN(models.Model):
         null=False,
         blank=False,
         help_text=_("Name of the file with suffix"),
-        validators=[validade_file_type],
+        validators=[validate_file_type],
         max_length=100
     )
     filepath = models.FileField(
@@ -98,7 +97,7 @@ class SINAN(models.Model):
     )
     notification_year = models.IntegerField(
         null=False,
-        validators=[validade_year]
+        validators=[validate_year]
     )
     uf = models.CharField(
         max_length=2,
@@ -216,7 +215,7 @@ class SINAN(models.Model):
 
         sinan = cls(
             filename=file.name,
-            filepath=file.absolute(),
+            filepath=str(file.absolute()),
             disease=disease,
             notification_year=notification_year,
             uf=uf,
@@ -232,15 +231,16 @@ class SINAN(models.Model):
         return sinan
 
     @property
-    def chunks_dir(self):
-        fname = Path(self.filename)
-        dir = Path(
-            os.path.join(
-                settings.MEDIA_ROOT,
-                fname.name.removesuffix(fname.suffix))
-        )
-        dir.mkdir(exist_ok=True, parents=True)
-        return dir.absolute()
+    def chunks_dir(self) -> str | None:
+        if self.filepath:
+            fname = Path(self.filename)
+            dir = Path(
+                os.path.join(
+                    settings.MEDIA_ROOT,
+                    fname.name.removesuffix(fname.suffix))
+            )
+            dir.mkdir(exist_ok=True, parents=True)
+            return str(dir.absolute())
 
 
 def move_file_to_final_destination(

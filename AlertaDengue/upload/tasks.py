@@ -3,7 +3,6 @@ import csv
 from pathlib import Path
 from django.core.mail import send_mail
 
-import psycopg2
 import pandas as pd
 import geopandas as gpd
 import dask.dataframe as dd
@@ -19,6 +18,7 @@ from django.conf import settings
 from ad_main.settings import get_sqla_conn
 from .models import SINAN, Status
 from .sinan.utils import (
+    EXPECTED_FIELDS,
     sinan_drop_duplicates_from_dataframe,
     sinan_parse_fields,
     chunk_gen
@@ -115,6 +115,15 @@ def chunk_dbf_file(file_path: str, chunks_dir: str) -> None:
             ignore_geometry=True,
             engine="fastparquet"
         )
+
+        if not all([c in EXPECTED_FIELDS for c in list(df.columns)]):
+            missing_cols = list(
+                filter(lambda c: c not in EXPECTED_FIELDS, list(df.columns))
+            )
+
+            for column in missing_cols:
+                df[column] = None
+
         df.to_parquet(parquet_fname)
         logger.info(f"Chunk {parquet_fname} parsed for {dbf_name}")
 
@@ -134,7 +143,16 @@ def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
     sinan.status = Status.INSERTING
     sinan.save()
 
-    chunks_list = [chunk for chunk in Path(sinan.chunks_dir).glob("*.parquet")]
+    if sinan.chunks_dir:
+        chunks_list = list(Path(sinan.chunks_dir).glob("*.parquet"))
+    else:
+        err = f"Error creating chunks dir for {sinan.filename}"
+        logger.error(err)
+        sinan.status = Status.ERROR
+        sinan.misparsed_file = None
+        sinan.status_error = err
+        sinan.save()
+        return False
 
     uploaded: bool = False
     with DB_ENGINE.begin() as conn:  # pyright: ignore
@@ -168,12 +186,13 @@ def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
                 sinan.save()
                 return False
 
-            # Can't throw any exception
+            # Can't throw any exception. Return False instead
             df = sinan_parse_fields(
                 df,  # pyright: ignore
                 sinan
             )
 
+            # Can't throw any exception. Return false instead
             uploaded = save_to_pgsql(
                 df,  # pyright: ignore
                 sinan,
@@ -195,6 +214,7 @@ def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
                 # send_mail(): # TODO: send successful insert email
                 return True
         else:
+            conn.connection.rollback()
             # send_mail(): # TODO: send failed insert email
             return False
 
@@ -202,22 +222,18 @@ def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
 def save_to_pgsql(
     df: pd.DataFrame, sinan_obj: SINAN, conn
 ) -> bool:
-    # Log the start of the transaction process
     logger.info(
         f"Starting the SINAN transaction process for {sinan_obj.filename}"
     )
 
-    # Start a transaction and create a cursor
     try:
         cursor = conn.connection.cursor(cursor_factory=DictCursor)
 
-        # Execute a query to get the column names of the table
         cursor.execute(
             f"SELECT * FROM {sinan_obj.table_schema} LIMIT 1;"
         )
         col_names = [c.name for c in cursor.description if c.name != "id"]
 
-        # Create the insert query
         insert_sql = (
             f"INSERT INTO {sinan_obj.table_schema}({','.join(col_names)}) "
             f"VALUES ({','.join(['%s' for _ in col_names])}) "
@@ -225,7 +241,6 @@ def save_to_pgsql(
             f"{','.join([f'{j}=excluded.{j}' for j in col_names])}"
         )
 
-        # Execute the insert statement for each row in the dataframe
         rows = [
             tuple(row)
             for row in df.itertuples(index=False)

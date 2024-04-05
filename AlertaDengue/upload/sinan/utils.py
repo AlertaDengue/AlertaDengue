@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pandas as pd
 import numpy as np
-from dask import dataframe as dd
 from loguru import logger
 from django.utils.translation import gettext_lazy as _
 
@@ -34,7 +33,9 @@ EXPECTED_FIELDS = {
     "classi_fin": "CLASSI_FIN",
 }
 
-EXPECTED_DATE_FIELDS = ["DT_SIN_PRI", "DT_NOTIFIC", "DT_DIGITA", "DT_NASC"]
+REQUIRED_DATE_FIELDS = ["DT_SIN_PRI", "DT_NOTIFIC", "DT_DIGITA", "DT_NASC"]
+
+REQUIRED_FIELDS = REQUIRED_DATE_FIELDS  # +
 
 DISEASE_CID = {
     "dengue": "A90",
@@ -185,7 +186,7 @@ def sinan_parse_fields(df: pd.DataFrame, sinan_obj) -> pd.DataFrame:
 
 
 def sinan_parse_row(row: pd.Series, sinan_obj) -> pd.Series:
-    for col in EXPECTED_DATE_FIELDS:
+    for col in REQUIRED_DATE_FIELDS:
         row[col] = pd.to_datetime(row[col])
 
     row["NU_NOTIFIC"] = map(fix_nu_notif, row["NU_NOTIFIC"])

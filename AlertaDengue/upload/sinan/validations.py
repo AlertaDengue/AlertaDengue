@@ -5,7 +5,7 @@ from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from upload.sinan.utils import EXPECTED_FIELDS
+from upload.sinan.utils import REQUIRED_FIELDS
 
 
 def validate_file_exists(file_path: str) -> None:
@@ -13,7 +13,7 @@ def validate_file_exists(file_path: str) -> None:
         raise ValidationError(_(f'File {file_path} not found'))
 
 
-def validade_file_type(file_name: str) -> None:
+def validate_file_type(file_name: str) -> None:
     file_path = Path(file_name)
 
     if file_path.suffix.lower() not in [".csv", ".dbf"]:
@@ -36,7 +36,7 @@ def validate_misparsed_file_name(file_path: str) -> None:
             ))
 
 
-def validade_year(year: int) -> None:
+def validate_year(year: int) -> None:
     if year > datetime.now().year:
         raise ValidationError(_(f"Invalid year {year}"))
 
@@ -45,9 +45,9 @@ def validade_year(year: int) -> None:
 
 
 def validate_fields(columns: list[str]) -> None:
-    if not all([c in columns for c in EXPECTED_FIELDS.values()]):
+    if not all([c in columns for c in REQUIRED_FIELDS]):
         raise ValidationError(
             "Required field(s): "
-            f"{list(set(EXPECTED_FIELDS.values()).difference(set(columns)))} "
+            f"{list(set(REQUIRED_FIELDS).difference(set(columns)))} "
             "not found in data file"
         )
