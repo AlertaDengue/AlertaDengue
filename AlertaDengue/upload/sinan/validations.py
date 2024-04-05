@@ -9,12 +9,12 @@ from upload.sinan.utils import REQUIRED_FIELDS
 
 
 def validate_file_exists(file_path: str) -> None:
-    if not os.path.exists(file_path):
-        raise ValidationError(_(f'File {file_path} not found'))
+    if not os.path.exists(str(file_path)):
+        raise ValidationError(_(f'File {str(file_path)} not found'))
 
 
 def validate_file_type(file_name: str) -> None:
-    file_path = Path(file_name)
+    file_path = Path(str(file_name))
 
     if file_path.suffix.lower() not in [".csv", ".dbf"]:
         raise ValidationError(_(f"Unknown file suffix {file_path.suffix}"))
@@ -22,13 +22,13 @@ def validate_file_type(file_name: str) -> None:
 
 def validate_misparsed_file_exists(file_path: str) -> None:
     if file_path:
-        if not os.path.exists(file_path):
-            raise ValidationError(_(f'File {file_path} not found'))
+        if not os.path.exists(str(file_path)):
+            raise ValidationError(_(f'File {str(file_path)} not found'))
 
 
 def validate_misparsed_file_name(file_path: str) -> None:
     if file_path:
-        fpath = Path(file_path)
+        fpath = Path(str(file_path))
 
         if not fpath.name.startswith("MISPARSED_"):
             raise ValidationError(_(

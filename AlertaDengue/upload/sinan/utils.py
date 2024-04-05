@@ -173,11 +173,11 @@ def sinan_parse_fields(df: pd.DataFrame, sinan_obj) -> pd.DataFrame:
 
         logger.warning(
             f"Parsing residues found for {sinan_obj.filename}, please check "
-            f"{sinan_obj.misparsed_file} manually."
+            f"{str(sinan_obj.misparsed_file)} manually."
         )
 
         misparsed_df.to_csv(
-            sinan_obj.misparsed_file,
+            str(sinan_obj.misparsed_file),
             index=False,
             mode="a",
         )

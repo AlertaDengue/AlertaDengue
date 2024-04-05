@@ -158,24 +158,28 @@ class SINAN(models.Model):
         uploaded_by: Optional[User] = None,  # pyright: ignore
         uploaded_at=datetime.now().date()
     ):
-        file = Path(filepath)
+        file = Path(str(filepath))
 
         if not file.is_absolute():
-            status = Status.ERROR
-            status_error = "File path must be absolute"
+            raise ValueError("File path must be absolute")
 
-        try:
-            file = Path(move_file_to_final_destination(
-                file_path=str(file.absolute()),
-                disease=disease,
-                uf=uf,
-                notification_year=notification_year,
-                export_date=uploaded_at,
-                geocode=municipio,
-            ))
-        except Exception as e:
-            status = Status.ERROR
-            status_error = f"File could not be moved: {e}"
+        if not file.exists():
+            raise FileNotFoundError(f"{file} not found")
+
+        if file.is_dir():
+            raise ValueError(f"{file} is a directory")
+
+        if file.suffix.lower() not in [".dbf", ".csv", ".parquet"]:
+            raise ValueError(f"Unkown file type {file.suffix}")
+
+        file = Path(move_file_to_final_destination(
+            file_path=str(file.absolute()),
+            disease=disease,
+            uf=uf,
+            notification_year=notification_year,
+            export_date=uploaded_at,
+            geocode=municipio,
+        ))
 
         columns: list = []
         try:
@@ -233,10 +237,11 @@ class SINAN(models.Model):
     @property
     def chunks_dir(self) -> str | None:
         if self.filepath:
-            fname = Path(self.filename)
+            fname = Path(str(self.filename))
             dir = Path(
                 os.path.join(
-                    settings.MEDIA_ROOT,
+                    settings.DBF_SINAN,
+                    "chunks",
                     fname.name.removesuffix(fname.suffix))
             )
             dir.mkdir(exist_ok=True, parents=True)
@@ -260,7 +265,7 @@ def move_file_to_final_destination(
 
     dest_dir.mkdir(exist_ok=True, parents=True)
 
-    file = Path(file_path)
+    file = Path(str(file_path))
 
     if not file.is_absolute():
         raise ValueError(f"{str(file)} path is not abosule")

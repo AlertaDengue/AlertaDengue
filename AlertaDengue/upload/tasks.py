@@ -9,7 +9,7 @@ import dask.dataframe as dd
 from loguru import logger
 from simpledbf import Dbf5
 from celery import shared_task
-from celery.result import AsyncResult
+from celery.result import AsyncResult, allow_join_result
 from psycopg2.extras import DictCursor
 
 from django.utils.translation import gettext_lazy as _
@@ -30,11 +30,10 @@ DB_ENGINE = get_sqla_conn(database="dengue")
 @shared_task
 def process_sinan_file(sinan_pk: str) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
+    fpath = Path(str(sinan.filepath))
 
     sinan.status = Status.CHUNKING
     sinan.save()
-
-    fpath = Path(sinan.filepath)
 
     try:
         if fpath.suffix == ".csv":
@@ -50,7 +49,7 @@ def process_sinan_file(sinan_pk: str) -> bool:
 
         elif fpath.suffix == ".dbf":
             result: AsyncResult = chunk_dbf_file.delay(  # pyright: ignore
-                str(fpath)
+                str(fpath), sinan.chunks_dir
             )
 
         else:
@@ -67,23 +66,24 @@ def process_sinan_file(sinan_pk: str) -> bool:
         sinan.save()
         return False
 
-    chunks = result.get(follow_parents=True)
+    with allow_join_result():
+        chunks = result.get(follow_parents=True)
 
-    if chunks:
-        logger.debug(f"Parsed {len(chunks)} chunks for {sinan.filename}")
-        inserted: AsyncResult = (
-            parse_insert_chunks_on_database
-            .delay(sinan_pk)  # pyright: ignore
-        )
+        if chunks:
+            logger.debug(f"Parsed {len(chunks)} chunks for {sinan.filename}")
+            inserted: AsyncResult = (
+                parse_insert_chunks_on_database
+                .delay(sinan_pk)  # pyright: ignore
+            )
 
-        if not inserted.get(follow_parents=True):
-            return False
-        return True
-
-    logger.error(f"No chunks parsed for {sinan.filename}")
-    sinan.status = Status.ERROR
-    sinan.status_error = f"No chunks were parsed"
-    sinan.save()
+            if not inserted.get(follow_parents=True):
+                return False
+            return True
+        else:
+            logger.error(f"No chunks parsed for {sinan.filename}")
+            sinan.status = Status.ERROR
+            sinan.status_error = f"No chunks were parsed"
+            sinan.save()
     return False
 
 
@@ -94,12 +94,13 @@ def chunk_csv_file(file_path: str, sep: str) -> list[str]:
 
 @shared_task
 def chunk_dbf_file(file_path: str, chunks_dir: str) -> None:
+    file_path = str(file_path)
     logger.info("Converting DBF file to Parquet chunks")
 
     dbf = Dbf5(file_path, codec="iso-8859-1")
     dbf_name = str(dbf.dbf)[:-4]
 
-    if not os.path.exists(chunks_dir):
+    if not os.path.exists(str(chunks_dir)):
         os.mkdir(chunks_dir)
 
     if not os.path.exists(file_path):
@@ -108,17 +109,19 @@ def chunk_dbf_file(file_path: str, chunks_dir: str) -> None:
     for chunk, (lowerbound, upperbound) in enumerate(
         chunk_gen(1000, dbf.numrec)
     ):
-        parquet_fname = os.path.join(chunks_dir, f"{dbf_name}-{chunk}.parquet")
+        parquet_fname = os.path.join(
+            str(chunks_dir), f"{dbf_name}-{chunk}.parquet"
+        )
         df = gpd.read_file(
             file_path,
+            include_fields=list(EXPECTED_FIELDS.values()),
             rows=slice(lowerbound, upperbound),
             ignore_geometry=True,
-            engine="fastparquet"
         )
 
-        if not all([c in EXPECTED_FIELDS for c in list(df.columns)]):
+        if not all([c in EXPECTED_FIELDS.values() for c in list(df.columns)]):
             missing_cols = list(
-                filter(lambda c: c not in EXPECTED_FIELDS, list(df.columns))
+                set(EXPECTED_FIELDS.values()).difference(set(df.columns))
             )
 
             for column in missing_cols:
@@ -134,7 +137,7 @@ def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
 
     misparsed_csv_file = (
         Path(str(settings.DBF_SINAN)) / "residue_csvs" /
-        f"RESIDUE_{Path(sinan.filename).with_suffix('.csv')}"
+        f"RESIDUE_{Path(str(sinan.filename)).with_suffix('.csv')}"
     )
 
     misparsed_csv_file.touch()
@@ -174,7 +177,7 @@ def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
 
             try:
                 df = sinan_drop_duplicates_from_dataframe(
-                    df,  # pyright: ignore
+                    df.compute(),  # pyright: ignore
                     sinan.filename
                 )
             except Exception as e:
@@ -262,7 +265,7 @@ def save_to_pgsql(
         sinan_obj.status = Status.ERROR
         sinan_obj.status_error = err
         sinan_obj.parse_error = False
-        Path(sinan_obj.misparsed_file).unlink()
+        Path(str(sinan_obj.misparsed_file)).unlink()
         sinan_obj.misparsed_file = None
         sinan_obj.save()
         return False
