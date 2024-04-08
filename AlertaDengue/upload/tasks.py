@@ -32,9 +32,6 @@ def process_sinan_file(sinan_pk: str) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
     fpath = Path(str(sinan.filepath))
 
-    sinan.status = Status.CHUNKING
-    sinan.save()
-
     try:
         if fpath.suffix == ".csv":
             sniffer = csv.Sniffer()
@@ -44,12 +41,12 @@ def process_sinan_file(sinan_pk: str) -> bool:
                 sep = sniffer.sniff(data).delimiter
 
             result: AsyncResult = chunk_csv_file.delay(  # pyright: ignore
-                str(fpath), sep=sep
+                sinan.pk
             )
 
         elif fpath.suffix == ".dbf":
             result: AsyncResult = chunk_dbf_file.delay(  # pyright: ignore
-                str(fpath), sinan.chunks_dir
+                sinan.pk
             )
 
         else:
@@ -57,20 +54,25 @@ def process_sinan_file(sinan_pk: str) -> bool:
             logger.error(err)
             sinan.status = Status.ERROR
             sinan.status_error = err
-            sinan.save()
+            sinan.save(update_fields=['status', 'status_error'])
             return False
 
     except Exception as e:
         sinan.status = Status.ERROR
         sinan.status_error = f"Error chunking file: {e}"
-        sinan.save()
+        sinan.save(update_fields=['status', 'status_error'])
         return False
 
     with allow_join_result():
         chunks = result.get(follow_parents=True)
 
         if chunks:
-            logger.debug(f"Parsed {len(chunks)} chunks for {sinan.filename}")
+            sinan.save(update_fields=['status', 'status_error'])
+            logger.info(
+                "Parsed "
+                f"{len(list(Path(str(sinan.chunks_dir)).glob('*.parquet')))} "
+                f"chunks for {sinan.filename}"
+            )
             inserted: AsyncResult = (
                 parse_insert_chunks_on_database
                 .delay(sinan_pk)  # pyright: ignore
@@ -83,52 +85,62 @@ def process_sinan_file(sinan_pk: str) -> bool:
             logger.error(f"No chunks parsed for {sinan.filename}")
             sinan.status = Status.ERROR
             sinan.status_error = f"No chunks were parsed"
-            sinan.save()
+            sinan.save(update_fields=['status', 'status_error'])
     return False
 
 
 @shared_task
-def chunk_csv_file(file_path: str, sep: str) -> list[str]:
+def chunk_csv_file(sinan_pk: str) -> bool:
     ...
+    return False
 
 
 @shared_task
-def chunk_dbf_file(file_path: str, chunks_dir: str) -> None:
-    file_path = str(file_path)
-    logger.info("Converting DBF file to Parquet chunks")
+def chunk_dbf_file(sinan_pk: str) -> bool:
+    sinan = SINAN.objects.get(pk=sinan_pk)
 
-    dbf = Dbf5(file_path, codec="iso-8859-1")
-    dbf_name = str(dbf.dbf)[:-4]
+    if sinan.status == Status.WAITING_CHUNK:
+        sinan.status = Status.CHUNKING
+        sinan.save(update_fields=['status'])
 
-    if not os.path.exists(str(chunks_dir)):
-        os.mkdir(chunks_dir)
+        logger.info("Converting DBF file to Parquet chunks")
+        dbf = Dbf5(str(sinan.filepath), codec="iso-8859-1")
+        dbf_name = str(dbf.dbf)[:-4]
 
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"{file_path} does not exist")
+        if not os.path.exists(str(sinan.filepath)):
+            raise FileNotFoundError(f"{str(sinan.filepath)} does not exist")
 
-    for chunk, (lowerbound, upperbound) in enumerate(
-        chunk_gen(1000, dbf.numrec)
-    ):
-        parquet_fname = os.path.join(
-            str(chunks_dir), f"{dbf_name}-{chunk}.parquet"
-        )
-        df = gpd.read_file(
-            file_path,
-            include_fields=list(EXPECTED_FIELDS.values()),
-            rows=slice(lowerbound, upperbound),
-            ignore_geometry=True,
-        )
-
-        if not all([c in EXPECTED_FIELDS.values() for c in list(df.columns)]):
-            missing_cols = list(
-                set(EXPECTED_FIELDS.values()).difference(set(df.columns))
+        for chunk, (lowerbound, upperbound) in enumerate(
+            chunk_gen(1000, dbf.numrec)
+        ):
+            parquet_fname = os.path.join(
+                str(sinan.chunks_dir), f"{dbf_name}-{chunk}.parquet"
+            )
+            df = gpd.read_file(
+                str(sinan.filepath),
+                include_fields=list(EXPECTED_FIELDS.values()),
+                rows=slice(lowerbound, upperbound),
+                ignore_geometry=True,
             )
 
-            for column in missing_cols:
-                df[column] = None
+            if not all([c in EXPECTED_FIELDS.values() for c in list(df.columns)]):
+                missing_cols = list(
+                    set(EXPECTED_FIELDS.values()).difference(set(df.columns))
+                )
 
-        df.to_parquet(parquet_fname)
-        logger.info(f"Chunk {parquet_fname} parsed for {dbf_name}")
+                for column in missing_cols:
+                    df[column] = None
+
+            df.to_parquet(parquet_fname)
+
+        sinan.status = Status.WAITING_INSERT
+        sinan.save(update_fields=['status'])
+        return True
+    else:
+        logger.info(
+            f"Invalid Status to chunk SINAN object: {sinan.status}"
+        )
+        return False
 
 
 @shared_task
@@ -144,7 +156,7 @@ def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
 
     sinan.misparsed_file = str(misparsed_csv_file.absolute())
     sinan.status = Status.INSERTING
-    sinan.save()
+    sinan.save(update_fields=['misparsed_file', 'status'])
 
     if sinan.chunks_dir:
         chunks_list = list(Path(sinan.chunks_dir).glob("*.parquet"))
@@ -154,11 +166,12 @@ def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
         sinan.status = Status.ERROR
         sinan.misparsed_file = None
         sinan.status_error = err
-        sinan.save()
+        sinan.save(update_fields=['status', 'misparsed_file', 'status_error'])
         return False
 
-    uploaded: bool = False
+    uploaded_rows: int = 0
     with DB_ENGINE.begin() as conn:  # pyright: ignore
+        # TODO: this could be ran asynchronously
         for chunk in chunks_list:
             try:
                 df: dd = dd.read_parquet(  # pyright: ignore
@@ -172,7 +185,9 @@ def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
                 sinan.status = Status.ERROR
                 sinan.misparsed_file = None
                 sinan.status_error = err
-                sinan.save()
+                sinan.save(
+                    update_fields=['status', 'misparsed_file', 'status_error']
+                )
                 return False
 
             try:
@@ -186,7 +201,9 @@ def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
                 sinan.status = Status.ERROR
                 sinan.misparsed_file = None
                 sinan.status_error = err
-                sinan.save()
+                sinan.save(
+                    update_fields=['status', 'misparsed_file', 'status_error']
+                )
                 return False
 
             # Can't throw any exception. Return False instead
@@ -195,25 +212,29 @@ def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
                 sinan
             )
 
-            # Can't throw any exception. Return false instead
-            uploaded = save_to_pgsql(
+            # Can't throw any exception. Return number of inserted rows
+            uploaded_rows += save_to_pgsql(
                 df,  # pyright: ignore
                 sinan,
                 conn
             )
 
-        if uploaded:
+        if uploaded_rows:
+            logger.info(
+                f"Inserting {uploaded_rows} rows from {sinan.filename}"
+            )
             conn.connection.commit()
 
             if sinan.parse_error:
                 sinan.status = Status.FINISHED_MISPARSED
+                sinan.save(update_fields=['status'])
                 # send_mail() # TODO: send mail with link to misparsed csv file
                 return True
             else:
                 sinan.status = Status.FINISHED
                 misparsed_csv_file.unlink(missing_ok=True)
                 sinan.misparsed_file = None
-                sinan.save()
+                sinan.save(update_fields=['status', 'misparsed_file'])
                 # send_mail(): # TODO: send successful insert email
                 return True
         else:
@@ -224,32 +245,27 @@ def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
 
 def save_to_pgsql(
     df: pd.DataFrame, sinan_obj: SINAN, conn
-) -> bool:
-    logger.info(
-        f"Starting the SINAN transaction process for {sinan_obj.filename}"
-    )
-
+) -> int:
+    """
+    Return the number of rows executed by INSERT. Can't throw any Exception
+    """
     try:
         cursor = conn.connection.cursor(cursor_factory=DictCursor)
 
-        cursor.execute(
-            f"SELECT * FROM {sinan_obj.table_schema} LIMIT 1;"
-        )
-        col_names = [c.name for c in cursor.description if c.name != "id"]
-
         insert_sql = (
-            f"INSERT INTO {sinan_obj.table_schema}({','.join(col_names)}) "
-            f"VALUES ({','.join(['%s' for _ in col_names])}) "
+            f"INSERT INTO {sinan_obj.table_schema}"
+            f"({','.join(list(df.columns))}) "
+            f"VALUES ({','.join(['%s' for _ in df.columns])}) "
             f"ON CONFLICT ON CONSTRAINT casos_unicos DO UPDATE SET "
-            f"{','.join([f'{j}=excluded.{j}' for j in col_names])}"
+            f"{','.join([f'{j}=excluded.{j}' for j in df.columns])}"
         )
 
         rows = [
             tuple(row)
             for row in df.itertuples(index=False)
         ]
-        cursor.executemany(insert_sql, rows)
 
+        cursor.executemany(insert_sql, rows)
     except Exception as e:
         error_message = str(e)
         field_start_index = error_message.find('"') + 1
@@ -267,7 +283,14 @@ def save_to_pgsql(
         sinan_obj.parse_error = False
         Path(str(sinan_obj.misparsed_file)).unlink()
         sinan_obj.misparsed_file = None
-        sinan_obj.save()
-        return False
+        sinan_obj.save(
+            update_fields=[
+                'status',
+                'misparsed_file',
+                'status_error',
+                'parse_error'
+            ]
+        )
+        return 0
 
-    return True
+    return len(df)

@@ -64,8 +64,6 @@ def sinan_drop_duplicates_from_dataframe(
     pd.DataFrame
         A pandas DataFrame with duplicates removed.
     """
-    logger.info(f"Removing duplicates from {filename}")
-
     duplicate_se_notific_mask = df.duplicated(
         subset=["ID_AGRAVO", "NU_NOTIFIC", "ID_MUNICIP", "SEM_NOT"]
     )
@@ -91,7 +89,7 @@ def sinan_drop_duplicates_from_dataframe(
 
             logger.info(
                 f"Saved {df_se_notific.shape[0]} rows due to duplicate values "
-                "(Condition SEM_NOT)."
+                f"(Condition SEM_NOT) for {filename}."
             )
 
     duplicate_dt_notific_mask = df.duplicated(
@@ -189,8 +187,21 @@ def sinan_parse_row(row: pd.Series, sinan_obj) -> pd.Series:
     for col in REQUIRED_DATE_FIELDS:
         row[col] = pd.to_datetime(row[col])
 
-    row["NU_NOTIFIC"] = map(fix_nu_notif, row["NU_NOTIFIC"])
-    row["ID_MUNICIP"] = map(add_dv, row["ID_MUNICIP"])
+    nu_notific = row["NU_NOTIFIC"]
+    char_to_replace = {",": "", "'": "", ".": ""}
+    if str(nu_notific).isdigit():
+        row["NU_NOTIFIC"] = int(row["NU_NOTIFIC"])
+    elif (
+        "".join(
+            [str(c) for c in str(nu_notific) if c not in char_to_replace]
+        ).isdigit()
+    ):
+        row["NU_NOTIFIC"] = int("".join(
+            [str(c) for c in str(nu_notific) if c not in char_to_replace]
+        ))
+    else:
+        row["NU_NOTIFIC"] = None
+    row["ID_MUNICIP"] = list(map(add_dv, row["ID_MUNICIP"]))
 
     for col in ["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"]:
         try:
@@ -212,38 +223,6 @@ def sinan_parse_row(row: pd.Series, sinan_obj) -> pd.Series:
     row["SEM_NOT"] = int(str(int(row["SEM_NOT"]))[-2:])
 
     return row
-
-
-def fix_nu_notif(value: Union[str, None]) -> Optional[int]:
-    """
-    Formats NU_NOTIF field value.
-    Parameters
-    ----------
-        value: Union[str, None]
-            Value of NU_NOTIF field.
-    Returns
-    -------
-        Optional[int]: Formatted NU_NOTIF field value.
-    Raises
-    ------
-        ValueError: If value cannot be converted to int.
-    """
-    char_to_replace = {",": "", "'": "", ".": ""}
-    if value is None:
-        return None
-
-    try:
-        return int(value)
-    except ValueError:
-        # Replace multiple characters.
-        for char, replacement in char_to_replace.items():
-            value = value.replace(char, replacement)
-
-        try:
-            return int(value)
-        except ValueError:
-            logger.error(_(f"Invalid NU_NOTIF value: {value}"))
-            return None
 
 
 def calculate_digit(dig: str) -> int:

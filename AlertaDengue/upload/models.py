@@ -64,6 +64,9 @@ class Diseases(models.TextChoices):
 class Status(models.TextChoices):
     WAITING_CHUNK = "waiting_chunk", _("Aguardando chunk")  # pyright: ignore
     CHUNKING = "chunking", _("Processando chunks")  # pyright: ignore
+    WAITING_INSERT = "waiting_insert", _(
+        "Aguardando inserção"
+    )  # pyright: ignore
     INSERTING = "inserting", _("Inserindo dados")  # pyright: ignore
     ERROR = "error", _("Erro")  # pyright: ignore
     FINISHED = "finished", _("Finalizado")  # pyright: ignore
@@ -159,6 +162,9 @@ class SINAN(models.Model):
         uploaded_at=datetime.now().date()
     ):
         file = Path(str(filepath))
+
+        if not file:
+            raise ValueError(f"Error reading file {str(file)}")
 
         if not file.is_absolute():
             raise ValueError("File path must be absolute")
