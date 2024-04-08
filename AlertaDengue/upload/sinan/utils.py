@@ -14,7 +14,6 @@ duplicated_sinan_dir.mkdir(parents=True, exist_ok=True)
 residue_sinan_dir = Path(str(settings.DBF_SINAN)) / "residue_csvs"
 residue_sinan_dir.mkdir(parents=True, exist_ok=True)
 
-
 EXPECTED_FIELDS = {
     "dt_notific": "DT_NOTIFIC",
     "se_notif": "SEM_NOT",
@@ -168,7 +167,7 @@ def sinan_parse_fields(df: pd.DataFrame, sinan_obj) -> pd.DataFrame:
 
     if not misparsed_df.empty:
         sinan_obj.parse_error = True
-        sinan_obj.save()
+        sinan_obj.save(update_fields=['parse_error'])
 
         logger.warning(
             f"Parsing residues found for {sinan_obj.filename}, please check "
@@ -185,23 +184,49 @@ def sinan_parse_fields(df: pd.DataFrame, sinan_obj) -> pd.DataFrame:
 
 
 def sinan_parse_row(row: pd.Series, sinan_obj) -> pd.Series:
-    for col in REQUIRED_DATE_FIELDS:
-        row[col] = pd.to_datetime(row[col])
+    """
+    If an Exception is thrown in this method, the row will be removed from the
+    data and be stored in the `RESIDUE_` CSV file. Returns the parsed row
 
-    nu_notific = row["NU_NOTIFIC"]
-    char_to_replace = {",": "", "'": "", ".": ""}
-    if str(nu_notific).isdigit():
-        row["NU_NOTIFIC"] = int(row["NU_NOTIFIC"])
-    elif (
-        "".join(
-            [str(c) for c in str(nu_notific) if c not in char_to_replace]
-        ).isdigit()
-    ):
-        row["NU_NOTIFIC"] = int("".join(
-            [str(c) for c in str(nu_notific) if c not in char_to_replace]
-        ))
-    else:
-        row["NU_NOTIFIC"] = None
+    "Municipio"."Notificacao" table description:
+    dt_notific          | date                |
+    se_notif            | integer             |
+    ano_notif           | integer             |
+    dt_sin_pri          | date                |
+    se_sin_pri          | integer             |
+    dt_digita           | date                |
+    municipio_geocodigo | integer             |
+    nu_notific          | integer             |
+    cid10_codigo        | character varying(5)|
+    dt_nasc             | date                |
+    cs_sexo             | character varying(1)|
+    nu_idade_n          | integer             |
+    resul_pcr           | numeric             |
+    criterio            | numeric             |
+    classi_fin          | numeric             |
+    """
+
+    for col in REQUIRED_DATE_FIELDS:
+        try:
+            if row[col] in [np.nan, "", None]:
+                raise ValueError(f"Required date field {col} is Null")
+            row[col] = pd.to_datetime(row[col], )
+        except Exception as e:
+            include_misparsed_col(sinan_obj, col)
+            raise e
+
+    try:
+        nu_notific = row["NU_NOTIFIC"]
+        chars_to_remove = ",'.:"
+        if str(nu_notific).isdigit():
+            row["NU_NOTIFIC"] = int(row["NU_NOTIFIC"])
+        else:
+            row["NU_NOTIFIC"] = int("".join(
+                [str(c) for c in str(nu_notific) if c not in chars_to_remove]
+            ))
+    except Exception as e:
+        include_misparsed_col(sinan_obj, "NU_NOTIFIC")
+        raise e
 
     geocode = str(row["ID_MUNICIP"])
     if geocode.isdigit():
@@ -210,6 +235,7 @@ def sinan_parse_row(row: pd.Series, sinan_obj) -> pd.Series:
         geocode = str(int(float(geocode)))
         row["ID_MUNICIP"] = add_dv(geocode)
     else:
+        include_misparsed_col(sinan_obj, "ID_MUNICIP")
         raise ValueError(_(f"Can't parse geocode: {geocode}"))
 
     for col in ["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"]:
@@ -222,16 +248,35 @@ def sinan_parse_row(row: pd.Series, sinan_obj) -> pd.Series:
         row["ID_AGRAVO"] = DISEASE_CID[sinan_obj.disease]
 
     if row["SEM_PRI"] != None:
-        row["SEM_PRI"] = str(row["SEM_PRI"])[-2:]
+        try:
+            row["SEM_PRI"] = int(str(row["SEM_PRI"])[-2:])
+        except Exception as e:
+            include_misparsed_col(sinan_obj, "SEM_PRI")
+            raise e
 
-    if row["NU_ANO"] in [None, np.nan, "", 0]:
-        row["NU_ANO"] = sinan_obj.notification_year
-    else:
-        row["NU_ANO"] = int(row["NU_ANO"])
+    try:
+        if row["NU_ANO"] in [None, np.nan, "", 0]:
+            row["NU_ANO"] = sinan_obj.notification_year
+        else:
+            row["NU_ANO"] = int(row["NU_ANO"])
+    except Exception as e:
+        include_misparsed_col(sinan_obj, "NU_ANO")
+        raise e
 
-    row["SEM_NOT"] = int(str(int(row["SEM_NOT"]))[-2:])
+    try:
+        row["SEM_NOT"] = int(str(int(row["SEM_NOT"]))[-2:])
+    except Exception as e:
+        include_misparsed_col(sinan_obj, "SEM_NOT")
+        raise e
 
     return row
+
+
+def include_misparsed_col(sinan_obj, col: str) -> None:
+    misparsed_cols = set(list(sinan_obj.misparsed_cols))
+    misparsed_cols.add(col)
+    sinan_obj.misparsed_cols = list(misparsed_cols)
+    sinan_obj.save(update_fields=['misparsed_cols'])
 
 
 def calculate_digit(dig: str) -> int:

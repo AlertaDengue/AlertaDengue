@@ -139,6 +139,10 @@ class SINAN(models.Model):
             "MISPARSED_{filename} and it requires further human verification"
         ),
     )
+    misparsed_cols = models.JSONField(
+        default=list,
+        help_text=_("Name of the columns containing misparsed rows"),
+    )
     uploaded_by = models.ForeignKey(
         "auth.User",
         on_delete=models.SET_NULL,

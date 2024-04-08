@@ -127,11 +127,11 @@ def chunk_dbf_file(sinan_pk: str) -> bool:
                 ignore_geometry=True,
             )
 
-            if not all([c in EXPECTED_FIELDS.values() for c in list(df.columns)]):
-                missing_cols = list(
-                    set(EXPECTED_FIELDS.values()).difference(set(df.columns))
-                )
+            missing_cols = list(
+                set(EXPECTED_FIELDS.values()).difference(set(df.columns))
+            )
 
+            if missing_cols:
                 for column in missing_cols:
                     df[column] = None
 
@@ -168,9 +168,8 @@ def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
         err = f"Error creating chunks dir for {sinan.filename}"
         logger.error(err)
         sinan.status = Status.ERROR
-        sinan.misparsed_file = None
         sinan.status_error = err
-        sinan.save(update_fields=['status', 'misparsed_file', 'status_error'])
+        sinan.save(update_fields=['status', 'status_error'])
         return False
 
     uploaded_rows: int = 0
@@ -204,11 +203,8 @@ def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
                 err = f"Error dropping duplicates from {sinan.filename}: {e}"
                 logger.error(err)
                 sinan.status = Status.ERROR
-                sinan.misparsed_file = None
                 sinan.status_error = err
-                sinan.save(
-                    update_fields=['status', 'misparsed_file', 'status_error']
-                )
+                sinan.save(update_fields=['status', 'status_error'])
                 return False
 
             # Can't throw any exception. Return False instead
@@ -290,17 +286,7 @@ def save_to_pgsql(
         sinan_obj.status = Status.ERROR
         sinan_obj.status_error = err
         sinan_obj.parse_error = False
-        if sinan_obj.misparsed_file:
-            Path(str(sinan_obj.misparsed_file)).unlink()
-            sinan_obj.misparsed_file = None
-        sinan_obj.save(
-            update_fields=[
-                'status',
-                'misparsed_file',
-                'status_error',
-                'parse_error'
-            ]
-        )
+        sinan_obj.save(update_fields=['status', 'status_error', 'parse_error'])
         return 0
 
     return len(df)
