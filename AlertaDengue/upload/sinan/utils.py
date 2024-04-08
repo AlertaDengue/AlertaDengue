@@ -157,7 +157,8 @@ def sinan_parse_fields(df: pd.DataFrame, sinan_obj) -> pd.DataFrame:
     for _, row in df.iterrows():
         try:
             valid_rows.append(sinan_parse_row(row, sinan_obj))
-        except:
+        except Exception as e:
+            logger.debug(f"Misparsed row motive: {str(e)}")
             misparsed_rows.append(row)
 
     df = pd.DataFrame(valid_rows, columns=df.columns)
@@ -201,7 +202,15 @@ def sinan_parse_row(row: pd.Series, sinan_obj) -> pd.Series:
         ))
     else:
         row["NU_NOTIFIC"] = None
-    row["ID_MUNICIP"] = list(map(add_dv, row["ID_MUNICIP"]))
+
+    geocode = str(row["ID_MUNICIP"])
+    if geocode.isdigit():
+        row["ID_MUNICIP"] = add_dv(geocode)
+    elif "." in str(row["ID_MUNICIP"]):
+        geocode = str(int(float(geocode)))
+        row["ID_MUNICIP"] = add_dv(geocode)
+    else:
+        raise ValueError(_(f"Can't parse geocode: {geocode}"))
 
     for col in ["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"]:
         try:
@@ -262,10 +271,6 @@ def add_dv(geocode: str) -> int:
     -------
         geocode: geocode 7 digit.
     """
-
-    if "." in str(geocode):
-        geocode = str(int(float(geocode)))
-
     if len(str(geocode)) == 7:
         return int(geocode)
     elif len(str(geocode)) == 6:
