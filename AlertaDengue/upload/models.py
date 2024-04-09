@@ -112,7 +112,6 @@ class SINAN(models.Model):
     status = models.TextField(
         null=False,
         choices=Status.choices,
-        default=Status.WAITING_CHUNK,
         help_text=_("Upload status of the file")
     )
     status_error = models.TextField(
@@ -143,12 +142,19 @@ class SINAN(models.Model):
         default=list,
         help_text=_("Name of the columns containing misparsed rows"),
     )
+    inserted_rows = models.IntegerField(
+        default=0,
+        help_text=_("Amount of inserted rows in database"),
+    )
     uploaded_by = models.ForeignKey(
         "auth.User",
         on_delete=models.SET_NULL,
         null=True
     )
     uploaded_at = models.DateField(null=False)
+
+    def __str__(self):
+        return str(self.filename)
 
     @classmethod
     def create(
@@ -283,12 +289,15 @@ def move_file_to_final_destination(
     if not file.exists():
         raise FileNotFoundError(f"{str(file)} not found")
 
+    random_id = int(str(datetime.now().timestamp())[-4:])
+
     file_specs = [
         uf,
         disease.upper(),
         str(geocode) if geocode else None,
         str(notification_year),
-        str(export_date)
+        str(export_date),
+        str(random_id)
     ]
 
     dest_filename = "-".join(

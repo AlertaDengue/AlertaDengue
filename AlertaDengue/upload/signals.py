@@ -12,24 +12,12 @@ from .tasks import process_sinan_file
 def process_sinan_file_on_save(sender, instance, **kwargs):
     sinan = SINAN.objects.get(pk=instance.pk)
     if sinan.status == Status.WAITING_CHUNK:
-        result: AsyncResult = process_sinan_file.delay(  # pyright: ignore
-            sinan.pk
-        )
+        process_sinan_file.delay(sinan.pk)  # pyright: ignore
 
-        if result.ready():
-            if not result.get(follow_parents=True):
-                if sinan.chunks_dir:
-                    chunks_dir = Path(sinan.chunks_dir)
-
-                    for chunk in list(chunks_dir.glob("*.parquet")):
-                        chunk.unlink(missing_ok=True)
-
-                    Path(sinan.chunks_dir).rmdir()
-
-                # TODO: should it unlink the data file on error?
-                # Path(str(instance.filepath)).unlink(missing_ok=True)
-                # instance.filepath = None
-                # instance.save()
+        # TODO: should it unlink the data file on error?
+        # Path(str(instance.filepath)).unlink(missing_ok=True)
+        # instance.filepath = None
+        # instance.save()
 
 
 @receiver(pre_delete, sender=SINAN)

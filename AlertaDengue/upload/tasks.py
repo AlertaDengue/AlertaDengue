@@ -34,12 +34,6 @@ def process_sinan_file(sinan_pk: int) -> bool:
 
     try:
         if fpath.suffix == ".csv":
-            sniffer = csv.Sniffer()
-
-            with open(fpath, "r") as f:
-                data = f.read(10240)
-                sep = sniffer.sniff(data).delimiter
-
             result: AsyncResult = chunk_csv_file.delay(  # pyright: ignore
                 sinan.pk
             )
@@ -64,33 +58,43 @@ def process_sinan_file(sinan_pk: int) -> bool:
         return False
 
     with allow_join_result():
-        chunks = result.get(follow_parents=True)
+        try:
+            chunking_success = result.get(timeout=10*60)
 
-        if chunks:
-            sinan.save(update_fields=['status', 'status_error'])
-            logger.info(
-                "Parsed "
-                f"{len(list(Path(str(sinan.chunks_dir)).glob('*.parquet')))} "
-                f"chunks for {sinan.filename}"
-            )
-            inserted: AsyncResult = (
-                parse_insert_chunks_on_database
-                .delay(sinan_pk)  # pyright: ignore
-            )
+            if chunking_success:
+                logger.info(
+                    f"Parsed {len(list(Path(str(sinan.chunks_dir)).glob('*.parquet')))} "
+                    f"chunks for {sinan.filename}"
+                )
 
-            if not inserted.get(follow_parents=True):
-                logger.error(f"No data inserted for {sinan.filename}")
+                inserted: AsyncResult = (
+                    parse_insert_chunks_on_database.delay(  # pyright: ignore
+                        sinan_pk
+                    )
+                )
+
+                if inserted.get(timeout=10*60):
+                    return True
+                else:
+                    logger.error(f"Insertion task for {sinan.filename} failed")
+                    sinan.status = Status.ERROR
+                    sinan.status_error = "No data were parsed"
+                    sinan.save(update_fields=['status', 'status_error'])
+                    return False
+
+            else:
+                logger.error(f"Chunking task for {sinan.filename} failed")
                 sinan.status = Status.ERROR
-                sinan.status_error = f"No data were parsed"
+                sinan.status_error = "No chunks were parsed"
                 sinan.save(update_fields=['status', 'status_error'])
                 return False
-            return True
-        else:
-            logger.error(f"No chunks parsed for {sinan.filename}")
+
+        except Exception as e:
+            logger.error(f"Task failed with exception: {e}")
             sinan.status = Status.ERROR
-            sinan.status_error = f"No chunks were parsed"
+            sinan.status_error = str(e)
             sinan.save(update_fields=['status', 'status_error'])
-    return False
+            return False
 
 
 @shared_task
@@ -220,27 +224,29 @@ def parse_insert_chunks_on_database(sinan_pk: int) -> bool:
                 conn
             )
 
-        if uploaded_rows:
-            logger.info(
-                f"Inserting {uploaded_rows} rows from {sinan.filename}"
-            )
+    if uploaded_rows:
+        logger.info(
+            f"Inserting {uploaded_rows} rows from {sinan.filename}"
+        )
 
-            if sinan.parse_error:
-                sinan.status = Status.FINISHED_MISPARSED
-                sinan.save(update_fields=['status'])
-                # send_mail() # TODO: send mail with link to misparsed csv file
-                return True
-            else:
-                sinan.status = Status.FINISHED
-                if misparsed_csv_file:
-                    misparsed_csv_file.unlink(missing_ok=True)
-                    sinan.misparsed_file = None
-                sinan.save(update_fields=['status', 'misparsed_file'])
-                # send_mail(): # TODO: send successful insert email
-                return True
+        sinan.inserted_rows = uploaded_rows
+
+        if sinan.parse_error:
+            sinan.status = Status.FINISHED_MISPARSED
+            sinan.save(update_fields=['status'])
+            # send_mail() # TODO: send mail with link to misparsed csv file
+            return True
         else:
-            # send_mail(): # TODO: send failed insert email
-            return False
+            sinan.status = Status.FINISHED
+            if misparsed_csv_file:
+                misparsed_csv_file.unlink(missing_ok=True)
+                sinan.misparsed_file = None
+            sinan.save(update_fields=['status', 'misparsed_file'])
+            # send_mail(): # TODO: send successful insert email
+            return True
+    else:
+        # send_mail(): # TODO: send failed insert email
+        return False
 
 
 def save_to_pgsql(

@@ -152,12 +152,13 @@ def sinan_parse_fields(df: pd.DataFrame, sinan_obj) -> pd.DataFrame:
 
     valid_rows: list[pd.Series] = []
     misparsed_rows: list[pd.Series] | list = []
+    misparsed_cols = set(sinan_obj.misparsed_cols)
 
     for _, row in df.iterrows():
         try:
-            valid_rows.append(sinan_parse_row(row, sinan_obj))
-        except Exception as e:
-            logger.debug(f"Misparsed row motive: {str(e)}")
+            valid_rows.append(sinan_parse_row(row, sinan_obj, misparsed_cols))
+        except:
+            # logger.debug(f"Misparsed row motive: {str(e)}")
             misparsed_rows.append(row)
 
     df = pd.DataFrame(valid_rows, columns=df.columns)
@@ -167,12 +168,8 @@ def sinan_parse_fields(df: pd.DataFrame, sinan_obj) -> pd.DataFrame:
 
     if not misparsed_df.empty:
         sinan_obj.parse_error = True
-        sinan_obj.save(update_fields=['parse_error'])
-
-        logger.warning(
-            f"Parsing residues found for {sinan_obj.filename}, please check "
-            f"{str(sinan_obj.misparsed_file)} manually."
-        )
+        sinan_obj.misparsed_cols = list(misparsed_cols)
+        sinan_obj.save(update_fields=['parse_error', 'misparsed_cols'])
 
         misparsed_df.to_csv(
             str(sinan_obj.misparsed_file),
@@ -183,7 +180,9 @@ def sinan_parse_fields(df: pd.DataFrame, sinan_obj) -> pd.DataFrame:
     return df
 
 
-def sinan_parse_row(row: pd.Series, sinan_obj) -> pd.Series:
+def sinan_parse_row(
+        row: pd.Series, sinan_obj, misparsed_cols: set
+) -> pd.Series:
     """
     If an Exception is thrown in this method, the row will be removed from the
     data and be stored in the `RESIDUE_` CSV file. Returns the parsed row
@@ -210,9 +209,9 @@ def sinan_parse_row(row: pd.Series, sinan_obj) -> pd.Series:
         try:
             if row[col] in [np.nan, "", None]:
                 raise ValueError(f"Required date field {col} is Null")
-            row[col] = pd.to_datetime(row[col], )
+            row[col] = pd.to_datetime(row[col])
         except Exception as e:
-            include_misparsed_col(sinan_obj, col)
+            misparsed_cols.add(col)
             raise e
 
     try:
@@ -225,7 +224,7 @@ def sinan_parse_row(row: pd.Series, sinan_obj) -> pd.Series:
                 [str(c) for c in str(nu_notific) if c not in chars_to_remove]
             ))
     except Exception as e:
-        include_misparsed_col(sinan_obj, "NU_NOTIFIC")
+        misparsed_cols.add("NU_NOTIFIC")
         raise e
 
     geocode = str(row["ID_MUNICIP"])
@@ -235,7 +234,7 @@ def sinan_parse_row(row: pd.Series, sinan_obj) -> pd.Series:
         geocode = str(int(float(geocode)))
         row["ID_MUNICIP"] = add_dv(geocode)
     else:
-        include_misparsed_col(sinan_obj, "ID_MUNICIP")
+        misparsed_cols.add("ID_MUNICIP")
         raise ValueError(_(f"Can't parse geocode: {geocode}"))
 
     for col in ["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"]:
@@ -251,7 +250,7 @@ def sinan_parse_row(row: pd.Series, sinan_obj) -> pd.Series:
         try:
             row["SEM_PRI"] = int(str(row["SEM_PRI"])[-2:])
         except Exception as e:
-            include_misparsed_col(sinan_obj, "SEM_PRI")
+            misparsed_cols.add("SEM_PRI")
             raise e
 
     try:
@@ -260,23 +259,16 @@ def sinan_parse_row(row: pd.Series, sinan_obj) -> pd.Series:
         else:
             row["NU_ANO"] = int(row["NU_ANO"])
     except Exception as e:
-        include_misparsed_col(sinan_obj, "NU_ANO")
+        misparsed_cols.add("NU_ANO")
         raise e
 
     try:
         row["SEM_NOT"] = int(str(int(row["SEM_NOT"]))[-2:])
     except Exception as e:
-        include_misparsed_col(sinan_obj, "SEM_NOT")
+        misparsed_cols.add("SEM_NOT")
         raise e
 
     return row
-
-
-def include_misparsed_col(sinan_obj, col: str) -> None:
-    misparsed_cols = set(list(sinan_obj.misparsed_cols))
-    misparsed_cols.add(col)
-    sinan_obj.misparsed_cols = list(misparsed_cols)
-    sinan_obj.save(update_fields=['misparsed_cols'])
 
 
 def calculate_digit(dig: str) -> int:
