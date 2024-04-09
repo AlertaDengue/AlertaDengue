@@ -28,7 +28,7 @@ DB_ENGINE = get_sqla_conn(database="dengue")
 
 
 @shared_task
-def process_sinan_file(sinan_pk: str) -> bool:
+def process_sinan_file(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
     fpath = Path(str(sinan.filepath))
 
@@ -94,13 +94,13 @@ def process_sinan_file(sinan_pk: str) -> bool:
 
 
 @shared_task
-def chunk_csv_file(sinan_pk: str) -> bool:
+def chunk_csv_file(sinan_pk: int) -> bool:
     ...
     return False
 
 
 @shared_task
-def chunk_dbf_file(sinan_pk: str) -> bool:
+def chunk_dbf_file(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 
     if sinan.status == Status.WAITING_CHUNK:
@@ -148,7 +148,7 @@ def chunk_dbf_file(sinan_pk: str) -> bool:
 
 
 @shared_task
-def parse_insert_chunks_on_database(sinan_pk: str) -> bool:
+def parse_insert_chunks_on_database(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 
     misparsed_csv_file = (

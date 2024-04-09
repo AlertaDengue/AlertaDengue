@@ -79,8 +79,8 @@ class SINAN(models.Model):
     db_engine = get_sqla_conn("dengue")
     table_schema = '"Municipio"."Notificacao"'
 
+    id = models.AutoField(primary_key=True)
     filename = models.CharField(
-        primary_key=True,
         null=False,
         blank=False,
         help_text=_("Name of the file with suffix"),
