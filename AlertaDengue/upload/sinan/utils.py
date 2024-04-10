@@ -1,4 +1,4 @@
-from typing import Optional, Union, Iterator, Tuple
+from typing import Iterator, Tuple
 from pathlib import Path
 
 import pandas as pd
@@ -209,7 +209,7 @@ def sinan_parse_row(
         try:
             if row[col] in [np.nan, "", None]:
                 raise ValueError(f"Required date field {col} is Null")
-            row[col] = pd.to_datetime(row[col])
+            row[col] = pd.to_datetime(str(row[col]))
         except Exception as e:
             misparsed_cols.add(col)
             raise e

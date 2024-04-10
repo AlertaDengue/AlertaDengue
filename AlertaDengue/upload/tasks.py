@@ -33,15 +33,18 @@ def process_sinan_file(sinan_pk: int) -> bool:
     fpath = Path(str(sinan.filepath))
 
     try:
-        if fpath.suffix == ".csv":
+        if fpath.suffix.lower() == ".csv":
             result: AsyncResult = chunk_csv_file.delay(  # pyright: ignore
                 sinan.pk
             )
 
-        elif fpath.suffix == ".dbf":
+        elif fpath.suffix.lower() == ".dbf":
             result: AsyncResult = chunk_dbf_file.delay(  # pyright: ignore
                 sinan.pk
             )
+
+        elif fpath.suffix.lower() == ".parquert":
+            raise NotImplementedError("Not implemented yet")
 
         else:
             err = f"Unknown file type {fpath.suffix}"
@@ -82,12 +85,12 @@ def process_sinan_file(sinan_pk: int) -> bool:
                     sinan.save(update_fields=['status', 'status_error'])
                     return False
 
-            else:
+            if result.status == "FAILURE":
                 logger.error(f"Chunking task for {sinan.filename} failed")
                 sinan.status = Status.ERROR
                 sinan.status_error = "No chunks were parsed"
                 sinan.save(update_fields=['status', 'status_error'])
-                return False
+            return False
 
         except Exception as e:
             logger.error(f"Task failed with exception: {e}")
@@ -99,8 +102,37 @@ def process_sinan_file(sinan_pk: int) -> bool:
 
 @shared_task
 def chunk_csv_file(sinan_pk: int) -> bool:
-    ...
-    return False
+    sinan = SINAN.objects.get(pk=sinan_pk)
+
+    if sinan.status == Status.WAITING_CHUNK:
+        sinan.status = Status.CHUNKING
+        sinan.save(update_fields=['status'])
+
+        logger.info("Converting CSV file to Parquet chunks")
+
+        if not os.path.exists(str(sinan.filepath)):
+            raise FileNotFoundError(f"{str(sinan.filepath)} does not exist")
+
+        for chunk, df in enumerate(
+            pd.read_csv(
+                str(sinan.filepath),
+                encoding="iso-8859-1",
+                usecols=list(EXPECTED_FIELDS.values()),  # pyright: ignore
+                chunksize=10000
+            )
+        ):
+            df.to_parquet(os.path.join(
+                str(sinan.chunks_dir), f"{sinan.filename}-{chunk}.parquet"
+            ))
+
+        sinan.status = Status.WAITING_INSERT
+        sinan.save(update_fields=['status'])
+        return True
+    else:
+        logger.info(
+            f"Invalid Status to chunk SINAN object: {sinan.status}"
+        )
+        return False
 
 
 @shared_task
@@ -119,7 +151,7 @@ def chunk_dbf_file(sinan_pk: int) -> bool:
             raise FileNotFoundError(f"{str(sinan.filepath)} does not exist")
 
         for chunk, (lowerbound, upperbound) in enumerate(
-            chunk_gen(1000, dbf.numrec)
+            chunk_gen(10000, dbf.numrec)
         ):
             parquet_fname = os.path.join(
                 str(sinan.chunks_dir), f"{dbf_name}-{chunk}.parquet"
@@ -130,14 +162,6 @@ def chunk_dbf_file(sinan_pk: int) -> bool:
                 rows=slice(lowerbound, upperbound),
                 ignore_geometry=True,
             )
-
-            missing_cols = list(
-                set(EXPECTED_FIELDS.values()).difference(set(df.columns))
-            )
-
-            if missing_cols:
-                for column in missing_cols:
-                    df[column] = None
 
             df.to_parquet(parquet_fname)
 
@@ -233,7 +257,7 @@ def parse_insert_chunks_on_database(sinan_pk: int) -> bool:
 
         if sinan.parse_error:
             sinan.status = Status.FINISHED_MISPARSED
-            sinan.save(update_fields=['status'])
+            sinan.save(update_fields=['status', 'inserted_rows'])
             # send_mail() # TODO: send mail with link to misparsed csv file
             return True
         else:
@@ -241,7 +265,9 @@ def parse_insert_chunks_on_database(sinan_pk: int) -> bool:
             if misparsed_csv_file:
                 misparsed_csv_file.unlink(missing_ok=True)
                 sinan.misparsed_file = None
-            sinan.save(update_fields=['status', 'misparsed_file'])
+            sinan.save(
+                update_fields=['status', 'misparsed_file', 'inserted_rows']
+            )
             # send_mail(): # TODO: send successful insert email
             return True
     else:
