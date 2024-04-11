@@ -1,5 +1,4 @@
 import os
-import csv
 from pathlib import Path
 from django.core.mail import send_mail
 
@@ -78,24 +77,15 @@ def process_sinan_file(sinan_pk: int) -> bool:
 
                 if inserted.get(timeout=10*60):
                     return True
-                else:
-                    logger.error(f"Insertion task for {sinan.filename} failed")
-                    sinan.status = Status.ERROR
-                    sinan.status_error = "No data were parsed"
-                    sinan.save(update_fields=['status', 'status_error'])
-                    return False
-
             if result.status == "FAILURE":
                 logger.error(f"Chunking task for {sinan.filename} failed")
-                sinan.status = Status.ERROR
-                sinan.status_error = "No chunks were parsed"
-                sinan.save(update_fields=['status', 'status_error'])
             return False
 
         except Exception as e:
-            logger.error(f"Task failed with exception: {e}")
+            err = f"Process file task failed with exception: {e}"
+            logger.error(err)
             sinan.status = Status.ERROR
-            sinan.status_error = str(e)
+            sinan.status_error = str(err)
             sinan.save(update_fields=['status', 'status_error'])
             return False
 
@@ -186,19 +176,47 @@ def parse_insert_chunks_on_database(sinan_pk: int) -> bool:
 
     misparsed_csv_file.touch()
 
-    sinan.misparsed_file = str(misparsed_csv_file.absolute())
-    sinan.status = Status.INSERTING
-    sinan.save(update_fields=['misparsed_file', 'status'])
+    if sinan.status == Status.WAITING_INSERT:
+        sinan.misparsed_file = str(misparsed_csv_file.absolute())
+        sinan.status = Status.INSERTING
+        sinan.save(update_fields=['misparsed_file', 'status'])
 
-    if sinan.chunks_dir:
-        chunks_list = list(Path(sinan.chunks_dir).glob("*.parquet"))
+        uploaded_rows = sinan_insert_chunks_on_database(sinan.pk)
+        sinan.inserted_rows = uploaded_rows
+
+        if uploaded_rows:
+            logger.info(
+                f"Inserting {uploaded_rows} rows from {sinan.filename}"
+            )
+
+            if sinan.parse_error:
+                sinan.status = Status.FINISHED_MISPARSED
+                sinan.save(update_fields=['status', 'inserted_rows'])
+                # send_mail() # TODO: send mail with link to misparsed csv file
+                return True
+            else:
+                sinan.status = Status.FINISHED
+                if misparsed_csv_file:
+                    misparsed_csv_file.unlink(missing_ok=True)
+                    sinan.misparsed_file = None
+                sinan.save(
+                    update_fields=['status', 'misparsed_file', 'inserted_rows']
+                )
+                # send_mail(): # TODO: send successful insert email
+                return True
+        else:
+            ...
+            # send_mail(): # TODO: send failed insert email
     else:
-        err = f"Error creating chunks dir for {sinan.filename}"
-        logger.error(err)
-        sinan.status = Status.ERROR
-        sinan.status_error = err
-        sinan.save(update_fields=['status', 'status_error'])
-        return False
+        logger.error(f"Invalid SINAN Status for parsing: {sinan.status}")
+
+    return False
+
+
+def sinan_insert_chunks_on_database(sinan_pk: int) -> int:
+    sinan = SINAN.objects.get(pk=sinan_pk)
+
+    chunks_list = list(Path(str(sinan.chunks_dir)).glob("*.parquet"))
 
     uploaded_rows: int = 0
     with DB_ENGINE.begin() as conn:  # pyright: ignore
@@ -212,15 +230,15 @@ def parse_insert_chunks_on_database(sinan_pk: int) -> bool:
             except Exception as e:
                 err = f"Error reading chunks for {sinan.filename}: {e}"
                 logger.error(err)
-                if misparsed_csv_file:
-                    misparsed_csv_file.unlink(missing_ok=True)
+                if sinan.misparsed_file:
+                    Path(str(sinan.misparsed_file)).unlink(missing_ok=True)
                     sinan.misparsed_file = None
                 sinan.status = Status.ERROR
                 sinan.status_error = err
                 sinan.save(
                     update_fields=['status', 'misparsed_file', 'status_error']
                 )
-                return False
+                return 0
 
             try:
                 df = sinan_drop_duplicates_from_dataframe(
@@ -233,7 +251,7 @@ def parse_insert_chunks_on_database(sinan_pk: int) -> bool:
                 sinan.status = Status.ERROR
                 sinan.status_error = err
                 sinan.save(update_fields=['status', 'status_error'])
-                return False
+                return 0
 
             # Can't throw any exception. Return False instead
             df = sinan_parse_fields(
@@ -247,32 +265,7 @@ def parse_insert_chunks_on_database(sinan_pk: int) -> bool:
                 sinan,
                 conn
             )
-
-    if uploaded_rows:
-        logger.info(
-            f"Inserting {uploaded_rows} rows from {sinan.filename}"
-        )
-
-        sinan.inserted_rows = uploaded_rows
-
-        if sinan.parse_error:
-            sinan.status = Status.FINISHED_MISPARSED
-            sinan.save(update_fields=['status', 'inserted_rows'])
-            # send_mail() # TODO: send mail with link to misparsed csv file
-            return True
-        else:
-            sinan.status = Status.FINISHED
-            if misparsed_csv_file:
-                misparsed_csv_file.unlink(missing_ok=True)
-                sinan.misparsed_file = None
-            sinan.save(
-                update_fields=['status', 'misparsed_file', 'inserted_rows']
-            )
-            # send_mail(): # TODO: send successful insert email
-            return True
-    else:
-        # send_mail(): # TODO: send failed insert email
-        return False
+    return uploaded_rows
 
 
 def save_to_pgsql(
@@ -289,8 +282,7 @@ def save_to_pgsql(
 
         insert_sql = (
             f"INSERT INTO {sinan_obj.table_schema}"
-            f"({','.join(cols)}) "
-            f"VALUES ({','.join(['%s' for _ in cols])}) "
+            f"({','.join(cols)}) VALUES ({','.join(['%s' for _ in cols])}) "
             f"ON CONFLICT ON CONSTRAINT casos_unicos DO UPDATE SET "
             f"{','.join([f'{j}=excluded.{j}' for j in cols])}"
         )
@@ -302,17 +294,12 @@ def save_to_pgsql(
 
         cursor.executemany(insert_sql, rows)
         conn.connection.commit()
+        return len(df)
     except Exception as e:
         conn.connection.rollback()
-        error_message = str(e)
-        field_start_index = error_message.find('"') + 1
-        field_end_index = error_message.find('"', field_start_index)
         err = (
-            f"""Error inserting {sinan_obj.filename} chunk in database.
-                Field causing the error: {
-                error_message[field_start_index:field_end_index]
-                }\n {e}
-            """
+            f"Error inserting {sinan_obj.filename} chunk in database."
+            f"Error: {str(e)}"
         )
         logger.error(err)
         sinan_obj.status = Status.ERROR
@@ -320,5 +307,3 @@ def save_to_pgsql(
         sinan_obj.parse_error = False
         sinan_obj.save(update_fields=['status', 'status_error', 'parse_error'])
         return 0
-
-    return len(df)
