@@ -270,7 +270,7 @@ def move_file_to_final_destination(
     uf: str,
     notification_year: int,
     export_date: date,
-    dest_dir: Optional[Path] = Path(settings.DBF_SINAN) / "imported",
+    dest_dir: Path = Path(settings.DBF_SINAN) / "imported",
     geocode: Optional[int] = None,
 ) -> str:
     if not settings.DBF_SINAN:
