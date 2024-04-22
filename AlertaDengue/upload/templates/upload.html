@@ -91,15 +91,6 @@
     </div>
   </div>
 
-{% if messages %}
-  <ul class="list-group mt-3">
-    {% for message in messages %}
-    <li class="list-group-item {{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %}
-</div>
-
 <style>
 .input-container {
     display: inline-flex;

@@ -1,0 +1,38 @@
+{% for message in messages %}
+<div class="container-fluid alert-container p-0">
+  <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+    <center>{{ message }}</center>
+  </div>
+</div>
+
+<style>
+  .alert-container {
+    position: fixed;
+    bottom: 135px;
+    left: 10px;
+    z-index: 1000;
+    width: calc(100% - 20px);
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .alert {
+    margin-right: 10px;
+    transition: opacity 0.5s ease;
+  }
+
+  .alert.hide {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+</style>
+
+<script>
+  setTimeout(function() {
+    document.querySelector('.alert').classList.add('hide');
+    setTimeout(function() {
+      document.querySelector('.alert').remove();
+    }, 500);
+  }, 3000);
+</script>
+{% endfor %}

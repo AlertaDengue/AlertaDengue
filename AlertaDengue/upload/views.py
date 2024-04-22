@@ -7,7 +7,7 @@ import pandas as pd
 from simpledbf import Dbf5
 from dbfread import DBF
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, redirect
 from django.views import View
@@ -53,18 +53,39 @@ class ProcessSINAN(View):
 
     def get(self, request):
         if not request.user.is_staff:
+            messages.error(request, "Unauthorized")
             return redirect("dados:main")
 
         user_id = request.GET.get("user_id")
         user = User.objects.get(pk=user_id)
 
         if request.user != user:
-            return redirect("dados:main")
+            messages.error(
+                request,
+                "Access denied, please use /upload/sinan/process-file instead",
+            )
+            return redirect("upload_sinan")
 
         disease = request.GET.get("disease")
         notification_year = request.GET.get("notification_year")
         uf = request.GET.get("uf")
         file_path = request.GET.get("file_path")
+
+        if not disease or not notification_year or not uf or not file_path:
+            messages.error(
+                request,
+                "Access denied, please use /upload/sinan/process-file instead",
+            )
+            return redirect("upload_sinan")
+
+        file = Path(file_path)
+
+        if not file.exists():
+            messages.error(
+                request,
+                "Access denied, please use /upload/sinan/process-file instead",
+            )
+            return redirect("upload_sinan")
 
         print(file_path)
 

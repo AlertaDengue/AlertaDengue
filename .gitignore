@@ -27,6 +27,7 @@ geodjango.db
 chunked_uploads
 authorized_keys
 .env_export.sh
+*celerybeat-schedule*
 
 AlertaDengue/static/*
 *staticfiles/*
