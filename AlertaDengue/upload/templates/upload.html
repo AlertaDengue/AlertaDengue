@@ -73,13 +73,25 @@
     <button type="submit" id="submit-btn" class="btn btn-primary" disabled>Upload</button>
   </form>
 
-  <div id="uploadModal" class="modal">
-    <div class="modal-content">
-      <p>Uploading file... Please wait.</p>
+  <div id="uploadModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Uploading file... Please wait.</p>
+        </div>
+        <div class="modal-footer">
+        </div>
+      </div>
     </div>
   </div>
 
-  {% if messages %}
+{% if messages %}
   <ul class="list-group mt-3">
     {% for message in messages %}
     <li class="list-group-item {{ message.tags }}">{{ message }}</li>
@@ -251,18 +263,16 @@
       .catch(error => console.error('Error reading file:', error));
   });
 
-  document.getElementById('uploadForm').addEventListener('submit', function(event) {
+  document.getElementById('dataForm').addEventListener('submit', function(event) {
     event.preventDefault();
+    var form = this;
     var formData = new FormData(this);
     var modal = document.getElementById('uploadModal');
 
     modal.style.display = 'block';
-    
-    if (file) {
-      formData.append('file', file);
-    }
+    formData.append('file', file);
 
-    fetch('/sinan/upload-file/', {
+    fetch('/upload/sinan/upload-file/', {
       method: 'POST',
       body: formData,
       headers: {
@@ -271,8 +281,16 @@
     })
     .then(response => response.json())
     .then(data => {
-      console.log(data);
       modal.style.display = 'none';
+      var context = {
+          user_id: '{{ request.user.id }}',
+          disease: document.getElementById('disease').value,
+          notification_year: document.getElementById('notification_year').value,
+          uf: document.getElementById('uf').value,
+          file_path: data.file_path
+      };
+      let params = new URLSearchParams(context).toString();
+      window.location.href = '/upload/sinan/process-file/?'+ params;
     })
     .catch(error => {
       console.error('Error uploading file:', error);

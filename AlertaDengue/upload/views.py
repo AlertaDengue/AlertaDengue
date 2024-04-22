@@ -8,6 +8,7 @@ from simpledbf import Dbf5
 from dbfread import DBF
 
 from django.http import JsonResponse
+from django.contrib.auth import get_user_model
 from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib import messages
@@ -15,6 +16,9 @@ from django.conf import settings
 
 from .sinan.utils import EXPECTED_FIELDS, REQUIRED_FIELDS
 from .models import UFs, Diseases
+
+
+User = get_user_model()
 
 
 class UploadSINAN(View):
@@ -33,14 +37,38 @@ class UploadSINAN(View):
     def post(self, request):
         if not request.user.is_staff:
             return redirect("dados:main")
-        if request.method == 'POST':
-            files = request.FILES.getlist('files')
 
-            messages.success(
-                request, f'Successfully uploaded {len(files)} files.')
-            return redirect('upload')
+        context = {}
+        context["user_id"] = request.user.id
+        context["disease"] = request.POST.get('disease')
+        context["notification_year"] = request.POST.get('notification_year')
+        context["uf"] = request.POST.get('uf')
+        context["file_path"] = request.POST.get('file_path')
 
-        return redirect('upload')
+        return redirect('dados:main')
+
+
+class ProcessSINAN(View):
+    template_name = "process-file.html"
+
+    def get(self, request):
+        if not request.user.is_staff:
+            return redirect("dados:main")
+
+        user_id = request.GET.get("user_id")
+        user = User.objects.get(pk=user_id)
+
+        if request.user != user:
+            return redirect("dados:main")
+
+        disease = request.GET.get("disease")
+        notification_year = request.GET.get("notification_year")
+        uf = request.GET.get("uf")
+        file_path = request.GET.get("file_path")
+
+        print(file_path)
+
+        return render(request, self.template_name)
 
 
 def sinan_upload_file(request):
@@ -57,12 +85,10 @@ def sinan_upload_file(request):
         dest_dir.mkdir(exist_ok=True, parents=True)
 
         file_path = dest_dir / file.name
-
         with open(file_path, 'wb') as dest:
             for chunk in file.chunks():
                 dest.write(chunk)
 
-        print(file_path)
         return JsonResponse({'file_path': str(file_path)})
 
     return JsonResponse(
@@ -110,8 +136,6 @@ def sinan_check_csv_columns(request):
                 context['file'] = file.name
 
                 context['columns'] = columns
-
-                print(context)
 
                 return JsonResponse(context, status=200)
 

@@ -14,4 +14,9 @@ urlpatterns = [
         views.sinan_upload_file,
         name="sinan_upload_file"
     ),
+    path(
+        "sinan/process-file/",
+        views.ProcessSINAN.as_view(),
+        name="sinan_process_file"
+    ),
 ]
