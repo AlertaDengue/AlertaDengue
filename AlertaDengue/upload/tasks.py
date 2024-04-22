@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from django.core.mail import send_mail
+import time
 
 import pandas as pd
 import geopandas as gpd
@@ -18,12 +19,64 @@ from ad_main.settings import get_sqla_conn
 from .models import SINAN, Status
 from .sinan.utils import (
     EXPECTED_FIELDS,
+    UF_CODES,
     sinan_drop_duplicates_from_dataframe,
     sinan_parse_fields,
-    chunk_gen
+    chunk_gen,
+    add_dv,
 )
 
+CODES_UF = {v: k for k, v in UF_CODES.items()}
+
 DB_ENGINE = get_sqla_conn(database="dengue")
+
+
+@shared_task
+def sinan_split_in_states(file_path: str) -> bool:
+    file = Path(file_path)
+
+    if not file.exists():
+        raise FileNotFoundError(f"{file} not found")
+
+    dest_dir = Path(os.path.splitext(str(file.absolute()))[0])
+    dest_dir.mkdir(exist_ok=True)
+
+    if file.suffix.lower() in [".csv", ".csv.gz"]:
+        columns = pd.read_csv(
+            str(file.absolute()),
+            encoding="iso-8859-1",
+            index_col=0,
+            nrows=0,
+        ).columns.to_list()
+
+        for df in pd.read_csv(
+            str(file),
+            chunksize=30000,
+            encoding="iso-8859-1",
+            usecols=list(
+                set(EXPECTED_FIELDS.values()) & set(columns)
+            ),  # pyright: ignore
+        ):
+            for _, row in df.iterrows():
+                row: pd.Series
+                try:
+                    uf = CODES_UF[int(str(row['ID_MUNICIP'])[:2])]
+                except (TypeError, ValueError, KeyError):
+                    uf = "BR"
+
+                uf_file = dest_dir / f"{uf}.csv.gz"
+
+                row.to_csv(uf_file, mode="a", index=False)
+
+        return True
+
+    if file.suffix.lower() == ".dbf":
+        ...
+
+    if file.suffix.lower() == ".parquet":
+        raise NotImplementedError("TODO: parquet parsing not implemented yet")
+
+    raise ValueError(f"Unable to parse file type '{file.suffix}'")
 
 
 @shared_task
@@ -42,8 +95,10 @@ def process_sinan_file(sinan_pk: int) -> bool:
                 sinan.pk
             )
 
-        elif fpath.suffix.lower() == ".parquert":
-            raise NotImplementedError("Not implemented yet")
+        elif fpath.suffix.lower() == ".parquet":
+            result: AsyncResult = chunk_parquet_file.delay(  # pyright: ignore
+                sinan.pk
+            )
 
         else:
             err = f"Unknown file type {fpath.suffix}"
@@ -106,7 +161,6 @@ def chunk_csv_file(sinan_pk: int) -> bool:
         for chunk, df in enumerate(
             pd.read_csv(
                 str(sinan.filepath),
-                encoding="iso-8859-1",
                 usecols=list(EXPECTED_FIELDS.values()),  # pyright: ignore
                 chunksize=10000
             )
@@ -154,6 +208,42 @@ def chunk_dbf_file(sinan_pk: int) -> bool:
             )
 
             df.to_parquet(parquet_fname)
+
+        sinan.status = Status.WAITING_INSERT
+        sinan.save(update_fields=['status'])
+        return True
+    else:
+        logger.info(
+            f"Invalid Status to chunk SINAN object: {sinan.status}"
+        )
+        return False
+
+
+@shared_task
+def chunk_parquet_file(sinan_pk: int) -> bool:
+    sinan = SINAN.objects.get(pk=sinan_pk)
+
+    if sinan.status == Status.WAITING_CHUNK:
+        sinan.status = Status.CHUNKING
+        sinan.save(update_fields=['status'])
+
+        logger.info("Converting Parquet file into chunks")
+
+        if not os.path.exists(str(sinan.filepath)):
+            raise FileNotFoundError(f"{str(sinan.filepath)} does not exist")
+
+        for chunk, df in enumerate(
+            pd.read_parquet(
+                str(sinan.filepath),
+                engine="fastparquet",
+                encoding="iso-8859-1",
+                usecols=list(EXPECTED_FIELDS.values()),  # pyright: ignore
+                chunksize=10000
+            )
+        ):
+            df.to_parquet(os.path.join(
+                str(sinan.chunks_dir), f"{sinan.filename}-{chunk}.parquet"
+            ))
 
         sinan.status = Status.WAITING_INSERT
         sinan.save(update_fields=['status'])

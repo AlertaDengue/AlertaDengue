@@ -15,6 +15,7 @@ from django.contrib import messages
 from django.conf import settings
 
 from .sinan.utils import EXPECTED_FIELDS, REQUIRED_FIELDS
+from .tasks import sinan_split_in_states
 from .models import UFs, Diseases
 
 
@@ -34,19 +35,6 @@ class UploadSINAN(View):
 
         return render(request, self.template_name, context)
 
-    def post(self, request):
-        if not request.user.is_staff:
-            return redirect("dados:main")
-
-        context = {}
-        context["user_id"] = request.user.id
-        context["disease"] = request.POST.get('disease')
-        context["notification_year"] = request.POST.get('notification_year')
-        context["uf"] = request.POST.get('uf')
-        context["file_path"] = request.POST.get('file_path')
-
-        return redirect('dados:main')
-
 
 class ProcessSINAN(View):
     template_name = "process-file.html"
@@ -57,24 +45,24 @@ class ProcessSINAN(View):
             return redirect("dados:main")
 
         user_id = request.GET.get("user_id")
-        user = User.objects.get(pk=user_id)
-
-        if request.user != user:
-            messages.error(
-                request,
-                "Access denied, please use /upload/sinan/process-file instead",
-            )
-            return redirect("upload_sinan")
-
         disease = request.GET.get("disease")
         notification_year = request.GET.get("notification_year")
         uf = request.GET.get("uf")
         file_path = request.GET.get("file_path")
 
+        user = User.objects.get(pk=user_id)
+
+        if request.user != user:
+            messages.error(
+                request,
+                "Access denied, please use /upload/sinan/ instead",
+            )
+            return redirect("upload_sinan")
+
         if not disease or not notification_year or not uf or not file_path:
             messages.error(
                 request,
-                "Access denied, please use /upload/sinan/process-file instead",
+                "Access denied, please use /upload/sinan/ instead",
             )
             return redirect("upload_sinan")
 
@@ -83,11 +71,14 @@ class ProcessSINAN(View):
         if not file.exists():
             messages.error(
                 request,
-                "Access denied, please use /upload/sinan/process-file instead",
+                "Access denied, please use /upload/sinan/ instead",
             )
             return redirect("upload_sinan")
 
-        print(file_path)
+        dest_dir = Path(os.path.splitext(str(file.absolute()))[0])
+        dest_dir.mkdir(exist_ok=True)
+
+        sinan_split_in_states.delay(str(file.absolute()))
 
         return render(request, self.template_name)
 

@@ -1214,7 +1214,7 @@ files = [
 
 [[package]]
 name = "episcanner-downloader"
-version = "1.0.5"
+version = "1.0.7"
 description = "Dashboard quickstart template"
 optional = false
 python-versions = ">=3.9,<3.11"
@@ -1237,9 +1237,9 @@ urllib3 = "1.26.15"
 
 [package.source]
 type = "git"
-url = "https://github.com/luabida/episcanner-downloader"
-reference = "fix-duckdb"
-resolved_reference = "3477b716aaf6558ab18c065ab7004918a540353f"
+url = "https://github.com/AlertaDengue/episcanner-downloader"
+reference = "1.0.7"
+resolved_reference = "1d37b481c2988257e5bb15bc29c9e27262fa72cc"
 
 [[package]]
 name = "epiweeks"
@@ -2003,13 +2003,13 @@ dev = ["Sphinx (==7.2.5)", "colorama (==0.4.5)", "colorama (==0.4.6)", "exceptio
 
 [[package]]
 name = "makim"
-version = "1.14.0"
+version = "1.15.0"
 description = "Simplify the usage of containers"
 optional = false
-python-versions = ">=3.8.1,<4"
+python-versions = "<4,>=3.8.1"
 files = [
-    {file = "makim-1.14.0-py3-none-any.whl", hash = "sha256:12ffa74f52191c970df8fca8fbbc97739ae63ab5115154fe532458fe66262473"},
-    {file = "makim-1.14.0.tar.gz", hash = "sha256:166e51f799237c4ef3465a2537b80222d78559dfac97d6d73a0c76ddfd38ab5f"},
+    {file = "makim-1.15.0-py3-none-any.whl", hash = "sha256:01397559a6d58c0f9261d61e308e8bf177755b6a34e6b104bf18ed05a068d432"},
+    {file = "makim-1.15.0.tar.gz", hash = "sha256:1eb5a1abdfb24b589e66342d69c0b6ea14fd0a44face3aeb34b7784c33d7eda8"},
 ]
 
 [package.dependencies]
@@ -4078,4 +4078,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "b89e7dae92cec43362d4fe1091aa24c0bd60f90cd6f576676d8e6d920515aa8f"
+content-hash = "0b12b2da5403fb8823dc923382f89d57c26e20503eb945ec10ea9a39a3d9594c"
