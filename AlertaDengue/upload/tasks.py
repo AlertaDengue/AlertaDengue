@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 from django.core.mail import send_mail
-import time
 
 import pandas as pd
 import geopandas as gpd
@@ -32,13 +31,16 @@ DB_ENGINE = get_sqla_conn(database="dengue")
 
 
 @shared_task
-def sinan_split_in_states(file_path: str) -> bool:
+def sinan_split_by_uf_or_chunk(
+    file_path: str,
+    dest_dir: Path,
+    by_uf: bool
+) -> bool:
     file = Path(file_path)
 
     if not file.exists():
         raise FileNotFoundError(f"{file} not found")
 
-    dest_dir = Path(os.path.splitext(str(file.absolute()))[0])
     dest_dir.mkdir(exist_ok=True)
 
     if file.suffix.lower() in [".csv", ".csv.gz"]:
@@ -49,34 +51,92 @@ def sinan_split_in_states(file_path: str) -> bool:
             nrows=0,
         ).columns.to_list()
 
-        for df in pd.read_csv(
+        for chunk, df in enumerate(pd.read_csv(
             str(file),
             chunksize=30000,
             encoding="iso-8859-1",
             usecols=list(
                 set(EXPECTED_FIELDS.values()) & set(columns)
             ),  # pyright: ignore
-        ):
-            for _, row in df.iterrows():
-                row: pd.Series
-                try:
-                    uf = CODES_UF[int(str(row['ID_MUNICIP'])[:2])]
-                except (TypeError, ValueError, KeyError):
-                    uf = "BR"
-
-                uf_file = dest_dir / f"{uf}.csv.gz"
-
-                row.to_csv(uf_file, mode="a", index=False)
+        )):
+            if by_uf:
+                for _, row in df.iterrows():
+                    _append_row_to_uf(row, dest_dir)
+            else:
+                df.to_parquet(os.path.join(
+                    str(dest_dir), f"{str(file)}-{chunk}.parquet"
+                ))
 
         return True
 
     if file.suffix.lower() == ".dbf":
-        ...
+        dbf = Dbf5(str(file), codec="iso-8859-1")
+
+        for chunk, (lowerbound, upperbound) in enumerate(
+            chunk_gen(30000, dbf.numrec)
+        ):
+            df = gpd.read_file(
+                str(file),
+                include_fields=list(
+                    set(EXPECTED_FIELDS.values()) & set(dbf.columns)
+                ),
+                rows=slice(lowerbound, upperbound),
+                ignore_geometry=True,
+            )
+
+            if by_uf:
+                for _, row in df.iterrows():
+                    _append_row_to_uf(row, dest_dir)
+            else:
+                df.to_parquet(os.path.join(
+                    str(dest_dir), f"{str(file)}-{chunk}.parquet"
+                ))
+
+        return True
 
     if file.suffix.lower() == ".parquet":
-        raise NotImplementedError("TODO: parquet parsing not implemented yet")
+        columns = pd.read_parquet(
+            str(file.absolute()),
+            engine="fastparquet",
+            encoding="iso-8859-1",
+            index_col=0,
+            nrows=0,
+        ).columns.to_list()
+
+        for chunk, df in enumerate(
+            pd.read_parquet(
+                str(file),
+                engine="fastparquet",
+                encoding="iso-8859-1",
+                usecols=list(
+                    set(EXPECTED_FIELDS.values()) & set(columns)
+                ),  # pyright: ignore
+                chunksize=30000
+            )
+        ):
+            if by_uf:
+                for _, row in df.iterrows():
+                    _append_row_to_uf(row, dest_dir)
+            else:
+                df.to_parquet(os.path.join(
+                    str(dest_dir), f"{str(file)}-{chunk}.parquet"
+                ))
+
+        return True
 
     raise ValueError(f"Unable to parse file type '{file.suffix}'")
+
+
+def _append_row_to_uf(row: pd.Series, dest_dir: Path) -> None:
+    try:
+        uf = CODES_UF[int(str(row['ID_MUNICIP'])[:2])]
+    except (TypeError, ValueError, KeyError) as e:
+        print(str(e))
+        uf = "BR"
+
+    uf_file = dest_dir / f"{uf}.csv.gz"
+
+    row.to_csv(uf_file, mode="a", index=False)
 
 
 @shared_task
