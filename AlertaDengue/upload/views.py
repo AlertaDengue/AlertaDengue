@@ -15,7 +15,7 @@ from django.contrib import messages
 from django.conf import settings
 
 from .sinan.utils import EXPECTED_FIELDS, REQUIRED_FIELDS
-from .tasks import sinan_split_in_states
+from .tasks import sinan_split_by_uf_or_chunk
 from .models import UFs, Diseases
 
 
@@ -78,7 +78,7 @@ class ProcessSINAN(View):
         dest_dir = Path(os.path.splitext(str(file.absolute()))[0])
         dest_dir.mkdir(exist_ok=True)
 
-        sinan_split_in_states.delay(str(file.absolute()))
+        sinan_split_by_uf_or_chunk.delay(str(file.absolute()))
 
         return render(request, self.template_name)
 
