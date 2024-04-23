@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from django.core.mail import send_mail
+from typing import Optional
 
 import pandas as pd
 import geopandas as gpd
@@ -13,6 +13,7 @@ from celery.result import AsyncResult, allow_join_result
 from psycopg2.extras import DictCursor
 
 from django.utils.translation import gettext_lazy as _
+from django.core.mail import send_mail
 from django.conf import settings
 
 from ad_main.settings import get_sqla_conn
@@ -35,7 +36,7 @@ def sinan_split_by_uf_or_chunk(
     file_path: str,
     dest_dir: Path,
     by_uf: bool
-) -> bool:
+) -> tuple[bool, Optional[list]]:
     file = Path(file_path)
 
     if not file.exists():
@@ -51,6 +52,7 @@ def sinan_split_by_uf_or_chunk(
             nrows=0,
         ).columns.to_list()
 
+        chunks = []
         for chunk, df in enumerate(pd.read_csv(
             str(file),
             chunksize=30000,
@@ -63,15 +65,18 @@ def sinan_split_by_uf_or_chunk(
                 for _, row in df.iterrows():
                     _append_row_to_uf(row, dest_dir)
             else:
-                df.to_parquet(os.path.join(
-                    str(dest_dir), f"{str(file)}-{chunk}.parquet"
-                ))
+                parquet_chunk = f"{str(file)}-{chunk}.parquet"
+                chunks.append(parquet_chunk)
+                df.to_parquet(os.path.join(str(dest_dir), parquet_chunk))
 
-        return True
+        if not by_uf:
+            return True, chunks
+        return True, None
 
     if file.suffix.lower() == ".dbf":
         dbf = Dbf5(str(file), codec="iso-8859-1")
 
+        chunks = []
         for chunk, (lowerbound, upperbound) in enumerate(
             chunk_gen(30000, dbf.numrec)
         ):
@@ -88,16 +93,19 @@ def sinan_split_by_uf_or_chunk(
                 for _, row in df.iterrows():
                     _append_row_to_uf(row, dest_dir)
             else:
-                df.to_parquet(os.path.join(
-                    str(dest_dir), f"{str(file)}-{chunk}.parquet"
-                ))
+                parquet_chunk = f"{str(file)}-{chunk}.parquet"
+                chunks.append(parquet_chunk)
+                df.to_parquet(os.path.join(str(dest_dir), parquet_chunk))
 
-        return True
+        if not by_uf:
+            return True, chunks
+        return True, None
 
     if file.suffix.lower() == ".parquet":
         table = pq.read_table(str(file.absolute()))
         columns = table.column_names
 
+        chunks = []
         for chunk, (lowerbound, upperbound) in enumerate(
             chunk_gen(30000, len(table))
         ):
@@ -107,11 +115,13 @@ def sinan_split_by_uf_or_chunk(
                 for _, row in df.iterrows():
                     _append_row_to_uf(row, dest_dir)
             else:
-                df.to_parquet(os.path.join(
-                    str(dest_dir), f"{str(file)}-{chunk}.parquet"
-                ))
+                parquet_chunk = f"{str(file)}-{chunk}.parquet"
+                chunks.append(parquet_chunk)
+                df.to_parquet(os.path.join(str(dest_dir), parquet_chunk))
 
-        return True
+        if not by_uf:
+            return True, chunks
+        return True, None
 
     raise ValueError(f"Unable to parse file type '{file.suffix}'")
 
@@ -128,7 +138,7 @@ def _append_row_to_uf(row: pd.Series, dest_dir: Path) -> None:
     row.to_csv(uf_file, mode="a", index=False)
 
 
-@ shared_task
+@shared_task
 def process_sinan_file(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
     fpath = Path(str(sinan.filepath))
@@ -194,7 +204,7 @@ def process_sinan_file(sinan_pk: int) -> bool:
             return False
 
 
-@ shared_task
+@shared_task
 def chunk_csv_file(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 
@@ -228,7 +238,7 @@ def chunk_csv_file(sinan_pk: int) -> bool:
         return False
 
 
-@ shared_task
+@shared_task
 def chunk_dbf_file(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 
@@ -268,7 +278,7 @@ def chunk_dbf_file(sinan_pk: int) -> bool:
         return False
 
 
-@ shared_task
+@shared_task
 def chunk_parquet_file(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 
@@ -302,7 +312,7 @@ def chunk_parquet_file(sinan_pk: int) -> bool:
         return False
 
 
-@ shared_task
+@shared_task
 def parse_insert_chunks_on_database(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 

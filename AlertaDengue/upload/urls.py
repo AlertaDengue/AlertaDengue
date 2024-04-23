@@ -19,4 +19,9 @@ urlpatterns = [
         views.ProcessSINAN.as_view(),
         name="sinan_process_file"
     ),
+    path(
+        "sinan/chunk-upload-file/",
+        views.sinan_chunk_uploaded_file,
+        name="sinan_chunk_uploaded_file"
+    ),
 ]

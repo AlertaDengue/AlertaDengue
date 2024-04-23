@@ -1,3 +1,4 @@
+from celery.result import AsyncResult
 import os
 import io
 import csv
@@ -44,6 +45,8 @@ class ProcessSINAN(View):
             messages.error(request, "Unauthorized")
             return redirect("dados:main")
 
+        context = {}
+
         user_id = request.GET.get("user_id")
         disease = request.GET.get("disease")
         notification_year = request.GET.get("notification_year")
@@ -78,9 +81,10 @@ class ProcessSINAN(View):
         dest_dir = Path(os.path.splitext(str(file.absolute()))[0])
         dest_dir.mkdir(exist_ok=True)
 
-        sinan_split_by_uf_or_chunk.delay(str(file.absolute()))
+        context["dest_dir"] = str(dest_dir)
+        context["file_path"] = str(file.absolute())
 
-        return render(request, self.template_name)
+        return render(request, self.template_name, context)
 
 
 def sinan_upload_file(request):
@@ -106,6 +110,56 @@ def sinan_upload_file(request):
     return JsonResponse(
         {'error': 'POST request with file required'}, status=400
     )
+
+
+def sinan_chunk_uploaded_file(request):
+    if not request.user.is_staff:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+
+    if request.method == "POST":
+        file = Path(request.POST.get("file_path"))
+
+        if not file.exists():
+            return JsonResponse({'error': 'File not found'}, status=403)
+
+        dest_dir = Path(os.path.splitext(str(file))[0])
+
+        dest_dir.mkdir(exist_ok=True, parents=True)
+
+        result = sinan_split_by_uf_or_chunk.delay(  # pyright: ignore
+            file_path=str(file),
+            dest_dir=dest_dir,
+            by_uf=False
+        )
+
+        request.session['task_id'] = result.id
+
+        return JsonResponse({'task_id': result.id}, status=200)
+
+    if request.method == "GET":
+        task_id = request.GET.get("task_id")
+
+        if 'task_id' in request.session:
+            task_id = request.session['task_id']
+
+            task = AsyncResult(task_id)
+
+            if task.successful():
+                _, chunks = task.get()
+                return JsonResponse({'status': 'success', 'chunks': chunks})
+            elif task.failed():
+                return JsonResponse(
+                    {'status': 'failure', 'error': 'Task execution failed'}
+                )
+            elif task.ready():
+                return JsonResponse({'status': 'running'})
+            else:
+                return JsonResponse({'status': 'pending'})
+
+        else:
+            return JsonResponse({'error': 'Task not found'}, status=400)
+
+    return JsonResponse({'error': 'Request error'}, status=403)
 
 
 def sinan_check_csv_columns(request):

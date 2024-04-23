@@ -281,6 +281,14 @@
           file_path: data.file_path
       };
       let params = new URLSearchParams(context).toString();
+
+      fetch('/upload/sinan/chunk-upload-file/', {
+        method: 'POST',
+        body: new URLSearchParams({"file_path": data.file_path}),
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        }
+      })
       window.location.href = '/upload/sinan/process-file/?'+ params;
     })
     .catch(error => {
