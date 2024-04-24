@@ -1,5 +1,5 @@
-from celery.result import AsyncResult
 import os
+import re
 import io
 import csv
 from pathlib import Path
@@ -11,6 +11,7 @@ from dbfread import DBF
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, redirect
+from celery.result import AsyncResult
 from django.views import View
 from django.contrib import messages
 from django.conf import settings
@@ -155,6 +156,58 @@ def sinan_chunk_uploaded_file(request):
 
         else:
             return JsonResponse({'error': f'Unknown task ID'}, status=400)
+
+    return JsonResponse({'error': 'Request error'}, status=404)
+
+
+def sinan_parse_chunks_to_uf(request):
+    if not request.user.is_staff:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+
+    if request.method == "POST":
+        dest_dir = Path(request.POST.get("dest_dir")).absolute()
+
+        parquets = list(dest_dir.glob(f"{dest_dir.name}*.parquet"))
+
+        if not parquets:
+            return JsonResponse({'error': 'No data to parse'}, status=404)
+
+        task_ids = []
+        for parquet in parquets:
+            task = sinan_split_by_uf_or_chunk.delay(  # pyright: ignore
+                file_path=str(parquet),
+                dest_dir=str(dest_dir),
+                by_uf=True
+            )
+            task_ids.append(task.id)
+
+        return JsonResponse({"tasks": task_ids}, status=200)
+
+    return JsonResponse({'error': 'Request error'}, status=404)
+
+
+def sinan_watch_for_uf_chunks(request):
+    if not request.user.is_staff:
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+
+    if request.method == "GET":
+        dest_dir = Path(request.GET.get("dest_dir")).absolute()
+
+        if not dest_dir.exists() or not dest_dir.is_dir():
+            return JsonResponse({'error': 'Incorrect `dest_dir`'}, status=404)
+
+        regexp = re.compile(r"|".join(list(map(str, UFs))) + r"\.csv\.gz")
+        uf_files: list[dict] = [
+            {
+                "file": f.name,
+                "uf": f.name[:2],
+                "size": os.path.getsize(str(f))
+            }
+            for f in dest_dir.glob("*.csv.gz")
+            if regexp.match(f.name)
+        ]
+
+        return JsonResponse({"files": uf_files}, status=200)
 
     return JsonResponse({'error': 'Request error'}, status=404)
 
