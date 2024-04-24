@@ -235,7 +235,6 @@
         })
           .then(response => response.json())
           .then(data => {
-            console.log(data);
             if (data.error) {
               $('.error-icon').show().find('.tooltip').text(data.error);
               submitBtn.disabled = true;
@@ -272,16 +271,6 @@
     })
     .then(response => response.json())
     .then(data => {
-      modal.style.display = 'none';
-      var context = {
-          user_id: '{{ request.user.id }}',
-          disease: document.getElementById('disease').value,
-          notification_year: document.getElementById('notification_year').value,
-          uf: document.getElementById('uf').value,
-          file_path: data.file_path
-      };
-      let params = new URLSearchParams(context).toString();
-
       fetch('/upload/sinan/chunk-upload-file/', {
         method: 'POST',
         body: new URLSearchParams({"file_path": data.file_path}),
@@ -289,7 +278,21 @@
           'X-CSRFToken': '{{ csrf_token }}'
         }
       })
-      window.location.href = '/upload/sinan/process-file/?'+ params;
+      .then(response => response.json())
+      .then(task => {
+        modal.style.display = 'none';
+        var context = {
+            user_id: '{{ request.user.id }}',
+            disease: document.getElementById('disease').value,
+            notification_year: document.getElementById('notification_year').value,
+            uf: document.getElementById('uf').value,
+            file_path: data.file_path,
+            task_id: task.task_id
+        };
+        let params = new URLSearchParams(context).toString();
+
+        window.location.href = '/upload/sinan/process-file/?'+ params;
+      })
     })
     .catch(error => {
       console.error('Error uploading file:', error);

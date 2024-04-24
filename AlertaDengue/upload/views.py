@@ -47,11 +47,21 @@ class ProcessSINAN(View):
 
         context = {}
 
-        user_id = request.GET.get("user_id")
-        disease = request.GET.get("disease")
-        notification_year = request.GET.get("notification_year")
-        uf = request.GET.get("uf")
-        file_path = request.GET.get("file_path")
+        user_id = request.GET.get("user_id", None)
+        disease = request.GET.get("disease", None)
+        notification_year = request.GET.get("notification_year", None)
+        uf = request.GET.get("uf", None)
+        file_path = request.GET.get("file_path", None)
+        task_id = request.GET.get("task_id", None)
+
+        if not all(
+            [user_id, disease, notification_year, uf, file_path, task_id]
+        ):
+            messages.error(
+                request,
+                "Access denied, please use /upload/sinan/ instead",
+            )
+            return redirect("upload_sinan")
 
         user = User.objects.get(pk=user_id)
 
@@ -62,27 +72,18 @@ class ProcessSINAN(View):
             )
             return redirect("upload_sinan")
 
-        if not disease or not notification_year or not uf or not file_path:
-            messages.error(
-                request,
-                "Access denied, please use /upload/sinan/ instead",
-            )
-            return redirect("upload_sinan")
-
-        file = Path(file_path)
-
-        if not file.exists():
-            messages.error(
-                request,
-                "Access denied, please use /upload/sinan/ instead",
-            )
-            return redirect("upload_sinan")
-
-        dest_dir = Path(os.path.splitext(str(file.absolute()))[0])
+        dest_dir = Path(os.path.splitext(file_path)[0])
         dest_dir.mkdir(exist_ok=True)
 
+        context["user_id"] = user_id
+        context["disease"] = disease
+        context["notification_year"] = notification_year
+        context["uf"] = uf
+        context["task_id"] = task_id
         context["dest_dir"] = str(dest_dir)
-        context["file_path"] = str(file.absolute())
+
+        from pprint import pprint
+        pprint(context)
 
         return render(request, self.template_name, context)
 
@@ -120,7 +121,7 @@ def sinan_chunk_uploaded_file(request):
         file = Path(request.POST.get("file_path"))
 
         if not file.exists():
-            return JsonResponse({'error': 'File not found'}, status=403)
+            return JsonResponse({'error': 'File not found'}, status=404)
 
         dest_dir = Path(os.path.splitext(str(file))[0])
 
@@ -128,7 +129,7 @@ def sinan_chunk_uploaded_file(request):
 
         result = sinan_split_by_uf_or_chunk.delay(  # pyright: ignore
             file_path=str(file),
-            dest_dir=dest_dir,
+            dest_dir=str(dest_dir),
             by_uf=False
         )
 
@@ -144,22 +145,18 @@ def sinan_chunk_uploaded_file(request):
 
             task = AsyncResult(task_id)
 
-            if task.successful():
-                _, chunks = task.get()
-                return JsonResponse({'status': 'success', 'chunks': chunks})
-            elif task.failed():
+            if task.status == "SUCCESS":
+                _, chunks_dir = task.get()  # pyright: ignore
                 return JsonResponse(
-                    {'status': 'failure', 'error': 'Task execution failed'}
+                    {'task_status': task.status, 'chunks_dir': chunks_dir}
                 )
-            elif task.ready():
-                return JsonResponse({'status': 'running'})
             else:
-                return JsonResponse({'status': 'pending'})
+                return JsonResponse({'task_status': task.status})
 
         else:
-            return JsonResponse({'error': 'Task not found'}, status=400)
+            return JsonResponse({'error': f'Unknown task ID'}, status=400)
 
-    return JsonResponse({'error': 'Request error'}, status=403)
+    return JsonResponse({'error': 'Request error'}, status=404)
 
 
 def sinan_check_csv_columns(request):

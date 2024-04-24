@@ -34,15 +34,14 @@ DB_ENGINE = get_sqla_conn(database="dengue")
 @shared_task
 def sinan_split_by_uf_or_chunk(
     file_path: str,
-    dest_dir: Path,
+    dest_dir: str,
     by_uf: bool
-) -> tuple[bool, Optional[list]]:
+) -> tuple[bool, Optional[str]]:
     file = Path(file_path)
+    dest = Path(dest_dir)
 
     if not file.exists():
         raise FileNotFoundError(f"{file} not found")
-
-    dest_dir.mkdir(exist_ok=True)
 
     if file.suffix.lower() in [".csv", ".csv.gz"]:
         columns = pd.read_csv(
@@ -63,14 +62,17 @@ def sinan_split_by_uf_or_chunk(
         )):
             if by_uf:
                 for _, row in df.iterrows():
-                    _append_row_to_uf(row, dest_dir)
+                    _append_row_to_uf(row, dest)
             else:
-                parquet_chunk = f"{str(file)}-{chunk}.parquet"
+                parquet_chunk = (
+                    f"{os.path.splitext(file.name)[0]}-{chunk}.parquet"
+                )
                 chunks.append(parquet_chunk)
                 df.to_parquet(os.path.join(str(dest_dir), parquet_chunk))
 
         if not by_uf:
-            return True, chunks
+            file.unlink(missing_ok=True)
+            return True, str(dest_dir)
         return True, None
 
     if file.suffix.lower() == ".dbf":
@@ -91,14 +93,16 @@ def sinan_split_by_uf_or_chunk(
 
             if by_uf:
                 for _, row in df.iterrows():
-                    _append_row_to_uf(row, dest_dir)
+                    _append_row_to_uf(row, dest)
             else:
-                parquet_chunk = f"{str(file)}-{chunk}.parquet"
+                parquet_chunk = (
+                    f"{os.path.splitext(file.name)[0]}-{chunk}.parquet"
+                )
                 chunks.append(parquet_chunk)
                 df.to_parquet(os.path.join(str(dest_dir), parquet_chunk))
 
         if not by_uf:
-            return True, chunks
+            return True, str(dest_dir)
         return True, None
 
     if file.suffix.lower() == ".parquet":
@@ -113,14 +117,16 @@ def sinan_split_by_uf_or_chunk(
 
             if by_uf:
                 for _, row in df.iterrows():
-                    _append_row_to_uf(row, dest_dir)
+                    _append_row_to_uf(row, dest)
             else:
-                parquet_chunk = f"{str(file)}-{chunk}.parquet"
+                parquet_chunk = (
+                    f"{os.path.splitext(file.name)[0]}-{chunk}.parquet"
+                )
                 chunks.append(parquet_chunk)
                 df.to_parquet(os.path.join(str(dest_dir), parquet_chunk))
 
         if not by_uf:
-            return True, chunks
+            return True, str(dest_dir)
         return True, None
 
     raise ValueError(f"Unable to parse file type '{file.suffix}'")
