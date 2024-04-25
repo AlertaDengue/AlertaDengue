@@ -36,12 +36,36 @@ def sinan_split_by_uf_or_chunk(
     file_path: str,
     dest_dir: str,
     by_uf: bool
-) -> tuple[bool, Optional[str]]:
+) -> tuple[bool, Optional[list]]:
     file = Path(file_path)
     dest = Path(dest_dir)
+    task_ids = []
 
     if not file.exists():
         raise FileNotFoundError(f"{file} not found")
+
+    def semaphore(
+        chunk_df: pd.DataFrame,
+        chunk_id: int,
+        task_ids: list = []
+    ) -> None:
+        parquet_chunk = Path(os.path.join(
+            dest_dir, f"{os.path.splitext(file.name)[0]}-{chunk_id}.parquet"
+        ))
+
+        if by_uf:
+            for _, row in chunk_df.iterrows():
+                _append_row_to_uf(row, dest)
+            parquet_chunk.unlink()
+
+        else:
+            chunk_df.to_parquet(str(parquet_chunk))
+            by_uf_task = sinan_split_by_uf_or_chunk.delay(  # pyright: ignore
+                file_path=str(parquet_chunk),
+                dest_dir=dest_dir,
+                by_uf=True
+            )
+            task_ids.append(by_uf_task.id)
 
     if file.suffix.lower() in [".csv", ".csv.gz"]:
         columns = pd.read_csv(
@@ -51,7 +75,6 @@ def sinan_split_by_uf_or_chunk(
             nrows=0,
         ).columns.to_list()
 
-        chunks = []
         for chunk, df in enumerate(pd.read_csv(
             str(file),
             chunksize=30000,
@@ -60,25 +83,11 @@ def sinan_split_by_uf_or_chunk(
                 set(EXPECTED_FIELDS.values()) & set(columns)
             ),  # pyright: ignore
         )):
-            if by_uf:
-                for _, row in df.iterrows():
-                    _append_row_to_uf(row, dest)
-            else:
-                parquet_chunk = (
-                    f"{os.path.splitext(file.name)[0]}-{chunk}.parquet"
-                )
-                chunks.append(parquet_chunk)
-                df.to_parquet(os.path.join(str(dest_dir), parquet_chunk))
+            semaphore(df, chunk, task_ids)
 
-        if not by_uf:
-            file.unlink(missing_ok=True)
-            return True, str(dest_dir)
-        return True, None
-
-    if file.suffix.lower() == ".dbf":
+    elif file.suffix.lower() == ".dbf":
         dbf = Dbf5(str(file), codec="iso-8859-1")
 
-        chunks = []
         for chunk, (lowerbound, upperbound) in enumerate(
             chunk_gen(30000, dbf.numrec)
         ):
@@ -90,46 +99,24 @@ def sinan_split_by_uf_or_chunk(
                 rows=slice(lowerbound, upperbound),
                 ignore_geometry=True,
             )
+            semaphore(df, chunk, task_ids)
 
-            if by_uf:
-                for _, row in df.iterrows():
-                    _append_row_to_uf(row, dest)
-            else:
-                parquet_chunk = (
-                    f"{os.path.splitext(file.name)[0]}-{chunk}.parquet"
-                )
-                chunks.append(parquet_chunk)
-                df.to_parquet(os.path.join(str(dest_dir), parquet_chunk))
-
-        if not by_uf:
-            return True, str(dest_dir)
-        return True, None
-
-    if file.suffix.lower() == ".parquet":
+    elif file.suffix.lower() == ".parquet":
         table = pq.read_table(str(file.absolute()))
         columns = table.column_names
 
-        chunks = []
         for chunk, (lowerbound, upperbound) in enumerate(
             chunk_gen(30000, len(table))
         ):
             df = table.slice(lowerbound, upperbound).to_pandas()
+            semaphore(df, chunk, task_ids)
 
-            if by_uf:
-                for _, row in df.iterrows():
-                    _append_row_to_uf(row, dest)
-            else:
-                parquet_chunk = (
-                    f"{os.path.splitext(file.name)[0]}-{chunk}.parquet"
-                )
-                chunks.append(parquet_chunk)
-                df.to_parquet(os.path.join(str(dest_dir), parquet_chunk))
+    else:
+        raise ValueError(f"Unable to parse file type '{file.suffix}'")
 
-        if not by_uf:
-            return True, str(dest_dir)
-        return True, None
-
-    raise ValueError(f"Unable to parse file type '{file.suffix}'")
+    if not by_uf:
+        return True, task_ids
+    return True, None
 
 
 def _append_row_to_uf(row: pd.Series, dest_dir: Path) -> None:

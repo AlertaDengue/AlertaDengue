@@ -160,32 +160,6 @@ def sinan_chunk_uploaded_file(request):
     return JsonResponse({'error': 'Request error'}, status=404)
 
 
-def sinan_parse_chunks_to_uf(request):
-    if not request.user.is_staff:
-        return JsonResponse({'error': 'Unauthorized'}, status=403)
-
-    if request.method == "POST":
-        dest_dir = Path(request.POST.get("dest_dir")).absolute()
-
-        parquets = list(dest_dir.glob(f"{dest_dir.name}*.parquet"))
-
-        if not parquets:
-            return JsonResponse({'error': 'No data to parse'}, status=404)
-
-        task_ids = []
-        for parquet in parquets:
-            task = sinan_split_by_uf_or_chunk.delay(  # pyright: ignore
-                file_path=str(parquet),
-                dest_dir=str(dest_dir),
-                by_uf=True
-            )
-            task_ids.append(task.id)
-
-        return JsonResponse({"tasks": task_ids}, status=200)
-
-    return JsonResponse({'error': 'Request error'}, status=404)
-
-
 def sinan_watch_for_uf_chunks(request):
     if not request.user.is_staff:
         return JsonResponse({'error': 'Unauthorized'}, status=403)

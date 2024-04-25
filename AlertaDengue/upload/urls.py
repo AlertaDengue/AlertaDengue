@@ -25,11 +25,6 @@ urlpatterns = [
         name="sinan_chunk_uploaded_file"
     ),
     path(
-        "sinan/chunks-to-uf/",
-        views.sinan_parse_chunks_to_uf,
-        name="sinan_parse_chunks_to_uf"
-    ),
-    path(
         "sinan/watch-uf-chunks/",
         views.sinan_watch_for_uf_chunks,
         name="sinan_watch_for_uf_chunks"
