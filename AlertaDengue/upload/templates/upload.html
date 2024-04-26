@@ -15,7 +15,7 @@
       <div class="input-container">
         <label class="input-group-text btn btn-outline-secondary" for="file" style="display: flex;">{% translate "Choose file" %}</label>
         <div class="input-group">
-          <input type="file" class="form-control" id="file" name="file" accept=".csv,.csv.gz" style="display: none;">
+          <input type="file" class="form-control" id="file" name="file" accept=".csv,.csv.gz, .dbf, .parquet" style="display: none;">
         </div>
         <div class="file-info" style="display: none;">
           <span class="file-name"></span>
@@ -77,13 +77,13 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Modal title</h5>
+          <h5 class="modal-title">SINAN - Upload</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <p>Uploading file... Please wait.</p>
+          <p>Uploading file. Please wait.</p>
         </div>
         <div class="modal-footer">
         </div>
@@ -237,16 +237,23 @@
           .then(data => {
             if (data.error) {
               $('.error-icon').show().find('.tooltip').text(data.error);
+              let extension = file.name.split('.').pop().toLowerCase();
+              submitBtn.classList.add('btn-primar');
+              submitBtn.classList.remove('btn-warning');
               submitBtn.disabled = true;
+              if (extension === "dbf" | extension === "parquet") {
+                submitBtn.classList.add('btn-warning');
+                submitBtn.classList.remove('btn-primary');
+                submitBtn.disabled = false;
+              }
             } else {
               $('.error-icon').hide();
               $('.ok-icon').show();
               if (data.warning) {
                 $('.ok-icon').hide();
                 $('.warning-icon').show().find('.tooltip').text(data.warning);
-              } else {
-                submitBtn.disabled = false;
               }
+              submitBtn.disabled = false;
             }
           })
       })

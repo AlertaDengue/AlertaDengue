@@ -49,16 +49,36 @@ def sinan_split_by_uf_or_chunk(
         chunk_id: int,
         task_ids: list = []
     ) -> None:
-        parquet_chunk = Path(os.path.join(
-            dest_dir, f"{os.path.splitext(file.name)[0]}-{chunk_id}.parquet"
-        ))
 
         if by_uf:
+            uf_rows = {}
             for _, row in chunk_df.iterrows():
-                _append_row_to_uf(row, dest)
-            parquet_chunk.unlink()
+                try:
+                    uf = CODES_UF[int(str(row['ID_MUNICIP'])[:2])]
+                except (TypeError, ValueError, KeyError):
+                    uf = "BR"
+                if uf not in uf_rows:
+                    uf_rows[uf] = []
+                uf_rows[uf].append(row)
+
+            for uf, rows in uf_rows.items():
+                uf_file = dest / f"{uf}.csv"
+
+                df = pd.DataFrame(rows)
+
+                df.to_csv(
+                    str(uf_file),
+                    index=False,
+                    mode='a',
+                    header=not uf_file.exists()
+                )
+            file.unlink()
 
         else:
+            parquet_chunk = os.path.join(
+                dest_dir,
+                f"{os.path.splitext(file.name)[0]}-{chunk_id}.parquet"
+            )
             chunk_df.to_parquet(str(parquet_chunk))
             by_uf_task = sinan_split_by_uf_or_chunk.delay(  # pyright: ignore
                 file_path=str(parquet_chunk),
@@ -115,20 +135,9 @@ def sinan_split_by_uf_or_chunk(
         raise ValueError(f"Unable to parse file type '{file.suffix}'")
 
     if not by_uf:
+        file.unlink()
         return True, task_ids
     return True, None
-
-
-def _append_row_to_uf(row: pd.Series, dest_dir: Path) -> None:
-    try:
-        uf = CODES_UF[int(str(row['ID_MUNICIP'])[:2])]
-    except (TypeError, ValueError, KeyError) as e:
-        print(str(e))
-        uf = "BR"
-
-    uf_file = dest_dir / f"{uf}.csv.gz"
-
-    row.to_csv(uf_file, mode="a", index=False)
 
 
 @shared_task
@@ -214,7 +223,8 @@ def chunk_csv_file(sinan_pk: int) -> bool:
             pd.read_csv(
                 str(sinan.filepath),
                 usecols=list(EXPECTED_FIELDS.values()),  # pyright: ignore
-                chunksize=10000
+                chunksize=10000,
+                encoding="iso-8859-1",
             )
         ):
             df.to_parquet(os.path.join(

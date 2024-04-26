@@ -4,6 +4,7 @@
 
 {% block content %}
 <div id="status"></div>
+<div id="file-list"></div>
 
 <script>
 function updateTaskStatus() {
@@ -22,7 +23,7 @@ function updateTaskStatus() {
         })
         .then(data => {
             console.log('Task status:', data.task_status);
-            if (data.task_status !== "STARTED") {
+            if (data.task_status !== "STARTED" | data.task_status !== "PENDING") {
                 clearInterval(intervalId);
             }
         })
@@ -32,6 +33,40 @@ function updateTaskStatus() {
     }, 1000);
 }
 
+function updateFileList() {
+    fetch('/upload/sinan/watch-uf-chunks/?dest_dir={{dest_dir}}', {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('File list:', data.files);
+        renderFileList(data.files);
+    })
+    .catch(error => {
+        console.error('GET request error:', error);
+    });
+}
+
+function renderFileList(files) {
+    let fileList = document.getElementById('file-list');
+    fileList.innerHTML = '';
+    
+    files.forEach(file => {
+        let listItem = document.createElement('div');
+        listItem.textContent = `File: ${file.file}, UF: ${file.uf}, Size: ${file.size} bytes`;
+        fileList.appendChild(listItem);
+    });
+}
+
+setInterval(updateFileList, 3000);
 updateTaskStatus();
 </script>
 {% endblock %}

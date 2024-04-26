@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 from simpledbf import Dbf5
+import dask.dataframe as dd
 from dbfread import DBF
 
 from django.http import JsonResponse, HttpResponse
@@ -83,9 +84,6 @@ class ProcessSINAN(View):
         context["task_id"] = task_id
         context["dest_dir"] = str(dest_dir)
 
-        from pprint import pprint
-        pprint(context)
-
         return render(request, self.template_name, context)
 
 
@@ -147,9 +145,10 @@ def sinan_chunk_uploaded_file(request):
             task = AsyncResult(task_id)
 
             if task.status == "SUCCESS":
-                _, chunks_dir = task.get()  # pyright: ignore
+                _, chunks_tasks = task.get()  # pyright: ignore
+                print(chunks_tasks)
                 return JsonResponse(
-                    {'task_status': task.status, 'chunks_dir': chunks_dir}
+                    {'task_status': task.status, 'chunks_dir': chunks_tasks}
                 )
             else:
                 return JsonResponse({'task_status': task.status})
@@ -170,14 +169,14 @@ def sinan_watch_for_uf_chunks(request):
         if not dest_dir.exists() or not dest_dir.is_dir():
             return JsonResponse({'error': 'Incorrect `dest_dir`'}, status=404)
 
-        regexp = re.compile(r"|".join(list(map(str, UFs))) + r"\.csv\.gz")
+        regexp = re.compile(r"|".join(list(map(str, UFs))) + r"\.csv")
         uf_files: list[dict] = [
             {
                 "file": f.name,
                 "uf": f.name[:2],
                 "size": os.path.getsize(str(f))
             }
-            for f in dest_dir.glob("*.csv.gz")
+            for f in dest_dir.glob("*.csv")
             if regexp.match(f.name)
         ]
 
@@ -208,33 +207,40 @@ def sinan_check_csv_columns(request):
                     nrows=10,
                     sep=sep
                 ).columns.to_list()
-
-                if not all([c in columns for c in REQUIRED_FIELDS]):
-                    return JsonResponse({'error': (
-                        "Required field(s): "
-                        f"{list(set(REQUIRED_FIELDS).difference(set(columns)))} "
-                        "not found in data file"
-                    )}, status=400)
-
-                if not all([c in columns for c in EXPECTED_FIELDS.values()]):
-                    context["warning"] = (
-                        "Expected field(s): "
-                        f"{list(set(EXPECTED_FIELDS.values()).difference(set(columns)))} "
-                        "not found in data file, and will be  filled with None"
-                    )
-
-                context['file'] = file.name
-
-                context['columns'] = columns
-
-                return JsonResponse(context, status=200)
-
             except Exception as e:
                 return JsonResponse({'error': str(e)}, status=400)
 
-        return JsonResponse(
-            {'error': f'Could not extract {file.name} columns'}, status=400
-        )
+        # elif file.name.lower().endswith(".dbf"):
+        #     columns = Dbf5(str(file), codec="iso-8859-1").columns
+        # elif file.name.lower().endswith(".parquet"):
+        #     columns = dd.read_parquet(  # pyright: ignore
+        #         str(file), engine="fastparquet"
+        #     ).columns  # pyright: ignore
+
+        else:
+            return JsonResponse(
+                {'error': f'Could not extract {file.name} columns'}, status=400
+            )
+
+        if not all([c in columns for c in REQUIRED_FIELDS]):
+            return JsonResponse({'error': (
+                "Required field(s): "
+                f"{list(set(REQUIRED_FIELDS).difference(set(columns)))} "
+                "not found in data file"
+            )}, status=400)
+
+        if not all([c in columns for c in EXPECTED_FIELDS.values()]):
+            context["warning"] = (
+                "Expected field(s): "
+                f"{list(set(EXPECTED_FIELDS.values()).difference(set(columns)))} "
+                "not found in data file, and will be  filled with None"
+            )
+
+        context['file'] = file.name
+
+        context['columns'] = columns
+
+        return JsonResponse(context, status=200)
 
     return JsonResponse(
         {'error': 'POST request with file required'},
