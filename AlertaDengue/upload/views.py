@@ -11,6 +11,7 @@ from dbfread import DBF
 
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import get_user_model
+from django.views.decorators.cache import never_cache
 from django.shortcuts import render, redirect
 from celery.result import AsyncResult
 from django.views import View
@@ -25,6 +26,7 @@ from .models import UFs, Diseases
 User = get_user_model()
 
 
+@never_cache
 class UploadSINAN(View):
     template_name = "upload.html"
 
@@ -39,6 +41,7 @@ class UploadSINAN(View):
         return render(request, self.template_name, context)
 
 
+@never_cache
 class ProcessSINAN(View):
     template_name = "process-file.html"
 
@@ -87,6 +90,7 @@ class ProcessSINAN(View):
         return render(request, self.template_name, context)
 
 
+@never_cache
 def sinan_upload_file(request):
     if not request.user.is_staff:
         return JsonResponse(
@@ -112,6 +116,7 @@ def sinan_upload_file(request):
     )
 
 
+@never_cache
 def sinan_chunk_uploaded_file(request):
     if not request.user.is_staff:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
@@ -159,6 +164,7 @@ def sinan_chunk_uploaded_file(request):
     return JsonResponse({'error': 'Request error'}, status=404)
 
 
+@never_cache
 def sinan_watch_for_uf_chunks(request):
     if not request.user.is_staff:
         return JsonResponse({'error': 'Unauthorized'}, status=403)
@@ -185,6 +191,7 @@ def sinan_watch_for_uf_chunks(request):
     return JsonResponse({'error': 'Request error'}, status=404)
 
 
+@never_cache
 def sinan_check_csv_columns(request):
     if not request.user.is_staff:
         return redirect('dados:main')

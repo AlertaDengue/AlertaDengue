@@ -4,10 +4,14 @@
 
 {% block content %}
 <div id="status"></div>
+<br>
 <div id="file-list"></div>
 
 <script>
-function updateTaskStatus() {
+
+var chunk_status;
+
+function updateProcessFile() {
     let intervalId = setInterval(() => {
         fetch('/upload/sinan/chunk-upload-file/?task_id={{task_id}}', {
             method: 'GET',
@@ -22,8 +26,10 @@ function updateTaskStatus() {
             return response.json();
         })
         .then(data => {
-            console.log('Task status:', data.task_status);
-            if (data.task_status !== "STARTED" | data.task_status !== "PENDING") {
+            chunk_status = data.task_status;
+            $('#status').text(chunk_status);
+            updateFileList();
+            if (chunk_status !== 'STARTED' && chunk_status !== 'PENDING') {
                 clearInterval(intervalId);
             }
         })
@@ -61,13 +67,14 @@ function renderFileList(files) {
     
     files.forEach(file => {
         let listItem = document.createElement('div');
-        listItem.textContent = `File: ${file.file}, UF: ${file.uf}, Size: ${file.size} bytes`;
+        listItem.textContent = `File: ${file.file}, UF: ${file.uf}, Size: ${formatBytes(file.size)}`;
         fileList.appendChild(listItem);
     });
 }
 
-setInterval(updateFileList, 3000);
-updateTaskStatus();
+function formatBytes(a,b=2){if(!+a)return"0 Bytes";const c=0>b?0:b,d=Math.floor(Math.log(a)/Math.log(1024));return`${parseFloat((a/Math.pow(1024,d)).toFixed(c))} ${["Bytes","KiB","MiB","GiB"][d]}`}
+
+updateProcessFile();
 </script>
 {% endblock %}
 

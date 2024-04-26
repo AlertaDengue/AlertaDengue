@@ -37,6 +37,9 @@ def sinan_split_by_uf_or_chunk(
     dest_dir: str,
     by_uf: bool
 ) -> tuple[bool, Optional[list]]:
+    """
+    TODO: Split & async it
+    """
     file = Path(file_path)
     dest = Path(dest_dir)
     task_ids = []

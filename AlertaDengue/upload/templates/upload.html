@@ -235,11 +235,11 @@
         })
           .then(response => response.json())
           .then(data => {
+            submitBtn.classList.add('btn-primary');
+            submitBtn.classList.remove('btn-warning');
             if (data.error) {
               $('.error-icon').show().find('.tooltip').text(data.error);
               let extension = file.name.split('.').pop().toLowerCase();
-              submitBtn.classList.add('btn-primar');
-              submitBtn.classList.remove('btn-warning');
               submitBtn.disabled = true;
               if (extension === "dbf" | extension === "parquet") {
                 submitBtn.classList.add('btn-warning');
@@ -252,6 +252,8 @@
               if (data.warning) {
                 $('.ok-icon').hide();
                 $('.warning-icon').show().find('.tooltip').text(data.warning);
+                submitBtn.classList.add('btn-warning');
+                submitBtn.classList.remove('btn-primary');
               }
               submitBtn.disabled = false;
             }
