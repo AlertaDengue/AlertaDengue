@@ -3,9 +3,34 @@
 {% load static %}
 
 {% block content %}
-<div id="status"></div>
+<h1>Processing SINAN file</h1>
 <br>
-<div id="file-list"></div>
+<div class="container">
+  <div id="status-row" class="row h-50 pt-3 border border-dark border-3 align-items-center rounded-pill bg-warning text-white">
+    <div class="col">
+      <p>Chunking {{file_name}}</p>
+    </div>
+    <div class="col-4 text-center">
+      <p id="status"></p>
+    </div>
+  </div>
+</div>
+<br>
+<ul class="list-group" id="file-list">
+  <li class="list-group-item bg-secondary text-white h-50">
+    <div class="row">
+      <div class="col">
+        <p><b>File</b></p>
+      </div>
+      <div class="col-4 text-center">
+        <p><b>Size</b></p>
+      </div>
+      <div class="col-4 text-center">
+        <p><b>Status</b></p>
+      </div>
+    </div>
+  </li>
+</ul>
 
 <script>
 
@@ -29,6 +54,16 @@ function updateProcessFile() {
             chunk_status = data.task_status;
             $('#status').text(chunk_status);
             updateFileList();
+            if (chunk_status === 'SUCCESS') {
+              $('#status-row').removeClass('bg-warning bg-danger').addClass('bg-success');
+            }
+            else if (chunk_status === 'STARTED' || chunk_status === 'PENDING') {
+              $('#status-row').removeClass('bg-success bg-danger').addClass('bg-warning');
+            }
+            else if (chunk_status === 'FAILURE') {
+              $('#status-row').removeClass('bg-success bg-warning').addClass('bg-danger');
+              $('#file-list').hide()
+            }
             if (chunk_status !== 'STARTED' && chunk_status !== 'PENDING') {
                 clearInterval(intervalId);
             }
@@ -62,12 +97,39 @@ function updateFileList() {
 }
 
 function renderFileList(files) {
+    files.sort((a, b) => b.size - a.size);
+
     let fileList = document.getElementById('file-list');
-    fileList.innerHTML = '';
     
+    while (fileList.children.length > 1) {
+        fileList.removeChild(fileList.lastChild);
+    }
+
     files.forEach(file => {
-        let listItem = document.createElement('div');
-        listItem.textContent = `File: ${file.file}, UF: ${file.uf}, Size: ${formatBytes(file.size)}`;
+        let listItem = document.createElement('li');
+        listItem.classList.add('list-group-item');
+
+        let row = document.createElement('div');
+        row.classList.add('row');
+
+        let fileNameCol = document.createElement('div');
+        fileNameCol.classList.add('col');
+        fileNameCol.textContent = `${file.file}`;
+
+        let fileSizeCol = document.createElement('div');
+        fileSizeCol.classList.add('col-4');
+        fileSizeCol.classList.add('text-center');
+        fileSizeCol.textContent = `${formatBytes(file.size)}`;
+
+        let fileStatusCol = document.createElement('div');
+        fileStatusCol.classList.add('col-4');
+        fileStatusCol.classList.add('text-center');
+        fileStatusCol.textContent = `${chunk_status}`;
+
+        row.appendChild(fileNameCol);
+        row.appendChild(fileSizeCol);
+        row.appendChild(fileStatusCol);
+        listItem.appendChild(row);
         fileList.appendChild(listItem);
     });
 }

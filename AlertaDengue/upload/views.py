@@ -5,11 +5,8 @@ import csv
 from pathlib import Path
 
 import pandas as pd
-from simpledbf import Dbf5
-import dask.dataframe as dd
-from dbfread import DBF
 
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.contrib.auth import get_user_model
 from django.views.decorators.cache import never_cache
 from django.shortcuts import render, redirect
@@ -26,10 +23,10 @@ from .models import UFs, Diseases
 User = get_user_model()
 
 
-@never_cache
 class UploadSINAN(View):
     template_name = "upload.html"
 
+    @never_cache
     def get(self, request):
         if not request.user.is_staff:
             return redirect("dados:main")
@@ -41,10 +38,10 @@ class UploadSINAN(View):
         return render(request, self.template_name, context)
 
 
-@never_cache
 class ProcessSINAN(View):
     template_name = "process-file.html"
 
+    @never_cache
     def get(self, request):
         if not request.user.is_staff:
             messages.error(request, "Unauthorized")
@@ -86,6 +83,7 @@ class ProcessSINAN(View):
         context["uf"] = uf
         context["task_id"] = task_id
         context["dest_dir"] = str(dest_dir)
+        context["file_name"] = Path(file_path).name
 
         return render(request, self.template_name, context)
 
@@ -130,6 +128,9 @@ def sinan_chunk_uploaded_file(request):
         dest_dir = Path(os.path.splitext(str(file))[0])
 
         dest_dir.mkdir(exist_ok=True, parents=True)
+
+        for csv_file in dest_dir.glob("*"):
+            csv_file.unlink(missing_ok=True)
 
         result = sinan_split_by_uf_or_chunk.delay(  # pyright: ignore
             file_path=str(file),

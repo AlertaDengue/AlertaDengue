@@ -11,32 +11,40 @@
   <form id="uploadForm" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <label for="file" class="form-label">{% translate "Select File" %}</label>
-    <div class="mb-3">
-      <div class="input-container">
-        <label class="input-group-text btn btn-outline-secondary" for="file" style="display: flex;">{% translate "Choose file" %}</label>
-        <div class="input-group">
-          <input type="file" class="form-control" id="file" name="file" accept=".csv,.csv.gz, .dbf, .parquet" style="display: none;">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-auto me-auto">
+          <div class="input-container">
+            <label class="input-group-text btn btn-outline-secondary" for="file" style="display: flex;">{% translate "Choose file" %}</label>
+            <div class="input-group">
+              <input type="file" class="form-control" id="file" name="file" accept=".csv,.csv.gz, .dbf, .parquet" style="display: none;">
+            </div>
+          </div>
         </div>
-        <div class="file-info" style="display: none;">
-          <span class="file-name"></span>
-          <div class="icons">
-            <div class="error-icon" style="display: none;">
-              <i class="fas fa-exclamation-circle"></i>
-              <div class="tooltip"></div>
-            </div>
-            <div class="warning-icon" style="display: none;">
-              <i class="fas fa-circle-check"></i>
-              <div class="tooltip"></div>
-            </div>
-            <div class="ok-icon" style="display: none;">
-              <i class="fas fa-circle-check"></i>
-              <div class="tooltip"></div>
+        <div class="col">
+          <div class="file-info" style="display: none;">
+            <span class="file-name"></span>
+            <div class="icons">
+              <div class="error-icon" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <div class="tooltip"></div>
+              </div>
+              <div class="warning-icon" style="display: none;">
+                <i class="fas fa-circle-check"></i>
+                <div class="tooltip"></div>
+              </div>
+              <div class="ok-icon" style="display: none;">
+                <i class="fas fa-circle-check"></i>
+                <div class="tooltip"></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </form>
+
+  <br>
 
   <form id="dataForm">
     <div class="row">
