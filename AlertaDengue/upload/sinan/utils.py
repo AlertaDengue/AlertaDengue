@@ -1,4 +1,4 @@
-from typing import Iterator, Tuple
+from typing import Iterator, Tuple, TYPE_CHECKING
 from pathlib import Path
 
 import pandas as pd
@@ -7,6 +7,9 @@ from loguru import logger
 from django.utils.translation import gettext_lazy as _
 
 from ad_main import settings
+
+if TYPE_CHECKING:
+    from upload.models import SINAN
 
 duplicated_sinan_dir = Path(str(settings.DBF_SINAN)) / "duplicated_csvs"
 duplicated_sinan_dir.mkdir(parents=True, exist_ok=True)
@@ -154,7 +157,7 @@ def sinan_drop_duplicates_from_dataframe(
     return df
 
 
-def sinan_parse_fields(df: pd.DataFrame, sinan_obj) -> pd.DataFrame:
+def sinan_parse_fields(df: pd.DataFrame, sinan_obj: 'SINAN') -> pd.DataFrame:
     """
     Rename and parse data types on dataframe columns based on SINAN specs
     Parameters
@@ -181,7 +184,7 @@ def sinan_parse_fields(df: pd.DataFrame, sinan_obj) -> pd.DataFrame:
     ).astype(str)
 
     valid_rows: list[pd.Series] = []
-    misparsed_rows: list[pd.Series] | list = []
+    misparsed_rows: list[pd.Series] = []
     misparsed_cols = set(sinan_obj.misparsed_cols)
 
     for _, row in df.iterrows():
@@ -211,7 +214,7 @@ def sinan_parse_fields(df: pd.DataFrame, sinan_obj) -> pd.DataFrame:
 
 
 def sinan_parse_row(
-        row: pd.Series, sinan_obj, misparsed_cols: set
+    row: pd.Series, sinan_obj: 'SINAN', misparsed_cols: set[str]
 ) -> pd.Series:
     """
     If an Exception is thrown in this method, the row will be removed from the
@@ -237,7 +240,10 @@ def sinan_parse_row(
 
     for col in REQUIRED_DATE_FIELDS:
         try:
-            if row[col] in [np.nan, "", None]:
+            if (
+                row[col] in [np.nan, pd.NA, pd.NaT] or
+                str(row[col]) in ["", None, "NaT", "NaN"]
+            ):
                 raise ValueError(f"Required date field {col} is Null")
             row[col] = pd.to_datetime(str(row[col]))
         except Exception as e:

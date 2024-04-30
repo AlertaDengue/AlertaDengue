@@ -29,6 +29,12 @@ def delete_sinan_file_on_delete(
         for chunk in Path(instance.chunks_dir).glob("*.parquet"):
             chunk.unlink(missing_ok=True)
 
+        for csv in Path(instance.chunks_dir).glob("*.csv"):
+            csv.unlink(missing_ok=True)
+
+        for dbf in Path(instance.chunks_dir).glob("*.dbf"):
+            dbf.unlink(missing_ok=True)
+
         Path(instance.chunks_dir).rmdir()
 
     Path(str(instance.filepath)).unlink(missing_ok=True)

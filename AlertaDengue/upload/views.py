@@ -2,7 +2,6 @@ import os
 import re
 import io
 import csv
-from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -19,7 +18,7 @@ from celery.result import AsyncResult
 
 from .sinan.utils import EXPECTED_FIELDS, REQUIRED_FIELDS
 from .tasks import sinan_split_by_uf_or_chunk
-from .models import UFs, Diseases, SINAN
+from .models import UFs, Diseases
 
 
 User = get_user_model()
@@ -88,12 +87,6 @@ class ProcessSINAN(View):
         context["file_name"] = Path(str(file_path)).name
 
         return render(request, self.template_name, context)
-
-
-@never_cache
-def get_task_status(request: HttpRequest) -> HttpResponse:
-    if not request.user.is_staff:  # type: ignore
-        return JsonResponse({'error': 'Unauthorized'}, status=403)
 
 
 @never_cache
@@ -236,31 +229,33 @@ def sinan_object_router(request: HttpRequest) -> HttpResponse:
         file = dest_dir / file_name
 
         try:
-            sinan, created = SINAN.objects.get_or_create(
-                filepath=str(file),
-                disease=disease,
-                notification_year=notification_year,
-                uf=uf,
-                uploaded_by=request.user,
-                uploaded_at=datetime.now().date()
-            )
+            # sinan, created = SINAN.objects.get_or_create(
+            #     filepath=str(file),
+            #     disease=disease,
+            #     notification_year=notification_year,
+            #     uf=uf,
+            #     uploaded_by=request.user,
+            #     uploaded_at=datetime.now().date()
+            # )
+            #
+            # print(sinan.id)
 
-            print(sinan.id)
-
-            if created:
-                print("created")
-                sinan.save()
+            # if created:
+            #     print("created")
+            #     sinan.save()
+            print('x')
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
         return JsonResponse(
             {
-                "file_name": sinan.filename,
-                "status": sinan.status,
-                "status_error": sinan.status_error,
-                "parse_error": sinan.parse_error,
-                "misparsed_cols": sinan.misparsed_cols,
-                "inserted_rows": sinan.inserted_rows,
+                "x": "x"
+                # "file_name": sinan.filename,
+                # "status": sinan.status,
+                # "status_error": sinan.status_error,
+                # "parse_error": sinan.parse_error,
+                # "misparsed_cols": sinan.misparsed_cols,
+                # "inserted_rows": sinan.inserted_rows,
             },
             status=200
         )

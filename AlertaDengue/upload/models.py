@@ -256,14 +256,8 @@ class SINAN(models.Model):
     @property
     def chunks_dir(self) -> str | None:
         if self.filepath:
-            fname = Path(str(self.filename))
-            dir = Path(
-                os.path.join(
-                    settings.DBF_SINAN,
-                    "chunks",
-                    fname.name.removesuffix(fname.suffix))
-            )
-            dir.mkdir(exist_ok=True, parents=True)
+            fname = Path(str(self.filepath))
+            dir = fname.parent
             return str(dir.absolute())
         return None
 
