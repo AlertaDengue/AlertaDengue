@@ -29,4 +29,9 @@ urlpatterns = [
         views.sinan_watch_for_uf_chunks,
         name="sinan_watch_for_uf_chunks"
     ),
+    path(
+        "sinan/object-router/",
+        views.sinan_object_router,
+        name="sinan_object_router"
+    ),
 ]

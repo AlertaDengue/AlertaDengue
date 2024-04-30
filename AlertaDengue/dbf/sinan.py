@@ -20,12 +20,7 @@ class Sinan(object):
     and prepare the data for insertion into another database.
     """
 
-    def __init__(
-        self,
-        fname: str,
-        year: int,
-        separator: Optional[str] = ";"
-    ) -> None:
+    def __init__(self, fname: str, year: int, separator: Optional[str] = ";") -> None:
         """
         Instantiates a SINAN object by loading data from the specified file.
         :param fname: The absolute name of the Sinan dbf or csv file (str)
@@ -140,13 +135,11 @@ class Sinan(object):
 
                 # Log the start of the upsert iteration
                 logger.info(
-                    f"Starting iteration to upsert data into {table_name}..."
-                )
+                    f"Starting iteration to upsert data into {table_name}...")
 
                 # Execute the insert statement for each row in the dataframe
                 rows = [
-                    tuple(row)
-                    for row in df_without_duplicates.itertuples(index=False)
+                    tuple(row) for row in df_without_duplicates.itertuples(index=False)
                 ]
                 cursor.executemany(insert_sql, rows)
 

@@ -35,6 +35,8 @@
 <script>
 
 var chunk_status;
+let chunk_files;
+$('#file-list').hide();
 
 function updateProcessFile() {
     let intervalId = setInterval(() => {
@@ -52,10 +54,13 @@ function updateProcessFile() {
         })
         .then(data => {
             chunk_status = data.task_status;
+            updateChunkList();
             $('#status').text(chunk_status);
-            updateFileList();
+            $('#file-list').show();
+            console.log(chunk_files);
             if (chunk_status === 'SUCCESS') {
               $('#status-row').removeClass('bg-warning bg-danger').addClass('bg-success');
+                updateSINANList();
             }
             else if (chunk_status === 'STARTED' || chunk_status === 'PENDING') {
               $('#status-row').removeClass('bg-success bg-danger').addClass('bg-warning');
@@ -74,7 +79,42 @@ function updateProcessFile() {
     }, 1000);
 }
 
-function updateFileList() {
+function updateSINANList() {
+    let disease = "{{disease}}";
+    let notificationYear = "{{notification_year}}";
+    let uf = "{{uf}}";
+    let dest_dir = "{{dest_dir}}";
+
+    let intervalId = setInterval(() => {
+      if (chunk_files) {
+        chunk_files.forEach(file => {
+          let context = {
+              "disease": disease,
+              "notification_year": notificationYear,
+              "uf": uf,
+              "dest_dir": dest_dir,
+              "file_name": file.file
+          }
+          let params = new URLSearchParams(context).toString();
+          fetch('/upload/sinan/object-router/?' + params, {
+            method: 'GET',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            }
+          })
+          .then(response => response.json())
+          .then(sinan => {
+            console.log(sinan);
+          })
+          .catch(error => {
+              console.error(error);
+          });
+        });
+      }
+    }, 1000);
+}
+
+function updateChunkList() {
     fetch('/upload/sinan/watch-uf-chunks/?dest_dir={{dest_dir}}', {
         method: 'GET',
         headers: {
@@ -88,8 +128,10 @@ function updateFileList() {
         return response.json();
     })
     .then(data => {
-        console.log('File list:', data.files);
-        renderFileList(data.files);
+        let files = data.files;
+        renderFileList(files);
+        chunk_files = files;
+        console.log(files);
     })
     .catch(error => {
         console.error('GET request error:', error);

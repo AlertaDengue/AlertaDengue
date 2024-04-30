@@ -2,22 +2,24 @@ import os
 import re
 import io
 import csv
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, HttpRequest
 from django.contrib.auth import get_user_model
-from django.views.decorators.cache import never_cache
-from django.shortcuts import render, redirect
-from celery.result import AsyncResult
-from django.views import View
 from django.contrib import messages
+from django.views.decorators.cache import never_cache
+from django.views import View
+from django.shortcuts import render, redirect
 from django.conf import settings
+from django.core.files.uploadedfile import UploadedFile
+from celery.result import AsyncResult
 
 from .sinan.utils import EXPECTED_FIELDS, REQUIRED_FIELDS
 from .tasks import sinan_split_by_uf_or_chunk
-from .models import UFs, Diseases
+from .models import UFs, Diseases, SINAN
 
 
 User = get_user_model()
@@ -27,8 +29,8 @@ class UploadSINAN(View):
     template_name = "upload.html"
 
     @never_cache
-    def get(self, request):
-        if not request.user.is_staff:
+    def get(self, request: HttpRequest) -> HttpResponse:
+        if not request.user.is_staff:  # type: ignore
             return redirect("dados:main")
         context = {}
 
@@ -42,8 +44,8 @@ class ProcessSINAN(View):
     template_name = "process-file.html"
 
     @never_cache
-    def get(self, request):
-        if not request.user.is_staff:
+    def get(self, request: HttpRequest) -> HttpResponse:
+        if not request.user.is_staff:  # type: ignore
             messages.error(request, "Unauthorized")
             return redirect("dados:main")
 
@@ -74,7 +76,7 @@ class ProcessSINAN(View):
             )
             return redirect("upload_sinan")
 
-        dest_dir = Path(os.path.splitext(file_path)[0])
+        dest_dir = Path(os.path.splitext(str(file_path))[0])
         dest_dir.mkdir(exist_ok=True)
 
         context["user_id"] = user_id
@@ -83,14 +85,20 @@ class ProcessSINAN(View):
         context["uf"] = uf
         context["task_id"] = task_id
         context["dest_dir"] = str(dest_dir)
-        context["file_name"] = Path(file_path).name
+        context["file_name"] = Path(str(file_path)).name
 
         return render(request, self.template_name, context)
 
 
 @never_cache
-def sinan_upload_file(request):
-    if not request.user.is_staff:
+def get_task_status(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_staff:  # type: ignore
+        return JsonResponse({'error': 'Unauthorized'}, status=403)
+
+
+@never_cache
+def sinan_upload_file(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_staff:  # type: ignore
         return JsonResponse(
             {'error': 'Unauthorized'}, status=403
         )
@@ -98,11 +106,16 @@ def sinan_upload_file(request):
     if request.method == "POST" and request.FILES["file"]:
         file = request.FILES["file"]
 
+        if not isinstance(file, UploadedFile):
+            return JsonResponse(
+                {'error': 'Incorrect file received'}, status=400
+            )
+
         dest_dir = Path(os.path.join(settings.MEDIA_ROOT, "upload/sinan/"))
 
         dest_dir.mkdir(exist_ok=True, parents=True)
 
-        file_path = dest_dir / file.name
+        file_path = dest_dir / str(file.name)
         with open(file_path, 'wb') as dest:
             for chunk in file.chunks():
                 dest.write(chunk)
@@ -115,12 +128,19 @@ def sinan_upload_file(request):
 
 
 @never_cache
-def sinan_chunk_uploaded_file(request):
-    if not request.user.is_staff:
+def sinan_chunk_uploaded_file(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_staff:  # type: ignore
         return JsonResponse({'error': 'Unauthorized'}, status=403)
 
     if request.method == "POST":
-        file = Path(request.POST.get("file_path"))
+        file_path = request.POST.get("file_path")
+
+        if not isinstance(file_path, str):
+            return JsonResponse(
+                {'error': 'Incorrect file path received'}, status=400
+            )
+
+        file = Path(file_path)
 
         if not file.exists():
             return JsonResponse({'error': 'File not found'}, status=404)
@@ -132,7 +152,7 @@ def sinan_chunk_uploaded_file(request):
         for csv_file in dest_dir.glob("*"):
             csv_file.unlink(missing_ok=True)
 
-        result = sinan_split_by_uf_or_chunk.delay(  # pyright: ignore
+        result = sinan_split_by_uf_or_chunk.delay(
             file_path=str(file),
             dest_dir=str(dest_dir),
             by_uf=False
@@ -145,39 +165,42 @@ def sinan_chunk_uploaded_file(request):
     if request.method == "GET":
         task_id = request.GET.get("task_id")
 
-        if 'task_id' in request.session:
-            task_id = request.session['task_id']
-
-            task = AsyncResult(task_id)
-
-            if task.status == "SUCCESS":
-                _, chunks_tasks = task.get()  # pyright: ignore
-                print(chunks_tasks)
-                return JsonResponse(
-                    {'task_status': task.status, 'chunks_dir': chunks_tasks}
-                )
-            else:
-                return JsonResponse({'task_status': task.status})
-
-        else:
+        if not task_id:
             return JsonResponse({'error': f'Unknown task ID'}, status=400)
+
+        task = AsyncResult(task_id)
+
+        if task.status == "SUCCESS":
+            _, chunks_tasks = task.get()
+            return JsonResponse(
+                {'task_status': task.status, 'chunks_dir': chunks_tasks}
+            )
+        else:
+            return JsonResponse({'task_status': task.status})
 
     return JsonResponse({'error': 'Request error'}, status=404)
 
 
 @never_cache
-def sinan_watch_for_uf_chunks(request):
-    if not request.user.is_staff:
+def sinan_watch_for_uf_chunks(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_staff:  # type: ignore
         return JsonResponse({'error': 'Unauthorized'}, status=403)
 
     if request.method == "GET":
-        dest_dir = Path(request.GET.get("dest_dir")).absolute()
+        dest_dir_path = request.GET.get("dest_dir")
+
+        if not isinstance(dest_dir_path, str):
+            return JsonResponse(
+                {'error': 'Incorrect dir path received'}, status=400
+            )
+
+        dest_dir = Path(dest_dir_path).absolute()
 
         if not dest_dir.exists() or not dest_dir.is_dir():
             return JsonResponse({'error': 'Incorrect `dest_dir`'}, status=404)
 
         regexp = re.compile(r"|".join(list(map(str, UFs))) + r"\.csv")
-        uf_files: list[dict] = [
+        uf_files: list[dict[str, str | int]] = [
             {
                 "file": f.name,
                 "uf": f.name[:2],
@@ -193,17 +216,75 @@ def sinan_watch_for_uf_chunks(request):
 
 
 @never_cache
-def sinan_check_csv_columns(request):
-    if not request.user.is_staff:
+def sinan_object_router(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_staff:  # type: ignore
+        return redirect('dados:main')
+
+    if request.method == "GET":
+        disease = request.GET.get("disease", None)
+        notification_year = request.GET.get("notification_year", None)
+        uf = request.GET.get("uf", None)
+        dest_dir = request.GET.get("dest_dir", None)
+        file_name = request.GET.get("file_name", None)
+
+        if not all([disease, notification_year, uf, dest_dir, file_name]):
+            return JsonResponse(
+                {'error': 'Bad request'}, status=400
+            )
+
+        dest_dir = Path(dest_dir)
+        file = dest_dir / file_name
+
+        try:
+            sinan, created = SINAN.objects.get_or_create(
+                filepath=str(file),
+                disease=disease,
+                notification_year=notification_year,
+                uf=uf,
+                uploaded_by=request.user,
+                uploaded_at=datetime.now().date()
+            )
+
+            print(sinan.id)
+
+            if created:
+                print("created")
+                sinan.save()
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+        return JsonResponse(
+            {
+                "file_name": sinan.filename,
+                "status": sinan.status,
+                "status_error": sinan.status_error,
+                "parse_error": sinan.parse_error,
+                "misparsed_cols": sinan.misparsed_cols,
+                "inserted_rows": sinan.inserted_rows,
+            },
+            status=200
+        )
+    return JsonResponse({'error': 'Request error'}, status=404)
+
+
+@never_cache
+def sinan_check_csv_columns(request: HttpRequest) -> HttpResponse:
+    if not request.user.is_staff:  # type: ignore
         return redirect('dados:main')
 
     if request.method == "POST" and request.FILES["truncated-file"]:
         file = request.FILES["truncated-file"]
+
+        if not isinstance(file, UploadedFile):
+            return JsonResponse(
+                {'error': 'Incorrect file path received'}, status=400
+            )
+
         file_data = file.read()
         context = {}
 
         if (
-            file.name.lower().endswith((".csv.gz", ".csv"))
+            str(file.name).lower().endswith((".csv.gz", ".csv"))
             or file.content_type == "text/csv"
         ):
             try:
@@ -244,7 +325,7 @@ def sinan_check_csv_columns(request):
                 "not found in data file, and will be  filled with None"
             )
 
-        context['file'] = file.name
+        context['file'] = str(file.name)
 
         context['columns'] = columns
 

@@ -2,13 +2,14 @@ import shutil
 import os
 import csv
 from pathlib import Path
-from typing import Optional
+from typing import Optional, TypeVar, Type
 from datetime import (datetime, date)
 import pandas as pd
 from simpledbf import Dbf5
 
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 
@@ -20,59 +21,60 @@ from upload.sinan.validations import (
     validate_fields,
 )
 
-
 User = get_user_model()
+T = TypeVar('T', bound='SINAN')
+U = TypeVar('U', bound='User')
 
 
 class UFs(models.TextChoices):
-    BR = "BR", "Brasil"  # pyright: ignore
-    AC = "AC", "Acre"  # pyright: ignore
-    AL = "AL", "Alagoas"  # pyright: ignore
-    AP = "AP", "Amapá"  # pyright: ignore
-    AM = "AM", "Amazonas"  # pyright: ignore
-    BA = "BA", "Bahia"  # pyright: ignore
-    CE = "CE", "Ceará"  # pyright: ignore
-    ES = "ES", "Espírito Santo"  # pyright: ignore
-    GO = "GO", "Goiás"  # pyright: ignore
-    MA = "MA", "Maranhão"  # pyright: ignore
-    MT = "MT", "Mato Grosso"  # pyright: ignore
-    MS = "MS", "Mato Grosso do Sul"  # pyright: ignore
-    MG = "MG", "Minas Gerais"  # pyright: ignore
-    PA = "PA", "Pará"  # pyright: ignore
-    PB = "PB", "Paraíba"  # pyright: ignore
-    PR = "PR", "Paraná"  # pyright: ignore
-    PE = "PE", "Pernambuco"  # pyright: ignore
-    PI = "PI", "Piauí"  # pyright: ignore
-    RJ = "RJ", "Rio de Janeiro"  # pyright: ignore
-    RN = "RN", "Rio Grande do Norte"  # pyright: ignore
-    RS = "RS", "Rio Grande do Sul"  # pyright: ignore
-    RO = "RO", "Rondônia"  # pyright: ignore
-    RR = "RR", "Roraima"  # pyright: ignore
-    SC = "SC", "Santa Catarina"  # pyright: ignore
-    SP = "SP", "São Paulo"  # pyright: ignore
-    SE = "SE", "Sergipe"  # pyright: ignore
-    TO = "TO", "Tocantins"  # pyright: ignore
-    DF = "DF", "Distrito Federal"  # pyright: ignore
+    BR = "BR", "Brasil"
+    AC = "AC", "Acre"
+    AL = "AL", "Alagoas"
+    AP = "AP", "Amapá"
+    AM = "AM", "Amazonas"
+    BA = "BA", "Bahia"
+    CE = "CE", "Ceará"
+    ES = "ES", "Espírito Santo"
+    GO = "GO", "Goiás"
+    MA = "MA", "Maranhão"
+    MT = "MT", "Mato Grosso"
+    MS = "MS", "Mato Grosso do Sul"
+    MG = "MG", "Minas Gerais"
+    PA = "PA", "Pará"
+    PB = "PB", "Paraíba"
+    PR = "PR", "Paraná"
+    PE = "PE", "Pernambuco"
+    PI = "PI", "Piauí"
+    RJ = "RJ", "Rio de Janeiro"
+    RN = "RN", "Rio Grande do Norte"
+    RS = "RS", "Rio Grande do Sul"
+    RO = "RO", "Rondônia"
+    RR = "RR", "Roraima"
+    SC = "SC", "Santa Catarina"
+    SP = "SP", "São Paulo"
+    SE = "SE", "Sergipe"
+    TO = "TO", "Tocantins"
+    DF = "DF", "Distrito Federal"
 
 
 class Diseases(models.TextChoices):
-    DENGUE = "dengue", "Dengue"  # pyright: ignore
-    CHIK = "chik", "Chigungunya"  # pyright: ignore
-    ZIKA = "zika", "Zika"  # pyright: ignore
+    DENGUE = "dengue", "Dengue"
+    CHIK = "chik", "Chigungunya"
+    ZIKA = "zika", "Zika"
 
 
 class Status(models.TextChoices):
-    WAITING_CHUNK = "waiting_chunk", _("Aguardando chunk")  # pyright: ignore
-    CHUNKING = "chunking", _("Processando chunks")  # pyright: ignore
+    WAITING_CHUNK = "waiting_chunk", _("Aguardando chunk")
+    CHUNKING = "chunking", _("Processando chunks")
     WAITING_INSERT = "waiting_insert", _(
         "Aguardando inserção"
-    )  # pyright: ignore
-    INSERTING = "inserting", _("Inserindo dados")  # pyright: ignore
-    ERROR = "error", _("Erro")  # pyright: ignore
-    FINISHED = "finished", _("Finalizado")  # pyright: ignore
+    )
+    INSERTING = "inserting", _("Inserindo dados")
+    ERROR = "error", _("Erro")
+    FINISHED = "finished", _("Finalizado")
     FINISHED_MISPARSED = "finished_misparsed", _(
         "Finalizado com erro"
-    )  # pyright: ignore
+    )
 
 
 class SINAN(models.Model):
@@ -151,14 +153,14 @@ class SINAN(models.Model):
         on_delete=models.SET_NULL,
         null=True
     )
-    uploaded_at = models.DateField(null=False)
+    uploaded_at = models.DateField(default=timezone.now)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.filename)
 
     @classmethod
     def create(
-        cls,
+        cls: Type[T],
         filepath: str,
         notification_year: int,
         disease: Diseases = Diseases.DENGUE,
@@ -168,9 +170,9 @@ class SINAN(models.Model):
         status_error: Optional[str] = None,
         parse_error: bool = False,
         misparsed_file: Optional[str] = None,
-        uploaded_by: Optional[User] = None,  # pyright: ignore
-        uploaded_at=datetime.now().date()
-    ):
+        uploaded_by: Optional[Type[U]] = None,
+        uploaded_at: date = datetime.now().date()
+    ) -> T:
         file = Path(str(filepath))
 
         if not file:
@@ -188,16 +190,17 @@ class SINAN(models.Model):
         if file.suffix.lower() not in [".dbf", ".csv", ".parquet"]:
             raise ValueError(f"Unkown file type {file.suffix}")
 
-        file = Path(move_file_to_final_destination(
-            file_path=str(file.absolute()),
-            disease=disease,
-            uf=uf,
-            notification_year=notification_year,
-            export_date=uploaded_at,
-            geocode=municipio,
-        ))
+        # file = Path(move_file_to_final_destination(
+        #     file_path=str(file.absolute()),
+        #     dest_dir=file.parent,
+        #     disease=disease,
+        #     uf=uf,
+        #     notification_year=notification_year,
+        #     export_date=uploaded_at,
+        #     geocode=municipio,
+        # ))
 
-        columns: list = []
+        columns: list[str] = []
         try:
             if file.suffix == ".csv":
                 sniffer = csv.Sniffer()
@@ -262,50 +265,51 @@ class SINAN(models.Model):
             )
             dir.mkdir(exist_ok=True, parents=True)
             return str(dir.absolute())
+        return None
 
 
-def move_file_to_final_destination(
-    file_path: str,
-    disease: str,
-    uf: str,
-    notification_year: int,
-    export_date: date,
-    dest_dir: Path = Path(settings.DBF_SINAN) / "imported",
-    geocode: Optional[int] = None,
-) -> str:
-    if not settings.DBF_SINAN:
-        raise NotADirectoryError("DBF_SINAN directory is None")
-
-    if not dest_dir or not dest_dir.exists():
-        raise NotADirectoryError("dest_dir must be specified")
-
-    dest_dir.mkdir(exist_ok=True, parents=True)
-
-    file = Path(str(file_path))
-
-    if not file.is_absolute():
-        raise ValueError(f"{str(file)} path is not abosule")
-
-    if not file.exists():
-        raise FileNotFoundError(f"{str(file)} not found")
-
-    random_id = int(str(datetime.now().timestamp())[-4:])
-
-    file_specs = [
-        uf,
-        disease.upper(),
-        str(geocode) if geocode else None,
-        str(notification_year),
-        str(export_date),
-        str(random_id)
-    ]
-
-    dest_filename = "-".join(
-        [s for s in file_specs if s is not None]
-    ) + file.suffix.lower()
-
-    dest = dest_dir / dest_filename
-
-    shutil.move(str(file.absolute()), str(dest.absolute()))
-
-    return str(dest.absolute())
+# def move_file_to_final_destination(
+#     file_path: str,
+#     disease: str,
+#     uf: str,
+#     notification_year: int,
+#     export_date: date,
+#     dest_dir: Path = Path(settings.DBF_SINAN) / "imported",
+#     geocode: Optional[int] = None,
+# ) -> str:
+#     if not settings.DBF_SINAN:
+#         raise NotADirectoryError("DBF_SINAN directory is None")
+#
+#     if not dest_dir or not dest_dir.exists():
+#         raise NotADirectoryError("dest_dir must be specified")
+#
+#     dest_dir.mkdir(exist_ok=True, parents=True)
+#
+#     file = Path(str(file_path))
+#
+#     if not file.is_absolute():
+#         raise ValueError(f"{str(file)} path is not abosule")
+#
+#     if not file.exists():
+#         raise FileNotFoundError(f"{str(file)} not found")
+#
+#     random_id = int(str(datetime.now().timestamp())[-4:])
+#
+#     file_specs = [
+#         uf,
+#         disease.upper(),
+#         str(geocode) if geocode else None,
+#         str(notification_year),
+#         str(export_date),
+#         str(random_id)
+#     ]
+#
+#     dest_filename = "-".join(
+#         [s for s in file_specs if s is not None]
+#     ) + file.suffix.lower()
+#
+#     dest = dest_dir / dest_filename
+#
+#     shutil.move(str(file.absolute()), str(dest.absolute()))
+#
+#     return str(dest.absolute())

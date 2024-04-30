@@ -1,27 +1,30 @@
+from typing import Type, Any
 from pathlib import Path
 
-from celery.result import AsyncResult
-from django.db.models.signals import post_save, pre_delete
+from django.db.models import signals, Model
 from django.dispatch import receiver
 
 from .models import SINAN, Status
 from .tasks import process_sinan_file
 
 
-@receiver(post_save, sender=SINAN)
-def process_sinan_file_on_save(sender, instance, **kwargs):
-    sinan = SINAN.objects.get(pk=instance.pk)
+@receiver(signals.post_save, sender=SINAN)
+def process_sinan_file_on_save(
+    sender: Type[Model],
+    instance: SINAN,
+    **kwargs: Any
+) -> None:
+    sinan = SINAN.objects.get(pk=instance.pk)  # pylint: disable=E1101
     if sinan.status == Status.WAITING_CHUNK:
-        process_sinan_file.delay(sinan.pk)  # pyright: ignore
-
-        # TODO: should it unlink the data file on error?
-        # Path(str(instance.filepath)).unlink(missing_ok=True)
-        # instance.filepath = None
-        # instance.save()
+        process_sinan_file.delay(sinan.pk)
 
 
-@receiver(pre_delete, sender=SINAN)
-def delete_sinan_file_on_delete(sender, instance, **kwargs):
+@receiver(signals.pre_delete, sender=SINAN)
+def delete_sinan_file_on_delete(
+    sender: Type[Model],
+    instance: SINAN,
+    **kwargs: Any
+) -> None:
     if instance.chunks_dir:
         for chunk in Path(instance.chunks_dir).glob("*.parquet"):
             chunk.unlink(missing_ok=True)

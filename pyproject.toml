@@ -116,6 +116,9 @@ exclude = [
     'tests/',
 ]
 
+# [mypy.plugins.django-stubs]
+# django_settings_module = AlertaDengue.ad_main.settings
+
 [[tool.mypy.overrides]]
 module = [
   "requests",

@@ -11,9 +11,9 @@ from simpledbf import Dbf5
 from celery import shared_task
 from celery.result import AsyncResult, allow_join_result
 from psycopg2.extras import DictCursor
+from sqlalchemy.engine import Engine
 
 from django.utils.translation import gettext_lazy as _
-from django.core.mail import send_mail
 from django.conf import settings
 
 from ad_main.settings import get_sqla_conn
@@ -31,18 +31,18 @@ CODES_UF = {v: k for k, v in UF_CODES.items()}
 DB_ENGINE = get_sqla_conn(database="dengue")
 
 
-@shared_task
+@shared_task  # type: ignore
 def sinan_split_by_uf_or_chunk(
     file_path: str,
     dest_dir: str,
     by_uf: bool
-) -> tuple[bool, Optional[list]]:
+) -> tuple[bool, Optional[list[str]]]:
     """
     TODO: Split & async it
     """
     file = Path(file_path)
     dest = Path(dest_dir)
-    task_ids = []
+    task_ids: list[str] = []
 
     if not file.exists():
         raise FileNotFoundError(f"{file} not found")
@@ -50,11 +50,11 @@ def sinan_split_by_uf_or_chunk(
     def semaphore(
         chunk_df: pd.DataFrame,
         chunk_id: int,
-        task_ids: list = []
+        task_ids: list[str] = []
     ) -> None:
 
         if by_uf:
-            uf_rows = {}
+            uf_rows: dict[str, list[pd.Series]] = {}
             for _, row in chunk_df.iterrows():
                 try:
                     uf = CODES_UF[int(str(row['ID_MUNICIP'])[:2])]
@@ -83,7 +83,7 @@ def sinan_split_by_uf_or_chunk(
                 f"{os.path.splitext(file.name)[0]}-{chunk_id}.parquet"
             )
             chunk_df.to_parquet(str(parquet_chunk))
-            by_uf_task = sinan_split_by_uf_or_chunk.delay(  # pyright: ignore
+            by_uf_task = sinan_split_by_uf_or_chunk.delay(
                 file_path=str(parquet_chunk),
                 dest_dir=dest_dir,
                 by_uf=True
@@ -104,7 +104,7 @@ def sinan_split_by_uf_or_chunk(
             encoding="iso-8859-1",
             usecols=list(
                 set(EXPECTED_FIELDS.values()) & set(columns)
-            ),  # pyright: ignore
+            ),
         )):
             semaphore(df, chunk, task_ids)
 
@@ -143,24 +143,25 @@ def sinan_split_by_uf_or_chunk(
     return True, None
 
 
-@shared_task
+@shared_task  # type: ignore
 def process_sinan_file(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
     fpath = Path(str(sinan.filepath))
 
     try:
+        result: AsyncResult
         if fpath.suffix.lower() == ".csv":
-            result: AsyncResult = chunk_csv_file.delay(  # pyright: ignore
+            result = chunk_csv_file.delay(
                 sinan.pk
             )
 
         elif fpath.suffix.lower() == ".dbf":
-            result: AsyncResult = chunk_dbf_file.delay(  # pyright: ignore
+            result = chunk_dbf_file.delay(
                 sinan.pk
             )
 
         elif fpath.suffix.lower() == ".parquet":
-            result: AsyncResult = chunk_parquet_file.delay(  # pyright: ignore
+            result = chunk_parquet_file.delay(
                 sinan.pk
             )
 
@@ -209,7 +210,7 @@ def process_sinan_file(sinan_pk: int) -> bool:
             return False
 
 
-@shared_task
+@shared_task  # type: ignore
 def chunk_csv_file(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 
@@ -225,7 +226,7 @@ def chunk_csv_file(sinan_pk: int) -> bool:
         for chunk, df in enumerate(
             pd.read_csv(
                 str(sinan.filepath),
-                usecols=list(EXPECTED_FIELDS.values()),  # pyright: ignore
+                # usecols=list(EXPECTED_FIELDS.values()),
                 chunksize=10000,
                 encoding="iso-8859-1",
             )
@@ -237,14 +238,13 @@ def chunk_csv_file(sinan_pk: int) -> bool:
         sinan.status = Status.WAITING_INSERT
         sinan.save(update_fields=['status'])
         return True
-    else:
-        logger.info(
-            f"Invalid Status to chunk SINAN object: {sinan.status}"
-        )
-        return False
+    logger.info(
+        f"Invalid Status to chunk SINAN object: {sinan.status}"
+    )
+    return False
 
 
-@shared_task
+@shared_task  # type: ignore
 def chunk_dbf_file(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 
@@ -284,7 +284,7 @@ def chunk_dbf_file(sinan_pk: int) -> bool:
         return False
 
 
-@shared_task
+@shared_task  # type: ignore
 def chunk_parquet_file(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 
@@ -318,7 +318,7 @@ def chunk_parquet_file(sinan_pk: int) -> bool:
         return False
 
 
-@shared_task
+@shared_task  # type: ignore
 def parse_insert_chunks_on_database(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 
@@ -372,11 +372,11 @@ def sinan_insert_chunks_on_database(sinan_pk: int) -> int:
     chunks_list = list(Path(str(sinan.chunks_dir)).glob("*.parquet"))
 
     uploaded_rows: int = 0
-    with DB_ENGINE.begin() as conn:  # pyright: ignore
+    with DB_ENGINE.begin() as conn:
         # TODO: this could be ran asynchronously
         for chunk in chunks_list:
             try:
-                df: dd = dd.read_parquet(  # pyright: ignore
+                df: dd = dd.read_parquet(  # type: ignore
                     str(chunk.absolute()),
                     engine="fastparquet"
                 )
@@ -395,7 +395,7 @@ def sinan_insert_chunks_on_database(sinan_pk: int) -> int:
 
             try:
                 df = sinan_drop_duplicates_from_dataframe(
-                    df.compute(),  # pyright: ignore
+                    df.compute(),  # type: ignore
                     sinan.filename
                 )
             except Exception as e:
@@ -422,7 +422,7 @@ def sinan_insert_chunks_on_database(sinan_pk: int) -> int:
 
 
 def save_to_pgsql(
-    df: pd.DataFrame, sinan_obj: SINAN, conn
+    df: pd.DataFrame, sinan_obj: SINAN, conn: Engine
 ) -> int:
     """
     Return the number of rows executed by INSERT. Can't throw any Exception
