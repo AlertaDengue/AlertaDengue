@@ -10,6 +10,8 @@ import ibis
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
+from django.contrib.messages import constants as messages
+
 # using existing module to specify location of the .env file
 load_dotenv()
 env_path = Path(".") / ".env"
@@ -96,6 +98,7 @@ LOCAL_APPS = [
     "forecast",
     "dbf.apps.DbfConfig",
     "api",
+    "upload",
 ]
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -121,6 +124,16 @@ if DEBUG:
     INSTALLED_APPS += ("django_extensions",)
     MIDDLEWARE += ("django_cprofile_middleware.middleware.ProfilerMiddleware",)
     DJANGO_CPROFILE_MIDDLEWARE_REQUIRE_STAFF = False
+
+
+MESSAGE_TAGS = {
+    messages.DEBUG: "alert-secondary",
+    messages.INFO: "alert-info",
+    messages.SUCCESS: "alert-success",
+    messages.WARNING: "alert-warning",
+    messages.ERROR: "alert-danger",
+}
+
 
 # URLS
 # ------------------------------------------------------------------------------

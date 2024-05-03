@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<div class="container mt-5">
+  <h1>Upload SINAN</h1>
+
+  <form id="uploadForm" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="file" class="form-label">{% translate "Select File" %}</label>
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-auto me-auto">
+          <div class="input-container">
+            <label class="input-group-text btn btn-outline-secondary" for="file" style="display: flex;">{% translate "Choose file" %}</label>
+            <div class="input-group">
+              <input type="file" class="form-control" id="file" name="file" accept=".csv,.csv.gz, .dbf, .parquet" style="display: none;">
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="file-info" style="display: none;">
+            <span class="file-name"></span>
+            <div class="icons">
+              <div class="error-icon" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <div class="tooltip"></div>
+              </div>
+              <div class="warning-icon" style="display: none;">
+                <i class="fas fa-circle-check"></i>
+                <div class="tooltip"></div>
+              </div>
+              <div class="ok-icon" style="display: none;">
+                <i class="fas fa-circle-check"></i>
+                <div class="tooltip"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <br>
+
+  <form id="dataForm">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="disease" class="form-label">{% translate "Disease" %}</label>
+          <select class="form-control" id="disease" name="disease">
+            {% for value, disease in diseases %}
+            <option value="{{value}}" {% if value == "dengue" %}selected{% endif %}>{{disease}}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="notification_year" class="form-label">{% translate "Notification Year" %}</label>
+          <input type="number" class="form-control" id="notification_year" name="notification_year" value="{% now 'Y' %}" required>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="mb-3">
+          <label for="uf" class="form-label">UF</label>
+          <select class="form-control" id="uf" name="uf">
+            {% for uf, name in ufs %}
+            <option value="{{uf}}" {% if uf == "BR" %}selected{% endif %}>{{name}}</option>
+            {% if uf == "BR" %}
+            <option value="" disabled>-----------</option>
+            {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+    <button type="submit" id="submit-btn" class="btn btn-primary" disabled>Upload</button>
+  </form>
+
+  <div id="uploadModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">SINAN - Upload</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Uploading file. Please wait.</p>
+        </div>
+        <div class="modal-footer">
+        </div>
+      </div>
+    </div>
+  </div>
+
+<style>
+.input-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.file-info {
+    display: flex;
+}
+
+.icons {
+    margin-left: 10px;
+}
+
+.icons > div {
+    margin-right: 5px;
+}
+
+.error-icon {
+    position: relative;
+    display: inline-block;
+}
+
+.error-icon i {
+    cursor: help;
+    color: red;
+}
+
+.warning-icon {
+    position: relative;
+    display: inline-block;
+}
+
+.warning-icon i {
+    cursor: help;
+    color: #CFC720;
+}
+
+.ok-icon {
+    position: relative;
+    display: inline-block;
+}
+
+.ok-icon i {
+    cursor: default;
+    color: green;
+}
+
+.tooltip {
+    visibility: hidden;
+    width: 200px;
+    background-color: #E95A3B;
+    color: white;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    top: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.error-icon:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+</style>
+
+<script>
+  var file;
+
+  document.getElementById('file').addEventListener('change', function(event) {
+    event.preventDefault();
+    var formData = new FormData();
+    file = event.target.files[0];
+    const submitBtn = document.querySelector('#submit-btn');
+
+    $('.file-name').text(file.name);
+    $('.file-info').show();
+    $('.error-icon').hide();
+    $('.ok-icon').hide();
+
+    function readFirstRows(file, maxRows) {
+      return new Promise((resolve, reject) => {
+        var reader = new FileReader();
+        var chunkSize = 20000;
+        var offset = 0;
+        var rows = '';
+        var header = '';
+
+        reader.onload = function(event) {
+          var result = event.target.result;
+          rows += result;
+
+          var delimiterIndex = rows.indexOf('\n');
+          var count = 0;
+          while (delimiterIndex !== -1 && count < maxRows) {
+            if (count === 0) {
+              header = rows.slice(0, delimiterIndex + 1);
+            }
+            rows = rows.slice(delimiterIndex + 1);
+            delimiterIndex = rows.indexOf('\n');
+            count++;
+          }
+
+          if (count >= maxRows || delimiterIndex === -1) {
+            resolve({ header: header, data: rows.slice(0, -1) });
+          } else if (offset < file.size) {
+            offset += chunkSize;
+            var chunk = file.slice(offset, offset + chunkSize);
+            reader.readAsText(chunk);
+          }
+        };
+
+        reader.onerror = function(event) {
+          reject(event.target.error);
+        };
+
+        var chunk = file.slice(0, chunkSize);
+        reader.readAsText(chunk);
+      });
+    }
+
+    readFirstRows(file, 10)
+      .then(result => {
+        var blob = new Blob([result.header, result.data], { type: 'text/plain' });
+        var truncatedFile = new File([blob], file.name);
+        formData.append('truncated-file', truncatedFile);
+
+        fetch('/upload/sinan/csv-preview/', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          }
+        })
+          .then(response => response.json())
+          .then(data => {
+            submitBtn.classList.add('btn-primary');
+            submitBtn.classList.remove('btn-warning');
+            if (data.error) {
+              $('.error-icon').show().find('.tooltip').text(data.error);
+              let extension = file.name.split('.').pop().toLowerCase();
+              submitBtn.disabled = true;
+              if (extension === "dbf" | extension === "parquet") {
+                submitBtn.classList.add('btn-warning');
+                submitBtn.classList.remove('btn-primary');
+                submitBtn.disabled = false;
+              }
+            } else {
+              $('.error-icon').hide();
+              $('.ok-icon').show();
+              if (data.warning) {
+                $('.ok-icon').hide();
+                $('.warning-icon').show().find('.tooltip').text(data.warning);
+                submitBtn.classList.add('btn-warning');
+                submitBtn.classList.remove('btn-primary');
+              }
+              submitBtn.disabled = false;
+            }
+          })
+      })
+      .catch(error => console.error('Error reading file:', error));
+  });
+
+  document.getElementById('dataForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var form = this;
+    var formData = new FormData(this);
+    var modal = document.getElementById('uploadModal');
+
+    modal.style.display = 'block';
+    formData.append('file', file);
+
+    fetch('/upload/sinan/upload-file/', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      fetch('/upload/sinan/chunk-upload-file/', {
+        method: 'POST',
+        body: new URLSearchParams({"file_path": data.file_path}),
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        }
+      })
+      .then(response => response.json())
+      .then(task => {
+        modal.style.display = 'none';
+        var context = {
+            user_id: '{{ request.user.id }}',
+            disease: document.getElementById('disease').value,
+            notification_year: document.getElementById('notification_year').value,
+            uf: document.getElementById('uf').value,
+            file_path: data.file_path,
+            task_id: task.task_id
+        };
+        let params = new URLSearchParams(context).toString();
+
+        window.location.href = '/upload/sinan/process-file/?'+ params;
+      })
+    })
+    .catch(error => {
+      // TODO: send to error page
+      console.error('Error uploading file:', error);
+      modal.style.display = 'none';
+    });
+  });
+</script>
+{% endblock %}

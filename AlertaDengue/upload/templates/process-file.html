@@ -1,0 +1,337 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<h1>Processing SINAN file</h1>
+<br>
+<div class="container">
+  <div id="status-row" class="row h-50 pt-3 border border-dark border-3 align-items-center rounded-pill bg-warning text-white">
+    <div class="col">
+      <p>Chunking {{file_name}}</p>
+    </div>
+    <div class="col-4 text-center">
+      <p id="status"></p>
+    </div>
+  </div>
+</div>
+<br>
+<ul class="list-group" id="chunks-list">
+  <li class="list-group-item bg-secondary text-white h-50">
+    <div id="chunks-list-header" class="row">
+      <div class="col">
+        <p><b>File</b></p>
+      </div>
+      <div class="col-4 text-center">
+        <p><b>Size</b></p>
+      </div>
+      <div class="col-4 text-center">
+        <p><b>Status</b></p>
+      </div>
+    </div>
+  </li>
+</ul>
+
+<style>
+.error-icon {
+    position: relative;
+    display: inline-block;
+}
+
+.error-icon i {
+    cursor: help;
+    color: red;
+}
+
+.warning-icon {
+    position: relative;
+    display: inline-block;
+}
+
+.warning-icon i {
+    cursor: help;
+    color: #E9CD13;
+}
+
+.ok-icon {
+    position: relative;
+    display: inline-block;
+}
+
+.ok-icon i {
+    cursor: default;
+    color: green;
+}
+
+.tooltip-error,.tooltip-warning {
+    visibility: hidden;
+    width: 200px;
+    color: white;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    top: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tooltip-error {
+    background-color: #E95A3B;
+}
+
+.tooltip-warning {
+    background-color: #F2E730;
+}
+
+.error-icon:hover .tooltip-error,.warning-icon:hover .tooltip-warning {
+    visibility: visible;
+    opacity: 1;
+}
+
+</style>
+
+<script>
+var chunk_status;
+var chunk_files;
+$('#chunks-list').hide();
+
+function updateProcessFile() {
+    let intervalId = setInterval(() => {
+        fetch('/upload/sinan/chunk-upload-file/?task_id={{task_id}}', {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            chunk_status = data.task_status;
+            updateChunkList();
+            $('#status').text(chunk_status);
+            $('#chunks-list').show();
+            if (chunk_status === 'SUCCESS' && chunk_files) {
+              $('#status-row').removeClass('bg-warning bg-danger').addClass('bg-success');
+              updateSINANList();
+            }
+            else if (chunk_status === 'STARTED' || chunk_status === 'PENDING') {
+              $('#status-row').removeClass('bg-success bg-danger').addClass('bg-warning');
+            }
+            else if (chunk_status === 'FAILURE') {
+              $('#status-row').removeClass('bg-success bg-warning').addClass('bg-danger');
+              $('#chunks-list').hide()
+            }
+            if (chunk_status !== 'STARTED' && chunk_status !== 'PENDING') {
+                clearInterval(intervalId);
+            }
+        })
+        .catch(error => {
+            console.error('GET request error:', error);
+        });
+    }, 1000);
+}
+
+function updateSINANList() {
+    let disease = "{{disease}}";
+    let notificationYear = "{{notification_year}}";
+    let uf = "{{uf}}";
+    let dest_dir = "{{dest_dir}}";
+
+    if (!chunk_files || chunk_files.length === 0) {
+        throw new Error('No SINAN files found to insert');
+    }
+
+    if (chunk_status !== "SUCCESS") {
+        throw new Error('Chunk tasks must succeed');
+    }
+
+    let chunksListHeader = document.getElementById('chunks-list-header');
+    chunksListHeader.innerHTML = `
+        <div class="col-3">
+            <p><b>File</b></p>
+        </div>
+        <div class="col-3 text-center">
+            <p><b>Inserted rows</b></p>
+        </div>
+        <div class="col-3 text-center">
+            <p><b>Status</b></p>
+        </div>
+        <div id="flags" class="col-3 text-center">
+            <p></p>
+        </div>
+    `;
+
+    let intervalIds = [];
+    chunk_files.forEach((file, index) => {
+        let intervalId = setInterval(() => {
+            let context = {
+                "disease": disease,
+                "notification_year": notificationYear,
+                "uf": uf,
+                "dest_dir": dest_dir,
+                "file_name": file.file
+            };
+            let params = new URLSearchParams(context).toString();
+            fetch('/upload/sinan/object-router/?' + params, {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(sinan => {
+                console.log(sinan);
+                let row = document.getElementById(sinan.file_name);
+                if (row) {
+                    row.innerHTML = '';
+
+                    let fileNameCol = document.createElement('div');
+                    fileNameCol.classList.add('col-3');
+                    fileNameCol.textContent = sinan.file_name;
+
+                    let insertedRowsCol = document.createElement('div');
+                    insertedRowsCol.classList.add('col-3');
+                    insertedRowsCol.style.textAlign = 'center';
+                    insertedRowsCol.textContent = sinan.inserted_rows;
+
+                    let statusCol = document.createElement('div');
+                    statusCol.classList.add('col-3');
+                    statusCol.style.textAlign = 'center';
+                    statusCol.textContent = sinan.status;
+
+                    let flagsCol = document.createElement('div');
+                    flagsCol.classList.add('col-3');
+                    flagsCol.style.textAlign = 'center';
+                    flagsCol.textContent = ' ';
+
+                    row.appendChild(fileNameCol);
+                    row.appendChild(insertedRowsCol);
+                    row.appendChild(statusCol);
+                    row.appendChild(flagsCol);
+
+                    if (sinan.status === 'finished') {
+                        let okIcon = document.createElement('div');
+                        okIcon.classList.add('ok-icon');
+                        okIcon.innerHTML = `
+                            <i class="fas fa-circle-check"></i>
+                        `;
+                        flagsCol.appendChild(okIcon);
+                    } 
+
+                    else if (sinan.status === 'finished_misparsed') {
+                        let warningIcon = document.createElement('div');
+                        warningIcon.classList.add('warning-icon');
+                        warningIcon.innerHTML = `
+                            <i class="fas fa-circle-check"></i>
+                            <div class="tooltip-warning text-dark">Misparsed columns: ${sinan.misparsed_cols}</div>
+                        `;
+                        flagsCol.appendChild(warningIcon);
+                    }
+
+                    else if (sinan.status === 'error') {
+                        let warningIcon = document.createElement('div');
+                        warningIcon.classList.add('error-icon');
+                        warningIcon.innerHTML = `
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div class="tooltip-error">${sinan.status_error}</div>
+                        `;
+                        flagsCol.appendChild(warningIcon);
+                    }
+                }
+
+                if (sinan.status === 'finished' || sinan.status === 'finished_misparsed' || sinan.status === 'error') {
+                    clearInterval(intervalId);
+                    intervalIds.splice(index, 1);
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                clearInterval(intervalId);
+                intervalIds.splice(index, 1);
+            });
+        }, 500);
+
+        intervalIds.push(intervalId);
+    });
+}
+
+function updateChunkList() {
+    fetch('/upload/sinan/watch-uf-chunks/?dest_dir={{dest_dir}}', {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        let files = data.files;
+        renderFileList(files);
+        chunk_files = files;
+        if (chunk_status === 'SUCCESS') {
+            $('#status-row').removeClass('bg-warning bg-danger').addClass('bg-success');
+            updateSINANList();
+        }
+    })
+    .catch(error => {
+        console.error('GET request error:', error);
+    });
+}
+
+function renderFileList(files) {
+    files.sort((a, b) => b.size - a.size);
+
+    let fileList = document.getElementById('chunks-list');
+    
+    while (fileList.children.length > 1) {
+        fileList.removeChild(fileList.lastChild);
+    }
+
+    files.forEach(file => {
+        let listItem = document.createElement('li');
+        listItem.classList.add('list-group-item');
+
+        let row = document.createElement('div');
+        row.classList.add('row');
+        row.id = file.file;
+
+        let fileNameCol = document.createElement('div');
+        fileNameCol.classList.add('col');
+        fileNameCol.textContent = file.file;
+
+        let fileSizeCol = document.createElement('div');
+        fileSizeCol.classList.add('col-4');
+        fileSizeCol.classList.add('text-center');
+        fileSizeCol.textContent = `${formatBytes(file.size)}`;
+
+        let fileStatusCol = document.createElement('div');
+        fileStatusCol.classList.add('col-4');
+        fileStatusCol.classList.add('text-center');
+        fileStatusCol.textContent = `${chunk_status}`;
+
+        row.appendChild(fileNameCol);
+        row.appendChild(fileSizeCol);
+        row.appendChild(fileStatusCol);
+        listItem.appendChild(row);
+        fileList.appendChild(listItem);
+    });
+}
+
+function formatBytes(a,b=2){if(!+a)return"0 Bytes";const c=0>b?0:b,d=Math.floor(Math.log(a)/Math.log(1024));return`${parseFloat((a/Math.pow(1024,d)).toFixed(c))} ${["Bytes","KiB","MiB","GiB"][d]}`}
+
+updateProcessFile();
+</script>
+{% endblock %}
+
