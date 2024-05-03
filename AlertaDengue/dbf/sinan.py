@@ -1,8 +1,6 @@
 from typing import Any, List, Optional
-from pathlib import Path
 
 import psycopg2
-import pandas as pd
 from ad_main.settings import get_sqla_conn
 from dbf.utils import (
     FIELD_MAP,
@@ -16,14 +14,16 @@ from psycopg2.extras import DictCursor
 
 class Sinan(object):
     """
-    Introspects a SINAN DBF or CSV file, perform data cleaning and type conversion,
+    Introspects a SINAN DBF file, perform data cleaning and type conversion,
     and prepare the data for insertion into another database.
     """
 
-    def __init__(self, fname: str, year: int, separator: Optional[str] = ";") -> None:
+    def __init__(
+        self, dbf_fname: str, year: int, encoding: str = "iso=8859-1"
+    ) -> None:
         """
         Instantiates a SINAN object by loading data from the specified file.
-        :param fname: The absolute name of the Sinan dbf or csv file (str)
+        :param dbf_fname: The name of the Sinan dbf file (str)
         :param year: The year of the data (int)
         :param encoding: The file encoding (str)
         :return: None
@@ -34,21 +34,9 @@ class Sinan(object):
 
         logger.info("Formatting fields and reading chunks from parquet files")
 
-        file = Path(fname)
-
-        if not file.exists():
-            raise FileNotFoundError(f"{fname} not found")
-
-        if file.suffix.lower() == ".dbf":
-            self.table = read_dbf(fname)
-        elif file.suffix.lower() == ".csv":
-            self.table = pd.read_csv(file.absolute(), sep=separator)
-        else:
-            raise NotImplementedError(f"Unknown file type: {file.suffix}")
-
-        self.fname = file.absolute()
+        self.table = read_dbf(dbf_fname)
         self.year = year
-        self.fname = fname
+        self.dbf_fname = dbf_fname
 
     def _fill_missing_columns(self, col_names: List[str]) -> None:
         """
@@ -95,7 +83,7 @@ class Sinan(object):
         # Log the start of the transaction process
         logger.info(
             f"Starting the SINAN transaction process for the {self.year} year "
-            f"using the {self.fname} file."
+            f"using the {self.dbf_fname} file."
         )
 
         # Start a transaction and create a cursor
@@ -135,11 +123,13 @@ class Sinan(object):
 
                 # Log the start of the upsert iteration
                 logger.info(
-                    f"Starting iteration to upsert data into {table_name}...")
+                    f"Starting iteration to upsert data into {table_name}..."
+                )
 
                 # Execute the insert statement for each row in the dataframe
                 rows = [
-                    tuple(row) for row in df_without_duplicates.itertuples(index=False)
+                    tuple(row)
+                    for row in df_without_duplicates.itertuples(index=False)
                 ]
                 cursor.executemany(insert_sql, rows)
 

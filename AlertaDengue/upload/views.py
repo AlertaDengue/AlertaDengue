@@ -2,6 +2,7 @@ import os
 import re
 import io
 import csv
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -18,7 +19,7 @@ from celery.result import AsyncResult
 
 from .sinan.utils import EXPECTED_FIELDS, REQUIRED_FIELDS
 from .tasks import sinan_split_by_uf_or_chunk
-from .models import UFs, Diseases
+from .models import UFs, Diseases, SINAN
 
 
 User = get_user_model()
@@ -221,41 +222,44 @@ def sinan_object_router(request: HttpRequest) -> HttpResponse:
         file_name = request.GET.get("file_name", None)
 
         if not all([disease, notification_year, uf, dest_dir, file_name]):
-            return JsonResponse(
-                {'error': 'Bad request'}, status=400
-            )
+            return JsonResponse({'error': 'Bad request'}, status=400)
 
         dest_dir = Path(dest_dir)
         file = dest_dir / file_name
 
-        try:
-            # sinan, created = SINAN.objects.get_or_create(
-            #     filepath=str(file),
-            #     disease=disease,
-            #     notification_year=notification_year,
-            #     uf=uf,
-            #     uploaded_by=request.user,
-            #     uploaded_at=datetime.now().date()
-            # )
-            #
-            # print(sinan.id)
+        if not file.exists():
+            return JsonResponse({'error': 'File not found'}, status=404)
 
-            # if created:
-            #     print("created")
-            #     sinan.save()
-            print('x')
+        try:
+            sinan = SINAN.objects.get(
+                filepath=str(file),
+                disease=disease,
+                notification_year=int(notification_year)
+            )
+        except SINAN.DoesNotExist:
+            sinan = SINAN.create(
+                filepath=str(file),
+                disease=disease,
+                notification_year=int(notification_year),
+                uf=uf,
+                uploaded_by=request.user,
+                uploaded_at=datetime.now().date()
+            )
+            sinan.save()
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
+        sinan = SINAN.objects.get(pk=sinan.id)
+
         return JsonResponse(
             {
-                "x": "x"
-                # "file_name": sinan.filename,
-                # "status": sinan.status,
-                # "status_error": sinan.status_error,
-                # "parse_error": sinan.parse_error,
-                # "misparsed_cols": sinan.misparsed_cols,
-                # "inserted_rows": sinan.inserted_rows,
+                "id": sinan.id,
+                "file_name": sinan.filename,
+                "status": sinan.status,
+                "status_error": sinan.status_error,
+                "parse_error": sinan.parse_error,
+                "misparsed_cols": sinan.misparsed_cols,
+                "inserted_rows": sinan.inserted_rows,
             },
             status=200
         )

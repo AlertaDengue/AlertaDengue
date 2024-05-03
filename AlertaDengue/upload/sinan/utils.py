@@ -240,12 +240,10 @@ def sinan_parse_row(
 
     for col in REQUIRED_DATE_FIELDS:
         try:
-            if (
-                row[col] in [np.nan, pd.NA, pd.NaT] or
-                str(row[col]) in ["", None, "NaT", "NaN"]
-            ):
+            value = pd.to_datetime(str(row[col]))
+            if isinstance(value, type(pd.NaT)):
                 raise ValueError(f"Required date field {col} is Null")
-            row[col] = pd.to_datetime(str(row[col]))
+            row[col] = value
         except Exception as e:
             misparsed_cols.add(col)
             raise e

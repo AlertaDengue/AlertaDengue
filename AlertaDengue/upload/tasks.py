@@ -31,7 +31,7 @@ CODES_UF = {v: k for k, v in UF_CODES.items()}
 DB_ENGINE = get_sqla_conn(database="dengue")
 
 
-@shared_task  # type: ignore
+@shared_task(default_retry_delay=30, max_retries=3, soft_time_limit=5*60)
 def sinan_split_by_uf_or_chunk(
     file_path: str,
     dest_dir: str,
@@ -146,7 +146,7 @@ def sinan_split_by_uf_or_chunk(
     return True, None
 
 
-@shared_task  # type: ignore
+@shared_task(default_retry_delay=30, max_retries=3, soft_time_limit=5*60)
 def process_sinan_file(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
     fpath = Path(str(sinan.filepath))
@@ -184,21 +184,16 @@ def process_sinan_file(sinan_pk: int) -> bool:
 
     with allow_join_result():
         try:
-            chunking_success = result.get(timeout=10*60)
+            chunking_success = result.get(timeout=120*60)
 
             if chunking_success:
-                logger.info(
-                    f"Parsed {len(list(Path(str(sinan.chunks_dir)).glob('*.parquet')))} "
-                    f"chunks for {sinan.filename}"
-                )
-
                 inserted: AsyncResult = (
                     parse_insert_chunks_on_database.delay(  # pyright: ignore
                         sinan_pk
                     )
                 )
 
-                if inserted.get(timeout=10*60):
+                if inserted.get(timeout=120*60):
                     return True
             if result.status == "FAILURE":
                 err = f"Chunking task for {sinan.filename} failed"
@@ -217,7 +212,7 @@ def process_sinan_file(sinan_pk: int) -> bool:
             return False
 
 
-@shared_task  # type: ignore
+@shared_task(default_retry_delay=30, max_retries=3, soft_time_limit=3*60)
 def chunk_csv_file(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 
@@ -252,7 +247,7 @@ def chunk_csv_file(sinan_pk: int) -> bool:
         return True
 
 
-@shared_task  # type: ignore
+@shared_task(default_retry_delay=30, max_retries=3, soft_time_limit=3*60)
 def chunk_dbf_file(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 
@@ -294,7 +289,7 @@ def chunk_dbf_file(sinan_pk: int) -> bool:
         return True
 
 
-@shared_task  # type: ignore
+@shared_task(default_retry_delay=30, max_retries=3, soft_time_limit=3*60)
 def chunk_parquet_file(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 
@@ -329,7 +324,7 @@ def chunk_parquet_file(sinan_pk: int) -> bool:
         return True
 
 
-@shared_task  # type: ignore
+@shared_task(default_retry_delay=30, max_retries=3, soft_time_limit=120*60)
 def parse_insert_chunks_on_database(sinan_pk: int) -> bool:
     sinan = SINAN.objects.get(pk=sinan_pk)
 
@@ -369,7 +364,10 @@ def parse_insert_chunks_on_database(sinan_pk: int) -> bool:
 
 
 def sinan_insert_chunks_on_database(sinan: SINAN) -> int | None:
-    chunks_list = list(Path(str(sinan.chunks_dir)).glob("*.parquet"))
+    chunks_list = (
+        list(Path(str(sinan.chunks_dir))
+             .glob(f"{sinan.filename}*.parquet"))
+    )
 
     uploaded_rows: int = 0
     with DB_ENGINE.begin() as conn:

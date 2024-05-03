@@ -156,7 +156,7 @@ class SINAN(models.Model):
     uploaded_at = models.DateField(default=timezone.now)
 
     def __str__(self) -> str:
-        return str(self.filename)
+        return str(self.filename) + " - " + str(self.id)
 
     @classmethod
     def create(

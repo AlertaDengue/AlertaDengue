@@ -18,9 +18,6 @@ temp_files_dir = Path(settings.TEMP_FILES_DIR)
 dbf_sinan_dir = Path(settings.DBF_SINAN) / "dbf_duplicated_csv"
 dbf_pqt_dir = temp_files_dir / "dbf_parquet"
 
-dbf_sinan_dir.mkdir(exist_ok=True, parents=True)
-dbf_pqt_dir.mkdir(exist_ok=True, parents=True)
-
 EXPECTED_FIELDS = [
     "NU_ANO",
     "ID_MUNICIP",

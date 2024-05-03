@@ -35,6 +35,10 @@ def delete_sinan_file_on_delete(
         for dbf in Path(instance.chunks_dir).glob("*.dbf"):
             dbf.unlink(missing_ok=True)
 
-        Path(instance.chunks_dir).rmdir()
+        chunks_dir = Path(instance.chunks_dir)
+        if chunks_dir.exists():
+            chunks_dir.rmdir()
 
     Path(str(instance.filepath)).unlink(missing_ok=True)
+    if instance.misparsed_file:
+        Path(str(instance.misparsed_file)).unlink(missing_ok=True)
