@@ -34,4 +34,9 @@ urlpatterns = [
         views.sinan_object_router,
         name="sinan_object_router"
     ),
+    path(
+        "sinan/owncloud/list-files/",
+        views.owncloud_list_files,
+        name="owncloud_list_files"
+    )
 ]

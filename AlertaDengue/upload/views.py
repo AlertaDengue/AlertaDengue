@@ -3,9 +3,11 @@ import re
 import io
 import csv
 from datetime import datetime
+from dateutil import parser
 from pathlib import Path
 
 import pandas as pd
+import owncloud
 
 from django.http import JsonResponse, HttpResponse, HttpRequest
 from django.contrib.auth import get_user_model
@@ -19,7 +21,7 @@ from celery.result import AsyncResult
 
 from .sinan.utils import EXPECTED_FIELDS, REQUIRED_FIELDS
 from .tasks import sinan_split_by_uf_or_chunk
-from .models import UFs, Diseases, SINAN
+from .models import UFs, Diseases, SINAN, OwnCloudUser
 
 
 User = get_user_model()
@@ -88,6 +90,62 @@ class ProcessSINAN(View):
         context["file_name"] = Path(str(file_path)).name
 
         return render(request, self.template_name, context)
+
+
+@never_cache
+def owncloud_list_files(request: HttpRequest) -> JsonResponse:
+    if not request.user.is_staff:  # type: ignore
+        return JsonResponse(
+            {'error': 'Unauthorized'}, status=403
+        )
+
+    if request.method == "GET":
+        try:
+            owncloud_user = OwnCloudUser.objects.get(user=request.user)
+        except OwnCloudUser.DoesNotExist:
+            return JsonResponse(
+                {'error': (
+                    'OwnCloud user not configured. Please contact the moderation'
+                )}, status=404
+            )
+
+        directory = request.GET.get("directory-path")
+
+        try:
+            oc = owncloud.Client(settings.OWNCLOUD_URL)
+            oc.login(owncloud_user.username, owncloud_user.password)
+        except (owncloud.HTTPResponseError, AttributeError):
+            oc.logout()
+            return JsonResponse(
+                {'error': (
+                    'Unable to login with OwnCloud user '
+                    f'{owncloud_user.username}'
+                )}, status=403
+            )
+
+        try:
+            files = oc.list(directory)
+        except owncloud.HTTPResponseError:
+            return JsonResponse(
+                {'error': f'Directory {directory} not found'},
+                status=404
+            )
+        finally:
+            oc.logout()
+
+        res: list[dict[str, str | int]] = []
+        for file in files:
+            res_file = {}
+            last_modify = parser.parse(
+                file.attributes['{DAV:}getlastmodified']
+            )
+            res_file["path"] = file.path
+            res_file["last_modify"] = last_modify.strftime("%x %H:%M")
+            res_file["size"] = int(file.attributes['{DAV:}getcontentlength'])
+            res.append(res_file)
+
+        return JsonResponse({"files": res}, status=200)
+    return JsonResponse({'error': 'Invalid request'}, status=403)
 
 
 @never_cache
