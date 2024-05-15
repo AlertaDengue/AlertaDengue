@@ -38,5 +38,10 @@ urlpatterns = [
         "sinan/owncloud/list-files/",
         views.owncloud_list_files,
         name="owncloud_list_files"
+    ),
+    path(
+        "sinan/owncloud/get-file/",
+        views.owncloud_download_file_view,
+        name="owncloud_get_file"
     )
 ]

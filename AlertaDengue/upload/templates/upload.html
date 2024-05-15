@@ -10,6 +10,37 @@
 
   <form id="uploadForm" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
+    <div id="owncloud">
+      <center><h3>OwnCloud Files:</h3></center>
+      <ul class="list-group" id="owncloud-file-list">
+        <li class="list-group-item bg-secondary text-white py-1 my-auto">
+          <div id="owncloud-file-list-header" class="row">
+            <div class="col">
+              <p><b>File</b></p>
+            </div>
+            <div class="col-4 text-center">
+              <p><b>Size</b></p>
+            </div>
+            <div class="col-4 text-center">
+              <p><b>Last Modified</b></p>
+            </div>
+          </div>
+        </li>
+        <li id="loading-files" class="list-group-item py-1">
+          <div class="text-center">
+            <p>Loading files...</p>
+          </div>
+        </li>
+      </ul>
+      <div id="owncloud-buttons" class="pt-3 justify-content-center gap-3">
+        <center>
+          <button id="owncloud-load-more-btn" class="btn btn-outline-secondary me-3">{% translate "Load more" %}</button>
+          <button id="owncloud-download-files" class="btn btn-outline-secondary me-3">{% translate "Download selected" %}</button>
+          <button id="owncloud-choose-files" class="btn btn-outline-secondary">{% translate "Choose selected" %}</button>
+        </center>
+      </div>
+    </div>
+
     <label for="file" class="form-label">{% translate "Select File" %}</label>
     <div class="container">
       <div class="row align-items-center">
@@ -107,6 +138,15 @@
     gap: 10px;
 }
 
+#owncloud {
+  padding: 10px 5% 0 5%;
+}
+
+#owncloud-file-list .list-group-item {
+  overflow: hidden;
+  align-items: center;
+}
+
 .file-info {
     display: flex;
 }
@@ -173,148 +213,222 @@
 </style>
 
 <script>
-  var file;
+  document.addEventListener('DOMContentLoaded', function() {
+    let owncloudFiles = [];
+    let owncloudFilesIndex = 0;
 
-  document.getElementById('file').addEventListener('change', function(event) {
-    event.preventDefault();
-    var formData = new FormData();
-    file = event.target.files[0];
-    const submitBtn = document.querySelector('#submit-btn');
-
-    $('.file-name').text(file.name);
-    $('.file-info').show();
-    $('.error-icon').hide();
-    $('.ok-icon').hide();
-
-    function readFirstRows(file, maxRows) {
-      return new Promise((resolve, reject) => {
-        var reader = new FileReader();
-        var chunkSize = 20000;
-        var offset = 0;
-        var rows = '';
-        var header = '';
-
-        reader.onload = function(event) {
-          var result = event.target.result;
-          rows += result;
-
-          var delimiterIndex = rows.indexOf('\n');
-          var count = 0;
-          while (delimiterIndex !== -1 && count < maxRows) {
-            if (count === 0) {
-              header = rows.slice(0, delimiterIndex + 1);
+    function fetchOwnCloudFiles() {
+        fetch('/upload/sinan/owncloud/list-files/?directory-path=/Dados%20Infodengue', {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
             }
-            rows = rows.slice(delimiterIndex + 1);
-            delimiterIndex = rows.indexOf('\n');
-            count++;
-          }
-
-          if (count >= maxRows || delimiterIndex === -1) {
-            resolve({ header: header, data: rows.slice(0, -1) });
-          } else if (offset < file.size) {
-            offset += chunkSize;
-            var chunk = file.slice(offset, offset + chunkSize);
-            reader.readAsText(chunk);
-          }
-        };
-
-        reader.onerror = function(event) {
-          reject(event.target.error);
-        };
-
-        var chunk = file.slice(0, chunkSize);
-        reader.readAsText(chunk);
-      });
+        })
+        .then(response => {
+            if (!response.ok) {
+              throw new Error(response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            owncloudFiles = data.owncloud_files;
+            displayNextOwnCloudFiles();
+        })
+        .catch(error => {
+            displayError(error.message);
+        });
     }
 
-    readFirstRows(file, 10)
-      .then(result => {
-        var blob = new Blob([result.header, result.data], { type: 'text/plain' });
-        var truncatedFile = new File([blob], file.name);
-        formData.append('truncated-file', truncatedFile);
+    function displayNextOwnCloudFiles() {
+      const fileList = document.getElementById('owncloud-file-list');
+      const filesToShowIndex = Math.min(owncloudFilesIndex + 5, owncloudFiles.length);
+      for (let i = owncloudFilesIndex; i < filesToShowIndex; i++) {
+          const file = owncloudFiles[i];
+          const listItem = document.createElement('li');
+          listItem.classList.add('list-group-item');
+          listItem.classList.add('py-1');
+          listItem.classList.add('my-auto');
+          const rowDiv = document.createElement('div');
+          rowDiv.classList.add('row');
+          rowDiv.innerHTML = `
+              <div class="col" id="${file.name}">
+                  <p>${file.name}</p>
+              </div>
+              <div class="col-4 text-center">
+                  <p>${formatBytes(file.size)}</p>
+              </div>
+              <div class="col-4 text-center">
+                  <p>${file.last_modify}</p>
+              </div>
+          `;
+          listItem.appendChild(rowDiv);
+          fileList.appendChild(listItem);
+      }
+      owncloudFilesIndex = filesToShowIndex;
+      $('#loading-files').hide();
 
-        fetch('/upload/sinan/csv-preview/', {
-          method: 'POST',
-          body: formData,
-          headers: {
-            'X-CSRFToken': '{{ csrf_token }}'
-          }
-        })
-          .then(response => response.json())
-          .then(data => {
-            submitBtn.classList.add('btn-primary');
-            submitBtn.classList.remove('btn-warning');
-            if (data.error) {
-              $('.error-icon').show().find('.tooltip').text(data.error);
-              let extension = file.name.split('.').pop().toLowerCase();
-              submitBtn.disabled = true;
-              if (extension === "dbf" | extension === "parquet") {
-                submitBtn.classList.add('btn-warning');
-                submitBtn.classList.remove('btn-primary');
-                submitBtn.disabled = false;
+      if (owncloudFilesIndex >= owncloudFiles.length) {
+          $('#owncloud-load-more-btn').hide();
+      }
+    }
+
+    function displayError(errorMessage) {
+      const fileList = document.getElementById('owncloud-file-list');
+      fileList.innerHTML = `<div class="alert alert-danger" role="alert">OwnCloud Error: ${errorMessage}</div>`;
+      document.getElementById('load-more-btn').style.display = 'none';
+    }
+
+    fetchOwnCloudFiles();
+    var file;
+
+    document.getElementById('owncloud-load-more-btn').addEventListener('click', () => {
+        event.preventDefault();
+        displayNextOwnCloudFiles();
+      });
+
+    document.getElementById('file').addEventListener('change', function(event) {
+      event.preventDefault();
+      var formData = new FormData();
+      file = event.target.files[0];
+      const submitBtn = document.querySelector('#submit-btn');
+
+      $('.file-name').text(file.name);
+      $('.file-info').show();
+      $('.error-icon').hide();
+      $('.ok-icon').hide();
+
+      function readFirstRows(file, maxRows) {
+        return new Promise((resolve, reject) => {
+          var reader = new FileReader();
+          var chunkSize = 20000;
+          var offset = 0;
+          var rows = '';
+          var header = '';
+
+          reader.onload = function(event) {
+            var result = event.target.result;
+            rows += result;
+
+            var delimiterIndex = rows.indexOf('\n');
+            var count = 0;
+            while (delimiterIndex !== -1 && count < maxRows) {
+              if (count === 0) {
+                header = rows.slice(0, delimiterIndex + 1);
               }
-            } else {
-              $('.error-icon').hide();
-              $('.ok-icon').show();
-              if (data.warning) {
-                $('.ok-icon').hide();
-                $('.warning-icon').show().find('.tooltip').text(data.warning);
-                submitBtn.classList.add('btn-warning');
-                submitBtn.classList.remove('btn-primary');
-              }
-              submitBtn.disabled = false;
+              rows = rows.slice(delimiterIndex + 1);
+              delimiterIndex = rows.indexOf('\n');
+              count++;
+            }
+
+            if (count >= maxRows || delimiterIndex === -1) {
+              resolve({ header: header, data: rows.slice(0, -1) });
+            } else if (offset < file.size) {
+              offset += chunkSize;
+              var chunk = file.slice(offset, offset + chunkSize);
+              reader.readAsText(chunk);
+            }
+          };
+
+          reader.onerror = function(event) {
+            reject(event.target.error);
+          };
+
+          var chunk = file.slice(0, chunkSize);
+          reader.readAsText(chunk);
+        });
+      }
+
+      readFirstRows(file, 10)
+        .then(result => {
+          var blob = new Blob([result.header, result.data], { type: 'text/plain' });
+          var truncatedFile = new File([blob], file.name);
+          formData.append('truncated-file', truncatedFile);
+
+          fetch('/upload/sinan/csv-preview/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
             }
           })
-      })
-      .catch(error => console.error('Error reading file:', error));
-  });
+            .then(response => response.json())
+            .then(data => {
+              submitBtn.classList.add('btn-primary');
+              submitBtn.classList.remove('btn-warning');
+              if (data.error) {
+                $('.error-icon').show().find('.tooltip').text(data.error);
+                let extension = file.name.split('.').pop().toLowerCase();
+                submitBtn.disabled = true;
+                if (extension === "dbf" | extension === "parquet") {
+                  submitBtn.classList.add('btn-warning');
+                  submitBtn.classList.remove('btn-primary');
+                  submitBtn.disabled = false;
+                }
+              } else {
+                $('.error-icon').hide();
+                $('.ok-icon').show();
+                if (data.warning) {
+                  $('.ok-icon').hide();
+                  $('.warning-icon').show().find('.tooltip').text(data.warning);
+                  submitBtn.classList.add('btn-warning');
+                  submitBtn.classList.remove('btn-primary');
+                }
+                submitBtn.disabled = false;
+              }
+            })
+        })
+        .catch(error => console.error('Error reading file:', error));
+    });
 
-  document.getElementById('dataForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    var form = this;
-    var formData = new FormData(this);
-    var modal = document.getElementById('uploadModal');
+    document.getElementById('dataForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      var form = this;
+      var formData = new FormData(this);
+      var modal = document.getElementById('uploadModal');
 
-    modal.style.display = 'block';
-    formData.append('file', file);
+      modal.style.display = 'block';
+      formData.append('file', file);
 
-    fetch('/upload/sinan/upload-file/', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-CSRFToken': '{{ csrf_token }}'
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      fetch('/upload/sinan/chunk-upload-file/', {
+      fetch('/upload/sinan/upload-file/', {
         method: 'POST',
-        body: new URLSearchParams({"file_path": data.file_path}),
+        body: formData,
         headers: {
           'X-CSRFToken': '{{ csrf_token }}'
         }
       })
       .then(response => response.json())
-      .then(task => {
-        modal.style.display = 'none';
-        var context = {
-            user_id: '{{ request.user.id }}',
-            disease: document.getElementById('disease').value,
-            notification_year: document.getElementById('notification_year').value,
-            uf: document.getElementById('uf').value,
-            file_path: data.file_path,
-            task_id: task.task_id
-        };
-        let params = new URLSearchParams(context).toString();
+      .then(data => {
+        fetch('/upload/sinan/chunk-upload-file/', {
+          method: 'POST',
+          body: new URLSearchParams({"file_path": data.file_path}),
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+          }
+        })
+        .then(response => response.json())
+        .then(task => {
+          modal.style.display = 'none';
+          var context = {
+              user_id: '{{ request.user.id }}',
+              disease: document.getElementById('disease').value,
+              notification_year: document.getElementById('notification_year').value,
+              uf: document.getElementById('uf').value,
+              file_path: data.file_path,
+              task_id: task.task_id
+          };
+          let params = new URLSearchParams(context).toString();
 
-        window.location.href = '/upload/sinan/process-file/?'+ params;
+          window.location.href = '/upload/sinan/process-file/?'+ params;
+        })
       })
-    })
-    .catch(error => {
-      // TODO: send to error page
-      console.error('Error uploading file:', error);
-      modal.style.display = 'none';
+      .catch(error => {
+        // TODO: send to error page
+        console.error('Error uploading file:', error);
+        modal.style.display = 'none';
+      });
     });
-  });
+
+    function formatBytes(a,b=2){if(!+a)return"0 Bytes";const c=0>b?0:b,d=Math.floor(Math.log(a)/Math.log(1024));return`${parseFloat((a/Math.pow(1024,d)).toFixed(c))} ${["Bytes","KiB","MiB","GiB"][d]}`}
+  })
 </script>
 {% endblock %}
