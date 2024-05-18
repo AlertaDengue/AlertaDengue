@@ -151,13 +151,17 @@ def owncloud_list_files(request: HttpRequest) -> JsonResponse:
             res_file["path"] = file.path
             res_file["last_modify"] = last_modify.strftime("%x %H:%M")
             res_file["size"] = file.get_size()
+            try:
+                res_file["status"] = SINAN.objects.get(filename=file.name)
+            except SINAN.DoesNotExist:
+                res_file["status"] = ""
             res.append(res_file)
 
         return JsonResponse({"owncloud_files": res}, status=200)
     return JsonResponse({'error': 'Invalid request'}, status=403)
 
 
-@ never_cache
+@never_cache
 def owncloud_download_file_view(request: HttpRequest) -> JsonResponse:
     if not request.user.is_staff:  # type: ignore
         return JsonResponse(
@@ -219,7 +223,7 @@ def owncloud_download_file_view(request: HttpRequest) -> JsonResponse:
     return JsonResponse({"error": "Incorrect request"}, status=404)
 
 
-@ never_cache
+@never_cache
 def sinan_upload_file(request: HttpRequest) -> HttpResponse:
     if not request.user.is_staff:  # type: ignore
         return JsonResponse(
@@ -250,7 +254,7 @@ def sinan_upload_file(request: HttpRequest) -> HttpResponse:
     )
 
 
-@ never_cache
+@never_cache
 def sinan_chunk_uploaded_file(request: HttpRequest) -> HttpResponse:
     if not request.user.is_staff:  # type: ignore
         return JsonResponse({'error': 'Unauthorized'}, status=403)
@@ -304,7 +308,7 @@ def sinan_chunk_uploaded_file(request: HttpRequest) -> HttpResponse:
     return JsonResponse({'error': 'Request error'}, status=404)
 
 
-@ never_cache
+@never_cache
 def sinan_watch_for_uf_chunks(request: HttpRequest) -> HttpResponse:
     if not request.user.is_staff:  # type: ignore
         return JsonResponse({'error': 'Unauthorized'}, status=403)
@@ -338,7 +342,7 @@ def sinan_watch_for_uf_chunks(request: HttpRequest) -> HttpResponse:
     return JsonResponse({'error': 'Request error'}, status=404)
 
 
-@ never_cache
+@never_cache
 def sinan_object_router(request: HttpRequest) -> HttpResponse:
     if not request.user.is_staff:  # type: ignore
         return redirect('dados:main')
@@ -395,7 +399,7 @@ def sinan_object_router(request: HttpRequest) -> HttpResponse:
     return JsonResponse({'error': 'Request error'}, status=404)
 
 
-@ never_cache
+@never_cache
 def sinan_check_csv_columns(request: HttpRequest) -> HttpResponse:
     if not request.user.is_staff:  # type: ignore
         return redirect('dados:main')
