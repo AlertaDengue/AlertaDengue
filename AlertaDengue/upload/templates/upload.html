@@ -62,9 +62,9 @@
             </div>
           </li>
         </ul>
-        <div id="owncloud-buttons" class="pt-3 pb-3 justify-content-center gap-3">
+        <div id="owncloud-buttons-to-download" class="pt-3 pb-3 justify-content-center gap-3">
           <center>
-            <button id="owncloud-download-selected" class="btn btn-outline-secondary">{% translate "Download file(s)" %}</button>
+            <button id="owncloud-download-selected-btn" class="btn btn-outline-secondary">{% translate "Download file(s)" %}</button>
           </center>
         </div>
       </div>
@@ -254,7 +254,7 @@
   visibility: visible;
   opacity: 1;
 }
-  </style>
+</style>
 
   <script>
   $('#owncloud-error').hide();
@@ -265,6 +265,7 @@
   document.addEventListener('DOMContentLoaded', function() {
     let owncloudFiles = [];
     let owncloudFilesIndex = 0;
+    let owncloudTaskIDs = [];
 
     function fetchOwnCloudFiles() {
       const fetchWithTimeout = (url, options, timeout = 3000) => {
@@ -338,9 +339,23 @@
         listItem.classList.add('list-group-item', 'list-group-item-file', 'py-1', 'my-auto');
         const rowDiv = document.createElement('div');
         rowDiv.classList.add('row');
+
+        const fileStatusClass = getFileStatusClass(file.status);
+
         rowDiv.innerHTML = `
           <div class="col" id="${file.name}">
-            <p>${file.name}</p>
+            <div class="file-info">
+              <div class="file-name">${file.name}</div>
+              <div class="file-status pl-1">${file.status}</div>
+              <div class="${fileStatusClass.okIcon}" style="display: ${fileStatusClass.displayOkIcon}">
+                <i class="fas fa-check-circle"></i>
+                <div class="tooltip">OK</div>
+              </div>
+              <div class="${fileStatusClass.warningIcon}" style="display: ${fileStatusClass.displayWarningIcon}">
+                <i class="fas fa-exclamation-circle"></i>
+                <div class="tooltip">Warning</div>
+              </div>
+            </div>
           </div>
           <div class="col-4 text-center">
             <p>${formatBytes(file.size)}</p>
@@ -348,7 +363,7 @@
           <div class="col-4 text-center">
             <p>${file.last_modify}</p>
           </div>
-          `;
+        `;
         listItem.appendChild(rowDiv);
         fileList.appendChild(listItem);
       }
@@ -361,6 +376,25 @@
       if (owncloudFilesIndex >= owncloudFiles.length) {
         $('#owncloud-load-more-btn').hide();
       }
+    }
+
+    function getFileStatusClass(status) {
+      let okIconClass = 'ok-icon';
+      let displayOkIcon = 'none';
+      let warningIconClass = 'warning-icon';
+      let displayWarningIcon = 'none';
+      let errorIconClass = 'error-icon';
+      let displayErrorIcon = 'none';
+
+      if (status === 'finished') {
+        displayOkIcon = 'inline-block';
+      } else if (status === 'finished_misparsed') {
+        displayWarningIcon = 'inline-block';
+      } else if (status === 'error') {
+        displayErrorIcon = 'inline-block';
+      }
+
+      return { okIcon: okIconClass, displayOkIcon: displayOkIcon, warningIcon: warningIconClass, displayWarningIcon: displayWarningIcon, errorIcon: errorIconClass, displayErrorIcon: displayErrorIcon };
     }
 
     function displayError(errorMessage) {
@@ -383,7 +417,6 @@
       $('#owncloud-to-download').show();
 
       const selectedFiles = document.querySelectorAll('.owncloud-selected-file');
-      console.log(selectedFiles);
       selectedFiles.forEach(file => {
         const clonedItem = file.cloneNode(true);
         clonedItem.classList.remove('owncloud-selected-file');
@@ -392,8 +425,60 @@
         file.classList.remove('owncloud-selected-file');
         file.classList.add('owncloud-chosen-file');
       })
-
     });
+
+    document.getElementById('owncloud-download-selected-btn').addEventListener('click', () => {
+      event.preventDefault();
+      const chosenFiles = document.querySelectorAll('.owncloud-chosen-file .file-name');
+      const fileNames = Array.from(chosenFiles).map(item => item.id);
+      console.log(fileNames);
+      downloadOwnCloudFiles(fileNames);
+      $('#owncloud-buttons-to-download').hide();
+    });
+
+    async function downloadOwnCloudFiles(fileNames, maxRetries = 3) {
+      const taskIds = [];
+      for (const file of fileNames) {
+        const filePath = `/Dados Infodengue/${file}`;
+        const formData = new FormData();
+        formData.append('file_path', filePath);
+
+        let attempt = 0;
+        let success = false;
+        while (attempt < maxRetries && !success) {
+          try {
+            const response = await fetch('/upload/sinan/owncloud/get-file/', {
+              method: 'POST',
+              body: formData,
+              headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+              }
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.task_id) {
+              taskIds.push(data.task_id);
+              success = true;
+            } else {
+              console.error(`Error: ${data.error}`);
+            }
+          } catch (error) {
+            attempt++;
+            if (attempt >= maxRetries) {
+              console.error('Error during fetch after maximum retries:', error);
+            } else {
+              console.warn(`Retrying fetch attempt ${attempt}...`);
+            }
+          }
+        }
+      }
+      owncloudTaskIDs = taskIds;
+      console.log(owncloudTaskIDs);
+    }
 
     // document.getElementById('file').addEventListener('change', function(event) {
     //   event.preventDefault();
