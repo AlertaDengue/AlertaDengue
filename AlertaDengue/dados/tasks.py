@@ -9,17 +9,17 @@ from scanner.scanner import EpiScanner
 app.conf.beat_schedule = {
     "episcanner-dengue-current-year": {
         "task": "dados.tasks.episcanner_all_states",
-        "schedule": crontab(minute=0, hour=3, day_of_month=13),
+        "schedule": crontab(minute=0, hour=3, day_of_week=1),
         "args": (datetime.now().year, "dengue"),
     },
     "episcanner-zika-current-year": {
         "task": "dados.tasks.episcanner_all_states",
-        "schedule": crontab(minute=0, hour=3, day_of_month=14),
+        "schedule": crontab(minute=0, hour=3, day_of_week=2),
         "args": (datetime.now().year, "zika"),
     },
     "episcanner-chik-current-year": {
         "task": "dados.tasks.episcanner_all_states",
-        "schedule": crontab(minute=0, hour=3, day_of_month=15),
+        "schedule": crontab(minute=0, hour=3, day_of_week=3),
         "args": (datetime.now().year, "chik"),
     },
 }
