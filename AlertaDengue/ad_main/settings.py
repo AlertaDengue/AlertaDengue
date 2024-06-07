@@ -7,10 +7,11 @@ from pathlib import Path
 from typing import Optional
 
 import ibis
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
-
+import sentry_sdk
 from django.contrib.messages import constants as messages
+from dotenv import load_dotenv
+from sentry_sdk.integrations.django import DjangoIntegration
+from sqlalchemy import create_engine
 
 # using existing module to specify location of the .env file
 load_dotenv()
@@ -455,3 +456,13 @@ MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
 MINIO_ROOT_USER = os.getenv("MINIO_ROOT_USER")
 MINIO_ROOT_PASSWORD = os.getenv("MINIO_ROOT_PASSWORD")
 MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
+
+# Sentry
+# ------------------------------------------------------------------------------
+SENTRY_DSN = config("SENTRY_DSN", default=None)
+if SENTRY_DSN:
+    sentry_sdk.init(
+        SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        send_default_pii=True,
+    )
