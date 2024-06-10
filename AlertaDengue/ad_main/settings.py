@@ -459,7 +459,7 @@ MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
 
 # Sentry
 # ------------------------------------------------------------------------------
-SENTRY_DSN = config("SENTRY_DSN", default=None)
+SENTRY_DSN = os.getenv("SENTRY_DSN", default=None)
 if SENTRY_DSN:
     sentry_sdk.init(
         SENTRY_DSN,
