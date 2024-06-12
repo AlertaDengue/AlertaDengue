@@ -70,7 +70,7 @@ isort = "^5.11.4"
 mypy = "^0.991"
 pre-commit = "^2.21.0"
 pytest = "^7.2.1"
-makim = ">=1.14"
+makim = ">=1.15.2"
 bpython = "^0.24"
 
 [build-system]
