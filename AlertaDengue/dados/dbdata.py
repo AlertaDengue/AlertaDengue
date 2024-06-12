@@ -123,10 +123,26 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
 class RegionalParameters:
     DB = settings.PSQL_DB
 
-    t_parameters = IBIS_CONN.table("parameters", DB, "Dengue_global")
-    t_municipio = IBIS_CONN.table("Municipio", DB, "Dengue_global")
-    t_estado = IBIS_CONN.table("estado", DB, "Dengue_global")
-    t_regional = IBIS_CONN.table("regional", DB, "Dengue_global")
+    t_parameters = IBIS_CONN.table(
+        name="parameters",
+        database=DB,
+        schema="Dengue_global"
+    )
+    t_municipio = IBIS_CONN.table(
+        name="Municipio",
+        database=DB,
+        schema="Dengue_global"
+    )
+    t_estado = IBIS_CONN.table(
+        name="estado",
+        database=DB,
+        schema="Dengue_global"
+    )
+    t_regional = IBIS_CONN.table(
+        name="regional",
+        database=DB,
+        schema="Dengue_global"
+    )
 
     @classmethod
     def get_regional_names(cls, state_name: str) -> list:
@@ -1097,7 +1113,9 @@ class ReportCity:
             table_suffix = get_disease_suffix(disease)  # F'_{disease}'
 
         t_hist = IBIS_CONN.table(
-            f"Historico_alerta{table_suffix}", settings.PSQL_DB, "Municipio"
+            name=f"Historico_alerta{table_suffix}",
+            database=settings.PSQL_DB,
+            schema="Municipio"
         )
 
         # 200 = 2 years
@@ -1208,7 +1226,9 @@ class ReportState:
             table_suffix = get_disease_suffix(disease)  # F'_{disease}'
 
         t_hist = IBIS_CONN.table(
-            f"Historico_alerta{table_suffix}", settings.PSQL_DB, "Municipio"
+            name=f"Historico_alerta{table_suffix}",
+            database=settings.PSQL_DB,
+            schema="Municipio"
         )
 
         #  200 = 2 years

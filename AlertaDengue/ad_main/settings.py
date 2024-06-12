@@ -204,7 +204,11 @@ def get_ibis_conn(database: Optional[str] = PSQL_DB):
     """
     try:
         connection = ibis.postgres.connect(
-            url=f"postgresql://{PSQL_USER}:{PSQL_PASSWORD}@{PSQL_HOST}:{PSQL_PORT}/{database}"
+            user=PSQL_USER,
+            password=PSQL_PASSWORD,
+            host=PSQL_HOST,
+            port=PSQL_PORT,
+            database=database
         )
 
     except ConnectionError as e:
@@ -459,7 +463,7 @@ MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
 
 # Sentry
 # ------------------------------------------------------------------------------
-SENTRY_DSN = config("SENTRY_DSN", default=None)
+SENTRY_DSN = os.getenv("SENTRY_DSN", default=None)
 if SENTRY_DSN:
     sentry_sdk.init(
         SENTRY_DSN,
