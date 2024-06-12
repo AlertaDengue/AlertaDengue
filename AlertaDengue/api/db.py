@@ -489,7 +489,9 @@ class AlertCity:
         # schema_city = IBIS_CONN.schema("Municipio")
         # t_hist = schema_city.table(f"Historico_alerta{table_suffix}")
         t_hist = IBIS_CONN.table(
-            f"Historico_alerta{table_suffix}", PSQL_DB, "Municipio"
+            name=f"Historico_alerta{table_suffix}",
+            database=PSQL_DB,
+            schema="Municipio"
         )
 
         if ew_start and ew_end:

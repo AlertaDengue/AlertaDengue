@@ -65,7 +65,7 @@ groups:
     help: Development tasks and utilities.
     vars:
       manage_py: python AlertaDengue/manage.py
-    targets:
+    tasks:
       # CI
       container-wait:
         help: Wait for a specific service to become available.
@@ -79,12 +79,37 @@ groups:
             type: string
             required: true
         run: |
-          timeout {{ args.timeout }} ./containers/scripts/healthcheck.sh {{ args.service }}
+          timeout ${{ args.timeout }} ./containers/scripts/healthcheck.sh ${{ args.service }}
 
       container-wait-all:
-        run: |
-          for service in ["stagingdb", "memcached", "rabbitmq", "web", "worker"]:
-            makim develop.container-wait --service @(service)
+        help: Wait until container is healthy
+        args:
+          timeout:
+            help: the time (in seconds) for waiting the service
+            type: int
+            default: 90
+            required: false
+        dependencies:
+          - task: develop.container-wait
+            args:
+              timeout: ${{ args.timeout }}
+              service: stagingdb
+          - task: develop.container-wait
+            args:
+              timeout: ${{ args.timeout }}
+              service: memcached
+          - task: develop.container-wait
+            args:
+              timeout: ${{ args.timeout }}
+              service: rabbitmq
+          - task: develop.container-wait
+            args:
+              timeout: ${{ args.timeout }}
+              service: web
+          - task: develop.container-wait
+            args:
+              timeout: ${{ args.timeout }}
+              service: worker
 
       clean:
         help: Clean all generated artifacts from the project.
