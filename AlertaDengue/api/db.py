@@ -482,14 +482,10 @@ class AlertCity:
                 f"The diseases available are: {list(CID10.keys())}"
             )
 
-        table_suffix = ""
-        if disease != "dengue" and disease != "zika":
-            table_suffix = get_disease_suffix(disease)
-
         # schema_city = IBIS_CONN.schema("Municipio")
         # t_hist = schema_city.table(f"Historico_alerta{table_suffix}")
         t_hist = IBIS_CONN.table(
-            name=f"Historico_alerta{table_suffix}",
+            name=f"Historico_alerta{get_disease_suffix(disease)}",
             database=PSQL_DB,
             schema="Municipio"
         )
