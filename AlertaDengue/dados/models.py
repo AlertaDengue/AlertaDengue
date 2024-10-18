@@ -28,6 +28,28 @@ class City(models.Model):
         max_length=20,
         help_text=_("Nome do estado"),
     )
+    id_regional = models.IntegerField(
+        db_column="id_regional",
+        null=False,
+        help_text=_("Geocódigo da Regional de Saúde"),
+    )
+    regional = models.CharField(
+        db_column="regional",
+        null=False,
+        max_length=128,
+        help_text=_("Nome da Regional de Saúde"),
+    )
+    macroregional_id = models.IntegerField(
+        db_column="macroregional_id",
+        null=False,
+        help_text=_("Geocódigo da Macroregional de Saúde"),
+    )
+    macroregional = models.CharField(
+        db_column="macroregional",
+        null=False,
+        max_length=128,
+        help_text=_("Nome da Regional de Saúde"),
+    )
 
     class Meta:
         db_table = 'Dengue_global"."Municipio'
