@@ -675,12 +675,29 @@ def add_dv(geocodigo):
     se necessário.
     :param geocodigo: geocóodigo com 6 ou 7 dígitos
     """
+
+    miscalculated_geocodes = {
+        "2201911": 2201919,
+        "2201986": 2201988,
+        "2202257": 2202251,
+        "2611531": 2611533,
+        "3117835": 3117836,
+        "3152139": 3152131,
+        "4305876": 4305871,
+        "5203963": 5203962,
+        "5203930": 5203939
+    }
+
     if len(str(geocodigo)) == 7:
         return geocodigo
-    elif len(str(geocodigo)) == 6:
-        return int(str(geocodigo) + str(calculate_digit(geocodigo)))
-    else:
-        raise ValueError("geocode does not match!")
+
+    if len(str(geocodigo)) == 6:
+        geocode = int(str(geocodigo) + str(calculate_digit(geocodigo)))
+        if str(geocode) in miscalculated_geocodes:
+            return miscalculated_geocodes[str(geocode)]
+        return geocode
+
+    raise ValueError("geocode does not match!")
 
 
 def get_epiyears(
