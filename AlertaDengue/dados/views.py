@@ -92,7 +92,7 @@ def hex_to_rgb(value):
     value = value.lstrip("#")
     lv = len(value)
     return tuple(
-        int(value[i : i + lv // 3], 16)
+        int(value[i: i + lv // 3], 16)
         for i in range(0, lv, lv // 3)  # noqa: E203
     )
 
@@ -1184,7 +1184,7 @@ class ReportStateData(TemplateView):
         notif_chart = {}
         mun_by_regional = {}
 
-        df = ReportState.csv_get_regional_by_state(state_abbv)
+        df = ReportState.get_regional_by_state(state_abbv)
 
         df_regional_filtered = df[df.id_regional == regional_id]
 
@@ -1233,7 +1233,7 @@ class ReportStateView(TemplateView):
         last_year = last_year_week_s[:4]
         last_week = last_year_week_s[-2:]
 
-        df = ReportState.csv_get_regional_by_state(state)
+        df = ReportState.get_regional_by_state(state)
 
         regional_dict = {
             d["id_regional"]: d["nome_regional"]

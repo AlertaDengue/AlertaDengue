@@ -21,6 +21,7 @@ from sqlalchemy.engine.base import Engine
 
 # local
 from .episem import episem
+from .models import City
 
 logger = logging.getLogger(__name__)
 
@@ -675,12 +676,29 @@ def add_dv(geocodigo):
     se necessário.
     :param geocodigo: geocóodigo com 6 ou 7 dígitos
     """
+
+    miscalculated_geocodes = {
+        "2201911": 2201919,
+        "2201986": 2201988,
+        "2202257": 2202251,
+        "2611531": 2611533,
+        "3117835": 3117836,
+        "3152139": 3152131,
+        "4305876": 4305871,
+        "5203963": 5203962,
+        "5203930": 5203939
+    }
+
     if len(str(geocodigo)) == 7:
         return geocodigo
-    elif len(str(geocodigo)) == 6:
-        return int(str(geocodigo) + str(calculate_digit(geocodigo)))
-    else:
-        raise ValueError("geocode does not match!")
+
+    if len(str(geocodigo)) == 6:
+        geocode = int(str(geocodigo) + str(calculate_digit(geocodigo)))
+        if str(geocode) in miscalculated_geocodes:
+            return miscalculated_geocodes[str(geocode)]
+        return geocode
+
+    raise ValueError("geocode does not match!")
 
 
 def get_epiyears(
@@ -1165,7 +1183,7 @@ class ReportState:
     """Report State class."""
 
     @classmethod
-    def csv_get_regional_by_state(self, state: str) -> pd:
+    def get_regional_by_state(self, state: str) -> pd:
         """
         Import CSV file with the municipalities of regional health by state.
         Parameters
@@ -1180,31 +1198,22 @@ class ReportState:
         res = cache.get(cache_name)
 
         if res is None:
-            df_reg = pd.read_csv(
-                settings.APPS_DIR / "data" / "regionais_saude_name.csv",
-                names=[
-                    "UF",
-                    "municipio_nome",
-                    "municipio_geocodigo",
-                    "id_regional",
-                    "nome_regional",
-                ],
-                skiprows=1,
-            )
+            uf_name = ALL_STATE_NAMES[state][0]
 
-            df_reg.municipio_geocodigo = add_dv(df_reg.municipio_geocodigo)
+            data = City.objects.filter(state=uf_name)
 
-            df = df_reg[df_reg.UF.eq(state)]
+            res = pd.DataFrame(list(data.values(
+                'id_regional',
+                'regional',
+                'geocode',
+                'name'
+            )))
 
-            res = df.loc[
-                :,
-                [
-                    "id_regional",
-                    "nome_regional",
-                    "municipio_geocodigo",
-                    "municipio_nome",
-                ],
-            ]
+            res.rename(columns={
+                'regional': 'nome_regional',
+                'geocode': 'municipio_geocodigo',
+                'name': 'municipio_nome'
+            }, inplace=True)
 
             cache.set(
                 cache_name,

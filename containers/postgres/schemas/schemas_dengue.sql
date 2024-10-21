@@ -223,7 +223,10 @@ CREATE TABLE "Dengue_global"."Municipio" (
     geojson text NOT NULL,
     populacao bigint NOT NULL,
     uf character varying(20) NOT NULL,
-    id_regional integer
+    id_regional integer NOT NULL,
+    regional character varying(128) NOT NULL,
+    macroregional_id integer NOT NULL,
+    macroregional character varying(128) NOT NULL
 );
 
 
@@ -240,9 +243,10 @@ COMMENT ON TABLE "Dengue_global"."Municipio" IS 'Municipio integrado ao sistema 
 -- Name: alerta_regional_chik; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
 --
 
+-- TODO: Remove this table?
 CREATE TABLE "Dengue_global".alerta_regional_chik (
     id bigint NOT NULL,
-    id_regional integer NOT NULL,
+--    id_regional integer NOT NULL,
     data_inise date NOT NULL,
     se integer NOT NULL,
     casos_est real,
@@ -294,9 +298,10 @@ ALTER SEQUENCE "Dengue_global".alerta_regional_chik_id_seq OWNED BY "Dengue_glob
 -- Name: alerta_regional_dengue; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
 --
 
+-- TODO: Remove this table?
 CREATE TABLE "Dengue_global".alerta_regional_dengue (
     id bigint NOT NULL,
-    id_regional integer NOT NULL,
+--    id_regional integer NOT NULL,
     data_inise date NOT NULL,
     se integer NOT NULL,
     casos_est real,
@@ -348,9 +353,10 @@ ALTER SEQUENCE "Dengue_global".alerta_regional_dengue_id_seq OWNED BY "Dengue_gl
 -- Name: alerta_regional_zika; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
 --
 
+-- TODO: Remove this table?
 CREATE TABLE "Dengue_global".alerta_regional_zika (
     id bigint NOT NULL,
-    id_regional integer NOT NULL,
+--    id_regional integer NOT NULL,
     data_inise date NOT NULL,
     se integer NOT NULL,
     casos_est real,
@@ -417,35 +423,35 @@ ALTER TABLE "Dengue_global".estado OWNER TO administrador;
 -- Name: macroregional; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
 --
 
-CREATE TABLE "Dengue_global".macroregional (
-    id integer NOT NULL,
-    nome character varying(255) NOT NULL,
-    codigo integer NOT NULL,
-    uf character varying(2)
-);
+-- CREATE TABLE "Dengue_global".macroregional (
+--    id integer NOT NULL,
+--    nome character varying(255) NOT NULL,
+--    codigo integer NOT NULL,
+--    uf character varying(2)
+--);
 
 
-ALTER TABLE "Dengue_global".macroregional OWNER TO dengueadmin;
+-- ALTER TABLE "Dengue_global".macroregional OWNER TO dengueadmin;
 
 --
 -- Name: macroregional_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
 --
 
-CREATE SEQUENCE "Dengue_global".macroregional_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+-- CREATE SEQUENCE "Dengue_global".macroregional_id_seq
+--    START WITH 1
+--    INCREMENT BY 1
+--    NO MINVALUE
+--    NO MAXVALUE
+--    CACHE 1;
 
 
-ALTER TABLE "Dengue_global".macroregional_id_seq OWNER TO dengueadmin;
+-- ALTER TABLE "Dengue_global".macroregional_id_seq OWNER TO dengueadmin;
 
 --
 -- Name: macroregional_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
 --
 
-ALTER SEQUENCE "Dengue_global".macroregional_id_seq OWNED BY "Dengue_global".macroregional.id;
+-- ALTER SEQUENCE "Dengue_global".macroregional_id_seq OWNED BY "Dengue_global".macroregional.id;
 
 
 --
@@ -475,79 +481,79 @@ ALTER TABLE "Dengue_global".parameters OWNER TO dengueadmin;
 -- Name: regional; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
 --
 
-CREATE TABLE "Dengue_global".regional (
-    id integer NOT NULL,
-    nome character varying(255) NOT NULL,
-    codigo integer NOT NULL,
-    id_macroregional integer NOT NULL
-);
+-- CREATE TABLE "Dengue_global".regional (
+--     id integer NOT NULL,
+--     nome character varying(255) NOT NULL,
+--     codigo integer NOT NULL,
+--     id_macroregional integer NOT NULL
+-- );
 
 
-ALTER TABLE "Dengue_global".regional OWNER TO dengueadmin;
+-- ALTER TABLE "Dengue_global".regional OWNER TO dengueadmin;
 
 --
 -- Name: regional_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
 --
 
-CREATE SEQUENCE "Dengue_global".regional_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+-- CREATE SEQUENCE "Dengue_global".regional_id_seq
+--     START WITH 1
+--     INCREMENT BY 1
+--     NO MINVALUE
+--     NO MAXVALUE
+--     CACHE 1;
 
 
-ALTER TABLE "Dengue_global".regional_id_seq OWNER TO dengueadmin;
+-- ALTER TABLE "Dengue_global".regional_id_seq OWNER TO dengueadmin;
 
 --
 -- Name: regional_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
 --
 
-ALTER SEQUENCE "Dengue_global".regional_id_seq OWNED BY "Dengue_global".regional.id;
+-- ALTER SEQUENCE "Dengue_global".regional_id_seq OWNED BY "Dengue_global".regional.id;
 
 
 --
 -- Name: regional_saude; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
 --
 
-CREATE TABLE "Dengue_global".regional_saude (
-    id integer NOT NULL,
-    municipio_geocodigo integer,
-    id_regional integer,
-    codigo_estacao_wu character varying(16),
-    nome_regional character varying(32),
-    limiar_preseason real,
-    limiar_posseason real,
-    limiar_epidemico real,
-    estacao_wu_sec character varying(10),
-    varcli character varying(10),
-    tcrit double precision,
-    ucrit double precision,
-    nome_macroreg character varying(32)
-);
+-- CREATE TABLE "Dengue_global".regional_saude (
+--     id integer NOT NULL,
+--     municipio_geocodigo integer,
+--     id_regional integer,
+--     codigo_estacao_wu character varying(16),
+--     nome_regional character varying(32),
+--     limiar_preseason real,
+--     limiar_posseason real,
+--     limiar_epidemico real,
+--     estacao_wu_sec character varying(10),
+--     varcli character varying(10),
+--     tcrit double precision,
+--     ucrit double precision,
+--     nome_macroreg character varying(32)
+-- );
 
 
-ALTER TABLE "Dengue_global".regional_saude OWNER TO dengueadmin;
+-- ALTER TABLE "Dengue_global".regional_saude OWNER TO dengueadmin;
 
 --
 -- Name: regional_saude_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
 --
 
-CREATE SEQUENCE "Dengue_global".regional_saude_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+-- CREATE SEQUENCE "Dengue_global".regional_saude_id_seq
+--     START WITH 1
+--     INCREMENT BY 1
+--     NO MINVALUE
+--     NO MAXVALUE
+--     CACHE 1;
 
 
-ALTER TABLE "Dengue_global".regional_saude_id_seq OWNER TO dengueadmin;
+-- ALTER TABLE "Dengue_global".regional_saude_id_seq OWNER TO dengueadmin;
 
 --
 -- Name: regional_saude_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
 --
 
-ALTER SEQUENCE "Dengue_global".regional_saude_id_seq OWNED BY "Dengue_global".regional_saude.id;
+-- ALTER SEQUENCE "Dengue_global".regional_saude_id_seq OWNED BY "Dengue_global".regional_saude.id;
 
 
 --
@@ -2424,21 +2430,21 @@ ALTER TABLE ONLY "Dengue_global".alerta_regional_zika ALTER COLUMN id SET DEFAUL
 -- Name: macroregional id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY "Dengue_global".macroregional ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".macroregional_id_seq'::regclass);
+-- ALTER TABLE ONLY "Dengue_global".macroregional ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".macroregional_id_seq'::regclass);
 
 
 --
 -- Name: regional id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY "Dengue_global".regional ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".regional_id_seq'::regclass);
+-- ALTER TABLE ONLY "Dengue_global".regional ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".regional_id_seq'::regclass);
 
 
 --
 -- Name: regional_saude id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY "Dengue_global".regional_saude ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".regional_saude_id_seq'::regclass);
+-- ALTER TABLE ONLY "Dengue_global".regional_saude ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".regional_saude_id_seq'::regclass);
 
 
 --
@@ -2759,8 +2765,8 @@ ALTER TABLE ONLY "Dengue_global".estado
 -- Name: macroregional macroregional_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY "Dengue_global".macroregional
-    ADD CONSTRAINT macroregional_pk PRIMARY KEY (id);
+-- ALTER TABLE ONLY "Dengue_global".macroregional
+--    ADD CONSTRAINT macroregional_pk PRIMARY KEY (id);
 
 
 --
@@ -2775,24 +2781,24 @@ ALTER TABLE ONLY "Dengue_global".parameters
 -- Name: regional regional_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY "Dengue_global".regional
-    ADD CONSTRAINT regional_pk PRIMARY KEY (id);
+-- ALTER TABLE ONLY "Dengue_global".regional
+--    ADD CONSTRAINT regional_pk PRIMARY KEY (id);
 
 
 --
 -- Name: regional_saude regional_saude_pkey; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY "Dengue_global".regional_saude
-    ADD CONSTRAINT regional_saude_pkey PRIMARY KEY (id);
+-- ALTER TABLE ONLY "Dengue_global".regional_saude
+--    ADD CONSTRAINT regional_saude_pkey PRIMARY KEY (id);
 
 
 --
 -- Name: regional_saude regional_saude_uq_municipio_geocodigo; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY "Dengue_global".regional_saude
-    ADD CONSTRAINT regional_saude_uq_municipio_geocodigo UNIQUE (municipio_geocodigo);
+-- ALTER TABLE ONLY "Dengue_global".regional_saude
+--    ADD CONSTRAINT regional_saude_uq_municipio_geocodigo UNIQUE (municipio_geocodigo);
 
 
 --
@@ -3404,7 +3410,7 @@ CREATE INDEX estado_idx_gc ON "Dengue_global".estado USING btree (geocodigo);
 -- Name: macroregional_idx_codigo; Type: INDEX; Schema: Dengue_global; Owner: dengueadmin
 --
 
-CREATE INDEX macroregional_idx_codigo ON "Dengue_global".macroregional USING btree (codigo);
+-- CREATE INDEX macroregional_idx_codigo ON "Dengue_global".macroregional USING btree (codigo);
 
 
 --
@@ -3418,7 +3424,7 @@ CREATE INDEX parameters_idx_gc ON "Dengue_global".parameters USING btree (munici
 -- Name: regional_idx_codigo; Type: INDEX; Schema: Dengue_global; Owner: dengueadmin
 --
 
-CREATE INDEX regional_idx_codigo ON "Dengue_global".regional USING btree (codigo);
+-- CREATE INDEX regional_idx_codigo ON "Dengue_global".regional USING btree (codigo);
 
 
 --
@@ -3740,40 +3746,40 @@ CREATE INDEX uf_total_zika_view_data_idx ON public.uf_total_zika_view USING btre
 -- Name: regional macroregional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY "Dengue_global".regional
-    ADD CONSTRAINT macroregional_fk FOREIGN KEY (id_macroregional) REFERENCES "Dengue_global".macroregional(id);
+-- ALTER TABLE ONLY "Dengue_global".regional
+--    ADD CONSTRAINT macroregional_fk FOREIGN KEY (id_macroregional) REFERENCES "Dengue_global".macroregional(id);
 
 
 --
 -- Name: Municipio regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: administrador
 --
 
-ALTER TABLE ONLY "Dengue_global"."Municipio"
-    ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
+-- ALTER TABLE ONLY "Dengue_global"."Municipio"
+--    ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
 
 
 --
 -- Name: alerta_regional_dengue regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY "Dengue_global".alerta_regional_dengue
-    ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
+-- ALTER TABLE ONLY "Dengue_global".alerta_regional_dengue
+--     ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
 
 
 --
 -- Name: alerta_regional_chik regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY "Dengue_global".alerta_regional_chik
-    ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
+-- ALTER TABLE ONLY "Dengue_global".alerta_regional_chik
+--     ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
 
 
 --
 -- Name: alerta_regional_zika regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY "Dengue_global".alerta_regional_zika
-    ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
+-- ALTER TABLE ONLY "Dengue_global".alerta_regional_zika
+--     ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
 
 
 --
@@ -4125,16 +4131,16 @@ GRANT SELECT ON TABLE "Dengue_global".estado TO infodenguedev;
 -- Name: TABLE macroregional; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
 --
 
-GRANT ALL ON TABLE "Dengue_global".macroregional TO dengue;
-GRANT SELECT ON TABLE "Dengue_global".macroregional TO "Read_only";
-GRANT SELECT ON TABLE "Dengue_global".macroregional TO infodenguedev;
+-- GRANT ALL ON TABLE "Dengue_global".macroregional TO dengue;
+-- GRANT SELECT ON TABLE "Dengue_global".macroregional TO "Read_only";
+-- GRANT SELECT ON TABLE "Dengue_global".macroregional TO infodenguedev;
 
 
 --
 -- Name: SEQUENCE macroregional_id_seq; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
 --
 
-GRANT SELECT ON SEQUENCE "Dengue_global".macroregional_id_seq TO "Read_only";
+-- GRANT SELECT ON SEQUENCE "Dengue_global".macroregional_id_seq TO "Read_only";
 
 
 --
@@ -4150,34 +4156,34 @@ GRANT SELECT ON TABLE "Dengue_global".parameters TO infodenguedev;
 -- Name: TABLE regional; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
 --
 
-GRANT ALL ON TABLE "Dengue_global".regional TO dengue;
-GRANT SELECT ON TABLE "Dengue_global".regional TO "Read_only";
-GRANT SELECT ON TABLE "Dengue_global".regional TO infodenguedev;
+-- GRANT ALL ON TABLE "Dengue_global".regional TO dengue;
+-- GRANT SELECT ON TABLE "Dengue_global".regional TO "Read_only";
+-- GRANT SELECT ON TABLE "Dengue_global".regional TO infodenguedev;
 
 
 --
 -- Name: SEQUENCE regional_id_seq; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
 --
 
-GRANT SELECT ON SEQUENCE "Dengue_global".regional_id_seq TO "Read_only";
+-- GRANT SELECT ON SEQUENCE "Dengue_global".regional_id_seq TO "Read_only";
 
 
 --
 -- Name: TABLE regional_saude; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
 --
 
-GRANT ALL ON TABLE "Dengue_global".regional_saude TO dengue;
-GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE "Dengue_global".regional_saude TO "Dengue";
-GRANT SELECT ON TABLE "Dengue_global".regional_saude TO "Read_only";
-GRANT SELECT ON TABLE "Dengue_global".regional_saude TO infodenguedev;
+-- GRANT ALL ON TABLE "Dengue_global".regional_saude TO dengue;
+-- GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE "Dengue_global".regional_saude TO "Dengue";
+-- GRANT SELECT ON TABLE "Dengue_global".regional_saude TO "Read_only";
+-- GRANT SELECT ON TABLE "Dengue_global".regional_saude TO infodenguedev;
 
 
 --
 -- Name: SEQUENCE regional_saude_id_seq; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
 --
 
-GRANT SELECT,USAGE ON SEQUENCE "Dengue_global".regional_saude_id_seq TO dengue;
-GRANT SELECT ON SEQUENCE "Dengue_global".regional_saude_id_seq TO "Read_only";
+-- GRANT SELECT,USAGE ON SEQUENCE "Dengue_global".regional_saude_id_seq TO dengue;
+-- GRANT SELECT ON SEQUENCE "Dengue_global".regional_saude_id_seq TO "Read_only";
 
 
 --
