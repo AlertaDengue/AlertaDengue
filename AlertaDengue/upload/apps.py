@@ -5,5 +5,5 @@ class UploadConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "upload"
 
-    def ready(self) -> None:
-        import upload.signals
+    # def ready(self) -> None:
+    # import upload.signals

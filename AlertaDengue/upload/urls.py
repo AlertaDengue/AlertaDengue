@@ -2,22 +2,17 @@ from django.urls import re_path
 
 from . import views
 
-
+app_name = "upload"
 urlpatterns = [
-    re_path(r"^sinan/$", views.SINANUpload.as_view(), name="sinan_upload"),
+    re_path(r"^sinan/$", views.SINANUpload.as_view(), name="sinan"),
     re_path(
-        r"^sinan/success/$",
-        views.SINANUploadSuccessful.as_view(),
-        name="sinan_success",
-    ),
-    re_path(
-        r"^chunked_upload/?$",
+        r"^sinan/chunked/?$",
         views.SINANChunkedUploadView.as_view(),
-        name="api_chunked_upload",
+        name="sinan_chunked",
     ),
     re_path(
-        r"^chunked_upload_complete/?$",
+        r"^sinan/chunked/complete/?$",
         views.SINANChunkedUploadCompleteView.as_view(),
-        name="api_chunked_upload_complete",
+        name="sinan_chunked_complete",
     ),
 ]

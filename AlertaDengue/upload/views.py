@@ -1,31 +1,20 @@
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView
+from django.core.files.base import File
+from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import FormView
 from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
 
-from .models import SINAN, Diseases, UFs
-from .sinan.utils import EXPECTED_FIELDS, REQUIRED_FIELDS
-from .tasks import sinan_split_by_uf_or_chunk
-from . import models
+from . import models, forms
 
 
 User = get_user_model()
 
 
-class SINANUploadSuccessful(LoginRequiredMixin, TemplateView):
-    template_name = "sinan_success.html"
-
-    def get_context_data(self, **kwargs):
-        kwargs["last_uploaded"] = models.SINANUpload.objects.filter(
-            uploaded_by=self.request.user
-        ).order_by("-uploaded_at")[:5]
-        return super().get_context_data(**kwargs)
-
-
 class SINANUpload(LoginRequiredMixin, FormView):
-    form_class = DBFForm
+    form_class = forms.SINANForm
     template_name = "sinan.html"
     success_url = reverse_lazy("upload:sinan_success")
 
@@ -36,46 +25,46 @@ class SINANUpload(LoginRequiredMixin, FormView):
         return super().post(self.request, *args, **kwargs)
 
     def form_valid(self, form):
-        chunked_upload = DBFChunkedUpload.objects.get(
+        chunked_upload = models.SINANChunkedUpload.objects.get(
             id=form.cleaned_data["chunked_upload_id"], user=self.request.user
         )
         uploaded_file = File(
             chunked_upload.file, form.cleaned_data["filename"]
         )
-        dbf = DBF.objects.create(
-            uploaded_by=self.request.user,
+        sinan_file = models.SINANUpload.objects.create(
+            year=form.cleaned_data["notification_year"],
+            uf=form.cleaned_data["abbreviation"],
+            municipio=form.cleaned_data["municipio"],
             file=uploaded_file,
             export_date=form.cleaned_data["export_date"],
-            notification_year=form.cleaned_data["notification_year"],
-            abbreviation=form.cleaned_data["abbreviation"],
-            municipio=form.cleaned_data["municipio"],
+            uploaded_by=self.request.user,
         )
-        import_dbf_to_database.delay(dbf.id)
+        # import_dbf_to_database.delay(dbf.id)
         success_message = _(
             f"""
-            O arquivo {dbf.file.name} exportado em {dbf.export_date:%d/%m/%Y}
-            com notificações do ano {dbf.notification_year}
-            foi enviado com sucesso. Você será informado por email
-            ({self.request.user.email}) assim que o processo de
-            importação for finalizado,
+            O arquivo {sinan_file.file.name} exportado em 
+            {sinan_file.export_date:%d/%m/%Y} com notificações do ano 
+            {sinan_file.notification_year} foi enviado com sucesso. Você será
+            informado por email ({self.request.user.email}) assim que 
+            o processo de importação for finalizado
             """
         )
         messages.success(self.request, success_message)
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        kwargs["last_uploaded"] = DBF.objects.filter(
+        kwargs["last_uploaded"] = models.SINANUpload.objects.filter(
             uploaded_by=self.request.user
         ).order_by("-uploaded_at")[:5]
         return super().get_context_data(**kwargs)
 
 
 class SINANChunkedUploadView(ChunkedUploadView):
-    model = SINANChunkedUpload
+    model = models.SINANChunkedUpload
 
 
 class SINANChunkedUploadCompleteView(ChunkedUploadCompleteView):
-    model = SINANChunkedUpload
+    model = models.SINANChunkedUpload
 
     def get_response_data(self, chunked_upload, request):
         return {

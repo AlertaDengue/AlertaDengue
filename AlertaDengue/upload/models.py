@@ -12,12 +12,6 @@ from chunked_upload.models import BaseChunkedUpload
 
 from ad_main.settings import get_sqla_conn
 from dados.models import City
-from upload.sinan.validations import (
-    validate_fields,
-    validate_file_exists,
-    validate_file_type,
-    validate_year,
-)
 
 User = get_user_model()
 
@@ -73,9 +67,22 @@ class SINANUpload(models.Model):
     export_date = models.DateField(null=False)
     uploaded_by = models.ForeignKey(User, on_delete=models.PROTECT, null=False)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    inserted_rows = models.IntegerField(null=True, default=0)
 
     def clean(self):
-        if self.notification_year > date.today().year:
+        self.validate()
+
+        # if not is_valid_dbf(self.file, self.notification_year):
+        #     raise ValidationError({"file": _("Arquivo DBF inválido")})
+
+    def __str__(self):
+        return f"{self.file}"
+
+    def validate(self):
+        self._validate_year()
+
+    def _validate_year(self):
+        if self.year > date.today().year:
             raise ValidationError(
                 {
                     "notification_year": _(
@@ -84,12 +91,6 @@ class SINANUpload(models.Model):
                     )
                 }
             )
-
-        # if not is_valid_dbf(self.file, self.notification_year):
-        #     raise ValidationError({"file": _("Arquivo DBF inválido")})
-
-    def __str__(self):
-        return f"{self.file}"
 
     class Meta:
         app_label = "upload"

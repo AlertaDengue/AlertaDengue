@@ -29,7 +29,7 @@ authorized_keys
 .env_export.sh
 *celerybeat-schedule*
 
-AlertaDengue/static/*
+AlertaDengue/static/img/incidence_maps/*
 *staticfiles/*
 
 */incidence_maps/*
