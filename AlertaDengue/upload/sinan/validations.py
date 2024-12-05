@@ -5,8 +5,6 @@ from datetime import datetime
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from upload.sinan.utils import REQUIRED_FIELDS
-
 
 def validate_file_exists(file_path: str) -> None:
     if not os.path.exists(str(file_path)):
@@ -42,12 +40,3 @@ def validate_year(year: int) -> None:
 
     if year < 1970:
         raise ValidationError(_(f"Invalid year {year}"))
-
-
-def validate_fields(columns: list[str]) -> None:
-    if not all([c in columns for c in REQUIRED_FIELDS]):
-        raise ValidationError(
-            "Required field(s): "
-            f"{list(set(REQUIRED_FIELDS).difference(set(columns)))} "
-            "not found in data file"
-        )
