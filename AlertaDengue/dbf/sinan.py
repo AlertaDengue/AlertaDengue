@@ -122,9 +122,9 @@ class Sinan(object):
                     df_parsed, default_cid, self.year
                 )
 
-                df_without_duplicates = df_without_duplicates.where(
-                    pd.notna(df_without_duplicates), None
-                )
+                df_without_duplicates = df_without_duplicates.replace({
+                    pd.NA: None
+                })
 
                 # Log the start of the upsert iteration
                 logger.info(
