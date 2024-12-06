@@ -1,6 +1,7 @@
 from typing import Any, List, Optional
 
 import psycopg2
+import pandas as pd
 from ad_main.settings import get_sqla_conn
 from dbf.utils import (
     FIELD_MAP,
@@ -120,6 +121,10 @@ class Sinan(object):
                 df_without_duplicates = drop_duplicates_from_dataframe(
                     df_parsed, default_cid, self.year
                 )
+
+                df_without_duplicates = df_without_duplicates.replace({
+                    pd.NA: None
+                })
 
                 # Log the start of the upsert iteration
                 logger.info(

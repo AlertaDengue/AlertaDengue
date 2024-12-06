@@ -1000,7 +1000,27 @@ CREATE TABLE "Municipio"."Notificacao" (
     nu_idade_n integer,
     resul_pcr numeric,
     criterio numeric,
-    classi_fin numeric
+    classi_fin numeric,
+    -- updated on 12-2024
+    dt_chik_s1 date,
+    dt_chik_s2 date,
+    dt_prnt date,
+    res_chiks1 character varying(255),
+    res_chiks2 character varying(255),
+    resul_prnt character varying(255),
+    dt_soro date,
+    resul_soro character varying(255),
+    dt_ns1 date,
+    resul_ns1 character varying(255),
+    dt_viral date,
+    resul_vi_n character varying(255),
+    dt_pcr date,
+    sorotipo character varying(255),
+    id_distrit numeric,
+    id_bairro numeric,
+    nm_bairro character varying(255),
+    id_unidade numeric
+
 );
 
 

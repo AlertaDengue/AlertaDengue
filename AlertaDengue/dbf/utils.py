@@ -52,6 +52,25 @@ FIELD_MAP = {
     "resul_pcr": "RESUL_PCR_",
     "criterio": "CRITERIO",
     "classi_fin": "CLASSI_FIN",
+    # updated on 12-2024
+    "dt_chik_s1": "DT_CHIK_S1",
+    "dt_chik_s2": "DT_CHIK_S2",
+    "dt_prnt": "DT_PRNT",
+    "res_chiks1": "RES_CHIKS1",
+    "res_chiks2": "RES_CHIKS2",
+    "resul_prnt": "RESUL_PRNT",
+    "dt_soro": "DT_SORO",
+    "resul_soro": "RESUL_SORO",
+    "dt_ns1": "DT_NS1",
+    "resul_ns1": "RESUL_NS1",
+    "dt_viral": "DT_VIRAL",
+    "resul_vi_n": "RESUL_VI_N",
+    "dt_pcr": "DT_PCR",
+    "sorotipo": "SOROTIPO",
+    "id_distrit": "ID_DISTRIT",
+    "id_bairro": "ID_BAIRRO",
+    "nm_bairro": "NM_BAIRRO",
+    "id_unidade": "ID_UNIDADE",
 }
 
 
@@ -283,17 +302,37 @@ def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
 
     df["ID_MUNICIP"] = add_dv(df.ID_MUNICIP)
 
-    df["DT_SIN_PRI"] = convert_date(df.DT_SIN_PRI)
-    df["DT_DIGITA"] = convert_date(df.DT_DIGITA)
-    df["DT_NASC"] = convert_date(df.DT_NASC)
-    df["DT_NOTIFIC"] = convert_date(df.DT_NOTIFIC)
+    dt_cols = [
+        "DT_SIN_PRI",
+        "DT_DIGITA",
+        "DT_NASC",
+        "DT_NOTIFIC",
+        "DT_CHIK_S1",
+        "DT_CHIK_S2",
+        "DT_PRNT",
+        "DT_SORO",
+        "DT_NS1",
+        "DT_VIRAL",
+        "DT_PCR",
+    ]
+
+    for dt_col in dt_cols:
+        df[dt_col] = convert_date(df[dt_col])
 
     # Replace values other than 'M' or 'F' with 'I'
     df["CS_SEXO"] = np.where(
         df["CS_SEXO"].isin(["M", "F"]), df["CS_SEXO"], "I"
     ).astype(str)
 
-    df["NU_IDADE_N"] = convert_data_types(df.NU_IDADE_N, int)
+    int_cols = [
+        "NU_IDADE_N",
+        "ID_DISTRIT",
+        "ID_BAIRRO",
+        "ID_UNIDADE",
+    ]
+
+    for int_col in int_cols:
+        df[int_col] = convert_data_types(df[int_col], int)
 
     df["RESUL_PCR_"] = (
         convert_data_types(df["RESUL_PCR_"], int)
