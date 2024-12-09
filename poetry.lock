@@ -716,25 +716,22 @@ files = [
 
 [[package]]
 name = "containers-sugar"
-version = "1.16.1"
+version = "1.13.0"
 description = "Simplify the usage of containers"
 optional = false
-python-versions = "<4,>=3.9"
+python-versions = "<4,>=3.8.1"
 files = [
-    {file = "containers_sugar-1.16.1-py3-none-any.whl", hash = "sha256:5e218c47306c93fe55f46d7cb67b107643ba2ae60be32993351c4c4f8067b316"},
-    {file = "containers_sugar-1.16.1.tar.gz", hash = "sha256:73bb1788d58d4e528d935b2ae77afd567b7c193910024d1e58877cc92ccffc35"},
+    {file = "containers_sugar-1.13.0-py3-none-any.whl", hash = "sha256:35cf0b199cf728b37d7ea43ad1151a30d1eea7f6bc5c29546a82dbef8e2feef1"},
+    {file = "containers_sugar-1.13.0.tar.gz", hash = "sha256:f9619d94e0fa646e827d4add7cc3e897a3389b89b8f26ce85f5ce9b7c5abbaa1"},
 ]
 
 [package.dependencies]
 colorama = ">=0.4.6"
-compose-go = ">=1.27.0"
 Jinja2 = ">=2"
-jsonschema = ">=4"
 python-dotenv = ">=0.21.1"
 pyyaml = ">=6"
 sh = ">=2.0.0"
 typer = ">=0.9.0"
-xonsh = ">=0.15.0"
 
 [package.extras]
 tui = ["plotille (>=5)", "rich (>=10.11.0)", "textual (>=0.48)"]
@@ -4026,4 +4023,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "c9fff3e9d41aca3d6c83c941b6ce1b905778fdd63dfb91fe874c2572df4fdf4c"
+content-hash = "130bc8ac796b2f980f9bf55294bc1f1cc7a49e989202a240ccc63875e765c1ca"
