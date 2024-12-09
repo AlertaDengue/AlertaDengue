@@ -6,13 +6,24 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('upload', '0002_sinan_inserted_rows'),
+        ("upload", "0002_sinan_inserted_rows"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='sinan',
-            name='status',
-            field=models.TextField(choices=[('waiting_chunk', 'Aguardando chunk'), ('chunking', 'Processando chunks'), ('waiting_insert', 'Aguardando inserção'), ('inserting', 'Inserindo dados'), ('error', 'Erro'), ('finished', 'Finalizado'), ('finished_misparsed', 'Finalizado com erro')], help_text='Upload status of the file'),
+            model_name="sinan",
+            name="status",
+            field=models.TextField(
+                choices=[
+                    ("waiting_chunk", "Aguardando chunk"),
+                    ("chunking", "Processando chunks"),
+                    ("waiting_insert", "Aguardando inserção"),
+                    ("inserting", "Inserindo dados"),
+                    ("error", "Erro"),
+                    ("finished", "Finalizado"),
+                    ("finished_misparsed", "Finalizado com erro"),
+                ],
+                help_text="Upload status of the file",
+            ),
         ),
     ]

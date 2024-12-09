@@ -1,12 +1,11 @@
-from typing import Iterator, Tuple, TYPE_CHECKING
 from pathlib import Path
+from typing import TYPE_CHECKING, Iterator, Tuple
 
-import pandas as pd
 import numpy as np
-from loguru import logger
-from django.utils.translation import gettext_lazy as _
-
+import pandas as pd
 from ad_main import settings
+from django.utils.translation import gettext_lazy as _
+from loguru import logger
 
 if TYPE_CHECKING:
     from upload.models import SINAN
@@ -39,11 +38,7 @@ REQUIRED_DATE_FIELDS = ["DT_SIN_PRI", "DT_NOTIFIC", "DT_DIGITA", "DT_NASC"]
 
 REQUIRED_FIELDS = REQUIRED_DATE_FIELDS + ["ID_MUNICIP"]  # +
 
-DISEASE_CID = {
-    "dengue": "A90",
-    "chik": "A92.0",
-    "zika": "A98"
-}
+DISEASE_CID = {"dengue": "A90", "chik": "A92.0", "zika": "A98"}
 
 UF_CODES = {
     "AC": 12,
@@ -107,16 +102,13 @@ def sinan_drop_duplicates_from_dataframe(
 
         if df_se_notific.shape[0] > 0:
             dup_file = (
-                duplicated_sinan_dir /
-                f"duplicate_values_SE_NOT_{filename}.csv"
+                duplicated_sinan_dir
+                / f"duplicate_values_SE_NOT_{filename}.csv"
             )
 
             with open(dup_file, "a") as f:
                 df_se_notific.to_csv(
-                    f,
-                    index=False,
-                    mode="a",
-                    header=(not f.tell())
+                    f, index=False, mode="a", header=(not f.tell())
                 )
 
             logger.info(
@@ -134,16 +126,12 @@ def sinan_drop_duplicates_from_dataframe(
         df_dt_notific = df[duplicate_dt_notific_mask]
 
         dup_file = (
-            duplicated_sinan_dir /
-            f"duplicate_values_DT_NOT_{filename}.csv"
+            duplicated_sinan_dir / f"duplicate_values_DT_NOT_{filename}.csv"
         )
 
         with open(dup_file, "a") as f:
             df_dt_notific.to_csv(
-                f,
-                index=False,
-                mode="a",
-                header=(not f.tell())
+                f, index=False, mode="a", header=(not f.tell())
             )
 
         if df_dt_notific.shape[0] > 0:
@@ -157,7 +145,7 @@ def sinan_drop_duplicates_from_dataframe(
     return df
 
 
-def sinan_parse_fields(df: pd.DataFrame, sinan_obj: 'SINAN') -> pd.DataFrame:
+def sinan_parse_fields(df: pd.DataFrame, sinan_obj: "SINAN") -> pd.DataFrame:
     """
     Rename and parse data types on dataframe columns based on SINAN specs
     Parameters
@@ -202,7 +190,7 @@ def sinan_parse_fields(df: pd.DataFrame, sinan_obj: 'SINAN') -> pd.DataFrame:
     if not misparsed_df.empty:
         sinan_obj.parse_error = True
         sinan_obj.misparsed_cols = list(misparsed_cols)
-        sinan_obj.save(update_fields=['parse_error', 'misparsed_cols'])
+        sinan_obj.save(update_fields=["parse_error", "misparsed_cols"])
 
         misparsed_df.to_csv(
             str(sinan_obj.misparsed_file),
@@ -214,7 +202,7 @@ def sinan_parse_fields(df: pd.DataFrame, sinan_obj: 'SINAN') -> pd.DataFrame:
 
 
 def sinan_parse_row(
-    row: pd.Series, sinan_obj: 'SINAN', misparsed_cols: set[str]
+    row: pd.Series, sinan_obj: "SINAN", misparsed_cols: set[str]
 ) -> pd.Series:
     """
     If an Exception is thrown in this method, the row will be removed from the
@@ -254,9 +242,15 @@ def sinan_parse_row(
         if str(nu_notific).isdigit():
             row["NU_NOTIFIC"] = int(row["NU_NOTIFIC"])
         else:
-            row["NU_NOTIFIC"] = int("".join(
-                [str(c) for c in str(nu_notific) if c not in chars_to_remove]
-            ))
+            row["NU_NOTIFIC"] = int(
+                "".join(
+                    [
+                        str(c)
+                        for c in str(nu_notific)
+                        if c not in chars_to_remove
+                    ]
+                )
+            )
     except Exception as e:
         misparsed_cols.add("NU_NOTIFIC")
         raise e
@@ -359,7 +353,7 @@ def chunk_gen(chunksize: int, totalsize: int) -> Iterator[Tuple[int, int]]:
         totalsize (int): Total size of the data.
     Yields
     ------
-        Tuple[int, int]: A tuple containing the lowerbound and upperbound 
+        Tuple[int, int]: A tuple containing the lowerbound and upperbound
         indices of each chunk.
     """
     chunks = totalsize // chunksize

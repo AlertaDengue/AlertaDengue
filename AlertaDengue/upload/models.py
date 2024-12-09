@@ -1,29 +1,28 @@
-import shutil
-import os
 import csv
+import os
+import shutil
+from datetime import date, datetime
 from pathlib import Path
-from typing import Optional, TypeVar, Type
-from datetime import (datetime, date)
-import pandas as pd
-from simpledbf import Dbf5
+from typing import Optional, Type, TypeVar
 
-from django.db import models
+import pandas as pd
+from ad_main.settings import get_sqla_conn
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth import get_user_model
-
-from ad_main.settings import get_sqla_conn
+from simpledbf import Dbf5
 from upload.sinan.validations import (
+    validate_fields,
     validate_file_exists,
     validate_file_type,
     validate_year,
-    validate_fields,
 )
 
 User = get_user_model()
-T = TypeVar('T', bound='SINAN')
-U = TypeVar('U', bound='User')
+T = TypeVar("T", bound="SINAN")
+U = TypeVar("U", bound="User")
 
 
 class UFs(models.TextChoices):
@@ -66,15 +65,11 @@ class Diseases(models.TextChoices):
 class Status(models.TextChoices):
     WAITING_CHUNK = "waiting_chunk", _("Aguardando chunk")
     CHUNKING = "chunking", _("Processando chunks")
-    WAITING_INSERT = "waiting_insert", _(
-        "Aguardando inserção"
-    )
+    WAITING_INSERT = "waiting_insert", _("Aguardando inserção")
     INSERTING = "inserting", _("Inserindo dados")
     ERROR = "error", _("Erro")
     FINISHED = "finished", _("Finalizado")
-    FINISHED_MISPARSED = "finished_misparsed", _(
-        "Finalizado com erro"
-    )
+    FINISHED_MISPARSED = "finished_misparsed", _("Finalizado com erro")
 
 
 class SINAN(models.Model):
@@ -87,41 +82,35 @@ class SINAN(models.Model):
         blank=False,
         help_text=_("Name of the file with suffix"),
         validators=[validate_file_type],
-        max_length=100
+        max_length=100,
     )
     filepath = models.FileField(
         null=True,
         blank=False,
         help_text=_("Absolute data file path, Null if deleted after insert"),
-        validators=[validate_file_exists]
+        validators=[validate_file_exists],
     )
     disease = models.CharField(
-        choices=Diseases.choices,
-        default=Diseases.DENGUE,
-        max_length=50
+        choices=Diseases.choices, default=Diseases.DENGUE, max_length=50
     )
     notification_year = models.IntegerField(
-        null=False,
-        validators=[validate_year]
+        null=False, validators=[validate_year]
     )
     uf = models.CharField(
-        max_length=2,
-        null=False,
-        choices=UFs.choices,
-        default=UFs.BR
+        max_length=2, null=False, choices=UFs.choices, default=UFs.BR
     )
     municipio = models.IntegerField(null=True)
     status = models.TextField(
         null=False,
         choices=Status.choices,
-        help_text=_("Upload status of the file")
+        help_text=_("Upload status of the file"),
     )
     status_error = models.TextField(
         null=True,
         blank=False,
         help_text=_(
             "If Status ERROR, the traceback will be stored in status_error"
-        )
+        ),
     )
     parse_error = models.BooleanField(
         null=False,
@@ -130,7 +119,8 @@ class SINAN(models.Model):
             "An parse error ocurred when reading data, "
             "moved errored rows to `misparsed_file` file. "
             "This error doesn't change the status to ERROR"
-        ))
+        ),
+    )
     misparsed_file = models.FileField(
         null=True,
         default=None,
@@ -149,9 +139,7 @@ class SINAN(models.Model):
         help_text=_("Amount of inserted rows in database"),
     )
     uploaded_by = models.ForeignKey(
-        "auth.User",
-        on_delete=models.SET_NULL,
-        null=True
+        "auth.User", on_delete=models.SET_NULL, null=True
     )
     uploaded_at = models.DateField(default=timezone.now)
 
@@ -171,7 +159,7 @@ class SINAN(models.Model):
         parse_error: bool = False,
         misparsed_file: Optional[str] = None,
         uploaded_by: Optional[Type[U]] = None,
-        uploaded_at: date = datetime.now().date()
+        uploaded_at: date = datetime.now().date(),
     ) -> T:
         file = Path(str(filepath))
 
@@ -205,15 +193,12 @@ class SINAN(models.Model):
             if file.suffix == ".csv":
                 sniffer = csv.Sniffer()
 
-                with open(file.absolute(), "r", newline='') as f:
+                with open(file.absolute(), "r", newline="") as f:
                     data = f.read(10240)
                     sep = sniffer.sniff(data).delimiter
 
                 columns = pd.read_csv(
-                    file.absolute(),
-                    index_col=0,
-                    nrows=0,
-                    sep=sep
+                    file.absolute(), index_col=0, nrows=0, sep=sep
                 ).columns.to_list()
 
             elif file.suffix == ".dbf":
@@ -248,7 +233,7 @@ class SINAN(models.Model):
             parse_error=parse_error,
             misparsed_file=misparsed_file,
             uploaded_by=uploaded_by,
-            uploaded_at=uploaded_at
+            uploaded_at=uploaded_at,
         )
 
         return sinan

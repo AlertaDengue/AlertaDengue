@@ -125,24 +125,16 @@ class RegionalParameters:
     DB = settings.PSQL_DB
 
     t_parameters = IBIS_CONN.table(
-        name="parameters",
-        database=DB,
-        schema="Dengue_global"
+        name="parameters", database=DB, schema="Dengue_global"
     )
     t_municipio = IBIS_CONN.table(
-        name="Municipio",
-        database=DB,
-        schema="Dengue_global"
+        name="Municipio", database=DB, schema="Dengue_global"
     )
     t_estado = IBIS_CONN.table(
-        name="estado",
-        database=DB,
-        schema="Dengue_global"
+        name="estado", database=DB, schema="Dengue_global"
     )
     t_regional = IBIS_CONN.table(
-        name="regional",
-        database=DB,
-        schema="Dengue_global"
+        name="regional", database=DB, schema="Dengue_global"
     )
 
     @classmethod
@@ -686,7 +678,7 @@ def add_dv(geocodigo):
         "3152139": 3152131,
         "4305876": 4305871,
         "5203963": 5203962,
-        "5203930": 5203939
+        "5203930": 5203939,
     }
 
     if len(str(geocodigo)) == 7:
@@ -1133,7 +1125,7 @@ class ReportCity:
         t_hist = IBIS_CONN.table(
             name=f"Historico_alerta{table_suffix}",
             database=settings.PSQL_DB,
-            schema="Municipio"
+            schema="Municipio",
         )
 
         # 200 = 2 years
@@ -1202,18 +1194,18 @@ class ReportState:
 
             data = City.objects.filter(state=uf_name)
 
-            res = pd.DataFrame(list(data.values(
-                'id_regional',
-                'regional',
-                'geocode',
-                'name'
-            )))
+            res = pd.DataFrame(
+                list(data.values("id_regional", "regional", "geocode", "name"))
+            )
 
-            res.rename(columns={
-                'regional': 'nome_regional',
-                'geocode': 'municipio_geocodigo',
-                'name': 'municipio_nome'
-            }, inplace=True)
+            res.rename(
+                columns={
+                    "regional": "nome_regional",
+                    "geocode": "municipio_geocodigo",
+                    "name": "municipio_nome",
+                },
+                inplace=True,
+            )
 
             cache.set(
                 cache_name,
@@ -1237,7 +1229,7 @@ class ReportState:
         t_hist = IBIS_CONN.table(
             name=f"Historico_alerta{table_suffix}",
             database=settings.PSQL_DB,
-            schema="Municipio"
+            schema="Municipio",
         )
 
         #  200 = 2 years
