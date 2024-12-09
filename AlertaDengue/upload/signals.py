@@ -1,7 +1,7 @@
-from typing import Type, Any
 from pathlib import Path
+from typing import Any, Type
 
-from django.db.models import signals, Model
+from django.db.models import Model, signals
 from django.dispatch import receiver
 
 from .models import SINAN, Status
@@ -10,9 +10,7 @@ from .tasks import process_sinan_file
 
 @receiver(signals.post_save, sender=SINAN)
 def process_sinan_file_on_save(
-    sender: Type[Model],
-    instance: SINAN,
-    **kwargs: Any
+    sender: Type[Model], instance: SINAN, **kwargs: Any
 ) -> None:
     sinan = SINAN.objects.get(pk=instance.pk)  # pylint: disable=E1101
     if sinan.status == Status.WAITING_CHUNK:
@@ -21,9 +19,7 @@ def process_sinan_file_on_save(
 
 @receiver(signals.pre_delete, sender=SINAN)
 def delete_sinan_file_on_delete(
-    sender: Type[Model],
-    instance: SINAN,
-    **kwargs: Any
+    sender: Type[Model], instance: SINAN, **kwargs: Any
 ) -> None:
     if instance.chunks_dir:
         for chunk in Path(instance.chunks_dir).glob("*.parquet"):

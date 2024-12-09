@@ -1,4 +1,3 @@
-version: 1.0.0
 env-file: .env
 groups:
 
@@ -9,7 +8,7 @@ groups:
     vars:
       sugar_run_rm: sugar run --service web --options --rm
       manage_py: python manage.py
-    targets:
+    tasks:
       # DEV MODE
       run:
         help: Start the development server locally.

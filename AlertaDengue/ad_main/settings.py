@@ -208,7 +208,7 @@ def get_ibis_conn(database: Optional[str] = PSQL_DB):
             password=PSQL_PASSWORD,
             host=PSQL_HOST,
             port=PSQL_PORT,
-            database=database
+            database=database,
         )
 
     except ConnectionError as e:

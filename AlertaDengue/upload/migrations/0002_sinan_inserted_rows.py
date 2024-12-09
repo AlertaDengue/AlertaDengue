@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('upload', '0001_initial'),
+        ("upload", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='sinan',
-            name='inserted_rows',
-            field=models.IntegerField(default=0, help_text='Amount of inserted rows in database'),
+            model_name="sinan",
+            name="inserted_rows",
+            field=models.IntegerField(
+                default=0, help_text="Amount of inserted rows in database"
+            ),
         ),
     ]

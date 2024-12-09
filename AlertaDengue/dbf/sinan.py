@@ -1,5 +1,6 @@
 from typing import Any, List, Optional
 
+import pandas as pd
 import psycopg2
 from ad_main.settings import get_sqla_conn
 from dbf.utils import (
@@ -119,6 +120,10 @@ class Sinan(object):
                 # Remove duplicate rows from the parsed data
                 df_without_duplicates = drop_duplicates_from_dataframe(
                     df_parsed, default_cid, self.year
+                )
+
+                df_without_duplicates = df_without_duplicates.replace(
+                    {pd.NA: None}
                 )
 
                 # Log the start of the upsert iteration

@@ -487,7 +487,7 @@ class AlertCity:
         t_hist = IBIS_CONN.table(
             name=f"Historico_alerta{get_disease_suffix(disease)}",
             database=PSQL_DB,
-            schema="Municipio"
+            schema="Municipio",
         )
 
         if ew_start and ew_end:

@@ -44,7 +44,7 @@ tables = "^3.7.0"
 sqlglot = ">=23.4,<23.13"
 altair = "^5.2.0"
 watchdog = "^3.0.0"
-containers-sugar = ">=1.9.3,<2"
+containers-sugar = "<1.14.0"
 django-celery-beat = "^2.6.0"
 redis = "^5.0.1"
 django-redis = "^5.4.0"
@@ -58,6 +58,7 @@ pandas = ">=2.1.0"
 psycopg2 = "^2.9.9"
 minio = "^7.2.5"
 sentry-sdk = ">= 1.45.0, < 2.0.0"
+makim = "1.15.2"
 
 
 [tool.poetry.group.dev.dependencies]
