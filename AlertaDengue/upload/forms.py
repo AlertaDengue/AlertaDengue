@@ -22,7 +22,8 @@ class SINANForm(forms.Form):
     notification_year = forms.IntegerField(label=_("Ano de notificação"))
     abbreviation = forms.ChoiceField(
         choices=models.SINANUpload.UFs,
-        label=_("Abrangência")
+        label=_("Abrangência"),
+        required=False
     )
     municipio = forms.CharField(
         label=_("Nome do município (opcional)"),
@@ -30,14 +31,12 @@ class SINANForm(forms.Form):
     )
 
     def clean(self):
-        cleaned_data = super().clean()
-        chunked_upload_id = cleaned_data.get("chunked_upload_id")
-        user = cleaned_data.get("uploaded_by")
+        data = super().clean()
         try:
             uploaded_file = models.SINANChunkedUpload.objects.get(
-                id=chunked_upload_id, user=self.user
+                id=data["upload_id"], user=data["uploaded_by"]
             )
-        except models.SINANUpload.DoesNotExist:
+        except models.SINANChunkedUpload.DoesNotExist:
             raise ValidationError(
                 _(
                     "Houve um erro durante o envio do arquivo. "
@@ -46,4 +45,4 @@ class SINANForm(forms.Form):
             )
         # This might be a performance problem for really large DBFs
         # is_valid_dbf(uploaded_file.file, cleaned_data["notification_year"])
-        return cleaned_data
+        return data

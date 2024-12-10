@@ -2808,6 +2808,20 @@ files = [
 ]
 
 [[package]]
+name = "pyocclient"
+version = "0.6"
+description = "Python client library for ownCloud"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pyocclient-0.6.tar.gz", hash = "sha256:a33ddcbbd2ec22d9bc7d76b71dd77896c557221153d1428759780b5fb8fe8fa3"},
+]
+
+[package.dependencies]
+requests = ">=2.0.1"
+six = "*"
+
+[[package]]
 name = "pyparsing"
 version = "3.1.2"
 description = "pyparsing module - Classes and methods to define and execute parsing grammars"
@@ -4023,4 +4037,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "f5536a73772c781e8ec4efa4ac9c44242d7131914bff8d83a7067b52c3330d22"
+content-hash = "77519963ac5aadaff407a7f5cdde7080afb7ac340a09f95a965009f57d3f509d"

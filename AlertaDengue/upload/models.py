@@ -1,17 +1,15 @@
 from pathlib import Path
 from datetime import date
 
-import pandas as pd
-from ad_main.settings import get_sqla_conn
+from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 from chunked_upload.models import BaseChunkedUpload
 
-from ad_main.settings import get_sqla_conn
 from dados.models import City
+
 
 User = get_user_model()
 
@@ -23,7 +21,7 @@ def _get_upload_storage_path() -> str:
 class SINANChunkedUpload(BaseChunkedUpload):
     user = models.ForeignKey(
         User,
-        related_name='chunks',
+        related_name='sinan_chunks',
         on_delete=models.PROTECT
     )
 
@@ -63,11 +61,10 @@ class SINANUpload(models.Model):
     year = models.IntegerField(null=False)
     uf = models.CharField(max_length=2, null=True, choices=UFs)
     municipio = models.ForeignKey(City, on_delete=models.PROTECT, null=True)
-    file = models.FileField(null=False, upload_to=_get_upload_storage_path)
+    file = models.FileField(null=False)
     export_date = models.DateField(null=False)
     uploaded_by = models.ForeignKey(User, on_delete=models.PROTECT, null=False)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    inserted_rows = models.IntegerField(null=True, default=0)
 
     def clean(self):
         self.validate()
@@ -105,5 +102,6 @@ class SINANUploadHistory(models.Model):
     upload = models.ForeignKey(
         SINANUpload,
         on_delete=models.PROTECT,
+        related_name="notificacoes",
         null=False
     )

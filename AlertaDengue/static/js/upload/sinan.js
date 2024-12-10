@@ -1,5 +1,4 @@
 var md5 = ""
-var csrf = $("input[name='csrfmiddlewaretoken']")[0].value
 var form_data = [{ "name": "csrfmiddlewaretoken", "value": csrf }];
 var uploadCompleted = false;
 
@@ -52,17 +51,10 @@ $("#chunked_upload").fileupload({
     $("#filename_display>span").text("Enviando " + data.files[0].name + "...");
     $("form>.alert").hide();
     window.form_has_changed = true;
-    uploadCompleted = false; // Reset the flag when a new file is being uploaded
+    uploadCompleted = false;
   },
 
   chunkdone: function(e, data) {
-    if (form_data.length < 2) {
-      form_data.push(
-        { "name": "upload_id", "value": data.result.upload_id }
-      );
-    }
-    console.log(data);
-    console.log(data.result.upload_id);
     var progress = parseInt(data.loaded / data.total * 100.0, 10);
     update_progress_bar(progress);
   },
@@ -78,17 +70,36 @@ $("#chunked_upload").fileupload({
       },
       dataType: "json",
 
-      success: function(data) {
-        $("#id_chunked_upload_id").val(data.chunked_upload_id);
-        $("#id_filename").val(data.filename);
-        $("#submit_button").removeAttr("disabled");
+      success: function(file) {
         uploadCompleted = true;
         update_progress_bar(100);
         $("#filename_display>span").html(
-          data.filename +
+          file.filename +
           " pronto para ser enviado. <br />Preencha os dados abaixo e clique em 'Enviar' para importar os dados."
         );
         $("#submit_button").prop("disabled", false);
+
+        if ($("#upload_id").length > 0) {
+          $("#upload_id").val(file.id);
+        } else {
+          $("<input>", {
+            type: "hidden",
+            id: "upload_id",
+            name: "upload_id",
+            value: file.id
+          }).appendTo("form");
+        }
+
+        if ($("#filename").length > 0) {
+          $("#filename").val(file.filename);
+        } else {
+          $("<input>", {
+            type: "hidden",
+            id: "filename",
+            name: "filename",
+            value: file.filename
+          }).appendTo("form");
+        }
       },
 
       error: function(jqXHR, textStatus, errorThrown) {
@@ -98,11 +109,4 @@ $("#chunked_upload").fileupload({
       }
     });
   },
-});
-
-$("form").submit(function(e) {
-  if (!uploadCompleted) {
-    e.preventDefault();
-    alert("Please complete the file upload before submitting the form.");
-  }
 });

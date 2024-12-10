@@ -15,7 +15,7 @@ User = get_user_model()
 
 class SINANUpload(LoginRequiredMixin, FormView):
     form_class = forms.SINANForm
-    template_name = "sinan.html"
+    template_name = "sinan/index.html"
     success_url = reverse_lazy("upload:sinan_success")
 
     def post(self, request, *args, **kwargs):
@@ -26,15 +26,16 @@ class SINANUpload(LoginRequiredMixin, FormView):
 
     def form_valid(self, form):
         chunked_upload = models.SINANChunkedUpload.objects.get(
-            id=form.cleaned_data["chunked_upload_id"], user=self.request.user
+            id=form.cleaned_data["upload_id"], user=self.request.user
         )
         uploaded_file = File(
             chunked_upload.file, form.cleaned_data["filename"]
         )
+        print(uploaded_file)
         sinan_file = models.SINANUpload.objects.create(
             year=form.cleaned_data["notification_year"],
             uf=form.cleaned_data["abbreviation"],
-            municipio=form.cleaned_data["municipio"],
+            municipio=form.cleaned_data["municipio"] or None,
             file=uploaded_file,
             export_date=form.cleaned_data["export_date"],
             uploaded_by=self.request.user,
@@ -44,7 +45,7 @@ class SINANUpload(LoginRequiredMixin, FormView):
             f"""
             O arquivo {sinan_file.file.name} exportado em 
             {sinan_file.export_date:%d/%m/%Y} com notificações do ano 
-            {sinan_file.notification_year} foi enviado com sucesso. Você será
+            {sinan_file.year} foi enviado com sucesso. Você será
             informado por email ({self.request.user.email}) assim que 
             o processo de importação for finalizado
             """
@@ -68,6 +69,6 @@ class SINANChunkedUploadCompleteView(ChunkedUploadCompleteView):
 
     def get_response_data(self, chunked_upload, request):
         return {
+            "id": chunked_upload.id,
             "filename": chunked_upload.filename,
-            "chunked_upload_id": chunked_upload.id,
         }
