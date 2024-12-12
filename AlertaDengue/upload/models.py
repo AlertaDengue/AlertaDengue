@@ -27,7 +27,7 @@ class SINANChunkedUpload(BaseChunkedUpload):
 
 
 class SINANUpload(models.Model):
-    UFs = (
+    UFs = [
         (None, "Brasil"),
         ("AC", "Acre"),
         ("AL", "Alagoas"),
@@ -56,13 +56,18 @@ class SINANUpload(models.Model):
         ("SP", "São Paulo"),
         ("SE", "Sergipe"),
         ("TO", "Tocantins"),
-    )
+    ]
 
-    year = models.IntegerField(null=False)
+    CID10 = [
+        ("A90", "Dengue"),
+        ("A92.0", "Chikungunya"),
+        ("A928", "Zika")
+    ]
+
+    cid10 = models.CharField(max_length=5, null=False, choices=CID10)
     uf = models.CharField(max_length=2, null=True, choices=UFs)
-    municipio = models.ForeignKey(City, on_delete=models.PROTECT, null=True)
+    year = models.IntegerField(null=False)
     file = models.FileField(null=False)
-    export_date = models.DateField(null=False)
     uploaded_by = models.ForeignKey(User, on_delete=models.PROTECT, null=False)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 

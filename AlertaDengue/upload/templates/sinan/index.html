@@ -97,7 +97,7 @@
                     <form>
                       <div class="form-group">
                         {% csrf_token %}
-                        <input id="chunked_upload" type="file" name="file">
+                        <input id="chunked_upload" type="file" name="file" multiple accept=".csv,.dbf,.parquet,.csv.gz,.csv.zip,.dbf.gz,.dbf.zip,.parquet.gz,.parquet.zip">
                       </div>
                       <div class="form-group">
                         <label id="filename_display" style="display: none;">

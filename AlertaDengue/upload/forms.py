@@ -1,3 +1,5 @@
+from datetime import date
+
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -18,16 +20,20 @@ class SINANForm(forms.Form):
         widget=forms.HiddenInput()
     )
     filename = forms.CharField(required=False, widget=forms.HiddenInput())
-    export_date = forms.DateField(label=_("Data da exportação"))
-    notification_year = forms.IntegerField(label=_("Ano de notificação"))
-    abbreviation = forms.ChoiceField(
+    cid10 = forms.ChoiceField(
+        choices=models.SINANUpload.CID10,
+        label=_("CID10"),
+        initial=models.SINANUpload.CID10[0][0],
+    )
+    notification_year = forms.IntegerField(
+        label=_("Ano de notificação"),
+        initial=date.today().year
+    )
+    uf = forms.ChoiceField(
         choices=models.SINANUpload.UFs,
         label=_("Abrangência"),
-        required=False
-    )
-    municipio = forms.CharField(
-        label=_("Nome do município (opcional)"),
         required=False,
+        initial=None
     )
 
     def clean(self):
