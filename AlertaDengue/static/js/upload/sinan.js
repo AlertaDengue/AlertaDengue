@@ -1,13 +1,11 @@
-var form_data = [{ "name": "csrfmiddlewaretoken", "value": csrf }];
-
-async function calculate_md5(file) {
-  const chunk_size = 10000000; // 10Mb
-  const slice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
-  const spark = new SparkMD5.ArrayBuffer();
-  const chunks = Math.ceil(file.size / chunk_size);
-  let current_chunk = 0;
-
+function calculate_md5(file) {
   return new Promise((resolve) => {
+    var chunk_size = 10000000; // 10Mb
+    var slice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice;
+    var spark = new SparkMD5.ArrayBuffer();
+    var chunks = Math.ceil(file.size / chunk_size);
+    let current_chunk = 0;
+
     function onload(e) {
       spark.append(e.target.result);
       current_chunk++;
@@ -19,9 +17,9 @@ async function calculate_md5(file) {
     }
 
     function read_next_chunk() {
-      const reader = new FileReader();
-      const start = current_chunk * chunk_size;
-      const end = Math.min(start + chunk_size, file.size);
+      var reader = new FileReader();
+      var start = current_chunk * chunk_size;
+      var end = Math.min(start + chunk_size, file.size);
       reader.onload = onload;
       reader.readAsArrayBuffer(slice.call(file, start, end));
     }
@@ -30,30 +28,52 @@ async function calculate_md5(file) {
   });
 }
 
-async function upload(data) {
-  const file = data.files[0];
-  console.log(file);
-  const md5 = await calculate_md5(file);
-  console.log(md5);
-}
 
 $("#chunked_upload").fileupload({
   url: 'chunked/',
   dataType: "json",
   maxChunkSize: 10000000,
-  formData: form_data,
+  headers: { 'X-CSRFToken': csrf },
+  multipart: true,
 
   add: function(e, data) {
-    upload(data);
-    // $("#messages").empty();
-    // form_data.splice(1);
-    // calculate_md5(data.files[0], 10000000);
-    // data.submit();
+    console.log("add");
+    console.log(data);
+
+    $.each(data.files, function(index, file) {
+      calculate_md5(file).then(md5 => {
+        console.log("md5");
+        console.log(md5);
+        var jqXHR = data.submit()
+          .done(function(result, textStatus, jqXHR) {
+            console.log("add done");
+            console.log(result);
+            console.log(textStatus);
+            console.log(jqXHR);
+          })
+          .fail(function(jqXHR, textStatus, errorThrown) {
+            console.log("add fail");
+            console.log(jqXHR);
+            console.log(textStatus);
+            console.log(errorThrown);
+          });
+      });
+    });
+  },
+
+  progress: function(e, data) {
+    console.log("progress");
+    console.log(data);
+    if (e.lengthComputable) {
+      var progress = Math.round((data.loaded / data.total) * 100);
+      console.log("Uploading", data.files[0].name, progress + "%");
+    }
   },
 
   chunkdone: function(e, data) {
-    console.log("chunkdone")
+    console.log("chunkdone");
     console.log(data);
+    console.log(data.result.upload_id);
   },
 
   done: function(e, data) {
@@ -63,40 +83,23 @@ $("#chunked_upload").fileupload({
       data: {
         csrfmiddlewaretoken: csrf,
         upload_id: data.result.upload_id,
-        md5: md5
       },
       dataType: "json",
-
-      success: function(file) {
-
-        if ($("#upload_id").length > 0) {
-          $("#upload_id").val(file.id);
-        } else {
-          $("<input>", {
-            type: "hidden",
-            id: "upload_id",
-            name: "upload_id",
-            value: file.id
-          }).appendTo("form");
-        }
-
-        if ($("#filename").length > 0) {
-          $("#filename").val(file.filename);
-        } else {
-          $("<input>", {
-            type: "hidden",
-            id: "filename",
-            name: "filename",
-            value: file.filename
-          }).appendTo("form");
-        }
+      success: function(response) {
+        console.log("done success");
+        console.log(response);
       },
-
       error: function(jqXHR, textStatus, errorThrown) {
+        console.log("done error");
         console.log(jqXHR);
         console.log(textStatus);
         console.log(errorThrown);
       }
     });
   },
+
+  fail: function(e, data) {
+    console.log("fail");
+    console.log(data);
+  }
 });
