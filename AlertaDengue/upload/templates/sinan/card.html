@@ -1,0 +1,15 @@
+<form>
+  <div class="form-group">
+    {% csrf_token %}
+  </div>
+</form>
+
+<form method="POST" enctype="multipart/form-data" action='{% url "upload:sinan" %}'>
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  {% buttons %}
+  <button type="submit" id="submit_button" class="btn btn-primary" disabled="disabled">
+    {% translate "Enviar" %}
+  </button>
+  {% endbuttons %}
+</form>
