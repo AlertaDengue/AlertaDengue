@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib import messages
+from django.http import JsonResponse
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.base import File
 from django.urls import reverse_lazy
@@ -66,6 +68,24 @@ class SINANChunkedUploadView(ChunkedUploadView):
         logger.info(request)
         logger.info(req)
         return super().post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        upload_id = kwargs.get('upload_id')
+        try:
+            upload = self.model.objects.get(upload_id=upload_id)
+            if upload.user != request.user:
+                raise PermissionDenied("Forbidden")
+            upload.file.delete()
+            upload.delete()
+            return JsonResponse(
+                {"success": True, "message": f"{upload.file.name}"},
+                status=200
+            )
+        except self.model.DoesNotExist:
+            return JsonResponse(
+                {"success": False, "message": "Unknown upload"},
+                status=404
+            )
 
 
 class SINANChunkedUploadCompleteView(ChunkedUploadCompleteView):
