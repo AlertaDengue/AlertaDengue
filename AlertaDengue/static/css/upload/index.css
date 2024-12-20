@@ -28,3 +28,18 @@
 #dropzone:hover {
   background-color: #eef6ff;
 }
+
+#upload-files {
+  display: flex;
+  justify-content:center;
+  align-items: center;
+
+}
+
+[id^="upload_"] {
+  display: none;
+}
+
+label[for^="upload_"] {
+  margin-botton: 0;
+}

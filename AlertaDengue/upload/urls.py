@@ -6,7 +6,7 @@ app_name = "upload"
 urlpatterns = [
     re_path(r"^sinan/$", views.SINANDashboard.as_view(), name="sinan"),
     re_path(
-        r"^sinan/file$",
+        r"^sinan/file-card/$",
         views.SINANUpload.as_view(),
         name="sinan_file"
     ),

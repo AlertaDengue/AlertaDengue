@@ -52,22 +52,16 @@ class SINANUpload(LoginRequiredMixin, FormView):
         )
         # import_dbf_to_database.delay(dbf.id)
         return super().form_valid(form)
-    #
-    # def get_context_data(self, **kwargs):
-    #     kwargs["last_uploaded"] = models.SINANUpload.objects.filter(
-    #         uploaded_by=self.request.user
-    #     ).order_by("-uploaded_at")[:5]
-    #     return super().get_context_data(**kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        filename = self.request.GET.get("filename", "")
+        context["filename"] = filename
+        return context
 
 
 class SINANChunkedUploadView(ChunkedUploadView):
     model = models.SINANChunkedUpload
-
-    def post(self, request, *args, **kwargs):
-        req = request.POST.copy()
-        logger.info(request)
-        logger.info(req)
-        return super().post(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         upload_id = kwargs.get('upload_id')

@@ -1,15 +1,35 @@
-<form>
-  <div class="form-group">
-    {% csrf_token %}
-  </div>
-</form>
+{% load i18n %}
+{% load bootstrap4 %}
+{% load static %}
 
-<form method="POST" enctype="multipart/form-data" action='{% url "upload:sinan" %}'>
-  {% csrf_token %}
-  {% bootstrap_form form %}
-  {% buttons %}
-  <button type="submit" id="submit_button" class="btn btn-primary" disabled="disabled">
-    {% translate "Enviar" %}
-  </button>
-  {% endbuttons %}
-</form>
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title text-truncate" title="{{ filename }}">{{ filename }}</h3>
+  </div>
+  <div class="card-body">
+    <form method="POST" enctype="multipart/form-data" action='{% url "upload:sinan" %}'>
+      {% csrf_token %}
+      {% bootstrap_form form %}
+    </form>
+  </div>
+</div>
+
+<style>
+  .card {
+    width: 300px;
+    max-width: 100%;
+    margin: 10px;
+  }
+
+  .card-header {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-title {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    width: 100%;
+  }
+</style>
