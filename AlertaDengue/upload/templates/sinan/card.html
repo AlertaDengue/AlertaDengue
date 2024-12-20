@@ -1,0 +1,36 @@
+{% load i18n %}
+{% load bootstrap4 %}
+{% load static %}
+
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title text-truncate" title="{{ filename }}">{{ filename }}</h3>
+  </div>
+  <div class="card-body">
+    <form method="POST" enctype="multipart/form-data" action='{% url "upload:sinan" %}'>
+      {% csrf_token %}
+      {% bootstrap_form form %}
+    </form>
+  </div>
+</div>
+
+<style>
+  .card {
+    flex: 0 1 calc(30% - 10px);
+    width: 240px;
+    max-width: 100%;
+    margin: 10px;
+  }
+
+  .card-header {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-title {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    width: 100%;
+  }
+</style>
