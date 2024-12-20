@@ -86,18 +86,35 @@ function upload_card(element_id, action, filename, formData) {
 }
 
 function chunked_upload(element_id) {
-  const id_parts = element_id.split('_').map((part, index) => index === 1 ? parseInt(part) : part);
+  const id_parts = element_id.split('_').map((part, index) => (index === 1 ? parseInt(part) : part));
+  const input_id = element_id.replace('#', '');
 
-  if ($(element_id).length === 0) {
-    $('#upload-files').append(`
-      <label for="${element_id.replace('#', '')}" style="cursor: pointer; display: inline-block;" alt="Upload file">
-        <i class="fa fa-plus-circle" style="font-size: 50px; color: #2ff96c;"></i>
-      </label>
+  if (!$('#upload-icon label').length) {
+    $('#upload-files').prepend(`
+      <div id="upload-icon">
+        <label for="${input_id}" style="cursor: pointer; display: inline-block;" alt="Upload file">
+          <i class="fa fa-plus-circle" style="font-size: 50px; color: #2ff96c;"></i>
+        </label>
+        <input
+          id="${input_id}"
+          type="file"
+          name="file"
+          accept=".csv,.dbf,.parquet,.csv.gz,.csv.zip,.dbf.gz,.dbf.zip,.parquet.gz,.parquet.zip"
+          style="display: none;"
+        >
+      </div>
+    `);
+  } else {
+    $('#upload-icon label').attr('for', input_id);
+
+    $('#upload-icon input').remove();
+    $('#upload-icon').append(`
       <input
-        id="${element_id.replace('#', '')}"
+        id="${input_id}"
         type="file"
         name="file"
         accept=".csv,.dbf,.parquet,.csv.gz,.csv.zip,.dbf.gz,.dbf.zip,.parquet.gz,.parquet.zip"
+        style="display: none;"
       >
     `);
   }
@@ -109,9 +126,8 @@ function chunked_upload(element_id) {
     headers: { 'X-CSRFToken': csrf },
 
     add: function(e, data) {
-      $(`label[for="${element_id.replace('#', '')}"]`).hide();
       chunked_upload([id_parts[0], `${id_parts[1] + 1}`].join('_'));
-      upload_card("card_1", "get", data.files[0].name);
+      upload_card(`${id_parts[1]}`, "get", data.files[0].name);
 
       calculate_md5(data).then(() => {
         data.formData = [

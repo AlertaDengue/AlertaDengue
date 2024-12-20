@@ -16,30 +16,40 @@
   padding: 4px;
 }
 
-#dropzone {
-  border: 2px dashed #007bff;
-  border-radius: 5px;
-  padding: 20px;
-  text-align: center;
-  background-color: #f9f9f9;
-  cursor: pointer;
-}
-
-#dropzone:hover {
-  background-color: #eef6ff;
+.card-body {
+  margin: -15px;
+  margin-bottom: -30px;
 }
 
 #upload-files {
   display: flex;
-  justify-content:center;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-height: 300px;
   align-items: center;
-
-}
-
-[id^="upload_"] {
-  display: none;
+  padding-left: 15px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1), 0 2px 5px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease-in-out;
 }
 
 label[for^="upload_"] {
   margin-botton: 0;
+}
+
+#upload-files {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+}
+
+#upload-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
 }

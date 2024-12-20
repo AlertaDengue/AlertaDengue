@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.http import JsonResponse
@@ -11,6 +13,7 @@ from django.shortcuts import render
 from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
 
 from . import models, forms
+from upload.sinan.utils import UF_CODES
 
 from loguru import logger
 
@@ -56,6 +59,12 @@ class SINANUpload(LoginRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         filename = self.request.GET.get("filename", "")
+
+        for uf in UF_CODES:
+            if uf in str(Path(filename).with_suffix("")).upper():
+                context["form"] = self.get_form(self.get_form_class())
+                context["form"].fields["uf"].initial = uf
+
         context["filename"] = filename
         return context
 
