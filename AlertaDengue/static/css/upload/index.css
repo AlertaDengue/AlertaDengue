@@ -28,7 +28,7 @@
   min-height: 300px;
   align-items: center;
   padding-left: 15px;
-  background: #fff;
+  background: #fff2f0;
   border-radius: 8px;
   border: 1px solid #e0e0e0;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1), 0 2px 5px rgba(0, 0, 0, 0.06);
@@ -43,7 +43,6 @@ label[for^="upload_"] {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 20px;
 }
 
 #upload-icon {
@@ -52,4 +51,5 @@ label[for^="upload_"] {
   justify-content: center;
   align-items: center;
   flex-shrink: 0;
+  padding-right: 5px;
 }

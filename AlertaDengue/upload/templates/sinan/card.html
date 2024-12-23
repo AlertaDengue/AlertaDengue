@@ -2,7 +2,7 @@
 {% load bootstrap4 %}
 {% load static %}
 
-<div class="card">
+<div class="card card-secondary">
   <div class="card-header">
     <h3 class="card-title text-truncate" title="{{ filename }}">{{ filename }}</h3>
   </div>
@@ -17,7 +17,7 @@
 <style>
   .card {
     flex: 0 1 calc(30% - 10px);
-    width: 240px;
+    width: 200px;
     max-width: 100%;
     margin: 10px;
   }
@@ -32,5 +32,32 @@
     word-break: break-word;
     overflow-wrap: break-word;
     width: 100%;
+  }
+
+  [data-tooltip] {
+    position: relative;
+  }
+
+  [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 250px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  [data-tooltip]:hover::after {
+    opacity: 1;
   }
 </style>
