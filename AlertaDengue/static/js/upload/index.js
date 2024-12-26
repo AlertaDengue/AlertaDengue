@@ -1,28 +1,70 @@
-var uploadStatus = {};
-
 $(document).ready(function() {
-
-  function is_ready() {
-    for (var card_id in uploadStatus) {
-      if (uploadStatus[card_id].status !== "done") {
-        return false;
-      }
-    }
-    return true;
-  }
-
   window.addEventListener("beforeunload", function(e) {
-    if (is_ready()) {
+    if (is_ready() && Object.keys(uploadStatus).length === 0) {
       return undefined;
     }
 
-    var confirmationMessage = 'Existem alterações no formulário. Se você sair agora '
-      + 'todas as alterações serão perdidas.';
+    var message = 'Existem alterações no formulário. Se você sair agora todas as alterações serão perdidas.';
+    e.preventDefault();
+    e.returnValue = message;
+    return message;
+  });
 
-    (e || window.event).returnValue = confirmationMessage;
-    return confirmationMessage;
+  window.addEventListener("unload", function() { // not working, should delete if upload is canceled
+    for (var card_id in uploadStatus) {
+      const upload_id = uploadStatus[card_id].form.upload_id;
+      if (upload_id) {
+        delete_chunked_upload(upload_id);
+      }
+    }
   });
 });
+
+
+var uploadStatus = {};
+
+
+function is_ready() {
+  function form_ready(card_id) {
+    const form = uploadStatus[card_id].form;
+    if (!form.csrfmiddlewaretoken) {
+      console.log(form.csrfmiddlewaretoken);
+      return false;
+    }
+    if (!form.upload_id) {
+      console.log(form.upload_id);
+      return false;
+    }
+    if (!form.filename) {
+      console.log(form.filename);
+      return false;
+    }
+    if (!form.cid10) {
+      console.log(form.cid10);
+      return false;
+    }
+    if (!form.notification_year) {
+      console.log(form.notification_year);
+      return false;
+    }
+    return true;
+  }
+  for (var card_id in uploadStatus) {
+    if (uploadStatus[card_id].status !== "done" || !form_ready(card_id)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+function update_submit() {
+  if (is_ready() && Object.keys(uploadStatus).length !== 0) {
+    $('#submit-button').prop('disabled', false).removeClass('btn-secondary').addClass('btn-primary');;
+  } else {
+    $('#submit-button').prop('disabled', true).removeClass('btn-primary').addClass('btn-secondary');;
+  }
+}
 
 
 function calculate_md5(data, card) {
@@ -94,18 +136,22 @@ function card_error(card, errorMessage) {
   const $cardEl = $card.find('.card');
   $cardEl.removeClass('card-secondary').addClass('card-danger');
 
-  const $overlay = $cardEl.find('.overlay');
-  if ($overlay.length) {
-    $overlay.html(`
-      <i class="fas fa-2x fa-times" 
-         style="cursor: pointer; position: relative;" 
-         data-tooltip="${errorMessage}"></i>
-    `);
+  let $overlay = $cardEl.find('.overlay');
 
-    $overlay.find('i').on('click', function() {
-      $card.remove();
-    });
+  if (!$overlay.length) {
+    $overlay = $('<div class="overlay"></div>');
+    $cardEl.append($overlay);
   }
+
+  $overlay.html(`
+    <i class="fas fa-2x fa-times" 
+       style="cursor: pointer; position: relative;" 
+       data-tooltip="${errorMessage}"></i>
+  `);
+
+  $overlay.find('i').on('click', function() {
+    delete_card(card[0].id);
+  });
 }
 
 
@@ -122,6 +168,7 @@ function delete_chunked_upload(upload_id) {
     }
   });
 }
+
 
 function upload_card(card_id, action, filename, formData) {
   return new Promise((resolve, reject) => {
@@ -140,6 +187,12 @@ function upload_card(card_id, action, filename, formData) {
           const closeButton = card.find('.close-button');
           closeButton.on('click', function() {
             card.remove();
+          });
+
+          const inputs = card.find('input, select, textarea');
+
+          inputs.each(function() {
+            uploadStatus[card_id]["form"][$(this).attr('name')] = $(this).val();
           });
 
           resolve(card[0]);
@@ -175,11 +228,11 @@ function upload_card(card_id, action, filename, formData) {
 
 function delete_card(card_id, upload_id) {
   if (upload_id) {
-    delete_chunked_upload(data.result.upload_id);
+    delete_chunked_upload(upload_id);
   }
   delete uploadStatus[card_id];
   $(`#${card_id}`).remove();
-
+  update_submit();
 }
 
 function chunked_upload(element_id) {
@@ -225,8 +278,9 @@ function chunked_upload(element_id) {
     headers: { 'X-CSRFToken': csrf },
 
     add: function(e, data) {
-      uploadStatus[card_id] = { "status": "pending" };
+      uploadStatus[card_id] = { "status": "pending", "form": {} };
       chunked_upload(upload_id);
+      update_submit();
 
       upload_card(card_id, "get", data.files[0].name).then(card => {
         return calculate_md5(data, card);
@@ -246,6 +300,8 @@ function chunked_upload(element_id) {
 
     chunkdone: function(e, data) {
       console.log("chunkdone");
+      uploadStatus[card_id]["status"] = "pending";
+      update_submit();
       if (!data.formData.find(f => f.name === "upload_id")) {
         data.formData.push({ name: "upload_id", value: data.result.upload_id });
       }
@@ -267,6 +323,9 @@ function chunked_upload(element_id) {
         success: function(response) {
           console.log("done success", response);
           uploadStatus[card_id]["status"] = "done";
+          uploadStatus[card_id]["form"]["upload_id"] = data.result.upload_id;
+          uploadStatus[card_id]["form"]["filename"] = data.files[0].name;
+          update_submit();
           $(`#${card_id} .card`).removeClass('card-secondary');
           $(`#${card_id} .card`).addClass('card-success');
           $(`#${card_id} .close-button`).off('click').on('click', function() {
