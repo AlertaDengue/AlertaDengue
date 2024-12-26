@@ -3,8 +3,11 @@
 {% load static %}
 
 <div class="card card-secondary">
-  <div class="card-header">
+  <div class="card-header" style="position: relative;">
     <h3 class="card-title text-truncate" title="{{ filename }}">{{ filename }}</h3>
+    <button type="button" class="close-button">
+      &times;
+    </button>
   </div>
   <div class="card-body">
     <form method="POST" enctype="multipart/form-data" action='{% url "upload:sinan" %}'>
@@ -32,6 +35,21 @@
     word-break: break-word;
     overflow-wrap: break-word;
     width: 100%;
+  }
+
+  .close-button {
+    color: #000;
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    border: none;
+    background: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .close-button:hover {
+    color: #d00;
   }
 
   [data-tooltip] {

@@ -1,21 +1,3 @@
-.ui-datepicker {
-  background-color: #FFF;
-  border: 0px solid white;
-  border-radius: 10px;
-  padding: 10px;
-}
-
-.ui-datepicker-next {
-  float: right;
-}
-.ui-datepicker-title {
-  padding: 10px;
-  text-align: center;
-}
-.ui-datepicker-calendar th {
-  padding: 4px;
-}
-
 .card-body {
   margin: -15px;
   margin-bottom: -30px;
@@ -29,10 +11,7 @@
   align-items: center;
   padding-left: 15px;
   background: #fff2f0;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1), 0 2px 5px rgba(0, 0, 0, 0.06);
-  transition: box-shadow 0.3s ease-in-out;
+  border-top: 8px solid #fff2f0;
 }
 
 label[for^="upload_"] {
@@ -52,4 +31,12 @@ label[for^="upload_"] {
   align-items: center;
   flex-shrink: 0;
   padding-right: 5px;
+}
+
+#submit-button {
+  margin-top: auto;
+  width: 100%;
+  border-radius: 0px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1), 0 2px 5px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease-in-out;
 }
