@@ -2,7 +2,7 @@ from pathlib import Path
 
 from django.contrib.auth import get_user_model
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, QueryDict
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.base import File
@@ -34,30 +34,29 @@ class SINANUpload(LoginRequiredMixin, FormView):
     success_url = reverse_lazy("upload:sinan")
 
     def post(self, request, *args, **kwargs):
-        mutable_POST = self.request.POST.copy()
-        mutable_POST["uploaded_by"] = request.user.id
-        self.request.POST = mutable_POST
+        post = request.POST.copy()
+        post["uploaded_by"] = request.user.id
+        self.request.POST = post
         return super().post(self.request, *args, **kwargs)
 
     def form_valid(self, form):
-        chunked_upload = models.SINANChunkedUpload.objects.get(
-            id=form.cleaned_data["upload_id"], user=self.request.user
-        )
-        uploaded_file = File(
-            chunked_upload.file, form.cleaned_data["filename"]
+        upload = models.SINANChunkedUpload.objects.get(
+            upload_id=form.cleaned_data["upload_id"], user=self.request.user
         )
         sinan_file = models.SINANUpload.objects.create(
-            uploaded_by=self.request.user,
             cid10=form.cleaned_data["cid10"],
             uf=form.cleaned_data["uf"],
             year=form.cleaned_data["notification_year"],
-            file=uploaded_file,
+            upload=upload,
         )
-        # import_dbf_to_database.delay(dbf.id)
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        if self.request.method == "POST":
+            return context
+
         filename = self.request.GET.get("filename", "")
 
         for uf in UF_CODES:
@@ -95,7 +94,6 @@ class SINANChunkedUploadCompleteView(ChunkedUploadCompleteView):
     model = models.SINANChunkedUpload
 
     def get_response_data(self, chunked_upload, request):
-        logger.info(f"Chunked Upload Data: {chunked_upload.__dict__}")
         return {
             "id": chunked_upload.id,
             "filename": chunked_upload.filename,

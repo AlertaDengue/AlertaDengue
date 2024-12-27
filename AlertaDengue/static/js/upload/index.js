@@ -18,6 +18,13 @@ $(document).ready(function() {
       }
     }
   });
+
+  $('#submit-button').on('click', function(e) {
+    e.preventDefault();
+    for (var card_id in uploadStatus) {
+      upload_card(card_id, "post", null, uploadStatus[card_id].form)
+    }
+  });
 });
 
 
@@ -28,23 +35,18 @@ function is_ready() {
   function form_ready(card_id) {
     const form = uploadStatus[card_id].form;
     if (!form.csrfmiddlewaretoken) {
-      console.log(form.csrfmiddlewaretoken);
       return false;
     }
     if (!form.upload_id) {
-      console.log(form.upload_id);
       return false;
     }
     if (!form.filename) {
-      console.log(form.filename);
       return false;
     }
     if (!form.cid10) {
-      console.log(form.cid10);
       return false;
     }
     if (!form.notification_year) {
-      console.log(form.notification_year);
       return false;
     }
     return true;
@@ -195,6 +197,14 @@ function upload_card(card_id, action, filename, formData) {
             uploadStatus[card_id]["form"][$(this).attr('name')] = $(this).val();
           });
 
+          inputs.on('input change', function() {
+            const key = $(this).attr('name');
+            const val = $(this).val();
+            if (key) {
+              uploadStatus[card_id]["form"][key] = val;
+            }
+          });
+
           resolve(card[0]);
         },
         error: function(xhr) {
@@ -203,10 +213,15 @@ function upload_card(card_id, action, filename, formData) {
         }
       });
     } else if (action === "post") {
+      let form = new FormData();
+      for (var key in formData) {
+        form.append(key, formData[key])
+      }
+      console.log(form);
       $.ajax({
         url: "file-card/",
         method: "POST",
-        data: formData,
+        data: form,
         processData: false,
         contentType: false,
         headers: {
@@ -214,11 +229,14 @@ function upload_card(card_id, action, filename, formData) {
           "X-CSRFToken": csrf
         },
         success: function() {
-          console.log("upload_card POST success");
+          delete_card(card_id);
+          if (Object.keys(uploadStatus).length === 0) {
+            location.reload();
+          }
           resolve();
         },
         error: function(xhr) {
-          console.error("upload_card POST error");
+          card_error($(`#${card_id}`), "505 error. Please contact the moderation");
           reject(xhr);
         }
       });
@@ -299,7 +317,7 @@ function chunked_upload(element_id) {
     },
 
     chunkdone: function(e, data) {
-      console.log("chunkdone");
+      // console.log("chunkdone");
       uploadStatus[card_id]["status"] = "pending";
       update_submit();
       if (!data.formData.find(f => f.name === "upload_id")) {
@@ -321,7 +339,7 @@ function chunked_upload(element_id) {
         },
         dataType: "json",
         success: function(response) {
-          console.log("done success", response);
+          // console.log("done success", response);
           uploadStatus[card_id]["status"] = "done";
           uploadStatus[card_id]["form"]["upload_id"] = data.result.upload_id;
           uploadStatus[card_id]["form"]["filename"] = data.files[0].name;

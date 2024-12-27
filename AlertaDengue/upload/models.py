@@ -67,18 +67,15 @@ class SINANUpload(models.Model):
     cid10 = models.CharField(max_length=5, null=False, choices=CID10)
     uf = models.CharField(max_length=2, null=True, choices=UFs)
     year = models.IntegerField(null=False)
-    file = models.FileField(null=False)
-    uploaded_by = models.ForeignKey(User, on_delete=models.PROTECT, null=False)
+    upload = models.ForeignKey(
+        SINANChunkedUpload,
+        on_delete=models.PROTECT,
+        null=True,
+    )
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
-    def clean(self):
-        self.validate()
-
-        # if not is_valid_dbf(self.file, self.notification_year):
-        #     raise ValidationError({"file": _("Arquivo DBF inválido")})
-
     def __str__(self):
-        return f"{self.file}"
+        return f"{self.upload.filename}"
 
     def validate(self):
         self._validate_year()

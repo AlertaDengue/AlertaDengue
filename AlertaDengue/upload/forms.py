@@ -15,7 +15,7 @@ class SINANForm(forms.Form):
     uploaded_by = forms.ModelChoiceField(
         queryset=User.objects.all(), widget=forms.HiddenInput()
     )
-    upload_id = forms.IntegerField(
+    upload_id = forms.CharField(
         required=False,
         widget=forms.HiddenInput()
     )
@@ -39,8 +39,8 @@ class SINANForm(forms.Form):
     def clean(self):
         data = super().clean()
         try:
-            uploaded_file = models.SINANChunkedUpload.objects.get(
-                id=data["upload_id"], user=data["uploaded_by"]
+            models.SINANChunkedUpload.objects.get(
+                upload_id=data["upload_id"], user=data["uploaded_by"]
             )
         except models.SINANChunkedUpload.DoesNotExist:
             raise ValidationError(
@@ -49,6 +49,4 @@ class SINANForm(forms.Form):
                     "Por favor, tente novamente."
                 )
             )
-        # This might be a performance problem for really large DBFs
-        # is_valid_dbf(uploaded_file.file, cleaned_data["notification_year"])
         return data
