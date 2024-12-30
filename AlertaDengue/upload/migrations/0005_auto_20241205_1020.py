@@ -20,15 +20,20 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='SINANChunkedUpload',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('upload_id', models.CharField(default=chunked_upload.models.generate_upload_id, editable=False, max_length=32, unique=True)),
-                ('file', models.FileField(max_length=255, upload_to=chunked_upload.settings.default_upload_to)),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
+                ('upload_id', models.CharField(default=chunked_upload.models.generate_upload_id,
+                 editable=False, max_length=32, unique=True)),
+                ('file', models.FileField(max_length=255,
+                 upload_to=chunked_upload.settings.default_upload_to)),
                 ('filename', models.CharField(max_length=255)),
                 ('offset', models.BigIntegerField(default=0)),
                 ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('status', models.PositiveSmallIntegerField(choices=[(1, 'Uploading'), (2, 'Complete')], default=1)),
+                ('status', models.PositiveSmallIntegerField(
+                    choices=[(1, 'Uploading'), (2, 'Complete')], default=1)),
                 ('completed_on', models.DateTimeField(blank=True, null=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='chunks', to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT,
+                 related_name='chunks', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'abstract': False,
@@ -37,22 +42,28 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='SINANUpload',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('year', models.IntegerField()),
-                ('uf', models.CharField(choices=[(None, 'Brasil'), ('AC', 'Acre'), ('AL', 'Alagoas'), ('AP', 'Amapá'), ('AM', 'Amazonas'), ('BA', 'Bahia'), ('CE', 'Ceará'), ('DF', 'Distrito Federal'), ('ES', 'Espírito Santo'), ('GO', 'Goiás'), ('MA', 'Maranhão'), ('MT', 'Mato Grosso'), ('MS', 'Mato Grosso do Sul'), ('MG', 'Minas Gerais'), ('PA', 'Pará'), ('PB', 'Paraíba'), ('PR', 'Paraná'), ('PE', 'Pernambuco'), ('PI', 'Piauí'), ('RJ', 'Rio de Janeiro'), ('RN', 'Rio Grande do Norte'), ('RS', 'Rio Grande do Sul'), ('RO', 'Rondônia'), ('RR', 'Roraima'), ('SC', 'Santa Catarina'), ('SP', 'São Paulo'), ('SE', 'Sergipe'), ('TO', 'Tocantins')], max_length=2, null=True)),
-                ('file', models.FileField(upload_to=upload.models._get_upload_storage_path)),
+                ('uf', models.CharField(choices=[(None, 'Brasil'), ('AC', 'Acre'), ('AL', 'Alagoas'), ('AP', 'Amapá'), ('AM', 'Amazonas'), ('BA', 'Bahia'), ('CE', 'Ceará'), ('DF', 'Distrito Federal'), ('ES', 'Espírito Santo'), ('GO', 'Goiás'), ('MA', 'Maranhão'), ('MT', 'Mato Grosso'), ('MS', 'Mato Grosso do Sul'), ('MG', 'Minas Gerais'), (
+                    'PA', 'Pará'), ('PB', 'Paraíba'), ('PR', 'Paraná'), ('PE', 'Pernambuco'), ('PI', 'Piauí'), ('RJ', 'Rio de Janeiro'), ('RN', 'Rio Grande do Norte'), ('RS', 'Rio Grande do Sul'), ('RO', 'Rondônia'), ('RR', 'Roraima'), ('SC', 'Santa Catarina'), ('SP', 'São Paulo'), ('SE', 'Sergipe'), ('TO', 'Tocantins')], max_length=2, null=True)),
+                ('file', models.FileField(upload_to=upload.models.sinan_upload_path)),
                 ('export_date', models.DateField()),
                 ('uploaded_at', models.DateTimeField(auto_now_add=True)),
-                ('municipio', models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='dados.city')),
-                ('uploaded_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                ('municipio', models.ForeignKey(
+                    null=True, on_delete=django.db.models.deletion.PROTECT, to='dados.city')),
+                ('uploaded_by', models.ForeignKey(
+                    on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(
             name='SINANUploadHistory',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(auto_created=True,
+                 primary_key=True, serialize=False, verbose_name='ID')),
                 ('notificacao_id', models.BigIntegerField()),
-                ('upload', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='upload.sinanupload')),
+                ('upload', models.ForeignKey(
+                    on_delete=django.db.models.deletion.PROTECT, to='upload.sinanupload')),
             ],
         ),
         migrations.DeleteModel(
