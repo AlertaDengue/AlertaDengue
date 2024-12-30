@@ -7,6 +7,6 @@ from celery import Celery
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ad_main.settings")
 
 
-app = Celery("ad_main", include=["dbf.tasks"])
+app = Celery("ad_main", include=["dbf.tasks", "upload.tasks"])
 app.config_from_object("ad_main.celery_settings", namespace="CELERY")
 app.autodiscover_tasks()

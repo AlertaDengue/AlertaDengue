@@ -1,11 +1,58 @@
-def move_file(self):
-    file = self.upload.file
-    date = ...
-    disease = {
-        "A90": "DENG",
-        "A92.0": "CHIK",
-        "A928": "ZIKA"
-    }
+import shutil
+from pathlib import Path
+
+import geopandas as gpd
+from celery import shared_task
+
+from .models import (
+    sinan_upload_path,
+    SINANUpload,
+    SINANUploadFatalError,
+)
+
+
+@shared_task
+def sinan_process_file(upload_sinan_id: int):
+    sinan = SINANUpload.objects.get(pk=upload_sinan_id)
+    sinan.status.debug("Task 'process_sinan_file' started.")
+    sinan_move_file(upload_sinan_id)
+
+
+@shared_task
+def sinan_move_file(upload_sinan_id: int):
+    sinan = SINANUpload.objects.get(pk=upload_sinan_id)
+    sinan.status.debug("Task 'move_sinan_file' started.")
+    try:
+        file = Path(sinan.upload.file.path)
+        if not file.exists():
+            raise SINANUploadFatalError(
+                sinan.status,
+                "SINAN Upload file not found"
+            )
+        dest = Path(sinan_upload_path()) / sinan._final_basename()
+        dest = dest.with_suffix(Path(sinan.upload.filename).suffix)
+        shutil.move(str(file), str(dest))
+        sinan.upload.file.name = str(dest)
+        sinan.upload.save()
+        sinan.status.debug(f"File moved to {str(dest)}")
+        sinan.status.debug("Task 'move_sinan_file' finished.")
+    except Exception as e:
+        raise SINANUploadFatalError(sinan.status, e)
+
+
+@shared_task
+def sinan_verify_file(upload_sinan_id: int):
+    sinan = SINANUpload.objects.get(pk=upload_sinan_id)
+    sinan.status.debug("Task 'process_verify_file' started.")
+
+    try:
+        columns = gpd.read_file(
+            sinan.upload.file.path,
+            rows=0,
+            ignore_geometry=True,
+        ).columns
+    except Exception as e:
+        raise SINANUploadFatalError(sinan.status, e)
 
 
 # import os
@@ -17,7 +64,6 @@ def move_file(self):
 # import pandas as pd
 # import pyarrow.parquet as pq
 # from ad_main.settings import get_sqla_conn
-# from celery import shared_task
 # from celery.result import AsyncResult, allow_join_result
 # from django.conf import settings
 # from django.utils.translation import gettext_lazy as _

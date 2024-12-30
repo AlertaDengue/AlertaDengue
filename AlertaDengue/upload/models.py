@@ -16,6 +16,36 @@ from dados.models import City
 
 User = get_user_model()
 
+UF_CODES = {
+    "AC": 12,
+    "AL": 27,
+    "AM": 13,
+    "AP": 16,
+    "BA": 29,
+    "CE": 23,
+    "DF": 53,
+    "ES": 32,
+    "GO": 52,
+    "MA": 21,
+    "MG": 31,
+    "MS": 50,
+    "MT": 51,
+    "PA": 15,
+    "PB": 25,
+    "PE": 26,
+    "PI": 22,
+    "PR": 41,
+    "RJ": 33,
+    "RN": 24,
+    "RO": 11,
+    "RR": 14,
+    "RS": 43,
+    "SC": 42,
+    "SE": 28,
+    "SP": 35,
+    "TO": 17,
+}
+
 
 def sinan_upload_path() -> str:
     return str(Path(settings.DBF_SINAN) / "imported")
@@ -64,6 +94,11 @@ class SINANUploadLogStatus(models.Model):
         level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"],
         message: str,
     ):
+        if self.status != 0:
+            raise ValueError(
+                "Log is closed for writing (finished with status " +
+                f"{self.status})."
+            )
         log_message = f"{level}{' ' * (7 - len(level))} - {message}\n"
         with Path(self.log_file).open(mode='a', encoding="utf-8") as log_file:
             log_file.write(log_message)
@@ -128,6 +163,60 @@ class SINANUpload(models.Model):
         ("A928", "Zika")
     ]
 
+    REQUIRED_COLS = [
+        "ID_MUNICIP",
+        "ID_AGRAVO",
+        "DT_SIN_PRI",
+        "DT_NOTIFIC",
+        "DT_DIGITA",
+        "DT_NASC",
+        "NU_ANO",
+        "NU_IDADE_N",
+        "NU_NOTIFIC",
+        "SEM_NOT",
+        "SEM_PRI",
+        "CS_SEXO",
+    ]
+
+    SYNONYMS_FIELDS = {"ID_MUNICIP": ["ID_MN_RESI"]}
+
+    COLUMNS = {
+        "DT_NOTIFIC": "dt_notific",
+        "SEM_NOT": "se_notif",
+        "NU_ANO": "ano_notif",
+        "DT_SIN_PRI": "dt_sin_pri",
+        "SEM_PRI": "se_sin_pri",
+        "DT_DIGITA": "dt_digita",
+        "ID_MUNICIP": "municipio_geocodigo",
+        "NU_NOTIFIC": "nu_notific",
+        "ID_AGRAVO": "cid10_codigo",
+        "DT_NASC": "dt_nasc",
+        "CS_SEXO": "cs_sexo",
+        "NU_IDADE_N": "nu_idade_n",
+        "RESUL_PCR_": "resul_pcr",
+        "CRITERIO": "criterio",
+        "CLASSI_FIN": "classi_fin",
+        # updated on 12-2024
+        "DT_CHIK_S1": "dt_chik_s1",
+        "DT_CHIK_S2": "dt_chik_s2",
+        "DT_PRNT": "dt_prnt",
+        "RES_CHIKS1": "res_chiks1",
+        "RES_CHIKS2": "res_chiks2",
+        "RESUL_PRNT": "resul_prnt",
+        "DT_SORO": "dt_soro",
+        "RESUL_SORO": "resul_soro",
+        "DT_NS1": "dt_ns1",
+        "RESUL_NS1": "resul_ns1",
+        "DT_VIRAL": "dt_viral",
+        "RESUL_VI_N": "resul_vi_n",
+        "DT_PCR": "dt_pcr",
+        "SOROTIPO": "sorotipo",
+        "ID_DISTRIT": "id_distrit",
+        "ID_BAIRRO": "id_bairro",
+        "NM_BAIRRO": "nm_bairro",
+        "ID_UNIDADE": "id_unidade",
+    }
+
     cid10 = models.CharField(max_length=5, null=False, choices=CID10)
     uf = models.CharField(max_length=2, null=True, choices=UFs)
     year = models.IntegerField(null=False)
@@ -175,3 +264,9 @@ class SINANUploadHistory(models.Model):
         related_name="notificacoes",
         null=False
     )
+
+
+class SINANUploadFatalError(Exception):
+    def __init__(self, log_status: SINANUploadLogStatus, error_message: str):
+        log_status.fatal(error_message)
+        super().__init__(error_message)

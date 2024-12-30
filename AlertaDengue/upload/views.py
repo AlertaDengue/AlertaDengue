@@ -13,9 +13,8 @@ from django.shortcuts import render
 from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
 
 from . import models, forms
-from upload.sinan.utils import UF_CODES
+from upload.models import UF_CODES
 
-from loguru import logger
 
 User = get_user_model()
 
