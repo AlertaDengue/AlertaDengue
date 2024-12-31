@@ -268,5 +268,8 @@ class SINANUploadHistory(models.Model):
 
 class SINANUploadFatalError(Exception):
     def __init__(self, log_status: SINANUploadLogStatus, error_message: str):
-        log_status.fatal(error_message)
+        try:
+            log_status.fatal(error_message)
+        except ValueError:
+            pass
         super().__init__(error_message)

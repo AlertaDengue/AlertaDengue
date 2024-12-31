@@ -269,7 +269,7 @@ function chunked_upload(element_id) {
           id="${input_id}"
           type="file"
           name="file"
-          accept=".csv,.dbf,.parquet,.csv.gz,.csv.zip,.dbf.gz,.dbf.zip,.parquet.gz,.parquet.zip"
+          accept=".csv,.dbf,.parquet"
           style="display: none;"
         >
       </div>
@@ -283,7 +283,7 @@ function chunked_upload(element_id) {
         id="${input_id}"
         type="file"
         name="file"
-        accept=".csv,.dbf,.parquet,.csv.gz,.csv.zip,.dbf.gz,.dbf.zip,.parquet.gz,.parquet.zip"
+        accept=".csv,.dbf,.parquet"
         style="display: none;"
       >
     `);
