@@ -27,6 +27,10 @@ class SINANDashboard(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
 
+class SINANStatus(LoginRequiredMixin, View):
+    template_name = "sinan/status.html"
+
+
 class SINANUpload(LoginRequiredMixin, FormView):
     form_class = forms.SINANForm
     template_name = "sinan/card.html"

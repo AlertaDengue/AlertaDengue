@@ -4,10 +4,9 @@ $(document).ready(function() {
       return undefined;
     }
 
-    var message = 'Existem alterações no formulário. Se você sair agora todas as alterações serão perdidas.';
-    e.preventDefault();
-    e.returnValue = message;
-    return message;
+    var confirmationMessage = 'Favor deletar os arquivos pendentes antes de sair da página';
+    (e || window.event).returnValue = confirmationMessage;
+    return confirmationMessage;
   });
 
   window.addEventListener("unload", function() { // not working, should delete if upload is canceled
@@ -19,6 +18,8 @@ $(document).ready(function() {
     }
   });
 
+  chunked_upload("#upload_1");
+
   $('#submit-button').on('click', function(e) {
     e.preventDefault();
     for (var card_id in uploadStatus) {
@@ -29,7 +30,6 @@ $(document).ready(function() {
 
 
 var uploadStatus = {};
-
 
 function is_ready() {
   function form_ready(card_id) {
@@ -62,9 +62,15 @@ function is_ready() {
 
 function update_submit() {
   if (is_ready() && Object.keys(uploadStatus).length !== 0) {
-    $('#submit-button').prop('disabled', false).removeClass('btn-secondary').addClass('btn-primary');;
+    $('#submit-button')
+      .prop('disabled', false)
+      .removeClass('btn-secondary')
+      .addClass('btn-primary');
   } else {
-    $('#submit-button').prop('disabled', true).removeClass('btn-primary').addClass('btn-secondary');;
+    $('#submit-button')
+      .prop('disabled', true)
+      .removeClass('btn-primary')
+      .addClass('btn-secondary');
   }
 }
 
@@ -217,7 +223,6 @@ function upload_card(card_id, action, filename, formData) {
       for (var key in formData) {
         form.append(key, formData[key])
       }
-      console.log(form);
       $.ajax({
         url: "file-card/",
         method: "POST",
@@ -382,5 +387,3 @@ function chunked_upload(element_id) {
     }
   });
 }
-
-chunked_upload("#upload_1");

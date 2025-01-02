@@ -130,20 +130,14 @@ def insert_chunk_to_temp_table(
         f"ON CONFLICT ON CONSTRAINT casos_unicos DO UPDATE SET "
         f"{','.join([f'{j}=excluded.{j}' for j in columns])}"
     )
-    try:
-        df_chunk = parse_data(df_chunk, sinan.cid10, sinan.year)
-        df_chunk = df_chunk.replace({pd.NA: None})
-        df_chunk = df_chunk.rename(columns=sinan.COLUMNS)
-        rows = [
-            tuple(row)
-            for row in df_chunk.itertuples(index=False)
-        ]
-        cursor.executemany(insert_sql, rows)
-    except Exception as e:
-        raise SINANUploadFatalError(
-            sinan.status,
-            f"Error inserting chunk into temporary table: {e}"
-        )
+    df_chunk = parse_data(df_chunk, sinan.cid10, sinan.year)
+    df_chunk = df_chunk.replace({pd.NA: None})
+    df_chunk = df_chunk.rename(columns=sinan.COLUMNS)
+    rows = [
+        tuple(row)
+        for row in df_chunk.itertuples(index=False)
+    ]
+    cursor.executemany(insert_sql, rows)
 
 
 def insert_temp_to_notificacao(
@@ -234,7 +228,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
                         upload_sinan_id,
                         df_chunk,
                         temp_table,
-                        conn
+                        cursor
                     )
                     inserted_rows += len(df_chunk)
             elif file.suffix.lower() == ".csv":
@@ -247,7 +241,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
                         upload_sinan_id,
                         chunk,
                         temp_table,
-                        conn
+                        cursor
                     )
                     inserted_rows += len(chunk)
             elif file.suffix.lower() == ".dbf":
@@ -265,14 +259,25 @@ def sinan_insert_to_db(upload_sinan_id: int):
                         upload_sinan_id,
                         chunk,
                         temp_table,
-                        conn
+                        cursor
                     )
                     inserted_rows += len(chunk)
             else:
                 raise SINANUploadFatalError(
                     sinan.status, f"File type '{file.suffix}' is not supported"
                 )
+        except Exception as e:
+            if not isinstance(e, SINANUploadFatalError):
+                raise SINANUploadFatalError(
+                    sinan.status, f"Error populating temporary table: {e}"
+                )
+            else:
+                raise
+        finally:
+            cursor.execute(f"DROP TABLE IF EXISTS {temp_table};")
+            sinan.status.debug(f"{temp_table} created.")
 
+        try:
             stard_id, end_id = insert_temp_to_notificacao(
                 cursor,
                 temp_table,
@@ -284,14 +289,10 @@ def sinan_insert_to_db(upload_sinan_id: int):
                     notificacao_id=id,
                     upload=sinan,
                 )
-
         except Exception as e:
             raise SINANUploadFatalError(
                 sinan.status, f"Error inserting {file.name} into db: {e}"
             )
-        finally:
-            cursor.execute(f"DROP TABLE IF EXISTS {temp_table};")
-            sinan.status.debug(f"{temp_table} created.")
 
         et = time.time()
         sinan.status.debug(

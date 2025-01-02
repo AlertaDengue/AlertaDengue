@@ -33,31 +33,7 @@
 
     <!-- FontsAwesome icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script>
-    $(document).ready( function() {
-      $("#id_export_date").datepicker({dateFormat: "yy-mm-dd"});
-      window.form_has_changed = false;
-      var ask_confirmation = function() {
-        return window.form_has_changed;
-      };
 
-      window.addEventListener("beforeunload", function (e) {
-        if (!ask_confirmation()) {
-          return undefined;
-        }
-
-        var confirmationMessage = 'Existem alterações no formulário. Se você sair agora '
-          + 'todas as alterações serão perdidas.';
-
-        (e || window.event).returnValue = confirmationMessage;
-        return confirmationMessage;
-      });
-
-      $("#submit_button").click(function(e) {
-        window.form_has_changed = false;
-      });
-    });
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
     <!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
@@ -93,6 +69,7 @@
               <div class="content">
                 <div class="panel panel-default col-xs-6">
                   <div class="panel-body">
+                    <div id="upload-status"</div>
                     <div id="upload-files"></div>
                     <button id="submit-button" class="btn btn-secondary" disabled>{% trans "Submit" %}</button>
                   </div>
