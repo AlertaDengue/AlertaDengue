@@ -1,3 +1,8 @@
+#load-more {
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
 .card-body {
   margin: -15px;
   margin-bottom: -30px;
@@ -6,7 +11,7 @@
 #upload-files {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 300px;
   align-items: center;
   padding-left: 15px;
@@ -16,12 +21,6 @@
 
 label[for^="upload_"] {
   margin-botton: 0;
-}
-
-#upload-files {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
 }
 
 #upload-icon {

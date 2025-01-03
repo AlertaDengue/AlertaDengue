@@ -18,7 +18,13 @@ $(document).ready(function() {
     }
   });
 
+  render_status_list();
   chunked_upload("#upload_1");
+
+  $('#load-more').on('click', function() {
+    uploadsLimit += 5;
+    render_status_list();
+  });
 
   $('#submit-button').on('click', function(e) {
     e.preventDefault();
@@ -28,6 +34,72 @@ $(document).ready(function() {
   });
 });
 
+let uploadsLimit = 5;
+let uploadsCount;
+
+// Status
+function get_uploads(limit, callback) {
+  $.ajax({
+    type: "GET",
+    url: "get-user-uploads/",
+    success: function(response) {
+      const uploads = response["uploads"];
+      uploadsCount = uploads.length;
+      callback(uploads.slice(0, limit));
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.error("get_uploads error: ", errorThrown);
+    }
+  });
+}
+
+function get_status(SINANUpload_id, callback) {
+  $.ajax({
+    type: "GET",
+    url: `status/${SINANUpload_id}`,
+    headers: { 'X-CSRFToken': csrf },
+    success: function(response) {
+      callback(response);
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.error(`get_status with id '${SINANUpload_id}' error:`, errorThrown);
+    }
+  });
+}
+
+function render_status_list() {
+  const status_list = $("#upload-status-list");
+  status_list.empty();
+
+  get_uploads(uploadsLimit, function(uploads) {
+    let completedRequests = 0;
+    const totalUploads = uploads.length;
+    let statuses = [];
+
+    uploads.forEach((id, index) => {
+      get_status(id, function(statusHTML) {
+        statuses[index] = statusHTML;
+
+        completedRequests++;
+
+        if (completedRequests === totalUploads) {
+          statuses.forEach((status) => {
+            status_list.append(status);
+          });
+        }
+      });
+    });
+
+    if (uploadsLimit < uploadsCount) {
+      $('#load-more').show();
+    } else {
+      $('#load-more').hide();
+    }
+  });
+}
+
+
+// Upload
 
 var uploadStatus = {};
 

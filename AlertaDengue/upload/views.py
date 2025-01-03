@@ -9,11 +9,12 @@ from django.core.files.base import File
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import FormView, View
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import render
 from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
 
 from . import models, forms
-from upload.models import UF_CODES
 
 
 User = get_user_model()
@@ -22,6 +23,7 @@ User = get_user_model()
 class SINANDashboard(LoginRequiredMixin, View):
     template_name = "sinan/index.html"
 
+    @never_cache
     def get(self, request, *args, **kwargs):
         context = {}
         return render(request, self.template_name, context)
@@ -29,6 +31,32 @@ class SINANDashboard(LoginRequiredMixin, View):
 
 class SINANStatus(LoginRequiredMixin, View):
     template_name = "sinan/status.html"
+
+    @never_cache
+    def get(self, request, *args, **kwargs):
+        sinan_upload_id = kwargs.get('sinan_upload_id')
+        context = {}
+
+        try:
+            sinan = models.SINANUpload.objects.get(
+                pk=sinan_upload_id,
+                upload__user=request.user
+            )
+        except models.SINANUpload.DoesNotExist:
+            return JsonResponse({"error": "Upload not found"}, safe=True)
+
+        context["id"] = sinan.pk
+        context["filename"] = sinan.upload.filename
+        context["status"] = sinan.status.status
+        context["uploaded_at"] = sinan.uploaded_at
+
+        if sinan.status.status == 2:
+            error_message = (
+                sinan.status.read_logs(level="ERROR")[0].split(" - ")[1]
+            )
+            context["error"] = error_message
+
+        return render(request, self.template_name, context)
 
 
 class SINANUpload(LoginRequiredMixin, FormView):
@@ -62,7 +90,7 @@ class SINANUpload(LoginRequiredMixin, FormView):
 
         filename = self.request.GET.get("filename", "")
 
-        for uf in UF_CODES:
+        for uf in models.UF_CODES:
             if uf in str(Path(filename).with_suffix("")).upper():
                 context["form"] = self.get_form(self.get_form_class())
                 context["form"].fields["uf"].initial = uf
@@ -101,3 +129,15 @@ class SINANChunkedUploadCompleteView(ChunkedUploadCompleteView):
             "id": chunked_upload.id,
             "filename": chunked_upload.filename,
         }
+
+
+@never_cache
+@csrf_protect
+def get_user_uploads(request):
+    context = {}
+    uploads = models.SINANUpload.objects.filter(upload__user=request.user)
+    context["uploads"] = list(
+        uploads.order_by("-uploaded_at").values_list("id", flat=True)
+    )
+    print(context)
+    return JsonResponse(context)

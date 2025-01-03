@@ -49,7 +49,7 @@ def sinan_move_file(upload_sinan_id: int):
         dest = dest.with_suffix(Path(sinan.upload.filename).suffix)
         shutil.move(str(file), str(dest))
         sinan.upload.file.name = str(dest)
-        sinan.upload.filename = sinan._final_basename()
+        sinan.upload.filename = dest.name
         sinan.upload.save()
         sinan.status.debug(f"File moved to {str(dest)}")
         sinan.status.debug("Task 'move_sinan_file' finished.")
