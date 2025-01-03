@@ -41,8 +41,12 @@ class SINANUploadLogStatus(models.Model):
         (2, "Error")
     ]
 
+    inserts = models.IntegerField(default=0, null=False)
+    updates = models.IntegerField(default=0, null=False)
+    filtered_out = models.IntegerField(default=0, null=False)
     status = models.IntegerField(choices=STATUS, default=0, null=False)
     log_file = models.FilePathField(path=sinan_upload_log_path)
+    time_spend = models.FloatField(default=.0, null=False)
 
     def read_logs(
         self,
@@ -92,6 +96,7 @@ class SINANUploadLogStatus(models.Model):
         filename = SINANUpload.objects.get(status__id=self.id).upload.filename
         message = f"{filename} finished with {inserts} inserts."
         self._write_logs(level="SUCCESS", message=message)
+        self.inserts = inserts
         self.status = 1
         self.save()
 

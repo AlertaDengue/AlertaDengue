@@ -4,7 +4,7 @@ import datetime as dt
 from typing import Iterator, Tuple, Optional, Union
 
 
-from dados.dbdata import add_dv, calculate_digit
+from dados.dbdata import calculate_digit
 
 
 UF_CODES = {
@@ -48,12 +48,43 @@ def chunk_gen(chunksize: int, totalsize: int) -> Iterator[Tuple[int, int]]:
 
 
 @np.vectorize
-def convert_date(col: Union[pd.Timestamp, str, None]) -> Optional[dt.date]:
-    if pd.isnull(col):
+def add_dv(geocodigo):
+    miscalculated_geocodes = {
+        "2201911": 2201919,
+        "2201986": 2201988,
+        "2202257": 2202251,
+        "2611531": 2611533,
+        "3117835": 3117836,
+        "3152139": 3152131,
+        "4305876": 4305871,
+        "5203963": 5203962,
+        "5203930": 5203939,
+    }
+
+    try:
+        if len(str(geocodigo)) == 7:
+            return int(geocodigo)
+        elif len(str(geocodigo)) == 6:
+            geocode = int(str(geocodigo) + str(calculate_digit(geocodigo)))
+            if str(geocode) in miscalculated_geocodes:
+                return miscalculated_geocodes[str(geocode)]
+            return int(geocode)
+        else:
+            return None
+    except (ValueError, TypeError):
         return None
-    if isinstance(col, dt.date):
-        return col
-    return pd.to_datetime(col).date()
+
+
+@np.vectorize
+def convert_date(col: Union[pd.Timestamp, str, None]) -> Optional[dt.date]:
+    try:
+        if pd.isnull(col):
+            return None
+        if isinstance(col, dt.date):
+            return col
+        return pd.to_datetime(col).date()
+    except Exception:
+        return None
 
 
 @np.vectorize
@@ -68,22 +99,20 @@ def convert_sem_pri(col: str) -> int:
     return int(col)
 
 
-@np.vectorize
-def fix_nu_notif(value: Optional[str] = None) -> Optional[int]:
+def fix_nu_notif(value: Union[str, None]) -> Optional[int]:
     char_to_replace = {",": "", "'": "", ".": ""}
-    if value is None:
-        return None
-
     try:
         return int(value)
     except ValueError:
         for char, replacement in char_to_replace.items():
-            value = value.replace(char, replacement)
+            value = str(value).replace(char, replacement)
 
         try:
             return int(value)
-        except ValueError:
+        except (ValueError, TypeError):
             return None
+    except TypeError:
+        return None
 
 
 @np.vectorize
