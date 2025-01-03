@@ -3,25 +3,28 @@
 {% load static %}
 
 <li id="{{id}}" class="list-group-item
-  {% if status == 0 %}list-group-item-warning
+  {% if status == 0 %}list-group-item-primary
   {% elif status == 1 %}list-group-item-success
   {% elif status == 2 %}list-group-item-danger
   {% else %}
   {% endif %}">
   <div style="display: flex; align-items: center;">
-    <div style="flex: 1;">{{filename}}</div>
+    <div style="flex: 1;">{{id}} - {{filename}}</div>
     <div>
+      {% if status == 0 %}
+      <i class="fas fa-sync-alt fa-spin" 
+         style="cursor: pointer; margin-left: 10px;"></i>
+      {% endif %}
+
       {% if status == 2 %}
-        <i class="fas fa-exclamation-circle" 
-           data-toggle="tooltip" 
-           title="{{error}}"
-           onclick="showErrorMessage(event, '{{id}}')" 
-           style="cursor: pointer; color: #dc3545; margin-left: 10px;">
-        </i>
-        
-        <div id="error-message-{{id}}" class="error-message" style="display: none;">
-          {{error}}
-        </div>
+      <i class="fas fa-exclamation-circle error-icon" 
+         data-toggle="tooltip" 
+         style="cursor: pointer; color: #dc3545; margin-left: 10px;">
+      </i>
+
+      <div id="error-message-{{id}}" class="error-message">
+        {{error}}
+      </div>
       {% endif %}
     </div>
   </div>
@@ -39,25 +42,17 @@
   z-index: 9999;
   display: none;
 }
-</style>
 
-<script>
-function showErrorMessage(event, id) {
-  event.preventDefault();
-
-  const errorMessage = document.getElementById('error-message-' + id);
-  const icon = event.target.closest('.list-group-item').querySelector('.error-icon');
-
-  if (errorMessage.style.display === 'none' || errorMessage.style.display === '') {
-    errorMessage.style.display = 'block';
-  } else {
-    errorMessage.style.display = 'none';
-  }
-
-  document.addEventListener('click', function (e) {
-    if (!e.target.closest('.list-group-item') || e.target === icon) {
-      errorMessage.style.display = 'none';
-    }
-  });
+.error-icon:hover + .error-message {
+  display: block;
 }
-</script>
+
+.fas.fa-sync-alt.fa-spin {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>

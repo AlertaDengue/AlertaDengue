@@ -53,42 +53,51 @@ function get_uploads(limit, callback) {
   });
 }
 
-function get_status(SINANUpload_id, callback) {
-  $.ajax({
-    type: "GET",
-    url: `status/${SINANUpload_id}`,
-    headers: { 'X-CSRFToken': csrf },
-    success: function(response) {
-      callback(response);
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-      console.error(`get_status with id '${SINANUpload_id}' error:`, errorThrown);
-    }
+
+function get_status(SINANUpload_id) {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      type: "GET",
+      url: `status/${SINANUpload_id}`,
+      headers: { 'X-CSRFToken': csrf },
+      success: function(response) {
+        const item = $(`#upload-status-list #${SINANUpload_id}`);
+        if (item.length) {
+          if (response.includes('list-group-item-primary')) {
+            setTimeout(() => {
+              get_status(SINANUpload_id);
+            }, 1000);
+          } else {
+            item.replaceWith(response);
+            resolve();
+          }
+        } else {
+          $("#upload-status-list").append(response);
+          if (response.includes('list-group-item-primary')) {
+            setTimeout(() => {
+              get_status(SINANUpload_id);
+            }, 1000);
+          }
+          resolve();
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.error(`get_status with id '${SINANUpload_id}' error:`, errorThrown);
+        reject(errorThrown);
+      }
+    });
   });
 }
 
-function render_status_list() {
+
+async function render_status_list() {
   const status_list = $("#upload-status-list");
   status_list.empty();
 
-  get_uploads(uploadsLimit, function(uploads) {
-    let completedRequests = 0;
-    const totalUploads = uploads.length;
-    let statuses = [];
-
-    uploads.forEach((id, index) => {
-      get_status(id, function(statusHTML) {
-        statuses[index] = statusHTML;
-
-        completedRequests++;
-
-        if (completedRequests === totalUploads) {
-          statuses.forEach((status) => {
-            status_list.append(status);
-          });
-        }
-      });
-    });
+  get_uploads(uploadsLimit, async function(uploads) {
+    for (let i = 0; i < uploads.length; i++) {
+      await get_status(uploads[i]);
+    }
 
     if (uploadsLimit < uploadsCount) {
       $('#load-more').show();
