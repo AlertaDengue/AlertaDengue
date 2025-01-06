@@ -42,11 +42,26 @@ class SINANUploadLogStatus(models.Model):
     ]
 
     inserts = models.IntegerField(default=0, null=False)
+    start_id = models.IntegerField(default=None, null=True)
+    end_id = models.IntegerField(default=None, null=True)
     updates = models.IntegerField(default=0, null=False)
-    filtered_out = models.IntegerField(default=0, null=False)
     status = models.IntegerField(choices=STATUS, default=0, null=False)
     log_file = models.FilePathField(path=sinan_upload_log_path)
     time_spend = models.FloatField(default=.0, null=False)
+
+    def save_updates(self, updates: int):
+        self.info(f"{updates} rows were updated (ON CONFLICT UPDATE)")
+        self.updates = updates
+        self.save()
+
+    def save_start_end_id(self, start_id: int, end_id: int):
+        self.start_id = start_id
+        self.end_id = end_id
+        self.save()
+
+    def save_time_spend(self, time_spend: float):
+        self.time_spend = time_spend
+        self.save()
 
     def read_logs(
         self,
@@ -226,20 +241,6 @@ class SINANUpload(models.Model):
 
     class Meta:
         app_label = "upload"
-
-
-class SINANUploadHistory(models.Model):
-    """
-    Stores the History of SINAN inserts on "Municipio"."Notificacao". Each
-    objects represent an inserted row (id) and points to SINANUpload
-    """
-    notificacao_id = models.BigIntegerField(null=False)
-    upload = models.ForeignKey(
-        SINANUpload,
-        on_delete=models.PROTECT,
-        related_name="notificacoes",
-        null=False
-    )
 
 
 class SINANUploadFatalError(Exception):

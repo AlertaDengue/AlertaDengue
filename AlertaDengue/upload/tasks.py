@@ -10,13 +10,13 @@ from celery import shared_task
 from psycopg2.extras import DictCursor
 from simpledbf import Dbf5
 
+from django.db import transaction
 from ad_main.settings import get_sqla_conn
 
 from .models import (
     sinan_upload_path,
     SINANUpload,
     SINANUploadFatalError,
-    SINANUploadHistory
 )
 from .sinan.utils import chunk_gen, parse_data
 
@@ -52,7 +52,6 @@ def sinan_move_file(upload_sinan_id: int):
         sinan.upload.filename = dest.name
         sinan.upload.save()
         sinan.status.debug(f"File moved to {str(dest)}")
-        sinan.status.debug("Task 'move_sinan_file' finished.")
     except Exception as e:
         raise SINANUploadFatalError(sinan.status, e)
 
@@ -120,20 +119,20 @@ def insert_chunk_to_temp_table(
     df_chunk: pd.DataFrame,
     tablename: str,
     cursor,
-    filtered_rows: int,
 ):
     sinan = SINANUpload.objects.get(pk=upload_sinan_id)
     columns = list(sinan.COLUMNS.values())
 
     df_chunk = parse_data(df_chunk, sinan.cid10, sinan.year)
     df_chunk = df_chunk.replace({pd.NA: None})
-
-    tot_rows = len(df_chunk)
-    df_chunk = df_chunk.dropna(subset=SINANUpload.REQUIRED_COLS, how="any")
-    fil_rows = len(df_chunk)
-
-    filtered_rows += tot_rows - fil_rows
-
+    len1 = len(df_chunk)
+    df_chunk = df_chunk.dropna(
+        subset=SINANUpload.REQUIRED_COLS, how="any"
+    )
+    len2 = len(df_chunk)
+    sinan.status.warning(
+        f"{len1-len2} rows were dropped due to 'NA' values on required fields"
+    )
     df_chunk = df_chunk.rename(columns=sinan.COLUMNS)
 
     insert_sql = f"""
@@ -149,6 +148,8 @@ def insert_chunk_to_temp_table(
     ]
 
     cursor.executemany(insert_sql, rows)
+    print("executemany: ")
+    print(cursor.rowcount)
 
 
 def insert_temp_to_notificacao(
@@ -159,9 +160,10 @@ def insert_temp_to_notificacao(
     fields = ",".join(columns)
     on_conflict = ",".join([f"{field}=excluded.{field}" for field in columns])
 
-    cursor.execute(
-        'SELECT COALESCE(MAX(id), 0) FROM "Municipio"."Notificacao";')
-    start_id = cursor.fetchone()[0]
+    cursor.execute('SELECT MAX(id) FROM "Municipio"."Notificacao";')
+    start_id = cursor.fetchone()[0] or 0
+    print("start_id")
+    print(start_id)
 
     insert_sql = (
         f'INSERT INTO "Municipio"."Notificacao" ({fields}) '
@@ -172,11 +174,14 @@ def insert_temp_to_notificacao(
 
     cursor.execute(insert_sql)
     conflicted_rows = sum(1 for row in cursor.fetchall() if row[0] != 0)
+    print("conflicted_rows")
+    print(conflicted_rows)
+    print(sum(1 for row in cursor.fetchall() if row[0] == 0))
 
-    cursor.execute(
-        'SELECT COALESCE(MAX(id), 0) FROM "Municipio"."Notificacao";'
-    )
+    cursor.execute('SELECT MAX(id) FROM "Municipio"."Notificacao";')
     end_id = cursor.fetchone()[0]
+    print("end_id")
+    print(end_id)
 
     return start_id, end_id, conflicted_rows
 
@@ -184,13 +189,13 @@ def insert_temp_to_notificacao(
 @shared_task
 def sinan_insert_to_db(upload_sinan_id: int):
     sinan = SINANUpload.objects.get(pk=upload_sinan_id)
-    sinan.status.debug("Task 'sinan_insert_to_db' started.")
+    status = sinan.status
+    status.debug("Task 'sinan_insert_to_db' started.")
 
     st = time.time()
     file = Path(sinan.upload.file.path)
     temp_table = f"temp_sinan_upload_{sinan.pk}"
     chunksize = 100000
-    filtered_rows = 0
 
     with ENGINE.begin() as conn:
         cursor = conn.connection.cursor(cursor_factory=DictCursor)
@@ -232,7 +237,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
                 CONSTRAINT casos_unicos UNIQUE (nu_notific, dt_notific, cid10_codigo, municipio_geocodigo)
             );
         """)
-        sinan.status.debug(f"{temp_table} created.")
+        status.debug(f"{temp_table} created.")
         try:
             if file.suffix.lower() == ".parquet":
                 reader = pq.ParquetFile(str(file))
@@ -246,7 +251,6 @@ def sinan_insert_to_db(upload_sinan_id: int):
                         df_chunk,
                         temp_table,
                         cursor,
-                        filtered_rows,
                     )
             elif file.suffix.lower() == ".csv":
                 for chunk in pd.read_csv(
@@ -259,7 +263,6 @@ def sinan_insert_to_db(upload_sinan_id: int):
                         chunk,
                         temp_table,
                         cursor,
-                        filtered_rows,
                     )
             elif file.suffix.lower() == ".dbf":
                 dbf = Dbf5(str(file), codec="iso-8859-1")
@@ -277,16 +280,15 @@ def sinan_insert_to_db(upload_sinan_id: int):
                         chunk,
                         temp_table,
                         cursor,
-                        filtered_rows,
                     )
             else:
                 raise SINANUploadFatalError(
-                    sinan.status, f"File type '{file.suffix}' is not supported"
+                    status, f"File type '{file.suffix}' is not supported"
                 )
         except Exception as e:
             if not isinstance(e, SINANUploadFatalError):
                 raise SINANUploadFatalError(
-                    sinan.status, f"Error populating temporary table: {e}"
+                    status, f"Error populating temporary table: {e}"
                 )
             else:
                 raise
@@ -299,17 +301,10 @@ def sinan_insert_to_db(upload_sinan_id: int):
             )
 
             if conflicted_rows:
-                sinan.status.info(
-                    f"{conflicted_rows} rows were updated (ON CONFLICT UPDATE)"
-                )
-                sinan.status.updates = conflicted_rows
-                sinan.status.save()
+                status.save_updates(conflicted_rows)
 
-            for id in range(start_id + 1, end_id + 1):
-                SINANUploadHistory.objects.create(
-                    notificacao_id=id,
-                    upload=sinan,
-                )
+            status.save_start_end_id(start_id, end_id)
+
         except Exception as e:
             raise SINANUploadFatalError(
                 sinan.status, f"Error inserting {file.name} into db: {e}"
@@ -319,17 +314,8 @@ def sinan_insert_to_db(upload_sinan_id: int):
             sinan.status.debug(f"{temp_table} dropped.")
 
         et = time.time()
-        if filtered_rows:
-            sinan.status.warning(
-                f'{filtered_rows} rows could not be insert into '
-                '"Municipio"."Notificacao" (required fields containing '
-                'NULL values)'
-            )
-            sinan.status.filtered_out = filtered_rows
-
-        sinan.status.debug(
-            f"Task 'sinan_insert_to_db' finished with {et-st:.2f} seconds."
+        status.info(
+            f"Task 'sinan_insert_to_db' finished in {et-st:.2f} seconds."
         )
-        sinan.status.time_spend = float(f"{et-st:.2f}")
-        sinan.status.save()
+        status.save_time_spend(et-st)
         return end_id - start_id

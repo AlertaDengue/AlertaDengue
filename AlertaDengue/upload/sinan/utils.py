@@ -99,20 +99,20 @@ def convert_sem_pri(col: str) -> int:
     return int(col)
 
 
+@np.vectorize
 def fix_nu_notif(value: Union[str, None]) -> Optional[int]:
     char_to_replace = {",": "", "'": "", ".": ""}
+    if value is None:
+        return None
     try:
         return int(value)
     except ValueError:
         for char, replacement in char_to_replace.items():
-            value = str(value).replace(char, replacement)
-
+            value = value.replace(char, replacement)
         try:
             return int(value)
-        except (ValueError, TypeError):
+        except ValueError:
             return None
-    except TypeError:
-        return None
 
 
 @np.vectorize
