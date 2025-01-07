@@ -43,6 +43,8 @@ class SINANUploadLogStatus(models.Model):
         (2, "Error")
     ]
 
+    LOG_LEVEL = ["DEBUG", "PROGRESS", "INFO", "WARNING", "ERROR", "SUCCESS"]
+
     status = models.IntegerField(choices=STATUS, default=0, null=False)
     log_file = models.FilePathField(path=sinan_upload_log_path)
     inserts_file = models.FilePathField(path=sinan_upload_log_path, null=True)
@@ -108,16 +110,21 @@ class SINANUploadLogStatus(models.Model):
 
     def read_logs(
         self,
-        level: Optional[
-            Literal["DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"]
-        ] = None,
+        level: Optional[Literal[
+            "DEBUG", "PROGRESS", "INFO", "WARNING", "ERROR", "SUCCESS"
+        ]] = None,
+        only_level: bool = False,
     ):
-        levels = ["DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"]
         with Path(self.log_file).open(mode='r', encoding="utf-8") as log_file:
             logs = []
+            startswith = (
+                tuple(LOG_LEVEL[LOG_LEVEL.index(level):])
+                if not only_level else level
+            )
+
             for line in log_file:
                 if level:
-                    if line.startswith(tuple(levels[levels.index(level):])):
+                    if line.startswith(startswith):
                         logs.append(line.strip())
                 else:
                     logs.append(line.strip())
@@ -125,7 +132,7 @@ class SINANUploadLogStatus(models.Model):
 
     def _write_logs(
         self,
-        level: Literal["DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"],
+        level: Literal["DEBUG", "PROGRESS", "INFO", "WARNING", "ERROR", "SUCCESS"],
         message: str,
     ):
         if self.status != 0:
@@ -139,6 +146,10 @@ class SINANUploadLogStatus(models.Model):
 
     def debug(self, message: str):
         self._write_logs(level="DEBUG", message=message)
+
+    def progress(self, rowcount: int, total_rows: int):
+        percentage = f"{(rowcount / total_rows) * 100:.2f}%"
+        self._write_logs(level="PROGRESS", message=percentage)
 
     def info(self, message: str):
         self._write_logs(level="INFO", message=message)

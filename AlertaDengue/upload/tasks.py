@@ -185,6 +185,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
     file = Path(sinan.upload.file.path)
     temp_table = f"temp_sinan_upload_{sinan.pk}"
     chunksize = 100000
+    current_row = 0
 
     with ENGINE.begin() as conn:
         cursor = conn.connection.cursor(cursor_factory=DictCursor)
@@ -223,14 +224,20 @@ def sinan_insert_to_db(upload_sinan_id: int):
                 id_bairro NUMERIC,
                 nm_bairro VARCHAR(255),
                 id_unidade NUMERIC,
-                CONSTRAINT casos_unicos UNIQUE (nu_notific, dt_notific, cid10_codigo, municipio_geocodigo)
+                CONSTRAINT casos_unicos UNIQUE (
+                    nu_notific,
+                    dt_notific,
+                    cid10_codigo,
+                    municipio_geocodigo
+                )
             );
         """)
         status.debug(f"{temp_table} created.")
         try:
             if file.suffix.lower() == ".parquet":
-                reader = pq.ParquetFile(str(file))
-                for batch in reader.iter_batches(
+                parquet = pq.ParquetFile(str(file))
+                total_rows = parquet.count
+                for batch in parquet.iter_batches(
                     batch_size=chunksize,
                     columns=list(sinan.COLUMNS)
                 ):
@@ -241,7 +248,12 @@ def sinan_insert_to_db(upload_sinan_id: int):
                         temp_table,
                         cursor,
                     )
+                    current_row += chunksize
+                    status.progress(current_row, total_rows)
             elif file.suffix.lower() == ".csv":
+                with file.open("r", encoding="iso-8859-1") as csv:
+                    total_rows = sum(1 for _ in csv) - 1
+
                 for chunk in pd.read_csv(
                     str(file),
                     chunksize=chunksize,
@@ -253,8 +265,11 @@ def sinan_insert_to_db(upload_sinan_id: int):
                         temp_table,
                         cursor,
                     )
+                    current_row += chunksize
+                    status.progress(current_row, total_rows)
             elif file.suffix.lower() == ".dbf":
                 dbf = Dbf5(str(file), codec="iso-8859-1")
+                total_rows = dbf.numrec
                 for chunk, (lowerbound, upperbound) in enumerate(
                     chunk_gen(chunksize, dbf.numrec)
                 ):
@@ -270,6 +285,8 @@ def sinan_insert_to_db(upload_sinan_id: int):
                         temp_table,
                         cursor,
                     )
+                    current_row += chunksize
+                    status.progress(current_row, total_rows)
             else:
                 raise SINANUploadFatalError(
                     status, f"File type '{file.suffix}' is not supported"
