@@ -120,6 +120,7 @@ def insert_chunk_to_temp_table(
     df_chunk: pd.DataFrame,
     tablename: str,
     cursor,
+    filtered_rows: int = 0,
 ):
     sinan = SINANUpload.objects.get(pk=upload_sinan_id)
     columns = list(sinan.COLUMNS.values())
@@ -131,9 +132,7 @@ def insert_chunk_to_temp_table(
         subset=SINANUpload.REQUIRED_COLS, how="any"
     )
     len2 = len(df_chunk)
-    sinan.status.warning(
-        f"{len1-len2} rows were dropped due to 'NA' values on required fields"
-    )
+    filtered_rows += len1-len2
     df_chunk = df_chunk.rename(columns=sinan.COLUMNS)
 
     insert_sql = f"""
@@ -186,6 +185,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
     temp_table = f"temp_sinan_upload_{sinan.pk}"
     chunksize = 100000
     current_row = 0
+    filtered_rows = 0
 
     with ENGINE.begin() as conn:
         cursor = conn.connection.cursor(cursor_factory=DictCursor)
@@ -237,6 +237,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
             if file.suffix.lower() == ".parquet":
                 parquet = pq.ParquetFile(str(file))
                 total_rows = parquet.count
+                status.progress(current_row, total_rows)
                 for batch in parquet.iter_batches(
                     batch_size=chunksize,
                     columns=list(sinan.COLUMNS)
@@ -247,6 +248,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
                         df_chunk,
                         temp_table,
                         cursor,
+                        filtered_rows,
                     )
                     current_row += chunksize
                     status.progress(current_row, total_rows)
@@ -254,6 +256,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
                 with file.open("r", encoding="iso-8859-1") as csv:
                     total_rows = sum(1 for _ in csv) - 1
 
+                status.progress(current_row, total_rows)
                 for chunk in pd.read_csv(
                     str(file),
                     chunksize=chunksize,
@@ -264,12 +267,14 @@ def sinan_insert_to_db(upload_sinan_id: int):
                         chunk,
                         temp_table,
                         cursor,
+                        filtered_rows,
                     )
                     current_row += chunksize
                     status.progress(current_row, total_rows)
             elif file.suffix.lower() == ".dbf":
                 dbf = Dbf5(str(file), codec="iso-8859-1")
                 total_rows = dbf.numrec
+                status.progress(current_row, total_rows)
                 for chunk, (lowerbound, upperbound) in enumerate(
                     chunk_gen(chunksize, dbf.numrec)
                 ):
@@ -284,6 +289,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
                         chunk,
                         temp_table,
                         cursor,
+                        filtered_rows,
                     )
                     current_row += chunksize
                     status.progress(current_row, total_rows)
@@ -298,6 +304,12 @@ def sinan_insert_to_db(upload_sinan_id: int):
                 )
             else:
                 raise
+
+        if filtered_rows:
+            sinan.status.warning(
+                f"{filtered_rows} rows were dropped due to 'NA' values on "
+                "required fields"
+            )
 
         try:
             inserted_ids, conflicted_ids = insert_temp_to_notificacao(

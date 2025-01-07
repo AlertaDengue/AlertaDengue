@@ -1,4 +1,4 @@
-from typing import Literal, Optional, Union
+from typing import Literal, Optional, Union, Generator
 from pathlib import Path
 from datetime import date
 from array import array
@@ -14,7 +14,7 @@ from django.contrib.auth import get_user_model
 from chunked_upload.models import BaseChunkedUpload
 
 from dados.models import City
-from .sinan.utils import UF_CODES
+from .sinan.utils import UF_CODES, chunk_gen
 
 
 User = get_user_model()
@@ -51,34 +51,56 @@ class SINANUploadLogStatus(models.Model):
     updates_file = models.FilePathField(path=sinan_upload_log_path, null=True)
 
     @property
-    def inserts(self, rowcount: bool = False) -> Union[list[int], int]:
+    def inserts(self) -> int:
         inserts_file = Path(sinan_upload_log_path()) / f"{self.pk}.inserts.log"
+
         if not inserts_file.exists():
-            if rowcount:
-                return 0
-            return []
+            return 0
 
         with inserts_file.open("rb") as log:
             inserts = pickle.load(log)
 
-        if rowcount:
-            return len(inserts)
-        return inserts.tolist()
+        return len(inserts)
+
+    def inserts_ids(
+        self, chunk_size: int = 100000
+    ) -> Generator[list[int], None, None]:
+        inserts_file = Path(sinan_upload_log_path()) / f"{self.pk}.inserts.log"
+
+        if not inserts_file.exists():
+            return iter([])
+
+        with inserts_file.open("rb") as log:
+            inserts = pickle.load(log)
+
+        for start, end in chunk_gen(chunk_size, len(inserts)):
+            yield inserts[start:end]
 
     @property
-    def updates(self, rowcount: bool = False) -> list[int]:
+    def updates(self) -> int:
         updates_file = Path(sinan_upload_log_path()) / f"{self.pk}.updates.log"
+
         if not updates_file.exists():
-            if rowcount:
-                return 0
-            return []
+            return 0
 
         with updates_file.open("rb") as log:
             updates = pickle.load(log)
 
-        if rowcount:
-            return len(updates)
-        return updates.tolist()
+        return len(updates)
+
+    def updates_ids(
+        self, chunk_size: int = 100000
+    ) -> Generator[list[int], None, None]:
+        updates_file = Path(sinan_upload_log_path()) / f"{self.pk}.updates.log"
+
+        if not updates_file.exists():
+            return iter([])
+
+        with updates_file.open("rb") as log:
+            updates = pickle.load(log)
+
+        for start, end in chunk_gen(chunk_size, len(updates)):
+            yield updates[start:end]
 
     @property
     def time_spend(self) -> float:
@@ -117,13 +139,13 @@ class SINANUploadLogStatus(models.Model):
     ):
         with Path(self.log_file).open(mode='r', encoding="utf-8") as log_file:
             logs = []
-            startswith = (
-                tuple(LOG_LEVEL[LOG_LEVEL.index(level):])
-                if not only_level else level
-            )
 
             for line in log_file:
                 if level:
+                    startswith = (
+                        tuple(self.LOG_LEVEL[self.LOG_LEVEL.index(level):])
+                        if not only_level else level
+                    )
                     if line.startswith(startswith):
                         logs.append(line.strip())
                 else:
@@ -148,7 +170,7 @@ class SINANUploadLogStatus(models.Model):
         self._write_logs(level="DEBUG", message=message)
 
     def progress(self, rowcount: int, total_rows: int):
-        percentage = f"{(rowcount / total_rows) * 100:.2f}%"
+        percentage = f"{min((rowcount / total_rows) * 100, 100):.2f}%"
         self._write_logs(level="PROGRESS", message=percentage)
 
     def info(self, message: str):
