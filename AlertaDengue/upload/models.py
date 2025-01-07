@@ -1,6 +1,8 @@
 from typing import Literal, Optional
 from pathlib import Path
 from datetime import date
+from array import array
+import pickle
 
 from epiweeks import Week
 
@@ -43,22 +45,26 @@ class SINANUploadLogStatus(models.Model):
 
     status = models.IntegerField(choices=STATUS, default=0, null=False)
     log_file = models.FilePathField(path=sinan_upload_log_path)
+    inserts_file = models.FilePathField(path=sinan_upload_log_path, null=True)
+    updates_file = models.FilePathField(path=sinan_upload_log_path, null=True)
 
     @property
-    def inserts(self) -> int:
-        for log in self.read_logs(level="DEBUG"):
-            if "inserts: " in log:
-                _, inserts = log.split("inserts: ")
-                return int(inserts)
-        raise ValueError("No inserts found in logs")
+    def inserts(self) -> list[int]:
+        inserts_file = Path(sinan_upload_log_path()) / f"{self.pk}.inserts.log"
+        if not inserts_file.exists():
+            return []
+        with inserts_file.open("rb") as log:
+            inserts = pickle.load(log)
+        return inserts.tolist()
 
     @property
-    def updates(self) -> int:
-        for log in self.read_logs(level="DEBUG"):
-            if "updates: " in log:
-                _, updates = log.split("updates: ")
-                return int(updates)
-        raise ValueError("No updates found in logs")
+    def updates(self) -> list[int]:
+        updates_file = Path(sinan_upload_log_path()) / f"{self.pk}.updates.log"
+        if not updates_file.exists():
+            return []
+        with updates_file.open("rb") as log:
+            updates = pickle.load(log)
+        return updates.tolist()
 
     @property
     def time_spend(self) -> float:
@@ -68,17 +74,38 @@ class SINANUploadLogStatus(models.Model):
                 return float(time_spend)
         raise ValueError("No time_spend found in logs")
 
+    def write_inserts(self, insert_ids: list[int]):
+        log_dir = Path(sinan_upload_log_path())
+        inserts_file = log_dir / f"{self.pk}.inserts.log"
+        inserts_file.touch()
+        inserts = array("i", insert_ids)
+        with inserts_file.open("wb") as log:
+            pickle.dump(inserts, log)
+        self.inserts_file = inserts_file
+        self.save()
+
+    def write_updates(self, updates_ids: list[int]):
+        log_dir = Path(sinan_upload_log_path())
+        updates_file = log_dir / f"{self.pk}.updates.log"
+        updates_file.touch()
+        updates = array("i", updates_ids)
+        with updates_file.open("wb") as log:
+            pickle.dump(updates, log)
+        self.updates_file = updates_file
+        self.save()
+
     def read_logs(
         self,
         level: Optional[
             Literal["DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"]
         ] = None,
     ):
+        levels = ["DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"]
         with Path(self.log_file).open(mode='r', encoding="utf-8") as log_file:
             logs = []
             for line in log_file:
                 if level:
-                    if line.startswith(level):
+                    if line.startswith(tuple(levels[levels.index(level):])):
                         logs.append(line.strip())
                 else:
                     logs.append(line.strip())

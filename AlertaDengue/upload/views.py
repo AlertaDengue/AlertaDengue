@@ -83,6 +83,12 @@ class SINANUpload(LoginRequiredMixin, FormView):
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
+        disease = {
+            "DENG": "A90",
+            "CHIK": "A92.0",
+            "ZIKA": "A928",
+        }
+
         context = super().get_context_data(**kwargs)
 
         if self.request.method == "POST":
@@ -94,6 +100,11 @@ class SINANUpload(LoginRequiredMixin, FormView):
             if uf in str(Path(filename).with_suffix("")).upper():
                 context["form"] = self.get_form(self.get_form_class())
                 context["form"].fields["uf"].initial = uf
+
+        for dis in disease:
+            if dis in str(Path(filename).with_suffix("")).upper():
+                context["form"] = self.get_form(self.get_form_class())
+                context["form"].fields["cid10"].initial = disease[dis]
 
         context["filename"] = filename
         return context

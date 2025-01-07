@@ -149,8 +149,6 @@ def insert_chunk_to_temp_table(
     ]
 
     cursor.executemany(insert_sql, rows)
-    print("executemany: ")
-    print(cursor.rowcount)
 
 
 def insert_temp_to_notificacao(
@@ -292,9 +290,11 @@ def sinan_insert_to_db(upload_sinan_id: int):
             )
 
             if conflicted_ids:
+                status.write_updates(conflicted_ids)
                 status.debug(f"updates: {len(conflicted_ids)}")
 
             if inserted_ids:
+                status.write_inserts(inserted_ids)
                 status.debug(f"inserts: {len(inserted_ids)}")
 
         except Exception as e:
