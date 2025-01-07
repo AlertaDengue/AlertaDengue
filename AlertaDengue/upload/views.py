@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import humanize
+
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.http import JsonResponse, QueryDict
@@ -50,6 +52,21 @@ class SINANStatus(LoginRequiredMixin, View):
         context["status"] = sinan.status.status
         context["uploaded_at"] = sinan.uploaded_at
 
+        if sinan.status.status == 1:
+            context["inserts"] = self.humanizer(sinan.status.inserts)
+            context["updates"] = self.humanizer(sinan.status.updates)
+
+            hours, remainder = divmod(sinan.status.time_spend, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            if hours > 0:
+                time_spend = f"{int(hours)}:{int(minutes)}:{int(seconds)}"
+            elif minutes > 0:
+                time_spend = f"{int(minutes)}:{int(seconds)}"
+            else:
+                time_spend = f"{int(seconds)}s"
+
+            context["time_spend"] = time_spend
+
         if sinan.status.status == 2:
             error_message = (
                 sinan.status.read_logs(level="ERROR")[0].split(" - ")[1]
@@ -57,6 +74,21 @@ class SINANStatus(LoginRequiredMixin, View):
             context["error"] = error_message
 
         return render(request, self.template_name, context)
+
+    def humanizer(self, integer) -> str:
+        word = humanize.intword(integer)
+
+        suffixes = {
+            "thousand": "k",
+            "million": "M",
+            "billion": "B"
+        }
+
+        for suffix in suffixes:
+            if suffix in word:
+                word = word.replace(f" {suffix}", suffixes[suffix])
+
+        return word
 
 
 class SINANUpload(LoginRequiredMixin, FormView):
