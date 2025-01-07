@@ -41,27 +41,32 @@ class SINANUploadLogStatus(models.Model):
         (2, "Error")
     ]
 
-    inserts = models.IntegerField(default=0, null=False)
-    start_id = models.IntegerField(default=None, null=True)
-    end_id = models.IntegerField(default=None, null=True)
-    updates = models.IntegerField(default=0, null=False)
     status = models.IntegerField(choices=STATUS, default=0, null=False)
     log_file = models.FilePathField(path=sinan_upload_log_path)
-    time_spend = models.FloatField(default=.0, null=False)
 
-    def save_updates(self, updates: int):
-        self.info(f"{updates} rows were updated (ON CONFLICT UPDATE)")
-        self.updates = updates
-        self.save()
+    @property
+    def inserts(self) -> int:
+        for log in self.read_logs(level="DEBUG"):
+            if "inserts: " in log:
+                _, inserts = log.split("inserts: ")
+                return int(inserts)
+        raise ValueError("No inserts found in logs")
 
-    def save_start_end_id(self, start_id: int, end_id: int):
-        self.start_id = start_id
-        self.end_id = end_id
-        self.save()
+    @property
+    def updates(self) -> int:
+        for log in self.read_logs(level="DEBUG"):
+            if "updates: " in log:
+                _, updates = log.split("updates: ")
+                return int(updates)
+        raise ValueError("No updates found in logs")
 
-    def save_time_spend(self, time_spend: float):
-        self.time_spend = time_spend
-        self.save()
+    @property
+    def time_spend(self) -> float:
+        for log in self.read_logs(level="DEBUG"):
+            if "time_spend: " in log:
+                _, time_spend = log.split("time_spend: ")
+                return float(time_spend)
+        raise ValueError("No time_spend found in logs")
 
     def read_logs(
         self,
@@ -107,11 +112,10 @@ class SINANUploadLogStatus(models.Model):
         self.status = 2
         self.save()
 
-    def done(self, inserts: int):
+    def done(self, inserts: int, time_spend: float):
         filename = SINANUpload.objects.get(status__id=self.id).upload.filename
-        message = f"{filename} finished with {inserts} inserts."
+        message = f"{filename}: {inserts} inserts in {time_spend:.2f} seconds."
         self._write_logs(level="SUCCESS", message=message)
-        self.inserts = inserts
         self.status = 1
         self.save()
 

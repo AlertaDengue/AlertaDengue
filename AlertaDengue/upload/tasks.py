@@ -30,8 +30,9 @@ def sinan_process_file(upload_sinan_id: int):
     sinan.status.debug("Task 'process_sinan_file' started.")
     sinan_move_file(upload_sinan_id)
     sinan_verify_file(upload_sinan_id)
-    inserted_rows = sinan_insert_to_db(upload_sinan_id)
-    sinan.status.done(inserted_rows)
+    inserted_rows, time_spend = sinan_insert_to_db(upload_sinan_id)
+    sinan.status.debug(f"inserts: {inserted_rows}")
+    sinan.status.done(inserted_rows, time_spend)
 
 
 @shared_task
@@ -156,34 +157,24 @@ def insert_temp_to_notificacao(
     cursor,
     temp_table: str,
     columns: list[str]
-) -> tuple[int, int, int]:
+) -> tuple[list[int], int]:
     fields = ",".join(columns)
     on_conflict = ",".join([f"{field}=excluded.{field}" for field in columns])
-
-    cursor.execute('SELECT MAX(id) FROM "Municipio"."Notificacao";')
-    start_id = cursor.fetchone()[0] or 0
-    print("start_id")
-    print(start_id)
 
     insert_sql = (
         f'INSERT INTO "Municipio"."Notificacao" ({fields}) '
         f"SELECT {fields} FROM {temp_table} "
         f"ON CONFLICT ON CONSTRAINT casos_unicos DO UPDATE SET {on_conflict} "
-        f"RETURNING xmax"
+        f"RETURNING id, xmax"
     )
 
     cursor.execute(insert_sql)
-    conflicted_rows = sum(1 for row in cursor.fetchall() if row[0] != 0)
-    print("conflicted_rows")
-    print(conflicted_rows)
-    print(sum(1 for row in cursor.fetchall() if row[0] == 0))
+    results = cursor.fetchall()
 
-    cursor.execute('SELECT MAX(id) FROM "Municipio"."Notificacao";')
-    end_id = cursor.fetchone()[0]
-    print("end_id")
-    print(end_id)
+    inserted_ids = [row[0] for row in results if row[1] == '0']
+    conflicted_ids = [row[0] for row in results if row[1] != '0']
 
-    return start_id, end_id, conflicted_rows
+    return inserted_ids, conflicted_ids
 
 
 @shared_task
@@ -294,16 +285,17 @@ def sinan_insert_to_db(upload_sinan_id: int):
                 raise
 
         try:
-            start_id, end_id, conflicted_rows = insert_temp_to_notificacao(
+            inserted_ids, conflicted_ids = insert_temp_to_notificacao(
                 cursor,
                 temp_table,
                 list(sinan.COLUMNS.values())
             )
 
-            if conflicted_rows:
-                status.save_updates(conflicted_rows)
+            if conflicted_ids:
+                status.debug(f"updates: {len(conflicted_ids)}")
 
-            status.save_start_end_id(start_id, end_id)
+            if inserted_ids:
+                status.debug(f"inserts: {len(inserted_ids)}")
 
         except Exception as e:
             raise SINANUploadFatalError(
@@ -314,8 +306,6 @@ def sinan_insert_to_db(upload_sinan_id: int):
             sinan.status.debug(f"{temp_table} dropped.")
 
         et = time.time()
-        status.info(
-            f"Task 'sinan_insert_to_db' finished in {et-st:.2f} seconds."
-        )
-        status.save_time_spend(et-st)
-        return end_id - start_id
+        time_spend = et-st
+        status.debug(f"time_spend: {time_spend}")
+        return len(inserted_ids), time_spend
