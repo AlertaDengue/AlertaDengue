@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal, Optional, Union
 from pathlib import Path
 from datetime import date
 from array import array
@@ -49,21 +49,33 @@ class SINANUploadLogStatus(models.Model):
     updates_file = models.FilePathField(path=sinan_upload_log_path, null=True)
 
     @property
-    def inserts(self) -> list[int]:
+    def inserts(self, rowcount: bool = False) -> Union[list[int], int]:
         inserts_file = Path(sinan_upload_log_path()) / f"{self.pk}.inserts.log"
         if not inserts_file.exists():
+            if rowcount:
+                return 0
             return []
+
         with inserts_file.open("rb") as log:
             inserts = pickle.load(log)
+
+        if rowcount:
+            return len(inserts)
         return inserts.tolist()
 
     @property
-    def updates(self) -> list[int]:
+    def updates(self, rowcount: bool = False) -> list[int]:
         updates_file = Path(sinan_upload_log_path()) / f"{self.pk}.updates.log"
         if not updates_file.exists():
+            if rowcount:
+                return 0
             return []
+
         with updates_file.open("rb") as log:
             updates = pickle.load(log)
+
+        if rowcount:
+            return len(updates)
         return updates.tolist()
 
     @property
