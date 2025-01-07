@@ -1,0 +1,132 @@
+{% load i18n %}
+{% load bootstrap4 %}
+{% load static %}
+
+<li id="{{id}}" class="li-item list-group-item
+  {% if status == 0 %}list-group-item-primary
+  {% elif status == 1 %}list-group-item-success
+  {% elif status == 2 %}list-group-item-danger
+  {% else %}
+  {% endif %}">
+  {% if status == 1 %}
+  <a href="/upload/sinan/overview/{{id}}" class="li-item-link">
+  {% endif %}
+  <div class="li-content" style="display: flex; align-items: center;">
+    <div style="flex: 1;">{{filename}}</div>
+    <div>
+      {% if status == 0 %}
+      <i class="fas fa-sync-alt fa-spin" 
+         style="cursor: pointer; margin-left: 10px;"></i>
+      {% endif %}
+
+      {% if status == 1 %}
+      <div class="info-box">
+          <i class="fas fa-arrow-up"> {{inserts}}</i>
+          <i class="fas fa-repeat"> {{updates}}</i>
+          <i class="fas fa-stopwatch"> {{time_spend}}</i>
+      </div>
+      {% endif %}
+
+      {% if status == 2 %}
+      <i class="fas fa-exclamation-circle error-icon" 
+         data-toggle="tooltip" 
+         style="cursor: pointer; color: #dc3545; margin-left: 10px;">
+      </i>
+
+      <div id="error-message-{{id}}" class="error-message">
+        {{error}}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</li>
+
+<style>
+.li-item {
+  position: relative;
+  height: 50px;
+  display: flex !important;
+  align-items: center;
+  margin: 0px;
+  padding: 0px !important;
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+}
+
+.li-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 45px;
+}
+
+.li-item-link {
+  display: block;
+  width: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.li-item-link:hover,
+.li-item-link:focus {
+  color: inherit;
+  text-decoration: none;
+}
+
+.info-box {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  font-size: 0.85rem;
+  min-height: 40px !important;
+  right: -250px;
+  width: 200px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  z-index: 10;
+  transition: right 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+  margin-bottom: 0px !important;
+}
+
+.info-box .fas {
+  margin-right: 5px;
+  margin-left: 2px;
+}
+
+li:hover .info-box {
+  right: 0;
+  opacity: 1;
+  visibility: visible;
+}
+
+.error-message {
+  position: absolute;
+  left: 70%;
+  background-color: #dc3545;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  display: none;
+}
+
+.error-icon:hover + .error-message {
+  display: block;
+}
+
+.fas.fa-sync-alt.fa-spin {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>

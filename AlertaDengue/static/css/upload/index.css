@@ -1,0 +1,42 @@
+#load-more {
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.card-body {
+  margin: -15px;
+  margin-bottom: -30px;
+}
+
+#upload-files {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  min-height: 300px;
+  align-items: center;
+  padding-left: 15px;
+  background: #fff2f0;
+  border-top: 8px solid #fff2f0;
+}
+
+label[for^="upload_"] {
+  margin-botton: 0;
+}
+
+#upload-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  padding-right: 5px;
+}
+
+#submit-button {
+  margin-top: auto;
+  margin-bottom: 50px;
+  width: 100%;
+  border-radius: 0px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1), 0 2px 5px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease-in-out;
+}

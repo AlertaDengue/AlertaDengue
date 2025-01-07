@@ -1,44 +1,11 @@
-from pathlib import Path
-from typing import TYPE_CHECKING, Iterator, Tuple
-
 import numpy as np
 import pandas as pd
-from ad_main import settings
-from django.utils.translation import gettext_lazy as _
-from loguru import logger
+import datetime as dt
+from typing import Iterator, Tuple, Optional, Union
 
-if TYPE_CHECKING:
-    from upload.models import SINAN
 
-duplicated_sinan_dir = Path(str(settings.DBF_SINAN)) / "duplicated_csvs"
-duplicated_sinan_dir.mkdir(parents=True, exist_ok=True)
+from dados.dbdata import calculate_digit
 
-residue_sinan_dir = Path(str(settings.DBF_SINAN)) / "residue_csvs"
-residue_sinan_dir.mkdir(parents=True, exist_ok=True)
-
-EXPECTED_FIELDS = {
-    "dt_notific": "DT_NOTIFIC",
-    "se_notif": "SEM_NOT",
-    "ano_notif": "NU_ANO",
-    "dt_sin_pri": "DT_SIN_PRI",
-    "se_sin_pri": "SEM_PRI",
-    "dt_digita": "DT_DIGITA",
-    "municipio_geocodigo": "ID_MUNICIP",
-    "nu_notific": "NU_NOTIFIC",
-    "cid10_codigo": "ID_AGRAVO",
-    "dt_nasc": "DT_NASC",
-    "cs_sexo": "CS_SEXO",
-    "nu_idade_n": "NU_IDADE_N",
-    "resul_pcr": "RESUL_PCR_",
-    "criterio": "CRITERIO",
-    "classi_fin": "CLASSI_FIN",
-}
-
-REQUIRED_DATE_FIELDS = ["DT_SIN_PRI", "DT_NOTIFIC", "DT_DIGITA", "DT_NASC"]
-
-REQUIRED_FIELDS = REQUIRED_DATE_FIELDS + ["ID_MUNICIP"]  # +
-
-DISEASE_CID = {"dengue": "A90", "chik": "A92.0", "zika": "A98"}
 
 UF_CODES = {
     "AC": 12,
@@ -71,297 +38,162 @@ UF_CODES = {
 }
 
 
-def sinan_drop_duplicates_from_dataframe(
-    df: pd.DataFrame, filename: str
-) -> pd.DataFrame:
-    """
-    Remove duplicates from a pandas DataFrame based on the provided conditions.
-    The function checks if the data has duplicate values.
-    If the first condition (SEM_NOT) is met, it saves the data to a CSV file
-    and returns the original DataFrame without any changes.
-    If the second condition (DT_NOTIFIC) is met,
-    it drops the duplicate rows from the DataFrame and
-    returns it without the duplicate values.
-    Parameters
-    ----------
-    df : pd.DataFrame
-        The pandas DataFrame to remove duplicates from.
-    Returns
-    -------
-    pd.DataFrame
-        A pandas DataFrame with duplicates removed.
-    """
-    duplicate_se_notific_mask = df.duplicated(
-        subset=["ID_AGRAVO", "NU_NOTIFIC", "ID_MUNICIP", "SEM_NOT"]
-    )
-
-    if duplicate_se_notific_mask.any():
-        logger.warning("Duplicates found for the same epiweek!")
-
-        df_se_notific = df[duplicate_se_notific_mask]
-
-        if df_se_notific.shape[0] > 0:
-            dup_file = (
-                duplicated_sinan_dir
-                / f"duplicate_values_SE_NOT_{filename}.csv"
-            )
-
-            with open(dup_file, "a") as f:
-                df_se_notific.to_csv(
-                    f, index=False, mode="a", header=(not f.tell())
-                )
-
-            logger.info(
-                f"Saved {df_se_notific.shape[0]} rows due to duplicate values "
-                f"(Condition SEM_NOT) for {filename}."
-            )
-
-    duplicate_dt_notific_mask = df.duplicated(
-        subset=["ID_AGRAVO", "NU_NOTIFIC", "ID_MUNICIP", "DT_NOTIFIC"]
-    )
-
-    if duplicate_dt_notific_mask.any():
-        logger.debug("Duplicates found for the same notification date")
-
-        df_dt_notific = df[duplicate_dt_notific_mask]
-
-        dup_file = (
-            duplicated_sinan_dir / f"duplicate_values_DT_NOT_{filename}.csv"
-        )
-
-        with open(dup_file, "a") as f:
-            df_dt_notific.to_csv(
-                f, index=False, mode="a", header=(not f.tell())
-            )
-
-        if df_dt_notific.shape[0] > 0:
-            logger.info(
-                f"Saved {df_dt_notific.shape[0]} rows due to duplicate values "
-                "(Condition DT_NOTIFIC)."
-            )
-
-        df = df[~duplicate_dt_notific_mask]  # pyright: ignore
-
-    return df
+def chunk_gen(chunksize: int, totalsize: int) -> Iterator[Tuple[int, int]]:
+    chunks = totalsize // chunksize
+    for i in range(chunks):
+        yield i * chunksize, (i + 1) * chunksize
+    rest = totalsize % chunksize
+    if rest:
+        yield chunks * chunksize, chunks * chunksize + rest
 
 
-def sinan_parse_fields(df: pd.DataFrame, sinan_obj: "SINAN") -> pd.DataFrame:
-    """
-    Rename and parse data types on dataframe columns based on SINAN specs
-    Parameters
-    ----------
-    df : DataFrame
-        DataFrame containing the data.
-    sinan_obj : SINAN
-        SINAN object
-    Returns
-    -------
-    pd.DataFrame
-        DataFrame with renamed columns and converted datetime columns.
-    """
-    if "ID_MUNICIP" in df.columns:
-        df = df.dropna(subset=["ID_MUNICIP"])
+@np.vectorize
+def add_dv(geocodigo):
+    miscalculated_geocodes = {
+        "2201911": 2201919,
+        "2201986": 2201988,
+        "2202257": 2202251,
+        "2611531": 2611533,
+        "3117835": 3117836,
+        "3152139": 3152131,
+        "4305876": 4305871,
+        "5203963": 5203962,
+        "5203930": 5203939,
+    }
 
-    elif "ID_MN_RESI" in df.columns:
-        df = df.dropna(subset=["ID_MN_RESI"])
-        df["ID_MUNICIP"] = df.ID_MN_RESI
-        del df["ID_MN_RESI"]
+    try:
+        if len(str(geocodigo)) == 7:
+            return int(geocodigo)
+        elif len(str(geocodigo)) == 6:
+            geocode = int(str(geocodigo) + str(calculate_digit(geocodigo)))
+            if str(geocode) in miscalculated_geocodes:
+                return miscalculated_geocodes[str(geocode)]
+            return int(geocode)
+        else:
+            return None
+    except (ValueError, TypeError):
+        return None
+
+
+@np.vectorize
+def convert_date(col: Union[pd.Timestamp, str, None]) -> Optional[dt.date]:
+    try:
+        if pd.isnull(col):
+            return None
+        if isinstance(col, dt.date):
+            return col
+        return pd.to_datetime(col).date()
+    except Exception:
+        return None
+
+
+@np.vectorize
+def convert_nu_ano(year: str, col: pd.Series) -> int:
+    return int(year) if pd.isnull(col) else int(col)
+
+
+@np.vectorize
+def convert_sem_pri(col: str) -> int:
+    if col:
+        col = str(col)[-2:]
+    return int(col)
+
+
+@np.vectorize
+def fix_nu_notif(value: Union[str, None]) -> Optional[int]:
+    char_to_replace = {",": "", "'": "", ".": ""}
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except ValueError:
+        for char, replacement in char_to_replace.items():
+            value = value.replace(char, replacement)
+        try:
+            return int(value)
+        except ValueError:
+            return None
+
+
+@np.vectorize
+def fill_id_agravo(cid: str, default_cid: str) -> str:
+    return default_cid if not cid else cid
+
+
+@np.vectorize
+def convert_sem_not(col: np.ndarray[int]) -> np.ndarray[int]:
+    return int(str(int(col))[-2:])
+
+
+def convert_data_types(col: pd.Series, dtype: type) -> pd.Series:
+    if dtype == int:
+        col = pd.to_numeric(col, errors="coerce").fillna(0).astype(int)
+    elif dtype == float:
+        col = pd.to_numeric(col, errors="coerce").fillna(0.0)
+    elif dtype == str:
+        col = col.fillna("").astype(str)
+    else:
+        raise ValueError(f"Unsupported dtype: {dtype}")
+    return col
+
+
+def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
+    df["NU_NOTIFIC"] = fix_nu_notif(df.NU_NOTIFIC)
+    df["ID_MUNICIP"] = add_dv(df.ID_MUNICIP)
+
+    dt_cols = [
+        "DT_SIN_PRI",
+        "DT_DIGITA",
+        "DT_NASC",
+        "DT_NOTIFIC",
+        "DT_CHIK_S1",
+        "DT_CHIK_S2",
+        "DT_PRNT",
+        "DT_SORO",
+        "DT_NS1",
+        "DT_VIRAL",
+        "DT_PCR",
+    ]
+
+    for dt_col in dt_cols:
+        df[dt_col] = convert_date(df[dt_col])
 
     df["CS_SEXO"] = np.where(
         df["CS_SEXO"].isin(["M", "F"]), df["CS_SEXO"], "I"
     ).astype(str)
 
-    valid_rows: list[pd.Series] = []
-    misparsed_rows: list[pd.Series] = []
-    misparsed_cols = set(sinan_obj.misparsed_cols)
+    int_cols = [
+        "NU_IDADE_N",
+        "ID_DISTRIT",
+        "ID_BAIRRO",
+        "ID_UNIDADE",
+    ]
 
-    for _, row in df.iterrows():
-        try:
-            valid_rows.append(sinan_parse_row(row, sinan_obj, misparsed_cols))
-        except:
-            # logger.debug(f"Misparsed row motive: {str(e)}")
-            misparsed_rows.append(row)
+    for int_col in int_cols:
+        df[int_col] = convert_data_types(df[int_col], int)
 
-    df = pd.DataFrame(valid_rows, columns=df.columns)
-    df = df.reset_index(drop=True)
+    df["RESUL_PCR_"] = (
+        convert_data_types(df["RESUL_PCR_"], int)
+        if "RESUL_PCR_" in df.columns
+        else 0
+    )
+    df["CRITERIO"] = (
+        convert_data_types(df["CRITERIO"], int)
+        if "CRITERIO" in df.columns
+        else 0
+    )
+    df["CLASSI_FIN"] = (
+        convert_data_types(df["CLASSI_FIN"], int)
+        if "CLASSI_FIN" in df.columns
+        else 0
+    )
 
-    misparsed_df = pd.DataFrame(misparsed_rows, columns=df.columns)
+    df["ID_AGRAVO"] = fill_id_agravo(df.ID_AGRAVO, default_cid)
 
-    if not misparsed_df.empty:
-        sinan_obj.parse_error = True
-        sinan_obj.misparsed_cols = list(misparsed_cols)
-        sinan_obj.save(update_fields=["parse_error", "misparsed_cols"])
+    df["SEM_PRI"] = convert_sem_pri(df.SEM_PRI)
 
-        misparsed_df.to_csv(
-            str(sinan_obj.misparsed_file),
-            index=False,
-            mode="a",
-        )
+    df["NU_ANO"] = convert_nu_ano(year, df.NU_ANO)
+
+    df["SEM_NOT"] = convert_sem_not(df.SEM_NOT)
 
     return df
-
-
-def sinan_parse_row(
-    row: pd.Series, sinan_obj: "SINAN", misparsed_cols: set[str]
-) -> pd.Series:
-    """
-    If an Exception is thrown in this method, the row will be removed from the
-    data and be stored in the `RESIDUE_` CSV file. Returns the parsed row
-
-    "Municipio"."Notificacao" table description:
-    dt_notific          | date                |
-    se_notif            | integer             |
-    ano_notif           | integer             |
-    dt_sin_pri          | date                |
-    se_sin_pri          | integer             |
-    dt_digita           | date                |
-    municipio_geocodigo | integer             |
-    nu_notific          | integer             |
-    cid10_codigo        | character varying(5)|
-    dt_nasc             | date                |
-    cs_sexo             | character varying(1)|
-    nu_idade_n          | integer             |
-    resul_pcr           | numeric             |
-    criterio            | numeric             |
-    classi_fin          | numeric             |
-    """
-
-    for col in REQUIRED_DATE_FIELDS:
-        try:
-            value = pd.to_datetime(str(row[col]))
-            if isinstance(value, type(pd.NaT)):
-                raise ValueError(f"Required date field {col} is Null")
-            row[col] = value
-        except Exception as e:
-            misparsed_cols.add(col)
-            raise e
-
-    try:
-        nu_notific = row["NU_NOTIFIC"]
-        chars_to_remove = ",'.:"
-        if str(nu_notific).isdigit():
-            row["NU_NOTIFIC"] = int(row["NU_NOTIFIC"])
-        else:
-            row["NU_NOTIFIC"] = int(
-                "".join(
-                    [
-                        str(c)
-                        for c in str(nu_notific)
-                        if c not in chars_to_remove
-                    ]
-                )
-            )
-    except Exception as e:
-        misparsed_cols.add("NU_NOTIFIC")
-        raise e
-
-    geocode = str(row["ID_MUNICIP"])
-    if geocode.isdigit():
-        row["ID_MUNICIP"] = add_dv(geocode)
-    elif "." in str(row["ID_MUNICIP"]):
-        geocode = str(int(float(geocode)))
-        row["ID_MUNICIP"] = add_dv(geocode)
-    else:
-        misparsed_cols.add("ID_MUNICIP")
-        raise ValueError(_(f"Can't parse geocode: {geocode}"))
-
-    for col in ["RESUL_PCR_", "CRITERIO", "CLASSI_FIN"]:
-        try:
-            row[col] = pd.to_numeric(row[col])
-        except ValueError:
-            row[col] = 0
-
-    if row["ID_AGRAVO"] not in list(DISEASE_CID.values()):
-        row["ID_AGRAVO"] = DISEASE_CID[sinan_obj.disease]
-
-    if row["SEM_PRI"] != None:
-        try:
-            row["SEM_PRI"] = int(str(row["SEM_PRI"])[-2:])
-        except Exception as e:
-            misparsed_cols.add("SEM_PRI")
-            raise e
-
-    try:
-        if row["NU_ANO"] in [None, np.nan, "", 0]:
-            row["NU_ANO"] = sinan_obj.notification_year
-        else:
-            row["NU_ANO"] = int(row["NU_ANO"])
-    except Exception as e:
-        misparsed_cols.add("NU_ANO")
-        raise e
-
-    try:
-        row["SEM_NOT"] = int(str(int(row["SEM_NOT"]))[-2:])
-    except Exception as e:
-        misparsed_cols.add("SEM_NOT")
-        raise e
-
-    return row
-
-
-def calculate_digit(dig: str) -> int:
-    """
-    Calculates the verifier digit of the municipality geocode.
-    Parameters
-    ----------
-        geocode: str
-            IBGE codes of municipalities in Brazil.
-    Returns
-    -------
-        digit: the verifier digit.
-    """
-
-    peso = [1, 2, 1, 2, 1, 2, 0]
-    soma = 0
-    dig = str(dig)
-    for i in range(6):
-        valor = int(dig[i]) * peso[i]
-        soma += sum([int(d) for d in str(valor)]) if valor > 9 else valor
-    dv = 0 if soma % 10 == 0 else (10 - (soma % 10))
-    return dv
-
-
-def add_dv(geocode: str) -> int:
-    """
-    Returns the geocode of the municipality by adding the verifier digit.
-    If the input geocode is already 7 digits long, it is returned as is.
-    If the input geocode is 6 digits long, the verifier digit is calculated
-        and appended to the end.
-    If the input geocode is 0 digits long, a log message is printed
-        and 0 is returned.
-    Parameters
-    ----------
-        geocode: IBGE codes of municipalities in Brazil.
-    Returns
-    -------
-        geocode: geocode 7 digit.
-    """
-    if len(str(geocode)) == 7:
-        return int(geocode)
-    elif len(str(geocode)) == 6:
-        return int(str(geocode) + str(calculate_digit(geocode)))
-
-    raise ValueError(_(f"geocode:{geocode} does not match!"))
-
-
-def chunk_gen(chunksize: int, totalsize: int) -> Iterator[Tuple[int, int]]:
-    """
-    Generate chunks.
-    Parameters
-    ----------
-        chunksize (int): Size of each chunk.
-        totalsize (int): Total size of the data.
-    Yields
-    ------
-        Tuple[int, int]: A tuple containing the lowerbound and upperbound
-        indices of each chunk.
-    """
-    chunks = totalsize // chunksize
-
-    for i in range(chunks):
-        yield i * chunksize, (i + 1) * chunksize
-
-    rest = totalsize % chunksize
-
-    if rest:
-        yield chunks * chunksize, chunks * chunksize + rest

@@ -1,0 +1,81 @@
+{% load i18n %}
+{% load bootstrap4 %}
+{% load static %}
+
+<div class="card card-secondary">
+  <div class="card-header" style="position: relative;">
+    <h3 class="card-title text-truncate" title="{{ filename }}">{{ filename }}</h3>
+    <button type="button" class="close-button">
+      &times;
+    </button>
+  </div>
+  <div class="card-body">
+    <form method="POST" enctype="multipart/form-data" action='{% url "upload:sinan" %}'>
+      {% csrf_token %}
+      {% bootstrap_form form %}
+    </form>
+  </div>
+</div>
+
+<style>
+  .card {
+    flex: 0 1 calc(30% - 10px);
+    width: 200px;
+    max-width: 100%;
+    margin: 10px;
+  }
+
+  .card-header {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-title {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    width: 100%;
+  }
+
+  .close-button {
+    color: #000;
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    border: none;
+    background: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .close-button:hover {
+    color: #d00;
+  }
+
+  [data-tooltip] {
+    position: relative;
+  }
+
+  [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: normal;
+    word-wrap: break-word;
+    max-width: 250px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  [data-tooltip]:hover::after {
+    opacity: 1;
+  }
+</style>

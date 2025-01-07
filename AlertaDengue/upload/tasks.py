@@ -1,438 +1,340 @@
-import os
+import shutil
+import time
 from pathlib import Path
-from typing import Optional
+from typing import Iterator, Tuple
 
-import dask.dataframe as dd
+import pyarrow.parquet as pq
 import geopandas as gpd
 import pandas as pd
-import pyarrow.parquet as pq
-from ad_main.settings import get_sqla_conn
 from celery import shared_task
-from celery.result import AsyncResult, allow_join_result
-from django.conf import settings
-from django.utils.translation import gettext_lazy as _
-from loguru import logger
 from psycopg2.extras import DictCursor
 from simpledbf import Dbf5
-from sqlalchemy.engine import Engine
 
-from .models import SINAN, Status
-from .sinan.utils import (
-    EXPECTED_FIELDS,
-    UF_CODES,
-    chunk_gen,
-    sinan_drop_duplicates_from_dataframe,
-    sinan_parse_fields,
+from django.db import transaction
+from ad_main.settings import get_sqla_conn
+
+from .models import (
+    sinan_upload_path,
+    SINANUpload,
+    SINANUploadFatalError,
 )
-
-CODES_UF = {v: k for k, v in UF_CODES.items()}
-
-DB_ENGINE = get_sqla_conn(database="dengue")
+from .sinan.utils import chunk_gen, parse_data
 
 
-@shared_task(default_retry_delay=30, max_retries=3, soft_time_limit=5 * 60)
-def sinan_split_by_uf_or_chunk(
-    file_path: str, dest_dir: str, by_uf: bool
-) -> tuple[bool, Optional[list[str]]]:
-    """
-    TODO: Split & async it
-    """
-    file = Path(file_path)
-    dest = Path(dest_dir)
-    task_ids: list[str] = []
+ENGINE = get_sqla_conn(database="dengue")
 
-    if not file.exists():
-        raise FileNotFoundError(f"{file} not found")
 
-    def semaphore(
-        chunk_df: pd.DataFrame, chunk_id: int, task_ids: list[str] = []
-    ) -> None:
-        if by_uf:
-            uf_rows: dict[str, list[pd.Series]] = {}
-            for _, row in chunk_df.iterrows():
-                try:
-                    uf = CODES_UF[int(str(row["ID_MUNICIP"])[:2])]
-                except (TypeError, ValueError, KeyError):
-                    uf = "BR"
-                if uf not in uf_rows:
-                    uf_rows[uf] = []
-                uf_rows[uf].append(row)
+@shared_task
+def sinan_process_file(upload_sinan_id: int):
+    sinan = SINANUpload.objects.get(pk=upload_sinan_id)
+    sinan.status.debug("Task 'process_sinan_file' started.")
+    sinan_move_file(upload_sinan_id)
+    sinan_verify_file(upload_sinan_id)
+    inserted_rows, time_spend = sinan_insert_to_db(upload_sinan_id)
+    sinan.status.debug(f"inserts: {inserted_rows}")
+    sinan.status.done(inserted_rows, time_spend)
 
-            for uf, rows in uf_rows.items():
-                uf_file = dest / f"{uf}.csv"
 
-                df = pd.DataFrame(rows)
-
-                df.to_csv(
-                    str(uf_file),
-                    index=False,
-                    mode="a",
-                    header=not uf_file.exists(),
-                )
-            file.unlink()
-
-        else:
-            parquet_chunk = os.path.join(
-                dest_dir,
-                f"{os.path.splitext(file.name)[0]}-{chunk_id}.parquet",
+@shared_task
+def sinan_move_file(upload_sinan_id: int):
+    sinan = SINANUpload.objects.get(pk=upload_sinan_id)
+    sinan.status.debug("Task 'move_sinan_file' started.")
+    try:
+        file = Path(sinan.upload.file.path)
+        if not file.exists():
+            raise SINANUploadFatalError(
+                sinan.status,
+                "SINAN Upload file not found"
             )
-            chunk_df.to_parquet(str(parquet_chunk))
-            by_uf_task = sinan_split_by_uf_or_chunk.delay(
-                file_path=str(parquet_chunk), dest_dir=dest_dir, by_uf=True
-            )
-            task_ids.append(by_uf_task.id)
-
-    if file.suffix.lower() in [".csv", ".csv.gz"]:
-        header_df = pd.read_csv(
-            str(file.absolute()),
-            encoding="iso-8859-1",
-            index_col=0,
-            nrows=10,
-        )
-
-        header_df = header_df.reset_index(drop=False)
-
-        columns = header_df.columns.to_list()
-
-        for chunk, df in enumerate(
-            pd.read_csv(
-                str(file),
-                chunksize=30000,
-                encoding="iso-8859-1",
-                usecols=list(set(EXPECTED_FIELDS.values()) & set(columns)),
-            )
-        ):
-            semaphore(df, chunk, task_ids)
-
-    elif file.suffix.lower() == ".dbf":
-        dbf = Dbf5(str(file), codec="iso-8859-1")
-
-        for chunk, (lowerbound, upperbound) in enumerate(
-            chunk_gen(30000, dbf.numrec)
-        ):
-            df = gpd.read_file(
-                str(file),
-                include_fields=list(
-                    set(EXPECTED_FIELDS.values()) & set(dbf.columns)
-                ),
-                rows=slice(lowerbound, upperbound),
-                ignore_geometry=True,
-            )
-            semaphore(df, chunk, task_ids)
-
-    elif file.suffix.lower() == ".parquet":
-        table = pq.read_table(str(file.absolute()))
-        columns = table.column_names
-
-        for chunk, (lowerbound, upperbound) in enumerate(
-            chunk_gen(30000, len(table))
-        ):
-            df = table.slice(lowerbound, upperbound).to_pandas()
-            semaphore(df, chunk, task_ids)
-
-    else:
-        raise ValueError(f"Unable to parse file type '{file.suffix}'")
-
-    if not by_uf:
-        file.unlink()
-        return True, task_ids
-    return True, None
+        dest = Path(sinan_upload_path()) / sinan._final_basename()
+        dest = dest.with_suffix(Path(sinan.upload.filename).suffix)
+        shutil.move(str(file), str(dest))
+        sinan.upload.file.name = str(dest)
+        sinan.upload.filename = dest.name
+        sinan.upload.save()
+        sinan.status.debug(f"File moved to {str(dest)}")
+    except Exception as e:
+        raise SINANUploadFatalError(sinan.status, e)
 
 
-@shared_task(default_retry_delay=30, max_retries=3, soft_time_limit=5 * 60)
-def process_sinan_file(sinan_pk: int) -> bool:
-    sinan = SINAN.objects.get(pk=sinan_pk)
-    fpath = Path(str(sinan.filepath))
+@shared_task
+def sinan_verify_file(upload_sinan_id: int):
+    sinan = SINANUpload.objects.get(pk=upload_sinan_id)
+    sinan.status.debug("Task 'sinan_verify_file' started.")
+    file = Path(sinan.upload.file.path)
 
     try:
-        result: AsyncResult
-        if fpath.suffix.lower() == ".csv":
-            result = chunk_csv_file.delay(sinan.pk)
-
-        elif fpath.suffix.lower() == ".dbf":
-            result = chunk_dbf_file.delay(sinan.pk)
-
-        elif fpath.suffix.lower() == ".parquet":
-            result = chunk_parquet_file.delay(sinan.pk)
-
+        if file.suffix.lower() == ".parquet":
+            columns = pq.read_schema(str(file)).names
+        elif file.suffix.lower() == ".dbf":
+            columns = gpd.read_file(
+                sinan.upload.file.path,
+                rows=0,
+                ignore_geometry=True,
+            ).columns
+        elif file.suffix.lower() == ".csv":
+            columns = pd.read_csv(str(file), nrows=0).columns
         else:
-            err = f"Unknown file type {fpath.suffix}"
-            logger.error(err)
-            sinan.status = Status.ERROR
-            sinan.status_error = err
-            sinan.save(update_fields=["status", "status_error"])
-            return False
-
+            raise SINANUploadFatalError(
+                sinan.status, f"File type '{file.suffix}' is not supported"
+            )
     except Exception as e:
-        sinan.status = Status.ERROR
-        sinan.status_error = f"Error chunking file: {e}"
-        sinan.save(update_fields=["status", "status_error"])
-        return False
+        err = f"Could not read {sinan.upload.filename} columns: {e}"
+        raise SINANUploadFatalError(sinan.status, err)
 
-    with allow_join_result():
+    for col, synonym in sinan.SYNONYMS_FIELDS.items():
         try:
-            chunking_success = result.get(timeout=120 * 60)
+            if not col in columns:
+                if synonym in columns:
+                    for i, req in enumerate(sinan.REQUIRED_COLS):
+                        if req == col:
+                            sinan.REQUIRED_COLS[i] = synonym
 
-            if chunking_success:
-                inserted: AsyncResult = (
-                    parse_insert_chunks_on_database.delay(  # pyright: ignore
-                        sinan_pk
-                    )
+                    cols = sinan.COLUMNS.copy()
+                    for column, final_col in sinan.COLUMNS:
+                        if column == col:
+                            del cols[column]
+                            cols[synonym] = final_col
+                    sinan.COLUMNS = cols
+                    sinan.save()
+        except:
+            sinan.status.warning(
+                f"Could not use the synonym '{synonym}' of the field '{col}'"
+            )
+
+    if not all(col in columns for col in sinan.REQUIRED_COLS):
+        missing_cols = set(sinan.REQUIRED_COLS).difference(set(columns))
+        err = f"Missing required columns: {missing_cols}"
+        raise SINANUploadFatalError(sinan.status, err)
+
+    if not all(col in columns for col in sinan.COLUMNS):
+        missing_cols = set(sinan.COLUMNS).difference(set(columns))
+        warning = f"Missing columns (filled with <NA>): {missing_cols}"
+        sinan.status.warning(warning)
+
+    sinan.status.debug("Task 'sinan_verify_file' finished.")
+
+
+def insert_chunk_to_temp_table(
+    upload_sinan_id: int,
+    df_chunk: pd.DataFrame,
+    tablename: str,
+    cursor,
+    filtered_rows: int = 0,
+):
+    sinan = SINANUpload.objects.get(pk=upload_sinan_id)
+    columns = list(sinan.COLUMNS.values())
+
+    df_chunk = parse_data(df_chunk, sinan.cid10, sinan.year)
+    df_chunk = df_chunk.replace({pd.NA: None})
+    len1 = len(df_chunk)
+    df_chunk = df_chunk.dropna(
+        subset=SINANUpload.REQUIRED_COLS, how="any"
+    )
+    len2 = len(df_chunk)
+    filtered_rows += len1-len2
+    df_chunk = df_chunk.rename(columns=sinan.COLUMNS)
+
+    insert_sql = f"""
+        INSERT INTO {tablename}({','.join(df_chunk.columns)}) 
+        VALUES ({','.join(['%s' for _ in df_chunk.columns])}) 
+        ON CONFLICT ON CONSTRAINT casos_unicos DO UPDATE SET 
+        {','.join([f'{j}=excluded.{j}' for j in df_chunk.columns])}
+    """
+
+    rows = [
+        tuple(row)
+        for row in df_chunk.itertuples(index=False)
+    ]
+
+    cursor.executemany(insert_sql, rows)
+
+
+def insert_temp_to_notificacao(
+    cursor,
+    temp_table: str,
+    columns: list[str]
+) -> tuple[list[int], int]:
+    fields = ",".join(columns)
+    on_conflict = ",".join([f"{field}=excluded.{field}" for field in columns])
+
+    insert_sql = (
+        f'INSERT INTO "Municipio"."Notificacao" ({fields}) '
+        f"SELECT {fields} FROM {temp_table} "
+        f"ON CONFLICT ON CONSTRAINT casos_unicos DO UPDATE SET {on_conflict} "
+        f"RETURNING id, xmax"
+    )
+
+    cursor.execute(insert_sql)
+    results = cursor.fetchall()
+
+    inserted_ids = [row[0] for row in results if row[1] == '0']
+    conflicted_ids = [row[0] for row in results if row[1] != '0']
+
+    return inserted_ids, conflicted_ids
+
+
+@shared_task
+def sinan_insert_to_db(upload_sinan_id: int):
+    sinan = SINANUpload.objects.get(pk=upload_sinan_id)
+    status = sinan.status
+    status.debug("Task 'sinan_insert_to_db' started.")
+
+    st = time.time()
+    file = Path(sinan.upload.file.path)
+    temp_table = f"temp_sinan_upload_{sinan.pk}"
+    chunksize = 100000
+    current_row = 0
+    filtered_rows = 0
+
+    with ENGINE.begin() as conn:
+        cursor = conn.connection.cursor(cursor_factory=DictCursor)
+        cursor.execute(f"""
+            CREATE TEMP TABLE {temp_table} (
+                dt_notific DATE,
+                se_notif INTEGER,
+                ano_notif INTEGER,
+                dt_sin_pri DATE,
+                se_sin_pri INTEGER,
+                dt_digita DATE,
+                municipio_geocodigo INTEGER,
+                nu_notific INTEGER,
+                cid10_codigo VARCHAR(5),
+                dt_nasc DATE,
+                cs_sexo VARCHAR(1),
+                nu_idade_n INTEGER,
+                resul_pcr NUMERIC,
+                criterio NUMERIC,
+                classi_fin NUMERIC,
+                dt_chik_s1 DATE,
+                dt_chik_s2 DATE,
+                dt_prnt DATE,
+                res_chiks1 VARCHAR(255),
+                res_chiks2 VARCHAR(255),
+                resul_prnt VARCHAR(255),
+                dt_soro DATE,
+                resul_soro VARCHAR(255),
+                dt_ns1 DATE,
+                resul_ns1 VARCHAR(255),
+                dt_viral DATE,
+                resul_vi_n VARCHAR(255),
+                dt_pcr DATE,
+                sorotipo VARCHAR(255),
+                id_distrit NUMERIC,
+                id_bairro NUMERIC,
+                nm_bairro VARCHAR(255),
+                id_unidade NUMERIC,
+                CONSTRAINT casos_unicos UNIQUE (
+                    nu_notific,
+                    dt_notific,
+                    cid10_codigo,
+                    municipio_geocodigo
                 )
+            );
+        """)
+        status.debug(f"{temp_table} created.")
+        try:
+            if file.suffix.lower() == ".parquet":
+                parquet = pq.ParquetFile(str(file))
+                total_rows = parquet.count
+                status.progress(current_row, total_rows)
+                for batch in parquet.iter_batches(
+                    batch_size=chunksize,
+                    columns=list(sinan.COLUMNS)
+                ):
+                    df_chunk = batch.to_pandas()
+                    insert_chunk_to_temp_table(
+                        upload_sinan_id,
+                        df_chunk,
+                        temp_table,
+                        cursor,
+                        filtered_rows,
+                    )
+                    current_row += chunksize
+                    status.progress(current_row, total_rows)
+            elif file.suffix.lower() == ".csv":
+                with file.open("r", encoding="iso-8859-1") as csv:
+                    total_rows = sum(1 for _ in csv) - 1
 
-                if inserted.get(timeout=120 * 60):
-                    return True
-            if result.status == "FAILURE":
-                err = f"Chunking task for {sinan.filename} failed"
-                logger.error(err)
-                sinan.status = Status.ERROR
-                sinan.status_error = str(err)
-                sinan.save(update_fields=["status", "status_error"])
-            return False
+                status.progress(current_row, total_rows)
+                for chunk in pd.read_csv(
+                    str(file),
+                    chunksize=chunksize,
+                    usecols=list(sinan.COLUMNS)
+                ):
+                    insert_chunk_to_temp_table(
+                        upload_sinan_id,
+                        chunk,
+                        temp_table,
+                        cursor,
+                        filtered_rows,
+                    )
+                    current_row += chunksize
+                    status.progress(current_row, total_rows)
+            elif file.suffix.lower() == ".dbf":
+                dbf = Dbf5(str(file), codec="iso-8859-1")
+                total_rows = dbf.numrec
+                status.progress(current_row, total_rows)
+                for chunk, (lowerbound, upperbound) in enumerate(
+                    chunk_gen(chunksize, dbf.numrec)
+                ):
+                    chunk = gpd.read_file(
+                        str(file),
+                        include_fields=list(sinan.COLUMNS),
+                        rows=slice(lowerbound, upperbound),
+                        ignore_geometry=True,
+                    )
+                    insert_chunk_to_temp_table(
+                        upload_sinan_id,
+                        chunk,
+                        temp_table,
+                        cursor,
+                        filtered_rows,
+                    )
+                    current_row += chunksize
+                    status.progress(current_row, total_rows)
+            else:
+                raise SINANUploadFatalError(
+                    status, f"File type '{file.suffix}' is not supported"
+                )
+        except Exception as e:
+            if not isinstance(e, SINANUploadFatalError):
+                raise SINANUploadFatalError(
+                    status, f"Error populating temporary table: {e}"
+                )
+            else:
+                raise
+
+        if filtered_rows:
+            sinan.status.warning(
+                f"{filtered_rows} rows were dropped due to 'NA' values on "
+                "required fields"
+            )
+
+        try:
+            inserted_ids, conflicted_ids = insert_temp_to_notificacao(
+                cursor,
+                temp_table,
+                list(sinan.COLUMNS.values())
+            )
+
+            if conflicted_ids:
+                status.write_updates(conflicted_ids)
+                status.debug(f"updates: {len(conflicted_ids)}")
+
+            if inserted_ids:
+                status.write_inserts(inserted_ids)
+                status.debug(f"inserts: {len(inserted_ids)}")
 
         except Exception as e:
-            err = f"Process file task failed with exception: {e}"
-            logger.error(err)
-            sinan.status = Status.ERROR
-            sinan.status_error = str(err)
-            sinan.save(update_fields=["status", "status_error"])
-            return False
-
-
-@shared_task(default_retry_delay=30, max_retries=3, soft_time_limit=3 * 60)
-def chunk_csv_file(sinan_pk: int) -> bool:
-    sinan = SINAN.objects.get(pk=sinan_pk)
-
-    if sinan.status == Status.WAITING_CHUNK:
-        sinan.status = Status.CHUNKING
-        sinan.save(update_fields=["status"])
-
-        logger.info("Converting CSV file to Parquet chunks")
-
-        if not os.path.exists(str(sinan.filepath)):
-            raise FileNotFoundError(f"{str(sinan.filepath)} does not exist")
-
-        for chunk, df in enumerate(
-            pd.read_csv(
-                str(sinan.filepath),
-                # usecols=list(EXPECTED_FIELDS.values()),
-                chunksize=10000,
-                encoding="iso-8859-1",
+            raise SINANUploadFatalError(
+                sinan.status, f"Error inserting {file.name} into db: {e}"
             )
-        ):
-            missing_cols = set(EXPECTED_FIELDS.values()).difference(
-                set(df.columns)
-            )
-            for col in missing_cols:
-                df[col] = None
-            df.to_parquet(
-                os.path.join(
-                    str(sinan.chunks_dir), f"{sinan.filename}-{chunk}.parquet"
-                )
-            )
+        finally:
+            cursor.execute(f"DROP TABLE IF EXISTS {temp_table};")
+            sinan.status.debug(f"{temp_table} dropped.")
 
-        sinan.status = Status.WAITING_INSERT
-        sinan.save(update_fields=["status"])
-        return True
-
-
-@shared_task(default_retry_delay=30, max_retries=3, soft_time_limit=3 * 60)
-def chunk_dbf_file(sinan_pk: int) -> bool:
-    sinan = SINAN.objects.get(pk=sinan_pk)
-
-    if sinan.status == Status.WAITING_CHUNK:
-        sinan.status = Status.CHUNKING
-        sinan.save(update_fields=["status"])
-
-        logger.info("Converting DBF file to Parquet chunks")
-        dbf = Dbf5(str(sinan.filepath), codec="iso-8859-1")
-        dbf_name = str(dbf.dbf)[:-4]
-
-        if not os.path.exists(str(sinan.filepath)):
-            raise FileNotFoundError(f"{str(sinan.filepath)} does not exist")
-
-        for chunk, (lowerbound, upperbound) in enumerate(
-            chunk_gen(10000, dbf.numrec)
-        ):
-            parquet_fname = os.path.join(
-                str(sinan.chunks_dir), f"{dbf_name}-{chunk}.parquet"
-            )
-            df = gpd.read_file(
-                str(sinan.filepath),
-                # include_fields=list(EXPECTED_FIELDS.values()),
-                rows=slice(lowerbound, upperbound),
-                ignore_geometry=True,
-            )
-
-            missing_cols = set(EXPECTED_FIELDS.values()).difference(
-                set(df.columns)
-            )
-
-            for col in missing_cols:
-                df[col] = None
-
-            df.to_parquet(parquet_fname)
-
-        sinan.status = Status.WAITING_INSERT
-        sinan.save(update_fields=["status"])
-        return True
-
-
-@shared_task(default_retry_delay=30, max_retries=3, soft_time_limit=3 * 60)
-def chunk_parquet_file(sinan_pk: int) -> bool:
-    sinan = SINAN.objects.get(pk=sinan_pk)
-
-    if sinan.status == Status.WAITING_CHUNK:
-        sinan.status = Status.CHUNKING
-        sinan.save(update_fields=["status"])
-
-        logger.info("Converting Parquet file into chunks")
-
-        if not os.path.exists(str(sinan.filepath)):
-            raise FileNotFoundError(f"{str(sinan.filepath)} does not exist")
-
-        table = pq.read_table(str(sinan.filepath))
-
-        for chunk, (lowerbound, upperbound) in enumerate(
-            chunk_gen(30000, len(table))
-        ):
-            df = table.slice(lowerbound, upperbound).to_pandas()
-
-            missing_cols = set(EXPECTED_FIELDS.values()).difference(
-                set(df.columns)
-            )
-            for col in missing_cols:
-                df[col] = None
-
-            df.to_parquet(
-                os.path.join(
-                    str(sinan.chunks_dir), f"{sinan.filename}-{chunk}.parquet"
-                )
-            )
-
-        sinan.status = Status.WAITING_INSERT
-        sinan.save(update_fields=["status"])
-        return True
-
-
-@shared_task(default_retry_delay=30, max_retries=3, soft_time_limit=120 * 60)
-def parse_insert_chunks_on_database(sinan_pk: int) -> bool:
-    sinan = SINAN.objects.get(pk=sinan_pk)
-
-    misparsed_csv_file = (
-        Path(str(settings.DBF_SINAN))
-        / "residue_csvs"
-        / f"RESIDUE_{sinan.id}_{Path(str(sinan.filename)).with_suffix('.csv')}"
-    )
-
-    misparsed_csv_file.touch()
-
-    if sinan.status == Status.WAITING_INSERT:
-        sinan.misparsed_file = str(misparsed_csv_file.absolute())
-        sinan.status = Status.INSERTING
-        sinan.save(update_fields=["misparsed_file", "status"])
-
-        uploaded_rows = sinan_insert_chunks_on_database(sinan)
-        sinan.inserted_rows = uploaded_rows
-
-        if uploaded_rows is None:
-            return False
-
-        if sinan.parse_error:
-            sinan.status = Status.FINISHED_MISPARSED
-            sinan.save(update_fields=["status", "inserted_rows"])
-            # send_mail() # TODO: send mail with link to misparsed csv file
-            return True
-
-        sinan.status = Status.FINISHED
-        if misparsed_csv_file:
-            misparsed_csv_file.unlink(missing_ok=True)
-            sinan.misparsed_file = None
-        sinan.save(update_fields=["status", "misparsed_file", "inserted_rows"])
-        # send_mail(): # TODO: send successful insert email
-        return True
-
-
-def sinan_insert_chunks_on_database(sinan: SINAN) -> int | None:
-    chunks_list = list(
-        Path(str(sinan.chunks_dir)).glob(f"{sinan.filename}*.parquet")
-    )
-
-    uploaded_rows: int = 0
-    with DB_ENGINE.begin() as conn:
-        # TODO: this could be ran asynchronously
-        for chunk in chunks_list:
-            try:
-                df: dd = dd.read_parquet(  # type: ignore
-                    str(chunk.absolute()), engine="fastparquet"
-                )
-            except Exception as e:
-                err = f"Error reading chunks for {sinan.filename}: {e}"
-                logger.error(err)
-                if sinan.misparsed_file:
-                    Path(str(sinan.misparsed_file)).unlink(missing_ok=True)
-                    sinan.misparsed_file = None
-                sinan.status = Status.ERROR
-                sinan.status_error = err
-                sinan.save(
-                    update_fields=["status", "misparsed_file", "status_error"]
-                )
-                return None
-
-            try:
-                df = sinan_drop_duplicates_from_dataframe(
-                    df.compute(),  # type: ignore
-                    sinan.filename + f"_{sinan.id}",
-                )
-            except Exception as e:
-                err = f"Error dropping duplicates from {sinan.filename}: {e}"
-                logger.error(err)
-                sinan.status = Status.ERROR
-                sinan.status_error = err
-                sinan.save(update_fields=["status", "status_error"])
-                return None
-
-            # Can't throw any exception. Return False instead
-            df = sinan_parse_fields(df, sinan)  # pyright: ignore
-
-            # Can't throw any exception. Return number of inserted rows
-            uploaded_rows += save_to_pgsql(df, sinan, conn)  # pyright: ignore
-
-        logger.info(f"Inserting {uploaded_rows} rows from {sinan.filename}")
-    return uploaded_rows
-
-
-def save_to_pgsql(df: pd.DataFrame, sinan_obj: SINAN, conn: Engine) -> int:
-    """
-    Return the number of rows executed by INSERT. Can't throw any Exception
-    """
-    try:
-        cursor = conn.connection.cursor(cursor_factory=DictCursor)
-
-        expected_cols = {v: k for k, v in EXPECTED_FIELDS.items()}
-        cols = [expected_cols[c] for c in list(df.columns)]
-
-        insert_sql = (
-            f"INSERT INTO {sinan_obj.table_schema}"
-            f"({','.join(cols)}) VALUES ({','.join(['%s' for _ in cols])}) "
-            f"ON CONFLICT ON CONSTRAINT casos_unicos DO UPDATE SET "
-            f"{','.join([f'{j}=excluded.{j}' for j in cols])}"
-        )
-
-        rows = [tuple(row) for row in df.itertuples(index=False)]
-
-        cursor.executemany(insert_sql, rows)
-        conn.connection.commit()
-        return len(df)
-    except Exception as e:
-        conn.connection.rollback()
-        err = (
-            f"Error inserting {sinan_obj.filename} chunk in database."
-            f"Error: {str(e)}"
-        )
-        logger.error(err)
-        sinan_obj.status = Status.ERROR
-        sinan_obj.status_error = err
-        sinan_obj.parse_error = False
-        sinan_obj.save(update_fields=["status", "status_error", "parse_error"])
-        return 0
+        et = time.time()
+        time_spend = et-st
+        status.debug(f"time_spend: {time_spend}")
+        return len(inserted_ids), time_spend

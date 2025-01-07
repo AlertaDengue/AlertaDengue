@@ -9,6 +9,7 @@ from typing import Optional
 import ibis
 import sentry_sdk
 from django.contrib.messages import constants as messages
+from django.core.files.storage import FileSystemStorage
 from dotenv import load_dotenv
 from sentry_sdk.integrations.django import DjangoIntegration
 from sqlalchemy import create_engine
@@ -134,6 +135,17 @@ MESSAGE_TAGS = {
     messages.WARNING: "alert-warning",
     messages.ERROR: "alert-danger",
 }
+
+
+CHUNKED_UPLOAD_PATH = 'uploaded/chunked_uploads/%Y/%m/%d'
+
+
+class DBFSINANStorage(FileSystemStorage):
+    def __init__(self, location='/DBF_SINAN', *args, **kwargs):
+        super().__init__(location=location, *args, **kwargs)
+
+
+CHUNKED_UPLOAD_STORAGE_CLASS = DBFSINANStorage
 
 
 # URLS

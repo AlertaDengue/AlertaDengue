@@ -3,38 +3,42 @@ from typing import Any, Type
 
 from django.db.models import Model, signals
 from django.dispatch import receiver
+from django.db import transaction
 
-from .models import SINAN, Status
-from .tasks import process_sinan_file
-
-
-@receiver(signals.post_save, sender=SINAN)
-def process_sinan_file_on_save(
-    sender: Type[Model], instance: SINAN, **kwargs: Any
-) -> None:
-    sinan = SINAN.objects.get(pk=instance.pk)  # pylint: disable=E1101
-    if sinan.status == Status.WAITING_CHUNK:
-        process_sinan_file.delay(sinan.pk)
+from .models import (
+    sinan_upload_log_path,
+    SINANChunkedUpload,
+    SINANUpload,
+    SINANUploadLogStatus
+)
+from .tasks import sinan_process_file
 
 
-@receiver(signals.pre_delete, sender=SINAN)
+@receiver(signals.pre_delete, sender=SINANChunkedUpload)
 def delete_sinan_file_on_delete(
-    sender: Type[Model], instance: SINAN, **kwargs: Any
+    sender: Type[Model], instance: SINANChunkedUpload, **kwargs: Any
 ) -> None:
-    if instance.chunks_dir:
-        for chunk in Path(instance.chunks_dir).glob("*.parquet"):
-            chunk.unlink(missing_ok=True)
+    try:
+        Path(instance.file.path).unlink(missing_ok=True)
+    except ValueError:
+        pass
 
-        for csv in Path(instance.chunks_dir).glob("*.csv"):
-            csv.unlink(missing_ok=True)
 
-        for dbf in Path(instance.chunks_dir).glob("*.dbf"):
-            dbf.unlink(missing_ok=True)
+@receiver(signals.post_save, sender=SINANUpload)
+def create_sinan_upload(sender, instance: SINANUpload, created, **kwargs):
+    if created:
+        log_dir = Path(sinan_upload_log_path())
+        log_dir.mkdir(exist_ok=True)
+        log_file = log_dir / f"{instance._final_basename()}-{instance.pk}.log"
+        log_file.touch()
 
-        chunks_dir = Path(instance.chunks_dir)
-        if chunks_dir.exists():
-            chunks_dir.rmdir()
+        log_status = SINANUploadLogStatus.objects.create(
+            status=0,
+            log_file=str(log_file.absolute())
+        )
+        log_status.debug(f"Log file '{log_file}' created")
 
-    Path(str(instance.filepath)).unlink(missing_ok=True)
-    if instance.misparsed_file:
-        Path(str(instance.misparsed_file)).unlink(missing_ok=True)
+        instance.status = log_status
+        instance.save()
+
+        transaction.on_commit(lambda: sinan_process_file.delay(instance.pk))

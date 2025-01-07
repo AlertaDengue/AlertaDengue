@@ -1,35 +1,43 @@
-from django.urls import path
+from django.urls import re_path
 
 from . import views
 
+app_name = "upload"
 urlpatterns = [
-    path("sinan/", views.UploadSINAN.as_view(), name="upload_sinan"),
-    path(
-        "sinan/csv-preview/",
-        views.sinan_check_csv_columns,
-        name="sinan_csv_preview",
+    re_path(r"^sinan/$", views.SINANDashboard.as_view(), name="sinan"),
+    re_path(
+        r"^sinan/overview/(?P<sinan_upload_id>[^/]+)/?$",
+        views.SINANOverview.as_view(),
+        name="sinan"
     ),
-    path(
-        "sinan/upload-file/", views.sinan_upload_file, name="sinan_upload_file"
+    re_path(
+        r"^sinan/status/(?P<sinan_upload_id>[^/]+)$",
+        views.SINANStatus.as_view(),
+        name="sinan_status"
     ),
-    path(
-        "sinan/process-file/",
-        views.ProcessSINAN.as_view(),
-        name="sinan_process_file",
+    re_path(
+        r"^sinan/get-user-uploads/$",
+        views.get_user_uploads,
+        name="sinan_get_user_uploads"
     ),
-    path(
-        "sinan/chunk-upload-file/",
-        views.sinan_chunk_uploaded_file,
-        name="sinan_chunk_uploaded_file",
+    re_path(
+        r"^sinan/file-card/$",
+        views.SINANUpload.as_view(),
+        name="sinan_file"
     ),
-    path(
-        "sinan/watch-uf-chunks/",
-        views.sinan_watch_for_uf_chunks,
-        name="sinan_watch_for_uf_chunks",
+    re_path(
+        r"^sinan/chunked/?$",
+        views.SINANChunkedUploadView.as_view(),
+        name="sinan_chunked",
     ),
-    path(
-        "sinan/object-router/",
-        views.sinan_object_router,
-        name="sinan_object_router",
+    re_path(
+        r"^sinan/chunked/(?P<upload_id>[^/]+)/delete/?$",
+        views.SINANChunkedUploadView.as_view(),
+        name="sinan_chunked_delete",
+    ),
+    re_path(
+        r"^sinan/chunked/complete/?$",
+        views.SINANChunkedUploadCompleteView.as_view(),
+        name="sinan_chunked_complete",
     ),
 ]
