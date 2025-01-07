@@ -6,6 +6,11 @@ app_name = "upload"
 urlpatterns = [
     re_path(r"^sinan/$", views.SINANDashboard.as_view(), name="sinan"),
     re_path(
+        r"^sinan/overview/(?P<sinan_upload_id>[^/]+)/?$",
+        views.SINANOverview.as_view(),
+        name="sinan"
+    ),
+    re_path(
         r"^sinan/status/(?P<sinan_upload_id>[^/]+)$",
         views.SINANStatus.as_view(),
         name="sinan_status"

@@ -31,6 +31,15 @@ class SINANDashboard(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
 
+class SINANOverview(LoginRequiredMixin, View):
+    template_name = "sinan/overview.html"
+
+    @never_cache
+    def get(self, request, *args, **kwargs):
+        context = {}
+        return render(request, self.template_name, context)
+
+
 class SINANStatus(LoginRequiredMixin, View):
     template_name = "sinan/status.html"
 
