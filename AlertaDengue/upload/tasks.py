@@ -305,6 +305,9 @@ def sinan_insert_to_db(upload_sinan_id: int):
             else:
                 raise
 
+        status.debug(f"total_rows: {total_rows}")
+        status.info(f"{total_rows} rows were found.")
+
         if filtered_rows:
             sinan.status.warning(
                 f"{filtered_rows} rows were dropped due to 'NA' values on "

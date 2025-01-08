@@ -1,6 +1,5 @@
 <!DOCTYPE HTML>
 {% load i18n %}
-{% load bootstrap4 %}
 {% load static %}
 
 <html lang="pt-BR">
@@ -27,53 +26,93 @@
     <script src='{% static "/libs/jquery/jquery-ui.min.js" %}'></script>
     <script src="{% static '/js/typeahead.bundle.min.js' %}"></script>
 
-    <!-- Bootstrap CSS and JS -->
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
-
     <!-- FontsAwesome icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
   </head>
 
   <body>
     {% include 'components/messages.html' %}
-      <main role="main" class="flex-fill">
-          <div class="wrapper">
-            <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-              <ul class="navbar-nav">
-                <li class="nav-item">
-                  <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                  <a href='{% url "dados:main" %}' class="nav-link">Home</a>
-                </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                  <a href='/upload/sinan' class="nav-link">Upload</a>
-                </li>
-              </ul>
-            </nav>
+    <main role="main" class="flex-fill">
+        <div class="wrapper">
+          <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+              </li>
+              <li class="nav-item d-none d-sm-inline-block">
+                <a href='{% url "dados:main" %}' class="nav-link">Home</a>
+              </li>
+              <li class="nav-item d-none d-sm-inline-block">
+                <a href='/upload/sinan' class="nav-link">Upload</a>
+              </li>
+            </ul>
+          </nav>
 
-            {% include 'sinan/sidebar-overview.html' %}
+          {% include 'sinan/sidebar-overview.html' %}
 
-            <div class="content-wrapper">
-              <div class="content-header">
-              </div>
-              <div class="content">
-                <div class="panel panel-default col-xs-6">
-                  <div class="panel-body">
+          <div class="content-wrapper">
+            <div class="content-header">
+            </div>
+            <div class="content">
+              <div class="panel panel-default col-xs-6">
+                <div class="panel-body">
+
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">{{filename}}</h3>
+                      <div class="card-tools">
+                        <span id="log-toggle" class="badge badge-primary" data-bs-toggle="modal" data-bs-target="#log-modal">
+                          <i class="fa-regular fa-file-lines" style="font-size: 1rem;"></i>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      The body of the card
+                    </div>
+                    <div class="card-footer">
+                      The footer of the card
+                    </div>
                   </div>
+
                 </div>
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="modal fade" id="log-modal" tabindex="-1" aria-labelledby="log-modal-label" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="log-modal-label">Logs</h5>
+                <button id="log-close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                ...
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
 
     <script>
     const csrf = "{{ csrf_token }}";
     </script>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <style>
+    .alert-container {
+      bottom: 10px;
+    }
+
+    #log-toggle {
+      cursor: pointer;
+    }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
   </body>
 </html>

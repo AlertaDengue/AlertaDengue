@@ -157,12 +157,13 @@ class SINANUploadLogStatus(models.Model):
         level: Literal["DEBUG", "PROGRESS", "INFO", "WARNING", "ERROR", "SUCCESS"],
         message: str,
     ):
+        spaces = " " * max(map(len, self.LOG_LEVEL)) - len(level)
         if self.status != 0:
             raise ValueError(
                 "Log is closed for writing (finished with status " +
                 f"{self.status})."
             )
-        log_message = f"{level}{' ' * (7 - len(level))} - {message}\n"
+        log_message = f"{level}{spaces} - {message}\n"
         with Path(self.log_file).open(mode='a', encoding="utf-8") as log_file:
             log_file.write(log_message)
 

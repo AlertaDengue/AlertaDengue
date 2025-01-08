@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import FormView, View
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
 
 from . import models, forms
@@ -36,7 +36,19 @@ class SINANOverview(LoginRequiredMixin, View):
 
     @never_cache
     def get(self, request, *args, **kwargs):
+        sinan_upload_id = kwargs.get('sinan_upload_id')
         context = {}
+
+        try:
+            sinan = models.SINANUpload.objects.get(
+                pk=sinan_upload_id,
+                upload__user=request.user
+            )
+        except models.SINANUpload.DoesNotExist:
+            messages.error(request, "Upload not found")
+            return redirect("upload:sinan")
+
+        context["filename"] = sinan.upload.filename
         return render(request, self.template_name, context)
 
 
@@ -187,9 +199,13 @@ class SINANChunkedUploadCompleteView(ChunkedUploadCompleteView):
 @csrf_protect
 def get_user_uploads(request):
     context = {}
-    uploads = models.SINANUpload.objects.filter(upload__user=request.user)
+    if request.user.is_superuser:
+        uploads = models.SINANUpload.objects.all()
+    elif request.user.is_staff:
+        uploads = models.SINANUpload.objects.filter(upload__user=request.user)
+    else:
+        uploads = models.SINANUpload.objects.none()
     context["uploads"] = list(
         uploads.order_by("-uploaded_at").values_list("id", flat=True)
     )
-    print(context)
     return JsonResponse(context)
