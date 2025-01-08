@@ -1,6 +1,7 @@
 <!DOCTYPE HTML>
 {% load i18n %}
 {% load static %}
+{% load overview %}
 
 <html lang="pt-BR">
   <head>
@@ -60,7 +61,7 @@
               <div class="panel panel-default col-xs-6">
                 <div class="panel-body">
 
-                  <div class="card">
+                  <div class="card card-outline card-success">
                     <div class="card-header">
                       <h3 class="card-title">{{filename}}</h3>
                       <div class="card-tools">
@@ -70,11 +71,11 @@
                       </div>
                     </div>
                     <div class="card-body">
-                      The body of the card
+                      <p>{% trans "File size" %}: {{size}}</p>
+                      <p>{% trans "Inserts" %}: {{inserts}}</p>
+                      <p>{% trans "Updates" %}: {{updates}}</p>
                     </div>
-                    <div class="card-footer">
-                      The footer of the card
-                    </div>
+                    <div class="card-footer">{% trans "uploaded at" %} {{uploaded_at}}</div>
                   </div>
 
                 </div>
@@ -91,7 +92,9 @@
                 <button id="log-close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                ...
+                {% for log in logs %}
+                  <p class="{{ log|log_type }}">{{ log }}</p>
+                {% endfor %}
               </div>
             </div>
           </div>
@@ -109,6 +112,22 @@
 
     #log-toggle {
       cursor: pointer;
+    }
+
+    .modal-body {
+      background-color: #e2e2e2;
+    }
+
+    .log-success {
+      color: #0d7208;
+    }
+
+    .log-warning {
+      color: #b7610b;
+    }
+
+    .log-info {
+      color: #0d76aa;
     }
     </style>
 

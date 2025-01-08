@@ -49,6 +49,11 @@ class SINANOverview(LoginRequiredMixin, View):
             return redirect("upload:sinan")
 
         context["filename"] = sinan.upload.filename
+        context["size"] = humanize.naturalsize(sinan.upload.file.size)
+        context["inserts"] = sinan.status.inserts
+        context["updates"] = sinan.status.updates
+        context["uploaded_at"] = sinan.uploaded_at
+        context["logs"] = sinan.status.read_logs("INFO")
         return render(request, self.template_name, context)
 
 

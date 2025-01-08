@@ -43,7 +43,7 @@ class SINANUploadLogStatus(models.Model):
         (2, "Error")
     ]
 
-    LOG_LEVEL = ["DEBUG", "PROGRESS", "INFO", "WARNING", "ERROR", "SUCCESS"]
+    LOG_LEVEL = ["PROGRESS", "DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"]
 
     status = models.IntegerField(choices=STATUS, default=0, null=False)
     log_file = models.FilePathField(path=sinan_upload_log_path)
@@ -133,7 +133,7 @@ class SINANUploadLogStatus(models.Model):
     def read_logs(
         self,
         level: Optional[Literal[
-            "DEBUG", "PROGRESS", "INFO", "WARNING", "ERROR", "SUCCESS"
+            "PROGRESS", "DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"
         ]] = None,
         only_level: bool = False,
     ):
@@ -154,7 +154,7 @@ class SINANUploadLogStatus(models.Model):
 
     def _write_logs(
         self,
-        level: Literal["DEBUG", "PROGRESS", "INFO", "WARNING", "ERROR", "SUCCESS"],
+        level: Literal["PROGRESS", "DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"],
         message: str,
     ):
         spaces = " " * max(map(len, self.LOG_LEVEL)) - len(level)
@@ -187,7 +187,7 @@ class SINANUploadLogStatus(models.Model):
 
     def done(self, inserts: int, time_spend: float):
         filename = SINANUpload.objects.get(status__id=self.id).upload.filename
-        message = f"{filename}: {inserts} inserts in {time_spend:.2f} seconds."
+        message = f"{inserts} inserts in {time_spend:.2f} seconds."
         self._write_logs(level="SUCCESS", message=message)
         self.status = 1
         self.save()
@@ -315,6 +315,26 @@ class SINANUpload(models.Model):
         return "_".join(
             [str(epiweek), disease[self.cid10], uf]
         ) + "-" + filename
+
+    def delete(self, *args, **kwargs):
+        file = Path(self.upload.file.path)
+
+        if not file.exists():
+            super(SINANUpload, self).delete(*args, **kwargs)
+            return
+
+        if self.status.status == 0:
+            raise RuntimeError(f"{file} is still being processed")
+
+        if self.status.status == 1:
+            raise RuntimeError(
+                f"{file} is attached with this upload, delete the file first"
+            )
+
+        if self.status.status == 2:
+            file.unlink()
+
+        super(SINANUpload, self).delete(*args, **kwargs)
 
     class Meta:
         app_label = "upload"
