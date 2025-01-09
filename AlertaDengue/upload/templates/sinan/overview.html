@@ -78,6 +78,23 @@
                     <div class="card-footer">{% trans "uploaded at" %} {{uploaded_at}}</div>
                   </div>
 
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Pie Chart Example</h3>
+                      <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                          <i class="fas fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-tool" data-card-widget="remove">
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <canvas id="sexChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -103,6 +120,47 @@
 
     <script>
     const csrf = "{{ csrf_token }}";
+
+    const eventSource = new EventSource('/upload/sinan/overview-charts-stream/?sinan_upload_id=159',
+      {retry:0});
+
+eventSource.onmessage = function(event) {
+    // Parse the JSON event data
+    try {
+        const data = JSON.parse(event.data);
+        console.log('Received event data:', data);
+
+        // You can now process the data, for example:
+        if (data.chart === 'sexChart') {
+            console.log(data.data);  // Update your chart with the data
+        }
+    } catch (e) {
+        console.error("Error parsing event data:", e);
+    }
+};
+
+eventSource.onerror = function(error) {
+    console.error("EventSource failed:", error);
+};
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var sexChart = document.getElementById('sexChart').getContext('2d');
+      new Chart(sexChart, {
+        type: 'pie',
+        data: {
+          labels: ['Red', 'Blue', 'Yellow'],
+          datasets: [{
+            data: [10, 20, 30],
+            backgroundColor: ['#f56954', '#00a65a', '#f39c12']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+    });
     </script>
 
     <style>
@@ -133,5 +191,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </body>
 </html>

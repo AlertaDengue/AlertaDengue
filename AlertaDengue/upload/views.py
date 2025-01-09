@@ -1,10 +1,18 @@
 from pathlib import Path
 
 import humanize
+import json
+
+from psycopg2.extras import DictCursor
 
 from django.contrib.auth import get_user_model
 from django.contrib import messages
-from django.http import JsonResponse, QueryDict
+from django.http import (
+    JsonResponse,
+    QueryDict,
+    StreamingHttpResponse,
+    HttpResponseNotFound
+)
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.base import File
@@ -17,9 +25,10 @@ from django.shortcuts import render, redirect
 from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
 
 from . import models, forms
-
+from ad_main.settings import get_sqla_conn
 
 User = get_user_model()
+Engine = get_sqla_conn(database="dengue")
 
 
 class SINANDashboard(LoginRequiredMixin, View):
@@ -214,3 +223,54 @@ def get_user_uploads(request):
         uploads.order_by("-uploaded_at").values_list("id", flat=True)
     )
     return JsonResponse(context)
+
+
+@csrf_protect
+def overview_charts_stream(request):
+    try:
+        sinan = models.SINANUpload.objects.get(
+            pk=request.GET.get("sinan_upload_id")
+        )
+    except models.SINANUpload.DoesNotExist:
+        return HttpResponseNotFound(
+            json.dumps({"error": "Upload not found"}),
+            content_type="application/json"
+        )
+
+    queries = {
+        "sexChart": (
+            'SELECT cs_sexo, COUNT(*) AS count '
+            'FROM "Municipio"."Notificacao" '
+            'WHERE id IN ({}) GROUP BY cs_sexo;'
+        )
+    }
+
+    def query(ids, cursor):
+        placeholder = ','.join(map(str, ids))
+        for chart, query in queries.items():
+            cursor.execute(query.format(placeholder))
+            results = cursor.fetchall()
+            if chart == "sexChart":
+                data = {
+                    row['cs_sexo']: row['count'] for row in results
+                }
+                yield f"data: {json.dumps({'chart': chart, 'data': data})}\n\n"
+
+    def data_gen():
+        try:
+            with Engine.begin() as conn:
+                cursor = conn.connection.cursor(cursor_factory=DictCursor)
+
+                for ids in sinan.status.inserts_ids():
+                    yield from query(ids, cursor)
+
+                for ids in sinan.status.updates_ids():
+                    yield from query(ids, cursor)
+
+        except Exception as e:
+            yield f"data: {{'error': 'Error processing data: {str(e)}'}}\n\n"
+
+    return StreamingHttpResponse(
+        data_gen(),
+        content_type="text/event-stream",
+    )

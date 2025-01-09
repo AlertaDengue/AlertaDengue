@@ -11,6 +11,11 @@ urlpatterns = [
         name="sinan"
     ),
     re_path(
+        r"^sinan/overview-charts-stream/?$",
+        views.overview_charts_stream,
+        name="overview_charts_stream"
+    ),
+    re_path(
         r"^sinan/status/(?P<sinan_upload_id>[^/]+)$",
         views.SINANStatus.as_view(),
         name="sinan_status"
