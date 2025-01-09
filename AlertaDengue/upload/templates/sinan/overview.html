@@ -121,29 +121,6 @@
     <script>
     const csrf = "{{ csrf_token }}";
 
-    const eventSource = new EventSource('/upload/sinan/overview-charts-stream/?sinan_upload_id=159',
-      {retry:0});
-
-eventSource.onmessage = function(event) {
-    // Parse the JSON event data
-    try {
-        const data = JSON.parse(event.data);
-        console.log('Received event data:', data);
-
-        // You can now process the data, for example:
-        if (data.chart === 'sexChart') {
-            console.log(data.data);  // Update your chart with the data
-        }
-    } catch (e) {
-        console.error("Error parsing event data:", e);
-    }
-};
-
-eventSource.onerror = function(error) {
-    console.error("EventSource failed:", error);
-};
-
-
     document.addEventListener('DOMContentLoaded', function () {
       var sexChart = document.getElementById('sexChart').getContext('2d');
       new Chart(sexChart, {

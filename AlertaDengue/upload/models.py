@@ -62,19 +62,20 @@ class SINANUploadLogStatus(models.Model):
 
         return len(inserts)
 
-    def inserts_ids(
-        self, chunk_size: int = 100000
-    ) -> Generator[list[int], None, None]:
+    def inserts_ids(self, offset: int, limit: int,) -> list[int]:
         inserts_file = Path(sinan_upload_log_path()) / f"{self.pk}.inserts.log"
 
         if not inserts_file.exists():
-            return iter([])
+            return []
 
         with inserts_file.open("rb") as log:
             inserts = pickle.load(log)
 
-        for start, end in chunk_gen(chunk_size, len(inserts)):
-            yield inserts[start:end]
+        start, end = offset, min(offset + limit, len(inserts))
+
+        if start < len(inserts):
+            return inserts[start:end]
+        return []
 
     @property
     def updates(self) -> int:
@@ -88,19 +89,20 @@ class SINANUploadLogStatus(models.Model):
 
         return len(updates)
 
-    def updates_ids(
-        self, chunk_size: int = 100000
-    ) -> Generator[list[int], None, None]:
+    def updates_ids(self, offset: int, limit: int,) -> list[int]:
         updates_file = Path(sinan_upload_log_path()) / f"{self.pk}.updates.log"
 
         if not updates_file.exists():
-            return iter([])
+            return []
 
         with updates_file.open("rb") as log:
             updates = pickle.load(log)
 
-        for start, end in chunk_gen(chunk_size, len(updates)):
-            yield updates[start:end]
+        start, end = offset, min(offset + limit, len(updates))
+
+        if start < len(inserts):
+            return inserts[start:end]
+        return []
 
     @property
     def time_spend(self) -> float:
