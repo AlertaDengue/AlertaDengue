@@ -224,9 +224,13 @@ def get_user_uploads(request):
 def overview_charts_limit_offset(request):
     offset = request.GET.get("offset")
     limit = request.GET.get("limit")
+    id_type = request.GET.get("id_type")
 
-    if offset is None or limit is None:
-        return JsonResponse({"error": "missing offset and/or limit"}, status=400)
+    if offset is None or limit is None or not id_type:
+        return JsonResponse(
+            {"error": "missing 'offset', 'limit' or 'id_type' parameters"},
+            status=400
+        )
 
     limit, offset = int(limit), int(offset)
 
@@ -248,30 +252,21 @@ def overview_charts_limit_offset(request):
         )
     }
     results = {}
+    ids = sinan.status.list_ids(offset=offset, limit=limit, id_type=id_type)
 
-    inserts_ids = sinan.status.inserts_ids(offset=offset, limit=limit)
-    updates_ids = sinan.status.updates_ids(offset=offset, limit=limit)
+    if not ids:
+        return JsonResponse({chart: {} for chart in queries})
 
-    with Engine.begin() as conn:
-        cursor = conn.connection.cursor(cursor_factory=DictCursor)
+    placeholder = ','.join(map(str, ids))
 
-        for ids in [inserts_ids, updates_ids]:
-            if not ids:
-                continue
+    for chart, query in queries.items():
+        with Engine.begin() as conn:
+            cursor = conn.connection.cursor(cursor_factory=DictCursor)
+            cursor.execute(query.format(placeholder))
+            res = cursor.fetchall()
 
-            placeholder = ','.join(map(str, ids))
-            for chart, query in queries.items():
-                if not chart in results:
-                    results[chart] = {}
-
-                cursor.execute(query.format(placeholder))
-                res = cursor.fetchall()
-
-                if chart == "sexChart":
-                    for row in res:
-                        results[chart][row['cs_sexo']] = (
-                            results[chart].get(row['cs_sexo'], 0) +
-                            row['count']
-                        )
+        if chart == "sexChart":
+            print(res)
+            results[chart] = {row['cs_sexo']: row['count'] for row in res}
 
     return JsonResponse(results)

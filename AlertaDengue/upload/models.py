@@ -50,58 +50,39 @@ class SINANUploadLogStatus(models.Model):
     inserts_file = models.FilePathField(path=sinan_upload_log_path, null=True)
     updates_file = models.FilePathField(path=sinan_upload_log_path, null=True)
 
+    def _read_ids(self, id_type: Literal["inserts", "updates"]) -> array:
+        ids_file = Path(sinan_upload_log_path()) / f"{self.pk}.{id_type}.log"
+
+        if not ids_file.exists():
+            return array("i", [])
+
+        with ids_file.open("rb") as log:
+            ids = pickle.load(log)
+
+        return ids
+
     @property
     def inserts(self) -> int:
-        inserts_file = Path(sinan_upload_log_path()) / f"{self.pk}.inserts.log"
-
-        if not inserts_file.exists():
-            return 0
-
-        with inserts_file.open("rb") as log:
-            inserts = pickle.load(log)
-
-        return len(inserts)
-
-    def inserts_ids(self, offset: int, limit: int,) -> list[int]:
-        inserts_file = Path(sinan_upload_log_path()) / f"{self.pk}.inserts.log"
-
-        if not inserts_file.exists():
-            return []
-
-        with inserts_file.open("rb") as log:
-            inserts = pickle.load(log)
-
-        start, end = offset, min(offset + limit, len(inserts))
-
-        if start < len(inserts):
-            return inserts[start:end]
-        return []
+        return len(self._read_ids("inserts"))
 
     @property
     def updates(self) -> int:
-        updates_file = Path(sinan_upload_log_path()) / f"{self.pk}.updates.log"
+        return len(self._read_ids("updates"))
 
-        if not updates_file.exists():
-            return 0
+    def list_ids(
+        self,
+        offset: int,
+        limit: int,
+        id_type: Literal["inserts", "updates"]
+    ) -> list[int]:
+        if abs(limit - offset) > 100000:
+            raise ValueError("ids range exceeds 100_000 entries")
 
-        with updates_file.open("rb") as log:
-            updates = pickle.load(log)
+        ids = self._read_ids(id_type)
+        start, end = offset, min(offset + limit, len(ids))
 
-        return len(updates)
-
-    def updates_ids(self, offset: int, limit: int,) -> list[int]:
-        updates_file = Path(sinan_upload_log_path()) / f"{self.pk}.updates.log"
-
-        if not updates_file.exists():
-            return []
-
-        with updates_file.open("rb") as log:
-            updates = pickle.load(log)
-
-        start, end = offset, min(offset + limit, len(updates))
-
-        if start < len(inserts):
-            return inserts[start:end]
+        if start < len(ids):
+            return ids[start:end]
         return []
 
     @property
