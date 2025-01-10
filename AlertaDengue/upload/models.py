@@ -43,64 +43,48 @@ class SINANUploadLogStatus(models.Model):
         (2, "Error")
     ]
 
-    LOG_LEVEL = ["DEBUG", "PROGRESS", "INFO", "WARNING", "ERROR", "SUCCESS"]
+    LOG_LEVEL = ["PROGRESS", "DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"]
 
     status = models.IntegerField(choices=STATUS, default=0, null=False)
     log_file = models.FilePathField(path=sinan_upload_log_path)
     inserts_file = models.FilePathField(path=sinan_upload_log_path, null=True)
     updates_file = models.FilePathField(path=sinan_upload_log_path, null=True)
 
+    def _read_ids(self, id_type: Literal["inserts", "updates"]) -> array:
+        ids_file = Path(sinan_upload_log_path()) / f"{self.pk}.{id_type}.log"
+
+        if not ids_file.exists():
+            return array("i", [])
+
+        with ids_file.open("rb") as log:
+            ids = pickle.load(log)
+
+        return ids
+
     @property
     def inserts(self) -> int:
-        inserts_file = Path(sinan_upload_log_path()) / f"{self.pk}.inserts.log"
-
-        if not inserts_file.exists():
-            return 0
-
-        with inserts_file.open("rb") as log:
-            inserts = pickle.load(log)
-
-        return len(inserts)
-
-    def inserts_ids(
-        self, chunk_size: int = 100000
-    ) -> Generator[list[int], None, None]:
-        inserts_file = Path(sinan_upload_log_path()) / f"{self.pk}.inserts.log"
-
-        if not inserts_file.exists():
-            return iter([])
-
-        with inserts_file.open("rb") as log:
-            inserts = pickle.load(log)
-
-        for start, end in chunk_gen(chunk_size, len(inserts)):
-            yield inserts[start:end]
+        return len(self._read_ids("inserts"))
 
     @property
     def updates(self) -> int:
-        updates_file = Path(sinan_upload_log_path()) / f"{self.pk}.updates.log"
+        return len(self._read_ids("updates"))
 
-        if not updates_file.exists():
-            return 0
+    def list_ids(
+        self,
+        offset: int,
+        limit: int,
+        id_type: Literal["inserts", "updates"]
+    ) -> list[int]:
+        if abs(limit - offset) > 50000:
+            raise ValueError("ids range exceeds 50_000 entries")
 
-        with updates_file.open("rb") as log:
-            updates = pickle.load(log)
+        ids = self._read_ids(id_type)
 
-        return len(updates)
+        if len(ids) == 0:
+            return []
 
-    def updates_ids(
-        self, chunk_size: int = 100000
-    ) -> Generator[list[int], None, None]:
-        updates_file = Path(sinan_upload_log_path()) / f"{self.pk}.updates.log"
-
-        if not updates_file.exists():
-            return iter([])
-
-        with updates_file.open("rb") as log:
-            updates = pickle.load(log)
-
-        for start, end in chunk_gen(chunk_size, len(updates)):
-            yield updates[start:end]
+        start, end = min([offset, limit]), max([offset, limit])
+        return ids[start:end+1]
 
     @property
     def time_spend(self) -> float:
@@ -133,7 +117,7 @@ class SINANUploadLogStatus(models.Model):
     def read_logs(
         self,
         level: Optional[Literal[
-            "DEBUG", "PROGRESS", "INFO", "WARNING", "ERROR", "SUCCESS"
+            "PROGRESS", "DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"
         ]] = None,
         only_level: bool = False,
     ):
@@ -154,15 +138,16 @@ class SINANUploadLogStatus(models.Model):
 
     def _write_logs(
         self,
-        level: Literal["DEBUG", "PROGRESS", "INFO", "WARNING", "ERROR", "SUCCESS"],
+        level: Literal["PROGRESS", "DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"],
         message: str,
     ):
+        spaces = " " * max(map(len, self.LOG_LEVEL)) - len(level)
         if self.status != 0:
             raise ValueError(
                 "Log is closed for writing (finished with status " +
                 f"{self.status})."
             )
-        log_message = f"{level}{' ' * (7 - len(level))} - {message}\n"
+        log_message = f"{level}{spaces} - {message}\n"
         with Path(self.log_file).open(mode='a', encoding="utf-8") as log_file:
             log_file.write(log_message)
 
@@ -186,7 +171,7 @@ class SINANUploadLogStatus(models.Model):
 
     def done(self, inserts: int, time_spend: float):
         filename = SINANUpload.objects.get(status__id=self.id).upload.filename
-        message = f"{filename}: {inserts} inserts in {time_spend:.2f} seconds."
+        message = f"{inserts} inserts in {time_spend:.2f} seconds."
         self._write_logs(level="SUCCESS", message=message)
         self.status = 1
         self.save()
@@ -314,6 +299,26 @@ class SINANUpload(models.Model):
         return "_".join(
             [str(epiweek), disease[self.cid10], uf]
         ) + "-" + filename
+
+    def delete(self, *args, **kwargs):
+        file = Path(self.upload.file.path)
+
+        if not file.exists():
+            super(SINANUpload, self).delete(*args, **kwargs)
+            return
+
+        if self.status.status == 0:
+            raise RuntimeError(f"{file} is still being processed")
+
+        if self.status.status == 1:
+            raise RuntimeError(
+                f"{file} is attached with this upload, delete the file first"
+            )
+
+        if self.status.status == 2:
+            file.unlink()
+
+        super(SINANUpload, self).delete(*args, **kwargs)
 
     class Meta:
         app_label = "upload"

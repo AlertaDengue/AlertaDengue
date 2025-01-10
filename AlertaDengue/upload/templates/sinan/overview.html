@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 {% load i18n %}
-{% load bootstrap4 %}
 {% load static %}
+{% load overview %}
 
 <html lang="pt-BR">
   <head>
@@ -27,53 +27,443 @@
     <script src='{% static "/libs/jquery/jquery-ui.min.js" %}'></script>
     <script src="{% static '/js/typeahead.bundle.min.js' %}"></script>
 
-    <!-- Bootstrap CSS and JS -->
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
-
     <!-- FontsAwesome icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
   </head>
 
   <body>
     {% include 'components/messages.html' %}
-      <main role="main" class="flex-fill">
-          <div class="wrapper">
-            <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-              <ul class="navbar-nav">
-                <li class="nav-item">
-                  <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                  <a href='{% url "dados:main" %}' class="nav-link">Home</a>
-                </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                  <a href='/upload/sinan' class="nav-link">Upload</a>
-                </li>
-              </ul>
-            </nav>
+    <main role="main" class="flex-fill">
+      <div class="wrapper">
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+              <a href='{% url "dados:main" %}' class="nav-link">Home</a>
+            </li>
+            <li class="nav-item d-none d-sm-inline-block">
+              <a href='/upload/sinan' class="nav-link">Upload</a>
+            </li>
+          </ul>
+        </nav>
 
-            {% include 'sinan/sidebar-overview.html' %}
+        {% include 'sinan/sidebar-overview.html' %}
 
-            <div class="content-wrapper">
-              <div class="content-header">
-              </div>
-              <div class="content">
-                <div class="panel panel-default col-xs-6">
-                  <div class="panel-body">
+        <div class="content-wrapper">
+          <div class="content-header">
+          </div>
+          <div class="content">
+            <div class="panel panel-default col-xs-6">
+              <div class="panel-body">
+
+                <div id="file-card" class="card card-outline card-primary">
+                  <div class="card-header">
+                    <h3 class="card-title">{{filename}}</h3>
+                    <div class="card-tools">
+                      <span id="log-toggle" class="badge badge-primary" data-bs-toggle="modal" data-bs-target="#log-modal">
+                        <i class="fa-regular fa-file-lines" style="font-size: 1rem;"></i>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <div class="d-flex">
+                      <div class="info-box">
+                        <span class="info-box-icon bg-info"><i class="far fa-floppy-disk"></i></span>
+                        <div class="info-box-content">
+                          <span class="info-box-text">{% trans "File size" %}</span>
+                          <span class="info-box-number">{{size}}</span>
+                        </div>
+                      </div>
+
+                      <div class="info-box bg-gradient-warning" style="margin-left: 10px;">
+                        <span class="info-box-icon"><i class="fas fa-repeat"></i></span>
+                        <div class="info-box-content">
+                          <span class="info-box-text">{% trans "Updates" %}</span>
+                          <span class="info-box-number">{{updates}}</span>
+                        </div>
+                      </div>
+
+                      <div class="info-box bg-success" style="margin-left: 10px;">
+                        <span class="info-box-icon"><i class="fa-solid fa-arrow-up-from-bracket"></i></span>
+                        <div class="info-box-content">
+                          <span class="info-box-text">{% trans "Inserts" %}</span>
+                          <span class="info-box-number">{{inserts}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-footer">{% trans "uploaded at" %} {{uploaded_at}} {% trans "in" %} {{time_spend}} {% trans "seconds" %}</div>
+                </div>
+
+                <div class="row">
+                  <div class="d-flex flex-wrap">
+
+                    <div class="card" style="margin-right: 10px; width: 300px;">
+                      <div class="card-header">
+                        <h3 class="card-title">{% trans "cs_sexo distribution" %}</h3>
+                        <div class="card-tools">
+                          <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                          </button>
+                          <button type="button" class="btn btn-tool" data-card-widget="remove">
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <canvas id="cs_sexo" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                      </div>
+                    </div>
+
+                    <div class="card" style="margin-right: 10px; width: 300px">
+                      <div class="card-header">
+                        <h3 class="card-title">{% trans "criterio distribution" %}</h3>
+                        <div class="card-tools">
+                          <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                          </button>
+                          <button type="button" class="btn btn-tool" data-card-widget="remove">
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <canvas id="criterio" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                      </div>
+                    </div>
+
+                    <div class="card col">
+                      <div class="card-header">
+                        <h3 class="card-title">{% trans "Total cases" %}</h3>
+                        <div class="card-tools">
+                          <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                          </button>
+                          <button type="button" class="btn btn-tool" data-card-widget="remove">
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <canvas id="epiweek" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
+
+                <div class="row">
+                  <div class="col-12">
+                    <div class="card">
+                      <div class="card-header">
+                        <h3 class="card-title">{% trans "municipio_geocodigo distribution" %}</h3>
+                        <div class="card-tools">
+                          <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                          </button>
+                          <button type="button" class="btn btn-tool" data-card-widget="remove">
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <canvas id="municipio_geocodigo" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
-      </main>
+        </div>
+      </div>
+
+      <div class="modal fade" id="log-modal" tabindex="-1" aria-labelledby="log-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="log-modal-label">Logs</h5>
+              <button id="log-close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              {% for log in logs %}
+              <p class="{{ log|log_type }}">{{ log }}</p>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
 
     <script>
     const csrf = "{{ csrf_token }}";
+    const sinanUploadId = {{sinan_upload_id}};
+    const totalInserts = {{inserts}};
+    const totalUpdates = {{updates}};
+
+    function idsRanges(totalRows) {
+      const chunkSize = 50000;
+      const ranges = [];
+      for (let start = 0; start < totalRows; start += chunkSize) {
+        const end = Math.min(start + chunkSize - 1, totalRows - 1);
+        ranges.push([start, end]);
+      }
+      return ranges;
+    }
+
+    async function fetchChartsChunk(offset, limit, idType) {
+      const baseUrl = "/upload/sinan/overview-charts-data/";
+      const params = new URLSearchParams({
+        offset: offset,
+        limit: limit,
+        id_type: idType,
+        sinan_upload_id: sinanUploadId,
+      });
+      const response = await fetch(`${baseUrl}?${params.toString()}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrf,
+        },
+      });
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      return response.json();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var sexChartContext = document.getElementById('cs_sexo').getContext('2d');
+      var criterioChartContext = document.getElementById('criterio').getContext('2d');
+      var epiweekChartContext = document.getElementById('epiweek').getContext('2d');
+      var municipioChartContext = document.getElementById('municipio_geocodigo').getContext('2d');
+
+      new Chart(sexChartContext, {
+        type: 'doughnut',
+        data: {
+          labels: ["M", "F", "I"],
+          datasets: [{
+            data: [0.0001, 0.0001, 0.0001],
+            backgroundColor: ['#1da2e0', '#ff9bf1', '#d6d6d6']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+
+      new Chart(criterioChartContext, {
+        type: 'pie',
+        data: {
+          labels: ["0", "1", "2", "3"],
+          datasets: [{
+            data: [0.0001, 0.0001, 0.0001, 0.0001],
+            backgroundColor: ['#ffa600', '#ff6361', '#bc5090', '#58508d']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+
+      new Chart(epiweekChartContext, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            data: [],
+            borderColor: 'rgba(17, 34, 80, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            fill: false,
+            tension: 0.4
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          responsive: true,
+          scales: {
+            x: {
+              title: {
+                display: false,
+              },
+              grid: {
+                display: false
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: `{% trans "Cases" %}`,
+              },
+              grid: {
+                display: false
+              },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+
+      new Chart(municipioChartContext, {
+        type: 'bar',
+        data: {
+          labels: [],
+          datasets: [{
+            label: `{% trans "Cases" %}`,
+            data: [],
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: `{% trans "Geocode" %}`
+              }
+            },
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Count'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false,
+            }
+          }
+        }
+      });
+
+      fetchChartsData(["cs_sexo", "criterio", "epiweek", "municipio_geocodigo"]);
+    });
+
+    async function fetchChartsData(chart_ids) {
+      const insertRanges = idsRanges(totalInserts);
+      const updateRanges = idsRanges(totalUpdates);
+
+      const promises = [];
+
+      insertRanges.forEach(([start, end]) => {
+        promises.push(fetchChartsChunk(start, end, "inserts"));
+      });
+      updateRanges.forEach(([start, end]) => {
+        promises.push(fetchChartsChunk(start, end, "updates"));
+      });
+
+      epiweek_res = {}
+      municipio_geocodigo_res = {}
+
+      try {
+        await Promise.all(promises.map(promise =>
+          promise.then(result => {
+            chart_ids.forEach((id) => {
+              const chart = Chart.getChart(id);
+              if (id === 'cs_sexo' && result && result.cs_sexo) {
+                chart.data.datasets[0].data[0] += result.cs_sexo.M || 0;
+                chart.data.datasets[0].data[1] += result.cs_sexo.F || 0;
+                chart.data.datasets[0].data[2] += result.cs_sexo.I || 0;
+              }
+              if (id === 'criterio' && result && result.criterio) {
+                chart.data.datasets[0].data[0] += result.criterio["0"] || 0;
+                chart.data.datasets[0].data[1] += result.criterio["1"] || 0;
+                chart.data.datasets[0].data[2] += result.criterio["2"] || 0;
+                chart.data.datasets[0].data[3] += result.criterio["3"] || 0;
+              }
+              if (id === 'epiweek' && result && result.epiweek) {
+                for (const [epiweek, count] of Object.entries(result.epiweek)) {
+                  if (epiweek_res[epiweek]) {
+                    epiweek_res[epiweek] += count;
+                  } else {
+                    epiweek_res[epiweek] = count;
+                  }
+                }
+              }
+              if (id === 'municipio_geocodigo' && result && result.municipio_geocodigo) {
+                for (const [geocodigo, count] of Object.entries(result.municipio_geocodigo)) {
+                  if (municipio_geocodigo_res[geocodigo]) {
+                    municipio_geocodigo_res[geocodigo] += count;
+                  } else {
+                    municipio_geocodigo_res[geocodigo] = count;
+                  }
+                }
+                chart.data.labels = Object.keys(municipio_geocodigo_res);
+                chart.data.datasets[0].data = Object.values(municipio_geocodigo_res);
+              }
+              chart.update();
+            });
+          })
+        ));
+
+        const sortedGeocodes = Object.entries(municipio_geocodigo_res).sort(([, a], [, b]) => b - a);
+        const munChart = Chart.getChart("municipio_geocodigo");
+        munChart.data.labels = sortedGeocodes.slice(0, 50).map(([key]) => key);
+        munChart.data.datasets[0].data = sortedGeocodes.slice(0, 50).map(([, value]) => value);
+        munChart.update();
+
+        const sortedEpiweeks = Object.entries(epiweek_res).sort((a, b) => {
+          console.log(a);
+          return parseInt(a[0], 10) - parseInt(b[0], 10);
+        });
+        const epiweekChart = Chart.getChart("epiweek");
+        epiweekChart.data.labels = sortedEpiweeks.map(([key]) => key);
+        epiweekChart.data.datasets[0].data = sortedEpiweeks.map(([, value]) => value);
+        epiweekChart.update();
+
+        $('#file-card').removeClass('card-primary').addClass('card-success');
+      } catch (error) {
+        console.error(error);
+      }
+    }
     </script>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <style>
+    .alert-container {
+      bottom: 10px;
+    }
+
+    #log-toggle {
+      cursor: pointer;
+    }
+
+    .modal-body {
+      background-color: #e2e2e2;
+    }
+
+    .log-success {
+      color: #0d7208;
+    }
+
+    .log-warning {
+      color: #b7610b;
+    }
+
+    .log-info {
+      color: #0d76aa;
+    }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </body>
 </html>

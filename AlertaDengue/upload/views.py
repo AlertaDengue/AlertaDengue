@@ -1,10 +1,13 @@
 from pathlib import Path
 
 import humanize
+import json
+
+from psycopg2.extras import DictCursor
 
 from django.contrib.auth import get_user_model
 from django.contrib import messages
-from django.http import JsonResponse, QueryDict
+from django.http import JsonResponse, QueryDict, HttpResponseNotFound
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.base import File
@@ -13,13 +16,14 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import FormView, View
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
 
 from . import models, forms
-
+from ad_main.settings import get_sqla_conn
 
 User = get_user_model()
+Engine = get_sqla_conn(database="dengue")
 
 
 class SINANDashboard(LoginRequiredMixin, View):
@@ -36,7 +40,26 @@ class SINANOverview(LoginRequiredMixin, View):
 
     @never_cache
     def get(self, request, *args, **kwargs):
+        sinan_upload_id = kwargs.get('sinan_upload_id')
         context = {}
+
+        try:
+            sinan = models.SINANUpload.objects.get(
+                pk=sinan_upload_id,
+                upload__user=request.user
+            )
+        except models.SINANUpload.DoesNotExist:
+            messages.error(request, "Upload not found")
+            return redirect("upload:sinan")
+
+        context["sinan_upload_id"] = sinan_upload_id
+        context["filename"] = sinan.upload.filename
+        context["size"] = humanize.naturalsize(sinan.upload.file.size)
+        context["inserts"] = sinan.status.inserts
+        context["updates"] = sinan.status.updates
+        context["uploaded_at"] = sinan.uploaded_at
+        context["time_spend"] = f"{sinan.status.time_spend:.2f}"
+        context["logs"] = sinan.status.read_logs("INFO")
         return render(request, self.template_name, context)
 
 
@@ -187,9 +210,89 @@ class SINANChunkedUploadCompleteView(ChunkedUploadCompleteView):
 @csrf_protect
 def get_user_uploads(request):
     context = {}
-    uploads = models.SINANUpload.objects.filter(upload__user=request.user)
+    if request.user.is_superuser:
+        uploads = models.SINANUpload.objects.all()
+    elif request.user.is_staff:
+        uploads = models.SINANUpload.objects.filter(upload__user=request.user)
+    else:
+        uploads = models.SINANUpload.objects.none()
     context["uploads"] = list(
         uploads.order_by("-uploaded_at").values_list("id", flat=True)
     )
-    print(context)
     return JsonResponse(context)
+
+
+@never_cache
+@csrf_protect
+def overview_charts_limit_offset(request):
+    offset = request.GET.get("offset")
+    limit = request.GET.get("limit")
+    id_type = request.GET.get("id_type")
+
+    if offset is None or limit is None or not id_type:
+        return JsonResponse(
+            {"error": "missing 'offset', 'limit' or 'id_type' parameters"},
+            status=400
+        )
+
+    limit, offset = int(limit), int(offset)
+
+    try:
+        sinan = models.SINANUpload.objects.get(
+            pk=request.GET.get("sinan_upload_id")
+        )
+    except models.SINANUpload.DoesNotExist:
+        return HttpResponseNotFound(
+            json.dumps({"error": "Upload not found"}),
+            content_type="application/json"
+        )
+
+    queries = {
+        "epiweek": (
+            'SELECT se_notif, ano_notif, COUNT(*) AS count '
+            'FROM "Municipio"."Notificacao" '
+            'WHERE id IN ({}) GROUP BY se_notif, ano_notif;'
+        ),
+        "cs_sexo": (
+            'SELECT cs_sexo, COUNT(*) AS count '
+            'FROM "Municipio"."Notificacao" '
+            'WHERE id IN ({}) GROUP BY cs_sexo;'
+        ),
+        "criterio": (
+            'SELECT criterio, COUNT(*) AS count '
+            'FROM "Municipio"."Notificacao" '
+            'WHERE id IN ({}) GROUP BY criterio;'
+        ),
+        "municipio_geocodigo": (
+            'SELECT municipio_geocodigo, COUNT(*) AS count '
+            'FROM "Municipio"."Notificacao" '
+            'WHERE id IN ({}) GROUP BY municipio_geocodigo;'
+        )
+    }
+    results = {}
+    ids = sinan.status.list_ids(offset=offset, limit=limit, id_type=id_type)
+
+    if not ids:
+        return JsonResponse({chart: {} for chart in queries})
+
+    placeholder = ','.join(map(str, ids))
+
+    for chart, query in queries.items():
+        with Engine.begin() as conn:
+            cursor = conn.connection.cursor(cursor_factory=DictCursor)
+            cursor.execute(query.format(placeholder))
+            res = cursor.fetchall()
+
+        if chart == "epiweek":
+            results[chart] = {
+                f"{row['se_notif']:02d}{row['ano_notif']}": row['count']
+                for row in res
+            }
+
+        if chart == "cs_sexo":
+            results[chart] = {row[chart]: row['count'] for row in res}
+
+        if chart in ["criterio", "municipio_geocodigo"]:
+            results[chart] = {str(row[chart]): row['count'] for row in res}
+
+    return JsonResponse(results)
