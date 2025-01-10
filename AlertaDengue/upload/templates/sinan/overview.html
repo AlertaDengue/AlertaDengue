@@ -61,7 +61,7 @@
             <div class="panel panel-default col-xs-6">
               <div class="panel-body">
 
-                <div class="card card-outline card-success">
+                <div id="file-card" class="card card-outline card-primary">
                   <div class="card-header">
                     <h3 class="card-title">{{filename}}</h3>
                     <div class="card-tools">
@@ -429,7 +429,7 @@
         epiweekChart.data.datasets[0].data = sortedEpiweeks.map(([, value]) => value);
         epiweekChart.update();
 
-        console.log('All promises have completed');
+        $('#file-card').removeClass('card-primary').addClass('card-success');
       } catch (error) {
         console.error(error);
       }
