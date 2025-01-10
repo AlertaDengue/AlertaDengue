@@ -52,11 +52,13 @@ class SINANOverview(LoginRequiredMixin, View):
             messages.error(request, "Upload not found")
             return redirect("upload:sinan")
 
+        context["sinan_upload_id"] = sinan_upload_id
         context["filename"] = sinan.upload.filename
         context["size"] = humanize.naturalsize(sinan.upload.file.size)
         context["inserts"] = sinan.status.inserts
         context["updates"] = sinan.status.updates
         context["uploaded_at"] = sinan.uploaded_at
+        context["time_spend"] = f"{sinan.status.time_spend:.2f}"
         context["logs"] = sinan.status.read_logs("INFO")
         return render(request, self.template_name, context)
 
@@ -220,6 +222,7 @@ def get_user_uploads(request):
     return JsonResponse(context)
 
 
+@never_cache
 @csrf_protect
 def overview_charts_limit_offset(request):
     offset = request.GET.get("offset")
@@ -245,10 +248,25 @@ def overview_charts_limit_offset(request):
         )
 
     queries = {
-        "sexChart": (
+        "epiweek": (
+            'SELECT se_notif, ano_notif, COUNT(*) AS count '
+            'FROM "Municipio"."Notificacao" '
+            'WHERE id IN ({}) GROUP BY se_notif, ano_notif;'
+        ),
+        "cs_sexo": (
             'SELECT cs_sexo, COUNT(*) AS count '
             'FROM "Municipio"."Notificacao" '
             'WHERE id IN ({}) GROUP BY cs_sexo;'
+        ),
+        "criterio": (
+            'SELECT criterio, COUNT(*) AS count '
+            'FROM "Municipio"."Notificacao" '
+            'WHERE id IN ({}) GROUP BY criterio;'
+        ),
+        "municipio_geocodigo": (
+            'SELECT municipio_geocodigo, COUNT(*) AS count '
+            'FROM "Municipio"."Notificacao" '
+            'WHERE id IN ({}) GROUP BY municipio_geocodigo;'
         )
     }
     results = {}
@@ -265,8 +283,16 @@ def overview_charts_limit_offset(request):
             cursor.execute(query.format(placeholder))
             res = cursor.fetchall()
 
-        if chart == "sexChart":
-            print(res)
-            results[chart] = {row['cs_sexo']: row['count'] for row in res}
+        if chart == "epiweek":
+            results[chart] = {
+                f"{row['se_notif']:02d}{row['ano_notif']}": row['count']
+                for row in res
+            }
+
+        if chart == "cs_sexo":
+            results[chart] = {row[chart]: row['count'] for row in res}
+
+        if chart in ["criterio", "municipio_geocodigo"]:
+            results[chart] = {str(row[chart]): row['count'] for row in res}
 
     return JsonResponse(results)

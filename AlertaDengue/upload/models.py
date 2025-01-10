@@ -75,15 +75,16 @@ class SINANUploadLogStatus(models.Model):
         limit: int,
         id_type: Literal["inserts", "updates"]
     ) -> list[int]:
-        if abs(limit - offset) > 100000:
-            raise ValueError("ids range exceeds 100_000 entries")
+        if abs(limit - offset) > 50000:
+            raise ValueError("ids range exceeds 50_000 entries")
 
         ids = self._read_ids(id_type)
-        start, end = offset, min(offset + limit, len(ids))
 
-        if start < len(ids):
-            return ids[start:end]
-        return []
+        if len(ids) == 0:
+            return []
+
+        start, end = min([offset, limit]), max([offset, limit])
+        return ids[start:end+1]
 
     @property
     def time_spend(self) -> float:
