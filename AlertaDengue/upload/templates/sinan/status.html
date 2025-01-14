@@ -20,6 +20,10 @@
       {% endif %}
 
       {% if status == 1 %}
+      <span id="date" class="badge badge-primary ml-2" style="font-size: 0.85rem;">
+        {{ uploaded_at|date:"Y-m-d H:i" }}
+      </span>
+
       <div class="info-box">
           <i class="fas fa-arrow-up" title='{% trans "New inserts" %}'> {{inserts}}</i>
           <i class="fas fa-repeat" title='{% trans "Updated rows" %}'> {{updates}}</i>
@@ -74,13 +78,21 @@
   text-decoration: none;
 }
 
+#date {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
 .info-box {
-  display: flex;
+  top: 5px;
+  left: 5px;
+  display: none;
   align-items: center;
   position: absolute;
   font-size: 0.85rem;
   min-height: 40px !important;
-  width: 200px;
+  width: auto;
   padding: 10px;
   background-color: #f8f9fa;
   border: 1px solid #ddd;
@@ -99,7 +111,10 @@
 }
 
 li:hover .info-box {
-  right: 0;
+  display: flex;
+  right: 5px;
+  top: 5px;
+  left: unset;
   opacity: 1;
   visibility: visible;
 }

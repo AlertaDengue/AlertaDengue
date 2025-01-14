@@ -5,12 +5,13 @@ import json
 
 from psycopg2.extras import DictCursor
 
-from django.contrib.auth import get_user_model
 from django.contrib import messages
-from django.http import JsonResponse, QueryDict, HttpResponseNotFound
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.core.files.base import File
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import JsonResponse, QueryDict, HttpResponseNotFound
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import FormView, View
@@ -209,16 +210,42 @@ class SINANChunkedUploadCompleteView(ChunkedUploadCompleteView):
 @never_cache
 @csrf_protect
 def get_user_uploads(request):
+    page = request.GET.get("page", 1)
     context = {}
+
     if request.user.is_superuser:
-        uploads = models.SINANUpload.objects.all()
+        uploads = models.SINANUpload.objects.filter(status__isnull=False)
     elif request.user.is_staff:
-        uploads = models.SINANUpload.objects.filter(upload__user=request.user)
+        uploads = models.SINANUpload.objects.filter(
+            upload__user=request.user,
+            status__isnull=False
+        )
     else:
         uploads = models.SINANUpload.objects.none()
+
+    paginator = Paginator(uploads.order_by("-uploaded_at"), 10)
+
+    try:
+        uploads_page = paginator.page(page)
+    except PageNotAnInteger:
+        uploads_page = paginator.page(1)
+    except EmptyPage:
+        uploads_page = []
+
     context["uploads"] = list(
         uploads.order_by("-uploaded_at").values_list("id", flat=True)
     )
+    context["uploads"] = list(
+        uploads_page.object_list.values_list("id", flat=True)
+    )
+    context["pagination"] = {
+        "current_page": page,
+        "total_pages": paginator.num_pages,
+        "total_items": paginator.count,
+        "has_next": uploads_page.has_next() if uploads_page else False,
+        "has_previous": uploads_page.has_previous() if uploads_page else False,
+    }
+
     return JsonResponse(context)
 
 
