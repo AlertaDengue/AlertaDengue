@@ -19,6 +19,13 @@
   border-top: 8px solid #fff2f0;
 }
 
+#pagination {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
+}
+
 label[for^="upload_"] {
   margin-botton: 0;
 }

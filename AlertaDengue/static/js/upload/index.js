@@ -18,13 +18,8 @@ $(document).ready(function() {
     }
   });
 
-  render_status_list();
   chunked_upload("#upload_1");
-
-  $('#load-more').on('click', function() {
-    uploadsLimit += 5;
-    render_status_list();
-  });
+  get_uploads(1);
 
   $('#submit-button').on('click', function(e) {
     e.preventDefault();
@@ -34,25 +29,34 @@ $(document).ready(function() {
   });
 });
 
-let uploadsLimit = 5;
-let uploadsCount;
-
 // Status
-function get_uploads(limit, callback) {
-  $.ajax({
-    type: "GET",
-    url: "get-user-uploads/",
-    success: function(response) {
-      const uploads = response["uploads"];
-      uploadsCount = uploads.length;
-      callback(uploads.slice(0, limit));
-    },
-    error: function(jqXHR, textStatus, errorThrown) {
-      console.error("get_uploads error: ", errorThrown);
+
+function initialize_pagination(totalItems) {
+  $('#pagination').pagination({
+    items: totalItems,
+    itemsOnPage: 10,
+    currentPage: 1,
+    onPageClick: function(page) {
+      get_uploads(page);
     }
   });
 }
 
+async function get_uploads(page) {
+  $.ajax({
+    type: 'GET',
+    url: `get-user-uploads/?page=${page}`,
+    success: function(response) {
+      render_status_list(response.uploads);
+      if (page === 1) {
+        initialize_pagination(response.pagination.total_items, 5);
+      }
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      console.error('Error fetching uploads:', errorThrown);
+    }
+  });
+}
 
 function get_status(SINANUpload_id) {
   return new Promise((resolve, reject) => {
@@ -65,7 +69,7 @@ function get_status(SINANUpload_id) {
         if (item.length) {
           if (response.includes('list-group-item-primary')) {
             setTimeout(() => {
-              get_status(SINANUpload_id);
+              get_status(SINANUpload_id).then(resolve).catch(reject);
             }, 1000);
           } else {
             item.replaceWith(response);
@@ -75,10 +79,11 @@ function get_status(SINANUpload_id) {
           $("#upload-status-list").append(response);
           if (response.includes('list-group-item-primary')) {
             setTimeout(() => {
-              get_status(SINANUpload_id);
+              get_status(SINANUpload_id).then(resolve).catch(reject);
             }, 1000);
+          } else {
+            resolve();
           }
-          resolve();
         }
       },
       error: function(jqXHR, textStatus, errorThrown) {
@@ -90,21 +95,11 @@ function get_status(SINANUpload_id) {
 }
 
 
-async function render_status_list() {
+async function render_status_list(uploads) {
   const status_list = $("#upload-status-list");
   status_list.empty();
-
-  get_uploads(uploadsLimit, async function(uploads) {
-    for (let i = 0; i < uploads.length; i++) {
-      await get_status(uploads[i]);
-    }
-
-    if (uploadsLimit < uploadsCount) {
-      $('#load-more').show();
-    } else {
-      $('#load-more').hide();
-    }
-  });
+  const status = uploads.map(upload => get_status(upload));
+  await Promise.all(status);
 }
 
 

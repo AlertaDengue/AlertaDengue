@@ -141,7 +141,11 @@ class SINANUploadLogStatus(models.Model):
         level: Literal["PROGRESS", "DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"],
         message: str,
     ):
-        spaces = " " * max(map(len, self.LOG_LEVEL)) - len(level)
+        try:
+            spaces = " " * (max(map(len, self.LOG_LEVEL)) - len(level))
+        except TypeError:
+            spaces = " " * len("PROGRESS")
+
         if self.status != 0:
             raise ValueError(
                 "Log is closed for writing (finished with status " +
@@ -307,15 +311,15 @@ class SINANUpload(models.Model):
             super(SINANUpload, self).delete(*args, **kwargs)
             return
 
-        if self.status.status == 0:
+        if self.status and self.status.status == 0:
             raise RuntimeError(f"{file} is still being processed")
 
-        if self.status.status == 1:
+        if self.status and self.status.status == 1:
             raise RuntimeError(
                 f"{file} is attached with this upload, delete the file first"
             )
 
-        if self.status.status == 2:
+        if not self.status or self.status.status == 2:
             file.unlink()
 
         super(SINANUpload, self).delete(*args, **kwargs)
