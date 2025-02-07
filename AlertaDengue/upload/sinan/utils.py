@@ -94,9 +94,7 @@ def convert_nu_ano(year: str, col: pd.Series) -> int:
 
 @np.vectorize
 def convert_sem_pri(col: str) -> int:
-    if col:
-        col = str(col)[-2:]
-    return int(col)
+    return int(str(col)[-2:])
 
 
 @np.vectorize

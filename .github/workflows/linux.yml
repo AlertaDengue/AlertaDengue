@@ -76,14 +76,12 @@ jobs:
 
     - uses: conda-incubator/setup-miniconda@v3
       with:
-        # miniconda-version: "latest"
-        mamba-version: "*"
+        miniforge-version: latest
         environment-file: conda/base.yaml
         channels: conda-forge,nodefaults
         activate-environment: alertadengue
-        use-mamba: true
-        miniforge-variant: Mambaforge
-        miniforge-version: "24.11.0-0"
+        auto-update-conda: true
+        conda-solver: libmamba
 
     - name: Prepare data volumes
       run: |

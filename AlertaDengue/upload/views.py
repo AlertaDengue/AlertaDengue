@@ -230,11 +230,8 @@ def get_user_uploads(request):
     except PageNotAnInteger:
         uploads_page = paginator.page(1)
     except EmptyPage:
-        uploads_page = []
+        models_page = paginator.page(paginator.num_pages)
 
-    context["uploads"] = list(
-        uploads.order_by("-uploaded_at").values_list("id", flat=True)
-    )
     context["uploads"] = list(
         uploads_page.object_list.values_list("id", flat=True)
     )
@@ -242,8 +239,8 @@ def get_user_uploads(request):
         "current_page": page,
         "total_pages": paginator.num_pages,
         "total_items": paginator.count,
-        "has_next": uploads_page.has_next() if uploads_page else False,
-        "has_previous": uploads_page.has_previous() if uploads_page else False,
+        "has_next": uploads_page.has_next(),
+        "has_previous": uploads_page.has_previous(),
     }
 
     return JsonResponse(context)
