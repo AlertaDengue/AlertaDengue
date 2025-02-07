@@ -125,12 +125,12 @@ def insert_chunk_to_temp_table(
     sinan = SINANUpload.objects.get(pk=upload_sinan_id)
     columns = list(sinan.COLUMNS.values())
 
-    df_chunk = parse_data(df_chunk, sinan.cid10, sinan.year)
     df_chunk = df_chunk.replace({pd.NA: None})
     len1 = len(df_chunk)
     df_chunk = df_chunk.dropna(
         subset=SINANUpload.REQUIRED_COLS, how="any"
     )
+    df_chunk = parse_data(df_chunk, sinan.cid10, sinan.year)
     len2 = len(df_chunk)
     filtered_rows += len1-len2
     df_chunk = df_chunk.rename(columns=sinan.COLUMNS)
