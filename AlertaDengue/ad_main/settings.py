@@ -89,7 +89,7 @@ THIRD_PARTY_APPS = [
     "bootstrap4",
     "chunked_upload",
     "manager.router",
-    "maintenance_mode",
+    # "maintenance_mode",
     "django_celery_results",
     "django_celery_beat",
 ]
@@ -118,7 +118,7 @@ MIDDLEWARE = (
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "maintenance_mode.middleware.MaintenanceModeMiddleware",
+    # "maintenance_mode.middleware.MaintenanceModeMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 )
 

@@ -73,7 +73,9 @@ def sinan_verify_file(upload_sinan_id: int):
                 ignore_geometry=True,
             ).columns
         elif file.suffix.lower() == ".csv":
-            columns = pd.read_csv(str(file), nrows=0).columns
+            columns = pd.read_csv(
+                str(file), nrows=0, engine="python", sep=None
+            ).columns
         else:
             raise SINANUploadFatalError(
                 sinan.status, f"File type '{file.suffix}' is not supported"
@@ -260,7 +262,9 @@ def sinan_insert_to_db(upload_sinan_id: int):
                 for chunk in pd.read_csv(
                     str(file),
                     chunksize=chunksize,
-                    usecols=list(sinan.COLUMNS)
+                    usecols=list(sinan.COLUMNS),
+                    engine="python",
+                    sep=None
                 ):
                     insert_chunk_to_temp_table(
                         upload_sinan_id,
