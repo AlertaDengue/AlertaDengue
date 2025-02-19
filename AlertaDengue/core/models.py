@@ -204,3 +204,118 @@ class HistoricoAlertaZika(models.Model):
                 name="alertas_unicos_zika"
             )
         ]
+
+
+class Localidade(models.Model):
+    """
+    Sub-unidades de analise no municipio
+
+    NOTE: It should run with `migrate --fake` due to previously populated table
+    """
+    nome = models.CharField(max_length=32)
+    populacao = models.IntegerField()
+    geojson = models.TextField()
+    id = models.IntegerField(primary_key=True)
+    municipio_geocodigo = models.IntegerField()
+    codigo_estacao_wu = models.CharField(max_length=5, null=True, blank=True)
+
+    class Meta:
+        db_table = '"Municipio"."Localidade"'
+
+
+class Bairro(models.Model):
+    """
+    Lista de bairros por localidade
+
+    NOTE: It should run with `migrate --fake` due to previously populated table
+    """
+    nome = models.TextField()
+    bairro_id = models.IntegerField()
+    localidade = models.ForeignKey(
+        Localidade,
+        on_delete=models.CASCADE,
+        db_column="Localidade_id"
+    )
+
+    class Meta:
+        db_table = '"Municipio"."Bairro"'
+        constraints = [
+            models.UniqueConstraint(
+                fields=["nome", "bairro_id"],
+                name="Bairro_pk"
+            )
+        ]
+        unique_together = ("nome", "bairro_id")
+
+
+# class Ovitrampa(models.Model):
+#     """
+#     NOTE: It should run with `migrate --fake` due to previously populated table
+#     """
+#     id = models.IntegerField(primary_key=True)
+#     Municipio_geocodigo = models.IntegerField()
+#     latitude = models.FloatField()
+#     longitude = models.FloatField()
+#     Arm_codigo = models.IntegerField()
+#     Perdida = models.BooleanField()
+#     Positiva = models.BooleanField(null=True, blank=True)
+#     Ovos = models.IntegerField(null=True, blank=True)
+#     localidade = models.ForeignKey(
+#         Localidade,
+#         on_delete=models.CASCADE,
+#         db_column="Localidade_id"
+#     )
+#
+#     class Meta:
+#         db_table = '"Municipio"."Ovitrampa"'
+#         constraints = [
+#             models.UniqueConstraint(
+#                 fields=["id"],
+#                 name="Ovitrampa_pk"
+#             )
+#         ]
+
+
+# Dengue_global
+
+
+class Estado(models.Model):
+    geocodigo = models.IntegerField(primary_key=True)
+    nome = models.CharField(max_length=128, null=False)
+    geojson = models.TextField(null=False)
+    regiao = models.CharField(max_length=32, null=False)
+    uf = models.CharField(max_length=2, null=False)
+
+    class Meta:
+        db_table = '"Dengue_global"."estado"'
+        indexes = [
+            models.Index(fields=['geocodigo'], name='estado_idx_gc'),
+        ]
+
+
+class Parameters(models.Model):
+    municipio_geocodigo = models.IntegerField(primary_key=True)
+    limiar_preseason = models.FloatField(null=True, blank=True)
+    limiar_posseason = models.FloatField(null=True, blank=True)
+    limiar_epidemico = models.FloatField(null=True, blank=True)
+    varcli = models.TextField(null=True, blank=True)
+    clicrit = models.DecimalField(
+        max_digits=5, decimal_places=0, null=True, blank=True
+    )
+    cid10 = models.CharField(max_length=255, null=True, blank=True)
+    codmodelo = models.CharField(max_length=255, null=True, blank=True)
+    varcli2 = models.CharField(max_length=16, null=True, blank=True)
+    clicrit2 = models.DecimalField(
+        max_digits=5, decimal_places=0, null=True, blank=True
+    )
+    codigo_estacao_wu = models.CharField(max_length=255, null=True, blank=True)
+    estacao_wu_sec = models.CharField(max_length=255, null=True, blank=True)
+
+    class Meta:
+        db_table = '"Dengue_global"."parameters"'
+        indexes = [
+            models.Index(
+                fields=['municipio_geocodigo'],
+                name='parameters_idx_gc'
+            ),
+        ]

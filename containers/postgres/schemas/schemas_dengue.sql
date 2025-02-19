@@ -38,21 +38,14 @@ CREATE SCHEMA weather;
 ALTER SCHEMA weather OWNER TO dengueadmin;
 
 
---
--- Name: CID10; Type: TABLE; Schema: Dengue_global; Owner: administrador
---
+---------------
 
 CREATE TABLE "Dengue_global"."CID10" (
     nome character varying(512) NOT NULL,
     codigo character varying(5) NOT NULL
 );
 
-
 ALTER TABLE "Dengue_global"."CID10" OWNER TO administrador;
-
---
--- Name: Municipio; Type: TABLE; Schema: Dengue_global; Owner: administrador
---
 
 CREATE TABLE "Dengue_global"."Municipio" (
     geocodigo integer NOT NULL,
@@ -66,7 +59,6 @@ CREATE TABLE "Dengue_global"."Municipio" (
     macroregional character varying(128) NOT NULL
 );
 
-
 ALTER TABLE "Dengue_global"."Municipio" OWNER TO administrador;
 
 --
@@ -75,177 +67,13 @@ ALTER TABLE "Dengue_global"."Municipio" OWNER TO administrador;
 
 COMMENT ON TABLE "Dengue_global"."Municipio" IS 'Municipio integrado ao sistema de alerta';
 
-
---
--- Name: estado; Type: TABLE; Schema: Dengue_global; Owner: administrador
---
-
-CREATE TABLE "Dengue_global".estado (
-    nome character varying(128) NOT NULL,
-    geojson text NOT NULL,
-    regiao character varying(32) NOT NULL,
-    uf character varying(2) NOT NULL,
-    geocodigo integer NOT NULL
-);
-
+---------------
 
 ALTER TABLE "Dengue_global".estado OWNER TO administrador;
 
---
--- Name: macroregional; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
---
-
--- CREATE TABLE "Dengue_global".macroregional (
---    id integer NOT NULL,
---    nome character varying(255) NOT NULL,
---    codigo integer NOT NULL,
---    uf character varying(2)
---);
-
-
--- ALTER TABLE "Dengue_global".macroregional OWNER TO dengueadmin;
-
---
--- Name: macroregional_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
---
-
--- CREATE SEQUENCE "Dengue_global".macroregional_id_seq
---    START WITH 1
---    INCREMENT BY 1
---    NO MINVALUE
---    NO MAXVALUE
---    CACHE 1;
-
-
--- ALTER TABLE "Dengue_global".macroregional_id_seq OWNER TO dengueadmin;
-
---
--- Name: macroregional_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
---
-
--- ALTER SEQUENCE "Dengue_global".macroregional_id_seq OWNED BY "Dengue_global".macroregional.id;
-
-
---
--- Name: parameters; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
---
-
-CREATE TABLE "Dengue_global".parameters (
-    "row.names" text,
-    municipio_geocodigo integer NOT NULL,
-    limiar_preseason double precision,
-    limiar_posseason double precision,
-    limiar_epidemico double precision,
-    varcli text,
-    clicrit numeric(5,0) DEFAULT NULL::numeric,
-    cid10 character varying DEFAULT NULL::bpchar,
-    codmodelo character varying,
-    varcli2 character varying(16) DEFAULT NULL::character varying,
-    clicrit2 numeric(5,0) DEFAULT NULL::numeric,
-    codigo_estacao_wu character varying,
-    estacao_wu_sec character varying
-);
-
-
 ALTER TABLE "Dengue_global".parameters OWNER TO dengueadmin;
 
---
--- Name: regional; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
---
-
--- CREATE TABLE "Dengue_global".regional (
---     id integer NOT NULL,
---     nome character varying(255) NOT NULL,
---     codigo integer NOT NULL,
---     id_macroregional integer NOT NULL
--- );
-
-
--- ALTER TABLE "Dengue_global".regional OWNER TO dengueadmin;
-
---
--- Name: regional_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
---
-
--- CREATE SEQUENCE "Dengue_global".regional_id_seq
---     START WITH 1
---     INCREMENT BY 1
---     NO MINVALUE
---     NO MAXVALUE
---     CACHE 1;
-
-
--- ALTER TABLE "Dengue_global".regional_id_seq OWNER TO dengueadmin;
-
---
--- Name: regional_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
---
-
--- ALTER SEQUENCE "Dengue_global".regional_id_seq OWNED BY "Dengue_global".regional.id;
-
-
---
--- Name: regional_saude; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
---
-
--- CREATE TABLE "Dengue_global".regional_saude (
---     id integer NOT NULL,
---     municipio_geocodigo integer,
---     id_regional integer,
---     codigo_estacao_wu character varying(16),
---     nome_regional character varying(32),
---     limiar_preseason real,
---     limiar_posseason real,
---     limiar_epidemico real,
---     estacao_wu_sec character varying(10),
---     varcli character varying(10),
---     tcrit double precision,
---     ucrit double precision,
---     nome_macroreg character varying(32)
--- );
-
-
--- ALTER TABLE "Dengue_global".regional_saude OWNER TO dengueadmin;
-
---
--- Name: regional_saude_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
---
-
--- CREATE SEQUENCE "Dengue_global".regional_saude_id_seq
---     START WITH 1
---     INCREMENT BY 1
---     NO MINVALUE
---     NO MAXVALUE
---     CACHE 1;
-
-
--- ALTER TABLE "Dengue_global".regional_saude_id_seq OWNER TO dengueadmin;
-
---
--- Name: regional_saude_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
---
-
--- ALTER SEQUENCE "Dengue_global".regional_saude_id_seq OWNED BY "Dengue_global".regional_saude.id;
-
-
---
--- Name: Bairro; Type: TABLE; Schema: Municipio; Owner: administrador
---
-
-CREATE TABLE "Municipio"."Bairro" (
-    nome text NOT NULL,
-    bairro_id integer NOT NULL,
-    "Localidade_id" integer NOT NULL
-);
-
-
 ALTER TABLE "Municipio"."Bairro" OWNER TO administrador;
-
---
--- Name: TABLE "Bairro"; Type: COMMENT; Schema: Municipio; Owner: administrador
---
-
-COMMENT ON TABLE "Municipio"."Bairro" IS 'Lista de bairros por localidade';
 
 
 --
@@ -432,27 +260,7 @@ ALTER TABLE "Municipio"."Estacao_wu" OWNER TO administrador;
 COMMENT ON TABLE "Municipio"."Estacao_wu" IS 'metadados das estacoes meteorologicas da WU';
 
 
---
--- Name: Localidade; Type: TABLE; Schema: Municipio; Owner: administrador
---
-
-CREATE TABLE "Municipio"."Localidade" (
-    nome character varying(32) NOT NULL,
-    populacao integer NOT NULL,
-    geojson text NOT NULL,
-    id integer NOT NULL,
-    "Municipio_geocodigo" integer NOT NULL,
-    codigo_estacao_wu character varying(5) DEFAULT NULL::character varying
-);
-
-
 ALTER TABLE "Municipio"."Localidade" OWNER TO administrador;
-
---
--- Name: TABLE "Localidade"; Type: COMMENT; Schema: Municipio; Owner: administrador
---
-
-COMMENT ON TABLE "Municipio"."Localidade" IS 'Sub-unidades de analise no municipio';
 
 
 --
@@ -555,23 +363,6 @@ ALTER TABLE "Municipio"."Notificacao_id_seq" OWNER TO administrador;
 ALTER SEQUENCE "Municipio"."Notificacao_id_seq" OWNED BY "Municipio"."Notificacao".id;
 
 
---
--- Name: Ovitrampa; Type: TABLE; Schema: Municipio; Owner: administrador
---
-
-CREATE TABLE "Municipio"."Ovitrampa" (
-    "Municipio_geocodigo" integer NOT NULL,
-    latitude real NOT NULL,
-    longitude real NOT NULL,
-    "Arm_codigo" integer NOT NULL,
-    "Perdida" boolean NOT NULL,
-    "Positiva" boolean,
-    "Ovos" integer,
-    "Localidade_id" integer NOT NULL,
-    id integer NOT NULL
-);
-
-
 ALTER TABLE "Municipio"."Ovitrampa" OWNER TO administrador;
 
 --
@@ -588,11 +379,6 @@ CREATE SEQUENCE "Municipio"."Ovitrampa_id_seq"
 
 ALTER TABLE "Municipio"."Ovitrampa_id_seq" OWNER TO administrador;
 
---
--- Name: Ovitrampa_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
---
-
-ALTER SEQUENCE "Municipio"."Ovitrampa_id_seq" OWNED BY "Municipio"."Ovitrampa".id;
 
 --
 -- Name: alerta_mrj; Type: TABLE; Schema: Municipio; Owner: dengueadmin
@@ -1970,12 +1756,6 @@ ALTER TABLE ONLY "Municipio"."Clima_wu" ALTER COLUMN id SET DEFAULT nextval('"Mu
 ALTER TABLE ONLY "Municipio"."Notificacao" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Notificacao_id_seq"'::regclass);
 
 
---
--- Name: Ovitrampa id; Type: DEFAULT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Ovitrampa" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Ovitrampa_id_seq"'::regclass);
-
 
 --
 -- Name: alerta_mrj id; Type: DEFAULT; Schema: Municipio; Owner: dengueadmin
@@ -2251,37 +2031,6 @@ ALTER TABLE ONLY "Dengue_global".parameters
     ADD CONSTRAINT parameters_pkey PRIMARY KEY (municipio_geocodigo);
 
 
---
--- Name: regional regional_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
---
-
--- ALTER TABLE ONLY "Dengue_global".regional
---    ADD CONSTRAINT regional_pk PRIMARY KEY (id);
-
-
---
--- Name: regional_saude regional_saude_pkey; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
---
-
--- ALTER TABLE ONLY "Dengue_global".regional_saude
---    ADD CONSTRAINT regional_saude_pkey PRIMARY KEY (id);
-
-
---
--- Name: regional_saude regional_saude_uq_municipio_geocodigo; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
---
-
--- ALTER TABLE ONLY "Dengue_global".regional_saude
---    ADD CONSTRAINT regional_saude_uq_municipio_geocodigo UNIQUE (municipio_geocodigo);
-
-
---
--- Name: Bairro Bairro_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Bairro"
-    ADD CONSTRAINT "Bairro_pk" PRIMARY KEY (nome, bairro_id);
-
 
 --
 -- Name: Clima_Satelite Clima_Satelite_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
@@ -2323,29 +2072,12 @@ ALTER TABLE ONLY "Municipio"."Estacao_wu"
     ADD CONSTRAINT "Estacao_wu_pk" PRIMARY KEY (estacao_id);
 
 
-
---
--- Name: Localidade Localidade_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Localidade"
-    ADD CONSTRAINT "Localidade_pk" PRIMARY KEY (id);
-
-
 --
 -- Name: Notificacao Notificacao_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
 --
 
 ALTER TABLE ONLY "Municipio"."Notificacao"
     ADD CONSTRAINT "Notificacao_pk" PRIMARY KEY (id);
-
-
---
--- Name: Ovitrampa Ovitrampa_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Ovitrampa"
-    ADD CONSTRAINT "Ovitrampa_pk" PRIMARY KEY (id);
 
 
 --
@@ -3146,62 +2878,6 @@ CREATE INDEX uf_total_view_data_idx ON public.uf_total_view USING btree (data);
 --
 
 CREATE INDEX uf_total_zika_view_data_idx ON public.uf_total_zika_view USING btree (data);
-
-
---
--- Name: regional macroregional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
---
-
--- ALTER TABLE ONLY "Dengue_global".regional
---    ADD CONSTRAINT macroregional_fk FOREIGN KEY (id_macroregional) REFERENCES "Dengue_global".macroregional(id);
-
-
---
--- Name: Municipio regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: administrador
---
-
--- ALTER TABLE ONLY "Dengue_global"."Municipio"
---    ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
-
-
---
--- Name: alerta_regional_dengue regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
---
-
--- ALTER TABLE ONLY "Dengue_global".alerta_regional_dengue
---     ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
-
-
---
--- Name: alerta_regional_chik regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
---
-
--- ALTER TABLE ONLY "Dengue_global".alerta_regional_chik
---     ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
-
-
---
--- Name: alerta_regional_zika regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
---
-
--- ALTER TABLE ONLY "Dengue_global".alerta_regional_zika
---     ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
-
-
---
--- Name: Bairro Bairro_Localidade; Type: FK CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Bairro"
-    ADD CONSTRAINT "Bairro_Localidade" FOREIGN KEY ("Localidade_id") REFERENCES "Municipio"."Localidade"(id);
-
-
---
--- Name: Ovitrampa Ovitrampa_Localidade; Type: FK CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Ovitrampa"
-    ADD CONSTRAINT "Ovitrampa_Localidade" FOREIGN KEY ("Localidade_id") REFERENCES "Municipio"."Localidade"(id);
 
 
 --
