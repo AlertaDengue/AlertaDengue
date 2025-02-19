@@ -15,191 +15,28 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
+SET default_tablespace = '';
+SET default_table_access_method = heap;
 
---
--- Name: Dengue_global; Type: SCHEMA; Schema: -; Owner: Dengue
---
 
 CREATE SCHEMA "Dengue_global";
-
-
 ALTER SCHEMA "Dengue_global" OWNER TO "Dengue";
 
---
--- Name: Municipio; Type: SCHEMA; Schema: -; Owner: Dengue
---
 
 CREATE SCHEMA "Municipio";
-
-
 ALTER SCHEMA "Municipio" OWNER TO "Dengue";
 
---
--- Name: forecast; Type: SCHEMA; Schema: -; Owner: postgres
---
 
 CREATE SCHEMA forecast;
-
-
 ALTER SCHEMA forecast OWNER TO postgres;
-
---
--- Name: public; Type: SCHEMA; Schema: -; Owner: dengueadmin
---
-
--- *not* creating schema, since initdb creates it
 
 
 ALTER SCHEMA public OWNER TO dengueadmin;
 
---
--- Name: weather; Type: SCHEMA; Schema: -; Owner: dengueadmin
---
 
 CREATE SCHEMA weather;
-
-
 ALTER SCHEMA weather OWNER TO dengueadmin;
 
---
--- Name: adminpack; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS adminpack WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION adminpack; Type: COMMENT; Schema: -; Owner: 
---
-
-COMMENT ON EXTENSION adminpack IS 'administrative functions for PostgreSQL';
-
-
---
--- Name: postgis; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
-
-
---
--- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: 
---
-
-COMMENT ON EXTENSION postgis IS 'PostGIS geometry, geography, and raster spatial types and functions';
-
-
---
--- Name: epi_week(date); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-CREATE FUNCTION public.epi_week(dt date) RETURNS integer
-    LANGUAGE plpgsql
-    AS $$
-
-DECLARE epiyear INTEGER;
-DECLARE epiend DATE;
-DECLARE epistart DATE;
-DECLARE epi_dow INTEGER;
-DECLARE epiweek INTEGER;
-
-BEGIN
-    epiyear = EXTRACT(YEAR FROM dt);
-    epiend = CONCAT(CAST(epiyear AS VARCHAR), '-12-31')::DATE;
-    epi_dow = EXTRACT(DOW FROM epiend);
-
-    -- Last epiday
-    IF epi_dow < 3 THEN
-        epiend = epiend - CAST(CAST(epi_dow+1 AS VARCHAR) || ' DAY' AS INTERVAL);
-    ELSE
-        epiend = epiend + CAST(CAST(6-epi_dow AS VARCHAR) || ' DAY' AS INTERVAL);
-    END IF;
-
-    IF dt > epiend THEN
-        epiyear = epiyear + 1;
-        RETURN epiyear*100 + 01;
-    END IF;
-
-    -- First epiday
-    epistart = CONCAT(CAST(epiyear AS VARCHAR), '-01-01')::DATE;
-    epi_dow = EXTRACT(DOW FROM epistart);
-
-    IF epi_dow < 4 THEN
-        epistart = epistart - CAST(CAST(epi_dow AS VARCHAR) || ' DAY' AS INTERVAL);
-    ELSE
-        epistart = epistart + CAST(CAST(7-epi_dow AS VARCHAR) || ' DAY' AS INTERVAL);
-    END IF;
-
-    -- If current date is before its year first epiweek,
-    -- then our base year is the previous one
-    IF dt < epistart THEN
-    epiyear = epiyear-1;
-
-    epistart = CONCAT(CAST(epiyear AS VARCHAR), '-01-01')::DATE;
-        epi_dow = EXTRACT(DOW FROM epistart);
-
-        -- First epiday
-        IF epi_dow < 4 THEN
-        epistart = epistart - CAST(CAST(epi_dow AS VARCHAR) || ' DAY' AS INTERVAL);
-        ELSE
-            epistart = epistart + CAST(CAST(7-epi_dow AS VARCHAR) || ' DAY' AS INTERVAL);
-        END IF;
-    END IF;
-    --epiweek = int(((x - epistart)/7).days) + 1
-    epiweek = ((dt - epistart)/7)+1;
-    --raise notice '%', ((dt - epistart)/7)+1;
-
-    RETURN epiyear*100 + epiweek;
-END;
-$$;
-
-
-ALTER FUNCTION public.epi_week(dt date) OWNER TO postgres;
-
---
--- Name: epiweek2date(integer, integer); Type: FUNCTION; Schema: public; Owner: postgres
---
-
-CREATE FUNCTION public.epiweek2date(epi_year_week integer, weekday integer DEFAULT 0) RETURNS date
-    LANGUAGE plpgsql
-    AS $$
-
-DECLARE epiyear INTEGER;
-DECLARE epiweek INTEGER;
-DECLARE date_1 DATE;
-DECLARE date_1_w INTEGER;
-DECLARE epiweek_day_1 DATE;
-DECLARE epi_interval INTERVAL;
-
-BEGIN
-    IF epi_year_week < 190000 THEN
-        RAISE EXCEPTION 'INVALID epi_year_week value.';
-    END IF;
-    
-    epiyear = epi_year_week/100;
-    epiweek = CAST((epi_year_week/100.0) % 1 * 100 AS INT);
-    date_1 = CAST(epiyear::varchar || '-01-01' AS DATE);
-    date_1_w = EXTRACT(DOW FROM date_1);
-
-    IF date_1_w <=3 THEN
-	epi_interval = (date_1_w::varchar || ' days')::interval;
-        epiweek_day_1 = date_1 - epi_interval;
-    ELSE
-        epi_interval = ((7-date_1_w)::varchar || ' days')::interval;
-	epiweek_day_1 = date_1 + epi_interval;
-    END IF; 
-    
-    epi_interval = ((7 * (epiweek-1) + weekday) || ' days')::interval;
-    RETURN epiweek_day_1 + epi_interval;
-END;
-$$;
-
-
-ALTER FUNCTION public.epiweek2date(epi_year_week integer, weekday integer) OWNER TO postgres;
-
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
 
 --
 -- Name: CID10; Type: TABLE; Schema: Dengue_global; Owner: administrador
