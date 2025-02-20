@@ -312,6 +312,28 @@ class EstacaoCemaden(models.Model):
         db_table = '"Municipio"."Estacao_cemaden"'
 
 
+class EstacaoWU(models.Model):
+    """
+    metadados das estacoes meteorologicas da WU
+
+    NOTE: It should run with `migrate --fake` due to previously populated table
+    """
+    estacao_id = models.CharField(max_length=4, primary_key=True)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    localidades = models.ForeignKey(
+        Localidade,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column="Localidades_id"
+    )
+    nome = models.CharField(max_length=128)
+
+    class Meta:
+        db_table = '"Municipio"."Estacao_wu"'
+
+
 # Dengue_global
 
 

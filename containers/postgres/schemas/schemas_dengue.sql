@@ -56,23 +56,7 @@ ALTER TABLE "Dengue_global".parameters OWNER TO dengueadmin;
 ALTER TABLE "Municipio"."Bairro" OWNER TO administrador;
 ALTER TABLE "Municipio"."Clima_wu" OWNER TO administrador;
 ALTER TABLE "Municipio"."Estacao_cemaden" OWNER TO administrador;
-
-
-CREATE TABLE "Municipio"."Estacao_wu" (
-    estacao_id character varying(4) NOT NULL,
-    latitude real NOT NULL,
-    longitude real NOT NULL,
-    "Localidades_id" integer,
-    nome character varying(128) NOT NULL
-);
-
-
 ALTER TABLE "Municipio"."Estacao_wu" OWNER TO administrador;
-
-
-COMMENT ON TABLE "Municipio"."Estacao_wu" IS 'metadados das estacoes meteorologicas da WU';
-
-
 ALTER TABLE "Municipio"."Localidade" OWNER TO administrador;
 
 
@@ -1254,9 +1238,6 @@ ALTER TABLE ONLY "Dengue_global".parameters
 
 
 
-
-ALTER TABLE ONLY "Municipio"."Estacao_wu"
-    ADD CONSTRAINT "Estacao_wu_pk" PRIMARY KEY (estacao_id);
 
 
 
