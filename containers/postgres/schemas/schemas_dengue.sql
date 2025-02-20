@@ -76,47 +76,6 @@ ALTER TABLE "Dengue_global".parameters OWNER TO dengueadmin;
 ALTER TABLE "Municipio"."Bairro" OWNER TO administrador;
 
 
---
--- Name: Clima_cemaden; Type: TABLE; Schema: Municipio; Owner: administrador
---
-
-CREATE TABLE "Municipio"."Clima_cemaden" (
-    valor real NOT NULL,
-    sensor character varying(32) NOT NULL,
-    id bigint NOT NULL,
-    datahora timestamp without time zone NOT NULL,
-    "Estacao_cemaden_codestacao" character varying(10) NOT NULL
-);
-
-
-ALTER TABLE "Municipio"."Clima_cemaden" OWNER TO administrador;
-
---
--- Name: TABLE "Clima_cemaden"; Type: COMMENT; Schema: Municipio; Owner: administrador
---
-
-COMMENT ON TABLE "Municipio"."Clima_cemaden" IS 'dados de clima - CEMADEN';
-
-
---
--- Name: Clima_cemaden_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
---
-
-CREATE SEQUENCE "Municipio"."Clima_cemaden_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE "Municipio"."Clima_cemaden_id_seq" OWNER TO administrador;
-
---
--- Name: Clima_cemaden_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
---
-
-ALTER SEQUENCE "Municipio"."Clima_cemaden_id_seq" OWNED BY "Municipio"."Clima_cemaden".id;
 
 
 --
@@ -1665,14 +1624,6 @@ ALTER TABLE ONLY "Dengue_global".alerta_regional_zika ALTER COLUMN id SET DEFAUL
 -- ALTER TABLE ONLY "Dengue_global".regional_saude ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".regional_saude_id_seq'::regclass);
 
 
-
---
--- Name: Clima_cemaden id; Type: DEFAULT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Clima_cemaden" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Clima_cemaden_id_seq"'::regclass);
-
-
 --
 -- Name: Clima_wu id; Type: DEFAULT; Schema: Municipio; Owner: administrador
 --
@@ -1961,14 +1912,6 @@ ALTER TABLE ONLY "Dengue_global".estado
 ALTER TABLE ONLY "Dengue_global".parameters
     ADD CONSTRAINT parameters_pkey PRIMARY KEY (municipio_geocodigo);
 
-
-
---
--- Name: Clima_cemaden Clima_cemaden_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Clima_cemaden"
-    ADD CONSTRAINT "Clima_cemaden_pk" PRIMARY KEY (id);
 
 
 --
@@ -2515,20 +2458,6 @@ CREATE INDEX "Dengue_idx_data" ON "Municipio"."Notificacao" USING btree (dt_noti
 --
 
 CREATE INDEX "WU_idx_data" ON "Municipio"."Clima_wu" USING btree (data_dia DESC);
-
-
---
--- Name: chuva_idx_data; Type: INDEX; Schema: Municipio; Owner: administrador
---
-
-CREATE INDEX chuva_idx_data ON "Municipio"."Clima_cemaden" USING btree (datahora DESC);
-
-
---
--- Name: estacoes_idx; Type: INDEX; Schema: Municipio; Owner: administrador
---
-
-CREATE INDEX estacoes_idx ON "Municipio"."Clima_cemaden" USING btree ("Estacao_cemaden_codestacao");
 
 
 --
@@ -3202,13 +3131,7 @@ GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_Satelite_id_seq" TO dengue;
 GRANT ALL ON TABLE "Municipio"."Clima_cemaden" TO "Dengue";
 GRANT ALL ON TABLE "Municipio"."Clima_cemaden" TO dengue;
 GRANT SELECT ON TABLE "Municipio"."Clima_cemaden" TO infodenguedev;
-
-
---
--- Name: SEQUENCE "Clima_cemaden_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_cemaden_id_seq" TO dengue;
+ALTER TABLE "Municipio"."Clima_cemaden" OWNER TO administrador;
 
 
 --

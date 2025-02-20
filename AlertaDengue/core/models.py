@@ -242,6 +242,28 @@ class Bairro(models.Model):
         db_table = '"Municipio"."Bairro"'
 
 
+class ClimaCemaden(models.Model):
+    """
+    Tabela de dados climáticos do Cemaden.
+    """
+    id = models.BigAutoField(primary_key=True)
+    valor = models.FloatField()
+    sensor = models.CharField(max_length=32)
+    datahora = models.DateTimeField()
+    estacao_cemaden_codestacao = models.CharField(
+        max_length=10, db_column="Estacao_cemaden_codestacao"
+    )
+
+    class Meta:
+        db_table = '"Municipio"."Clima_cemaden"'
+        indexes = [
+            models.Index(fields=["-datahora"], name="chuva_idx_data"),
+            models.Index(
+                fields=["estacao_cemaden_codestacao"],
+                name="estacoes_idx"
+            ),
+        ]
+
 # Dengue_global
 
 
