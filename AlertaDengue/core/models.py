@@ -229,6 +229,7 @@ class Bairro(models.Model):
 
     NOTE: It should run with `migrate --fake` due to previously populated table
     """
+    id = models.AutoField(primary_key=True)
     nome = models.TextField()
     bairro_id = models.IntegerField()
     localidade = models.ForeignKey(
@@ -239,13 +240,6 @@ class Bairro(models.Model):
 
     class Meta:
         db_table = '"Municipio"."Bairro"'
-        constraints = [
-            models.UniqueConstraint(
-                fields=["nome", "bairro_id"],
-                name="Bairro_pk"
-            )
-        ]
-        unique_together = ("nome", "bairro_id")
 
 
 # class Ovitrampa(models.Model):
