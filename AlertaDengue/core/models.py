@@ -295,6 +295,23 @@ class ClimaWU(models.Model):
         ]
 
 
+class EstacaoCemaden(models.Model):
+    """
+    Metadados da estação do cemaden
+
+    NOTE: It should run with `migrate --fake` due to previously populated table
+    """
+    codestacao = models.CharField(max_length=32, primary_key=True)
+    nome = models.CharField(max_length=128)
+    municipio = models.CharField(max_length=128, null=True, blank=True)
+    uf = models.CharField(max_length=2, null=True, blank=True)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+
+    class Meta:
+        db_table = '"Municipio"."Estacao_cemaden"'
+
+
 # Dengue_global
 
 
