@@ -242,34 +242,6 @@ class Bairro(models.Model):
         db_table = '"Municipio"."Bairro"'
 
 
-# class Ovitrampa(models.Model):
-#     """
-#     NOTE: It should run with `migrate --fake` due to previously populated table
-#     """
-#     id = models.IntegerField(primary_key=True)
-#     Municipio_geocodigo = models.IntegerField()
-#     latitude = models.FloatField()
-#     longitude = models.FloatField()
-#     Arm_codigo = models.IntegerField()
-#     Perdida = models.BooleanField()
-#     Positiva = models.BooleanField(null=True, blank=True)
-#     Ovos = models.IntegerField(null=True, blank=True)
-#     localidade = models.ForeignKey(
-#         Localidade,
-#         on_delete=models.CASCADE,
-#         db_column="Localidade_id"
-#     )
-#
-#     class Meta:
-#         db_table = '"Municipio"."Ovitrampa"'
-#         constraints = [
-#             models.UniqueConstraint(
-#                 fields=["id"],
-#                 name="Ovitrampa_pk"
-#             )
-#         ]
-
-
 # Dengue_global
 
 
