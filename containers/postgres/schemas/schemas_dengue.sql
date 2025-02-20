@@ -3116,14 +3116,6 @@ GRANT ALL ON TABLE "Municipio"."Bairro" TO dengue;
 GRANT SELECT ON TABLE "Municipio"."Bairro" TO infodenguedev;
 
 
-
---
--- Name: SEQUENCE "Clima_Satelite_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_Satelite_id_seq" TO dengue;
-
-
 --
 -- Name: TABLE "Clima_cemaden"; Type: ACL; Schema: Municipio; Owner: administrador
 --
