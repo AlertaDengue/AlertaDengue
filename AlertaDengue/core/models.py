@@ -245,6 +245,8 @@ class Bairro(models.Model):
 class ClimaCemaden(models.Model):
     """
     Tabela de dados climáticos do Cemaden.
+
+    NOTE: It should run with `migrate --fake` due to previously populated table
     """
     id = models.BigAutoField(primary_key=True)
     valor = models.FloatField()
@@ -264,10 +266,42 @@ class ClimaCemaden(models.Model):
             ),
         ]
 
+
+class ClimaWU(models.Model):
+    """
+    série temporal de variaveis meteorologicas diarias do WU
+
+    NOTE: It should run with `migrate --fake` due to previously populated table
+    """
+    id = models.BigAutoField(primary_key=True)
+    temp_min = models.FloatField(null=True, blank=True)
+    temp_max = models.FloatField(null=True, blank=True)
+    temp_med = models.FloatField(null=True, blank=True)
+    data_dia = models.DateField()
+    umid_min = models.FloatField(null=True, blank=True)
+    umid_med = models.FloatField(null=True, blank=True)
+    umid_max = models.FloatField(null=True, blank=True)
+    pressao_min = models.FloatField(null=True, blank=True)
+    pressao_med = models.FloatField(null=True, blank=True)
+    pressao_max = models.FloatField(null=True, blank=True)
+    estacao_wu_estacao_id = models.CharField(
+        max_length=4, db_column="Estacao_wu_estacao_id"
+    )
+
+    class Meta:
+        db_table = '"Municipio"."Clima_wu"'
+        indexes = [
+            models.Index(fields=["-data_dia"], name="WU_idx_data"),
+        ]
+
+
 # Dengue_global
 
 
 class Estado(models.Model):
+    """
+    NOTE: It should run with `migrate --fake` due to previously populated table
+    """
     geocodigo = models.IntegerField(primary_key=True)
     nome = models.CharField(max_length=128, null=False)
     geojson = models.TextField(null=False)
@@ -282,6 +316,9 @@ class Estado(models.Model):
 
 
 class Parameters(models.Model):
+    """
+    NOTE: It should run with `migrate --fake` due to previously populated table
+    """
     municipio_geocodigo = models.IntegerField(primary_key=True)
     limiar_preseason = models.FloatField(null=True, blank=True)
     limiar_posseason = models.FloatField(null=True, blank=True)
