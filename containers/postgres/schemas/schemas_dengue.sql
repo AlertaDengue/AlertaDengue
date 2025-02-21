@@ -184,20 +184,6 @@ ALTER TABLE "Municipio"."Notificacao" OWNER TO administrador;
 
 -- ALTER SEQUENCE "Municipio".alerta_mrj_zika_id_seq OWNED BY "Municipio".alerta_mrj_zika.id;
 
-
-
-CREATE VIEW "Municipio".historico_casos AS
- SELECT dengue."data_iniSE",
-    dengue."SE",
-    (COALESCE(dengue.casos_est, (0.0)::real) + COALESCE(chik.casos_est, (0.0)::real)) AS casos_est,
-    (COALESCE(dengue.casos_est_min, 0) + COALESCE(chik.casos_est_min, 0)) AS casos_est_min,
-    (COALESCE(dengue.casos_est_max, 0) + COALESCE(chik.casos_est_max, 0)) AS casos_est_max,
-    (COALESCE(dengue.casos, 0) + COALESCE(chik.casos, 0)) AS casos,
-    dengue.municipio_geocodigo
-   FROM ("Municipio"."Historico_alerta" dengue
-     FULL JOIN "Municipio"."Historico_alerta_chik" chik ON (((dengue."SE" = chik."SE") AND (dengue.municipio_geocodigo = chik.municipio_geocodigo))));
-
-
 ALTER TABLE "Municipio".historico_casos OWNER TO postgres;
 
 

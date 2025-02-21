@@ -276,6 +276,27 @@ class Notificacao(models.Model):
         ]
 
 
+class NotificacaoView(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    data_iniSE = models.DateField()
+    SE = models.IntegerField()
+    casos_est = models.FloatField()
+    casos_est_min = models.IntegerField()
+    casos_est_max = models.IntegerField()
+    casos = models.IntegerField()
+    municipio_geocodigo = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'Municipio"."historico_casos'
+        indexes = [
+            models.Index(
+                fields=['-data_iniSE'],
+                name='historico_casos_data_inise_idx'
+            ),
+        ]
+
+
 class Localidade(models.Model):
     """
     Sub-unidades de analise no municipio
