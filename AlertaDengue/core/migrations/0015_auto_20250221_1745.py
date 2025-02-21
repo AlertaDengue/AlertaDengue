@@ -10,6 +10,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunSQL("""
+            CREATE SCHEMA IF NOT EXISTS weather;
+        """),
         migrations.CreateModel(
             name='CopernicusBra',
             fields=[
@@ -36,7 +39,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='copernicusbra',
-            constraint=models.UniqueConstraint(fields=('date', 'geocode'), name='composite_primary_key'),
+            constraint=models.UniqueConstraint(
+                fields=('date', 'geocode'), name='composite_primary_key'),
         ),
         migrations.AlterUniqueTogether(
             name='copernicusbra',
