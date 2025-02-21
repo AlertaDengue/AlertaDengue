@@ -206,6 +206,76 @@ class HistoricoAlertaZika(models.Model):
         ]
 
 
+class Notificacao(models.Model):
+    """
+    Casos de notificacao de dengue
+
+    NOTE: It should run with `migrate --fake` due to previously populated table
+    """
+    id = models.BigAutoField(primary_key=True)
+    dt_notific = models.DateField(null=True, blank=True)
+    se_notif = models.IntegerField(null=True, blank=True)
+    ano_notif = models.IntegerField(null=True, blank=True)
+    dt_sin_pri = models.DateField(null=True, blank=True)
+    se_sin_pri = models.IntegerField(null=True, blank=True)
+    dt_digita = models.DateField(null=True, blank=True)
+    municipio_geocodigo = models.IntegerField(null=True, blank=True)
+    nu_notific = models.IntegerField(null=True, blank=True)
+    cid10_codigo = models.CharField(max_length=5, null=True, blank=True)
+    dt_nasc = models.DateField(null=True, blank=True)
+    cs_sexo = models.CharField(max_length=1, null=True, blank=True)
+    nu_idade_n = models.IntegerField(null=True, blank=True)
+    resul_pcr = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
+    criterio = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
+    classi_fin = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
+    dt_chik_s1 = models.DateField(null=True, blank=True)
+    dt_chik_s2 = models.DateField(null=True, blank=True)
+    dt_prnt = models.DateField(null=True, blank=True)
+    res_chiks1 = models.CharField(max_length=255, null=True, blank=True)
+    res_chiks2 = models.CharField(max_length=255, null=True, blank=True)
+    resul_prnt = models.CharField(max_length=255, null=True, blank=True)
+    dt_soro = models.DateField(null=True, blank=True)
+    resul_soro = models.CharField(max_length=255, null=True, blank=True)
+    dt_ns1 = models.DateField(null=True, blank=True)
+    resul_ns1 = models.CharField(max_length=255, null=True, blank=True)
+    dt_viral = models.DateField(null=True, blank=True)
+    resul_vi_n = models.CharField(max_length=255, null=True, blank=True)
+    dt_pcr = models.DateField(null=True, blank=True)
+    sorotipo = models.CharField(max_length=255, null=True, blank=True)
+    id_distrit = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
+    id_bairro = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
+    nm_bairro = models.CharField(max_length=255, null=True, blank=True)
+    id_unidade = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
+
+    class Meta:
+        db_table = '"Municipio"."Notificacao"'
+        unique_together = (
+            "nu_notific", "dt_notific", "cid10_codigo", "municipio_geocodigo"
+        )
+        indexes = [
+            models.Index(
+                fields=["-dt_notific", "-se_notif"],
+                name="Dengue_idx_data"
+            ),
+            models.Index(
+                fields=["cid10_codigo"],
+                name="notificacao_cid10_idx"
+            ),
+        ]
+
+
 class Localidade(models.Model):
     """
     Sub-unidades de analise no municipio

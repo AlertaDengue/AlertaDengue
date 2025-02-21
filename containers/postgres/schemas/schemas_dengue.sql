@@ -58,191 +58,131 @@ ALTER TABLE "Municipio"."Clima_wu" OWNER TO administrador;
 ALTER TABLE "Municipio"."Estacao_cemaden" OWNER TO administrador;
 ALTER TABLE "Municipio"."Estacao_wu" OWNER TO administrador;
 ALTER TABLE "Municipio"."Localidade" OWNER TO administrador;
-
-
-CREATE TABLE "Municipio"."Notificacao" (
-    id bigint NOT NULL,
-    dt_notific date,
-    se_notif integer,
-    ano_notif integer,
-    dt_sin_pri date,
-    se_sin_pri integer,
-    dt_digita date,
-    municipio_geocodigo integer,
-    nu_notific integer,
-    cid10_codigo character varying(5),
-    dt_nasc date,
-    cs_sexo character varying(1),
-    nu_idade_n integer,
-    resul_pcr numeric,
-    criterio numeric,
-    classi_fin numeric,
-    
-    dt_chik_s1 date,
-    dt_chik_s2 date,
-    dt_prnt date,
-    res_chiks1 character varying(255),
-    res_chiks2 character varying(255),
-    resul_prnt character varying(255),
-    dt_soro date,
-    resul_soro character varying(255),
-    dt_ns1 date,
-    resul_ns1 character varying(255),
-    dt_viral date,
-    resul_vi_n character varying(255),
-    dt_pcr date,
-    sorotipo character varying(255),
-    id_distrit numeric,
-    id_bairro numeric,
-    nm_bairro character varying(255),
-    id_unidade numeric
-
-);
-
-
 ALTER TABLE "Municipio"."Notificacao" OWNER TO administrador;
 
 
-COMMENT ON TABLE "Municipio"."Notificacao" IS 'Casos de notificacao de dengue';
+-- CREATE TABLE "Municipio"."Notificacao__20220806" (
+--     id bigint,
+--     dt_notific date,
+--     se_notif integer,
+--     ano_notif integer,
+--     dt_sin_pri date,
+--     se_sin_pri integer,
+--     dt_digita date,
+--     municipio_geocodigo integer,
+--     nu_notific integer,
+--     cid10_codigo character varying(5),
+--     dt_nasc date,
+--     cs_sexo character varying(1),
+--     nu_idade_n integer,
+--     resul_pcr numeric,
+--     criterio numeric,
+--     classi_fin numeric
+-- );
 
 
-CREATE TABLE "Municipio"."Notificacao__20220806" (
-    id bigint,
-    dt_notific date,
-    se_notif integer,
-    ano_notif integer,
-    dt_sin_pri date,
-    se_sin_pri integer,
-    dt_digita date,
-    municipio_geocodigo integer,
-    nu_notific integer,
-    cid10_codigo character varying(5),
-    dt_nasc date,
-    cs_sexo character varying(1),
-    nu_idade_n integer,
-    resul_pcr numeric,
-    criterio numeric,
-    classi_fin numeric
-);
+-- ALTER TABLE "Municipio"."Notificacao__20220806" OWNER TO dengueadmin;
+
+-- CREATE TABLE "Municipio".alerta_mrj (
+--     id bigint NOT NULL,
+--     aps character varying(6) NOT NULL,
+--     se integer NOT NULL,
+--     data date NOT NULL,
+--     casos integer,
+--     casos_est real,
+--     casos_estmin real,
+--     casos_estmax real,
+--     tmin real,
+--     rt real,
+--     prt1 real,
+--     inc real,
+--     nivel integer
+-- );
 
 
-ALTER TABLE "Municipio"."Notificacao__20220806" OWNER TO dengueadmin;
+-- ALTER TABLE "Municipio".alerta_mrj OWNER TO dengueadmin;
 
 
-CREATE SEQUENCE "Municipio"."Notificacao_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+-- CREATE TABLE "Municipio".alerta_mrj_chik (
+--     id bigint NOT NULL,
+--     aps character varying(6) NOT NULL,
+--     se integer NOT NULL,
+--     data date NOT NULL,
+--     casos integer,
+--     casos_est real,
+--     casos_estmin real,
+--     casos_estmax real,
+--     tmin real,
+--     rt real,
+--     prt1 real,
+--     inc real,
+--     nivel integer
+-- );
 
 
-ALTER TABLE "Municipio"."Notificacao_id_seq" OWNER TO administrador;
+-- ALTER TABLE "Municipio".alerta_mrj_chik OWNER TO dengueadmin;
 
 
-ALTER SEQUENCE "Municipio"."Notificacao_id_seq" OWNED BY "Municipio"."Notificacao".id;
+-- CREATE SEQUENCE "Municipio".alerta_mrj_chik_id_seq
+--     START WITH 1
+--     INCREMENT BY 1
+--     NO MINVALUE
+--     NO MAXVALUE
+--     CACHE 1;
 
 
-CREATE TABLE "Municipio".alerta_mrj (
-    id bigint NOT NULL,
-    aps character varying(6) NOT NULL,
-    se integer NOT NULL,
-    data date NOT NULL,
-    casos integer,
-    casos_est real,
-    casos_estmin real,
-    casos_estmax real,
-    tmin real,
-    rt real,
-    prt1 real,
-    inc real,
-    nivel integer
-);
+-- ALTER TABLE "Municipio".alerta_mrj_chik_id_seq OWNER TO dengueadmin;
 
 
-ALTER TABLE "Municipio".alerta_mrj OWNER TO dengueadmin;
+-- ALTER SEQUENCE "Municipio".alerta_mrj_chik_id_seq OWNED BY "Municipio".alerta_mrj_chik.id;
 
 
-CREATE TABLE "Municipio".alerta_mrj_chik (
-    id bigint NOT NULL,
-    aps character varying(6) NOT NULL,
-    se integer NOT NULL,
-    data date NOT NULL,
-    casos integer,
-    casos_est real,
-    casos_estmin real,
-    casos_estmax real,
-    tmin real,
-    rt real,
-    prt1 real,
-    inc real,
-    nivel integer
-);
+-- CREATE SEQUENCE "Municipio".alerta_mrj_id_seq
+--     START WITH 1
+--     INCREMENT BY 1
+--     NO MINVALUE
+--     NO MAXVALUE
+--     CACHE 1;
 
 
-ALTER TABLE "Municipio".alerta_mrj_chik OWNER TO dengueadmin;
+-- ALTER TABLE "Municipio".alerta_mrj_id_seq OWNER TO dengueadmin;
 
 
-CREATE SEQUENCE "Municipio".alerta_mrj_chik_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+-- ALTER SEQUENCE "Municipio".alerta_mrj_id_seq OWNED BY "Municipio".alerta_mrj.id;
 
 
-ALTER TABLE "Municipio".alerta_mrj_chik_id_seq OWNER TO dengueadmin;
+-- CREATE TABLE "Municipio".alerta_mrj_zika (
+--     id bigint NOT NULL,
+--     aps character varying(6) NOT NULL,
+--     se integer NOT NULL,
+--     data date NOT NULL,
+--     casos integer,
+--     casos_est real,
+--     casos_estmin real,
+--     casos_estmax real,
+--     tmin real,
+--     rt real,
+--     prt1 real,
+--     inc real,
+--     nivel integer
+-- );
 
 
-ALTER SEQUENCE "Municipio".alerta_mrj_chik_id_seq OWNED BY "Municipio".alerta_mrj_chik.id;
+-- ALTER TABLE "Municipio".alerta_mrj_zika OWNER TO postgres;
 
 
-CREATE SEQUENCE "Municipio".alerta_mrj_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+-- CREATE SEQUENCE "Municipio".alerta_mrj_zika_id_seq
+--     START WITH 1
+--     INCREMENT BY 1
+--     NO MINVALUE
+--     NO MAXVALUE
+--     CACHE 1;
 
 
-ALTER TABLE "Municipio".alerta_mrj_id_seq OWNER TO dengueadmin;
+-- ALTER TABLE "Municipio".alerta_mrj_zika_id_seq OWNER TO postgres;
 
 
-ALTER SEQUENCE "Municipio".alerta_mrj_id_seq OWNED BY "Municipio".alerta_mrj.id;
-
-
-CREATE TABLE "Municipio".alerta_mrj_zika (
-    id bigint NOT NULL,
-    aps character varying(6) NOT NULL,
-    se integer NOT NULL,
-    data date NOT NULL,
-    casos integer,
-    casos_est real,
-    casos_estmin real,
-    casos_estmax real,
-    tmin real,
-    rt real,
-    prt1 real,
-    inc real,
-    nivel integer
-);
-
-
-ALTER TABLE "Municipio".alerta_mrj_zika OWNER TO postgres;
-
-
-CREATE SEQUENCE "Municipio".alerta_mrj_zika_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE "Municipio".alerta_mrj_zika_id_seq OWNER TO postgres;
-
-
-ALTER SEQUENCE "Municipio".alerta_mrj_zika_id_seq OWNED BY "Municipio".alerta_mrj_zika.id;
+-- ALTER SEQUENCE "Municipio".alerta_mrj_zika_id_seq OWNED BY "Municipio".alerta_mrj_zika.id;
 
 
 
@@ -450,8 +390,7 @@ CREATE TABLE forecast.django_admin_log (
     object_id text,
     object_repr character varying(200) NOT NULL,
     action_flag smallint NOT NULL,
-    change_message text NOT NULL,
-    content_type_id integer,
+    change_message text NOT NULL, content_type_id integer,
     user_id integer NOT NULL,
     CONSTRAINT django_admin_log_action_flag_check CHECK ((action_flag >= 0))
 );
