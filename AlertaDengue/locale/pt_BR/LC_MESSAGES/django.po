@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-10 00:13+0000\n"
+"POT-Creation-Date: 2025-02-20 13:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -353,9 +353,9 @@ msgid ""
 "umidade para se reproduzir e viver.\n"
 "        O vírus ao infectar o mosquito, também irá se reproduzir melhor em "
 "temperaturas mais altas. Dados de\n"
-"        temperatura e umidade são obtidos das <a href=\"https://estacoes."
-"dengue.mat.br/\">estações meteorológicas</a> de aeroportos assim como de "
-"imagens de\n"
+"        temperatura e umidade são obtidos das <a href=\"https://"
+"estacoes.dengue.mat.br/\">estações meteorológicas</a> de aeroportos assim "
+"como de imagens de\n"
 "        satélite."
 msgstr ""
 
@@ -817,9 +817,9 @@ msgstr ""
 
 #: dados/templates/alert_base.html:278
 msgid ""
-"Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www."
-"riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros "
-"para o mosquito!</a>"
+"Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://"
+"www.riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe "
+"criadouros para o mosquito!</a>"
 msgstr ""
 
 #: dados/templates/alert_base.html:279
@@ -1142,32 +1142,6 @@ msgstr ""
 
 #: dados/templates/main.html:73
 msgid "Situação Epidemiológica"
-msgstr ""
-
-#: dados/templates/mapadengue.html:22
-msgid "Mapa de Casos"
-msgstr ""
-
-#: dados/templates/mapadengue.html:29
-msgid "Casos de Dengue no município do Rio de Janeiro, em <b id="
-msgstr ""
-
-#: dados/templates/mapadengue.html:30
-msgid "Year: "
-msgstr ""
-
-#: dados/templates/mapamosquito.html:22
-msgid "Positividade de Ovitrampas"
-msgstr ""
-
-#: dados/templates/mapamosquito.html:28
-msgid "Ovitrampas Positivas"
-msgstr ""
-
-#: dados/templates/mapamosquito.html:30
-msgid ""
-"Modelo GAM espacial da positividade de ovitrampas no município do Rio de "
-"Janeiro."
 msgstr ""
 
 #: dados/templates/report_city.html:53
@@ -2243,18 +2217,6 @@ msgid ""
 "Este arquivo não contém {}, que é esperado em um arquivo válido do SINAN."
 msgstr ""
 
-#: dbf/views.py:53
-msgid ""
-"\n"
-"            O arquivo {dbf.file.name} exportado em {dbf.export_date:%d/%m/"
-"%Y}\n"
-"            com notificações do ano {dbf.notification_year}\n"
-"            foi enviado com sucesso. Você será informado por email\n"
-"            ({self.request.user.email}) assim que o processo de\n"
-"            importação for finalizado,\n"
-"            "
-msgstr ""
-
 #: forecast/models.py:21 upload/templates/sinan/overview.html:338
 msgid "Geocode"
 msgstr ""
@@ -2436,21 +2398,17 @@ msgstr ""
 msgid "CID10"
 msgstr ""
 
-#: upload/templates/sinan/index.html:72
+#: upload/templates/sinan/index.html:73
 msgid "Add Files"
 msgstr "Incluir Arquivos"
 
-#: upload/templates/sinan/index.html:74
+#: upload/templates/sinan/index.html:75
 msgid "Submit"
 msgstr "Enviar"
 
-#: upload/templates/sinan/index.html:77
+#: upload/templates/sinan/index.html:78
 msgid "Last Uploads"
 msgstr "Últimos envios"
-
-#: upload/templates/sinan/index.html:80
-msgid "Load More"
-msgstr "Carregar mais"
 
 #: upload/templates/sinan/overview.html:78
 msgid "File size"
@@ -2497,14 +2455,17 @@ msgstr "Casos por município"
 msgid "Cases"
 msgstr "Casos"
 
-#: upload/templates/sinan/status.html:24
+#: upload/templates/sinan/status.html:28
 msgid "New inserts"
 msgstr "Inserções"
 
-#: upload/templates/sinan/status.html:25
+#: upload/templates/sinan/status.html:29
 msgid "Updated rows"
 msgstr "Atualizações"
 
-#: upload/templates/sinan/status.html:26
+#: upload/templates/sinan/status.html:30
 msgid "Task duration"
 msgstr "Duração"
+
+#~ msgid "Load More"
+#~ msgstr "Carregar mais"
