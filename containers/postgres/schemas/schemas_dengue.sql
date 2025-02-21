@@ -12,20 +12,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 
-CREATE SCHEMA "Dengue_global";
-ALTER SCHEMA "Dengue_global" OWNER TO "Dengue";
-
-
-CREATE SCHEMA "Municipio";
-ALTER SCHEMA "Municipio" OWNER TO "Dengue";
-
-
-CREATE SCHEMA forecast;
-ALTER SCHEMA forecast OWNER TO postgres;
-
-
 ALTER SCHEMA public OWNER TO dengueadmin;
-
 
 CREATE SCHEMA weather;
 ALTER SCHEMA weather OWNER TO dengueadmin;
@@ -42,460 +29,52 @@ ALTER TABLE "Municipio"."Localidade" OWNER TO administrador;
 ALTER TABLE "Municipio"."Notificacao" OWNER TO administrador;
 
 
--- CREATE TABLE "Municipio"."Notificacao__20220806" (
---     id bigint,
---     dt_notific date,
---     se_notif integer,
---     ano_notif integer,
---     dt_sin_pri date,
---     se_sin_pri integer,
---     dt_digita date,
---     municipio_geocodigo integer,
---     nu_notific integer,
---     cid10_codigo character varying(5),
---     dt_nasc date,
---     cs_sexo character varying(1),
---     nu_idade_n integer,
---     resul_pcr numeric,
---     criterio numeric,
---     classi_fin numeric
--- );
-
-
--- ALTER TABLE "Municipio"."Notificacao__20220806" OWNER TO dengueadmin;
-
--- CREATE TABLE "Municipio".alerta_mrj (
---     id bigint NOT NULL,
---     aps character varying(6) NOT NULL,
---     se integer NOT NULL,
---     data date NOT NULL,
---     casos integer,
---     casos_est real,
---     casos_estmin real,
---     casos_estmax real,
---     tmin real,
---     rt real,
---     prt1 real,
---     inc real,
---     nivel integer
--- );
-
-
--- ALTER TABLE "Municipio".alerta_mrj OWNER TO dengueadmin;
-
-
--- CREATE TABLE "Municipio".alerta_mrj_chik (
---     id bigint NOT NULL,
---     aps character varying(6) NOT NULL,
---     se integer NOT NULL,
---     data date NOT NULL,
---     casos integer,
---     casos_est real,
---     casos_estmin real,
---     casos_estmax real,
---     tmin real,
---     rt real,
---     prt1 real,
---     inc real,
---     nivel integer
--- );
-
-
--- ALTER TABLE "Municipio".alerta_mrj_chik OWNER TO dengueadmin;
-
-
--- CREATE SEQUENCE "Municipio".alerta_mrj_chik_id_seq
---     START WITH 1
---     INCREMENT BY 1
---     NO MINVALUE
---     NO MAXVALUE
---     CACHE 1;
-
-
--- ALTER TABLE "Municipio".alerta_mrj_chik_id_seq OWNER TO dengueadmin;
-
-
--- ALTER SEQUENCE "Municipio".alerta_mrj_chik_id_seq OWNED BY "Municipio".alerta_mrj_chik.id;
-
-
--- CREATE SEQUENCE "Municipio".alerta_mrj_id_seq
---     START WITH 1
---     INCREMENT BY 1
---     NO MINVALUE
---     NO MAXVALUE
---     CACHE 1;
-
-
--- ALTER TABLE "Municipio".alerta_mrj_id_seq OWNER TO dengueadmin;
-
-
--- ALTER SEQUENCE "Municipio".alerta_mrj_id_seq OWNED BY "Municipio".alerta_mrj.id;
-
-
--- CREATE TABLE "Municipio".alerta_mrj_zika (
---     id bigint NOT NULL,
---     aps character varying(6) NOT NULL,
---     se integer NOT NULL,
---     data date NOT NULL,
---     casos integer,
---     casos_est real,
---     casos_estmin real,
---     casos_estmax real,
---     tmin real,
---     rt real,
---     prt1 real,
---     inc real,
---     nivel integer
--- );
-
-
--- ALTER TABLE "Municipio".alerta_mrj_zika OWNER TO postgres;
-
-
--- CREATE SEQUENCE "Municipio".alerta_mrj_zika_id_seq
---     START WITH 1
---     INCREMENT BY 1
---     NO MINVALUE
---     NO MAXVALUE
---     CACHE 1;
-
-
--- ALTER TABLE "Municipio".alerta_mrj_zika_id_seq OWNER TO postgres;
-
-
--- ALTER SEQUENCE "Municipio".alerta_mrj_zika_id_seq OWNED BY "Municipio".alerta_mrj_zika.id;
-
 ALTER TABLE "Municipio".historico_casos OWNER TO postgres;
-
-
-CREATE TABLE public.auth_group (
-    id integer NOT NULL,
-    name character varying(150) NOT NULL
-);
 
 
 ALTER TABLE public.auth_group OWNER TO dengueadmin;
 
 
-CREATE SEQUENCE public.auth_group_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
 ALTER TABLE public.auth_group_id_seq OWNER TO dengueadmin;
-
-
-ALTER SEQUENCE public.auth_group_id_seq OWNED BY public.auth_group.id;
-
-
-CREATE TABLE public.auth_group_permissions (
-    id integer NOT NULL,
-    group_id integer NOT NULL,
-    permission_id integer NOT NULL
-);
 
 
 ALTER TABLE public.auth_group_permissions OWNER TO dengueadmin;
 
 
-CREATE SEQUENCE public.auth_group_permissions_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.auth_group_permissions_id_seq OWNER TO dengueadmin;
-
-
-ALTER SEQUENCE public.auth_group_permissions_id_seq OWNED BY public.auth_group_permissions.id;
-
-
-CREATE TABLE public.auth_permission (
-    id integer NOT NULL,
-    name character varying(255) NOT NULL,
-    content_type_id integer NOT NULL,
-    codename character varying(100) NOT NULL
-);
-
-
 ALTER TABLE public.auth_permission OWNER TO dengueadmin;
-
-
-CREATE SEQUENCE public.auth_permission_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
 
 ALTER TABLE public.auth_permission_id_seq OWNER TO dengueadmin;
 
 
-ALTER SEQUENCE public.auth_permission_id_seq OWNED BY public.auth_permission.id;
-
-
-
-CREATE TABLE public.auth_user (
-    id integer NOT NULL,
-    password character varying(128) NOT NULL,
-    last_login timestamp with time zone,
-    is_superuser boolean NOT NULL,
-    username character varying(150) NOT NULL,
-    first_name character varying(150) NOT NULL,
-    last_name character varying(150) NOT NULL,
-    email character varying(254) NOT NULL,
-    is_staff boolean NOT NULL,
-    is_active boolean NOT NULL,
-    date_joined timestamp with time zone NOT NULL
-);
-
-
 ALTER TABLE public.auth_user OWNER TO dengueadmin;
-
-
-CREATE TABLE public.auth_user_groups (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    group_id integer NOT NULL
-);
 
 
 ALTER TABLE public.auth_user_groups OWNER TO dengueadmin;
 
 
-CREATE SEQUENCE public.auth_user_groups_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.auth_user_groups_id_seq OWNER TO dengueadmin;
-
-
-ALTER SEQUENCE public.auth_user_groups_id_seq OWNED BY public.auth_user_groups.id;
-
-
-CREATE SEQUENCE public.auth_user_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
 ALTER TABLE public.auth_user_id_seq OWNER TO dengueadmin;
-
-
-ALTER SEQUENCE public.auth_user_id_seq OWNED BY public.auth_user.id;
-
-
-CREATE TABLE public.auth_user_user_permissions (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    permission_id integer NOT NULL
-);
 
 
 ALTER TABLE public.auth_user_user_permissions OWNER TO dengueadmin;
 
 
-CREATE SEQUENCE public.auth_user_user_permissions_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.auth_user_user_permissions_id_seq OWNER TO dengueadmin;
-
-
-ALTER SEQUENCE public.auth_user_user_permissions_id_seq OWNED BY public.auth_user_user_permissions.id;
-
-
-CREATE TABLE public.chunked_upload_chunkedupload (
-    id integer NOT NULL,
-    upload_id character varying(32) NOT NULL,
-    file character varying(255) NOT NULL,
-    filename character varying(255) NOT NULL,
-    "offset" bigint NOT NULL,
-    created_on timestamp with time zone NOT NULL,
-    status smallint NOT NULL,
-    completed_on timestamp with time zone,
-    user_id integer,
-    CONSTRAINT chunked_upload_chunkedupload_status_check CHECK ((status >= 0))
-);
-
-
-ALTER TABLE public.chunked_upload_chunkedupload OWNER TO dengueadmin;
-
-
-CREATE SEQUENCE public.chunked_upload_chunkedupload_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.chunked_upload_chunkedupload_id_seq OWNER TO dengueadmin;
-
-
-ALTER SEQUENCE public.chunked_upload_chunkedupload_id_seq OWNED BY public.chunked_upload_chunkedupload.id;
-
-
-CREATE TABLE public.dbf_dbf (
-    id integer NOT NULL,
-    file character varying(100) NOT NULL,
-    uploaded_at timestamp with time zone NOT NULL,
-    export_date date NOT NULL,
-    notification_year integer NOT NULL,
-    uploaded_by_id integer NOT NULL,
-    state_abbreviation character varying(2),
-    municipio character varying(255) NOT NULL
-);
-
-
 ALTER TABLE public.dbf_dbf OWNER TO dengueadmin;
-
-
-CREATE SEQUENCE public.dbf_dbf_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.dbf_dbf_id_seq OWNER TO dengueadmin;
-
-
-ALTER SEQUENCE public.dbf_dbf_id_seq OWNED BY public.dbf_dbf.id;
-
-
-CREATE TABLE public.dbf_dbfchunkedupload (
-    id integer NOT NULL,
-    upload_id character varying(32) NOT NULL,
-    file character varying(255) NOT NULL,
-    filename character varying(255) NOT NULL,
-    "offset" bigint NOT NULL,
-    created_on timestamp with time zone NOT NULL,
-    status smallint NOT NULL,
-    completed_on timestamp with time zone,
-    user_id integer NOT NULL,
-    CONSTRAINT dbf_dbfchunkedupload_status_check CHECK ((status >= 0))
-);
 
 
 ALTER TABLE public.dbf_dbfchunkedupload OWNER TO dengueadmin;
 
 
-CREATE SEQUENCE public.dbf_dbfchunkedupload_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.dbf_dbfchunkedupload_id_seq OWNER TO dengueadmin;
-
-
-ALTER SEQUENCE public.dbf_dbfchunkedupload_id_seq OWNED BY public.dbf_dbfchunkedupload.id;
-
-
-CREATE TABLE public.django_admin_log (
-    id integer NOT NULL,
-    action_time timestamp with time zone NOT NULL,
-    object_id text,
-    object_repr character varying(200) NOT NULL,
-    action_flag smallint NOT NULL,
-    change_message text NOT NULL,
-    content_type_id integer,
-    user_id integer NOT NULL,
-    CONSTRAINT django_admin_log_action_flag_check CHECK ((action_flag >= 0))
-);
-
-
 ALTER TABLE public.django_admin_log OWNER TO dengueadmin;
-
-
-CREATE SEQUENCE public.django_admin_log_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
 
 
 ALTER TABLE public.django_admin_log_id_seq OWNER TO dengueadmin;
 
 
-ALTER SEQUENCE public.django_admin_log_id_seq OWNED BY public.django_admin_log.id;
-
-
-CREATE TABLE public.django_content_type (
-    id integer NOT NULL,
-    app_label character varying(100) NOT NULL,
-    model character varying(100) NOT NULL
-);
-
-
 ALTER TABLE public.django_content_type OWNER TO dengueadmin;
 
 
-CREATE SEQUENCE public.django_content_type_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.django_content_type_id_seq OWNER TO dengueadmin;
-
-
-ALTER SEQUENCE public.django_content_type_id_seq OWNED BY public.django_content_type.id;
-
-
-CREATE TABLE public.django_migrations (
-    id integer NOT NULL,
-    app character varying(255) NOT NULL,
-    name character varying(255) NOT NULL,
-    applied timestamp with time zone NOT NULL
-);
-
-
 ALTER TABLE public.django_migrations OWNER TO dengueadmin;
-
-
-CREATE SEQUENCE public.django_migrations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.django_migrations_id_seq OWNER TO dengueadmin;
-
-
-ALTER SEQUENCE public.django_migrations_id_seq OWNED BY public.django_migrations.id;
-
-
-CREATE TABLE public.django_session (
-    session_key character varying(40) NOT NULL,
-    session_data text NOT NULL,
-    expire_date timestamp with time zone NOT NULL
-);
 
 
 ALTER TABLE public.django_session OWNER TO dengueadmin;
@@ -679,195 +258,10 @@ ALTER TABLE weather.copernicus_foz_do_iguacu_index_seq OWNER TO dengueadmin;
 ALTER SEQUENCE weather.copernicus_foz_do_iguacu_index_seq OWNED BY weather.copernicus_foz_do_iguacu.index;
 
 
-ALTER TABLE ONLY "Municipio".alerta_mrj ALTER COLUMN id SET DEFAULT nextval('"Municipio".alerta_mrj_id_seq'::regclass);
-
-
-ALTER TABLE ONLY "Municipio".alerta_mrj_chik ALTER COLUMN id SET DEFAULT nextval('"Municipio".alerta_mrj_chik_id_seq'::regclass);
-
-
-ALTER TABLE ONLY "Municipio".alerta_mrj_zika ALTER COLUMN id SET DEFAULT nextval('"Municipio".alerta_mrj_zika_id_seq'::regclass);
-
-
-ALTER TABLE ONLY public.auth_group ALTER COLUMN id SET DEFAULT nextval('public.auth_group_id_seq'::regclass);
-
-
-ALTER TABLE ONLY public.auth_group_permissions ALTER COLUMN id SET DEFAULT nextval('public.auth_group_permissions_id_seq'::regclass);
-
-
-ALTER TABLE ONLY public.auth_permission ALTER COLUMN id SET DEFAULT nextval('public.auth_permission_id_seq'::regclass);
-
-
-ALTER TABLE ONLY public.auth_user ALTER COLUMN id SET DEFAULT nextval('public.auth_user_id_seq'::regclass);
-
-
-ALTER TABLE ONLY public.auth_user_groups ALTER COLUMN id SET DEFAULT nextval('public.auth_user_groups_id_seq'::regclass);
-
-
-ALTER TABLE ONLY public.auth_user_user_permissions ALTER COLUMN id SET DEFAULT nextval('public.auth_user_user_permissions_id_seq'::regclass);
-
-
-ALTER TABLE ONLY public.chunked_upload_chunkedupload ALTER COLUMN id SET DEFAULT nextval('public.chunked_upload_chunkedupload_id_seq'::regclass);
-
-
-ALTER TABLE ONLY public.dbf_dbf ALTER COLUMN id SET DEFAULT nextval('public.dbf_dbf_id_seq'::regclass);
-
-
-ALTER TABLE ONLY public.dbf_dbfchunkedupload ALTER COLUMN id SET DEFAULT nextval('public.dbf_dbfchunkedupload_id_seq'::regclass);
-
-
-ALTER TABLE ONLY public.django_admin_log ALTER COLUMN id SET DEFAULT nextval('public.django_admin_log_id_seq'::regclass);
-
-
-ALTER TABLE ONLY public.django_content_type ALTER COLUMN id SET DEFAULT nextval('public.django_content_type_id_seq'::regclass);
-
-
-ALTER TABLE ONLY public.django_migrations ALTER COLUMN id SET DEFAULT nextval('public.django_migrations_id_seq'::regclass);
-
-
 ALTER TABLE ONLY weather.copernicus_brasil ALTER COLUMN index SET DEFAULT nextval('weather.copernicus_brasil_index_seq'::regclass);
 
 
 ALTER TABLE ONLY weather.copernicus_foz_do_iguacu ALTER COLUMN index SET DEFAULT nextval('weather.copernicus_foz_do_iguacu_index_seq'::regclass);
-
-
-ALTER TABLE ONLY "Dengue_global"."CID10"
-    ADD CONSTRAINT "CID10_pk" PRIMARY KEY (codigo);
-
-
-ALTER TABLE ONLY "Dengue_global"."Municipio"
-    ADD CONSTRAINT "Municipio_pk" PRIMARY KEY (geocodigo);
-
-
-ALTER TABLE ONLY "Dengue_global".estado
-    ADD CONSTRAINT estado_pkey PRIMARY KEY (geocodigo);
-
-
-ALTER TABLE ONLY "Dengue_global".parameters
-    ADD CONSTRAINT parameters_pkey PRIMARY KEY (municipio_geocodigo);
-
-
-ALTER TABLE ONLY "Municipio".alerta_mrj_chik
-    ADD CONSTRAINT alerta_mrj_chik_pk PRIMARY KEY (id);
-
-
-ALTER TABLE ONLY "Municipio".alerta_mrj
-    ADD CONSTRAINT alerta_mrj_pk PRIMARY KEY (id);
-
-
-ALTER TABLE ONLY "Municipio".alerta_mrj_zika
-    ADD CONSTRAINT alerta_mrj_zika_pk PRIMARY KEY (id);
-
-
-ALTER TABLE ONLY "Municipio".alerta_mrj
-    ADD CONSTRAINT previsao UNIQUE (aps, se);
-
-
-ALTER TABLE ONLY "Municipio".alerta_mrj_chik
-    ADD CONSTRAINT previsao_chik UNIQUE (aps, se);
-
-
-ALTER TABLE ONLY "Municipio".alerta_mrj_zika
-    ADD CONSTRAINT previsao_zika UNIQUE (aps, se);
-
-
-ALTER TABLE ONLY "Municipio".alerta_mrj
-    ADD CONSTRAINT unique_aps_se UNIQUE (se, aps);
-
-
-ALTER TABLE ONLY "Municipio".alerta_mrj_chik
-    ADD CONSTRAINT unique_chik_aps_se UNIQUE (se, aps);
-
-
-ALTER TABLE ONLY "Municipio".alerta_mrj_zika
-    ADD CONSTRAINT unique_zika_aps_se UNIQUE (se, aps);
-
-
-ALTER TABLE ONLY public.auth_group
-    ADD CONSTRAINT auth_group_name_key UNIQUE (name);
-
-
-ALTER TABLE ONLY public.auth_group_permissions
-    ADD CONSTRAINT auth_group_permissions_group_id_permission_id_0cd325b0_uniq UNIQUE (group_id, permission_id);
-
-
-ALTER TABLE ONLY public.auth_group_permissions
-    ADD CONSTRAINT auth_group_permissions_pkey PRIMARY KEY (id);
-
-
-ALTER TABLE ONLY public.auth_group
-    ADD CONSTRAINT auth_group_pkey PRIMARY KEY (id);
-
-
-ALTER TABLE ONLY public.auth_permission
-    ADD CONSTRAINT auth_permission_content_type_id_codename_01ab375a_uniq UNIQUE (content_type_id, codename);
-
-
-ALTER TABLE ONLY public.auth_permission
-    ADD CONSTRAINT auth_permission_pkey PRIMARY KEY (id);
-
-
-ALTER TABLE ONLY public.auth_user_groups
-    ADD CONSTRAINT auth_user_groups_pkey PRIMARY KEY (id);
-
-
-ALTER TABLE ONLY public.auth_user_groups
-    ADD CONSTRAINT auth_user_groups_user_id_group_id_94350c0c_uniq UNIQUE (user_id, group_id);
-
-
-ALTER TABLE ONLY public.auth_user
-    ADD CONSTRAINT auth_user_pkey PRIMARY KEY (id);
-
-
-ALTER TABLE ONLY public.auth_user_user_permissions
-    ADD CONSTRAINT auth_user_user_permissions_pkey PRIMARY KEY (id);
-
-
-ALTER TABLE ONLY public.auth_user_user_permissions
-    ADD CONSTRAINT auth_user_user_permissions_user_id_permission_id_14a6b632_uniq UNIQUE (user_id, permission_id);
-
-
-ALTER TABLE ONLY public.auth_user
-    ADD CONSTRAINT auth_user_username_key UNIQUE (username);
-
-
-ALTER TABLE ONLY public.chunked_upload_chunkedupload
-    ADD CONSTRAINT chunked_upload_chunkedupload_pkey PRIMARY KEY (id);
-
-
-ALTER TABLE ONLY public.chunked_upload_chunkedupload
-    ADD CONSTRAINT chunked_upload_chunkedupload_upload_id_key UNIQUE (upload_id);
-
-
-ALTER TABLE ONLY public.dbf_dbf
-    ADD CONSTRAINT dbf_dbf_pkey PRIMARY KEY (id);
-
-
-ALTER TABLE ONLY public.dbf_dbfchunkedupload
-    ADD CONSTRAINT dbf_dbfchunkedupload_pkey PRIMARY KEY (id);
-
-
-ALTER TABLE ONLY public.dbf_dbfchunkedupload
-    ADD CONSTRAINT dbf_dbfchunkedupload_upload_id_key UNIQUE (upload_id);
-
-
-ALTER TABLE ONLY public.django_admin_log
-    ADD CONSTRAINT django_admin_log_pkey PRIMARY KEY (id);
-
-
-ALTER TABLE ONLY public.django_content_type
-    ADD CONSTRAINT django_content_type_app_label_model_76bd3d3b_uniq UNIQUE (app_label, model);
-
-
-ALTER TABLE ONLY public.django_content_type
-    ADD CONSTRAINT django_content_type_pkey PRIMARY KEY (id);
-
-
-ALTER TABLE ONLY public.django_migrations
-    ADD CONSTRAINT django_migrations_pkey PRIMARY KEY (id);
-
-
-ALTER TABLE ONLY public.django_session
-    ADD CONSTRAINT django_session_pkey PRIMARY KEY (session_key);
 
 
 ALTER TABLE ONLY weather.copernicus_brasil
@@ -876,129 +270,6 @@ ALTER TABLE ONLY weather.copernicus_brasil
 
 ALTER TABLE ONLY weather.copernicus_foz_do_iguacu
     ADD CONSTRAINT copernicus_foz_do_iguacu_pkey PRIMARY KEY (index);
-
-
-CREATE INDEX "Municipio_idx_gc" ON "Dengue_global"."Municipio" USING btree (geocodigo);
-
-
-CREATE INDEX "Municipio_idx_n" ON "Dengue_global"."Municipio" USING btree (nome);
-
-
-CREATE INDEX estado_idx_gc ON "Dengue_global".estado USING btree (geocodigo);
-
-
-CREATE INDEX parameters_idx_gc ON "Dengue_global".parameters USING btree (municipio_geocodigo);
-
-
-CREATE INDEX auth_group_name_a6ea08ec_like ON public.auth_group USING btree (name varchar_pattern_ops);
-
-
-CREATE INDEX auth_group_permissions_group_id_b120cbf9 ON public.auth_group_permissions USING btree (group_id);
-
-
-CREATE INDEX auth_group_permissions_permission_id_84c5c92e ON public.auth_group_permissions USING btree (permission_id);
-
-
-CREATE INDEX auth_permission_content_type_id_2f476e4b ON public.auth_permission USING btree (content_type_id);
-
-
-CREATE INDEX auth_user_groups_group_id_97559544 ON public.auth_user_groups USING btree (group_id);
-
-
-CREATE INDEX auth_user_groups_user_id_6a12ed8b ON public.auth_user_groups USING btree (user_id);
-
-
-CREATE INDEX auth_user_user_permissions_permission_id_1fbb5f2c ON public.auth_user_user_permissions USING btree (permission_id);
-
-
-CREATE INDEX auth_user_user_permissions_user_id_a95ead1b ON public.auth_user_user_permissions USING btree (user_id);
-
-
-CREATE INDEX auth_user_username_6821ab7c_like ON public.auth_user USING btree (username varchar_pattern_ops);
-
-
-CREATE INDEX chunked_upload_chunkedupload_upload_id_23703435_like ON public.chunked_upload_chunkedupload USING btree (upload_id varchar_pattern_ops);
-
-
-CREATE INDEX chunked_upload_chunkedupload_user_id_70ff6dbf ON public.chunked_upload_chunkedupload USING btree (user_id);
-
-
-CREATE INDEX dbf_dbf_uploaded_by_id_ad662eb4 ON public.dbf_dbf USING btree (uploaded_by_id);
-
-
-CREATE INDEX dbf_dbfchunkedupload_upload_id_e3989f45_like ON public.dbf_dbfchunkedupload USING btree (upload_id varchar_pattern_ops);
-
-
-CREATE INDEX dbf_dbfchunkedupload_user_id_c7cc2beb ON public.dbf_dbfchunkedupload USING btree (user_id);
-
-
-CREATE INDEX django_admin_log_content_type_id_c4bce8eb ON public.django_admin_log USING btree (content_type_id);
-
-
-CREATE INDEX django_admin_log_user_id_c564eba6 ON public.django_admin_log USING btree (user_id);
-
-
-CREATE INDEX django_session_expire_date_a5c62663 ON public.django_session USING btree (expire_date);
-
-
-CREATE INDEX django_session_session_key_c0390e0f_like ON public.django_session USING btree (session_key varchar_pattern_ops);
-
-
-CREATE INDEX uf_total_chik_view_data_idx ON public.uf_total_chik_view USING btree (data);
-
-
-CREATE INDEX uf_total_view_data_idx ON public.uf_total_view USING btree (data);
-
-
-CREATE INDEX uf_total_zika_view_data_idx ON public.uf_total_zika_view USING btree (data);
-
-
-ALTER TABLE ONLY public.auth_group_permissions
-    ADD CONSTRAINT auth_group_permissio_permission_id_84c5c92e_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES public.auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
-
-
-ALTER TABLE ONLY public.auth_group_permissions
-    ADD CONSTRAINT auth_group_permissions_group_id_b120cbf9_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
-
-
-ALTER TABLE ONLY public.auth_permission
-    ADD CONSTRAINT auth_permission_content_type_id_2f476e4b_fk_django_co FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
-
-
-ALTER TABLE ONLY public.auth_user_groups
-    ADD CONSTRAINT auth_user_groups_group_id_97559544_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES public.auth_group(id) DEFERRABLE INITIALLY DEFERRED;
-
-
-ALTER TABLE ONLY public.auth_user_groups
-    ADD CONSTRAINT auth_user_groups_user_id_6a12ed8b_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
-ALTER TABLE ONLY public.auth_user_user_permissions
-    ADD CONSTRAINT auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm FOREIGN KEY (permission_id) REFERENCES public.auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
-
-
-ALTER TABLE ONLY public.auth_user_user_permissions
-    ADD CONSTRAINT auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
-ALTER TABLE ONLY public.chunked_upload_chunkedupload
-    ADD CONSTRAINT chunked_upload_chunkedupload_user_id_70ff6dbf_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
-ALTER TABLE ONLY public.dbf_dbf
-    ADD CONSTRAINT dbf_dbf_uploaded_by_id_ad662eb4_fk_auth_user_id FOREIGN KEY (uploaded_by_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
-ALTER TABLE ONLY public.dbf_dbfchunkedupload
-    ADD CONSTRAINT dbf_dbfchunkedupload_user_id_c7cc2beb_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
-ALTER TABLE ONLY public.django_admin_log
-    ADD CONSTRAINT django_admin_log_content_type_id_c4bce8eb_fk_django_co FOREIGN KEY (content_type_id) REFERENCES public.django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
-
-
-ALTER TABLE ONLY public.django_admin_log
-    ADD CONSTRAINT django_admin_log_user_id_c564eba6_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 GRANT USAGE ON SCHEMA "Dengue_global" TO "Read_only";
@@ -1078,32 +349,7 @@ GRANT ALL ON TABLE "Municipio"."Notificacao" TO dengue;
 GRANT SELECT ON TABLE "Municipio"."Notificacao" TO infodenguedev;
 
 
-GRANT SELECT ON TABLE "Municipio"."Notificacao__20220806" TO infodenguedev;
-
-
 GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Notificacao_id_seq" TO dengue;
-
-
-GRANT ALL ON TABLE "Municipio".alerta_mrj TO dengue;
-GRANT SELECT ON TABLE "Municipio".alerta_mrj TO infodenguedev;
-
-
-GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE "Municipio".alerta_mrj_chik TO "Dengue";
-GRANT ALL ON TABLE "Municipio".alerta_mrj_chik TO dengue;
-GRANT SELECT ON TABLE "Municipio".alerta_mrj_chik TO infodenguedev;
-
-
-GRANT SELECT,USAGE ON SEQUENCE "Municipio".alerta_mrj_chik_id_seq TO dengue;
-
-
-GRANT SELECT,USAGE ON SEQUENCE "Municipio".alerta_mrj_id_seq TO dengue;
-
-
-GRANT ALL ON TABLE "Municipio".alerta_mrj_zika TO dengue;
-GRANT SELECT ON TABLE "Municipio".alerta_mrj_zika TO infodenguedev;
-
-
-GRANT SELECT,USAGE ON SEQUENCE "Municipio".alerta_mrj_zika_id_seq TO dengue;
 
 
 GRANT ALL ON TABLE "Municipio".historico_casos TO dengue;

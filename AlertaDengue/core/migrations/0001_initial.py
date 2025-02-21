@@ -11,6 +11,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunSQL("""
+            CREATE SCHEMA IF NOT EXISTS "Municipio";
+            ALTER SCHEMA "Municipio" OWNER TO "Dengue";
+        """),
         migrations.CreateModel(
             name='HistoricoAlerta',
             fields=[
@@ -26,20 +30,30 @@ class Migration(migrations.Migration):
                 ('p_inc100k', models.FloatField(blank=True, null=True)),
                 ('Localidade_id', models.IntegerField(blank=True, null=True)),
                 ('nivel', models.SmallIntegerField(blank=True, null=True)),
-                ('versao_modelo', models.CharField(blank=True, max_length=40, null=True)),
-                ('municipio_nome', models.CharField(blank=True, max_length=128, null=True)),
-                ('tweet', models.DecimalField(blank=True, decimal_places=0, max_digits=5, null=True)),
+                ('versao_modelo', models.CharField(
+                    blank=True, max_length=40, null=True)),
+                ('municipio_nome', models.CharField(
+                    blank=True, max_length=128, null=True)),
+                ('tweet', models.DecimalField(blank=True,
+                 decimal_places=0, max_digits=5, null=True)),
                 ('Rt', models.FloatField(blank=True, null=True)),
-                ('pop', models.DecimalField(blank=True, decimal_places=0, max_digits=20, null=True)),
-                ('tempmin', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True)),
-                ('umidmax', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True)),
+                ('pop', models.DecimalField(blank=True,
+                 decimal_places=0, max_digits=20, null=True)),
+                ('tempmin', models.DecimalField(blank=True,
+                 decimal_places=2, max_digits=10, null=True)),
+                ('umidmax', models.DecimalField(blank=True,
+                 decimal_places=2, max_digits=10, null=True)),
                 ('receptivo', models.SmallIntegerField(blank=True, null=True)),
                 ('transmissao', models.SmallIntegerField(blank=True, null=True)),
                 ('nivel_inc', models.SmallIntegerField(blank=True, null=True)),
-                ('umidmed', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True)),
-                ('umidmin', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True)),
-                ('tempmed', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True)),
-                ('tempmax', models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True)),
+                ('umidmed', models.DecimalField(blank=True,
+                 decimal_places=2, max_digits=10, null=True)),
+                ('umidmin', models.DecimalField(blank=True,
+                 decimal_places=2, max_digits=10, null=True)),
+                ('tempmed', models.DecimalField(blank=True,
+                 decimal_places=2, max_digits=10, null=True)),
+                ('tempmax', models.DecimalField(blank=True,
+                 decimal_places=2, max_digits=10, null=True)),
                 ('casprov', models.IntegerField(blank=True, null=True)),
                 ('casprov_est', models.FloatField(blank=True, null=True)),
                 ('casprov_est_min', models.IntegerField(blank=True, null=True)),
@@ -56,6 +70,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='historicoalerta',
-            constraint=models.UniqueConstraint(fields=('SE', 'municipio_geocodigo', 'Localidade_id'), name='alertas_unicos'),
+            constraint=models.UniqueConstraint(
+                fields=('SE', 'municipio_geocodigo', 'Localidade_id'), name='alertas_unicos'),
         ),
     ]

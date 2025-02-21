@@ -10,6 +10,7 @@ from django.db import migrations
 def create_dengue_global():
     sql = """
         CREATE SCHEMA IF NOT EXISTS "Dengue_global";
+        ALTER SCHEMA "Dengue_global" OWNER TO "Dengue";
 
         CREATE TABLE IF NOT EXISTS "Dengue_global"."Municipio"
         (
