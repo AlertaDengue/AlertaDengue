@@ -8,29 +8,26 @@ from django.db import migrations
 
 
 def create_dengue_global():
-    if "test" in sys.argv:
-        sql = """
-            CREATE SCHEMA IF NOT EXISTS "Dengue_global";
+    sql = """
+        CREATE SCHEMA IF NOT EXISTS "Dengue_global";
 
-            CREATE TABLE IF NOT EXISTS "Dengue_global"."Municipio"
-            (
-              geocodigo integer NOT NULL,
-              nome character varying(128) NOT NULL,
-              geojson text NOT NULL,
-              populacao bigint NOT NULL,
-              uf character varying(20) NOT NULL,
-              CONSTRAINT "Municipio_pk" PRIMARY KEY (geocodigo)
-            );
+        CREATE TABLE IF NOT EXISTS "Dengue_global"."Municipio"
+        (
+            geocodigo integer NOT NULL,
+            nome character varying(128) NOT NULL,
+            geojson text NOT NULL,
+            populacao bigint NOT NULL,
+            uf character varying(20) NOT NULL,
+            CONSTRAINT "Municipio_pk" PRIMARY KEY (geocodigo)
+        );
 
-            CREATE TABLE IF NOT EXISTS "Dengue_global"."CID10"
-            (
-              nome character varying(512) NOT NULL,
-              codigo character varying(5) NOT NULL,
-              CONSTRAINT "CID10_pk" PRIMARY KEY (codigo)
-            );
-        """
-    else:
-        sql = "SELECT 1;"
+        CREATE TABLE IF NOT EXISTS "Dengue_global"."CID10"
+        (
+            nome character varying(512) NOT NULL,
+            codigo character varying(5) NOT NULL,
+            CONSTRAINT "CID10_pk" PRIMARY KEY (codigo)
+        );
+    """
 
     return migrations.RunSQL(sql, hints={"target_db": "forecast"})
 
