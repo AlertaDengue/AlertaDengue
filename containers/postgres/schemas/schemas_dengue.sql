@@ -33,162 +33,21 @@ ALTER TABLE "Municipio".historico_casos OWNER TO postgres;
 
 
 ALTER TABLE public.auth_group OWNER TO dengueadmin;
-
-
 ALTER TABLE public.auth_group_id_seq OWNER TO dengueadmin;
-
-
 ALTER TABLE public.auth_group_permissions OWNER TO dengueadmin;
-
-
 ALTER TABLE public.auth_permission OWNER TO dengueadmin;
-
-
 ALTER TABLE public.auth_permission_id_seq OWNER TO dengueadmin;
-
-
 ALTER TABLE public.auth_user OWNER TO dengueadmin;
-
-
 ALTER TABLE public.auth_user_groups OWNER TO dengueadmin;
-
-
 ALTER TABLE public.auth_user_id_seq OWNER TO dengueadmin;
-
-
 ALTER TABLE public.auth_user_user_permissions OWNER TO dengueadmin;
-
-
 ALTER TABLE public.dbf_dbf OWNER TO dengueadmin;
-
-
 ALTER TABLE public.dbf_dbfchunkedupload OWNER TO dengueadmin;
-
-
 ALTER TABLE public.django_admin_log OWNER TO dengueadmin;
-
-
 ALTER TABLE public.django_admin_log_id_seq OWNER TO dengueadmin;
-
-
 ALTER TABLE public.django_content_type OWNER TO dengueadmin;
-
-
 ALTER TABLE public.django_migrations OWNER TO dengueadmin;
-
-
 ALTER TABLE public.django_session OWNER TO dengueadmin;
-
-
-CREATE MATERIALIZED VIEW public.hist_uf_chik_materialized_view AS
- SELECT upper((state.uf)::text) AS state_abbv,
-    city.uf AS state_name,
-    alerta.municipio_geocodigo,
-    alerta."SE",
-    alerta."data_iniSE",
-    alerta.casos_est,
-    alerta.casos,
-    alerta.nivel,
-    alerta.receptivo
-   FROM (("Municipio"."Historico_alerta_chik" alerta
-     JOIN "Dengue_global"."Municipio" city ON ((alerta.municipio_geocodigo = city.geocodigo)))
-     JOIN "Dengue_global".estado state ON ((upper((city.uf)::text) = (state.nome)::text)))
-  WHERE (alerta."data_iniSE" >= ( SELECT (max(alerta_1."data_iniSE") - '28 days'::interval) AS max_date
-           FROM "Municipio"."Historico_alerta_chik" alerta_1))
-  ORDER BY alerta."data_iniSE"
-  WITH NO DATA;
-
-
-ALTER TABLE public.hist_uf_chik_materialized_view OWNER TO dengueadmin;
-
-
-CREATE MATERIALIZED VIEW public.hist_uf_dengue_materialized_view AS
- SELECT upper((state.uf)::text) AS state_abbv,
-    city.uf AS state_name,
-    alerta.municipio_geocodigo,
-    alerta."SE",
-    alerta."data_iniSE",
-    alerta.casos_est,
-    alerta.casos,
-    alerta.nivel,
-    alerta.receptivo
-   FROM (("Municipio"."Historico_alerta" alerta
-     JOIN "Dengue_global"."Municipio" city ON ((alerta.municipio_geocodigo = city.geocodigo)))
-     JOIN "Dengue_global".estado state ON ((upper((city.uf)::text) = (state.nome)::text)))
-  WHERE (alerta."data_iniSE" >= ( SELECT (max(alerta_1."data_iniSE") - '28 days'::interval) AS max_date
-           FROM "Municipio"."Historico_alerta" alerta_1))
-  ORDER BY alerta."data_iniSE"
-  WITH NO DATA;
-
-
-ALTER TABLE public.hist_uf_dengue_materialized_view OWNER TO dengueadmin;
-
-
-CREATE MATERIALIZED VIEW public.hist_uf_zika_materialized_view AS
- SELECT upper((state.uf)::text) AS state_abbv,
-    city.uf AS state_name,
-    alerta.municipio_geocodigo,
-    alerta."SE",
-    alerta."data_iniSE",
-    alerta.casos_est,
-    alerta.casos,
-    alerta.nivel,
-    alerta.receptivo
-   FROM (("Municipio"."Historico_alerta_zika" alerta
-     JOIN "Dengue_global"."Municipio" city ON ((alerta.municipio_geocodigo = city.geocodigo)))
-     JOIN "Dengue_global".estado state ON ((upper((city.uf)::text) = (state.nome)::text)))
-  WHERE (alerta."data_iniSE" >= ( SELECT (max(alerta_1."data_iniSE") - '28 days'::interval) AS max_date
-           FROM "Municipio"."Historico_alerta_zika" alerta_1))
-  ORDER BY alerta."data_iniSE"
-  WITH NO DATA;
-
-
-ALTER TABLE public.hist_uf_zika_materialized_view OWNER TO dengueadmin;
-
-
-CREATE MATERIALIZED VIEW public.uf_total_chik_view AS
- SELECT "Municipio".uf,
-    "Historico_alerta_chik"."data_iniSE" AS data,
-    sum("Historico_alerta_chik".casos) AS casos_s,
-    sum("Historico_alerta_chik".casos_est) AS casos_est_s
-   FROM ("Municipio"."Historico_alerta_chik"
-     JOIN "Dengue_global"."Municipio" ON (("Historico_alerta_chik".municipio_geocodigo = "Municipio".geocodigo)))
-  GROUP BY "Historico_alerta_chik"."data_iniSE", "Municipio".uf
-  ORDER BY "Municipio".uf, "Historico_alerta_chik"."data_iniSE"
-  WITH NO DATA;
-
-
-ALTER TABLE public.uf_total_chik_view OWNER TO administrador;
-
-
-CREATE MATERIALIZED VIEW public.uf_total_view AS
- SELECT "Municipio".uf,
-    "Historico_alerta"."data_iniSE" AS data,
-    sum("Historico_alerta".casos) AS casos_s,
-    sum("Historico_alerta".casos_est) AS casos_est_s
-   FROM ("Municipio"."Historico_alerta"
-     JOIN "Dengue_global"."Municipio" ON (("Historico_alerta".municipio_geocodigo = "Municipio".geocodigo)))
-  GROUP BY "Historico_alerta"."data_iniSE", "Municipio".uf
-  ORDER BY "Municipio".uf, "Historico_alerta"."data_iniSE"
-  WITH NO DATA;
-
-
-ALTER TABLE public.uf_total_view OWNER TO administrador;
-
-
-CREATE MATERIALIZED VIEW public.uf_total_zika_view AS
- SELECT "Municipio".uf,
-    "Historico_alerta_zika"."data_iniSE" AS data,
-    sum("Historico_alerta_zika".casos) AS casos_s,
-    sum("Historico_alerta_zika".casos_est) AS casos_est_s
-   FROM ("Municipio"."Historico_alerta_zika"
-     JOIN "Dengue_global"."Municipio" ON (("Historico_alerta_zika".municipio_geocodigo = "Municipio".geocodigo)))
-  GROUP BY "Historico_alerta_zika"."data_iniSE", "Municipio".uf
-  ORDER BY "Municipio".uf, "Historico_alerta_zika"."data_iniSE"
-  WITH NO DATA;
-
-
-ALTER TABLE public.uf_total_zika_view OWNER TO postgres;
 
 
 GRANT USAGE ON SCHEMA "Dengue_global" TO "Read_only";
@@ -276,101 +135,37 @@ GRANT SELECT ON TABLE "Municipio".historico_casos TO infodenguedev;
 
 
 GRANT SELECT ON TABLE forecast.auth_group TO infodenguedev;
-
-
 GRANT SELECT ON TABLE forecast.auth_group_permissions TO infodenguedev;
-
-
 GRANT SELECT ON TABLE forecast.auth_permission TO infodenguedev;
-
-
 GRANT SELECT ON TABLE forecast.auth_user TO infodenguedev;
-
-
 GRANT SELECT ON TABLE forecast.auth_user_groups TO infodenguedev;
-
-
 GRANT SELECT ON TABLE forecast.auth_user_user_permissions TO infodenguedev;
-
-
 GRANT SELECT ON TABLE forecast.chunked_upload_chunkedupload TO infodenguedev;
-
-
 GRANT SELECT ON TABLE forecast.django_admin_log TO infodenguedev;
-
-
 GRANT SELECT ON TABLE forecast.django_content_type TO infodenguedev;
-
-
 GRANT SELECT ON TABLE forecast.django_migrations TO infodenguedev;
-
-
 GRANT SELECT ON TABLE forecast.django_session TO infodenguedev;
-
-
 GRANT SELECT ON TABLE forecast.forecast_cases TO infodenguedev;
-
-
 GRANT SELECT ON TABLE forecast.forecast_city TO infodenguedev;
-
-
 GRANT SELECT ON TABLE forecast.forecast_model TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.auth_group TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.auth_group_permissions TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.auth_permission TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.auth_user TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.auth_user_groups TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.auth_user_user_permissions TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.chunked_upload_chunkedupload TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.dbf_dbf TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.dbf_dbfchunkedupload TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.django_admin_log TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.django_content_type TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.django_migrations TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.django_session TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.geography_columns TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.geometry_columns TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.hist_uf_chik_materialized_view TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.hist_uf_dengue_materialized_view TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.hist_uf_zika_materialized_view TO infodenguedev;
-
-
 GRANT SELECT ON TABLE public.spatial_ref_sys TO infodenguedev;
 
 
