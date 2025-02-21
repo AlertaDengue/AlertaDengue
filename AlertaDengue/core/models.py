@@ -474,3 +474,34 @@ class Parameters(models.Model):
                 name='parameters_idx_gc'
             ),
         ]
+
+
+# weather
+
+
+class CopernicusBra(models.Model):
+    date = models.DateTimeField(null=False, primary_key=True)
+    geocode = models.TextField(null=False)
+    temp_max = models.FloatField(null=False)
+    precip_max = models.FloatField(null=False)
+    umid_max = models.FloatField(null=False)
+    pressao_max = models.FloatField(null=False)
+    temp_med = models.FloatField(null=False)
+    precip_med = models.FloatField(null=False)
+    umid_med = models.FloatField(null=False)
+    pressao_med = models.FloatField(null=False)
+    temp_min = models.FloatField(null=False)
+    precip_min = models.FloatField(null=False)
+    umid_min = models.FloatField(null=False)
+    pressao_min = models.FloatField(null=False)
+    precip_tot = models.FloatField(null=False)
+    epiweek = models.TextField(null=False)
+
+    class Meta:
+        db_table = '"weather"."copernicus_bra"'
+        constraints = [
+            models.UniqueConstraint(
+                fields=["date", "geocode"], name="composite_primary_key"
+            )
+        ]
+        unique_together = ['date', 'geocode']

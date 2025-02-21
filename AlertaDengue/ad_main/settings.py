@@ -190,6 +190,9 @@ DATABASES = {
         "PASSWORD": PSQL_PASSWORD,
         "HOST": PSQL_HOST,
         "PORT": PSQL_PORT,
+        "OPTIONS": {
+            "options": '-c search_path="Municipio","Dengue_global",weather,public'
+        },
     },
     "infodengue": {
         "ENGINE": "django.db.backends.postgresql",
