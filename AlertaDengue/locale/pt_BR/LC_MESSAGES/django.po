@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-10 00:13+0000\n"
+"POT-Creation-Date: 2025-02-28 17:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -353,9 +353,9 @@ msgid ""
 "umidade para se reproduzir e viver.\n"
 "        O vírus ao infectar o mosquito, também irá se reproduzir melhor em "
 "temperaturas mais altas. Dados de\n"
-"        temperatura e umidade são obtidos das <a href=\"https://estacoes."
-"dengue.mat.br/\">estações meteorológicas</a> de aeroportos assim como de "
-"imagens de\n"
+"        temperatura e umidade são obtidos das <a href=\"https://"
+"estacoes.dengue.mat.br/\">estações meteorológicas</a> de aeroportos assim "
+"como de imagens de\n"
 "        satélite."
 msgstr ""
 
@@ -817,9 +817,9 @@ msgstr ""
 
 #: dados/templates/alert_base.html:278
 msgid ""
-"Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www."
-"riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros "
-"para o mosquito!</a>"
+"Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://"
+"www.riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe "
+"criadouros para o mosquito!</a>"
 msgstr ""
 
 #: dados/templates/alert_base.html:279
@@ -1997,152 +1997,148 @@ msgstr ""
 #: dados/templates/team.html:15
 msgid ""
 "\n"
-"                O Sistema de Alerta Info Dengue é desenvolvido pela parceria "
-"de pesquisadores e profissionais\n"
-"                de diversas instituições"
+"        O Sistema de Alerta Info Dengue é desenvolvido pela parceria de "
+"pesquisadores e profissionais\n"
+"        de diversas instituições"
 msgstr ""
 
 #: dados/templates/team.html:18
 msgid "Coordenação Geral"
 msgstr ""
 
-#: dados/templates/team.html:20
-msgid "Escola de Matemática Aplicada/FGV"
-msgstr ""
-
-#: dados/templates/team.html:21 dados/templates/team.html:22
+#: dados/templates/team.html:20 dados/templates/team.html:22
+#: dados/templates/team.html:23 dados/templates/team.html:42
+#: dados/templates/team.html:61 dados/templates/team.html:62
 msgid "PROCC/Fiocruz"
 msgstr ""
 
-#: dados/templates/team.html:24
-msgid "Epidemiologia"
+#: dados/templates/team.html:21
+msgid "Escola de Matemática Aplicada/FGV"
 msgstr ""
 
-#: dados/templates/team.html:26
-msgid "World Mosquito Program/Fiocruz"
+#: dados/templates/team.html:25
+msgid "Analistas de dados e de situação epidemiológica:"
 msgstr ""
 
-#: dados/templates/team.html:27
-msgid "Epidemiologista, bolsista INOVA"
-msgstr ""
-
-#: dados/templates/team.html:28
-msgid "Epidemiologista, bolsista PDJ-INOVA"
+#: dados/templates/team.html:27 dados/templates/team.html:28
+msgid "Analista InfoDengue - epidemiologia"
 msgstr ""
 
 #: dados/templates/team.html:29
-msgid "Pesquisador Associado - PROCC/Fiocruz"
+msgid "Analista InfoDengue - estatística e epidemiologia"
 msgstr ""
 
 #: dados/templates/team.html:30 dados/templates/team.html:31
-msgid "Pesquisador Titular - PROCC/Fiocruz"
+msgid "Analista InfoDengue - ciência de dados"
 msgstr ""
 
 #: dados/templates/team.html:33
 msgid "Desenvolvimento"
 msgstr ""
 
-#: dados/templates/team.html:35 dados/templates/team.html:37
-msgid "Cientista de dados"
+#: dados/templates/team.html:35
+msgid "TI Infodengue & Mosqlimate"
 msgstr ""
 
-#: dados/templates/team.html:36
-msgid "Desenvolvedor Full Stack"
+#: dados/templates/team.html:36 dados/templates/team.html:37
+msgid "Consultor externo"
 msgstr ""
 
 #: dados/templates/team.html:39
-msgid "Comunicação"
+msgid "Pesquisadores Associados"
 msgstr ""
 
-#: dados/templates/team.html:41 dados/templates/team.html:46
-#: dados/templates/team.html:47
-msgid "Observatório da Dengue/UFMG"
+#: dados/templates/team.html:41
+msgid "Barcelona Supercomputing Center (BSC) - Espanha"
 msgstr ""
 
 #: dados/templates/team.html:44
-msgid "Colaboradores"
+msgid "Comunicação"
+msgstr ""
+
+#: dados/templates/team.html:46
+msgid "comunicação e engajamento"
 msgstr ""
 
 #: dados/templates/team.html:48
-msgid "Instituto de Biociências/UFPR"
+msgid "Doutorandos e Mestrandos"
 msgstr ""
 
-#: dados/templates/team.html:50
-msgid "Colaboradores internacionais"
-msgstr ""
-
+#: dados/templates/team.html:50 dados/templates/team.html:51
 #: dados/templates/team.html:52
-msgid "University of Exeter: UK"
+msgid "Programa de Doutorado em Epidemiologia em Saúde Pública - ENSP/Fiocruz"
 msgstr ""
 
 #: dados/templates/team.html:53
-msgid "University of Warwick: UK"
+msgid ""
+"Programa de Doutorado em Parasitologia - Universidade Federal de Minas "
+"Gerais (UFMG)"
 msgstr ""
 
 #: dados/templates/team.html:54
-msgid "University of Chicago: USA"
+msgid "Programa de Mestrado em Medicina Tropical - IOC/Fiocruz"
 msgstr ""
 
-#: dados/templates/team.html:56
-msgid "Alunos"
+#: dados/templates/team.html:55
+msgid "Programa de Mestrado em Biologia Computacional e Sistemas - IOC/Fiocruz"
 msgstr ""
 
-#: dados/templates/team.html:58
-msgid ""
-"Aluna de doutorado do Programa de Epidemiologia em Saúde Pública - ENSP/"
-"Fiocruz"
+#: dados/templates/team.html:57
+msgid "Agradecimentos a todos que participaram da comunidade Infodengue"
 msgstr ""
 
 #: dados/templates/team.html:59
+msgid "Observatório da Dengue/UFMG"
+msgstr ""
+
+#: dados/templates/team.html:60
+msgid "Instituto de Biociências/UFPR"
+msgstr ""
+
+#: dados/templates/team.html:63
 msgid ""
 "Aluna de mestrado do Programa de Epidemiologia em Saúde Pública - ENSP/"
 "Fiocruz"
 msgstr ""
 
-#: dados/templates/team.html:60
-msgid ""
-"Aluno de doutorado do Programa de Biologia Computacional e Sistemas - IOC/"
-"Fiocruz"
-msgstr ""
-
-#: dados/templates/team.html:62
+#: dados/templates/team.html:65
 msgid "Parceria"
 msgstr ""
 
-#: dados/templates/team.html:82
+#: dados/templates/team.html:83
 msgid "Apoio"
 msgstr ""
 
-#: dados/templates/team.html:84
+#: dados/templates/team.html:85
 msgid "DECIT/MS (2014 – 2016)"
 msgstr ""
 
-#: dados/templates/team.html:85
+#: dados/templates/team.html:86
 msgid "Fiocruz Edital Inova 2019 (2019-2021)"
 msgstr ""
 
-#: dados/templates/team.html:86
+#: dados/templates/team.html:87
 msgid "FNS/MS (2020-2021)"
 msgstr ""
 
-#: dados/templates/team.html:88
+#: dados/templates/team.html:89
 msgid "Oportunidade"
 msgstr ""
 
-#: dados/templates/team.html:90
+#: dados/templates/team.html:91
 msgid ""
 "No momento não temos posições abertas, mas se você tem formação em ciência "
 "de dados, tem conhecimento de R ou Python, e tem interesse em colaborar com "
 "o Infodengue, mande seu currículo"
 msgstr ""
 
-#: dados/templates/team.html:95
+#: dados/templates/team.html:96
 msgid ""
 "Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta "
 "Info Dengue?"
 msgstr ""
 
-#: dados/templates/team.html:96
+#: dados/templates/team.html:97
 msgid "Entre em contato conosco"
 msgstr ""
 
@@ -2241,18 +2237,6 @@ msgstr ""
 #: dbf/validation.py:54
 msgid ""
 "Este arquivo não contém {}, que é esperado em um arquivo válido do SINAN."
-msgstr ""
-
-#: dbf/views.py:53
-msgid ""
-"\n"
-"            O arquivo {dbf.file.name} exportado em {dbf.export_date:%d/%m/"
-"%Y}\n"
-"            com notificações do ano {dbf.notification_year}\n"
-"            foi enviado com sucesso. Você será informado por email\n"
-"            ({self.request.user.email}) assim que o processo de\n"
-"            importação for finalizado,\n"
-"            "
 msgstr ""
 
 #: forecast/models.py:21 upload/templates/sinan/overview.html:338
@@ -2436,21 +2420,17 @@ msgstr ""
 msgid "CID10"
 msgstr ""
 
-#: upload/templates/sinan/index.html:72
+#: upload/templates/sinan/index.html:73
 msgid "Add Files"
 msgstr "Incluir Arquivos"
 
-#: upload/templates/sinan/index.html:74
+#: upload/templates/sinan/index.html:75
 msgid "Submit"
 msgstr "Enviar"
 
-#: upload/templates/sinan/index.html:77
+#: upload/templates/sinan/index.html:78
 msgid "Last Uploads"
 msgstr "Últimos envios"
-
-#: upload/templates/sinan/index.html:80
-msgid "Load More"
-msgstr "Carregar mais"
 
 #: upload/templates/sinan/overview.html:78
 msgid "File size"
@@ -2497,14 +2477,17 @@ msgstr "Casos por município"
 msgid "Cases"
 msgstr "Casos"
 
-#: upload/templates/sinan/status.html:24
+#: upload/templates/sinan/status.html:28
 msgid "New inserts"
 msgstr "Inserções"
 
-#: upload/templates/sinan/status.html:25
+#: upload/templates/sinan/status.html:29
 msgid "Updated rows"
 msgstr "Atualizações"
 
-#: upload/templates/sinan/status.html:26
+#: upload/templates/sinan/status.html:30
 msgid "Task duration"
 msgstr "Duração"
+
+#~ msgid "Load More"
+#~ msgstr "Carregar mais"
