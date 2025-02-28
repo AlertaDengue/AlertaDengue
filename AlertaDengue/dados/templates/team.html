@@ -2,101 +2,101 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}{% translate "Equipe" %}{% endblock %}
+  {% block title %}{% translate "Equipe" %}{% endblock %}
 
-{% block content %}
-    <div class="card" id="diseaseTabContent"
-        style="background-color: #e0eefd63;
-          margin-bottom: 20px;
-          border-radius: 7px">
+  {% block content %}
+  <div class="card" id="diseaseTabContent"
+    style="background-color: #e0eefd63;
+    margin-bottom: 20px;
+    border-radius: 7px">
 
-        <div class="card-body">
+    <div class="card-body">
 
-            <h5>{% blocktranslate %}
-                O Sistema de Alerta Info Dengue é desenvolvido pela parceria de pesquisadores e profissionais
-                de diversas instituições{% endblocktranslate %}:</h5><br>
-                <b>{% translate "Coordenação Geral" %}:</b>
-                <ul>
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4784466T7">Flávio Codeço Coelho</a>: {% translate "Escola de Matemática Aplicada/FGV" %}
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4791352H4">Oswaldo Gonçalves Cruz</a>: {% translate "PROCC/Fiocruz" %}
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4790532T7">Cláudia Torres Codeço</a>: {% translate "PROCC/Fiocruz" %}
-                </ul>
-                <b>{% translate "Epidemiologia" %}:</b>
-                <ul>
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4759101T0">Thais I S Riback</a> - {% translate "World Mosquito Program/Fiocruz" %}
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4361680P0">Sara de Souza Oliveira</a>: {% translate "Epidemiologista, bolsista INOVA" %}
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4223051Y0">Raquel Martins Lana</a>: {% translate "Epidemiologista, bolsista PDJ-INOVA" %}
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4739761D0">Marcelo F C Gomes</a>: {% translate "Pesquisador Associado - PROCC/Fiocruz" %}
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4791405Z2">Daniel A M Villela</a>: {% translate "Pesquisador Titular - PROCC/Fiocruz" %}
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4764470D2">Leonardo Soares Bastos</a>: {% translate "Pesquisador Titular - PROCC/Fiocruz" %}
-                </ul>
-                <b>{% translate "Desenvolvimento" %}:</b>
-                <ul>
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K8141821A0">Ivan Ogasawara</a>: {% translate "Cientista de dados" %}
-                    <li><a href="https://esloch.github.io/cv/">Sandro Loch</a>: {% translate "Desenvolvedor Full Stack" %}
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K8065406A9">Vinicius Godinho</a>: {% translate "Cientista de dados" %}
-                </ul>
-                <b>{% translate "Comunicação" %}:</b>
-                <ul>
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K8593649P3">Marcelle Chagas</a> - {% translate "Observatório da Dengue/UFMG" %}
-                </ul>
+      <h5>{% blocktranslate %}
+        O Sistema de Alerta Info Dengue é desenvolvido pela parceria de pesquisadores e profissionais
+        de diversas instituições{% endblocktranslate %}:</h5><br>
+      <b>{% translate "Coordenação Geral" %}:</b>
+      <ul>
+        <li><a href="https://lattes.cnpq.br/1929576902623348">Cláudia Torres Codeço</a>: {% translate "PROCC/Fiocruz" %}
+        <li><a href="https://lattes.cnpq.br/0309050626285266">Flávio Codeço Coelho</a>: {% translate "Escola de Matemática Aplicada/FGV" %}
+        <li><a href="https://lattes.cnpq.br/5241799121437269">Leonardo Soares Bastos</a>: {% translate "PROCC/Fiocruz" %}
+        <li><a href="https://lattes.cnpq.br/9530671289607786">Oswaldo Gonçalves Cruz</a>: {% translate "PROCC/Fiocruz" %}
+      </ul>
+      <b>{% translate "Analistas de dados e de situação epidemiológica:" %}:</b>
+      <ul>
+        <li><a href="https://lattes.cnpq.br/2864482261450215">Sara de Souza Oliveira</a>: {% translate "Analista InfoDengue - epidemiologia" %}
+        <li><a href="https://lattes.cnpq.br/4335590727747384">Thais I S Riback</a> - {% translate "Analista InfoDengue - epidemiologia" %}
+        <li><a href="https://lattes.cnpq.br/5099258319176445">Lucas Monteiro Bianchi</a> - {% translate "Analista InfoDengue - estatística e epidemiologia" %}
+        <li><a href="https://lattes.cnpq.br/8508944359245527">Vinicius Godinho</a>: {% translate "Analista InfoDengue - ciência de dados" %}
+        <li><a href="https://lattes.cnpq.br/2326164285897270">Eduardo Correa Araujo</a>: {% translate "Analista InfoDengue - ciência de dados" %}
+      </ul>
+      <b>{% translate "Desenvolvimento" %}:</b>
+      <ul>
+        <li><a href="https://lattes.cnpq.br/2917646970654963">Luã Bida Vacaro</a>: {% translate "TI Infodengue & Mosqlimate" %}
+        <li><a href="https://lattes.cnpq.br/7764277601641080">Ivan Ogasawara</a>: {% translate "Consultor externo" %}
+        <li><a href="https://esloch.github.io/cv/">Sandro Loch</a>: {% translate "Consultor externo" %}
+      </ul>
+      <b>{% translate "Pesquisadores Associados" %}:</b>
+      <ul>
+        <li><a href="https://lattes.cnpq.br/2518752229392005">Raquel Martins Lana</a>: {% translate "Barcelona Supercomputing Center (BSC) - Espanha" %}
+        <li><a href="https://lattes.cnpq.br/2996805485281003">Laís Picinini Freitas</a>: {% translate "PROCC/Fiocruz" %}
+      </ul>
+      <b>{% translate "Comunicação" %}:</b>
+      <ul>
+        <li><a href="https://lattes.cnpq.br/2219603304725763">Marcelle Chagas</a> - {% translate "comunicação e engajamento" %}
+      </ul>
+      <b>{% translate "Doutorandos e Mestrandos" %}:</b>
+      <ul>
+        <li><a href="https://lattes.cnpq.br/6555136792794111">Iasmim Ferreira de Almeida</a> - {% translate "Programa de Doutorado em Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}</li>
+        <li><a href="https://lattes.cnpq.br/0485886911362331">Ramila Alencar</a> - {% translate "Programa de Doutorado em Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}</li>
+        <li><a href="https://lattes.cnpq.br/2651948797512226">Ayrton Gouveia</a> - {% translate "Programa de Doutorado em Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}</li>
+        <li><a href="https://lattes.cnpq.br/0421717413079286">Danielle Andreza da Cruz Ferreira</a> - {% translate "Programa de Doutorado em Parasitologia - Universidade Federal de Minas Gerais (UFMG)" %}</li>
+        <li><a href="https://lattes.cnpq.br/9746873482395128">Dalila Oliveira</a> - {% translate "Programa de Mestrado em Medicina Tropical - IOC/Fiocruz" %}</li>
+        <li><a href="https://lattes.cnpq.br/3293230312200648">Jo de Napole Arruda Dias</a> - {% translate "Programa de Mestrado em Biologia Computacional e Sistemas - IOC/Fiocruz" %}</li>
+      </ul>
+      <b>{% translate "Agradecimentos a todos que participaram da comunidade Infodengue" %}:</b>
+      <ul>
+        <li><a href="https://lattes.cnpq.br/1316412551645220">Mauro Martins Teixeira</a> - {% translate "Observatório da Dengue/UFMG" %}</li>
+        <li><a href="https://lattes.cnpq.br/5566477869758674">Magda C V C Ribeiro</a> - {% translate "Instituto de Biociências/UFPR" %}</li>
+        <li><a href="https://lattes.cnpq.br/6064559192125515">Marcelo F C Gomes</a> - {% translate "PROCC/Fiocruz" %}</li>
+        <li><a href="https://lattes.cnpq.br/4016632420686251">Daniel A M Villela</a> - {% translate "PROCC/Fiocruz" %}</li>
+        <li><a href="https://lattes.cnpq.br/4132749866565570">Nathaly Dutra</a> - {% translate "Aluna de mestrado do Programa de Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}</li>
+      </ul>
+      <b>{% translate "Parceria" %}:</b>
+      <ul>
+        <li><a href="https://observatorio.inweb.org.br">Observatório da Dengue</a>
+        <li><a href="http://www.saude.rj.gov.br/">Secretaria Estadual de Saúde do Rio de Janeiro</a>
+        <li><a href="https://saude.es.gov.br/">Secretaria Estadual de Saúde do Estado do Espirito Santo</a>
+        <li><a href="https://www.saude.pr.gov.br/">Secretaria Estadual de Saúde do Estado do Paraná</a>
+        <li><a href="https://www.saude.ce.gov.br/">Secretaria Estadual de Saúde do Estado do Ceará</a>
+        <li><a href="https://www.saude.mg.gov.br/">Secretaria Estadual de Saúde do Estado de Minas Gerais</a>
+        <li><a href="https://www.saude.ma.gov.br/">Secretaria Estadual de Saúde do Estado do Maranhão</a>
+        <li><a href="https://www.saude.sc.gov.br/">Secretaria Estadual de Saúde do Estado de Santa Catarina</a>
+        <li><a href="https://www.rio.rj.gov.br/web/sms">Secretaria Municipal de Saúde/Rio de Janeiro/RJ</a>
+        <li><a href="http://www.saude.riopreto.sp.gov.br/transparencia/">Secretaria Municipal de Saúde de São José do Rio Preto/SP</a>
+        <li><a href="https://www2.bauru.sp.gov.br/saude/">Secretaria Municipal de Saúde de Bauru/SP</a>
+        <li><a href="https://saude.sorocaba.sp.gov.br/">Secretaria Municipal de Saúde de Sorocaba/SP</a>
+        <li><a href="https://prefeitura.poa.br/sms">Secretaria Municipal de Saúde de Porto Alegre/RS</a>
+        <li><a href="http://www.riobranco.ac.gov.br/">Secretaria Municipal de Saúde de Rio Branco/AC</a>
+        <li><a href="https://www.vs.saude.ms.gov.br/">Secretaria de Vigilância em Saúde/MS</a>
+      </ul>
+      <b>{% translate "Apoio" %}:</b>
+      <ul>
+        <li> {% translate "DECIT/MS (2014 – 2016)" %}
+        <li> {% translate "Fiocruz Edital Inova 2019 (2019-2021)" %}
+        <li> {% translate "FNS/MS (2020-2021)" %}
+      </ul>
+      <b>{% translate "Oportunidade" %}:</b>
+      <ul>
+        <li>{% translate "No momento não temos posições abertas, mas se você tem formação em ciência de dados, tem conhecimento de R ou Python, e tem interesse em colaborar com o Infodengue, mande seu currículo" %}.
+        </li>
+      </ul>
 
-                <b>{% translate "Colaboradores" %}:</b>
-                <ul>
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4469269H2">Karina Talita O S Jorge</a> - {% translate "Observatório da Dengue/UFMG" %}
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4782323E6">Mauro Martins Teixeira</a> - {% translate "Observatório da Dengue/UFMG" %}
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4700277J3">Magda C V C Ribeiro</a> - {% translate  "Instituto de Biociências/UFPR" %}
-                </ul>
-                <b>{% translate "Colaboradores internacionais" %}:</b>
-                <ul>
-                    <li><a href="http://emps.exeter.ac.uk/mathematics/staff/te201">Theo Economou</a> - {% translate  "University of Exeter: UK" %}
-                    <li><a href="https://www.wbs.ac.uk/about/person/suzy-moat/">Suzy Moat</a> and <a href="https://www.wbs.ac.uk/about/person/tobias-preis/">Tobias Preis</a> - {% translate "University of Warwick: UK" %}
-                    <li><a href="https://pondside.uchicago.edu/ecol-evol/people/pascual.html">Mercedes Pascual</a> - {% translate  "University of Chicago: USA" %}
-                </ul>
-                <b>{% translate "Alunos" %}:</b>
-                <ul>
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4354190H7">Iasmim Ferreira de Almeida</a>: {% translate "Aluna de doutorado do Programa de Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4473376Z6">Nathaly Dutra</a>: {% translate "Aluna de mestrado do Programa de Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}
-                    <li><a href="http://buscatextual.cnpq.br/buscatextual/visualizacv.do?id=K4859585D4">Leon Diniz Alves</a>: {% translate "Aluno de doutorado do Programa de Biologia Computacional e Sistemas - IOC/Fiocruz" %}
-                </ul>
-                <b>{% translate "Parceria" %}:</b>
-                <ul>
-                    <li><a href="https://observatorio.inweb.org.br">Observatório da Dengue</a>
-                    <li><a href="http://www.saude.rj.gov.br/">Secretaria Estadual de Saúde do Rio de Janeiro</a>
-                    <li><a href="https://saude.es.gov.br/">Secretaria Estadual de Saúde do Estado do Espirito Santo</a>
-                    <li><a href="https://www.saude.pr.gov.br/">Secretaria Estadual de Saúde do Estado do Paraná</a>
-                    <li><a href="https://www.saude.ce.gov.br/">Secretaria Estadual de Saúde do Estado do Ceará</a>
-                    <li><a href="https://www.saude.mg.gov.br/">Secretaria Estadual de Saúde do Estado de Minas Gerais</a>
-                    <li><a href="https://www.saude.ma.gov.br/">Secretaria Estadual de Saúde do Estado do Maranhão</a>
-                    <li><a href="https://www.saude.sc.gov.br/">Secretaria Estadual de Saúde do Estado de Santa Catarina</a>
-                    <li><a href="https://www.rio.rj.gov.br/web/sms">Secretaria Municipal de Saúde/Rio de Janeiro/RJ</a>
-                    <li><a href="http://www.saude.riopreto.sp.gov.br/transparencia/">Secretaria Municipal de Saúde de São José do Rio Preto/SP</a>
-                    <li><a href="https://www2.bauru.sp.gov.br/saude/">Secretaria Municipal de Saúde de Bauru/SP</a>
-                    <li><a href="https://saude.sorocaba.sp.gov.br/">Secretaria Municipal de Saúde de Sorocaba/SP</a>
-                    <li><a href="https://prefeitura.poa.br/sms">Secretaria Municipal de Saúde de Porto Alegre/RS</a>
-                    <li><a href="http://www.riobranco.ac.gov.br/">Secretaria Municipal de Saúde de Rio Branco/AC</a>
-                    <li><a href="https://www.vs.saude.ms.gov.br/">Secretaria de Vigilância em Saúde/MS</a>
-
-
-                </ul>
-                <b>{% translate "Apoio" %}:</b>
-                <ul>
-                    <li> {% translate "DECIT/MS (2014 – 2016)" %}
-                    <li> {% translate "Fiocruz Edital Inova 2019 (2019-2021)" %}
-                    <li> {% translate "FNS/MS (2020-2021)" %}
-                </ul>
-                <b>{% translate "Oportunidade" %}:</b>
-                <ul>
-                    <li>{% translate "No momento não temos posições abertas, mas se você tem formação em ciência de dados, tem conhecimento de R ou Python, e tem interesse em colaborar com o Infodengue, mande seu currículo" %}.
-                    </li>
-                </ul>
-                
-                <p>
-                    <b>{% translate "Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta Info Dengue?" %}
-                    <i><a href='mailto:alerta_dengue@fiocruz.br'> {% translate "Entre em contato conosco" %}</a></i></b>.
-                </p>
-        </div>
+      <p>
+        <b>{% translate "Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta Info Dengue?" %}
+          <i><a href='mailto:alerta_dengue@fiocruz.br'> {% translate "Entre em contato conosco" %}</a></i></b>.
+      </p>
     </div>
-</div>
+  </div>
 
-{% endblock %}
+  {% endblock %}
