@@ -1,5 +1,6 @@
 import shutil
 import time
+import csv
 from pathlib import Path
 from typing import Iterator, Tuple
 
@@ -255,8 +256,9 @@ def sinan_insert_to_db(upload_sinan_id: int):
                     current_row += chunksize
                     status.progress(current_row, total_rows)
             elif file.suffix.lower() == ".csv":
-                with file.open("r", encoding="iso-8859-1") as csv:
-                    total_rows = sum(1 for _ in csv) - 1
+                csv.field_size_limit(10**6)  # malformated DS_OBS column
+                with file.open("r", encoding="iso-8859-1") as csv_file:
+                    total_rows = sum(1 for _ in csv_file) - 1
 
                 status.progress(current_row, total_rows)
                 for chunk in pd.read_csv(
