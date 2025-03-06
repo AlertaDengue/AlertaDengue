@@ -1239,7 +1239,7 @@ files = [
 
 [[package]]
 name = "episcanner-downloader"
-version = "1.0.10"
+version = "1.0.11"
 description = "Dashboard quickstart template"
 optional = false
 python-versions = ">=3.9,<3.11"
@@ -1263,8 +1263,8 @@ urllib3 = "1.26.15"
 [package.source]
 type = "git"
 url = "https://github.com/AlertaDengue/episcanner-downloader"
-reference = "1.0.10"
-resolved_reference = "2c2b23d13d8bd9020256bffc4965fc3ee25602e3"
+reference = "1.0.11"
+resolved_reference = "503d39e9843fc36ceed5a21cbc9bf2e356d7f47e"
 
 [[package]]
 name = "epiweeks"
@@ -4215,4 +4215,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.11"
-content-hash = "69c2785bed2e48193f534a25b2f243f33a3fd57a4147106d5c09a6d603f944ff"
+content-hash = "b1e7f01660744e143622bdd7004d92987c0222661f580eec7ef9243c1f8595b3"
