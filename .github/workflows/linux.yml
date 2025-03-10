@@ -64,7 +64,7 @@ jobs:
       matrix:
         python_version: ["3.9", "3.10", "3.11"]
     concurrency:
-      group: ci-${{ github.ref }}
+      group: ci-${{ matrix.python_version }}-${{ github.ref }}
       cancel-in-progress: false
 
     defaults:
