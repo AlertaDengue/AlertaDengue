@@ -137,11 +137,11 @@ MESSAGE_TAGS = {
 }
 
 
-CHUNKED_UPLOAD_PATH = 'uploaded/chunked_uploads/%Y/%m/%d'
+CHUNKED_UPLOAD_PATH = "uploaded/chunked_uploads/%Y/%m/%d"
 
 
 class DBFSINANStorage(FileSystemStorage):
-    def __init__(self, location='/DBF_SINAN', *args, **kwargs):
+    def __init__(self, location="/DBF_SINAN", *args, **kwargs):
         super().__init__(location=location, *args, **kwargs)
 
 

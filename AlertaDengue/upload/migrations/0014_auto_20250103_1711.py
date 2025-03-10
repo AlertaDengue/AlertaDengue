@@ -8,33 +8,37 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('upload', '0013_alter_sinanuploadlogstatus_log_file'),
+        ("upload", "0013_alter_sinanuploadlogstatus_log_file"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='sinanuploadlogstatus',
-            name='filtered_out',
+            model_name="sinanuploadlogstatus",
+            name="filtered_out",
             field=models.IntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='sinanuploadlogstatus',
-            name='inserts',
+            model_name="sinanuploadlogstatus",
+            name="inserts",
             field=models.IntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='sinanuploadlogstatus',
-            name='time_spend',
+            model_name="sinanuploadlogstatus",
+            name="time_spend",
             field=models.FloatField(default=0.0),
         ),
         migrations.AddField(
-            model_name='sinanuploadlogstatus',
-            name='updates',
+            model_name="sinanuploadlogstatus",
+            name="updates",
             field=models.IntegerField(default=0),
         ),
         migrations.AlterField(
-            model_name='sinanchunkedupload',
-            name='file',
-            field=models.FileField(max_length=255, storage=ad_main.settings.DBFSINANStorage(), upload_to=chunked_upload.settings.default_upload_to),
+            model_name="sinanchunkedupload",
+            name="file",
+            field=models.FileField(
+                max_length=255,
+                storage=ad_main.settings.DBFSINANStorage(),
+                upload_to=chunked_upload.settings.default_upload_to,
+            ),
         ),
     ]

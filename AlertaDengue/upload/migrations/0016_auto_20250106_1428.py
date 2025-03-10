@@ -6,21 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('upload', '0015_remove_sinanuploadlogstatus_filtered_out'),
+        ("upload", "0015_remove_sinanuploadlogstatus_filtered_out"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='sinanuploadlogstatus',
-            name='end_id',
+            model_name="sinanuploadlogstatus",
+            name="end_id",
             field=models.IntegerField(default=None, null=True),
         ),
         migrations.AddField(
-            model_name='sinanuploadlogstatus',
-            name='start_id',
+            model_name="sinanuploadlogstatus",
+            name="start_id",
             field=models.IntegerField(default=None, null=True),
         ),
         migrations.DeleteModel(
-            name='SINANUploadHistory',
+            name="SINANUploadHistory",
         ),
     ]

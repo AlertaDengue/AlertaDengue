@@ -7,7 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from . import models
 
-
 User = get_user_model()
 
 
@@ -15,10 +14,7 @@ class SINANForm(forms.Form):
     uploaded_by = forms.ModelChoiceField(
         queryset=User.objects.all(), widget=forms.HiddenInput()
     )
-    upload_id = forms.CharField(
-        required=False,
-        widget=forms.HiddenInput()
-    )
+    upload_id = forms.CharField(required=False, widget=forms.HiddenInput())
     filename = forms.CharField(required=False, widget=forms.HiddenInput())
     cid10 = forms.ChoiceField(
         choices=models.SINANUpload.CID10,
@@ -26,14 +22,13 @@ class SINANForm(forms.Form):
         initial=models.SINANUpload.CID10[0][0],
     )
     notification_year = forms.IntegerField(
-        label=_("Ano de notificação"),
-        initial=date.today().year
+        label=_("Ano de notificação"), initial=date.today().year
     )
     uf = forms.ChoiceField(
         choices=models.SINANUpload.UFs,
         label=_("Abrangência"),
         required=False,
-        initial=None
+        initial=None,
     )
 
     def clean(self):

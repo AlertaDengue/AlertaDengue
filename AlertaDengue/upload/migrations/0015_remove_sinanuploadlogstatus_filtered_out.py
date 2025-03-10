@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('upload', '0014_auto_20250103_1711'),
+        ("upload", "0014_auto_20250103_1711"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='sinanuploadlogstatus',
-            name='filtered_out',
+            model_name="sinanuploadlogstatus",
+            name="filtered_out",
         ),
     ]

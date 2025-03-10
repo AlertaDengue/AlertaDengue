@@ -1,21 +1,19 @@
-from typing import Literal, Optional, Union, Generator
-from pathlib import Path
-from datetime import date
-from array import array
 import pickle
+from array import array
+from datetime import date
+from pathlib import Path
+from typing import Generator, Literal, Optional, Union
 
+from chunked_upload.models import BaseChunkedUpload
+from dados.models import City
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 from epiweeks import Week
 
-from django.db import models
-from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
-from django.contrib.auth import get_user_model
-from chunked_upload.models import BaseChunkedUpload
-
-from dados.models import City
 from .sinan.utils import UF_CODES, chunk_gen
-
 
 User = get_user_model()
 
@@ -30,18 +28,12 @@ def sinan_upload_log_path() -> str:
 
 class SINANChunkedUpload(BaseChunkedUpload):
     user = models.ForeignKey(
-        User,
-        related_name='uploads',
-        on_delete=models.PROTECT
+        User, related_name="uploads", on_delete=models.PROTECT
     )
 
 
 class SINANUploadLogStatus(models.Model):
-    STATUS = [
-        (0, "Pending"),
-        (1, "Success"),
-        (2, "Error")
-    ]
+    STATUS = [(0, "Pending"), (1, "Success"), (2, "Error")]
 
     LOG_LEVEL = ["PROGRESS", "DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"]
 
@@ -70,10 +62,7 @@ class SINANUploadLogStatus(models.Model):
         return len(self._read_ids("updates"))
 
     def list_ids(
-        self,
-        offset: int,
-        limit: int,
-        id_type: Literal["inserts", "updates"]
+        self, offset: int, limit: int, id_type: Literal["inserts", "updates"]
     ) -> list[int]:
         if abs(limit - offset) > 50000:
             raise ValueError("ids range exceeds 50_000 entries")
@@ -84,7 +73,7 @@ class SINANUploadLogStatus(models.Model):
             return []
 
         start, end = min([offset, limit]), max([offset, limit])
-        return ids[start:end+1]
+        return ids[start : end + 1]
 
     @property
     def time_spend(self) -> float:
@@ -116,19 +105,20 @@ class SINANUploadLogStatus(models.Model):
 
     def read_logs(
         self,
-        level: Optional[Literal[
-            "PROGRESS", "DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"
-        ]] = None,
+        level: Optional[
+            Literal["PROGRESS", "DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"]
+        ] = None,
         only_level: bool = False,
     ):
-        with Path(self.log_file).open(mode='r', encoding="utf-8") as log_file:
+        with Path(self.log_file).open(mode="r", encoding="utf-8") as log_file:
             logs = []
 
             for line in log_file:
                 if level:
                     startswith = (
-                        tuple(self.LOG_LEVEL[self.LOG_LEVEL.index(level):])
-                        if not only_level else level
+                        tuple(self.LOG_LEVEL[self.LOG_LEVEL.index(level) :])
+                        if not only_level
+                        else level
                     )
                     if line.startswith(startswith):
                         logs.append(line.strip())
@@ -138,7 +128,9 @@ class SINANUploadLogStatus(models.Model):
 
     def _write_logs(
         self,
-        level: Literal["PROGRESS", "DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"],
+        level: Literal[
+            "PROGRESS", "DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"
+        ],
         message: str,
     ):
         try:
@@ -148,11 +140,11 @@ class SINANUploadLogStatus(models.Model):
 
         if self.status != 0:
             raise ValueError(
-                "Log is closed for writing (finished with status " +
-                f"{self.status})."
+                "Log is closed for writing (finished with status "
+                + f"{self.status})."
             )
         log_message = f"{level}{spaces} - {message}\n"
-        with Path(self.log_file).open(mode='a', encoding="utf-8") as log_file:
+        with Path(self.log_file).open(mode="a", encoding="utf-8") as log_file:
             log_file.write(log_message)
 
     def debug(self, message: str):
@@ -213,11 +205,7 @@ class SINANUpload(models.Model):
         ("TO", "Tocantins"),
     ]
 
-    CID10 = [
-        ("A90", "Dengue"),
-        ("A92.0", "Chikungunya"),
-        ("A928", "Zika")
-    ]
+    CID10 = [("A90", "Dengue"), ("A92.0", "Chikungunya"), ("A928", "Zika")]
 
     REQUIRED_COLS = [
         "ID_MUNICIP",
@@ -293,16 +281,12 @@ class SINANUpload(models.Model):
 
     def _final_basename(self):
         filename = str(Path(self.upload.filename).with_suffix(""))
-        disease = {
-            "A90": "DENG",
-            "A92.0": "CHIK",
-            "A928": "ZIKA"
-        }
+        disease = {"A90": "DENG", "A92.0": "CHIK", "A928": "ZIKA"}
         uf = self.uf if self.uf else "BR"
         epiweek = Week.fromdate(self.uploaded_at)
-        return "_".join(
-            [str(epiweek), disease[self.cid10], uf]
-        ) + "-" + filename
+        return (
+            "_".join([str(epiweek), disease[self.cid10], uf]) + "-" + filename
+        )
 
     def delete(self, *args, **kwargs):
         file = Path(self.upload.file.path)

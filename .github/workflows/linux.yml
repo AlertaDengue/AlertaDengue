@@ -65,7 +65,7 @@ jobs:
         python_version: ["3.9", "3.10", "3.11"]
     concurrency:
       group: ci-${{ github.ref }}
-      cancel-in-progress: true
+      cancel-in-progress: false
 
     defaults:
       run:
@@ -119,10 +119,6 @@ jobs:
     - name: Container wait all
       run: |
           makim develop.container-wait-all --timeout 150
-
-    - name: Setup tmate session
-      if: "${{ failure() }}"
-      uses: mxschmitt/action-tmate@v3
 
     - name: Linting
       run: |

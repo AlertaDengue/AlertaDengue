@@ -1,27 +1,25 @@
+import json
 from pathlib import Path
 
 import humanize
-import json
-
-from psycopg2.extras import DictCursor
-
+from ad_main.settings import get_sqla_conn
+from chunked_upload.views import ChunkedUploadCompleteView, ChunkedUploadView
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.base import File
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import JsonResponse, QueryDict, HttpResponseNotFound
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.http import HttpResponseNotFound, JsonResponse, QueryDict
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic.edit import FormView, View
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-from django.shortcuts import render, redirect
-from chunked_upload.views import ChunkedUploadView, ChunkedUploadCompleteView
+from django.views.generic.edit import FormView, View
+from psycopg2.extras import DictCursor
 
-from . import models, forms
-from ad_main.settings import get_sqla_conn
+from . import forms, models
 
 User = get_user_model()
 Engine = get_sqla_conn(database="dengue")
@@ -41,13 +39,12 @@ class SINANOverview(LoginRequiredMixin, View):
 
     @never_cache
     def get(self, request, *args, **kwargs):
-        sinan_upload_id = kwargs.get('sinan_upload_id')
+        sinan_upload_id = kwargs.get("sinan_upload_id")
         context = {}
 
         try:
             sinan = models.SINANUpload.objects.get(
-                pk=sinan_upload_id,
-                upload__user=request.user
+                pk=sinan_upload_id, upload__user=request.user
             )
         except models.SINANUpload.DoesNotExist:
             messages.error(request, "Upload not found")
@@ -69,13 +66,12 @@ class SINANStatus(LoginRequiredMixin, View):
 
     @never_cache
     def get(self, request, *args, **kwargs):
-        sinan_upload_id = kwargs.get('sinan_upload_id')
+        sinan_upload_id = kwargs.get("sinan_upload_id")
         context = {}
 
         try:
             sinan = models.SINANUpload.objects.get(
-                pk=sinan_upload_id,
-                upload__user=request.user
+                pk=sinan_upload_id, upload__user=request.user
             )
         except models.SINANUpload.DoesNotExist:
             return JsonResponse({"error": "Upload not found"}, safe=True)
@@ -101,9 +97,9 @@ class SINANStatus(LoginRequiredMixin, View):
             context["time_spend"] = time_spend
 
         if sinan.status.status == 2:
-            error_message = (
-                sinan.status.read_logs(level="ERROR")[0].split(" - ")[1]
-            )
+            error_message = sinan.status.read_logs(level="ERROR")[0].split(
+                " - "
+            )[1]
             context["error"] = error_message
 
         return render(request, self.template_name, context)
@@ -111,11 +107,7 @@ class SINANStatus(LoginRequiredMixin, View):
     def humanizer(self, integer) -> str:
         word = humanize.intword(integer)
 
-        suffixes = {
-            "thousand": "k",
-            "million": "M",
-            "billion": "B"
-        }
+        suffixes = {"thousand": "k", "million": "M", "billion": "B"}
 
         for suffix in suffixes:
             if suffix in word:
@@ -179,7 +171,7 @@ class SINANChunkedUploadView(ChunkedUploadView):
     model = models.SINANChunkedUpload
 
     def delete(self, request, *args, **kwargs):
-        upload_id = kwargs.get('upload_id')
+        upload_id = kwargs.get("upload_id")
         try:
             upload = self.model.objects.get(upload_id=upload_id)
             if upload.user != request.user:
@@ -187,13 +179,11 @@ class SINANChunkedUploadView(ChunkedUploadView):
             upload.file.delete()
             upload.delete()
             return JsonResponse(
-                {"success": True, "message": f"{upload.file.name}"},
-                status=200
+                {"success": True, "message": f"{upload.file.name}"}, status=200
             )
         except self.model.DoesNotExist:
             return JsonResponse(
-                {"success": False, "message": "Unknown upload"},
-                status=404
+                {"success": False, "message": "Unknown upload"}, status=404
             )
 
 
@@ -217,8 +207,7 @@ def get_user_uploads(request):
         uploads = models.SINANUpload.objects.filter(status__isnull=False)
     elif request.user.is_staff:
         uploads = models.SINANUpload.objects.filter(
-            upload__user=request.user,
-            status__isnull=False
+            upload__user=request.user, status__isnull=False
         )
     else:
         uploads = models.SINANUpload.objects.none()
@@ -256,7 +245,7 @@ def overview_charts_limit_offset(request):
     if offset is None or limit is None or not id_type:
         return JsonResponse(
             {"error": "missing 'offset', 'limit' or 'id_type' parameters"},
-            status=400
+            status=400,
         )
 
     limit, offset = int(limit), int(offset)
@@ -268,30 +257,30 @@ def overview_charts_limit_offset(request):
     except models.SINANUpload.DoesNotExist:
         return HttpResponseNotFound(
             json.dumps({"error": "Upload not found"}),
-            content_type="application/json"
+            content_type="application/json",
         )
 
     queries = {
         "epiweek": (
-            'SELECT se_notif, ano_notif, COUNT(*) AS count '
+            "SELECT se_notif, ano_notif, COUNT(*) AS count "
             'FROM "Municipio"."Notificacao" '
-            'WHERE id IN ({}) GROUP BY se_notif, ano_notif;'
+            "WHERE id IN ({}) GROUP BY se_notif, ano_notif;"
         ),
         "cs_sexo": (
-            'SELECT cs_sexo, COUNT(*) AS count '
+            "SELECT cs_sexo, COUNT(*) AS count "
             'FROM "Municipio"."Notificacao" '
-            'WHERE id IN ({}) GROUP BY cs_sexo;'
+            "WHERE id IN ({}) GROUP BY cs_sexo;"
         ),
         "criterio": (
-            'SELECT criterio, COUNT(*) AS count '
+            "SELECT criterio, COUNT(*) AS count "
             'FROM "Municipio"."Notificacao" '
-            'WHERE id IN ({}) GROUP BY criterio;'
+            "WHERE id IN ({}) GROUP BY criterio;"
         ),
         "municipio_geocodigo": (
-            'SELECT municipio_geocodigo, COUNT(*) AS count '
+            "SELECT municipio_geocodigo, COUNT(*) AS count "
             'FROM "Municipio"."Notificacao" '
-            'WHERE id IN ({}) GROUP BY municipio_geocodigo;'
-        )
+            "WHERE id IN ({}) GROUP BY municipio_geocodigo;"
+        ),
     }
     results = {}
     ids = sinan.status.list_ids(offset=offset, limit=limit, id_type=id_type)
@@ -299,7 +288,7 @@ def overview_charts_limit_offset(request):
     if not ids:
         return JsonResponse({chart: {} for chart in queries})
 
-    placeholder = ','.join(map(str, ids))
+    placeholder = ",".join(map(str, ids))
 
     for chart, query in queries.items():
         with Engine.begin() as conn:
@@ -309,14 +298,14 @@ def overview_charts_limit_offset(request):
 
         if chart == "epiweek":
             results[chart] = {
-                f"{row['se_notif']:02d}{row['ano_notif']}": row['count']
+                f"{row['se_notif']:02d}{row['ano_notif']}": row["count"]
                 for row in res
             }
 
         if chart == "cs_sexo":
-            results[chart] = {row[chart]: row['count'] for row in res}
+            results[chart] = {row[chart]: row["count"] for row in res}
 
         if chart in ["criterio", "municipio_geocodigo"]:
-            results[chart] = {str(row[chart]): row['count'] for row in res}
+            results[chart] = {str(row[chart]): row["count"] for row in res}
 
     return JsonResponse(results)
