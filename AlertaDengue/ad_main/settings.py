@@ -347,7 +347,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                "maintenance_mode.context_processors.maintenance_mode",
+                # "maintenance_mode.context_processors.maintenance_mode",
             ],
         },
     }
