@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-28 17:11+0000\n"
+"POT-Creation-Date: 2025-03-11 21:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1158,35 +1158,80 @@ msgstr "Más detalles"
 msgid "Número de casos estimados na semana"
 msgstr "Número de casos estimados en la semana"
 
-#: dados/templates/components/home/charts.html:22
+#: dados/templates/components/home/charts.html:6
+msgid ""
+"Registrados: casos notificados de dengue por semana de início de sintomas "
+"(dados incompletos) <br> Estimados: estimativa utilizando modelo de nowcast "
+"(ver saiba mais)"
+msgstr ""
+"Registrados: casos de dengue notificados por semana de inicio de los síntomas"
+"(datos incompletos) <br> Estimación: estimación utilizando el modelo de pronóstico inmediato "
+"(ver más información)"
+
+#: dados/templates/components/home/charts.html:7
+msgid ""
+"Registrados: casos notificados de chikungunya por semana de início de "
+"sintomas (dados incompletos) <br> Estimados: estimativa utilizando modelo de "
+"nowcast (ver saiba mais)"
+msgstr ""
+"Registrados: casos de chikungunya notificados por semana de inicio de los síntomas"
+"(datos incompletos) <br> Estimación: estimación utilizando el modelo de pronóstico inmediato "
+"(ver más información)"
+
+#: dados/templates/components/home/charts.html:8
+msgid ""
+"Registrados: casos notificados de zika por semana de início de sintomas "
+"(dados incompletos) <br> Estimados: estimativa utilizando modelo de nowcast "
+"(ver saiba mais)"
+msgstr ""
+"Registrados: casos de zika notificados por semana de inicio de los síntomas"
+"(datos incompletos) <br> Estimación: estimación utilizando el modelo de pronóstico inmediato "
+"(ver más información)"
+
+#: dados/templates/components/home/charts.html:10
+msgid ""
+"Aumento o reducción de ciudades con clima favorable para la transmisión, en"
+"en comparación con la semana pasada"
+msgstr ""
+
+
+#: dados/templates/components/home/charts.html:12
+msgid ""
+"Amarelo: clima favorável e presença de arbovirus <br> Laranja: tendência de "
+"aumento de casos <br> Vermelho: alta incidência em relação ao histórico"
+msgstr ""
+"Amarillo: clima favorable y presencia de arbovirus <br> Naranja: tendencia de "
+"Aumento de casos <br> Rojo: alta incidencia en comparación con el historial"
+
+#: dados/templates/components/home/charts.html:30
 msgid "Gráficos sobre Dengue"
 msgstr "Gráficos sobre Dengue"
 
-#: dados/templates/components/home/charts.html:34
+#: dados/templates/components/home/charts.html:42
 msgid "Gráficos sobre Chikungunya"
 msgstr "Gráficos sobre Chikungunya"
 
-#: dados/templates/components/home/charts.html:45
+#: dados/templates/components/home/charts.html:53
 msgid "Gráficos sobre Zika"
 msgstr "Gráficos sobre Zika"
 
-#: dados/templates/components/home/charts.html:56
+#: dados/templates/components/home/charts.html:64
 msgid "Veja o mapa de incidência das doenças no estado"
 msgstr "Ver el mapa de incidencia de enfermedades en el estado"
 
-#: dados/templates/components/home/charts.html:57
+#: dados/templates/components/home/charts.html:65
 msgid "Mapa incidência"
 msgstr "Mapa de incidencia"
 
-#: dados/templates/components/home/charts.html:71
+#: dados/templates/components/home/charts.html:79
 msgid "Municípios monitorados"
 msgstr "Municipios monitoreados"
 
-#: dados/templates/components/home/charts.html:71
+#: dados/templates/components/home/charts.html:79
 msgid "Última atualização na SE"
 msgstr "Última actualización en SE"
 
-#: dados/templates/components/home/charts.html:141
+#: dados/templates/components/home/charts.html:158
 msgid "Informações detalhadas sobre o Estado"
 msgstr "Información detallada sobre el estado"
 
@@ -2560,11 +2605,11 @@ msgstr "% humedad máxima del aire"
 msgid "Data da exportação"
 msgstr ""
 
-#: dbf/forms.py:20 upload/forms.py:29
+#: dbf/forms.py:20 upload/forms.py:25
 msgid "Ano de notificação"
 msgstr ""
 
-#: dbf/forms.py:22 upload/forms.py:34
+#: dbf/forms.py:22 upload/forms.py:29
 msgid "Abrangência"
 msgstr ""
 
@@ -2572,7 +2617,7 @@ msgstr ""
 msgid "Nome do município (opcional)"
 msgstr ""
 
-#: dbf/forms.py:42 upload/forms.py:48
+#: dbf/forms.py:42 upload/forms.py:43
 msgid "Houve um erro durante o envio do arquivo. Por favor, tente novamente."
 msgstr ""
 
@@ -2816,7 +2861,7 @@ msgstr "Tu nombre de usuario, en caso de que lo hayas olvidado, es:"
 msgid "Obrigado por usar o InfoDengue"
 msgstr "Gracias por usar InfoDengue"
 
-#: upload/forms.py:25
+#: upload/forms.py:21
 msgid "CID10"
 msgstr ""
 
