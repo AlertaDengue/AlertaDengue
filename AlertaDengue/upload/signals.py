@@ -1,15 +1,15 @@
 from pathlib import Path
 from typing import Any, Type
 
+from django.db import transaction
 from django.db.models import Model, signals
 from django.dispatch import receiver
-from django.db import transaction
 
 from .models import (
-    sinan_upload_log_path,
     SINANChunkedUpload,
     SINANUpload,
-    SINANUploadLogStatus
+    SINANUploadLogStatus,
+    sinan_upload_log_path,
 )
 from .tasks import sinan_process_file
 
@@ -33,8 +33,7 @@ def create_sinan_upload(sender, instance: SINANUpload, created, **kwargs):
         log_file.touch()
 
         log_status = SINANUploadLogStatus.objects.create(
-            status=0,
-            log_file=str(log_file.absolute())
+            status=0, log_file=str(log_file.absolute())
         )
         log_status.debug(f"Log file '{log_file}' created")
 

@@ -3,6 +3,14 @@
 
 {% block content %}
 
+{% trans "Registrados: casos notificados de dengue por semana de início de sintomas (dados incompletos) <br> Estimados: estimativa utilizando modelo de nowcast (ver saiba mais)" as dengue_scatter %}
+{% trans "Registrados: casos notificados de chikungunya por semana de início de sintomas (dados incompletos) <br> Estimados: estimativa utilizando modelo de nowcast (ver saiba mais)" as chik_scatter %}
+{% trans "Registrados: casos notificados de zika por semana de início de sintomas (dados incompletos) <br> Estimados: estimativa utilizando modelo de nowcast (ver saiba mais)" as zika_scatter %}
+
+{% trans "Aumento ou redução de cidades com clima favorável para transmissão, em relação à última semana" as indicator_text %}
+
+{% trans "Amarelo: clima favorável e presença de arbovirus <br> Laranja: tendência de aumento de casos <br> Vermelho: alta incidência em relação ao histórico" as stack_text %}
+
 <div class="row justify-content-md-center">
   <!-- Grid column -->
   <div class="col-sm-12 mb-1 mb-xl-0">
@@ -76,14 +84,17 @@
             role="tabpanel"
             aria-labelledby="dengue-{{ state }}-tab">
           <div class="row">
-            <div class="col-md-4 w-100">
+            <div class="col-md-4 w-100 position-relative">
               {{ chart_scatter|lookup:'dengue'|lookup:state | safe }}
+              {% include "components/tooltip.html" with class="tooltip-charts" placement="bottom" text=dengue_scatter %}
             </div>
-            <div class="col-md-4 w-100">
+            <div class="col-md-4 w-100 position-relative">
               {{ chart_indicator|lookup:'dengue'|lookup:state | safe }}
+              {% include "components/tooltip.html" with class="tooltip-charts" placement="bottom" text=indicator_text %}
             </div>
-            <div class="col-md-4 w-100">
+            <div class="col-md-4 w-100 position-relative">
               {{ chart_stack|lookup:'dengue'|lookup:state | safe }}
+              {% include "components/tooltip.html" with class="tooltip-charts tooltip-stack" placement="bottom" text=stack_text %}
             </div>
           </div>
         </div>
@@ -92,14 +103,17 @@
             role="tabpanel"
             aria-labelledby="chikungunya-{{ state }}-tab">
           <div class="row">
-            <div class="col-md-4 w-100">
+            <div class="col-md-4 w-100 position-relative">
               {{ chart_scatter|lookup:'chikungunya'|lookup:state | safe }}
+              {% include "components/tooltip.html" with class="tooltip-charts" placement="bottom" text=chik_scatter %}
             </div>
-            <div class="col-md-4 w-100">
+            <div class="col-md-4 w-100 position-relative">
               {{ chart_indicator|lookup:'chikungunya'|lookup:state | safe }}
+              {% include "components/tooltip.html" with class="tooltip-charts" placement="bottom" text=indicator_text %}
             </div>
-            <div class="col-md-4 w-100">
+            <div class="col-md-4 w-100 position-relative">
               {{ chart_stack|lookup:'chikungunya'|lookup:state | safe }}
+              {% include "components/tooltip.html" with class="tooltip-charts tooltip-stack" placement="bottom" text=stack_text %}
             </div>
           </div>
         </div>
@@ -108,14 +122,17 @@
             role="tabpanel"
             aria-labelledby="zika-{{ state }}-tab">
           <div class="row">
-            <div class="col-md-4 w-100">
+            <div class="col-md-4 w-100 position-relative">
               {{ chart_scatter|lookup:'zika'|lookup:state | safe }}
+              {% include "components/tooltip.html" with class="tooltip-charts" placement="bottom" text=zika_scatter %}
             </div>
-            <div class="col-md-4 w-100">
+            <div class="col-md-4 w-100 position-relative">
               {{ chart_indicator|lookup:'zika'|lookup:state | safe }}
+              {% include "components/tooltip.html" with class="tooltip-charts" placement="bottom" text=indicator_text %}
             </div>
-            <div class="col-md-4 w-100">
+            <div class="col-md-4 w-100 position-relative">
               {{ chart_stack|lookup:'zika'|lookup:state | safe }}
+              {% include "components/tooltip.html" with class="tooltip-charts tooltip-stack" placement="bottom" text=stack_text %}
             </div>
           </div>
         </div>
@@ -124,13 +141,13 @@
             role="tabpanel"
             aria-labelledby="incidence_map-{{ state }}-tab">
           <div class="row">
-            <div class="col-md-4 w-100">
+            <div class="col-md-4 w-100 position-relative">
               {{ create_maps|lookup:'dengue'|lookup:state | safe }}
             </div>
-            <div class="col-md-4 w-100">
+            <div class="col-md-4 w-100 position-relative">
               {{ create_maps|lookup:'chikungunya'|lookup:state | safe }}
             </div>
-            <div class="col-md-4 w-100">
+            <div class="col-md-4 w-100 position-relative">
               {{ create_maps|lookup:'zika'|lookup:state | safe }}
             </div>
           </div>
@@ -148,5 +165,28 @@
   </div>
   <!-- Grid column -->
 </div>
+
+<style>
+.tooltip-charts {
+  position: absolute !important;
+  top: calc(100% - 50px) !important;
+  left: calc(100% - 50px) !important;
+}
+
+.tooltip-stack.tooltip.show p {
+  text-align: left;
+}
+</style>
+
+<script>
+  $('[data-toggle="tooltip"]').tooltip()
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('[data-toggle="tooltip"]').forEach(el => {
+      new bootstrap.Tooltip(el, {
+        html: true
+      });
+    });
+  });
+</script>
 
 {% endblock %}

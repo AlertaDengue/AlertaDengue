@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('upload', '0005_auto_20241205_1020'),
+        ("upload", "0005_auto_20241205_1020"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='sinanupload',
-            name='inserted_rows',
+            model_name="sinanupload",
+            name="inserted_rows",
             field=models.IntegerField(default=0, null=True),
         ),
     ]

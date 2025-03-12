@@ -481,79 +481,79 @@ ALTER TABLE "Dengue_global".parameters OWNER TO dengueadmin;
 -- Name: regional; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
 --
 
--- CREATE TABLE "Dengue_global".regional (
---     id integer NOT NULL,
---     nome character varying(255) NOT NULL,
---     codigo integer NOT NULL,
---     id_macroregional integer NOT NULL
--- );
+CREATE TABLE "Dengue_global".regional (
+    id integer NOT NULL,
+    nome character varying(255) NOT NULL,
+    codigo integer NOT NULL,
+    id_macroregional integer NOT NULL
+);
 
 
--- ALTER TABLE "Dengue_global".regional OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".regional OWNER TO dengueadmin;
 
 --
 -- Name: regional_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
 --
 
--- CREATE SEQUENCE "Dengue_global".regional_id_seq
---     START WITH 1
---     INCREMENT BY 1
---     NO MINVALUE
---     NO MAXVALUE
---     CACHE 1;
+CREATE SEQUENCE "Dengue_global".regional_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 
--- ALTER TABLE "Dengue_global".regional_id_seq OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".regional_id_seq OWNER TO dengueadmin;
 
 --
 -- Name: regional_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
 --
 
--- ALTER SEQUENCE "Dengue_global".regional_id_seq OWNED BY "Dengue_global".regional.id;
+ALTER SEQUENCE "Dengue_global".regional_id_seq OWNED BY "Dengue_global".regional.id;
 
 
 --
 -- Name: regional_saude; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
 --
 
--- CREATE TABLE "Dengue_global".regional_saude (
---     id integer NOT NULL,
---     municipio_geocodigo integer,
---     id_regional integer,
---     codigo_estacao_wu character varying(16),
---     nome_regional character varying(32),
---     limiar_preseason real,
---     limiar_posseason real,
---     limiar_epidemico real,
---     estacao_wu_sec character varying(10),
---     varcli character varying(10),
---     tcrit double precision,
---     ucrit double precision,
---     nome_macroreg character varying(32)
--- );
+CREATE TABLE "Dengue_global".regional_saude (
+    id integer NOT NULL,
+    municipio_geocodigo integer,
+    id_regional integer,
+    codigo_estacao_wu character varying(16),
+    nome_regional character varying(32),
+    limiar_preseason real,
+    limiar_posseason real,
+    limiar_epidemico real,
+    estacao_wu_sec character varying(10),
+    varcli character varying(10),
+    tcrit double precision,
+    ucrit double precision,
+    nome_macroreg character varying(32)
+);
 
 
--- ALTER TABLE "Dengue_global".regional_saude OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".regional_saude OWNER TO dengueadmin;
 
 --
 -- Name: regional_saude_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
 --
 
--- CREATE SEQUENCE "Dengue_global".regional_saude_id_seq
---     START WITH 1
---     INCREMENT BY 1
---     NO MINVALUE
---     NO MAXVALUE
---     CACHE 1;
+CREATE SEQUENCE "Dengue_global".regional_saude_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 
--- ALTER TABLE "Dengue_global".regional_saude_id_seq OWNER TO dengueadmin;
+ALTER TABLE "Dengue_global".regional_saude_id_seq OWNER TO dengueadmin;
 
 --
 -- Name: regional_saude_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
 --
 
--- ALTER SEQUENCE "Dengue_global".regional_saude_id_seq OWNED BY "Dengue_global".regional_saude.id;
+ALTER SEQUENCE "Dengue_global".regional_saude_id_seq OWNED BY "Dengue_global".regional_saude.id;
 
 
 --

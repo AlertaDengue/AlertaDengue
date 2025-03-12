@@ -1,26 +1,20 @@
+import csv
 import shutil
 import time
-import csv
 from pathlib import Path
 from typing import Iterator, Tuple
 
-import pyarrow.parquet as pq
 import geopandas as gpd
 import pandas as pd
+import pyarrow.parquet as pq
+from ad_main.settings import get_sqla_conn
 from celery import shared_task
+from django.db import transaction
 from psycopg2.extras import DictCursor
 from simpledbf import Dbf5
 
-from django.db import transaction
-from ad_main.settings import get_sqla_conn
-
-from .models import (
-    sinan_upload_path,
-    SINANUpload,
-    SINANUploadFatalError,
-)
+from .models import SINANUpload, SINANUploadFatalError, sinan_upload_path
 from .sinan.utils import chunk_gen, parse_data
-
 
 ENGINE = get_sqla_conn(database="dengue")
 
@@ -44,8 +38,7 @@ def sinan_move_file(upload_sinan_id: int):
         file = Path(sinan.upload.file.path)
         if not file.exists():
             raise SINANUploadFatalError(
-                sinan.status,
-                "SINAN Upload file not found"
+                sinan.status, "SINAN Upload file not found"
             )
         dest = Path(sinan_upload_path()) / sinan._final_basename()
         dest = dest.with_suffix(Path(sinan.upload.filename).suffix)
@@ -130,12 +123,10 @@ def insert_chunk_to_temp_table(
 
     df_chunk = df_chunk.replace({pd.NA: None})
     len1 = len(df_chunk)
-    df_chunk = df_chunk.dropna(
-        subset=SINANUpload.REQUIRED_COLS, how="any"
-    )
+    df_chunk = df_chunk.dropna(subset=SINANUpload.REQUIRED_COLS, how="any")
     df_chunk = parse_data(df_chunk, sinan.cid10, sinan.year)
     len2 = len(df_chunk)
-    filtered_rows += len1-len2
+    filtered_rows += len1 - len2
     df_chunk = df_chunk.rename(columns=sinan.COLUMNS)
 
     insert_sql = f"""
@@ -145,18 +136,13 @@ def insert_chunk_to_temp_table(
         {','.join([f'{j}=excluded.{j}' for j in df_chunk.columns])}
     """
 
-    rows = [
-        tuple(row)
-        for row in df_chunk.itertuples(index=False)
-    ]
+    rows = [tuple(row) for row in df_chunk.itertuples(index=False)]
 
     cursor.executemany(insert_sql, rows)
 
 
 def insert_temp_to_notificacao(
-    cursor,
-    temp_table: str,
-    columns: list[str]
+    cursor, temp_table: str, columns: list[str]
 ) -> tuple[list[int], int]:
     fields = ",".join(columns)
     on_conflict = ",".join([f"{field}=excluded.{field}" for field in columns])
@@ -171,8 +157,8 @@ def insert_temp_to_notificacao(
     cursor.execute(insert_sql)
     results = cursor.fetchall()
 
-    inserted_ids = [row[0] for row in results if row[1] == '0']
-    conflicted_ids = [row[0] for row in results if row[1] != '0']
+    inserted_ids = [row[0] for row in results if row[1] == "0"]
+    conflicted_ids = [row[0] for row in results if row[1] != "0"]
 
     return inserted_ids, conflicted_ids
 
@@ -192,7 +178,8 @@ def sinan_insert_to_db(upload_sinan_id: int):
 
     with ENGINE.begin() as conn:
         cursor = conn.connection.cursor(cursor_factory=DictCursor)
-        cursor.execute(f"""
+        cursor.execute(
+            f"""
             CREATE TEMP TABLE {temp_table} (
                 dt_notific DATE,
                 se_notif INTEGER,
@@ -234,7 +221,8 @@ def sinan_insert_to_db(upload_sinan_id: int):
                     municipio_geocodigo
                 )
             );
-        """)
+        """
+        )
         status.debug(f"{temp_table} created.")
         try:
             if file.suffix.lower() == ".parquet":
@@ -242,8 +230,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
                 total_rows = parquet.count
                 status.progress(current_row, total_rows)
                 for batch in parquet.iter_batches(
-                    batch_size=chunksize,
-                    columns=list(sinan.COLUMNS)
+                    batch_size=chunksize, columns=list(sinan.COLUMNS)
                 ):
                     df_chunk = batch.to_pandas()
                     insert_chunk_to_temp_table(
@@ -266,7 +253,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
                     chunksize=chunksize,
                     usecols=list(sinan.COLUMNS),
                     engine="python",
-                    sep=None
+                    sep=None,
                 ):
                     insert_chunk_to_temp_table(
                         upload_sinan_id,
@@ -322,9 +309,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
 
         try:
             inserted_ids, conflicted_ids = insert_temp_to_notificacao(
-                cursor,
-                temp_table,
-                list(sinan.COLUMNS.values())
+                cursor, temp_table, list(sinan.COLUMNS.values())
             )
 
             if conflicted_ids:
@@ -344,6 +329,6 @@ def sinan_insert_to_db(upload_sinan_id: int):
             sinan.status.debug(f"{temp_table} dropped.")
 
         et = time.time()
-        time_spend = et-st
+        time_spend = et - st
         status.debug(f"time_spend: {time_spend}")
         return len(inserted_ids), time_spend

@@ -6,22 +6,30 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('upload', '0008_auto_20241210_2045'),
+        ("upload", "0008_auto_20241210_2045"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='sinanupload',
-            name='export_date',
+            model_name="sinanupload",
+            name="export_date",
         ),
         migrations.RemoveField(
-            model_name='sinanupload',
-            name='municipio',
+            model_name="sinanupload",
+            name="municipio",
         ),
         migrations.AddField(
-            model_name='sinanupload',
-            name='cid10',
-            field=models.CharField(choices=[('A90', 'Dengue'), ('A92.0', 'Chikungunya'), ('A928', 'Zika')], default='A90', max_length=5),
+            model_name="sinanupload",
+            name="cid10",
+            field=models.CharField(
+                choices=[
+                    ("A90", "Dengue"),
+                    ("A92.0", "Chikungunya"),
+                    ("A928", "Zika"),
+                ],
+                default="A90",
+                max_length=5,
+            ),
             preserve_default=False,
         ),
     ]

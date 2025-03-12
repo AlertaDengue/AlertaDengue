@@ -1,11 +1,9 @@
+import datetime as dt
+from typing import Iterator, Optional, Tuple, Union
+
 import numpy as np
 import pandas as pd
-import datetime as dt
-from typing import Iterator, Tuple, Optional, Union
-
-
 from dados.dbdata import calculate_digit
-
 
 UF_CODES = {
     "AC": 12,
