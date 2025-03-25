@@ -73,18 +73,20 @@ class NotificationQueries:
     def _get_period_filter(self, initial_date=None, final_date=None):
         common_filter = """
         dt_notific >= (CURRENT_DATE - INTERVAL '1 YEAR') - CAST(CONCAT(CAST(
-          EXTRACT(DOW FROM (CURRENT_DATE-INTERVAL '1 YEAR')) AS VARCHAR),'DAY'
+        EXTRACT(DOW FROM (CURRENT_DATE-INTERVAL '1 YEAR')) AS VARCHAR),'DAY'
         ) AS INTERVAL) AND
         """
-        if not initial_date and not final_date:
+
+        if not initial_date or initial_date == "undefined":
+            initial_date = None
+        if not final_date or final_date == "undefined":
+            final_date = None
+
+        if initial_date and final_date:
+            date_filter = f"BETWEEN '{initial_date}' AND '{final_date}'"
+        else:
             return common_filter + "1=1"
-        date_filter = (
-            f">= '{initial_date}'"
-            if not final_date
-            else f"<= '{final_date}'"
-            if not initial_date
-            else f"BETWEEN '{initial_date}' AND '{final_date}'"
-        )
+
         return common_filter + f"dt_notific {date_filter}"
 
     def _get_disease_filter(self, disease):

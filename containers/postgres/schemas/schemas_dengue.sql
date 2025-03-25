@@ -2339,10 +2339,10 @@ CREATE MATERIALIZED VIEW public.uf_total_zika_view AS
 ALTER TABLE public.uf_total_zika_view OWNER TO postgres;
 
 --
--- Name: copernicus_brasil; Type: TABLE; Schema: weather; Owner: dengueadmin
+-- Name: copernicus_bra; Type: TABLE; Schema: weather; Owner: dengueadmin
 --
 
-CREATE TABLE weather.copernicus_brasil (
+CREATE TABLE weather.copernicus_bra (
     index integer NOT NULL,
     date date NOT NULL,
     geocodigo bigint NOT NULL,
@@ -2358,17 +2358,18 @@ CREATE TABLE weather.copernicus_brasil (
     pressao_max real NOT NULL,
     umid_min real NOT NULL,
     umid_med real NOT NULL,
-    umid_max real NOT NULL
+    umid_max real NOT NULL,
+    epiweek integer NOT NULL
 );
 
 
-ALTER TABLE weather.copernicus_brasil OWNER TO dengueadmin;
+ALTER TABLE weather.copernicus_bra OWNER TO dengueadmin;
 
 --
--- Name: copernicus_brasil_index_seq; Type: SEQUENCE; Schema: weather; Owner: dengueadmin
+-- Name: copernicus_bra_index_seq; Type: SEQUENCE; Schema: weather; Owner: dengueadmin
 --
 
-CREATE SEQUENCE weather.copernicus_brasil_index_seq
+CREATE SEQUENCE weather.copernicus_bra_index_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -2377,13 +2378,13 @@ CREATE SEQUENCE weather.copernicus_brasil_index_seq
     CACHE 1;
 
 
-ALTER TABLE weather.copernicus_brasil_index_seq OWNER TO dengueadmin;
+ALTER TABLE weather.copernicus_bra_index_seq OWNER TO dengueadmin;
 
 --
--- Name: copernicus_brasil_index_seq; Type: SEQUENCE OWNED BY; Schema: weather; Owner: dengueadmin
+-- Name: copernicus_bra_index_seq; Type: SEQUENCE OWNED BY; Schema: weather; Owner: dengueadmin
 --
 
-ALTER SEQUENCE weather.copernicus_brasil_index_seq OWNED BY weather.copernicus_brasil.index;
+ALTER SEQUENCE weather.copernicus_bra_index_seq OWNED BY weather.copernicus_bra.index;
 
 
 --
@@ -2720,10 +2721,10 @@ ALTER TABLE ONLY public.django_migrations ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
--- Name: copernicus_brasil index; Type: DEFAULT; Schema: weather; Owner: dengueadmin
+-- Name: copernicus_bra index; Type: DEFAULT; Schema: weather; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY weather.copernicus_brasil ALTER COLUMN index SET DEFAULT nextval('weather.copernicus_brasil_index_seq'::regclass);
+ALTER TABLE ONLY weather.copernicus_bra ALTER COLUMN index SET DEFAULT nextval('weather.copernicus_bra_index_seq'::regclass);
 
 
 --
@@ -3390,11 +3391,11 @@ ALTER TABLE ONLY public.django_session
 
 
 --
--- Name: copernicus_brasil copernicus_brasil_pkey; Type: CONSTRAINT; Schema: weather; Owner: dengueadmin
+-- Name: copernicus_bra copernicus_bra_pkey; Type: CONSTRAINT; Schema: weather; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY weather.copernicus_brasil
-    ADD CONSTRAINT copernicus_brasil_pkey PRIMARY KEY (date, geocodigo);
+ALTER TABLE ONLY weather.copernicus_bra
+    ADD CONSTRAINT copernicus_bra_pkey PRIMARY KEY (date, geocodigo);
 
 
 --

@@ -80,6 +80,7 @@ services:
       service: base_postgres
     env_file:
       - ../.env
+    shm_size: '8gb'
     environment:
       PG_RESTORE_STAGING: ${PG_RESTORE_STAGING}
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
@@ -108,6 +109,7 @@ services:
       service: base_postgres
     env_file:
       - ../.env
+    shm_size: '8gb' # same as postgresql.conf
     environment:
       PG_RESTORE_STAGING: ${PG_RESTORE_STAGING}
       POSTGRES_PASSWORD: ${PSQL_PASSWORD}
