@@ -318,12 +318,11 @@ def _create_stack_chart(df: pd.DataFrame) -> px.bar():
     )
 
     fig.update_traces(
-        customdata=df_alert.SE.map(lambda v: f"{str(v)[-2:]}"),
         hovertemplate="%(cases)s %(label2)s %(week)s <br>"
         "<extra></extra>"
         % {
             "label2": _("Cidades na Semana"),
-            "week": "%{customdata}",
+            "week": "%{x}",
             "cases": "%{y:1f}",
         },
     )
