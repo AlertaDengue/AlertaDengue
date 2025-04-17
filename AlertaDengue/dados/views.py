@@ -92,7 +92,7 @@ def hex_to_rgb(value):
     value = value.lstrip("#")
     lv = len(value)
     return tuple(
-        int(value[i : i + lv // 3], 16)
+        int(value[i: i + lv // 3], 16)
         for i in range(0, lv, lv // 3)  # noqa: E203
     )
 
@@ -205,7 +205,7 @@ class DataPublicServicesPageView(TemplateView):
         if service == "maps":
             if service_type is None:
 
-                geo_info_path = get_static("geojson/geo_info.json")
+                geo_info_path = find("geojson/geo_info.json")
 
                 with open(geo_info_path) as f:
                     geo_info_json = json.load(f)
