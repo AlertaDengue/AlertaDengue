@@ -205,7 +205,7 @@ class DataPublicServicesPageView(TemplateView):
         if service == "maps":
             if service_type is None:
 
-                geo_info_path = get_static("geojson/geo_info.json")
+                geo_info_path = find("geojson/geo_info.json")
 
                 with open(geo_info_path) as f:
                     geo_info_json = json.load(f)

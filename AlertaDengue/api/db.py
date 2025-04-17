@@ -361,7 +361,9 @@ class NotificationQueries:
 
         with db_engine.connect() as conn:
             result = conn.execute(sql)
-            df_gender_dist = pd.DataFrame(result.fetchall())
+            df_gender_dist = pd.DataFrame(
+                result.fetchall(), columns=result.keys()
+            )
 
             return df_gender_dist.set_index("category", drop=True)
 
