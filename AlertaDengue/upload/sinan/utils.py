@@ -80,7 +80,7 @@ def convert_date(col: Union[pd.Timestamp, str, None]) -> Optional[dt.date]:
             return None
         if isinstance(col, dt.date):
             return col
-        return pd.to_datetime(col).date()
+        return pd.to_datetime(col, dayfirst=True).date()
     except Exception:
         return None
 
