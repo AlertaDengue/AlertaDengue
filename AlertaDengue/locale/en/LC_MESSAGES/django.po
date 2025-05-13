@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-11 21:53+0000\n"
+"POT-Creation-Date: 2025-05-13 22:09+0000\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -157,7 +157,7 @@ msgstr "Estimated"
 msgid "Total de casos no estado"
 msgstr "Cumulative number of cases in the State"
 
-#: dados/charts/home.py:89 dados/charts/home.py:233 dados/charts/home.py:354
+#: dados/charts/home.py:89 dados/charts/home.py:233 dados/charts/home.py:353
 #: dados/charts/states.py:109 dados/charts/states.py:270
 #: dados/templates/report_city.html:81 dados/templates/report_city.html:254
 #: dados/templates/report_state.html:43 dados/templates/services_api.html:205
@@ -169,15 +169,15 @@ msgstr "Epidemiological week"
 msgid "Cidades com clima favorável <br>para transmissão"
 msgstr "Cities with favorable environment <br>for transmission"
 
-#: dados/charts/home.py:325 dados/charts/states.py:238
+#: dados/charts/home.py:324 dados/charts/states.py:238
 msgid "Cidades na Semana"
 msgstr "Cities in the Week"
 
-#: dados/charts/home.py:333
+#: dados/charts/home.py:332
 msgid "Situação epidemiológica das cidades"
 msgstr "Epidemiological Situation"
 
-#: dados/charts/home.py:364 dados/charts/states.py:280
+#: dados/charts/home.py:363 dados/charts/states.py:280
 msgid "Número de cidades"
 msgstr "Number of cities"
 
@@ -1131,9 +1131,9 @@ msgid ""
 "(dados incompletos) <br> Estimados: estimativa utilizando modelo de nowcast "
 "(ver saiba mais)"
 msgstr ""
-"Recorded: reported cases of dengue fever by week of onset of symptoms"
-"(incomplete data) <br> Estimated: estimates using nowcast model"
-"(see more)"
+"Recorded: reported cases of dengue fever by week of onset of "
+"symptoms(incomplete data) <br> Estimated: estimates using nowcast model(see "
+"more)"
 
 #: dados/templates/components/home/charts.html:7
 msgid ""
@@ -1141,9 +1141,9 @@ msgid ""
 "sintomas (dados incompletos) <br> Estimados: estimativa utilizando modelo de "
 "nowcast (ver saiba mais)"
 msgstr ""
-"Recorded: reported cases of chikungunya by week of onset of "
-"symptoms (incomplete data) <br> Estimated: estimate using "
-"nowcast model (see learn more)"
+"Recorded: reported cases of chikungunya by week of onset of symptoms "
+"(incomplete data) <br> Estimated: estimate using nowcast model (see learn "
+"more)"
 
 #: dados/templates/components/home/charts.html:8
 msgid ""
@@ -1151,24 +1151,24 @@ msgid ""
 "(dados incompletos) <br> Estimados: estimativa utilizando modelo de nowcast "
 "(ver saiba mais)"
 msgstr ""
-"Recorded: reported cases of zika by week of onset of "
-"symptoms (incomplete data) <br> Estimated: estimate using "
-"nowcast model (see learn more)"
+"Recorded: reported cases of zika by week of onset of symptoms (incomplete "
+"data) <br> Estimated: estimate using nowcast model (see learn more)"
 
 #: dados/templates/components/home/charts.html:10
 msgid ""
 "Aumento ou redução de cidades com clima favorável para transmissão, em "
 "relação à última semana"
 msgstr ""
-"Increase or reduction of cities with favorable climate for transmission, in relation to the last week"
+"Increase or reduction of cities with favorable climate for transmission, in "
+"relation to the last week"
 
 #: dados/templates/components/home/charts.html:12
 msgid ""
 "Amarelo: clima favorável e presença de arbovirus <br> Laranja: tendência de "
 "aumento de casos <br> Vermelho: alta incidência em relação ao histórico"
 msgstr ""
-"Yellow: favorable climate and presence of arbovirus <br> Orange: tendency for "
-"increasing cases <br> Red: high incidence compared to historical figures"
+"Yellow: favorable climate and presence of arbovirus <br> Orange: tendency "
+"for increasing cases <br> Red: high incidence compared to historical figures"
 
 #: dados/templates/components/home/charts.html:30
 msgid "Gráficos sobre Dengue"
@@ -2687,6 +2687,16 @@ msgstr "Forecast week initial date"
 #: forecast/models.py:175
 msgid "Casos Previstos"
 msgstr "Forecast cases"
+
+#: templates/base.html:56
+#, fuzzy
+#| msgid "Atenção"
+msgid "Manutenção"
+msgstr "Attention"
+
+#: templates/base.html:57
+msgid "O site encontra-se em manutenção, por favor volte mais tarde"
+msgstr "The site is currently under maintenance. Please check back later"
 
 #: templates/components/footer.html:6
 #, fuzzy
