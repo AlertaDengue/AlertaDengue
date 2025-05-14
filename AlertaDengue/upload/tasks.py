@@ -2,7 +2,7 @@ import csv
 import shutil
 import time
 from pathlib import Path
-from typing import Iterator, Tuple
+from typing import Iterator, Tuple, List, Literal
 
 import geopandas as gpd
 import pandas as pd
@@ -28,6 +28,64 @@ def sinan_process_file(upload_sinan_id: int):
     inserted_rows, time_spend = sinan_insert_to_db(upload_sinan_id)
     sinan.status.debug(f"inserts: {inserted_rows}")
     sinan.status.done(inserted_rows, time_spend)
+
+
+@shared_task
+def sinan_rollback_file(
+    upload_sinan_id: int,
+    insert_types: List[Literal["inserts", "updates"]] = ["inserts", "updates"],
+):
+    """
+    WARNING: drop inserted and/or updated rows from "Municipio"."Notificacao"
+    @param insert_types [list]: can be one of the options or both
+    """
+    sinan = SINANUpload.objects.get(pk=upload_sinan_id)
+
+    if sinan.status.status != 1:
+        raise RuntimeError(
+            f"{sinan.upload.filename} is being processed or errored"
+        )
+
+    warning = f"Droping %s %s rows from {sinan.upload.filename}"
+    _query = """
+        DELETE FROM "Municipio"."Notificacao"
+        WHERE id IN (%s);
+    """
+
+    def drop_rows(insert_type: Literal["inserts", "updates"]):
+        total_ids = getattr(sinan.status, insert_type)
+        dropped_rows = 0
+
+        for offset in range(0, total_ids, 50000):
+            ids = sinan.status.list_ids(
+                offset=offset,
+                limit=min(offset + 50000, total_ids),
+                id_type=insert_type
+            )
+
+            if not ids:
+                continue
+
+            query = _query % ", ".join(["%s"] * len(ids))
+
+            with ENGINE.begin() as conn:
+                cursor = conn.connection.cursor(cursor_factory=DictCursor)
+                cursor.execute(query, ids)
+                dropped_rows += cursor.rowcount
+
+        if dropped_rows:
+            if insert_type == "inserts":
+                sinan.status.write_inserts([])
+            if insert_type == "updates":
+                sinan.status.write_updates([])
+
+        sinan.status.warning(warning % (str(dropped_rows), insert_type))
+
+    if "inserts" in insert_types:
+        drop_rows("inserts")
+
+    if "updates" in insert_types:
+        drop_rows("updates")
 
 
 @shared_task
