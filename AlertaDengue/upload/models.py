@@ -73,7 +73,7 @@ class SINANUploadLogStatus(models.Model):
             return []
 
         start, end = min([offset, limit]), max([offset, limit])
-        return ids[start: end + 1]
+        return ids[start : end + 1]
 
     @property
     def time_spend(self) -> float:
@@ -116,7 +116,7 @@ class SINANUploadLogStatus(models.Model):
             for line in log_file:
                 if level:
                     startswith = (
-                        tuple(self.LOG_LEVEL[self.LOG_LEVEL.index(level):])
+                        tuple(self.LOG_LEVEL[self.LOG_LEVEL.index(level) :])
                         if not only_level
                         else level
                     )
@@ -139,9 +139,7 @@ class SINANUploadLogStatus(models.Model):
             spaces = " " * len("PROGRESS")
 
         if self.status == 2:
-            raise ValueError(
-                "Log is closed for writing (finished with error)"
-            )
+            raise ValueError("Log is closed for writing (finished with error)")
         log_message = f"{level}{spaces} - {message}\n"
         with Path(self.log_file).open(mode="a", encoding="utf-8") as log_file:
             log_file.write(log_message)

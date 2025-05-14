@@ -2,7 +2,7 @@ import csv
 import shutil
 import time
 from pathlib import Path
-from typing import Iterator, Tuple, List, Literal
+from typing import Iterator, List, Literal, Tuple
 
 import geopandas as gpd
 import pandas as pd
@@ -60,7 +60,7 @@ def sinan_rollback_file(
             ids = sinan.status.list_ids(
                 offset=offset,
                 limit=min(offset + 50000, total_ids),
-                id_type=insert_type
+                id_type=insert_type,
             )
 
             if not ids:
