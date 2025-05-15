@@ -41,6 +41,7 @@ class SINANUploadLogStatus(models.Model):
     log_file = models.FilePathField(path=sinan_upload_log_path)
     inserts_file = models.FilePathField(path=sinan_upload_log_path, null=True)
     updates_file = models.FilePathField(path=sinan_upload_log_path, null=True)
+    residues_file = models.FilePathField(path=sinan_upload_log_path, null=True)
 
     def _read_ids(self, id_type: Literal["inserts", "updates"]) -> array:
         ids_file = Path(sinan_upload_log_path()) / f"{self.pk}.{id_type}.log"
@@ -73,7 +74,7 @@ class SINANUploadLogStatus(models.Model):
             return []
 
         start, end = min([offset, limit]), max([offset, limit])
-        return ids[start : end + 1]
+        return ids[start: end + 1]
 
     @property
     def time_spend(self) -> float:
@@ -116,7 +117,7 @@ class SINANUploadLogStatus(models.Model):
             for line in log_file:
                 if level:
                     startswith = (
-                        tuple(self.LOG_LEVEL[self.LOG_LEVEL.index(level) :])
+                        tuple(self.LOG_LEVEL[self.LOG_LEVEL.index(level):])
                         if not only_level
                         else level
                     )
@@ -270,6 +271,11 @@ class SINANUpload(models.Model):
         SINANUploadLogStatus,
         on_delete=models.PROTECT,
         null=True,
+    )
+    date_formats = models.JSONField(
+        null=False,
+        default=dict,
+        help_text="A dict with {'DT_COLUMN': 'date format'}"
     )
     uploaded_at = models.DateTimeField(auto_now_add=True)
 

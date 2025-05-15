@@ -13,7 +13,12 @@ from django.db import transaction
 from psycopg2.extras import DictCursor
 from simpledbf import Dbf5
 
-from .models import SINANUpload, SINANUploadFatalError, sinan_upload_path
+from .models import (
+    SINANUpload,
+    SINANUploadFatalError,
+    sinan_upload_path,
+    sinan_upload_log_path
+)
 from .sinan.utils import chunk_gen, parse_data
 
 ENGINE = get_sqla_conn(database="dengue")
@@ -179,22 +184,35 @@ def insert_chunk_to_temp_table(
     sinan = SINANUpload.objects.get(pk=upload_sinan_id)
     columns = list(sinan.COLUMNS.values())
 
-    df_chunk = df_chunk.replace({pd.NA: None})
-    len1 = len(df_chunk)
-    df_chunk = df_chunk.dropna(subset=SINANUpload.REQUIRED_COLS, how="any")
-    df_chunk = parse_data(df_chunk, sinan.cid10, sinan.year)
-    len2 = len(df_chunk)
-    filtered_rows += len1 - len2
-    df_chunk = df_chunk.rename(columns=sinan.COLUMNS)
+    chunk = df_chunk.replace({pd.NA: None})
+    residues = chunk[chunk[SINANUpload.REQUIRED_COLS].isna().any(axis=1)]
+    chunk = chunk.dropna(subset=SINANUpload.REQUIRED_COLS, how="any")
+    chunk = parse_dates(chunk)
+    chunk = parse_data(chunk, sinan.cid10, sinan.year)
+    filtered_rows += len(chunk) - len(residues)
+    chunk = chunk.rename(columns=sinan.COLUMNS)
+
+    residues_file = sinan.status.residues_file
+
+    if not residues_file or not Path(residues_file).exists():
+        residues_file = (
+            Path(sinan_upload_log_path()) /
+            f"{sinan.status.pk}.residues.csv"
+        )
+        with open(residues_file, "w") as f:
+            residues.head(0).to_csv(f, index=False)
+
+    if not residues.empty:
+        residues.to_csv(residues_file, mode="a", index=False, header=False)
 
     insert_sql = f"""
-        INSERT INTO {tablename}({','.join(df_chunk.columns)}) 
-        VALUES ({','.join(['%s' for _ in df_chunk.columns])}) 
+        INSERT INTO {tablename}({','.join(chunk.columns)}) 
+        VALUES ({','.join(['%s' for _ in chunk.columns])}) 
         ON CONFLICT ON CONSTRAINT casos_unicos DO UPDATE SET 
-        {','.join([f'{j}=excluded.{j}' for j in df_chunk.columns])}
+        {','.join([f'{j}=excluded.{j}' for j in chunk.columns])}
     """
 
-    rows = [tuple(row) for row in df_chunk.itertuples(index=False)]
+    rows = [tuple(row) for row in chunk.itertuples(index=False)]
 
     cursor.executemany(insert_sql, rows)
 
