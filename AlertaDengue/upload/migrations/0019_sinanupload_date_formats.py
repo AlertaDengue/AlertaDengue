@@ -6,13 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('upload', '0018_auto_20250107_0455'),
+        ("upload", "0018_auto_20250107_0455"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='sinanupload',
-            name='date_formats',
-            field=models.JSONField(default={}, help_text="A dict with {'DT_COLUMN': 'date format'}"),
+            model_name="sinanupload",
+            name="date_formats",
+            field=models.JSONField(
+                default={},
+                help_text="A dict with {'DT_COLUMN': 'date format'}",
+            ),
         ),
     ]

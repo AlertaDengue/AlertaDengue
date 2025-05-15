@@ -1,14 +1,14 @@
 import datetime as dt
 from collections import Counter
-from dateutil.parser import parser
-from typing import Iterator, Iterable, Optional, Tuple, Union
+from typing import ForwardRef, Iterable, Iterator, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
+from dados.dbdata import calculate_digit
+from dateutil.parser import parse, parser
 from pandas.tseries.api import guess_datetime_format
 
-from dados.dbdata import calculate_digit
-from upload.models import SINANUpload
+SINANUpload = ForwardRef("SINANUpload")
 
 
 UF_CODES = {
@@ -81,8 +81,7 @@ def add_dv(geocodigo):
 
 @np.vectorize
 def convert_date(
-    col: Union[pd.Timestamp, str, None],
-    format: str
+    col: Union[pd.Timestamp, str, None], fmt: Optional[str] = None
 ) -> Optional[dt.date]:
     try:
         if pd.isnull(col):
@@ -90,7 +89,7 @@ def convert_date(
         if isinstance(col, dt.date):
             return col
         try:
-            return pd.to_datetime(col, format=format).date()
+            return pd.to_datetime(col, format=fmt).date()
         except ValueError:
             return None
     except Exception:
@@ -145,9 +144,7 @@ def convert_data_types(col: pd.Series, dtype: type) -> pd.Series:
     return col
 
 
-def parse_dates(df: pd.DataFrame, sinan_upload_id: int) -> pd.DataFrame:
-    sinan = SINANUpload.objects.get(pk=upload_sinan_id)
-
+def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
     dt_cols = [
         "DT_SIN_PRI",
         "DT_DIGITA",
@@ -163,22 +160,31 @@ def parse_dates(df: pd.DataFrame, sinan_upload_id: int) -> pd.DataFrame:
     ]
     formats = {}
 
+    if df.empty:
+        return df
+
     for dt_col in dt_cols:
-        format = infer_date_format(dt_col)
-        df[dt_col] = convert_date(df[dt_col], format)
-        formats[dt_col] = format
+        fmt = None
+        if dt_col in df.columns:
+            if df[dt_col].dtype == "object":
+                fmt = infer_date_format(df[dt_col])
+                formats[dt_col] = fmt
+            df[dt_col] = convert_date(df[dt_col], fmt)
 
     if not sinan.date_formats:
         sinan.date_formats = formats
         sinan.save()
     else:
         if sinan.date_formats != formats:
+            print(formats)
+            print(sinan.date_formats)
             sinan.status.warning(
                 "A date discrepancy were found for the chunk. "
                 "Please contact the moderation"
             )
             sinan.date_formats = formats
             sinan.save()
+    return df
 
 
 def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
@@ -240,9 +246,9 @@ def infer_date_format(date_series: Iterable[str]) -> str | None:
     """
     dates = [d for d in set(date_series) if not is_date_ambiguous(d)]
     scores = Counter(
-        format for format in
-        [guess_datetime_format(d) for d in dates if d]
-        if format is not None
+        fmt
+        for fmt in [guess_datetime_format(d) for d in dates if d]
+        if fmt is not None
     )
     return scores.most_common(1)[0][0] if scores else None
 

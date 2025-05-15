@@ -16,8 +16,8 @@ from simpledbf import Dbf5
 from .models import (
     SINANUpload,
     SINANUploadFatalError,
+    sinan_upload_log_path,
     sinan_upload_path,
-    sinan_upload_log_path
 )
 from .sinan.utils import chunk_gen, parse_data, parse_dates
 
@@ -185,9 +185,12 @@ def insert_chunk_to_temp_table(
     columns = list(sinan.COLUMNS.values())
 
     chunk = df_chunk.replace({pd.NA: None})
-    chunk = parse_dates(chunk)
+    chunk = parse_dates(chunk, sinan)
     chunk = parse_data(chunk, sinan.cid10, sinan.year)
-    residues = chunk[chunk[SINANUpload.REQUIRED_COLS].isna().any(axis=1)]
+    existing_cols = [
+        col for col in SINANUpload.REQUIRED_COLS if col in chunk.columns
+    ]
+    residues = chunk[chunk[existing_cols].isna().any(axis=1)]
     chunk = chunk.dropna(subset=SINANUpload.REQUIRED_COLS, how="any")
     filtered_rows += len(chunk) - len(residues)
     chunk = chunk.rename(columns=sinan.COLUMNS)
@@ -196,8 +199,7 @@ def insert_chunk_to_temp_table(
 
     if not residues_file or not Path(residues_file).exists():
         residues_file = (
-            Path(sinan_upload_log_path()) /
-            f"{sinan.status.pk}.residues.csv"
+            Path(sinan_upload_log_path()) / f"{sinan.status.pk}.residues.csv"
         )
         with residues_file.open("w") as f:
             residues.head(0).to_csv(f, index=False)
@@ -300,79 +302,78 @@ def sinan_insert_to_db(upload_sinan_id: int):
         """
         )
         status.debug(f"{temp_table} created.")
-        try:
-            if file.suffix.lower() == ".parquet":
-                parquet = pq.ParquetFile(str(file))
-                total_rows = parquet.count
+        if file.suffix.lower() == ".parquet":
+            parquet = pq.ParquetFile(str(file))
+            total_rows = parquet.count
+            status.progress(current_row, total_rows)
+            for batch in parquet.iter_batches(
+                batch_size=chunksize, columns=list(sinan.COLUMNS)
+            ):
+                df_chunk = batch.to_pandas()
+                insert_chunk_to_temp_table(
+                    upload_sinan_id,
+                    df_chunk,
+                    temp_table,
+                    cursor,
+                    filtered_rows,
+                )
+                current_row += chunksize
                 status.progress(current_row, total_rows)
-                for batch in parquet.iter_batches(
-                    batch_size=chunksize, columns=list(sinan.COLUMNS)
-                ):
-                    df_chunk = batch.to_pandas()
-                    insert_chunk_to_temp_table(
-                        upload_sinan_id,
-                        df_chunk,
-                        temp_table,
-                        cursor,
-                        filtered_rows,
-                    )
-                    current_row += chunksize
-                    status.progress(current_row, total_rows)
-            elif file.suffix.lower() == ".csv":
-                csv.field_size_limit(10**6)  # malformated DS_OBS column
-                with file.open("r", encoding="iso-8859-1") as csv_file:
-                    total_rows = sum(1 for _ in csv_file) - 1
+        elif file.suffix.lower() == ".csv":
+            csv.field_size_limit(10**6)  # malformated DS_OBS column
+            with file.open("r", encoding="iso-8859-1") as csv_file:
+                total_rows = sum(1 for _ in csv_file) - 1
 
+            status.progress(current_row, total_rows)
+            for chunk in pd.read_csv(
+                str(file),
+                chunksize=chunksize,
+                usecols=list(sinan.COLUMNS),
+                engine="python",
+                sep=None,
+            ):
+                insert_chunk_to_temp_table(
+                    upload_sinan_id,
+                    chunk,
+                    temp_table,
+                    cursor,
+                    filtered_rows,
+                )
+                current_row += chunksize
                 status.progress(current_row, total_rows)
-                for chunk in pd.read_csv(
+        elif file.suffix.lower() == ".dbf":
+            dbf = Dbf5(str(file), codec="iso-8859-1")
+            total_rows = dbf.numrec
+            status.progress(current_row, total_rows)
+            for chunk, (lowerbound, upperbound) in enumerate(
+                chunk_gen(chunksize, dbf.numrec)
+            ):
+                chunk = gpd.read_file(
                     str(file),
-                    chunksize=chunksize,
-                    usecols=list(sinan.COLUMNS),
-                    engine="python",
-                    sep=None,
-                ):
-                    insert_chunk_to_temp_table(
-                        upload_sinan_id,
-                        chunk,
-                        temp_table,
-                        cursor,
-                        filtered_rows,
-                    )
-                    current_row += chunksize
-                    status.progress(current_row, total_rows)
-            elif file.suffix.lower() == ".dbf":
-                dbf = Dbf5(str(file), codec="iso-8859-1")
-                total_rows = dbf.numrec
+                    include_fields=list(sinan.COLUMNS),
+                    rows=slice(lowerbound, upperbound),
+                    ignore_geometry=True,
+                )
+                insert_chunk_to_temp_table(
+                    upload_sinan_id,
+                    chunk,
+                    temp_table,
+                    cursor,
+                    filtered_rows,
+                )
+                current_row += chunksize
                 status.progress(current_row, total_rows)
-                for chunk, (lowerbound, upperbound) in enumerate(
-                    chunk_gen(chunksize, dbf.numrec)
-                ):
-                    chunk = gpd.read_file(
-                        str(file),
-                        include_fields=list(sinan.COLUMNS),
-                        rows=slice(lowerbound, upperbound),
-                        ignore_geometry=True,
-                    )
-                    insert_chunk_to_temp_table(
-                        upload_sinan_id,
-                        chunk,
-                        temp_table,
-                        cursor,
-                        filtered_rows,
-                    )
-                    current_row += chunksize
-                    status.progress(current_row, total_rows)
-            else:
-                raise SINANUploadFatalError(
-                    status, f"File type '{file.suffix}' is not supported"
-                )
-        except Exception as e:
-            if not isinstance(e, SINANUploadFatalError):
-                raise SINANUploadFatalError(
-                    status, f"Error populating temporary table: {e}"
-                )
-            else:
-                raise
+        else:
+            raise SINANUploadFatalError(
+                status, f"File type '{file.suffix}' is not supported"
+            )
+        # except Exception as e:
+        #     if not isinstance(e, SINANUploadFatalError):
+        #         raise SINANUploadFatalError(
+        #             status, f"Error populating temporary table: {e}"
+        #         )
+        #     else:
+        #         raise
 
         status.debug(f"total_rows: {total_rows}")
         status.info(f"{total_rows} rows were found.")

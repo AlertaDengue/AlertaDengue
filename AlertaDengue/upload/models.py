@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Generator, Literal, Optional, Union
 
 import pandas as pd
-
 from chunked_upload.models import BaseChunkedUpload
 from dados.models import City
 from django.conf import settings
@@ -89,7 +88,7 @@ class SINANUploadLogStatus(models.Model):
             return []
 
         start, end = min([offset, limit]), max([offset, limit])
-        return ids[start: end + 1]
+        return ids[start : end + 1]
 
     @property
     def time_spend(self) -> float:
@@ -132,7 +131,7 @@ class SINANUploadLogStatus(models.Model):
             for line in log_file:
                 if level:
                     startswith = (
-                        tuple(self.LOG_LEVEL[self.LOG_LEVEL.index(level):])
+                        tuple(self.LOG_LEVEL[self.LOG_LEVEL.index(level) :])
                         if not only_level
                         else level
                     )
@@ -290,7 +289,7 @@ class SINANUpload(models.Model):
     date_formats = models.JSONField(
         null=False,
         default=dict,
-        help_text="A dict with {'DT_COLUMN': 'date format'}"
+        help_text="A dict with {'DT_COLUMN': 'date format'}",
     )
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
