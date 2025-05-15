@@ -6,7 +6,10 @@ from typing import Iterator, Iterable, Optional, Tuple, Union
 import numpy as np
 import pandas as pd
 from pandas.tseries.api import guess_datetime_format
+
 from dados.dbdata import calculate_digit
+from upload.models import SINANUpload
+
 
 UF_CODES = {
     "AC": 12,
@@ -77,14 +80,19 @@ def add_dv(geocodigo):
 
 
 @np.vectorize
-def convert_date(col: Union[pd.Timestamp, str, None]) -> Optional[dt.date]:
+def convert_date(
+    col: Union[pd.Timestamp, str, None],
+    format: str
+) -> Optional[dt.date]:
     try:
         if pd.isnull(col):
             return None
         if isinstance(col, dt.date):
             return col
-        # return pd.to_datetime(col, dayfirst=True).date()
-        return pd.to_datetime(col).date()
+        try:
+            return pd.to_datetime(col, format=format).date()
+        except ValueError:
+            return None
     except Exception:
         return None
 
@@ -137,9 +145,8 @@ def convert_data_types(col: pd.Series, dtype: type) -> pd.Series:
     return col
 
 
-def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
-    df["NU_NOTIFIC"] = fix_nu_notif(df.NU_NOTIFIC)
-    df["ID_MUNICIP"] = add_dv(df.ID_MUNICIP)
+def parse_dates(df: pd.DataFrame, sinan_upload_id: int) -> pd.DataFrame:
+    sinan = SINANUpload.objects.get(pk=upload_sinan_id)
 
     dt_cols = [
         "DT_SIN_PRI",
@@ -154,9 +161,29 @@ def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
         "DT_VIRAL",
         "DT_PCR",
     ]
+    formats = {}
 
     for dt_col in dt_cols:
-        df[dt_col] = convert_date(df[dt_col])
+        format = infer_date_format(dt_col)
+        df[dt_col] = convert_date(df[dt_col], format)
+        formats[dt_col] = format
+
+    if not sinan.date_formats:
+        sinan.date_formats = formats
+        sinan.save()
+    else:
+        if sinan.date_formats != formats:
+            sinan.status.warning(
+                "A date discrepancy were found for the chunk. "
+                "Please contact the moderation"
+            )
+            sinan.date_formats = formats
+            sinan.save()
+
+
+def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
+    df["NU_NOTIFIC"] = fix_nu_notif(df.NU_NOTIFIC)
+    df["ID_MUNICIP"] = add_dv(df.ID_MUNICIP)
 
     df["CS_SEXO"] = np.where(
         df["CS_SEXO"].isin(["M", "F"]), df["CS_SEXO"], "I"

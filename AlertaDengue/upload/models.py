@@ -4,6 +4,8 @@ from datetime import date
 from pathlib import Path
 from typing import Generator, Literal, Optional, Union
 
+import pandas as pd
+
 from chunked_upload.models import BaseChunkedUpload
 from dados.models import City
 from django.conf import settings
@@ -61,6 +63,19 @@ class SINANUploadLogStatus(models.Model):
     @property
     def updates(self) -> int:
         return len(self._read_ids("updates"))
+
+    def contains_residue(self) -> bool:
+        if self.residues_file and Path(self.residues_file.exists()):
+            try:
+                df = pd.read_csv(self.residues_file)
+                if len(df) > 0:
+                    return True
+            except Exception:
+                self.warning(
+                    f"Couldn't open {self.residues_file}."
+                    "Please contact the moderation"
+                )
+        return False
 
     def list_ids(
         self, offset: int, limit: int, id_type: Literal["inserts", "updates"]

@@ -19,7 +19,7 @@ from .models import (
     sinan_upload_path,
     sinan_upload_log_path
 )
-from .sinan.utils import chunk_gen, parse_data
+from .sinan.utils import chunk_gen, parse_data, parse_dates
 
 ENGINE = get_sqla_conn(database="dengue")
 
@@ -185,10 +185,10 @@ def insert_chunk_to_temp_table(
     columns = list(sinan.COLUMNS.values())
 
     chunk = df_chunk.replace({pd.NA: None})
-    residues = chunk[chunk[SINANUpload.REQUIRED_COLS].isna().any(axis=1)]
-    chunk = chunk.dropna(subset=SINANUpload.REQUIRED_COLS, how="any")
     chunk = parse_dates(chunk)
     chunk = parse_data(chunk, sinan.cid10, sinan.year)
+    residues = chunk[chunk[SINANUpload.REQUIRED_COLS].isna().any(axis=1)]
+    chunk = chunk.dropna(subset=SINANUpload.REQUIRED_COLS, how="any")
     filtered_rows += len(chunk) - len(residues)
     chunk = chunk.rename(columns=sinan.COLUMNS)
 
@@ -199,7 +199,7 @@ def insert_chunk_to_temp_table(
             Path(sinan_upload_log_path()) /
             f"{sinan.status.pk}.residues.csv"
         )
-        with open(residues_file, "w") as f:
+        with residues_file.open("w") as f:
             residues.head(0).to_csv(f, index=False)
 
     if not residues.empty:
