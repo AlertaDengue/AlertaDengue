@@ -1,9 +1,15 @@
 import datetime as dt
-from typing import Iterator, Optional, Tuple, Union
+from collections import Counter
+from typing import ForwardRef, Iterable, Iterator, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 from dados.dbdata import calculate_digit
+from dateutil.parser import parse, parser
+from pandas.tseries.api import guess_datetime_format
+
+SINANUpload = ForwardRef("SINANUpload")
+
 
 UF_CODES = {
     "AC": 12,
@@ -74,13 +80,18 @@ def add_dv(geocodigo):
 
 
 @np.vectorize
-def convert_date(col: Union[pd.Timestamp, str, None]) -> Optional[dt.date]:
+def convert_date(
+    col: Union[pd.Timestamp, str, None], fmt: Optional[str] = None
+) -> Optional[dt.date]:
     try:
         if pd.isnull(col):
             return None
         if isinstance(col, dt.date):
             return col
-        return pd.to_datetime(col, dayfirst=True).date()
+        try:
+            return pd.to_datetime(col, format=fmt).date()
+        except ValueError:
+            return None
     except Exception:
         return None
 
@@ -133,10 +144,7 @@ def convert_data_types(col: pd.Series, dtype: type) -> pd.Series:
     return col
 
 
-def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
-    df["NU_NOTIFIC"] = fix_nu_notif(df.NU_NOTIFIC)
-    df["ID_MUNICIP"] = add_dv(df.ID_MUNICIP)
-
+def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
     dt_cols = [
         "DT_SIN_PRI",
         "DT_DIGITA",
@@ -150,9 +158,38 @@ def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
         "DT_VIRAL",
         "DT_PCR",
     ]
+    formats = {}
+
+    if df.empty:
+        return df
 
     for dt_col in dt_cols:
-        df[dt_col] = convert_date(df[dt_col])
+        fmt = None
+        if dt_col in df.columns:
+            if df[dt_col].dtype == "object":
+                fmt = infer_date_format(df[dt_col])
+                formats[dt_col] = fmt
+            df[dt_col] = convert_date(df[dt_col], fmt)
+
+    if not sinan.date_formats:
+        sinan.date_formats = formats
+        sinan.save()
+    else:
+        if sinan.date_formats != formats:
+            print(formats)
+            print(sinan.date_formats)
+            sinan.status.warning(
+                "A date discrepancy were found for the chunk. "
+                "Please contact the moderation"
+            )
+            sinan.date_formats = formats
+            sinan.save()
+    return df
+
+
+def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
+    df["NU_NOTIFIC"] = fix_nu_notif(df.NU_NOTIFIC)
+    df["ID_MUNICIP"] = add_dv(df.ID_MUNICIP)
 
     df["CS_SEXO"] = np.where(
         df["CS_SEXO"].isin(["M", "F"]), df["CS_SEXO"], "I"
@@ -193,3 +230,56 @@ def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
     df["SEM_NOT"] = convert_sem_not(df.SEM_NOT)
 
     return df
+
+
+def infer_date_format(date_series: Iterable[str]) -> str | None:
+    """
+    Returns the most common date format found in a series of strings. Returns
+    None if it was not possible to infer
+
+    ```
+    infer_date_format([None, "abc", "01-20-2020"]) # None (same scores)
+    infer_date_format([None, "abc", "01-20-2020", "03-26-2020"]) # '%m-%d-%Y'
+    ```
+
+    @param date_series: it must be an Iterable of strings
+    """
+    dates = [d for d in set(date_series) if not is_date_ambiguous(d)]
+    scores = Counter(
+        fmt
+        for fmt in [guess_datetime_format(d) for d in dates if d]
+        if fmt is not None
+    )
+    return scores.most_common(1)[0][0] if scores else None
+
+
+def is_date_ambiguous(date: str) -> bool:
+    """
+    The date is ambiguous when it's format can't be determined.
+    How it's being used only to filter out ambiguous dates, value errors can
+    be ignored
+
+    Examples:
+    12/05/2023 (%m/%d/%Y or %d/%m/%Y)   True
+    2023-05-12          ||              True
+    12-12-2023          ||              True
+    25/03/1999 (can't be %m/%d/%Y)      False
+    1999-25-03          ||              False
+    """
+    try:
+        monthfirst = parse(date, dayfirst=False)
+        dayfirst = parse(date, dayfirst=True)
+
+        if monthfirst == dayfirst and dayfirst.day != dayfirst.month:
+            return False
+
+        if monthfirst.day <= 12:
+            return True
+
+        if dayfirst.day <= 12:
+            return True
+
+    except (ValueError, TypeError):
+        pass
+
+    return False

@@ -4,6 +4,7 @@ from datetime import date
 from pathlib import Path
 from typing import Generator, Literal, Optional, Union
 
+import pandas as pd
 from chunked_upload.models import BaseChunkedUpload
 from dados.models import City
 from django.conf import settings
@@ -41,6 +42,7 @@ class SINANUploadLogStatus(models.Model):
     log_file = models.FilePathField(path=sinan_upload_log_path)
     inserts_file = models.FilePathField(path=sinan_upload_log_path, null=True)
     updates_file = models.FilePathField(path=sinan_upload_log_path, null=True)
+    residues_file = models.FilePathField(path=sinan_upload_log_path, null=True)
 
     def _read_ids(self, id_type: Literal["inserts", "updates"]) -> array:
         ids_file = Path(sinan_upload_log_path()) / f"{self.pk}.{id_type}.log"
@@ -60,6 +62,19 @@ class SINANUploadLogStatus(models.Model):
     @property
     def updates(self) -> int:
         return len(self._read_ids("updates"))
+
+    def contains_residue(self) -> bool:
+        if self.residues_file and Path(self.residues_file.exists()):
+            try:
+                df = pd.read_csv(self.residues_file)
+                if len(df) > 0:
+                    return True
+            except Exception:
+                self.warning(
+                    f"Couldn't open {self.residues_file}."
+                    "Please contact the moderation"
+                )
+        return False
 
     def list_ids(
         self, offset: int, limit: int, id_type: Literal["inserts", "updates"]
@@ -138,11 +153,8 @@ class SINANUploadLogStatus(models.Model):
         except TypeError:
             spaces = " " * len("PROGRESS")
 
-        if self.status != 0:
-            raise ValueError(
-                "Log is closed for writing (finished with status "
-                + f"{self.status})."
-            )
+        if self.status == 2:
+            raise ValueError("Log is closed for writing (finished with error)")
         log_message = f"{level}{spaces} - {message}\n"
         with Path(self.log_file).open(mode="a", encoding="utf-8") as log_file:
             log_file.write(log_message)
@@ -273,6 +285,11 @@ class SINANUpload(models.Model):
         SINANUploadLogStatus,
         on_delete=models.PROTECT,
         null=True,
+    )
+    date_formats = models.JSONField(
+        null=False,
+        default=dict,
+        help_text="A dict with {'DT_COLUMN': 'date format'}",
     )
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
