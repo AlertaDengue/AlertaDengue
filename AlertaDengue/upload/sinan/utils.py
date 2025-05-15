@@ -1,8 +1,11 @@
 import datetime as dt
-from typing import Iterator, Optional, Tuple, Union
+from collections import Counter
+from dateutil.parser import parser
+from typing import Iterator, Iterable, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
+from pandas.tseries.api import guess_datetime_format
 from dados.dbdata import calculate_digit
 
 UF_CODES = {
@@ -194,3 +197,56 @@ def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
     df["SEM_NOT"] = convert_sem_not(df.SEM_NOT)
 
     return df
+
+
+def infer_date_format(date_series: Iterable[str]) -> str | None:
+    """
+    Returns the most common date format found in a series of strings. Returns
+    None if it was not possible to infer
+
+    ```
+    infer_date_format([None, "abc", "01-20-2020"]) # None (same scores)
+    infer_date_format([None, "abc", "01-20-2020", "03-26-2020"]) # '%m-%d-%Y'
+    ```
+
+    @param date_series: it must be an Iterable of strings
+    """
+    dates = [d for d in set(date_series) if not is_date_ambiguous(d)]
+    scores = Counter(
+        format for format in
+        [guess_datetime_format(d) for d in dates if d]
+        if format is not None
+    )
+    return scores.most_common(1)[0][0] if scores else None
+
+
+def is_date_ambiguous(date: str) -> bool:
+    """
+    The date is ambiguous when it's format can't be determined.
+    How it's being used only to filter out ambiguous dates, value errors can
+    be ignored
+
+    Examples:
+    12/05/2023 (%m/%d/%Y or %d/%m/%Y)   True
+    2023-05-12          ||              True
+    12-12-2023          ||              True
+    25/03/1999 (can't be %m/%d/%Y)      False
+    1999-25-03          ||              False
+    """
+    try:
+        monthfirst = parse(date, dayfirst=False)
+        dayfirst = parse(date, dayfirst=True)
+
+        if monthfirst == dayfirst and dayfirst.day != dayfirst.month:
+            return False
+
+        if monthfirst.day <= 12:
+            return True
+
+        if dayfirst.day <= 12:
+            return True
+
+    except (ValueError, TypeError):
+        pass
+
+    return False

@@ -177,8 +177,11 @@
                     </div>
                   </div>
                 </div>
-
               </div>
+              <!--<div class="d-grid gap-2">-->
+              <!--  <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rollback-modal">{% trans "Rollback data" %}</button>-->
+              <!--</div>-->
+              <br>
             </div>
           </div>
         </div>
@@ -195,6 +198,25 @@
               {% for log in logs %}
               <p class="{{ log|log_type }}">{{ log }}</p>
               {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="rollback-modal" tabindex="-1" aria-labelledby="rollback-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header danger-header">
+              <h5 class="modal-title" id="rollback-modal-label">{% trans "Delete inserts and updates" %}</h5>
+              <button id="rollback-close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <h3>{% trans "Are you sure you want to proceed?" %}</h3>
+              <p>{% trans "It will delete all inserted and updated rows by the file in the 'Municipio'.'Notificacao' table" %}</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+              <button id="rollback-btn" type="button" class="btn btn-danger" data-bs-dismiss="modal">{% trans "Yes" %}</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "No" %}</button>
             </div>
           </div>
         </div>
@@ -243,6 +265,10 @@
       var criterioChartContext = document.getElementById('criterio').getContext('2d');
       var epiweekChartContext = document.getElementById('epiweek').getContext('2d');
       var municipioChartContext = document.getElementById('municipio_geocodigo').getContext('2d');
+
+        $("#rollback-btn").on("click", function() {
+          console.log("rollback");
+        });
 
       new Chart(sexChartContext, {
         type: 'doughnut',
@@ -459,6 +485,11 @@
 
     .log-info {
       color: #0d76aa;
+    }
+    
+    .danger-header {
+      background-color: #dc3545;
+      color: #fff;
     }
     </style>
 
