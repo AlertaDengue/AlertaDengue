@@ -9,12 +9,12 @@ import pandas as pd
 import pyarrow.parquet as pq
 from ad_main.settings import DEBUG, get_sqla_conn
 from celery import shared_task
-from django.db import transaction
 from psycopg2.extras import DictCursor
 from simpledbf import Dbf5
 
 from .models import (
     SINANUpload,
+    SINANUploadLogStatus,
     SINANUploadFatalError,
     sinan_upload_log_path,
     sinan_upload_path,
@@ -182,6 +182,7 @@ def insert_chunk_to_temp_table(
     filtered_rows: int = 0,
 ):
     sinan = SINANUpload.objects.get(pk=upload_sinan_id)
+    status = SINANUploadLogStatus.objects.get(pk=sinan.status.pk)
     columns = list(sinan.COLUMNS.values())
 
     chunk = df_chunk.replace({pd.NA: None})
@@ -195,16 +196,16 @@ def insert_chunk_to_temp_table(
     filtered_rows += len(chunk) - len(residues)
     chunk = chunk.rename(columns=sinan.COLUMNS)
 
-    residues_file = sinan.status.residues_file
-
-    if not residues_file or not Path(residues_file).exists():
+    if not status.contains_residue():
         residues_file = (
-            Path(sinan_upload_log_path()) / f"{sinan.status.pk}.residues.csv"
+            Path(sinan_upload_log_path()) / f"{status.pk}.residues.csv"
         )
         with residues_file.open("w") as f:
             residues.head(0).to_csv(f, index=False)
 
     if not residues.empty:
+        status.warning(f"{len(residues)} rows moved to residues")
+        status.debug(f"residues: {len(residues)}")
         residues.to_csv(residues_file, mode="a", index=False, header=False)
 
     insert_sql = f"""

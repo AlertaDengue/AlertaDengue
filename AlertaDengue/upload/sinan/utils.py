@@ -4,6 +4,7 @@ from typing import ForwardRef, Iterable, Iterator, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
+from epiweeks import Week
 from dados.dbdata import calculate_digit
 from dateutil.parser import parse, parser
 from pandas.tseries.api import guess_datetime_format
@@ -102,11 +103,13 @@ def convert_nu_ano(year: str, col: pd.Series) -> int:
 
 
 @np.vectorize
-def convert_sem_pri(col: str) -> int | None:
+def convert_sem_pri(val: str) -> int | None:
+    if pd.isna(val):
+        return pd.NA
     try:
-        return int(str(col)[-2:])
-    except ValueError:
-        return None
+        return Week.fromstring(str(val)).week
+    except (ValueError, AttributeError, TypeError):
+        return pd.NA
 
 
 @np.vectorize
@@ -131,11 +134,13 @@ def fill_id_agravo(cid: str, default_cid: str) -> str:
 
 
 @np.vectorize
-def convert_sem_not(col: np.ndarray[int]) -> np.ndarray[int] | None:
+def convert_sem_not(val: np.ndarray[int]) -> np.ndarray[int] | None:
+    if pd.isna(val):
+        return pd.NA
     try:
-        return int(str(int(col))[-2:])
-    except ValueError:
-        return None
+        return Week.fromstring(str(val)).week
+    except (ValueError, AttributeError, TypeError):
+        return pd.NA
 
 
 def convert_data_types(col: pd.Series, dtype: type) -> pd.Series:
@@ -237,11 +242,11 @@ def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
 
     df["ID_AGRAVO"] = fill_id_agravo(df.ID_AGRAVO, default_cid)
 
-    df["SEM_PRI"] = convert_sem_pri(df.SEM_PRI)
+    df["SEM_PRI"] = df["SEM_PRI"].apply(convert_sem_pri)
 
     df["NU_ANO"] = convert_nu_ano(year, df.NU_ANO)
 
-    df["SEM_NOT"] = convert_sem_not(df.SEM_NOT)
+    df["SEM_NOT"] = df["SEM_NOT"].apply(convert_sem_not)
 
     return df
 
