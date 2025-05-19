@@ -6,9 +6,10 @@
   {% if status == 0 %}list-group-item-primary
   {% elif status == 1 %}list-group-item-success
   {% elif status == 2 %}list-group-item-danger
+  {% elif status == 3 %}list-group-item-warning
   {% else %}
   {% endif %}">
-  {% if status == 1 %}
+  {% if status == 1 or status == 3 %}
   <a href="/upload/sinan/overview/{{id}}" class="li-item-link">
   {% endif %}
   <div class="li-content" style="display: flex; align-items: center;">
@@ -25,6 +26,19 @@
       </span>
 
       <div class="info-box">
+          <i class="fas fa-arrow-up" title='{% trans "New inserts" %}'> {{inserts}}</i>
+          <i class="fas fa-repeat" title='{% trans "Updated rows" %}'> {{updates}}</i>
+          <i class="fas fa-stopwatch" title='{% trans "Task duration" %}'> {{time_spend}}</i>
+      </div>
+      {% endif %}
+
+      {% if status == 3 %}
+      <span id="date" class="badge badge-primary ml-2" style="font-size: 0.85rem;">
+        {{ uploaded_at|date:"Y-m-d H:i" }}
+      </span>
+
+      <div class="info-box">
+          <i class="fas fa-exclamation-triangle" title='{% trans "Residues" %}'> {{residues}}</i>
           <i class="fas fa-arrow-up" title='{% trans "New inserts" %}'> {{inserts}}</i>
           <i class="fas fa-repeat" title='{% trans "Updated rows" %}'> {{updates}}</i>
           <i class="fas fa-stopwatch" title='{% trans "Task duration" %}'> {{time_spend}}</i>

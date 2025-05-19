@@ -4,9 +4,9 @@ from typing import ForwardRef, Iterable, Iterator, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
-from epiweeks import Week
 from dados.dbdata import calculate_digit
 from dateutil.parser import parse, parser
+from epiweeks import Week
 from pandas.tseries.api import guess_datetime_format
 
 SINANUpload = ForwardRef("SINANUpload")

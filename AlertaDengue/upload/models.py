@@ -34,7 +34,12 @@ class SINANChunkedUpload(BaseChunkedUpload):
 
 
 class SINANUploadLogStatus(models.Model):
-    STATUS = [(0, "Pending"), (1, "Success"), (2, "Error")]
+    STATUS = [
+        (0, "Pending"),
+        (1, "Success"),
+        (2, "Error"),
+        (3, "Success with residues"),
+    ]
 
     LOG_LEVEL = ["PROGRESS", "DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"]
 
@@ -66,14 +71,12 @@ class SINANUploadLogStatus(models.Model):
     def residues(self) -> str | None:
         if self.contains_residue():
             return str(
-                Path(sinan_upload_log_path()) /
-                f"{self.pk}.residues.csv"
+                Path(sinan_upload_log_path()) / f"{self.pk}.residues.csv"
             )
 
     def contains_residue(self) -> bool:
         residues_file = (
-            Path(sinan_upload_log_path()) /
-            f"{self.pk}.residues.csv"
+            Path(sinan_upload_log_path()) / f"{self.pk}.residues.csv"
         )
         if residues_file.exists():
             try:
@@ -99,7 +102,7 @@ class SINANUploadLogStatus(models.Model):
             return []
 
         start, end = min([offset, limit]), max([offset, limit])
-        return ids[start: end + 1]
+        return ids[start : end + 1]
 
     @property
     def time_spend(self) -> float:
@@ -142,7 +145,7 @@ class SINANUploadLogStatus(models.Model):
             for line in log_file:
                 if level:
                     startswith = (
-                        tuple(self.LOG_LEVEL[self.LOG_LEVEL.index(level):])
+                        tuple(self.LOG_LEVEL[self.LOG_LEVEL.index(level) :])
                         if not only_level
                         else level
                     )
@@ -192,7 +195,10 @@ class SINANUploadLogStatus(models.Model):
         filename = SINANUpload.objects.get(status__id=self.id).upload.filename
         message = f"{inserts} inserts in {time_spend:.2f} seconds."
         self._write_logs(level="SUCCESS", message=message)
-        self.status = 1
+        if self.contains_residue():
+            self.status = 3
+        else:
+            self.status = 1
         self.save()
 
 

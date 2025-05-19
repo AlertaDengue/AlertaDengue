@@ -14,8 +14,8 @@ from simpledbf import Dbf5
 
 from .models import (
     SINANUpload,
-    SINANUploadLogStatus,
     SINANUploadFatalError,
+    SINANUploadLogStatus,
     sinan_upload_log_path,
     sinan_upload_path,
 )
@@ -46,7 +46,7 @@ def sinan_rollback_file(
     """
     sinan = SINANUpload.objects.get(pk=upload_sinan_id)
 
-    if sinan.status.status != 1:
+    if not sinan.status.status in [1, 3]:
         raise RuntimeError(
             f"{sinan.upload.filename} is being processed or errored"
         )
