@@ -1,4 +1,4 @@
-from django.urls import re_path
+from django.urls import path, re_path
 
 from . import views
 
@@ -42,5 +42,10 @@ urlpatterns = [
         r"^sinan/chunked/complete/?$",
         views.SINANChunkedUploadCompleteView.as_view(),
         name="sinan_chunked_complete",
+    ),
+    re_path(
+        r"^sinan/residues/(?P<upload_id>[^/]+)/?$",
+        views.sinan_download_residues_csv,
+        name="sinan_residues",
     ),
 ]

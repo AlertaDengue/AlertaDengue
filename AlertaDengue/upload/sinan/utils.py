@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from dados.dbdata import calculate_digit
 from dateutil.parser import parse, parser
+from epiweeks import Week
 from pandas.tseries.api import guess_datetime_format
 
 SINANUpload = ForwardRef("SINANUpload")
@@ -102,8 +103,13 @@ def convert_nu_ano(year: str, col: pd.Series) -> int:
 
 
 @np.vectorize
-def convert_sem_pri(col: str) -> int:
-    return int(str(col)[-2:])
+def convert_sem_pri(val: str) -> int | None:
+    if pd.isna(val):
+        return pd.NA
+    try:
+        return Week.fromstring(str(val)).week
+    except (ValueError, AttributeError, TypeError):
+        return pd.NA
 
 
 @np.vectorize
@@ -128,8 +134,13 @@ def fill_id_agravo(cid: str, default_cid: str) -> str:
 
 
 @np.vectorize
-def convert_sem_not(col: np.ndarray[int]) -> np.ndarray[int]:
-    return int(str(int(col))[-2:])
+def convert_sem_not(val: np.ndarray[int]) -> np.ndarray[int] | None:
+    if pd.isna(val):
+        return pd.NA
+    try:
+        return Week.fromstring(str(val)).week
+    except (ValueError, AttributeError, TypeError):
+        return pd.NA
 
 
 def convert_data_types(col: pd.Series, dtype: type) -> pd.Series:
@@ -159,6 +170,7 @@ def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
         "DT_PCR",
     ]
     formats = {}
+    sinan_formats = sinan.date_formats or {}
 
     if df.empty:
         return df
@@ -171,19 +183,26 @@ def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
                 formats[dt_col] = fmt
             df[dt_col] = convert_date(df[dt_col], fmt)
 
-    if not sinan.date_formats:
-        sinan.date_formats = formats
-        sinan.save()
-    else:
-        if sinan.date_formats != formats:
-            print(formats)
-            print(sinan.date_formats)
+    for col, fmt in formats.items():
+        if not col in sinan_formats:
+            sinan_formats[col] = fmt
+
+        if not sinan_formats[col]:
+            sinan_formats[col] = fmt
+
+        if fmt and sinan_formats[col] != fmt:
             sinan.status.warning(
-                "A date discrepancy were found for the chunk. "
+                f"A date discrepancy were found for the column {col}. "
                 "Please contact the moderation"
             )
-            sinan.date_formats = formats
-            sinan.save()
+            sinan.status.debug(
+                f"DATE FORMAT CHANGED FROM '{sinan_formats[col]}' TO '{fmt}'"
+            )
+            sinan_formats[col] = fmt
+
+    if sinan.date_formats != sinan_formats:
+        sinan.date_formats = sinan_formats
+        sinan.save()
     return df
 
 
@@ -223,11 +242,11 @@ def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
 
     df["ID_AGRAVO"] = fill_id_agravo(df.ID_AGRAVO, default_cid)
 
-    df["SEM_PRI"] = convert_sem_pri(df.SEM_PRI)
+    df["SEM_PRI"] = df["SEM_PRI"].apply(convert_sem_pri)
 
     df["NU_ANO"] = convert_nu_ano(year, df.NU_ANO)
 
-    df["SEM_NOT"] = convert_sem_not(df.SEM_NOT)
+    df["SEM_NOT"] = df["SEM_NOT"].apply(convert_sem_not)
 
     return df
 

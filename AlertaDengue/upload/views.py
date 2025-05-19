@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import humanize
+import pandas as pd
 from ad_main.settings import get_sqla_conn
 from chunked_upload.views import ChunkedUploadCompleteView, ChunkedUploadView
 from django.contrib import messages
@@ -10,7 +11,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.base import File
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.http import HttpResponseNotFound, JsonResponse, QueryDict
+from django.http import (
+    FileResponse,
+    Http404,
+    HttpResponseNotFound,
+    JsonResponse,
+    QueryDict,
+)
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -50,7 +57,12 @@ class SINANOverview(LoginRequiredMixin, View):
             messages.error(request, "Upload not found")
             return redirect("upload:sinan")
 
+        if sinan.status.status == 3:
+            residues = pd.read_csv(sinan.status.residues)
+            context["residues"] = len(residues)
+
         context["sinan_upload_id"] = sinan_upload_id
+        context["status"] = sinan.status.status
         context["filename"] = sinan.upload.filename
         context["size"] = humanize.naturalsize(sinan.upload.file.size)
         context["inserts"] = sinan.status.inserts
@@ -59,6 +71,18 @@ class SINANOverview(LoginRequiredMixin, View):
         context["time_spend"] = f"{sinan.status.time_spend:.2f}"
         context["logs"] = sinan.status.read_logs("INFO")
         return render(request, self.template_name, context)
+
+
+def sinan_download_residues_csv(request, upload_id):
+    try:
+        sinan = models.SINANUpload.objects.get(pk=upload_id)
+        return FileResponse(
+            open(sinan.status.residues, "rb"),
+            as_attachment=True,
+            filename=f"{sinan.pk}.residues.csv",
+        )
+    except models.SINANUpload.DoesNotExist:
+        raise Http404("Not found")
 
 
 class SINANStatus(LoginRequiredMixin, View):
@@ -81,7 +105,7 @@ class SINANStatus(LoginRequiredMixin, View):
         context["status"] = sinan.status.status
         context["uploaded_at"] = sinan.uploaded_at
 
-        if sinan.status.status == 1:
+        if sinan.status.status in [1, 3]:
             context["inserts"] = self.humanizer(sinan.status.inserts)
             context["updates"] = self.humanizer(sinan.status.updates)
 
@@ -101,6 +125,10 @@ class SINANStatus(LoginRequiredMixin, View):
                 " - "
             )[1]
             context["error"] = error_message
+
+        if sinan.status.status == 3:
+            residues = pd.read_csv(sinan.status.residues)
+            context["residues"] = self.humanizer(len(residues))
 
         return render(request, self.template_name, context)
 

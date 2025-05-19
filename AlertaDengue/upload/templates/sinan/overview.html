@@ -95,6 +95,17 @@
                           <span class="info-box-number">{{inserts}}</span>
                         </div>
                       </div>
+
+                      {% if status == 3 %}
+                      <div class="info-box bg-danger" style="margin-left: 10px;">
+                        <span class="info-box-icon"><a href="/upload/sinan/residues/{{sinan_upload_id}}/" style="color: inherit; text-decoration: none;"><i class="fa-solid fa-exclamation-triangle"></i></span></a>
+                          <a href="/upload/sinan/residues/{{sinan_upload_id}}/"><div class="info-box-content">
+                          <span class="info-box-text">{% trans "Residues" %}</span>
+                          <span class="info-box-number">{{residues}}</span>
+                        </div></a>
+                      </div>
+                      {% endif %}
+
                     </div>
                   </div>
                   <div class="card-footer">{% trans "uploaded at" %} {{uploaded_at}} {% trans "in" %} {{time_spend}} {% trans "seconds" %}</div>

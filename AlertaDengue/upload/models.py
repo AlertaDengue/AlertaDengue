@@ -34,7 +34,12 @@ class SINANChunkedUpload(BaseChunkedUpload):
 
 
 class SINANUploadLogStatus(models.Model):
-    STATUS = [(0, "Pending"), (1, "Success"), (2, "Error")]
+    STATUS = [
+        (0, "Pending"),
+        (1, "Success"),
+        (2, "Error"),
+        (3, "Success with residues"),
+    ]
 
     LOG_LEVEL = ["PROGRESS", "DEBUG", "INFO", "WARNING", "ERROR", "SUCCESS"]
 
@@ -42,7 +47,6 @@ class SINANUploadLogStatus(models.Model):
     log_file = models.FilePathField(path=sinan_upload_log_path)
     inserts_file = models.FilePathField(path=sinan_upload_log_path, null=True)
     updates_file = models.FilePathField(path=sinan_upload_log_path, null=True)
-    residues_file = models.FilePathField(path=sinan_upload_log_path, null=True)
 
     def _read_ids(self, id_type: Literal["inserts", "updates"]) -> array:
         ids_file = Path(sinan_upload_log_path()) / f"{self.pk}.{id_type}.log"
@@ -63,15 +67,25 @@ class SINANUploadLogStatus(models.Model):
     def updates(self) -> int:
         return len(self._read_ids("updates"))
 
+    @property
+    def residues(self) -> str | None:
+        if self.contains_residue():
+            return str(
+                Path(sinan_upload_log_path()) / f"{self.pk}.residues.csv"
+            )
+
     def contains_residue(self) -> bool:
-        if self.residues_file and Path(self.residues_file.exists()):
+        residues_file = (
+            Path(sinan_upload_log_path()) / f"{self.pk}.residues.csv"
+        )
+        if residues_file.exists():
             try:
-                df = pd.read_csv(self.residues_file)
+                df = pd.read_csv(residues_file)
                 if len(df) > 0:
                     return True
             except Exception:
                 self.warning(
-                    f"Couldn't open {self.residues_file}."
+                    f"Couldn't open {residues_file}."
                     "Please contact the moderation"
                 )
         return False
@@ -181,7 +195,10 @@ class SINANUploadLogStatus(models.Model):
         filename = SINANUpload.objects.get(status__id=self.id).upload.filename
         message = f"{inserts} inserts in {time_spend:.2f} seconds."
         self._write_logs(level="SUCCESS", message=message)
-        self.status = 1
+        if self.contains_residue():
+            self.status = 3
+        else:
+            self.status = 1
         self.save()
 
 
