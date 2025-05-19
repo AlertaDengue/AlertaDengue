@@ -102,8 +102,11 @@ def convert_nu_ano(year: str, col: pd.Series) -> int:
 
 
 @np.vectorize
-def convert_sem_pri(col: str) -> int:
-    return int(str(col)[-2:])
+def convert_sem_pri(col: str) -> int | None:
+    try:
+        return int(str(col)[-2:])
+    except ValueError:
+        return None
 
 
 @np.vectorize
@@ -128,8 +131,11 @@ def fill_id_agravo(cid: str, default_cid: str) -> str:
 
 
 @np.vectorize
-def convert_sem_not(col: np.ndarray[int]) -> np.ndarray[int]:
-    return int(str(int(col))[-2:])
+def convert_sem_not(col: np.ndarray[int]) -> np.ndarray[int] | None:
+    try:
+        return int(str(int(col))[-2:])
+    except ValueError:
+        return None
 
 
 def convert_data_types(col: pd.Series, dtype: type) -> pd.Series:
@@ -159,6 +165,7 @@ def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
         "DT_PCR",
     ]
     formats = {}
+    sinan_formats = sinan.date_formats or {}
 
     if df.empty:
         return df
@@ -171,19 +178,26 @@ def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
                 formats[dt_col] = fmt
             df[dt_col] = convert_date(df[dt_col], fmt)
 
-    if not sinan.date_formats:
-        sinan.date_formats = formats
-        sinan.save()
-    else:
-        if sinan.date_formats != formats:
-            print(formats)
-            print(sinan.date_formats)
+    for col, fmt in formats.items():
+        if not col in sinan_formats:
+            sinan_formats[col] = fmt
+
+        if not sinan_formats[col]:
+            sinan_formats[col] = fmt
+
+        if fmt and sinan_formats[col] != fmt:
             sinan.status.warning(
-                "A date discrepancy were found for the chunk. "
+                f"A date discrepancy were found for the column {col}. "
                 "Please contact the moderation"
             )
-            sinan.date_formats = formats
-            sinan.save()
+            sinan.status.debug(
+                f"DATE FORMAT CHANGED FROM '{sinan_formats[col]}' TO '{fmt}'"
+            )
+            sinan_formats[col] = fmt
+
+    if sinan.date_formats != sinan_formats:
+        sinan.date_formats = sinan_formats
+        sinan.save()
     return df
 
 
