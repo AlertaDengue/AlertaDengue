@@ -28,6 +28,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
 from django.views.generic.base import TemplateView, View
+from epiweeks import Week
 
 # local
 from gis.geotiff import convert_from_shapefile
@@ -1305,6 +1306,7 @@ class AlertaStateView(TemplateView):
                 "case_series": cases_series_last_12,
                 "disease_label": context["disease"].title(),
                 "last_update": last_update,
+                "SE": Week.fromdate(last_update),
             }
         )
         return context
