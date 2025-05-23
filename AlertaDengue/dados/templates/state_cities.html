@@ -208,9 +208,15 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="card">
-                <div class="card-body content-inline">
-                    <strong>{% blocktranslate %}Descrição de filtro{% endblocktranslate %}: </strong>
-                    <span id="filter-display"></span>
+                <div class="card-body">
+                    <div class="content-inline mb-2">
+                        <strong>{% blocktranslate %}Descrição de filtro{% endblocktranslate %}: </strong>
+                        <span id="filter-display"></span>
+                    </div>
+                    <div class="content-inline">
+                        <strong>{% blocktranslate %}Casos notificados{% endblocktranslate %}: </strong>
+                        <span id="notify-display">{% blocktranslate %}Clique na arbovirose para alterar seleção de filtro. A escolha da doença implica no recarregamento da página.{% endblocktranslate %}</span>
+                    </div>
                 </div>
             </div>
         </div>

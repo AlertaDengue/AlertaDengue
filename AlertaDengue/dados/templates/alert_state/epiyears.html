@@ -64,7 +64,7 @@ $(document).ready(function () {
             }
         });
 
-        var n = epiyears_chart.colorCounter-1;
+        var n = epiyears_chart.series.length - 1;
         var color_value, _r, _g, _b;
 
         for (var i=0; i<n; i++) {
@@ -77,10 +77,12 @@ $(document).ready(function () {
             epiyears_chart.series[i].update({color: color_value});
         }
 
-        epiyears_chart.series[n].update({
-            lineWidth: 3,
-            marker: { symbol: 'circle', radius: 4}
-        });
+        if (epiyears_chart.series.length) {
+          epiyears_chart.series[n].update({
+              lineWidth: 3,
+              marker: { symbol: 'circle', radius: 4}
+          });
+        }
     });
 });
 </script>

@@ -49,7 +49,7 @@ ALLOWED_HOSTS = (
     os.getenv("ALLOWED_HOSTS").split(",") if os.getenv("ALLOWED_HOSTS") else []
 )
 # if True the maintenance-mode will be activated
-MAINTENANCE_MODE = None
+MAINTENANCE_MODE = os.getenv("MAINTENANCE", "False").lower() == "true"
 
 MAINTENANCE_MODE_TEMPLATE = str(APPS_DIR / "dados/templates/503.html")
 

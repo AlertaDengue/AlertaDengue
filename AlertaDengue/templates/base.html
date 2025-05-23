@@ -44,19 +44,17 @@
         </div>
         <main role="main" class="flex-fill">
             <div class="container py-4">
-                {% if user.is_authenticated %}
-                  <h3>{% block title %}{% endblock %}</h3>
-                  {% block breadcrumbs %}{% endblock %}
-                  {% block content %}
-                  <!-- Main content goes here -->
-                  {% endblock %}
-                {% else %}
+              <h3>{% block title %}{% endblock %}</h3>
+              {% block breadcrumbs %}{% endblock %}
+              {% if settings.MAINTENANCE_MODE and not user.is_authenticated %}
                 <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 50vh;">
-                    <img src="{% static 'img/maintenance.png' %}" alt="Maintenance" style="width: 200px;">
-                    <h3>{% trans "Manutenção" %}</h3>
-                    <p>{% trans "O site encontra-se em manutenção, por favor volte mais tarde" %}</p>
+                  <img src="{% static 'img/maintenance.png' %}" alt="Maintenance" style="width: 200px;">
+                  <h3>{% trans "Manutenção" %}</h3>
+                  <p>{% trans "O site encontra-se em manutenção, por favor volte mais tarde" %}</p>
                 </div>
-                {% endif %}
+              {% else %}
+                {% block content %}{% endblock %}
+              {% endif %}
             </div>
         </main>
         <footer class="footer py-4">

@@ -303,7 +303,9 @@ class NotificationQueries:
 
         with db_engine.connect() as conn:
             result = conn.execute(sql)
-            df_age_gender_dist = pd.DataFrame(result.fetchall())
+            data = result.fetchall()
+            columns = result.keys()
+            df_age_gender_dist = pd.DataFrame(data, columns=columns)
 
             return df_age_gender_dist.set_index("category", drop=True)
 
@@ -374,7 +376,7 @@ class NotificationQueries:
 
         disease_filter = ""
         if disease:
-            disease_code = CID10.get(disease, "")
+            disease_code = CID10.get(disease.lower(), "").replace(".", "")
             parameters["disease_code"] = disease_code
             disease_filter = " AND disease_code = :disease_code"
 
