@@ -45,7 +45,8 @@ function _get_diseases_selected() {
 }
 
 function get_diseases_selected() {
-    return '&diseases=' + _get_diseases_selected().join(',');
+    const diseases = ["dengue", "chikungunya", "zika"];
+    return '&diseases=' + diseases.join(',');
 }
 
 function plot_chart_disease(data, config){
