@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-11 21:53+0000\n"
+"POT-Creation-Date: 2025-05-23 19:46+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -60,7 +60,7 @@ msgstr ""
 #: dados/charts/alerts.py:273 dados/charts/cities.py:68 dados/charts/home.py:99
 #: dados/charts/states.py:119 dados/templates/alert_state/age.html:125
 #: dados/templates/alert_state/date.html:100
-#: dados/templates/alert_state/disease.html:122
+#: dados/templates/alert_state/disease.html:123
 #: dados/templates/alert_state/epiyears.html:39
 #: dados/templates/alert_state/gender.html:113
 msgid "Casos"
@@ -154,7 +154,7 @@ msgstr "Estimados"
 msgid "Total de casos no estado"
 msgstr "Total de casos en el estado"
 
-#: dados/charts/home.py:89 dados/charts/home.py:233 dados/charts/home.py:354
+#: dados/charts/home.py:89 dados/charts/home.py:233 dados/charts/home.py:353
 #: dados/charts/states.py:109 dados/charts/states.py:270
 #: dados/templates/report_city.html:81 dados/templates/report_city.html:254
 #: dados/templates/report_state.html:43 dados/templates/services_api.html:205
@@ -166,15 +166,15 @@ msgstr "Semana epidemiológica"
 msgid "Cidades com clima favorável <br>para transmissão"
 msgstr "Ciudades con clima favorable <br>para la transmisión"
 
-#: dados/charts/home.py:325 dados/charts/states.py:238
+#: dados/charts/home.py:324 dados/charts/states.py:238
 msgid "Cidades na Semana"
 msgstr "Ciudades en la Semana"
 
-#: dados/charts/home.py:333
+#: dados/charts/home.py:332
 msgid "Situação epidemiológica das cidades"
 msgstr "Situación epidemiológica de las ciudades"
 
-#: dados/charts/home.py:364 dados/charts/states.py:280
+#: dados/charts/home.py:363 dados/charts/states.py:280
 msgid "Número de cidades"
 msgstr "Número de ciudades"
 
@@ -1113,11 +1113,11 @@ msgstr ""
 "Para cambiar el zoom del gráfico,<br/>utiliza los controles de la parte "
 "inferior."
 
-#: dados/templates/alert_state/disease.html:109
+#: dados/templates/alert_state/disease.html:110
 msgid "Casos notificados no Período"
 msgstr "Casos notificados en el período"
 
-#: dados/templates/alert_state/disease.html:138
+#: dados/templates/alert_state/disease.html:139
 msgid ""
 "Clique na categoria (coluna) para <br/>alterar seleção de filtro. A escolha "
 "da doença <br/>implica no recarregamento da página."
@@ -1164,9 +1164,9 @@ msgid ""
 "(dados incompletos) <br> Estimados: estimativa utilizando modelo de nowcast "
 "(ver saiba mais)"
 msgstr ""
-"Registrados: casos de dengue notificados por semana de inicio de los síntomas"
-"(datos incompletos) <br> Estimación: estimación utilizando el modelo de pronóstico inmediato "
-"(ver más información)"
+"Registrados: casos de dengue notificados por semana de inicio de los "
+"síntomas(datos incompletos) <br> Estimación: estimación utilizando el modelo "
+"de pronóstico inmediato (ver más información)"
 
 #: dados/templates/components/home/charts.html:7
 msgid ""
@@ -1174,9 +1174,9 @@ msgid ""
 "sintomas (dados incompletos) <br> Estimados: estimativa utilizando modelo de "
 "nowcast (ver saiba mais)"
 msgstr ""
-"Registrados: casos de chikungunya notificados por semana de inicio de los síntomas"
-"(datos incompletos) <br> Estimación: estimación utilizando el modelo de pronóstico inmediato "
-"(ver más información)"
+"Registrados: casos de chikungunya notificados por semana de inicio de los "
+"síntomas(datos incompletos) <br> Estimación: estimación utilizando el modelo "
+"de pronóstico inmediato (ver más información)"
 
 #: dados/templates/components/home/charts.html:8
 msgid ""
@@ -1184,24 +1184,24 @@ msgid ""
 "(dados incompletos) <br> Estimados: estimativa utilizando modelo de nowcast "
 "(ver saiba mais)"
 msgstr ""
-"Registrados: casos de zika notificados por semana de inicio de los síntomas"
-"(datos incompletos) <br> Estimación: estimación utilizando el modelo de pronóstico inmediato "
-"(ver más información)"
+"Registrados: casos de zika notificados por semana de inicio de los "
+"síntomas(datos incompletos) <br> Estimación: estimación utilizando el modelo "
+"de pronóstico inmediato (ver más información)"
 
 #: dados/templates/components/home/charts.html:10
 msgid ""
-"Aumento o reducción de ciudades con clima favorable para la transmisión, en"
-"en comparación con la semana pasada"
+"Aumento ou redução de cidades com clima favorável para transmissão, em "
+"relação à última semana"
 msgstr ""
-
 
 #: dados/templates/components/home/charts.html:12
 msgid ""
 "Amarelo: clima favorável e presença de arbovirus <br> Laranja: tendência de "
 "aumento de casos <br> Vermelho: alta incidência em relação ao histórico"
 msgstr ""
-"Amarillo: clima favorable y presencia de arbovirus <br> Naranja: tendencia de "
-"Aumento de casos <br> Rojo: alta incidencia en comparación con el historial"
+"Amarillo: clima favorable y presencia de arbovirus <br> Naranja: tendencia "
+"de Aumento de casos <br> Rojo: alta incidencia en comparación con el "
+"historial"
 
 #: dados/templates/components/home/charts.html:30
 msgid "Gráficos sobre Dengue"
@@ -1231,7 +1231,9 @@ msgstr "Municipios monitoreados"
 msgid "Última atualização na SE"
 msgstr "Última actualización en SE"
 
-#: dados/templates/components/home/charts.html:158
+#: dados/templates/components/home/charts.html:103
+#: dados/templates/components/home/charts.html:128
+#: dados/templates/components/home/charts.html:153
 msgid "Informações detalhadas sobre o Estado"
 msgstr "Información detallada sobre el estado"
 
@@ -2371,11 +2373,29 @@ msgstr "edades"
 msgid "Última atualização"
 msgstr "Última actualización"
 
-#: dados/templates/state_cities.html:212
+#: dados/templates/state_cities.html:213
 msgid "Descrição de filtro"
 msgstr "Descripción del filtro"
 
-#: dados/templates/state_cities.html:295
+#: dados/templates/state_cities.html:217
+#, fuzzy
+#| msgid "Casos Notificados"
+msgid "Casos notificados"
+msgstr "Casos Notificados"
+
+#: dados/templates/state_cities.html:218
+#, fuzzy
+#| msgid ""
+#| "Clique na categoria (coluna) para <br/>alterar seleção de filtro. A "
+#| "escolha da doença <br/>implica no recarregamento da página."
+msgid ""
+"Clique na arbovirose para alterar seleção de filtro. A escolha da doença "
+"implica no recarregamento da página."
+msgstr ""
+"Haz clic en la arbovirose para <br/>cambiar la selección de filtro. "
+"La elección de la enfermedad <br/>implica recargar la página."
+
+#: dados/templates/state_cities.html:301
 msgid "Por favor, aguarde."
 msgstr "Por favor, espere."
 
@@ -2566,7 +2586,7 @@ msgstr ""
 msgid "Entre em contato conosco"
 msgstr "Contáctenos"
 
-#: dados/views.py:359
+#: dados/views.py:360
 msgid ""
 "A doença {} não está registrada em nosso banco de dados para o município de "
 "{}."
@@ -2574,29 +2594,29 @@ msgstr ""
 "La enfermedad {} no está registrada en nuestra base de datos para el "
 "municipio de {}."
 
-#: dados/views.py:956
+#: dados/views.py:957
 msgid "°C temperatura mínima"
 msgstr "°C temperatura mínima"
 
-#: dados/views.py:957
+#: dados/views.py:958
 msgid "°C temperatura média"
 msgstr "°C temperatura media"
 
-#: dados/views.py:958
+#: dados/views.py:959
 msgid "°C temperatura máxima"
 msgstr "°C temperatura máxima"
 
-#: dados/views.py:959
+#: dados/views.py:960
 #, python-format
 msgid "% umidade mínima do ar"
 msgstr "% humedad mínima del aire"
 
-#: dados/views.py:960
+#: dados/views.py:961
 #, python-format
 msgid "% umidade média do ar"
 msgstr "% humedad media del aire"
 
-#: dados/views.py:961
+#: dados/views.py:962
 #, python-format
 msgid "% umidade máxima do ar"
 msgstr "% humedad máxima del aire"
@@ -2665,7 +2685,7 @@ msgid ""
 "Este arquivo não contém {}, que é esperado em um arquivo válido do SINAN."
 msgstr ""
 
-#: forecast/models.py:21 upload/templates/sinan/overview.html:338
+#: forecast/models.py:21 upload/templates/sinan/overview.html:375
 msgid "Geocode"
 msgstr ""
 
@@ -2727,6 +2747,16 @@ msgstr ""
 
 #: forecast/models.py:175
 msgid "Casos Previstos"
+msgstr ""
+
+#: templates/base.html:52
+#, fuzzy
+#| msgid "Atenção"
+msgid "Manutenção"
+msgstr "Atención"
+
+#: templates/base.html:53
+msgid "O site encontra-se em manutenção, por favor volte mais tarde"
 msgstr ""
 
 #: templates/components/footer.html:6
@@ -2889,50 +2919,81 @@ msgstr ""
 msgid "Inserts"
 msgstr ""
 
-#: upload/templates/sinan/overview.html:100
+#: upload/templates/sinan/overview.html:103
+#: upload/templates/sinan/status.html:41
+msgid "Residues"
+msgstr ""
+
+#: upload/templates/sinan/overview.html:111
 msgid "uploaded at"
 msgstr ""
 
-#: upload/templates/sinan/overview.html:100
+#: upload/templates/sinan/overview.html:111
 msgid "in"
 msgstr ""
 
-#: upload/templates/sinan/overview.html:100
+#: upload/templates/sinan/overview.html:111
 msgid "seconds"
 msgstr ""
 
-#: upload/templates/sinan/overview.html:108
+#: upload/templates/sinan/overview.html:119
 msgid "cs_sexo distribution"
 msgstr ""
 
-#: upload/templates/sinan/overview.html:125
+#: upload/templates/sinan/overview.html:136
 msgid "criterio distribution"
 msgstr ""
 
-#: upload/templates/sinan/overview.html:142
+#: upload/templates/sinan/overview.html:153
 #, fuzzy
 #| msgid "Total de casos no estado"
 msgid "Total cases"
 msgstr "Total de casos en el estado"
 
-#: upload/templates/sinan/overview.html:164
+#: upload/templates/sinan/overview.html:175
 msgid "municipio_geocodigo distribution"
 msgstr ""
 
-#: upload/templates/sinan/overview.html:308
-#: upload/templates/sinan/overview.html:324
+#: upload/templates/sinan/overview.html:193
+msgid "Rollback data"
+msgstr ""
+
+#: upload/templates/sinan/overview.html:221
+msgid "Delete inserts and updates"
+msgstr ""
+
+#: upload/templates/sinan/overview.html:225
+msgid "Are you sure you want to proceed?"
+msgstr ""
+
+#: upload/templates/sinan/overview.html:226
+msgid ""
+"It will delete all inserted and updated rows by the file in the "
+"'Municipio'.'Notificacao' table"
+msgstr ""
+
+#: upload/templates/sinan/overview.html:229
+msgid "Yes"
+msgstr ""
+
+#: upload/templates/sinan/overview.html:230
+msgid "No"
+msgstr ""
+
+#: upload/templates/sinan/overview.html:345
+#: upload/templates/sinan/overview.html:361
 msgid "Cases"
 msgstr ""
 
-#: upload/templates/sinan/status.html:28
+#: upload/templates/sinan/status.html:29 upload/templates/sinan/status.html:42
 msgid "New inserts"
 msgstr ""
 
-#: upload/templates/sinan/status.html:29
+#: upload/templates/sinan/status.html:30 upload/templates/sinan/status.html:43
 msgid "Updated rows"
 msgstr ""
 
-#: upload/templates/sinan/status.html:30
+#: upload/templates/sinan/status.html:31 upload/templates/sinan/status.html:44
 msgid "Task duration"
 msgstr ""
 
