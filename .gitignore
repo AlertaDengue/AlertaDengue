@@ -40,6 +40,7 @@ AlertaDengue/static/img/incidence_maps/*
 /build/
 /tiffs/
 .vscode
+.pylintrc
 
 # env
 .env*

@@ -31,12 +31,12 @@ function plot_chart_date(data, config){
     var format = d3.timeFormat('%Y-%m-%d');
 
     for (i in data) {
-        if (data[i].category == undefined) {
+        if (data[i].dt_week == undefined) {
             continue;
         }
-        dt = parser(data[i].category);
+        dt = parser(data[i].dt_week);
         dt_utc = Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate());
-        _values.push([dt_utc, parseInt(data[i].casos)]);
+        _values.push([dt_utc, parseInt(data[i].Casos)]);
     }
     // set data
     date_chart.series[0].setData(_values);

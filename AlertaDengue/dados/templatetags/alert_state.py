@@ -25,6 +25,7 @@ def map_chart(context):
 
 @register.inclusion_tag("alert_state/date.html", takes_context=True)
 def date_chart(context):
+    print(context)
     return context
 
 
