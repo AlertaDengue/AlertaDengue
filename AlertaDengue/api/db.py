@@ -376,7 +376,7 @@ class NotificationQueries:
 
         disease_filter = ""
         if disease:
-            disease_code = CID10.get(disease, "")
+            disease_code = CID10.get(disease.lower(), "").replace(".", "")
             parameters["disease_code"] = disease_code
             disease_filter = " AND disease_code = :disease_code"
 
