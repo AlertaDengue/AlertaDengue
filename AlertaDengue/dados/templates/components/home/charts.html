@@ -97,6 +97,12 @@
               {% include "components/tooltip.html" with class="tooltip-charts tooltip-stack" placement="bottom" text=stack_text %}
             </div>
           </div>
+          <div class="align-buttom mt-2">
+            <a href="/alerta/{{states_alert|lookup:state}}/dengue"
+              class="btn btn-outline-primary btn-sm" style="font-size: medium;">
+              <span class="badge">{% translate "Informações detalhadas sobre o Estado" %}</span>
+            </a>
+          </div>
         </div>
         <div class="tab-pane fade"
             id="chikungunya-{{ state }}"
@@ -115,6 +121,12 @@
               {{ chart_stack|lookup:'chikungunya'|lookup:state | safe }}
               {% include "components/tooltip.html" with class="tooltip-charts tooltip-stack" placement="bottom" text=stack_text %}
             </div>
+          </div>
+          <div class="align-buttom mt-2">
+            <a href="/alerta/{{states_alert|lookup:state}}/chikungunya"
+              class="btn btn-outline-primary btn-sm" style="font-size: medium;">
+              <span class="badge">{% translate "Informações detalhadas sobre o Estado" %}</span>
+            </a>
           </div>
         </div>
         <div class="tab-pane fade"
@@ -135,6 +147,12 @@
               {% include "components/tooltip.html" with class="tooltip-charts tooltip-stack" placement="bottom" text=stack_text %}
             </div>
           </div>
+          <div class="align-buttom mt-2">
+            <a href="/alerta/{{states_alert|lookup:state}}/zika"
+              class="btn btn-outline-primary btn-sm" style="font-size: medium;">
+              <span class="badge">{% translate "Informações detalhadas sobre o Estado" %}</span>
+            </a>
+          </div>
         </div>
         <div class="tab-pane fade"
             id="incidence_map-{{ state }}"
@@ -151,12 +169,6 @@
               {{ create_maps|lookup:'zika'|lookup:state | safe }}
             </div>
           </div>
-        </div>
-        <div class="align-buttom mt-2">
-          <a href="/alerta/{{states_alert|lookup:state}}"
-            class="btn btn-outline-primary btn-sm" style="font-size: medium;">
-            <span class="badge">{% translate "Informações detalhadas sobre o Estado" %}</span>
-          </a>
         </div>
       </div>
 
