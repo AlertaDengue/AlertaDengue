@@ -196,9 +196,7 @@ def insert_chunk_to_temp_table(
     filtered_rows += len(chunk) - len(residues)
     chunk = chunk.rename(columns=sinan.COLUMNS)
 
-    residues_file = (
-        Path(sinan_upload_log_path()) / f"{status.pk}.residues.csv"
-    )
+    residues_file = Path(sinan_upload_log_path()) / f"{status.pk}.residues.csv"
 
     if not status.contains_residue():
         with residues_file.open("w") as f:
