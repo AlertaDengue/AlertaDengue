@@ -55,11 +55,15 @@ class NotificationQueries:
     def _get_gender_filter(self, gender):
         if gender is None:
             return "cs_sexo IN ('F', 'M')"
-        genders = [
-            "'F'" if g == "mulher" else "'M'" if g == "homem" else None
-            for g in gender.lower().split(",")
-        ]
-        return f"cs_sexo IN ({','.join(filter(None, genders))})"
+        genders = []
+        for g in gender.lower().split(","):
+            if g == "mulher":
+                genders.append("'F'")
+            if g == "homem":
+                genders.append("'M'")
+        if not genders:
+            return "cs_sexo IN ('F', 'M')"
+        return f"cs_sexo IN ({','.join(genders)})"
 
     def _get_city_filter(self, city):
         return f"municipio_geocodigo IN ({city})" if city is not None else ""
@@ -256,7 +260,9 @@ class NotificationQueries:
 
         with db_engine.connect() as conn:
             result = conn.execute(sql)
-            df_age_dist = pd.DataFrame(result.fetchall())
+            df_age_dist = pd.DataFrame(
+                result.fetchall(), columns=result.keys()
+            )
 
             return df_age_dist.set_index("category", drop=True)
 
