@@ -7,16 +7,16 @@ import logging
 import unicodedata
 from collections import defaultdict
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import List, Literal, Optional, Tuple
 
 import ibis
 import numpy as np
 import pandas as pd
-from epiweeks import Week
 from ad_main.settings import APPS_DIR, get_ibis_conn, get_sqla_conn
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.text import slugify
+from epiweeks import Week
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 
@@ -357,7 +357,10 @@ def normalize_str(string: str) -> str:
     return string
 
 
-def get_disease_suffix(disease: str, empty_for_dengue: bool = True):
+def get_disease_suffix(
+    disease: Literal["dengue", "zika", "chikungunya"],
+    empty_for_dengue: bool = True,
+):
     """
     :param disease:
     :return:
@@ -488,7 +491,7 @@ def get_last_alert(geo_id, disease, db_engine: Engine = DB_ENGINE):
         return pd.read_sql_query(sql, conn)
 
 
-def get_last_SE(disease, db_engine: Engine = DB_ENGINE) -> Week:
+def get_last_SE(disease="dengue", db_engine: Engine = DB_ENGINE) -> Week:
     table_name = "Historico_alerta" + get_disease_suffix(disease)
 
     sql = f"""

@@ -304,7 +304,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
         disease_code = context["disease"]
         disease_label = _get_disease_label(disease_code)
         geocode = context["geocodigo"]
-        last_SE = get_last_SE(disease_code)
+        last_SE = get_last_SE()
 
         # Fetch city info from cache or database
         city_info = cache.get(f"city_info:{geocode}")
@@ -1271,7 +1271,7 @@ class AlertaStateView(TemplateView):
             self._state_name[context["state"]], context["disease"]
         )
 
-        last_update = get_last_SE(context["disease"]).enddate()
+        last_update = get_last_SE().enddate()
         alerts = dict(
             cities_alert[["municipio_geocodigo", "level_alert"]].values
         )
