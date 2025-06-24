@@ -120,7 +120,7 @@
     <br>
     <p>
       {% trans "O mapa abaixo mostra os níveis de atenção dos municípios pertencentes à mesma regional de saúde de " %}
-      {{ nome }}, {% trans "que está destacado com bordas azuis." %}
+      {{ nome }}, {% trans "que está destacado com bordas azuis." %} {% trans "Para ver os casos estimados e o alerta das últimas semanas, clique sobre o município." %}
     </p>
 
     <div class="row justify-content-center"
@@ -214,7 +214,7 @@
                 Epidemiológica {{ SE }}: {{ data1 }} a {{ data2 }}. Com {{ total_observed }} casos notificados oficialmente
                 até o momento{% endblocktranslate %}</p>
             <h4>{% blocktranslate %} Últimas {{ look_back }} semanas: {% endblocktranslate %}</h4>
-            <span class='totalsparkline'></span>
+            <span class="totalsparkline" style="display: inline-block; width: 250px;"></span>
 
             <p></p>
             {% comment %}<h4>Há um ano:</h4>
@@ -311,8 +311,8 @@
 
     $('.totalsparkline').sparkline(values, {
       type: 'bar',
-      barWidth: 15,
-      height: '30px',
+      barWidth: 18,
+      height: '90px',
       colorMap: levels.map(level => colors[level] || "#cccccc"),
       tooltipFormat: '{' + '{value}' + '} {% blocktranslate %}casos{% endblocktranslate %}'
     });
