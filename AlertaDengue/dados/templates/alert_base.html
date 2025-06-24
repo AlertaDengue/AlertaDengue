@@ -117,6 +117,12 @@
 
     <!-- MAP attention level alert -->
 
+    <br>
+    <p>
+      {% trans "O mapa abaixo mostra os níveis de atenção dos municípios pertencentes à mesma regional de saúde de " %}
+      {{ nome }}, {% trans "que está destacado com bordas azuis." %}
+    </p>
+
     <div class="row justify-content-center"
         style="background-color: #e0eefd63;
         margin-left: 25px;
@@ -208,7 +214,7 @@
                 Epidemiológica {{ SE }}: {{ data1 }} a {{ data2 }}. Com {{ total_observed }} casos notificados oficialmente
                 até o momento{% endblocktranslate %}</p>
             <h4>{% blocktranslate %} Últimas {{ look_back }} semanas: {% endblocktranslate %}</h4>
-            <span class='totalsparkline'>{{ total_series }}</span>
+            <span class='totalsparkline'></span>
 
             <p></p>
             {% comment %}<h4>Há um ano:</h4>
@@ -273,12 +279,7 @@
     var casos_por_ap = {{ casos_por_ap| safe }};
     var series_casos = {{ series_casos| safe }};
     var alerta = {{ alerta| safe }};
-    var recomendacoes = {
-        0: "{% blocktranslate %}Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://www.riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe criadouros para o mosquito!</a>{% endblocktranslate %}",
-        1: '{% blocktranslate %}Uma vez por semana, aplique os <a href="http://www.riocontradengue.com.br/Site/Conteudo/Checklist.aspx">“10 minutos Contra a dengue”!</a>{% endblocktranslate %}',
-        2: '{% blocktranslate %}Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.{% endblocktranslate %}',
-        3: '{% blocktranslate %}Fique <a href="http://www.riocontradengue.rj.gov.br/Site/Conteudo/FiqueAtento.aspx">atento aos sintomas da Dengue!</a> Procure um médico caso suspeite de dengue.{% endblocktranslate %}'
-    };
+    let focused_layer = null;
 
     var bairros = {{ bairros| safe }};
 
@@ -288,7 +289,7 @@
     var legend = L.control({ position: 'bottomright' });
 
     // @override this
-    var dataurl = '{{geojson_url}}';
+    var dataurls = {{geojson_urls|safe}};
 
     var alertLevels = [
         { name: '{% blocktranslate %}Baixo Risco{% endblocktranslate %}', color: '#0D6B0D' },
@@ -297,13 +298,23 @@
         { name: '{% blocktranslate %}Atividade aumentada{% endblocktranslate %}', color: '#FF0205' },
     ];
 
-    $('.totalsparkline').sparkline('html', {
-        type: 'bar',
-        width: "auto",
-        heigth: "auto",
-        barWidth: "15px",
-        barColor: "White",
-        tooltipSuffix: " {% blocktranslate %}casos{% endblocktranslate %}"
+    const colors = {
+      0: "#cccccc",
+      1: "#00ff00",
+      2: "#ffff00",
+      3: "#ff9900",
+      4: "#ff0000",
+    };
+    const total_series = {{ total_series| safe }};
+    const values = total_series.map(d => d[0]);
+    const levels = total_series.map(d => d[1]);
+
+    $('.totalsparkline').sparkline(values, {
+      type: 'bar',
+      barWidth: 15,
+      height: '30px',
+      colorMap: levels.map(level => colors[level] || "#cccccc"),
+      tooltipFormat: '{' + '{value}' + '} {% blocktranslate %}casos{% endblocktranslate %}'
     });
 
     function isInArray(el, array) {
@@ -319,13 +330,13 @@
         map.fitBounds(group.getBounds());
     }
 
-    function style(feature) {
+    function style(feature, focus = false) {
         var i = +feature.properties.alerta || 0;
         return {
-            weight: 2,
+            weight: focus ? 2 : 1.5,
             opacity: 1,
-            color: 'white',
-            dashArray: '3',
+            color: focus ? '#3388ff' : 'white',
+            dashArray: focus ? '' : '3',
             fillOpacity: 0.7,
             fillColor: alertLevels[i].color
         };
@@ -351,18 +362,27 @@
     }
 
     function resetHighlight(e) {
-        geojson.resetStyle(e.target);
+        const codigo = e.target.feature.properties.geocodigo || e.target.feature.properties.COD_AP_SMS;
+        const focus = String(codigo) === String(geocode);
+        e.target.setStyle(style(e.target.feature, focus));
         info.update();
+        if (focused_layer) {
+          focused_layer.bringToFront();
+        }
     }
 
-    function renderSparkline(e) {
-        $('.inlinesparkline').sparkline('html', {
-            type: 'bar',
-            width: "14em",
-            heigth: "5em",
-            barWidth: "9em",
-            tooltipSuffix: " {% blocktranslate %}casos{% endblocktranslate %}"
-        });
+    function renderSparkline(selector, series) {
+      const values = series.map(d => d[0]);
+      const levels = series.map(d => d[1]);
+
+      $(selector).sparkline(values, {
+          type: 'bar',
+          width: "14em",
+          height: "5em",
+          barWidth: "9em",
+          colorMap: levels.map(level => colors[level] || "#cccccc"),
+          tooltipFormat: '{' + '{value}' + '} {% blocktranslate %}casos{% endblocktranslate %}'
+      });
     }
 
     function apply_map_settings(map) {
@@ -414,7 +434,7 @@
 
         {% block alert_js_main_init %} {% endblock %}
 
-        load_map_layer(dataurl, map);
+        load_map_layer(dataurls, map);
 
         info.addTo(map);
 

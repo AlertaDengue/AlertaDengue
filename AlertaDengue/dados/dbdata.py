@@ -482,13 +482,12 @@ def get_last_alert(geo_id, disease, db_engine: Engine = DB_ENGINE):
     sql = f"""
     SELECT nivel
     FROM "Municipio"."{table_name}"
-    WHERE municipio_geocodigo="{geo_id}"
+    WHERE municipio_geocodigo={geo_id}
     ORDER BY "data_iniSE" DESC
     LIMIT 1
     """
 
-    with db_engine.connect() as conn:
-        return pd.read_sql_query(sql, conn)
+    return pd.read_sql_query(sql, db_engine.raw_connection())
 
 
 def get_last_SE(disease="dengue", db_engine: Engine = DB_ENGINE) -> Week:
@@ -552,6 +551,8 @@ def load_series(
         series = defaultdict(lambda: defaultdict(lambda: []))
 
         series[ap]["dia"] = dados_alerta.data_iniSE.tolist()
+
+        series[ap]["nivel"] = dados_alerta.nivel.tolist()
 
         series[ap]["casos_est_min"] = _nan_to_num_int_list(
             dados_alerta.casos_est_min
@@ -637,6 +638,7 @@ def get_city_alert(cidade, disease="dengue"):
     alert = series_city["alerta"][-1]
     SE = series_city["SE"][-1]
     case_series = series_city["casos_est"]
+    nivel = series_city["nivel"]
     last_year = (
         series_city["casos"][-52] if len(series_city["casos"]) >= 52 else None
     )
@@ -653,6 +655,7 @@ def get_city_alert(cidade, disease="dengue"):
         alert,
         SE,
         case_series,
+        nivel,
         last_year,
         obs_case_series,
         min_max_est,

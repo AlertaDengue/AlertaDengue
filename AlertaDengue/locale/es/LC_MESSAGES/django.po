@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-23 19:46+0000\n"
+"POT-Creation-Date: 2025-06-24 14:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,48 +23,49 @@ msgid "Casos Notificados"
 msgstr "Casos Notificados"
 
 #: dados/charts/alerts.py:138 dados/charts/alerts.py:159
-#: dados/charts/alerts.py:182 dados/charts/alerts.py:205
-#: dados/charts/alerts.py:228 dados/charts/alerts.py:252
+#: dados/charts/alerts.py:183 dados/charts/alerts.py:206
+#: dados/charts/alerts.py:229 dados/charts/alerts.py:253
 #: dados/charts/home.py:51 dados/charts/home.py:70 dados/charts/states.py:68
 #: dados/charts/states.py:89 dados/templates/services_api.html:205
 msgid "SE"
 msgstr "SE"
 
 #: dados/charts/alerts.py:141 dados/charts/alerts.py:162
-#: dados/charts/alerts.py:185 dados/charts/alerts.py:208
-#: dados/charts/alerts.py:231 dados/charts/alerts.py:244
-#: dados/charts/alerts.py:255 dados/charts/home.py:73 dados/charts/states.py:92
-msgid "Casos Estimados"
-msgstr "Casos Estimados"
-
-#: dados/charts/alerts.py:151
-msgid "Alerta Verde"
-msgstr "Alerta verde"
-
-#: dados/charts/alerts.py:174 dados/templates/series_plot.html:152
-msgid "Alerta Amarelo"
-msgstr "Alerta Amarillo"
-
-#: dados/charts/alerts.py:197
-msgid "Alerta Laranja"
-msgstr "Alerta naranja"
-
-#: dados/charts/alerts.py:220
-msgid "Alerta Vermelho de "
-msgstr "Alerta Rojo de "
-
-#: dados/charts/alerts.py:262
-msgid "Mês/Ano"
-msgstr ""
-
-#: dados/charts/alerts.py:273 dados/charts/cities.py:68 dados/charts/home.py:99
-#: dados/charts/states.py:119 dados/templates/alert_state/age.html:125
+#: dados/charts/alerts.py:186 dados/charts/alerts.py:209
+#: dados/charts/alerts.py:232 dados/charts/alerts.py:274
+#: dados/charts/cities.py:68 dados/charts/home.py:99 dados/charts/states.py:119
+#: dados/templates/alert_state/age.html:125
 #: dados/templates/alert_state/date.html:100
 #: dados/templates/alert_state/disease.html:123
 #: dados/templates/alert_state/epiyears.html:39
 #: dados/templates/alert_state/gender.html:113
 msgid "Casos"
 msgstr "Casos"
+
+#: dados/charts/alerts.py:151
+msgid "Alerta Verde"
+msgstr "Alerta verde"
+
+#: dados/charts/alerts.py:175 dados/templates/series_plot.html:152
+msgid "Alerta Amarelo"
+msgstr "Alerta Amarillo"
+
+#: dados/charts/alerts.py:198
+msgid "Alerta Laranja"
+msgstr "Alerta naranja"
+
+#: dados/charts/alerts.py:221 dados/templates/series_plot.html:122
+msgid "Alerta Vermelho"
+msgstr "Alerta Rojo"
+
+#: dados/charts/alerts.py:245 dados/charts/alerts.py:256
+#: dados/charts/home.py:73 dados/charts/states.py:92
+msgid "Casos Estimados"
+msgstr "Casos Estimados"
+
+#: dados/charts/alerts.py:263
+msgid "Mês/Ano"
+msgstr ""
 
 #: dados/charts/cities.py:43 dados/charts/cities.py:107
 msgid "alerta verde"
@@ -897,15 +898,25 @@ msgstr ""
 "%(prt)s%%\n"
 "                "
 
-#: dados/templates/alert_base.html:129
+#: dados/templates/alert_base.html:122
+msgid ""
+"O mapa abaixo mostra os níveis de atenção dos municípios pertencentes à "
+"mesma regional de saúde de "
+msgstr ""
+
+#: dados/templates/alert_base.html:123
+msgid "que está destacado com bordas azuis."
+msgstr ""
+
+#: dados/templates/alert_base.html:135
 msgid "Níveis de Atenção"
 msgstr "Niveles de Atención"
 
-#: dados/templates/alert_base.html:137
+#: dados/templates/alert_base.html:143
 msgid "Nível Verde"
 msgstr "Nivel Verde"
 
-#: dados/templates/alert_base.html:144
+#: dados/templates/alert_base.html:150
 msgid ""
 "Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições\n"
 "                            ideais para a reprodução do Mosquito."
@@ -914,11 +925,11 @@ msgstr ""
 "condiciones ideales\n"
 " para la reproducción del mosquito."
 
-#: dados/templates/alert_base.html:155
+#: dados/templates/alert_base.html:161
 msgid "Nível Amarelo"
 msgstr "Nivel Amarillo"
 
-#: dados/templates/alert_base.html:162
+#: dados/templates/alert_base.html:168
 #, python-format
 msgid ""
 "Estação da %(disease_label)s. No nível amarelo, temos condições climáticas\n"
@@ -932,11 +943,11 @@ msgstr ""
 "significativa de\n"
 " la Enfermedad."
 
-#: dados/templates/alert_base.html:172
+#: dados/templates/alert_base.html:178
 msgid "Nível Laranja"
 msgstr "Nivel Naranja"
 
-#: dados/templates/alert_base.html:178
+#: dados/templates/alert_base.html:184
 #, python-format
 msgid ""
 "Transmissão de %(disease_label)s. No nível laranja, já observamos uma "
@@ -951,11 +962,11 @@ msgstr ""
 "que tendremos\n"
 " una epidemia."
 
-#: dados/templates/alert_base.html:188
+#: dados/templates/alert_base.html:194
 msgid "Nível Vermelho"
 msgstr "Nivel Rojo"
 
-#: dados/templates/alert_base.html:193
+#: dados/templates/alert_base.html:199
 #, python-format
 msgid ""
 "Atividade aumentada. Neste nível tem-se alta\n"
@@ -971,11 +982,11 @@ msgstr ""
 "de inmediato\n"
 " en caso de sospecha de %(disease_label)s."
 
-#: dados/templates/alert_base.html:205 dados/templates/alert_state/map.html:213
+#: dados/templates/alert_base.html:211 dados/templates/alert_state/map.html:213
 msgid "Casos estimados"
 msgstr "Casos Estimados"
 
-#: dados/templates/alert_base.html:207
+#: dados/templates/alert_base.html:213
 #, python-format
 msgid ""
 " São estimados entre <b>%(min_est)s</b> e <b>%(max_est)s novos casos</b> na "
@@ -988,12 +999,12 @@ msgstr ""
 "en la Semana Epidemiológica %(SE)s: %(data1)s a %(data2)s. Con un total de "
 "%(total_observed)s casos notificados oficialmente hasta el momento"
 
-#: dados/templates/alert_base.html:210
+#: dados/templates/alert_base.html:216
 #, python-format
 msgid " Últimas %(look_back)s semanas: "
 msgstr "Últimas %(look_back)s semanas: "
 
-#: dados/templates/alert_base.html:220
+#: dados/templates/alert_base.html:226
 msgid ""
 "Suspeita de um\n"
 "                criadouro?"
@@ -1001,81 +1012,53 @@ msgstr ""
 "Suspecha de un\n"
 "criadero?"
 
-#: dados/templates/alert_base.html:223
+#: dados/templates/alert_base.html:229
 msgid "Em caso de suspeita de criadouro de mosquitos, "
 msgstr "En caso de sospecha de criadero de mosquitos, "
 
-#: dados/templates/alert_base.html:227
+#: dados/templates/alert_base.html:233
 msgid "contacte a "
 msgstr "póngase en contacto con"
 
-#: dados/templates/alert_base.html:229
+#: dados/templates/alert_base.html:235
 msgid "central de apoio ao cidadão: 1746."
 msgstr "central de apoyo al ciudadano: 1746."
 
-#: dados/templates/alert_base.html:232
+#: dados/templates/alert_base.html:238
 msgid "contacte a central de apoio ao cidadão: 1746."
 msgstr "póngase en contacto con la central de apoyo al ciudadano: 1746"
 
-#: dados/templates/alert_base.html:236 dados/templates/alert_base.html:248
-#: dados/templates/alert_base.html:251
+#: dados/templates/alert_base.html:242 dados/templates/alert_base.html:254
+#: dados/templates/alert_base.html:257
 msgid "contacte a secretaria de saúde de sua cidade"
 msgstr "póngase en contacto con la secretaría de salud de su ciudad"
 
-#: dados/templates/alert_base.html:241
+#: dados/templates/alert_base.html:247
 msgid "contacte a secretaria de saúde de sua cidade."
 msgstr "póngase en contacto con la secretaría de salud de su ciudad"
 
-#: dados/templates/alert_base.html:245
+#: dados/templates/alert_base.html:251
 msgid "contacte a central de apoio ao cidadão: 0800.285.0880"
 msgstr ""
 "póngase en contacto con la central de apoyo al ciudadano: 0800.285.0880"
 
-#: dados/templates/alert_base.html:278
-msgid ""
-"Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://"
-"www.riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe "
-"criadouros para o mosquito!</a>"
-msgstr ""
-"Es hora de arreglar el patio, cubrir los recipientes de agua, <a "
-"href='http://www.riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>¡No "
-"dejes criaderos para los mosquitos!</a>"
-
-#: dados/templates/alert_base.html:279
-msgid ""
-"Uma vez por semana, aplique os <a href=\"http://www.riocontradengue.com.br/"
-"Site/Conteudo/Checklist.aspx\">“10 minutos Contra a dengue”!</a>"
-msgstr ""
-"¡Una vez por semana, realiza los <a href=\"http://www.riocontradengue.com.br/"
-"Site/Conteudo/Checklist.aspx\">“10 minutos contra el dengue”!</a>"
-
-#: dados/templates/alert_base.html:280 dados/templates/alert_base.html:281
-msgid ""
-"Fique <a href=\"http://www.riocontradengue.rj.gov.br/Site/Conteudo/"
-"FiqueAtento.aspx\">atento aos sintomas da Dengue!</a> Procure um médico caso "
-"suspeite de dengue."
-msgstr ""
-"¡Mantente <a href=\"http://www.riocontradengue.rj.gov.br/Site/Conteudo/"
-"FiqueAtento.aspx\">atento a los síntomas del dengue</a>! Consulta a un "
-"médico si sospechas de dengue."
-
-#: dados/templates/alert_base.html:295 dados/templates/alert_state/map.html:26
+#: dados/templates/alert_base.html:296 dados/templates/alert_state/map.html:26
 msgid "Baixo Risco"
 msgstr "Bajo Riesgo"
 
-#: dados/templates/alert_base.html:296 dados/templates/alert_state/map.html:27
+#: dados/templates/alert_base.html:297 dados/templates/alert_state/map.html:27
 msgid "Atenção"
 msgstr "Atención"
 
-#: dados/templates/alert_base.html:297 dados/templates/alert_state/map.html:28
+#: dados/templates/alert_base.html:298 dados/templates/alert_state/map.html:28
 msgid "Transmissão"
 msgstr "Transmisión"
 
-#: dados/templates/alert_base.html:298
+#: dados/templates/alert_base.html:299
 msgid "Atividade aumentada"
 msgstr "Mayor actividad"
 
-#: dados/templates/alert_base.html:307 dados/templates/alert_base.html:365
+#: dados/templates/alert_base.html:318 dados/templates/alert_base.html:385
 #: dados/templates/series_plot.html:44 dados/templates/series_plot.html:97
 #: dados/templates/series_plot.html:115 dados/templates/series_plot.html:132
 #: dados/templates/series_plot.html:147 dados/templates/series_plot.html:162
@@ -1084,12 +1067,12 @@ msgstr "Mayor actividad"
 msgid "casos"
 msgstr "casos"
 
-#: dados/templates/alert_base.html:399 dados/templates/alert_base.html:424
+#: dados/templates/alert_base.html:419 dados/templates/alert_base.html:444
 #: dados/templates/alert_state/map.html:189
 msgid "Unidades de Saúde"
 msgstr "Unidades de Salud"
 
-#: dados/templates/alert_base.html:423
+#: dados/templates/alert_base.html:443
 msgid "Áreas de Planejamento"
 msgstr "Áreas de Planificación"
 
@@ -1931,10 +1914,6 @@ msgstr "Casos estimados de %(disease_label)s"
 msgid "Casos previstos de %(disease_label)s (%(title)s)"
 msgstr "Casos previstos de %(disease_label)s (%(title)s)"
 
-#: dados/templates/series_plot.html:122
-msgid "Alerta Vermelho"
-msgstr "Alerta Rojo"
-
 #: dados/templates/series_plot.html:137
 msgid "Alerta laranja"
 msgstr "Alerta naranja"
@@ -2392,8 +2371,8 @@ msgid ""
 "Clique na arbovirose para alterar seleção de filtro. A escolha da doença "
 "implica no recarregamento da página."
 msgstr ""
-"Haz clic en la arbovirose para <br/>cambiar la selección de filtro. "
-"La elección de la enfermedad <br/>implica recargar la página."
+"Haz clic en la arbovirose para <br/>cambiar la selección de filtro. La "
+"elección de la enfermedad <br/>implica recargar la página."
 
 #: dados/templates/state_cities.html:301
 msgid "Por favor, aguarde."
@@ -2586,7 +2565,7 @@ msgstr ""
 msgid "Entre em contato conosco"
 msgstr "Contáctenos"
 
-#: dados/views.py:360
+#: dados/views.py:394
 msgid ""
 "A doença {} não está registrada em nosso banco de dados para o município de "
 "{}."
@@ -2594,29 +2573,29 @@ msgstr ""
 "La enfermedad {} no está registrada en nuestra base de datos para el "
 "municipio de {}."
 
-#: dados/views.py:957
+#: dados/views.py:994
 msgid "°C temperatura mínima"
 msgstr "°C temperatura mínima"
 
-#: dados/views.py:958
+#: dados/views.py:995
 msgid "°C temperatura média"
 msgstr "°C temperatura media"
 
-#: dados/views.py:959
+#: dados/views.py:996
 msgid "°C temperatura máxima"
 msgstr "°C temperatura máxima"
 
-#: dados/views.py:960
+#: dados/views.py:997
 #, python-format
 msgid "% umidade mínima do ar"
 msgstr "% humedad mínima del aire"
 
-#: dados/views.py:961
+#: dados/views.py:998
 #, python-format
 msgid "% umidade média do ar"
 msgstr "% humedad media del aire"
 
-#: dados/views.py:962
+#: dados/views.py:999
 #, python-format
 msgid "% umidade máxima do ar"
 msgstr "% humedad máxima del aire"
@@ -2996,6 +2975,36 @@ msgstr ""
 #: upload/templates/sinan/status.html:31 upload/templates/sinan/status.html:44
 msgid "Task duration"
 msgstr ""
+
+#~ msgid ""
+#~ "Hora de arrumar o quintal, cobrir caixas d'água, <a href='http://"
+#~ "www.riocontradengue.rj.gov.br/Site/Conteudo/Eliminar.aspx'>Não deixe "
+#~ "criadouros para o mosquito!</a>"
+#~ msgstr ""
+#~ "Es hora de arreglar el patio, cubrir los recipientes de agua, <a "
+#~ "href='http://www.riocontradengue.rj.gov.br/Site/Conteudo/"
+#~ "Eliminar.aspx'>¡No dejes criaderos para los mosquitos!</a>"
+
+#~ msgid ""
+#~ "Uma vez por semana, aplique os <a href=\"http://"
+#~ "www.riocontradengue.com.br/Site/Conteudo/Checklist.aspx\">“10 minutos "
+#~ "Contra a dengue”!</a>"
+#~ msgstr ""
+#~ "¡Una vez por semana, realiza los <a href=\"http://"
+#~ "www.riocontradengue.com.br/Site/Conteudo/Checklist.aspx\">“10 minutos "
+#~ "contra el dengue”!</a>"
+
+#~ msgid ""
+#~ "Fique <a href=\"http://www.riocontradengue.rj.gov.br/Site/Conteudo/"
+#~ "FiqueAtento.aspx\">atento aos sintomas da Dengue!</a> Procure um médico "
+#~ "caso suspeite de dengue."
+#~ msgstr ""
+#~ "¡Mantente <a href=\"http://www.riocontradengue.rj.gov.br/Site/Conteudo/"
+#~ "FiqueAtento.aspx\">atento a los síntomas del dengue</a>! Consulta a un "
+#~ "médico si sospechas de dengue."
+
+#~ msgid "Alerta Vermelho de "
+#~ msgstr "Alerta Rojo de "
 
 #~ msgid "Código da Estação WU"
 #~ msgstr "Código de la Estación WU"
