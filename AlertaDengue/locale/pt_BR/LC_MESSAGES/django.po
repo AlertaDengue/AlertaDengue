@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-24 14:02+0000\n"
+"POT-Creation-Date: 2025-06-24 20:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,54 +18,49 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: dados/charts/alerts.py:130 dados/charts/cities.py:198
-#: dados/charts/home.py:54 dados/charts/states.py:71
+#: dados/charts/alerts.py:130 dados/charts/alerts.py:141
+#: dados/charts/cities.py:198 dados/charts/home.py:54 dados/charts/states.py:71
 msgid "Casos Notificados"
 msgstr ""
 
-#: dados/charts/alerts.py:138 dados/charts/alerts.py:159
-#: dados/charts/alerts.py:183 dados/charts/alerts.py:206
-#: dados/charts/alerts.py:229 dados/charts/alerts.py:253
+#: dados/charts/alerts.py:138 dados/charts/alerts.py:221
 #: dados/charts/home.py:51 dados/charts/home.py:70 dados/charts/states.py:68
 #: dados/charts/states.py:89 dados/templates/services_api.html:205
 msgid "SE"
-msgstr ""
-
-#: dados/charts/alerts.py:141 dados/charts/alerts.py:162
-#: dados/charts/alerts.py:186 dados/charts/alerts.py:209
-#: dados/charts/alerts.py:232 dados/charts/alerts.py:274
-#: dados/charts/cities.py:68 dados/charts/home.py:99 dados/charts/states.py:119
-#: dados/templates/alert_state/age.html:125
-#: dados/templates/alert_state/date.html:100
-#: dados/templates/alert_state/disease.html:123
-#: dados/templates/alert_state/epiyears.html:39
-#: dados/templates/alert_state/gender.html:113
-msgid "Casos"
 msgstr ""
 
 #: dados/charts/alerts.py:151
 msgid "Alerta Verde"
 msgstr ""
 
-#: dados/charts/alerts.py:175 dados/templates/series_plot.html:152
+#: dados/charts/alerts.py:167 dados/templates/series_plot.html:152
 msgid "Alerta Amarelo"
 msgstr ""
 
-#: dados/charts/alerts.py:198
+#: dados/charts/alerts.py:182
 msgid "Alerta Laranja"
 msgstr ""
 
-#: dados/charts/alerts.py:221 dados/templates/series_plot.html:122
+#: dados/charts/alerts.py:197 dados/templates/series_plot.html:122
 msgid "Alerta Vermelho"
 msgstr ""
 
-#: dados/charts/alerts.py:245 dados/charts/alerts.py:256
+#: dados/charts/alerts.py:213 dados/charts/alerts.py:224
 #: dados/charts/home.py:73 dados/charts/states.py:92
 msgid "Casos Estimados"
 msgstr ""
 
-#: dados/charts/alerts.py:263
+#: dados/charts/alerts.py:231
 msgid "Mês/Ano"
+msgstr ""
+
+#: dados/charts/alerts.py:242 dados/charts/cities.py:68 dados/charts/home.py:99
+#: dados/charts/states.py:119 dados/templates/alert_state/age.html:125
+#: dados/templates/alert_state/date.html:100
+#: dados/templates/alert_state/disease.html:123
+#: dados/templates/alert_state/epiyears.html:39
+#: dados/templates/alert_state/gender.html:113
+msgid "Casos"
 msgstr ""
 
 #: dados/charts/cities.py:43 dados/charts/cities.py:107
@@ -714,6 +709,12 @@ msgstr ""
 
 #: dados/templates/alert_base.html:123
 msgid "que está destacado com bordas azuis."
+msgstr ""
+
+#: dados/templates/alert_base.html:123
+msgid ""
+"Para ver os casos estimados e o alerta das últimas semanas, clique sobre o "
+"município."
 msgstr ""
 
 #: dados/templates/alert_base.html:135

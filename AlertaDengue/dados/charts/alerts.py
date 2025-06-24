@@ -138,7 +138,7 @@ class AlertCitiesCharts:
                     "label1": _("SE"),
                     "week": "%{text}",
                     "cases": "%{y:1f}",
-                    "label2": _("Casos"),
+                    "label2": _("Casos Notificados"),
                 },
             )
         )
@@ -150,17 +150,9 @@ class AlertCitiesCharts:
                 y=df_verde.casos,
                 name=_("Alerta Verde"),
                 marker={"color": "#48FD48"},
-                text=df_verde.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
-                "%(cases)s %(label2)s"
-                "<extra></extra>"
-                % {
-                    "label0": "%{x}",
-                    "label1": _("SE"),
-                    "week": "%{text}",
-                    "cases": "%{y:1f}",
-                    "label2": _("Casos"),
-                },
+                text=None,
+                hoverinfo="skip",
+                hovertemplate=None,
                 stackgroup="one",
                 fill=None,
                 line=dict(width=0),
@@ -174,17 +166,9 @@ class AlertCitiesCharts:
                 y=df_amarelo.casos,
                 name=_("Alerta Amarelo"),
                 marker={"color": "#FBFC49"},
-                text=df_amarelo.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
-                "%(cases)s %(label2)s"
-                "<extra></extra>"
-                % {
-                    "label0": "%{x}",
-                    "label1": _("SE"),
-                    "week": "%{text}",
-                    "cases": "%{y:1f}",
-                    "label2": _("Casos"),
-                },
+                text=None,
+                hoverinfo="skip",
+                hovertemplate=None,
                 stackgroup="one",
                 line=dict(width=0),
             )
@@ -197,17 +181,9 @@ class AlertCitiesCharts:
                 y=df_laranja.casos,
                 name=_("Alerta Laranja"),
                 marker={"color": "#FFA858"},
-                text=df_laranja.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
-                "%(cases)s %(label2)s"
-                "<extra></extra>"
-                % {
-                    "label0": "%{x}",
-                    "label1": _("SE"),
-                    "week": "%{text}",
-                    "cases": "%{y:1f}",
-                    "label2": _("Casos"),
-                },
+                text=None,
+                hoverinfo="skip",
+                hovertemplate=None,
                 stackgroup="one",
                 line=dict(width=0),
             )
@@ -220,17 +196,9 @@ class AlertCitiesCharts:
                 y=df_vermelho.casos,
                 name=_("Alerta Vermelho"),
                 marker={"color": "#FB4949"},
-                text=df_vermelho.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
-                "%(cases)s %(label2)s"
-                "<extra></extra>"
-                % {
-                    "label0": "%{x}",
-                    "label1": _("SE"),
-                    "week": "%{text}",
-                    "cases": "%{y:1f}",
-                    "label2": _("Casos"),
-                },
+                text=None,
+                hoverinfo="skip",
+                hovertemplate=None,
                 stackgroup="one",
                 line=dict(width=0),
             )

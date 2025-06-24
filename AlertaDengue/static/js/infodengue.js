@@ -25,15 +25,16 @@ function load_map_layer(urls, map) {
       features.addTo(map);
       boundsGroup.addLayer(geojson);
 
+      if (focused_layer) {
+        focused_layer.bringToFront();
+      }
+
       if (boundsGroup.getLayers().length === urls.length) {
         map.fitBounds(boundsGroup.getBounds());
       }
     });
   });
 
-  if (focused_layer) {
-    focused_layer.bringToFront();
-  }
 }
 
 function fill_popup(feature, layer) {
