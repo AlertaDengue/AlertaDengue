@@ -138,7 +138,7 @@ class AlertCitiesCharts:
                     "label1": _("SE"),
                     "week": "%{text}",
                     "cases": "%{y:1f}",
-                    "label2": _("Casos Estimados"),
+                    "label2": _("Casos"),
                 },
             )
         )
@@ -159,10 +159,11 @@ class AlertCitiesCharts:
                     "label1": _("SE"),
                     "week": "%{text}",
                     "cases": "%{y:1f}",
-                    "label2": _("Casos Estimados"),
+                    "label2": _("Casos"),
                 },
                 stackgroup="one",
                 fill=None,
+                line=dict(width=0),
             )
         )
 
@@ -182,7 +183,7 @@ class AlertCitiesCharts:
                     "label1": _("SE"),
                     "week": "%{text}",
                     "cases": "%{y:1f}",
-                    "label2": _("Casos Estimados"),
+                    "label2": _("Casos"),
                 },
                 stackgroup="one",
                 line=dict(width=0),
@@ -205,7 +206,7 @@ class AlertCitiesCharts:
                     "label1": _("SE"),
                     "week": "%{text}",
                     "cases": "%{y:1f}",
-                    "label2": _("Casos Estimados"),
+                    "label2": _("Casos"),
                 },
                 stackgroup="one",
                 line=dict(width=0),
@@ -217,7 +218,7 @@ class AlertCitiesCharts:
             go.Scatter(
                 x=pd.to_datetime(df_vermelho.dia, unit="s"),
                 y=df_vermelho.casos,
-                name=_("Alerta Vermelho de "),
+                name=_("Alerta Vermelho"),
                 marker={"color": "#FB4949"},
                 text=df_vermelho.SE.map(lambda v: "{}".format(str(v)[-2:])),
                 hovertemplate="%(label0)s <br>%(label1)s %(week)s<br>"
@@ -228,7 +229,7 @@ class AlertCitiesCharts:
                     "label1": _("SE"),
                     "week": "%{text}",
                     "cases": "%{y:1f}",
-                    "label2": _("Casos Estimados"),
+                    "label2": _("Casos"),
                 },
                 stackgroup="one",
                 line=dict(width=0),

@@ -5,13 +5,13 @@
 {% load static %}
 
 {% block alert_js %}
-dataurl ;
+dataurls ;
 {% endblock %}
 
 {% block alert_js_main_init %}
 info.update = function (props) {
     this._div.innerHTML = '<h4>{% blocktranslate %}Número de casos estimados na semana{% endblocktranslate %}:</h4>' + (props ?
-            '<b>' + props.casos + '</b><br />' : '{% blocktranslate %}Passe o mouse sobre o mapa{% endblocktranslate %}');
+            '<b>' + props.name + ': ' + props.casos + '</b><br />' : '{% blocktranslate %}Passe o mouse sobre o mapa{% endblocktranslate %}');
 };
 
 get_map_bounds = function() {return geojson.getBounds();};
