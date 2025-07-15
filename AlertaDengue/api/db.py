@@ -221,7 +221,9 @@ class NotificationQueries:
 
         with db_engine.connect() as conn:
             result = conn.execute(sql)
-            df_disease_dist = pd.DataFrame(result.fetchall())
+            df_disease_dist = pd.DataFrame(
+                result.fetchall(), columns=result.keys()
+            )
 
         return df_disease_dist.set_index("category", drop=True)
 
