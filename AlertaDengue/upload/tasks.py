@@ -11,6 +11,7 @@ from ad_main.settings import DEBUG, get_sqla_conn
 from celery import shared_task
 from psycopg2.extras import DictCursor
 from simpledbf import Dbf5
+import chardet
 
 from .models import (
     SINANUpload,
@@ -130,8 +131,10 @@ def sinan_verify_file(upload_sinan_id: int):
                 ignore_geometry=True,
             ).columns
         elif file.suffix.lower() == ".csv":
+            raw = open(file, "rb").read(20000)
+            enc = chardet.detect(raw)["encoding"] or "latin1"
             columns = pd.read_csv(
-                str(file), nrows=0, engine="python", sep=None
+                str(file), nrows=0, engine="python", sep=None, encoding=enc
             ).columns
         else:
             raise SINANUploadFatalError(
@@ -271,8 +274,10 @@ def sinan_insert_to_db(upload_sinan_id: int):
                 current_row += chunksize
                 sinan.status.progress(current_row, total_rows)
         elif file.suffix.lower() == ".csv":
+            raw = open(file, "rb").read(20000)
+            enc = chardet.detect(raw)["encoding"] or "latin1"
             csv.field_size_limit(10**6)  # malformated DS_OBS column
-            with file.open("r", encoding="iso-8859-1") as csv_file:
+            with file.open("r", encoding=enc) as csv_file:
                 total_rows = sum(1 for _ in csv_file) - 1
 
             sinan.status.progress(current_row, total_rows)
@@ -282,6 +287,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
                 usecols=list(sinan.COLUMNS),
                 engine="python",
                 sep=None,
+                encoding=enc
             ):
                 insert_chunk_to_temp_table(
                     upload_sinan_id,
