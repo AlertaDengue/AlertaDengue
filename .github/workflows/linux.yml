@@ -104,16 +104,16 @@ jobs:
 
     - name: Build postgres database
       run: |
-        sugar build --services stagingdb
+        sugar compose build --services stagingdb
 
     - name: Start postgres database
       run: |
-        sugar ext start --services stagingdb --options -d
+        sugar compose-ext start --services stagingdb --options -d
 
     - name: Start containers
       run: |
-        sugar build --group dev --all
-        sugar ext start --group dev --all --options -d
+        sugar compose build --group dev --all
+        sugar compose-ext start --group dev --all --options -d
 
     - name: Container wait all
       run: |
