@@ -94,11 +94,10 @@ jobs:
         mkdir -p /tmp/dbf_duplicated_csv
         chmod 777 -R /tmp/dbf_duplicated_csv
 
-
-    - name: Install dependencies
+    - name: Install toolchain and app dependencies
       run: |
-        poetry lock
-        poetry install
+        chmod +x scripts/install-dev.sh
+        ./scripts/install-dev.sh
 
     - name: Create env file
       run: envsubst < .env.tpl > .env
@@ -122,5 +121,5 @@ jobs:
 
     - name: Linting
       run: |
-        pre-commit install
-        pre-commit run --all-files
+        poetry run pre-commit install -t pre-commit -t commit-msg -t pre-push
+        poetry run pre-commit run --all-files
