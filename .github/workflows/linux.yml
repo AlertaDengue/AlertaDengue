@@ -96,8 +96,8 @@ jobs:
 
     - name: Install toolchain and app dependencies
       run: |
-        chmod +x scripts/install-dev.sh
-        ./scripts/install-dev.sh
+        chmod +x scripts/install-deps.sh
+        ./scripts/install-deps.sh
 
     - name: Create env file
       run: envsubst < .env.tpl > .env
