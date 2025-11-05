@@ -3,16 +3,14 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - python >=3.9,<3.11
-  - pip
+  - python=3.10.*
   - poetry
-  # (Opcional) libs de sistema úteis p/ psycopg2 e afins
-  # - libpq
-  # - openssl
-  # - ca-certificates
-  # - git
-
-  # Instala o toolchain via pip no ambiente conda (separado do Poetry)
+  - gdal>=3.6,<3.9
+  - proj
+  - geos
+  - psycopg2-binary
+  - sqlalchemy
+  - pip
   - pip:
       - makim==1.27.0
       - "containers-sugar>=1.19,<2.0"
