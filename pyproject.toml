@@ -12,7 +12,7 @@ packages = [
 
 ]
 
-[poetry.dependencies]
+[tool.poetry.dependencies]
 celery = "^5.2.6"
 dask = "^2023.12.1"
 dbfread = "^2.0.7"
@@ -61,7 +61,7 @@ humanize = "^4.11.0"
 chardet = "^5.2.0"
 sqlalchemy = ">=1.4.54,<2.0"
 
-[poetry.group.dev.dependencies]
+[tool.poetry.group.dev.dependencies]
 black = "^22.12.0"
 compose-go = "^2.20.2"
 django-extensions = "^3.2.3"
