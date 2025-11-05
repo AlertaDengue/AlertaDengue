@@ -1,10 +1,16 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.http import JsonResponse
 from django.urls import include, path, re_path
 from django.views.generic import RedirectView
 
 admin.autodiscover()
+
+
+def status(request):
+    return JsonResponse({"status": "ok"})
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -16,4 +22,5 @@ urlpatterns = [
     re_path(r"^dbf/", include("dbf.urls")),
     re_path(r"^api/", include("api.urls")),
     re_path(r"^upload/", include("upload.urls")),
+    re_path(r"^status/$", status),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

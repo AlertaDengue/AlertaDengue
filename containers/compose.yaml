@@ -185,7 +185,7 @@ services:
           python manage.py runserver 0.0.0.0:${WEB_PORT};
         fi
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${WEB_PORT}"]
+      test: ["CMD", "curl", "-f", "http://0.0.0.0:8000/status/"]
       interval: 10s
       timeout: 10s
       retries: 5
