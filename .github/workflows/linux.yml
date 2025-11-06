@@ -11,11 +11,10 @@ env:
   ALLOWED_HOSTS: "localhost"
   DEBUG: False
   ENV: dev
-  WEB_PORT: 8080
+  WEB_PORT: 8000
   HOST_UID: 1000
   HOST_GID: 1000
   SECRET_KEY: my-secret-key
-  PORT_WEB: 8000
 
   EMAIL_CONFIG: ${{ secrets.EMAIL_CONFIG }}
   EMAIL_CONNECTION_DEFAULT: "outlook"
@@ -117,7 +116,7 @@ jobs:
 
     - name: Container wait all
       run: |
-          makim develop.container-wait-all --timeout 150
+          makim develop.container-wait-all --timeout 30
 
     - name: Setup tmate session
       if: "${{ failure() }}"
