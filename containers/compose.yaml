@@ -182,14 +182,14 @@ services:
           gunicorn -w 4 -b 0.0.0.0:${WEB_PORT} ad_main.wsgi:application --timeout 9640;
         else
           python3 /opt/services/AlertaDengue/manage.py collectstatic --noinput
-          python manage.py runserver 0.0.0.0:${WEB_PORT};
+          python manage.py runserver 0.0.0.0:${WEB_PORT} --noreload;
         fi
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://0.0.0.0:8000/status/"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 10s
+      test: ["CMD-SHELL", "wget -q --spider --tries=1 --timeout=3 http://127.0.0.1:${WEB_PORT}/status/ || exit 1"]
+      interval: 5s
+      timeout: 4s
+      retries: 60
+      start_period: 120s
     networks:
       - infodengue
 

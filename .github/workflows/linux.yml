@@ -117,7 +117,7 @@ jobs:
 
     - name: Container wait all
       run: |
-          makim develop.container-wait-all --timeout 150
+          makim develop.container-wait-all --timeout 360
 
     - name: Linting
       run: |
