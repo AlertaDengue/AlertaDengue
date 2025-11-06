@@ -117,7 +117,11 @@ jobs:
 
     - name: Container wait all
       run: |
-          makim develop.container-wait-all --timeout 360
+          makim develop.container-wait-all --timeout 150
+
+    - name: Setup tmate session
+      if: "${{ failure() }}"
+      uses: mxschmitt/action-tmate@v3          
 
     - name: Linting
       run: |
