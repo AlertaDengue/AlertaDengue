@@ -185,7 +185,7 @@ services:
           python manage.py runserver 0.0.0.0:${WEB_PORT} --noreload;
         fi
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider --tries=1 --timeout=3 http://127.0.0.1:${WEB_PORT}/status/ || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider --tries=1 --timeout=3 http://localhost:${WEB_PORT}/status/ || exit 1"]
       interval: 5s
       timeout: 4s
       retries: 60
