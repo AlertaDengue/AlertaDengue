@@ -1,4 +1,3 @@
-
 name: Release
 on:
   workflow_dispatch:
@@ -32,9 +31,10 @@ jobs:
         auto-update-conda: true
         conda-solver: libmamba
 
-    - uses: actions/setup-node@v3
+    - uses: actions/setup-node@v4
       with:
-        node-version: 20.11.0
+        node-version: '22.14.0'
+        check-latest: true
 
     - name: Test release
       if: ${{ github.event_name != 'workflow_dispatch' }}
@@ -42,15 +42,15 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         npx --yes \
-          -p semantic-release \
-          -p conventional-changelog-conventionalcommits \
-          -p "@semantic-release/commit-analyzer" \
-          -p "@semantic-release/release-notes-generator" \
-          -p "@semantic-release/changelog" \
-          -p "@semantic-release/exec" \
-          -p "@semantic-release/github" \
-          -p "@semantic-release/git" \
-          -p "@google/semantic-release-replace-plugin" \
+          -p semantic-release@latest \
+          -p conventional-changelog-conventionalcommits@latest \
+          -p @semantic-release/commit-analyzer@latest \
+          -p @semantic-release/release-notes-generator@latest \
+          -p @semantic-release/changelog@latest \
+          -p @semantic-release/exec@latest \
+          -p @semantic-release/github@latest \
+          -p @semantic-release/git@latest \
+          -p semantic-release-replace-plugin@latest \
           semantic-release --dry-run
 
     - name: Release
@@ -59,13 +59,13 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         npx --yes \
-          -p semantic-release \
-          -p conventional-changelog-conventionalcommits \
-          -p "@semantic-release/commit-analyzer" \
-          -p "@semantic-release/release-notes-generator" \
-          -p "@semantic-release/changelog" \
-          -p "@semantic-release/exec" \
-          -p "@semantic-release/github" \
-          -p "@semantic-release/git" \
-          -p "@google/semantic-release-replace-plugin" \
+          -p semantic-release@latest \
+          -p conventional-changelog-conventionalcommits@latest \
+          -p @semantic-release/commit-analyzer@latest \
+          -p @semantic-release/release-notes-generator@latest \
+          -p @semantic-release/changelog@latest \
+          -p @semantic-release/exec@latest \
+          -p @semantic-release/github@latest \
+          -p @semantic-release/git@latest \
+          -p semantic-release-replace-plugin@latest \
           semantic-release --ci
