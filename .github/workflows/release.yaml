@@ -4,17 +4,18 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
+    branches:  [ main ]
 
 jobs:
   release:
+    if: ${{ !github.event.pull_request.draft }}
     name: Release
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     defaults:
       run:
-        shell: bash -l {0}
+        shell: bash -el {0}
 
     steps:
     - uses: actions/checkout@v4
@@ -36,36 +37,22 @@ jobs:
         node-version: '22.14.0'
         check-latest: true
 
-    - name: Test release
+    - name: Update npm
+      run: npm -g update npm
+
+    - name: Create file with environment variables
+      run: touch .env
+
+    - name: Run semantic release (for tests)
       if: ${{ github.event_name != 'workflow_dispatch' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        npx --yes \
-          -p semantic-release@latest \
-          -p conventional-changelog-conventionalcommits@latest \
-          -p @semantic-release/commit-analyzer@latest \
-          -p @semantic-release/release-notes-generator@latest \
-          -p @semantic-release/changelog@latest \
-          -p @semantic-release/exec@latest \
-          -p @semantic-release/github@latest \
-          -p @semantic-release/git@latest \
-          -p semantic-release-replace-plugin@latest \
-          semantic-release --dry-run
+      run: makim release.dry
 
-    - name: Release
+    - name: Release command
       if: ${{ github.event_name == 'workflow_dispatch' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
       run: |
-        npx --yes \
-          -p semantic-release@latest \
-          -p conventional-changelog-conventionalcommits@latest \
-          -p @semantic-release/commit-analyzer@latest \
-          -p @semantic-release/release-notes-generator@latest \
-          -p @semantic-release/changelog@latest \
-          -p @semantic-release/exec@latest \
-          -p @semantic-release/github@latest \
-          -p @semantic-release/git@latest \
-          -p semantic-release-replace-plugin@latest \
-          semantic-release --ci
+        makim release.ci
