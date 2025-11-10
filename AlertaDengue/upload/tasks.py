@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 from typing import Iterator, List, Literal, Tuple
 
+import chardet
 import geopandas as gpd
 import pandas as pd
 import pyarrow.parquet as pq
@@ -11,7 +12,6 @@ from ad_main.settings import DEBUG, get_sqla_conn
 from celery import shared_task
 from psycopg2.extras import DictCursor
 from simpledbf import Dbf5
-import chardet
 
 from .models import (
     SINANUpload,
@@ -287,7 +287,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
                 usecols=list(sinan.COLUMNS),
                 engine="python",
                 sep=None,
-                encoding=enc
+                encoding=enc,
             ):
                 insert_chunk_to_temp_table(
                     upload_sinan_id,

@@ -8,7 +8,6 @@ LABEL org.opencontainers.image.source="https://github.com/AlertaDengue/AlertaDen
 LABEL org.opencontainers.image.version="latest"
 LABEL org.opencontainers.image.description="AlertaDengue package"
 
-# it is the default, but using it here to have it explicitly
 USER root
 
 ARG HOST_UID
@@ -22,6 +21,7 @@ RUN apt-get -qq update --yes \
   && apt-get -qq install --yes --no-install-recommends \
   build-essential git make postgresql-client vim \
   ca-certificates wget locales cron sudo inotify-tools \
+  libpq-dev pkg-config \
   && rm -rf /var/lib/apt/lists/* \
   /var/cache/apt/archives \
   /tmp/*
@@ -50,38 +50,33 @@ RUN chmod +x /activate.sh
 
 USER deploy
 
-# Change shell to bash
 SHELL ["/bin/bash", "-c"]
 
+# --- Conda env ---
 COPY --chown=${HOST_UID}:${HOST_GID} conda/base.yaml /tmp/environment.yaml
-
-# Use environment to update the env alertadengue
 RUN conda env create -n $ENV_NAME \
   --file /tmp/environment.yaml \
   && conda clean --all \
   && find /opt/conda/ -type f,l -name '*.a' -delete \
   && find /opt/conda/ -type f,l -name '*.pyc' -delete \
   && find /opt/conda/ -type f,l -name '*.js.map' -delete
-# && rm -rf /home/deploy/.conda/pkgs
 
 COPY --chown=${HOST_UID}:${HOST_GID} ./AlertaDengue  /opt/services/AlertaDengue
-
 WORKDIR /opt/services/AlertaDengue
 
-COPY --chown=${HOST_UID}:${HOST_GID} .env.tpl pyproject.toml poetry.lock README.md /opt/services/
-COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/poetry-install.sh /tmp/poetry-install.sh
+# Ensure Poetry installs venv inside the project and binaries are on PATH
+ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+ENV POETRY_VIRTUALENVS_CREATE=true
+ENV PATH="/opt/services/AlertaDengue/.venv/bin:${PATH}"
 
-RUN bash /tmp/poetry-install.sh
+# Deps installer (uses conda/base.yaml via ENV_FILE)
+COPY --chown=${HOST_UID}:${HOST_GID} ./scripts/install-deps.sh /tmp/install-deps.sh
+COPY --chown=${HOST_UID}:${HOST_GID} .env.tpl pyproject.toml poetry.lock README.md ./
+RUN ENV_FILE=/tmp/environment.yaml bash /tmp/install-deps.sh dev
 
-RUN mkdir -p /opt/services/scripts/
-RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/scripts/
-
-RUN mkdir -p /opt/services/collector
-RUN chown -R ${HOST_UID}:${HOST_GID} /opt/services/collector
-
+# Runtime scripts
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/crontab_setup.sh /opt/services/crontab_setup.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/cronjob /etc/cron.d/cronjob
-
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/celery.sh  /opt/services/celery.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/entrypoint.sh  /entrypoint.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/test.sh /opt/services/test.sh

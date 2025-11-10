@@ -1,18 +1,24 @@
-version: 1.0.0
-compose-app: docker-compose
+backend: compose
 env-file: .env
 defaults:
-  group: {{ env.ENV }}
+  profile: ${{ env.ENV }}
+  project-name: alertadengue${{ env.DOCKER_PROJECT_NAME }}
 
-groups:
+profiles:
   dev:
     project-name: infodengue-dev
-    compose-path:
+    env-file: .env
+    config-path:
       - containers/compose.yaml
       - containers/compose-dev.yaml
-    env-file: .env
     services:
-      default: memcached,rabbitmq,redis,web,worker,stagingdb
+      default: 
+        - memcached
+        - rabbitmq
+        - redis
+        - web
+        - worker
+        - stagingdb
       available:
         - name: stagingdb
         - name: web
@@ -23,10 +29,17 @@ groups:
 
   prod:
     project-name: infodengue-prod
-    compose-path: containers/compose.yaml
     env-file: .env
+    config-path:
+      - containers/compose.yaml
+      - containers/compose-dev.yaml
     services:
-      default: memcached,rabbitmq,redis,web,worker
+      default: 
+        - memcached
+        - rabbitmq
+        - redis
+        - web
+        - worker
       available:
         - name: postgres
         - name: web
