@@ -40,6 +40,9 @@ jobs:
     - name: Update npm
       run: npm -g update npm
 
+    - name: Create file with environment variables
+      run: touch .env
+
     - name: Run semantic release (for tests)
       if: ${{ github.event_name != 'workflow_dispatch' }}
       env:
