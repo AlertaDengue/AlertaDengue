@@ -2,117 +2,87 @@
 {% load i18n %}
 {% load searchbox_component %}
 
-<div class="row clearfix mb-3">
-    <div class="col-md-12">
+<div class="row p-2"
+     style="background-color:#e0eefd63;border-radius:7px;
+            box-shadow:2px 2px 7px #0c1b2b69;">
+  <div class="col-md-12">
+    <nav class="navbar navbar-light navbar-custom navbar-expand-md w-100 py-1"
+         style="border-radius:5px;">
+      <button class="navbar-toggler" type="button" data-toggle="collapse"
+              data-target="#navbarSupportedContent"
+              aria-controls="navbarSupportedContent"
+              aria-expanded="false"
+              aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-        <nav class="navbar navbar-light navbar-custom navbar-expand-md rounded py-1">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto">
-                    <li class="py-2">
-                        <a href="{% url 'dados:main' %}">
-                            {% translate "Início" %}
-                        </a>
-                    </li>
-                    <li class="py-2">
-                        <a href="{% url 'dados:about' %}">
-                            {% translate "Sobre nós" %}
-                        </a>
-                    </li>
-                    <li class="py-2">
-                        <a href="{% url 'dados:team' %}">
-                            {% translate "Equipe" %}
-                        </a>
-                    </li>
-                    <li class="py-2">
-                        <a href="{% url 'dados:joinin' %}">
-                            {% translate "Participe" %}
-                        </a>
-                    </li>
-                    <li class="py-2">
-                        <a href="{% url 'dados:data_public_services' %}">
-                            {% translate "Dados" %}
-                        </a>
-                    </li>
-                    <li class="py-2">
-                        <a href="{% url 'dados:report' %}">
-                            {% translate "Relatórios" %}
-                        </a>
-                    </li>
-                    <li class="py-2" style="overflow: visible">
-                        {% searchbox_component %}
-                    </li>
-                    <li class="py-2 dropdown">
-                        <a class="py-2 dropdown-toggle" href="#" id="recursosDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="{% translate 'Links para páginas com informações adicionais, ferramentas e outras seções úteis do site' %}">
-                            {% translate "Recursos" %}                                        </a>
-                        <div class="dropdown-menu" aria-labelledby="recursosDropdown">
-                            <a class="dropdown-item"
-                               href="/epi-scanner"
-                               target="_blank"
-                               onclick="alert('You will be redirected to a new tab!')"
-                               style="text-decoration: none;"
-                               title="{% translate 'Aplicação que utiliza dados atualizados de incidência de arboviroses, como Dengue e Chikungunya, do Infodengue para analisar a expansão da onda no território nacional brasileiro.' %}">Episcanner
-                            </a>
-                            <a class="dropdown-item"
-                               href="/alertflow"
-                               target="_blank"
-                               onclick="alert('You will be redirected to a new tab!')"
-                               style="text-decoration: none;"
-                               title="{% translate 'O AlertFlow é um sistema de gerenciamento de fluxo de trabalho projetado para o projeto Alertadenge.' %}">AlertFlow
-                            </a>
-                            <a class="dropdown-item"
-                               href="https://e-vigilancia.dengue.mat.br/"
-                               target="_blank"
-                               onclick="alert('You will be redirected to a new tab!')"
-                               style="text-decoration: none;"
-                               title="{% translate 'E-vigilância é um evento que tem como objetivo discutir as tecnologias, metodologias e desafios relacionados à vigilância em saúde.' %}">E-vigilância
-                            </a>
-                            <a class="dropdown-item"
-                            href="https://readthedocs.org/projects/pysus/"
-                            target="_blank"
-                               onclick="alert('You will be redirected to a new tab!')"
-                               style="text-decoration: none;"
-                               title="{% translate 'PySUS reúne um conjunto de utilitários para lidar com bancos de dados públicos publicados pelo DATASUS do Brasil.' %}">PySUS
-                            </a>
-                        </div>
-                    </li>
-                    {% if user.is_authenticated %}
-                        <li class="py-2">
-                            <a href="{% url 'upload:sinan' %}">
-                                {% translate "Envie dados atualizados" %}
-                            </a>
-                        </li>
-                        <li class="dropdown py-2">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                {% translate "Account " %}
-                                <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="{% url 'logout' %}">
-                                        {% translate "Logout" %}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'password_change' %}">
-                                        {% translate "Change password" %}
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li class="py-2">
-                            <a href="{% url 'login' %}">
-                                {% translate "Login" %}
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </nav>
+          <!-- Início -->
+          <li class="py-2">
+            <a href="{% url 'dados:main' %}"
+               data-toggle="tooltip"
+               data-placement="bottom"
+               title="{% trans 'Página inicial com visão geral da situação das arboviroses e principais recursos do Infodengue.' %}">
+              {% translate "Início" %}
+            </a>
+          </li>
 
-    </div>
+          <!-- Dados -->
+          <li class="py-2">
+            <a href="{% url 'dados:data_public_services' %}"
+               data-toggle="tooltip"
+               data-placement="bottom"
+               title="{% trans 'Acesse os dados por meio da API e de notebooks de documentação com exemplos.' %}">
+              {% translate "Dados" %}
+            </a>
+          </li>
+
+          <!-- Relatórios -->
+          <li class="py-2">
+            <a href="{% url 'dados:report' %}"
+               data-toggle="tooltip"
+               data-placement="bottom"
+               title="{% trans 'Consulte relatórios municipais e estaduais com indicadores epidemiológicos e níveis de alerta.' %}">
+              {% translate "Relatórios" %}
+            </a>
+          </li>
+
+          <!-- Search box (sem tooltip) -->
+          <li class="py-2" style="overflow: visible">
+            {% searchbox_component %}
+          </li>
+
+          <!-- Equipe -->
+          <li class="py-2">
+            <a href="{% url 'dados:team' %}"
+               data-toggle="tooltip"
+               data-placement="bottom"
+               title="{% trans 'Conheça a equipe responsável pelo desenvolvimento, manutenção e análise dos dados do Infodengue.' %}">
+              {% translate "Equipe" %}
+            </a>
+          </li>
+
+          <!-- Sobre nós -->
+          <li class="py-2">
+            <a href="{% url 'dados:about' %}"
+               data-toggle="tooltip"
+               data-placement="bottom"
+               title="{% trans 'Informações sobre o projeto Infodengue, seus objetivos, histórico e principais parceiros.' %}">
+              {% translate "Sobre nós" %}
+            </a>
+          </li>
+
+        </ul>
+      </div>
+    </nav>
+  </div>
 </div>
+
+<script>
+  // Ativa os tooltips do Bootstrap para os itens do menu
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+</script>

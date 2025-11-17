@@ -1,0 +1,108 @@
+{% load i18n %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="h4 mb-0 text-primary">
+    {% trans "Funcionalidades" %}
+  </h2>
+</div>
+
+<div class="row mb-4 p-3"
+     style="background-color:#e0eefd63;border-radius:7px;
+            box-shadow:2px 2px 7px #0c1b2b69;">
+  <div class="col-12">
+    <div class="row justify-content-center">
+
+      <!-- API -->
+      <div class="col-6 col-md-4 col-lg-2 mb-3 d-flex">
+        <a href="/services/api"
+           class="btn btn-primary w-100 d-flex flex-column
+                  justify-content-center align-items-center py-4"
+           data-toggle="tooltip"
+           data-placement="bottom"
+           title="{% trans 'Acesso aos dados utilizados para gerar os resultados apresentados no site.' %}">
+          <span class="mb-2">
+            <i class="fas fa-code fa-lg"></i>
+          </span>
+          <span class="font-weight-semibold">
+            {% trans "API" %}
+          </span>
+        </a>
+      </div>
+
+      <!-- Relatórios municipais -->
+      <div class="col-6 col-md-4 col-lg-2 mb-3 d-flex">
+        <a href="/report/"
+           class="btn btn-primary w-100 d-flex flex-column
+                  justify-content-center align-items-center py-4 text-center"
+           data-toggle="tooltip"
+           data-placement="bottom"
+           title="{% trans 'Informações sobre o número de casos, nível de alerta e condições climáticas para a transmissão de arboviroses a nível municipal.' %}">
+          <span class="mb-2">
+            <i class="fas fa-city fa-lg"></i>
+          </span>
+          <span class="font-weight-semibold">
+            {% trans "Relatórios municipais" %}
+          </span>
+        </a>
+      </div>
+
+      <!-- Relatórios estaduais -->
+      <div class="col-6 col-md-4 col-lg-2 mb-3 d-flex">
+        <a href="/report/"
+           class="btn btn-primary w-100 d-flex flex-column
+                  justify-content-center align-items-center py-4 text-center"
+           data-toggle="tooltip"
+           data-placement="bottom"
+           title="{% trans 'Informações sobre o número de casos e nível de alerta para as regionais de saúde de cada estado.' %}">
+          <span class="mb-2">
+            <i class="fas fa-map-marked-alt fa-lg"></i>
+          </span>
+          <span class="font-weight-semibold">
+            {% trans "Relatórios estaduais" %}
+          </span>
+        </a>
+      </div>
+
+      <!-- Relatórios técnicos -->
+      <div class="col-6 col-md-4 col-lg-2 mb-3 d-flex">
+        <a href="/informacoes/#section1.1"
+           class="btn btn-primary w-100 d-flex flex-column
+                  justify-content-center align-items-center py-4 text-center"
+           data-toggle="tooltip"
+           data-placement="bottom"
+           title="{% trans 'Análises adicionais sobre a situação das arboviroses no país.' %}">
+          <span class="mb-2">
+            <i class="fas fa-file-medical-alt fa-lg"></i>
+          </span>
+          <span class="font-weight-semibold">
+            {% trans "Relatórios técnicos" %}
+          </span>
+        </a>
+      </div>
+
+      <!-- Tutoriais -->
+      <div class="col-6 col-md-4 col-lg-2 mb-3 d-flex">
+        <a href="/services/tutorial"
+           class="btn btn-primary w-100 d-flex flex-column
+                  justify-content-center align-items-center py-4 text-center"
+           data-toggle="tooltip"
+           data-placement="bottom"
+           title="{% trans 'Exemplo de acesso aos dados da API usando R e Python.' %}">
+          <span class="mb-2">
+            <i class="fas fa-chalkboard-teacher fa-lg"></i>
+          </span>
+          <span class="font-weight-semibold">
+            {% trans "Tutoriais" %}
+          </span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+</script>

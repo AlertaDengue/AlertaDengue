@@ -1,0 +1,82 @@
+{% load i18n %}
+{% load static %}
+
+<style>
+  .uf-maps-row {
+    display: flex;
+    justify-content: center;
+  }
+
+  .uf-maps-wrapper {
+    max-width: 960px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .uf-map-col {
+    display: flex;
+    justify-content: center;
+  }
+
+  .uf-map-img {
+    width: 115%;
+    max-width: 115%;
+    height: auto;
+  }
+
+  @media (max-width: 767.98px) {
+    .uf-maps-wrapper {
+      padding: 0 0.5rem;
+    }
+    .uf-map-img {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+</style>
+
+{% block uf_incidence_component %}
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h4 mb-0 text-primary">
+      {% trans "Situação de casos estimados" %}
+    </h2>
+  </div>
+
+  <div class="row mb-4 p-3"
+       style="background-color:#e0eefd63;border-radius:7px;
+              box-shadow:2px 2px 7px #0c1b2b69;">
+    <div class="col-12">
+      <div class="row justify-content-center">
+        <div class="col-md-10">
+<div class="uf-maps-row">
+  <div class="uf-maps-wrapper">
+    <div class="row">
+      <div class="col-md-6 mb-3 uf-map-col">
+        <a href="report/" title="Clique para abrir os relatórios estaduais">
+          <img
+            class="uf-map-img"
+            src="{% static 'img/incidence_maps/country/incidence_Nacional_dengue.png' %}"
+            alt="Mapa de incidência de Dengue no Brasil"
+          >
+        </a>
+      </div>
+
+      <div class="col-md-6 mb-3 uf-map-col">
+        <a href="report/" title="Clique para abrir os relatórios estaduais">
+          <img
+            class="uf-map-img"
+            src="{% static 'img/incidence_maps/country/incidence_Nacional_chikungunya.png' %}"
+            alt="Mapa de incidência de Chikungunya no Brasil"
+          >
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+{% endblock %}
