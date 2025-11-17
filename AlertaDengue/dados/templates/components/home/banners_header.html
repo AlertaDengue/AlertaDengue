@@ -1,0 +1,75 @@
+{% load i18n %}
+{% load static %}
+
+{% block extra_head %}
+<link href="{% static 'css/banner_styles.css' %}"
+      rel="stylesheet" type="text/css">
+{% endblock %}
+
+<div class="row mb-4 p-2"
+     style="background-color:#e0eefd63;border-radius:7px;
+            box-shadow:2px 2px 7px #0c1b2b69;">
+
+  <div class="col-lg-12 col-md-12 col-sm-12 mb-3 mt-2">
+    <div class="feature-banners">
+
+      <div id="carouselTop" class="carousel slide"
+           data-ride="carousel" data-interval="7000">
+
+        <ol class="carousel-indicators">
+          <li data-target="#carouselTop" data-slide-to="0" class="active"></li>
+          <li data-target="#carouselTop" data-slide-to="1"></li>
+          <li data-target="#carouselTop" data-slide-to="2"></li>
+        </ol>
+
+        <div class="carousel-inner">
+
+          <!-- 1) E-Vigilância -->
+          <div class="carousel-item">
+            <div class="banner-slide">
+              <img
+                class="d-block banner-img img-fluid"
+                src="{% static 'img/home/banners/banner_evig_3.svg' %}"
+                alt=""
+              >
+            </div>
+          </div>
+
+          <!-- 2) Sprint / IMDC -->
+          <div class="carousel-item">
+            <div class="banner-slide">
+              <a href="https://zenodo.org/records/17516518"
+                target="_blank"
+                rel="noopener noreferrer">
+                <img
+                  class="d-block banner-img img-fluid"
+                  style="cursor:pointer;"
+                  src="{% static 'img/home/banners/capa_site_relatorio_sprint.svg' %}"
+                  alt=""
+                >
+              </a>
+            </div>
+          </div>
+
+
+          <!-- 3) Hero -->
+          <div class="carousel-item active">
+            <div class="banner-slide">
+              <img
+                class="d-block banner-img img-fluid"
+                src="{% static 'img/home/banners/data_analysis.svg' %}"
+                alt=""
+              >
+              <a type="button" onclick="location.href='/informacoes/'"
+                      class="btn btn-primary banner-cta">
+                {% trans "saiba mais" %}
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

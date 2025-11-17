@@ -1,48 +1,63 @@
 {% load lookup %}
 {% load cache %}
+{% load i18n %}
+{% load static %}
 
 {% cache 500 object_list %}
 
 <!-- Start Component -->
 {% block collapse_component %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="h4 mb-0 text-primary">
+    {% trans "Situação Epidemiológica" %}
+  </h2>
+</div>
 
-<div class="row">
-  <div class="col-sm-12 mb-4 mb-xl-0">
-    <div id="accordion">
-      {% for key,value in states_name.items %}
-      <div class="card">
-        <div id="flip_{{ key }}"
-          class="collapse-style">
-            <button
-              class="collapse-effect text-left"
-              data-toggle="collapse"
-              data-target="#panel_{{ key }}"
-              aria-expanded="true"
-              data-toggle="tooltip"
-              data-placement="bottom"
-              title="Clique para visualizar os dados sobre as doenças no estado de {{ key }}"
-              aria-controls="panel_{{ key }}">
-              <span>{{ value }}</span>
-          </button>
-        </div>
-        <div id="panel_{{ key }}"
-          {% if key == 'CE' %}
-            class="collapse show"
-            {% else %}
-            class="collapse"
-            {% endif %}
-            aria-labelledby="flip_{{ key }}"
-            data-parent="#accordion">
-          <div class="card-body">
-            <div class="spinner-border text-muted">
+<div class="row mb-4 p-3"
+      style="background-color:#e0eefd63;border-radius:7px;
+            box-shadow:2px 2px 7px #0c1b2b69;">
+  <div class="col-md-12 p-1">
+    <div class="card-primary">
+        <div class="row">
+          <div class="col-sm-12 mb-4 mb-xl-0">
+            <div id="accordion">
+              {% for key,value in states_name.items %}
+              <div class="card">
+                <div id="flip_{{ key }}"
+                  class="collapse-style">
+                    <button
+                      class="collapse-effect text-left"
+                      data-toggle="collapse"
+                      data-target="#panel_{{ key }}"
+                      aria-expanded="true"
+                      data-toggle="tooltip"
+                      data-placement="bottom"
+                      title="Clique para visualizar os dados sobre as doenças no estado de {{ key }}"
+                      aria-controls="panel_{{ key }}">
+                      <span>{{ value }}</span>
+                  </button>
+                </div>
+                <div id="panel_{{ key }}"
+                  {% if key == 'CE' %}
+                    class="collapse show"
+                    {% else %}
+                    class="collapse"
+                    {% endif %}
+                    aria-labelledby="flip_{{ key }}"
+                    data-parent="#accordion">
+                  <div class="card-body">
+                    <div class="spinner-border text-muted">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
             </div>
           </div>
         </div>
       </div>
-      {% endfor %}
     </div>
   </div>
-</div>
 
 {% endblock %}
 {% endcache %}

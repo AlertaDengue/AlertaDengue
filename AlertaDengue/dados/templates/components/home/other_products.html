@@ -1,0 +1,85 @@
+{% load i18n %}
+{% load static %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="h4 mb-0 text-primary">
+    {% trans "Outros Produtos" %}
+  </h2>
+</div>
+
+<div class="row mb-4 p-3"
+     style="background-color:#e0eefd63;border-radius:7px;
+            box-shadow:2px 2px 7px #0c1b2b69;">
+  <div class="col-12">
+    <div class="row justify-content-center">
+
+      {# Epi-Scanner #}
+      <div class="col-6 col-md-4 col-lg-3 mb-3 d-flex">
+        <a href="https://info.dengue.mat.br/epi-scanner/"
+           class="btn btn-primary w-100 d-flex flex-column
+                  justify-content-center align-items-center py-4"
+           target="_blank" rel="noopener noreferrer"
+           data-toggle="tooltip" data-placement="bottom"
+           title="{% trans 'Análise de parâmetros epidemiológicos como a semana de pico, número de reprodução e total de casos por epidemia a nível municipal.' %}">
+          <img src="{% static 'img/home/features/episcanner.svg' %}"
+               alt="{% trans 'Epi-Scanner' %}"
+               class="mb-2"
+               style="max-height:64px;">
+          <span class="font-weight-semibold">
+            {% trans "Epi-Scanner" %}
+          </span>
+          <span class="small mt-1">
+            {% trans "Visualize os parâmetros epidemiológicos de cada epidemia." %}
+          </span>
+        </a>
+      </div>
+
+      {# PySUS #}
+      <div class="col-6 col-md-4 col-lg-3 mb-3 d-flex">
+        <a href="https://pysus.readthedocs.io/en/latest/"
+           class="btn btn-primary w-100 d-flex flex-column
+                  justify-content-center align-items-center py-4 text-center"
+           target="_blank" rel="noopener noreferrer"
+           data-toggle="tooltip" data-placement="bottom"
+           title="{% trans 'Biblioteca em Python que permite o acesso a conjuntos de dados disponibilizados pelo DATASUS.' %}">
+          <span class="mb-2">
+            <i class="fas fa-database fa-2x"></i>
+          </span>
+          <span class="font-weight-semibold">
+            {% trans "PySUS" %}
+          </span>
+          <span class="small mt-1">
+            {% trans "Acesse bancos de dados públicos do DATASUS." %}
+          </span>
+        </a>
+      </div>
+
+      {# YouTube Channel #}
+      <div class="col-6 col-md-4 col-lg-3 mb-3 d-flex">
+        <a href="https://www.youtube.com/@infodenguebrazil8805"
+           class="btn btn-primary w-100 d-flex flex-column
+                  justify-content-center align-items-center py-4 text-center"
+           target="_blank" rel="noopener noreferrer"
+           data-toggle="tooltip" data-placement="bottom"
+           title="{% trans 'Canal do Infodengue no YouTube, com vídeos sobre modelos, dados e vigilância em saúde.' %}">
+          <span class="mb-2">
+            <i class="fab fa-youtube fa-2x"></i>
+          </span>
+          <span class="font-weight-semibold">
+            {% trans "Canal do YouTube" %}
+          </span>
+          <span class="small mt-1">
+            {% trans "Vídeos sobre modelos, dados e vigilância em saúde." %}
+          </span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+  });
+</script>

@@ -35,17 +35,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     {% block extra_head %}{% endblock %}
 </head>
-<body>
-    {% include 'components/messages.html' %}
-    <div class="container-fluid d-flex flex-column min-vh-100">
-        <div class="container">
-            {% include 'components/header.html' %}
+<body >  
+  {# ===================== VIERIFY THE USAGE OF MESSAGES ===================== #}
+  {% include 'components/messages.html' %}
+
+<div class="container-fluid d-flex flex-column min-vh-100">
+  {# ===================== HEADER ===================== #}    
+  <section class="mb-0">
+  <div class="container">
+        {% include 'components/header.html' %}
+  </div>
+  </section>
+
+    <main role="main" class="flex-fill">
+        <div class="container pt-0 pb-0">
+          {# ===================== NAVBAR ===================== #}
+          <section class="mt-3 mb-0 p-0">
             {% include 'components/navbar.html' %}
-        </div>
-        <main role="main" class="flex-fill">
-            <div class="container py-4">
-              <h3>{% block title %}{% endblock %}</h3>
-              {% block breadcrumbs %}{% endblock %}
+          </section>
+
+            <h3 class="mb-3">
+                {% block title %}{% endblock %}
+            </h3>
+            {% block breadcrumbs %}{% endblock %}
               {% if settings.MAINTENANCE_MODE and not user.is_authenticated %}
                 <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 50vh;">
                   <img src="{% static 'img/maintenance.png' %}" alt="Maintenance" style="width: 200px;">

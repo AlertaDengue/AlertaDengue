@@ -1,87 +1,45 @@
 {% extends 'base.html' %}
-{% load i18n %}
-{% load static %}
-{% load home_components %}
-{% load lookup %}
+{% load i18n static home_components lookup %}
 
 {% block extra_head %}
-<meta property="og:image" content="{% static '/img/screenshot.png' %}" />
-<meta property="og:image:secure_url" content="{% static '/img/screenshot.png' %}" />
+<meta property="og:image" content="{% static 'img/screenshot.png' %}">
+<meta property="og:image:secure_url" content="{% static 'img/screenshot.png' %}">
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<link href="{% static '/css/components.css' %}" rel="stylesheet" type="text/css">
-<link href="{% static '/css/main_styles.css' %}" rel="stylesheet" type="text/css">
+
+<link href="{% static 'css/components.css' %}" rel="stylesheet" type="text/css">
+<link href="{% static 'css/main_styles.css' %}" rel="stylesheet" type="text/css">
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous" referrerpolicy="no-referrer">
 {% endblock %}
 
-{% block title %}{% translate "Situação de casos estimados" %}{% endblock %}
-
 {% block content %}
-<!-- Main Content Layer -->
-<div class="container">
-    <!-- Content Rows -->
-    <div class="row mt-12 ms-5 mb-4" style="background-color: #e0eefd63; border-radius: 7px; border: 1px; box-shadow: 2px 2px 7px #c9e4ff69; padding-bottom: 20px;">
-        <!-- Column 1 -->
-        <div class="col-md-4 col-sm-6 mb-1">
-            <!-- Analysis Text -->
-            <div class="h-1 p-0 mt-5">
-                <h4><p class="text-muted text-center font-italic">{% translate "Análise integrada de dados epidemiológicos e climáticos" %}</p></h4>
-            </div>
-            <!-- Weekly Update -->
-            <div class="h-0 p-4 mt-2">
-                <h3><small>{% translate "Atualização semanal" %}</small></h3>
-                <p class="text-muted">
-                    <span>{% translate "Incidência estimada" %} (nowcasting)</span><br>
-                    <span>{% translate "Cidades com condições favoráveis para transmissão" %}</span><br>
-                    <span>{% translate "Cidades em níveis de atenção" %}</span>
-                </p>
-            </div>
-        </div>
 
-        <!-- Carousel Column -->
-        <div class="col-md-4 col-sm-6 mb-1">
-            <div class="h-0 p-0 mt-3">
-                <div class="border-0 mb-4 mt-0">
-                    {% carousel_component %}
-                </div>
-            </div>
-        </div>
+<div class="container-fluid p-0 mb-1 mt-0">
 
-        <!-- Functionality and Participation Column -->
-        <div class="col-md-4 col-sm-6 mb-1">
-            <div class="h-0 p-0 mt-5">
-                <h3><small>{% translate "Funcionalidades" %}</small></h3>
-                <ul class="custom-list text-muted">
-                    <li><a href="report/" target="_blank">{% translate "Relatórios municipais" %}</a></li>
-                    <li><a href="report/" target="_blank">{% translate "Relatórios estaduais" %}</a></li>
-                    <li><a href="informacoes/#section1.1" target="_blank">{% translate "Relatórios técnicos" %}</a></li>
-                    <li><a href="services/api" target="_blank">{% translate "API" %}</a></li>
-                    <li><a href="services/tutorial" target="_blank">{% translate "Tutoriais" %}</a></li>
-                </ul>
-            </div>
-            <div class="h-0 p-0 mt-5">
-                <h3><small>{% translate "Participe" %}</small></h3>
-                <p class="text-muted">
-                    {% translate "Existem várias formas de participar" %}<br>
-                    <span><a href="participe/" title={% translate "Clique e saiba como participar do Infodengue" %}><i>{% translate "Confira aqui!" %}</i></a></span>
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
+  {# ===================== BANNERS HEADER ===================== #}
+  <section class="mb-4">
+        {% include 'components/home/banners_header.html' %}
+  </section>
+  {# ===================== FUNCTIONALITIES ===================== #}
+  <section class="mb-4">
+    {% include 'components/home/functionalities.html' %}
+  </section>
+  {# ===================== OTHER PRODUCTS ===================== #}
+  <section class="mb-4">
+    {% include 'components/home/other_products.html' %}
+  </section>
+  {# ===================== ESTIMATED CASES SITUATION ===================== #}
+  <section class="mb-4">
+    {% include 'components/home/uf_incidence.html' %}
+  </section>
+  {# ===================== EPIDEMIOLOGICAL SITUATION ===================== #}
+  <section class="mb-4">
+    {% collapse_component %}
+  </section>
 
-<!-- Epidemiological Situation Header -->
-<div class="page-header align-title mt-4" style="margin-bottom: 20px;">
-    <h3>{% translate "Situação Epidemiológica" %}</h3>
-</div>
-
-<!-- Collapse States Section -->
-<div class="container">
-    <div class="row justify-content-center" style="background-color: #e0eefd63; margin-bottom: 20px; border-radius: 7px">
-        <div class="col-md-12 p-1">
-            <div class="card-primary">
-                {% collapse_component %}
-            </div>
-        </div>
-    </div>
 </div>
 
 {% endblock %}
