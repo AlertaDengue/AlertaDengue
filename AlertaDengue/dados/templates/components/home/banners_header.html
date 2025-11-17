@@ -1,11 +1,10 @@
+{% load i18n %}
 {% load static %}
-{% block extra_head %}
 
+{% block extra_head %}
 <link href="{% static 'css/banner_styles.css' %}"
       rel="stylesheet" type="text/css">
 {% endblock %}
-
-
 
 <div class="row mb-4 p-2"
      style="background-color:#e0eefd63;border-radius:7px;
@@ -47,7 +46,7 @@
             </div>
           </div>
 
-          <!-- 3) Hero com botão -->
+          <!-- 3) Hero -->
           <div class="carousel-item">
             <div class="banner-slide">
               <img
@@ -57,7 +56,7 @@
               >
               <button type="button"
                       class="btn btn-primary banner-cta">
-                Saiba mais
+                {% trans "saiba mais" %}
               </button>
             </div>
           </div>

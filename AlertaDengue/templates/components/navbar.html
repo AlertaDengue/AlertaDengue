@@ -19,7 +19,7 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
 
-          <!-- Início -->
+          <!-- Start -->
           <li class="py-2">
             <a href="{% url 'dados:main' %}"
                data-toggle="tooltip"
@@ -29,7 +29,7 @@
             </a>
           </li>
 
-          <!-- Dados -->
+          <!-- Data -->
           <li class="py-2">
             <a href="{% url 'dados:data_public_services' %}"
                data-toggle="tooltip"
@@ -39,7 +39,7 @@
             </a>
           </li>
 
-          <!-- Relatórios -->
+          <!-- Reports -->
           <li class="py-2">
             <a href="{% url 'dados:report' %}"
                data-toggle="tooltip"
@@ -49,12 +49,12 @@
             </a>
           </li>
 
-          <!-- Search box (sem tooltip) -->
+          <!-- Search box (without tooltip) -->
           <li class="py-2" style="overflow: visible">
             {% searchbox_component %}
           </li>
 
-          <!-- Equipe -->
+          <!-- Team -->
           <li class="py-2">
             <a href="{% url 'dados:team' %}"
                data-toggle="tooltip"
@@ -64,7 +64,7 @@
             </a>
           </li>
 
-          <!-- Sobre nós -->
+          <!-- About us -->
           <li class="py-2">
             <a href="{% url 'dados:about' %}"
                data-toggle="tooltip"
@@ -81,7 +81,7 @@
 </div>
 
 <script>
-  // Ativa os tooltips do Bootstrap para os itens do menu
+  // Activate Bootstrap tooltips for menu items
   $(function () {
     $('[data-toggle="tooltip"]').tooltip();
   });
