@@ -25,7 +25,7 @@
         <div class="carousel-inner">
 
           <!-- 1) E-Vigilância -->
-          <div class="carousel-item active">
+          <div class="carousel-item">
             <div class="banner-slide">
               <img
                 class="d-block banner-img img-fluid"
@@ -47,17 +47,17 @@
           </div>
 
           <!-- 3) Hero -->
-          <div class="carousel-item">
+          <div class="carousel-item active">
             <div class="banner-slide">
               <img
                 class="d-block banner-img img-fluid"
                 src="{% static 'img/home/banners/data_analysis.svg' %}"
                 alt=""
               >
-              <button type="button"
+              <a type="button" onclick="location.href='/informacoes/'"
                       class="btn btn-primary banner-cta">
                 {% trans "saiba mais" %}
-              </button>
+              </a>
             </div>
           </div>
 
