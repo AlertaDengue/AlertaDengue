@@ -1,10 +1,13 @@
-{% load i18n %}
-{% load static %}
+{% load i18n static %}
+
 
 {% block extra_head %}
 <link href="{% static 'css/banner_styles.css' %}"
       rel="stylesheet" type="text/css">
 {% endblock %}
+
+{% get_current_language as LANGUAGE_CODE %}
+{% with LANGUAGE_CODE|slice:":2" as lang_suffix %}
 
 <div class="row mb-4 p-2"
      style="background-color:#e0eefd63;border-radius:7px;
@@ -17,47 +20,47 @@
            data-ride="carousel" data-interval="7000">
 
         <ol class="carousel-indicators">
-          <li data-target="#carouselTop" data-slide-to="2" class="active"></li>
+          <li data-target="#carouselTop" data-slide-to="2"
+              class="active"></li>
           <li data-target="#carouselTop" data-slide-to="1"></li>
           <li data-target="#carouselTop" data-slide-to="0"></li>
         </ol>
 
         <div class="carousel-inner">
 
-          <!-- 3) E-Vigilância -->
+          {# 3) E-Vigilância #}
           <div class="carousel-item">
             <div class="banner-slide">
               <img
                 class="d-block banner-img img-fluid"
-                src="{% static 'img/home/banners/banner_evig_pt.svg' %}"
+                src="{% static 'img/home/banners/banner_evig_'|add:lang_suffix|add:'.svg' %}"
                 alt=""
               >
             </div>
           </div>
 
-          <!-- 2) Sprint / IMDC -->
+          {# 2) Sprint / IMDC #}
           <div class="carousel-item">
             <div class="banner-slide">
               <a href="https://zenodo.org/records/17516518"
-                target="_blank"
-                rel="noopener noreferrer">
+                 target="_blank"
+                 rel="noopener noreferrer">
                 <img
                   class="d-block banner-img img-fluid"
                   style="cursor:pointer;"
-                  src="{% static 'img/home/banners/banner_report_pt.svg' %}"
+                  src="{% static 'img/home/banners/banner_report_'|add:lang_suffix|add:'.svg' %}"
                   alt=""
                 >
               </a>
             </div>
           </div>
 
-
-          <!-- 1) Hero -->
+          {# 1) Hero #}
           <div class="carousel-item active">
             <div class="banner-slide">
               <img
                 class="d-block banner-img img-fluid"
-                src="{% static 'img/home/banners/banner_home_pt.svg' %}"
+                src="{% static 'img/home/banners/banner_home_'|add:lang_suffix|add:'.svg' %}"
                 alt=""
               >
               <a type="button" onclick="location.href='/informacoes/'"
@@ -73,3 +76,5 @@
     </div>
   </div>
 </div>
+
+{% endwith %}
