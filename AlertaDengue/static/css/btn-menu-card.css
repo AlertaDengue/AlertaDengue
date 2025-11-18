@@ -1,0 +1,13 @@
+.btn-menu-card {
+  background-color: #058ED0;
+  border-color: #058ED0;
+  color: white;
+  box-shadow: 2px 2px 7px #0c1b2b69;
+  transition: background-color 0.3s, border-color 0.3
+}
+.btn-menu-card:hover {
+  background-color: #0065b3ff;
+  border-color: #ffffffff;
+  color: white;
+  text-decoration: none;
+}
