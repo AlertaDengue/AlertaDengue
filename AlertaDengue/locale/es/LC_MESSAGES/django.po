@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-17 12:24-0300\n"
+"POT-Creation-Date: 2025-11-18 09:57-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1142,7 +1142,7 @@ msgstr "Más detalles"
 msgid "Número de casos estimados na semana"
 msgstr "Número de casos estimados en la semana"
 
-#: dados/templates/components/home/banners_header.html:59
+#: dados/templates/components/home/banners_header.html:68
 msgid "saiba mais"
 msgstr "Lea más aquí"
 
@@ -1261,24 +1261,24 @@ msgstr "Cerrar"
 msgid "Saiba mais"
 msgstr "Lea más aquí"
 
-#: dados/templates/components/home/functionalities.html:5
+#: dados/templates/components/home/functionalities.html:11
 msgid "Funcionalidades"
 msgstr "Funcionalidades"
 
-#: dados/templates/components/home/functionalities.html:22
+#: dados/templates/components/home/functionalities.html:28
 msgid ""
 "Acesso aos dados utilizados para gerar os resultados apresentados no site."
 msgstr ""
 "Acceso a los datos utilizados para generar los resultados presentados en el "
 "sitio."
 
-#: dados/templates/components/home/functionalities.html:27
+#: dados/templates/components/home/functionalities.html:33
 #: dados/templates/services_api.html:76 dados/templates/services_api.html:83
 #: dados/templates/services_api_doc.html:54
 msgid "API"
 msgstr ""
 
-#: dados/templates/components/home/functionalities.html:39
+#: dados/templates/components/home/functionalities.html:45
 msgid ""
 "Informações sobre o número de casos, nível de alerta e condições climáticas "
 "para a transmissão de arboviroses a nível municipal."
@@ -1286,11 +1286,11 @@ msgstr ""
 "Información sobre el número de casos, nivel de alerta y condiciones "
 "climáticas para la transmisión de arbovirosis a nivel municipal."
 
-#: dados/templates/components/home/functionalities.html:44
+#: dados/templates/components/home/functionalities.html:50
 msgid "Relatórios municipais"
 msgstr "Informes municipales"
 
-#: dados/templates/components/home/functionalities.html:56
+#: dados/templates/components/home/functionalities.html:62
 msgid ""
 "Informações sobre o número de casos e nível de alerta para as regionais de "
 "saúde de cada estado."
@@ -1298,33 +1298,31 @@ msgstr ""
 "Información sobre el número de casos y nivel de alerta para las regiones de "
 "salud de cada estado."
 
-#: dados/templates/components/home/functionalities.html:61
+#: dados/templates/components/home/functionalities.html:67
 msgid "Relatórios estaduais"
 msgstr "Informes estatales "
 
-#: dados/templates/components/home/functionalities.html:73
+#: dados/templates/components/home/functionalities.html:79
 msgid "Análises adicionais sobre a situação das arboviroses no país."
 msgstr "Informe de Situación de las Arbovirosis en el país"
 
-#: dados/templates/components/home/functionalities.html:78
+#: dados/templates/components/home/functionalities.html:84
 msgid "Relatórios técnicos"
 msgstr "Informes técnicos"
 
-#: dados/templates/components/home/functionalities.html:90
+#: dados/templates/components/home/functionalities.html:96
 msgid "Exemplo de acesso aos dados da API usando R e Python."
 msgstr "Ejemplo de acceso a los datos de la API usando R y Python."
 
-#: dados/templates/components/home/functionalities.html:95
-#, fuzzy
-#| msgid "Tutorial"
+#: dados/templates/components/home/functionalities.html:101
 msgid "Tutoriais"
 msgstr "Tutorial"
 
-#: dados/templates/components/home/other_products.html:6
+#: dados/templates/components/home/other_products.html:11
 msgid "Outros Produtos"
-msgstr "Otros productos"
+msgstr "Otros Productos"
 
-#: dados/templates/components/home/other_products.html:23
+#: dados/templates/components/home/other_products.html:28
 msgid ""
 "Análise de parâmetros epidemiológicos como a semana de pico, número de "
 "reprodução e total de casos por epidemia a nível municipal."
@@ -1332,16 +1330,16 @@ msgstr ""
 "Análisis de parámetros epidemiológicos como la semana pico, número de "
 "reproducción y total de casos por epidemia a nivel municipal."
 
-#: dados/templates/components/home/other_products.html:25
-#: dados/templates/components/home/other_products.html:29
+#: dados/templates/components/home/other_products.html:30
+#: dados/templates/components/home/other_products.html:34
 msgid "Epi-Scanner"
 msgstr "Epi-Scanner"
 
-#: dados/templates/components/home/other_products.html:32
+#: dados/templates/components/home/other_products.html:37
 msgid "Visualize os parâmetros epidemiológicos de cada epidemia."
 msgstr "Visualice los parámetros epidemiológicos de cada epidemia."
 
-#: dados/templates/components/home/other_products.html:44
+#: dados/templates/components/home/other_products.html:49
 msgid ""
 "Biblioteca em Python que permite o acesso a conjuntos de dados "
 "disponibilizados pelo DATASUS."
@@ -1349,15 +1347,15 @@ msgstr ""
 "Biblioteca en Python que permite el acceso a conjuntos de datos "
 "disponibilizados por DATASUS."
 
-#: dados/templates/components/home/other_products.html:49
+#: dados/templates/components/home/other_products.html:54
 msgid "PySUS"
 msgstr "PySUS"
 
-#: dados/templates/components/home/other_products.html:52
+#: dados/templates/components/home/other_products.html:57
 msgid "Acesse bancos de dados públicos do DATASUS."
 msgstr "Acceda a bases de datos públicas del DATASUS."
 
-#: dados/templates/components/home/other_products.html:64
+#: dados/templates/components/home/other_products.html:69
 msgid ""
 "Canal do Infodengue no YouTube, com vídeos sobre modelos, dados e vigilância "
 "em saúde."
@@ -1365,11 +1363,11 @@ msgstr ""
 "Canal de Infodengue en YouTube, con videos sobre modelos, datos y vigilancia "
 "en salud."
 
-#: dados/templates/components/home/other_products.html:69
+#: dados/templates/components/home/other_products.html:74
 msgid "Canal do YouTube"
 msgstr "Canal de YouTube"
 
-#: dados/templates/components/home/other_products.html:72
+#: dados/templates/components/home/other_products.html:77
 msgid "Vídeos sobre modelos, dados e vigilância em saúde."
 msgstr "Videos sobre modelos, datos y vigilancia en salud."
 

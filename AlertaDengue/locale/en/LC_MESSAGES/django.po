@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-17 11:38-0300\n"
+"POT-Creation-Date: 2025-11-18 09:57-0300\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1118,7 +1118,7 @@ msgstr "More details"
 msgid "Número de casos estimados na semana"
 msgstr "Estimated cases in the week"
 
-#: dados/templates/components/home/banners_header.html:59
+#: dados/templates/components/home/banners_header.html:68
 msgid "saiba mais"
 msgstr "Learn more"
 
@@ -1237,22 +1237,22 @@ msgstr ""
 msgid "Saiba mais"
 msgstr "Learn more"
 
-#: dados/templates/components/home/functionalities.html:5
+#: dados/templates/components/home/functionalities.html:11
 msgid "Funcionalidades"
 msgstr "Functionalities"
 
-#: dados/templates/components/home/functionalities.html:22
+#: dados/templates/components/home/functionalities.html:28
 msgid ""
 "Acesso aos dados utilizados para gerar os resultados apresentados no site."
 msgstr "Access to the data used to generate the results presented on the site."
 
-#: dados/templates/components/home/functionalities.html:27
+#: dados/templates/components/home/functionalities.html:33
 #: dados/templates/services_api.html:76 dados/templates/services_api.html:83
 #: dados/templates/services_api_doc.html:54
 msgid "API"
 msgstr "API"
 
-#: dados/templates/components/home/functionalities.html:39
+#: dados/templates/components/home/functionalities.html:45
 msgid ""
 "Informações sobre o número de casos, nível de alerta e condições climáticas "
 "para a transmissão de arboviroses a nível municipal."
@@ -1260,12 +1260,11 @@ msgstr ""
 "Information on the number of cases, alert level, and weather conditions for "
 "arbovirus transmission at the municipal level."
 
-#: dados/templates/components/home/functionalities.html:44
-#| msgid "página de relatórios municipais"
+#: dados/templates/components/home/functionalities.html:50
 msgid "Relatórios municipais"
 msgstr "Municipal reports"
 
-#: dados/templates/components/home/functionalities.html:56
+#: dados/templates/components/home/functionalities.html:62
 msgid ""
 "Informações sobre o número de casos e nível de alerta para as regionais de "
 "saúde de cada estado."
@@ -1273,33 +1272,31 @@ msgstr ""
 "Information on the number of cases and alert level for each state's health "
 "regions."
 
-#: dados/templates/components/home/functionalities.html:61
-#| msgid "Relatórios"
+#: dados/templates/components/home/functionalities.html:67
 msgid "Relatórios estaduais"
 msgstr "State Reports"
 
-#: dados/templates/components/home/functionalities.html:73
+#: dados/templates/components/home/functionalities.html:79
 msgid "Análises adicionais sobre a situação das arboviroses no país."
 msgstr "Additional analyses on the situation of arboviruses in the country."
 
-#: dados/templates/components/home/functionalities.html:78
-#| msgid "Relatórios Técnicos"
+#: dados/templates/components/home/functionalities.html:84
 msgid "Relatórios técnicos"
 msgstr "Technical Reports"
 
-#: dados/templates/components/home/functionalities.html:90
+#: dados/templates/components/home/functionalities.html:96
 msgid "Exemplo de acesso aos dados da API usando R e Python."
 msgstr "Example of accessing API data using R and Python."
 
-#: dados/templates/components/home/functionalities.html:95
+#: dados/templates/components/home/functionalities.html:101
 msgid "Tutoriais"
 msgstr "Tutorials"
 
-#: dados/templates/components/home/other_products.html:6
+#: dados/templates/components/home/other_products.html:11
 msgid "Outros Produtos"
 msgstr "Other Products"
 
-#: dados/templates/components/home/other_products.html:23
+#: dados/templates/components/home/other_products.html:28
 msgid ""
 "Análise de parâmetros epidemiológicos como a semana de pico, número de "
 "reprodução e total de casos por epidemia a nível municipal."
@@ -1307,30 +1304,30 @@ msgstr ""
 "Analysis of epidemiological parameters such as peak week, reproduction "
 "number, and total cases per epidemic at the municipal level."
 
-#: dados/templates/components/home/other_products.html:25
-#: dados/templates/components/home/other_products.html:29
+#: dados/templates/components/home/other_products.html:30
+#: dados/templates/components/home/other_products.html:34
 msgid "Epi-Scanner"
 msgstr "Epi-Scanner"
 
-#: dados/templates/components/home/other_products.html:32
+#: dados/templates/components/home/other_products.html:37
 msgid "Visualize os parâmetros epidemiológicos de cada epidemia."
 msgstr "Visualize the epidemiological parameters of each epidemic."
 
-#: dados/templates/components/home/other_products.html:44
+#: dados/templates/components/home/other_products.html:49
 msgid ""
 "Biblioteca em Python que permite o acesso a conjuntos de dados "
 "disponibilizados pelo DATASUS."
 msgstr "Python library that enables access to datasets provided by DATASUS."
 
-#: dados/templates/components/home/other_products.html:49
+#: dados/templates/components/home/other_products.html:54
 msgid "PySUS"
 msgstr "PySUS"
 
-#: dados/templates/components/home/other_products.html:52
+#: dados/templates/components/home/other_products.html:57
 msgid "Acesse bancos de dados públicos do DATASUS."
 msgstr "Access public DATASUS databases."
 
-#: dados/templates/components/home/other_products.html:64
+#: dados/templates/components/home/other_products.html:69
 msgid ""
 "Canal do Infodengue no YouTube, com vídeos sobre modelos, dados e vigilância "
 "em saúde."
@@ -1338,11 +1335,11 @@ msgstr ""
 "Infodengue's YouTube channel, with videos on models, data, and health "
 "surveillance."
 
-#: dados/templates/components/home/other_products.html:69
+#: dados/templates/components/home/other_products.html:74
 msgid "Canal do YouTube"
 msgstr "YouTube Channel"
 
-#: dados/templates/components/home/other_products.html:72
+#: dados/templates/components/home/other_products.html:77
 msgid "Vídeos sobre modelos, dados e vigilância em saúde."
 msgstr "Videos on models, data, and health surveillance."
 
@@ -2791,29 +2788,47 @@ msgstr ""
 "Scientists, and students who work in partnership with government health "
 "agencies to assist in the management of mosquito-borne diseases such as "
 "dengue, zika, and Chikungunya."
+
 #: templates/components/navbar.html:27
-msgid "Página inicial com visão geral da situação das arboviroses e principais recursos do Infodengue."
-msgstr "Home page with an overview of the arbovirus situation and main resources of Infodengue."
+msgid ""
+"Página inicial com visão geral da situação das arboviroses e principais "
+"recursos do Infodengue."
+msgstr ""
+"Home page with an overview of the arbovirus situation and main resources of "
+"Infodengue."
 
 #: templates/components/navbar.html:28
 msgid "Início"
 msgstr "Home"
 
 #: templates/components/navbar.html:37
-msgid "Acesse os dados por meio da API e de notebooks de documentação com exemplos."
+msgid ""
+"Acesse os dados por meio da API e de notebooks de documentação com exemplos."
 msgstr "Access data through the API and documentation notebooks with examples."
 
 #: templates/components/navbar.html:47
-msgid "Consulte relatórios municipais e estaduais com indicadores epidemiológicos e níveis de alerta."
-msgstr "Consult municipal and state reports with epidemiological indicators and alert levels."
+msgid ""
+"Consulte relatórios municipais e estaduais com indicadores epidemiológicos e "
+"níveis de alerta."
+msgstr ""
+"Consult municipal and state reports with epidemiological indicators and "
+"alert levels."
 
 #: templates/components/navbar.html:62
-msgid "Conheça a equipe responsável pelo desenvolvimento, manutenção e análise dos dados do Infodengue."
-msgstr "Meet the team responsible for the development, maintenance, and analysis of Infodengue data."
+msgid ""
+"Conheça a equipe responsável pelo desenvolvimento, manutenção e análise dos "
+"dados do Infodengue."
+msgstr ""
+"Meet the team responsible for the development, maintenance, and analysis of "
+"Infodengue data."
 
 #: templates/components/navbar.html:72
-msgid "Informações sobre o projeto Infodengue, seus objetivos, histórico e principais parceiros."
-msgstr "Information about the Infodengue project, its objectives, history, and main partners."
+msgid ""
+"Informações sobre o projeto Infodengue, seus objetivos, histórico e "
+"principais parceiros."
+msgstr ""
+"Information about the Infodengue project, its objectives, history, and main "
+"partners."
 
 #: templates/components/navbar.html:73
 msgid "Sobre nós"
