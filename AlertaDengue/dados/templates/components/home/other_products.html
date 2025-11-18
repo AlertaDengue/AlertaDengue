@@ -1,10 +1,15 @@
 {% load i18n %}
 {% load static %}
 
+{% block extra_head %}
+<link href="{% static 'css/btn-menu-card.css' %}"
+      rel="stylesheet" type="text/css">
+{% endblock %}
+
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h2 class="h4 mb-0 text-primary">
+  <h3 class="h3 mb-0">
     {% trans "Outros Produtos" %}
-  </h2>
+  </h3>
 </div>
 
 <div class="row mb-4 p-3"
@@ -16,7 +21,7 @@
       {# Epi-Scanner #}
       <div class="col-6 col-md-4 col-lg-3 mb-3 d-flex">
         <a href="https://info.dengue.mat.br/epi-scanner/"
-           class="btn btn-primary w-100 d-flex flex-column
+           class="btn btn-menu-card w-100 d-flex flex-column
                   justify-content-center align-items-center py-4"
            target="_blank" rel="noopener noreferrer"
            data-toggle="tooltip" data-placement="bottom"
@@ -37,7 +42,7 @@
       {# PySUS #}
       <div class="col-6 col-md-4 col-lg-3 mb-3 d-flex">
         <a href="https://pysus.readthedocs.io/en/latest/"
-           class="btn btn-primary w-100 d-flex flex-column
+           class="btn btn-menu-card w-100 d-flex flex-column
                   justify-content-center align-items-center py-4 text-center"
            target="_blank" rel="noopener noreferrer"
            data-toggle="tooltip" data-placement="bottom"
@@ -57,7 +62,7 @@
       {# YouTube Channel #}
       <div class="col-6 col-md-4 col-lg-3 mb-3 d-flex">
         <a href="https://www.youtube.com/@infodenguebrazil8805"
-           class="btn btn-primary w-100 d-flex flex-column
+           class="btn btn-menu-card w-100 d-flex flex-column
                   justify-content-center align-items-center py-4 text-center"
            target="_blank" rel="noopener noreferrer"
            data-toggle="tooltip" data-placement="bottom"
