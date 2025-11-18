@@ -1,6 +1,14 @@
 Release Notes
 ---
 
+## [4.1.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.0.0...4.1.0) (2025-11-18)
+
+### Features
+
+* **about-us:** link technical reports to zenodo ([#795](https://github.com/AlertaDengue/AlertaDengue/issues/795)) ([5ef31f9](https://github.com/AlertaDengue/AlertaDengue/commit/5ef31f9d3b912171ec17b2295e357684ee47fac4))
+* **home,i18n:** add localized banners and refine home menu styles ([#794](https://github.com/AlertaDengue/AlertaDengue/issues/794)) ([41cca34](https://github.com/AlertaDengue/AlertaDengue/commit/41cca34109a4c506c3a2d18817b66072bb7ece03))
+* **home:** refactor layout with responsive banners and feature buttons ([#792](https://github.com/AlertaDengue/AlertaDengue/issues/792)) ([25b6e5d](https://github.com/AlertaDengue/AlertaDengue/commit/25b6e5de8e184936013ec73815f5f52e2b7cc47e))
+
 ## [4.0.0](https://github.com/AlertaDengue/AlertaDengue/compare/3.8.0...4.0.0) (2025-11-10)
 
 ### ⚠ BREAKING CHANGES
