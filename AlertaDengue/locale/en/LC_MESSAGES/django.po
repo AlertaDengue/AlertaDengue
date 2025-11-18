@@ -620,11 +620,11 @@ msgstr "Reflections on the risk of Arboviruses in 2024"
 
 #: dados/templates/about.html:127
 msgid "Previsões para a temporada de dengue de 2024-2025"
-msgstr "Forecasts for the 2024–2025 dengue season"
+msgstr "Forecasts for the 2024-2025 dengue season"
 
 #: dados/templates/about.html:130
 msgid "Previsões para a temporada de dengue de 2025-2026"
-msgstr "Forecasts for the 2025–2026 dengue season"
+msgstr "Forecasts for the 2025-2026 dengue season"
 
 #: dados/templates/about.html:134
 msgid "Projetos de pesquisa"
