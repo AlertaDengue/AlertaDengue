@@ -19,11 +19,6 @@
     margin-right: 10px;
 }
 
-h1,
-h3 {
-    color: #003E7E;
-}
-
 .parceiros {
     margin-top: 30px;
     padding-top: 10px;
@@ -33,32 +28,32 @@ h3 {
 .card-green * {
     border-color: #519452;
     border-width: medium;
-    background-color: #519452!important;
+    background-color: #519452 !important;
 }
 
 .card-green .btn-link,
 .card-yellow .btn-link,
 .card-orange .btn-link,
 .card-red .btn-link {
-    color: white!important;
+    color: white !important;
 }
 
 .card-yellow {
     border-color: #D4DC53;
     border-width: medium;
-    background-color: #D4DC53!important;
+    background-color: #D4DC53 !important;
 }
 
 .card-orange {
     border-color: #E8824C;
     border-width: medium;
-    background-color: #E8824C!important;
+    background-color: #E8824C !important;
 }
 
 .card-red {
     border-color: #FB4A4C;
     border-width: medium;
-    background-color: #FB4A4C!important;
+    background-color: #FB4A4C !important;
 }
 
 .bluebox {
@@ -200,7 +195,7 @@ h3 {
 .card-indicator-value,
 .card-indicator-value * {
     color: #ff9900;
-    text-align: left!important;
+    text-align: left !important;
 }
 
 .vertical-align {
@@ -217,11 +212,11 @@ h3 {
 }
 
 .bluebox>h3 {
-    color: white!important;
+    color: white !important;
 }
 
 .content-inline * {
-    display: inline!important;
+    display: inline !important;
 }
 
 #footer {
@@ -234,4 +229,16 @@ h3 {
 
 .btn-primary {
     background-color: rgb(51, 122, 183);
+}
+
+h3 {
+    color: #003E7E !important;
+}
+
+h4 {
+    color: #003E7E !important;
+}
+
+h5 {
+    color: #003E7E !important;
 }
