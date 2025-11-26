@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-18 09:57-0300\n"
+"POT-Creation-Date: 2025-11-18 10:38-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -632,11 +632,19 @@ msgstr "Informes técnicos"
 msgid "Reflexões sobre o risco de arboviroses em 2024"
 msgstr "Reflexiones sobre el riesgo de arbovirus en 2024"
 
-#: dados/templates/about.html:128
+#: dados/templates/about.html:127
+msgid "Previsões para a temporada de dengue de 2024-2025"
+msgstr "Pronósticos para la temporada de dengue 2024-2025"
+
+#: dados/templates/about.html:130
+msgid "Previsões para a temporada de dengue de 2025-2026"
+msgstr "Pronósticos para la temporada de dengue 2025-2026"
+
+#: dados/templates/about.html:134
 msgid "Projetos de pesquisa"
 msgstr "Proyectos de investigación"
 
-#: dados/templates/about.html:133
+#: dados/templates/about.html:139
 msgid ""
 "ARBOFRONTEIRA: Prevendo epidemias de doenças transmitidas por mosquitos no "
 "arco sul do país"
@@ -644,7 +652,7 @@ msgstr ""
 "ARBOFRONTERA: Prediciendo epidemias de enfermedades transmitidas por "
 "mosquitos en el arco sur del país"
 
-#: dados/templates/about.html:135
+#: dados/templates/about.html:141
 msgid ""
 "\n"
 "            O objetivo dessa proposta é gerar indicadores para a vigilância "
@@ -685,16 +693,16 @@ msgstr ""
 "incorporarán a Infodengue y se proporcionarán informes específicos para cada "
 "región."
 
-#: dados/templates/about.html:147 dados/templates/about.html:169
-#: dados/templates/about.html:179
+#: dados/templates/about.html:153 dados/templates/about.html:175
+#: dados/templates/about.html:185
 msgid "Financiamento:"
 msgstr "Financiamiento:"
 
-#: dados/templates/about.html:151
+#: dados/templates/about.html:157
 msgid "Prevendo epidemias de doenças transmitidas por mosquitos"
 msgstr "Prediciendo epidemias de enfermedades transmitidas por mosquitos"
 
-#: dados/templates/about.html:153
+#: dados/templates/about.html:159
 msgid ""
 "\n"
 "            Esse projeto visa fornecer projeções a médio prazo para a "
@@ -749,11 +757,11 @@ msgstr ""
 "modo que las predicciones sean accesibles para los tomadores de decisiones y "
 "la población en general."
 
-#: dados/templates/about.html:173
+#: dados/templates/about.html:179
 msgid "EVIGILANCIA: monitoramento integrado e contínuo de arboviroses"
 msgstr "EVIGILANCIA: monitoreo integrado y continuo de arbovirosis"
 
-#: dados/templates/about.html:175
+#: dados/templates/about.html:181
 msgid ""
 "\n"
 "            Este projeto visou a consolidação do sistema de alerta para "
@@ -769,23 +777,23 @@ msgstr ""
 "extraídos de datos regionales\n"
 "            climáticos y epidemiológicos, InfoDengue."
 
-#: dados/templates/about.html:184
+#: dados/templates/about.html:190
 msgid "Como citar o InfoDengue"
 msgstr "Cómo citar a InfoDengue"
 
-#: dados/templates/about.html:205
+#: dados/templates/about.html:211
 msgid "Produções científicas associadas ao Infodengue"
 msgstr "Producciones científicas asociadas a Infodengue"
 
-#: dados/templates/about.html:294
+#: dados/templates/about.html:300
 msgid "Eventos"
 msgstr "Eventos"
 
-#: dados/templates/about.html:301
+#: dados/templates/about.html:307
 msgid "Como colaborar"
 msgstr "Cómo colaborar"
 
-#: dados/templates/about.html:304
+#: dados/templates/about.html:310
 msgid ""
 "Se sua cidade não está no Infodengue, entre em contato com a Secretaria de "
 "Saúde"
@@ -793,7 +801,7 @@ msgstr ""
 "Si tu ciudad no está en Infodengue, ponte en contacto con la Secretaría de "
 "Salud"
 
-#: dados/templates/about.html:305
+#: dados/templates/about.html:311
 msgid ""
 "Se é um estudante ou pesquisador e gostaria de contribuir com análises e "
 "modelos, nos escreva"
@@ -801,11 +809,11 @@ msgstr ""
 "Si eres estudiante o investigador y te gustaría contribuir con análisis y "
 "modelos, escríbenos"
 
-#: dados/templates/about.html:306
+#: dados/templates/about.html:312
 msgid "Se quiser contribuir com patrocínios, escreva-nos"
 msgstr "Si desea contribuir con patrocinios, escríbanos"
 
-#: dados/templates/about.html:307
+#: dados/templates/about.html:313
 msgid ""
 "Se quiser aprender a usar o infodengue, tem sugestões, críticas ou se "
 "percebeu algum erro no site, escreva-nos"
@@ -813,31 +821,31 @@ msgstr ""
 "Si desea aprender a usar Infodengue, tiene sugerencias, críticas o si ha "
 "encontrado algún error en el sitio, escríbanos"
 
-#: dados/templates/about.html:308
+#: dados/templates/about.html:314
 msgid ""
 "Vencer as arboviroses é um trabalho de todos, toda colaboração é bem vinda!"
 msgstr ""
 "¡Vencer las arbovirosis es un trabajo de todos, toda colaboración es "
 "bienvenida!"
 
-#: dados/templates/about.html:312
+#: dados/templates/about.html:318
 msgid "Videos relacionados"
 msgstr "Videos relacionados"
 
-#: dados/templates/about.html:318
+#: dados/templates/about.html:324
 msgid "Entenda o modelo mais usado para representar a pandemia de COVID-19"
 msgstr ""
 "Comprenda el modelo más utilizado para representar la pandemia de COVID-19"
 
-#: dados/templates/about.html:328
+#: dados/templates/about.html:334
 msgid "Curso PySUS - Aula 1"
 msgstr "Curso PySUS - Clase 1"
 
-#: dados/templates/about.html:341
+#: dados/templates/about.html:347
 msgid "Mais videos da série no canal"
 msgstr "Más videos de la serie en el canal"
 
-#: dados/templates/about.html:343
+#: dados/templates/about.html:349
 msgid "A Matemática das Epidemias"
 msgstr "Las Matemáticas de las Epidemias"
 
