@@ -6,9 +6,12 @@
 <link href="{% static '/css/about_styles.css' %}" rel="stylesheet">
 {% endblock %}
 
+
 {% block title %}{% translate "Sobre nós" %}{% endblock %}
 
 {% block content %}
+  {% get_current_language as LANGUAGE_CODE %}
+  {% with LANGUAGE_CODE|slice:":2" as lang_suffix %}
 
   <!-- Sobre o Infodengue -->
   <section class="mb-4">
@@ -16,21 +19,24 @@
       <div class="card-header"
            style="background-color: #e0eefd63; border-radius: 7px">
         <h3 class="mb-0">
-          {% trans "Sobre o Infodengue" %}
+          {% translate "Sobre o Infodengue" %}
         </h3>
       </div>
       <div class="card-body">
         <div class="row align-items-center">
           <div class="col-lg-12 mb-3 mb-lg-0">
             <p class="lead">
+              {% blocktrans trimmed %}
               O Infodengue é um sistema de alerta precoce de transmissão de
               arboviroses (dengue, chikungunya e zika) que opera em todos os
               municípios do Brasil. Lançado em 2015, o sistema é mantido por
               pesquisadores do Programa de Computação Científica (Fundação
               Oswaldo Cruz, RJ) e da Escola de Matemática Aplicada (Fundação
               Getúlio Vargas), com parceria e apoio do Ministério da Saúde.
+              {% endblocktrans %}
             </p>
             <p>
+              {% blocktrans trimmed %}
               Um sistema de alerta precoce visa antecipar mudanças no padrão de
               notificação das arboviroses, de forma que os profissionais da
               vigilância sejam informados o mais cedo possível de potenciais
@@ -40,34 +46,40 @@
               o nível nacional com o apoio do Ministério da Saúde. Relatórios
               em nível estadual podem ser solicitados pelas secretarias
               estaduais de saúde.
+              {% endblocktrans %}
             </p>
-          <h5 class="mt-4">
-            {% trans "Histórico do Infodengue" %}
-          </h5>
+            <h5 class="mt-4">
+              {% translate "Histórico do Infodengue" %}
+            </h5>
           </div>
           <div class="col-lg-12 mt-3 mt-lg-0">
             <figure class="figure w-100 text-center">
-              <img src="{% static 'img/about/historico_infodengue_pt.png' %}"
+              <img
+                   src="{% static 'img/about/historico_infodengue_'|add:lang_suffix|add:'.png' %}"
                    class="figure-img img-fluid rounded"
                    alt="{% trans 'Linha do tempo do Infodengue' %}">
               <figcaption class="figure-caption text-muted small">
-                Histórico de implantação do Infodengue.
+                {% translate "Histórico de implantação do Infodengue." %}
               </figcaption>
             </figure>
           </div>
         </div>
 
         <p class="mt-3">
+          {% blocktrans trimmed %}
           Nossa rede de colaboradores inclui grupos de pesquisa nacionais e
           internacionais que buscam soluções para vigilância e resposta à
           epidemias de arboviroses, além de organizações da sociedade civil.
           Ao compartilhar experiências e metodologias, expandimos nossa
           capacidade de inovar na vigilância de arbovírus.
+          {% endblocktrans %}
         </p>
 
         <p>
+          {% blocktrans trimmed %}
           Todos os códigos utilizados na geração das análises do Infodengue
           estão disponíveis em:
+          {% endblocktrans %}
           <a href="https://github.com/AlertaDengue"
              target="_blank"
              rel="noopener noreferrer">
@@ -76,11 +88,13 @@
         </p>
 
         <p>
+          {% blocktrans trimmed %}
           Os diversos desafios técnicos e científicos enfrentados durante o
           desenvolvimento do Infodengue resultaram em teses e dissertações.
           Como os desafios não param, continuamos e sempre continuaremos a
           investigar novas soluções para gerar informações úteis para o manejo
           e o avanço do conhecimento sobre arboviroses e seu controle.
+          {% endblocktrans %}
         </p>
       </div>
     </div>
@@ -92,23 +106,28 @@
       <div class="card-header"
            style="background-color: #e0eefd63; border-radius: 7px">
         <h4 class="mb-0">
-          {% trans "Sobre o sistema" %}
+          {% translate "Sobre o sistema" %}
         </h4>
       </div>
       <div class="card-body">
         <p>
+          {% blocktrans trimmed %}
           A figura abaixo apresenta o fluxo de trabalho do Infodengue. A seguir,
           cada um dos passos será detalhado.
+          {% endblocktrans %}
         </p>
         <h5 class="mt-4">
-          {% trans "Fluxo Infodengue" %}
+          {% translate "Fluxo Infodengue" %}
         </h5>
         <figure class="figure w-100 text-center mb-4">
-          <img src="{% static 'img/about/fluxo_infodengue_pt.png' %}"
+          <img
+               src="{% static 'img/about/fluxo_infodengue_'|add:lang_suffix|add:'.png' %}"
                class="figure-img img-fluid rounded"
                alt="{% trans 'Fluxo de trabalho do sistema Infodengue' %}">
           <figcaption class="figure-caption text-muted small">
+            {% blocktrans trimmed %}
             Fluxo de coleta, harmonização e análise de dados do Infodengue.
+            {% endblocktrans %}
           </figcaption>
         </figure>
 
@@ -117,7 +136,7 @@
           reporting delays in disease surveillance data.” Statistics in
           Medicine 38.22 (2019): 4363–4377.</br>
           2. Codeço, Claudia T., Daniel A. M. Villela, e Flavio C. Coelho.
-          “Estimating the effective reproduction number of dengue considering
+          “Estimating the effective reproduction number of dengue considerando
           temperature-dependent generation intervals.” Epidemics 25 (2018):
           101–111.
         </p>
@@ -131,12 +150,17 @@
       <div class="card-header"
            style="background-color: #e0eefd63; border-radius: 7px">
         <h4 class="mb-0">
-          {% trans "Coleta de dados" %}
+          {% translate "Coleta de dados" %}
         </h4>
       </div>
       <div class="card-body">
         <p>
-          <strong>Casos notificados de dengue, zika ou chikungunya.</strong>
+          <strong>
+            {% blocktrans trimmed %}
+            Casos notificados de dengue, zika ou chikungunya.
+            {% endblocktrans %}
+          </strong>
+          {% blocktrans trimmed %}
           São doenças de notificação compulsória, ou seja, o profissional de
           saúde que diagnostica um caso suspeito precisa preencher uma ficha de
           notificação que alimenta o SINAN (Sistema Nacional de Notificação de
@@ -146,34 +170,39 @@
           que alimentam o Infodengue são calculados utilizando todos os casos
           notificados. Os dados de notificação são obtidos pelo Ministério da
           Saúde.
+          {% endblocktrans %}
         </p>
 
         <p>
-          <strong>Dados meteorológicos.</strong>
+          <strong>{% translate "Dados meteorológicos." %}</strong>
+          {% blocktrans trimmed %}
           A transmissão de arbovírus é muito influenciada pelo clima.
           O mosquito transmissor, Aedes aegypti, requer alta temperatura e
           umidade para se reproduzir e sobreviver. O vírus que infecta o
           mosquito também se reproduz melhor em temperaturas mais altas.
           Os dados de temperatura e umidade são obtidos a partir da API do
           projeto
+          {% endblocktrans %}
           <a href="https://mosqlimate.org/pt/"
              target="_blank"
              rel="noopener noreferrer">Mosqlimate</a>,
-          que agrega os dados de reanálise de satélite disponibilizados pelo
+          {% translate "que agrega os dados de reanálise de satélite disponibilizados pelo" %}
           <a href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
              target="_blank"
              rel="noopener noreferrer">Copernicus ERA5</a>.
-          No passado, a fonte desses dados eram
+          {% translate "No passado, a fonte desses dados eram" %}
           <a href="https://estacoes.dengue.mat.br/"
              target="_blank"
-             rel="noopener noreferrer">estações meteorológicas de aeroportos</a>.
+             rel="noopener noreferrer">{%translate "estações meteorológicas de aeroportos" %}</a>.
         </p>
 
         <p>
-          <strong>Dados demográficos.</strong>
+          <strong>{% translate "Dados demográficos." %}</strong>
+          {% blocktrans trimmed %}
           Os indicadores epidemiológicos exigem o tamanho da população.
           Os dados demográficos dos municípios brasileiros são atualizados
           anualmente no Infodengue, utilizando estimativas do
+          {% endblocktrans %}
           <a href="https://www.ibge.gov.br/pt/inicio.html"
              target="_blank"
              rel="noopener noreferrer">IBGE</a>.
@@ -188,34 +217,37 @@
       <div class="card-header"
            style="background-color: #e0eefd63; border-radius: 7px">
         <h4 class="mb-0">
-          {% trans "Harmonização e análise de dados" %}
+          {% translate "Harmonização e análise de dados" %}
         </h4>
       </div>
       <div class="card-body">
         <h5 class="mt-2">
-          {% trans "Correção do atraso de notificação" %}
+          {% translate "Correção do atraso de notificação" %}
         </h5>
         <p>
+          {% blocktrans trimmed %}
           Os dados disponíveis de ocorrência de doenças podem estar atrasados
           por uma variedade de razões, incluindo o tempo entre adoecer e
           procurar atendimento médico, o tempo que o profissional de saúde leva
           para relatar e o tempo que leva para agregar informações em bancos de
           dados. Esse atraso dificulta a tomada de decisões porque sempre é
           preciso olhar para dados desatualizados.
+          {% endblocktrans %}
         </p>
         <p>
+          {% blocktrans trimmed %}
           Para contornar esse problema, a equipe do Infodengue desenvolveu um
           método estatístico baseado em inferência bayesiana que combina a
           estimativa de atraso com o padrão temporal histórico de incidência
           para calcular o número esperado de casos a cada semana. Esse processo
           de previsão a curto prazo é descrito por
+          {% endblocktrans %}
           <a href="https://onlinelibrary.wiley.com/doi/full/10.1002/sim.8303"
              target="_blank"
-             rel="noopener noreferrer">
-            Bastos, Economou et al. (2019)
-          </a>.
+             rel="noopener noreferrer">Bastos, Economou et al. (2019)</a>.
         </p>
         <p>
+          {% blocktrans trimmed %}
           A figura abaixo (retirada de Bastos et al., 2019) exemplifica a
           importância dessa correção. A curva em preto mostra a incidência
           real, e em vermelho, a informação disponível no momento da tomada de
@@ -223,9 +255,10 @@
           de fato estão aumentando. O modelo de correção, em cinza, mostra a
           incidência corrigida. Para mais detalhes técnicos, consulte a
           publicação. Essas funções estão disponíveis em
+          {% endblocktrans %}
           <a href="https://github.com/AlertaDengue/AlertTools"
              target="_blank"
-             rel="noopener noreferrer">pacote R AlertTools</a>.
+             rel="noopener noreferrer">{% translate "pacote R AlertTools" %}</a>.
         </p>
 
         <div class="row">
@@ -233,15 +266,16 @@
             <figure class="figure w-100 text-center">
               <img src="{% static 'img/about/nowcast.png' %}"
                    class="figure-img img-fluid rounded"
-                   alt="Exemplo de correção de atraso de notificação">
+                   alt="{% trans 'Exemplo de correção de atraso de notificação' %}">
               <figcaption class="figure-caption text-muted small">
-                Exemplo de correção de atraso de notificação (nowcasting).
+                {% translate "Exemplo de correção de atraso de notificação (nowcasting)." %}
               </figcaption>
             </figure>
           </div>
 
           <div class="col-md-12">
             <p>
+              {% blocktrans trimmed %}
               Na figura abaixo, há um exemplo de como os casos estimados pela
               metodologia de nowcasting aparecem nos gráficos em nível
               municipal, que podem ser acessados ao se pesquisar o nome de um
@@ -250,27 +284,30 @@
               azul indica os casos notificados até o momento. As cores na área
               sombreada representam os níveis de alerta que serão explicados a
               seguir.
+              {% endblocktrans %}
             </p>
-          <h5 class="mt-4">
-            {% trans "Correção do atraso de notificação" %}
-          </h5>
+            <h5 class="mt-4">
+              {% translate "Correção do atraso de notificação" %}
+            </h5>
           </div>
+
           <div class="col-md-12">
             <figure class="figure w-100 text-center">
-              <img src="{% static 'img/about/fig_nowcast.png' %}"
+              <img src="{% static 'img/about/fig_nowcast_'|add:lang_suffix|add:'.png' %}"
                    class="figure-img img-fluid rounded"
-                   alt="Exemplo de nowcasting em gráfico municipal">
+                   alt="{% trans 'Exemplo de nowcasting em gráfico municipal' %}">
               <figcaption class="figure-caption text-muted small">
-                Visualização do nowcasting em nível municipal.
+                {% translate "Visualização do nowcasting em nível municipal." %}
               </figcaption>
             </figure>
           </div>
         </div>
 
         <h5 class="mt-4">
-          {% trans "Análise de receptividade" %}
+          {% translate "Análise de receptividade" %}
         </h5>
         <p>
+          {% blocktrans trimmed %}
           A transmissão de arbovírus requer condições climáticas adequadas, que
           podem variar de local para local. No Rio de Janeiro, por exemplo, uma
           temperatura superior a 22&nbsp;°C é uma condição necessária para a
@@ -278,8 +315,10 @@
           é uma condição necessária. Ajustamos modelos de árvore de decisão
           para avaliar qual combinação de variáveis climáticas e ambientais
           são indicativas de condições de transmissão.
+          {% endblocktrans %}
         </p>
         <p>
+          {% blocktrans trimmed %}
           A figura abaixo mostra um exemplo, para uma cidade. A árvore mostra
           as condições que estão mais associadas com a ocorrência de semanas
           com transmissão (Rt&gt;1). Quando ocorre uma semana com temperatura
@@ -289,41 +328,49 @@
           alta (&gt;48.9). Essas regras são utilizadas para passar de nível
           verde para amarelo. Cada município terá seu conjunto específico de
           regras.
+          {% endblocktrans %}
         </p>
         <h5 class="mt-4">
-          {% trans "Receptividade para transmissão" %}
+          {% translate "Receptividade para transmissão" %}
         </h5>
         <figure class="figure w-100 text-center">
-          <img src="{% static 'img/about/receptividade_clima_pt.png' %}"
+          <img
+               src="{% static 'img/about/receptividade_clima_'|add:lang_suffix|add:'.png' %}"
                class="figure-img img-fluid rounded"
-               alt="Exemplo de árvore de decisão para receptividade climática">
+               alt="{% trans 'Exemplo de árvore de decisão para receptividade climática' %}">
           <figcaption class="figure-caption text-muted small">
-            Exemplo de árvore de decisão relacionando clima e transmissão.
+            {% translate "Exemplo de árvore de decisão relacionando clima e transmissão." %}
           </figcaption>
         </figure>
 
         <h5 class="mt-4">
-          {% trans "Detecção de transmissão sustentada" %}
+          {% translate "Detecção de transmissão sustentada" %}
         </h5>
         <p>
+          {% blocktrans trimmed %}
           A estimativa do número reprodutivo é importante de várias maneiras.
           A sequência de semanas com transmissão crítica (Rt &gt; 1) indica
           transmissão sustentada, ou seja, indica a fase de propagação da
           doença e que ações de controle adequadas precisam ser implementadas.
           Por outro lado, períodos subcríticos (Rt &lt; 1) indicam que não há
           transmissão sustentada.
+          {% endblocktrans %}
         </p>
         <p>
+          {% blocktrans trimmed %}
           Para estimar o Rt a partir dos dados de incidência, desenvolvemos
           nossa própria metodologia, descrita em
+          {% endblocktrans %}
           <a href="https://www.sciencedirect.com/science/article/pii/S1755436517300907?via%3Dihub"
              target="_blank"
-             rel="noopener noreferrer">
-            Codeço et al. (2018)
-          </a>."Estimando o número efetivo de reprodução da dengue considerando
+             rel="noopener noreferrer">Codeço et al. (2018)</a>.
+          {% blocktrans trimmed %}
+          "Estimando o número efetivo de reprodução da dengue considerando
           intervalos de geração dependentes da temperatura".
+          {% endblocktrans %}
         </p>
         <p>
+          {% blocktrans trimmed %}
           A figura abaixo apresenta três painéis: o primeiro mostra a
           temperatura média, o segundo exibe os casos notificados e o terceiro
           apresenta o Rt estimado a partir da combinação entre casos e
@@ -333,30 +380,33 @@
           Rt &gt; 1. Ao menos duas semanas com o Rt &gt; 1 é o critério
           utilizado para a transição do nível de alerta amarelo para o
           laranja.
+          {% endblocktrans %}
         </p>
         <h5 class="mt-4">
-          {% trans "Transmissão sustentada" %}
+          {% translate "Transmissão sustentada" %}
         </h5>
         <figure class="figure w-100 text-center">
-          <img src="{% static 'img/about/trans_sust_pt.png' %}"
+          <img
+               src="{% static 'img/about/trans_sust_'|add:lang_suffix|add:'.png' %}"
                class="figure-img img-fluid rounded"
-               alt="Exemplo de Rt e períodos de transmissão sustentada">
+               alt="{% trans 'Exemplo de Rt e períodos de transmissão sustentada' %}">
           <figcaption class="figure-caption text-muted small">
-            Temperatura, incidência e Rt com destaque para períodos de Rt &gt; 1.
+            {% translate "Temperatura, incidência e Rt com destaque para períodos de Rt &gt; 1." %}
           </figcaption>
         </figure>
 
         <h5 class="mt-4">
-          {% trans "Detecção de incidência atípica" %}
+          {% translate "Detecção de incidência atípica" %}
         </h5>
         <p>
+          {% blocktrans trimmed %}
           Para estimar os limiares epidêmicos para dengue, adaptamos o Método
           de Epidemias Móveis (MEM),
+          {% endblocktrans %}
           <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/j.1750-2659.2012.00422.x"
              target="_blank"
-             rel="noopener noreferrer">
-            Vega et al. (2012)
-          </a>,
+             rel="noopener noreferrer">Vega et al. (2012)</a>,
+          {% blocktrans trimmed %}
           que permite estimar diversas grandezas de interesse com base em dados
           históricos locais como limiares pré-epidemia, níveis típicos de
           atividade, valores esperados para cada semana, etc. Como esse limiar
@@ -372,8 +422,10 @@
           cada semana e intervalos de confiança inferior e superior (usamos
           10% e 90%, respectivamente), definindo corredores de atividade como
           um diagrama de controle.
+          {% endblocktrans %}
         </p>
         <p>
+          {% blocktrans trimmed %}
           A figura abaixo é exibida ao acessar os relatórios municipais
           disponíveis na aba “Relatórios” do menu de navegação. Ela apresenta
           a curva de casos notificados (em preto), acompanhada das barras
@@ -383,102 +435,124 @@
           MEM para cada período: pré-epidêmico, epidêmico e pós-epidêmico. Uma
           incidência acima de 90% do limiar calculado pelo MEM é necessária
           para mudar o nível de alerta de laranja para vermelho
+          (incidência alta).
+          {% endblocktrans %}
         </p>
         <h5 class="mt-4">
-          {% trans "Incidência alta" %}
+          {% translate "Incidência alta" %}
         </h5>
         <figure class="figure w-100 text-center">
-          <img src="{% static 'img/about/alta_ativ_pt.png' %}"
+          <img
+               src="{% static 'img/about/alta_ativ_'|add:lang_suffix|add:'.png' %}"
                class="figure-img img-fluid rounded"
-               alt="Exemplo de limiares epidêmicos e atividade atípica">
+               alt="{% trans 'Exemplo de limiares epidêmicos e atividade atípica' %}">
           <figcaption class="figure-caption text-muted small">
-            Exemplo de incidência acima dos limiares epidêmicos calculados
-            pelo MEM.
+            {% translate "Exemplo de incidência acima dos limiares epidêmicos calculados pelo MEM." %}
           </figcaption>
         </figure>
 
         <h5 class="mt-4">
-          {% trans "Níveis de alerta de transmissão de arboviroses" %}
+          {% translate "Níveis de alerta de transmissão de arboviroses" %}
         </h5>
         <p>
-          Os indicadores descritos acima são utilizados para definir o nível de
+          {% blocktrans trimmed %}
           alerta do município. Esse alerta é atualizado semanalmente e é
           composto pelos seguintes níveis:
+          {% endblocktrans %}
         </p>
 
         <ul>
           <li>
             <span class="badge badge-pill"
                   style="background-color:#00e320; color:#000;">
-              {% trans "Verde" %}
+              {% translate "Verde" %}
             </span>
+            {% blocktrans trimmed %}
             – Condições climáticas não favoráveis para a transmissão
             (em termos de temperatura ou umidade) e atividade viral baixa.
+            {% endblocktrans %}
           </li>
 
           <li>
             <span class="badge badge-pill"
                   style="background-color:#f1ff00; color:#000;">
-              {% trans "Amarelo" %}
+              {% translate "Amarelo" %}
             </span>
+            {% blocktrans trimmed %}
             – Condições climáticas favoráveis para a transmissão
             (em termos de temperatura ou umidade) e atividade viral presente
             (pelo menos 1 caso).
+            {% endblocktrans %}
           </li>
 
           <li>
             <span class="badge badge-pill"
                   style="background-color:#ff8800; color:#fff;">
-              {% trans "Laranja" %}
+              {% translate "Laranja" %}
             </span>
+            {% blocktrans trimmed %}
             – Incidência crescente (ao menos 2 semanas com Rt &gt; 1)
             mas dentro dos níveis históricos.
+            {% endblocktrans %}
           </li>
 
           <li>
             <span class="badge badge-pill"
                   style="background-color:#fc0000; color:#fff;">
-              {% trans "Vermelho" %}
+              {% translate "Vermelho" %}
             </span>
+            {% blocktrans trimmed %}
             – Incidência alta para os padrões históricos
             (acima de 90% do limiar calculado pelo MEM).
+            {% endblocktrans %}
           </li>
         </ul>
 
         <p>
+          {% blocktrans trimmed %}
           A figura abaixo apresenta a variação dos níveis de alerta em
           diferentes períodos da curva epidêmica da cidade de Foz do Iguaçu.
+          {% endblocktrans %}
         </p>
         <h5 class="mt-4">
-          {% trans "Classificação da situação de transmissão de arboviroses" %}
+          {% translate "Classificação da situação de transmissão de arboviroses" %}
         </h5>
         <figure class="figure w-100 text-center">
-          <img src="{% static 'img/about/overview_pt.png' %}"
+          <img
+               src="{% static 'img/about/overview_'|add:lang_suffix|add:'.png' %}"
                class="figure-img img-fluid rounded"
-               alt="Exemplo de evolução dos níveis de alerta">
+               alt="{% trans 'Exemplo de evolução dos níveis de alerta' %}">
           <figcaption class="figure-caption text-muted small">
+            {% blocktrans trimmed %}
             Variação dos níveis de alerta em diferentes períodos da
             curva epidêmica.
+            {% endblocktrans %}
           </figcaption>
         </figure>
 
         <p>
+          {% blocktrans trimmed %}
           As análises de situação de transmissão são atualizadas semanalmente
           e disponibilizadas na aba
+          {% endblocktrans %}
           <a href="https://info.dengue.mat.br/report/"
              target="_blank"
-             rel="noopener noreferrer">relatórios</a>
+             rel="noopener noreferrer">{% translate "relatórios" %}</a>
+          {% blocktrans trimmed %}
           do site, assim como em dashboards a nível municipal e estadual,
           também disponíveis na plataforma. Além disso, os dados podem ser
           acessados na
+          {% endblocktrans %}
           <a href="https://info.dengue.mat.br/services/api"
              target="_blank"
-             rel="noopener noreferrer">API do projeto</a>.
+             rel="noopener noreferrer">{% translate "API do projeto" %}</a>.
+          {% blocktrans trimmed %}
           Para mais informações sobre os materiais disponibilizados acesse o
           nosso
+          {% endblocktrans %}
           <a href="https://cursosqualificacao.campusvirtual.fiocruz.br/hotsite/infodengueinfogripe"
              target="_blank"
-             rel="noopener noreferrer">curso online</a>.
+             rel="noopener noreferrer">{% translate "curso online" %}</a>.
         </p>
       </div>
     </div>
@@ -490,31 +564,39 @@
       <div class="card-header"
            style="background-color: #e0eefd63; border-radius: 7px">
         <h4 class="mb-0">
-          {% trans "Epi-Scanner" %}
+          {% translate "Epi-Scanner" %}
         </h4>
       </div>
       <div class="card-body">
         <p>
+          {% blocktrans trimmed %}
           Além da análise de situação de transmissão de arboviroses, o
           Infodengue desenvolve e disponibiliza outros recursos para apoio à
           tomada de decisão. Um recurso adicional do projeto é o
+          {% endblocktrans %}
           <a href="https://info.dengue.mat.br/epi-scanner/"
              target="_blank"
              rel="noopener noreferrer">Epi-Scanner</a>,
+          {% blocktrans trimmed %}
           uma metodologia criada para estimar os parâmetros epidemiológicos de
           cada epidemia e município do país. Dentre os parâmetros estimados
           estão a semana de pico, o número de reprodução e o número total de
           casos na temporada.
+          {% endblocktrans %}
         </p>
         <p>
+          {% blocktrans trimmed %}
           Mais detalhes podem ser encontrados no
+          {% endblocktrans %}
           <a href="https://info.dengue.mat.br/epi-scanner/"
              target="_blank"
              rel="noopener noreferrer">dashboard</a>
+          {% blocktrans trimmed %}
           do produto. O artigo que descreve a metodologia pode ser acessado
+          {% endblocktrans %}
           <a href="https://royalsocietypublishing.org/doi/full/10.1098/rsos.241261"
              target="_blank"
-             rel="noopener noreferrer">aqui</a>.
+             rel="noopener noreferrer">{% translate "aqui" %}</a>.
         </p>
       </div>
     </div>
@@ -526,29 +608,37 @@
       <div class="card-header"
            style="background-color: #e0eefd63; border-radius: 7px">
         <h4 class="mb-0">
-          {% trans "Desafio Infodengue-Mosqlimate de previsão de epidemias de dengue" %}
+          {% translate "Desafio Infodengue-Mosqlimate de previsão de epidemias de dengue" %}
         </h4>
       </div>
       <div class="card-body">
         <p>
+          {% blocktrans trimmed %}
           Além dos relatórios semanais, desde 2024, o Infodengue, em parceria
           com o projeto
+          {% endblocktrans %}
           <a href="https://api.mosqlimate.org/"
              target="_blank"
              rel="noopener noreferrer">Mosqlimate</a>,
+          {% blocktrans trimmed %}
           tem organizado um desafio de previsão de longo prazo de dengue, em
           nível estadual, com o objetivo de combinar os esforços de diferentes
           estratégias de modelagem. Os resultados dessa competição são
           agregados em um relatório que é enviado para o Ministério da Saúde
           para o auxílio na preparação para a próxima temporada.
+          {% endblocktrans %}
         </p>
         <p>
+          {% blocktrans trimmed %}
           Mais informações sobre a competição podem ser encontradas
+          {% endblocktrans %}
           <a href="https://sprint.mosqlimate.org/"
              target="_blank"
-             rel="noopener noreferrer">aqui</a>.
+             rel="noopener noreferrer">{% translate "aqui" %}</a>.
+          {% blocktrans trimmed %}
           Os relatórios gerados por essa iniciativa estão disponíveis na
           seção <em>Relatórios técnicos</em>.
+          {% endblocktrans %}
         </p>
       </div>
     </div>
@@ -994,4 +1084,5 @@
     </div>
   </section>
 
+  {% endwith %}
 {% endblock %}
