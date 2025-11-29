@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.2.1](https://github.com/AlertaDengue/AlertaDengue/compare/4.2.0...4.2.1) (2025-11-29)
+
+### Bug Fixes
+
+* **about-us:** resolve youtube embed error with nocookie player ([#799](https://github.com/AlertaDengue/AlertaDengue/issues/799)) ([45dfe0a](https://github.com/AlertaDengue/AlertaDengue/commit/45dfe0a9f93ca8528620040085f1d6191fab98ac))
+
 ## [4.2.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.1.0...4.2.0) (2025-11-29)
 
 ### Features
