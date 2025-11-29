@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.2.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.1.0...4.2.0) (2025-11-29)
+
+### Features
+
+* **about:** update text and images in 'about-us' section ([#797](https://github.com/AlertaDengue/AlertaDengue/issues/797)) ([512d0f3](https://github.com/AlertaDengue/AlertaDengue/commit/512d0f3e1cc37d752993d95bd1a2574ce3b3cc39))
+
 ## [4.1.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.0.0...4.1.0) (2025-11-18)
 
 ### Features
