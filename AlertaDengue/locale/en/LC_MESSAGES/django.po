@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-18 10:38-0300\n"
+"POT-Creation-Date: 2025-11-28 13:35-0300\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -252,581 +252,876 @@ msgid ""
 msgstr ""
 "AlertaDengue/InfoDengue services are momentarily unavailable for maintenance."
 
-#: dados/templates/about.html:12
-msgid "Sobre o InfoDengue"
-msgstr "About InfoDengue"
+#: dados/templates/about.html:10 templates/components/navbar.html:73
+msgid "Sobre nós"
+msgstr "About us"
 
-#: dados/templates/about.html:15
+#: dados/templates/about.html:22
+msgid "Sobre o Infodengue"
+msgstr "About Infodengue"
+
+#: dados/templates/about.html:29
 msgid ""
-"\n"
-"            O InfoDengue é um sistema de alerta para arboviroses baseado em "
-"dados híbridos gerados por meio da análise integrada\n"
-"            de dados minerados a partir da web social e de dados climáticos "
-"e epidemiológicos"
+"O Infodengue é um sistema de alerta precoce de transmissão de arboviroses "
+"(dengue, chikungunya e zika) que opera em todos os municípios do Brasil. "
+"Lançado em 2015, o sistema é mantido por pesquisadores do Programa de "
+"Computação Científica (Fundação Oswaldo Cruz, RJ) e da Escola de Matemática "
+"Aplicada (Fundação Getúlio Vargas), com parceria e apoio do Ministério da "
+"Saúde."
 msgstr ""
-"\n"
-" InfoDengue is an early-warning system for arbovirosis in Brazil.  It relies "
-"on the continuous analysis of online, climate and epidemiological data"
+"Infodengue is an early-warning system for arbovirus transmission (dengue, "
+"chikungunya, and Zika) operating in all Brazilian municipalities. Launched "
+"in 2015, the system is maintained by researchers from the Scientific "
+"Computing Program (Oswaldo Cruz Foundation, RJ) and the School of Applied "
+"Mathematics (Getulio Vargas Foundation), in partnership with and supported "
+"by the Ministry of Health."
 
-#: dados/templates/about.html:18
+#: dados/templates/about.html:39
 msgid ""
-"\n"
-"            Em 2021, o sistema ganhou amplitude nacional com o apoio do "
-"Ministério da Saúde realizando análises em nível estadual.\n"
-"            Com isso, mais secretarias passaram a receber semanalmente os "
-"boletins do InfoDengue. Implementado em 2015,\n"
-"            o sistema foi desenvolvido por pesquisadores do Programa de "
-"Computação Científica (Fundação Oswaldo Cruz, RJ) e\n"
-"            da Escola de Matemática Aplicada (Fundação Getúlio Vargas) com a "
-"forte colaboração da Secretaria Municipal de Saúde do Rio de Janeiro,\n"
-"            o Observatório da Dengue/UFMG e pesquisadores da Universidade "
-"Federal do Paraná e da Universidade Estadual do Oeste do Paraná.</p>\n"
-"            <p>\n"
-"            Embora desenvolva boletins com análises de casos de dengue, zika "
-"e chikungunya de todo o país, os estados ainda podem aderir ao sistema.</"
-"br>\n"
-"            Acesse <a href=\"/participe\"> como participar </a> para "
-"integrar o InfoDengue.\n"
-"            O estado participante recebe um relatório de análise de situação "
-"da dengue semanalmente.\n"
-"            A versão pública do site é acessada por muitas pessoas e é comum "
-"recebermos notícias de que essas informações são\n"
-"            utilizadas na definição de viagens e outras atividades.</p>\n"
-"            <p>\n"
-"            Nossa rede de colaboradores cresceu e conta agora com a parceria "
-"de grupos de pesquisa internacionais que buscam soluções para\n"
-"            arboviroses em outros países e organizações da sociedade civil. "
-"Por meio do compartilhamento de experiências e metodologias,\n"
-"            ampliamos a inovação e o conhecimento das arboviroses.</p>\n"
-"            <p>\n"
-"            Vários desafios técnicos e científicos foram enfrentados durante "
-"o desenvolvimento do InfoDengue, resultando em diversas teses e\n"
-"            dissertações. Como os desafios não terminam, continuamos e "
-"continuaremos sempre investigando novas soluções para gerar\n"
-"            informação útil para a gestão e para o avanço do conhecimento "
-"das arboviroses e seu controle."
+"Um sistema de alerta precoce visa antecipar mudanças no padrão de "
+"notificação das arboviroses, de forma que os profissionais da vigilância "
+"sejam informados o mais cedo possível de potenciais mudanças no risco de "
+"surtos e epidemias. Desde sua criação, os boletins do Infodengue auxiliaram "
+"municípios e estados no direcionamento de ações e no alerta. Em 2021, o "
+"sistema alcançou o nível nacional com o apoio do Ministério da Saúde. "
+"Relatórios em nível estadual podem ser solicitados pelas secretarias "
+"estaduais de saúde."
 msgstr ""
-"\n"
-" In 2021, the system reached the national level with the support of the "
-"Brazilian Health Ministry.  As a result, all municipalities began to receive "
-"weekly InfoDengue bulletins.  Reports at the state level can be requested by "
-"the state health secretariats.  Access the tab <a href=\"/participe\"> “how "
-"to participate” </a> to know more. Implemented in 2015, the system was "
-"developed by researchers  from the Scientific Computing Program (Fundação "
-"Oswaldo Cruz, RJ) and the School of Applied Mathematics (Fundação Getúlio "
-"Vargas)  with the strong collaboration of the Rio de Janeiro Municipal "
-"Health Secretariat, the Observatory of Dengue (UFMG) and researchers  from "
-"the Federal University of Paraná and the State University of Western Paraná. "
-"<p>\n"
-"The Infodengue website is accessed by many people and it is common for us to "
-"receive news that this information is used in  the definition of travel and "
-"other activities.  <p>\n"
-"Our network of collaborators has grown and now includes international "
-"research groups seeking solutions for arboviruses in  other countries and "
-"civil society organizations. By sharing experiences and methodologies,  we "
-"expand our capacity to innovate on arbovirus surveillance.  <p>\n"
-"The several technical and scientific challenges faced during the development "
-"of InfoDengue resulted in theses and dissertations.  As the challenges do "
-"not end, we continue and will always continue to investigate new solutions "
-"to generate useful  information for the management and advancement of "
-"knowledge of arboviruses and their control. "
-
-#: dados/templates/about.html:41
-msgid "O Sistema"
-msgstr "About the system"
-
-#: dados/templates/about.html:44
-msgid ""
-"\n"
-"        O sistema InfoDengue é um pipeline de coleta, harmonização e análise "
-"de dados semi-automatizado,\n"
-"        que gera indicadores de situação epidemiológica da dengue e outras "
-"arboviroses a nível municipal."
-msgstr ""
-"\n"
-"            <h5>The InfoDengue system is a semi-automated data collection, "
-"harmonization and analysis pipeline that generates indicators of \n"
-"            the epidemiological situation of dengue and other arboviruses at "
-"the municipal level.</h5><br>\n"
-"\n"
-"              \n"
-"            "
-
-#: dados/templates/about.html:48
-msgid "/static/img/system_level_color.png"
-msgstr "/static/img/system_level_color_en.png"
-
-#: dados/templates/about.html:50
-msgid "De onde vem os dados?"
-msgstr "Where does the data come from?"
+"An early-warning system aims to anticipate changes in arbovirus reporting "
+"patterns so that surveillance professionals are informed as early as "
+"possible about potential shifts in outbreak and epidemic risk. Since its "
+"inception, Infodengue bulletins have supported municipalities and states in "
+"guiding actions and issuing alerts. In 2021, with support from the Ministry "
+"of Health, the system reached national coverage. State-level reports can be "
+"requested by state health departments."
 
 #: dados/templates/about.html:52
-msgid "Casos de dengue, chikungunya e zika:"
-msgstr "Reported cases of dengue, zika or chikungunya."
+msgid "Histórico do Infodengue"
+msgstr "History of Infodengue"
 
-#: dados/templates/about.html:52
-msgid ""
-"Essas são doenças de notificação obrigatória, isso é, o profissional\n"
-"        de saúde que diagnostica um caso suspeito precisa preencher uma "
-"ficha de notificação que alimenta um banco\n"
-"        de dados municipal que depois é consolidado a nível estadual e "
-"finalmente, a nível federal pelo Ministério\n"
-"        da Saúde. Apenas uma fração desses casos são confirmados "
-"laboratorialmente, a maioria recebe classificação\n"
-"        final com base em critérios clínico-epidemiológicos. A partir dos "
-"casos notificados, são calculados os\n"
-"        indicadores de incidência que alimentam o InfoDengue."
-msgstr ""
-"These are notifiable diseases, that is, the health worker diagnosing a "
-"suspicious case needs to fill out a notification form that feeds a municipal "
-"database which is then consolidated at the state level and finally, "
-"federally by the Ministry of Health. Only a fraction of these cases are "
-"laboratory confirmed, most receive final classification based on clinical "
-"and epidemiological criteria. From the notified cases, the incidence "
-"indicators that feed the InfoDengue are calculated."
+#: dados/templates/about.html:60
+msgid "Linha do tempo do Infodengue"
+msgstr "Infodengue timeline"
 
-#: dados/templates/about.html:59
-msgid "Dados meteorológicos:"
-msgstr "Weather data:"
-
-#: dados/templates/about.html:59
-msgid ""
-"A transmissão de arboviroses é muito influenciada pelo clima.\n"
-"        O mosquito transmissor, Aedes aegypti, requer temperatura alta e "
-"umidade para se reproduzir e viver.\n"
-"        O vírus ao infectar o mosquito, também irá se reproduzir melhor em "
-"temperaturas mais altas. Dados de\n"
-"        temperatura e umidade são obtidos das <a href=\"https://estacoes."
-"dengue.mat.br/\">estações meteorológicas</a> de aeroportos assim como de "
-"imagens de\n"
-"        satélite."
-msgstr ""
-"The transmission of arboviruses is greatly influenced by the climate. The "
-"transmitting mosquito, Aedes aegypti, requires high temperature and humidity "
-"to reproduce and live. The virus infecting the mosquito will also reproduce "
-"better at higher temperatures. Temperature and humidity data are obtained "
-"from<a href=\"https://estacoes.dengue.mat.br/\"> airport weather stations</"
-"a> as well as satellite images."
-
-#: dados/templates/about.html:65
-msgid "Dados demográficos:"
-msgstr "Demographic data:"
-
-#: dados/templates/about.html:65
-msgid ""
-"Indicadores epidemiológicos precisam ser calculados em relação ao tamanho da "
-"população.\n"
-"        Dados demográficos dos municípios brasileiros são atualizados a cada "
-"ano no Infodengue, utilizando as estimativas\n"
-"        do"
-msgstr ""
-"Epidemiological indicators require population size. Demographic data of "
-"Brazilian municipalities are updated each year in Infodengue, using estimates"
+#: dados/templates/about.html:62
+msgid "Histórico de implantação do Infodengue."
+msgstr "Implementation history of Infodengue."
 
 #: dados/templates/about.html:69
-msgid "O que o sistema faz"
-msgstr "What to do"
-
-#: dados/templates/about.html:71
-msgid "Correção do atraso de notificação (nowcasting):"
-msgstr "Nowcasting:"
-
-#: dados/templates/about.html:72
 msgid ""
-" Os dados de notificação de doenças tem sempre um atraso.\n"
-"        Isso ocorre por vários motivos e inclui o tempo entre a pessoa "
-"adoecer e buscar atendimento médico,\n"
-"        o tempo que leva para o profissional de saúde notificar e o tempo "
-"que demora para agregar as informações\n"
-"        nos bancos de dados. Esse atraso dificulta a tomada de decisão pois "
-"tem-se sempre que olhar para um dado\n"
-"        desatualizado. Para contornar esse problema, foi desenvolvido um "
-"método estatístico baseado em inferência\n"
-"        Bayesiana que combina a estimação do atraso com a estimação do "
-"padrão temporal histórico da incidência para\n"
-"        calcular o número esperado de casos a cada semana. Esse processo se "
-"chama nowcasting ou estimação do\n"
-"        presente e está descrita em: "
+"Nossa rede de colaboradores inclui grupos de pesquisa nacionais e "
+"internacionais que buscam soluções para vigilância e resposta à epidemias de "
+"arboviroses, além de organizações da sociedade civil. Ao compartilhar "
+"experiências e metodologias, expandimos nossa capacidade de inovar na "
+"vigilância de arbovírus."
 msgstr ""
-"            Disease notification data are always delayed for a variety of "
-"reasons including the time \n"
-"            between getting sick and seeking medical attention, the time it "
-"takes for the healthcare professional to report, and the time it takes to "
-"aggregate \n"
-"            information into databases. This delay makes decision making "
-"difficult because one always has to look at outdated data. To circumvent "
-"this problem, a \n"
-"            Bayesian inference-based statistical method was developed that "
-"combines the delay estimate with the historical temporal pattern of "
-"incidence to \n"
-"            calculate the expected number of cases each week. This process "
-"of nowcasting is described"
+"Our collaborator network includes national and international research groups "
+"seeking solutions for arbovirus surveillance and response, as well as civil-"
+"society organizations. By sharing experiences and methodologies, we expand "
+"our capacity to innovate in arbovirus surveillance."
 
-#: dados/templates/about.html:82
+#: dados/templates/about.html:79
 msgid ""
-"A Figura abaixo (retirada de Bastos et al 2019) mostra em preto, a "
-"incidência verdadeira, em vermelho,\n"
-"        aquela observada com atraso e, em cinza, o nowcasting. Para mais "
-"detalhes técnicos, ver a referida publicação."
-msgstr ""
-"            A modelling approach for correcting reporting delays in disease "
-"surveillance data”. \n"
-"            The figure below (taken from Bastos et al 2019) shows in black "
-"the true incidence, in red, that observed late and in gray the nowcasting. \n"
-"            For further technical details, see the publication.            "
+"Todos os códigos utilizados na geração das análises do Infodengue estão "
+"disponíveis em:"
+msgstr "All code used to generate Infodengue analyses is available at:"
 
-#: dados/templates/about.html:87
-msgid "Detecção de transmissão sustentada:"
-msgstr "Sustained Transmission Detection:"
-
-#: dados/templates/about.html:87
+#: dados/templates/about.html:91
 msgid ""
-"A estimação do número reprodutivo é importante em vários aspectos. Sequência "
-"de semanas com transmissão\n"
-"        crítica (Rt > 1) indica transmissão sustentada. Isso é, indica que "
-"estamos na fase de espalhamento da doença, e que ações adequadas para "
-"controle\n"
-"        precisam ser implementadas. Já períodos sub-críticos (Rt < 1) "
-"indicam que não há transmissão sustentada, isso pode ocorrer por causa do "
-"clima,\n"
-"        por causa do controle ou pela redução do contingente de suscetíveis. "
-"Para estimar R0 e Rt a partir dos dados de incidência, desenvolvemos "
-"metodologia\n"
-"        própria, descrita em"
+"Os diversos desafios técnicos e científicos enfrentados durante o "
+"desenvolvimento do Infodengue resultaram em teses e dissertações. Como os "
+"desafios não param, continuamos e sempre continuaremos a investigar novas "
+"soluções para gerar informações úteis para o manejo e o avanço do "
+"conhecimento sobre arboviroses e seu controle."
 msgstr ""
-" Estimation of reproductive number is important in many ways. Sequence of "
-"weeks with \n"
-"            critical transmission (Rt> 1) indicates sustained transmission. "
-"That is, it indicates the phase of spread of the disease, and that "
-"appropriate control \n"
-"            actions need to be implemented. On the other hand, sub-critical "
-"periods (Rt <1) indicate that there is no sustained transmission. \n"
-"            To estimate Rt from the incidence data, we developed our own "
-"methodology, described in"
+"The many technical and scientific challenges faced during Infodengue’s "
+"development have led to theses and dissertations. As challenges persist, we "
+"continue—and will always continue—to investigate new solutions that produce "
+"useful information for management and for advancing knowledge on arboviruses "
+"and their control."
 
-#: dados/templates/about.html:94
-msgid "Análise de receptividade:"
-msgstr "Receptivity Analysis:"
-
-#: dados/templates/about.html:94
-#, python-format
-msgid ""
-"A transmissão das arboviroses requer condições climáticas adequadas, que "
-"podem variar de lugar para lugar. No Rio de Janeiro,\n"
-"        por exemplo, temperatura maior que 22 graus é condição necessária "
-"para transmissão sustentada. Em Fortaleza, umidade máxima acima de 85%% é a "
-"condição\n"
-"        necessária. Nós ajustamos modelos de árvore de decisão, para avaliar "
-"que combinação de variáveis climáticas e ambientais são indicadoras de "
-"condições de\n"
-"        transmissão. Essa informação serve de alerta precoce de chegada da "
-"temporada da arbovirose."
-msgstr ""
-" The transmission of arboviruses requires appropriate weather conditions, \n"
-"            which may vary from place to place. In Rio de Janeiro, for "
-"example, a temperature higher than 22 degrees is a necessary condition for \n"
-"            sustained transmission. In Fortaleza, maximum humidity above "
-"85%% is a necessary condition. We have adjusted decision tree models to "
-"evaluate \n"
-"            which combination of climate and environmental variables are "
-"indicative of transmission conditions. This information serves as an early "
-"warning of the arrival of the transmission season.\n"
-"            "
-
-#: dados/templates/about.html:99
-msgid "Detecção de situação atípica:"
-msgstr "Atypical Incidence Detection:"
-
-#: dados/templates/about.html:100
-msgid ""
-"Para estimar limiares epidêmicos, nós utilizamos o Moving Epidemics Method "
-"(MEM)"
-msgstr ""
-"To estimate epidemic thresholds for dengue, we adapted the Moving Epidemics "
-"Method (MEM)"
-
-#: dados/templates/about.html:101
-#, python-format
-msgid ""
-"que permite estimar\n"
-"        diversas grandezas de interesse com base em dados históricos locais "
-"como limiar pré-epidêmico, níveis de atividade típicas, valores esperados "
-"para\n"
-"        cada semana, etc. Como este limiar é obtido a partir do histórico de "
-"dados que alimenta o sistema, ele tem valores particulares para cada "
-"localidade.\n"
-"        Além destes limiares globais para a série temporal, a metodologia "
-"utilizada permite ainda obter estimativas para o número esperado de casos "
-"por semana,\n"
-"        juntamente de intervalos de confiança que permitem definir zonas de "
-"atividade semanal. Estas regiões são definidas de maneira similar aos níveis "
-"de atividade,\n"
-"        porém são calculados com base na distribuição típica de casos para "
-"cada semana. Tal construção identifica visualmente os padrões sazonais, uma "
-"vez que\n"
-"        apresentam a evolução temporal típica com base na mediana dos casos "
-"esperados para cada semana e intervalos de confiança inferior e superior\n"
-"        (utilizamos 10%% e 90%%, respectivamente), definindo corredores de "
-"atividade típica, como um diagrama de controle."
-msgstr ""
-"      which allows estimating of various quantities \n"
-"            of interest based on local historical data such as pre-"
-"threshold. - epidemic, typical activity levels, expected values ​​for each "
-"week, etc. Because this \n"
-"            threshold is derived from the data history, locations with "
-"different case volumes have different thresholds. The methodology also "
-"provides estimates for \n"
-"            the expected number of cases per week, together with confidence "
-"intervals that allow the definition of weekly activity zones. These regions "
-"are defined \n"
-"            similarly to activity levels, but are calculated based on the "
-"typical case distribution for each week. This construction allows us to "
-"visually identify \n"
-"            seasonal patterns, since they present the typical temporal "
-"evolution based on the median of expected cases for each week and lower and "
-"upper confidence \n"
-"            intervals (we use 10%% and 90%%, respectively), defining "
-"activity corridors as a control diagram.\n"
-"            "
-
-#: dados/templates/about.html:110
-msgid "Código de Cores:"
-msgstr "Disease code"
-
-#: dados/templates/about.html:112
-msgid "/static/img/table_color_level_pt.png"
-msgstr "/static/img/system_level_color_en.png"
+#: dados/templates/about.html:109
+msgid "Sobre o sistema"
+msgstr "About the system"
 
 #: dados/templates/about.html:114
-msgid "Implementação"
-msgstr "Implementation"
-
-#: dados/templates/about.html:115
 msgid ""
-"Todos os códigos gerados para o InfoDengue, em sua maioria em R e Python, "
-"estão disponíveis em acesso aberto em​:"
+"A figura abaixo apresenta o fluxo de trabalho do Infodengue. A seguir, cada "
+"um dos passos será detalhado."
 msgstr ""
-"            All code generated for InfoDengue, mostly R and Python, is "
-"available at: \n"
-"            "
+"The figure below presents the Infodengue workflow. Each step is detailed "
+"next."
 
 #: dados/templates/about.html:120
-msgid "Relatórios Técnicos"
-msgstr "Technical Reports"
+msgid "Fluxo Infodengue"
+msgstr "Infodengue workflow"
 
-#: dados/templates/about.html:124
+#: dados/templates/about.html:126
+msgid "Fluxo de trabalho do sistema Infodengue"
+msgstr "Infodengue system workflow"
+
+#: dados/templates/about.html:128
+msgid "Fluxo de coleta, harmonização e análise de dados do Infodengue."
+msgstr ""
+"Workflow for data collection, harmonization, and analysis in Infodengue."
+
+#: dados/templates/about.html:153
+msgid "Coleta de dados"
+msgstr "Data collection"
+
+#: dados/templates/about.html:159
+msgid "Casos notificados de dengue, zika ou chikungunya."
+msgstr "Notified cases of dengue, Zika, or chikungunya."
+
+#: dados/templates/about.html:163
+msgid ""
+"São doenças de notificação compulsória, ou seja, o profissional de saúde que "
+"diagnostica um caso suspeito precisa preencher uma ficha de notificação que "
+"alimenta o SINAN (Sistema Nacional de Notificação de Agravos). Apenas uma "
+"fração desses casos é confirmada laboratorialmente; a maioria recebe "
+"classificação final com base em critérios clínicos e epidemiológicos. Os "
+"indicadores de incidência que alimentam o Infodengue são calculados "
+"utilizando todos os casos notificados. Os dados de notificação são obtidos "
+"pelo Ministério da Saúde."
+msgstr ""
+"These are notifiable diseases: the health professional who diagnoses a "
+"suspected case must complete a notification form that feeds SINAN (the "
+"National System for Notifiable Diseases). Only a fraction of cases are "
+"laboratory-confirmed; most receive final classification based on clinical "
+"and epidemiological criteria. The incidence indicators used by Infodengue "
+"are calculated using all notified cases. Notification data are obtained from "
+"the Ministry of Health."
+
+#: dados/templates/about.html:177
+msgid "Dados meteorológicos."
+msgstr "Meteorological data."
+
+#: dados/templates/about.html:178
+msgid ""
+"A transmissão de arbovírus é muito influenciada pelo clima. O mosquito "
+"transmissor, Aedes aegypti, requer alta temperatura e umidade para se "
+"reproduzir e sobreviver. O vírus que infecta o mosquito também se reproduz "
+"melhor em temperaturas mais altas. Os dados de temperatura e umidade são "
+"obtidos a partir da API do projeto"
+msgstr ""
+"Arbovirus transmission is strongly influenced by climate. The vector "
+"mosquito, Aedes aegypti, requires high temperature and humidity to reproduce "
+"and survive. The virus infecting the mosquito also replicates better at "
+"higher temperatures. Temperature and humidity data are obtained from the "
+"project’s API"
+
+#: dados/templates/about.html:189
+msgid "que agrega os dados de reanálise de satélite disponibilizados pelo"
+msgstr "which aggregates satellite reanalysis data provided by"
+
+#: dados/templates/about.html:193
+msgid "No passado, a fonte desses dados eram"
+msgstr "In the past, these data were sourced from"
+
+#: dados/templates/about.html:196
+msgid "estações meteorológicas de aeroportos"
+msgstr "airport weather stations"
+
+#: dados/templates/about.html:200
+msgid "Dados demográficos."
+msgstr "Demographic data."
+
+#: dados/templates/about.html:201
+msgid ""
+"Os indicadores epidemiológicos exigem o tamanho da população. Os dados "
+"demográficos dos municípios brasileiros são atualizados anualmente no "
+"Infodengue, utilizando estimativas do"
+msgstr ""
+"Epidemiological indicators require population size. The demographic data of "
+"Brazilian municipalities are updated annually in Infodengue using estimates "
+"from"
+
+#: dados/templates/about.html:220
+msgid "Harmonização e análise de dados"
+msgstr "Data harmonization and analysis"
+
+#: dados/templates/about.html:225 dados/templates/about.html:290
+msgid "Correção do atraso de notificação"
+msgstr "Correction for reporting delay"
+
+#: dados/templates/about.html:228
+msgid ""
+"Os dados disponíveis de ocorrência de doenças podem estar atrasados por uma "
+"variedade de razões, incluindo o tempo entre adoecer e procurar atendimento "
+"médico, o tempo que o profissional de saúde leva para relatar e o tempo que "
+"leva para agregar informações em bancos de dados. Esse atraso dificulta a "
+"tomada de decisões porque sempre é preciso olhar para dados desatualizados."
+msgstr ""
+"Available disease-occurrence data may be delayed for many reasons, including "
+"the time between falling ill and seeking care, the time a health "
+"professional takes to report, and the time required to aggregate information "
+"in databases. Such delays hinder decision-making because one must look at "
+"out-of-date data."
+
+#: dados/templates/about.html:238
+msgid ""
+"Para contornar esse problema, a equipe do Infodengue desenvolveu um método "
+"estatístico baseado em inferência bayesiana que combina a estimativa de "
+"atraso com o padrão temporal histórico de incidência para calcular o número "
+"esperado de casos a cada semana. Esse processo de previsão a curto prazo é "
+"descrito por"
+msgstr ""
+"To address this, the Infodengue team developed a statistical method based on "
+"Bayesian inference that combines delay estimation with the historical "
+"temporal pattern of incidence to compute the expected number of cases each "
+"week. This short-term forecasting process is described by"
+
+#: dados/templates/about.html:250
+msgid ""
+"A figura abaixo (retirada de Bastos et al., 2019) exemplifica a importância "
+"dessa correção. A curva em preto mostra a incidência real, e em vermelho, a "
+"informação disponível no momento da tomada de decisão. Veja que os dados "
+"disponíveis sugerem queda quanto os dados de fato estão aumentando. O modelo "
+"de correção, em cinza, mostra a incidência corrigida. Para mais detalhes "
+"técnicos, consulte a publicação. Essas funções estão disponíveis em"
+msgstr ""
+"The figure below (from Bastos et al., 2019) illustrates the importance of "
+"this correction. The black curve shows the actual incidence, while the red "
+"curve shows the information available at the decision time. Note that the "
+"available data suggest a decline when, in fact, incidence is rising. The "
+"correction model (grey) shows the adjusted incidence. For technical details, "
+"see the publication. These functions are available in the"
+
+#: dados/templates/about.html:261
+msgid "pacote R AlertTools"
+msgstr "R AlertTools package"
+
+#: dados/templates/about.html:269
+msgid "Exemplo de correção de atraso de notificação"
+msgstr "Example of correction for reporting delay"
+
+#: dados/templates/about.html:271
+msgid "Exemplo de correção de atraso de notificação (nowcasting)."
+msgstr "Example of correction for reporting delay (nowcasting)."
+
+#: dados/templates/about.html:278
+msgid ""
+"Na figura abaixo, há um exemplo de como os casos estimados pela metodologia "
+"de nowcasting aparecem nos gráficos em nível municipal, que podem ser "
+"acessados ao se pesquisar o nome de um município no campo “Encontre um "
+"município” da barra de navegação. A linha vermelha-escura pontilhada "
+"representa o nowcasting, e a azul indica os casos notificados até o momento. "
+"As cores na área sombreada representam os níveis de alerta que serão "
+"explicados a seguir."
+msgstr ""
+"In the figure below, an example shows how cases estimated by the nowcasting "
+"methodology appear in municipal-level charts, which can be accessed by "
+"searching for a municipality in the “Find a municipality” field in the "
+"navigation bar. The dark-red dotted line represents the nowcast, and the "
+"blue line indicates cases notified to date. Colours in the shaded area "
+"represent the alert levels described next."
+
+#: dados/templates/about.html:298
+msgid "Exemplo de nowcasting em gráfico municipal"
+msgstr "Example of nowcasting in a municipal chart"
+
+#: dados/templates/about.html:300
+msgid "Visualização do nowcasting em nível municipal."
+msgstr "Visualization of nowcasting at the municipal level."
+
+#: dados/templates/about.html:307
+msgid "Análise de receptividade"
+msgstr "Receptivity analysis"
+
+#: dados/templates/about.html:310
+#, python-format
+msgid ""
+"A transmissão de arbovírus requer condições climáticas adequadas, que podem "
+"variar de local para local. No Rio de Janeiro, por exemplo, uma temperatura "
+"superior a 22&nbsp;°C é uma condição necessária para a transmissão "
+"sustentada. Em Fortaleza, a umidade máxima acima de 85%% é uma condição "
+"necessária. Ajustamos modelos de árvore de decisão para avaliar qual "
+"combinação de variáveis climáticas e ambientais são indicativas de condições "
+"de transmissão."
+msgstr ""
+"Arbovirus transmission requires suitable climatic conditions, which can vary "
+"by location. In Rio de Janeiro, for example, temperature above 22&nbsp;°C is "
+"a necessary condition for sustained transmission. In Fortaleza, maximum "
+"humidity above 85%% is required. We fit decision-tree models to evaluate "
+"which combinations of climatic and environmental variables indicate "
+"transmission conditions."
+
+#: dados/templates/about.html:321
+msgid ""
+"A figura abaixo mostra um exemplo, para uma cidade. A árvore mostra as "
+"condições que estão mais associadas com a ocorrência de semanas com "
+"transmissão (Rt&gt;1). Quando ocorre uma semana com temperatura máxima &gt; "
+"27,6, existe uma alta probabilidade de transmissão 3 semanas depois (barras "
+"mais escuras). Isso ocorre quando a incidência já estava alta (&gt;107.3) ou "
+"quando a umidade estava alta (&gt;48.9). Essas regras são utilizadas para "
+"passar de nível verde para amarelo. Cada município terá seu conjunto "
+"específico de regras."
+msgstr ""
+"The figure below shows an example for one city. The tree depicts conditions "
+"most associated with weeks of transmission (Rt&gt;1). When a week occurs "
+"with maximum temperature &gt; 27.6, there is a high probability of "
+"transmission three weeks later (darker bars). This happens when incidence "
+"was already high (&gt;107.3) or when humidity was high (&gt;48.9). These "
+"rules are used to move from green to yellow level. Each municipality has its "
+"own specific set of rules."
+
+#: dados/templates/about.html:334
+msgid "Receptividade para transmissão"
+msgstr "Receptivity for transmission"
+
+#: dados/templates/about.html:340
+msgid "Exemplo de árvore de decisão para receptividade climática"
+msgstr "Example decision tree for climatic receptivity"
+
+#: dados/templates/about.html:342
+msgid "Exemplo de árvore de decisão relacionando clima e transmissão."
+msgstr "Example decision tree linking climate and transmission."
+
+#: dados/templates/about.html:347
+msgid "Detecção de transmissão sustentada"
+msgstr "Detection of sustained transmission"
+
+#: dados/templates/about.html:350
+msgid ""
+"A estimativa do número reprodutivo é importante de várias maneiras. A "
+"sequência de semanas com transmissão crítica (Rt &gt; 1) indica transmissão "
+"sustentada, ou seja, indica a fase de propagação da doença e que ações de "
+"controle adequadas precisam ser implementadas. Por outro lado, períodos "
+"subcríticos (Rt &lt; 1) indicam que não há transmissão sustentada."
+msgstr ""
+"Estimating the reproduction number is important in several ways. A sequence "
+"of weeks with critical transmission (Rt &gt; 1) indicates sustained "
+"transmission—that is, the propagation phase of the disease—requiring "
+"appropriate control actions. Conversely, subcritical periods (Rt &lt; 1) "
+"indicate there is no sustained transmission."
+
+#: dados/templates/about.html:360
+msgid ""
+"Para estimar o Rt a partir dos dados de incidência, desenvolvemos nossa "
+"própria metodologia, descrita em"
+msgstr ""
+"To estimate Rt from incidence data, we developed our own methodology, "
+"described in"
+
+#: dados/templates/about.html:367
+msgid ""
+"\"Estimando o número efetivo de reprodução da dengue considerando intervalos "
+"de geração dependentes da temperatura\"."
+msgstr ""
+"“Estimating the effective reproduction number of dengue considering "
+"temperature-dependent generation intervals.”"
+
+#: dados/templates/about.html:373
+msgid ""
+"A figura abaixo apresenta três painéis: o primeiro mostra a temperatura "
+"média, o segundo exibe os casos notificados e o terceiro apresenta o Rt "
+"estimado a partir da combinação entre casos e temperatura. No último painel, "
+"a linha horizontal vermelha indica o limiar de Rt = 1. As barras horizontais "
+"em laranja destacam as semanas em que houve transmissão sustentada, "
+"caracterizada por Rt &gt; 1. Ao menos duas semanas com o Rt &gt; 1 é o "
+"critério utilizado para a transição do nível de alerta amarelo para o "
+"laranja."
+msgstr ""
+"The figure below has three panels: the first shows mean temperature; the "
+"second, notified cases; and the third, Rt estimated from the combination of "
+"cases and temperature. In the last panel, the red horizontal line indicates "
+"the threshold Rt = 1. Orange horizontal bars highlight weeks with sustained "
+"transmission (Rt &gt; 1). At least two weeks with Rt &gt; 1 are required to "
+"move the alert level from yellow to orange."
+
+#: dados/templates/about.html:386
+msgid "Transmissão sustentada"
+msgstr "Sustained transmission"
+
+#: dados/templates/about.html:392
+msgid "Exemplo de Rt e períodos de transmissão sustentada"
+msgstr "Example of Rt and periods of sustained transmission"
+
+#: dados/templates/about.html:394
+msgid "Temperatura, incidência e Rt com destaque para períodos de Rt &gt; 1."
+msgstr "Temperature, incidence, and Rt highlighting periods with Rt &gt; 1."
+
+#: dados/templates/about.html:399
+msgid "Detecção de incidência atípica"
+msgstr "Detection of atypical incidence"
+
+#: dados/templates/about.html:402
+msgid ""
+"Para estimar os limiares epidêmicos para dengue, adaptamos o Método de "
+"Epidemias Móveis (MEM),"
+msgstr ""
+"To estimate epidemic thresholds for dengue, we adapted the Moving Epidemics "
+"Method (MEM),"
+
+#: dados/templates/about.html:409
+#, python-format
+msgid ""
+"que permite estimar diversas grandezas de interesse com base em dados "
+"históricos locais como limiares pré-epidemia, níveis típicos de atividade, "
+"valores esperados para cada semana, etc. Como esse limiar é derivado do "
+"histórico de dados, locais com diferentes volumes de casos têm limiares "
+"diferentes. A metodologia também fornece estimativas para o número esperado "
+"de casos por semana, juntamente com intervalos de confiança que permitem a "
+"definição de zonas de atividade semanal. Essas regiões são definidas de "
+"forma semelhante aos níveis de atividade, mas são calculadas com base na "
+"distribuição típica de casos para cada semana. Essa construção nos permite "
+"identificar visualmente padrões sazonais, uma vez que apresentam a evolução "
+"temporal típica com base na mediana de casos esperados para cada semana e "
+"intervalos de confiança inferior e superior (usamos 10%% e 90%%, "
+"respectivamente), definindo corredores de atividade como um diagrama de "
+"controle."
+msgstr ""
+"which allows estimation of several quantities of interest from local "
+"historical data—such as pre-epidemic thresholds, typical activity levels, "
+"and expected values for each week. Because these thresholds are derived from "
+"historical data, locations with different case volumes have different "
+"thresholds. The methodology also provides estimates of the expected number "
+"of cases per week, together with confidence intervals that allow definition "
+"of weekly activity zones. These regions are defined similarly to activity "
+"levels but are computed from the typical distribution of cases for each "
+"week. This construction allows visual identification of seasonal patterns, "
+"since it shows the typical temporal evolution based on the median expected "
+"cases for each week and lower/upper confidence intervals (we use 10%% and "
+"90%%, respectively), defining activity corridors akin to a control chart."
+
+#: dados/templates/about.html:428
+#, python-format
+msgid ""
+"A figura abaixo é exibida ao acessar os relatórios municipais disponíveis na "
+"aba “Relatórios” do menu de navegação. Ela apresenta a curva de casos "
+"notificados (em preto), acompanhada das barras verticais que indicam os "
+"níveis de alerta e das barras horizontais que representam os limiares "
+"epidêmicos calculados pelo MEM. Na parte superior da figura, são também "
+"apresentados os valores estimados pelo MEM para cada período: pré-epidêmico, "
+"epidêmico e pós-epidêmico. Uma incidência acima de 90%% do limiar calculado "
+"pelo MEM é necessária para mudar o nível de alerta de laranja para vermelho "
+"(incidência alta)."
+msgstr ""
+"The figure below appears in municipal reports available under the “Reports” "
+"tab. It shows the curve of notified cases (black), vertical bars indicating "
+"alert levels, and horizontal bars representing the epidemic thresholds "
+"calculated by MEM. At the top, the MEM-estimated values for each period are "
+"also shown: pre-epidemic, epidemic, and post-epidemic. Incidence above 90%% "
+"of the MEM threshold is required to change the alert level from orange to "
+"red (high incidence)."
+
+#: dados/templates/about.html:442
+msgid "Incidência alta"
+msgstr "High incidence"
+
+#: dados/templates/about.html:448
+msgid "Exemplo de limiares epidêmicos e atividade atípica"
+msgstr "Example of epidemic thresholds and atypical activity"
+
+#: dados/templates/about.html:450
+msgid ""
+"Exemplo de incidência acima dos limiares epidêmicos calculados pelo MEM."
+msgstr "Example of incidence above epidemic thresholds calculated by MEM."
+
+#: dados/templates/about.html:455
+msgid "Níveis de alerta de transmissão de arboviroses"
+msgstr "Alert levels for arbovirus transmission"
+
+#: dados/templates/about.html:458
+msgid ""
+"alerta do município. Esse alerta é atualizado semanalmente e é composto "
+"pelos seguintes níveis:"
+msgstr ""
+"municipal alert. This alert is updated weekly and comprises the following "
+"levels:"
+
+#: dados/templates/about.html:468 dados/templates/report_city.html:225
+msgid "Verde"
+msgstr "Green"
+
+#: dados/templates/about.html:470
+msgid ""
+"– Condições climáticas não favoráveis para a transmissão (em termos de "
+"temperatura ou umidade) e atividade viral baixa."
+msgstr ""
+"– Climatic conditions are not favourable for transmission (temperature or "
+"humidity), and viral activity is low."
+
+#: dados/templates/about.html:479 dados/templates/report_city.html:229
+msgid "Amarelo"
+msgstr "Yellow"
+
+#: dados/templates/about.html:481
+msgid ""
+"– Condições climáticas favoráveis para a transmissão (em termos de "
+"temperatura ou umidade) e atividade viral presente (pelo menos 1 caso)."
+msgstr ""
+"– Climatic conditions are favourable for transmission (temperature or "
+"humidity), and viral activity is present (at least one case)."
+
+#: dados/templates/about.html:491 dados/templates/report_city.html:233
+msgid "Laranja"
+msgstr "Orange"
+
+#: dados/templates/about.html:493
+msgid ""
+"– Incidência crescente (ao menos 2 semanas com Rt &gt; 1) mas dentro dos "
+"níveis históricos."
+msgstr ""
+"– Rising incidence (at least two consecutive weeks with Rt &gt; 1) but still "
+"within historical levels."
+
+#: dados/templates/about.html:502 dados/templates/report_city.html:236
+msgid "Vermelho"
+msgstr "Red"
+
+#: dados/templates/about.html:504
+#, python-format
+msgid ""
+"– Incidência alta para os padrões históricos (acima de 90%% do limiar "
+"calculado pelo MEM)."
+msgstr ""
+"– High incidence relative to historical patterns (above 90%% of the MEM "
+"threshold)."
+
+#: dados/templates/about.html:512
+msgid ""
+"A figura abaixo apresenta a variação dos níveis de alerta em diferentes "
+"períodos da curva epidêmica da cidade de Foz do Iguaçu."
+msgstr ""
+"The figure below shows the variation in alert levels at different periods of "
+"the epidemic curve for the city of Foz do Iguaçu."
+
+#: dados/templates/about.html:518
+msgid "Classificação da situação de transmissão de arboviroses"
+msgstr "Classification of the arbovirus transmission situation"
+
+#: dados/templates/about.html:524
+msgid "Exemplo de evolução dos níveis de alerta"
+msgstr "Example of the evolution of alert levels"
+
+#: dados/templates/about.html:526
+msgid ""
+"Variação dos níveis de alerta em diferentes períodos da curva epidêmica."
+msgstr ""
+"Variation in alert levels across different periods of the epidemic curve."
+
+#: dados/templates/about.html:534
+msgid ""
+"As análises de situação de transmissão são atualizadas semanalmente e "
+"disponibilizadas na aba"
+msgstr ""
+"The transmission-situation analyses are updated weekly and made available in "
+"the"
+
+#: dados/templates/about.html:540
+msgid "relatórios"
+msgstr "reports"
+
+#: dados/templates/about.html:541
+msgid ""
+"do site, assim como em dashboards a nível municipal e estadual, também "
+"disponíveis na plataforma. Além disso, os dados podem ser acessados na"
+msgstr ""
+"section of the site, as well as in municipal and state dashboards available "
+"on the platform. In addition, the data can be accessed in the"
+
+#: dados/templates/about.html:548
+msgid "API do projeto"
+msgstr "project's API"
+
+#: dados/templates/about.html:549
+msgid ""
+"Para mais informações sobre os materiais disponibilizados acesse o nosso"
+msgstr "For more information on the available materials, please access our"
+
+#: dados/templates/about.html:555
+msgid "curso online"
+msgstr "online course"
+
+#: dados/templates/about.html:567
+#: dados/templates/components/home/other_products.html:30
+#: dados/templates/components/home/other_products.html:34
+msgid "Epi-Scanner"
+msgstr "Epi-Scanner"
+
+#: dados/templates/about.html:572
+msgid ""
+"Além da análise de situação de transmissão de arboviroses, o Infodengue "
+"desenvolve e disponibiliza outros recursos para apoio à tomada de decisão. "
+"Um recurso adicional do projeto é o"
+msgstr ""
+"In addition to analysing the arbovirus transmission situation, Infodengue "
+"develops and provides other decision-support resources. An additional "
+"resource of the project is the"
+
+#: dados/templates/about.html:580
+msgid ""
+"uma metodologia criada para estimar os parâmetros epidemiológicos de cada "
+"epidemia e município do país. Dentre os parâmetros estimados estão a semana "
+"de pico, o número de reprodução e o número total de casos na temporada."
+msgstr ""
+"a methodology designed to estimate epidemiological parameters for each "
+"epidemic and municipality in the country. Estimated parameters include the "
+"peak week, the reproduction number, and the total number of cases in the "
+"season."
+
+#: dados/templates/about.html:588
+msgid "Mais detalhes podem ser encontrados no"
+msgstr "More details can be found on the"
+
+#: dados/templates/about.html:594
+msgid "do produto. O artigo que descreve a metodologia pode ser acessado"
+msgstr "of the product. The paper describing the methodology can be accessed"
+
+#: dados/templates/about.html:599 dados/templates/about.html:637
+msgid "aqui"
+msgstr "here"
+
+#: dados/templates/about.html:611
+msgid "Desafio Infodengue-Mosqlimate de previsão de epidemias de dengue"
+msgstr "Infodengue–Mosqlimate challenge for forecasting dengue epidemics"
+
+#: dados/templates/about.html:616
+msgid ""
+"Além dos relatórios semanais, desde 2024, o Infodengue, em parceria com o "
+"projeto"
+msgstr ""
+"In addition to weekly reports, since 2024 Infodengue, in partnership with the"
+
+#: dados/templates/about.html:623
+msgid ""
+"tem organizado um desafio de previsão de longo prazo de dengue, em nível "
+"estadual, com o objetivo de combinar os esforços de diferentes estratégias "
+"de modelagem. Os resultados dessa competição são agregados em um relatório "
+"que é enviado para o Ministério da Saúde para o auxílio na preparação para a "
+"próxima temporada."
+msgstr ""
+"has organised a long-term dengue forecasting challenge at the state level, "
+"aiming to combine efforts from different modelling strategies. The results "
+"of this competition are aggregated into a report sent to the Ministry of "
+"Health to support preparation for the next season."
+
+#: dados/templates/about.html:632
+msgid "Mais informações sobre a competição podem ser encontradas"
+msgstr "More information about the competition can be found"
+
+#: dados/templates/about.html:638
+msgid ""
+"Os relatórios gerados por essa iniciativa estão disponíveis na seção "
+"<em>Relatórios técnicos</em>."
+msgstr ""
+"The reports generated by this initiative are available in the <em>Technical "
+"reports</em> section."
+
+#: dados/templates/about.html:653
+#: dados/templates/components/home/functionalities.html:84
+msgid "Relatórios técnicos"
+msgstr "Technical reports"
+
+#: dados/templates/about.html:660
 msgid "Reflexões sobre o risco de arboviroses em 2024"
-msgstr "Reflections on the risk of Arboviruses in 2024"
+msgstr "Reflections on the risk of arboviruses in 2024"
 
-#: dados/templates/about.html:127
+#: dados/templates/about.html:667
 msgid "Previsões para a temporada de dengue de 2024-2025"
-msgstr "Forecasts for the 2024-2025 dengue season"
+msgstr "Forecasts for the 2024–2025 dengue season"
 
-#: dados/templates/about.html:130
+#: dados/templates/about.html:674
 msgid "Previsões para a temporada de dengue de 2025-2026"
-msgstr "Forecasts for the 2025-2026 dengue season"
+msgstr "Forecasts for the 2025–2026 dengue season"
 
-#: dados/templates/about.html:134
+#: dados/templates/about.html:688
 msgid "Projetos de pesquisa"
 msgstr "Research projects"
 
-#: dados/templates/about.html:139
+#: dados/templates/about.html:696
 msgid ""
 "ARBOFRONTEIRA: Prevendo epidemias de doenças transmitidas por mosquitos no "
 "arco sul do país"
 msgstr ""
-"ARBOFRONTEIRA: Predicting epidemics of mosquito-borne diseases in the "
+"ARBOFRONTEIRA: Forecasting epidemics of mosquito-borne diseases in the "
 "southern arc of the country"
 
-#: dados/templates/about.html:141
+#: dados/templates/about.html:699
 msgid ""
 "\n"
-"            O objetivo dessa proposta é gerar indicadores para a vigilância "
-"de arboviroses que sejam\n"
-"            específicos para a fronteira sul do país e guidelines para seu "
-"uso no fortalecimento da\n"
-"            vigilância desses municípios. Para isso, faz-se necessário "
-"compreender o processo de\n"
-"            expansão das arboviroses nos três países e identificar cenários "
-"futuros de expansão. Por\n"
-"            meio de modelos estatísticos e matemáticos, vamos investigar "
-"cenários possíveis de disseminação\n"
-"            das arboviroses e a importância de protocolos binacionais e "
-"trinacionais para\n"
-"            a maior precisão de ações de controle. Do ponto de vista "
-"prático, serão aplicados modelos\n"
-"            de nowcasting e de predição em dois pontos: a tríplice fronteira "
-"Foz do Iguaçu, Iguazu e\n"
-"            Ciudad del este; e na fronteira formada por Barracão (PR), "
-"Dionísio Cerqueira (SC) e Bernando de\n"
-"            Irigoyen (Arg). Os modelos serão incorporados ao Infodengue e "
-"serão disponibilizados\n"
-"            relatórios específicos para cada região."
+"          O objetivo dessa proposta é gerar indicadores para a vigilância "
+"de\n"
+"          arboviroses que sejam específicos para a fronteira sul do país e\n"
+"          guidelines para seu uso no fortalecimento da vigilância desses\n"
+"          municípios. Para isso, faz-se necessário compreender o processo "
+"de\n"
+"          expansão das arboviroses nos três países e identificar cenários\n"
+"          futuros de expansão. Por meio de modelos estatísticos e "
+"matemáticos,\n"
+"          vamos investigar cenários possíveis de disseminação das "
+"arboviroses e\n"
+"          a importância de protocolos binacionais e trinacionais para a "
+"maior\n"
+"          precisão de ações de controle. Do ponto de vista prático, serão\n"
+"          aplicados modelos de nowcasting e de predição em dois pontos: a\n"
+"          tríplice fronteira Foz do Iguaçu, Iguazu e Ciudad del este; e na\n"
+"          fronteira formada por Barracão (PR), Dionísio Cerqueira (SC) e\n"
+"          Bernando de Irigoyen (Arg). Os modelos serão incorporados ao\n"
+"          Infodengue e serão disponibilizados relatórios específicos para "
+"cada\n"
+"          região.\n"
+"          "
 msgstr ""
 "\n"
-"The objective of this proposal is to generate indicators for the "
-"surveillance of arboviruses that are specific to the southern border of the "
-"country and guidelines for its use in strengthening the surveillance of "
-"these municipalities. For this, it is necessary to understand the process of "
-"expansion of arboviruses in the three countries and to identify future "
-"expansion scenarios. Per Through statistical and mathematical models, we "
-"will investigate possible scenarios for the spread of arboviruses and the "
-"importance of binational and trinational protocols to the highest precision "
-"of control actions. From a practical point of view, models will be applied "
-"of nowcasting and prediction at two points: the triple border Foz do Iguaçu, "
-"Iguazu and city of the east; and on the border formed by Barracão (PR), D "
-"Cerqueira (SC) and Bernardo de Irigoyen (Arg). The models will be "
-"incorporated into Infodengue and will be made available specific reports for "
-"each region."
+"The objective of this proposal is to generate surveillance indicators for "
+"arboviruses specific to the country’s southern border and to provide "
+"guidelines for their use in strengthening municipal surveillance. This "
+"requires understanding how arboviruses have expanded across the three "
+"countries and identifying future expansion scenarios. Using statistical and "
+"mathematical models, we will investigate possible dissemination scenarios "
+"and the importance of bi- and trinational protocols for more precise control "
+"actions. Practically, nowcasting and forecasting models will be applied in "
+"two areas: the tri-border region of Foz do Iguaçu, Iguazú, and Ciudad del "
+"Este; and the border formed by Barracão (PR), Dionísio Cerqueira (SC), and "
+"Bernardo de Irigoyen (ARG). The models will be incorporated into Infodengue, "
+"and region-specific reports will be provided."
 
-#: dados/templates/about.html:153 dados/templates/about.html:175
-#: dados/templates/about.html:185
+#: dados/templates/about.html:717 dados/templates/about.html:751
+#: dados/templates/about.html:768
 msgid "Financiamento:"
-msgstr ""
+msgstr "Funding:"
 
-#: dados/templates/about.html:157
+#: dados/templates/about.html:724
 msgid "Prevendo epidemias de doenças transmitidas por mosquitos"
-msgstr "Predicting epidemics of mosquito-borne diseases"
+msgstr "Forecasting epidemics of mosquito-borne diseases"
 
-#: dados/templates/about.html:159
+#: dados/templates/about.html:727
 msgid ""
 "\n"
-"            Esse projeto visa fornecer projeções a médio prazo para a "
-"incidência de novos casos \n"
-"            de doenças transmitidas por mosquitos no Brasil. O projeto visa "
-"adaptar para a realidade \n"
-"            brasileira a experiência implementada no Vietnam onde propomos o "
-"uso de modelos hierárquicos \n"
-"            espaço-temporais bayesianos para prever a incidência de casos de "
-"dengue e o suporte de \n"
-"            variáveis auxiliares tais como variáveis climáticas (Colon-"
-"Gonzalez, Bastos, et al. 2021). \n"
-"            Neste projeto estenderemos a modelagem preditiva de dengue no "
-"Vietnam para as doenças transmitidas \n"
-"            por mosquito, na qual exploraremos, separadamente, as "
-"arboviroses no Brasil e a malária na \n"
-"            região Amazônica, que são doenças de grande impacto e relevância "
-"na saúde pública do país. \n"
-"            Os modelos a serem propostos serão construídos e validados "
-"usando dados abertos, e serão feitas \n"
-"            projeções a médio prazo, ou seja seis a doze meses à frente para "
-"as microrregiões de saúde. \n"
-"            O projeto priorizará o uso de dados abertos, além do uso e "
-"desenvolvimento de códigos em ambientes \n"
-"            livres, de tal forma que equipes de vigilância epidemiológica "
-"possam replicar e adaptar conforme \n"
-"            suas necessidades. Além das projeções, será desenvolvido em "
-"paralelo um dashboard específico para \n"
-"            cada doença, de tal forma que as previsões fiquem acessíveis a "
-"tomadores de decisão e para população \n"
-"            geral. "
+"          Esse projeto visa fornecer projeções a médio prazo para a "
+"incidência\n"
+"          de novos casos de doenças transmitidas por mosquitos no Brasil. O\n"
+"          projeto visa adaptar para a realidade brasileira a experiência\n"
+"          implementada no Vietnam onde propomos o uso de modelos "
+"hierárquicos\n"
+"          espaço-temporais bayesianos para prever a incidência de casos de\n"
+"          dengue e o suporte de variáveis auxiliares tais como variáveis\n"
+"          climáticas (Colon-Gonzalez, Bastos, et al. 2021). Neste projeto\n"
+"          estenderemos a modelagem preditiva de dengue no Vietnam para as\n"
+"          doenças transmitidas por mosquito, na qual exploraremos,\n"
+"          separadamente, as arboviroses no Brasil e a malária na região\n"
+"          Amazônica, que são doenças de grande impacto e relevância na "
+"saúde\n"
+"          pública do país. Os modelos a serem propostos serão construídos e\n"
+"          validados usando dados abertos, e serão feitas projeções a médio\n"
+"          prazo, ou seja seis a doze meses à frente para as microrregiões "
+"de\n"
+"          saúde. O projeto priorizará o uso de dados abertos, além do uso e\n"
+"          desenvolvimento de códigos em ambientes livres, de tal forma que\n"
+"          equipes de vigilância epidemiológica possam replicar e adaptar\n"
+"          conforme suas necessidades. Além das projeções, será desenvolvido "
+"em\n"
+"          paralelo um dashboard específico para cada doença, de tal forma "
+"que as\n"
+"          previsões fiquem acessíveis a tomadores de decisão e para "
+"população\n"
+"          geral.\n"
+"          "
 msgstr ""
 "\n"
 "This project aims to provide medium-term projections for the incidence of "
-"new cases of mosquito-borne diseases in Brazil. The project adapts to the "
-"Brazilian reality, the experience implemented in Vietnam, where we propose "
-"the use of Bayesian space-time hierarchical models to predict the incidence "
-"of dengue cases, and the support of auxiliary variables, such as climatic "
-"variables (Colon-Gonzalez, Bastos, et al. al. 2021). In this project, we "
-"will extend the predictive modeling of dengue in Vietnam to mosquito-borne "
-"diseases, in which we will separately explore arboviruses in Brazil and "
-"malaria in the Amazon region, which are diseases of great impact and "
-"relevance in the country's public health. The models to be proposed will be "
-"built and validated using open data, where medium-term projections will be "
-"made, that is, six to twelve months ahead for the health microregions. The "
-"project will prioritize the use of open data, in addition to the use and "
-"development of codes in free environments, so that epidemiological "
-"surveillance teams can replicate and adapt according to their needs. In "
-"addition to the projections, a specific dashboard for each disease will be "
-"developed in parallel, so that the forecasts are accessible to decision "
-"makers and the general population."
+"new cases of mosquito-borne diseases in Brazil. It adapts to the Brazilian "
+"context an approach implemented in Vietnam, proposing Bayesian spatio-"
+"temporal hierarchical models to forecast dengue incidence with support from "
+"auxiliary variables such as climatic factors (Colon-Gonzalez, Bastos, et "
+"al., 2021). Here we extend dengue predictive modelling from Vietnam to "
+"mosquito-borne diseases, exploring arboviruses in Brazil and malaria in the "
+"Amazon region—both of major public-health relevance. Models will be built "
+"and validated using open data, and medium-term projections (six to twelve "
+"months ahead) will be produced for health microregions. The project "
+"prioritises open data and open-source development so that epidemiological "
+"surveillance teams can replicate and adapt as needed. In parallel, a disease-"
+"specific dashboard will be developed so forecasts are accessible to decision-"
+"makers and the general public."
 
-#: dados/templates/about.html:179
+#: dados/templates/about.html:758
 msgid "EVIGILANCIA: monitoramento integrado e contínuo de arboviroses"
-msgstr "EVIGILANCIA: Continuous & integrated arboviruses monitoring"
+msgstr "EVIGILANCIA: integrated and continuous monitoring of arboviroses"
 
-#: dados/templates/about.html:181
+#: dados/templates/about.html:761
 msgid ""
 "\n"
-"            Este projeto visou a consolidação do sistema de alerta para "
-"arboviroses baseado em dados\n"
-"            hı́bridos gerados por meio da análise integrada de dados "
-"minerados a partir de dados regionais\n"
-"            climáticos e epidemiológicos, o Infodengue."
+"          Este projeto visou a consolidação do sistema de alerta para\n"
+"          arboviroses baseado em dados hı́bridos gerados por meio da análise\n"
+"          integrada de dados minerados a partir de dados regionais "
+"climáticos e\n"
+"          epidemiológicos, o Infodengue.\n"
+"          "
 msgstr ""
 "\n"
-"Evigilancia aimed to consolidate the alert system for arboviruses based on "
-"hybrid data generated through integrated data analysis, mined from web "
-"climatic and epidemiological data, the InfoDengue."
+"This project sought to consolidate the arbovirus alert system based on "
+"hybrid data generated through integrated analysis of regional climatic and "
+"epidemiological data—Infodengue."
 
-#: dados/templates/about.html:190
+#: dados/templates/about.html:780
 msgid "Como citar o InfoDengue"
-msgstr "How to quote InfoDengue"
+msgstr "How to cite Infodengue"
 
-#: dados/templates/about.html:211
+#: dados/templates/about.html:820
 msgid "Produções científicas associadas ao Infodengue"
-msgstr "Scientific productions associated with Infodengue"
+msgstr "Scientific publications associated with Infodengue"
 
-#: dados/templates/about.html:300
+#: dados/templates/about.html:991
 msgid "Eventos"
 msgstr "Events"
 
-#: dados/templates/about.html:307
+#: dados/templates/about.html:1009
 msgid "Como colaborar"
-msgstr "How to Collaborate"
+msgstr "How to collaborate"
 
-#: dados/templates/about.html:310
+#: dados/templates/about.html:1013
 msgid ""
 "Se sua cidade não está no Infodengue, entre em contato com a Secretaria de "
 "Saúde"
 msgstr ""
-"If your city in Brazil is not Infodengue, contact the Health Department"
+"If your city is not on Infodengue, contact your local Department of Health"
 
-#: dados/templates/about.html:311
+#: dados/templates/about.html:1014
 msgid ""
 "Se é um estudante ou pesquisador e gostaria de contribuir com análises e "
 "modelos, nos escreva"
 msgstr ""
-"If you are a student or researcher and would like to contribute analysis and "
-"models, write us"
+"If you are a student or researcher and would like to contribute analyses and "
+"models, write to us"
 
-#: dados/templates/about.html:312
+#: dados/templates/about.html:1015
 msgid "Se quiser contribuir com patrocínios, escreva-nos"
-msgstr "If you would like to contribute sponsorships, write us"
+msgstr "If you would like to contribute with sponsorships, write to us"
 
-#: dados/templates/about.html:313
+#: dados/templates/about.html:1016
 msgid ""
 "Se quiser aprender a usar o infodengue, tem sugestões, críticas ou se "
 "percebeu algum erro no site, escreva-nos"
 msgstr ""
-"If you want to learn how to use infodengue, have suggestions, criticism or "
-"if you noticed any errors on the site, write us"
+"If you want to learn how to use Infodengue, have suggestions or criticisms, "
+"or noticed any error on the site, write to us"
 
-#: dados/templates/about.html:314
+#: dados/templates/about.html:1018
 msgid ""
 "Vencer as arboviroses é um trabalho de todos, toda colaboração é bem vinda!"
-msgstr ""
-"Overcoming arboviruses is everyone's job, all collaboration is welcome!"
+msgstr "Beating arboviruses is everyone’s work—every contribution is welcome!"
 
-#: dados/templates/about.html:318
+#: dados/templates/about.html:1030
 msgid "Videos relacionados"
-msgstr "Related Videos"
+msgstr "Related videos"
 
-#: dados/templates/about.html:324
+#: dados/templates/about.html:1039
 msgid "Entenda o modelo mais usado para representar a pandemia de COVID-19"
-msgstr "See the most used model to represent the COVID-19 pandemic"
+msgstr "Understand the model most used to represent the COVID-19 pandemic"
 
-#: dados/templates/about.html:334
+#: dados/templates/about.html:1055
 msgid "Curso PySUS - Aula 1"
-msgstr "PySUS Course - Lesson 1"
+msgstr "PySUS course — Lesson 1"
 
-#: dados/templates/about.html:347
+#: dados/templates/about.html:1074
 msgid "Mais videos da série no canal"
-msgstr "More videos of the series on the channel"
+msgstr "More videos from the series on the channel"
 
-#: dados/templates/about.html:349
+#: dados/templates/about.html:1078
 msgid "A Matemática das Epidemias"
-msgstr "The Mathematics of Epidemics"
+msgstr "The mathematics of epidemics"
 
 #: dados/templates/alert_base.html:68
 #, python-format
@@ -1288,10 +1583,6 @@ msgstr "State Reports"
 msgid "Análises adicionais sobre a situação das arboviroses no país."
 msgstr "Additional analyses on the situation of arboviruses in the country."
 
-#: dados/templates/components/home/functionalities.html:84
-msgid "Relatórios técnicos"
-msgstr "Technical Reports"
-
 #: dados/templates/components/home/functionalities.html:96
 msgid "Exemplo de acesso aos dados da API usando R e Python."
 msgstr "Example of accessing API data using R and Python."
@@ -1311,11 +1602,6 @@ msgid ""
 msgstr ""
 "Analysis of epidemiological parameters such as peak week, reproduction "
 "number, and total cases per epidemic at the municipal level."
-
-#: dados/templates/components/home/other_products.html:30
-#: dados/templates/components/home/other_products.html:34
-msgid "Epi-Scanner"
-msgstr "Epi-Scanner"
 
 #: dados/templates/components/home/other_products.html:37
 msgid "Visualize os parâmetros epidemiológicos de cada epidemia."
@@ -1642,20 +1928,12 @@ msgid "As cores indicam niveis de atenção"
 msgstr "The colors indicate levels of alerts"
 
 #: dados/templates/report_city.html:225
-msgid "Verde"
-msgstr "Green"
-
-#: dados/templates/report_city.html:225
 msgid "condições climáticas desfavoráveis, seja"
 msgstr "unfavorable climatic conditions, whether"
 
 #: dados/templates/report_city.html:226
 msgid "por baixa temperatura ou baixa umidade, e baixa incidência de casos"
 msgstr "due to low temperature or low humidity, and low incidence of cases"
-
-#: dados/templates/report_city.html:229
-msgid "Amarelo"
-msgstr "Yellow"
 
 #: dados/templates/report_city.html:229
 msgid "condições climáticas propícias para"
@@ -1666,16 +1944,8 @@ msgid "aumento da população do vetor e transmissão de arboviroses"
 msgstr "increase of the vector population and transmission of arboviruses"
 
 #: dados/templates/report_city.html:233
-msgid "Laranja"
-msgstr "Orange"
-
-#: dados/templates/report_city.html:233
 msgid "transmissão aumentada e sustentada da arbovirose"
 msgstr "increased and sustained transmission of arbovirus"
-
-#: dados/templates/report_city.html:236
-msgid "Vermelho"
-msgstr "Red"
 
 #: dados/templates/report_city.html:236
 #, python-format
@@ -2838,10 +3108,6 @@ msgstr ""
 "Information about the Infodengue project, its objectives, history, and main "
 "partners."
 
-#: templates/components/navbar.html:73
-msgid "Sobre nós"
-msgstr "About us"
-
 #: templates/registration/login.html:17
 msgid "Please correct the error below."
 msgstr "Please correct the error below."
@@ -2987,6 +3253,171 @@ msgstr ""
 msgid "Task duration"
 msgstr ""
 
+#~ msgid ""
+#~ "\n"
+#~ "            O InfoDengue é um sistema de alerta para arboviroses baseado "
+#~ "em dados híbridos gerados por meio da análise integrada\n"
+#~ "            de dados minerados a partir da web social e de dados "
+#~ "climáticos e epidemiológicos"
+#~ msgstr ""
+#~ "\n"
+#~ " InfoDengue is an early-warning system for arbovirosis in Brazil.  It "
+#~ "relies on the continuous analysis of online, climate and epidemiological "
+#~ "data"
+
+#~ msgid ""
+#~ "\n"
+#~ "            Em 2021, o sistema ganhou amplitude nacional com o apoio do "
+#~ "Ministério da Saúde realizando análises em nível estadual.\n"
+#~ "            Com isso, mais secretarias passaram a receber semanalmente os "
+#~ "boletins do InfoDengue. Implementado em 2015,\n"
+#~ "            o sistema foi desenvolvido por pesquisadores do Programa de "
+#~ "Computação Científica (Fundação Oswaldo Cruz, RJ) e\n"
+#~ "            da Escola de Matemática Aplicada (Fundação Getúlio Vargas) "
+#~ "com a forte colaboração da Secretaria Municipal de Saúde do Rio de "
+#~ "Janeiro,\n"
+#~ "            o Observatório da Dengue/UFMG e pesquisadores da Universidade "
+#~ "Federal do Paraná e da Universidade Estadual do Oeste do Paraná.</p>\n"
+#~ "            <p>\n"
+#~ "            Embora desenvolva boletins com análises de casos de dengue, "
+#~ "zika e chikungunya de todo o país, os estados ainda podem aderir ao "
+#~ "sistema.</br>\n"
+#~ "            Acesse <a href=\"/participe\"> como participar </a> para "
+#~ "integrar o InfoDengue.\n"
+#~ "            O estado participante recebe um relatório de análise de "
+#~ "situação da dengue semanalmente.\n"
+#~ "            A versão pública do site é acessada por muitas pessoas e é "
+#~ "comum recebermos notícias de que essas informações são\n"
+#~ "            utilizadas na definição de viagens e outras atividades.</p>\n"
+#~ "            <p>\n"
+#~ "            Nossa rede de colaboradores cresceu e conta agora com a "
+#~ "parceria de grupos de pesquisa internacionais que buscam soluções para\n"
+#~ "            arboviroses em outros países e organizações da sociedade "
+#~ "civil. Por meio do compartilhamento de experiências e metodologias,\n"
+#~ "            ampliamos a inovação e o conhecimento das arboviroses.</p>\n"
+#~ "            <p>\n"
+#~ "            Vários desafios técnicos e científicos foram enfrentados "
+#~ "durante o desenvolvimento do InfoDengue, resultando em diversas teses e\n"
+#~ "            dissertações. Como os desafios não terminam, continuamos e "
+#~ "continuaremos sempre investigando novas soluções para gerar\n"
+#~ "            informação útil para a gestão e para o avanço do conhecimento "
+#~ "das arboviroses e seu controle."
+#~ msgstr ""
+#~ "\n"
+#~ " In 2021, the system reached the national level with the support of the "
+#~ "Brazilian Health Ministry.  As a result, all municipalities began to "
+#~ "receive weekly InfoDengue bulletins.  Reports at the state level can be "
+#~ "requested by the state health secretariats.  Access the tab <a href=\"/"
+#~ "participe\"> “how to participate” </a> to know more. Implemented in 2015, "
+#~ "the system was developed by researchers  from the Scientific Computing "
+#~ "Program (Fundação Oswaldo Cruz, RJ) and the School of Applied Mathematics "
+#~ "(Fundação Getúlio Vargas)  with the strong collaboration of the Rio de "
+#~ "Janeiro Municipal Health Secretariat, the Observatory of Dengue (UFMG) "
+#~ "and researchers  from the Federal University of Paraná and the State "
+#~ "University of Western Paraná. <p>\n"
+#~ "The Infodengue website is accessed by many people and it is common for us "
+#~ "to receive news that this information is used in  the definition of "
+#~ "travel and other activities.  <p>\n"
+#~ "Our network of collaborators has grown and now includes international "
+#~ "research groups seeking solutions for arboviruses in  other countries and "
+#~ "civil society organizations. By sharing experiences and methodologies,  "
+#~ "we expand our capacity to innovate on arbovirus surveillance.  <p>\n"
+#~ "The several technical and scientific challenges faced during the "
+#~ "development of InfoDengue resulted in theses and dissertations.  As the "
+#~ "challenges do not end, we continue and will always continue to "
+#~ "investigate new solutions to generate useful  information for the "
+#~ "management and advancement of knowledge of arboviruses and their control. "
+
+#~ msgid "O Sistema"
+#~ msgstr "About the system"
+
+#~ msgid ""
+#~ "\n"
+#~ "        O sistema InfoDengue é um pipeline de coleta, harmonização e "
+#~ "análise de dados semi-automatizado,\n"
+#~ "        que gera indicadores de situação epidemiológica da dengue e "
+#~ "outras arboviroses a nível municipal."
+#~ msgstr ""
+#~ "\n"
+#~ "            <h5>The InfoDengue system is a semi-automated data "
+#~ "collection, harmonization and analysis pipeline that generates indicators "
+#~ "of \n"
+#~ "            the epidemiological situation of dengue and other arboviruses "
+#~ "at the municipal level.</h5><br>\n"
+#~ "\n"
+#~ "              \n"
+#~ "            "
+
+#~ msgid "/static/img/system_level_color.png"
+#~ msgstr "/static/img/system_level_color_en.png"
+
+#~ msgid "De onde vem os dados?"
+#~ msgstr "Where does the data come from?"
+
+#~ msgid ""
+#~ " Os dados de notificação de doenças tem sempre um atraso.\n"
+#~ "        Isso ocorre por vários motivos e inclui o tempo entre a pessoa "
+#~ "adoecer e buscar atendimento médico,\n"
+#~ "        o tempo que leva para o profissional de saúde notificar e o tempo "
+#~ "que demora para agregar as informações\n"
+#~ "        nos bancos de dados. Esse atraso dificulta a tomada de decisão "
+#~ "pois tem-se sempre que olhar para um dado\n"
+#~ "        desatualizado. Para contornar esse problema, foi desenvolvido um "
+#~ "método estatístico baseado em inferência\n"
+#~ "        Bayesiana que combina a estimação do atraso com a estimação do "
+#~ "padrão temporal histórico da incidência para\n"
+#~ "        calcular o número esperado de casos a cada semana. Esse processo "
+#~ "se chama nowcasting ou estimação do\n"
+#~ "        presente e está descrita em: "
+#~ msgstr ""
+#~ "            Disease notification data are always delayed for a variety of "
+#~ "reasons including the time \n"
+#~ "            between getting sick and seeking medical attention, the time "
+#~ "it takes for the healthcare professional to report, and the time it takes "
+#~ "to aggregate \n"
+#~ "            information into databases. This delay makes decision making "
+#~ "difficult because one always has to look at outdated data. To circumvent "
+#~ "this problem, a \n"
+#~ "            Bayesian inference-based statistical method was developed "
+#~ "that combines the delay estimate with the historical temporal pattern of "
+#~ "incidence to \n"
+#~ "            calculate the expected number of cases each week. This "
+#~ "process of nowcasting is described"
+
+#~ msgid ""
+#~ "A Figura abaixo (retirada de Bastos et al 2019) mostra em preto, a "
+#~ "incidência verdadeira, em vermelho,\n"
+#~ "        aquela observada com atraso e, em cinza, o nowcasting. Para mais "
+#~ "detalhes técnicos, ver a referida publicação."
+#~ msgstr ""
+#~ "            A modelling approach for correcting reporting delays in "
+#~ "disease surveillance data”. \n"
+#~ "            The figure below (taken from Bastos et al 2019) shows in "
+#~ "black the true incidence, in red, that observed late and in gray the "
+#~ "nowcasting. \n"
+#~ "            For further technical details, see the "
+#~ "publication.            "
+
+#~ msgid "Código de Cores:"
+#~ msgstr "Disease code"
+
+#~ msgid "/static/img/table_color_level_pt.png"
+#~ msgstr "/static/img/system_level_color_en.png"
+
+#~ msgid "Implementação"
+#~ msgstr "Implementation"
+
+#~ msgid ""
+#~ "Todos os códigos gerados para o InfoDengue, em sua maioria em R e Python, "
+#~ "estão disponíveis em acesso aberto em​:"
+#~ msgstr ""
+#~ "            All code generated for InfoDengue, mostly R and Python, is "
+#~ "available at: \n"
+#~ "            "
+
+#~ msgid "Relatórios Técnicos"
+#~ msgstr "Technical Reports"
+
 #~ msgid "Análise integrada de dados epidemiológicos e climáticos"
 #~ msgstr " Integrated analysis of epidemiological and climate data"
 
@@ -3123,9 +3554,6 @@ msgstr ""
 
 #~ msgid "Pesquisador Titular - PROCC/Fiocruz"
 #~ msgstr "Associate Researcher - PROCC/Fiocruz"
-
-#~ msgid "Cientista de dados"
-#~ msgstr "Data Scientist"
 
 #~ msgid "Desenvolvedor Full Stack"
 #~ msgstr "Full Stack Developer"

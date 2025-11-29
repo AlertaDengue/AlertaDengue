@@ -6,351 +6,1083 @@
 <link href="{% static '/css/about_styles.css' %}" rel="stylesheet">
 {% endblock %}
 
+
+{% block title %}{% translate "Sobre nós" %}{% endblock %}
+
 {% block content %}
+  {% get_current_language as LANGUAGE_CODE %}
+  {% with LANGUAGE_CODE|slice:":2" as lang_suffix %}
 
-    <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
-        <h3 id="section1" class="panel-title">{% translate "Sobre o InfoDengue" %}</h3>
-    </div>
-    <div class="card-body">
-        <h5>{% blocktranslate %}
-            O InfoDengue é um sistema de alerta para arboviroses baseado em dados híbridos gerados por meio da análise integrada
-            de dados minerados a partir da web social e de dados climáticos e epidemiológicos{% endblocktranslate %}.</h5>
-            </br><p>{% blocktranslate %}
-            Em 2021, o sistema ganhou amplitude nacional com o apoio do Ministério da Saúde realizando análises em nível estadual.
-            Com isso, mais secretarias passaram a receber semanalmente os boletins do InfoDengue. Implementado em 2015,
-            o sistema foi desenvolvido por pesquisadores do Programa de Computação Científica (Fundação Oswaldo Cruz, RJ) e
-            da Escola de Matemática Aplicada (Fundação Getúlio Vargas) com a forte colaboração da Secretaria Municipal de Saúde do Rio de Janeiro,
-            o Observatório da Dengue/UFMG e pesquisadores da Universidade Federal do Paraná e da Universidade Estadual do Oeste do Paraná.</p>
+  <!-- Sobre o Infodengue -->
+  <section class="mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header"
+           style="background-color: #e0eefd63; border-radius: 7px">
+        <h3 class="mb-0">
+          {% translate "Sobre o Infodengue" %}
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-lg-12 mb-3 mb-lg-0">
+            <p class="lead">
+              {% blocktrans trimmed %}
+              O Infodengue é um sistema de alerta precoce de transmissão de
+              arboviroses (dengue, chikungunya e zika) que opera em todos os
+              municípios do Brasil. Lançado em 2015, o sistema é mantido por
+              pesquisadores do Programa de Computação Científica (Fundação
+              Oswaldo Cruz, RJ) e da Escola de Matemática Aplicada (Fundação
+              Getúlio Vargas), com parceria e apoio do Ministério da Saúde.
+              {% endblocktrans %}
+            </p>
             <p>
-            Embora desenvolva boletins com análises de casos de dengue, zika e chikungunya de todo o país, os estados ainda podem aderir ao sistema.</br>
-            Acesse <a href="/participe"> como participar </a> para integrar o InfoDengue.
-            O estado participante recebe um relatório de análise de situação da dengue semanalmente.
-            A versão pública do site é acessada por muitas pessoas e é comum recebermos notícias de que essas informações são
-            utilizadas na definição de viagens e outras atividades.</p>
-            <p>
-            Nossa rede de colaboradores cresceu e conta agora com a parceria de grupos de pesquisa internacionais que buscam soluções para
-            arboviroses em outros países e organizações da sociedade civil. Por meio do compartilhamento de experiências e metodologias,
-            ampliamos a inovação e o conhecimento das arboviroses.</p>
-            <p>
-            Vários desafios técnicos e científicos foram enfrentados durante o desenvolvimento do InfoDengue, resultando em diversas teses e
-            dissertações. Como os desafios não terminam, continuamos e continuaremos sempre investigando novas soluções para gerar
-            informação útil para a gestão e para o avanço do conhecimento das arboviroses e seu controle.{% endblocktranslate %}</p>
-    </div>
-
-    <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
-        <h3 id="section2" class="panel-title">{% translate "O Sistema" %}</h3>
-    </div>
-    <div class="card-body">
-        <h5>{% blocktranslate %}
-        O sistema InfoDengue é um pipeline de coleta, harmonização e análise de dados semi-automatizado,
-        que gera indicadores de situação epidemiológica da dengue e outras arboviroses a nível municipal.{% endblocktranslate %}</h5></br>
-
-        <center><img style="relative: left;" src={% translate "/static/img/system_level_color.png" %} alt="gibberish" width="400" /></center><br></br>
-
-        <h5><b>{% translate "De onde vem os dados?" %}</b></h5><p>
-
-        <b>• {% translate "Casos de dengue, chikungunya e zika:" %}</b> {% blocktranslate %}Essas são doenças de notificação obrigatória, isso é, o profissional
-        de saúde que diagnostica um caso suspeito precisa preencher uma ficha de notificação que alimenta um banco
-        de dados municipal que depois é consolidado a nível estadual e finalmente, a nível federal pelo Ministério
-        da Saúde. Apenas uma fração desses casos são confirmados laboratorialmente, a maioria recebe classificação
-        final com base em critérios clínico-epidemiológicos. A partir dos casos notificados, são calculados os
-        indicadores de incidência que alimentam o InfoDengue.{% endblocktranslate %}<br></br>
-
-        <b>• {% translate "Dados meteorológicos:" %}</b> {% blocktranslate %}A transmissão de arboviroses é muito influenciada pelo clima.
-        O mosquito transmissor, Aedes aegypti, requer temperatura alta e umidade para se reproduzir e viver.
-        O vírus ao infectar o mosquito, também irá se reproduzir melhor em temperaturas mais altas. Dados de
-        temperatura e umidade são obtidos das <a href="https://estacoes.dengue.mat.br/">estações meteorológicas</a> de aeroportos assim como de imagens de
-        satélite.{% endblocktranslate %}<br></br>
-
-        <b>• {% translate "Dados demográficos:" %}</b> {% blocktranslate %}Indicadores epidemiológicos precisam ser calculados em relação ao tamanho da população.
-        Dados demográficos dos municípios brasileiros são atualizados a cada ano no Infodengue, utilizando as estimativas
-        do{% endblocktranslate %} <a href="https://www.ibge.gov.br/pt/inicio.html">IBGE.<a><br></br>
-
-        <h5><b>{% translate "O que o sistema faz" %}?</b></h5>
-
-        • <span style="background-color:orange">{% translate "Correção do atraso de notificação (nowcasting):" %}</span>
-        {% blocktranslate %} Os dados de notificação de doenças tem sempre um atraso.
-        Isso ocorre por vários motivos e inclui o tempo entre a pessoa adoecer e buscar atendimento médico,
-        o tempo que leva para o profissional de saúde notificar e o tempo que demora para agregar as informações
-        nos bancos de dados. Esse atraso dificulta a tomada de decisão pois tem-se sempre que olhar para um dado
-        desatualizado. Para contornar esse problema, foi desenvolvido um método estatístico baseado em inferência
-        Bayesiana que combina a estimação do atraso com a estimação do padrão temporal histórico da incidência para
-        calcular o número esperado de casos a cada semana. Esse processo se chama nowcasting ou estimação do
-        presente e está descrita em: {% endblocktranslate %}
-        <a href="https://onlinelibrary.wiley.com/doi/full/10.1002/sim.8303">Bastos, Economou et al (2019)</a>
-        ”A modelling approach for correcting reporting delays in disease surveillance data”.
-        {% blocktranslate %}A Figura abaixo (retirada de Bastos et al 2019) mostra em preto, a incidência verdadeira, em vermelho,
-        aquela observada com atraso e, em cinza, o nowcasting. Para mais detalhes técnicos, ver a referida publicação.{% endblocktranslate %}<br></br>
-
-        <center><img style="relative: left;" src="/static/img/graph_weeks.png" alt="gibberish" width="700" /></center><br></br>
-
-        • <span style="background-color:orange">{% translate "Detecção de transmissão sustentada:" %}</span> {% blocktranslate %}A estimação do número reprodutivo é importante em vários aspectos. Sequência de semanas com transmissão
-        crítica (Rt > 1) indica transmissão sustentada. Isso é, indica que estamos na fase de espalhamento da doença, e que ações adequadas para controle
-        precisam ser implementadas. Já períodos sub-críticos (Rt < 1) indicam que não há transmissão sustentada, isso pode ocorrer por causa do clima,
-        por causa do controle ou pela redução do contingente de suscetíveis. Para estimar R0 e Rt a partir dos dados de incidência, desenvolvemos metodologia
-        própria, descrita em{% endblocktranslate %} <a href="https://www.sciencedirect.com/science/article/pii/S1755436517300907?via%3Dihub">Codeço et al. 2018
-            </a>"Estimating the effective reproduction number of dengue considering temperature-dependent generation intervals".<br></br>
-
-        • <span style="background-color:yellow">{% translate "Análise de receptividade:" %}</span> {% blocktranslate %}A transmissão das arboviroses requer condições climáticas adequadas, que podem variar de lugar para lugar. No Rio de Janeiro,
-        por exemplo, temperatura maior que 22 graus é condição necessária para transmissão sustentada. Em Fortaleza, umidade máxima acima de 85% é a condição
-        necessária. Nós ajustamos modelos de árvore de decisão, para avaliar que combinação de variáveis climáticas e ambientais são indicadoras de condições de
-        transmissão. Essa informação serve de alerta precoce de chegada da temporada da arbovirose.{% endblocktranslate %}<br></br>
-
-        • <span style="background-color:red">{% translate "Detecção de situação atípica:" %}</span>
-            {% translate "Para estimar limiares epidêmicos, nós utilizamos o Moving Epidemics Method (MEM)" %}
-        <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/j.1750-2659.2012.00422.x">Vega et al. 2012</a>, {% blocktranslate %}que permite estimar
-        diversas grandezas de interesse com base em dados históricos locais como limiar pré-epidêmico, níveis de atividade típicas, valores esperados para
-        cada semana, etc. Como este limiar é obtido a partir do histórico de dados que alimenta o sistema, ele tem valores particulares para cada localidade.
-        Além destes limiares globais para a série temporal, a metodologia utilizada permite ainda obter estimativas para o número esperado de casos por semana,
-        juntamente de intervalos de confiança que permitem definir zonas de atividade semanal. Estas regiões são definidas de maneira similar aos níveis de atividade,
-        porém são calculados com base na distribuição típica de casos para cada semana. Tal construção identifica visualmente os padrões sazonais, uma vez que
-        apresentam a evolução temporal típica com base na mediana dos casos esperados para cada semana e intervalos de confiança inferior e superior
-        (utilizamos 10% e 90%, respectivamente), definindo corredores de atividade típica, como um diagrama de controle.{% endblocktranslate %}<br></br>
-
-        <h5><b>{% translate "Código de Cores:" %} </b></h5><p>
-
-        <center><img style="relative: left;" src={% translate "/static/img/table_color_level_pt.png" %} alt="gibberish" width="500" /></center><br></br>
-
-        <b>{% translate "Implementação" %}</b></br>
-        {% translate "Todos os códigos gerados para o InfoDengue, em sua maioria em R e Python, estão disponíveis em acesso aberto em​:" %} <br>
-        <a href="https://github.com/AlertaDengue">​https://github.com/AlertaDengue</a>
-    </div>
-
-    <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
-        <h3 id="section1.1" class="panel-title">{% translate "Relatórios Técnicos" %}</h3>
-    </div>
-    <br>
-    <ul>
-      <li><a href="{% url 'dados:download_technical_report_pdf' %}">{% translate "Reflexões sobre o risco de arboviroses em 2024" %}</a></li>
-      <li><a href="https://zenodo.org/records/13929005"
-                 target="_blank"
-                 rel="noopener noreferrer">{% translate "Previsões para a temporada de dengue de 2024-2025" %}</a></li>
-      <li><a href="https://zenodo.org/records/17516518"
-                 target="_blank"
-                 rel="noopener noreferrer">{% translate "Previsões para a temporada de dengue de 2025-2026" %}</a></li>
-    </ul>
-
-    <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
-        <h3 id="section2" class="panel-title">{% translate "Projetos de pesquisa" %}</h3>
-    </div>
-    <div class="card-body">
-        <p>
-            <h5>2022-2023<br>
-                <b>{% translate "ARBOFRONTEIRA: Prevendo epidemias de doenças transmitidas por mosquitos no arco sul do país" %}</b>
+              {% blocktrans trimmed %}
+              Um sistema de alerta precoce visa antecipar mudanças no padrão de
+              notificação das arboviroses, de forma que os profissionais da
+              vigilância sejam informados o mais cedo possível de potenciais
+              mudanças no risco de surtos e epidemias. Desde sua criação, os
+              boletins do Infodengue auxiliaram municípios e estados no
+              direcionamento de ações e no alerta. Em 2021, o sistema alcançou
+              o nível nacional com o apoio do Ministério da Saúde. Relatórios
+              em nível estadual podem ser solicitados pelas secretarias
+              estaduais de saúde.
+              {% endblocktrans %}
+            </p>
+            <h5 class="mt-4">
+              {% translate "Histórico do Infodengue" %}
             </h5>
-            {% blocktranslate %}
-            O objetivo dessa proposta é gerar indicadores para a vigilância de arboviroses que sejam
-            específicos para a fronteira sul do país e guidelines para seu uso no fortalecimento da
-            vigilância desses municípios. Para isso, faz-se necessário compreender o processo de
-            expansão das arboviroses nos três países e identificar cenários futuros de expansão. Por
-            meio de modelos estatísticos e matemáticos, vamos investigar cenários possíveis de disseminação
-            das arboviroses e a importância de protocolos binacionais e trinacionais para
-            a maior precisão de ações de controle. Do ponto de vista prático, serão aplicados modelos
-            de nowcasting e de predição em dois pontos: a tríplice fronteira Foz do Iguaçu, Iguazu e
-            Ciudad del este; e na fronteira formada por Barracão (PR), Dionísio Cerqueira (SC) e Bernando de
-            Irigoyen (Arg). Os modelos serão incorporados ao Infodengue e serão disponibilizados
-            relatórios específicos para cada região.{% endblocktranslate %}<br>
-            <b>{% translate "Financiamento:" %}</b> INOVA Fiocruz
+          </div>
+          <div class="col-lg-12 mt-3 mt-lg-0">
+            <figure class="figure w-100 text-center">
+              <img
+                   src="{% static 'img/about/historico_infodengue_'|add:lang_suffix|add:'.png' %}"
+                   class="figure-img img-fluid rounded"
+                   alt="{% trans 'Linha do tempo do Infodengue' %}">
+              <figcaption class="figure-caption text-muted small">
+                {% translate "Histórico de implantação do Infodengue." %}
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <p class="mt-3">
+          {% blocktrans trimmed %}
+          Nossa rede de colaboradores inclui grupos de pesquisa nacionais e
+          internacionais que buscam soluções para vigilância e resposta à
+          epidemias de arboviroses, além de organizações da sociedade civil.
+          Ao compartilhar experiências e metodologias, expandimos nossa
+          capacidade de inovar na vigilância de arbovírus.
+          {% endblocktrans %}
+        </p>
+
+        <p>
+          {% blocktrans trimmed %}
+          Todos os códigos utilizados na geração das análises do Infodengue
+          estão disponíveis em:
+          {% endblocktrans %}
+          <a href="https://github.com/AlertaDengue"
+             target="_blank"
+             rel="noopener noreferrer">
+            https://github.com/AlertaDengue
+          </a>.
+        </p>
+
+        <p>
+          {% blocktrans trimmed %}
+          Os diversos desafios técnicos e científicos enfrentados durante o
+          desenvolvimento do Infodengue resultaram em teses e dissertações.
+          Como os desafios não param, continuamos e sempre continuaremos a
+          investigar novas soluções para gerar informações úteis para o manejo
+          e o avanço do conhecimento sobre arboviroses e seu controle.
+          {% endblocktrans %}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sobre o sistema -->
+  <section class="mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header"
+           style="background-color: #e0eefd63; border-radius: 7px">
+        <h4 class="mb-0">
+          {% translate "Sobre o sistema" %}
+        </h4>
+      </div>
+      <div class="card-body">
+        <p>
+          {% blocktrans trimmed %}
+          A figura abaixo apresenta o fluxo de trabalho do Infodengue. A seguir,
+          cada um dos passos será detalhado.
+          {% endblocktrans %}
+        </p>
+        <h5 class="mt-4">
+          {% translate "Fluxo Infodengue" %}
+        </h5>
+        <figure class="figure w-100 text-center mb-4">
+          <img
+               src="{% static 'img/about/fluxo_infodengue_'|add:lang_suffix|add:'.png' %}"
+               class="figure-img img-fluid rounded"
+               alt="{% trans 'Fluxo de trabalho do sistema Infodengue' %}">
+          <figcaption class="figure-caption text-muted small">
+            {% blocktrans trimmed %}
+            Fluxo de coleta, harmonização e análise de dados do Infodengue.
+            {% endblocktrans %}
+          </figcaption>
+        </figure>
+
+        <p class="small text-muted mb-0">
+          1. Bastos, Leonardo S., et al. “A modelling approach for correcting
+          reporting delays in disease surveillance data.” Statistics in
+          Medicine 38.22 (2019): 4363–4377.</br>
+          2. Codeço, Claudia T., Daniel A. M. Villela, e Flavio C. Coelho.
+          “Estimating the effective reproduction number of dengue considerando
+          temperature-dependent generation intervals.” Epidemics 25 (2018):
+          101–111.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Coleta de dados -->
+  <section class="mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header"
+           style="background-color: #e0eefd63; border-radius: 7px">
+        <h4 class="mb-0">
+          {% translate "Coleta de dados" %}
+        </h4>
+      </div>
+      <div class="card-body">
+        <p>
+          <strong>
+            {% blocktrans trimmed %}
+            Casos notificados de dengue, zika ou chikungunya.
+            {% endblocktrans %}
+          </strong>
+          {% blocktrans trimmed %}
+          São doenças de notificação compulsória, ou seja, o profissional de
+          saúde que diagnostica um caso suspeito precisa preencher uma ficha de
+          notificação que alimenta o SINAN (Sistema Nacional de Notificação de
+          Agravos). Apenas uma fração desses casos é confirmada
+          laboratorialmente; a maioria recebe classificação final com base em
+          critérios clínicos e epidemiológicos. Os indicadores de incidência
+          que alimentam o Infodengue são calculados utilizando todos os casos
+          notificados. Os dados de notificação são obtidos pelo Ministério da
+          Saúde.
+          {% endblocktrans %}
+        </p>
+
+        <p>
+          <strong>{% translate "Dados meteorológicos." %}</strong>
+          {% blocktrans trimmed %}
+          A transmissão de arbovírus é muito influenciada pelo clima.
+          O mosquito transmissor, Aedes aegypti, requer alta temperatura e
+          umidade para se reproduzir e sobreviver. O vírus que infecta o
+          mosquito também se reproduz melhor em temperaturas mais altas.
+          Os dados de temperatura e umidade são obtidos a partir da API do
+          projeto
+          {% endblocktrans %}
+          <a href="https://mosqlimate.org/pt/"
+             target="_blank"
+             rel="noopener noreferrer">Mosqlimate</a>,
+          {% translate "que agrega os dados de reanálise de satélite disponibilizados pelo" %}
+          <a href="https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview"
+             target="_blank"
+             rel="noopener noreferrer">Copernicus ERA5</a>.
+          {% translate "No passado, a fonte desses dados eram" %}
+          <a href="https://estacoes.dengue.mat.br/"
+             target="_blank"
+             rel="noopener noreferrer">{%translate "estações meteorológicas de aeroportos" %}</a>.
+        </p>
+
+        <p>
+          <strong>{% translate "Dados demográficos." %}</strong>
+          {% blocktrans trimmed %}
+          Os indicadores epidemiológicos exigem o tamanho da população.
+          Os dados demográficos dos municípios brasileiros são atualizados
+          anualmente no Infodengue, utilizando estimativas do
+          {% endblocktrans %}
+          <a href="https://www.ibge.gov.br/pt/inicio.html"
+             target="_blank"
+             rel="noopener noreferrer">IBGE</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Harmonização e análise de dados -->
+  <section class="mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header"
+           style="background-color: #e0eefd63; border-radius: 7px">
+        <h4 class="mb-0">
+          {% translate "Harmonização e análise de dados" %}
+        </h4>
+      </div>
+      <div class="card-body">
+        <h5 class="mt-2">
+          {% translate "Correção do atraso de notificação" %}
+        </h5>
+        <p>
+          {% blocktrans trimmed %}
+          Os dados disponíveis de ocorrência de doenças podem estar atrasados
+          por uma variedade de razões, incluindo o tempo entre adoecer e
+          procurar atendimento médico, o tempo que o profissional de saúde leva
+          para relatar e o tempo que leva para agregar informações em bancos de
+          dados. Esse atraso dificulta a tomada de decisões porque sempre é
+          preciso olhar para dados desatualizados.
+          {% endblocktrans %}
         </p>
         <p>
-            <h5>2020-2021<br>
-                <b>{% translate "Prevendo epidemias de doenças transmitidas por mosquitos" %}</b>
-            </h5>
-            {% blocktranslate %}
-            Esse projeto visa fornecer projeções a médio prazo para a incidência de novos casos 
-            de doenças transmitidas por mosquitos no Brasil. O projeto visa adaptar para a realidade 
-            brasileira a experiência implementada no Vietnam onde propomos o uso de modelos hierárquicos 
-            espaço-temporais bayesianos para prever a incidência de casos de dengue e o suporte de 
-            variáveis auxiliares tais como variáveis climáticas (Colon-Gonzalez, Bastos, et al. 2021). 
-            Neste projeto estenderemos a modelagem preditiva de dengue no Vietnam para as doenças transmitidas 
-            por mosquito, na qual exploraremos, separadamente, as arboviroses no Brasil e a malária na 
-            região Amazônica, que são doenças de grande impacto e relevância na saúde pública do país. 
-            Os modelos a serem propostos serão construídos e validados usando dados abertos, e serão feitas 
-            projeções a médio prazo, ou seja seis a doze meses à frente para as microrregiões de saúde. 
-            O projeto priorizará o uso de dados abertos, além do uso e desenvolvimento de códigos em ambientes 
-            livres, de tal forma que equipes de vigilância epidemiológica possam replicar e adaptar conforme 
-            suas necessidades. Além das projeções, será desenvolvido em paralelo um dashboard específico para 
-            cada doença, de tal forma que as previsões fiquem acessíveis a tomadores de decisão e para população 
-            geral. {% endblocktranslate %}<br>
-            <b>{% translate "Financiamento:" %}</b> INOVA Fiocruz
+          {% blocktrans trimmed %}
+          Para contornar esse problema, a equipe do Infodengue desenvolveu um
+          método estatístico baseado em inferência bayesiana que combina a
+          estimativa de atraso com o padrão temporal histórico de incidência
+          para calcular o número esperado de casos a cada semana. Esse processo
+          de previsão a curto prazo é descrito por
+          {% endblocktrans %}
+          <a href="https://onlinelibrary.wiley.com/doi/full/10.1002/sim.8303"
+             target="_blank"
+             rel="noopener noreferrer">Bastos, Economou et al. (2019)</a>.
         </p>
         <p>
-            <h5>2019-2023<br>
-                <b>{% translate "EVIGILANCIA: monitoramento integrado e contínuo de arboviroses" %}</b>
-            </h5>
-            {% blocktranslate %}
-            Este projeto visou a consolidação do sistema de alerta para arboviroses baseado em dados
-            hı́bridos gerados por meio da análise integrada de dados minerados a partir de dados regionais
-            climáticos e epidemiológicos, o Infodengue.{% endblocktranslate %}<br>
-            <b>{% translate "Financiamento:" %}</b> INOVA Fiocruz
+          {% blocktrans trimmed %}
+          A figura abaixo (retirada de Bastos et al., 2019) exemplifica a
+          importância dessa correção. A curva em preto mostra a incidência
+          real, e em vermelho, a informação disponível no momento da tomada de
+          decisão. Veja que os dados disponíveis sugerem queda quanto os dados
+          de fato estão aumentando. O modelo de correção, em cinza, mostra a
+          incidência corrigida. Para mais detalhes técnicos, consulte a
+          publicação. Essas funções estão disponíveis em
+          {% endblocktrans %}
+          <a href="https://github.com/AlertaDengue/AlertTools"
+             target="_blank"
+             rel="noopener noreferrer">{% translate "pacote R AlertTools" %}</a>.
         </p>
-    </div>
 
-    <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
-        <h3 id="section3" class="panel-title">{% translate "Como citar o InfoDengue" %}</h3>
+        <div class="row">
+          <div class="col-md-12">
+            <figure class="figure w-100 text-center">
+              <img src="{% static 'img/about/nowcast.png' %}"
+                   class="figure-img img-fluid rounded"
+                   alt="{% trans 'Exemplo de correção de atraso de notificação' %}">
+              <figcaption class="figure-caption text-muted small">
+                {% translate "Exemplo de correção de atraso de notificação (nowcasting)." %}
+              </figcaption>
+            </figure>
+          </div>
+
+          <div class="col-md-12">
+            <p>
+              {% blocktrans trimmed %}
+              Na figura abaixo, há um exemplo de como os casos estimados pela
+              metodologia de nowcasting aparecem nos gráficos em nível
+              municipal, que podem ser acessados ao se pesquisar o nome de um
+              município no campo “Encontre um município” da barra de navegação.
+              A linha vermelha-escura pontilhada representa o nowcasting, e a
+              azul indica os casos notificados até o momento. As cores na área
+              sombreada representam os níveis de alerta que serão explicados a
+              seguir.
+              {% endblocktrans %}
+            </p>
+            <h5 class="mt-4">
+              {% translate "Correção do atraso de notificação" %}
+            </h5>
+          </div>
+
+          <div class="col-md-12">
+            <figure class="figure w-100 text-center">
+              <img src="{% static 'img/about/fig_nowcast_'|add:lang_suffix|add:'.png' %}"
+                   class="figure-img img-fluid rounded"
+                   alt="{% trans 'Exemplo de nowcasting em gráfico municipal' %}">
+              <figcaption class="figure-caption text-muted small">
+                {% translate "Visualização do nowcasting em nível municipal." %}
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <h5 class="mt-4">
+          {% translate "Análise de receptividade" %}
+        </h5>
+        <p>
+          {% blocktrans trimmed %}
+          A transmissão de arbovírus requer condições climáticas adequadas, que
+          podem variar de local para local. No Rio de Janeiro, por exemplo, uma
+          temperatura superior a 22&nbsp;°C é uma condição necessária para a
+          transmissão sustentada. Em Fortaleza, a umidade máxima acima de 85%
+          é uma condição necessária. Ajustamos modelos de árvore de decisão
+          para avaliar qual combinação de variáveis climáticas e ambientais
+          são indicativas de condições de transmissão.
+          {% endblocktrans %}
+        </p>
+        <p>
+          {% blocktrans trimmed %}
+          A figura abaixo mostra um exemplo, para uma cidade. A árvore mostra
+          as condições que estão mais associadas com a ocorrência de semanas
+          com transmissão (Rt&gt;1). Quando ocorre uma semana com temperatura
+          máxima &gt; 27,6, existe uma alta probabilidade de transmissão
+          3 semanas depois (barras mais escuras). Isso ocorre quando a
+          incidência já estava alta (&gt;107.3) ou quando a umidade estava
+          alta (&gt;48.9). Essas regras são utilizadas para passar de nível
+          verde para amarelo. Cada município terá seu conjunto específico de
+          regras.
+          {% endblocktrans %}
+        </p>
+        <h5 class="mt-4">
+          {% translate "Receptividade para transmissão" %}
+        </h5>
+        <figure class="figure w-100 text-center">
+          <img
+               src="{% static 'img/about/receptividade_clima_'|add:lang_suffix|add:'.png' %}"
+               class="figure-img img-fluid rounded"
+               alt="{% trans 'Exemplo de árvore de decisão para receptividade climática' %}">
+          <figcaption class="figure-caption text-muted small">
+            {% translate "Exemplo de árvore de decisão relacionando clima e transmissão." %}
+          </figcaption>
+        </figure>
+
+        <h5 class="mt-4">
+          {% translate "Detecção de transmissão sustentada" %}
+        </h5>
+        <p>
+          {% blocktrans trimmed %}
+          A estimativa do número reprodutivo é importante de várias maneiras.
+          A sequência de semanas com transmissão crítica (Rt &gt; 1) indica
+          transmissão sustentada, ou seja, indica a fase de propagação da
+          doença e que ações de controle adequadas precisam ser implementadas.
+          Por outro lado, períodos subcríticos (Rt &lt; 1) indicam que não há
+          transmissão sustentada.
+          {% endblocktrans %}
+        </p>
+        <p>
+          {% blocktrans trimmed %}
+          Para estimar o Rt a partir dos dados de incidência, desenvolvemos
+          nossa própria metodologia, descrita em
+          {% endblocktrans %}
+          <a href="https://www.sciencedirect.com/science/article/pii/S1755436517300907?via%3Dihub"
+             target="_blank"
+             rel="noopener noreferrer">Codeço et al. (2018)</a>.
+          {% blocktrans trimmed %}
+          "Estimando o número efetivo de reprodução da dengue considerando
+          intervalos de geração dependentes da temperatura".
+          {% endblocktrans %}
+        </p>
+        <p>
+          {% blocktrans trimmed %}
+          A figura abaixo apresenta três painéis: o primeiro mostra a
+          temperatura média, o segundo exibe os casos notificados e o terceiro
+          apresenta o Rt estimado a partir da combinação entre casos e
+          temperatura. No último painel, a linha horizontal vermelha indica o
+          limiar de Rt = 1. As barras horizontais em laranja destacam as
+          semanas em que houve transmissão sustentada, caracterizada por
+          Rt &gt; 1. Ao menos duas semanas com o Rt &gt; 1 é o critério
+          utilizado para a transição do nível de alerta amarelo para o
+          laranja.
+          {% endblocktrans %}
+        </p>
+        <h5 class="mt-4">
+          {% translate "Transmissão sustentada" %}
+        </h5>
+        <figure class="figure w-100 text-center">
+          <img
+               src="{% static 'img/about/trans_sust_'|add:lang_suffix|add:'.png' %}"
+               class="figure-img img-fluid rounded"
+               alt="{% trans 'Exemplo de Rt e períodos de transmissão sustentada' %}">
+          <figcaption class="figure-caption text-muted small">
+            {% translate "Temperatura, incidência e Rt com destaque para períodos de Rt &gt; 1." %}
+          </figcaption>
+        </figure>
+
+        <h5 class="mt-4">
+          {% translate "Detecção de incidência atípica" %}
+        </h5>
+        <p>
+          {% blocktrans trimmed %}
+          Para estimar os limiares epidêmicos para dengue, adaptamos o Método
+          de Epidemias Móveis (MEM),
+          {% endblocktrans %}
+          <a href="https://onlinelibrary.wiley.com/doi/full/10.1111/j.1750-2659.2012.00422.x"
+             target="_blank"
+             rel="noopener noreferrer">Vega et al. (2012)</a>,
+          {% blocktrans trimmed %}
+          que permite estimar diversas grandezas de interesse com base em dados
+          históricos locais como limiares pré-epidemia, níveis típicos de
+          atividade, valores esperados para cada semana, etc. Como esse limiar
+          é derivado do histórico de dados, locais com diferentes volumes de
+          casos têm limiares diferentes. A metodologia também fornece
+          estimativas para o número esperado de casos por semana, juntamente
+          com intervalos de confiança que permitem a definição de zonas de
+          atividade semanal. Essas regiões são definidas de forma semelhante
+          aos níveis de atividade, mas são calculadas com base na distribuição
+          típica de casos para cada semana. Essa construção nos permite
+          identificar visualmente padrões sazonais, uma vez que apresentam a
+          evolução temporal típica com base na mediana de casos esperados para
+          cada semana e intervalos de confiança inferior e superior (usamos
+          10% e 90%, respectivamente), definindo corredores de atividade como
+          um diagrama de controle.
+          {% endblocktrans %}
+        </p>
+        <p>
+          {% blocktrans trimmed %}
+          A figura abaixo é exibida ao acessar os relatórios municipais
+          disponíveis na aba “Relatórios” do menu de navegação. Ela apresenta
+          a curva de casos notificados (em preto), acompanhada das barras
+          verticais que indicam os níveis de alerta e das barras horizontais
+          que representam os limiares epidêmicos calculados pelo MEM. Na parte
+          superior da figura, são também apresentados os valores estimados pelo
+          MEM para cada período: pré-epidêmico, epidêmico e pós-epidêmico. Uma
+          incidência acima de 90% do limiar calculado pelo MEM é necessária
+          para mudar o nível de alerta de laranja para vermelho
+          (incidência alta).
+          {% endblocktrans %}
+        </p>
+        <h5 class="mt-4">
+          {% translate "Incidência alta" %}
+        </h5>
+        <figure class="figure w-100 text-center">
+          <img
+               src="{% static 'img/about/alta_ativ_'|add:lang_suffix|add:'.png' %}"
+               class="figure-img img-fluid rounded"
+               alt="{% trans 'Exemplo de limiares epidêmicos e atividade atípica' %}">
+          <figcaption class="figure-caption text-muted small">
+            {% translate "Exemplo de incidência acima dos limiares epidêmicos calculados pelo MEM." %}
+          </figcaption>
+        </figure>
+
+        <h5 class="mt-4">
+          {% translate "Níveis de alerta de transmissão de arboviroses" %}
+        </h5>
+        <p>
+          {% blocktrans trimmed %}
+          alerta do município. Esse alerta é atualizado semanalmente e é
+          composto pelos seguintes níveis:
+          {% endblocktrans %}
+        </p>
+
+        <ul>
+          <li>
+            <span class="badge badge-pill"
+                  style="background-color:#00e320; color:#000;">
+              {% translate "Verde" %}
+            </span>
+            {% blocktrans trimmed %}
+            – Condições climáticas não favoráveis para a transmissão
+            (em termos de temperatura ou umidade) e atividade viral baixa.
+            {% endblocktrans %}
+          </li>
+
+          <li>
+            <span class="badge badge-pill"
+                  style="background-color:#f1ff00; color:#000;">
+              {% translate "Amarelo" %}
+            </span>
+            {% blocktrans trimmed %}
+            – Condições climáticas favoráveis para a transmissão
+            (em termos de temperatura ou umidade) e atividade viral presente
+            (pelo menos 1 caso).
+            {% endblocktrans %}
+          </li>
+
+          <li>
+            <span class="badge badge-pill"
+                  style="background-color:#ff8800; color:#fff;">
+              {% translate "Laranja" %}
+            </span>
+            {% blocktrans trimmed %}
+            – Incidência crescente (ao menos 2 semanas com Rt &gt; 1)
+            mas dentro dos níveis históricos.
+            {% endblocktrans %}
+          </li>
+
+          <li>
+            <span class="badge badge-pill"
+                  style="background-color:#fc0000; color:#fff;">
+              {% translate "Vermelho" %}
+            </span>
+            {% blocktrans trimmed %}
+            – Incidência alta para os padrões históricos
+            (acima de 90% do limiar calculado pelo MEM).
+            {% endblocktrans %}
+          </li>
+        </ul>
+
+        <p>
+          {% blocktrans trimmed %}
+          A figura abaixo apresenta a variação dos níveis de alerta em
+          diferentes períodos da curva epidêmica da cidade de Foz do Iguaçu.
+          {% endblocktrans %}
+        </p>
+        <h5 class="mt-4">
+          {% translate "Classificação da situação de transmissão de arboviroses" %}
+        </h5>
+        <figure class="figure w-100 text-center">
+          <img
+               src="{% static 'img/about/overview_'|add:lang_suffix|add:'.png' %}"
+               class="figure-img img-fluid rounded"
+               alt="{% trans 'Exemplo de evolução dos níveis de alerta' %}">
+          <figcaption class="figure-caption text-muted small">
+            {% blocktrans trimmed %}
+            Variação dos níveis de alerta em diferentes períodos da
+            curva epidêmica.
+            {% endblocktrans %}
+          </figcaption>
+        </figure>
+
+        <p>
+          {% blocktrans trimmed %}
+          As análises de situação de transmissão são atualizadas semanalmente
+          e disponibilizadas na aba
+          {% endblocktrans %}
+          <a href="https://info.dengue.mat.br/report/"
+             target="_blank"
+             rel="noopener noreferrer">{% translate "relatórios" %}</a>
+          {% blocktrans trimmed %}
+          do site, assim como em dashboards a nível municipal e estadual,
+          também disponíveis na plataforma. Além disso, os dados podem ser
+          acessados na
+          {% endblocktrans %}
+          <a href="https://info.dengue.mat.br/services/api"
+             target="_blank"
+             rel="noopener noreferrer">{% translate "API do projeto" %}</a>.
+          {% blocktrans trimmed %}
+          Para mais informações sobre os materiais disponibilizados acesse o
+          nosso
+          {% endblocktrans %}
+          <a href="https://cursosqualificacao.campusvirtual.fiocruz.br/hotsite/infodengueinfogripe"
+             target="_blank"
+             rel="noopener noreferrer">{% translate "curso online" %}</a>.
+        </p>
+      </div>
     </div>
-    <div class="card-body">
-        C. Codeco, F. Coelho, O. Cruz, S. Oliveira, T. Castro, L. Bastos, Infodengue:<br>
-        A nowcasting system for the surveillance of arboviruses in Brazil, Revue d'Épidémiologie et de Santé Publique,
-        Vol 66, Suppl 5, 2018, Page S386,<a href="https://www.sciencedirect.com/science/article/pii/S0398762018311088?via%3Dihub">​https://doi.org/10.1016/j.respe.2018.05.408.</a><br></br>
+  </section>
+
+  <!-- Epi-Scanner -->
+  <section class="mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header"
+           style="background-color: #e0eefd63; border-radius: 7px">
+        <h4 class="mb-0">
+          {% translate "Epi-Scanner" %}
+        </h4>
+      </div>
+      <div class="card-body">
+        <p>
+          {% blocktrans trimmed %}
+          Além da análise de situação de transmissão de arboviroses, o
+          Infodengue desenvolve e disponibiliza outros recursos para apoio à
+          tomada de decisão. Um recurso adicional do projeto é o
+          {% endblocktrans %}
+          <a href="https://info.dengue.mat.br/epi-scanner/"
+             target="_blank"
+             rel="noopener noreferrer">Epi-Scanner</a>,
+          {% blocktrans trimmed %}
+          uma metodologia criada para estimar os parâmetros epidemiológicos de
+          cada epidemia e município do país. Dentre os parâmetros estimados
+          estão a semana de pico, o número de reprodução e o número total de
+          casos na temporada.
+          {% endblocktrans %}
+        </p>
+        <p>
+          {% blocktrans trimmed %}
+          Mais detalhes podem ser encontrados no
+          {% endblocktrans %}
+          <a href="https://info.dengue.mat.br/epi-scanner/"
+             target="_blank"
+             rel="noopener noreferrer">dashboard</a>
+          {% blocktrans trimmed %}
+          do produto. O artigo que descreve a metodologia pode ser acessado
+          {% endblocktrans %}
+          <a href="https://royalsocietypublishing.org/doi/full/10.1098/rsos.241261"
+             target="_blank"
+             rel="noopener noreferrer">{% translate "aqui" %}</a>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Desafio Infodengue–Mosqlimate -->
+  <section class="mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header"
+           style="background-color: #e0eefd63; border-radius: 7px">
+        <h4 class="mb-0">
+          {% translate "Desafio Infodengue-Mosqlimate de previsão de epidemias de dengue" %}
+        </h4>
+      </div>
+      <div class="card-body">
+        <p>
+          {% blocktrans trimmed %}
+          Além dos relatórios semanais, desde 2024, o Infodengue, em parceria
+          com o projeto
+          {% endblocktrans %}
+          <a href="https://api.mosqlimate.org/"
+             target="_blank"
+             rel="noopener noreferrer">Mosqlimate</a>,
+          {% blocktrans trimmed %}
+          tem organizado um desafio de previsão de longo prazo de dengue, em
+          nível estadual, com o objetivo de combinar os esforços de diferentes
+          estratégias de modelagem. Os resultados dessa competição são
+          agregados em um relatório que é enviado para o Ministério da Saúde
+          para o auxílio na preparação para a próxima temporada.
+          {% endblocktrans %}
+        </p>
+        <p>
+          {% blocktrans trimmed %}
+          Mais informações sobre a competição podem ser encontradas
+          {% endblocktrans %}
+          <a href="https://sprint.mosqlimate.org/"
+             target="_blank"
+             rel="noopener noreferrer">{% translate "aqui" %}</a>.
+          {% blocktrans trimmed %}
+          Os relatórios gerados por essa iniciativa estão disponíveis na
+          seção <em>Relatórios técnicos</em>.
+          {% endblocktrans %}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Relatórios técnicos -->
+  <section class="mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header"
+           style="background-color: #e0eefd63; border-radius: 7px">
+        <h4 class="mb-0">
+          {% translate "Relatórios técnicos" %}
+        </h4>
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>
+            <a href="{% url 'dados:download_technical_report_pdf' %}">
+              {% translate "Reflexões sobre o risco de arboviroses em 2024" %}
+            </a>
+          </li>
+          <li>
+            <a href="https://zenodo.org/records/13929005"
+               target="_blank"
+               rel="noopener noreferrer">
+              {% translate "Previsões para a temporada de dengue de 2024-2025" %}
+            </a>
+          </li>
+          <li>
+            <a href="https://zenodo.org/records/17516518"
+               target="_blank"
+               rel="noopener noreferrer">
+              {% translate "Previsões para a temporada de dengue de 2025-2026" %}
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projetos de pesquisa -->
+  <section class="mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header"
+           style="background-color: #e0eefd63; border-radius: 7px">
+        <h4 class="mb-0">
+          {% translate "Projetos de pesquisa" %}
+        </h4>
+      </div>
+      <div class="card-body">
+        <div class="mb-4">
+          <h5>
+            2022-2023<br>
+            <b>
+              {% translate "ARBOFRONTEIRA: Prevendo epidemias de doenças transmitidas por mosquitos no arco sul do país" %}
+            </b>
+          </h5>
+          {% blocktranslate %}
+          O objetivo dessa proposta é gerar indicadores para a vigilância de
+          arboviroses que sejam específicos para a fronteira sul do país e
+          guidelines para seu uso no fortalecimento da vigilância desses
+          municípios. Para isso, faz-se necessário compreender o processo de
+          expansão das arboviroses nos três países e identificar cenários
+          futuros de expansão. Por meio de modelos estatísticos e matemáticos,
+          vamos investigar cenários possíveis de disseminação das arboviroses e
+          a importância de protocolos binacionais e trinacionais para a maior
+          precisão de ações de controle. Do ponto de vista prático, serão
+          aplicados modelos de nowcasting e de predição em dois pontos: a
+          tríplice fronteira Foz do Iguaçu, Iguazu e Ciudad del este; e na
+          fronteira formada por Barracão (PR), Dionísio Cerqueira (SC) e
+          Bernando de Irigoyen (Arg). Os modelos serão incorporados ao
+          Infodengue e serão disponibilizados relatórios específicos para cada
+          região.
+          {% endblocktranslate %}
+          <br>
+          <b>{% translate "Financiamento:" %}</b> INOVA Fiocruz
+        </div>
+
+        <div class="mb-4">
+          <h5>
+            2020-2021<br>
+            <b>
+              {% translate "Prevendo epidemias de doenças transmitidas por mosquitos" %}
+            </b>
+          </h5>
+          {% blocktranslate %}
+          Esse projeto visa fornecer projeções a médio prazo para a incidência
+          de novos casos de doenças transmitidas por mosquitos no Brasil. O
+          projeto visa adaptar para a realidade brasileira a experiência
+          implementada no Vietnam onde propomos o uso de modelos hierárquicos
+          espaço-temporais bayesianos para prever a incidência de casos de
+          dengue e o suporte de variáveis auxiliares tais como variáveis
+          climáticas (Colon-Gonzalez, Bastos, et al. 2021). Neste projeto
+          estenderemos a modelagem preditiva de dengue no Vietnam para as
+          doenças transmitidas por mosquito, na qual exploraremos,
+          separadamente, as arboviroses no Brasil e a malária na região
+          Amazônica, que são doenças de grande impacto e relevância na saúde
+          pública do país. Os modelos a serem propostos serão construídos e
+          validados usando dados abertos, e serão feitas projeções a médio
+          prazo, ou seja seis a doze meses à frente para as microrregiões de
+          saúde. O projeto priorizará o uso de dados abertos, além do uso e
+          desenvolvimento de códigos em ambientes livres, de tal forma que
+          equipes de vigilância epidemiológica possam replicar e adaptar
+          conforme suas necessidades. Além das projeções, será desenvolvido em
+          paralelo um dashboard específico para cada doença, de tal forma que as
+          previsões fiquem acessíveis a tomadores de decisão e para população
+          geral.
+          {% endblocktranslate %}
+          <br>
+          <b>{% translate "Financiamento:" %}</b> INOVA Fiocruz
+        </div>
+
+        <div class="mb-4">
+          <h5>
+            2019-2023<br>
+            <b>
+              {% translate "EVIGILANCIA: monitoramento integrado e contínuo de arboviroses" %}
+            </b>
+          </h5>
+          {% blocktranslate %}
+          Este projeto visou a consolidação do sistema de alerta para
+          arboviroses baseado em dados hı́bridos gerados por meio da análise
+          integrada de dados minerados a partir de dados regionais climáticos e
+          epidemiológicos, o Infodengue.
+          {% endblocktranslate %}
+          <br>
+          <b>{% translate "Financiamento:" %}</b> INOVA Fiocruz
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Como citar o InfoDengue -->
+  <section class="mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header"
+           style="background-color: #e0eefd63; border-radius: 7px">
+        <h4 class="mb-0">
+          {% translate "Como citar o InfoDengue" %}
+        </h4>
+      </div>
+      <div class="card-body">
+        C. Codeco, F. Coelho, O. Cruz, S. Oliveira, T. Castro, L. Bastos,
+        Infodengue:<br>
+        A nowcasting system for the surveillance of arboviruses in Brazil,
+        Revue d'Épidémiologie et de Santé Publique, Vol 66, Suppl 5, 2018,
+        Page S386,
+        <a href="https://www.sciencedirect.com/science/article/pii/S0398762018311088?via%3Dihub">
+          ​https://doi.org/10.1016/j.respe.2018.05.408
+        </a><br><br>
 
         <b>@article</b>{CODECO2018S386,<br>
-        <b>title</b> = "Infodengue: A nowcasting system for the surveillance of arboviruses in Brazil",<br>
+        <b>title</b> = "Infodengue: A nowcasting system for the surveillance of
+        arboviruses in Brazil",<br>
         <b>journal</b> = "Revue d'Épidémiologie et de Santé Publique",<br>
         <b>volume</b> = "66",<br>
         <b>pages</b> = "S386",<br>
         <b>year</b> = "2018",<br>
-        <b>note</b> = "European Congress of Epidemiology “Crises, epidemiological transitions and the role of epidemiologists”",<br>
+        <b>note</b> =
+        "European Congress of Epidemiology “Crises, epidemiological transitions
+        and the role of epidemiologists”",<br>
         <b>issn</b> = "0398-7620",<br>
         <b>doi</b> = "https://doi.org/10.1016/j.respe.2018.05.408",<br>
-        <b>url</b> = "http://www.sciencedirect.com/science/article/pii/S0398762018311088",<br>
-        <b>author</b> = "C. Codeco and F. Coelho and O. Cruz and S. Oliveira and T. Castro and L. Bastos"}<br>
+        <b>url</b> =
+        "http://www.sciencedirect.com/science/article/pii/S0398762018311088",<br>
+        <b>author</b> =
+        "C. Codeco and F. Coelho and O. Cruz and S. Oliveira and T. Castro and
+        L. Bastos"}<br>
+      </div>
     </div>
+  </section>
 
-    <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
-        <h3 id="section4" class="panel-title">{% translate "Produções científicas associadas ao Infodengue" %}</h3>
+  <!-- Produções científicas associadas -->
+  <section class="mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header"
+           style="background-color: #e0eefd63; border-radius: 7px">
+        <h4 class="mb-0">
+          {% translate "Produções científicas associadas ao Infodengue" %}
+        </h4>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <h5>2022</h5>
+          <ul>
+            <li>
+              Codeco C.T., Oliveira S.S., Ferreira D.A.C., Riback T.I.S.,
+              Bastos L.S., Lana R.M., Almeida I.F., Godinho V.B., Cruz O.G.,
+              and Coelho F.C. Fast expansion of dengue in brazil. The Lancet
+              Regional Health - Americas,
+              <a href="https://www.thelancet.com/action/showPdf?pii=S2667-193X%2822%2900091-6">
+                link
+              </a>
+            </li>
+            <li>
+              Miller S, Preis T, Mizzi G, Bastos LS, Gomes, MFC, Coelho FC,
+              Codeço CT, Moat SH. Faster indicators of chikungunya incidence
+              using Google searches Plos Computational Biology,
+              <a href="https://journals.plos.org/plosntds/article?id=10.1371/journal.pntd.0010441">
+                link
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mb-3">
+          <h5>2021</h5>
+          <ul>
+            <li>
+              Alves L.D., Lana R.M., and Coelho F.C. A framework for
+              weather-driven dengue virus transmission dynamics in different
+              Brazilian regions. International Journal of Environmental
+              Research and Public Health,
+              <a href="https://pubmed.ncbi.nlm.nih.gov/34574418/">
+                link
+              </a>
+            </li>
+            <li>
+              Colon-Gonzalez, Bastos, et al. (2021) Probabilistic seasonal
+              dengue forecasting in Vietnam: A modelling study using
+              superensembles PLOS Medicine,
+              <a href="https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1003542">
+                link
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mb-3">
+          <h5>2020</h5>
+          <ul>
+            <li>
+              Elisa Mussumeci, Flávio Codeço Coelho. Large-scale multivariate
+              forecasting models for Dengue - LSTM versus random forest
+              regression, Spatial and Spatio-temporal Epidemiology,
+              <a href="https://doi.org/10.1016/j.sste.2020.100372.">
+                link
+              </a>
+            </li>
+            <li>
+              Lowe R., Lee S., Lana R.M., Codeço C.T., Castro M.C., and
+              Pascual M. Emerging arboviruses in the urbanized amazon
+              rainforest. BMJ,
+              <a href="https://doi.org/10.1136/bmj.m4385">
+                link
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mb-3">
+          <h5>2019</h5>
+          <ul>
+            <li>
+              Bastos LS, Economou T, Gomes MG, Villela DAM, Coelho OG,
+              Stoner O, Bailey T, Codeço CT. A modelling approach for
+              correcting reporting delays in disease surveillance data.
+              Statistics in Medicine,
+              <a href="https://onlinelibrary.wiley.com/doi/full/10.1002/sim.8303">
+                link
+              </a>
+            </li>
+            <li>
+              Coelho FC, Codeço CT. Precision epidemiology of arboviral
+              diseases. Journal of Public Health and Emergency,
+              <a href="https://cdn.amegroups.cn/journals/ales/files/journals/29/articles/4940/public/4940-PB1-3757-R1.pdf">
+                link
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mb-3">
+          <h5>2018</h5>
+          <ul>
+            <li>
+              Santos, B.C., Coelho F.C., Armstrong M, Sarraceni V, Lemos C.
+              Zika: an ongoing threat to women and infant. Cadernos de Saude
+              Publica,
+              <a href="https://www.scielosp.org/article/csp/2018.v34n11/e00038218/en/">
+                link
+              </a>
+            </li>
+            <li>
+              Codeço, C.T., Villela A.M.D. , Coelho F.C. Estimating the
+              effective reproduction number of dengue considering
+              temperature-dependent generation intervals. Epidemics,
+              <a href="https://www.sciencedirect.com/science/article/pii/S1755436517300907">
+                link
+              </a>
+            </li>
+            <li>
+              Codeço, C.T., Coelho F.C., Cruz, O.G., Oliveira, S. Castro, T.
+              Bastos, L.S. Infodengue: A nowcasting system for the surveillance
+              of arboviruses in Brazil. Revue d'Épidémiologie et de Santé
+              Publique,
+              <a href="https://www.sciencedirect.com/science/article/abs/pii/S0398762018311088">
+                link
+              </a>
+            </li>
+            <li>
+              Lana R.M., Morais M.M., Lima T.F.M., Carneiro T.G.S.,
+              Stolerman L.M., Santos J.P.C., Cortês J.J.C., Eiras A.E., and
+              Codeço C.T. Assessment of a trap based aedes aegypti
+              surveillance program using mathematical modeling. PLOS ONE,
+              <a href="https://doi.org/10.1371/journal.pone.0190673">
+                link
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mb-3">
+          <h5>2017</h5>
+          <ul>
+            <li>
+              Lana R.M., Gomes M.F.C., Lima T.F.M., Honório N.A., and Codeço
+              C.T. The introduction of dengue follows transportation
+              infrastructure changes in the state of acre, brazil: A
+              network-based analysis. PLOS Neglected Tropical Diseases,
+              <a href="https://doi.org/10.1371/journal.pntd.0006070">
+                link
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mb-3">
+          <h5>2016</h5>
+          <ul>
+            <li>
+              Coelho et al. Epidemiological data accessibility in Brazil, The
+              Lancet ID,
+              <a href="https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(16)30007-X/fulltext">
+                link
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-        <ul>
-            <h5>2022</h5>
-            <li>
-                Codeco C.T., Oliveira S.S., Ferreira D.A.C., Riback T.I.S., Bastos L.S., Lana R.M., Almeida I.F., Godinho V.B., Cruz O.G., and Coelho F.C. Fast expansion of dengue in brazil. The Lancet Regional Health - Americas,
-                <a href="https://www.thelancet.com/action/showPdf?pii=S2667-193X%2822%2900091-6">link</a>
-            </li>
-            <li>
-                Miller S, Preis T, Mizzi G, Bastos LS, Gomes, MFC, Coelho FC, Codeço CT, Moat SH. Faster indicators of chikungunya incidence using Google searches Plos Computational Biology,
-                <a href="https://journals.plos.org/plosntds/article?id=10.1371/journal.pntd.0010441">link</a>
-            </li>
-        </ul>
+  </section>
 
-        <ul>
-            <h5>2021</h5>
-            <li>
-                Alves L.D., Lana R.M., and Coelho F.C. A framework for weather-driven dengue virus transmission dynamics in different Brazilian regions. International Journal of Environmental Research and Public Health,
-                <a href="https://pubmed.ncbi.nlm.nih.gov/34574418/">link</a>
-            </li>
-            <li>
-                Colon-Gonzalez, Bastos, et al. (2021) Probabilistic seasonal dengue forecasting in Vietnam: A modelling study using superensembles PLOS Medicine,
-                <a href="https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1003542">link</a>
-            </li>
-        </ul>
-
-        <ul>
-            <h5>2020</h5>
-            <li>
-                Elisa Mussumeci, Flávio Codeço Coelho. Large-scale multivariate forecasting models for Dengue - LSTM versus random forest regression, Spatial and Spatio-temporal Epidemiology,
-                <a href="https://doi.org/10.1016/j.sste.2020.100372.">link</a>
-            </li>
-            <li>
-                Lowe R., Lee S., Lana R.M., Codeço C.T., Castro M.C., and Pascual M. Emerging arboviruses in the urbanized amazon rainforest. BMJ,
-                <a href="https://doi.org/10.1136/bmj.m4385">link</a>
-            </li>
-        </ul>
-
-        <ul>
-            <h5>2019</h5>
-            <li>
-                Bastos LS, Economou T, Gomes MG, Villela DAM, Coelho OG, Stoner O, Bailey T, Codeço CT. A modelling approach for correcting reporting delays in disease surveillance data. Statistics in Medicine,
-                <a href="https://onlinelibrary.wiley.com/doi/full/10.1002/sim.8303">link</a>
-            </li>
-            <li>
-                Coelho FC, Codeço CT. Precision epidemiology of arboviral diseases. Journal of Public Health and Emergency,
-                <a href="https://cdn.amegroups.cn/journals/ales/files/journals/29/articles/4940/public/4940-PB1-3757-R1.pdf">link</a>
-            </li>
-        </ul>
-
-        <ul>
-            <h5>2018</h5>
-            <li>
-                Santos, B.C., Coelho F.C., Armstrong M, Sarraceni V, Lemos C. Zika: an ongoing threat to women and infant. Cadernos de Saude Publica,
-                <a href="https://www.scielosp.org/article/csp/2018.v34n11/e00038218/en/">link</a>
-            </li>
-            <li>
-                Codeço, C.T., Villela A.M.D. , Coelho F.C. Estimating the effective reproduction number of dengue considering temperature-dependent generation intervals. Epidemics,
-                <a href="https://www.sciencedirect.com/science/article/pii/S1755436517300907">link</a>
-            </li>
-            <li>
-                Codeço, C.T.,  Coelho F.C., Cruz, O.G., Oliveira, S. Castro, T. Bastos, L.S. Infodengue: A nowcasting system for the surveillance of arboviruses in Brazil. Revue d'Épidémiologie et de Santé Publique,
-                <a href="https://www.sciencedirect.com/science/article/abs/pii/S0398762018311088">link</a>
-            </li>
-            <li>
-                Lana R.M., Morais M.M., Lima T.F.M., Carneiro T.G.S., Stolerman L.M., Santos J.P.C., Cortês J.J.C., Eiras A.E., and Codeço C.T. Assessment of a trap based aedes aegypti surveillance program using mathematical modeling. PLOS ONE,
-                <a href="https://doi.org/10.1371/journal.pone.0190673">link</a>
-            </li>
-        </ul>
-
-        <ul>
-            <h5>2017</h5>
-            <li>
-                Lana R.M., Gomes M.F.C., Lima T.F.M., Honório N.A., and Codeço C.T. The introduction of dengue follows transportation infrastructure changes in the state of acre, brazil: A network-based analysis. PLOS Neglected Tropical Diseases,
-                <a href="https://doi.org/10.1371/journal.pntd.0006070">link</a>
-            </li>
-        </ul>
-
-        <ul>
-            <h5>2016</h5>
-            <li>
-                Coelho et al. Epidemiological data accessibility in Brazil, The Lancet ID,
-                <a href="https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(16)30007-X/fulltext">link</a>
-            </li>
-        </ul>
+  <!-- Eventos -->
+  <section class="mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header"
+           style="background-color: #e0eefd63; border-radius: 7px">
+        <h4 class="mb-0">
+          {% translate "Eventos" %}
+        </h4>
+      </div>
+      <div class="card-body">
+        • E-vigilância 2019-2023:
+        <a href="http://e-vigilancia.dengue.mat.br/">
+          ​ http://e-vigilancia.dengue.mat.br/
+        </a>
+      </div>
     </div>
+  </section>
 
-    <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
-        <h3 id="section5" class="panel-title">{% translate "Eventos" %}</h3>
-    </div>
-    <div class="card-body">
-        • E-vigilância 2019-2023: <a href="http://e-vigilancia.dengue.mat.br/">​ http://e-vigilancia.dengue.mat.br/</a>
-    </div>
-
-    <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
-        <h3 id="section6" class="panel-title">{% translate "Como colaborar" %}</h3>
-    </div>
-    <div class="card-body">
+  <!-- Como colaborar -->
+  <section class="mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header"
+           style="background-color: #e0eefd63; border-radius: 7px">
+        <h4 class="mb-0">
+          {% translate "Como colaborar" %}
+        </h4>
+      </div>
+      <div class="card-body">
         • {% translate "Se sua cidade não está no Infodengue, entre em contato com a Secretaria de Saúde" %}.<br>
         • {% translate "Se é um estudante ou pesquisador e gostaria de contribuir com análises e modelos, nos escreva" %}.<br>
         • {% translate "Se quiser contribuir com patrocínios, escreva-nos" %}.<br>
-        • {% translate "Se quiser aprender a usar o infodengue, tem sugestões, críticas ou se percebeu algum erro no site, escreva-nos" %}.<br></br>
-        <b>{% translate "Vencer as arboviroses é um trabalho de todos, toda colaboração é bem vinda!" %}</b>
+        • {% translate "Se quiser aprender a usar o infodengue, tem sugestões, críticas ou se percebeu algum erro no site, escreva-nos" %}.<br><br>
+        <b>
+          {% translate "Vencer as arboviroses é um trabalho de todos, toda colaboração é bem vinda!" %}
+        </b>
+      </div>
     </div>
+  </section>
 
-    <div class="card-header" style="background-color: #e0eefd63; border-radius: 7px">
-        <h3 id="section6" class="panel-title">{% translate "Videos relacionados" %}</h3>
-    </div>
+  <!-- Videos relacionados -->
+  <section class="mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header"
+           style="background-color: #e0eefd63; border-radius: 7px">
+        <h4 class="mb-0">
+          {% translate "Videos relacionados" %}
+        </h4>
+      </div>
 
-    <div class="card-body">
+      <div class="card-body">
         <div class="row">
-            <div class="col-md-6 w-100">
-                <p><small class="text-muted">{% translate "Entenda o modelo mais usado para representar a pandemia de COVID-19" %}</small></p>
-                <div class="video-container">
-                    <iframe class="video-container iframe"
-                        src="https://www.youtube.com/embed/rNFoMqI36g8"
-                        frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen>
-                    </iframe>
-                </div>
+          <div class="col-md-6 w-100">
+            <p>
+              <small class="text-muted">
+                {% translate "Entenda o modelo mais usado para representar a pandemia de COVID-19" %}
+              </small>
+            </p>
+            <div class="video-container">
+              <iframe class="video-container iframe"
+                      src="https://www.youtube.com/embed/rNFoMqI36g8"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; encrypted-media;
+                             gyroscope; picture-in-picture"
+                      allowfullscreen>
+              </iframe>
             </div>
-            <div class="col-md-6 w-100">
-                <p><small class="text-muted">{% translate "Curso PySUS - Aula 1" %}</small></p>
-                <div class="video-container">
-                    <iframe class="video-container iframe"
-                        src="https://www.youtube.com/embed/UU6rsyXn3p8"
-                        frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen>
-                    </iframe>
-                </div>
+          </div>
+          <div class="col-md-6 w-100">
+            <p>
+              <small class="text-muted">
+                {% translate "Curso PySUS - Aula 1" %}
+              </small>
+            </p>
+            <div class="video-container">
+              <iframe class="video-container iframe"
+                      src="https://www.youtube.com/embed/UU6rsyXn3p8"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; encrypted-media;
+                             gyroscope; picture-in-picture"
+                      allowfullscreen>
+              </iframe>
             </div>
+          </div>
         </div>
-        <div class="row">
-            <div class="col-md-12 w-100">
-                    </br>
-                    <b>{% translate "Mais videos da série no canal" %}:
-                        <a href="https://www.youtube.com/channel/UCZFllLoI5kB4o_6w59YVzAA">
-                    <b>{% translate "A Matemática das Epidemias" %}</a>
-            </div>
+
+        <div class="row mt-3">
+          <div class="col-md-12 w-100">
+            <p>
+              <b>
+                {% translate "Mais videos da série no canal" %}
+                :
+              </b>
+              <a href="https://www.youtube.com/channel/UCZFllLoI5kB4o_6w59YVzAA">
+                <b>{% translate "A Matemática das Epidemias" %}</b>
+              </a>
+            </p>
+          </div>
         </div>
+      </div>
     </div>
+  </section>
 
-</div>
-
+  {% endwith %}
 {% endblock %}
