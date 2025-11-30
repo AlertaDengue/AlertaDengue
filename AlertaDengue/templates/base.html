@@ -9,20 +9,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" href="{% static '/img/favicon.ico' %}" type="image/x-icon">
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SMYKFD7BD2"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-SMYKFD7BD2');
-    </script>
-
-    <!-- Bootstrap CSS and JS -->
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
-
     <!-- Custom Stylesheets -->
     <link href="{% static '/css/infodengue.css' %}" rel="stylesheet">
     <link href="{% static '/css/footer.css' %}" rel="stylesheet">
@@ -31,10 +17,15 @@
     <script src="{% static '/libs/jquery/jquery-3.3.1.js' %}"></script>
     <script src="{% static '/js/typeahead.bundle.min.js' %}"></script>
 
+    <!-- Bootstrap CSS and JS -->
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+
     <!-- FontsAwesome icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     {% block extra_head %}{% endblock %}
 </head>
+
 <body >  
   {# ===================== VIERIFY THE USAGE OF MESSAGES ===================== #}
   {% include 'components/messages.html' %}
