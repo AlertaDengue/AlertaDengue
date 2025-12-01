@@ -172,17 +172,18 @@
           Saúde.
           {% endblocktrans %}
         </p>
-
         <p>
           <strong>{% translate "Dados meteorológicos." %}</strong>
-          {% blocktrans trimmed %}
-          A transmissão de arbovírus é muito influenciada pelo clima.
-          O mosquito transmissor, Aedes aegypti, requer alta temperatura e
-          umidade para se reproduzir e sobreviver. O vírus que infecta o
-          mosquito também se reproduz melhor em temperaturas mais altas.
-          Os dados de temperatura e umidade são obtidos a partir da API do
-          projeto
-          {% endblocktrans %}
+          {% with aedes='<em>Aedes aegypti</em>'|safe %}
+            {% blocktrans trimmed with aedes=aedes %}
+              A transmissão de arbovírus é muito influenciada pelo clima.
+              O mosquito transmissor, {{ aedes }}, requer alta temperatura e
+              umidade para se reproduzir e sobreviver. O vírus que infecta o
+              mosquito também se reproduz melhor em temperaturas mais altas.
+              Os dados de temperatura e umidade são obtidos a partir da API do
+              projeto
+            {% endblocktrans %}
+          {% endwith %}
           <a href="https://mosqlimate.org/pt/"
              target="_blank"
              rel="noopener noreferrer">Mosqlimate</a>,
@@ -456,7 +457,7 @@
         </h5>
         <p>
           {% blocktrans trimmed %}
-          alerta do município. Esse alerta é atualizado semanalmente e é
+          Alerta do município. Esse alerta é atualizado semanalmente e é
           composto pelos seguintes níveis:
           {% endblocktrans %}
         </p>
