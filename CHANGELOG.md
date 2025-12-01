@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.2.2](https://github.com/AlertaDengue/AlertaDengue/compare/4.2.1...4.2.2) (2025-12-01)
+
+### Bug Fixes
+
+* **base:** restore jquery/bootstrap order to reenable accordion ([#801](https://github.com/AlertaDengue/AlertaDengue/issues/801)) ([dbbb708](https://github.com/AlertaDengue/AlertaDengue/commit/dbbb708cd5d45b3d2f53eba5fa6fae78a9ebdc3c))
+
 ## [4.2.1](https://github.com/AlertaDengue/AlertaDengue/compare/4.2.0...4.2.1) (2025-11-29)
 
 ### Bug Fixes
