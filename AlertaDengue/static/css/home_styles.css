@@ -64,11 +64,8 @@
     border-radius: 7px;
     border: 0;
     box-shadow: 2px 2px 7px rgba(12, 27, 43, 0.41);
-
     max-width: 1200px;
-    /* ajuste fino se quiser mais largo/estreito */
     margin: 0 auto;
-    /* centraliza horizontalmente */
   }
 
   .home-section-header {

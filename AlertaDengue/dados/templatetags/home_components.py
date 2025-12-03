@@ -7,12 +7,21 @@ register = template.Library()
 
 
 @register.inclusion_tag("components/home/collapse.html", takes_context=True)
-def collapse_component(context: dict) -> dict:
+def collapse_component(context: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Renderiza o componente de situação epidemiológica por estado.
+    Render the collapse component with the provided context.
+    Parameters
+    ----------
+    context : Dict[str, Any]
+        The context containing the data to be rendered.
+    Returns
+    -------
+    Dict[str, Any]
+        The updated context.
     """
     context["states_name"] = STATE_NAME
     context["states_abbv"] = list(STATE_NAME.keys())
+
     return context
 
 
