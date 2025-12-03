@@ -6,7 +6,9 @@ from django import template
 register = template.Library()
 
 
-@register.inclusion_tag("components/home/collapse.html", takes_context=True)
+@register.inclusion_tag(
+    "components/home/epi_state_card.html", takes_context=True
+)
 def collapse_component(context: Dict[str, Any]) -> Dict[str, Any]:
     """
     Render the collapse component with the provided context.

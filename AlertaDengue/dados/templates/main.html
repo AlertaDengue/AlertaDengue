@@ -13,6 +13,8 @@
       crossorigin="anonymous" referrerpolicy="no-referrer">
 
 <link href="{% static 'css/home_styles.css' %}" rel="stylesheet" type="text/css">
+<link href="{% static 'css/home_sections.css' %}" rel="stylesheet" type="text/css">
+
 <link href="{% static 'css/btn-menu-card.css' %}"
       rel="stylesheet" type="text/css">
 
@@ -39,7 +41,7 @@
 
   {# ===================== ESTIMATED CASES SITUATION ===================== #}
   <section class="mb-4" id="uf-incidence-section">
-    {% include 'components/home/uf_incidence.html' %}
+    {% include 'components/home/uf_incidence_maps.html' %}
   </section>
 
   {# ===================== EPIDEMIOLOGICAL SITUATION ===================== #}

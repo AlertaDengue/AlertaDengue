@@ -2,11 +2,14 @@
 {% load static %}
 
 
-{% block uf_incidence_component %}
+{% block extra_head %}
+<link href="{% static 'css/uf_incidence_maps.css' %}" rel="stylesheet" type="text/css">
 
-<div class="card mb-0 p-0 home-section-card"
-     style="background-color:#e0eefd63;border-radius:7px;
-            box-shadow:2px 2px 7px #0c1b2b69;">
+{% endblock %}
+
+{% block uf_incidence_maps_component %}
+
+<div class="card mb-0 p-0 home-section-card">
   <div class="card-header home-section-header d-flex align-items-center">
     <h3 class="h3 mb-0">
       {% trans "Situação de casos estimados" %}

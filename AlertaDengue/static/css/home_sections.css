@@ -1,0 +1,69 @@
+.home-section-card {
+  border-radius: 7px;
+  border: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #ff000063;
+  box-shadow: 2px 2px 7px #0c1b2b69;
+}
+
+.home-section-header {
+  background-color: #e0eefd63;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+#carouselTop .banner-slide {
+  position: relative !important;
+  width: 100% !important;
+}
+
+#carouselTop .banner-img {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+#carouselTop .carousel-indicators {
+  bottom: -12px !important;
+}
+
+#carouselTop .carousel-indicators li {
+  width: 7px !important;
+  height: 7px !important;
+}
+
+#carouselTop .banner-cta.btn.btn-primary {
+  position: absolute !important;
+  left: 65% !important;
+  transform: translateX(-50%) !important;
+  bottom: 26% !important;
+
+  padding: 0.32rem 0.6rem !important;
+  font-size: 0.82rem !important;
+  border-radius: 7px !important;
+}
+
+@media (max-width: 575.98px) {
+  #carouselTop .banner-cta.btn.btn-primary {
+    left: 65% !important;
+    bottom: 10% !important;
+    padding: 0.15rem 0.7rem !important;
+    font-size: 0.78rem !important;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+  #carouselTop .banner-cta.btn.btn-primary {
+    left: 58% !important;
+    bottom: 20% !important;
+    padding: 0.3rem 0.7rem !important;
+    font-size: 0.8rem !important;
+  }
+}
+
+@media (min-width: 992px) {
+  #carouselTop .banner-cta.btn.btn-primary {
+    left: 60% !important;
+    bottom: 26% !important;
+  }
+}
