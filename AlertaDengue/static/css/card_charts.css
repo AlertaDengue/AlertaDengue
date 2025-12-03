@@ -23,3 +23,13 @@
 *:focus {
     outline: none !important
 }
+
+.tooltip-charts {
+    position: absolute !important;
+    top: calc(100% - 50px) !important;
+    left: calc(100% - 50px) !important;
+}
+
+.tooltip-stack.tooltip.show p {
+    text-align: left;
+}

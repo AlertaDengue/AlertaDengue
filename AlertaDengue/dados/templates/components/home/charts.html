@@ -1,9 +1,10 @@
 {% load lookup %}
 {% load i18n %}
+{% load static %}
+
 
 {% block extra_head %}
 <link href="{% static 'css/card_charts.css' %}" rel="stylesheet" type="text/css">
-
 {% endblock %}
 
 {% block content %}
@@ -178,22 +179,9 @@
       </div>
 
     </section>
-    <!-- Section: Live preview -->
   </div>
-  <!-- Grid column -->
 </div>
-
-<style>
-.tooltip-charts {
-  position: absolute !important;
-  top: calc(100% - 50px) !important;
-  left: calc(100% - 50px) !important;
-}
-
-.tooltip-stack.tooltip.show p {
-  text-align: left;
-}
-</style>
+{% endblock %}
 
 <script>
   $('[data-toggle="tooltip"]').tooltip()
@@ -205,5 +193,3 @@
     });
   });
 </script>
-
-{% endblock %}
