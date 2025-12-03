@@ -1,0 +1,22 @@
+/* main_styles.css */
+
+.nav-tabs .nav-item .nav-link {
+    background-color: white;
+    color: #0080FF;
+}
+
+.nav-tabs .nav-item .nav-link.active {
+    background-color: #e0eefd63;
+    color: #495057;
+}
+
+.nav-tabs .nav-item .nav-link.disabled {
+    color: #DBDBDB;
+    pointer-events: none;
+    cursor: copy;
+}
+
+.card-body-nav {
+    margin: 4px;
+    margin-bottom: 4px;
+}

@@ -1,96 +1,153 @@
-{% load lookup %}
-{% load cache %}
 {% load i18n %}
-{% load static %}
+{% load lookup %}
+{% load hashthis %}
 
-{% cache 500 object_list %}
+{% block regional_collapse_component %}
 
-<!-- Start Component -->
-{% block collapse_component %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3 class="h3 mb-0">
-    {% trans "Situação Epidemiológica" %}
-  </h3>
-</div>
+<div class="card mb-0 p-0 home-section-card"
+     style="background-color:#e0eefd63;border-radius:7px;
+            box-shadow:2px 2px 7px #0c1b2b69;"
+     id="state-epi-card">
+  <div class="card-header home-section-header d-flex flex-column flex-md-row
+              align-items-md-center justify-content-between">
+    <div>
+      <h3 class="mb-1">
+        {% trans "Situação epidemiológica por estado" %}
+      </h3>
+      <p class="small text-muted mb-0">
+        {% trans "Selecione um estado para visualizar mapas de incidência, número de casos ou situação epidemiológica dos municípios." %}
+      </p>
+    </div>
 
-<div class="row mb-4 p-3"
-      style="background-color:#e0eefd63;border-radius:7px;
-            box-shadow:2px 2px 7px #0c1b2b69;">
-  <div class="col-md-12 p-1">
-    <div class="card-primary">
-        <div class="row">
-          <div class="col-sm-12 mb-4 mb-xl-0">
-            <div id="accordion">
-              {% for key,value in states_name.items %}
-              <div class="card">
-                <div id="flip_{{ key }}"
-                  class="collapse-style">
-                    <button
-                      class="collapse-effect text-left"
-                      data-toggle="collapse"
-                      data-target="#panel_{{ key }}"
-                      aria-expanded="true"
-                      data-toggle="tooltip"
-                      data-placement="bottom"
-                      title="Clique para visualizar os dados sobre as doenças no estado de {{ key }}"
-                      aria-controls="panel_{{ key }}">
-                      <span>{{ value }}</span>
-                  </button>
-                </div>
-                <div id="panel_{{ key }}"
-                  {% if key == 'CE' %}
-                    class="collapse show"
-                    {% else %}
-                    class="collapse"
-                    {% endif %}
-                    aria-labelledby="flip_{{ key }}"
-                    data-parent="#accordion">
-                  <div class="card-body">
-                    <div class="spinner-border text-muted">
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
+    <div class="d-flex flex-column align-items-md-end mt-3 mt-md-0">
+      <div class="state-epi-select-wrapper">
+        <select id="state-select"
+                class="form-control state-epi-select">
+          <option value="">
+            {% trans "Selecione um estado" %}
+          </option>
+          {% for abbr, name in states_name.items %}
+            <option value="{{ abbr }}"{% if abbr == 'CE' %} selected{% endif %}>
+              {{ name }}
+            </option>
+          {% endfor %}
+        </select>
       </div>
+
+      <span id="state-status-badge"
+            class="badge-state badge-state--neutral mt-2">
+      </span>
     </div>
   </div>
 
+  <div class="card-body">
+    <div id="state-chart-panel" class="state-chart-panel">
+      <p class="text-muted mb-0">
+        {% trans "Selecione um estado no campo acima para visualizar os gráficos de incidência." %}
+      </p>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
-{% endcache %}
 
-<script type="text/javascript"> //Chart columns are provided by template charts.html
+<script type="text/javascript">
+  (function ($) {
+    $(function () {
+      var $select = $('#state-select');
+      var $panel = $('#state-chart-panel');
+      var $card = $('#state-epi-card');
 
-  $(document).ready(function(){
-    var allStates = {{ states_abbv|safe }};
-    var requestCache = {};
-
-      function LoadDataFromApi(apiUrl) {
-        if (!requestCache[apiUrl]) {
-          requestCache[apiUrl] = $.ajax({
-              type: 'GET',
-              url: apiUrl,
-              dataType: "html"
-
-          });
+      function scrollToCard() {
+        if ($card.length && window.matchMedia('(max-width: 767px)').matches) {
+          $card[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-        return requestCache[apiUrl];
       }
-      $.each( allStates, function( i, state_abbv ) {
-        LoadDataFromApi("/chartshome/" + state_abbv)
-        .then(function(data) {
-          $("#panel_" + state_abbv).html(data);
-          // console.log(data);
-          // console.log("State: " + state_abbv);
-        });
-    });
-  });
 
+      $select.on('change', function () {
+        var state = $(this).val();
+
+        if (!state) {
+          $panel.html(
+            '<p class="text-muted mb-0">' +
+              '{% trans "Selecione um estado no campo acima para visualizar os gráficos de incidência." %}' +
+            '</p>'
+          );
+          return;
+        }
+
+        $.ajax({
+          url: '/chartshome/' + state,
+          method: 'GET',
+          dataType: 'html'
+        })
+        .done(function (data) {
+          $panel.html(data);
+          scrollToCard();
+        })
+        .fail(function () {
+          $panel.html(
+            '<div class="alert alert-danger mb-0">' +
+              '{% trans "Não foi possível carregar os dados deste estado." %}' +
+            '</div>'
+          );
+        });
+      });
+    });
+  })(jQuery);
 </script>
 
+<script type="text/javascript">
+  (function ($) {
+    $(function () {
+      var $select = $('#state-select');
+      var $panel = $('#state-chart-panel');
+      var $card = $('#state-epi-card');
+      var defaultState = 'RJ';
 
+      function scrollToCard() {
+        if ($card.length && window.matchMedia('(max-width: 767px)').matches) {
+          $card[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
 
-<!-- End component -->
+      $select.on('change', function () {
+        var state = $(this).val();
+
+        if (!state) {
+          $panel.html(
+            '<p class="text-muted mb-0">' +
+              '{% trans "Selecione um estado no campo acima para visualizar os gráficos de incidência." %}' +
+            '</p>'
+          );
+          return;
+        }
+
+        $.ajax({
+          url: '/chartshome/' + state,
+          method: 'GET',
+          dataType: 'html'
+        })
+        .done(function (data) {
+          $panel.html(data);
+          scrollToCard();
+        })
+        .fail(function () {
+          $panel.html(
+            '<div class="alert alert-danger mb-0">' +
+              '{% trans "Não foi possível carregar os dados deste estado." %}' +
+            '</div>'
+          );
+        });
+      });
+
+      if (
+        defaultState &&
+        $select.find('option[value="' + defaultState + '"]').length
+      ) {
+        $select.val(defaultState);
+        $select.trigger('change');
+      }
+    });
+  })(jQuery);
+</script>

@@ -1,0 +1,25 @@
+.align-title {
+    text-align: center;
+}
+
+.align-buttom {
+    text-align: center;
+    opacity: 0.6;
+    font-family: Helvetica Neue;
+}
+
+@media (min-width: 543px) {
+    .align-title {
+        text-align: left;
+    }
+
+    .align-buttom {
+        text-align: right;
+        opacity: 0.9;
+        font-family: Helvetica Neue;
+    }
+}
+
+*:focus {
+    outline: none !important
+}

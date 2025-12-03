@@ -1,15 +1,12 @@
 {% load i18n static %}
 
 
-{% block extra_head %}
-<link href="{% static 'css/banner_styles.css' %}"
-      rel="stylesheet" type="text/css">
-{% endblock %}
+
 
 {% get_current_language as LANGUAGE_CODE %}
 {% with LANGUAGE_CODE|slice:":2" as lang_suffix %}
 
-<div class="row mb-4 p-2"
+<div class="card mb-0 p-2 "
      style="background-color:#e0eefd63;border-radius:7px;
             box-shadow:2px 2px 7px #0c1b2b69;">
 

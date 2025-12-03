@@ -1,6 +1,11 @@
 {% load lookup %}
 {% load i18n %}
 
+{% block extra_head %}
+<link href="{% static 'css/card_charts.css' %}" rel="stylesheet" type="text/css">
+
+{% endblock %}
+
 {% block content %}
 
 {% trans "Registrados: casos notificados de dengue por semana de início de sintomas (dados incompletos) <br> Estimados: estimativa utilizando modelo de nowcast (ver saiba mais)" as dengue_scatter %}

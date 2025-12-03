@@ -1,35 +1,31 @@
 {% load i18n %}
 {% load static %}
 
-{% block extra_head %}
-<link href="{% static 'css/btn-menu-card.css' %}"
-      rel="stylesheet" type="text/css">
-{% endblock %}
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3 class="h3 mb-0">
-    {% trans "Outros Produtos" %}
-  </h3>
-</div>
-
-<div class="row mb-4 p-3"
+<div class="card mb-0 p-0 home-section-card"
      style="background-color:#e0eefd63;border-radius:7px;
             box-shadow:2px 2px 7px #0c1b2b69;">
-  <div class="col-12">
-    <div class="row justify-content-center">
+  <div class="card-header home-section-header d-flex align-items-center">
+    <h3 class="h3 mb-0">
+      {% trans "Outros Produtos" %}
+    </h3>
+  </div>
+
+  <div class="card-body">
+    <div class="row justify-content-center g-3">
 
       {# Epi-Scanner #}
-      <div class="col-6 col-md-4 col-lg-3 mb-3 d-flex">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex">
         <a href="https://info.dengue.mat.br/epi-scanner/"
-           class="btn btn-menu-card w-100 d-flex flex-column
-                  justify-content-center align-items-center py-4"
+           class="btn btn-menu-card w-100 h-100 d-flex flex-column
+                  justify-content-center align-items-center text-center py-4"
            target="_blank" rel="noopener noreferrer"
            data-toggle="tooltip" data-placement="bottom"
            title="{% trans 'Análise de parâmetros epidemiológicos como a semana de pico, número de reprodução e total de casos por epidemia a nível municipal.' %}">
           <img src="{% static 'img/home/features/episcanner.svg' %}"
                alt="{% trans 'Epi-Scanner' %}"
                class="mb-2"
-               style="max-height:64px;">
+               style="max-height: 64px;">
           <span class="font-weight-semibold">
             {% trans "Epi-Scanner" %}
           </span>
@@ -40,10 +36,10 @@
       </div>
 
       {# PySUS #}
-      <div class="col-6 col-md-4 col-lg-3 mb-3 d-flex">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex">
         <a href="https://pysus.readthedocs.io/en/latest/"
-           class="btn btn-menu-card w-100 d-flex flex-column
-                  justify-content-center align-items-center py-4 text-center"
+           class="btn btn-menu-card w-100 h-100 d-flex flex-column
+                  justify-content-center align-items-center text-center py-4"
            target="_blank" rel="noopener noreferrer"
            data-toggle="tooltip" data-placement="bottom"
            title="{% trans 'Biblioteca em Python que permite o acesso a conjuntos de dados disponibilizados pelo DATASUS.' %}">
@@ -60,10 +56,10 @@
       </div>
 
       {# YouTube Channel #}
-      <div class="col-6 col-md-4 col-lg-3 mb-3 d-flex">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3 d-flex">
         <a href="https://www.youtube.com/@infodenguebrazil8805"
-           class="btn btn-menu-card w-100 d-flex flex-column
-                  justify-content-center align-items-center py-4 text-center"
+           class="btn btn-menu-card w-100 h-100 d-flex flex-column
+                  justify-content-center align-items-center text-center py-4"
            target="_blank" rel="noopener noreferrer"
            data-toggle="tooltip" data-placement="bottom"
            title="{% trans 'Canal do Infodengue no YouTube, com vídeos sobre modelos, dados e vigilância em saúde.' %}">

@@ -53,3 +53,73 @@
       bottom: 26% !important;
     }
   }
+
+  .uf-map-img {
+    max-width: 100%;
+    height: auto;
+  }
+
+
+  .home-section-card {
+    border-radius: 7px;
+    border: 0;
+    box-shadow: 2px 2px 7px rgba(12, 27, 43, 0.41);
+
+    max-width: 1200px;
+    /* ajuste fino se quiser mais largo/estreito */
+    margin: 0 auto;
+    /* centraliza horizontalmente */
+  }
+
+  .home-section-header {
+    background-color: #e0eefd63;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .state-epi-select-wrapper {
+    min-width: 220px;
+  }
+
+  @media (max-width: 768px) {
+    .state-epi-card {
+      border-radius: 7px;
+      border: 1px solid #d5e2ff;
+      box-shadow: 0 2px 6px rgba(12, 27, 43, 0.12);
+      background-color: #ffffff;
+    }
+
+    .state-epi-select {
+      max-width: 100%;
+    }
+  }
+
+  .badge-state {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .badge-state--neutral {
+    background-color: #f1f5f9;
+    color: #64748b;
+  }
+
+  .state-chart-panel {
+    min-height: 260px;
+  }
+
+  /* Mobile */
+  @media (max-width: 767.98px) {
+    .state-epi-select-wrapper {
+      width: 100%;
+    }
+
+    .state-epi-select {
+      width: 100%;
+      max-width: none;
+    }
+  }

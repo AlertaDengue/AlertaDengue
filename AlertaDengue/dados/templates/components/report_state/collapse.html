@@ -1,86 +1,169 @@
+{% load i18n lookup hashthis %}
 
-
-{% load lookup %}
-
-{% load hashthis %}
-
-<!-- Start Component -->
+{# ============= COMPONENTE: Situação Epidemiológica por Estado ============= #}
 {% block regional_collapse_component %}
 
-<div id="accordion">
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center"
+       style="background-color:#e0eefd63;border-radius:7px;">
+    <h3 class="mb-0">
+      {% trans "Situação epidemiológica" %}
+    </h3>
+    <a href="#uf-incidence-section"
+       class="btn btn-sm btn-outline-primary">
+      {% trans "Voltar para o mapa" %}
+    </a>
+  </div>
 
-  {% for key,value in regional_dict.items %}
-
-    <div class="card">
-
-      <div id="flip_{{ key }}" class="collapse-style">
-          <button
-           onclick="setTimeout(resizePlotly, 100);"
-            class="collapse-effect text-left"
-            data-toggle="collapse"
-            data-target="#panel_{{ key }}"
-            aria-expanded="true"
-            aria-controls="panel_{{ key }}"
-          >
-            <span>{{ value }}</span>
-          </button>
+  <div class="card-body">
+    <div class="row">
+      {# Coluna esquerda: lista de estados #}
+      <div class="col-md-3 mb-3 mb-md-0">
+        <div class="list-group small" id="state-list">
+          {% for key, value in regional_dict.items %}
+            <button type="button"
+                    class="list-group-item list-group-item-action state-item"
+                    data-regional-id="{{ key }}"
+                    data-state-name="{{ value }}">
+              {{ value }}
+            </button>
+          {% endfor %}
+        </div>
       </div>
 
-      <div id="panel_{{ key }}"
-          {% if key == 12002 %}
-              class="collapse show"
-          {% else %}
-              class="collapse"
-          {% endif %}
-          aria-labelledby="flip_{{ key }}"
-          data-parent="#accordion">
-          <div class="card-body">
-            <div class="spinner-border text-muted"></div>
+      {# Coluna direita: painel com gráficos do estado #}
+      <div class="col-md-9">
+        <div id="state-panel" class="border rounded p-3"
+             style="min-height:220px;background-color:#f8f9fa;">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 id="state-panel-title" class="mb-0 text-primary">
+              {% trans "Selecione um estado" %}
+            </h4>
+            <button id="reload-state-panel"
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary d-none">
+              {% trans "Recarregar" %}
+            </button>
           </div>
+          <div id="state-panel-body">
+            <p class="text-muted mb-0">
+              {% trans "Clique em um estado na lista ao lado para visualizar os gráficos de incidência." %}
+            </p>
+          </div>
+        </div>
       </div>
-
     </div>
-
-  {% endfor %}
-
+  </div>
 </div>
 
 {% endblock %}
 
+{# ======================== SCRIPT DO COMPONENTE ======================== #}
 <script type="text/javascript">
+  (function ($) {
+    "use strict";
 
-  $(document).ready(function(){
-    const allRegionals = Object.keys({{ regional_dict| safe }});
-    const state_abbv = "{{ state }}";
-    let requestCache = {};
+    $(document).ready(function () {
+      var regionalMap = {{ regional_dict|safe }};
+      var allRegionalIds = Object.keys(regionalMap);
+      var stateAbbr = "{{ state }}";
+      var yearWeek = "{{ year_week }}";
+      var requestCache = {};
+      var $stateList = $("#state-list");
+      var $statePanelTitle = $("#state-panel-title");
+      var $statePanelBody = $("#state-panel-body");
+      var $reloadButton = $("#reload-state-panel");
+      var currentRegionalId = null;
+
+      function buildApiUrl(regionalId) {
+        return "/fetchdata/" + String(stateAbbr) + "/" +
+               String(regionalId) + "/" + String(yearWeek);
+      }
 
       function loadDataFromApi(apiUrl) {
         if (!requestCache[apiUrl]) {
           requestCache[apiUrl] = $.ajax({
-              type: 'GET',
-              url: apiUrl,
-              dataType: "html"
-
+            type: "GET",
+            url: apiUrl,
+            dataType: "html"
           });
         }
         return requestCache[apiUrl];
       }
 
-      $.each( allRegionals, function( i, regional_id ) {
-        // console.log(regional_id)
-        loadDataFromApi("/fetchdata/" + state_abbv + "/"  + regional_id + "/{{ year_week }}" )
-        .then(function(data) {
-          $("#panel_" + regional_id).html(data);
-             // console.log("State: " + regional_id);
-        });
+      function resizePlotly() {
+        var doc = $(".tab-pane.active .plotly-graph-div");
+        for (var i = 0; i < doc.length; i += 1) {
+          Plotly.relayout(doc[i], { autosize: true });
+        }
+      }
+
+      function setLoading() {
+        $statePanelBody.html(
+          '<div class="d-flex justify-content-center align-items-center" ' +
+          'style="min-height:120px;">' +
+          '<div class="spinner-border text-primary" role="status">' +
+          '<span class="sr-only">Carregando...</span>' +
+          "</div></div>"
+        );
+      }
+
+      function loadStatePanel(regionalId, stateName) {
+        currentRegionalId = regionalId;
+        var apiUrl = buildApiUrl(regionalId);
+
+        setLoading();
+        $statePanelTitle.text(stateName);
+        $reloadButton.removeClass("d-none");
+
+        loadDataFromApi(apiUrl).then(
+          function (data) {
+            $statePanelBody.html(data);
+            resizePlotly();
+          },
+          function () {
+            $statePanelBody.html(
+              '<p class="text-danger mb-0">' +
+              "Erro ao carregar os dados epidemiológicos do estado." +
+              "</p>"
+            );
+          }
+        );
+      }
+
+      $stateList.on("click", ".state-item", function (event) {
+        event.preventDefault();
+
+        var $btn = $(this);
+        var regionalId = $btn.data("regional-id");
+        var stateName = $btn.data("state-name");
+
+        $stateList.find(".state-item").removeClass("active");
+        $btn.addClass("active");
+
+        loadStatePanel(regionalId, stateName);
+      });
+
+      $reloadButton.on("click", function () {
+        if (currentRegionalId === null) {
+          return;
+        }
+        var stateName = regionalMap[String(currentRegionalId)];
+        var apiUrl = buildApiUrl(currentRegionalId);
+        delete requestCache[apiUrl];
+        loadStatePanel(currentRegionalId, stateName);
+      });
+
+      if (allRegionalIds.length > 0) {
+        var firstId = allRegionalIds[0];
+        var firstName = regionalMap[firstId];
+
+        var $firstBtn = $stateList
+          .find('.state-item[data-regional-id="' + firstId + '"]');
+        $firstBtn.addClass("active");
+
+        loadStatePanel(firstId, firstName);
+      }
     });
-  });
-
-  function resizePlotly() {
-    var doc = $(".tab-pane.active .plotly-graph-div");
-    for (var i = 0; i < doc.length; i++) {
-        Plotly.relayout(doc[i], {autosize: true});
-    }
-}
-
+  })(jQuery);
 </script>
