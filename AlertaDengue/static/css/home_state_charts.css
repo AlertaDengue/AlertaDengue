@@ -33,3 +33,19 @@
 .tooltip-stack.tooltip.show p {
     text-align: left;
 }
+
+.nav-tabs .nav-item .nav-link {
+    background-color: #ffffff44;
+    color: #0080FF;
+}
+
+.nav-tabs .nav-item .nav-link.active {
+    background-color: #b5b5b50d;
+    color: #495057;
+}
+
+.nav-tabs .nav-item .nav-link.disabled {
+    color: #363636ff;
+    pointer-events: none;
+    cursor: copy;
+}

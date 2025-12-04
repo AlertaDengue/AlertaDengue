@@ -5,6 +5,7 @@
 
 {% block extra_head %}
 <link href="{% static 'css/home_state_charts.css' %}" rel="stylesheet" type="text/css">
+<link href="{% static 'css/home_nav_charts.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block content %}
@@ -73,16 +74,13 @@
         </li>
       </ul>
 
-      <div class="tab-content"
+      <div class="tab-content mt-0 mb-0 p-3" 
         id="diseaseTabContent"
-        style="background-color: #e0eefd63;
-          margin-bottom: 20px;
-          border-radius: 7px"
       >
         <!-- Description -->
-        <h6><small class="px-3" style="color:#888888;">
+        <h6><small class="px-1" style="color:#888888;">
           {{ count_cities|lookup:'dengue'|lookup:state | safe }}
-          {% translate "Municípios monitorados" %}. {% translate "Última atualização na SE" %}:
+          {% translate "Municípios monitorados" %}. {% translate "Última ate na SE" %}:
           {{ last_se|lookup:state | safe }}
         </small></h6>
         <div class="tab-pane fade active show"

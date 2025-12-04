@@ -32,7 +32,7 @@
             {% trans "Selecione um estado" %}
           </option>
           {% for abbr, name in states_name.items %}
-            <option value="{{ abbr }}"{% if abbr == 'CE' %} selected{% endif %}>
+            <option value="{{ abbr }}"{% if abbr == 'TO' %} selected{% endif %}>
               {{ name }}
             </option>
           {% endfor %}
@@ -41,8 +41,12 @@
     </div>
   </div>
 
-  <div class="card-body">
-    <div id="state-chart-panel" class="state-chart-panel">
+  <div class="card mt-4 mb-4 p-4">
+    <div id="state-chart-panel" class="state-chart-panel" style="background-color: #e0eefd63;
+           border: 1px solid #e0eefd63;
+           box-shadow: 2px 2px 7px #0c1b2b69;
+           
+          border-radius: 7px">
       <p class="text-muted mb-0">
         {% trans "Selecione um estado no campo acima para visualizar os gráficos de incidência." %}
       </p>

@@ -1,15 +1,13 @@
 {% load static %}
 {% load i18n %}
 
-{% block extra_head %}
-<link href="{% static 'css/nav_styles.css' %}" rel="stylesheet" type="text/css">
-{% endblock %}
-
 {% load searchbox_component %}
+
+{% block menu-bar %}
 
 <div class="card mb-0 p-0 home-section-card">
 
-  <div class="card-body-nav">
+  <div class="card">
   
     <nav class="navbar navbar-light navbar-custom navbar-expand-md w-100 py-1"
          style="border-radius:5px;">
@@ -84,6 +82,8 @@
     </nav>
   </div>
 </div>
+
+{% endblock %}
 
 <script>
   // Activate Bootstrap tooltips for menu items
