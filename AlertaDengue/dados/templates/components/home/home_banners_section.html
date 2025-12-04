@@ -1,7 +1,7 @@
 {% load i18n static %}
 
 
-
+{% block home_banners_section %}
 
 {% get_current_language as LANGUAGE_CODE %}
 {% with LANGUAGE_CODE|slice:":2" as lang_suffix %}
@@ -73,3 +73,5 @@
 </div>
 
 {% endwith %}
+
+{% endblock %}

@@ -1,8 +1,15 @@
 {% load i18n %}
 {% load lookup %}
+{% load static %}
+
 {% load hashthis %}
 
-{% block regional_collapse_component %}
+{% block extra_head %}
+<link href="{% static 'css/home_state_epi.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+
+{% block home_state_epi_section %}
 
 <div class="card mb-0 p-0 home-section-card"
      id="state-epi-card">

@@ -621,7 +621,7 @@ class AlertaStateViewNew(TemplateView):
 
 
 class ChartsMainView(TemplateView):
-    template_name = "components/home/charts.html"
+    template_name = "components/home/home_state_charts.html"
 
     def get_img_map(self, state_abbv: str, disease: str) -> str:
         """

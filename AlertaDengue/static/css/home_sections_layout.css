@@ -3,11 +3,11 @@
   border: 0;
   max-width: 1200px;
   margin: 0 auto;
-  background-color: #ff000063;
+  background-color: #11ff0063;
   box-shadow: 2px 2px 7px #0c1b2b69;
 }
 
-.home-section-header {
+home-section-header .home-section-header {
   background-color: #e0eefd63;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
