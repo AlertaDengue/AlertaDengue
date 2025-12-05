@@ -4,10 +4,6 @@
 
 {% load hashthis %}
 
-{% block extra_head %}
-<link href="{% static 'css/home_state_epi.css' %}" rel="stylesheet" type="text/css">
-{% endblock %}
-
 
 {% block home_state_epi_section %}
 
@@ -25,14 +21,14 @@
     </div>
 
     <div class="d-flex flex-column align-items-md-end mt-3 mt-md-0">
-      <div class="state-epi-select-wrapper">
+      <div class="state-epi-select-wrapper p-2">
         <select id="state-select"
                 class="form-control state-epi-select">
           <option value="">
             {% trans "Selecione um estado" %}
           </option>
           {% for abbr, name in states_name.items %}
-            <option value="{{ abbr }}"{% if abbr == 'TO' %} selected{% endif %}>
+            <option value="{{ abbr }}"{% if abbr == 'RJ' %} selected{% endif %}>
               {{ name }}
             </option>
           {% endfor %}
@@ -42,11 +38,7 @@
   </div>
 
   <div class="card mt-4 mb-4 p-4">
-    <div id="state-chart-panel" class="state-chart-panel" style="background-color: #e0eefd63;
-           border: 1px solid #e0eefd63;
-           box-shadow: 2px 2px 7px #0c1b2b69;
-           
-          border-radius: 7px">
+    <div id="state-chart-panel" class="background-panel">
       <p class="text-muted mb-0">
         {% trans "Selecione um estado no campo acima para visualizar os gráficos de incidência." %}
       </p>
@@ -63,7 +55,7 @@
       var $card = $('#state-epi-card');
 
       // change this to 'RJ' if you prefer that as default
-      var defaultState = 'CE';
+      var defaultState = 'RJ';
 
       function scrollToCard() {
         if ($card.length &&
