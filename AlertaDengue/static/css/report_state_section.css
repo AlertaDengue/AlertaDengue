@@ -1,0 +1,57 @@
+.collapse-style {
+    background-color: #469ad3;
+    font-weight: large;
+    font-size: large;
+    line-height: 10px;
+    padding: 10px;
+    white-space: nowrap;
+    border: 5px solid #fff;
+    border: 0px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    color: #fff;
+}
+
+.collapse-effect {
+    transition-duration: 0.4s;
+    background-color: #469ad3;
+    border: none;
+    color: white;
+    width: 100%;
+}
+
+.collapse-effect:hover {
+    background-color: #469ad3;
+    color: #c5ced3;
+    border: none;
+    display: block;
+}
+
+.collapse-effect:active {
+    outline: none;
+    border: none;
+}
+
+.collapse-effect span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+
+.collapse-effect span:after {
+    content: '\00bb';
+    position: absolute;
+    opacity: 0;
+    top: 0;
+    right: -20px;
+    transition: 0.5s;
+}
+
+.collapse-effect:hover span {
+    padding-right: 25px;
+}
+
+.collapse-effect:hover span:after {
+    opacity: 1;
+    right: 0;
+}
