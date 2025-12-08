@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-08 08:43-0300\n"
+"POT-Creation-Date: 2025-12-08 10:41-0300\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1611,6 +1611,7 @@ msgstr "Chikungunya charts"
 #: dados/templates/components/home/home_state_charts.html:54
 msgid "Gráficos sobre Zika"
 msgstr "Zika charts"
+
 #: dados/templates/components/home/home_state_charts.html:65
 msgid "Veja o mapa de incidência das doenças no estado"
 msgstr "View the disease incidence map for the state"
@@ -1624,7 +1625,7 @@ msgid "Municípios monitorados"
 msgstr "Monitored municipalities"
 
 #: dados/templates/components/home/home_state_charts.html:77
-msgid "Última ate na SE"
+msgid "Última atualização na SE"
 msgstr "Last update (epidemiological week)"
 
 #: dados/templates/components/home/home_state_charts.html:101
@@ -1654,8 +1655,7 @@ msgstr "Select a state"
 #: dados/templates/components/home/home_state_epi_section.html:73
 msgid ""
 "Selecione um estado no campo acima para visualizar os gráficos de incidência."
-msgstr ""
-"Select a state in the field above to display the incidence charts."
+msgstr "Select a state in the field above to display the incidence charts."
 
 #: dados/templates/components/home/home_state_epi_section.html:91
 msgid "Não foi possível carregar os dados deste estado."
@@ -1678,7 +1678,7 @@ msgstr "Dengue incidence map in Brazil"
 msgid "Mapa de incidência de Chikungunya no Brasil"
 msgstr "Chikungunya incidence map in Brazil"
 
-#: dados/templates/components/report_state/collapse.html:9"
+#: dados/templates/components/report_state/collapse.html:9
 msgid "Situação epidemiológica"
 msgstr "Epidemiological situation"
 
@@ -1694,8 +1694,7 @@ msgstr "Reload"
 msgid ""
 "Clique em um estado na lista ao lado para visualizar os gráficos de "
 "incidência."
-msgstr ""
-"Click a state in the list to display the incidence charts."
+msgstr "Click a state in the list to display the incidence charts."
 
 #: dados/templates/components/report_state/report_state_charts.html:43
 #: dados/templates/components/report_state/report_state_charts.html:82
@@ -2917,31 +2916,31 @@ msgid ""
 "{}."
 msgstr "This disease {} is not registered in our database for {} municipality"
 
-#: dados/views.py:994
+#: dados/views.py:993
 msgid "°C temperatura mínima"
 msgstr "°C Minimum temperature"
 
-#: dados/views.py:995
+#: dados/views.py:994
 msgid "°C temperatura média"
 msgstr "°C Average temperatures"
 
-#: dados/views.py:996
+#: dados/views.py:995
 msgid "°C temperatura máxima"
 msgstr "°C Maximum temperature"
 
-#: dados/views.py:997
+#: dados/views.py:996
 #, fuzzy, python-format
 #| msgid "% umidade mínima do ar"
 msgid "% umidade mínima do ar"
 msgstr "% Minimum air humidity"
 
-#: dados/views.py:998
+#: dados/views.py:997
 #, fuzzy, python-format
 #| msgid "% umidade média do ar"
 msgid "% umidade média do ar"
 msgstr "% Average air humidity"
 
-#: dados/views.py:999
+#: dados/views.py:998
 #, fuzzy, python-format
 #| msgid "% umidade máxima do ar"
 msgid "% umidade máxima do ar"

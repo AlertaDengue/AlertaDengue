@@ -74,7 +74,7 @@
         <!-- Description -->
         <h6><small class="px-1" style="color:#888888;">
           {{ count_cities|lookup:'dengue'|lookup:state | safe }}
-          {% translate "Municípios monitorados" %}. {% translate "Última ate na SE" %}:
+          {% translate "Municípios monitorados" %}. {% translate "Última atualização na SE" %}:
           {{ last_se|lookup:state | safe }}
         </small></h6>
         <div class="tab-pane fade active show"
