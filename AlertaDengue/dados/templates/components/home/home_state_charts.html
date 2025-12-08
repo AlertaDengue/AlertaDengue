@@ -1,5 +1,6 @@
 {% load lookup %}
 {% load i18n %}
+{% load static %}
 
 {% block content %}
 
@@ -67,14 +68,11 @@
         </li>
       </ul>
 
-      <div class="tab-content"
+      <div class="tab-content mt-0 mb-0 p-3" 
         id="diseaseTabContent"
-        style="background-color: #e0eefd63;
-          margin-bottom: 20px;
-          border-radius: 7px"
       >
         <!-- Description -->
-        <h6><small class="px-3" style="color:#888888;">
+        <h6><small class="px-1" style="color:#888888;">
           {{ count_cities|lookup:'dengue'|lookup:state | safe }}
           {% translate "Municípios monitorados" %}. {% translate "Última atualização na SE" %}:
           {{ last_se|lookup:state | safe }}
@@ -173,22 +171,9 @@
       </div>
 
     </section>
-    <!-- Section: Live preview -->
   </div>
-  <!-- Grid column -->
 </div>
-
-<style>
-.tooltip-charts {
-  position: absolute !important;
-  top: calc(100% - 50px) !important;
-  left: calc(100% - 50px) !important;
-}
-
-.tooltip-stack.tooltip.show p {
-  text-align: left;
-}
-</style>
+{% endblock %}
 
 <script>
   $('[data-toggle="tooltip"]').tooltip()
@@ -200,5 +185,3 @@
     });
   });
 </script>
-
-{% endblock %}

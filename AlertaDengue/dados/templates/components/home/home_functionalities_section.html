@@ -1,28 +1,24 @@
 {% load i18n %}
 {% load static %}
 
-{% block extra_head %}
-<link href="{% static 'css/btn-menu-card.css' %}"
-      rel="stylesheet" type="text/css">
-{% endblock %}
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3 class="h3 mb-0">
-    {% trans "Funcionalidades" %}
-  </h3>
-</div>
+{% block home_functionalities_section %}
 
-<div class="row mb-4 p-3"
-     style="background-color:#e0eefd63;border-radius:7px;
-            box-shadow:2px 2px 7px #0c1b2b69;">
-  <div class="col-12">
-    <div class="row justify-content-center">
+<div class="card mb-0 p-0 home-section-card">
+  <div class="card-header home-section-header d-flex align-items-center">
+    <h3 class="h3 mb-0">
+      {% trans "Funcionalidades" %}
+    </h3>
+  </div>
+
+  <div class="card-body">
+    <div class="row justify-content-center g-3">
 
       <!-- API -->
-      <div class="col-6 col-md-4 col-lg-2 mb-3 d-flex">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-2 d-flex">
         <a href="/services/api"
-           class="btn btn-menu-card w-100 d-flex flex-column
-                  justify-content-center align-items-center py-4"
+           class="btn btn-menu-card w-100 h-100 d-flex flex-column
+                  justify-content-center align-items-center text-center py-4"
            data-toggle="tooltip"
            data-placement="bottom"
            title="{% trans 'Acesso aos dados utilizados para gerar os resultados apresentados no site.' %}">
@@ -35,11 +31,11 @@
         </a>
       </div>
 
-      <!-- Municipal Reports  -->
-      <div class="col-6 col-md-4 col-lg-2 mb-3 d-flex">
+      <!-- Municipal Reports -->
+      <div class="col-12 col-sm-6 col-md-4 col-lg-2 d-flex">
         <a href="/report/"
-           class="btn btn-menu-card w-100 d-flex flex-column
-                  justify-content-center align-items-center py-4 text-center"
+           class="btn btn-menu-card w-100 h-100 d-flex flex-column
+                  justify-content-center align-items-center text-center py-4"
            data-toggle="tooltip"
            data-placement="bottom"
            title="{% trans 'Informações sobre o número de casos, nível de alerta e condições climáticas para a transmissão de arboviroses a nível municipal.' %}">
@@ -53,10 +49,10 @@
       </div>
 
       <!-- State Reports -->
-      <div class="col-6 col-md-4 col-lg-2 mb-3 d-flex">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-2 d-flex">
         <a href="/report/"
-           class="btn btn-menu-card w-100 d-flex flex-column
-                  justify-content-center align-items-center py-4 text-center"
+           class="btn btn-menu-card w-100 h-100 d-flex flex-column
+                  justify-content-center align-items-center text-center py-4"
            data-toggle="tooltip"
            data-placement="bottom"
            title="{% trans 'Informações sobre o número de casos e nível de alerta para as regionais de saúde de cada estado.' %}">
@@ -70,10 +66,10 @@
       </div>
 
       <!-- Technical Reports -->
-      <div class="col-6 col-md-4 col-lg-2 mb-3 d-flex">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-2 d-flex">
         <a href="/informacoes/#section1.1"
-           class="btn btn-menu-card w-100 d-flex flex-column
-                  justify-content-center align-items-center py-4 text-center"
+           class="btn btn-menu-card w-100 h-100 d-flex flex-column
+                  justify-content-center align-items-center text-center py-4"
            data-toggle="tooltip"
            data-placement="bottom"
            title="{% trans 'Análises adicionais sobre a situação das arboviroses no país.' %}">
@@ -87,10 +83,10 @@
       </div>
 
       <!-- Tutorials -->
-      <div class="col-6 col-md-4 col-lg-2 mb-3 d-flex">
+      <div class="col-12 col-sm-6 col-md-4 col-lg-2 d-flex">
         <a href="/services/tutorial"
-           class="btn btn-menu-card w-100 d-flex flex-column
-                  justify-content-center align-items-center py-4 text-center"
+           class="btn btn-menu-card w-100 h-100 d-flex flex-column
+                  justify-content-center align-items-center text-center py-4"
            data-toggle="tooltip"
            data-placement="bottom"
            title="{% trans 'Exemplo de acesso aos dados da API usando R e Python.' %}">
@@ -106,6 +102,8 @@
     </div>
   </div>
 </div>
+
+{% endblock %}
 
 <script>
   $(function () {

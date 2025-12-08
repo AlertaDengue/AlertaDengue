@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-01 11:01-0300\n"
+"POT-Creation-Date: 2025-12-08 10:41-0300\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -252,7 +252,7 @@ msgid ""
 msgstr ""
 "AlertaDengue/InfoDengue services are momentarily unavailable for maintenance."
 
-#: dados/templates/about.html:10 templates/components/navbar.html:73
+#: dados/templates/about.html:10 templates/components/navbar.html:76
 msgid "Sobre nós"
 msgstr "About us"
 
@@ -397,6 +397,7 @@ msgid "Dados meteorológicos."
 msgstr "Meteorological data."
 
 #: dados/templates/about.html:178
+#, python-format
 msgid ""
 "A transmissão de arbovírus é muito influenciada pelo clima. O mosquito "
 "transmissor, %(aedes)s, requer alta temperatura e umidade para se reproduzir "
@@ -405,10 +406,10 @@ msgid ""
 "partir da API do projeto"
 msgstr ""
 "Arbovirus transmission is strongly influenced by climate. The vector "
-"mosquito, %(aedes)s, requires high temperature and humidity to reproduce "
-"and survive. The virus infecting the mosquito also replicates better at "
-"higher temperatures. Temperature and humidity data are obtained from the "
-"project’s API"
+"mosquito, %(aedes)s, requires high temperature and humidity to reproduce and "
+"survive. The virus infecting the mosquito also replicates better at higher "
+"temperatures. Temperature and humidity data are obtained from the project’s "
+"API"
 
 #: dados/templates/about.html:190
 msgid "que agrega os dados de reanálise de satélite disponibilizados pelo"
@@ -835,8 +836,8 @@ msgid "curso online"
 msgstr "online course"
 
 #: dados/templates/about.html:568
-#: dados/templates/components/home/other_products.html:30
-#: dados/templates/components/home/other_products.html:34
+#: dados/templates/components/home/home_other_products_section.html:25
+#: dados/templates/components/home/home_other_products_section.html:29
 msgid "Epi-Scanner"
 msgstr "Epi-Scanner"
 
@@ -910,7 +911,7 @@ msgstr ""
 "reports</em> section."
 
 #: dados/templates/about.html:654
-#: dados/templates/components/home/functionalities.html:84
+#: dados/templates/components/home/home_functionalities_section.html:80
 msgid "Relatórios técnicos"
 msgstr "Technical reports"
 
@@ -1421,93 +1422,6 @@ msgstr "More details"
 msgid "Número de casos estimados na semana"
 msgstr "Estimated cases in the week"
 
-#: dados/templates/components/home/banners_header.html:68
-msgid "saiba mais"
-msgstr "Learn more"
-
-#: dados/templates/components/home/charts.html:6
-msgid ""
-"Registrados: casos notificados de dengue por semana de início de sintomas "
-"(dados incompletos) <br> Estimados: estimativa utilizando modelo de nowcast "
-"(ver saiba mais)"
-msgstr ""
-"Recorded: reported cases of dengue fever by week of onset of "
-"symptoms(incomplete data) <br> Estimated: estimates using nowcast model(see "
-"more)"
-
-#: dados/templates/components/home/charts.html:7
-msgid ""
-"Registrados: casos notificados de chikungunya por semana de início de "
-"sintomas (dados incompletos) <br> Estimados: estimativa utilizando modelo de "
-"nowcast (ver saiba mais)"
-msgstr ""
-"Recorded: reported cases of chikungunya by week of onset of symptoms "
-"(incomplete data) <br> Estimated: estimate using nowcast model (see learn "
-"more)"
-
-#: dados/templates/components/home/charts.html:8
-msgid ""
-"Registrados: casos notificados de zika por semana de início de sintomas "
-"(dados incompletos) <br> Estimados: estimativa utilizando modelo de nowcast "
-"(ver saiba mais)"
-msgstr ""
-"Recorded: reported cases of zika by week of onset of symptoms (incomplete "
-"data) <br> Estimated: estimate using nowcast model (see learn more)"
-
-#: dados/templates/components/home/charts.html:10
-msgid ""
-"Aumento ou redução de cidades com clima favorável para transmissão, em "
-"relação à última semana"
-msgstr ""
-"Increase or reduction of cities with favorable climate for transmission, in "
-"relation to the last week"
-
-#: dados/templates/components/home/charts.html:12
-msgid ""
-"Amarelo: clima favorável e presença de arbovirus <br> Laranja: tendência de "
-"aumento de casos <br> Vermelho: alta incidência em relação ao histórico"
-msgstr ""
-"Yellow: favorable climate and presence of arbovirus <br> Orange: tendency "
-"for increasing cases <br> Red: high incidence compared to historical figures"
-
-#: dados/templates/components/home/charts.html:30
-msgid "Gráficos sobre Dengue"
-msgstr "Dengue charts"
-
-#: dados/templates/components/home/charts.html:42
-msgid "Gráficos sobre Chikungunya"
-msgstr "Chikungunya charts"
-
-#: dados/templates/components/home/charts.html:53
-msgid "Gráficos sobre Zika"
-msgstr "Zika charts"
-
-#: dados/templates/components/home/charts.html:64
-msgid "Veja o mapa de incidência das doenças no estado"
-msgstr "See the disease incidence map in the State"
-
-#: dados/templates/components/home/charts.html:65
-msgid "Mapa incidência"
-msgstr "Incidence Maps"
-
-#: dados/templates/components/home/charts.html:79
-msgid "Municípios monitorados"
-msgstr "Municipalities in the regional"
-
-#: dados/templates/components/home/charts.html:79
-msgid "Última atualização na SE"
-msgstr "Weekly Epidemiological Update"
-
-#: dados/templates/components/home/charts.html:103
-#: dados/templates/components/home/charts.html:128
-#: dados/templates/components/home/charts.html:153
-msgid "Informações detalhadas sobre o Estado"
-msgstr "Detailed information about the State"
-
-#: dados/templates/components/home/collapse.html:12
-msgid "Situação Epidemiológica"
-msgstr "Epidemiological Situation"
-
 #: dados/templates/components/home/e_vigilancia.html:15
 msgid "E-Vigilância 2023"
 msgstr "E-Vigilancia 2023"
@@ -1540,22 +1454,26 @@ msgstr ""
 msgid "Saiba mais"
 msgstr "Learn more"
 
-#: dados/templates/components/home/functionalities.html:11
+#: dados/templates/components/home/home_banners_section.html:63
+msgid "saiba mais"
+msgstr "Learn more"
+
+#: dados/templates/components/home/home_functionalities_section.html:10
 msgid "Funcionalidades"
 msgstr "Functionalities"
 
-#: dados/templates/components/home/functionalities.html:28
+#: dados/templates/components/home/home_functionalities_section.html:24
 msgid ""
 "Acesso aos dados utilizados para gerar os resultados apresentados no site."
 msgstr "Access to the data used to generate the results presented on the site."
 
-#: dados/templates/components/home/functionalities.html:33
+#: dados/templates/components/home/home_functionalities_section.html:29
 #: dados/templates/services_api.html:76 dados/templates/services_api.html:83
 #: dados/templates/services_api_doc.html:54
 msgid "API"
 msgstr "API"
 
-#: dados/templates/components/home/functionalities.html:45
+#: dados/templates/components/home/home_functionalities_section.html:41
 msgid ""
 "Informações sobre o número de casos, nível de alerta e condições climáticas "
 "para a transmissão de arboviroses a nível municipal."
@@ -1563,11 +1481,11 @@ msgstr ""
 "Information on the number of cases, alert level, and weather conditions for "
 "arbovirus transmission at the municipal level."
 
-#: dados/templates/components/home/functionalities.html:50
+#: dados/templates/components/home/home_functionalities_section.html:46
 msgid "Relatórios municipais"
 msgstr "Municipal reports"
 
-#: dados/templates/components/home/functionalities.html:62
+#: dados/templates/components/home/home_functionalities_section.html:58
 msgid ""
 "Informações sobre o número de casos e nível de alerta para as regionais de "
 "saúde de cada estado."
@@ -1575,27 +1493,27 @@ msgstr ""
 "Information on the number of cases and alert level for each state's health "
 "regions."
 
-#: dados/templates/components/home/functionalities.html:67
+#: dados/templates/components/home/home_functionalities_section.html:63
 msgid "Relatórios estaduais"
 msgstr "State Reports"
 
-#: dados/templates/components/home/functionalities.html:79
+#: dados/templates/components/home/home_functionalities_section.html:75
 msgid "Análises adicionais sobre a situação das arboviroses no país."
 msgstr "Additional analyses on the situation of arboviruses in the country."
 
-#: dados/templates/components/home/functionalities.html:96
+#: dados/templates/components/home/home_functionalities_section.html:92
 msgid "Exemplo de acesso aos dados da API usando R e Python."
 msgstr "Example of accessing API data using R and Python."
 
-#: dados/templates/components/home/functionalities.html:101
+#: dados/templates/components/home/home_functionalities_section.html:97
 msgid "Tutoriais"
 msgstr "Tutorials"
 
-#: dados/templates/components/home/other_products.html:11
+#: dados/templates/components/home/home_other_products_section.html:9
 msgid "Outros Produtos"
 msgstr "Other Products"
 
-#: dados/templates/components/home/other_products.html:28
+#: dados/templates/components/home/home_other_products_section.html:23
 msgid ""
 "Análise de parâmetros epidemiológicos como a semana de pico, número de "
 "reprodução e total de casos por epidemia a nível municipal."
@@ -1603,25 +1521,25 @@ msgstr ""
 "Analysis of epidemiological parameters such as peak week, reproduction "
 "number, and total cases per epidemic at the municipal level."
 
-#: dados/templates/components/home/other_products.html:37
+#: dados/templates/components/home/home_other_products_section.html:32
 msgid "Visualize os parâmetros epidemiológicos de cada epidemia."
 msgstr "Visualize the epidemiological parameters of each epidemic."
 
-#: dados/templates/components/home/other_products.html:49
+#: dados/templates/components/home/home_other_products_section.html:44
 msgid ""
 "Biblioteca em Python que permite o acesso a conjuntos de dados "
 "disponibilizados pelo DATASUS."
 msgstr "Python library that enables access to datasets provided by DATASUS."
 
-#: dados/templates/components/home/other_products.html:54
+#: dados/templates/components/home/home_other_products_section.html:49
 msgid "PySUS"
 msgstr "PySUS"
 
-#: dados/templates/components/home/other_products.html:57
+#: dados/templates/components/home/home_other_products_section.html:52
 msgid "Acesse bancos de dados públicos do DATASUS."
 msgstr "Access public DATASUS databases."
 
-#: dados/templates/components/home/other_products.html:69
+#: dados/templates/components/home/home_other_products_section.html:64
 msgid ""
 "Canal do Infodengue no YouTube, com vídeos sobre modelos, dados e vigilância "
 "em saúde."
@@ -1629,23 +1547,160 @@ msgstr ""
 "Infodengue's YouTube channel, with videos on models, data, and health "
 "surveillance."
 
-#: dados/templates/components/home/other_products.html:74
+#: dados/templates/components/home/home_other_products_section.html:69
 msgid "Canal do YouTube"
 msgstr "YouTube Channel"
 
-#: dados/templates/components/home/other_products.html:77
+#: dados/templates/components/home/home_other_products_section.html:72
 msgid "Vídeos sobre modelos, dados e vigilância em saúde."
 msgstr "Videos on models, data, and health surveillance."
 
-#: dados/templates/components/home/uf_incidence.html:13
+#: dados/templates/components/home/home_state_charts.html:7
+msgid ""
+"Registrados: casos notificados de dengue por semana de início de sintomas "
+"(dados incompletos) <br> Estimados: estimativa utilizando modelo de nowcast "
+"(ver saiba mais)"
+msgstr ""
+"Recorded: reported cases of dengue fever by week of onset of "
+"symptoms(incomplete data) <br> Estimated: estimates using nowcast model(see "
+"more)"
+
+#: dados/templates/components/home/home_state_charts.html:8
+msgid ""
+"Registrados: casos notificados de chikungunya por semana de início de "
+"sintomas (dados incompletos) <br> Estimados: estimativa utilizando modelo de "
+"nowcast (ver saiba mais)"
+msgstr ""
+"Recorded: reported cases of chikungunya by week of onset of symptoms "
+"(incomplete data) <br> Estimated: estimate using nowcast model (see learn "
+"more)"
+
+#: dados/templates/components/home/home_state_charts.html:9
+msgid ""
+"Registrados: casos notificados de zika por semana de início de sintomas "
+"(dados incompletos) <br> Estimados: estimativa utilizando modelo de nowcast "
+"(ver saiba mais)"
+msgstr ""
+"Recorded: reported cases of zika by week of onset of symptoms (incomplete "
+"data) <br> Estimated: estimate using nowcast model (see learn more)"
+
+#: dados/templates/components/home/home_state_charts.html:11
+msgid ""
+"Aumento ou redução de cidades com clima favorável para transmissão, em "
+"relação à última semana"
+msgstr ""
+"Increase or reduction of cities with favorable climate for transmission, in "
+"relation to the last week"
+
+#: dados/templates/components/home/home_state_charts.html:13
+msgid ""
+"Amarelo: clima favorável e presença de arbovirus <br> Laranja: tendência de "
+"aumento de casos <br> Vermelho: alta incidência em relação ao histórico"
+msgstr ""
+"Yellow: favorable climate and presence of arbovirus <br> Orange: tendency "
+"for increasing cases <br> Red: high incidence compared to historical figures"
+
+#: dados/templates/components/home/home_state_charts.html:31
+msgid "Gráficos sobre Dengue"
+msgstr "Dengue charts"
+
+#: dados/templates/components/home/home_state_charts.html:43
+msgid "Gráficos sobre Chikungunya"
+msgstr "Chikungunya charts"
+
+#: dados/templates/components/home/home_state_charts.html:54
+msgid "Gráficos sobre Zika"
+msgstr "Zika charts"
+
+#: dados/templates/components/home/home_state_charts.html:65
+msgid "Veja o mapa de incidência das doenças no estado"
+msgstr "View the disease incidence map for the state"
+
+#: dados/templates/components/home/home_state_charts.html:66
+msgid "Mapa incidência"
+msgstr "Incidence map"
+
+#: dados/templates/components/home/home_state_charts.html:77
+msgid "Municípios monitorados"
+msgstr "Monitored municipalities"
+
+#: dados/templates/components/home/home_state_charts.html:77
+msgid "Última atualização na SE"
+msgstr "Last update (epidemiological week)"
+
+#: dados/templates/components/home/home_state_charts.html:101
+#: dados/templates/components/home/home_state_charts.html:126
+#: dados/templates/components/home/home_state_charts.html:151
+msgid "Informações detalhadas sobre o Estado"
+msgstr "Detailed information about the state"
+
+#: dados/templates/components/home/home_state_epi_section.html:16
+msgid "Situação epidemiológica por estado"
+msgstr "Epidemiological situation by state"
+
+#: dados/templates/components/home/home_state_epi_section.html:19
+msgid ""
+"Selecione um estado para visualizar mapas de incidência, número de casos ou "
+"situação epidemiológica dos municípios."
+msgstr ""
+"Select a state to view incidence maps, case counts, and the epidemiological "
+"situation of the municipalities."
+
+#: dados/templates/components/home/home_state_epi_section.html:28
+#: dados/templates/components/report_state/collapse.html:39
+msgid "Selecione um estado"
+msgstr "Select a state"
+
+#: dados/templates/components/home/home_state_epi_section.html:43
+#: dados/templates/components/home/home_state_epi_section.html:73
+msgid ""
+"Selecione um estado no campo acima para visualizar os gráficos de incidência."
+msgstr "Select a state in the field above to display the incidence charts."
+
+#: dados/templates/components/home/home_state_epi_section.html:91
+msgid "Não foi possível carregar os dados deste estado."
+msgstr "The data for this state could not be loaded."
+
+#: dados/templates/components/home/home_uf_incidence_section.html:9
 msgid "Situação de casos estimados"
-msgstr "Estimated cases situation"
+msgstr "Situation of estimated cases"
+
+#: dados/templates/components/home/home_uf_incidence_section.html:20
+#: dados/templates/components/home/home_uf_incidence_section.html:31
+msgid "Clique para abrir os relatórios estaduais"
+msgstr "Click to open the state reports"
+
+#: dados/templates/components/home/home_uf_incidence_section.html:24
+msgid "Mapa de incidência de Dengue no Brasil"
+msgstr "Dengue incidence map in Brazil"
+
+#: dados/templates/components/home/home_uf_incidence_section.html:35
+msgid "Mapa de incidência de Chikungunya no Brasil"
+msgstr "Chikungunya incidence map in Brazil"
+
+#: dados/templates/components/report_state/collapse.html:9
+msgid "Situação epidemiológica"
+msgstr "Epidemiological situation"
+
+#: dados/templates/components/report_state/collapse.html:13
+msgid "Voltar para o mapa"
+msgstr "Back to the map"
+
+#: dados/templates/components/report_state/collapse.html:44
+msgid "Recarregar"
+msgstr "Reload"
+
+#: dados/templates/components/report_state/collapse.html:49
+msgid ""
+"Clique em um estado na lista ao lado para visualizar os gráficos de "
+"incidência."
+msgstr "Click a state in the list to display the incidence charts."
 
 #: dados/templates/components/report_state/report_state_charts.html:43
 #: dados/templates/components/report_state/report_state_charts.html:82
 #: dados/templates/components/report_state/report_state_charts.html:121
 msgid "Municípios na regional"
-msgstr "Municipalities by regional"
+msgstr "Municipalities in the regional health area"
 
 #: dados/templates/components/report_state/report_state_charts.html:49
 msgid "Municípios"
@@ -1653,7 +1708,7 @@ msgstr "Municipalities"
 
 #: dados/templates/components/searchbox/searchbox.html:22
 msgid "Encontre um município"
-msgstr "Search by city"
+msgstr "Find a municipality"
 
 #: dados/templates/dashboard_cities.html:56
 #, python-format
@@ -1799,7 +1854,7 @@ msgstr ""
 #: dados/templates/report_filter_report_type.html:31
 #: dados/templates/report_filter_state.html:35
 #: dados/templates/report_filter_state.html:42
-#: dados/templates/report_state.html:20 templates/components/navbar.html:48
+#: dados/templates/report_state.html:20 templates/components/navbar.html:51
 msgid "Relatórios"
 msgstr "Report"
 
@@ -2227,7 +2282,7 @@ msgstr "Reported cases of %(disease_label)s"
 #: dados/templates/services_tutorial.html:17
 #: dados/templates/services_tutorial_Python.html:174
 #: dados/templates/services_tutorial_R.html:174
-#: templates/components/navbar.html:38
+#: templates/components/navbar.html:41
 msgid "Dados"
 msgstr "Data"
 
@@ -2673,7 +2728,7 @@ msgstr ""
 msgid "Por favor, aguarde."
 msgstr "Please, wait."
 
-#: dados/templates/team.html:5 templates/components/navbar.html:63
+#: dados/templates/team.html:5 templates/components/navbar.html:66
 msgid "Equipe"
 msgstr "Team"
 
@@ -2861,31 +2916,31 @@ msgid ""
 "{}."
 msgstr "This disease {} is not registered in our database for {} municipality"
 
-#: dados/views.py:994
+#: dados/views.py:993
 msgid "°C temperatura mínima"
 msgstr "°C Minimum temperature"
 
-#: dados/views.py:995
+#: dados/views.py:994
 msgid "°C temperatura média"
 msgstr "°C Average temperatures"
 
-#: dados/views.py:996
+#: dados/views.py:995
 msgid "°C temperatura máxima"
 msgstr "°C Maximum temperature"
 
-#: dados/views.py:997
+#: dados/views.py:996
 #, fuzzy, python-format
 #| msgid "% umidade mínima do ar"
 msgid "% umidade mínima do ar"
 msgstr "% Minimum air humidity"
 
-#: dados/views.py:998
+#: dados/views.py:997
 #, fuzzy, python-format
 #| msgid "% umidade média do ar"
 msgid "% umidade média do ar"
 msgstr "% Average air humidity"
 
-#: dados/views.py:999
+#: dados/views.py:998
 #, fuzzy, python-format
 #| msgid "% umidade máxima do ar"
 msgid "% umidade máxima do ar"
@@ -3067,7 +3122,7 @@ msgstr ""
 "agencies to assist in the management of mosquito-borne diseases such as "
 "dengue, zika, and Chikungunya."
 
-#: templates/components/navbar.html:27
+#: templates/components/navbar.html:30
 msgid ""
 "Página inicial com visão geral da situação das arboviroses e principais "
 "recursos do Infodengue."
@@ -3075,16 +3130,16 @@ msgstr ""
 "Home page with an overview of the arbovirus situation and main resources of "
 "Infodengue."
 
-#: templates/components/navbar.html:28
+#: templates/components/navbar.html:31
 msgid "Início"
 msgstr "Home"
 
-#: templates/components/navbar.html:37
+#: templates/components/navbar.html:40
 msgid ""
 "Acesse os dados por meio da API e de notebooks de documentação com exemplos."
 msgstr "Access data through the API and documentation notebooks with examples."
 
-#: templates/components/navbar.html:47
+#: templates/components/navbar.html:50
 msgid ""
 "Consulte relatórios municipais e estaduais com indicadores epidemiológicos e "
 "níveis de alerta."
@@ -3092,7 +3147,7 @@ msgstr ""
 "Consult municipal and state reports with epidemiological indicators and "
 "alert levels."
 
-#: templates/components/navbar.html:62
+#: templates/components/navbar.html:65
 msgid ""
 "Conheça a equipe responsável pelo desenvolvimento, manutenção e análise dos "
 "dados do Infodengue."
@@ -3100,7 +3155,7 @@ msgstr ""
 "Meet the team responsible for the development, maintenance, and analysis of "
 "Infodengue data."
 
-#: templates/components/navbar.html:72
+#: templates/components/navbar.html:75
 msgid ""
 "Informações sobre o projeto Infodengue, seus objetivos, histórico e "
 "principais parceiros."

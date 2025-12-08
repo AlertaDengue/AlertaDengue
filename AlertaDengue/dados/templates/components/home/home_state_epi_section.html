@@ -1,0 +1,121 @@
+{% load i18n %}
+{% load lookup %}
+{% load static %}
+
+{% load hashthis %}
+
+
+{% block home_state_epi_section %}
+
+<div class="card mb-0 p-0 home-section-card"
+     id="state-epi-card">
+  <div class="card-header home-section-header d-flex flex-column flex-md-row
+              align-items-md-center justify-content-between">
+    <div>
+      <h3 class="mb-1">
+        {% trans "Situação epidemiológica por estado" %}
+      </h3>
+      <p class="small text-muted mb-0">
+        {% trans "Selecione um estado para visualizar mapas de incidência, número de casos ou situação epidemiológica dos municípios." %}
+      </p>
+    </div>
+
+    <div class="d-flex flex-column align-items-md-end mt-3 mt-md-0">
+      <div class="state-epi-select-wrapper p-2">
+        <select id="state-select"
+                class="form-control state-epi-select">
+          <option value="">
+            {% trans "Selecione um estado" %}
+          </option>
+          {% for abbr, name in states_name.items %}
+            <option value="{{ abbr }}"{% if abbr == 'RJ' %} selected{% endif %}>
+              {{ name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-4 mb-4 p-4">
+    <div id="state-chart-panel" class="background-panel">
+      <p class="text-muted mb-0">
+        {% trans "Selecione um estado no campo acima para visualizar os gráficos de incidência." %}
+      </p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+<script type="text/javascript">
+  (function ($) {
+    $(function () {
+      var $select = $('#state-select');
+      var $panel = $('#state-chart-panel');
+      var $card = $('#state-epi-card');
+
+      // change this to 'RJ' if you prefer that as default
+      var defaultState = 'RJ';
+
+      function scrollToCard() {
+        if ($card.length &&
+            window.matchMedia('(max-width: 767px)').matches) {
+          $card[0].scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      }
+
+      function renderEmptyMessage() {
+        $panel.html(
+          '<p class="text-muted mb-0">' +
+            '{% trans "Selecione um estado no campo acima para visualizar os gráficos de incidência." %}' +
+          '</p>'
+        );
+      }
+
+      function loadState(state) {
+        $.ajax({
+          url: '/chartshome/' + state,
+          method: 'GET',
+          dataType: 'html'
+        })
+          .done(function (data) {
+            $panel.html(data);
+            scrollToCard();
+          })
+          .fail(function () {
+            $panel.html(
+              '<div class="alert alert-danger mb-0">' +
+                '{% trans "Não foi possível carregar os dados deste estado." %}' +
+              '</div>'
+            );
+          });
+      }
+
+      // When the user changes the state
+      $select.on('change', function () {
+        var state = $(this).val();
+
+        if (!state) {
+          renderEmptyMessage();
+          return;
+        }
+
+        loadState(state);
+      });
+
+      // Load default state on first render, if it exists in the options
+      if (
+        defaultState &&
+        $select.find('option[value="' + defaultState + '"]').length
+      ) {
+        $select.val(defaultState);
+        loadState(defaultState);
+      } else {
+        renderEmptyMessage();
+      }
+    });
+  })(jQuery);
+</script>

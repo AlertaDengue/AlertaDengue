@@ -1,17 +1,12 @@
 {% load i18n static %}
 
 
-{% block extra_head %}
-<link href="{% static 'css/banner_styles.css' %}"
-      rel="stylesheet" type="text/css">
-{% endblock %}
+{% block home_banners_section %}
 
 {% get_current_language as LANGUAGE_CODE %}
 {% with LANGUAGE_CODE|slice:":2" as lang_suffix %}
 
-<div class="row mb-4 p-2"
-     style="background-color:#e0eefd63;border-radius:7px;
-            box-shadow:2px 2px 7px #0c1b2b69;">
+<div class="card mb-0 p-0 home-section-card">
 
   <div class="col-lg-12 col-md-12 col-sm-12 mb-3 mt-2">
     <div class="feature-banners">
@@ -78,3 +73,5 @@
 </div>
 
 {% endwith %}
+
+{% endblock %}

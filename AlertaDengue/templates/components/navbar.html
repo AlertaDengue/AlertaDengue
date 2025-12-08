@@ -1,11 +1,14 @@
 {% load static %}
 {% load i18n %}
+
 {% load searchbox_component %}
 
-<div class="row p-2"
-     style="background-color:#e0eefd63;border-radius:7px;
-            box-shadow:2px 2px 7px #0c1b2b69;">
-  <div class="col-md-12">
+{% block menu-bar %}
+
+<div class="card mb-0 p-0 home-section-card">
+
+  <div class="card">
+  
     <nav class="navbar navbar-light navbar-custom navbar-expand-md w-100 py-1"
          style="border-radius:5px;">
       <button class="navbar-toggler" type="button" data-toggle="collapse"
@@ -79,6 +82,8 @@
     </nav>
   </div>
 </div>
+
+{% endblock %}
 
 <script>
   // Activate Bootstrap tooltips for menu items
