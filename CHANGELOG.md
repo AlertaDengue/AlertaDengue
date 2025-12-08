@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.2.3](https://github.com/AlertaDengue/AlertaDengue/compare/4.2.2...4.2.3) (2025-12-08)
+
+### Bug Fixes
+
+* **css:** restore collapse styles in report-state ([#807](https://github.com/AlertaDengue/AlertaDengue/issues/807)) ([8c935ad](https://github.com/AlertaDengue/AlertaDengue/commit/8c935ad789056ccbffc88e1c66874b8812cdfcab))
+
 ## [4.2.2](https://github.com/AlertaDengue/AlertaDengue/compare/4.2.1...4.2.2) (2025-12-01)
 
 ### Bug Fixes
