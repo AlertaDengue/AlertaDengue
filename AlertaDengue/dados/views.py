@@ -677,8 +677,7 @@ class ChartsMainView(TemplateView):
         for disease in tuple(DISEASES_NAME):
             no_data_chart = f"""
                 <div class='alert alert-primary' align='center'>
-                    Não há dados suficientes para a geração do
-                    gráfico sobre {disease}
+                  There are insufficient data to generate the chart on {disease}
                 </div>"""
 
             empty_charts_count[disease] = 0
