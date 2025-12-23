@@ -1,7 +1,13 @@
 services:
   web:
+    environment:
+      DJANGO_SETTINGS_MODULE: ad_main.settings
+      DEBUG: "True"
     volumes:
       - ../AlertaDengue/:/opt/services/AlertaDengue
   worker:
+    environment:
+      DJANGO_SETTINGS_MODULE: ad_main.settings
+      DEBUG: "True"
     volumes:
       - ../AlertaDengue/:/opt/services/AlertaDengue
