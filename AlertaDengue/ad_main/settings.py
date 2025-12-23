@@ -21,6 +21,7 @@ load_dotenv()
 env_path = Path(".") / ".env"
 load_dotenv(dotenv_path=env_path)
 
+
 # Helpers
 def read_admins(value: str) -> Tuple[Tuple[str, str], ...]:
     """Parse ADMINS env var into Django's expected tuple.
@@ -90,7 +91,8 @@ def get_sqla_conn(database: Optional[str] = None):
     """
     db = database or os.getenv("PSQL_DB")
     uri = (
-        f"postgresql://{os.getenv('PSQL_USER')}:{os.getenv('PSQL_PASSWORD')}"
+        f"postgresql://{os.getenv('PSQL_USER')}:"
+        f"{os.getenv('PSQL_PASSWORD')}"
         f"@{os.getenv('PSQL_HOST')}:{os.getenv('PSQL_PORT')}/{db}"
     )
     try:
@@ -145,6 +147,7 @@ THIRD_PARTY_APPS = [
     "maintenance_mode",
     "django_celery_results",
     "django_celery_beat",
+    "pwa",
 ]
 
 LOCAL_APPS = [
@@ -186,6 +189,7 @@ else:
         + _BASE_MIDDLEWARE
         + ["django.middleware.cache.FetchFromCacheMiddleware"]
     )
+
 
 # Messages
 MESSAGE_TAGS = {
@@ -341,7 +345,7 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [str(APPS_DIR / "templates")],
-        "APP_DIRS": True,  # keep this in DEBUG
+        "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -359,10 +363,8 @@ TEMPLATES = [
 ]
 
 if DEBUG:
-    # No custom loaders in DEBUG, so hot-reload works.
     TEMPLATES[0]["OPTIONS"]["debug"] = True
 else:
-    # In production, switch to cached loader.
     TEMPLATES[0]["APP_DIRS"] = False
     TEMPLATES[0]["OPTIONS"]["loaders"] = [
         (
@@ -454,7 +456,6 @@ accept_content = ["json"]
 task_serializer = "json"
 
 if DEBUG:
-    # Use django-db in dev to avoid external cache coupling.
     result_backend = "django-db"
 else:
     result_backend = f"cache+memcached://{MEMCACHED_HOST}:{MEMCACHED_PORT}/"
@@ -473,10 +474,10 @@ LEAFLET_CONFIG = {
     "DEFAULT_CENTER": (-22.907000, -43.431000),
     "DEFAULT_ZOOM": 8,
     "MAXIMUM_ZOOM": 13,
-    "TILES": "http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+    "TILES": "http://{s}.basemaps.cartocdn.com/" "light_all/{z}/{x}/{y}.png",
     "MINIMAP": False,
     "ATTRIBUTION_PREFIX": (
-        "Fonte: <a href=http://info.dengue.mat.br>info.dengue.mat.br</a>"
+        "Fonte: <a href=http://info.dengue.mat.br>" "info.dengue.mat.br</a>"
     ),
     "PLUGINS": {
         "cluster": {
@@ -514,3 +515,23 @@ if SENTRY_DSN:
         integrations=[DjangoIntegration()],
         send_default_pii=True,
     )
+
+
+# Progressive Web App (django-pwa)
+PWA_APP_NAME = "InfoDengue"
+PWA_APP_DESCRIPTION = (
+    "Aplicação web do InfoDengue para monitoramento de arboviroses."
+)
+PWA_APP_THEME_COLOR = "#469ad3"
+PWA_APP_BACKGROUND_COLOR = "#ffffff"
+PWA_APP_DISPLAY = "standalone"
+PWA_APP_SCOPE = "/"
+PWA_APP_ORIENTATION = "portrait"
+PWA_APP_START_URL = "/"
+PWA_APP_STATUS_BAR_COLOR = "#469ad3"
+PWA_APP_DIR = "ltr"
+PWA_APP_LANG = LANGUAGE_CODE
+PWA_APP_DEBUG_MODE = DEBUG
+
+PWA_SERVICE_WORKER_PATH = APPS_DIR / "static" / "js" / "serviceworker.js"
+PWA_APP_MANIFEST_FILE = APPS_DIR / "templates" / "manifest.json"
