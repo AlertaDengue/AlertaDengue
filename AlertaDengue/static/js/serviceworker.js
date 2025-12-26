@@ -3,18 +3,16 @@
 const CACHE_NAME = "infodengue-pwa-v1";
 
 const OFFLINE_URLS = [
-  "/",                   // home
-  "/informacoes",       // about / info
-  "/report",            // reports entry
-  "/equipe",            // team
-  "/services/api",      // API page
-  "/report",           // reports entry
-  // "/report/AC/city",   // city-level report
-  // "/report/AC/1200013/202551", // specific report
-  "/services/tutorial", // API tutorials page
-  "/services/tutorial/R", // R tutorial
+  "/",                      // home
+  "/informacoes/",          // info / about
+  "/equipe/",               // team
+  "/participe/",            // participate
+  "/report/",               // reports entry
+  "/services/",             // data/services landing
+  "/services/api",          // API page (no trailing slash in URLconf)
+  "/services/tutorial",     // tutorials index
+  "/services/tutorial/R",   // R tutorial
   "/services/tutorial/Python", // Python tutorial
-  // add /participe/ if needed
 ];
 
 self.addEventListener("install", (event) => {
@@ -27,12 +25,7 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-          return null;
-        })
+        keys.map((key) => (key !== CACHE_NAME ? caches.delete(key) : null))
       )
     )
   );
@@ -45,8 +38,8 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Network-first for API
   if (request.url.includes("/services/api")) {
-    // network-first for API
     event.respondWith(
       fetch(request)
         .then((response) => {
@@ -59,7 +52,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // default: cache-first for everything else
+  // Cache-first for everything else
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) {

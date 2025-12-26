@@ -518,13 +518,31 @@ if SENTRY_DSN:
 
 
 # Progressive Web App (django-pwa)
-PWA_APP_NAME = "InfoDengue"
+PWA_APP_NAME = "InfoDengue – Sistema de alerta precoce de transmissão de arboviroses (dengue, chikungunya e zika)"
+PWA_APP_SHORT_NAME = "InfoDengue"
 PWA_APP_DESCRIPTION = (
-    "Aplicação web do InfoDengue para monitoramento de arboviroses."
+    "Portal de dados InfoDengue para monitoramento de arboviroses."
 )
-PWA_APP_THEME_COLOR = "#469ad3"
-PWA_APP_BACKGROUND_COLOR = "#ffffff"
+PWA_APP_LANG = "pt-BR"
+PWA_APP_DIR = "ltr"
 PWA_APP_DISPLAY = "standalone"
+PWA_APP_START_URL = "/"
+PWA_APP_THEME_COLOR = "#0080ff"
+PWA_APP_BACKGROUND_COLOR = "#ffffff"
+
+PWA_APP_ICONS = [
+    {
+        "src": "/static/img/logo-infodengue.png",
+        "sizes": "192x192",
+        "type": "image/png",
+    },
+    {
+        "src": "/static/img/logo-infodengue.png",
+        "sizes": "512x512",
+        "type": "image/png",
+    },
+]
+
 PWA_APP_SCOPE = "/"
 PWA_APP_ORIENTATION = "portrait"
 PWA_APP_START_URL = "/"

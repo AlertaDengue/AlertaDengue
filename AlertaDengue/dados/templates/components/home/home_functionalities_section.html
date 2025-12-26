@@ -1,7 +1,6 @@
 {% load i18n %}
 {% load static %}
 
-
 {% block home_functionalities_section %}
 
 <div class="card mb-0 p-0 home-section-card">
@@ -99,6 +98,26 @@
         </a>
       </div>
 
+      <!-- PWA Install tile (wrapper has its own id) -->
+      <div class="col-12 col-sm-6 col-md-4 col-lg-2 d-flex"
+           id="pwa-install-wrapper"
+           style="display: none;">
+        <button id="pwa-install-button"
+                type="button"
+                class="btn btn-menu-card w-100 h-100 d-flex flex-column
+                       justify-content-center align-items-center text-center py-4"
+                data-toggle="tooltip"
+                data-placement="bottom"
+                title="{% trans 'Instale o aplicativo do Infodengue neste dispositivo.' %}">
+          <span class="mb-2">
+            <i class="fas fa-mobile-alt fa-lg"></i>
+          </span>
+          <span class="font-weight-semibold" id="pwa-install-label">
+            {% trans "Instalar aplicativo" %}
+          </span>
+        </button>
+      </div>
+
     </div>
   </div>
 </div>
@@ -109,4 +128,77 @@
   $(function () {
     $('[data-toggle="tooltip"]').tooltip();
   });
+</script>
+
+<script>
+  (function () {
+    const STORAGE_KEY = "infodengue_pwa_installed";
+    let deferredPrompt = null;
+
+    function removeInstallTile() {
+      const wrapper = document.getElementById("pwa-install-wrapper");
+      if (wrapper) {
+        wrapper.remove();
+      }
+    }
+
+    // 1) React when the page is loaded
+    document.addEventListener("DOMContentLoaded", function () {
+      const wrapper = document.getElementById("pwa-install-wrapper");
+      const button = document.getElementById("pwa-install-button");
+
+      if (!wrapper || !button) {
+        return;
+      }
+
+      const alreadyInstalled =
+        window.localStorage.getItem(STORAGE_KEY) === "1";
+      const isStandalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true;
+
+      // If installed (this browser) or running as PWA: tile disappears
+      if (alreadyInstalled || isStandalone) {
+        removeInstallTile();
+        return;
+      }
+
+      // User clicks on "Instalar aplicativo"
+      button.addEventListener("click", async function (event) {
+        event.preventDefault();
+
+        if (!deferredPrompt) {
+          console.log("[PWA] beforeinstallprompt not fired yet.");
+          return;
+        }
+
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        deferredPrompt = null;
+
+        if (choice && choice.outcome === "accepted") {
+          window.localStorage.setItem(STORAGE_KEY, "1");
+          removeInstallTile();
+        }
+      });
+    });
+
+    // 2) Browser says: app can be installed
+    window.addEventListener("beforeinstallprompt", function (event) {
+      event.preventDefault();
+      deferredPrompt = event;
+
+      const wrapper = document.getElementById("pwa-install-wrapper");
+      if (wrapper) {
+        wrapper.style.display = "flex";
+      }
+    });
+
+    // 3) App actually installed (via our button or via address bar)
+    window.addEventListener("appinstalled", function () {
+      window.localStorage.setItem(STORAGE_KEY, "1");
+      removeInstallTile();
+      deferredPrompt = null;
+    });
+  })();
 </script>
