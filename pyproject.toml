@@ -60,6 +60,7 @@ pyocclient = "^0.6"
 humanize = "^4.11.0"
 chardet = "^5.2.0"
 sqlalchemy = ">=1.4.54,<2.0"
+django-pwa = "^2.0.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.12.0"

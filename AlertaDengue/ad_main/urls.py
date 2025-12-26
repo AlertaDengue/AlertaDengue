@@ -14,6 +14,7 @@ def status(request):
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", include("pwa.urls")),
     re_path(r"^accounts/profile/$", RedirectView.as_view(url="/")),
     re_path(r"^accounts/", include("django.contrib.auth.urls")),
     # apps
