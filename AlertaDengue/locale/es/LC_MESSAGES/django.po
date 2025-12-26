@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-08 10:41-0300\n"
+"POT-Creation-Date: 2025-12-26 11:14-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -928,7 +928,7 @@ msgid ""
 msgstr ""
 
 #: dados/templates/about.html:654
-#: dados/templates/components/home/home_functionalities_section.html:80
+#: dados/templates/components/home/home_functionalities_section.html:79
 msgid "Relatórios técnicos"
 msgstr "Informes técnicos"
 
@@ -1487,24 +1487,24 @@ msgstr "Lea más aquí"
 msgid "saiba mais"
 msgstr "Lea más aquí"
 
-#: dados/templates/components/home/home_functionalities_section.html:10
+#: dados/templates/components/home/home_functionalities_section.html:9
 msgid "Funcionalidades"
 msgstr "Funcionalidades"
 
-#: dados/templates/components/home/home_functionalities_section.html:24
+#: dados/templates/components/home/home_functionalities_section.html:23
 msgid ""
 "Acesso aos dados utilizados para gerar os resultados apresentados no site."
 msgstr ""
 "Acceso a los datos utilizados para generar los resultados presentados en el "
 "sitio."
 
-#: dados/templates/components/home/home_functionalities_section.html:29
+#: dados/templates/components/home/home_functionalities_section.html:28
 #: dados/templates/services_api.html:76 dados/templates/services_api.html:83
 #: dados/templates/services_api_doc.html:54
 msgid "API"
 msgstr "API"
 
-#: dados/templates/components/home/home_functionalities_section.html:41
+#: dados/templates/components/home/home_functionalities_section.html:40
 msgid ""
 "Informações sobre o número de casos, nível de alerta e condições climáticas "
 "para a transmissão de arboviroses a nível municipal."
@@ -1512,11 +1512,11 @@ msgstr ""
 "Información sobre el número de casos, el nivel de alerta y las condiciones "
 "climáticas para la transmisión de arbovirosis a nivel municipal."
 
-#: dados/templates/components/home/home_functionalities_section.html:46
+#: dados/templates/components/home/home_functionalities_section.html:45
 msgid "Relatórios municipais"
 msgstr "Informes municipales"
 
-#: dados/templates/components/home/home_functionalities_section.html:58
+#: dados/templates/components/home/home_functionalities_section.html:57
 msgid ""
 "Informações sobre o número de casos e nível de alerta para as regionais de "
 "saúde de cada estado."
@@ -1524,21 +1524,29 @@ msgstr ""
 "Información sobre el número de casos y el nivel de alerta para las regiones "
 "sanitarias de cada estado."
 
-#: dados/templates/components/home/home_functionalities_section.html:63
+#: dados/templates/components/home/home_functionalities_section.html:62
 msgid "Relatórios estaduais"
 msgstr "Informes estatales"
 
-#: dados/templates/components/home/home_functionalities_section.html:75
+#: dados/templates/components/home/home_functionalities_section.html:74
 msgid "Análises adicionais sobre a situação das arboviroses no país."
 msgstr "Análisis adicionales sobre la situación de las arbovirosis en el país."
 
-#: dados/templates/components/home/home_functionalities_section.html:92
+#: dados/templates/components/home/home_functionalities_section.html:91
 msgid "Exemplo de acesso aos dados da API usando R e Python."
 msgstr "Ejemplo de acceso a los datos de la API utilizando R y Python."
 
-#: dados/templates/components/home/home_functionalities_section.html:97
+#: dados/templates/components/home/home_functionalities_section.html:96
 msgid "Tutoriais"
 msgstr "Tutoriales"
+
+#: dados/templates/components/home/home_functionalities_section.html:111
+msgid "Instale o aplicativo do Infodengue neste dispositivo."
+msgstr "Instale la aplicación InfoDengue en este dispositivo."
+
+#: dados/templates/components/home/home_functionalities_section.html:116
+msgid "Instalar Infodengue"
+msgstr "Instalar InfoDengue"
 
 #: dados/templates/components/home/home_other_products_section.html:9
 msgid "Outros Produtos"
@@ -1682,7 +1690,6 @@ msgstr ""
 "la situación epidemiológica de los municipios."
 
 #: dados/templates/components/home/home_state_epi_section.html:28
-#: dados/templates/components/report_state/collapse.html:39
 msgid "Selecione um estado"
 msgstr "Seleccione un estado"
 
@@ -1714,26 +1721,6 @@ msgstr "Mapa de incidencia de dengue en Brasil"
 #: dados/templates/components/home/home_uf_incidence_section.html:35
 msgid "Mapa de incidência de Chikungunya no Brasil"
 msgstr "Mapa de incidencia de chikungunya en Brasil"
-
-#: dados/templates/components/report_state/collapse.html:9
-msgid "Situação epidemiológica"
-msgstr "Situación epidemiológica"
-
-#: dados/templates/components/report_state/collapse.html:13
-msgid "Voltar para o mapa"
-msgstr "Volver al mapa"
-
-#: dados/templates/components/report_state/collapse.html:44
-msgid "Recarregar"
-msgstr "Recargar"
-
-#: dados/templates/components/report_state/collapse.html:49
-msgid ""
-"Clique em um estado na lista ao lado para visualizar os gráficos de "
-"incidência."
-msgstr ""
-"Haga clic en un estado de la lista lateral para visualizar los gráficos de "
-"incidencia."
 
 #: dados/templates/components/report_state/report_state_charts.html:43
 #: dados/templates/components/report_state/report_state_charts.html:82
@@ -3137,16 +3124,6 @@ msgstr ""
 msgid "Casos Previstos"
 msgstr ""
 
-#: templates/base.html:55
-#, fuzzy
-#| msgid "Atenção"
-msgid "Manutenção"
-msgstr "Atención"
-
-#: templates/base.html:56
-msgid "O site encontra-se em manutenção, por favor volte mais tarde"
-msgstr ""
-
 #: templates/components/footer.html:6
 #, fuzzy
 #| msgid "InfoDengue"
@@ -3353,6 +3330,30 @@ msgstr ""
 #: upload/templates/sinan/status.html:31 upload/templates/sinan/status.html:44
 msgid "Task duration"
 msgstr ""
+
+#~ msgid "Instalar aplicativo"
+#~ msgstr "Instalar aplicación"
+
+#~ msgid "Situação epidemiológica"
+#~ msgstr "Situación epidemiológica"
+
+#~ msgid "Voltar para o mapa"
+#~ msgstr "Volver al mapa"
+
+#~ msgid "Recarregar"
+#~ msgstr "Recargar"
+
+#~ msgid ""
+#~ "Clique em um estado na lista ao lado para visualizar os gráficos de "
+#~ "incidência."
+#~ msgstr ""
+#~ "Haga clic en un estado de la lista lateral para visualizar los gráficos "
+#~ "de incidencia."
+
+#, fuzzy
+#~| msgid "Atenção"
+#~ msgid "Manutenção"
+#~ msgstr "Atención"
 
 #~ msgid ""
 #~ "\n"

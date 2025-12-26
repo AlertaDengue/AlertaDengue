@@ -518,10 +518,13 @@ if SENTRY_DSN:
 
 
 # Progressive Web App (django-pwa)
-PWA_APP_NAME = "InfoDengue – Sistema de alerta precoce de transmissão de arboviroses (dengue, chikungunya e zika)"
+PWA_APP_NAME = (
+    "InfoDengue – Early warning system for arbovirus transmission "
+    "(dengue, chikungunya, and Zika)"
+)
 PWA_APP_SHORT_NAME = "InfoDengue"
 PWA_APP_DESCRIPTION = (
-    "Portal de dados InfoDengue para monitoramento de arboviroses."
+    "InfoDengue data portal for monitoring arbovirus transmission."
 )
 PWA_APP_LANG = "pt-BR"
 PWA_APP_DIR = "ltr"
