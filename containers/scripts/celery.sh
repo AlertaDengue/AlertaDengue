@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-# Disable printing of executed commands and enable error checking
-set +ex
-
-# Set the Django settings module to ad_main.settings
-export DJANGO_SETTINGS_MODULE=ad_main.settings
+# Respect DJANGO_SETTINGS_MODULE from the container environment.
+# If not set, default to dev.
+export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-ad_main.settings.dev}"
 
 echo "[INFO] Starting celery..."
 celery \

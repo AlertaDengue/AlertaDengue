@@ -1,0 +1,191 @@
+services:
+  memcached:
+    image: memcached:alpine
+    entrypoint:
+      - memcached
+      - -m
+      - "64"
+    ports:
+      - "${MEMCACHED_PORT}:11211"
+    expose:
+      - "11211"
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "11211"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    restart: always
+    networks:
+      - infodengue
+
+  rabbitmq:
+    image: rabbitmq:3-alpine
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "5672"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    restart: always
+    networks:
+      - infodengue
+
+  redis:
+    platform: linux/amd64
+    image: redis:alpine
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 60s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - redis-data:/data
+    networks:
+      - infodengue
+
+  postgres:
+    build:
+      context: ".."
+      dockerfile: "containers/postgres/Dockerfile"
+      args:
+        HOST_UID: "${HOST_UID}"
+        HOST_GID: "${HOST_GID}"
+    env_file:
+      - ../.env
+    shm_size: "8gb"
+    environment:
+      POSTGRES_PASSWORD: "${PSQL_PASSWORD}"
+      POSTGRES_DB: "${PSQL_DB}"
+      POSTGRES_USER: "${PSQL_USER}"
+      POSTGRES_HOST_AUTH_METHOD: "md5"
+      PG_RESTORE_STAGING: "${PG_RESTORE_STAGING}"
+    ports:
+      - "${PSQL_PORT}:5432"
+    user: "1000:1000"
+    volumes:
+      - "${PG_DATA:-/opt/data/infodengue/${ENV}/pgdata}:/var/lib/postgresql/data"
+      - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/compose
+      - ../containers/postgres/dumps/:/dumps/
+    command:
+      - -p
+      - "${PSQL_PORT}"
+    restart: always
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -p ${PSQL_PORT} -U ${PSQL_USER}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - infodengue
+
+  base:
+    build:
+      context: ".."
+      dockerfile: "containers/web/Dockerfile"
+      args:
+        HOST_UID: "${HOST_UID}"
+        HOST_GID: "${HOST_GID}"
+        ENV: "${ENV}"
+    env_file:
+      - ../.env
+    environment:
+      MEMCACHED_HOST: "memcached"
+      CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672"
+      PSQL_HOST: "${PSQL_HOST}"
+      PSQL_PORT: "${PSQL_PORT}"
+    volumes:
+      - "${DOCKER_HOST_UPLOADED_FILES_DIR}:/MEDIA_ROOT"
+      - "${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES"
+      - "${DOCKER_HOST_DBF_SINAN}:/DBF_SINAN"
+      - "${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile"
+      - "${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbf_parquet"
+    user: "${HOST_UID}:${HOST_GID}"
+
+  web:
+    extends: base
+    hostname: web
+    environment:
+      DJANGO_SETTINGS_MODULE: "ad_main.settings.${ENV}"
+      DEBUG: "${DEBUG}"
+      MAINTENANCE_MODE: "${MAINTENANCE_MODE}"
+    env_file:
+      - ../.envs/.env.${ENV}
+    ports:
+      - "${WEB_PORT}:${WEB_PORT}"
+    entrypoint: ["bash", "/entrypoint.sh"]
+    command:
+      - sh
+      - -c
+      - |
+        if [ "${ENV}" = "prod" ]; then
+          python3 /opt/services/AlertaDengue/manage.py \
+            collectstatic --noinput
+          gunicorn -w 4 -b 0.0.0.0:${WEB_PORT} \
+            ad_main.wsgi:application --timeout 9640
+        else
+          python manage.py runserver 0.0.0.0:${WEB_PORT}
+        fi
+    depends_on:
+      memcached:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q --spider --tries=1 --timeout=3 http://localhost:${WEB_PORT}/status/ || exit 1",
+        ]
+      interval: 5s
+      timeout: 4s
+      retries: 60
+      start_period: 120s
+    networks:
+      - infodengue
+
+  celery:
+    extends: base
+    hostname: celery
+    command: >
+      celery -A config worker -l INFO
+      --pool=threads --concurrency=${CELERY_WORKER_CONCURRENCY:-4}
+    entrypoint: ["bash", "/entrypoint.sh", "/opt/services/celery.sh"]
+    # command: ["python3", "/opt/services/AlertaDengue/dbf/collector.py"]
+    env_file:
+      - ../.env
+    volumes:
+      - ${EPISCANNER_HOST_DIR}:/opt/services/episcanner
+    #   - ${HOST_MINIO_DATA_DIR}:/opt/services/collector
+    user: ${HOST_UID}:${HOST_GID}
+    depends_on:
+      memcached:
+        condition: service_healthy
+      postgres:
+        condition: service_started
+    healthcheck:
+        test: ["CMD-SHELL", "celery inspect ping --destination celery@$$HOSTNAME"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+        start_period: 5s
+    networks:
+      - infodengue
+
+volumes:
+  redis-data:
+
+networks:
+  infodengue:
+    driver: bridge

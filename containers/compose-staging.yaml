@@ -1,0 +1,17 @@
+# containers/compose-staging.yaml
+services:
+  postgres:
+    environment:
+      PGDATA: "/var/lib/postgresql/data"
+    volumes:
+      - "${PG_DATA_STAGING:-/opt/data/infodengue/staging/pgdata}:/var/lib/postgresql/data"
+
+  web:
+    environment:
+      DJANGO_SETTINGS_MODULE: "ad_main.settings.staging"
+      DEBUG: "False"
+
+  celery:
+    environment:
+      DJANGO_SETTINGS_MODULE: "ad_main.settings.staging"
+      DEBUG: "False"

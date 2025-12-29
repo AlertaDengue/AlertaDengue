@@ -1,49 +1,73 @@
 backend: compose
 env-file: .env
+
 defaults:
   profile: ${{ env.ENV }}
-  project-name: alertadengue${{ env.DOCKER_PROJECT_NAME }}
+  project-name: infodengue-${{ env.ENV }}
 
 profiles:
   dev:
     project-name: infodengue-dev
-    env-file: .env
+    env-file: .envs/.env.dev
     config-path:
-      - containers/compose.yaml
+      - containers/compose-base.yaml
       - containers/compose-dev.yaml
     services:
-      default: 
+      default:
+        - postgres
         - memcached
         - rabbitmq
         - redis
         - web
-        - worker
-        - stagingdb
+        - celery
       available:
-        - name: stagingdb
-        - name: web
+        - name: postgres
         - name: memcached
         - name: rabbitmq
         - name: redis
-        - name: worker
+        - name: web
+        - name: celery
+
+  staging:
+    project-name: infodengue-staging
+    env-file: .env.staging
+    config-path:
+      - containers/compose-base.yaml
+      - containers/compose-staging.yaml
+    services:
+      default:
+        - postgres
+        - memcached
+        - rabbitmq
+        - redis
+        - web
+        - celery
+      available:
+        - name: postgres
+        - name: memcached
+        - name: rabbitmq
+        - name: redis
+        - name: web
+        - name: celery
 
   prod:
     project-name: infodengue-prod
-    env-file: .env
+    env-file: .env.prod
     config-path:
-      - containers/compose.yaml
-      - containers/compose-dev.yaml
+      - containers/compose-base.yaml
+      - containers/compose-prod.yaml
     services:
-      default: 
+      default:
+        - postgres
         - memcached
         - rabbitmq
         - redis
         - web
-        - worker
+        - celery
       available:
         - name: postgres
-        - name: web
         - name: memcached
         - name: rabbitmq
         - name: redis
-        - name: worker
+        - name: web
+        - name: celery

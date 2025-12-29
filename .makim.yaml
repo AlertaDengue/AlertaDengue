@@ -1,6 +1,30 @@
+backend: bash
 env-file: .env
 groups:
 
+  clean:
+    tasks:
+      tmp:
+        help: remove build artifacts, compiled files, and cache
+        backend: bash
+        run: |
+          find . -name '*.egg-info' -exec rm -rf {} +
+          find . -name '*.egg' -exec rm -f {} +
+          find . -name '*.pyc' -exec rm -f {} +
+          find . -name '*.pyo' -exec rm -f {} +
+          find . -name '__pycache__' -exec rm -rf {} +
+          find . -name '*~' -exec rm -f {} +
+          rm -rf build/
+          rm -rf dist/
+          rm -rf .eggs/
+          rm -f .coverage
+          rm -rf htmlcov/
+          rm -rf .pytest_cache
+          rm -rf .mypy_cache
+          rm -rf .ruff_cache
+          rm -rf .cache/
+          find . -name "*.pyc" -delete
+          echo "[II] Cleaned temporary files."
   # DJANGO
   django:
     env-file: .env
@@ -21,26 +45,75 @@ groups:
           cd AlertaDengue &&
           ${{ env.manage_py }} ${{ args.subcommand }}
 
-      # CONTAINER
-      static-collectstatic:
-        help: Collect static files into a single location.
+      shell:
+        help: Run the Django console interpreter inside the container.
+        env-file: .env
+        env:
+          POSTGRES_HOST: localhost
+          REDIS_HOST: localhost
         run: |
-          ${{ env.sugar_run_rm }} --entrypoint "/entrypoint.sh" --cmd ${{ env.manage_py }} collectstatic --noinput
+          sugar compose-ext start --services web -- -d
+          python AlertaDengue/manage.py shell
 
+
+      # CONTAINER
+      collectstatic:
+        help: Run the collectstatic for the backend service
+        run: |
+          CMD="python manage.py collectstatic --no-input"
+
+          if [[ "${{ env.USE_CONTAINER }}" == "true" ]]; then
+            sugar compose run --service web --cmd "$CMD"
+          else
+            pushd ./AlertaDengue/
+            export POSTGRES_HOST=localhost
+            $CMD
+            popd
+          fi
       static-geofiles:
         help: Generate geojson files and save them in the staticfiles folder.
         run: |
           ${{ env.sugar_run_rm }} --entrypoint "/entrypoint.sh" --cmd ${{ env.manage_py }} sync_geofiles
 
-      migrate:
-        help: Apply database migrations for specified databases.
+      makemigrations:
+        help: Run django makemigrations command (just for development)
+        env:
+          REDIS_HOST: localhost
+          RETSU_REDIS_HOST: localhost
+          POSTGRES_HOST: localhost
+        args:
+          check:
+            help: |
+              Just check if the latest migration files were already created.
+            type: bool
+            action: store_true
         run: |
-          for cmd in [
-            "--database=dados",
-            "--database=infodengue",
-            # "--database=forecast"
-          ]:
-            ${{ env.sugar_run_rm }} --entrypoint "/entrypoint.sh" --cmd ${{ env.manage_py }} migrate --noinput @(cmd)
+          sugar compose-ext start --services postgres --options "-d"
+
+          CMD_FLAG="${{ '--check' if args.check else '' }} --no-input"
+
+          pushd "$(pwd)/AlertaDengue"
+
+          for app in 'dados' 'gis' 'api' ''; do
+            echo -e "\nMaking migration files for: '${app}' ...\n"
+            python manage.py makemigrations ${CMD_FLAG} ${app}
+          done
+
+          popd
+
+          echo "[II] postgres is running."
+
+
+      migrate:
+        help: Migrate regarding to the current migration files
+        env-file: .envs/.env.dev
+        env:
+          POSTGRES_HOST: localhost
+        run: |
+          sugar compose-ext start --services postgres --options "-d"
+          pushd ./AlertaDengue
+          python manage.py migrate --no-input
+          echo "[II] postgres is running."
 
       send-mail-partner:
         help: Send email to partners.

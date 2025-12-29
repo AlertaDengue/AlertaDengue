@@ -1,13 +1,19 @@
 services:
+  postgres:
+    user: "1000:1000"
+    volumes:
+      - "${PG_DATA_DEV:-/opt/data/infodengue/dev/pgdata}:/var/lib/postgresql/data"
+
   web:
     environment:
-      DJANGO_SETTINGS_MODULE: ad_main.settings
+      DJANGO_SETTINGS_MODULE: "ad_main.settings.dev"
       DEBUG: "True"
     volumes:
       - ../AlertaDengue/:/opt/services/AlertaDengue
-  worker:
+
+  celery:
     environment:
-      DJANGO_SETTINGS_MODULE: ad_main.settings
+      DJANGO_SETTINGS_MODULE: "ad_main.settings.dev"
       DEBUG: "True"
     volumes:
       - ../AlertaDengue/:/opt/services/AlertaDengue
