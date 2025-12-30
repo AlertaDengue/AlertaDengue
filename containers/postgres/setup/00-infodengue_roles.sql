@@ -16,7 +16,7 @@ CREATE ROLE "administrador";
 CREATE ROLE "dengueadmin";
 CREATE ROLE "dengue";
 CREATE ROLE "forecast";
--- CREATE ROLE "postgres";
+CREATE ROLE "postgres";
 
 --
 -- Alter Roles

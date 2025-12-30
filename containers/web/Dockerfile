@@ -18,7 +18,7 @@ ENV ENV_NAME=alertadengue
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get -qq update --yes \
-  && apt-get -qq install --yes --no-install-recommends \
+  && apt-get -qq install --yes --no-install-recommends curl \
   build-essential git make postgresql-client vim \
   ca-certificates wget locales cron sudo inotify-tools \
   libpq-dev pkg-config \
@@ -78,8 +78,11 @@ RUN ENV_FILE=/tmp/environment.yaml bash /tmp/install-deps.sh dev
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/crontab_setup.sh /opt/services/crontab_setup.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/cronjob /etc/cron.d/cronjob
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/celery.sh  /opt/services/celery.sh
-COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/entrypoint.sh  /entrypoint.sh
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/entrypoint.sh  /opt/entrypoint.sh
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/runwsgi.sh /opt/runwsgi.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/test.sh /opt/services/test.sh
 
-# The command specified in the Compose file will be executed
-# ENTRYPOINT ["/entrypoint.sh"]
+
+RUN chmod +x /opt/runwsgi.sh \
+  && chmod +x /opt/entrypoint.sh \
+  && echo "source /opt/entrypoint.sh" > ~/.bashrc

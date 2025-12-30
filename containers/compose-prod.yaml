@@ -6,15 +6,16 @@ services:
       - "${PG_DATA_PROD:-/opt/data/infodengue/prod/pgdata}:/var/lib/postgresql/data"
 
   web:
+    command: /opt/runwsgi.sh
     environment:
       DJANGO_SETTINGS_MODULE: "ad_main.settings.prod"
-      DEBUG: "False"
+      DEBUG: 0
     volumes:
       - ../AlertaDengue/:/opt/services/AlertaDengue
 
   celery:
     environment:
       DJANGO_SETTINGS_MODULE: "ad_main.settings.prod"
-      DEBUG: "False"
+      DEBUG: 0
     volumes:
       - ../AlertaDengue/:/opt/services/AlertaDengue

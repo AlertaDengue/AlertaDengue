@@ -5,9 +5,11 @@ services:
       - "${PG_DATA_DEV:-/opt/data/infodengue/dev/pgdata}:/var/lib/postgresql/data"
 
   web:
+    stdin_open: true
+    tty: true
+    command: ["python", "manage.py", "runserver_plus", "-v 3", "0.0.0.0:8000"]
     environment:
-      DJANGO_SETTINGS_MODULE: "ad_main.settings.dev"
-      DEBUG: "True"
+      DEBUG: 1
     volumes:
       - ../AlertaDengue/:/opt/services/AlertaDengue
 
