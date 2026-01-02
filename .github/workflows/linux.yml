@@ -11,7 +11,7 @@ env:
   ALLOWED_HOSTS: "localhost"
   DEBUG: False
   ENV: dev
-  WEB_PORT: 8000
+  DJANGO_PORT: 8000
   HOST_UID: 1000
   HOST_GID: 1000
   SECRET_KEY: my-secret-key
@@ -99,15 +99,18 @@ jobs:
         ./scripts/install-deps.sh
 
     - name: Create env file
-      run: envsubst < .env.tpl > .env
+      run: |
+        pushd .envs
+        envsubst < .env.tpl > .env
+        popd
 
     - name: Build postgres database
       run: |
-        sugar compose build --services stagingdb
+        sugar compose build --services postgres
 
     - name: Start postgres database
       run: |
-        sugar compose-ext start --services stagingdb --options -d
+        sugar compose-ext start --services postgres --options -d
 
     - name: Start containers
       run: |
