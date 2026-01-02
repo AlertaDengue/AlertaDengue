@@ -10,18 +10,20 @@ import geopy.distance
 import numpy as np
 import rasterio
 import rasterio.mask
+from dados.dbdata import RegionalParameters
 
 # local
-from ad_main.settings import (
-    DEBUG,
-    RASTER_METEROLOGICAL_FACTOR_INCREASE,
-    RASTER_PATH,
-    SHAPEFILE_PATH,
-)
-from dados.dbdata import RegionalParameters
+from django.conf import settings
 from rasterio import Affine
 from rasterio.features import rasterize
 from rasterio.transform import from_origin
+
+DEBUG = settings.DEBUG
+RASTER_METEROLOGICAL_FACTOR_INCREASE = (
+    settings.RASTER_METEROLOGICAL_FACTOR_INCREASE
+)
+RASTER_PATH = settings.RASTER_PATH
+SHAPEFILE_PATH = settings.SHAPEFILE_PATH
 
 
 def convert_from_shapefile(shapefile, rgb_color):

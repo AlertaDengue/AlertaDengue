@@ -7,10 +7,9 @@ import fiona
 import geojson
 import geopandas as gpd
 import shapely
-from ad_main.settings import get_sqla_conn
+from dados import dbdata, maps
 
 # local
-from dados import dbdata, maps
 from django.conf import settings
 from django.core.cache import cache
 from django.core.management.base import BaseCommand
@@ -19,7 +18,8 @@ from sqlalchemy.engine import Engine
 
 from ...geodf import extract_boundaries
 
-DB_ENGINE = get_sqla_conn()
+DB_ENGINE = settings.DB_ENGINE
+IBIS_CONN = settings.IBIS_CONN
 
 
 def get_all_active_cities(
