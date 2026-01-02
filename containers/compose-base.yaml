@@ -56,7 +56,7 @@ services:
         HOST_UID: "${HOST_UID}"
         HOST_GID: "${HOST_GID}"
     env_file:
-      - ../.env
+      - ../.envs/.env
     shm_size: "8gb"
     environment:
       POSTGRES_PASSWORD: "${PSQL_PASSWORD}"
@@ -96,7 +96,7 @@ services:
         HOST_GID: "${HOST_GID}"
         ENV: "${ENV}"
     env_file:
-      - ../.env
+      - ../.envs/.env
     environment:
       MEMCACHED_HOST: "memcached"
       CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672"
@@ -114,13 +114,14 @@ services:
     extends: base
     hostname: web
     environment:
+      DJANGO_PORT: "${DJANGO_PORT}"
       DJANGO_SETTINGS_MODULE: "ad_main.settings.${ENV}"
       DEBUG: "${DEBUG}"
-      MAINTENANCE_MODE: "${MAINTENANCE_MODE}"
+      MAINTENANCE_MODE: "${MAINTENANCE_MODE}"     
     env_file:
-      - ../.envs/.env.${ENV}
+      - ../.envs/.env
     ports:
-      - "${WEB_PORT}:${WEB_PORT}"
+      - "${DJANGO_PORT}:8000"
     entrypoint: ["bash", "/opt/entrypoint.sh"]
     depends_on:
       memcached:
@@ -135,7 +136,11 @@ services:
       timeout: 10s
       retries: 5
       start_period: 40s
-      test: ["CMD", "curl", "-f", "http://localhost:${DJANGO_PORT:-8000}/status/"]
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS http://localhost:${DJANGO_PORT}/status/ || exit 1",
+        ]
     networks:
       - infodengue
 
@@ -148,7 +153,7 @@ services:
     entrypoint: ["bash", "/opt/entrypoint.sh", "/opt/services/celery.sh"]
     # command: ["python3", "/opt/services/AlertaDengue/dbf/collector.py"]
     env_file:
-      - ../.env
+      - ../.envs/.env
     environment:
       DJANGO_SETTINGS_MODULE: "ad_main.settings.${ENV}"      
     volumes:

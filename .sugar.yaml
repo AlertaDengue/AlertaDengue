@@ -1,5 +1,5 @@
 backend: compose
-env-file: .env
+env-file: .envs/.env
 
 defaults:
   profile: ${{ env.ENV }}
@@ -8,7 +8,7 @@ defaults:
 profiles:
   dev:
     project-name: infodengue-dev
-    env-file: .envs/.env.dev
+    env-file: .envs/.env
     config-path:
       - containers/compose-base.yaml
       - containers/compose-dev.yaml
@@ -30,7 +30,7 @@ profiles:
 
   staging:
     project-name: infodengue-staging
-    env-file: .env.staging
+    env-file: .envs/.env
     config-path:
       - containers/compose-base.yaml
       - containers/compose-staging.yaml
@@ -52,7 +52,7 @@ profiles:
 
   prod:
     project-name: infodengue-prod
-    env-file: .env.prod
+    env-file: .envs/.env
     config-path:
       - containers/compose-base.yaml
       - containers/compose-prod.yaml

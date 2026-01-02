@@ -6,6 +6,6 @@ set -euo pipefail
 export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-ad_main.settings.dev}"
 
 echo "[INFO] Starting celery..."
-celery \
+exec celery \
   --app=ad_main.celeryapp:app \
   worker -Ofair -l INFO -B

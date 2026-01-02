@@ -7,7 +7,7 @@ services:
   web:
     stdin_open: true
     tty: true
-    command: ["python", "manage.py", "runserver_plus", "-v 3", "0.0.0.0:8000"]
+    command: ["python", "manage.py", "runserver", "-v 3", "0.0.0.0:8000"]
     environment:
       DEBUG: 1
     volumes:
