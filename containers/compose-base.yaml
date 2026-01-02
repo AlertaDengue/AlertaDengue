@@ -150,7 +150,7 @@ services:
     command: >
       celery -A config worker -l INFO
       --pool=threads --concurrency=${CELERY_WORKER_CONCURRENCY:-4}
-    entrypoint: ["bash", "/opt/entrypoint.sh", "/opt/services/celery.sh"]
+    entrypoint: ["bash", "/opt/entrypoint.sh", "/opt/runcelery.sh"]
     # command: ["python3", "/opt/services/AlertaDengue/dbf/collector.py"]
     env_file:
       - ../.envs/.env
