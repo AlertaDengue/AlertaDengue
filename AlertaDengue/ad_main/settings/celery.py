@@ -10,4 +10,4 @@ elif DJANGO_SETTINGS_MODULE == "config.settings.staging":
 else:
     from ad_main.settings.prod import *  # noqa: F403
 
-SERVICE_NAME = "worker"
+SERVICE_NAME = "celery"

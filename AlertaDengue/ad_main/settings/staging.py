@@ -1,39 +1,35 @@
-"""Staging settings for AlertaDengue."""
-
-from __future__ import annotations
-
 import os
 
-from ad_main.settings.base import *  # noqa: F401,F403
+from ad_main.settings.prod import *  # noqa: F403
 
+DEBUG = False
 
-def _bool(value: str | None, default: bool) -> bool:
-    """Convert environment string flag to bool.
+# we need this to console the email
+# without this in staging we will get a 500 error when
+# submitting the signup form for creating a new account
+# because the email configuration is not set
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-    Parameters
-    ----------
-    value : str or None
-        Raw environment value.
-    default : bool
-        Default value if env is not set.
-
-    Returns
-    -------
-    bool
-        Parsed boolean value.
-    """
-    if value is None:
-        return default
-    return value.strip().lower() == "true"
-
-
-DJANGO_ENV: str = "staging"
-os.environ.setdefault("DJANGO_ENV", DJANGO_ENV)
-
-DEBUG: bool = _bool(os.getenv("DEBUG"), True)
-
-_default_hosts = "localhost,127.0.0.1"
-env_hosts = os.getenv("ALLOWED_HOSTS", _default_hosts)
-ALLOWED_HOSTS: list[str] = [
-    h.strip() for h in env_hosts.split(",") if h.strip()
+# need to explitly define the domains that send
+# csrf_tokens otherwise all post requests will fail
+CSRF_TRUSTED_ORIGINS = [
+    "https://localhost",
+    "https://127.0.0.1",
 ]
+
+ALLOWED_HOSTS_ENV = os.getenv("ALLOWED_HOSTS", "").split(",")
+
+# https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
+ALLOWED_HOSTS = (
+    [
+        "localhost",
+        "www.localhost",  # needed for www redirection
+        "0.0.0.0",
+    ]
+    + ALLOWED_HOSTS_ENV
+    + [
+        f"{prefix}{domain}"
+        for prefix in ["www.", ""]
+        for domain in os.getenv("CERTBOT_DOMAIN", "").split(",")
+    ]
+)
