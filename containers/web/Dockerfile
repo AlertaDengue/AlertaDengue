@@ -71,7 +71,7 @@ ENV PATH="/opt/services/AlertaDengue/.venv/bin:${PATH}"
 
 # Deps installer (uses conda/base.yaml via ENV_FILE)
 COPY --chown=${HOST_UID}:${HOST_GID} ./scripts/install-deps.sh /tmp/install-deps.sh
-COPY --chown=${HOST_UID}:${HOST_GID} .env.tpl pyproject.toml poetry.lock README.md ./
+COPY --chown=${HOST_UID}:${HOST_GID} .envs/.env.tpl pyproject.toml poetry.lock README.md ./
 RUN ENV_FILE=/tmp/environment.yaml bash /tmp/install-deps.sh dev
 
 # Runtime scripts
