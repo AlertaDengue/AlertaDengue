@@ -66,7 +66,7 @@ services:
       PG_RESTORE_STAGING: "${PG_RESTORE_STAGING}"
     ports:
       - "${PSQL_PORT}:5432"
-    user: "1000:1000"
+    user: ${HOST_UID}:${HOST_GID}
     volumes:
       - "${PG_DATA:-/opt/data/infodengue/${ENV}/pgdata}:/var/lib/postgresql/data"
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/compose
