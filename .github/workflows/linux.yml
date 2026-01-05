@@ -30,15 +30,17 @@ env:
   POSTGRES_USER: postgres
   PSQL_DB: dengue
   PSQL_DBF: infodengue
-  PSQL_HOST: infodengue-dev-stagingdb
+  PSQL_HOST: infodengue-dev-postgres
   PSQL_PASSWORD: infodenguedev
   PSQL_PORT: 25432
   PSQL_USER: infodenguedev
   PSQL_DEV_USER: infodenguedev
   PSQL_DEV_PASSWORD: infodenguedev
+
   PG_RESTORE_STAGING: schemas
-  PG_DATA_PROD: "../../staging_data/postgres_data_prod"
-  PG_DATA_STAGING: "../../staging_data/postgres_data"
+  PG_DATA_DEV: "../staging_data/postgres_data"
+  PG_DATA_PROD: "../staging_data/postgres_data_prod"
+  PG_DATA_STAGING: "../staging_data/postgres_data_staging"
 
   DBF_SINAN: /DBF_SINAN
   IMPORTED_FILES: /IMPORTED_FILES
@@ -84,12 +86,9 @@ jobs:
 
     - name: Prepare data volumes
       run: |
-        mkdir -p ../../staging_data/postgres_data
-        chmod 777 -R ../../staging_data/postgres_data
-        sudo chown 1000:1000 -R  ../../staging_data/postgres_data
-        sudo mkdir -p ../staging_data/postgres_data
-        sudo chmod 777 -R ../staging_data/postgres_data
-        sudo chown 1000:1000 -R  ../staging_data/postgres_data
+        mkdir -p ../staging_data/postgres_data
+        chmod 777 -R ../staging_data/postgres_data
+        sudo chown 1000:1000 -R ../staging_data/postgres_data
         mkdir -p /tmp/dbf_duplicated_csv
         chmod 777 -R /tmp/dbf_duplicated_csv
 

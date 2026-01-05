@@ -179,7 +179,7 @@ groups:
             - task: develop.container-wait
               args:
                 timeout: ${{ args.timeout }}
-                service: stagingdb
+                service: postgres
             - task: develop.container-wait
               args:
                 timeout: ${{ args.timeout }}
@@ -195,7 +195,7 @@ groups:
             - task: develop.container-wait
               args:
                 timeout: ${{ args.timeout }}
-                service: worker
+                service: celery
 
       clean:
         help: Clean all generated artifacts from the project.
