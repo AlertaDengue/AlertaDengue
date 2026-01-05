@@ -104,6 +104,11 @@ jobs:
         envsubst < .env.tpl > .env
         popd
 
+    - name: Linting
+      run: |
+        poetry run pre-commit install -t pre-commit -t commit-msg -t pre-push
+        poetry run pre-commit run --all-files
+
     - name: Build postgres database
       run: |
         sugar compose build --services postgres
@@ -121,7 +126,16 @@ jobs:
       run: |
           makim develop.container-wait-all --timeout 150
 
-    - name: Linting
+    - name: Show logs on failure
+      if: ${{ failure() }}
       run: |
-        poetry run pre-commit install -t pre-commit -t commit-msg -t pre-push
-        poetry run pre-commit run --all-files
+        set -euxo pipefail
+        sugar --profile dev compose-ext logs -- -n 200
+        docker ps -a
+
+    - name: Stop services
+      if: ${{ always() }}
+      run: |
+        set -euxo pipefail
+        sugar --profile dev compose-ext stop || true
+        sugar --profile dev compose-ext down -- --volumes || true
