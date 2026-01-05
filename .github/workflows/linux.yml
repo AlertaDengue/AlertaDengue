@@ -42,19 +42,19 @@ env:
   PG_DATA_PROD: "../staging_data/postgres_data_prod"
   PG_DATA_STAGING: "../staging_data/postgres_data_staging"
 
-  DBF_SINAN: /DBF_SINAN
-  IMPORTED_FILES: /IMPORTED_FILES
-  MEDIA_ROOT: /MEDIA_ROOT
   DOCKER_HOST_DBF_SINAN: "../../staging_data/sftp2/alertadengue/sinan"
   DOCKER_HOST_IMPORTED_FILES_DIR: "../../staging_data/sftp2/alertadengue/sinan/imported"
   DOCKER_HOST_UPLOADED_FILES_DIR: "../../staging_data/sftp2/alertadengue/sinan/uploaded"
-
   DOCKER_HOST_SHAPEFILES_DIR: "../../staging_data/shapefiles"
   DOCKER_HOST_TEMP_PARQUET_DIR: "/tmp/dbf_parquet"
-
-  STORAGE: "../../staging_data/"
   DOCKER_HOST_STATIC: "../../staging_data/staticfiles"
+
+  DBF_SINAN: /DBF_SINAN
+  IMPORTED_FILES: /IMPORTED_FILES
+  MEDIA_ROOT: /MEDIA_ROOT
+  STORAGE: "../../staging_data/"
   TEMP_FILES_DIR: "/tmp"
+  EPISCANNER_HOST_DIR: "/home/runner/episcanner"
 
 
 jobs:
@@ -91,6 +91,7 @@ jobs:
         sudo chown 1000:1000 -R ../staging_data/postgres_data
         mkdir -p /tmp/dbf_duplicated_csv
         chmod 777 -R /tmp/dbf_duplicated_csv
+        mkdir -p /home/runner/episcanner
 
     - name: Install toolchain and app dependencies
       run: |
