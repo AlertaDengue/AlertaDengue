@@ -1,18 +1,18 @@
 /* global self, caches, fetch */
 
-const CACHE_NAME = "infodengue-pwa-v1";
+const CACHE_NAME = "infodengue-pwa-v2";
 
 const OFFLINE_URLS = [
-  "/",                      // home
-  "/informacoes/",          // info / about
-  "/equipe/",               // team
-  "/participe/",            // participate
-  "/report/",               // reports entry
-  "/services/",             // data/services landing
-  "/services/api",          // API page (no trailing slash in URLconf)
-  "/services/tutorial",     // tutorials index
-  "/services/tutorial/R",   // R tutorial
-  "/services/tutorial/Python", // Python tutorial
+  "/",
+  "/informacoes/",
+  "/equipe/",
+  "/participe/",
+  "/report/",
+  "/services/",
+  "/services/api",
+  "/services/tutorial",
+  "/services/tutorial/R",
+  "/services/tutorial/Python",
 ];
 
 self.addEventListener("install", (event) => {
@@ -38,7 +38,16 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Network-first for API
+  const url = new URL(request.url);
+
+  if (url.origin === self.location.origin) {
+    if (url.pathname.startsWith("/accounts/")
+      || url.pathname.startsWith("/admin/")) {
+      event.respondWith(fetch(request));
+      return;
+    }
+  }
+
   if (request.url.includes("/services/api")) {
     event.respondWith(
       fetch(request)
@@ -52,7 +61,6 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Cache-first for everything else
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) {
