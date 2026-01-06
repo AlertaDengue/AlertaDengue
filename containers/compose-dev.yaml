@@ -1,6 +1,5 @@
 services:
   postgres:
-    user: "1000:1000"
     volumes:
       - "${PG_DATA_DEV:-/opt/data/infodengue/dev/pgdata}:/var/lib/postgresql/data"
 

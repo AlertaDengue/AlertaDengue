@@ -68,7 +68,7 @@ services:
       - "${PSQL_PORT}:5432"
     user: ${HOST_UID}:${HOST_GID}
     volumes:
-      - "${PG_DATA:-/opt/data/infodengue/${ENV}/pgdata}:/var/lib/postgresql/data"
+      # - "${PG_DATA:-/opt/data/infodengue/${ENV}/pgdata}:/var/lib/postgresql/data"
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/compose
       - ../containers/postgres/dumps/:/dumps/
     command:

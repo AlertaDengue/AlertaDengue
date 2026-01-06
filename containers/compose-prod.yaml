@@ -1,7 +1,5 @@
 services:
   postgres:
-    environment:
-      PGDATA: "/var/lib/postgresql/data"
     volumes:
       - "${PG_DATA_PROD:-/opt/data/infodengue/prod/pgdata}:/var/lib/postgresql/data"
 
