@@ -49,6 +49,8 @@ services:
       - infodengue
 
   postgres:
+    hostname: literev-postgres
+    restart: unless-stopped  
     build:
       context: ".."
       dockerfile: "containers/postgres/Dockerfile"
@@ -74,7 +76,6 @@ services:
     command:
       - -p
       - "${PSQL_PORT}"
-    restart: always
     healthcheck:
       test:
         [

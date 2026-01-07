@@ -30,7 +30,7 @@ env:
   POSTGRES_USER: postgres
   PSQL_DB: dengue
   PSQL_DBF: infodengue
-  PSQL_HOST: infodengue-dev-postgres
+  PSQL_HOST: postgres
   PSQL_PASSWORD: infodenguedev
   PSQL_PORT: 25432
   PSQL_USER: infodenguedev
