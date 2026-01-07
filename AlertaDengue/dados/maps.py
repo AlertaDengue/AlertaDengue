@@ -4,7 +4,6 @@ import geojson
 from django.conf import settings
 
 DB_ENGINE = settings.DB_ENGINE
-IBIS_CONN = settings.IBIS_CONN
 
 
 def get_city_geojson(municipio):

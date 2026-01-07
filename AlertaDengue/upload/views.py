@@ -3,8 +3,10 @@ from pathlib import Path
 
 import humanize
 import pandas as pd
-from ad_main.settings import get_sqla_conn
 from chunked_upload.views import ChunkedUploadCompleteView, ChunkedUploadView
+
+# local
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -28,8 +30,9 @@ from psycopg2.extras import DictCursor
 
 from . import forms, models
 
+DB_ENGINE = settings.DB_ENGINE
+
 User = get_user_model()
-Engine = get_sqla_conn(database="dengue")
 
 
 class SINANDashboard(LoginRequiredMixin, View):
@@ -319,7 +322,7 @@ def overview_charts_limit_offset(request):
     placeholder = ",".join(map(str, ids))
 
     for chart, query in queries.items():
-        with Engine.begin() as conn:
+        with DB_ENGINE.begin() as conn:
             cursor = conn.connection.cursor(cursor_factory=DictCursor)
             cursor.execute(query.format(placeholder))
             res = cursor.fetchall()

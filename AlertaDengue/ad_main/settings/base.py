@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Any, Final
+from typing import Any, Final, Optional
 
 import ibis
 from django.contrib.messages import constants as messages
@@ -151,49 +151,65 @@ ROOT_URLCONF = "ad_main.urls"
 WSGI_APPLICATION = "ad_main.wsgi.application"
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
+PSQL_HOST: str = os.getenv("PSQL_HOST", "postgres")
+PSQL_PORT: int = int(os.getenv("PSQL_PORT", "5432"))
+PSQL_DB: str = os.getenv("PSQL_DB", "dengue")
+PSQL_USER: str = os.getenv("PSQL_USER", "dengueadmin")
+PSQL_PASSWORD: str = os.getenv("PSQL_PASSWORD", "dengueadmin")
+PSQL_DBF: str = os.getenv("PSQL_DBF", "infodengue")
 
-PSQL_HOST: Final[str] = os.getenv("PSQL_HOST", "postgres")
-PSQL_PORT: Final[int] = int(os.getenv("PSQL_PORT", "5432"))
-PSQL_DB: Final[str] = os.getenv("PSQL_DB", "dengue")
-PSQL_USER: Final[str] = os.getenv("PSQL_USER", "dengueadmin")
-PSQL_PASSWORD: Final[str] = os.getenv("PSQL_PASSWORD", "dengueadmin")
-PSQL_DBF: Final[str] = os.getenv("PSQL_DBF", "infodengue")
 
+def get_sqla_conn(psql_db: Optional[str] = None) -> Engine:
+    """Create SQLAlchemy engine for a PostgreSQL database.
 
-def get_sqla_conn() -> Engine:
-    """Create SQLAlchemy engine for the primary PostgreSQL database.
+    Parameters
+    ----------
+    psql_db : str or None, optional
+        Database name to connect to. If None, uses ``PSQL_DB``.
 
     Returns
     -------
     sqlalchemy.engine.Engine
-        Engine bound to the configured PostgreSQL instance.
+        Engine bound to the requested PostgreSQL database.
     """
+    db_name = psql_db or PSQL_DB
     dsn = (
         f"postgresql+psycopg2://{PSQL_USER}:{PSQL_PASSWORD}"
-        f"@{PSQL_HOST}:{PSQL_PORT}/{PSQL_DB}"
+        f"@{PSQL_HOST}:{PSQL_PORT}/{db_name}"
     )
     return create_engine(dsn, pool_pre_ping=True, future=True)
 
 
-def get_ibis_conn() -> ibis.backends.base.BaseBackend:
+def get_ibis_conn(
+    psql_db: Optional[str] = None,
+) -> ibis.backends.base.BaseBackend:
     """Create an Ibis PostgreSQL backend connection.
+
+    Parameters
+    ----------
+    psql_db : str or None, optional
+        Database name to connect to. If None, uses ``PSQL_DB``.
 
     Returns
     -------
     ibis.backends.base.BaseBackend
-        Ibis backend connection to the primary database.
+        Ibis backend connection to the requested PostgreSQL database.
     """
+    db_name = psql_db or PSQL_DB
     return ibis.postgres.connect(
         host=PSQL_HOST,
         port=PSQL_PORT,
         user=PSQL_USER,
         password=PSQL_PASSWORD,
-        database=PSQL_DB,
+        database=db_name,
     )
 
 
 DB_ENGINE: Engine = get_sqla_conn()
+DB_ENGINE_FACTORY = get_sqla_conn
+
 IBIS_CONN = get_ibis_conn()
+IBIS_CONN_FACTORY = get_ibis_conn
 
 DATABASE_ROUTERS = ["manager.router.DatabaseAppsRouter"]
 DATABASE_APPS_MAPPING = {

@@ -19,7 +19,6 @@ from sqlalchemy.engine import Engine
 from ...geodf import extract_boundaries
 
 DB_ENGINE = settings.DB_ENGINE
-IBIS_CONN = settings.IBIS_CONN
 
 
 def get_all_active_cities(

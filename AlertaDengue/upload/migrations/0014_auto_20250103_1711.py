@@ -2,6 +2,7 @@
 
 import ad_main.settings
 import chunked_upload.settings
+from ad_main.settings.base import DBFSINANStorage
 from django.db import migrations, models
 
 
@@ -37,7 +38,7 @@ class Migration(migrations.Migration):
             name="file",
             field=models.FileField(
                 max_length=255,
-                storage=ad_main.settings.DBFSINANStorage(),
+                storage=DBFSINANStorage(),
                 upload_to=chunked_upload.settings.default_upload_to,
             ),
         ),
