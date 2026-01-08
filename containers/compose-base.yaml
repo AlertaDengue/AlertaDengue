@@ -49,7 +49,7 @@ services:
       - infodengue
 
   postgres:
-    hostname: literev-postgres
+    hostname: postgres
     restart: unless-stopped  
     build:
       context: ".."
