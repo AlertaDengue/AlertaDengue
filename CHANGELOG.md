@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.2.4](https://github.com/AlertaDengue/AlertaDengue/compare/4.2.3...4.2.4) (2026-01-08)
+
+### Bug Fixes
+
+* **compose:** mount upload/dbf volumes in worker to match base service ([#816](https://github.com/AlertaDengue/AlertaDengue/issues/816)) ([6026170](https://github.com/AlertaDengue/AlertaDengue/commit/602617053449290202e34f3fa4b4244b312d1832))
+
 ## [4.2.3](https://github.com/AlertaDengue/AlertaDengue/compare/4.2.2...4.2.3) (2025-12-08)
 
 ### Bug Fixes
