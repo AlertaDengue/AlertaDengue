@@ -3,15 +3,15 @@ from typing import Optional
 import ibis
 import ibis.expr.datatypes as dt
 import pandas as pd
+from dados.dbdata import CID10, STATE_NAME, get_disease_suffix  # noqa:F401
 
 # local
-from ad_main.settings import PSQL_DB, get_ibis_conn, get_sqla_conn
-from dados.dbdata import CID10, STATE_NAME, get_disease_suffix  # noqa:F401
+from django.conf import settings
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 
-DB_ENGINE = get_sqla_conn()
-IBIS_CONN = get_ibis_conn()
+DB_ENGINE = settings.DB_ENGINE
+IBIS_CONN = settings.IBIS_CONN
 
 
 class NotificationQueries:
@@ -500,7 +500,7 @@ class AlertCity:
         # t_hist = schema_city.table(f"Historico_alerta{table_suffix}")
         t_hist = IBIS_CONN.table(
             name=f"Historico_alerta{get_disease_suffix(disease)}",
-            database=PSQL_DB,
+            database=settings.PSQL_DB,
             schema="Municipio",
         )
 

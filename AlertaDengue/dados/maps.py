@@ -1,7 +1,9 @@
 import geojson
-from ad_main.settings import get_sqla_conn
 
-DB_ENGINE = get_sqla_conn()
+# local
+from django.conf import settings
+
+DB_ENGINE = settings.DB_ENGINE
 
 
 def get_city_geojson(municipio):

@@ -1,24 +1,28 @@
+"""Database helpers for epidemiological data in AlertaDengue.
+
+This module provides convenience accessors and helpers for the main
+database engine and Ibis connection, using settings defined in
+``ad_main.settings``.
 """
-This module contains functions to interact with the main database of the
-Alertadengue project.
-"""
+
+from __future__ import annotations
+
 import json
 import logging
 import unicodedata
 from collections import defaultdict
 from datetime import datetime
-from typing import List, Literal, Optional, Tuple
+from typing import Final, List, Literal, Optional, Tuple
 
 import ibis
 import numpy as np
 import pandas as pd
-from ad_main.settings import APPS_DIR, get_ibis_conn, get_sqla_conn
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.text import slugify
 from epiweeks import Week
 from sqlalchemy import text
-from sqlalchemy.engine.base import Engine
+from sqlalchemy.engine import Engine
 
 # local
 from .episem import episem
@@ -26,9 +30,8 @@ from .models import City
 
 logger = logging.getLogger(__name__)
 
-DB_ENGINE = get_sqla_conn()
-IBIS_CONN = get_ibis_conn()
-
+DB_ENGINE = settings.DB_ENGINE
+IBIS_CONN = settings.IBIS_CONN
 
 CID10 = {"dengue": "A90", "chikungunya": "A92.0", "zika": "A928"}
 DISEASES_SHORT = ["dengue", "chik", "zika"]
@@ -71,7 +74,7 @@ STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
 MAP_CENTER = {k: v[1] for k, v in ALL_STATE_NAMES.items()}
 MAP_ZOOM = {k: v[2] for k, v in ALL_STATE_NAMES.items()}
 
-with open(APPS_DIR / "data" / "municipalities.json", "r") as muns:
+with open(settings.BASE_DIR / "data" / "municipalities.json", "r") as muns:
     _mun_decoded = muns.read().encode().decode("utf-8-sig")
     MUNICIPALITIES = json.loads(_mun_decoded)
 
@@ -122,76 +125,130 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
     return res
 
 
-class RegionalParameters:
-    DB = settings.PSQL_DB
+from functools import lru_cache
+from typing import Any, Dict, List, Optional, Tuple
 
-    t_parameters = IBIS_CONN.table(
-        name="parameters", database=DB, schema="Dengue_global"
-    )
-    t_municipio = IBIS_CONN.table(
-        name="Municipio", database=DB, schema="Dengue_global"
-    )
-    t_estado = IBIS_CONN.table(
-        name="estado", database=DB, schema="Dengue_global"
-    )
-    t_regional = IBIS_CONN.table(
-        name="regional", database=DB, schema="Dengue_global"
-    )
+import pandas as pd
+from dados.dbdata import CID10  # adjust import if needed
+from django.conf import settings
+from django.core.cache import cache
+
+# Assume IBIS_CONN is already defined above:
+# IBIS_CONN = settings.get_ibis_conn()
+
+
+class RegionalParameters:
+    """Helpers to query regional parameters via Ibis."""
+
+    SCHEMA: str = "Dengue_global"
 
     @classmethod
-    def get_regional_names(cls, state_name: str) -> list:
-        """
-        Parameters
-        ----------
-            dict_keys with state names
+    @lru_cache(maxsize=1)
+    def _tables(
+        cls,
+    ) -> Tuple[Any, Any, Any, Any]:
+        """Return Ibis table expressions for regional metadata.
+
         Returns
         -------
-            list(iterable)
+        tuple
+            A tuple with Ibis tables in this order:
+            (parameters, municipio, estado, regional).
+        """
+        t_parameters = IBIS_CONN.table(
+            "parameters",
+            database=cls.SCHEMA,
+        )
+        t_municipio = IBIS_CONN.table(
+            "Municipio",
+            database=cls.SCHEMA,
+        )
+        t_estado = IBIS_CONN.table(
+            "estado",
+            database=cls.SCHEMA,
+        )
+        t_regional = IBIS_CONN.table(
+            "regional",
+            database=cls.SCHEMA,
+        )
+        return t_parameters, t_municipio, t_estado, t_regional
+
+    @classmethod
+    def _unpack_tables(
+        cls,
+    ) -> Tuple[Any, Any, Any, Any]:
+        """Shortcut to unpack cached Ibis tables."""
+        return cls._tables()
+
+    @classmethod
+    def get_regional_names(cls, state_name: str) -> List[str]:
+        """Return list of regional names for a given state.
+
+        Parameters
+        ----------
+        state_name : str
+            State name (must match values in `Municipio.uf`).
+
+        Returns
+        -------
+        list of str
+            Regional names available for the state.
         """
         cache_name = (
             "regional_names_to" + "_" + str(state_name).replace(" ", "_")
         )
-        res = cache.get(cache_name)
+        res: Optional[List[str]] = cache.get(cache_name)
 
-        if res is None:
-            # print(f"add cache_name {cache_name}: ", res)
+        if res is not None:
+            return res
 
-            municipio_uf_filter = cls.t_municipio[
-                cls.t_municipio.uf == state_name
-            ]
-            t_joined = cls.t_regional.join(
-                municipio_uf_filter, cls.t_parameters
-            )[cls.t_regional.nome].distinct()
-            df_regional_names = t_joined.execute()
+        t_parameters, t_municipio, _, t_regional = cls._unpack_tables()
 
-            res = df_regional_names["nome"].to_list()
+        municipio_uf_filter = t_municipio[t_municipio.uf == state_name]
+        t_joined = t_regional.join(
+            municipio_uf_filter,
+            t_parameters,
+        )[t_regional.nome].distinct()
 
-            cache.set(
-                cache_name,
-                res,
-                settings.QUERY_CACHE_TIMEOUT,
-            )
+        df_regional_names: pd.DataFrame = t_joined.execute()
+        res = df_regional_names["nome"].to_list()
 
+        cache.set(
+            cache_name,
+            res,
+            settings.QUERY_CACHE_TIMEOUT,
+        )
         return res
 
     @classmethod
-    def get_var_climate_info(cls, geocodes: list) -> Tuple[str]:
-        """
+    def get_var_climate_info(
+        cls,
+        geocodes: List[int],
+    ) -> Tuple[str, str]:
+        """Return climate configuration for the first matching geocode.
+
         Parameters
         ----------
-            list dict_keys
-        Returns
-        ----------
-            Tuples pairs
-        """
+        geocodes : list of int
+            Geocodes to search in parameters.
 
-        geocode_filter = cls.t_parameters.municipio_geocodigo.isin(geocodes)
-        t_parameters_expr = cls.t_parameters[geocode_filter].distinct()
-        climate_proj = t_parameters_expr.projection(
+        Returns
+        -------
+        tuple of str
+            Pair (codigo_estacao_wu, varcli).
+        """
+        t_parameters, _, _, _ = cls._unpack_tables()
+
+        geocode_filter = t_parameters.municipio_geocodigo.isin(geocodes)
+        t_parameters_expr = t_parameters[geocode_filter].distinct()
+
+        climate_proj: pd.DataFrame = t_parameters_expr.projection(
             ["codigo_estacao_wu", "varcli"]
         ).execute()
-        var_climate_info = climate_proj.to_records(index=False).tolist()[0]
 
+        var_climate_info: Tuple[str, str] = climate_proj.to_records(
+            index=False
+        ).tolist()[0]
         return var_climate_info
 
     @classmethod
@@ -199,111 +256,126 @@ class RegionalParameters:
         cls,
         regional_name: Optional[str] = None,
         state_name: Optional[str] = None,
-    ) -> dict:
-        """
-        Get a list of cities from available states with code and name pairs
-        Returns
-        ----------
-        """
-        cities_by_region = {}
+    ) -> Dict[int, str]:
+        """Return mapping geocode -> city name for a region or state.
 
-        if regional_name is not None and state_name is not None:
+        Parameters
+        ----------
+        regional_name : str, optional
+            Regional name, when filtering by region.
+        state_name : str, optional
+            State acronym, e.g. 'RJ'.
+
+        Returns
+        -------
+        dict
+            Mapping geocode (int) to city name (str).
+        """
+        cities_by_region: Dict[int, str] = {}
+
+        if state_name is None:
+            return cities_by_region
+
+        if regional_name is not None:
             cache_name = (
                 str(regional_name).replace(" ", "_")
                 + "_"
                 + str(state_name).replace(" ", "_")
             )
-            # print('cache_name: ', cache_name)
-            res = cache.get(cache_name)
-
-            if res:
-                # print(f'cache_name {cache_name} found: ', res)
+            res: Optional[Dict[int, str]] = cache.get(cache_name)
+            if res is not None:
                 return res
 
-            else:
-                # print(f'Add new cache_name: {cache_name}')
-                municipio_proj = cls.t_municipio[
-                    "geocodigo", "nome", "uf", "id_regional"
-                ]
-                municipio_uf_filter = municipio_proj[
-                    municipio_proj.uf == state_name
-                ].order_by("id_regional")
+            t_parameters, t_municipio, _, t_regional = cls._unpack_tables()
 
-                regional_proj = cls.t_regional["id", "nome"]
-                regional_name_filter = regional_proj[
-                    regional_proj.nome == regional_name
-                ].order_by("id")
+            municipio_proj = t_municipio[
+                "geocodigo",
+                "nome",
+                "uf",
+                "id_regional",
+            ]
+            municipio_uf_filter = municipio_proj[
+                municipio_proj.uf == state_name
+            ].order_by("id_regional")
 
-                cities_expr = (
-                    municipio_uf_filter.join(
-                        regional_name_filter, cls.t_parameters
-                    )[municipio_uf_filter.geocodigo, municipio_uf_filter.nome]
-                    .order_by("nome")
-                    .execute()
-                )
+            regional_proj = t_regional["id", "nome"]
+            regional_name_filter = regional_proj[
+                regional_proj.nome == regional_name
+            ].order_by("id")
 
-                for row in cities_expr.to_dict(orient="records"):
-                    cities_by_region[row["geocodigo"]] = row["nome"]
-
-                res = cities_by_region
-
-                cache.set(
-                    cache_name,
-                    res,
-                    settings.QUERY_CACHE_TIMEOUT,
-                )
-
-                return res
-
-        else:
-            cache_name = (
-                "all_cities_from" + "_" + str(state_name).replace(" ", "_")
+            cities_expr: pd.DataFrame = (
+                municipio_uf_filter.join(
+                    regional_name_filter,
+                    t_parameters,
+                )[municipio_uf_filter.geocodigo, municipio_uf_filter.nome]
+                .order_by("nome")
+                .execute()
             )
-            res = cache.get(cache_name)
-            if res:
-                # print(f'Fetch {cache_name}', res)
-                return res
-            else:
-                # print(f'Add cache_name {cache_name}')
-                if state_name is None:
-                    state_names = [f"{state_name}"]
 
-                else:
-                    state_names = [f"{state_name}"]
+            for row in cities_expr.to_dict(orient="records"):
+                cities_by_region[int(row["geocodigo"])] = str(row["nome"])
 
-                t_municipio_uf_expr = cls.t_municipio.uf.isin(state_names)
+            cache.set(
+                cache_name,
+                cities_by_region,
+                settings.QUERY_CACHE_TIMEOUT,
+            )
+            return cities_by_region
 
-                cities_expr = (
-                    cls.t_municipio[t_municipio_uf_expr]["geocodigo", "nome"]
-                    .order_by("nome")
-                    .execute()
-                )
+        cache_name = (
+            "all_cities_from"
+            + "_"
+            + str(state_name).replace(
+                " ",
+                "_",
+            )
+        )
+        res = cache.get(cache_name)
+        if res is not None:
+            return res
 
-                for row in cities_expr.to_dict(orient="records"):
-                    cities_by_region[row["geocodigo"]] = row["nome"]
+        _, t_municipio, _, _ = cls._unpack_tables()
 
-                res = cities_by_region
+        state_names: List[str] = [f"{state_name}"]
+        t_municipio_uf_expr = t_municipio.uf.isin(state_names)
 
-                cache.set(
-                    cache_name,
-                    res,
-                    settings.QUERY_CACHE_TIMEOUT,
-                )
+        cities_expr: pd.DataFrame = (
+            t_municipio[t_municipio_uf_expr]["geocodigo", "nome"]
+            .order_by("nome")
+            .execute()
+        )
 
-                return res
+        for row in cities_expr.to_dict(orient="records"):
+            cities_by_region[int(row["geocodigo"])] = str(row["nome"])
+
+        cache.set(
+            cache_name,
+            cities_by_region,
+            settings.QUERY_CACHE_TIMEOUT,
+        )
+        return cities_by_region
 
     @classmethod
-    def get_station_data(cls, geocode: int, disease: str) -> pd:
-        """
+    def get_station_data(
+        cls,
+        geocode: int,
+        disease: str,
+    ) -> Tuple[Any, ...]:
+        """Return climate thresholds for a geocode and disease.
+
         Parameters
         ----------
         geocode : int
-        disease : str, {'dengue', 'chik', 'zika'}
+            City geocode.
+        disease : str
+            Disease key in CID10, e.g. ``'dengue'``, ``'chik'``, ``'zika'``.
+
         Returns
-        ----------
-        dataframe: pandas
-            climate data by gocode and disease
+        -------
+        tuple
+            Sequence of parameter values for the station.
         """
+        t_parameters, _, _, _ = cls._unpack_tables()
 
         climate_keys = [
             "cid10",
@@ -318,11 +390,12 @@ class RegionalParameters:
             "limiar_epidemico",
         ]
 
-        station_filter = (cls.t_parameters["cid10"] == CID10.get(disease)) & (
-            cls.t_parameters["municipio_geocodigo"] == geocode
+        station_filter = (t_parameters["cid10"] == CID10.get(disease)) & (
+            t_parameters["municipio_geocodigo"] == geocode
         )
-        climate_expr = (
-            cls.t_parameters[climate_keys].filter(station_filter).execute()
+
+        climate_expr: pd.DataFrame = (
+            t_parameters[climate_keys].filter(station_filter).execute()
         )
 
         return tuple(climate_expr.values)

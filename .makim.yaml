@@ -1,9 +1,33 @@
-env-file: .env
+backend: bash
+env-file: .envs/.env
 groups:
 
+  clean:
+    tasks:
+      tmp:
+        help: remove build artifacts, compiled files, and cache
+        backend: bash
+        run: |
+          find . -name '*.egg-info' -exec rm -rf {} +
+          find . -name '*.egg' -exec rm -f {} +
+          find . -name '*.pyc' -exec rm -f {} +
+          find . -name '*.pyo' -exec rm -f {} +
+          find . -name '__pycache__' -exec rm -rf {} +
+          find . -name '*~' -exec rm -f {} +
+          rm -rf build/
+          rm -rf dist/
+          rm -rf .eggs/
+          rm -f .coverage
+          rm -rf htmlcov/
+          rm -rf .pytest_cache
+          rm -rf .mypy_cache
+          rm -rf .ruff_cache
+          rm -rf .cache/
+          find . -name "*.pyc" -delete
+          echo "[II] Cleaned temporary files."
   # DJANGO
   django:
-    env-file: .env
+    env-file: .envs/.env
     help: Run Django commands and manage the development server.
     env:
       sugar_run_rm: sugar run --service web --options --rm
@@ -21,26 +45,87 @@ groups:
           cd AlertaDengue &&
           ${{ env.manage_py }} ${{ args.subcommand }}
 
-      # CONTAINER
-      static-collectstatic:
-        help: Collect static files into a single location.
+      shell:
+        help: Run the Django console interpreter inside the container.
+        env-file: .envs/.env
+        env:
+          POSTGRES_HOST: localhost
+          REDIS_HOST: localhost
         run: |
-          ${{ env.sugar_run_rm }} --entrypoint "/entrypoint.sh" --cmd ${{ env.manage_py }} collectstatic --noinput
+          sugar compose-ext start --services web -- -d
+          python AlertaDengue/manage.py shell
+
+
+      # CONTAINER
+      collectstatic:
+        help: Run the collectstatic for the backend service
+        env-file: .envs/.env
+        run: |
+          CMD="python manage.py collectstatic --no-input"
+          sugar compose-ext start \
+            --services postgres -- -d
+
+          CMD="python manage.py collectstatic --no-input"
+
+          if [[ "${{ env.USE_CONTAINER }}" == "true" ]]; then
+            sugar compose run --service web --cmd "$CMD" -- --rm
+          else
+            cd ./AlertaDengue/
+            export POSTGRES_HOST=localhost
+            $CMD
+          fi
+          echo "[II] postgres is running."
+
 
       static-geofiles:
         help: Generate geojson files and save them in the staticfiles folder.
         run: |
-          ${{ env.sugar_run_rm }} --entrypoint "/entrypoint.sh" --cmd ${{ env.manage_py }} sync_geofiles
+          ${{ env.sugar_run_rm }} --entrypoint "/opt/entrypoint.sh" --cmd ${{ env.manage_py }} sync_geofiles
+
+      makemigrations:
+        help: Run django makemigrations command (just for development)
+        args:
+          check:
+            help: |
+              Just check if the latest migration files were already created.
+            type: bool
+            action: store_true
+        env-file: .envs/.env
+        run: |
+          sugar compose-ext start \
+            --services postgres -- -d
+
+          CWD=$(pwd)
+          CMD_FLAG="${{ '--check' if args.check else '' }} --no-input"
+
+          for app in 'dbf'; do
+            echo -e "\nMaking migration files for: '${app}' ...\n"
+
+            CMD="python manage.py makemigrations ${CMD_FLAG} ${app}"
+
+            sugar --profile dev compose-ext run --rm --service web \
+              --cmd "$CMD"
+
+            echo "[II] postgres is running."
+
+
+          done
+
+          echo "[II] postgres is running."
 
       migrate:
-        help: Apply database migrations for specified databases.
+        help: Migrate regarding to the current migration files
+        env-file: .envs/.env
         run: |
-          for cmd in [
-            "--database=dados",
-            "--database=infodengue",
-            # "--database=forecast"
-          ]:
-            ${{ env.sugar_run_rm }} --entrypoint "/entrypoint.sh" --cmd ${{ env.manage_py }} migrate --noinput @(cmd)
+          sugar compose-ext start \
+            --services postgres -- -d
+
+          CMD="python manage.py migrate --no-input"
+          sugar --profile dev compose-ext run --rm --service web \
+           --cmd "$CMD"
+
+          echo "[II] postgres is running."
+
 
       send-mail-partner:
         help: Send email to partners.
@@ -52,15 +137,15 @@ groups:
         help: Run specific tests for web staging.
         run: |
           for test_name in ['dados', 'dbf', 'gis', 'api']:
-            ${{ env.sugar_run_rm }} --entrypoint "/entrypoint.sh" --cmd . /opt/services/test.sh @(test_name)
+            ${{ env.sugar_run_rm }} --entrypoint "/opt/entrypoint.sh" --cmd . /opt/services/test.sh @(test_name)
 
       test-staging-all:
         help: Run all tests for web staging.
         run: |
-          ${{ env.sugar_run_rm }} --entrypoint "/entrypoint.sh" --cmd ${{ env.manage_py }} test --noinput
+          ${{ env.sugar_run_rm }} --entrypoint "/opt/entrypoint.sh" --cmd ${{ env.manage_py }} test --noinput
 
   develop:
-    env-file: .env
+    env-file: .envs/.env
     help: Development tasks and utilities.
     env:
       manage_py: python AlertaDengue/manage.py
@@ -81,6 +166,7 @@ groups:
           timeout ${{ args.timeout }} ./containers/scripts/healthcheck.sh ${{ args.service }}
 
       container-wait-all:
+        env-file: .envs/.env
         help: Wait until container is healthy
         args:
           timeout:
@@ -88,13 +174,12 @@ groups:
             type: string
             default: "90"
             required: false
-
         hooks:
           pre-run:
             - task: develop.container-wait
               args:
                 timeout: ${{ args.timeout }}
-                service: stagingdb
+                service: postgres
             - task: develop.container-wait
               args:
                 timeout: ${{ args.timeout }}
@@ -110,7 +195,7 @@ groups:
             - task: develop.container-wait
               args:
                 timeout: ${{ args.timeout }}
-                service: worker
+                service: celery
 
       clean:
         help: Clean all generated artifacts from the project.

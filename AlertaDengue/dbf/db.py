@@ -1,7 +1,9 @@
 import pandas as pd
-from ad_main.settings import get_sqla_conn
 
-DB_ENGINE = get_sqla_conn(database="infodengue")
+# local
+from django.conf import settings
+
+DB_ENGINE = settings.DB_ENGINE_FACTORY(settings.PSQL_DBF)
 
 
 def is_partner_active():

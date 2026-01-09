@@ -11,7 +11,9 @@ ARG HOST_GID
 
 RUN usermod -u ${HOST_UID} postgres \
     && groupmod -g ${HOST_GID} postgres \
-    && echo "postgres:x:${HOST_UID}:${HOST_GID}:PostgreSQL,,,:/var/lib/postgresql:/bin/bash" >> /etc/passwd
+    && echo "postgres:x:${HOST_UID}:${HOST_GID}:PostgreSQL,,,:/var/lib/postgresql:/bin/bash" >> /etc/passwd \
+    && chown -R ${HOST_UID}:${HOST_GID} /var/run/postgresql \
+    && chown -R ${HOST_UID}:${HOST_GID} /var/lib/postgresql
 
 RUN apt-get update \
       && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \

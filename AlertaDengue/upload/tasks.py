@@ -8,8 +8,10 @@ import chardet
 import geopandas as gpd
 import pandas as pd
 import pyarrow.parquet as pq
-from ad_main.settings import DEBUG, get_sqla_conn
 from celery import shared_task
+
+# local
+from django.conf import settings
 from psycopg2.extras import DictCursor
 from simpledbf import Dbf5
 
@@ -22,7 +24,7 @@ from .models import (
 )
 from .sinan.utils import chunk_gen, parse_data, parse_dates
 
-ENGINE = get_sqla_conn(database="dengue")
+DB_ENGINE = settings.DB_ENGINE
 
 
 @shared_task
@@ -74,7 +76,7 @@ def sinan_rollback_file(
 
             query = _query % ", ".join(["%s"] * len(ids))
 
-            with ENGINE.begin() as conn:
+            with DB_ENGINE.begin() as conn:
                 cursor = conn.connection.cursor(cursor_factory=DictCursor)
                 cursor.execute(query, ids)
                 dropped_rows += cursor.rowcount
@@ -330,7 +332,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
     temp_table = f"temp_sinan_upload_{sinan.pk}"
     st = time.time()
 
-    with ENGINE.begin() as conn:
+    with DB_ENGINE.begin() as conn:
         cursor = conn.connection.cursor(cursor_factory=DictCursor)
         cursor.execute(
             f"""
@@ -379,7 +381,7 @@ def sinan_insert_to_db(upload_sinan_id: int):
         )
         status.debug(f"{temp_table} created.")
 
-        if not DEBUG:
+        if not settings.DEBUG:
             try:
                 total_rows, filtered_rows = insert(sinan)
             except Exception as e:

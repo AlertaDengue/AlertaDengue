@@ -12,7 +12,6 @@ import altair as alt
 import fiona
 import numpy as np
 import pandas as pd
-from dados.dbdata import get_epiyears, get_last_SE
 
 #
 from django.apps import apps
@@ -29,8 +28,6 @@ from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
 from django.views.generic.base import TemplateView, View
 from epiweeks import Week
-
-# local
 from gis.geotiff import convert_from_shapefile
 from upload.sinan.utils import UF_CODES
 
@@ -59,16 +56,19 @@ from .dbdata import (  # get_notification_cases,
     data_hist_uf,
     get_city_alert,
     get_last_alert,
+    get_last_SE,
 )
 from .episem import episem, episem2date
 from .maps import get_city_info
 from .models import City
 
+# local
+
 
 def get_static(static_dir):
     if not settings.DEBUG:
         return Path(static(static_dir))
-    _app_dir = settings.APPS_DIR
+    _app_dir = settings.BASE_DIR
     path_to_find = PurePath(find(static_dir))
     return str(path_to_find.relative_to(_app_dir))
 

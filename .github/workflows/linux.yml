@@ -11,9 +11,9 @@ env:
   ALLOWED_HOSTS: "localhost"
   DEBUG: False
   ENV: dev
-  WEB_PORT: 8000
-  HOST_UID: 1000
-  HOST_GID: 1000
+  DJANGO_PORT: 8000
+  HOST_UID: 1001
+  HOST_GID: 1001
   SECRET_KEY: my-secret-key
 
   EMAIL_CONFIG: ${{ secrets.EMAIL_CONFIG }}
@@ -30,29 +30,31 @@ env:
   POSTGRES_USER: postgres
   PSQL_DB: dengue
   PSQL_DBF: infodengue
-  PSQL_HOST: infodengue-dev-stagingdb
+  PSQL_HOST: postgres
   PSQL_PASSWORD: infodenguedev
   PSQL_PORT: 25432
   PSQL_USER: infodenguedev
   PSQL_DEV_USER: infodenguedev
   PSQL_DEV_PASSWORD: infodenguedev
+
   PG_RESTORE_STAGING: schemas
-  PG_DATA_PROD: "../../staging_data/postgres_data_prod"
-  PG_DATA_STAGING: "../../staging_data/postgres_data"
+  PG_DATA_DEV: "/home/runner/storage/postgres_data_dev"
+  PG_DATA_PROD: "/home/runner/storage/postgres_data_prod"
+  PG_DATA_STAGING: "/home/runner/storage/postgres_data_staging"
+
+  DOCKER_HOST_DBF_SINAN: "/home/runner/storage/sftp2/alertadengue/sinan"
+  DOCKER_HOST_IMPORTED_FILES_DIR: "/home/runner/storage/sftp2/alertadengue/sinan/imported"
+  DOCKER_HOST_UPLOADED_FILES_DIR: "/home/runner/storage/sftp2/alertadengue/sinan/uploaded"
+  DOCKER_HOST_SHAPEFILES_DIR: "/home/runner/storage/shapefiles"
+  DOCKER_HOST_TEMP_PARQUET_DIR: "/tmp/dbf_parquet"
+  DOCKER_HOST_STATIC: "/home/runner/storage/staticfiles"
 
   DBF_SINAN: /DBF_SINAN
   IMPORTED_FILES: /IMPORTED_FILES
   MEDIA_ROOT: /MEDIA_ROOT
-  DOCKER_HOST_DBF_SINAN: "../../staging_data/sftp2/alertadengue/sinan"
-  DOCKER_HOST_IMPORTED_FILES_DIR: "../../staging_data/sftp2/alertadengue/sinan/imported"
-  DOCKER_HOST_UPLOADED_FILES_DIR: "../../staging_data/sftp2/alertadengue/sinan/uploaded"
-
-  DOCKER_HOST_SHAPEFILES_DIR: "../../staging_data/shapefiles"
-  DOCKER_HOST_TEMP_PARQUET_DIR: "/tmp/dbf_parquet"
-
-  STORAGE: "../../staging_data/"
-  DOCKER_HOST_STATIC: "../../staging_data/staticfiles"
-  TEMP_FILES_DIR: "/tmp"
+  STORAGE: "/home/runner/storage/"
+  TEMP_FILES_DIR: "/tmp/"
+  EPISCANNER_HOST_DIR: "/home/runner/storage/episcanner"
 
 
 jobs:
@@ -84,14 +86,12 @@ jobs:
 
     - name: Prepare data volumes
       run: |
-        mkdir -p ../../staging_data/postgres_data
-        chmod 777 -R ../../staging_data/postgres_data
-        sudo chown 1000:1000 -R  ../../staging_data/postgres_data
-        sudo mkdir -p ../staging_data/postgres_data
-        sudo chmod 777 -R ../staging_data/postgres_data
-        sudo chown 1000:1000 -R  ../staging_data/postgres_data
+        mkdir -p /home/runner/storage/postgres_data_dev
+        chmod 777 -R /home/runner/storage/postgres_data_dev
+        sudo chown 1001:1001 -R /home/runner/storage/postgres_data_dev
         mkdir -p /tmp/dbf_duplicated_csv
         chmod 777 -R /tmp/dbf_duplicated_csv
+        mkdir -p /home/runner/storage/episcanner
 
     - name: Install toolchain and app dependencies
       run: |
@@ -99,26 +99,47 @@ jobs:
         ./scripts/install-deps.sh
 
     - name: Create env file
-      run: envsubst < .env.tpl > .env
-
-    - name: Build postgres database
       run: |
-        sugar compose build --services stagingdb
-
-    - name: Start postgres database
-      run: |
-        sugar compose-ext start --services stagingdb --options -d
-
-    - name: Start containers
-      run: |
-        sugar compose build --group dev --all
-        sugar compose-ext start --group dev --all --options -d
-
-    - name: Container wait all
-      run: |
-          makim develop.container-wait-all --timeout 150
+        pushd .envs
+        envsubst < .env.tpl > .env
+        popd
 
     - name: Linting
       run: |
         poetry run pre-commit install -t pre-commit -t commit-msg -t pre-push
         poetry run pre-commit run --all-files
+
+    - name: Build postgres database
+      run: |
+        sugar --profile dev compose build --services postgres
+
+    - name: Start postgres database
+      run: |
+        sugar --profile dev compose-ext start --services postgres --options -d
+
+    - name: Start containers
+      run: |
+        sugar --profile dev compose build
+        sugar --profile dev compose-ext start --options -d
+
+    - name: Container wait all
+      run: |
+          makim develop.container-wait-all --timeout 150
+
+    - name: Setup tmate session
+      if: "${{ failure() }}"
+      uses: mxschmitt/action-tmate@v3
+
+    - name: Show logs on failure
+      if: ${{ failure() }}
+      run: |
+        set -euxo pipefail
+        sugar --profile dev compose-ext logs -- -n 200
+        docker ps -a
+
+    - name: Stop services
+      if: ${{ always() }}
+      run: |
+        set -euxo pipefail
+        sugar --profile dev compose-ext stop || true
+        sugar --profile dev compose-ext down -- --volumes || true

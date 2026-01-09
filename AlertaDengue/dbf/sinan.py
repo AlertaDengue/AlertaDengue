@@ -2,13 +2,13 @@ from typing import Any, List, Optional
 
 import pandas as pd
 import psycopg2
-from ad_main.settings import get_sqla_conn
 from dbf.utils import (
     FIELD_MAP,
     drop_duplicates_from_dataframe,
     parse_data,
     read_dbf,
 )
+from django.conf import settings
 from loguru import logger
 from psycopg2.extras import DictCursor
 
@@ -31,7 +31,7 @@ class Sinan(object):
         """
 
         logger.info("Establishing connection to PostgreSQL database...")
-        self.db_engine = get_sqla_conn(database="dengue")
+        self.db_engine = settings.DB_ENGINE
 
         logger.info("Formatting fields and reading chunks from parquet files")
 
