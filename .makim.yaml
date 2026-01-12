@@ -1,7 +1,6 @@
 backend: bash
 env-file: .envs/.env
 groups:
-
   clean:
     tasks:
       tmp:
@@ -25,7 +24,7 @@ groups:
           rm -rf .cache/
           find . -name "*.pyc" -delete
           echo "[II] Cleaned temporary files."
-  # DJANGO
+
   django:
     env-file: .envs/.env
     help: Run Django commands and manage the development server.
@@ -33,17 +32,17 @@ groups:
       sugar_run_rm: sugar run --service web --options --rm
       manage_py: python manage.py
     tasks:
-      # DEV MODE
-      run:
+      runserver:
         help: Start the development server locally.
-        args:
-          subcommand:
-            help: Specify a Django subcommand to run.
-            type: string
-            default: runserver
+        env:
+          REDIS_HOST: infodengue-dev-redis
+          PSQL_HOST: infodengue-dev-postgres
+          PSQL_PORT: "25432"
         run: |
-          cd AlertaDengue &&
-          ${{ env.manage_py }} ${{ args.subcommand }}
+          sugar compose-ext restart --options "-d"
+          pushd ./AlertaDengue/
+            python manage.py runserver 0.0.0.0:8000
+          popd
 
       shell:
         help: Run the Django console interpreter inside the container.
@@ -52,11 +51,11 @@ groups:
           POSTGRES_HOST: localhost
           REDIS_HOST: localhost
         run: |
-          sugar compose-ext start --services web -- -d
-          python AlertaDengue/manage.py shell
+          sugar compose-ext restart --options "-d"
+          pushd ./AlertaDengue/
+            python manage.py shell
+          popd
 
-
-      # CONTAINER
       collectstatic:
         help: Run the collectstatic for the backend service
         env-file: .envs/.env
@@ -68,14 +67,13 @@ groups:
           CMD="python manage.py collectstatic --no-input"
 
           if [[ "${{ env.USE_CONTAINER }}" == "true" ]]; then
-            sugar compose run --service web --cmd "$CMD" -- --rm
+            sugar --profile dev compose-ext run --service web --cmd "$CMD" -- --rm
           else
             cd ./AlertaDengue/
             export POSTGRES_HOST=localhost
             $CMD
           fi
           echo "[II] postgres is running."
-
 
       static-geofiles:
         help: Generate geojson files and save them in the staticfiles folder.
@@ -107,8 +105,6 @@ groups:
               --cmd "$CMD"
 
             echo "[II] postgres is running."
-
-
           done
 
           echo "[II] postgres is running."
@@ -126,23 +122,20 @@ groups:
 
           echo "[II] postgres is running."
 
-
       send-mail-partner:
         help: Send email to partners.
         run: |
           ${{ env.sugar_run_rm }} --cmd ${{ env.manage_py }} send_mail
 
-      # TESTS
-      test-staging-web:
-        help: Run specific tests for web staging.
+      clear_cache:
+        help: Clear all Django cache
+        args:
+          subcommand:
+            help: Specify a Django subcommand to run.
+            type: string
+            default: clearcache
         run: |
-          for test_name in ['dados', 'dbf', 'gis', 'api']:
-            ${{ env.sugar_run_rm }} --entrypoint "/opt/entrypoint.sh" --cmd . /opt/services/test.sh @(test_name)
-
-      test-staging-all:
-        help: Run all tests for web staging.
-        run: |
-          ${{ env.sugar_run_rm }} --entrypoint "/opt/entrypoint.sh" --cmd ${{ env.manage_py }} test --noinput
+          ${{ env.manage_py }} ${{ args.subcommand }}
 
   develop:
     env-file: .envs/.env
@@ -150,7 +143,6 @@ groups:
     env:
       manage_py: python AlertaDengue/manage.py
     tasks:
-      # CI
       container-wait:
         help: Wait for a specific service to become available.
         args:
@@ -197,37 +189,45 @@ groups:
                 timeout: ${{ args.timeout }}
                 service: celery
 
-      clean:
-        help: Clean all generated artifacts from the project.
+  tests:
+    tasks:
+      setup:
+        help: Setup the infrastructure for the tests
+        env-file: .envs/.env
+        env:
+          POSTGRES_HOST: localhost
+          REDIS_HOST: localhost
+        run: |
+          sugar --group dev compose-ext restart --options -d
+
+      teardown:
+        help: Teardown the infrastructure for the tests
+        env-file: .envs/.env
+        env:
+          POSTGRES_HOST: localhost
+          REDIS_HOST: localhost
+        run: |
+          sugar --group dev compose-ext stop
+
+      lint:
+        help: Run linter tools
         hooks:
           pre-run:
-            - task: develop.clear_cache
-        args:
-          path:
-            help: Specify the path of the files to remove.
-            type: string
-            default: ""
+            - task: clean.tmp
         run: |
-          import shutil
-          from pathlib import Path
-          base_dir = Path(".")
-          list_to_cache_files = [
-            'build/', 'dist/', '.eggs/', '*/.eggs', 'db',
-            '*.egg-info', '*.egg', '*.pyc', '*.pyo', '*~',
-            '__pycache__', '*.ipynb_checkpoints', '*.pytest_cache'
-          ]
-          for item in list_to_cache_files:
-            for file in base_dir.glob(f'**/{item}'):
-              shutil.rmtree(file) if file.is_dir() else file.unlink()
-      clear_cache:
-        help: Clear all Django cache
-        args:
-          subcommand:
-            help: Specify a Django subcommand to run.
-            type: string
-            default: clearcache
+          pre-commit install
+          pre-commit run --all-files --verbose
+
+      staging-web:
+        help: Run specific tests for web staging.
         run: |
-          ${{ env.manage_py }} ${{ args.subcommand }}
+          for test_name in ['dados', 'dbf', 'gis', 'api']:
+            ${{ env.sugar_run_rm }} --entrypoint "/opt/entrypoint.sh" --cmd . /opt/services/test.sh @(test_name)
+
+      staging-all:
+        help: Run all tests for web staging.
+        run: |
+          ${{ env.sugar_run_rm }} --entrypoint "/opt/entrypoint.sh" --cmd ${{ env.manage_py }} test --noinput
 
   release:
     vars:
