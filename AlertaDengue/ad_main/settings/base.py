@@ -52,7 +52,7 @@ def read_admins(value: str) -> tuple[tuple[str, str], ...]:
     return tuple(pairs)
 
 
-BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
+BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent.parent
 
 APPS_DIR = BASE_DIR / "AlertaDengue"
 
