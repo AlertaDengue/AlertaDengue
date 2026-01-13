@@ -61,19 +61,13 @@ groups:
         env-file: .envs/.env
         run: |
           CMD="python manage.py collectstatic --no-input"
-          sugar compose-ext start \
+
+          sugar --profile ${ENV} compose-ext start \
             --services postgres -- -d
 
           CMD="python manage.py collectstatic --no-input"
+          sugar --profile ${{ env.ENV }}  compose-ext exec --service web --cmd "$CMD"
 
-          if [[ "${{ env.USE_CONTAINER }}" == "true" ]]; then
-            sugar --profile dev compose-ext run --service web --cmd "$CMD" -- --rm
-          else
-            cd ./AlertaDengue/
-            export POSTGRES_HOST=localhost
-            $CMD
-          fi
-          echo "[II] postgres is running."
 
       static-geofiles:
         help: Generate geojson files and save them in the staticfiles folder.
@@ -117,7 +111,7 @@ groups:
             --services postgres -- -d
 
           CMD="python manage.py migrate --no-input"
-          sugar --profile dev compose-ext run --rm --service web \
+          sugar --profile ${ENV} compose-ext run --rm --service web \
            --cmd "$CMD"
 
           echo "[II] postgres is running."

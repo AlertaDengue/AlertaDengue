@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
 
-set -e
-
-if [ $# -eq 0 ]; then
-  exit 0
-fi
+set -ex
 
 # prepare the conda environment
-is_conda_in_path=$(echo "$PATH"|grep -m 1 --count /opt/conda/)
+is_conda_in_path=$(echo "$PATH" | grep -m 1 --count /opt/conda/)
 
 if [ "$is_conda_in_path" == 0 ]; then
   export PATH="/opt/conda/condabin:/opt/conda/bin:$PATH"
@@ -15,9 +11,12 @@ if [ "$is_conda_in_path" == 0 ]; then
 fi
 
 echo "[INFO] activate alertadengue"
-. /opt/conda/etc/profile.d/conda.sh &&
+. /opt/conda/etc/profile.d/conda.sh
 conda activate alertadengue
 
-echo "Running: ${@}"
+set +ex
 
-exec "$@"
+if [ "$#" -ne 0 ]; then
+  echo "Running: $*"
+  exec "$@"
+fi
