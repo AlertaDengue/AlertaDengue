@@ -1,6 +1,6 @@
 from AlertaDengue.ad_main import settings
 
-APPS_DIR = settings.APPS_DIR
+APP_DIRS = settings.APP_DIRS
 RASTER_PATH = settings.RASTER_PATH
 RASTER_METEROLOGICAL_DATA_RANGE = settings.RASTER_METEROLOGICAL_DATA_RANGE
 

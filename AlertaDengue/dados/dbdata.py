@@ -75,7 +75,7 @@ STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
 MAP_CENTER = {k: v[1] for k, v in ALL_STATE_NAMES.items()}
 MAP_ZOOM = {k: v[2] for k, v in ALL_STATE_NAMES.items()}
 
-with open(settings.APP_DIR / "data" / "municipalities.json", "r") as muns:
+with open(settings.BASE_DIR / "data" / "municipalities.json", "r") as muns:
     _mun_decoded = muns.read().encode().decode("utf-8-sig")
     MUNICIPALITIES = json.loads(_mun_decoded)
 

@@ -4,26 +4,30 @@ from ad_main.settings.prod import *  # noqa: F403
 
 DEBUG = False
 
-# we need this to console the email
-# without this in staging we will get a 500 error when
-# submitting the signup form for creating a new account
-# because the email configuration is not set
+BASE_DIR = Path(__file__).resolve().parents[2]
+TEMPLATES[0]["DIRS"] = [str(BASE_DIR / "templates")]
+
+LANGUAGE_CODE = "en-us"
+MIDDLEWARE = [
+    mw
+    for mw in MIDDLEWARE
+    if mw != "django.middleware.locale.LocaleMiddleware"
+]
+
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-# need to explitly define the domains that send
-# csrf_tokens otherwise all post requests will fail
 CSRF_TRUSTED_ORIGINS = [
     "https://localhost",
     "https://127.0.0.1",
+    "https://infostaging.dengue.mat.br",
 ]
 
 ALLOWED_HOSTS_ENV = os.getenv("ALLOWED_HOSTS", "").split(",")
 
-# https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = (
     [
         "localhost",
-        "www.localhost",  # needed for www redirection
+        "www.localhost",
         "0.0.0.0",
     ]
     + ALLOWED_HOSTS_ENV
@@ -33,3 +37,5 @@ ALLOWED_HOSTS = (
         for domain in os.getenv("CERTBOT_DOMAIN", "").split(",")
     ]
 )
+
+PWA_APP_LANG = LANGUAGE_CODE

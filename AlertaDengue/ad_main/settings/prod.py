@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from ad_main.settings.base import *  # noqa: F401,F403
 
 DEBUG = False

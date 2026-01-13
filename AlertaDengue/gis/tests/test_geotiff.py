@@ -24,7 +24,7 @@ from django.test import TestCase
 def get_static(static_dir):
     if not settings.DEBUG:
         return Path(static(static_dir))
-    _app_dir = settings.APPS_DIR
+    _app_dir = settings.APP_DIRS
     path_to_find = PurePath(find(static_dir))
     return str(path_to_find.relative_to(_app_dir))
 
