@@ -140,7 +140,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "curl -fsS http://localhost:${DJANGO_PORT}/status/ || exit 1",
+          "curl -fsS http://127.0.0.1:8000/status/ || exit 1",
         ]
     networks:
       - infodengue
