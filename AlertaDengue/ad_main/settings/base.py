@@ -55,7 +55,8 @@ def read_admins(value: str) -> tuple[tuple[str, str], ...]:
 # /opt/services/AlertaDengue/ad_main/settings/base.py
 # parent.parent.parent.parent == /opt/services
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent.parent
-APP_DIRS = BASE_DIR / "AlertaDengue"
+# APP_DIRS = BASE_DIR / "AlertaDengue"
+PROJECT_ROOT = BASE_DIR / "AlertaDengue"
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALLOWED_HOSTS = (
@@ -64,14 +65,14 @@ ALLOWED_HOSTS = (
 ADMINS = read_admins(os.getenv("ADMINS", ""))
 
 MAINTENANCE_MODE = os.getenv("MAINTENANCE", "False").lower() == "true"
-MAINTENANCE_MODE_TEMPLATE = str(APP_DIRS / "dados/templates/503.html")
+MAINTENANCE_MODE_TEMPLATE = str(PROJECT_ROOT / "dados/templates/503.html")
 
 TIME_ZONE = "America/Sao_Paulo"
 LANGUAGE_CODE = "pt-br"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-LOCALE_PATHS = [str(APP_DIRS / "locale")]
+LOCALE_PATHS = [str(PROJECT_ROOT / "locale")]
 LANGUAGES = (
     ("pt-br", "Português"),
     ("en-us", "English"),
@@ -301,7 +302,7 @@ EMAIL_OUTLOOK_USER = os.getenv("EMAIL_OUTLOOK_USER")
 STATIC_ROOT = str(BASE_DIR / "staticfiles")
 STATIC_URL = "/static/"
 
-STATICFILES_DIRS = [str(APP_DIRS / "static")]
+STATICFILES_DIRS = [str(PROJECT_ROOT / "static")]
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
@@ -312,7 +313,7 @@ DBF_SINAN = os.getenv("DBF_SINAN")
 MEDIA_ROOT = os.getenv("MEDIA_ROOT")
 IMPORTED_FILES = os.getenv("IMPORTED_FILES")
 TEMP_FILES_DIR = os.getenv("TEMP_FILES_DIR")
-DATA_DIR = APP_DIRS.parent.parent / os.getenv("STORAGE", "")
+DATA_DIR = PROJECT_ROOT.parent.parent / os.getenv("STORAGE", "")
 
 
 def build_templates(debug: bool) -> list[dict[str, Any]]:
@@ -345,7 +346,7 @@ def build_templates(debug: bool) -> list[dict[str, Any]]:
     config: dict[str, Any] = {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         # main change: use project root templates dir
-        "DIRS": [str(APP_DIRS / "templates")],
+        "DIRS": [str(PROJECT_ROOT / "templates")],
         "APP_DIRS": True,
         "OPTIONS": base_options,
     }
@@ -555,5 +556,5 @@ PWA_APP_SCOPE = "/"
 PWA_APP_ORIENTATION = "portrait"
 PWA_APP_STATUS_BAR_COLOR = "#469ad3"
 
-PWA_SERVICE_WORKER_PATH = APP_DIRS / "static" / "js" / "serviceworker.js"
-PWA_APP_MANIFEST_FILE = APP_DIRS / "templates" / "manifest.json"
+PWA_SERVICE_WORKER_PATH = PROJECT_ROOT / "static" / "js" / "serviceworker.js"
+PWA_APP_MANIFEST_FILE = PROJECT_ROOT / "templates" / "manifest.json"

@@ -69,7 +69,7 @@ from .models import City
 def get_static(static_dir):
     if not settings.DEBUG:
         return Path(static(static_dir))
-    _app_dir = settings.APP_DIRS
+    _app_dir = settings.ROOT_DIR
     path_to_find = PurePath(find(static_dir))
     return str(path_to_find.relative_to(_app_dir))
 
