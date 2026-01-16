@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from typing import List, Tuple
+from typing import Final, List, Sequence, Tuple
 
 import fiona
 import geojson
@@ -14,51 +14,50 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.management.base import BaseCommand
 from shapely.geometry import MultiPolygon, shape
+from sqlalchemy import text
 from sqlalchemy.engine import Engine
 
 from ...geodf import extract_boundaries
 
-DB_ENGINE = settings.DB_ENGINE
+DB_ENGINE: Final[Engine] = settings.DB_ENGINE
 
 
 def get_all_active_cities(
     db_engine: Engine = DB_ENGINE,
-) -> List[Tuple[str, str]]:
-    """
-    Retrieve a list of active city names and their geocodes.
+) -> list[tuple[str, str]]:
+    """Retrieve active city geocodes and names.
 
     Parameters
     ----------
-    db_engine : Engine
-        The database engine to use for the query.
+    db_engine
+        SQLAlchemy engine used to execute the query.
 
     Returns
     -------
-    List[Tuple[str, str]]
-        List of city information (geocode, name)
+    list[tuple[str, str]]
+        List of (geocode, name).
     """
+    cache_key = "get_all_active_cities"
+    cached: Sequence[tuple[str, str]] | None = cache.get(cache_key)
+    if cached is not None:
+        return list(cached)
 
-    # Check if the result is already cached
-    res = cache.get("get_all_active_cities")
+    stmt = text(
+        """
+        SELECT DISTINCT
+          hist.municipio_geocodigo,
+          city.nome
+        FROM "Municipio"."Historico_alerta" AS hist
+        INNER JOIN "Dengue_global"."Municipio" AS city
+          ON hist.municipio_geocodigo = city.geocodigo
+        """
+    )
 
-    if res is None:
-        # If not cached, query the database and cache the result
-        with db_engine.connect() as conn:
-            res = conn.execute(
-                """
-                SELECT DISTINCT
-                  hist.municipio_geocodigo,
-                  city.nome
-                FROM "Municipio"."Historico_alerta" AS hist
-                  INNER JOIN "Dengue_global"."Municipio" AS city
-                    ON (hist.municipio_geocodigo=city.geocodigo)
-                """
-            )
-            res = res.fetchall()
-            cache.set(
-                "get_all_active_cities", res, settings.QUERY_CACHE_TIMEOUT
-            )
-    return res
+    with db_engine.connect() as conn:
+        res = conn.execute(stmt).fetchall()
+
+    cache.set(cache_key, res, settings.QUERY_CACHE_TIMEOUT)
+    return list(res)
 
 
 class Command(BaseCommand):

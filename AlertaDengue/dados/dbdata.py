@@ -484,51 +484,48 @@ def get_city_name_by_id(geocode: int, db_engine: Engine) -> str:
 
 def get_all_active_cities_state(
     db_engine: Engine = DB_ENGINE,
-) -> List[Tuple[str, str, str, str]]:
-    """
-    Fetches a list of names of active cities from the database.
+) -> list[tuple[int, object, str, str]]:
+    """Return active cities with state info from recent alert history.
 
     Parameters
     ----------
-    db_engine : Engine
-        The database engine instance to execute the query.
+    db_engine
+        SQLAlchemy engine.
 
     Returns
     -------
-    List[Tuple[str, str, str, str]]
-        A list of tuples containing municipality geocode, start date, city name, and state.
+    list[tuple[int, object, str, str]]
+        Rows as returned by the query:
+        (municipio_geocodigo, data_iniSE, nome, uf)
     """
-    # Check if the result is cached
-    res = cache.get("get_all_active_cities_state")
+    cache_key = "get_all_active_cities_state"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return list(cached)
 
-    if res is None:
-        # If not cached, fetch the data from the database
-        with db_engine.connect() as conn:
-            res = conn.execute(
-                """
-                SELECT DISTINCT
-                hist.municipio_geocodigo,
-                hist."data_iniSE",
-                city.nome,
-                city.uf
-                FROM "Municipio"."Historico_alerta" AS hist
-                INNER JOIN "Dengue_global"."Municipio" AS city
-                    ON (hist.municipio_geocodigo=city.geocodigo)
-                WHERE hist."data_iniSE" >= (
-                    SELECT MAX(hist."data_iniSE") - interval '52 weeks'
-                    FROM "Municipio"."Historico_alerta" AS hist
-                    )
-                ORDER BY hist."data_iniSE";
-                """
-            )
-            res = res.fetchall()
-            # Cache the result with a timeout
-            cache.set(
-                "get_all_active_cities_state",
-                res,
-                settings.QUERY_CACHE_TIMEOUT,
-            )
-    return res
+    stmt = text(
+        """
+        SELECT DISTINCT
+            hist.municipio_geocodigo,
+            hist."data_iniSE",
+            city.nome,
+            city.uf
+        FROM "Municipio"."Historico_alerta" AS hist
+        INNER JOIN "Dengue_global"."Municipio" AS city
+            ON hist.municipio_geocodigo = city.geocodigo
+        WHERE hist."data_iniSE" >= (
+            SELECT MAX(h2."data_iniSE") - interval '52 weeks'
+            FROM "Municipio"."Historico_alerta" AS h2
+        )
+        ORDER BY hist."data_iniSE";
+        """
+    )
+
+    with db_engine.connect() as conn:
+        rows = conn.execute(stmt).fetchall()
+
+    cache.set(cache_key, rows, settings.QUERY_CACHE_TIMEOUT)
+    return list(rows)
 
 
 def get_last_alert(geo_id, disease, db_engine: Engine = DB_ENGINE):
@@ -563,18 +560,45 @@ def get_last_alert(geo_id, disease, db_engine: Engine = DB_ENGINE):
     return pd.read_sql_query(sql, db_engine.raw_connection())
 
 
-def get_last_SE(disease="dengue", db_engine: Engine = DB_ENGINE) -> Week:
-    table_name = "Historico_alerta" + get_disease_suffix(disease)
+def get_last_SE(
+    disease: str = "dengue", db_engine: Engine = DB_ENGINE
+) -> Week:
+    """Return the most recent epidemiological week for a disease.
 
-    sql = f"""
-    SELECT "SE"
-    FROM "Municipio"."{table_name}"
-    ORDER BY "data_iniSE" DESC
-    LIMIT 1
+    Parameters
+    ----------
+    disease
+        Disease key (e.g. "dengue", "chikungunya", "zika").
+    db_engine
+        SQLAlchemy engine.
+
+    Returns
+    -------
+    epiweeks.Week
+        Most recent epidemiological week.
+
+    Raises
+    ------
+    ValueError
+        If the table has no rows.
     """
+    table_name = f"Historico_alerta{get_disease_suffix(disease)}"
+    stmt = text(
+        f"""
+        SELECT "SE"
+        FROM "Municipio"."{table_name}"
+        ORDER BY "data_iniSE" DESC
+        LIMIT 1
+        """
+    )
 
-    df = pd.read_sql_query(sql, db_engine.raw_connection())
-    return Week.fromstring(str(df.SE.iloc[0]))
+    with db_engine.connect() as conn:
+        row = conn.execute(stmt).first()
+
+    if row is None:
+        raise ValueError(f"No rows found for disease={disease!r}")
+
+    return Week.fromstring(str(row[0]))
 
 
 def load_series(
@@ -1065,24 +1089,33 @@ class Forecast:
         tuple[str, str]
             A tuple containing the minimum and maximum forecast dates as strings in 'YYYY-MM-DD' format.
         """
-        sql = f"""
-        SELECT
-            TO_CHAR(MIN(init_date_epiweek), 'YYYY-MM-DD') AS epiweek_min,
-            TO_CHAR(MAX(init_date_epiweek), 'YYYY-MM-DD') AS epiweek_max
-        FROM
-            forecast.forecast_cases AS f
+        stmt = text(
+            """
+            SELECT
+                TO_CHAR(MIN(f.init_date_epiweek), 'YYYY-MM-DD') AS epiweek_min,
+                TO_CHAR(MAX(f.init_date_epiweek), 'YYYY-MM-DD') AS epiweek_max
+            FROM forecast.forecast_cases AS f
             INNER JOIN forecast.forecast_city AS fc
-            ON (f.geocode = fc.geocode AND fc.active=TRUE)
+                ON f.geocode = fc.geocode AND fc.active = TRUE
             INNER JOIN forecast.forecast_model AS fm
-            ON (fc.forecast_model_id = fm.id AND fm.active = TRUE)
-        WHERE f.geocode={geocode} AND cid10='{cid10}'
-        """
+                ON fc.forecast_model_id = fm.id AND fm.active = TRUE
+            WHERE f.geocode = :geocode AND f.cid10 = :cid10
+            """
+        )
 
         with db_engine.connect() as connection:
-            result = connection.execute(sql)
-            values = result.fetchone()
+            row = connection.execute(
+                stmt,
+                {"geocode": geocode, "cid10": cid10},
+            ).fetchone()
 
-        return values[0], values[1]
+        if row is None or row[0] is None or row[1] is None:
+            raise ValueError(
+                "No forecast dates found for "
+                f"geocode={geocode}, cid10={cid10!r}."
+            )
+
+        return str(row[0]), str(row[1])
 
     @staticmethod
     def load_cases(

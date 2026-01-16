@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Optional
 
 import ibis
 import ibis.expr.datatypes as dt
@@ -398,6 +398,7 @@ class NotificationQueries:
         )
 
         with db_engine.connect() as conn:
+
             result = conn.execute(text(sql_text_query), parameters)
             df = pd.DataFrame(result.fetchall(), columns=result.keys())
             return pd.crosstab(
