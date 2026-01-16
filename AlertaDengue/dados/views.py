@@ -68,7 +68,7 @@ from .models import City
 def get_static(static_dir):
     if not settings.DEBUG:
         return Path(static(static_dir))
-    _app_dir = settings.BASE_DIR
+    _app_dir = settings.APP_DIRS
     path_to_find = PurePath(find(static_dir))
     return str(path_to_find.relative_to(_app_dir))
 
@@ -1144,7 +1144,9 @@ class ReportCityView(TemplateView):
         for df in [df_dengue, df_chik, df_zika]:
             result = df[df.index == last_year_week]
             if not result.empty:
-                disease_last_code.append(float(result["level_code"]))
+                value = result["level_code"].iloc[0]
+                if not pd.isna(value):
+                    disease_last_code.append(float(value))
 
         max_alert_code = int(np.nanmax(disease_last_code))
         max_alert_color = ALERT_COLOR[max_alert_code]
@@ -1292,41 +1294,38 @@ class ReportStateView(TemplateView):
 
 class AlertaStateView(TemplateView):
     template_name = "state_cities.html"
-
     _state_name = STATE_NAME
 
     def get_context_data(self, **kwargs):
-        """
-        :param kwargs:
-        :return:
-        """
-        context = super(AlertaStateView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
 
         cities_alert = NotificationResume.get_cities_alert_by_state(
-            self._state_name[context["state"]], context["disease"]
+            self._state_name[context["state"]],
+            context["disease"],
         )
 
         last_update = get_last_SE().enddate()
         alerts = dict(
             cities_alert[["municipio_geocodigo", "level_alert"]].values
         )
-
         mun_dict = dict(cities_alert[["municipio_geocodigo", "nome"]].values)
-
         mun_dict_ordered = OrderedDict(
             sorted(mun_dict.items(), key=lambda v: v[1])
         )
-
         geo_ids = list(mun_dict.keys())
 
-        if len(geo_ids) > 0:
-            cases_series_last_12 = (
-                NotificationResume.tail_estimated_cases(  # noqa: E501
-                    geo_ids, 12
-                )
-            )
+        if geo_ids:
+            df = NotificationResume.tail_estimated_cases(geo_ids, 12)
+            if isinstance(df, pd.DataFrame) and not df.empty:
+                df = df.sort_values(["municipio_geocodigo", "data_iniSE"])
+                case_series = {
+                    int(k): g["casos_est"].tolist()
+                    for k, g in df.groupby("municipio_geocodigo", sort=False)
+                }
+            else:
+                case_series = {}
         else:
-            cases_series_last_12 = {}
+            case_series = {}
 
         context.update(
             {
@@ -1338,8 +1337,7 @@ class AlertaStateView(TemplateView):
                 "mun_dict_ordered": mun_dict_ordered,
                 "geo_ids": geo_ids,
                 "alerts_level": alerts,
-                # estimated cases is used to show a chart of the last 12 events
-                "case_series": cases_series_last_12,
+                "case_series": case_series,
                 "disease_label": context["disease"].title(),
                 "last_update": last_update,
                 "SE": Week.fromdate(last_update),
