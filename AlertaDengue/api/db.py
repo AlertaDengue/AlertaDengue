@@ -149,7 +149,7 @@ class NotificationQueries:
 
         with db_engine.connect() as conn:
             result = conn.execute(sql, "casos")
-            return pd.DataFrame(result.fetchall())
+            return pd.DataFrame(result.fetchall(), columns=result.keys())
 
     def get_selected_rows(self, db_engine: Engine = DB_ENGINE):
         """
@@ -179,7 +179,7 @@ class NotificationQueries:
 
         with db_engine.connect() as conn:
             result = conn.execute(sql, "casos")
-            return pd.DataFrame(result.fetchall())
+            return pd.DataFrame(result.fetchall(), columns=result.keys())
 
     def get_disease_dist(self, db_engine: Engine = DB_ENGINE) -> pd.DataFrame:
         """
@@ -220,7 +220,7 @@ class NotificationQueries:
         """
 
         with db_engine.connect() as conn:
-            result = conn.execute(sql)
+            result = conn.execute(text(sql))
             df_disease_dist = pd.DataFrame(
                 result.fetchall(), columns=result.keys()
             )
@@ -261,7 +261,7 @@ class NotificationQueries:
         )
 
         with db_engine.connect() as conn:
-            result = conn.execute(sql)
+            result = conn.execute(text(sql))
             df_age_dist = pd.DataFrame(
                 result.fetchall(), columns=result.keys()
             )
@@ -310,7 +310,7 @@ class NotificationQueries:
         )
 
         with db_engine.connect() as conn:
-            result = conn.execute(sql)
+            result = conn.execute(text(sql))
             data = result.fetchall()
             columns = result.keys()
             df_age_gender_dist = pd.DataFrame(data, columns=columns)
@@ -370,7 +370,7 @@ class NotificationQueries:
         )
 
         with db_engine.connect() as conn:
-            result = conn.execute(sql)
+            result = conn.execute(text(sql))
             df_gender_dist = pd.DataFrame(
                 result.fetchall(), columns=result.keys()
             )
@@ -398,10 +398,9 @@ class NotificationQueries:
         )
 
         with db_engine.connect() as conn:
-            result = conn.execute(text(sql_text_query), **parameters)
-            df = pd.DataFrame(
-                result.fetchall(), columns=["ano_notif", "se_notif", "casos"]
-            )
+
+            result = conn.execute(text(sql_text_query), parameters)
+            df = pd.DataFrame(result.fetchall(), columns=result.keys())
             return pd.crosstab(
                 df["ano_notif"], df["se_notif"], df["casos"], aggfunc="sum"
             ).T

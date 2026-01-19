@@ -7,6 +7,7 @@ from collections import OrderedDict, defaultdict
 from copy import deepcopy
 from datetime import timedelta
 from pathlib import Path, PurePath
+from typing import Any
 
 import altair as alt
 import fiona
@@ -68,7 +69,7 @@ from .models import City
 def get_static(static_dir):
     if not settings.DEBUG:
         return Path(static(static_dir))
-    _app_dir = settings.BASE_DIR
+    _app_dir = settings.APP_DIRS
     path_to_find = PurePath(find(static_dir))
     return str(path_to_find.relative_to(_app_dir))
 
@@ -298,70 +299,98 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
         super().get_context_data(**kwargs)
         return super().dispatch(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        chart_alerts = AlertCitiesCharts()
-        codes_uf = {v: k for k, v in UF_CODES.items()}
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        """
+        Build the template context.
 
+        Parameters
+        ----------
+        **kwargs
+            Context kwargs.
+
+        Returns
+        -------
+        dict[str, Any]
+            Template context.
+        """
+        context = super().get_context_data(**kwargs)
+
+        chart_alerts = AlertCitiesCharts()
         disease_code = context["disease"]
         disease_label = _get_disease_label(disease_code)
-        geocode = context["geocodigo"]
-        last_SE = get_last_SE()
-        regionals = ReportState.get_regional_by_state(
-            codes_uf[int(str(geocode)[:2])]
-        )
+
+        geocode = int(context["geocodigo"])
+        last_se = get_last_SE()
+        year_week = str(int(str(last_se)))
+
+        codes_uf = {v: k for k, v in UF_CODES.items()}
+        uf_code = codes_uf.get(int(str(geocode)[:2]))
+
+        regionals = ReportState.get_regional_by_state(uf_code)
         regional_id = regionals.loc[
-            regionals["municipio_geocodigo"] == int(geocode), "id_regional"
+            regionals["municipio_geocodigo"] == int(geocode),
+            "id_regional",
         ].iloc[0]
-        regional_geocodes = regionals[regionals["id_regional"] == regional_id][
-            "municipio_geocodigo"
+
+        regional_geocodes = regionals.loc[
+            regionals["id_regional"] == regional_id,
+            "municipio_geocodigo",
         ].tolist()
-        alerta = {}
-        series_casos = {}
-        casos_por_ap = {}
-        cities_info = {}
-        bairros = {}
 
-        # Fetch forecast epiweek reference
+        alerta: dict[int, Any] = {}
+        series_casos: dict[int, Any] = {}
+        casos_por_ap: dict[int, int] = {}
+        cities_info: dict[int, dict[str, Any]] = {}
+        bairros: dict[int, str] = {}
+
+        cid10 = CID10[disease_code]
         forecast_date_min, forecast_date_max = Forecast.get_min_max_date(
-            geocode=geocode, cid10=CID10[disease_code]
+            geocode=geocode,
+            cid10=cid10,
         )
-        forecast_date_ref = self._get("ref", forecast_date_max)
 
-        if forecast_date_ref is None:
+        if not forecast_date_max:
+            forecast_date_ref = None
             epiweek = None
         else:
-            epiweek = episem(forecast_date_ref).replace("W", "")
+            forecast_date_ref = self._get("ref", forecast_date_max)
+            if not forecast_date_ref:
+                epiweek = None
+            else:
+                epiweek = episem(forecast_date_ref).replace("W", "")
 
         for geocode_ in regional_geocodes:
             city_info = cache.get(f"city_info:{geocode_}")
             if city_info is None:
                 city_info = get_city_info(geocode_)
                 cache.set(f"city_info:{geocode_}", city_info, 60 * 60 * 24)
-            cities_info[geocode_] = city_info
+            cities_info[int(geocode_)] = city_info
 
-            if geocode_ == int(geocode):
+            if int(geocode_) == int(geocode):
                 continue
 
-            (alert, SE, case_series, nivel, *_) = get_city_alert(
-                geocode_, disease_code
+            (alert, _se, case_series, nivel, *_) = get_city_alert(
+                geocode_,
+                disease_code,
             )
-            alerta[geocode_] = alert
-            casos_por_ap[geocode_] = int(case_series[-1])
-            series_casos[geocode_] = list(zip(case_series[-12:], nivel[-12:]))
-            bairros[geocode_] = city_info["nome"]
+            alerta[int(geocode_)] = alert
+            casos_por_ap[int(geocode_)] = int(case_series[-1])
+            series_casos[int(geocode_)] = list(
+                zip(case_series[-12:], nivel[-12:])
+            )
+            bairros[int(geocode_)] = city_info["nome"]
 
         city_info = cities_info[int(geocode)]
 
         (
             alert,
-            SE,
+            _se,
             case_series,
             nivel,
             last_year,
             observed_cases,
             min_max_est,
-            dia,
+            _dia,
             prt1,
         ) = get_city_alert(geocode, disease_code)
 
@@ -380,34 +409,29 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
             total_series = [(0, 0)]
             total_observed_series = [0]
 
-        try:
-            city_chart = chart_alerts.create_alert_chart(
-                geocode,
-                city_info["nome"],
-                disease_label,
-                disease_code,
-                epiweek,
-            )
-        except ValueError:
-            context = {
-                "message": _(
-                    "A doença {} não está registrada "
-                    "em nosso banco de dados para o município de {}."
-                ).format(disease_label, city_info["nome"])
-            }
-            self.template_name = "error.html"
-            return context
+        city_chart = chart_alerts.create_alert_chart(
+            geocode,
+            city_info["nome"],
+            disease_label,
+            disease_code,
+            epiweek,
+        )
+
+        state_name = city_info["uf"]
+        state_abv = STATE_INITIAL[state_name]
 
         context.update(
             {
-                "geocodigo": geocode,  # legacy
+                "geocodigo": geocode,
                 "geocode": geocode,
-                "state": city_info["uf"],
-                "state_abv": STATE_INITIAL[city_info["uf"]],
+                "state": state_abv,
+                "state_abv": state_abv,
+                "state_name": state_name,
+                "year_week": year_week,
                 "nome": city_info["nome"],
                 "populacao": city_info["populacao"],
                 "incidencia": (case_series[-1] / city_info["populacao"])
-                * 100000,  # casos/100000
+                * 100000,
                 "casos_por_ap": json.dumps(casos_por_ap),
                 "alerta": alerta,
                 "prt1": prt1 * 100,
@@ -416,10 +440,10 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
                 "min_est": min_max_est[0],
                 "max_est": min_max_est[1],
                 "series_casos": json.dumps(series_casos),
-                "SE": int(str(last_SE)),
-                "WEEK": str(last_SE.week),
-                "data1": last_SE.startdate(),
-                "data2": last_SE.enddate(),
+                "SE": int(str(last_se)),
+                "WEEK": str(last_se.week),
+                "data1": last_se.startdate(),
+                "data2": last_se.enddate(),
                 "last_year": last_year,
                 "look_back": len(total_series),
                 "total_series": json.dumps(total_series),
@@ -434,12 +458,12 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
                 "forecast_date_max": forecast_date_max,
                 "epiweek": epiweek,
                 "geojson_urls": [
-                    f"/static/geojson/{geocode}.json"
-                    for geocode in regional_geocodes
+                    f"/static/geojson/{g}.json" for g in regional_geocodes
                 ],
                 "chart_alert": city_chart,
             }
         )
+
         return context
 
 
@@ -1144,7 +1168,9 @@ class ReportCityView(TemplateView):
         for df in [df_dengue, df_chik, df_zika]:
             result = df[df.index == last_year_week]
             if not result.empty:
-                disease_last_code.append(float(result["level_code"]))
+                value = result["level_code"].iloc[0]
+                if not pd.isna(value):
+                    disease_last_code.append(float(value))
 
         max_alert_code = int(np.nanmax(disease_last_code))
         max_alert_color = ALERT_COLOR[max_alert_code]
@@ -1292,41 +1318,38 @@ class ReportStateView(TemplateView):
 
 class AlertaStateView(TemplateView):
     template_name = "state_cities.html"
-
     _state_name = STATE_NAME
 
     def get_context_data(self, **kwargs):
-        """
-        :param kwargs:
-        :return:
-        """
-        context = super(AlertaStateView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
 
         cities_alert = NotificationResume.get_cities_alert_by_state(
-            self._state_name[context["state"]], context["disease"]
+            self._state_name[context["state"]],
+            context["disease"],
         )
 
         last_update = get_last_SE().enddate()
         alerts = dict(
             cities_alert[["municipio_geocodigo", "level_alert"]].values
         )
-
         mun_dict = dict(cities_alert[["municipio_geocodigo", "nome"]].values)
-
         mun_dict_ordered = OrderedDict(
             sorted(mun_dict.items(), key=lambda v: v[1])
         )
-
         geo_ids = list(mun_dict.keys())
 
-        if len(geo_ids) > 0:
-            cases_series_last_12 = (
-                NotificationResume.tail_estimated_cases(  # noqa: E501
-                    geo_ids, 12
-                )
-            )
+        if geo_ids:
+            df = NotificationResume.tail_estimated_cases(geo_ids, 12)
+            if isinstance(df, pd.DataFrame) and not df.empty:
+                df = df.sort_values(["municipio_geocodigo", "data_iniSE"])
+                case_series = {
+                    int(k): g["casos_est"].tolist()
+                    for k, g in df.groupby("municipio_geocodigo", sort=False)
+                }
+            else:
+                case_series = {}
         else:
-            cases_series_last_12 = {}
+            case_series = {}
 
         context.update(
             {
@@ -1338,8 +1361,7 @@ class AlertaStateView(TemplateView):
                 "mun_dict_ordered": mun_dict_ordered,
                 "geo_ids": geo_ids,
                 "alerts_level": alerts,
-                # estimated cases is used to show a chart of the last 12 events
-                "case_series": cases_series_last_12,
+                "case_series": case_series,
                 "disease_label": context["disease"].title(),
                 "last_update": last_update,
                 "SE": Week.fromdate(last_update),
