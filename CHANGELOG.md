@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.2.5](https://github.com/AlertaDengue/AlertaDengue/compare/4.2.4...4.2.5) (2026-01-21)
+
+### Bug Fixes
+
+* **sqlalchemy:** replace string SQL execution with executable statements ([#825](https://github.com/AlertaDengue/AlertaDengue/issues/825)) ([01e57c4](https://github.com/AlertaDengue/AlertaDengue/commit/01e57c4249dd39704cdee8bd79a3baeff6bab42d))
+
 ## [4.2.4](https://github.com/AlertaDengue/AlertaDengue/compare/4.2.3...4.2.4) (2026-01-08)
 
 ### Bug Fixes
