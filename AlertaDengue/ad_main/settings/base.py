@@ -177,29 +177,27 @@ def get_sqla_conn(psql_db: Optional[str] = None) -> Engine:
     return create_engine(dsn, pool_pre_ping=True, future=True)
 
 
-def get_ibis_conn(
-    psql_db: Optional[str] = None,
-) -> ibis.backends.base.BaseBackend:
-    """Create an Ibis PostgreSQL backend connection.
+_IBIS_CONN: Optional[ibis.backends.postgres.Backend] = None
 
-    Parameters
-    ----------
-    psql_db : str or None, optional
-        Database name to connect to. If None, uses ``PSQL_DB``.
 
-    Returns
-    -------
-    ibis.backends.base.BaseBackend
-        Ibis backend connection to the requested PostgreSQL database.
-    """
-    db_name = psql_db or PSQL_DB
-    return ibis.postgres.connect(
-        host=PSQL_HOST,
-        port=PSQL_PORT,
-        user=PSQL_USER,
-        password=PSQL_PASSWORD,
-        database=db_name,
+def get_ibis_conn() -> ibis.backends.postgres.Backend:
+    global _IBIS_CONN
+
+    if _IBIS_CONN is not None:
+        try:
+            _IBIS_CONN.raw_sql("SELECT 1")
+            return _IBIS_CONN
+        except Exception:
+            _IBIS_CONN = None
+
+    _IBIS_CONN = ibis.postgres.connect(
+        user=os.getenv("PSQL_USER"),
+        password=os.getenv("PSQL_PASSWORD"),
+        host=os.getenv("PSQL_HOST"),
+        port=os.getenv("PSQL_PORT"),
+        database=os.getenv("PSQL_DB"),
     )
+    return _IBIS_CONN
 
 
 DB_ENGINE: Engine = get_sqla_conn()
