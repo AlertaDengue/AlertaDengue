@@ -82,8 +82,14 @@ COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/entrypoint.sh  /opt/en
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/runwsgi.sh /opt/runwsgi.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/test.sh /opt/services/test.sh
 
-
 RUN chmod +x /opt/runwsgi.sh \
   && chmod +x /opt/entrypoint.sh \
   && chmod +x /opt/runcelery.sh \
-  && echo "source /opt/entrypoint.sh" > ~/.bashrc
+  && printf '%s\n' \
+     'if [ -f /opt/conda/etc/profile.d/conda.sh ]; then' \
+     '  . /opt/conda/etc/profile.d/conda.sh' \
+     '  conda activate alertadengue' \
+     'fi' > /home/deploy/.bashrc
+
+ENTRYPOINT ["tini", "--", "/opt/entrypoint.sh"]
+CMD ["bash", "/opt/runwsgi.sh"]

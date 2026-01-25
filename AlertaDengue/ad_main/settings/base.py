@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Any, Final, Optional
+from typing import Any, Optional
 
 import ibis
 from django.contrib.messages import constants as messages
@@ -52,10 +52,11 @@ def read_admins(value: str) -> tuple[tuple[str, str], ...]:
     return tuple(pairs)
 
 
-BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
-
-APPS_DIR = BASE_DIR / "AlertaDengue"
-
+# /opt/services/AlertaDengue/ad_main/settings/base.py
+# parent.parent.parent.parent == /opt/services
+BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent.parent
+# APP_DIRS = BASE_DIR / "AlertaDengue"
+PROJECT_ROOT = BASE_DIR / "AlertaDengue"
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALLOWED_HOSTS = (
@@ -64,20 +65,19 @@ ALLOWED_HOSTS = (
 ADMINS = read_admins(os.getenv("ADMINS", ""))
 
 MAINTENANCE_MODE = os.getenv("MAINTENANCE", "False").lower() == "true"
-MAINTENANCE_MODE_TEMPLATE = str(APPS_DIR / "dados/templates/503.html")
+MAINTENANCE_MODE_TEMPLATE = str(PROJECT_ROOT / "dados/templates/503.html")
 
 TIME_ZONE = "America/Sao_Paulo"
 LANGUAGE_CODE = "pt-br"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-LOCALE_PATHS = [str(APPS_DIR / "locale")]
+LOCALE_PATHS = [str(PROJECT_ROOT / "locale")]
 LANGUAGES = (
     ("pt-br", "Português"),
     ("en-us", "English"),
     ("es", "Spanish"),
 )
-
 
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -113,7 +113,6 @@ LOCAL_APPS = [
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 BASE_MIDDLEWARE: list[str] = [
-    "django.middleware.gzip.GZipMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
@@ -133,7 +132,6 @@ MESSAGE_TAGS = {
     messages.ERROR: "alert-danger",
 }
 
-
 CHUNKED_UPLOAD_PATH = "uploaded/chunked_uploads/%Y/%m/%d"
 
 
@@ -145,7 +143,6 @@ class DBFSINANStorage(FileSystemStorage):
 
 
 CHUNKED_UPLOAD_STORAGE_CLASS = DBFSINANStorage
-
 
 ROOT_URLCONF = "ad_main.urls"
 WSGI_APPLICATION = "ad_main.wsgi.application"
@@ -180,29 +177,27 @@ def get_sqla_conn(psql_db: Optional[str] = None) -> Engine:
     return create_engine(dsn, pool_pre_ping=True, future=True)
 
 
-def get_ibis_conn(
-    psql_db: Optional[str] = None,
-) -> ibis.backends.base.BaseBackend:
-    """Create an Ibis PostgreSQL backend connection.
+_IBIS_CONN: Optional[ibis.backends.postgres.Backend] = None
 
-    Parameters
-    ----------
-    psql_db : str or None, optional
-        Database name to connect to. If None, uses ``PSQL_DB``.
 
-    Returns
-    -------
-    ibis.backends.base.BaseBackend
-        Ibis backend connection to the requested PostgreSQL database.
-    """
-    db_name = psql_db or PSQL_DB
-    return ibis.postgres.connect(
-        host=PSQL_HOST,
-        port=PSQL_PORT,
-        user=PSQL_USER,
-        password=PSQL_PASSWORD,
-        database=db_name,
+def get_ibis_conn() -> ibis.backends.postgres.Backend:
+    global _IBIS_CONN
+
+    if _IBIS_CONN is not None:
+        try:
+            _IBIS_CONN.raw_sql("SELECT 1")
+            return _IBIS_CONN
+        except Exception:
+            _IBIS_CONN = None
+
+    _IBIS_CONN = ibis.postgres.connect(
+        user=os.getenv("PSQL_USER"),
+        password=os.getenv("PSQL_PASSWORD"),
+        host=os.getenv("PSQL_HOST"),
+        port=os.getenv("PSQL_PORT"),
+        database=os.getenv("PSQL_DB"),
     )
+    return _IBIS_CONN
 
 
 DB_ENGINE: Engine = get_sqla_conn()
@@ -257,7 +252,6 @@ DATABASES = {
 MIGRATION_MODULES = {"dados": None, "gis": None, "api": None}
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False
 SECURE_BROWSER_XSS_FILTER = True
@@ -303,10 +297,10 @@ EMAIL_FROM_USER = os.getenv("EMAIL_FROM_USER")
 EMAIL_TO_ADDRESS = os.getenv("EMAIL_TO_ADDRESS")
 EMAIL_OUTLOOK_USER = os.getenv("EMAIL_OUTLOOK_USER")
 
-
 STATIC_ROOT = str(BASE_DIR / "staticfiles")
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [str(BASE_DIR / "static")]
+
+STATICFILES_DIRS = [str(PROJECT_ROOT / "static")]
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
@@ -317,7 +311,7 @@ DBF_SINAN = os.getenv("DBF_SINAN")
 MEDIA_ROOT = os.getenv("MEDIA_ROOT")
 IMPORTED_FILES = os.getenv("IMPORTED_FILES")
 TEMP_FILES_DIR = os.getenv("TEMP_FILES_DIR")
-DATA_DIR = APPS_DIR.parent.parent / os.getenv("STORAGE", "")
+DATA_DIR = PROJECT_ROOT.parent.parent / os.getenv("STORAGE", "")
 
 
 def build_templates(debug: bool) -> list[dict[str, Any]]:
@@ -349,7 +343,8 @@ def build_templates(debug: bool) -> list[dict[str, Any]]:
 
     config: dict[str, Any] = {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [str(BASE_DIR / "templates")],
+        # main change: use project root templates dir
+        "DIRS": [str(PROJECT_ROOT / "templates")],
         "APP_DIRS": True,
         "OPTIONS": base_options,
     }
@@ -388,7 +383,6 @@ RASTER_METEROLOGICAL_DATA_RANGE = {
 RASTER_METEROLOGICAL_FACTOR_INCREASE = os.getenv(
     "RASTER_METEROLOGICAL_FACTOR_INCREASE"
 )
-
 
 MEMCACHED_HOST = os.getenv("MEMCACHED_HOST")
 MEMCACHED_PORT = os.getenv("MEMCACHED_PORT")
@@ -454,7 +448,6 @@ LOGGING = {
     },
 }
 
-
 broker_url = os.getenv("CELERY_BROKER_URL")
 broker_connection_retry = True
 broker_connection_retry_on_startup = True
@@ -487,7 +480,6 @@ BOOTSTRAP4 = {
     }
 }
 
-
 LEAFLET_CONFIG = {
     "DEFAULT_CENTER": (-22.907000, -43.431000),
     "DEFAULT_ZOOM": 8,
@@ -517,12 +509,10 @@ LEAFLET_CONFIG = {
     "RESET_VIEW": False,
 }
 
-
 MINIO_ENDPOINT = os.getenv("MINIO_ENDPOINT")
 MINIO_ROOT_USER = os.getenv("MINIO_ROOT_USER")
 MINIO_ROOT_PASSWORD = os.getenv("MINIO_ROOT_PASSWORD")
 MINIO_BUCKET_NAME = os.getenv("MINIO_BUCKET_NAME")
-
 
 SENTRY_DSN = os.getenv("SENTRY_DSN", default=None)
 if SENTRY_DSN:
@@ -531,7 +521,6 @@ if SENTRY_DSN:
         integrations=[DjangoIntegration()],
         send_default_pii=True,
     )
-
 
 PWA_APP_NAME = (
     "InfoDengue – Early warning system for arbovirus transmission "
@@ -565,5 +554,5 @@ PWA_APP_SCOPE = "/"
 PWA_APP_ORIENTATION = "portrait"
 PWA_APP_STATUS_BAR_COLOR = "#469ad3"
 
-PWA_SERVICE_WORKER_PATH = BASE_DIR / "static" / "js" / "serviceworker.js"
-PWA_APP_MANIFEST_FILE = BASE_DIR / "templates" / "manifest.json"
+PWA_SERVICE_WORKER_PATH = PROJECT_ROOT / "static" / "js" / "serviceworker.js"
+PWA_APP_MANIFEST_FILE = PROJECT_ROOT / "templates" / "manifest.json"

@@ -32,7 +32,7 @@ from .models import City
 logger = logging.getLogger(__name__)
 
 DB_ENGINE = settings.DB_ENGINE
-IBIS_CONN = settings.IBIS_CONN
+IBIS_CONN_FACTORY = settings.IBIS_CONN_FACTORY
 
 CID10 = {"dengue": "A90", "chikungunya": "A92.0", "zika": "A928"}
 DISEASES_SHORT = ["dengue", "chik", "zika"]
@@ -75,7 +75,7 @@ STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
 MAP_CENTER = {k: v[1] for k, v in ALL_STATE_NAMES.items()}
 MAP_ZOOM = {k: v[2] for k, v in ALL_STATE_NAMES.items()}
 
-with open(settings.BASE_DIR / "data" / "municipalities.json", "r") as muns:
+with open(settings.PROJECT_ROOT / "data" / "municipalities.json", "r") as muns:
     _mun_decoded = muns.read().encode().decode("utf-8-sig")
     MUNICIPALITIES = json.loads(_mun_decoded)
 
@@ -109,7 +109,9 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
 
     if res is None:
         _disease = get_disease_suffix(disease, empty_for_dengue=False)
-        table_hist_uf = IBIS_CONN.table(f"hist_uf{_disease}_materialized_view")
+        table_hist_uf = IBIS_CONN_FACTORY().table(
+            f"hist_uf{_disease}_materialized_view"
+        )
 
         res = (
             table_hist_uf[table_hist_uf.state_abbv == state_abbv]
@@ -144,19 +146,19 @@ class RegionalParameters:
             A tuple with Ibis tables in this order:
             (parameters, municipio, estado, regional).
         """
-        t_parameters = IBIS_CONN.table(
+        t_parameters = IBIS_CONN_FACTORY().table(
             "parameters",
             database=cls.SCHEMA,
         )
-        t_municipio = IBIS_CONN.table(
+        t_municipio = IBIS_CONN_FACTORY().table(
             "Municipio",
             database=cls.SCHEMA,
         )
-        t_estado = IBIS_CONN.table(
+        t_estado = IBIS_CONN_FACTORY().table(
             "estado",
             database=cls.SCHEMA,
         )
-        t_regional = IBIS_CONN.table(
+        t_regional = IBIS_CONN_FACTORY().table(
             "regional",
             database=cls.SCHEMA,
         )
@@ -1330,7 +1332,7 @@ class ReportCity:
         if disease != "dengue":
             table_suffix = get_disease_suffix(disease)  # F'_{disease}'
 
-        t_hist = IBIS_CONN.table(
+        t_hist = IBIS_CONN_FACTORY().table(
             name=f"Historico_alerta{table_suffix}",
             database=settings.PSQL_DB,
             schema="Municipio",
@@ -1434,7 +1436,7 @@ class ReportState:
         if disease != "dengue":
             table_suffix = get_disease_suffix(disease)  # F'_{disease}'
 
-        t_hist = IBIS_CONN.table(
+        t_hist = IBIS_CONN_FACTORY().table(
             name=f"Historico_alerta{table_suffix}",
             database=settings.PSQL_DB,
             schema="Municipio",

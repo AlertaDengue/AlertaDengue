@@ -6,12 +6,13 @@ import pandas as pd
 from dados.dbdata import CID10, STATE_NAME, get_disease_suffix  # noqa:F401
 
 # local
+# from ad_main.settings.base import get_ibis_conn
 from django.conf import settings
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 
 DB_ENGINE = settings.DB_ENGINE
-IBIS_CONN = settings.IBIS_CONN
+IBIS_CONN_FACTORY = settings.IBIS_CONN_FACTORY
 
 
 class NotificationQueries:
@@ -497,7 +498,7 @@ class AlertCity:
 
         # schema_city = IBIS_CONN.schema("Municipio")
         # t_hist = schema_city.table(f"Historico_alerta{table_suffix}")
-        t_hist = IBIS_CONN.table(
+        t_hist = IBIS_CONN_FACTORY().table(
             name=f"Historico_alerta{get_disease_suffix(disease)}",
             database=settings.PSQL_DB,
             schema="Municipio",
