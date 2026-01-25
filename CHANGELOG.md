@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.2.6](https://github.com/AlertaDengue/AlertaDengue/compare/4.2.5...4.2.6) (2026-01-25)
+
+### Bug Fixes
+
+* **env:** align dev/staging/prod settings and staging compose vars ([#821](https://github.com/AlertaDengue/AlertaDengue/issues/821)) ([6ecee0b](https://github.com/AlertaDengue/AlertaDengue/commit/6ecee0b65f1146c109083f12ae8b01a4b11a1514))
+
 ## [4.2.5](https://github.com/AlertaDengue/AlertaDengue/compare/4.2.4...4.2.5) (2026-01-21)
 
 ### Bug Fixes
