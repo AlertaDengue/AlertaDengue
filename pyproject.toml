@@ -73,6 +73,7 @@ mypy = "^0.991"
 pre-commit = "^2.21.0"
 pytest = "^7.2.1"
 bpython = "^0.24"
+pydantic = "^2.12.5"
 
 [build-system]
 requires = ["poetry-core>=1.9.0"]
