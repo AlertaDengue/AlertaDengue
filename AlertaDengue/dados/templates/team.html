@@ -88,7 +88,17 @@
       </ul>
       <b>{% translate "Oportunidade" %}:</b>
       <ul>
-        <li>{% translate "No momento não temos posições abertas, mas se você tem formação em ciência de dados, tem conhecimento de R ou Python, e tem interesse em colaborar com o Infodengue, mande seu currículo" %}.
+        <li>
+          {% blocktrans trimmed %}
+          O infodengue está com uma vaga aberta para profissional com experiência em 
+          ciência de dados em saúde e programação R. 
+          Mais informações podem ser acessadas no 
+          {% endblocktrans %}
+          <a href="{% static 'docs/processo_seletivo_infodengue_2026_vagaDevR.pdf' %}"
+            target="_blank"
+            rel="noopener">
+            {% translate "edital" %}.
+          </a>
         </li>
       </ul>
 

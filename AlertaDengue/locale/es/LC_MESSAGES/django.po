@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-26 11:14-0300\n"
+"POT-Creation-Date: 2026-01-26 17:14-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2927,17 +2927,21 @@ msgstr "FNS/MS (2020-2021)"
 msgid "Oportunidade"
 msgstr "Oportunidades"
 
-#: dados/templates/team.html:91
+#: dados/templates/team.html:92
 msgid ""
-"No momento não temos posições abertas, mas se você tem formação em ciência "
-"de dados, tem conhecimento de R ou Python, e tem interesse em colaborar com "
-"o Infodengue, mande seu currículo"
+"O infodengue está com uma vaga aberta para profissional com experiência em "
+"ciência de dados em saúde e programação R. Mais informações podem ser "
+"acessadas no"
 msgstr ""
-"Por el momento no tenemos puestos vacantes, pero si tienes experiencia en "
-"ciencia de datos, tienes conocimientos de R o Python y estás interesado en "
-"colaborar con Infodengue, envía tu currículum"
+"InfoDengue tiene una vacante abierta para un/a profesional con experiencia "
+"en ciencia de datos en salud y programación R. Más información está "
+"disponible en la "
 
-#: dados/templates/team.html:96
+#: dados/templates/team.html:100
+msgid "edital"
+msgstr "convocatoria"
+
+#: dados/templates/team.html:106
 msgid ""
 "Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta "
 "Info Dengue?"
@@ -2945,41 +2949,33 @@ msgstr ""
 " ¿Le gustaría obtener más información o hacer preguntas sobre el Sistema de "
 "Alerta Info Dengue? "
 
-#: dados/templates/team.html:97
+#: dados/templates/team.html:107
 msgid "Entre em contato conosco"
 msgstr "Contáctenos"
 
-#: dados/views.py:394
-msgid ""
-"A doença {} não está registrada em nosso banco de dados para o município de "
-"{}."
-msgstr ""
-"La enfermedad {} no está registrada en nuestra base de datos para el "
-"municipio de {}."
-
-#: dados/views.py:993
+#: dados/views.py:1017
 msgid "°C temperatura mínima"
 msgstr "°C temperatura mínima"
 
-#: dados/views.py:994
+#: dados/views.py:1018
 msgid "°C temperatura média"
 msgstr "°C temperatura media"
 
-#: dados/views.py:995
+#: dados/views.py:1019
 msgid "°C temperatura máxima"
 msgstr "°C temperatura máxima"
 
-#: dados/views.py:996
+#: dados/views.py:1020
 #, python-format
 msgid "% umidade mínima do ar"
 msgstr "% humedad mínima del aire"
 
-#: dados/views.py:997
+#: dados/views.py:1021
 #, python-format
 msgid "% umidade média do ar"
 msgstr "% humedad media del aire"
 
-#: dados/views.py:998
+#: dados/views.py:1022
 #, python-format
 msgid "% umidade máxima do ar"
 msgstr "% humedad máxima del aire"
@@ -3016,16 +3012,16 @@ msgstr ""
 msgid "Dados do SINAN recebidos"
 msgstr ""
 
-#: dbf/templates/dbf_all_upload.html:11 dbf/templates/dbf_upload.html:181
+#: dbf/templates/dbf_all_upload.html:11 dbf/templates/dbf_upload.html:220
 #: dbf/templates/upload_successful.html:10
 msgid "Ultimos arquivos enviados:"
 msgstr ""
 
-#: dbf/templates/dbf_upload.html:67
+#: dbf/templates/dbf_upload.html:65
 msgid "Envie aqui os dados atualizados do SINAN"
 msgstr ""
 
-#: dbf/templates/dbf_upload.html:174
+#: dbf/templates/dbf_upload.html:213
 msgid "Enviar"
 msgstr ""
 
@@ -3330,6 +3326,22 @@ msgstr ""
 #: upload/templates/sinan/status.html:31 upload/templates/sinan/status.html:44
 msgid "Task duration"
 msgstr ""
+
+#~ msgid ""
+#~ "No momento não temos posições abertas, mas se você tem formação em "
+#~ "ciência de dados, tem conhecimento de R ou Python, e tem interesse em "
+#~ "colaborar com o Infodengue, mande seu currículo"
+#~ msgstr ""
+#~ "Por el momento no tenemos puestos vacantes, pero si tienes experiencia en "
+#~ "ciencia de datos, tienes conocimientos de R o Python y estás interesado "
+#~ "en colaborar con Infodengue, envía tu currículum"
+
+#~ msgid ""
+#~ "A doença {} não está registrada em nosso banco de dados para o município "
+#~ "de {}."
+#~ msgstr ""
+#~ "La enfermedad {} no está registrada en nuestra base de datos para el "
+#~ "municipio de {}."
 
 #~ msgid "Instalar aplicativo"
 #~ msgstr "Instalar aplicación"
