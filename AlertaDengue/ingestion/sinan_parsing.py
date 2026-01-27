@@ -25,6 +25,38 @@ DT_COLS: list[str] = [
 ]
 
 
+import pandas as pd
+
+
+def enforce_epiweek_from_dt_notific(df: pd.DataFrame) -> pd.DataFrame:
+    """Derive (NU_ANO, SEM_NOT) from DT_NOTIFIC when DT_NOTIFIC is present.
+
+    Parameters
+    ----------
+    df
+        Chunk with SINAN columns. Must include ``DT_NOTIFIC``.
+        If ``NU_ANO`` / ``SEM_NOT`` exist, they will be overwritten for rows
+        where ``DT_NOTIFIC`` is not null.
+
+    Returns
+    -------
+    pd.DataFrame
+        Updated DataFrame.
+    """
+    if "DT_NOTIFIC" not in df.columns:
+        return df
+
+    dt = pd.to_datetime(df["DT_NOTIFIC"], errors="coerce")
+    mask = dt.notna()
+    if not mask.any():
+        return df
+
+    iso = dt.loc[mask].dt.isocalendar()
+    df.loc[mask, "NU_ANO"] = iso["year"].astype("Int64")
+    df.loc[mask, "SEM_NOT"] = iso["week"].astype("Int64")
+    return df
+
+
 def is_date_ambiguous(value: str) -> bool:
     """
     Determine if a date string is ambiguous for inferring its format.
@@ -141,25 +173,10 @@ def parse_chunk_to_sinan(
 ) -> tuple[pd.DataFrame, dict[str, str | None]]:
     """
     Apply date parsing + SINAN normalization for a chunk.
-
-    Parameters
-    ----------
-    df : pd.DataFrame
-        Chunk in SINAN source column names (ID_*, DT_*, etc).
-    default_cid : str
-        CID used when ID_AGRAVO is missing.
-    year : int
-        Year to fill NU_ANO when missing.
-    date_formats : dict[str, str | None]
-        Known date formats for DT_* columns.
-
-    Returns
-    -------
-    tuple[pd.DataFrame, dict[str, str | None]]
-        Normalized chunk and updated date_formats.
     """
     df, updated_formats = parse_dates_for_run(df, date_formats)
     df = parse_data(df, default_cid=default_cid, year=year)
+    df = enforce_epiweek_from_dt_notific(df)
     return df, updated_formats
 
 
