@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-26 11:14-0300\n"
+"POT-Creation-Date: 2026-01-26 17:14-0300\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2877,17 +2877,20 @@ msgstr ""
 msgid "Oportunidade"
 msgstr "Opportunity"
 
-#: dados/templates/team.html:91
+#: dados/templates/team.html:92
 msgid ""
-"No momento não temos posições abertas, mas se você tem formação em ciência "
-"de dados, tem conhecimento de R ou Python, e tem interesse em colaborar com "
-"o Infodengue, mande seu currículo"
+"O infodengue está com uma vaga aberta para profissional com experiência em "
+"ciência de dados em saúde e programação R. Mais informações podem ser "
+"acessadas no"
 msgstr ""
-"At the moment we do not have any open positions, but if you have a "
-"background in data science, have knowledge of R or Python, and are "
-"interested in collaborating with Infodengue, send us your resume"
+"InfoDengue has an open position for a professional with experience in health "
+"data science and R programming. More information is available in the "
 
-#: dados/templates/team.html:96
+#: dados/templates/team.html:100
+msgid "edital"
+msgstr "call for applications"
+
+#: dados/templates/team.html:106
 msgid ""
 "Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta "
 "Info Dengue?"
@@ -2895,41 +2898,35 @@ msgstr ""
 " Would like to know more about Infodengue? <a href=\"mailto:"
 "alerta_dengue@fiocruz.br\">"
 
-#: dados/templates/team.html:97
+#: dados/templates/team.html:107
 msgid "Entre em contato conosco"
 msgstr "Contact us"
 
-#: dados/views.py:394
-msgid ""
-"A doença {} não está registrada em nosso banco de dados para o município de "
-"{}."
-msgstr "This disease {} is not registered in our database for {} municipality"
-
-#: dados/views.py:993
+#: dados/views.py:1017
 msgid "°C temperatura mínima"
 msgstr "°C Minimum temperature"
 
-#: dados/views.py:994
+#: dados/views.py:1018
 msgid "°C temperatura média"
 msgstr "°C Average temperatures"
 
-#: dados/views.py:995
+#: dados/views.py:1019
 msgid "°C temperatura máxima"
 msgstr "°C Maximum temperature"
 
-#: dados/views.py:996
+#: dados/views.py:1020
 #, fuzzy, python-format
 #| msgid "% umidade mínima do ar"
 msgid "% umidade mínima do ar"
 msgstr "% Minimum air humidity"
 
-#: dados/views.py:997
+#: dados/views.py:1021
 #, fuzzy, python-format
 #| msgid "% umidade média do ar"
 msgid "% umidade média do ar"
 msgstr "% Average air humidity"
 
-#: dados/views.py:998
+#: dados/views.py:1022
 #, fuzzy, python-format
 #| msgid "% umidade máxima do ar"
 msgid "% umidade máxima do ar"
@@ -2967,16 +2964,16 @@ msgstr "Invalid DBF file"
 msgid "Dados do SINAN recebidos"
 msgstr "SINAN data received"
 
-#: dbf/templates/dbf_all_upload.html:11 dbf/templates/dbf_upload.html:181
+#: dbf/templates/dbf_all_upload.html:11 dbf/templates/dbf_upload.html:220
 #: dbf/templates/upload_successful.html:10
 msgid "Ultimos arquivos enviados:"
 msgstr "Last uploaded files:"
 
-#: dbf/templates/dbf_upload.html:67
+#: dbf/templates/dbf_upload.html:65
 msgid "Envie aqui os dados atualizados do SINAN"
 msgstr "Send here the updated SINAN data"
 
-#: dbf/templates/dbf_upload.html:174
+#: dbf/templates/dbf_upload.html:213
 msgid "Enviar"
 msgstr "Send"
 
@@ -3286,6 +3283,21 @@ msgstr ""
 #: upload/templates/sinan/status.html:31 upload/templates/sinan/status.html:44
 msgid "Task duration"
 msgstr ""
+
+#~ msgid ""
+#~ "No momento não temos posições abertas, mas se você tem formação em "
+#~ "ciência de dados, tem conhecimento de R ou Python, e tem interesse em "
+#~ "colaborar com o Infodengue, mande seu currículo"
+#~ msgstr ""
+#~ "At the moment we do not have any open positions, but if you have a "
+#~ "background in data science, have knowledge of R or Python, and are "
+#~ "interested in collaborating with Infodengue, send us your resume"
+
+#~ msgid ""
+#~ "A doença {} não está registrada em nosso banco de dados para o município "
+#~ "de {}."
+#~ msgstr ""
+#~ "This disease {} is not registered in our database for {} municipality"
 
 #~ msgid "Instalar aplicativo"
 #~ msgstr "Install application"
