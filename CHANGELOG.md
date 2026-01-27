@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.3.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.2.6...4.3.0) (2026-01-27)
+
+### Features
+
+* **team:** add job opening announcement and edital link in Opportunity section ([#833](https://github.com/AlertaDengue/AlertaDengue/issues/833)) ([18f13f3](https://github.com/AlertaDengue/AlertaDengue/commit/18f13f389206f467220bc8627949d284829e8a9e))
+
 ## [4.2.6](https://github.com/AlertaDengue/AlertaDengue/compare/4.2.5...4.2.6) (2026-01-25)
 
 ### Bug Fixes
