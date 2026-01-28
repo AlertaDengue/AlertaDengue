@@ -22,7 +22,12 @@ from .models import (
     sinan_upload_log_path,
     sinan_upload_path,
 )
-from .sinan.utils import chunk_gen, parse_data, parse_dates
+from .sinan.utils import (
+    _derive_epiweek_from_dt_notific,
+    chunk_gen,
+    parse_data,
+    parse_dates,
+)
 
 DB_ENGINE = settings.DB_ENGINE
 
@@ -191,8 +196,13 @@ def insert_chunk_to_temp_table(
     columns = list(sinan.COLUMNS.values())
 
     chunk = df_chunk.replace({pd.NA: None})
+    # chunk = parse_dates(chunk, sinan)
+    # chunk = parse_data(chunk, sinan.cid10, sinan.year)
+
     chunk = parse_dates(chunk, sinan)
     chunk = parse_data(chunk, sinan.cid10, sinan.year)
+    chunk = _derive_epiweek_from_dt_notific(chunk)
+
     existing_cols = [
         col for col in SINANUpload.REQUIRED_COLS if col in chunk.columns
     ]

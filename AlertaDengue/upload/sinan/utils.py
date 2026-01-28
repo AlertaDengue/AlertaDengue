@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime as dt
 from collections import Counter
 from typing import ForwardRef, Iterable, Iterator, Optional, Tuple, Union
@@ -155,6 +157,65 @@ def convert_data_types(col: pd.Series, dtype: type) -> pd.Series:
     return col
 
 
+def _parse_dt_notific_with_sem_not(
+    dt_notific: pd.Series,
+    sem_not: pd.Series,
+) -> pd.Series:
+    """
+    Parse DT_NOTIFIC resolving YYYY-MM-DD vs YYYY-DD-MM using SEM_NOT (YYYYWW).
+
+    Parameters
+    ----------
+    dt_notific
+        Raw DT_NOTIFIC column.
+    sem_not
+        Raw SEM_NOT column (expected YYYYWW, may be string/int).
+
+    Returns
+    -------
+    pd.Series
+        Parsed dates as python ``datetime.date`` (or None).
+    """
+    dt_raw = dt_notific.astype(str).str.strip().replace({"": pd.NA})
+    sem_raw = sem_not.astype(str).str.replace(r"\D", "", regex=True)
+
+    sem_y = pd.to_numeric(sem_raw.str.slice(0, 4), errors="coerce")
+    sem_w = pd.to_numeric(sem_raw.str.slice(4, 6), errors="coerce")
+
+    a = pd.to_datetime(dt_raw, format="%Y-%m-%d", errors="coerce").dt.date
+    b = pd.to_datetime(dt_raw, format="%Y-%d-%m", errors="coerce").dt.date
+
+    mask = sem_y.notna() & sem_w.notna() & a.notna() & b.notna() & (a != b)
+    if not bool(mask.any()):
+        return a.where(a.notna(), None)
+
+    idx = a.index[mask]
+
+    def epi_yw(d: dt.date) -> tuple[int, int]:
+        w = Week.fromdate(d)
+        return int(w.year), int(w.week)
+
+    a_list = a.loc[idx].tolist()
+    b_list = b.loc[idx].tolist()
+
+    a_yw = [epi_yw(d) for d in a_list]
+    b_yw = [epi_yw(d) for d in b_list]
+
+    a_y = pd.Series([x[0] for x in a_yw], index=idx)
+    a_w = pd.Series([x[1] for x in a_yw], index=idx)
+    b_y = pd.Series([x[0] for x in b_yw], index=idx)
+    b_w = pd.Series([x[1] for x in b_yw], index=idx)
+
+    match_a = (a_y == sem_y.loc[idx]) & (a_w == sem_w.loc[idx])
+    match_b = (b_y == sem_y.loc[idx]) & (b_w == sem_w.loc[idx])
+
+    choose_b = match_b & ~match_a
+
+    out = a.copy()
+    out.loc[idx[choose_b]] = b.loc[idx[choose_b]]
+    return out.where(out.notna(), None)
+
+
 def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
     dt_cols = [
         "DT_SIN_PRI",
@@ -175,16 +236,24 @@ def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
     if df.empty:
         return df
 
+    if "DT_NOTIFIC" in df.columns and "SEM_NOT" in df.columns:
+        df["DT_NOTIFIC"] = _parse_dt_notific_with_sem_not(
+            df["DT_NOTIFIC"],
+            df["SEM_NOT"],
+        )
+
     for dt_col in dt_cols:
         fmt = None
         if dt_col in df.columns:
+            if dt_col == "DT_NOTIFIC":
+                continue
             if df[dt_col].dtype == "object":
                 fmt = infer_date_format(df[dt_col])
                 formats[dt_col] = fmt
             df[dt_col] = convert_date(df[dt_col], fmt)
 
     for col, fmt in formats.items():
-        if not col in sinan_formats:
+        if col not in sinan_formats:
             sinan_formats[col] = fmt
 
         if not sinan_formats[col]:
@@ -203,6 +272,35 @@ def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
     if sinan.date_formats != sinan_formats:
         sinan.date_formats = sinan_formats
         sinan.save()
+    return df
+
+
+def _derive_epiweek_from_dt_notific(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Enforce (NU_ANO, SEM_NOT) derived from DT_NOTIFIC when present.
+
+    Parameters
+    ----------
+    df
+        Chunk dataframe after parsing.
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe with consistent NU_ANO and SEM_NOT.
+    """
+    if "DT_NOTIFIC" not in df.columns:
+        return df
+
+    dt_ts = pd.to_datetime(df["DT_NOTIFIC"], errors="coerce")
+    iso = dt_ts.dt.isocalendar()
+    mask = dt_ts.notna()
+
+    if "NU_ANO" in df.columns:
+        df.loc[mask, "NU_ANO"] = iso.year.astype("Int64")[mask]
+    if "SEM_NOT" in df.columns:
+        df.loc[mask, "SEM_NOT"] = iso.week.astype("Int64")[mask]
+
     return df
 
 
