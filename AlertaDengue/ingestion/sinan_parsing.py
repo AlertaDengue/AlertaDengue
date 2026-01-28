@@ -6,7 +6,6 @@ from typing import Iterable
 
 import pandas as pd
 from dateutil.parser import parse
-from epiweeks import Week
 from pandas.tseries.api import guess_datetime_format
 from upload.sinan.utils import parse_data
 
@@ -25,45 +24,13 @@ DT_COLS: list[str] = [
 ]
 
 
-import pandas as pd
-
-
-def enforce_epiweek_from_dt_notific(df: pd.DataFrame) -> pd.DataFrame:
-    """Derive (NU_ANO, SEM_NOT) from DT_NOTIFIC when DT_NOTIFIC is present.
-
-    Parameters
-    ----------
-    df
-        Chunk with SINAN columns. Must include ``DT_NOTIFIC``.
-        If ``NU_ANO`` / ``SEM_NOT`` exist, they will be overwritten for rows
-        where ``DT_NOTIFIC`` is not null.
-
-    Returns
-    -------
-    pd.DataFrame
-        Updated DataFrame.
-    """
-    if "DT_NOTIFIC" not in df.columns:
-        return df
-
-    dt = pd.to_datetime(df["DT_NOTIFIC"], errors="coerce")
-    mask = dt.notna()
-    if not mask.any():
-        return df
-
-    iso = dt.loc[mask].dt.isocalendar()
-    df.loc[mask, "NU_ANO"] = iso["year"].astype("Int64")
-    df.loc[mask, "SEM_NOT"] = iso["week"].astype("Int64")
-    return df
-
-
 def is_date_ambiguous(value: str) -> bool:
     """
     Determine if a date string is ambiguous for inferring its format.
 
     Parameters
     ----------
-    value : str
+    value
         Date string.
 
     Returns
@@ -96,7 +63,7 @@ def infer_date_format(values: Iterable[str]) -> str | None:
 
     Parameters
     ----------
-    values : Iterable[str]
+    values
         Date string values.
 
     Returns
@@ -120,11 +87,111 @@ def _to_date_series(col: pd.Series, fmt: str | None) -> pd.Series:
         if isinstance(v, dt.date):
             return v
         try:
-            return pd.to_datetime(v, format=fmt).date()
+            return pd.to_datetime(v, format=fmt, errors="raise").date()
         except Exception:
             return None
 
     return col.apply(to_date)
+
+
+def _parse_sem_not_year_week(
+    sem_not: pd.Series,
+) -> tuple[pd.Series, pd.Series]:
+    """
+    Extract ISO year/week from SEM_NOT-like values (e.g. '202602').
+
+    Parameters
+    ----------
+    sem_not
+        SEM_NOT column as strings/objects.
+
+    Returns
+    -------
+    tuple[pd.Series, pd.Series]
+        (year, week) as Int64 series (nullable).
+    """
+    s = sem_not.astype("string").str.strip()
+    extracted = s.str.extract(r"(?P<y>\d{4}).*?(?P<w>\d{2})$")
+    year = pd.to_numeric(extracted["y"], errors="coerce").astype("Int64")
+    week = pd.to_numeric(extracted["w"], errors="coerce").astype("Int64")
+    return year, week
+
+
+def _parse_dt_notific_with_sem_not(
+    dt_notific: pd.Series,
+    sem_not: pd.Series,
+) -> pd.Series:
+    """
+    Parse DT_NOTIFIC choosing between YYYY-MM-DD and YYYY-DD-MM using SEM_NOT.
+
+    Parameters
+    ----------
+    dt_notific
+        Raw DT_NOTIFIC values.
+    sem_not
+        Raw SEM_NOT values.
+
+    Returns
+    -------
+    pd.Series
+        Parsed dates as dt.date (or None).
+    """
+    raw = dt_notific.astype("string").str.strip()
+    a = pd.to_datetime(raw, format="%Y-%m-%d", errors="coerce")
+    b = pd.to_datetime(raw, format="%Y-%d-%m", errors="coerce")
+
+    sem_y, sem_w = _parse_sem_not_year_week(sem_not)
+    sem_code = (sem_y.astype("Int64") * 100 + sem_w.astype("Int64")).astype(
+        "Int64"
+    )
+
+    a_iso = a.dt.isocalendar()
+    b_iso = b.dt.isocalendar()
+    a_code = (
+        a_iso.year.astype("Int64") * 100 + a_iso.week.astype("Int64")
+    ).astype("Int64")
+    b_code = (
+        b_iso.year.astype("Int64") * 100 + b_iso.week.astype("Int64")
+    ).astype("Int64")
+
+    a_dist = (a_code - sem_code).abs()
+    b_dist = (b_code - sem_code).abs()
+
+    has_sem = sem_code.notna()
+    choose_b = b.notna() & (a.isna() | (has_sem & (b_dist < a_dist)))
+
+    chosen = a.where(~choose_b, b)
+    out = chosen.dt.date
+    return out.where(chosen.notna(), None)
+
+
+def _derive_epiweek_from_dt_notific(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Enforce (NU_ANO, SEM_NOT) derived from DT_NOTIFIC when present.
+
+    Parameters
+    ----------
+    df
+        Chunk dataframe after parsing.
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe with consistent NU_ANO and SEM_NOT.
+    """
+    if "DT_NOTIFIC" not in df.columns:
+        return df
+
+    dt_ts = pd.to_datetime(df["DT_NOTIFIC"], errors="coerce")
+    iso = dt_ts.dt.isocalendar()
+    mask = dt_ts.notna()
+
+    if "NU_ANO" in df.columns:
+        df.loc[mask, "NU_ANO"] = iso.year.astype("Int64")[mask]
+    if "SEM_NOT" in df.columns:
+        df.loc[mask, "SEM_NOT"] = iso.week.astype("Int64")[mask]
+
+    return df
 
 
 def parse_dates_for_run(
@@ -136,9 +203,9 @@ def parse_dates_for_run(
 
     Parameters
     ----------
-    df : pd.DataFrame
+    df
         Input chunk.
-    date_formats : dict[str, str | None]
+    date_formats
         Previously known formats, will be updated.
 
     Returns
@@ -151,8 +218,16 @@ def parse_dates_for_run(
 
     updated = dict(date_formats)
 
+    if "DT_NOTIFIC" in df.columns and "SEM_NOT" in df.columns:
+        df["DT_NOTIFIC"] = _parse_dt_notific_with_sem_not(
+            df["DT_NOTIFIC"],
+            df["SEM_NOT"],
+        )
+
     for col in DT_COLS:
         if col not in df.columns:
+            continue
+        if col == "DT_NOTIFIC":
             continue
 
         fmt = updated.get(col)
@@ -176,25 +251,5 @@ def parse_chunk_to_sinan(
     """
     df, updated_formats = parse_dates_for_run(df, date_formats)
     df = parse_data(df, default_cid=default_cid, year=year)
-    df = enforce_epiweek_from_dt_notific(df)
+    df = _derive_epiweek_from_dt_notific(df)
     return df, updated_formats
-
-
-def week_from_epiweek_string(value: str) -> int | None:
-    """
-    Convert string epiweek representation to week number (1..53).
-
-    Parameters
-    ----------
-    value : str
-        Value like "2026W04" or "202604" depending on producer.
-
-    Returns
-    -------
-    int | None
-        Week number, or None if not parseable.
-    """
-    try:
-        return Week.fromstring(str(value)).week
-    except Exception:
-        return None
