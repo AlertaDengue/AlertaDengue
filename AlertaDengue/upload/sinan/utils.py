@@ -157,198 +157,6 @@ def convert_data_types(col: pd.Series, dtype: type) -> pd.Series:
     return col
 
 
-def _parse_dt_notific_with_sem_not(
-    dt_notific: pd.Series,
-    sem_not: pd.Series,
-) -> pd.Series:
-    """
-    Parse DT_NOTIFIC resolving YYYY-MM-DD vs YYYY-DD-MM using SEM_NOT (YYYYWW).
-
-    Parameters
-    ----------
-    dt_notific
-        Raw DT_NOTIFIC column.
-    sem_not
-        Raw SEM_NOT column (expected YYYYWW, may be string/int).
-
-    Returns
-    -------
-    pd.Series
-        Parsed dates as python ``datetime.date`` (or None).
-    """
-    dt_raw = dt_notific.astype(str).str.strip().replace({"": pd.NA})
-    sem_raw = sem_not.astype(str).str.replace(r"\D", "", regex=True)
-
-    sem_y = pd.to_numeric(sem_raw.str.slice(0, 4), errors="coerce")
-    sem_w = pd.to_numeric(sem_raw.str.slice(4, 6), errors="coerce")
-
-    a = pd.to_datetime(dt_raw, format="%Y-%m-%d", errors="coerce").dt.date
-    b = pd.to_datetime(dt_raw, format="%Y-%d-%m", errors="coerce").dt.date
-
-    mask = sem_y.notna() & sem_w.notna() & a.notna() & b.notna() & (a != b)
-    if not bool(mask.any()):
-        return a.where(a.notna(), None)
-
-    idx = a.index[mask]
-
-    def epi_yw(d: dt.date) -> tuple[int, int]:
-        w = Week.fromdate(d)
-        return int(w.year), int(w.week)
-
-    a_list = a.loc[idx].tolist()
-    b_list = b.loc[idx].tolist()
-
-    a_yw = [epi_yw(d) for d in a_list]
-    b_yw = [epi_yw(d) for d in b_list]
-
-    a_y = pd.Series([x[0] for x in a_yw], index=idx)
-    a_w = pd.Series([x[1] for x in a_yw], index=idx)
-    b_y = pd.Series([x[0] for x in b_yw], index=idx)
-    b_w = pd.Series([x[1] for x in b_yw], index=idx)
-
-    match_a = (a_y == sem_y.loc[idx]) & (a_w == sem_w.loc[idx])
-    match_b = (b_y == sem_y.loc[idx]) & (b_w == sem_w.loc[idx])
-
-    choose_b = match_b & ~match_a
-
-    out = a.copy()
-    out.loc[idx[choose_b]] = b.loc[idx[choose_b]]
-    return out.where(out.notna(), None)
-
-
-def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
-    dt_cols = [
-        "DT_SIN_PRI",
-        "DT_DIGITA",
-        "DT_NASC",
-        "DT_NOTIFIC",
-        "DT_CHIK_S1",
-        "DT_CHIK_S2",
-        "DT_PRNT",
-        "DT_SORO",
-        "DT_NS1",
-        "DT_VIRAL",
-        "DT_PCR",
-    ]
-    formats = {}
-    sinan_formats = sinan.date_formats or {}
-
-    if df.empty:
-        return df
-
-    if "DT_NOTIFIC" in df.columns and "SEM_NOT" in df.columns:
-        df["DT_NOTIFIC"] = _parse_dt_notific_with_sem_not(
-            df["DT_NOTIFIC"],
-            df["SEM_NOT"],
-        )
-
-    for dt_col in dt_cols:
-        fmt = None
-        if dt_col in df.columns:
-            if dt_col == "DT_NOTIFIC":
-                continue
-            if df[dt_col].dtype == "object":
-                fmt = infer_date_format(df[dt_col])
-                formats[dt_col] = fmt
-            df[dt_col] = convert_date(df[dt_col], fmt)
-
-    for col, fmt in formats.items():
-        if col not in sinan_formats:
-            sinan_formats[col] = fmt
-
-        if not sinan_formats[col]:
-            sinan_formats[col] = fmt
-
-        if fmt and sinan_formats[col] != fmt:
-            sinan.status.warning(
-                f"A date discrepancy were found for the column {col}. "
-                "Please contact the moderation"
-            )
-            sinan.status.debug(
-                f"DATE FORMAT CHANGED FROM '{sinan_formats[col]}' TO '{fmt}'"
-            )
-            sinan_formats[col] = fmt
-
-    if sinan.date_formats != sinan_formats:
-        sinan.date_formats = sinan_formats
-        sinan.save()
-    return df
-
-
-def _derive_epiweek_from_dt_notific(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Enforce (NU_ANO, SEM_NOT) derived from DT_NOTIFIC when present.
-
-    Parameters
-    ----------
-    df
-        Chunk dataframe after parsing.
-
-    Returns
-    -------
-    pd.DataFrame
-        Dataframe with consistent NU_ANO and SEM_NOT.
-    """
-    if "DT_NOTIFIC" not in df.columns:
-        return df
-
-    dt_ts = pd.to_datetime(df["DT_NOTIFIC"], errors="coerce")
-    iso = dt_ts.dt.isocalendar()
-    mask = dt_ts.notna()
-
-    if "NU_ANO" in df.columns:
-        df.loc[mask, "NU_ANO"] = iso.year.astype("Int64")[mask]
-    if "SEM_NOT" in df.columns:
-        df.loc[mask, "SEM_NOT"] = iso.week.astype("Int64")[mask]
-
-    return df
-
-
-def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
-    df["NU_NOTIFIC"] = fix_nu_notif(df.NU_NOTIFIC)
-    df["ID_MUNICIP"] = add_dv(df.ID_MUNICIP)
-
-    df["CS_SEXO"] = np.where(
-        df["CS_SEXO"].isin(["M", "F"]), df["CS_SEXO"], "I"
-    ).astype(str)
-
-    int_cols = [
-        "NU_IDADE_N",
-        "ID_DISTRIT",
-        "ID_BAIRRO",
-        "ID_UNIDADE",
-    ]
-
-    for int_col in int_cols:
-        df[int_col] = convert_data_types(df[int_col], int)
-
-    df["RESUL_PCR_"] = (
-        convert_data_types(df["RESUL_PCR_"], int)
-        if "RESUL_PCR_" in df.columns
-        else 0
-    )
-    df["CRITERIO"] = (
-        convert_data_types(df["CRITERIO"], int)
-        if "CRITERIO" in df.columns
-        else 0
-    )
-    df["CLASSI_FIN"] = (
-        convert_data_types(df["CLASSI_FIN"], int)
-        if "CLASSI_FIN" in df.columns
-        else 0
-    )
-
-    df["ID_AGRAVO"] = fill_id_agravo(df.ID_AGRAVO, default_cid)
-
-    df["SEM_PRI"] = df["SEM_PRI"].apply(convert_sem_pri)
-
-    df["NU_ANO"] = convert_nu_ano(year, df.NU_ANO)
-
-    df["SEM_NOT"] = df["SEM_NOT"].apply(convert_sem_not)
-
-    return df
-
-
 def infer_date_format(date_series: Iterable[str]) -> str | None:
     """
     Returns the most common date format found in a series of strings. Returns
@@ -400,3 +208,208 @@ def is_date_ambiguous(date: str) -> bool:
         pass
 
     return False
+
+
+def _derive_epiweek_from_dt_notific(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Enforce (NU_ANO, SEM_NOT) derived from DT_NOTIFIC using epiweeks rules.
+
+    Parameters
+    ----------
+    df
+        Chunk dataframe after parsing.
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe with consistent NU_ANO and SEM_NOT.
+    """
+    if "DT_NOTIFIC" not in df.columns:
+        return df
+
+    dt_ts = pd.to_datetime(df["DT_NOTIFIC"], errors="coerce")
+    mask = dt_ts.notna()
+    if not bool(mask.any()):
+        return df
+
+    dates = dt_ts.loc[mask].dt.date
+
+    def to_epi(d: dt.date) -> tuple[int, int]:
+        w = Week.fromdate(d)
+        return int(w.year), int(w.week)
+
+    epi = dates.map(to_epi)
+    epi_year = pd.Series((x[0] for x in epi), index=dates.index, dtype="Int64")
+    epi_week = pd.Series((x[1] for x in epi), index=dates.index, dtype="Int64")
+
+    if "NU_ANO" in df.columns:
+        df.loc[mask, "NU_ANO"] = epi_year
+    if "SEM_NOT" in df.columns:
+        df.loc[mask, "SEM_NOT"] = epi_week
+
+    return df
+
+
+def _parse_dt_notific_with_sem_not(
+    dt_notific: pd.Series,
+    sem_not: pd.Series,
+) -> pd.Series:
+    """
+    Parse DT_NOTIFIC resolving YYYY-MM-DD vs YYYY-DD-MM using SEM_NOT (YYYYWW).
+
+    Parameters
+    ----------
+    dt_notific
+        Raw DT_NOTIFIC column.
+    sem_not
+        Raw SEM_NOT column (expected YYYYWW, may be string/int).
+
+    Returns
+    -------
+    pd.Series
+        Parsed dates as python ``datetime.date`` (or None).
+    """
+    dt_raw = dt_notific.astype(str).str.strip().replace({"": pd.NA})
+    sem_raw = sem_not.astype(str).str.replace(r"\D", "", regex=True)
+
+    sem_y = pd.to_numeric(sem_raw.str.slice(0, 4), errors="coerce")
+    sem_w = pd.to_numeric(sem_raw.str.slice(4, 6), errors="coerce")
+
+    a = pd.to_datetime(dt_raw, format="%Y-%m-%d", errors="coerce").dt.date
+    b = pd.to_datetime(dt_raw, format="%Y-%d-%m", errors="coerce").dt.date
+
+    mask = sem_y.notna() & sem_w.notna() & a.notna() & b.notna() & (a != b)
+    if not bool(mask.any()):
+        return a.where(a.notna(), None)
+
+    idx = a.index[mask]
+
+    def epi_yw(d: dt.date) -> tuple[int, int]:
+        w = Week.fromdate(d)
+        return int(w.year), int(w.week)
+
+    a_list = a.loc[idx].tolist()
+    b_list = b.loc[idx].tolist()
+
+    a_yw = [epi_yw(d) for d in a_list]
+    b_yw = [epi_yw(d) for d in b_list]
+
+    a_y = pd.Series((x[0] for x in a_yw), index=idx)
+    a_w = pd.Series((x[1] for x in a_yw), index=idx)
+    b_y = pd.Series((x[0] for x in b_yw), index=idx)
+    b_w = pd.Series((x[1] for x in b_yw), index=idx)
+
+    match_a = (a_y == sem_y.loc[idx]) & (a_w == sem_w.loc[idx])
+    match_b = (b_y == sem_y.loc[idx]) & (b_w == sem_w.loc[idx])
+
+    choose_b = match_b & ~match_a
+
+    out = a.copy()
+    out.loc[idx[choose_b]] = b.loc[idx[choose_b]]
+    return out.where(out.notna(), None)
+
+
+def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
+    dt_cols = [
+        "DT_SIN_PRI",
+        "DT_DIGITA",
+        "DT_NASC",
+        "DT_NOTIFIC",
+        "DT_CHIK_S1",
+        "DT_CHIK_S2",
+        "DT_PRNT",
+        "DT_SORO",
+        "DT_NS1",
+        "DT_VIRAL",
+        "DT_PCR",
+    ]
+    formats: dict[str, str | None] = {}
+    sinan_formats = sinan.date_formats or {}
+
+    if df.empty:
+        return df
+
+    if "DT_NOTIFIC" in df.columns and "SEM_NOT" in df.columns:
+        df["DT_NOTIFIC"] = _parse_dt_notific_with_sem_not(
+            df["DT_NOTIFIC"],
+            df["SEM_NOT"],
+        )
+
+    for dt_col in dt_cols:
+        if dt_col not in df.columns:
+            continue
+        if dt_col == "DT_NOTIFIC":
+            continue
+
+        fmt: str | None = None
+        if df[dt_col].dtype == "object":
+            fmt = infer_date_format(df[dt_col])
+            formats[dt_col] = fmt
+
+        df[dt_col] = convert_date(df[dt_col], fmt)
+
+    for col, fmt in formats.items():
+        if col not in sinan_formats:
+            sinan_formats[col] = fmt
+
+        if not sinan_formats[col]:
+            sinan_formats[col] = fmt
+
+        if fmt and sinan_formats[col] != fmt:
+            sinan.status.warning(
+                f"A date discrepancy were found for the column {col}. "
+                "Please contact the moderation"
+            )
+            sinan.status.debug(
+                f"DATE FORMAT CHANGED FROM '{sinan_formats[col]}' TO '{fmt}'"
+            )
+            sinan_formats[col] = fmt
+
+    if sinan.date_formats != sinan_formats:
+        sinan.date_formats = sinan_formats
+        sinan.save()
+
+    return df
+
+
+def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
+    df["NU_NOTIFIC"] = fix_nu_notif(df.NU_NOTIFIC)
+    df["ID_MUNICIP"] = add_dv(df.ID_MUNICIP)
+
+    df["CS_SEXO"] = np.where(
+        df["CS_SEXO"].isin(["M", "F"]), df["CS_SEXO"], "I"
+    ).astype(str)
+
+    int_cols = [
+        "NU_IDADE_N",
+        "ID_DISTRIT",
+        "ID_BAIRRO",
+        "ID_UNIDADE",
+    ]
+
+    for int_col in int_cols:
+        df[int_col] = convert_data_types(df[int_col], int)
+
+    df["RESUL_PCR_"] = (
+        convert_data_types(df["RESUL_PCR_"], int)
+        if "RESUL_PCR_" in df.columns
+        else 0
+    )
+    df["CRITERIO"] = (
+        convert_data_types(df["CRITERIO"], int)
+        if "CRITERIO" in df.columns
+        else 0
+    )
+    df["CLASSI_FIN"] = (
+        convert_data_types(df["CLASSI_FIN"], int)
+        if "CLASSI_FIN" in df.columns
+        else 0
+    )
+
+    df["ID_AGRAVO"] = fill_id_agravo(df.ID_AGRAVO, default_cid)
+
+    df["SEM_PRI"] = df["SEM_PRI"].apply(convert_sem_pri)
+    df["NU_ANO"] = convert_nu_ano(year, df.NU_ANO)
+    df["SEM_NOT"] = df["SEM_NOT"].apply(convert_sem_not)
+
+    return df
