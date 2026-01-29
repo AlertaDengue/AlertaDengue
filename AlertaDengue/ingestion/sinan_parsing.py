@@ -166,19 +166,6 @@ def _parse_dt_notific_with_sem_not(
 
 
 def _derive_epiweek_from_dt_notific(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Enforce (NU_ANO, SEM_NOT) derived from DT_NOTIFIC when present.
-
-    Parameters
-    ----------
-    df
-        Chunk dataframe after parsing.
-
-    Returns
-    -------
-    pd.DataFrame
-        Dataframe with consistent NU_ANO and SEM_NOT.
-    """
     if "DT_NOTIFIC" not in df.columns:
         return df
 
@@ -198,43 +185,31 @@ def parse_dates_for_run(
     df: pd.DataFrame,
     date_formats: dict[str, str | None],
 ) -> tuple[pd.DataFrame, dict[str, str | None]]:
-    """
-    Parse DT_* columns to date and infer formats when needed.
-
-    Parameters
-    ----------
-    df
-        Input chunk.
-    date_formats
-        Previously known formats, will be updated.
-
-    Returns
-    -------
-    tuple[pd.DataFrame, dict[str, str | None]]
-        Parsed df and updated formats.
-    """
     if df.empty:
         return df, date_formats
 
     updated = dict(date_formats)
 
-    if "DT_NOTIFIC" in df.columns and "SEM_NOT" in df.columns:
-        df["DT_NOTIFIC"] = _parse_dt_notific_with_sem_not(
-            df["DT_NOTIFIC"],
-            df["SEM_NOT"],
-        )
+    if "DT_NOTIFIC" in df.columns:
+        if "SEM_NOT" in df.columns:
+            df["DT_NOTIFIC"] = _parse_dt_notific_with_sem_not(
+                df["DT_NOTIFIC"],
+                df["SEM_NOT"],
+            )
+        else:
+            fmt = updated.get("DT_NOTIFIC")
+            if fmt is None and df["DT_NOTIFIC"].dtype == "object":
+                fmt = infer_date_format(df["DT_NOTIFIC"].astype(str).tolist())
+                updated["DT_NOTIFIC"] = fmt
+            df["DT_NOTIFIC"] = _to_date_series(df["DT_NOTIFIC"], fmt)
 
     for col in DT_COLS:
-        if col not in df.columns:
+        if col not in df.columns or col == "DT_NOTIFIC":
             continue
-        if col == "DT_NOTIFIC":
-            continue
-
         fmt = updated.get(col)
         if fmt is None and df[col].dtype == "object":
             fmt = infer_date_format(df[col].astype(str).tolist())
             updated[col] = fmt
-
         df[col] = _to_date_series(df[col], fmt)
 
     return df, updated
