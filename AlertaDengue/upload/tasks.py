@@ -22,7 +22,12 @@ from .models import (
     sinan_upload_log_path,
     sinan_upload_path,
 )
-from .sinan.utils import chunk_gen, parse_data, parse_dates
+from .sinan.utils import (
+    chunk_gen,
+    derive_epiweek_from_dt_notific,
+    parse_data,
+    parse_dates,
+)
 
 DB_ENGINE = settings.DB_ENGINE
 
@@ -188,18 +193,21 @@ def insert_chunk_to_temp_table(
 ):
     sinan = SINANUpload.objects.get(pk=upload_sinan_id)
     status = SINANUploadLogStatus.objects.get(pk=sinan.status.pk)
-    columns = list(sinan.COLUMNS.values())
 
     chunk = df_chunk.replace({pd.NA: None})
     chunk = parse_dates(chunk, sinan)
     chunk = parse_data(chunk, sinan.cid10, sinan.year)
+    chunk = derive_epiweek_from_dt_notific(chunk)
+
     existing_cols = [
         col for col in SINANUpload.REQUIRED_COLS if col in chunk.columns
     ]
     residues = chunk[chunk[existing_cols].isna().any(axis=1)]
     chunk = chunk.dropna(subset=SINANUpload.REQUIRED_COLS, how="any")
-    filtered_rows += len(chunk) - len(residues)
+
     chunk = chunk.rename(columns=sinan.COLUMNS)
+
+    filtered_rows += len(chunk) - len(residues)
 
     residues_file = Path(sinan_upload_log_path()) / f"{status.pk}.residues.csv"
 
@@ -290,6 +298,11 @@ def sinan_insert_to_db(upload_sinan_id: int):
                 engine="python",
                 sep=None,
                 encoding=enc,
+                dtype={
+                    "DT_NOTIFIC": "string",
+                    "SEM_NOT": "string",
+                    "NU_ANO": "string",
+                },
             ):
                 insert_chunk_to_temp_table(
                     upload_sinan_id,

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime as dt
 from collections import Counter
 from typing import ForwardRef, Iterable, Iterator, Optional, Tuple, Union
@@ -5,7 +7,7 @@ from typing import ForwardRef, Iterable, Iterator, Optional, Tuple, Union
 import numpy as np
 import pandas as pd
 from dados.dbdata import calculate_digit
-from dateutil.parser import parse, parser
+from dateutil.parser import parse
 from epiweeks import Week
 from pandas.tseries.api import guess_datetime_format
 
@@ -143,6 +145,190 @@ def convert_sem_not(val: np.ndarray[int]) -> np.ndarray[int] | None:
         return pd.NA
 
 
+def is_date_ambiguous(value: str) -> bool:
+    """
+    Determine if a date string is ambiguous for inferring its format.
+
+    Parameters
+    ----------
+    value
+        Date string.
+
+    Returns
+    -------
+    bool
+        True if ambiguous, otherwise False.
+    """
+    try:
+        monthfirst = parse(value, dayfirst=False)
+        dayfirst = parse(value, dayfirst=True)
+
+        if monthfirst == dayfirst and dayfirst.day != dayfirst.month:
+            return False
+
+        if monthfirst.day <= 12:
+            return True
+
+        if dayfirst.day <= 12:
+            return True
+
+    except (ValueError, TypeError):
+        return False
+
+    return False
+
+
+def infer_date_format(values: Iterable[str]) -> str | None:
+    """
+    Infer the most common date format in a collection of strings.
+
+    Parameters
+    ----------
+    values
+        Date string values.
+
+    Returns
+    -------
+    str | None
+        Most common inferred format, or None if not inferable.
+    """
+    dates = [d for d in set(values) if d and not is_date_ambiguous(d)]
+    scores = Counter(
+        fmt
+        for fmt in (guess_datetime_format(d) for d in dates)
+        if fmt is not None
+    )
+    return scores.most_common(1)[0][0] if scores else None
+
+
+def parse_dt_notific_with_sem_not(
+    dt_notific: pd.Series,
+    sem_not: pd.Series,
+) -> pd.Series:
+    """
+    Parse DT_NOTIFIC choosing between YYYY-MM-DD and YYYY-DD-MM using SEM_NOT.
+
+    Parameters
+    ----------
+    dt_notific
+        Raw DT_NOTIFIC values.
+    sem_not
+        Raw SEM_NOT values.
+
+    Returns
+    -------
+    pd.Series
+        Parsed dates as dt.date (or None).
+    """
+    raw = dt_notific.astype("string").str.strip()
+    a = pd.to_datetime(raw, format="%Y-%m-%d", errors="coerce")
+    b = pd.to_datetime(raw, format="%Y-%d-%m", errors="coerce")
+
+    s = sem_not.astype("string").str.strip()
+    extracted = s.str.extract(r"(?P<y>\d{4}).*?(?P<w>\d{2})$")
+    sem_y = pd.to_numeric(extracted["y"], errors="coerce").astype("Int64")
+    sem_w = pd.to_numeric(extracted["w"], errors="coerce").astype("Int64")
+    sem_code = (sem_y * 100 + sem_w).astype("Int64")
+
+    a_iso = a.dt.isocalendar()
+    b_iso = b.dt.isocalendar()
+    a_code = a_iso.year.astype("Int64") * 100 + a_iso.week.astype("Int64")
+    b_code = b_iso.year.astype("Int64") * 100 + b_iso.week.astype("Int64")
+
+    a_dist = (a_code - sem_code).abs()
+    b_dist = (b_code - sem_code).abs()
+
+    has_sem = sem_code.notna()
+    choose_b = b.notna() & (a.isna() | (has_sem & (b_dist < a_dist)))
+
+    chosen = a.where(~choose_b, b)
+    out = chosen.dt.date
+    return out.where(chosen.notna(), None)
+
+
+def derive_epiweek_from_dt_notific(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Enforce (NU_ANO, SEM_NOT) derived from DT_NOTIFIC when present.
+
+    Parameters
+    ----------
+    df
+        Chunk dataframe after parsing.
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe with consistent NU_ANO and SEM_NOT.
+    """
+    if "DT_NOTIFIC" not in df.columns:
+        return df
+
+    dt_ts = pd.to_datetime(df["DT_NOTIFIC"], errors="coerce")
+    mask = dt_ts.notna()
+    if not bool(mask.any()):
+        return df
+
+    iso = dt_ts.dt.isocalendar()
+    if "NU_ANO" in df.columns:
+        df.loc[mask, "NU_ANO"] = iso.year.astype("Int64")[mask]
+    if "SEM_NOT" in df.columns:
+        df.loc[mask, "SEM_NOT"] = iso.week.astype("Int64")[mask]
+
+    return df
+
+
+def normalize_cid10(value: object, default_cid: str) -> str:
+    """Normalize CID10 codes for dengue/chikungunya/zika only.
+
+    Parameters
+    ----------
+    value
+        Raw CID10 value (e.g. ``A920``, ``A92.0``, ``A92.8``, ``A90.0``).
+    default_cid
+        Default CID10 for the current ingestion run.
+
+    Returns
+    -------
+    str
+        Canonical CID10 code. For the supported diseases:
+        - dengue: ``A90``
+        - chikungunya: ``A92.0``
+        - zika: ``A928``
+
+        Any other code is returned mostly unchanged (uppercased/trimmed).
+    """
+    if pd.isna(value):
+        raw = ""
+    else:
+        raw = str(value)
+
+    code = raw.strip().upper().replace(" ", "")
+    fallback = str(default_cid).strip().upper().replace(" ", "")
+
+    if not code:
+        code = fallback
+
+    variants: dict[str, str] = {
+        "A90": "A90",
+        "A90.0": "A90",
+        "A92.": "A92.0",
+        "A92.0": "A92.0",
+        "A920": "A92.0",
+        "A92.8": "A928",
+        "A928": "A928",
+    }
+
+    normalized = variants.get(code)
+    if normalized is not None:
+        return normalized
+
+    fallback_normalized = variants.get(fallback)
+    if fallback_normalized is not None:
+        return code[:5]
+
+    return code[:5]
+
+
 def convert_data_types(col: pd.Series, dtype: type) -> pd.Series:
     if dtype == int:
         col = pd.to_numeric(col, errors="coerce").fillna(0).astype(int)
@@ -169,22 +355,33 @@ def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
         "DT_VIRAL",
         "DT_PCR",
     ]
-    formats = {}
+    formats: dict[str, str | None] = {}
     sinan_formats = sinan.date_formats or {}
 
     if df.empty:
         return df
 
+    if "DT_NOTIFIC" in df.columns and "SEM_NOT" in df.columns:
+        df["DT_NOTIFIC"] = parse_dt_notific_with_sem_not(
+            df["DT_NOTIFIC"],
+            df["SEM_NOT"],
+        )
+
     for dt_col in dt_cols:
-        fmt = None
-        if dt_col in df.columns:
-            if df[dt_col].dtype == "object":
-                fmt = infer_date_format(df[dt_col])
-                formats[dt_col] = fmt
-            df[dt_col] = convert_date(df[dt_col], fmt)
+        if dt_col not in df.columns:
+            continue
+        if dt_col == "DT_NOTIFIC":
+            continue
+
+        fmt: str | None = None
+        if df[dt_col].dtype == "object":
+            fmt = infer_date_format(df[dt_col])
+            formats[dt_col] = fmt
+
+        df[dt_col] = convert_date(df[dt_col], fmt)
 
     for col, fmt in formats.items():
-        if not col in sinan_formats:
+        if col not in sinan_formats:
             sinan_formats[col] = fmt
 
         if not sinan_formats[col]:
@@ -203,6 +400,7 @@ def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
     if sinan.date_formats != sinan_formats:
         sinan.date_formats = sinan_formats
         sinan.save()
+
     return df
 
 
@@ -241,64 +439,12 @@ def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
     )
 
     df["ID_AGRAVO"] = fill_id_agravo(df.ID_AGRAVO, default_cid)
+    df["ID_AGRAVO"] = df["ID_AGRAVO"].apply(
+        lambda v: normalize_cid10(v, default_cid=default_cid)
+    )
 
     df["SEM_PRI"] = df["SEM_PRI"].apply(convert_sem_pri)
-
     df["NU_ANO"] = convert_nu_ano(year, df.NU_ANO)
-
     df["SEM_NOT"] = df["SEM_NOT"].apply(convert_sem_not)
 
     return df
-
-
-def infer_date_format(date_series: Iterable[str]) -> str | None:
-    """
-    Returns the most common date format found in a series of strings. Returns
-    None if it was not possible to infer
-
-    ```
-    infer_date_format([None, "abc", "01-20-2020"]) # None (same scores)
-    infer_date_format([None, "abc", "01-20-2020", "03-26-2020"]) # '%m-%d-%Y'
-    ```
-
-    @param date_series: it must be an Iterable of strings
-    """
-    dates = [d for d in set(date_series) if not is_date_ambiguous(d)]
-    scores = Counter(
-        fmt
-        for fmt in [guess_datetime_format(d) for d in dates if d]
-        if fmt is not None
-    )
-    return scores.most_common(1)[0][0] if scores else None
-
-
-def is_date_ambiguous(date: str) -> bool:
-    """
-    The date is ambiguous when it's format can't be determined.
-    How it's being used only to filter out ambiguous dates, value errors can
-    be ignored
-
-    Examples:
-    12/05/2023 (%m/%d/%Y or %d/%m/%Y)   True
-    2023-05-12          ||              True
-    12-12-2023          ||              True
-    25/03/1999 (can't be %m/%d/%Y)      False
-    1999-25-03          ||              False
-    """
-    try:
-        monthfirst = parse(date, dayfirst=False)
-        dayfirst = parse(date, dayfirst=True)
-
-        if monthfirst == dayfirst and dayfirst.day != dayfirst.month:
-            return False
-
-        if monthfirst.day <= 12:
-            return True
-
-        if dayfirst.day <= 12:
-            return True
-
-    except (ValueError, TypeError):
-        pass
-
-    return False

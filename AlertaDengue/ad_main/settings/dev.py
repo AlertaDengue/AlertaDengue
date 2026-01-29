@@ -19,6 +19,16 @@ CACHE_MIDDLEWARE_ALIAS = "default"
 CACHE_MIDDLEWARE_SECONDS = 600
 CACHE_MIDDLEWARE_KEY_PREFIX = "_"
 
+# Dev: allow cookies over HTTP
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+
+# Match how you actually access dev (http://localhost:8000)
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost",
+    "http://127.0.0.1",
+]
+
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 result_backend = build_result_backend(debug=DEBUG)
