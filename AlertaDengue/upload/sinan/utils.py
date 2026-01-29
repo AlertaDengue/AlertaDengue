@@ -135,6 +135,58 @@ def fill_id_agravo(cid: str, default_cid: str) -> str:
     return default_cid if not cid else cid
 
 
+def normalize_cid10(value: object, default_cid: str) -> str:
+    """Normalize CID10 codes for dengue/chikungunya/zika only.
+
+    Parameters
+    ----------
+    value
+        Raw CID10 value (e.g. ``A920``, ``A92.0``, ``A92.8``, ``A90.0``).
+    default_cid
+        Default CID10 for the current ingestion run.
+
+    Returns
+    -------
+    str
+        Canonical CID10 code. For the supported diseases:
+        - dengue: ``A90``
+        - chikungunya: ``A92.0``
+        - zika: ``A928``
+
+        Any other code is returned mostly unchanged (uppercased/trimmed).
+    """
+    if pd.isna(value):
+        raw = ""
+    else:
+        raw = str(value)
+
+    code = raw.strip().upper().replace(" ", "")
+    fallback = str(default_cid).strip().upper().replace(" ", "")
+
+    if not code:
+        code = fallback
+
+    variants: dict[str, str] = {
+        "A90": "A90",
+        "A90.0": "A90",
+        "A92.": "A92.0",
+        "A92.0": "A92.0",
+        "A920": "A92.0",
+        "A92.8": "A928",
+        "A928": "A928",
+    }
+
+    normalized = variants.get(code)
+    if normalized is not None:
+        return normalized
+
+    fallback_normalized = variants.get(fallback)
+    if fallback_normalized is not None:
+        return code[:5]
+
+    return code[:5]
+
+
 @np.vectorize
 def convert_sem_not(val: np.ndarray[int]) -> np.ndarray[int] | None:
     if pd.isna(val):
@@ -210,7 +262,9 @@ def is_date_ambiguous(date: str) -> bool:
     return False
 
 
-def _derive_epiweek_from_dt_notific(df: pd.DataFrame) -> pd.DataFrame:
+def _derive_epiweek_from_dt_notific(
+    df: pd.DataFrame,
+) -> pd.DataFrame:  # noqa: C901
     """
     Enforce (NU_ANO, SEM_NOT) derived from DT_NOTIFIC using epiweeks rules.
 
@@ -407,6 +461,9 @@ def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
     )
 
     df["ID_AGRAVO"] = fill_id_agravo(df.ID_AGRAVO, default_cid)
+    df["ID_AGRAVO"] = df["ID_AGRAVO"].apply(
+        lambda v: normalize_cid10(v, default_cid=default_cid)
+    )
 
     df["SEM_PRI"] = df["SEM_PRI"].apply(convert_sem_pri)
     df["NU_ANO"] = convert_nu_ano(year, df.NU_ANO)
