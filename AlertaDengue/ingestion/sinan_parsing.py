@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import datetime as dt
-from collections import Counter
-from typing import Iterable
+from typing import cast
 
 import pandas as pd
-from dateutil.parser import parse
-from pandas.tseries.api import guess_datetime_format
-from upload.sinan.utils import parse_data
+from upload.sinan.utils import (
+    derive_epiweek_from_dt_notific,
+    infer_date_format,
+    parse_data,
+)
 
 DT_COLS: list[str] = [
     "DT_SIN_PRI",
@@ -24,72 +25,42 @@ DT_COLS: list[str] = [
 ]
 
 
-def is_date_ambiguous(value: str) -> bool:
-    """
-    Determine if a date string is ambiguous for inferring its format.
-
-    Parameters
-    ----------
-    value
-        Date string.
-
-    Returns
-    -------
-    bool
-        True if ambiguous, otherwise False.
-    """
-    try:
-        monthfirst = parse(value, dayfirst=False)
-        dayfirst = parse(value, dayfirst=True)
-
-        if monthfirst == dayfirst and dayfirst.day != dayfirst.month:
-            return False
-
-        if monthfirst.day <= 12:
-            return True
-
-        if dayfirst.day <= 12:
-            return True
-
-    except (ValueError, TypeError):
-        return False
-
-    return False
-
-
-def infer_date_format(values: Iterable[str]) -> str | None:
-    """
-    Infer the most common date format in a collection of strings.
-
-    Parameters
-    ----------
-    values
-        Date string values.
-
-    Returns
-    -------
-    str | None
-        Most common inferred format, or None if not inferable.
-    """
-    dates = [d for d in set(values) if d and not is_date_ambiguous(d)]
-    scores = Counter(
-        fmt
-        for fmt in (guess_datetime_format(d) for d in dates)
-        if fmt is not None
-    )
-    return scores.most_common(1)[0][0] if scores else None
-
-
 def _to_date_series(col: pd.Series, fmt: str | None) -> pd.Series:
+    """
+    Convert a pandas Series to Python ``datetime.date`` values (or None).
+
+    Parameters
+    ----------
+    col
+        Input series containing date-like values.
+    fmt
+        Optional datetime format hint.
+
+    Returns
+    -------
+    pd.Series
+        Series of ``datetime.date`` (or None).
+    """
+
     def to_date(v: object) -> dt.date | None:
         if pd.isna(v):
             return None
+        if isinstance(v, dt.datetime):
+            return v.date()
         if isinstance(v, dt.date):
             return v
+
         try:
-            return pd.to_datetime(v, format=fmt, errors="raise").date()
+            ts_any = pd.to_datetime(v, format=fmt, errors="raise")
         except Exception:
             return None
+
+        if pd.isna(ts_any):
+            return None
+
+        ts = cast(pd.Timestamp, ts_any)
+        py_dt = cast(dt.datetime, ts.to_pydatetime())
+        return py_dt.date()
 
     return col.apply(to_date)
 
@@ -111,9 +82,9 @@ def _parse_sem_not_year_week(
         (year, week) as Int64 series (nullable).
     """
     s = sem_not.astype("string").str.strip()
-    extracted = s.str.extract(r"(?P<y>\d{4}).*?(?P<w>\d{2})$")
-    year = pd.to_numeric(extracted["y"], errors="coerce").astype("Int64")
-    week = pd.to_numeric(extracted["w"], errors="coerce").astype("Int64")
+    year = pd.to_numeric(s.str.slice(0, 4), errors="coerce").astype("Int64")
+    week = pd.to_numeric(s.str.slice(4, 6), errors="coerce").astype("Int64")
+
     return year, week
 
 
@@ -165,22 +136,6 @@ def _parse_dt_notific_with_sem_not(
     return out.where(chosen.notna(), None)
 
 
-def _derive_epiweek_from_dt_notific(df: pd.DataFrame) -> pd.DataFrame:
-    if "DT_NOTIFIC" not in df.columns:
-        return df
-
-    dt_ts = pd.to_datetime(df["DT_NOTIFIC"], errors="coerce")
-    iso = dt_ts.dt.isocalendar()
-    mask = dt_ts.notna()
-
-    if "NU_ANO" in df.columns:
-        df.loc[mask, "NU_ANO"] = iso.year.astype("Int64")[mask]
-    if "SEM_NOT" in df.columns:
-        df.loc[mask, "SEM_NOT"] = iso.week.astype("Int64")[mask]
-
-    return df
-
-
 def parse_dates_for_run(
     df: pd.DataFrame,
     date_formats: dict[str, str | None],
@@ -226,5 +181,5 @@ def parse_chunk_to_sinan(
     """
     df, updated_formats = parse_dates_for_run(df, date_formats)
     df = parse_data(df, default_cid=default_cid, year=year)
-    df = _derive_epiweek_from_dt_notific(df)
+    df = derive_epiweek_from_dt_notific(df)
     return df, updated_formats
