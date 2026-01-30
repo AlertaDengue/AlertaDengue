@@ -108,6 +108,7 @@ LOCAL_APPS = [
     "dbf.apps.DbfConfig",
     "api",
     "upload",
+    "ingestion",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
