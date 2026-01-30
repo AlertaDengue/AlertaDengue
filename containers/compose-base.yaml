@@ -148,15 +148,14 @@ services:
   celery:
     extends: base
     hostname: celery
-    command: >
-      celery -A config worker -l INFO
-      --pool=threads --concurrency=${CELERY_WORKER_CONCURRENCY:-4}
     entrypoint: ["bash", "/opt/entrypoint.sh", "/opt/runcelery.sh"]
-    # command: ["python3", "/opt/services/AlertaDengue/dbf/collector.py"]
     env_file:
       - ../.envs/.env
     environment:
-      DJANGO_SETTINGS_MODULE: "ad_main.settings.${ENV}"      
+      DJANGO_SETTINGS_MODULE: "ad_main.settings.${ENV}"
+      CELERY_WORKER_CONCURRENCY: ${CELERY_WORKER_CONCURRENCY:-4}
+      CELERY_WORKER_POOL: ${CELERY_WORKER_POOL:-prefork}
+      CELERY_LOGLEVEL: ${CELERY_LOGLEVEL:-INFO}
     volumes:
       - ${DOCKER_HOST_UPLOADED_FILES_DIR}:/MEDIA_ROOT
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
@@ -169,14 +168,14 @@ services:
         condition: service_healthy
       postgres:
         condition: service_started
+    networks:
+      - infodengue
     healthcheck:
-        test: ["CMD-SHELL", "celery inspect ping --destination celery@$$HOSTNAME"]
+        test: ["CMD-SHELL", "celery -A ad_main.celeryapp:app inspect ping --destination celery@$$HOSTNAME | grep -q OK"]
         interval: 30s
         timeout: 10s
         retries: 3
-        start_period: 5s
-    networks:
-      - infodengue
+        start_period: 10s
 
 volumes:
   redis-data:
