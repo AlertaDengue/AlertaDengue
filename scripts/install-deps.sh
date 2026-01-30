@@ -25,9 +25,8 @@ fi
 
 conda activate "$ENV_NAME"
 
-poetry config virtualenvs.create true
-poetry config virtualenvs.in-project true
-poetry env use "$(command -v python)"
+poetry config --local virtualenvs.create false
+poetry config --local virtualenvs.in-project false
 
 if [[ "$MODE" == "prod" ]]; then
   poetry install --no-root --only main
