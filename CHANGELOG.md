@@ -1,6 +1,13 @@
 Release Notes
 ---
 
+## [4.3.1](https://github.com/AlertaDengue/AlertaDengue/compare/4.3.0...4.3.1) (2026-01-30)
+
+### Bug Fixes
+
+* **celery+devtools:** resolve worker startup conflict, split beat, align Poetry install ([#843](https://github.com/AlertaDengue/AlertaDengue/issues/843)) ([bd26fca](https://github.com/AlertaDengue/AlertaDengue/commit/bd26fcae3b7cca64516f633d22bb1c467aac66b3))
+* **upload:** parse DT_NOTIFIC using SEM_NOT and re-derive epiweek ([#836](https://github.com/AlertaDengue/AlertaDengue/issues/836)) ([1b4b48f](https://github.com/AlertaDengue/AlertaDengue/commit/1b4b48fe1a27570ba04d1f8b322feb06f7fee3ef))
+
 ## [4.3.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.2.6...4.3.0) (2026-01-27)
 
 ### Features
