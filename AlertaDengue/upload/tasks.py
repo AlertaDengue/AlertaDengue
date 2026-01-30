@@ -197,7 +197,6 @@ def insert_chunk_to_temp_table(
     chunk = df_chunk.replace({pd.NA: None})
     chunk = parse_dates(chunk, sinan)
     chunk = parse_data(chunk, sinan.cid10, sinan.year)
-    chunk = derive_epiweek_from_dt_notific(chunk)
 
     existing_cols = [
         col for col in SINANUpload.REQUIRED_COLS if col in chunk.columns
