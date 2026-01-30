@@ -78,6 +78,7 @@ RUN ENV_FILE=/tmp/environment.yaml bash /tmp/install-deps.sh dev
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/crontab_setup.sh /opt/services/crontab_setup.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/cronjob /etc/cron.d/cronjob
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/runcelery.sh  /opt/runcelery.sh
+COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/runbeat.sh  /opt/runbeat.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/entrypoint.sh  /opt/entrypoint.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/runwsgi.sh /opt/runwsgi.sh
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/test.sh /opt/services/test.sh
@@ -85,6 +86,7 @@ COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/test.sh /opt/services/
 RUN chmod +x /opt/runwsgi.sh \
   && chmod +x /opt/entrypoint.sh \
   && chmod +x /opt/runcelery.sh \
+  && chmod +x /opt/runbeat.sh \
   && printf '%s\n' \
      'if [ -f /opt/conda/etc/profile.d/conda.sh ]; then' \
      '  . /opt/conda/etc/profile.d/conda.sh' \

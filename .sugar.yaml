@@ -20,6 +20,7 @@ profiles:
         - redis
         - web
         - celery
+        - celery-beat
       available:
         - name: postgres
         - name: memcached
@@ -27,6 +28,7 @@ profiles:
         - name: redis
         - name: web
         - name: celery
+        - name: celery-beat
 
   staging:
     project-name: infodengue-staging
@@ -42,6 +44,7 @@ profiles:
         - redis
         - web
         - celery
+        - celery-beat
       available:
         - name: postgres
         - name: memcached
@@ -49,6 +52,7 @@ profiles:
         - name: redis
         - name: web
         - name: celery
+        - name: celery-beat
 
   prod:
     project-name: infodengue-prod
@@ -64,6 +68,7 @@ profiles:
         - redis
         - web
         - celery
+        - celery-beat
       available:
         - name: postgres
         - name: memcached
@@ -71,3 +76,4 @@ profiles:
         - name: redis
         - name: web
         - name: celery
+        - name: celery-beat
