@@ -238,12 +238,32 @@ def parse_dt_notific_with_sem_not(
     return out.where(chosen.notna(), None)
 
 
+def _to_py_int(value: object) -> int | None:
+    """
+    Convert a scalar to Python int, preserving missing as None.
+
+    Parameters
+    ----------
+    value
+        Scalar value.
+
+    Returns
+    -------
+    int | None
+        Python int if value is not missing, otherwise None.
+    """
+    if pd.isna(value):
+        return None
+    return int(value)
+
+
 def _sinan_year_week_from_ts(
     ts: pd.Series,
 ) -> tuple[pd.Series, pd.Series]:
-    """Compute SINAN epidemiological (year, week) from timestamps.
+    """
+    Compute SINAN epidemiological (year, week) from timestamps.
 
-    SINAN rule:
+    SINAN rule (CDC epiweek):
     - Week starts on Sunday and ends on Saturday.
     - Week-year is the year that contains at least 4 days of that epiweek.
     - Week 1 is the week that contains January 4th.
@@ -279,6 +299,7 @@ def _sinan_year_week_from_ts(
         start_year.astype("string") + "-12-31",
         errors="coerce",
     )
+
     days_in_start_year = pd.Series(7, index=ts.index, dtype="Int64")
     days_in_start_year = days_in_start_year.where(
         ~crosses,
@@ -286,11 +307,13 @@ def _sinan_year_week_from_ts(
     )
 
     week_year = start_year.where(
-        ~crosses | (days_in_start_year >= 4), end_year
+        ~crosses | (days_in_start_year >= 4),
+        end_year,
     )
 
     jan4 = pd.to_datetime(
-        week_year.astype("string") + "-01-04", errors="coerce"
+        week_year.astype("string") + "-01-04",
+        errors="coerce",
     )
     jan4_weekday = jan4.dt.weekday
     jan4_offset = (jan4_weekday + 1) % 7
@@ -305,7 +328,19 @@ def _sinan_year_week_from_ts(
 
 
 def derive_epiweek_from_dt_notific(df: pd.DataFrame) -> pd.DataFrame:
-    """Enforce (NU_ANO, SEM_NOT) derived from DT_NOTIFIC using SINAN calendar."""
+    """
+    Enforce (NU_ANO, SEM_NOT) derived from DT_NOTIFIC using SINAN calendar.
+
+    Parameters
+    ----------
+    df
+        Parsed chunk dataframe.
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe with NU_ANO/SEM_NOT consistent with DT_NOTIFIC.
+    """
     if "DT_NOTIFIC" not in df.columns:
         return df
 
@@ -319,8 +354,11 @@ def derive_epiweek_from_dt_notific(df: pd.DataFrame) -> pd.DataFrame:
 
     if "NU_ANO" in df.columns:
         df.loc[ok, "NU_ANO"] = year.loc[ok]
+        df["NU_ANO"] = df["NU_ANO"].map(_to_py_int)
+
     if "SEM_NOT" in df.columns:
         df.loc[ok, "SEM_NOT"] = week.loc[ok]
+        df["SEM_NOT"] = df["SEM_NOT"].map(_to_py_int)
 
     return df
 
