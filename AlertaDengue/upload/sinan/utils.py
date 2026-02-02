@@ -105,13 +105,14 @@ def convert_nu_ano(year: str, col: pd.Series) -> int:
 
 
 @np.vectorize
-def convert_sem_pri(val: str) -> int | None:
+def convert_sem_pri(val: object) -> int | None:
     if pd.isna(val):
-        return pd.NA
-    try:
-        return Week.fromstring(str(val)).week
-    except (ValueError, AttributeError, TypeError):
-        return pd.NA
+        return None
+    s = str(val).strip()
+    tail = s[-2:] if len(s) >= 2 else ""
+    if tail.isdigit():
+        return int(tail)
+    return None
 
 
 @np.vectorize
@@ -136,13 +137,14 @@ def fill_id_agravo(cid: str, default_cid: str) -> str:
 
 
 @np.vectorize
-def convert_sem_not(val: np.ndarray[int]) -> np.ndarray[int] | None:
+def convert_sem_not(val: object) -> int | None:
     if pd.isna(val):
-        return pd.NA
-    try:
-        return Week.fromstring(str(val)).week
-    except (ValueError, AttributeError, TypeError):
-        return pd.NA
+        return None
+    s = str(val).strip()
+    tail = s[-2:] if len(s) >= 2 else ""
+    if tail.isdigit():
+        return int(tail)
+    return None
 
 
 def is_date_ambiguous(value: str) -> bool:
@@ -205,35 +207,25 @@ def parse_dt_notific_with_sem_not(
     dt_notific: pd.Series,
     sem_not: pd.Series,
 ) -> pd.Series:
-    """
-    Parse DT_NOTIFIC choosing between YYYY-MM-DD and YYYY-DD-MM using SEM_NOT.
+    """Parse DT_NOTIFIC choosing between YYYY-MM-DD and YYYY-DD-MM using SEM_NOT.
 
-    Parameters
-    ----------
-    dt_notific
-        Raw DT_NOTIFIC values.
-    sem_not
-        Raw SEM_NOT values.
-
-    Returns
-    -------
-    pd.Series
-        Parsed dates as dt.date (or None).
+    SEM_NOT in SINAN is based on the SINAN epiweek calendar (Sunday-Saturday
+    + 4+ days rule). This function matches candidates against SEM_NOT using
+    the same SINAN calendar.
     """
     raw = dt_notific.astype("string").str.strip()
     a = pd.to_datetime(raw, format="%Y-%m-%d", errors="coerce")
     b = pd.to_datetime(raw, format="%Y-%d-%m", errors="coerce")
 
     s = sem_not.astype("string").str.strip()
-    extracted = s.str.extract(r"(?P<y>\d{4}).*?(?P<w>\d{2})$")
-    sem_y = pd.to_numeric(extracted["y"], errors="coerce").astype("Int64")
-    sem_w = pd.to_numeric(extracted["w"], errors="coerce").astype("Int64")
+    sem_y = pd.to_numeric(s.str.slice(0, 4), errors="coerce").astype("Int64")
+    sem_w = pd.to_numeric(s.str.slice(4, 6), errors="coerce").astype("Int64")
     sem_code = (sem_y * 100 + sem_w).astype("Int64")
 
-    a_iso = a.dt.isocalendar()
-    b_iso = b.dt.isocalendar()
-    a_code = a_iso.year.astype("Int64") * 100 + a_iso.week.astype("Int64")
-    b_code = b_iso.year.astype("Int64") * 100 + b_iso.week.astype("Int64")
+    a_y, a_w = _sinan_year_week_from_ts(a)
+    b_y, b_w = _sinan_year_week_from_ts(b)
+    a_code = (a_y * 100 + a_w).astype("Int64")
+    b_code = (b_y * 100 + b_w).astype("Int64")
 
     a_dist = (a_code - sem_code).abs()
     b_dist = (b_code - sem_code).abs()
@@ -246,19 +238,108 @@ def parse_dt_notific_with_sem_not(
     return out.where(chosen.notna(), None)
 
 
+def _to_py_int(value: object) -> int | None:
+    """
+    Convert a scalar to Python int, preserving missing as None.
+
+    Parameters
+    ----------
+    value
+        Scalar value.
+
+    Returns
+    -------
+    int | None
+        Python int if value is not missing, otherwise None.
+    """
+    if pd.isna(value):
+        return None
+    return int(value)
+
+
+def _sinan_year_week_from_ts(
+    ts: pd.Series,
+) -> tuple[pd.Series, pd.Series]:
+    """
+    Compute SINAN epidemiological (year, week) from timestamps.
+
+    SINAN rule (CDC epiweek):
+    - Week starts on Sunday and ends on Saturday.
+    - Week-year is the year that contains at least 4 days of that epiweek.
+    - Week 1 is the week that contains January 4th.
+
+    Parameters
+    ----------
+    ts
+        Datetime-like pandas Series.
+
+    Returns
+    -------
+    tuple[pd.Series, pd.Series]
+        (year, week) as nullable Int64 series.
+    """
+    dt_ts = pd.to_datetime(ts, errors="coerce")
+    mask = dt_ts.notna()
+
+    out_year = pd.Series(pd.NA, index=ts.index, dtype="Int64")
+    out_week = pd.Series(pd.NA, index=ts.index, dtype="Int64")
+    if not bool(mask.any()):
+        return out_year, out_week
+
+    weekday = dt_ts.dt.weekday
+    offset = (weekday + 1) % 7
+    week_start = dt_ts - pd.to_timedelta(offset, unit="D")
+    week_end = week_start + pd.to_timedelta(6, unit="D")
+
+    start_year = week_start.dt.year.astype("Int64")
+    end_year = week_end.dt.year.astype("Int64")
+
+    crosses = start_year != end_year
+    end_of_start_year = pd.to_datetime(
+        start_year.astype("string") + "-12-31",
+        errors="coerce",
+    )
+
+    days_in_start_year = pd.Series(7, index=ts.index, dtype="Int64")
+    days_in_start_year = days_in_start_year.where(
+        ~crosses,
+        (end_of_start_year - week_start).dt.days.astype("Int64") + 1,
+    )
+
+    week_year = start_year.where(
+        ~crosses | (days_in_start_year >= 4),
+        end_year,
+    )
+
+    jan4 = pd.to_datetime(
+        week_year.astype("string") + "-01-04",
+        errors="coerce",
+    )
+    jan4_weekday = jan4.dt.weekday
+    jan4_offset = (jan4_weekday + 1) % 7
+    first_week_start = jan4 - pd.to_timedelta(jan4_offset, unit="D")
+
+    week_no = ((week_start - first_week_start).dt.days // 7) + 1
+
+    out_year.loc[mask] = week_year.loc[mask].astype("Int64")
+    out_week.loc[mask] = week_no.loc[mask].astype("Int64")
+
+    return out_year, out_week
+
+
 def derive_epiweek_from_dt_notific(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Enforce (NU_ANO, SEM_NOT) derived from DT_NOTIFIC when present.
+    Enforce (NU_ANO, SEM_NOT) derived from DT_NOTIFIC using SINAN calendar.
 
     Parameters
     ----------
     df
-        Chunk dataframe after parsing.
+        Parsed chunk dataframe.
 
     Returns
     -------
     pd.DataFrame
-        Dataframe with consistent NU_ANO and SEM_NOT.
+        Dataframe with NU_ANO/SEM_NOT consistent with DT_NOTIFIC.
     """
     if "DT_NOTIFIC" not in df.columns:
         return df
@@ -268,11 +349,16 @@ def derive_epiweek_from_dt_notific(df: pd.DataFrame) -> pd.DataFrame:
     if not bool(mask.any()):
         return df
 
-    iso = dt_ts.dt.isocalendar()
+    year, week = _sinan_year_week_from_ts(dt_ts)
+    ok = year.notna() & week.notna()
+
     if "NU_ANO" in df.columns:
-        df.loc[mask, "NU_ANO"] = iso.year.astype("Int64")[mask]
+        df.loc[ok, "NU_ANO"] = year.loc[ok]
+        df["NU_ANO"] = df["NU_ANO"].map(_to_py_int)
+
     if "SEM_NOT" in df.columns:
-        df.loc[mask, "SEM_NOT"] = iso.week.astype("Int64")[mask]
+        df.loc[ok, "SEM_NOT"] = week.loc[ok]
+        df["SEM_NOT"] = df["SEM_NOT"].map(_to_py_int)
 
     return df
 

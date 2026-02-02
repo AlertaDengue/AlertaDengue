@@ -182,4 +182,5 @@ def parse_chunk_to_sinan(
     df, updated_formats = parse_dates_for_run(df, date_formats)
     df = parse_data(df, default_cid=default_cid, year=year)
     df = derive_epiweek_from_dt_notific(df)
+
     return df, updated_formats
