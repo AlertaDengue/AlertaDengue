@@ -22,19 +22,9 @@ from ingestion.sinan_specs import (
 from ingestion.sources import iter_csv, iter_dbf, iter_parquet
 from psycopg2.extras import execute_values
 
+from .types import DataChunk
+
 DB_ENGINE: Any = settings.DB_ENGINE
-
-
-class DataChunk(Protocol):
-    df: pd.DataFrame
-    chunk_id: int
-    row_start: int
-
-
-@dataclass(frozen=True)
-class MergeCounts:
-    inserted: int
-    updated: int
 
 
 def _worker_hostname() -> str:

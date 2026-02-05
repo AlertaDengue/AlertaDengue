@@ -46,31 +46,6 @@ def sha256_file(path: Path, bufsize: int = 1024 * 1024) -> str:
     return h.hexdigest()
 
 
-def chunk_gen(chunksize: int, totalsize: int) -> Iterator[tuple[int, int]]:
-    """
-    Generate chunk bounds.
-
-    Parameters
-    ----------
-    chunksize : int
-        Chunk size.
-    totalsize : int
-        Total size.
-
-    Yields
-    ------
-    tuple[int, int]
-        (lowerbound, upperbound)
-    """
-    chunks = totalsize // chunksize
-    for i in range(chunks):
-        yield i * chunksize, (i + 1) * chunksize
-
-    rest = totalsize % chunksize
-    if rest:
-        yield chunks * chunksize, chunks * chunksize + rest
-
-
 def resolve_source_path(source_path: str) -> Path:
     """
     Resolve a run source_path to an absolute path in the worker container.

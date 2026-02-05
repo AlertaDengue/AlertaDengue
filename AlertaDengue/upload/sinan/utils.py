@@ -45,10 +45,12 @@ UF_CODES = {
 }
 
 
-def chunk_gen(chunksize: int, totalsize: int) -> Iterator[Tuple[int, int]]:
+def chunk_gen(chunksize: int, totalsize: int) -> Iterator[tuple[int, int]]:
+
     chunks = totalsize // chunksize
     for i in range(chunks):
         yield i * chunksize, (i + 1) * chunksize
+
     rest = totalsize % chunksize
     if rest:
         yield chunks * chunksize, chunks * chunksize + rest
