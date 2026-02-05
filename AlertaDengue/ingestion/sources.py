@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import importlib
 from pathlib import Path
 from typing import Iterator
 
@@ -8,6 +9,7 @@ import chardet
 import geopandas as gpd
 import pandas as pd
 from ingestion.sinan_specs import SINAN_SOURCE_TO_DEST_COLUMNS
+from pyarrow import parquet as pq
 from simpledbf import Dbf5
 from upload.sinan.utils import chunk_gen
 
@@ -94,6 +96,19 @@ def _read_dbf_slice(
         encoding="ISO-8859-1",
         include_fields=columns,
     )
+
+
+def iter_parquet(path: Path, chunksize: int) -> Iterator[Chunk]:
+    parquet = pq.ParquetFile(str(path))
+    cols = list(SINAN_SOURCE_TO_DEST_COLUMNS.keys())
+
+    row_start = 0
+    for chunk_id, batch in enumerate(
+        parquet.iter_batches(batch_size=chunksize, columns=cols)
+    ):
+        df = batch.to_pandas()
+        yield Chunk(chunk_id=chunk_id, row_start=row_start, df=df)
+        row_start += len(df)
 
 
 def iter_csv(path: Path, chunksize: int) -> Iterator[Chunk]:
