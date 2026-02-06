@@ -25,22 +25,29 @@ DT_COLS: list[str] = [
     "DT_PCR",
 ]
 
+_ROW_REQUIRED: tuple[str, ...] = (
+    "DT_NOTIFIC",
+    "NU_NOTIFIC",
+    "ID_MUNICIP",
+    "ID_AGRAVO",
+)
+
 
 def _to_date_series(col: pd.Series, fmt: str | None) -> pd.Series:
     """
-    Convert a pandas Series to Python ``datetime.date`` values (or None).
+    Convert a Series to ``datetime.date`` (or None).
 
     Parameters
     ----------
     col
-        Input series containing date-like values.
+        Input values.
     fmt
         Optional datetime format hint.
 
     Returns
     -------
     pd.Series
-        Series of ``datetime.date`` (or None).
+        Values as ``datetime.date`` or None.
     """
 
     def to_date(v: object) -> dt.date | None:
@@ -50,18 +57,14 @@ def _to_date_series(col: pd.Series, fmt: str | None) -> pd.Series:
             return v.date()
         if isinstance(v, dt.date):
             return v
-
         try:
             ts_any = pd.to_datetime(v, format=fmt, errors="raise")
         except Exception:
             return None
-
         if pd.isna(ts_any):
             return None
-
         ts = cast(pd.Timestamp, ts_any)
-        py_dt = cast(dt.datetime, ts.to_pydatetime())
-        return py_dt.date()
+        return cast(dt.datetime, ts.to_pydatetime()).date()
 
     return col.apply(to_date)
 
@@ -70,6 +73,21 @@ def parse_dates_for_run(
     df: pd.DataFrame,
     date_formats: dict[str, str | None],
 ) -> tuple[pd.DataFrame, dict[str, str | None]]:
+    """
+    Parse SINAN date columns for a chunk.
+
+    Parameters
+    ----------
+    df
+        Chunk dataframe.
+    date_formats
+        Persisted date format hints.
+
+    Returns
+    -------
+    tuple[pd.DataFrame, dict[str, str | None]]
+        Parsed dataframe and updated formats.
+    """
     if df.empty:
         return df, date_formats
 
@@ -100,6 +118,47 @@ def parse_dates_for_run(
     return df, updated
 
 
+def _drop_invalid_required_rows(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Drop rows missing required row-level fields.
+
+    Parameters
+    ----------
+    df
+        Parsed dataframe.
+
+    Returns
+    -------
+    pd.DataFrame
+        Filtered dataframe.
+    """
+    missing_cols = [c for c in _ROW_REQUIRED if c not in df.columns]
+    if missing_cols:
+        raise KeyError(f"Missing required columns in chunk: {missing_cols}")
+
+    ok = df[list(_ROW_REQUIRED)].notna().all(axis=1)
+    return df.loc[ok].copy()
+
+
+def _sanitize_for_db(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Replace pandas missing values with Python ``None``.
+
+    Parameters
+    ----------
+    df
+        Dataframe to sanitize.
+
+    Returns
+    -------
+    pd.DataFrame
+        Sanitized dataframe.
+    """
+    if df.empty:
+        return df
+    return df.where(pd.notna(df), None)
+
+
 def parse_chunk_to_sinan(
     df: pd.DataFrame,
     default_cid: str,
@@ -108,9 +167,38 @@ def parse_chunk_to_sinan(
 ) -> tuple[pd.DataFrame, dict[str, str | None]]:
     """
     Apply date parsing + SINAN normalization for a chunk.
+
+    Parameters
+    ----------
+    df
+        Chunk dataframe.
+    default_cid
+        Default CID10 for this run.
+    year
+        Run year (used as fallback for NU_ANO when missing).
+    date_formats
+        Persisted format hints.
+
+    Returns
+    -------
+    tuple[pd.DataFrame, dict[str, str | None]]
+        Normalized chunk and updated formats.
     """
+    if df.empty:
+        return df, date_formats
+
     df, updated_formats = parse_dates_for_run(df, date_formats)
+
+    if df.empty:
+        return df, updated_formats
+
     df = parse_data(df, default_cid=default_cid, year=year)
+
+    if df.empty:
+        return df, updated_formats
+
     df = derive_epiweek_from_dt_notific(df)
+    df = _drop_invalid_required_rows(df)
+    df = _sanitize_for_db(df)
 
     return df, updated_formats

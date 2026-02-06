@@ -84,10 +84,10 @@ def add_dv(geocodigo):
         return None
 
 
-@np.vectorize
 def convert_date(
     col: Union[pd.Timestamp, str, None], fmt: Optional[str] = None
 ) -> Optional[dt.date]:
+    """Convert a value to ``datetime.date`` or None."""
     try:
         if pd.isnull(col):
             return None
@@ -101,8 +101,8 @@ def convert_date(
         return None
 
 
-@np.vectorize
-def convert_nu_ano(year: str, col: pd.Series) -> int:
+def convert_nu_ano(year: int, col: pd.Series) -> int:
+    """Fill missing NU_ANO with the run year."""
     return int(year) if pd.isnull(col) else int(col)
 
 
@@ -152,16 +152,6 @@ def convert_sem_not(val: object) -> int | None:
 def is_date_ambiguous(value: str) -> bool:
     """
     Determine if a date string is ambiguous for inferring its format.
-
-    Parameters
-    ----------
-    value
-        Date string.
-
-    Returns
-    -------
-    bool
-        True if ambiguous, otherwise False.
     """
     try:
         monthfirst = parse(value, dayfirst=False)
@@ -183,19 +173,7 @@ def is_date_ambiguous(value: str) -> bool:
 
 
 def infer_date_format(values: Iterable[str]) -> str | None:
-    """
-    Infer the most common date format in a collection of strings.
-
-    Parameters
-    ----------
-    values
-        Date string values.
-
-    Returns
-    -------
-    str | None
-        Most common inferred format, or None if not inferable.
-    """
+    """Infer the most common date format in a collection of strings."""
     dates = [d for d in set(values) if d and not is_date_ambiguous(d)]
     scores = Counter(
         fmt
@@ -430,6 +408,21 @@ def convert_data_types(col: pd.Series, dtype: type) -> pd.Series:
 
 
 def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
+    """
+    Parse SINAN date columns, keeping best-effort format tracking.
+
+    Parameters
+    ----------
+    df
+        Chunk dataframe.
+    sinan
+        Upload model instance with persisted formats.
+
+    Returns
+    -------
+    pd.DataFrame
+        Parsed dataframe.
+    """
     dt_cols = [
         "DT_SIN_PRI",
         "DT_DIGITA",
@@ -449,21 +442,26 @@ def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
     if df.empty:
         return df
 
-    if "DT_NOTIFIC" in df.columns and "SEM_NOT" in df.columns:
-        df["DT_NOTIFIC"] = parse_dt_notific_with_sem_not(
-            df["DT_NOTIFIC"],
-            df["SEM_NOT"],
-        )
+    if "DT_NOTIFIC" in df.columns:
+        if "SEM_NOT" in df.columns:
+            df["DT_NOTIFIC"] = parse_dt_notific_with_sem_not(
+                df["DT_NOTIFIC"],
+                df["SEM_NOT"],
+            )
+        else:
+            fmt: str | None = None
+            if df["DT_NOTIFIC"].dtype == "object":
+                fmt = infer_date_format(df["DT_NOTIFIC"].astype(str).tolist())
+                formats["DT_NOTIFIC"] = fmt
+            df["DT_NOTIFIC"] = convert_date(df["DT_NOTIFIC"], fmt)
 
     for dt_col in dt_cols:
-        if dt_col not in df.columns:
-            continue
-        if dt_col == "DT_NOTIFIC":
+        if dt_col not in df.columns or dt_col == "DT_NOTIFIC":
             continue
 
-        fmt: str | None = None
+        fmt = None
         if df[dt_col].dtype == "object":
-            fmt = infer_date_format(df[dt_col])
+            fmt = infer_date_format(df[dt_col].astype(str).tolist())
             formats[dt_col] = fmt
 
         df[dt_col] = convert_date(df[dt_col], fmt)
@@ -493,8 +491,28 @@ def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
 
 
 def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
-    df["NU_NOTIFIC"] = fix_nu_notif(df.NU_NOTIFIC)
-    df["ID_MUNICIP"] = add_dv(df.ID_MUNICIP)
+    """
+    Normalize SINAN fields and coerce types.
+
+    Parameters
+    ----------
+    df
+        Chunk dataframe.
+    default_cid
+        Default CID10.
+    year
+        Run year (fallback for NU_ANO).
+
+    Returns
+    -------
+    pd.DataFrame
+        Normalized dataframe.
+    """
+    if df.empty:
+        return df
+
+    df["NU_NOTIFIC"] = fix_nu_notif(df["NU_NOTIFIC"])
+    df["ID_MUNICIP"] = add_dv(df["ID_MUNICIP"])
 
     df["CS_SEXO"] = np.where(
         df["CS_SEXO"].isin(["M", "F"]), df["CS_SEXO"], "I"
@@ -508,31 +526,31 @@ def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
     ]
 
     for int_col in int_cols:
-        df[int_col] = convert_data_types(df[int_col], int)
+        if int_col in df.columns:
+            df[int_col] = convert_data_types(df[int_col], int)
 
-    df["RESUL_PCR_"] = (
-        convert_data_types(df["RESUL_PCR_"], int)
-        if "RESUL_PCR_" in df.columns
-        else 0
-    )
-    df["CRITERIO"] = (
-        convert_data_types(df["CRITERIO"], int)
-        if "CRITERIO" in df.columns
-        else 0
-    )
-    df["CLASSI_FIN"] = (
-        convert_data_types(df["CLASSI_FIN"], int)
-        if "CLASSI_FIN" in df.columns
-        else 0
-    )
+    if "RESUL_PCR_" in df.columns:
+        df["RESUL_PCR_"] = convert_data_types(df["RESUL_PCR_"], int)
+    else:
+        df["RESUL_PCR_"] = 0
 
-    df["ID_AGRAVO"] = fill_id_agravo(df.ID_AGRAVO, default_cid)
+    if "CRITERIO" in df.columns:
+        df["CRITERIO"] = convert_data_types(df["CRITERIO"], int)
+    else:
+        df["CRITERIO"] = 0
+
+    if "CLASSI_FIN" in df.columns:
+        df["CLASSI_FIN"] = convert_data_types(df["CLASSI_FIN"], int)
+    else:
+        df["CLASSI_FIN"] = 0
+
+    df["ID_AGRAVO"] = fill_id_agravo(df["ID_AGRAVO"], default_cid)
     df["ID_AGRAVO"] = df["ID_AGRAVO"].apply(
         lambda v: normalize_cid10(v, default_cid=default_cid)
     )
 
     df["SEM_PRI"] = df["SEM_PRI"].apply(convert_sem_pri)
-    df["NU_ANO"] = convert_nu_ano(year, df.NU_ANO)
+    df["NU_ANO"] = convert_nu_ano(year, df["NU_ANO"])
     df["SEM_NOT"] = df["SEM_NOT"].apply(convert_sem_not)
 
     return df
