@@ -5,9 +5,12 @@ channels:
 dependencies:
   - python=3.10.*
   - poetry
+  - virtualenv
+  - distlib
   - gdal>=3.6,<3.9
   - psycopg2-binary
   - pip
   - pip:
       - makim==1.27.0
       - "containers-sugar>=1.19,<2.0"
+      - pyogrio

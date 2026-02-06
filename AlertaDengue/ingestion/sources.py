@@ -20,6 +20,8 @@ from .sinan_specs import (
 )
 from .types import Chunk
 
+DBF_ENCODING = "ISO-8859-1"
+
 
 def _has_module(name: str) -> bool:
 
@@ -134,30 +136,40 @@ def iter_csv(path: Path, chunksize: int) -> Iterator[Chunk]:
         row_start += len(df)
 
 
-def iter_dbf(path: Path, chunksize: int) -> Iterator[Chunk]:
-    dbf = Dbf5(str(path), codec="iso-8859-1")
-    total = int(dbf.numrec)
+def iter_dbf(
+    path: Path,
+    chunksize: int,
+    cols: list[str] | None = None,
+) -> Iterator[Chunk]:
+    """
+    Stream DBF rows in fixed-size chunks using GeoPandas + pyogrio.
+    """
+    if importlib.util.find_spec("pyogrio") is None:
+        raise RuntimeError(
+            "DBF chunk reading requires 'pyogrio'. Install it and retry."
+        )
 
-    engine = _select_gpd_engine()
-    header_cols = set(_read_dbf_header_columns(path, engine))
-
-    required_cols, rename_map = _resolve_required_columns(header_cols)
-    optional_cols = _resolve_optional_columns(header_cols)
-    cols = required_cols + [c for c in optional_cols if c not in required_cols]
+    if cols is None:
+        cols = list(SINAN_SOURCE_TO_DEST_COLUMNS.keys())
 
     row_start = 0
-    for chunk_id, (lb, ub) in enumerate(chunk_gen(chunksize, total)):
-        row_slice = slice(lb, ub)
-        df = _read_dbf_slice(path, engine, cols, row_slice)
+    chunk_id = 0
 
-        if rename_map:
-            df = df.rename(columns=rename_map)
+    while True:
+        df = gpd.read_file(
+            str(path),
+            include_fields=cols,
+            rows=slice(row_start, row_start + chunksize),
+            ignore_geometry=True,
+            encoding=DBF_ENCODING,
+            engine="pyogrio",
+        )
 
-        if (ub - lb) > 0 and df.empty:
-            raise RuntimeError(
-                f"DBF returned empty chunk: path={path} chunk={chunk_id} "
-                f"rows=[{lb},{ub}) engine={engine}"
-            )
+        if df.empty:
+            if row_start == 0:
+                raise RuntimeError(f"DBF returned 0 rows: {path}")
+            break
 
         yield Chunk(chunk_id=chunk_id, row_start=row_start, df=df)
         row_start += len(df)
+        chunk_id += 1
