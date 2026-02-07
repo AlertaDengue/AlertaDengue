@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.3.2](https://github.com/AlertaDengue/AlertaDengue/compare/4.3.1...4.3.2) (2026-02-07)
+
+### Bug Fixes
+
+* **ingestion:** Fix SINAN staging inserts and align DT_NOTIFIC parsing with SINAN calendar ([#848](https://github.com/AlertaDengue/AlertaDengue/issues/848)) ([645bb24](https://github.com/AlertaDengue/AlertaDengue/commit/645bb2417cc4a04db912c42a086fd2ba6fd1d8ba))
+
 ## [4.3.1](https://github.com/AlertaDengue/AlertaDengue/compare/4.3.0...4.3.1) (2026-01-30)
 
 ### Bug Fixes
