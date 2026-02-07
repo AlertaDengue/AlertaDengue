@@ -101,9 +101,11 @@ def convert_date(
         return None
 
 
-def convert_nu_ano(year: int, col: pd.Series) -> int:
-    """Fill missing NU_ANO with the run year."""
-    return int(year) if pd.isnull(col) else int(col)
+def convert_nu_ano(year: int, col: pd.Series) -> pd.Series:
+    """Normalize NU_ANO, filling missing values with the ingestion year."""
+    y = int(year)
+    s = pd.to_numeric(col, errors="coerce").astype("Int64")
+    return s.fillna(y).astype("Int64")
 
 
 @np.vectorize
@@ -550,7 +552,9 @@ def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
     )
 
     df["SEM_PRI"] = df["SEM_PRI"].apply(convert_sem_pri)
+
     df["NU_ANO"] = convert_nu_ano(year, df["NU_ANO"])
+
     df["SEM_NOT"] = df["SEM_NOT"].apply(convert_sem_not)
 
     return df
