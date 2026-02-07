@@ -8,6 +8,7 @@ from upload.sinan.utils import (
     derive_epiweek_from_dt_notific,
     infer_date_format,
     parse_data,
+    parse_dt_notific_with_sem_not,
 )
 
 DT_COLS: list[str] = [
@@ -24,22 +25,29 @@ DT_COLS: list[str] = [
     "DT_PCR",
 ]
 
+_ROW_REQUIRED: tuple[str, ...] = (
+    "DT_NOTIFIC",
+    "NU_NOTIFIC",
+    "ID_MUNICIP",
+    "ID_AGRAVO",
+)
+
 
 def _to_date_series(col: pd.Series, fmt: str | None) -> pd.Series:
     """
-    Convert a pandas Series to Python ``datetime.date`` values (or None).
+    Convert a Series to ``datetime.date`` (or None).
 
     Parameters
     ----------
     col
-        Input series containing date-like values.
+        Input values.
     fmt
         Optional datetime format hint.
 
     Returns
     -------
     pd.Series
-        Series of ``datetime.date`` (or None).
+        Values as ``datetime.date`` or None.
     """
 
     def to_date(v: object) -> dt.date | None:
@@ -49,97 +57,37 @@ def _to_date_series(col: pd.Series, fmt: str | None) -> pd.Series:
             return v.date()
         if isinstance(v, dt.date):
             return v
-
         try:
             ts_any = pd.to_datetime(v, format=fmt, errors="raise")
         except Exception:
             return None
-
         if pd.isna(ts_any):
             return None
-
         ts = cast(pd.Timestamp, ts_any)
-        py_dt = cast(dt.datetime, ts.to_pydatetime())
-        return py_dt.date()
+        return cast(dt.datetime, ts.to_pydatetime()).date()
 
     return col.apply(to_date)
-
-
-def _parse_sem_not_year_week(
-    sem_not: pd.Series,
-) -> tuple[pd.Series, pd.Series]:
-    """
-    Extract ISO year/week from SEM_NOT-like values (e.g. '202602').
-
-    Parameters
-    ----------
-    sem_not
-        SEM_NOT column as strings/objects.
-
-    Returns
-    -------
-    tuple[pd.Series, pd.Series]
-        (year, week) as Int64 series (nullable).
-    """
-    s = sem_not.astype("string").str.strip()
-    year = pd.to_numeric(s.str.slice(0, 4), errors="coerce").astype("Int64")
-    week = pd.to_numeric(s.str.slice(4, 6), errors="coerce").astype("Int64")
-
-    return year, week
-
-
-def _parse_dt_notific_with_sem_not(
-    dt_notific: pd.Series,
-    sem_not: pd.Series,
-) -> pd.Series:
-    """
-    Parse DT_NOTIFIC choosing between YYYY-MM-DD and YYYY-DD-MM using SEM_NOT.
-
-    Parameters
-    ----------
-    dt_notific
-        Raw DT_NOTIFIC values.
-    sem_not
-        Raw SEM_NOT values.
-
-    Returns
-    -------
-    pd.Series
-        Parsed dates as dt.date (or None).
-    """
-    raw = dt_notific.astype("string").str.strip()
-    a = pd.to_datetime(raw, format="%Y-%m-%d", errors="coerce")
-    b = pd.to_datetime(raw, format="%Y-%d-%m", errors="coerce")
-
-    sem_y, sem_w = _parse_sem_not_year_week(sem_not)
-    sem_code = (sem_y.astype("Int64") * 100 + sem_w.astype("Int64")).astype(
-        "Int64"
-    )
-
-    a_iso = a.dt.isocalendar()
-    b_iso = b.dt.isocalendar()
-    a_code = (
-        a_iso.year.astype("Int64") * 100 + a_iso.week.astype("Int64")
-    ).astype("Int64")
-    b_code = (
-        b_iso.year.astype("Int64") * 100 + b_iso.week.astype("Int64")
-    ).astype("Int64")
-
-    a_dist = (a_code - sem_code).abs()
-    b_dist = (b_code - sem_code).abs()
-
-    has_sem = sem_code.notna()
-    choose_b = b.notna() & (a.isna() | (has_sem & (b_dist < a_dist)))
-
-    chosen = a.where(~choose_b, b)
-    out = chosen.dt.date
-    return out.where(chosen.notna(), None)
 
 
 def parse_dates_for_run(
     df: pd.DataFrame,
     date_formats: dict[str, str | None],
 ) -> tuple[pd.DataFrame, dict[str, str | None]]:
+    """
+    Parse SINAN date columns for a chunk.
+
+    Parameters
+    ----------
+    df
+        Chunk dataframe.
+    date_formats
+        Persisted date format hints.
+
+    Returns
+    -------
+    tuple[pd.DataFrame, dict[str, str | None]]
+        Parsed dataframe and updated formats.
+    """
     if df.empty:
         return df, date_formats
 
@@ -147,7 +95,7 @@ def parse_dates_for_run(
 
     if "DT_NOTIFIC" in df.columns:
         if "SEM_NOT" in df.columns:
-            df["DT_NOTIFIC"] = _parse_dt_notific_with_sem_not(
+            df["DT_NOTIFIC"] = parse_dt_notific_with_sem_not(
                 df["DT_NOTIFIC"],
                 df["SEM_NOT"],
             )
@@ -170,17 +118,45 @@ def parse_dates_for_run(
     return df, updated
 
 
+def _drop_invalid_required_rows(df: pd.DataFrame) -> pd.DataFrame:
+    """Drop rows missing required row-level fields."""
+    missing_cols = [c for c in _ROW_REQUIRED if c not in df.columns]
+    if missing_cols:
+        raise KeyError(f"Missing required columns in chunk: {missing_cols}")
+
+    ok = df[list(_ROW_REQUIRED)].notna().all(axis=1)
+    return df.loc[ok].copy()
+
+
+def _sanitize_for_db(df: pd.DataFrame) -> pd.DataFrame:
+    """Replace pandas missing values with Python ``None``."""
+    if df.empty:
+        return df
+    return df.where(pd.notna(df), None)
+
+
 def parse_chunk_to_sinan(
     df: pd.DataFrame,
     default_cid: str,
     year: int,
     date_formats: dict[str, str | None],
 ) -> tuple[pd.DataFrame, dict[str, str | None]]:
-    """
-    Apply date parsing + SINAN normalization for a chunk.
-    """
+    """Apply date parsing + SINAN normalization for a chunk."""
+    if df.empty:
+        return df, date_formats
+
     df, updated_formats = parse_dates_for_run(df, date_formats)
+
+    if df.empty:
+        return df, updated_formats
+
     df = parse_data(df, default_cid=default_cid, year=year)
+
+    if df.empty:
+        return df, updated_formats
+
     df = derive_epiweek_from_dt_notific(df)
+    df = _drop_invalid_required_rows(df)
+    df = _sanitize_for_db(df)
 
     return df, updated_formats

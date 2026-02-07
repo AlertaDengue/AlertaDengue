@@ -5,10 +5,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable, Protocol
 
+import numpy as np
 import pandas as pd
 from celery import chain, shared_task
 from django.conf import settings
-from django.db import transaction
 from django.utils import timezone
 from ingestion.models import Run, RunStatus, SourceFormat
 from ingestion.schemas import RunError, RunMetadata
@@ -22,19 +22,9 @@ from ingestion.sinan_specs import (
 from ingestion.sources import iter_csv, iter_dbf, iter_parquet
 from psycopg2.extras import execute_values
 
+from .types import DataChunk
+
 DB_ENGINE: Any = settings.DB_ENGINE
-
-
-class DataChunk(Protocol):
-    df: pd.DataFrame
-    chunk_id: int
-    row_start: int
-
-
-@dataclass(frozen=True)
-class MergeCounts:
-    inserted: int
-    updated: int
 
 
 def _worker_hostname() -> str:
@@ -65,9 +55,10 @@ def _normalize_synonyms(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _ensure_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Ensure all expected SINAN source columns exist in the dataframe."""
     for src_col in SINAN_SOURCE_TO_DEST_COLUMNS.keys():
         if src_col not in df.columns:
-            df[src_col] = pd.NA
+            df[src_col] = None
     return df
 
 
@@ -95,6 +86,29 @@ def _dump_err(step: str, exc: Exception) -> dict[str, Any]:
         code=exc.__class__.__name__,
         message=str(exc),
     ).model_dump(mode="json")
+
+
+def _adapt_psycopg2_value(value: Any) -> Any:
+    """
+    Convert pandas/numpy scalars into psycopg2-friendly Python types.
+
+    Parameters
+    ----------
+    value
+        Scalar extracted from a pandas dataframe row.
+
+    Returns
+    -------
+    Any
+        Value compatible with psycopg2 (None, int, float, str, date, datetime).
+    """
+    if value is None or pd.isna(value):
+        return None
+    if isinstance(value, np.generic):
+        return value.item()
+    if isinstance(value, pd.Timestamp):
+        return value.to_pydatetime()
+    return value
 
 
 @shared_task(name="ingestion.enqueue_sinan_run")
@@ -202,8 +216,10 @@ def sinan_stage_run(run_id: str) -> None:
                 stage_df.insert(0, "run_id", str(run_id))
                 stage_df["created_at"] = _now()
 
-                rows = list(stage_df.itertuples(index=False, name=None))
-
+                rows = [
+                    tuple(_adapt_psycopg2_value(v) for v in row)
+                    for row in stage_df.itertuples(index=False, name=None)
+                ]
                 sql = (
                     f"INSERT INTO {_stage_table()} "
                     f"({', '.join(stage_cols)}) VALUES %s"
