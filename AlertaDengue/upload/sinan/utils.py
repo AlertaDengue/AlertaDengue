@@ -410,21 +410,7 @@ def convert_data_types(col: pd.Series, dtype: type) -> pd.Series:
 
 
 def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
-    """
-    Parse SINAN date columns, keeping best-effort format tracking.
-
-    Parameters
-    ----------
-    df
-        Chunk dataframe.
-    sinan
-        Upload model instance with persisted formats.
-
-    Returns
-    -------
-    pd.DataFrame
-        Parsed dataframe.
-    """
+    """Parse SINAN date columns, keeping best-effort format tracking."""
     dt_cols = [
         "DT_SIN_PRI",
         "DT_DIGITA",

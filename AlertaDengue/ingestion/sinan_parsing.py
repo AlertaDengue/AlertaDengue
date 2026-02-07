@@ -119,19 +119,7 @@ def parse_dates_for_run(
 
 
 def _drop_invalid_required_rows(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Drop rows missing required row-level fields.
-
-    Parameters
-    ----------
-    df
-        Parsed dataframe.
-
-    Returns
-    -------
-    pd.DataFrame
-        Filtered dataframe.
-    """
+    """Drop rows missing required row-level fields."""
     missing_cols = [c for c in _ROW_REQUIRED if c not in df.columns]
     if missing_cols:
         raise KeyError(f"Missing required columns in chunk: {missing_cols}")
@@ -141,19 +129,7 @@ def _drop_invalid_required_rows(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _sanitize_for_db(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Replace pandas missing values with Python ``None``.
-
-    Parameters
-    ----------
-    df
-        Dataframe to sanitize.
-
-    Returns
-    -------
-    pd.DataFrame
-        Sanitized dataframe.
-    """
+    """Replace pandas missing values with Python ``None``."""
     if df.empty:
         return df
     return df.where(pd.notna(df), None)
@@ -165,25 +141,7 @@ def parse_chunk_to_sinan(
     year: int,
     date_formats: dict[str, str | None],
 ) -> tuple[pd.DataFrame, dict[str, str | None]]:
-    """
-    Apply date parsing + SINAN normalization for a chunk.
-
-    Parameters
-    ----------
-    df
-        Chunk dataframe.
-    default_cid
-        Default CID10 for this run.
-    year
-        Run year (used as fallback for NU_ANO when missing).
-    date_formats
-        Persisted format hints.
-
-    Returns
-    -------
-    tuple[pd.DataFrame, dict[str, str | None]]
-        Normalized chunk and updated formats.
-    """
+    """Apply date parsing + SINAN normalization for a chunk."""
     if df.empty:
         return df, date_formats
 

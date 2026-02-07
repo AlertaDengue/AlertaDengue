@@ -55,19 +55,7 @@ def _normalize_synonyms(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _ensure_columns(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Ensure all expected SINAN source columns exist in the dataframe.
-
-    Parameters
-    ----------
-    df
-        Chunk dataframe.
-
-    Returns
-    -------
-    pd.DataFrame
-        Dataframe with missing columns added as nulls.
-    """
+    """Ensure all expected SINAN source columns exist in the dataframe."""
     for src_col in SINAN_SOURCE_TO_DEST_COLUMNS.keys():
         if src_col not in df.columns:
             df[src_col] = None
