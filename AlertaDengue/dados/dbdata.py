@@ -13,12 +13,21 @@ import unicodedata
 from collections import defaultdict
 from datetime import datetime
 from functools import lru_cache
-from typing import Any, Final, List, Literal, Optional, Tuple
+from typing import (
+    Any,
+    Callable,
+    Final,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    TypeVar,
+)
 
 import ibis
 import numpy as np
 import pandas as pd
-from ad_main.settings.base import _with_ibis_retry
+import psycopg2
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.text import slugify
@@ -31,26 +40,6 @@ from .episem import episem
 from .models import City
 
 logger = logging.getLogger(__name__)
-
-
-IBIS_CONN_FACTORY = settings.IBIS_CONN_FACTORY
-IBIS_TABLE = getattr(settings, "IBIS_TABLE", None)
-DB_ENGINE = settings.DB_ENGINE
-
-
-def _ibis_table(
-    name: str,
-    *,
-    database: str | None = None,
-) -> ibis.expr.types.relations.Table:
-    """Return an Ibis table expression."""
-    if IBIS_TABLE is not None:
-        return IBIS_TABLE(name, database=database)
-
-    con = IBIS_CONN_FACTORY()
-    if database is None:
-        return con.table(name)
-    return con.table(name, database=database)
 
 
 CID10 = {"dengue": "A90", "chikungunya": "A92.0", "zika": "A928"}
@@ -99,6 +88,38 @@ with open(settings.PROJECT_ROOT / "data" / "municipalities.json", "r") as muns:
     MUNICIPALITIES = json.loads(_mun_decoded)
 
 # Ibis utils
+
+IBIS_CONN_FACTORY = settings.IBIS_CONN_FACTORY
+IBIS_TABLE = getattr(settings, "IBIS_TABLE", None)
+DB_ENGINE = settings.DB_ENGINE
+IBIS_LOCAL = getattr(settings, "_IBIS_LOCAL", None)  # type: ignore
+
+T = TypeVar("T")
+
+
+def _ibis_table(
+    name: str,
+    *,
+    database: str | None = None,
+) -> ibis.expr.types.relations.Table:
+    """Return an Ibis table expression."""
+    if IBIS_TABLE is not None:
+        return IBIS_TABLE(name, database=database)
+
+    con = IBIS_CONN_FACTORY()
+    if database is None:
+        return con.table(name)
+    return con.table(name, database=database)
+
+
+def _with_ibis_retry(fn: Callable[[], T]) -> T:  # pragma: no cover
+    """Execute an Ibis operation with a single reconnect retry."""
+    try:
+        return fn()
+    except psycopg2.InterfaceError:
+        if hasattr(IBIS_LOCAL, "backend"):
+            IBIS_LOCAL.backend = None
+        return fn()
 
 
 def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:

@@ -12,7 +12,7 @@ import os
 import threading
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Optional, TypeVar
+from typing import Any, Optional
 
 import ibis
 import pandas as pd
@@ -155,7 +155,6 @@ ROOT_URLCONF = "ad_main.urls"
 WSGI_APPLICATION = "ad_main.wsgi.application"
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
-T = TypeVar("T")
 _IBIS_LOCAL = threading.local()
 
 PSQL_HOST: str = os.getenv("PSQL_HOST", "postgres")
@@ -164,16 +163,6 @@ PSQL_DB: str = os.getenv("PSQL_DB", "dengue")
 PSQL_USER: str = os.getenv("PSQL_USER", "dengueadmin")
 PSQL_PASSWORD: str = os.getenv("PSQL_PASSWORD", "dengueadmin")
 PSQL_DBF: str = os.getenv("PSQL_DBF", "infodengue")
-
-
-def _with_ibis_retry(fn: Callable[[], T]) -> T:  # pragma: no cover
-    """Execute an Ibis operation with a single reconnect retry."""
-    try:
-        return fn()
-    except psycopg2.InterfaceError:
-        if hasattr(_IBIS_LOCAL, "backend"):
-            _IBIS_LOCAL.backend = None
-        return fn()
 
 
 def get_sqla_conn(psql_db: Optional[str] = None) -> Engine:
