@@ -11,8 +11,24 @@ from django.conf import settings
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 
-DB_ENGINE = settings.DB_ENGINE
 IBIS_CONN_FACTORY = settings.IBIS_CONN_FACTORY
+IBIS_TABLE = getattr(settings, "IBIS_TABLE", None)
+DB_ENGINE = settings.DB_ENGINE
+
+
+def _ibis_table(
+    name: str,
+    *,
+    database: str | None = None,
+) -> ibis.expr.types.relations.Table:
+    """Return an Ibis table expression."""
+    if IBIS_TABLE is not None:
+        return IBIS_TABLE(name, database=database)
+
+    con = IBIS_CONN_FACTORY()
+    if database is None:
+        return con.table(name)
+    return con.table(name, database=database)
 
 
 class NotificationQueries:
@@ -496,12 +512,9 @@ class AlertCity:
                 f"The diseases available are: {list(CID10.keys())}"
             )
 
-        # schema_city = IBIS_CONN.schema("Municipio")
-        # t_hist = schema_city.table(f"Historico_alerta{table_suffix}")
-        t_hist = IBIS_CONN_FACTORY().table(
+        t_hist = _ibis_table(
             name=f"Historico_alerta{get_disease_suffix(disease)}",
-            database=settings.PSQL_DB,
-            schema="Municipio",
+            database="Municipio",
         )
 
         if ew_start and ew_end:

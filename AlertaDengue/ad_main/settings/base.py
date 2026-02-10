@@ -5,13 +5,19 @@ This module contains configuration shared by all environments. Environment-
 specific overrides live in ``dev.py`` and ``prod.py``.
 """
 
+
 from __future__ import annotations
 
 import os
+import threading
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Optional
 
 import ibis
+import pandas as pd
+import psycopg2
+from django.conf import settings
 from django.contrib.messages import constants as messages
 from django.core.files.storage import FileSystemStorage
 from dotenv import load_dotenv
@@ -149,6 +155,8 @@ ROOT_URLCONF = "ad_main.urls"
 WSGI_APPLICATION = "ad_main.wsgi.application"
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
+_IBIS_LOCAL = threading.local()
+
 PSQL_HOST: str = os.getenv("PSQL_HOST", "postgres")
 PSQL_PORT: int = int(os.getenv("PSQL_PORT", "5432"))
 PSQL_DB: str = os.getenv("PSQL_DB", "dengue")
@@ -158,18 +166,7 @@ PSQL_DBF: str = os.getenv("PSQL_DBF", "infodengue")
 
 
 def get_sqla_conn(psql_db: Optional[str] = None) -> Engine:
-    """Create SQLAlchemy engine for a PostgreSQL database.
-
-    Parameters
-    ----------
-    psql_db : str or None, optional
-        Database name to connect to. If None, uses ``PSQL_DB``.
-
-    Returns
-    -------
-    sqlalchemy.engine.Engine
-        Engine bound to the requested PostgreSQL database.
-    """
+    """Create SQLAlchemy engine for a PostgreSQL database."""
     db_name = psql_db or PSQL_DB
     dsn = (
         f"postgresql+psycopg2://{PSQL_USER}:{PSQL_PASSWORD}"
@@ -178,34 +175,45 @@ def get_sqla_conn(psql_db: Optional[str] = None) -> Engine:
     return create_engine(dsn, pool_pre_ping=True, future=True)
 
 
-_IBIS_CONN: Optional[ibis.backends.postgres.Backend] = None
-
-
 def get_ibis_conn() -> ibis.backends.postgres.Backend:
-    global _IBIS_CONN
+    """Return a per-thread Ibis Postgres backend, recreating it if stale."""
+    backend = getattr(_IBIS_LOCAL, "backend", None)
 
-    if _IBIS_CONN is not None:
+    if backend is not None:
         try:
-            _IBIS_CONN.raw_sql("SELECT 1")
-            return _IBIS_CONN
+            backend.raw_sql("SELECT 1")
+            return backend
         except Exception:
-            _IBIS_CONN = None
+            _IBIS_LOCAL.backend = None
 
-    _IBIS_CONN = ibis.postgres.connect(
-        user=os.getenv("PSQL_USER"),
-        password=os.getenv("PSQL_PASSWORD"),
-        host=os.getenv("PSQL_HOST"),
-        port=os.getenv("PSQL_PORT"),
-        database=os.getenv("PSQL_DB"),
+    backend = ibis.postgres.connect(
+        user=PSQL_USER,
+        password=PSQL_PASSWORD,
+        host=PSQL_HOST,
+        port=PSQL_PORT,
+        database=PSQL_DB,
     )
-    return _IBIS_CONN
+    _IBIS_LOCAL.backend = backend
+    return backend
+
+
+def ibis_table(
+    name: str,
+    *,
+    database: str | None = None,
+) -> ibis.expr.types.relations.Table:
+    """Return an Ibis table expression."""
+    con = get_ibis_conn()
+    if database is None:
+        return con.table(name)
+    return con.table(name, database=database)
 
 
 DB_ENGINE: Engine = get_sqla_conn()
 DB_ENGINE_FACTORY = get_sqla_conn
 
-IBIS_CONN = get_ibis_conn()
 IBIS_CONN_FACTORY = get_ibis_conn
+IBIS_TABLE = ibis_table
 
 DATABASE_ROUTERS = ["manager.router.DatabaseAppsRouter"]
 DATABASE_APPS_MAPPING = {

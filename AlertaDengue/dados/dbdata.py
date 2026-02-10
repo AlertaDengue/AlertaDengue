@@ -13,11 +13,21 @@ import unicodedata
 from collections import defaultdict
 from datetime import datetime
 from functools import lru_cache
-from typing import Any, Final, List, Literal, Optional, Tuple
+from typing import (
+    Any,
+    Callable,
+    Final,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    TypeVar,
+)
 
 import ibis
 import numpy as np
 import pandas as pd
+import psycopg2
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.text import slugify
@@ -31,8 +41,6 @@ from .models import City
 
 logger = logging.getLogger(__name__)
 
-DB_ENGINE = settings.DB_ENGINE
-IBIS_CONN_FACTORY = settings.IBIS_CONN_FACTORY
 
 CID10 = {"dengue": "A90", "chikungunya": "A92.0", "zika": "A928"}
 DISEASES_SHORT = ["dengue", "chik", "zika"]
@@ -81,50 +89,55 @@ with open(settings.PROJECT_ROOT / "data" / "municipalities.json", "r") as muns:
 
 # Ibis utils
 
+IBIS_CONN_FACTORY = settings.IBIS_CONN_FACTORY
+IBIS_TABLE = getattr(settings, "IBIS_TABLE", None)
+DB_ENGINE = settings.DB_ENGINE
+IBIS_LOCAL = getattr(settings, "_IBIS_LOCAL", None)  # type: ignore
+
+T = TypeVar("T")
+
+
+def _ibis_table(
+    name: str,
+    *,
+    database: str | None = None,
+) -> ibis.expr.types.relations.Table:
+    """Return an Ibis table expression."""
+    if IBIS_TABLE is not None:
+        return IBIS_TABLE(name, database=database)
+
+    con = IBIS_CONN_FACTORY()
+    if database is None:
+        return con.table(name)
+    return con.table(name, database=database)
+
+
+def _with_ibis_retry(fn: Callable[[], T]) -> T:  # pragma: no cover
+    """Execute an Ibis operation with a single reconnect retry."""
+    try:
+        return fn()
+    except psycopg2.InterfaceError:
+        if hasattr(IBIS_LOCAL, "backend"):
+            IBIS_LOCAL.backend = None
+        return fn()
+
 
 def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
     """
-    PostgreSQLTable[table]
-    name: hist_uf_disease_materialized_view
-    schema:
-        state_abbv : string
-        municipio_geocodigo : int32
-        SE : int32
-        data_iniSE : date
-        casos_est : float32
-        casos : int32
-        nivel : int16
-        receptivo : int16
-    Parameters:
-    ----------
-        uf, disease
-    Returns
-    -------
-        Dataframe
+    Load historical series by UF from a materialized view (cached).
     """
-
-    cache_name = "data_hist" + "_" + str(state_abbv) + "_" + str(disease)
-
+    cache_name = f"data_hist_{state_abbv}_{disease}"
     res = cache.get(cache_name)
+    if res is not None:
+        return res
 
-    if res is None:
-        _disease = get_disease_suffix(disease, empty_for_dengue=False)
-        table_hist_uf = IBIS_CONN_FACTORY().table(
-            f"hist_uf{_disease}_materialized_view"
-        )
+    suffix = get_disease_suffix(disease, empty_for_dengue=False)
+    t = _ibis_table(f"hist_uf{suffix}_materialized_view")
 
-        res = (
-            table_hist_uf[table_hist_uf.state_abbv == state_abbv]
-            .order_by("SE")
-            .execute()
-        )
+    expr = t.filter(t.state_abbv == state_abbv).order_by("SE")
+    res = _with_ibis_retry(expr.execute)
 
-        cache.set(
-            cache_name,
-            res,
-            settings.QUERY_CACHE_TIMEOUT,
-        )
-
+    cache.set(cache_name, res, settings.QUERY_CACHE_TIMEOUT)
     return res
 
 
@@ -137,238 +150,150 @@ class RegionalParameters:
     @lru_cache(maxsize=1)
     def _tables(
         cls,
-    ) -> Tuple[Any, Any, Any, Any]:
-        """Return Ibis table expressions for regional metadata.
+    ) -> tuple[Any, Any, Any, Any]:
+        """
+        Return Ibis tables for (parameters, municipio, estado, regional).
 
         Returns
         -------
         tuple
-            A tuple with Ibis tables in this order:
-            (parameters, municipio, estado, regional).
+            (parameters, municipio, estado, regional)
         """
-        t_parameters = IBIS_CONN_FACTORY().table(
-            "parameters",
-            database=cls.SCHEMA,
-        )
-        t_municipio = IBIS_CONN_FACTORY().table(
-            "Municipio",
-            database=cls.SCHEMA,
-        )
-        t_estado = IBIS_CONN_FACTORY().table(
-            "estado",
-            database=cls.SCHEMA,
-        )
-        t_regional = IBIS_CONN_FACTORY().table(
-            "regional",
-            database=cls.SCHEMA,
-        )
+
+        t_parameters = _ibis_table("parameters", database=cls.SCHEMA)
+        t_municipio = _ibis_table("Municipio", database=cls.SCHEMA)
+        t_estado = _ibis_table("estado", database=cls.SCHEMA)
+        t_regional = _ibis_table("regional", database=cls.SCHEMA)
+
         return t_parameters, t_municipio, t_estado, t_regional
 
     @classmethod
-    def _unpack_tables(
-        cls,
-    ) -> Tuple[Any, Any, Any, Any]:
-        """Shortcut to unpack cached Ibis tables."""
-        return cls._tables()
-
-    @classmethod
-    def get_regional_names(cls, state_name: str) -> List[str]:
-        """Return list of regional names for a given state.
+    def get_regional_names(cls, state_name: str) -> list[str]:
+        """
+        Return list of regional names for a given state.
 
         Parameters
         ----------
-        state_name : str
-            State name (must match values in `Municipio.uf`).
+        state_name
+            State acronym (UF), e.g. "RJ".
 
         Returns
         -------
-        list of str
-            Regional names available for the state.
+        list[str]
+            Regional names.
         """
-        cache_name = (
-            "regional_names_to" + "_" + str(state_name).replace(" ", "_")
-        )
-        res: Optional[List[str]] = cache.get(cache_name)
+        cache_name = f"regional_names_to_{state_name.replace(' ', '_')}"
+        cached = cache.get(cache_name)
+        if cached is not None:
+            return cached
 
-        if res is not None:
-            return res
+        t_parameters, t_municipio, _, t_regional = cls._tables()
 
-        t_parameters, t_municipio, _, t_regional = cls._unpack_tables()
+        mun = t_municipio.filter(t_municipio.uf == state_name)
+        joined = t_regional.join(mun, t_parameters)
 
-        municipio_uf_filter = t_municipio[t_municipio.uf == state_name]
-        t_joined = t_regional.join(
-            municipio_uf_filter,
-            t_parameters,
-        )[t_regional.nome].distinct()
+        expr = joined.select(t_regional.nome).distinct()
+        df = _with_ibis_retry(expr.execute)
 
-        df_regional_names: pd.DataFrame = t_joined.execute()
-        res = df_regional_names["nome"].to_list()
-
-        cache.set(
-            cache_name,
-            res,
-            settings.QUERY_CACHE_TIMEOUT,
-        )
+        res = df["nome"].to_list()
+        cache.set(cache_name, res, settings.QUERY_CACHE_TIMEOUT)
         return res
 
     @classmethod
-    def get_var_climate_info(
-        cls,
-        geocodes: List[int],
-    ) -> Tuple[str, str]:
-        """Return climate configuration for the first matching geocode.
-
-        Parameters
-        ----------
-        geocodes : list of int
-            Geocodes to search in parameters.
-
-        Returns
-        -------
-        tuple of str
-            Pair (codigo_estacao_wu, varcli).
+    def get_var_climate_info(cls, geocodes: list[int]) -> tuple[str, str]:
         """
-        t_parameters, _, _, _ = cls._unpack_tables()
+        Return (codigo_estacao_wu, varcli) for the first matching geocode.
+        """
+        t_parameters, _, _, _ = cls._tables()
 
-        geocode_filter = t_parameters.municipio_geocodigo.isin(geocodes)
-        t_parameters_expr = t_parameters[geocode_filter].distinct()
+        expr = (
+            t_parameters.filter(
+                t_parameters.municipio_geocodigo.isin(geocodes)
+            )
+            .select("codigo_estacao_wu", "varcli")
+            .distinct()
+        )
 
-        climate_proj: pd.DataFrame = t_parameters_expr.projection(
-            ["codigo_estacao_wu", "varcli"]
-        ).execute()
-
-        var_climate_info: Tuple[str, str] = climate_proj.to_records(
-            index=False
-        ).tolist()[0]
-        return var_climate_info
+        df = _with_ibis_retry(expr.execute)
+        row = df.to_records(index=False).tolist()[0]
+        return (str(row[0]), str(row[1]))
 
     @classmethod
     def get_cities(
         cls,
-        regional_name: Optional[str] = None,
-        state_name: Optional[str] = None,
-    ) -> Dict[int, str]:
-        """Return mapping geocode -> city name for a region or state.
-
-        Parameters
-        ----------
-        regional_name : str, optional
-            Regional name, when filtering by region.
-        state_name : str, optional
-            State acronym, e.g. 'RJ'.
-
-        Returns
-        -------
-        dict
-            Mapping geocode (int) to city name (str).
+        regional_name: str | None = None,
+        state_name: str | None = None,
+    ) -> dict[int, str]:
         """
-        cities_by_region: Dict[int, str] = {}
-
+        Return mapping geocode -> city name for a region or state.
+        """
+        cities_by_region: dict[int, str] = {}
         if state_name is None:
             return cities_by_region
 
         if regional_name is not None:
             cache_name = (
-                str(regional_name).replace(" ", "_")
-                + "_"
-                + str(state_name).replace(" ", "_")
+                f"{regional_name.replace(' ', '_')}_"
+                f"{state_name.replace(' ', '_')}"
             )
-            res: Optional[Dict[int, str]] = cache.get(cache_name)
-            if res is not None:
-                return res
+            cached = cache.get(cache_name)
+            if cached is not None:
+                return cached
 
-            t_parameters, t_municipio, _, t_regional = cls._unpack_tables()
+            t_parameters, t_municipio, _, t_regional = cls._tables()
 
-            municipio_proj = t_municipio[
-                "geocodigo",
-                "nome",
-                "uf",
-                "id_regional",
-            ]
-            municipio_uf_filter = municipio_proj[
-                municipio_proj.uf == state_name
-            ].order_by("id_regional")
-
-            regional_proj = t_regional["id", "nome"]
-            regional_name_filter = regional_proj[
-                regional_proj.nome == regional_name
-            ].order_by("id")
-
-            cities_expr: pd.DataFrame = (
-                municipio_uf_filter.join(
-                    regional_name_filter,
-                    t_parameters,
-                )[municipio_uf_filter.geocodigo, municipio_uf_filter.nome]
-                .order_by("nome")
-                .execute()
+            mun = (
+                t_municipio.select("geocodigo", "nome", "uf", "id_regional")
+                .filter(t_municipio.uf == state_name)
+                .order_by("id_regional")
             )
 
-            for row in cities_expr.to_dict(orient="records"):
+            reg = (
+                t_regional.select("id", "nome")
+                .filter(t_regional.nome == regional_name)
+                .order_by("id")
+            )
+
+            joined = mun.join(reg, t_parameters)
+            expr = joined.select(mun.geocodigo, mun.nome).order_by(mun.nome)
+
+            df = _with_ibis_retry(expr.execute)
+            for row in df.to_dict(orient="records"):
                 cities_by_region[int(row["geocodigo"])] = str(row["nome"])
 
             cache.set(
-                cache_name,
-                cities_by_region,
-                settings.QUERY_CACHE_TIMEOUT,
+                cache_name, cities_by_region, settings.QUERY_CACHE_TIMEOUT
             )
             return cities_by_region
 
-        cache_name = (
-            "all_cities_from"
-            + "_"
-            + str(state_name).replace(
-                " ",
-                "_",
-            )
-        )
-        res = cache.get(cache_name)
-        if res is not None:
-            return res
+        cache_name = f"all_cities_from_{state_name.replace(' ', '_')}"
+        cached = cache.get(cache_name)
+        if cached is not None:
+            return cached
 
-        _, t_municipio, _, _ = cls._unpack_tables()
+        _, t_municipio, _, _ = cls._tables()
 
-        state_names: List[str] = [f"{state_name}"]
-        t_municipio_uf_expr = t_municipio.uf.isin(state_names)
-
-        cities_expr: pd.DataFrame = (
-            t_municipio[t_municipio_uf_expr]["geocodigo", "nome"]
+        expr = (
+            t_municipio.filter(t_municipio.uf.isin([state_name]))
+            .select("geocodigo", "nome")
             .order_by("nome")
-            .execute()
         )
 
-        for row in cities_expr.to_dict(orient="records"):
+        df = _with_ibis_retry(expr.execute)
+        for row in df.to_dict(orient="records"):
             cities_by_region[int(row["geocodigo"])] = str(row["nome"])
 
-        cache.set(
-            cache_name,
-            cities_by_region,
-            settings.QUERY_CACHE_TIMEOUT,
-        )
+        cache.set(cache_name, cities_by_region, settings.QUERY_CACHE_TIMEOUT)
         return cities_by_region
 
     @classmethod
-    def get_station_data(
-        cls,
-        geocode: int,
-        disease: str,
-    ) -> Tuple[Any, ...]:
-        """Return climate thresholds for a geocode and disease.
-
-        Parameters
-        ----------
-        geocode : int
-            City geocode.
-        disease : str
-            Disease key in CID10, e.g. ``'dengue'``, ``'chik'``, ``'zika'``.
-
-        Returns
-        -------
-        tuple
-            Sequence of parameter values for the station.
+    def get_station_data(cls, geocode: int, disease: str) -> tuple[Any, ...]:
         """
-        t_parameters, _, _, _ = cls._unpack_tables()
+        Return climate thresholds for a geocode and disease.
+        """
+        t_parameters, _, _, _ = cls._tables()
 
-        climate_keys = [
+        keys = [
             "cid10",
             "municipio_geocodigo",
             "codigo_estacao_wu",
@@ -381,15 +306,14 @@ class RegionalParameters:
             "limiar_epidemico",
         ]
 
-        station_filter = (t_parameters["cid10"] == CID10.get(disease)) & (
-            t_parameters["municipio_geocodigo"] == geocode
+        filt = (t_parameters.cid10 == CID10.get(disease)) & (
+            t_parameters.municipio_geocodigo == geocode
         )
 
-        climate_expr: pd.DataFrame = (
-            t_parameters[climate_keys].filter(station_filter).execute()
-        )
+        expr = t_parameters.filter(filt).select(*keys)
+        df = _with_ibis_retry(expr.execute)
 
-        return tuple(climate_expr.values)
+        return tuple(df.values)
 
 
 # General util functions
@@ -1309,81 +1233,61 @@ class ReportCity:
         disease: str,
         geocode: int,
         year_week: int,
-    ) -> ibis.expr.types.Expr:
+    ) -> pd.DataFrame:
         """
-        Return an ibis expression with the history for a given disease.
-        Parameters
-        ----------
-        disease : str, {'dengue', 'chik', 'zika'}
-        geocode : int
-        year_week : int
-            The starting Year/Week, e.g.: 202002
-        Returns
-        -------
-        ibis.expr.types.Expr
+        Return a DataFrame with the history for a given disease/city.
         """
-
-        if disease not in CID10.keys():
-            raise Exception(
-                f"The diseases available are: {[k for k in CID10.keys()]}"
-            )
+        if disease not in CID10:
+            raise ValueError(f"Unsupported disease: {disease!r}")
 
         table_suffix = ""
         if disease != "dengue":
-            table_suffix = get_disease_suffix(disease)  # F'_{disease}'
+            table_suffix = get_disease_suffix(disease)
 
-        t_hist = IBIS_CONN_FACTORY().table(
-            name=f"Historico_alerta{table_suffix}",
-            database=settings.PSQL_DB,
-            schema="Municipio",
+        t_hist = _ibis_table(
+            f"Historico_alerta{table_suffix}",
+            database="Municipio",
         )
 
-        # 200 = 2 years
         ew_end = year_week
         ew_start = ew_end - 200
 
-        t_hist_filter_bol = (t_hist.SE.between(ew_start, ew_end)) & (
-            t_hist["municipio_geocodigo"] == geocode
+        filt = t_hist.SE.between(ew_start, ew_end) & (
+            t_hist.municipio_geocodigo == geocode
         )
-
-        t_hist_proj = t_hist.filter(t_hist_filter_bol).limit(200)
+        t = t_hist.filter(filt).limit(200)
 
         nivel = (
             ibis.case()
-            .when((t_hist_proj.nivel.cast("string") == "1"), "verde")
-            .when((t_hist_proj.nivel.cast("string") == "2"), "amarelo")
-            .when((t_hist_proj.nivel.cast("string") == "3"), "laranja")
-            .when((t_hist_proj.nivel.cast("string") == "4"), "vermelho")
+            .when(t.nivel.cast("string") == "1", "verde")
+            .when(t.nivel.cast("string") == "2", "amarelo")
+            .when(t.nivel.cast("string") == "3", "laranja")
+            .when(t.nivel.cast("string") == "4", "vermelho")
             .else_("-")
             .end()
         ).name("nivel")
 
-        hist_keys = [
-            t_hist_proj.SE.name("SE"),
-            t_hist_proj.casos.name("casos notif."),
-            t_hist_proj.casos_est.name("casos_est"),
-            t_hist_proj.p_inc100k.name("incidência"),
-            t_hist_proj.p_rt1.name("pr(incid. subir)"),
-            t_hist_proj.tempmin.name("temp.min"),
-            t_hist_proj.tempmed.name("temp.med"),
-            t_hist_proj.tempmax.name("temp.max"),
-            t_hist_proj.umidmin.name("umid.min"),
-            t_hist_proj.umidmed.name("umid.med"),
-            t_hist_proj.umidmax.name("umid.max"),
+        expr = t.select(
+            t.SE.name("SE"),
+            t.casos.name("casos notif."),
+            t.casos_est.name("casos_est"),
+            t.p_inc100k.name("incidência"),
+            t.p_rt1.name("pr(incid. subir)"),
+            t.tempmin.name("temp.min"),
+            t.tempmed.name("temp.med"),
+            t.tempmax.name("temp.max"),
+            t.umidmin.name("umid.min"),
+            t.umidmed.name("umid.med"),
+            t.umidmax.name("umid.max"),
             nivel,
-            t_hist_proj.nivel.name("level_code"),
-        ]
-
-        return (
-            t_hist_proj[hist_keys]
-            # .order_by(("SE", True))
-            .execute().set_index("SE")
+            t.nivel.name("level_code"),
         )
+
+        df = _with_ibis_retry(expr.execute)
+        return df.set_index("SE")
 
 
 class ReportState:
-    """Report State class."""
-
     @classmethod
     def get_regional_by_state(self, state: str) -> pd:
         """
@@ -1426,6 +1330,46 @@ class ReportState:
         return res
 
     @classmethod
+    def create_report_state_data(
+        cls,
+        geocodes: list[int],
+        disease: str,
+        year_week: int,
+    ) -> pd.DataFrame:
+        """
+        Return history for multiple cities for a given disease/state report.
+        """
+        if disease not in CID10:
+            raise ValueError(f"Unsupported disease: {disease!r}")
+
+        table_suffix = ""
+        if disease != "dengue":
+            table_suffix = get_disease_suffix(disease)
+
+        t_hist = _ibis_table(
+            f"Historico_alerta{table_suffix}",
+            database="Municipio",
+        )
+
+        ew_start = year_week - 20
+
+        filt = t_hist.SE.between(ew_start, year_week) & (
+            t_hist.municipio_geocodigo.isin(geocodes)
+        )
+        t = t_hist.filter(filt).limit(100)
+
+        expr = t.select(
+            "SE",
+            "casos_est",
+            "casos",
+            "nivel",
+            "municipio_geocodigo",
+            "municipio_nome",
+        ).order_by(("SE", False))
+
+        return _with_ibis_retry(expr.execute)
+
+    @classmethod
     def create_report_state_data(cls, geocodes, disease, year_week):
         if disease not in CID10.keys():
             raise Exception(
@@ -1438,8 +1382,7 @@ class ReportState:
 
         t_hist = IBIS_CONN_FACTORY().table(
             name=f"Historico_alerta{table_suffix}",
-            database=settings.PSQL_DB,
-            schema="Municipio",
+            database="Municipio",
         )
 
         #  200 = 2 years
