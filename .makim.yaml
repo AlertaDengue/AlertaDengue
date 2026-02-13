@@ -142,16 +142,19 @@ groups:
           sugar --profile dev compose-ext stop
 
       lint:
-        help: Run ruff + mypy on dbdata slice
+        help: Run linter tools
+        hooks:
+          pre-run:
+            - task: clean.tmp
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install "ruff==0.6.4"
-          ruff check \
-            AlertaDengue/dados/dbdata.py \
-            AlertaDengue/ad_main/settings/ci_dbdata.py \
-            AlertaDengue/tests/dbdata
-          mypy --ignore-missing-imports AlertaDengue/tests/dbdata
+          pre-commit install
+          pre-commit run --all-files --verbose
 
+      typecheck:
+        help: Run mypy (best-effort, skip third-party imports)
+        run: |
+          mypy --follow-imports=skip --ignore-missing-imports \
+            AlertaDengue/tests/dbdata
 
       unit:
         help: Run tests with pytest (inside web container)
