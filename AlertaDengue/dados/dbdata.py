@@ -11,7 +11,7 @@ import json
 import logging
 import unicodedata
 from collections import defaultdict
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from datetime import datetime
 from functools import lru_cache
 from typing import (
@@ -34,7 +34,7 @@ from django.core.cache import cache
 from django.utils.text import slugify
 from epiweeks import Week
 from sqlalchemy import bindparam, text
-from sqlalchemy.engine import Engine, Result, Row
+from sqlalchemy.engine import Engine, Row
 
 # local
 from .episem import episem
@@ -1398,44 +1398,3 @@ class ReportState:
         ).order_by(("SE", False))
 
         return _with_ibis_retry(expr.execute)
-
-    @classmethod
-    def create_report_state_data(cls, geocodes, disease, year_week):
-        if disease not in CID10.keys():
-            raise Exception(
-                f"The diseases available are: {[k for k in CID10.keys()]}"
-            )
-
-        table_suffix = ""
-        if disease != "dengue":
-            table_suffix = get_disease_suffix(disease)  # F'_{disease}'
-
-        t_hist = IBIS_CONN_FACTORY().table(
-            name=f"Historico_alerta{table_suffix}",
-            database="Municipio",
-        )
-
-        #  200 = 2 years
-        ew_start = year_week - 20
-
-        t_hist_filter_bol = (t_hist["SE"].between(ew_start, year_week)) & (
-            t_hist["municipio_geocodigo"].isin(geocodes)
-        )
-
-        t_hist_proj = t_hist.filter(t_hist_filter_bol).limit(100)
-
-        cols_ = [
-            "SE",
-            "casos_est",
-            "casos",
-            "nivel",
-            "municipio_geocodigo",
-            "municipio_nome",
-        ]
-
-        return (
-            t_hist_proj[cols_]
-            .order_by(("SE", False))
-            .execute()
-            # .set_index("SE")
-        )
