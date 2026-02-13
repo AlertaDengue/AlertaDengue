@@ -125,17 +125,65 @@ groups:
         run: |
           ${{ env.sugar_run_rm }} --cmd ${{ env.manage_py }} send_mail
 
-      # TESTS
-      test-staging-web:
-        help: Run specific tests for web staging.
+  # TESTS
+  tests:
+    help: Test tasks (dbdata TDD slice)
+    env-file: .envs/.env
+    tasks:
+      setup:
+        help: Setup infra for tests
         run: |
-          for test_name in ['dados', 'dbf', 'gis', 'api']:
-            ${{ env.sugar_run_rm }} --entrypoint "/opt/entrypoint.sh" --cmd . /opt/services/test.sh @(test_name)
+          sugar --profile dev compose-ext start --services postgres --options -d
+          makim develop.container-wait --service postgres --timeout 90
 
-      test-staging-all:
-        help: Run all tests for web staging.
+      teardown:
+        help: Teardown infra for tests
         run: |
-          ${{ env.sugar_run_rm }} --entrypoint "/opt/entrypoint.sh" --cmd ${{ env.manage_py }} test --noinput
+          sugar --profile dev compose-ext stop
+
+      lint:
+        help: Run ruff + mypy on dbdata slice
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "ruff==0.6.4"
+          ruff check \
+            AlertaDengue/dados/dbdata.py \
+            AlertaDengue/ad_main/settings/ci_dbdata.py \
+            AlertaDengue/tests/dbdata
+          mypy --ignore-missing-imports AlertaDengue/tests/dbdata
+
+
+      unit:
+        help: Run tests with pytest (inside web container)
+        args:
+          path:
+            help: Path or module to run (e.g., tests/dbdata)
+            type: string
+            default: "tests/dbdata"
+          settings:
+            help: Django settings module
+            type: string
+            default: "ad_main.settings.testing"
+          params:
+            help: Additional pytest params
+            type: string
+            default: "-vv"
+        env-file: .envs/.env
+        env:
+          POSTGRES_HOST: localhost
+          REDIS_HOST: localhost
+        hooks:
+          pre-run:
+            - task: tests.setup
+          post-run:
+            - task: tests.teardown
+        run: |
+          CMD="PYTHONPATH=/opt/services/AlertaDengue \
+            DJANGO_SETTINGS_MODULE=${{ args.settings }} \
+            PGOPTIONS='-c search_path=test_views,public' \
+            pytest -q ${{ args.path }} ${{ args.params }}"
+          sugar --profile dev compose-ext run --rm --service web \
+            --cmd "sh -lc \"$CMD\""
 
   develop:
     env-file: .envs/.env

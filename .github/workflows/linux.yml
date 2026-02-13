@@ -126,6 +126,12 @@ jobs:
       run: |
           makim develop.container-wait-all --timeout 150
 
+    # - name: Lint (dbdata slice)
+      # run: makim tests.lint
+
+    - name: Unit tests (dbdata slice)
+      run: makim tests.unit
+
     - name: Setup tmate session
       if: "${{ failure() }}"
       uses: mxschmitt/action-tmate@v3
