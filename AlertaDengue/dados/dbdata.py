@@ -11,6 +11,7 @@ import json
 import logging
 import unicodedata
 from collections import defaultdict
+from collections.abc import Mapping, Sequence
 from datetime import datetime
 from functools import lru_cache
 from typing import (
@@ -33,7 +34,7 @@ from django.core.cache import cache
 from django.utils.text import slugify
 from epiweeks import Week
 from sqlalchemy import bindparam, text
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import Engine, Result, Row
 
 # local
 from .episem import episem
@@ -96,6 +97,27 @@ IBIS_LOCAL = getattr(settings, "_IBIS_LOCAL", None)  # type: ignore
 
 T = TypeVar("T")
 
+HIST_UF_MATERIALIZED_VIEWS: Final[dict[str, str]] = {
+    "dengue": "hist_uf_dengue_materialized_view",
+    "chik": "hist_uf_chik_materialized_view",
+    "chikungunya": "hist_uf_chik_materialized_view",
+    "zika": "hist_uf_zika_materialized_view",
+}
+
+
+def _read_sql_df(
+    engine: Engine,
+    sql: str,
+    params: dict[str, object],
+) -> pd.DataFrame:
+    """Execute a SQL query and return a pandas DataFrame."""
+    stmt = text(sql)
+    with engine.connect() as conn:
+        result = conn.execute(stmt, params)
+        columns = list(result.keys())
+        rows: Sequence[Row] = result.fetchall()
+    return pd.DataFrame(rows, columns=columns)
+
 
 def _ibis_table(
     name: str,
@@ -123,19 +145,27 @@ def _with_ibis_retry(fn: Callable[[], T]) -> T:  # pragma: no cover
 
 
 def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
-    """
-    Load historical series by UF from a materialized view (cached).
-    """
+    """Load historical series by UF from a materialized view (cached)."""
     cache_name = f"data_hist_{state_abbv}_{disease}"
     res = cache.get(cache_name)
     if res is not None:
         return res
 
-    suffix = get_disease_suffix(disease, empty_for_dengue=False)
-    t = _ibis_table(f"hist_uf{suffix}_materialized_view")
+    view = HIST_UF_MATERIALIZED_VIEWS.get(disease)
+    if view is None:
+        raise ValueError(f"Unsupported disease: {disease!r}")
 
-    expr = t.filter(t.state_abbv == state_abbv).order_by("SE")
-    res = _with_ibis_retry(expr.execute)
+    sql = (
+        f"SELECT * "
+        f"FROM {view} "
+        f"WHERE state_abbv = :state_abbv "
+        f'ORDER BY "SE" DESC'
+    )
+    res = _read_sql_df(
+        DB_ENGINE,
+        sql,
+        params={"state_abbv": state_abbv},
+    )
 
     cache.set(cache_name, res, settings.QUERY_CACHE_TIMEOUT)
     return res
