@@ -220,8 +220,6 @@ class RegionalParameters:
         Return (codigo_estacao_wu, varcli) for the first matching geocode.
         """
         if not geocodes:
-            # Handle empty list case gracefully if needed, or let query return behavior happen.
-            # Assuming callers pass at least one geocode usually.
             pass
 
         sql = f"""
@@ -230,11 +228,6 @@ class RegionalParameters:
             WHERE municipio_geocodigo IN :geocodes
         """
 
-        # SQLAlchemy handles list params for IN clause if using text() carefully or
-        # explicitly expanding. However, _read_sql_df uses `conn.execute(text(sql), params)`.
-        # To be safe with list parameters and text(), we typically need to use `tuple(geocodes)`
-        # and checking driver support. psycopg2 usually handles tuples.
-
         df = _read_sql_df(
             DB_ENGINE,
             sql,
@@ -242,11 +235,6 @@ class RegionalParameters:
         )
 
         if df.empty:
-            # Fallback or appropriate error handling, mimicking original logic
-            # Original code would crash on index error if empty list returned by existing logic
-            # assuming data exists.
-            # Let's return empty strings or raise, but replicating current logic:
-            # `row = df.to_records(index=False).tolist()[0]` -> raises IndexError if empty
             raise IndexError("No climate info found for provided geocodes")
 
         row = df.to_records(index=False).tolist()[0]
@@ -331,20 +319,6 @@ class RegionalParameters:
         """
         cid10_code = CID10.get(disease, "")
 
-        # Columns must match the original order expected by callers
-        # keys = [
-        #     "cid10",
-        #     "municipio_geocodigo",
-        #     "codigo_estacao_wu",
-        #     "varcli",
-        #     "clicrit",
-        #     "varcli2",
-        #     "clicrit2",
-        #     "limiar_preseason",
-        #     "limiar_posseason",
-        #     "limiar_epidemico",
-        # ]
-
         sql = f"""
             SELECT 
                 cid10,
@@ -367,18 +341,6 @@ class RegionalParameters:
             sql,
             params={"cid10_code": cid10_code, "geocode": geocode},
         )
-
-        # Original implementation returned tuple(df.values) -> tuple of numpy array?
-        # Actually it was returning tuple(df.values). Since df.values is a 2D numpy array,
-        # it might have been returning something weird if multiple rows, but filter matches distinct.
-        # But `df.values` is [[row1], [row2]], so tuple(df.values) gives ([row1], [row2]).
-        # Wait, the callers might expect a flattened tuple if it was a single row?
-        # Looking at usages is tricky without context, but `expr.execute()` returns DataFrame.
-        # If the original code did `tuple(df.values)`, it returns a tuple of numpy arrays (rows).
-
-        # If I want to match exactly what `df.values` does for a DataFrame:
-        # It returns a numpy array. `tuple()` converts the first dimension (rows) to a tuple.
-        # So yes, it returns a tuple of rows.
 
         return tuple(df.values)
 
