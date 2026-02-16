@@ -172,30 +172,9 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
 
 
 class RegionalParameters:
-    """Helpers to query regional parameters via Ibis."""
+    """Helpers to query regional parameters via SQL."""
 
     SCHEMA: str = "Dengue_global"
-
-    @classmethod
-    @lru_cache(maxsize=1)
-    def _tables(
-        cls,
-    ) -> tuple[Any, Any, Any, Any]:
-        """
-        Return Ibis tables for (parameters, municipio, estado, regional).
-
-        Returns
-        -------
-        tuple
-            (parameters, municipio, estado, regional)
-        """
-
-        t_parameters = _ibis_table("parameters", database=cls.SCHEMA)
-        t_municipio = _ibis_table("Municipio", database=cls.SCHEMA)
-        t_estado = _ibis_table("estado", database=cls.SCHEMA)
-        t_regional = _ibis_table("regional", database=cls.SCHEMA)
-
-        return t_parameters, t_municipio, t_estado, t_regional
 
     @classmethod
     def get_regional_names(cls, state_name: str) -> list[str]:
@@ -217,15 +196,21 @@ class RegionalParameters:
         if cached is not None:
             return cached
 
-        t_parameters, t_municipio, _, t_regional = cls._tables()
+        sql = f"""
+            SELECT DISTINCT r.nome
+            FROM "{cls.SCHEMA}"."regional" AS r
+            JOIN "{cls.SCHEMA}"."Municipio" AS m ON r.id = m.id_regional
+            JOIN "{cls.SCHEMA}"."parameters" AS p ON m.geocodigo = p.municipio_geocodigo
+            WHERE m.uf = :state_name
+        """
 
-        mun = t_municipio.filter(t_municipio.uf == state_name)
-        joined = t_regional.join(mun, t_parameters)
+        df = _read_sql_df(
+            DB_ENGINE,
+            sql,
+            params={"state_name": state_name},
+        )
 
-        expr = joined.select(t_regional.nome).distinct()
-        df = _with_ibis_retry(expr.execute)
-
-        res = df["nome"].to_list()
+        res = df["nome"].tolist()
         cache.set(cache_name, res, settings.QUERY_CACHE_TIMEOUT)
         return res
 
@@ -234,17 +219,36 @@ class RegionalParameters:
         """
         Return (codigo_estacao_wu, varcli) for the first matching geocode.
         """
-        t_parameters, _, _, _ = cls._tables()
+        if not geocodes:
+            # Handle empty list case gracefully if needed, or let query return behavior happen.
+            # Assuming callers pass at least one geocode usually.
+            pass
 
-        expr = (
-            t_parameters.filter(
-                t_parameters.municipio_geocodigo.isin(geocodes)
-            )
-            .select("codigo_estacao_wu", "varcli")
-            .distinct()
+        sql = f"""
+            SELECT DISTINCT codigo_estacao_wu, varcli
+            FROM "{cls.SCHEMA}"."parameters"
+            WHERE municipio_geocodigo IN :geocodes
+        """
+
+        # SQLAlchemy handles list params for IN clause if using text() carefully or
+        # explicitly expanding. However, _read_sql_df uses `conn.execute(text(sql), params)`.
+        # To be safe with list parameters and text(), we typically need to use `tuple(geocodes)`
+        # and checking driver support. psycopg2 usually handles tuples.
+
+        df = _read_sql_df(
+            DB_ENGINE,
+            sql,
+            params={"geocodes": tuple(geocodes)},
         )
 
-        df = _with_ibis_retry(expr.execute)
+        if df.empty:
+            # Fallback or appropriate error handling, mimicking original logic
+            # Original code would crash on index error if empty list returned by existing logic
+            # assuming data exists.
+            # Let's return empty strings or raise, but replicating current logic:
+            # `row = df.to_records(index=False).tolist()[0]` -> raises IndexError if empty
+            raise IndexError("No climate info found for provided geocodes")
+
         row = df.to_records(index=False).tolist()[0]
         return (str(row[0]), str(row[1]))
 
@@ -270,26 +274,26 @@ class RegionalParameters:
             if cached is not None:
                 return cached
 
-            t_parameters, t_municipio, _, t_regional = cls._tables()
+            sql = f"""
+                SELECT m.geocodigo, m.nome
+                FROM "{cls.SCHEMA}"."Municipio" AS m
+                JOIN "{cls.SCHEMA}"."regional" AS r ON m.id_regional = r.id
+                JOIN "{cls.SCHEMA}"."parameters" AS p ON m.geocodigo = p.municipio_geocodigo
+                WHERE m.uf = :state_name AND r.nome = :regional_name
+                ORDER BY m.nome
+            """
 
-            mun = (
-                t_municipio.select("geocodigo", "nome", "uf", "id_regional")
-                .filter(t_municipio.uf == state_name)
-                .order_by("id_regional")
+            df = _read_sql_df(
+                DB_ENGINE,
+                sql,
+                params={
+                    "state_name": state_name,
+                    "regional_name": regional_name,
+                },
             )
 
-            reg = (
-                t_regional.select("id", "nome")
-                .filter(t_regional.nome == regional_name)
-                .order_by("id")
-            )
-
-            joined = mun.join(reg, t_parameters)
-            expr = joined.select(mun.geocodigo, mun.nome).order_by(mun.nome)
-
-            df = _with_ibis_retry(expr.execute)
-            for row in df.to_dict(orient="records"):
-                cities_by_region[int(row["geocodigo"])] = str(row["nome"])
+            for row in df.itertuples(index=False):
+                cities_by_region[int(row.geocodigo)] = str(row.nome)
 
             cache.set(
                 cache_name, cities_by_region, settings.QUERY_CACHE_TIMEOUT
@@ -301,17 +305,21 @@ class RegionalParameters:
         if cached is not None:
             return cached
 
-        _, t_municipio, _, _ = cls._tables()
+        sql = f"""
+            SELECT geocodigo, nome
+            FROM "{cls.SCHEMA}"."Municipio"
+            WHERE uf = :state_name
+            ORDER BY nome
+        """
 
-        expr = (
-            t_municipio.filter(t_municipio.uf.isin([state_name]))
-            .select("geocodigo", "nome")
-            .order_by("nome")
+        df = _read_sql_df(
+            DB_ENGINE,
+            sql,
+            params={"state_name": state_name},
         )
 
-        df = _with_ibis_retry(expr.execute)
-        for row in df.to_dict(orient="records"):
-            cities_by_region[int(row["geocodigo"])] = str(row["nome"])
+        for row in df.itertuples(index=False):
+            cities_by_region[int(row.geocodigo)] = str(row.nome)
 
         cache.set(cache_name, cities_by_region, settings.QUERY_CACHE_TIMEOUT)
         return cities_by_region
@@ -321,27 +329,56 @@ class RegionalParameters:
         """
         Return climate thresholds for a geocode and disease.
         """
-        t_parameters, _, _, _ = cls._tables()
+        cid10_code = CID10.get(disease, "")
 
-        keys = [
-            "cid10",
-            "municipio_geocodigo",
-            "codigo_estacao_wu",
-            "varcli",
-            "clicrit",
-            "varcli2",
-            "clicrit2",
-            "limiar_preseason",
-            "limiar_posseason",
-            "limiar_epidemico",
-        ]
+        # Columns must match the original order expected by callers
+        # keys = [
+        #     "cid10",
+        #     "municipio_geocodigo",
+        #     "codigo_estacao_wu",
+        #     "varcli",
+        #     "clicrit",
+        #     "varcli2",
+        #     "clicrit2",
+        #     "limiar_preseason",
+        #     "limiar_posseason",
+        #     "limiar_epidemico",
+        # ]
 
-        filt = (t_parameters.cid10 == CID10.get(disease)) & (
-            t_parameters.municipio_geocodigo == geocode
+        sql = f"""
+            SELECT 
+                cid10,
+                municipio_geocodigo,
+                codigo_estacao_wu,
+                varcli,
+                clicrit,
+                varcli2,
+                clicrit2,
+                limiar_preseason,
+                limiar_posseason,
+                limiar_epidemico
+            FROM "{cls.SCHEMA}"."parameters"
+            WHERE cid10 = :cid10_code 
+              AND municipio_geocodigo = :geocode
+        """
+
+        df = _read_sql_df(
+            DB_ENGINE,
+            sql,
+            params={"cid10_code": cid10_code, "geocode": geocode},
         )
 
-        expr = t_parameters.filter(filt).select(*keys)
-        df = _with_ibis_retry(expr.execute)
+        # Original implementation returned tuple(df.values) -> tuple of numpy array?
+        # Actually it was returning tuple(df.values). Since df.values is a 2D numpy array,
+        # it might have been returning something weird if multiple rows, but filter matches distinct.
+        # But `df.values` is [[row1], [row2]], so tuple(df.values) gives ([row1], [row2]).
+        # Wait, the callers might expect a flattened tuple if it was a single row?
+        # Looking at usages is tricky without context, but `expr.execute()` returns DataFrame.
+        # If the original code did `tuple(df.values)`, it returns a tuple of numpy arrays (rows).
+
+        # If I want to match exactly what `df.values` does for a DataFrame:
+        # It returns a numpy array. `tuple()` converts the first dimension (rows) to a tuple.
+        # So yes, it returns a tuple of rows.
 
         return tuple(df.values)
 

@@ -6,6 +6,10 @@ import os
 import sys
 from pathlib import Path
 
+from ad_main.settings.dev import *  # noqa: F403
+
+DEBUG = True
+
 
 def _load_dotenv_if_available(project_root: Path) -> None:
     """Load .env files if python-dotenv is installed."""
