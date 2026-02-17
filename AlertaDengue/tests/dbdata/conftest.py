@@ -162,3 +162,117 @@ def regional_parameters_tables(db_engine: Engine) -> None:
 
     with db_engine.begin() as conn:
         conn.execute(text(f'DROP SCHEMA IF EXISTS "{schema}" CASCADE'))
+
+
+@pytest.fixture()
+def report_data_tables(db_engine: Engine) -> None:
+    """Create schema and tables for ReportCity and ReportState tests."""
+    schemas = ["Municipio", "Dengue_global"]
+
+    with db_engine.begin() as conn:
+        for schema in schemas:
+            conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{schema}"'))
+
+        # Drop tables if exist
+        conn.execute(
+            text('DROP TABLE IF EXISTS "Municipio"."Historico_alerta"')
+        )
+        conn.execute(
+            text('DROP TABLE IF EXISTS "Municipio"."Historico_alerta_chik"')
+        )
+        conn.execute(
+            text('DROP TABLE IF EXISTS "Municipio"."Historico_alerta_zika"')
+        )
+        conn.execute(text('DROP TABLE IF EXISTS "Dengue_global"."Municipio"'))
+        conn.execute(text('DROP TABLE IF EXISTS "Dengue_global"."regional"'))
+
+        # Create Dengue_global.Municipio and regional (for get_regional_by_state)
+        conn.execute(
+            text(
+                """
+            CREATE TABLE IF NOT EXISTS "Dengue_global"."regional" (
+                id INTEGER PRIMARY KEY,
+                nome TEXT
+            )
+        """
+            )
+        )
+
+        conn.execute(
+            text(
+                """
+            CREATE TABLE IF NOT EXISTS "Dengue_global"."Municipio" (
+                geocodigo BIGINT PRIMARY KEY,
+                nome TEXT,
+                uf TEXT,
+                id_regional INTEGER,
+                regional TEXT
+            )
+        """
+            )
+        )
+
+        # Create Historico_alerta tables
+        create_hist_sql = """
+            CREATE TABLE "Municipio"."{table}" (
+                id SERIAL PRIMARY KEY,
+                "SE" INTEGER,
+                "data_iniSE" DATE,
+                municipio_geocodigo BIGINT,
+                casos INTEGER,
+                casos_est INTEGER,
+                casos_est_min INTEGER,
+                casos_est_max INTEGER,
+                nivel INTEGER,
+                p_inc100k NUMERIC,
+                p_rt1 NUMERIC,
+                tempmin NUMERIC,
+                tempmed NUMERIC,
+                tempmax NUMERIC,
+                umidmin NUMERIC,
+                umidmed NUMERIC,
+                umidmax NUMERIC
+            )
+        """
+
+        for suffix in ["", "_chik", "_zika"]:
+            table_name = f"Historico_alerta{suffix}"
+            conn.execute(text(create_hist_sql.format(table=table_name)))
+
+        # Insert Mock Data
+        # Rio de Janeiro (3304557), SE 202401
+        conn.execute(
+            text(
+                """
+            INSERT INTO "Municipio"."Historico_alerta" 
+            ("SE", "data_iniSE", municipio_geocodigo, casos, casos_est, nivel, p_inc100k, p_rt1)
+            VALUES
+            (202401, '2024-01-01', 3304557, 10, 15, 2, 5.0, 0.8),
+            (202402, '2024-01-08', 3304557, 20, 25, 3, 10.0, 1.2)
+        """
+            )
+        )
+
+        # Insert Mock Data for City/Regional
+        conn.execute(
+            text(
+                """
+            INSERT INTO "Dengue_global"."regional" (id, nome) VALUES (1, 'Metropolitana I')
+        """
+            )
+        )
+
+        conn.execute(
+            text(
+                """
+            INSERT INTO "Dengue_global"."Municipio" (geocodigo, nome, uf, id_regional, regional) 
+            VALUES (3304557, 'Rio de Janeiro', 'RJ', 1, 'Metropolitana I') 
+        """
+            )
+        )
+
+    yield
+
+    with db_engine.begin() as conn:
+        for schema in schemas:
+            conn.execute(text(f'DROP SCHEMA IF EXISTS "{schema}" CASCADE'))
