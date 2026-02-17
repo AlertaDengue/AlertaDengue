@@ -1,9 +1,4 @@
-"""Database helpers for epidemiological data in AlertaDengue.
-
-This module provides convenience accessors and helpers for the main
-database engine and Ibis connection, using settings defined in
-``ad_main.settings``.
-"""
+"""Database helpers for epidemiological data in AlertaDengue."""
 
 from __future__ import annotations
 
@@ -25,7 +20,6 @@ from typing import (
     TypeVar,
 )
 
-import ibis
 import numpy as np
 import pandas as pd
 import psycopg2
@@ -38,7 +32,6 @@ from sqlalchemy.engine import Engine, Row
 
 # local
 from .episem import episem
-from .models import City
 
 logger = logging.getLogger(__name__)
 
@@ -88,12 +81,7 @@ with open(settings.PROJECT_ROOT / "data" / "municipalities.json", "r") as muns:
     _mun_decoded = muns.read().encode().decode("utf-8-sig")
     MUNICIPALITIES = json.loads(_mun_decoded)
 
-# Ibis utils
-
-IBIS_CONN_FACTORY = settings.IBIS_CONN_FACTORY
-IBIS_TABLE = getattr(settings, "IBIS_TABLE", None)
 DB_ENGINE = settings.DB_ENGINE
-IBIS_LOCAL = getattr(settings, "_IBIS_LOCAL", None)  # type: ignore
 
 T = TypeVar("T")
 
@@ -117,31 +105,6 @@ def _read_sql_df(
         columns = list(result.keys())
         rows: Sequence[Row] = result.fetchall()
     return pd.DataFrame(rows, columns=columns)
-
-
-def _ibis_table(
-    name: str,
-    *,
-    database: str | None = None,
-) -> ibis.expr.types.relations.Table:
-    """Return an Ibis table expression."""
-    if IBIS_TABLE is not None:
-        return IBIS_TABLE(name, database=database)
-
-    con = IBIS_CONN_FACTORY()
-    if database is None:
-        return con.table(name)
-    return con.table(name, database=database)
-
-
-def _with_ibis_retry(fn: Callable[[], T]) -> T:  # pragma: no cover
-    """Execute an Ibis operation with a single reconnect retry."""
-    try:
-        return fn()
-    except psycopg2.InterfaceError:
-        if hasattr(IBIS_LOCAL, "backend"):
-            IBIS_LOCAL.backend = None
-        return fn()
 
 
 def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
@@ -1273,52 +1236,59 @@ class ReportCity:
         if disease != "dengue":
             table_suffix = get_disease_suffix(disease)
 
-        t_hist = _ibis_table(
-            f"Historico_alerta{table_suffix}",
-            database="Municipio",
-        )
+        table_name = f"Historico_alerta{table_suffix}"
 
         ew_end = year_week
         ew_start = ew_end - 200
 
-        filt = t_hist.SE.between(ew_start, ew_end) & (
-            t_hist.municipio_geocodigo == geocode
+        # Note: SE is typically an integer YYYYWW. Subtracting 200 from it directly
+        # (e.g. 202401 - 200 = 202201) works roughly but isn't chemically pure date math.
+        # However, preserving the logic from original code: `ew_start = ew_end - 200`
+
+        sql = f"""
+            SELECT 
+                "SE" AS "SE",
+                casos AS "casos notif.",
+                casos_est AS "casos_est",
+                p_inc100k AS "incidência",
+                p_rt1 AS "pr(incid. subir)",
+                tempmin AS "temp.min",
+                tempmed AS "temp.med",
+                tempmax AS "temp.max",
+                umidmin AS "umid.min",
+                umidmed AS "umid.med",
+                umidmax AS "umid.max",
+                CASE 
+                    WHEN nivel = 1 THEN 'verde'
+                    WHEN nivel = 2 THEN 'amarelo'
+                    WHEN nivel = 3 THEN 'laranja'
+                    WHEN nivel = 4 THEN 'vermelho'
+                    ELSE '-' 
+                END AS nivel,
+                nivel AS level_code
+            FROM "Municipio"."{table_name}"
+            WHERE 
+                "SE" BETWEEN :ew_start AND :ew_end
+                AND municipio_geocodigo = :geocode
+            ORDER BY "SE"
+            LIMIT 200
+        """
+
+        df = _read_sql_df(
+            DB_ENGINE,
+            sql,
+            params={
+                "ew_start": ew_start,
+                "ew_end": ew_end,
+                "geocode": geocode,
+            },
         )
-        t = t_hist.filter(filt).limit(200)
-
-        nivel = (
-            ibis.case()
-            .when(t.nivel.cast("string") == "1", "verde")
-            .when(t.nivel.cast("string") == "2", "amarelo")
-            .when(t.nivel.cast("string") == "3", "laranja")
-            .when(t.nivel.cast("string") == "4", "vermelho")
-            .else_("-")
-            .end()
-        ).name("nivel")
-
-        expr = t.select(
-            t.SE.name("SE"),
-            t.casos.name("casos notif."),
-            t.casos_est.name("casos_est"),
-            t.p_inc100k.name("incidência"),
-            t.p_rt1.name("pr(incid. subir)"),
-            t.tempmin.name("temp.min"),
-            t.tempmed.name("temp.med"),
-            t.tempmax.name("temp.max"),
-            t.umidmin.name("umid.min"),
-            t.umidmed.name("umid.med"),
-            t.umidmax.name("umid.max"),
-            nivel,
-            t.nivel.name("level_code"),
-        )
-
-        df = _with_ibis_retry(expr.execute)
         return df.set_index("SE")
 
 
 class ReportState:
     @classmethod
-    def get_regional_by_state(self, state: str) -> pd:
+    def get_regional_by_state(cls, state: str) -> pd.DataFrame:
         """
         Import CSV file with the municipalities of regional health by state.
         Parameters
@@ -1335,21 +1305,23 @@ class ReportState:
         if res is None:
             uf_name = ALL_STATE_NAMES[state][0]
 
-            data = City.objects.filter(state=uf_name)
+            sql = f"""
+                SELECT 
+                    m.id_regional AS id_regional,
+                    m.regional AS nome_regional,
+                    m.geocodigo AS municipio_geocodigo,
+                    m.nome AS municipio_nome
+                FROM "Dengue_global"."Municipio" AS m
+                WHERE m.uf = :uf_name
+            """
 
-            res = pd.DataFrame(
-                list(data.values("id_regional", "regional", "geocode", "name"))
+            df = _read_sql_df(
+                DB_ENGINE,
+                sql,
+                params={"uf_name": uf_name},
             )
 
-            res.rename(
-                columns={
-                    "regional": "nome_regional",
-                    "geocode": "municipio_geocodigo",
-                    "name": "municipio_nome",
-                },
-                inplace=True,
-            )
-
+            res = df
             cache.set(
                 cache_name,
                 res,
@@ -1375,25 +1347,48 @@ class ReportState:
         if disease != "dengue":
             table_suffix = get_disease_suffix(disease)
 
-        t_hist = _ibis_table(
-            f"Historico_alerta{table_suffix}",
-            database="Municipio",
-        )
+        table_name = f"Historico_alerta{table_suffix}"
 
         ew_start = year_week - 20
 
-        filt = t_hist.SE.between(ew_start, year_week) & (
-            t_hist.municipio_geocodigo.isin(geocodes)
+        # We need to construct the IN clause for geocodes.
+        if not geocodes:
+            return pd.DataFrame(
+                columns=[
+                    "SE",
+                    "casos_est",
+                    "casos",
+                    "nivel",
+                    "municipio_geocodigo",
+                    "municipio_nome",
+                ]
+            )
+
+        # Use parameterized query with tuple for IN clause
+
+        sql = f"""
+            SELECT
+                h."SE",
+                h.casos_est,
+                h.casos,
+                h.nivel,
+                h.municipio_geocodigo,
+                m.nome AS municipio_nome
+            FROM "Municipio"."{table_name}" AS h
+            JOIN "Dengue_global"."Municipio" AS m ON h.municipio_geocodigo = m.geocodigo
+            WHERE 
+                h."SE" BETWEEN :ew_start AND :ew_end
+                AND h.municipio_geocodigo IN :geocodes
+            ORDER BY h."SE"
+        """
+
+        df = _read_sql_df(
+            DB_ENGINE,
+            sql,
+            params={
+                "ew_start": ew_start,
+                "ew_end": year_week,
+                "geocodes": tuple(geocodes),
+            },
         )
-        t = t_hist.filter(filt).limit(100)
-
-        expr = t.select(
-            "SE",
-            "casos_est",
-            "casos",
-            "nivel",
-            "municipio_geocodigo",
-            "municipio_nome",
-        ).order_by(("SE", False))
-
-        return _with_ibis_retry(expr.execute)
+        return df
