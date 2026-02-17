@@ -36,6 +36,12 @@ from .episem import episem
 logger = logging.getLogger(__name__)
 
 
+DB_ENGINE = getattr(settings, "DB_ENGINE")
+PROJECT_ROOT = getattr(settings, "PROJECT_ROOT")
+QUERY_CACHE_TIMEOUT = getattr(settings, "QUERY_CACHE_TIMEOUT")
+
+T = TypeVar("T")
+
 CID10 = {"dengue": "A90", "chikungunya": "A92.0", "zika": "A928"}
 DISEASES_SHORT = ["dengue", "chik", "zika"]
 DISEASES_NAME = CID10.keys()
@@ -77,13 +83,10 @@ STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
 MAP_CENTER = {k: v[1] for k, v in ALL_STATE_NAMES.items()}
 MAP_ZOOM = {k: v[2] for k, v in ALL_STATE_NAMES.items()}
 
-with open(settings.PROJECT_ROOT / "data" / "municipalities.json", "r") as muns:
+with open(PROJECT_ROOT / "data" / "municipalities.json", "r") as muns:
     _mun_decoded = muns.read().encode().decode("utf-8-sig")
     MUNICIPALITIES = json.loads(_mun_decoded)
 
-DB_ENGINE = settings.DB_ENGINE
-
-T = TypeVar("T")
 
 HIST_UF_MATERIALIZED_VIEWS: Final[dict[str, str]] = {
     "dengue": "hist_uf_dengue_materialized_view",
@@ -130,7 +133,7 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
         params={"state_abbv": state_abbv},
     )
 
-    cache.set(cache_name, res, settings.QUERY_CACHE_TIMEOUT)
+    cache.set(cache_name, res, QUERY_CACHE_TIMEOUT)
     return res
 
 
@@ -174,7 +177,7 @@ class RegionalParameters:
         )
 
         res = df["nome"].tolist()
-        cache.set(cache_name, res, settings.QUERY_CACHE_TIMEOUT)
+        cache.set(cache_name, res, QUERY_CACHE_TIMEOUT)
         return res
 
     @classmethod
@@ -246,9 +249,7 @@ class RegionalParameters:
             for row in df.itertuples(index=False):
                 cities_by_region[int(row.geocodigo)] = str(row.nome)
 
-            cache.set(
-                cache_name, cities_by_region, settings.QUERY_CACHE_TIMEOUT
-            )
+            cache.set(cache_name, cities_by_region, QUERY_CACHE_TIMEOUT)
             return cities_by_region
 
         cache_name = f"all_cities_from_{state_name.replace(' ', '_')}"
@@ -272,7 +273,7 @@ class RegionalParameters:
         for row in df.itertuples(index=False):
             cities_by_region[int(row.geocodigo)] = str(row.nome)
 
-        cache.set(cache_name, cities_by_region, settings.QUERY_CACHE_TIMEOUT)
+        cache.set(cache_name, cities_by_region, QUERY_CACHE_TIMEOUT)
         return cities_by_region
 
     @classmethod
@@ -337,14 +338,8 @@ def normalize_str(string: str) -> str:
     return string
 
 
-def get_disease_suffix(
-    disease: Literal["dengue", "zika", "chikungunya"],
-    empty_for_dengue: bool = True,
-):
-    """
-    :param disease:
-    :return:
-    """
+def get_disease_suffix(disease: str, empty_for_dengue: bool = True) -> str:
+    """Get the suffix for a disease."""
     return (
         ("" if empty_for_dengue else "_dengue")
         if disease == "dengue"
@@ -431,7 +426,7 @@ def get_all_active_cities_state(
     with db_engine.connect() as conn:
         rows = conn.execute(stmt).fetchall()
 
-    cache.set(cache_key, rows, settings.QUERY_CACHE_TIMEOUT)
+    cache.set(cache_key, rows, QUERY_CACHE_TIMEOUT)
     return list(rows)
 
 
@@ -605,7 +600,7 @@ def load_series(
 
     if len(dados_alerta) == 0:
         result = {key_str: None}
-        cache.set(cache_key, result, settings.QUERY_CACHE_TIMEOUT)
+        cache.set(cache_key, result, QUERY_CACHE_TIMEOUT)
         return {key_str: None, key_int: None}
 
     series = defaultdict(lambda: defaultdict(list))
@@ -631,7 +626,7 @@ def load_series(
         series[key_str][k] = dados_alerta[k].astype(float).tolist()
 
     payload = {key_str: dict(series[key_str])}
-    cache.set(cache_key, payload, settings.QUERY_CACHE_TIMEOUT)
+    cache.set(cache_key, payload, QUERY_CACHE_TIMEOUT)
 
     result = dict(payload)
     result[key_int] = result[key_str]
@@ -919,7 +914,7 @@ class NotificationResume:
             )
             cities_alert = cities_alert.set_index("id")
 
-        cache.set(cache_key, cities_alert, settings.QUERY_CACHE_TIMEOUT)
+        cache.set(cache_key, cities_alert, QUERY_CACHE_TIMEOUT)
         logger.info("Cache set for key: %s", cache_key)
 
         return cities_alert
@@ -1325,7 +1320,7 @@ class ReportState:
             cache.set(
                 cache_name,
                 res,
-                settings.QUERY_CACHE_TIMEOUT,
+                QUERY_CACHE_TIMEOUT,
             )
 
         return res

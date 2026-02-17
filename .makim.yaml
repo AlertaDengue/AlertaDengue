@@ -154,7 +154,7 @@ groups:
         help: Run mypy (best-effort, skip third-party imports)
         run: |
           mypy --follow-imports=skip --ignore-missing-imports \
-            AlertaDengue/tests/dbdata
+            AlertaDengue/dados/dbdata.py
 
       unit:
         help: Run tests with pytest (inside web container)

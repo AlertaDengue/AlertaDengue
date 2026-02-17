@@ -40,10 +40,6 @@ os.environ.setdefault("PYTHONPATH", repo_root)
 os.environ.setdefault("POSTGRES_HOST", "localhost")
 os.environ.setdefault("REDIS_HOST", "localhost")
 
-from ad_main.settings.dev import *  # noqa: F403,E402
-
-DEBUG = True
-
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",

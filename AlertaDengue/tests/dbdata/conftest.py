@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+
 import pytest
 from django.conf import settings
 from sqlalchemy import text
@@ -14,11 +16,11 @@ HIST_UF_VIEW = "hist_uf_dengue_materialized_view"
 @pytest.fixture()
 def db_engine() -> Engine:
     """Return the SQLAlchemy engine configured by Django settings."""
-    return settings.DB_ENGINE
+    return getattr(settings, "DB_ENGINE")
 
 
 @pytest.fixture()
-def hist_uf_dengue_table(db_engine: Engine) -> None:
+def hist_uf_dengue_table(db_engine: Engine) -> Iterator[None]:
     """Create a fake hist_uf_dengue_materialized_view in a test schema."""
     with db_engine.begin() as conn:
         conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{TEST_SCHEMA}"'))
@@ -57,7 +59,7 @@ def hist_uf_dengue_table(db_engine: Engine) -> None:
 
 
 @pytest.fixture()
-def regional_parameters_tables(db_engine: Engine) -> None:
+def regional_parameters_tables(db_engine: Engine) -> Iterator[None]:
     """Create a fake Dengue_global schema and tables for RegionalParameters tests."""
     schema = "Dengue_global"
     with db_engine.begin() as conn:
@@ -130,8 +132,8 @@ def regional_parameters_tables(db_engine: Engine) -> None:
         )
 
         # Municipios
-        # 3304557: Rio de Janeiro (Metro I)
-        # 3303302: Niterói (Metro II)
+        # 3304557: Rio de Janeiro
+        # 3303302: Niterói
         conn.execute(
             text(
                 f"""
@@ -165,7 +167,7 @@ def regional_parameters_tables(db_engine: Engine) -> None:
 
 
 @pytest.fixture()
-def report_data_tables(db_engine: Engine) -> None:
+def report_data_tables(db_engine: Engine) -> Iterator[None]:
     """Create schema and tables for ReportCity and ReportState tests."""
     schemas = ["Municipio", "Dengue_global"]
 
