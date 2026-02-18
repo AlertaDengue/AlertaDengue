@@ -25,7 +25,9 @@ def hist_uf_dengue_table(db_engine: Engine) -> Iterator[None]:
     with db_engine.begin() as conn:
         conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{TEST_SCHEMA}"'))
         conn.execute(
-            text(f'DROP TABLE IF EXISTS "{TEST_SCHEMA}".{HIST_UF_VIEW}')
+            text(
+                f'DROP TABLE IF EXISTS "{TEST_SCHEMA}".{HIST_UF_VIEW} CASCADE'
+            )
         )
         conn.execute(
             text(
@@ -66,10 +68,16 @@ def regional_parameters_tables(db_engine: Engine) -> Iterator[None]:
         conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{schema}"'))
 
         # Drop tables if exist
-        conn.execute(text(f'DROP TABLE IF EXISTS "{schema}"."parameters"'))
-        conn.execute(text(f'DROP TABLE IF EXISTS "{schema}"."Municipio"'))
-        conn.execute(text(f'DROP TABLE IF EXISTS "{schema}"."estado"'))
-        conn.execute(text(f'DROP TABLE IF EXISTS "{schema}"."regional"'))
+        conn.execute(
+            text(f'DROP TABLE IF EXISTS "{schema}"."parameters" CASCADE')
+        )
+        conn.execute(
+            text(f'DROP TABLE IF EXISTS "{schema}"."Municipio" CASCADE')
+        )
+        conn.execute(text(f'DROP TABLE IF EXISTS "{schema}"."estado" CASCADE'))
+        conn.execute(
+            text(f'DROP TABLE IF EXISTS "{schema}"."regional" CASCADE')
+        )
 
         # Create tables
         # Municipio
@@ -177,16 +185,24 @@ def report_data_tables(db_engine: Engine) -> Iterator[None]:
 
         # Drop tables if exist
         conn.execute(
-            text('DROP TABLE IF EXISTS "Municipio"."Historico_alerta"')
+            text('DROP TABLE IF EXISTS "Municipio"."Historico_alerta" CASCADE')
         )
         conn.execute(
-            text('DROP TABLE IF EXISTS "Municipio"."Historico_alerta_chik"')
+            text(
+                'DROP TABLE IF EXISTS "Municipio"."Historico_alerta_chik" CASCADE'
+            )
         )
         conn.execute(
-            text('DROP TABLE IF EXISTS "Municipio"."Historico_alerta_zika"')
+            text(
+                'DROP TABLE IF EXISTS "Municipio"."Historico_alerta_zika" CASCADE'
+            )
         )
-        conn.execute(text('DROP TABLE IF EXISTS "Dengue_global"."Municipio"'))
-        conn.execute(text('DROP TABLE IF EXISTS "Dengue_global"."regional"'))
+        conn.execute(
+            text('DROP TABLE IF EXISTS "Dengue_global"."Municipio" CASCADE')
+        )
+        conn.execute(
+            text('DROP TABLE IF EXISTS "Dengue_global"."regional" CASCADE')
+        )
 
         # Create Dengue_global.Municipio and regional (for get_regional_by_state)
         conn.execute(
@@ -268,7 +284,7 @@ def report_data_tables(db_engine: Engine) -> Iterator[None]:
             text(
                 """
             INSERT INTO "Dengue_global"."Municipio" (geocodigo, nome, uf, id_regional, regional) 
-            VALUES (3304557, 'Rio de Janeiro', 'RJ', 1, 'Metropolitana I') 
+            VALUES (3304557, 'Rio de Janeiro', 'Rio de Janeiro', 1, 'Metropolitana I')
         """
             )
         )
