@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.4.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.3.3...4.4.0) (2026-02-19)
+
+### Features
+
+* **api:** Refactor AlertCity.search to use SQLAlchemy/SQL instead of IBIS ([#860](https://github.com/AlertaDengue/AlertaDengue/issues/860)) ([3a94449](https://github.com/AlertaDengue/AlertaDengue/commit/3a94449a44c99a53530435dc0a0aa69f337f1dc9))
+
 ## [4.3.3](https://github.com/AlertaDengue/AlertaDengue/compare/4.3.2...4.3.3) (2026-02-19)
 
 ### Bug Fixes
