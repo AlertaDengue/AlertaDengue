@@ -1,34 +1,14 @@
-from typing import Optional
+from typing import Any, Optional
 
-import ibis
-import ibis.expr.datatypes as dt
 import pandas as pd
 from dados.dbdata import CID10, STATE_NAME, get_disease_suffix  # noqa:F401
 
 # local
-# from ad_main.settings.base import get_ibis_conn
 from django.conf import settings
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 
-IBIS_CONN_FACTORY = settings.IBIS_CONN_FACTORY
-IBIS_TABLE = getattr(settings, "IBIS_TABLE", None)
 DB_ENGINE = settings.DB_ENGINE
-
-
-def _ibis_table(
-    name: str,
-    *,
-    database: str | None = None,
-) -> ibis.expr.types.relations.Table:
-    """Return an Ibis table expression."""
-    if IBIS_TABLE is not None:
-        return IBIS_TABLE(name, database=database)
-
-    con = IBIS_CONN_FACTORY()
-    if database is None:
-        return con.table(name)
-    return con.table(name, database=database)
 
 
 class NotificationQueries:
@@ -165,7 +145,7 @@ class NotificationQueries:
         )
 
         with db_engine.connect() as conn:
-            result = conn.execute(sql, "casos")
+            result = conn.execute(text(sql))
             return pd.DataFrame(result.fetchall(), columns=result.keys())
 
     def get_selected_rows(self, db_engine: Engine = DB_ENGINE):
@@ -195,7 +175,7 @@ class NotificationQueries:
         )
 
         with db_engine.connect() as conn:
-            result = conn.execute(sql, "casos")
+            result = conn.execute(text(sql))
             return pd.DataFrame(result.fetchall(), columns=result.keys())
 
     def get_disease_dist(self, db_engine: Engine = DB_ENGINE) -> pd.DataFrame:
@@ -491,9 +471,11 @@ class AlertCity:
         geocode: int,
         ew_start: Optional[int] = None,
         ew_end: Optional[int] = None,
-    ) -> ibis.expr:
+        db_engine: Engine = DB_ENGINE,
+    ) -> pd.DataFrame:
         """
-        Return an ibis expression with the history for a given disease.
+        Return the history for a given disease as a pandas DataFrame.
+
         Parameters
         ----------
         disease : str, {'dengue', 'chikungunya', 'zika'}
@@ -502,45 +484,51 @@ class AlertCity:
             The starting Year/Week, e.g.: 202202
         ew_end : Optional[int]
             The ending Year/Week, e.g.: 202205
+        db_engine : Engine
+            SQLAlchemy engine to use for the query.
+
         Returns
         -------
-        ibis.expr.types.Expr
+        pd.DataFrame
         """
 
         if disease not in CID10.keys():
-            raise Exception(
+            raise ValueError(
                 f"The diseases available are: {list(CID10.keys())}"
             )
 
-        t_hist = _ibis_table(
-            name=f"Historico_alerta{get_disease_suffix(disease)}",
-            database="Municipio",
-        )
+        table_name = f"Historico_alerta{get_disease_suffix(disease)}"
 
         if ew_start and ew_end:
-            t_hist_filter_bol = (
-                t_hist["SE"].between(int(ew_start), int(ew_end))
-            ) & (t_hist["municipio_geocodigo"] == geocode)
-
-            t_hist_filter_expr = t_hist.filter(t_hist_filter_bol).order_by(
-                ibis.desc("SE")
-            )
-
+            sql = f"""
+                SELECT *,
+                    sum(casos) OVER () as notif_accum_year
+                FROM "Municipio"."{table_name}"
+                WHERE "SE" BETWEEN :ew_start AND :ew_end
+                  AND municipio_geocodigo = :geocode
+                ORDER BY "SE" DESC
+            """
+            params = {
+                "ew_start": int(ew_start),
+                "ew_end": int(ew_end),
+                "geocode": geocode,
+            }
         else:
-            t_hist_filter_expr = (
-                t_hist.filter(t_hist["municipio_geocodigo"] == geocode)
-                .order_by(ibis.desc("SE"))
-                .limit(3)
-            )
+            sql = f"""
+                SELECT *,
+                    sum(casos) OVER () as notif_accum_year
+                FROM "Municipio"."{table_name}"
+                WHERE municipio_geocodigo = :geocode
+                ORDER BY "SE" DESC
+                LIMIT 3
+            """
+            params = {"geocode": geocode}
 
-        t_hist_accum_expr = t_hist_filter_expr.mutate(
-            notif_accum_year=t_hist_filter_expr.casos.sum()
-        )
+        with db_engine.connect() as conn:
+            result = conn.execute(text(sql), params)
+            df = pd.DataFrame(result.fetchall(), columns=result.keys())
 
-        t_hist_accum_expr = t_hist_accum_expr.mutate(
-            data_iniSE=t_hist_accum_expr.data_iniSE.cast(dt.timestamp)
-        )
+        if not df.empty:
+            df["data_iniSE"] = pd.to_datetime(df["data_iniSE"])
 
-        # print(ibis.impala.compile(t_hist_accum_expr))
-
-        return t_hist_accum_expr
+        return df
