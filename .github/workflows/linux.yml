@@ -143,6 +143,11 @@ jobs:
         sugar --profile dev compose-ext logs -- -n 200
         docker ps -a
 
+    - name: Generate logs
+      if: ${{ failure() }}
+      run: |
+        sugar compose logs --all > /tmp/containers-services.log
+
     - name: Stop services
       if: ${{ always() }}
       run: |
