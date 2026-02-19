@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.3.3](https://github.com/AlertaDengue/AlertaDengue/compare/4.3.2...4.3.3) (2026-02-19)
+
+### Bug Fixes
+
+* **dbdata:** remove deprecated ibis schema usage and standardize table access ([#852](https://github.com/AlertaDengue/AlertaDengue/issues/852)) ([1f1f221](https://github.com/AlertaDengue/AlertaDengue/commit/1f1f221e304b2bbedc9afbcb0fde66210815e81f))
+
 ## [4.3.2](https://github.com/AlertaDengue/AlertaDengue/compare/4.3.1...4.3.2) (2026-02-07)
 
 ### Bug Fixes
