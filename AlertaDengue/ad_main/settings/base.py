@@ -109,7 +109,6 @@ LOCAL_APPS = [
     "dados",
     "gis",
     "forecast",
-    "dbf.apps.DbfConfig",
     "api",
     "upload",
     "ingestion",
@@ -171,51 +170,14 @@ def get_sqla_conn(psql_db: Optional[str] = None) -> Engine:
     return create_engine(dsn, pool_pre_ping=True, future=True)
 
 
-def get_ibis_conn() -> ibis.backends.postgres.Backend:
-    """Return a per-thread Ibis Postgres backend, recreating it if stale."""
-    backend = getattr(_IBIS_LOCAL, "backend", None)
-
-    if backend is not None:
-        try:
-            backend.raw_sql("SELECT 1")
-            return backend
-        except Exception:
-            _IBIS_LOCAL.backend = None
-
-    backend = ibis.postgres.connect(
-        user=PSQL_USER,
-        password=PSQL_PASSWORD,
-        host=PSQL_HOST,
-        port=PSQL_PORT,
-        database=PSQL_DB,
-    )
-    _IBIS_LOCAL.backend = backend
-    return backend
-
-
-def ibis_table(
-    name: str,
-    *,
-    database: str | None = None,
-) -> ibis.expr.types.relations.Table:
-    """Return an Ibis table expression."""
-    con = get_ibis_conn()
-    if database is None:
-        return con.table(name)
-    return con.table(name, database=database)
-
-
 DB_ENGINE: Engine = get_sqla_conn()
 DB_ENGINE_FACTORY = get_sqla_conn
 
-IBIS_CONN_FACTORY = get_ibis_conn
-IBIS_TABLE = ibis_table
 
 DATABASE_ROUTERS = ["manager.router.DatabaseAppsRouter"]
 DATABASE_APPS_MAPPING = {
     "dados": "dados",
     "default": "default",
-    "dbf": "infodengue",
     "forecast": "forecast",
 }
 
@@ -481,7 +443,7 @@ def build_result_backend(debug: bool) -> str:
 
 BOOTSTRAP4 = {
     "form_renderers": {
-        "default": "dbf.forms.FormRendererWithHiddenFieldErrors"
+        "default": "dados.forms.FormRendererWithHiddenFieldErrors"
     }
 }
 
