@@ -9,12 +9,10 @@ specific overrides live in ``dev.py`` and ``prod.py``.
 from __future__ import annotations
 
 import os
-import threading
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Optional
 
-import ibis
 import pandas as pd
 import psycopg2
 from django.conf import settings
@@ -154,8 +152,6 @@ CHUNKED_UPLOAD_STORAGE_CLASS = DBFSINANStorage
 ROOT_URLCONF = "ad_main.urls"
 WSGI_APPLICATION = "ad_main.wsgi.application"
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
-
-_IBIS_LOCAL = threading.local()
 
 PSQL_HOST: str = os.getenv("PSQL_HOST", "postgres")
 PSQL_PORT: int = int(os.getenv("PSQL_PORT", "5432"))

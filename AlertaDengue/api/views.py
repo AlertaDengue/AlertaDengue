@@ -161,18 +161,17 @@ class AlertCityView(View, _GetMethod):
                     disease=disease,
                     ew_start=eyw_start,
                     ew_end=eyw_end,
-                ).execute()
+                )
             else:
                 # Use the keyword arguments for mobile app
                 df = AlertCity.search(
                     geocode=geocode,
                     disease=disease,
-                ).execute()
+                )
 
-            df.drop(
-                columns=["municipio_geocodigo", "municipio_nome"],
-                inplace=True,
-            )
+            # Drop geocode if present
+            if "municipio_geocodigo" in df.columns:
+                df.drop(columns=["municipio_geocodigo"], inplace=True)
 
             if format == "json":
                 result = df.to_json(orient="records")
