@@ -18,8 +18,9 @@ RUN usermod -u ${HOST_UID} postgres \
 RUN apt-get update \
       && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
       && apt-get install -y --no-install-recommends \
-           postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
-           postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts \
+      postgresql-plpython3-14 \
+      postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
+      postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts \
       && rm -rf /var/lib/apt/lists/*
 
 USER postgres

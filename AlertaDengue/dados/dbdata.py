@@ -1,9 +1,4 @@
-"""Database helpers for epidemiological data in AlertaDengue.
-
-This module provides convenience accessors and helpers for the main
-database engine and Ibis connection, using settings defined in
-``ad_main.settings``.
-"""
+"""Database helpers for epidemiological data in AlertaDengue."""
 
 from __future__ import annotations
 
@@ -11,6 +6,7 @@ import json
 import logging
 import unicodedata
 from collections import defaultdict
+from collections.abc import Sequence
 from datetime import datetime
 from functools import lru_cache
 from typing import (
@@ -24,7 +20,6 @@ from typing import (
     TypeVar,
 )
 
-import ibis
 import numpy as np
 import pandas as pd
 import psycopg2
@@ -33,14 +28,19 @@ from django.core.cache import cache
 from django.utils.text import slugify
 from epiweeks import Week
 from sqlalchemy import bindparam, text
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import Engine, Row
 
 # local
 from .episem import episem
-from .models import City
 
 logger = logging.getLogger(__name__)
 
+
+DB_ENGINE = getattr(settings, "DB_ENGINE")
+PROJECT_ROOT = getattr(settings, "PROJECT_ROOT")
+QUERY_CACHE_TIMEOUT = getattr(settings, "QUERY_CACHE_TIMEOUT")
+
+T = TypeVar("T")
 
 CID10 = {"dengue": "A90", "chikungunya": "A92.0", "zika": "A928"}
 DISEASES_SHORT = ["dengue", "chik", "zika"]
@@ -83,89 +83,64 @@ STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
 MAP_CENTER = {k: v[1] for k, v in ALL_STATE_NAMES.items()}
 MAP_ZOOM = {k: v[2] for k, v in ALL_STATE_NAMES.items()}
 
-with open(settings.PROJECT_ROOT / "data" / "municipalities.json", "r") as muns:
+with open(PROJECT_ROOT / "data" / "municipalities.json", "r") as muns:
     _mun_decoded = muns.read().encode().decode("utf-8-sig")
     MUNICIPALITIES = json.loads(_mun_decoded)
 
-# Ibis utils
 
-IBIS_CONN_FACTORY = settings.IBIS_CONN_FACTORY
-IBIS_TABLE = getattr(settings, "IBIS_TABLE", None)
-DB_ENGINE = settings.DB_ENGINE
-IBIS_LOCAL = getattr(settings, "_IBIS_LOCAL", None)  # type: ignore
-
-T = TypeVar("T")
-
-
-def _ibis_table(
-    name: str,
-    *,
-    database: str | None = None,
-) -> ibis.expr.types.relations.Table:
-    """Return an Ibis table expression."""
-    if IBIS_TABLE is not None:
-        return IBIS_TABLE(name, database=database)
-
-    con = IBIS_CONN_FACTORY()
-    if database is None:
-        return con.table(name)
-    return con.table(name, database=database)
+HIST_UF_MATERIALIZED_VIEWS: Final[dict[str, str]] = {
+    "dengue": "hist_uf_dengue_materialized_view",
+    "chik": "hist_uf_chik_materialized_view",
+    "chikungunya": "hist_uf_chik_materialized_view",
+    "zika": "hist_uf_zika_materialized_view",
+}
 
 
-def _with_ibis_retry(fn: Callable[[], T]) -> T:  # pragma: no cover
-    """Execute an Ibis operation with a single reconnect retry."""
-    try:
-        return fn()
-    except psycopg2.InterfaceError:
-        if hasattr(IBIS_LOCAL, "backend"):
-            IBIS_LOCAL.backend = None
-        return fn()
+def _read_sql_df(
+    engine: Engine,
+    sql: str,
+    params: dict[str, object],
+) -> pd.DataFrame:
+    """Execute a SQL query and return a pandas DataFrame."""
+    stmt = text(sql)
+    with engine.connect() as conn:
+        result = conn.execute(stmt, params)
+        columns = list(result.keys())
+        rows: Sequence[Row] = result.fetchall()
+    return pd.DataFrame(rows, columns=columns)
 
 
 def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
-    """
-    Load historical series by UF from a materialized view (cached).
-    """
+    """Load historical series by UF from a materialized view (cached)."""
     cache_name = f"data_hist_{state_abbv}_{disease}"
     res = cache.get(cache_name)
     if res is not None:
         return res
 
-    suffix = get_disease_suffix(disease, empty_for_dengue=False)
-    t = _ibis_table(f"hist_uf{suffix}_materialized_view")
+    view = HIST_UF_MATERIALIZED_VIEWS.get(disease)
+    if view is None:
+        raise ValueError(f"Unsupported disease: {disease!r}")
 
-    expr = t.filter(t.state_abbv == state_abbv).order_by("SE")
-    res = _with_ibis_retry(expr.execute)
+    sql = (
+        f"SELECT * "
+        f"FROM {view} "
+        f"WHERE state_abbv = :state_abbv "
+        f'ORDER BY "SE" DESC'
+    )
+    res = _read_sql_df(
+        DB_ENGINE,
+        sql,
+        params={"state_abbv": state_abbv},
+    )
 
-    cache.set(cache_name, res, settings.QUERY_CACHE_TIMEOUT)
+    cache.set(cache_name, res, QUERY_CACHE_TIMEOUT)
     return res
 
 
 class RegionalParameters:
-    """Helpers to query regional parameters via Ibis."""
+    """Helpers to query regional parameters via SQL."""
 
     SCHEMA: str = "Dengue_global"
-
-    @classmethod
-    @lru_cache(maxsize=1)
-    def _tables(
-        cls,
-    ) -> tuple[Any, Any, Any, Any]:
-        """
-        Return Ibis tables for (parameters, municipio, estado, regional).
-
-        Returns
-        -------
-        tuple
-            (parameters, municipio, estado, regional)
-        """
-
-        t_parameters = _ibis_table("parameters", database=cls.SCHEMA)
-        t_municipio = _ibis_table("Municipio", database=cls.SCHEMA)
-        t_estado = _ibis_table("estado", database=cls.SCHEMA)
-        t_regional = _ibis_table("regional", database=cls.SCHEMA)
-
-        return t_parameters, t_municipio, t_estado, t_regional
 
     @classmethod
     def get_regional_names(cls, state_name: str) -> list[str]:
@@ -187,16 +162,22 @@ class RegionalParameters:
         if cached is not None:
             return cached
 
-        t_parameters, t_municipio, _, t_regional = cls._tables()
+        sql = f"""
+            SELECT DISTINCT r.nome
+            FROM "{cls.SCHEMA}"."regional" AS r
+            JOIN "{cls.SCHEMA}"."Municipio" AS m ON r.id = m.id_regional
+            JOIN "{cls.SCHEMA}"."parameters" AS p ON m.geocodigo = p.municipio_geocodigo
+            WHERE m.uf = :state_name
+        """
 
-        mun = t_municipio.filter(t_municipio.uf == state_name)
-        joined = t_regional.join(mun, t_parameters)
+        df = _read_sql_df(
+            DB_ENGINE,
+            sql,
+            params={"state_name": state_name},
+        )
 
-        expr = joined.select(t_regional.nome).distinct()
-        df = _with_ibis_retry(expr.execute)
-
-        res = df["nome"].to_list()
-        cache.set(cache_name, res, settings.QUERY_CACHE_TIMEOUT)
+        res = df["nome"].tolist()
+        cache.set(cache_name, res, QUERY_CACHE_TIMEOUT)
         return res
 
     @classmethod
@@ -204,17 +185,24 @@ class RegionalParameters:
         """
         Return (codigo_estacao_wu, varcli) for the first matching geocode.
         """
-        t_parameters, _, _, _ = cls._tables()
+        if not geocodes:
+            pass
 
-        expr = (
-            t_parameters.filter(
-                t_parameters.municipio_geocodigo.isin(geocodes)
-            )
-            .select("codigo_estacao_wu", "varcli")
-            .distinct()
+        sql = f"""
+            SELECT DISTINCT codigo_estacao_wu, varcli
+            FROM "{cls.SCHEMA}"."parameters"
+            WHERE municipio_geocodigo IN :geocodes
+        """
+
+        df = _read_sql_df(
+            DB_ENGINE,
+            sql,
+            params={"geocodes": tuple(geocodes)},
         )
 
-        df = _with_ibis_retry(expr.execute)
+        if df.empty:
+            raise IndexError("No climate info found for provided geocodes")
+
         row = df.to_records(index=False).tolist()[0]
         return (str(row[0]), str(row[1]))
 
@@ -240,30 +228,28 @@ class RegionalParameters:
             if cached is not None:
                 return cached
 
-            t_parameters, t_municipio, _, t_regional = cls._tables()
+            sql = f"""
+                SELECT m.geocodigo, m.nome
+                FROM "{cls.SCHEMA}"."Municipio" AS m
+                JOIN "{cls.SCHEMA}"."regional" AS r ON m.id_regional = r.id
+                JOIN "{cls.SCHEMA}"."parameters" AS p ON m.geocodigo = p.municipio_geocodigo
+                WHERE m.uf = :state_name AND r.nome = :regional_name
+                ORDER BY m.nome
+            """
 
-            mun = (
-                t_municipio.select("geocodigo", "nome", "uf", "id_regional")
-                .filter(t_municipio.uf == state_name)
-                .order_by("id_regional")
+            df = _read_sql_df(
+                DB_ENGINE,
+                sql,
+                params={
+                    "state_name": state_name,
+                    "regional_name": regional_name,
+                },
             )
 
-            reg = (
-                t_regional.select("id", "nome")
-                .filter(t_regional.nome == regional_name)
-                .order_by("id")
-            )
+            for row in df.itertuples(index=False):
+                cities_by_region[int(row.geocodigo)] = str(row.nome)
 
-            joined = mun.join(reg, t_parameters)
-            expr = joined.select(mun.geocodigo, mun.nome).order_by(mun.nome)
-
-            df = _with_ibis_retry(expr.execute)
-            for row in df.to_dict(orient="records"):
-                cities_by_region[int(row["geocodigo"])] = str(row["nome"])
-
-            cache.set(
-                cache_name, cities_by_region, settings.QUERY_CACHE_TIMEOUT
-            )
+            cache.set(cache_name, cities_by_region, QUERY_CACHE_TIMEOUT)
             return cities_by_region
 
         cache_name = f"all_cities_from_{state_name.replace(' ', '_')}"
@@ -271,19 +257,23 @@ class RegionalParameters:
         if cached is not None:
             return cached
 
-        _, t_municipio, _, _ = cls._tables()
+        sql = f"""
+            SELECT geocodigo, nome
+            FROM "{cls.SCHEMA}"."Municipio"
+            WHERE uf = :state_name
+            ORDER BY nome
+        """
 
-        expr = (
-            t_municipio.filter(t_municipio.uf.isin([state_name]))
-            .select("geocodigo", "nome")
-            .order_by("nome")
+        df = _read_sql_df(
+            DB_ENGINE,
+            sql,
+            params={"state_name": state_name},
         )
 
-        df = _with_ibis_retry(expr.execute)
-        for row in df.to_dict(orient="records"):
-            cities_by_region[int(row["geocodigo"])] = str(row["nome"])
+        for row in df.itertuples(index=False):
+            cities_by_region[int(row.geocodigo)] = str(row.nome)
 
-        cache.set(cache_name, cities_by_region, settings.QUERY_CACHE_TIMEOUT)
+        cache.set(cache_name, cities_by_region, QUERY_CACHE_TIMEOUT)
         return cities_by_region
 
     @classmethod
@@ -291,27 +281,30 @@ class RegionalParameters:
         """
         Return climate thresholds for a geocode and disease.
         """
-        t_parameters, _, _, _ = cls._tables()
+        cid10_code = CID10.get(disease, "")
 
-        keys = [
-            "cid10",
-            "municipio_geocodigo",
-            "codigo_estacao_wu",
-            "varcli",
-            "clicrit",
-            "varcli2",
-            "clicrit2",
-            "limiar_preseason",
-            "limiar_posseason",
-            "limiar_epidemico",
-        ]
+        sql = f"""
+            SELECT 
+                cid10,
+                municipio_geocodigo,
+                codigo_estacao_wu,
+                varcli,
+                clicrit,
+                varcli2,
+                clicrit2,
+                limiar_preseason,
+                limiar_posseason,
+                limiar_epidemico
+            FROM "{cls.SCHEMA}"."parameters"
+            WHERE cid10 = :cid10_code 
+              AND municipio_geocodigo = :geocode
+        """
 
-        filt = (t_parameters.cid10 == CID10.get(disease)) & (
-            t_parameters.municipio_geocodigo == geocode
+        df = _read_sql_df(
+            DB_ENGINE,
+            sql,
+            params={"cid10_code": cid10_code, "geocode": geocode},
         )
-
-        expr = t_parameters.filter(filt).select(*keys)
-        df = _with_ibis_retry(expr.execute)
 
         return tuple(df.values)
 
@@ -345,14 +338,8 @@ def normalize_str(string: str) -> str:
     return string
 
 
-def get_disease_suffix(
-    disease: Literal["dengue", "zika", "chikungunya"],
-    empty_for_dengue: bool = True,
-):
-    """
-    :param disease:
-    :return:
-    """
+def get_disease_suffix(disease: str, empty_for_dengue: bool = True) -> str:
+    """Get the suffix for a disease."""
     return (
         ("" if empty_for_dengue else "_dengue")
         if disease == "dengue"
@@ -439,7 +426,7 @@ def get_all_active_cities_state(
     with db_engine.connect() as conn:
         rows = conn.execute(stmt).fetchall()
 
-    cache.set(cache_key, rows, settings.QUERY_CACHE_TIMEOUT)
+    cache.set(cache_key, rows, QUERY_CACHE_TIMEOUT)
     return list(rows)
 
 
@@ -613,7 +600,7 @@ def load_series(
 
     if len(dados_alerta) == 0:
         result = {key_str: None}
-        cache.set(cache_key, result, settings.QUERY_CACHE_TIMEOUT)
+        cache.set(cache_key, result, QUERY_CACHE_TIMEOUT)
         return {key_str: None, key_int: None}
 
     series = defaultdict(lambda: defaultdict(list))
@@ -639,7 +626,7 @@ def load_series(
         series[key_str][k] = dados_alerta[k].astype(float).tolist()
 
     payload = {key_str: dict(series[key_str])}
-    cache.set(cache_key, payload, settings.QUERY_CACHE_TIMEOUT)
+    cache.set(cache_key, payload, QUERY_CACHE_TIMEOUT)
 
     result = dict(payload)
     result[key_int] = result[key_str]
@@ -927,7 +914,7 @@ class NotificationResume:
             )
             cities_alert = cities_alert.set_index("id")
 
-        cache.set(cache_key, cities_alert, settings.QUERY_CACHE_TIMEOUT)
+        cache.set(cache_key, cities_alert, QUERY_CACHE_TIMEOUT)
         logger.info("Cache set for key: %s", cache_key)
 
         return cities_alert
@@ -1244,52 +1231,59 @@ class ReportCity:
         if disease != "dengue":
             table_suffix = get_disease_suffix(disease)
 
-        t_hist = _ibis_table(
-            f"Historico_alerta{table_suffix}",
-            database="Municipio",
-        )
+        table_name = f"Historico_alerta{table_suffix}"
 
         ew_end = year_week
         ew_start = ew_end - 200
 
-        filt = t_hist.SE.between(ew_start, ew_end) & (
-            t_hist.municipio_geocodigo == geocode
+        # Note: SE is typically an integer YYYYWW. Subtracting 200 from it directly
+        # (e.g. 202401 - 200 = 202201) works roughly but isn't chemically pure date math.
+        # However, preserving the logic from original code: `ew_start = ew_end - 200`
+
+        sql = f"""
+            SELECT 
+                "SE" AS "SE",
+                casos AS "casos notif.",
+                casos_est AS "casos_est",
+                p_inc100k AS "incidência",
+                p_rt1 AS "pr(incid. subir)",
+                tempmin AS "temp.min",
+                tempmed AS "temp.med",
+                tempmax AS "temp.max",
+                umidmin AS "umid.min",
+                umidmed AS "umid.med",
+                umidmax AS "umid.max",
+                CASE 
+                    WHEN nivel = 1 THEN 'verde'
+                    WHEN nivel = 2 THEN 'amarelo'
+                    WHEN nivel = 3 THEN 'laranja'
+                    WHEN nivel = 4 THEN 'vermelho'
+                    ELSE '-' 
+                END AS nivel,
+                nivel AS level_code
+            FROM "Municipio"."{table_name}"
+            WHERE 
+                "SE" BETWEEN :ew_start AND :ew_end
+                AND municipio_geocodigo = :geocode
+            ORDER BY "SE"
+            LIMIT 200
+        """
+
+        df = _read_sql_df(
+            DB_ENGINE,
+            sql,
+            params={
+                "ew_start": ew_start,
+                "ew_end": ew_end,
+                "geocode": geocode,
+            },
         )
-        t = t_hist.filter(filt).limit(200)
-
-        nivel = (
-            ibis.case()
-            .when(t.nivel.cast("string") == "1", "verde")
-            .when(t.nivel.cast("string") == "2", "amarelo")
-            .when(t.nivel.cast("string") == "3", "laranja")
-            .when(t.nivel.cast("string") == "4", "vermelho")
-            .else_("-")
-            .end()
-        ).name("nivel")
-
-        expr = t.select(
-            t.SE.name("SE"),
-            t.casos.name("casos notif."),
-            t.casos_est.name("casos_est"),
-            t.p_inc100k.name("incidência"),
-            t.p_rt1.name("pr(incid. subir)"),
-            t.tempmin.name("temp.min"),
-            t.tempmed.name("temp.med"),
-            t.tempmax.name("temp.max"),
-            t.umidmin.name("umid.min"),
-            t.umidmed.name("umid.med"),
-            t.umidmax.name("umid.max"),
-            nivel,
-            t.nivel.name("level_code"),
-        )
-
-        df = _with_ibis_retry(expr.execute)
         return df.set_index("SE")
 
 
 class ReportState:
     @classmethod
-    def get_regional_by_state(self, state: str) -> pd:
+    def get_regional_by_state(cls, state: str) -> pd.DataFrame:
         """
         Import CSV file with the municipalities of regional health by state.
         Parameters
@@ -1306,25 +1300,27 @@ class ReportState:
         if res is None:
             uf_name = ALL_STATE_NAMES[state][0]
 
-            data = City.objects.filter(state=uf_name)
+            sql = f"""
+                SELECT 
+                    m.id_regional AS id_regional,
+                    m.regional AS nome_regional,
+                    m.geocodigo AS municipio_geocodigo,
+                    m.nome AS municipio_nome
+                FROM "Dengue_global"."Municipio" AS m
+                WHERE m.uf = :uf_name
+            """
 
-            res = pd.DataFrame(
-                list(data.values("id_regional", "regional", "geocode", "name"))
+            df = _read_sql_df(
+                DB_ENGINE,
+                sql,
+                params={"uf_name": uf_name},
             )
 
-            res.rename(
-                columns={
-                    "regional": "nome_regional",
-                    "geocode": "municipio_geocodigo",
-                    "name": "municipio_nome",
-                },
-                inplace=True,
-            )
-
+            res = df
             cache.set(
                 cache_name,
                 res,
-                settings.QUERY_CACHE_TIMEOUT,
+                QUERY_CACHE_TIMEOUT,
             )
 
         return res
@@ -1346,66 +1342,48 @@ class ReportState:
         if disease != "dengue":
             table_suffix = get_disease_suffix(disease)
 
-        t_hist = _ibis_table(
-            f"Historico_alerta{table_suffix}",
-            database="Municipio",
-        )
+        table_name = f"Historico_alerta{table_suffix}"
 
         ew_start = year_week - 20
 
-        filt = t_hist.SE.between(ew_start, year_week) & (
-            t_hist.municipio_geocodigo.isin(geocodes)
-        )
-        t = t_hist.filter(filt).limit(100)
-
-        expr = t.select(
-            "SE",
-            "casos_est",
-            "casos",
-            "nivel",
-            "municipio_geocodigo",
-            "municipio_nome",
-        ).order_by(("SE", False))
-
-        return _with_ibis_retry(expr.execute)
-
-    @classmethod
-    def create_report_state_data(cls, geocodes, disease, year_week):
-        if disease not in CID10.keys():
-            raise Exception(
-                f"The diseases available are: {[k for k in CID10.keys()]}"
+        # We need to construct the IN clause for geocodes.
+        if not geocodes:
+            return pd.DataFrame(
+                columns=[
+                    "SE",
+                    "casos_est",
+                    "casos",
+                    "nivel",
+                    "municipio_geocodigo",
+                    "municipio_nome",
+                ]
             )
 
-        table_suffix = ""
-        if disease != "dengue":
-            table_suffix = get_disease_suffix(disease)  # F'_{disease}'
+        # Use parameterized query with tuple for IN clause
 
-        t_hist = IBIS_CONN_FACTORY().table(
-            name=f"Historico_alerta{table_suffix}",
-            database="Municipio",
+        sql = f"""
+            SELECT
+                h."SE",
+                h.casos_est,
+                h.casos,
+                h.nivel,
+                h.municipio_geocodigo,
+                m.nome AS municipio_nome
+            FROM "Municipio"."{table_name}" AS h
+            JOIN "Dengue_global"."Municipio" AS m ON h.municipio_geocodigo = m.geocodigo
+            WHERE 
+                h."SE" BETWEEN :ew_start AND :ew_end
+                AND h.municipio_geocodigo IN :geocodes
+            ORDER BY h."SE"
+        """
+
+        df = _read_sql_df(
+            DB_ENGINE,
+            sql,
+            params={
+                "ew_start": ew_start,
+                "ew_end": year_week,
+                "geocodes": tuple(geocodes),
+            },
         )
-
-        #  200 = 2 years
-        ew_start = year_week - 20
-
-        t_hist_filter_bol = (t_hist["SE"].between(ew_start, year_week)) & (
-            t_hist["municipio_geocodigo"].isin(geocodes)
-        )
-
-        t_hist_proj = t_hist.filter(t_hist_filter_bol).limit(100)
-
-        cols_ = [
-            "SE",
-            "casos_est",
-            "casos",
-            "nivel",
-            "municipio_geocodigo",
-            "municipio_nome",
-        ]
-
-        return (
-            t_hist_proj[cols_]
-            .order_by(("SE", False))
-            .execute()
-            # .set_index("SE")
-        )
+        return df

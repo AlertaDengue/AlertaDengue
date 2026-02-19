@@ -126,6 +126,12 @@ jobs:
       run: |
           makim develop.container-wait-all --timeout 150
 
+    # - name: Lint (dbdata slice)
+      # run: makim tests.lint
+
+    - name: Unit tests (dbdata slice)
+      run: makim tests.unit
+
     - name: Setup tmate session
       if: "${{ failure() }}"
       uses: mxschmitt/action-tmate@v3
@@ -136,6 +142,11 @@ jobs:
         set -euxo pipefail
         sugar --profile dev compose-ext logs -- -n 200
         docker ps -a
+
+    - name: Generate logs
+      if: ${{ failure() }}
+      run: |
+        sugar compose logs --all > /tmp/containers-services.log
 
     - name: Stop services
       if: ${{ always() }}

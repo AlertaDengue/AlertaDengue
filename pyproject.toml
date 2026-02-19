@@ -34,7 +34,7 @@ ibis-framework = {extras = ["postgres"], version = "^9.0.0"}
 loguru = "^0.7.0"
 plotly = "^5.11.0"
 pyproj = "^3.3.0"
-python = ">=3.9,<3.11"
+python = ">=3.10,<3.11"
 python-dotenv = "^1.0.0"
 python-memcached = "^1.59"
 rasterio = "^1.2.10"
@@ -70,11 +70,12 @@ django-extensions = "^3.2.3"
 django-maintenance-mode = "^0.16.3"
 flake8 = "^6.0.0"
 isort = "^5.11.4"
-mypy = "^0.991"
 pre-commit = "^2.21.0"
 pytest = "^7.2.1"
 bpython = "^0.24"
 pydantic = "^2.12.5"
+django-stubs = {version = "5.2.9", extras = ["compatible-mypy"]}
+django-stubs-ext = "5.2.9"
 
 [build-system]
 requires = ["poetry-core>=1.9.0"]
@@ -82,7 +83,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 # https://github.com/psf/black
-target-version = ["py39"]
+target-version = ["py310"]
 line-length = 79
 color = true
 
@@ -118,9 +119,10 @@ warn_unused_configs = true
 exclude = [
     'tests/',
 ]
+plugins = ["mypy_django_plugin.main"]
 
-# [mypy.plugins.django-stubs]
-# django_settings_module = AlertaDengue.ad_main.settings
+[tool.django-stubs]
+django_settings_module = "ad_main.settings.testing"
 
 [[tool.mypy.overrides]]
 module = [
