@@ -52,19 +52,14 @@ for db in DATABASES.values():
     elif "NAME" in db:
         db["TEST"]["NAME"] = db["NAME"]
 
-# Override the database names for SQLAlchemy/Ibis connections used in the code
-# These names should match the test database names created by Django
 if not PSQL_DB.startswith("test_"):
     PSQL_DB = f"test_{PSQL_DB}"
 if not PSQL_DBF.startswith("test_"):
     PSQL_DBF = f"test_{PSQL_DBF}"
 
-# Re-initialize SQLAlchemy engine and factory to use the test database
 DB_ENGINE = get_sqla_conn(psql_db=PSQL_DB)
 DB_ENGINE_FACTORY = get_sqla_conn
 
-# Re-initialize Ibis factory
-IBIS_CONN_FACTORY = get_ibis_conn
 
 CACHES = {
     "default": {
