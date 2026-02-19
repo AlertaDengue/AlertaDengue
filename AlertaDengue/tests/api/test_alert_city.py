@@ -18,10 +18,11 @@ def mock_engine():
         "casos",
         "data_iniSE",
         "nivel",
+        "notif_accum_year",
     ]
     mock_result.fetchall.return_value = [
-        (202301, 3304557, 10, "2023-01-01", 1),
-        (202302, 3304557, 20, "2023-01-08", 2),
+        (202301, 3304557, 10, "2023-01-01", 1, 30),
+        (202302, 3304557, 20, "2023-01-08", 2, 30),
     ]
     conn.execute.return_value = mock_result
     return mock
@@ -76,6 +77,7 @@ def test_alert_city_search_empty_result(mock_engine):
         "casos",
         "data_iniSE",
         "nivel",
+        "notif_accum_year",
     ]
     mock_result.fetchall.return_value = []
     conn.execute.return_value = mock_result

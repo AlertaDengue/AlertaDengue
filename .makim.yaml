@@ -162,7 +162,7 @@ groups:
           path:
             help: Path or module to run (e.g., tests/dbdata)
             type: string
-            default: "tests/dbdata"
+            default: "tests/"
           settings:
             help: Django settings module
             type: string
