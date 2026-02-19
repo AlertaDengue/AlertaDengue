@@ -6,11 +6,11 @@ dependencies:
   - python=3.10.*
   - poetry
   - virtualenv
-  - distlib
+  - pip
   - gdal>=3.6,<3.9
   - psycopg2-binary
-  - pip
   - pip:
+      - distlib
       - makim==1.27.0
       - "containers-sugar>=1.19,<2.0"
       - pyogrio
