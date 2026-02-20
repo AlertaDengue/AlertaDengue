@@ -273,6 +273,191 @@ groups:
         run: |
           ${{ env.manage_py }} ${{ args.subcommand }}
 
+  ingestion:
+    help: SINAN ingestion pipeline (host-side, Strategy A).
+    env-file: .envs/.env
+    env:
+      manage_py: python AlertaDengue/manage.py
+    tasks:
+      move:
+        help: Move CSV/DBF files to canonical imported path.
+        args:
+          paths:
+            help: Files or directories to process.
+            type: string
+            required: true
+          imported-base:
+            help: Destination base directory.
+            type: string
+            default: ""
+          uploaded-base:
+            help: Extra base for collision checks.
+            type: string
+            default: ""
+          dry-run:
+            help: Print planned actions without moving.
+            type: bool
+            action: store_true
+          include-uf:
+            help: Include UF folder layer when available.
+            type: bool
+            action: store_true
+          country:
+            help: Override country code (e.g. br, es).
+            type: string
+            default: ""
+          on-exists:
+            help: "Collision policy: version, skip, or error."
+            type: string
+            default: version
+        run: |
+          FLAGS=""
+          if [ -n "${{ args.imported_base }}" ]; then
+            FLAGS="$FLAGS --imported-base ${{ args.imported_base }}"
+          fi
+          if [ -n "${{ args.uploaded_base }}" ]; then
+            FLAGS="$FLAGS --uploaded-base ${{ args.uploaded_base }}"
+          fi
+          if [ "${{ args.dry_run }}" = "True" ]; then
+            FLAGS="$FLAGS --dry-run"
+          fi
+          if [ "${{ args.include_uf }}" = "True" ]; then
+            FLAGS="$FLAGS --include-uf"
+          fi
+          if [ -n "${{ args.country }}" ]; then
+            FLAGS="$FLAGS --country ${{ args.country }}"
+          fi
+          FLAGS="$FLAGS --on-exists ${{ args.on_exists }}"
+
+          python AlertaDengue/ingestion/management/commands/mover_sinan_data.py \
+            ${{ args.paths }} $FLAGS
+
+      enqueue:
+        help: Create a Run record and enqueue Celery processing.
+        hooks:
+          pre-run:
+            - task: develop.container-wait
+              args:
+                service: postgres
+                timeout: "30"
+            - task: develop.container-wait
+              args:
+                service: rabbitmq
+                timeout: "30"
+        args:
+          source-path:
+            help: Path to the source file (CSV/DBF/Parquet).
+            type: string
+            required: true
+          uf:
+            help: UF code (e.g. ES, BR).
+            type: string
+            required: true
+          disease:
+            help: CID10 disease code (e.g. A90, A92).
+            type: string
+            required: true
+          year:
+            help: Delivery year.
+            type: string
+            required: true
+          week:
+            help: Delivery epidemiological week.
+            type: string
+            required: true
+          requeue:
+            help: Re-enqueue even if run already exists.
+            type: bool
+            action: store_true
+        env:
+          PSQL_HOST: localhost
+          CELERY_BROKER_URL: "amqp://guest:guest@localhost:${RABBITMQ_PORT:-5672}"
+        run: |
+          FLAGS=""
+          if [ "${{ args.requeue }}" = "True" ]; then
+            FLAGS="$FLAGS --requeue"
+          fi
+
+          cd AlertaDengue &&
+          python manage.py ingestion_enqueue_sinan \
+            "${{ args.source_path }}" \
+            --uf "${{ args.uf }}" \
+            --disease "${{ args.disease }}" \
+            --year "${{ args.year }}" \
+            --week "${{ args.week }}" \
+            $FLAGS
+
+      run:
+        help: Full pipeline — move files then enqueue.
+        hooks:
+          pre-run:
+            - task: develop.container-wait
+              args:
+                service: postgres
+                timeout: "30"
+            - task: develop.container-wait
+              args:
+                service: rabbitmq
+                timeout: "30"
+        args:
+          paths:
+            help: Files or directories to move.
+            type: string
+            required: true
+          uf:
+            help: UF code (e.g. ES, BR).
+            type: string
+            required: true
+          disease:
+            help: CID10 disease code (e.g. A90, A92).
+            type: string
+            required: true
+          year:
+            help: Delivery year.
+            type: string
+            required: true
+          week:
+            help: Delivery epidemiological week.
+            type: string
+            required: true
+          imported-base:
+            help: Destination base directory.
+            type: string
+            default: ""
+          dry-run:
+            help: Print planned actions without moving.
+            type: bool
+            action: store_true
+        env:
+          PSQL_HOST: localhost
+          CELERY_BROKER_URL: "amqp://guest:guest@localhost:${RABBITMQ_PORT:-5672}"
+        run: |
+          FLAGS=""
+          if [ -n "${{ args.imported_base }}" ]; then
+            MOVE_FLAGS="--imported-base ${{ args.imported_base }}"
+          fi
+          if [ "${{ args.dry_run }}" = "True" ]; then
+            MOVE_FLAGS="$MOVE_FLAGS --dry-run"
+          fi
+
+          echo "── Phase 1: Moving files ──"
+          python AlertaDengue/ingestion/management/commands/mover_sinan_data.py \
+            ${{ args.paths }} $MOVE_FLAGS
+
+          if [ "${{ args.dry_run }}" = "True" ]; then
+            echo "Dry-run mode — skipping enqueue."
+            exit 0
+          fi
+
+          echo "── Phase 2: Enqueueing ──"
+          cd AlertaDengue &&
+          python manage.py ingestion_enqueue_sinan \
+            "${{ args.paths }}" \
+            --uf "${{ args.uf }}" \
+            --disease "${{ args.disease }}" \
+            --year "${{ args.year }}" \
+            --week "${{ args.week }}"
+
   release:
     vars:
       app: |
