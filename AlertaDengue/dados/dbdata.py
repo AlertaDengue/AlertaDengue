@@ -48,6 +48,37 @@ DISEASES_NAME = CID10.keys()
 ALERT_COLOR = {1: "verde", 2: "amarelo", 3: "laranja", 4: "vermelho"}
 ALERT_CODE = dict(zip(ALERT_COLOR.values(), ALERT_COLOR.keys()))
 
+
+UF_CODES = {
+    "AC": 12,
+    "AL": 27,
+    "AM": 13,
+    "AP": 16,
+    "BA": 29,
+    "CE": 23,
+    "DF": 53,
+    "ES": 32,
+    "GO": 52,
+    "MA": 21,
+    "MG": 31,
+    "MS": 50,
+    "MT": 51,
+    "PA": 15,
+    "PB": 25,
+    "PE": 26,
+    "PI": 22,
+    "PR": 41,
+    "RJ": 33,
+    "RN": 24,
+    "RO": 11,
+    "RR": 14,
+    "RS": 43,
+    "SC": 42,
+    "SE": 28,
+    "SP": 35,
+    "TO": 17,
+}
+
 ALL_STATE_NAMES = {
     "AC": ["Acre", [-8.77, -70.55], 6],
     "AL": ["Alagoas", [-9.71, -35.73], 6],
@@ -674,56 +705,6 @@ def get_city_alert(cidade, disease="dengue"):
         dia,
         prt1,
     )
-
-
-def calculate_digit(dig):
-    """
-    Calcula o digito verificador do geocódigo de município
-    :param dig: geocódigo com 6 dígitos
-    :return: dígito verificador
-    """
-    peso = [1, 2, 1, 2, 1, 2, 0]
-    soma = 0
-    dig = str(dig)
-
-    for i in range(6):
-        valor = int(dig[i]) * peso[i]
-        soma += sum([int(d) for d in str(valor)]) if valor > 9 else valor
-
-    dv = 0 if soma % 10 == 0 else (10 - (soma % 10))
-    return dv
-
-
-@np.vectorize
-def add_dv(geocodigo):
-    """
-    Retorna o geocóodigo do município adicionando o digito verificador,
-    se necessário.
-    :param geocodigo: geocóodigo com 6 ou 7 dígitos
-    """
-
-    miscalculated_geocodes = {
-        "2201911": 2201919,
-        "2201986": 2201988,
-        "2202257": 2202251,
-        "2611531": 2611533,
-        "3117835": 3117836,
-        "3152139": 3152131,
-        "4305876": 4305871,
-        "5203963": 5203962,
-        "5203930": 5203939,
-    }
-
-    if len(str(geocodigo)) == 7:
-        return geocodigo
-
-    if len(str(geocodigo)) == 6:
-        geocode = int(str(geocodigo) + str(calculate_digit(geocodigo)))
-        if str(geocode) in miscalculated_geocodes:
-            return miscalculated_geocodes[str(geocode)]
-        return geocode
-
-    raise ValueError("geocode does not match!")
 
 
 def get_epiyears(

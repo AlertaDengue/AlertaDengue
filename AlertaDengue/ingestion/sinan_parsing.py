@@ -4,7 +4,8 @@ import datetime as dt
 from typing import cast
 
 import pandas as pd
-from upload.sinan.utils import (
+
+from .utils import (
     derive_epiweek_from_dt_notific,
     infer_date_format,
     parse_data,
