@@ -13,20 +13,7 @@ from ingestion.tasks import enqueue_sinan_run
 
 
 def _sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
-    """Compute SHA256 for a file.
-
-    Parameters
-    ----------
-    path
-        File path to hash.
-    chunk_size
-        Read chunk size in bytes.
-
-    Returns
-    -------
-    str
-        Hex-encoded SHA256 digest.
-    """
+    """Compute SHA-256 hex digest for a file."""
     h = hashlib.sha256()
     with path.open("rb") as f:
         while True:
@@ -35,6 +22,21 @@ def _sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
                 break
             h.update(b)
     return h.hexdigest()
+
+
+def _translate_path(
+    source: Path,
+    host_base: str,
+    worker_base: str,
+) -> Path:
+    """Translate a host-side path to the worker-visible path."""
+    if not host_base or not worker_base:
+        return source
+    try:
+        rel = source.relative_to(host_base)
+    except ValueError:
+        return source
+    return Path(worker_base) / rel
 
 
 class Command(BaseCommand):
@@ -47,6 +49,19 @@ class Command(BaseCommand):
         parser.add_argument("--disease", required=True, type=str)
         parser.add_argument("--year", required=True, type=int)
         parser.add_argument("--week", required=True, type=int)
+
+        parser.add_argument(
+            "--host-base",
+            type=str,
+            default="",
+            help="Host-side base path (for path translation).",
+        )
+        parser.add_argument(
+            "--worker-base",
+            type=str,
+            default="",
+            help="Worker-side base path (for path translation).",
+        )
 
         parser.add_argument(
             "--requeue",
@@ -64,6 +79,8 @@ class Command(BaseCommand):
         year = int(options["year"])
         week = int(options["week"])
         requeue = bool(options["requeue"])
+        host_base = str(options["host_base"]).strip()
+        worker_base = str(options["worker_base"]).strip()
 
         if len(uf) != 2:
             raise CommandError("--uf must have 2 letters (e.g. ES).")
@@ -79,6 +96,8 @@ class Command(BaseCommand):
         }:
             raise CommandError(f"Unsupported file type: {source_path.suffix}")
 
+        worker_path = _translate_path(source_path, host_base, worker_base)
+
         file_sha256 = _sha256_file(source_path)
         stat = source_path.stat()
         mtime = timezone.make_aware(
@@ -92,7 +111,7 @@ class Command(BaseCommand):
             "delivery_year": year,
             "delivery_week": week,
             "source_format": suffix,
-            "source_path": str(source_path),
+            "source_path": str(worker_path),
             "filename": source_path.name,
             "sha256": file_sha256,
             "size_bytes": int(stat.st_size),
