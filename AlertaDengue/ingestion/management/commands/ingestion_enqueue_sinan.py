@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 import hashlib
 from pathlib import Path
 from typing import Any
@@ -101,7 +102,7 @@ class Command(BaseCommand):
         file_sha256 = _sha256_file(source_path)
         stat = source_path.stat()
         mtime = timezone.make_aware(
-            timezone.datetime.fromtimestamp(stat.st_mtime),
+            datetime.datetime.fromtimestamp(stat.st_mtime),
             timezone.get_current_timezone(),
         )
 
