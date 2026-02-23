@@ -69,7 +69,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: "md5"
       PG_RESTORE_STAGING: "${PG_RESTORE_STAGING}"
     ports:
-      - "${PSQL_PORT}:5432"
+      - "${PSQL_PORT}:${PSQL_PORT}"
     user: ${HOST_UID}:${HOST_GID}
     volumes:
       # - "${PG_DATA:-/opt/data/infodengue/${ENV}/pgdata}:/var/lib/postgresql/data"

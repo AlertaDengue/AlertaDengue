@@ -379,7 +379,7 @@ groups:
             type: bool
             action: store_true
         env:
-          PSQL_HOST: "172.18.0.4"
+          PSQL_HOST: "localhost"
           PSQL_PORT: "25432"
           CELERY_BROKER_URL: "amqp://guest:guest@localhost:5672"
         run: |
@@ -427,7 +427,7 @@ groups:
             type: bool
             action: store_true
         env:
-          PSQL_HOST: "172.18.0.4"
+          PSQL_HOST: "localhost"
           PSQL_PORT: "25432"
           CELERY_BROKER_URL: "amqp://guest:guest@localhost:5672"
         run: |
@@ -482,7 +482,7 @@ groups:
             type: bool
             action: store_true
         env:
-          PSQL_HOST: "172.18.0.4"
+          PSQL_HOST: "localhost"
           PSQL_PORT: "25432"
           CELERY_BROKER_URL: "amqp://guest:guest@localhost:5672"
         run: |
