@@ -106,10 +106,9 @@ services:
       PSQL_HOST: "${PSQL_HOST}"
       PSQL_PORT: "${PSQL_PORT}"
     volumes:
-      - "${DOCKER_HOST_UPLOADED_FILES_DIR}:/MEDIA_ROOT"
-      - "${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES"
-      - "${DOCKER_HOST_DBF_SINAN}:/DBF_SINAN"
-      - "${DOCKER_HOST_INGESTION_SINAN}:/opt/services/ingestion/sinan"
+      - "${DOCKER_HOST_UPLOADED_FILES_DIR}:/opt/services/ingestion/sinan/uploaded"
+      - "${DOCKER_HOST_IMPORTED_FILES_DIR}:/opt/services/ingestion/sinan/imported"
+      - "${DOCKER_HOST_SINAN_ROOT}:/opt/services/ingestion/sinan"
       - "${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile"
       - "${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbf_parquet"
     user: "${HOST_UID}:${HOST_GID}"
@@ -160,9 +159,8 @@ services:
       CELERY_WORKER_POOL: ${CELERY_WORKER_POOL:-prefork}
       CELERY_LOGLEVEL: ${CELERY_LOGLEVEL:-INFO}
     volumes:
-      - ${DOCKER_HOST_UPLOADED_FILES_DIR}:/MEDIA_ROOT
-      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
-      - ${DOCKER_HOST_DBF_SINAN}:/DBF_SINAN
+      - ${DOCKER_HOST_UPLOADED_FILES_DIR}:/opt/services/ingestion/sinan/uploaded
+      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/opt/services/ingestion/sinan/imported
       - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbf_parquet
       - ${EPISCANNER_HOST_DIR}:/opt/services/episcanner
     user: ${HOST_UID}:${HOST_GID}
@@ -191,9 +189,8 @@ services:
       CELERY_LOGLEVEL: ${CELERY_LOGLEVEL:-INFO}
       CELERYBEAT_SCHEDULE: /tmp/celerybeat-schedule
     volumes:
-      - ${DOCKER_HOST_UPLOADED_FILES_DIR}:/MEDIA_ROOT
-      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/IMPORTED_FILES
-      - ${DOCKER_HOST_DBF_SINAN}:/DBF_SINAN
+      - ${DOCKER_HOST_UPLOADED_FILES_DIR}:/opt/services/ingestion/sinan/uploaded
+      - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/opt/services/ingestion/sinan/imported
       - ${DOCKER_HOST_TEMP_PARQUET_DIR}:/tmp/dbf_parquet
       - ${EPISCANNER_HOST_DIR}:/opt/services/episcanner
     user: ${HOST_UID}:${HOST_GID}

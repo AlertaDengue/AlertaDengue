@@ -278,8 +278,8 @@ groups:
     env-file: .envs/.env
     env:
       manage_py: python AlertaDengue/manage.py
-      ingestion_host_base: "${DOCKER_HOST_INGESTION_SINAN}"
-      ingestion_worker_base: "/opt/services/ingestion/sinan"
+      ingestion_host_base: "${DOCKER_HOST_IMPORTED_FILES_DIR}"
+      ingestion_worker_base: "/opt/services/ingestion/sinan/imported"
     tasks:
       move:
         help: Move CSV/DBF files to canonical imported path.
@@ -339,7 +339,10 @@ groups:
           FLAGS="$FLAGS --on-exists ${{ args.on_exists }}"
 
           python AlertaDengue/ingestion/management/commands/mover_sinan_data.py \
-            ${{ args.paths }} $FLAGS
+            ${{ args.paths }} \
+            --imported-base "${DOCKER_HOST_IMPORTED_FILES_DIR}" \
+            --uploaded-base "${DOCKER_HOST_UPLOADED_FILES_DIR}" \
+            $FLAGS
 
       enqueue:
         help: Create a Run record and enqueue Celery processing.

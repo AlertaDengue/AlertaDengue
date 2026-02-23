@@ -136,12 +136,30 @@ class Command(BaseCommand):
             )
             self.stdout.write(self.style.WARNING(msg))
 
+            # Update fields that might have changed (like path translation or metadata)
+            updated_fields = []
+            if run.source_path != str(worker_path):
+                run.source_path = str(worker_path)
+                updated_fields.append("source_path")
+
+            if run.delivery_year != year:
+                run.delivery_year = year
+                updated_fields.append("delivery_year")
+
+            if run.delivery_week != week:
+                run.delivery_week = week
+                updated_fields.append("delivery_week")
+
+            if updated_fields:
+                run.save(update_fields=updated_fields + ["updated_at"])
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"Updated fields: {', '.join(updated_fields)}"
+                    )
+                )
+
             if not requeue:
                 return
-
-            if run.status in {RunStatus.COMPLETED}:
-                run.status = RunStatus.QUEUED
-                run.save(update_fields=["status", "updated_at"])
 
         try:
             async_result = enqueue_sinan_run.delay(str(run.id))
