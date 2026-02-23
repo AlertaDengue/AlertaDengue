@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import io
 import json
 import os
@@ -15,6 +16,18 @@ from pathlib import Path
 from typing import Any
 
 from dbfread import DBF
+
+
+def _sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
+    """Compute SHA-256 hex digest for a file."""
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        while True:
+            b = f.read(chunk_size)
+            if not b:
+                break
+            h.update(b)
+    return h.hexdigest()
 
 
 @dataclass(frozen=True, slots=True)
@@ -701,7 +714,7 @@ def _strip_numeric_suffix(stem: str) -> str:
     str
         Stem without trailing numeric suffix.
     """
-    return re.sub(r"_(\d{2})$", "", stem)
+    return re.sub(r"_(\d+)$", "", stem)
 
 
 def _base_roots(base: Path) -> list[Path]:
@@ -724,7 +737,7 @@ def _base_roots(base: Path) -> list[Path]:
     return roots
 
 
-def _exists_in_any_base(rel_path: Path, bases: list[Path]) -> bool:
+def _exists_in_any_base(rel_path: Path, bases: list[Path]) -> Path | None:
     """
     Check if a relative path exists under any of the base roots.
 
@@ -737,15 +750,20 @@ def _exists_in_any_base(rel_path: Path, bases: list[Path]) -> bool:
 
     Returns
     -------
-    bool
-        True if exists in any base root.
+    Path | None
+        Full path to the first existing file found, or None.
     """
-    return any((b / rel_path).exists() for b in bases)
+    for b in bases:
+        p = b / rel_path
+        if p.exists():
+            return p
+    return None
 
 
 def _resolve_collision(
     rel_path: Path,
     *,
+    src_path: Path,
     imported_roots: list[Path],
     uploaded_roots: list[Path],
     reserved: set[Path],
@@ -754,30 +772,30 @@ def _resolve_collision(
     """
     Resolve destination collisions across imported + uploaded + in-run reserved.
 
-    Parameters
-    ----------
-    rel_path
-        Candidate relative path.
-    imported_roots
-        Imported base roots.
-    uploaded_roots
-        Uploaded base roots.
-    reserved
-        Already reserved relative paths in this run.
-    on_exists
-        One of: 'error', 'skip', 'version'.
-
-    Returns
-    -------
-    Path | None
-        Final relative path or None if skipped.
+    If an identical file (by checksum) already exists at rel_path or any of its
+    versioned versions, we return None to signal it should be skipped.
     """
-    exists = (
-        rel_path in reserved
-        or _exists_in_any_base(rel_path, imported_roots)
-        or _exists_in_any_base(rel_path, uploaded_roots)
-    )
-    if not exists:
+    src_hash = _sha256_file(src_path)
+
+    def _get_match(target_rel: Path) -> bool:
+        """Check if target_rel matches src by checksum or reservation."""
+        if target_rel in reserved:
+            return True  # If reserved, we don't have its hash yet, assume collision
+
+        existing_full = _exists_in_any_base(
+            target_rel, imported_roots + uploaded_roots
+        )
+        if not existing_full:
+            return False
+
+        # If it exists, check checksum
+        return _sha256_file(existing_full) == src_hash
+
+    # 1. Check canonical path
+    if _exists_in_any_base(rel_path, imported_roots + uploaded_roots):
+        if _get_match(rel_path):
+            return None  # ALREADY_EXISTS (same checksum)
+    elif rel_path not in reserved:
         return rel_path
 
     if on_exists == "skip":
@@ -785,18 +803,17 @@ def _resolve_collision(
     if on_exists == "error":
         raise FileExistsError(str(rel_path))
 
+    # 2. Check versioned paths
     parent = rel_path.parent
     base_stem = _strip_numeric_suffix(rel_path.stem)
     suffix = rel_path.suffix
 
     for n in range(1, 1000):
         candidate = parent / f"{base_stem}_{n:02d}{suffix}"
-        exists = (
-            candidate in reserved
-            or _exists_in_any_base(candidate, imported_roots)
-            or _exists_in_any_base(candidate, uploaded_roots)
-        )
-        if not exists:
+        if _exists_in_any_base(candidate, imported_roots + uploaded_roots):
+            if _get_match(candidate):
+                return None  # ALREADY_EXISTS (same checksum)
+        elif candidate not in reserved:
             return candidate
 
     raise FileExistsError(f"Sem slot livre para versionamento: {rel_path}")
@@ -871,6 +888,7 @@ def move_to_canonical(
         rel = _rel_dest_path(info, include_uf=include_uf)
         rel_final = _resolve_collision(
             rel,
+            src_path=src,
             imported_roots=imported_roots,
             uploaded_roots=uploaded_roots,
             reserved=reserved_relpaths,

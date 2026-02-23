@@ -43,8 +43,9 @@ env:
   PG_DATA_STAGING: "/home/runner/storage/postgres_data_staging"
 
   DOCKER_HOST_DBF_SINAN: "/home/runner/storage/sftp2/alertadengue/sinan"
-  DOCKER_HOST_IMPORTED_FILES_DIR: "/home/runner/storage/sftp2/alertadengue/sinan/imported"
   DOCKER_HOST_UPLOADED_FILES_DIR: "/home/runner/storage/sftp2/alertadengue/sinan/uploaded"
+  DOCKER_HOST_IMPORTED_FILES_DIR: "/home/runner/storage/sftp2/alertadengue/sinan/imported"
+  DOCKER_HOST_SINAN_ROOT: "/home/runner/storage/sftp2/alertadengue/sinan"
   DOCKER_HOST_SHAPEFILES_DIR: "/home/runner/storage/shapefiles"
   DOCKER_HOST_TEMP_PARQUET_DIR: "/tmp/dbf_parquet"
   DOCKER_HOST_STATIC: "/home/runner/storage/staticfiles"
