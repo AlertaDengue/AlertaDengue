@@ -714,7 +714,7 @@ def _strip_numeric_suffix(stem: str) -> str:
     str
         Stem without trailing numeric suffix.
     """
-    return re.sub(r"_(\d+)$", "", stem)
+    return re.sub(r"_(\d{2})$", "", stem)
 
 
 def _base_roots(base: Path) -> list[Path]:

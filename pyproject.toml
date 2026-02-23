@@ -74,6 +74,7 @@ bpython = "^0.24"
 pydantic = "^2.12.5"
 django-stubs = {version = "5.2.9", extras = ["compatible-mypy"]}
 django-stubs-ext = "5.2.9"
+pytest-django = "^4.12.0"
 
 [build-system]
 requires = ["poetry-core>=1.9.0"]
@@ -127,3 +128,15 @@ module = [
   "requests",
 ]
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "ad_main.settings.testing"
+python_files = ["test_*.py", "*_test.py", "tests.py"]
+markers = [
+  "django_db: uses the Django database",
+]
+addopts = "-ra"
+filterwarnings = [
+  "ignore:The 'shapely\\.geos' module is deprecated.*:DeprecationWarning",
+  "ignore:invalid escape sequence.*:DeprecationWarning",
+]
