@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import json
 import sys
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import pytest
 from ingestion.management.commands import mover_sinan_data as mover
@@ -10,7 +12,7 @@ from ingestion.management.commands import mover_sinan_data as mover
 
 def _write_csv(path: Path, content: str) -> None:
     """
-    Write a CSV file as text.
+    Write a CSV file as UTF-8 text.
 
     Parameters
     ----------
@@ -23,9 +25,9 @@ def _write_csv(path: Path, content: str) -> None:
     path.write_text(content, encoding="utf-8")
 
 
-def test_move_to_canonical_csv_dry_run(tmp_path: Path) -> None:
+def test_move_to_canonical_csv_dry_run_bucket_es(tmp_path: Path) -> None:
     """
-    It computes the canonical destination for a CSV in dry-run mode.
+    A CSV with SG_UF_NOT=ES buckets to 'es' and includes ES in filename.
     """
     src = tmp_path / "incoming" / "DENGON_ES_202605_Infodengue.csv"
     _write_csv(
@@ -35,6 +37,7 @@ def test_move_to_canonical_csv_dry_run(tmp_path: Path) -> None:
 
     imported_base = tmp_path / "imported"
     uploaded_base = tmp_path / "uploaded"
+
     ok, dest, info, err = mover.move_to_canonical(
         src,
         imported_base=imported_base,
@@ -59,15 +62,58 @@ def test_move_to_canonical_csv_dry_run(tmp_path: Path) -> None:
     )
 
 
-def test_collision_versioning_creates_suffix(tmp_path: Path) -> None:
+def test_csv_priority_prefers_sg_uf_not_over_sg_uf(tmp_path: Path) -> None:
     """
-    When canonical exists with a different checksum, it versions the filename.
+    CSV priority: SG_UF_NOT > SG_UF > UF.
+
+    If SG_UF_NOT is single-UF (ES) but SG_UF is mixed, bucket must be 'es'.
+    """
+    src = tmp_path / "incoming" / "mix.csv"
+    _write_csv(
+        src,
+        "ID_AGRAVO;SEM_NOT;SG_UF_NOT;SG_UF\n"
+        "A90;202605;ES;SP\n"
+        "A90;202605;ES;MG\n",
+    )
+
+    imported_base = tmp_path / "imported"
+    uploaded_base = tmp_path / "uploaded"
+
+    ok, dest, info, err = mover.move_to_canonical(
+        src,
+        imported_base=imported_base,
+        uploaded_base=uploaded_base,
+        reserved_relpaths=set(),
+        dry_run=True,
+        include_uf=False,
+        country=None,
+        fmt_dir="csv",
+        csv_encoding="utf-8",
+        try_csv_encodings=["utf-8"],
+        dbf_encoding="iso-8859-1",
+        on_exists="version",
+    )
+
+    assert ok is True
+    assert err is None
+    assert info is not None
+    assert dest is not None
+    assert "/imported/es/" in dest.as_posix()
+    assert dest.name == "DenInfodengue_ES_202605.csv"
+
+
+def test_collision_versioning_creates_suffix_with_bucket(
+    tmp_path: Path,
+) -> None:
+    """
+    If canonical exists with different content, version to _01 and keep bucket
+    label in the filename.
     """
     imported_base = tmp_path / "imported"
     uploaded_base = tmp_path / "uploaded"
 
     existing = (
-        uploaded_base / "br/csv/dengue/2026/202605/DenInfodengue_202605.csv"
+        uploaded_base / "br/csv/dengue/2026/202605/DenInfodengue_BR_202605.csv"
     )
     _write_csv(existing, "ID_AGRAVO;SEM_NOT\nA90;202605\n")
 
@@ -93,22 +139,140 @@ def test_collision_versioning_creates_suffix(tmp_path: Path) -> None:
     assert err is None
     assert info is not None
     assert dest is not None
-    assert dest.name == "DenInfodengue_202605_01.csv"
+    assert dest.name == "DenInfodengue_BR_202605_01.csv"
 
 
-def test_main_writes_sorted_manifest(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_checksum_skip_if_identical_exists(tmp_path: Path) -> None:
     """
-    Manifest is sorted with ES entries first, then by sem_not_max.
+    If destination exists with the same checksum, return SKIP.
+
+    This checks the uploaded/imported checksum dedupe.
     """
     imported_base = tmp_path / "imported"
     uploaded_base = tmp_path / "uploaded"
 
-    es_src = tmp_path / "incoming" / "es" / "a.csv"
-    br_src = tmp_path / "incoming" / "br" / "b.csv"
+    content = "ID_AGRAVO;SEM_NOT\nA90;202605\n"
+    existing = (
+        uploaded_base / "br/csv/dengue/2026/202605/DenInfodengue_BR_202605.csv"
+    )
+    _write_csv(existing, content)
 
-    _write_csv(es_src, "CID10;SEM_NOT\nA90;202606\n")
+    src = tmp_path / "incoming" / "same.csv"
+    _write_csv(src, content)
+
+    ok, dest, info, err = mover.move_to_canonical(
+        src,
+        imported_base=imported_base,
+        uploaded_base=uploaded_base,
+        reserved_relpaths=set(),
+        dry_run=True,
+        include_uf=False,
+        country="br",
+        fmt_dir="csv",
+        csv_encoding="utf-8",
+        try_csv_encodings=["utf-8"],
+        dbf_encoding="iso-8859-1",
+        on_exists="version",
+    )
+
+    assert ok is False
+    assert dest is None
+    assert info is not None
+    assert err is not None
+    assert err.startswith("SKIP")
+
+
+@dataclass(frozen=True, slots=True)
+class _FakeDBF:
+    """
+    Fake DBF reader for deterministic bucketing-priority tests.
+    """
+
+    field_names: list[str]
+    records: list[dict[str, Any]]
+
+    def __iter__(self) -> Any:
+        return iter(self.records)
+
+
+def test_dbf_priority_prefers_sg_uf(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """
+    DBF priority: SG_UF > SG_UF_NOT > UF.
+
+    SG_UF is single-UF (SP) while SG_UF_NOT is mixed -> bucket must be 'sp'.
+    """
+    incoming = tmp_path / "incoming"
+    incoming.mkdir(parents=True, exist_ok=True)
+    src = incoming / "file.dbf"
+    src.write_bytes(b"not-a-real-dbf")
+
+    fields = ["ID_AGRAVO", "SEM_NOT", "SG_UF", "SG_UF_NOT", "UF"]
+    records = [
+        {
+            "ID_AGRAVO": b"A92.0",
+            "SEM_NOT": b"202452",
+            "SG_UF": b"35",
+            "SG_UF_NOT": b"35",
+            "UF": b"35",
+        },
+        {
+            "ID_AGRAVO": b"A92.0",
+            "SEM_NOT": b"202452",
+            "SG_UF": b"35",
+            "SG_UF_NOT": b"32",
+            "UF": b"35",
+        },
+    ]
+
+    def _fake_dbf(*_: Any, **__: Any) -> _FakeDBF:
+        return _FakeDBF(field_names=fields, records=records)
+
+    monkeypatch.setattr(mover, "DBF", _fake_dbf)
+
+    imported_base = tmp_path / "imported"
+    uploaded_base = tmp_path / "uploaded"
+
+    ok, dest, info, err = mover.move_to_canonical(
+        src,
+        imported_base=imported_base,
+        uploaded_base=uploaded_base,
+        reserved_relpaths=set(),
+        dry_run=True,
+        include_uf=False,
+        country=None,
+        fmt_dir="dbf",
+        csv_encoding=None,
+        try_csv_encodings=["utf-8"],
+        dbf_encoding="iso-8859-1",
+        on_exists="version",
+    )
+
+    assert ok is True
+    assert err is None
+    assert info is not None
+    assert dest is not None
+    assert dest.as_posix().endswith(
+        "/imported/sp/dbf/chik/2024/202452/ChikInfodengue_SP_202452.dbf"
+    )
+
+
+def test_main_writes_sorted_manifest_es_before_br(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """
+    Manifest should list ES before BR when both are present.
+    """
+    imported_base = tmp_path / "imported"
+    uploaded_base = tmp_path / "uploaded"
+
+    es_src = tmp_path / "incoming" / "a.csv"
+    br_src = tmp_path / "incoming" / "b.csv"
+
+    _write_csv(es_src, "CID10;SEM_NOT;SG_UF_NOT\nA90;202606;ES\n")
     _write_csv(br_src, "CID10;SEM_NOT\nA90;202605\n")
 
     manifest_path = tmp_path / "manifest.json"

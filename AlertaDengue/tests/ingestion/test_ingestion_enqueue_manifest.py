@@ -36,7 +36,7 @@ def test_manifest_sort_order_and_arg_building(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """
-    Enqueue order is ES first; within each country, earlier sem_not first.
+    Enqueue order is ES first; within each country, earlier weeks first.
     """
     manifest_path = tmp_path / "manifest.json"
     entries = [
@@ -56,7 +56,7 @@ def test_manifest_sort_order_and_arg_building(
             "year": 2026,
             "week": 4,
             "sem_not_max": 202604,
-            "uf": "ESP",
+            "uf": "ES",
         },
     ]
     manifest_path.write_text(
@@ -89,7 +89,6 @@ def test_manifest_sort_order_and_arg_building(
     assert first_args[0] == "/x/es.csv"
     assert "--uf" in first_args
     assert first_args[first_args.index("--uf") + 1] == "ES"
-
     assert second_args[0] == "/x/br.csv"
 
 
@@ -99,7 +98,7 @@ def test_manifest_dry_run_does_not_call_enqueue(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """
-    --dry-run prints the plan and does not call ingestion_enqueue_sinan.
+    --dry-run does not call ingestion_enqueue_sinan.
     """
     manifest_path = tmp_path / "manifest.json"
     manifest_path.write_text(

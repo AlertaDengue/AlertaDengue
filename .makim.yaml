@@ -154,7 +154,7 @@ groups:
         help: Run mypy (best-effort, skip third-party imports)
         run: |
           mypy --follow-imports=skip --ignore-missing-imports \
-            AlertaDengue/ingestion/management/commands
+            AlertaDengue/tests
 
       unit:
         help: Run tests with pytest (inside web container)
@@ -181,11 +181,18 @@ groups:
           post-run:
             - task: tests.teardown
         run: |
+          TTY_OPT=""
+          if [ ! -t 0 ]; then
+            TTY_OPT="-T"
+          fi
+
           CMD="PYTHONPATH=/opt/services/AlertaDengue \
             DJANGO_SETTINGS_MODULE=${{ args.settings }} \
             PGOPTIONS='-c search_path=test_views,public' \
             pytest -q ${{ args.path }} ${{ args.params }}"
+
           sugar --profile dev compose-ext run --rm --service web \
+            --options "$TTY_OPT" \
             --cmd "sh -lc \"$CMD\""
 
   develop:

@@ -136,6 +136,7 @@ markers = [
   "django_db: uses the Django database",
 ]
 addopts = "-ra"
+
 filterwarnings = [
   "ignore:The 'shapely\\.geos' module is deprecated.*:DeprecationWarning",
   "ignore:invalid escape sequence.*:DeprecationWarning",

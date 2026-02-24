@@ -10,6 +10,39 @@ from ingestion.management.commands import ingestion_enqueue_sinan as cmd
 from ingestion.models import Run, RunStatus
 
 
+def _write_unique_csv(path: Path, *, token: str) -> None:
+    """
+    Write a CSV whose sha256 is unique per test.
+
+    Parameters
+    ----------
+    path
+        Output file path.
+    token
+        Token included in file content to avoid checksum collisions.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "CID10;SEM_NOT\n" "A90;202605\n" f"{token}\n",
+        encoding="utf-8",
+    )
+
+
+def _ensure_run_absent_for_file(path: Path) -> None:
+    """
+    Remove any existing Run row for the file sha256.
+
+    This makes the test idempotent even if CI reuses a persistent database.
+
+    Parameters
+    ----------
+    path
+        File whose sha256 is used to match Runs.
+    """
+    sha256 = cmd._sha256_file(path)
+    Run.objects.filter(sha256=sha256).delete()
+
+
 @dataclass(frozen=True, slots=True)
 class _AsyncResult:
     """
@@ -52,16 +85,15 @@ class _DelayStub:
 
 @pytest.mark.django_db
 def test_enqueue_creates_run_and_sets_task_id(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """
     First enqueue creates a Run and stores celery_task_id.
     """
-
-    Run.objects.all().delete()
-
     fpath = tmp_path / "file.csv"
-    fpath.write_text("CID10;SEM_NOT\nA90;202605\n", encoding="utf-8")
+    _write_unique_csv(fpath, token=f"t1:{tmp_path}")
+    _ensure_run_absent_for_file(fpath)
 
     stub = _DelayStub()
     monkeypatch.setattr(cmd, "enqueue_sinan_run", stub)
@@ -94,11 +126,9 @@ def test_enqueue_existing_run_no_requeue_does_not_delay(
     """
     Second enqueue with same sha does not call .delay without --requeue.
     """
-
-    Run.objects.all().delete()
-
     fpath = tmp_path / "file.csv"
-    fpath.write_text("CID10;SEM_NOT\nA90;202605\n", encoding="utf-8")
+    _write_unique_csv(fpath, token=f"t2:{tmp_path}")
+    _ensure_run_absent_for_file(fpath)
 
     stub = _DelayStub()
     monkeypatch.setattr(cmd, "enqueue_sinan_run", stub)
@@ -133,16 +163,15 @@ def test_enqueue_existing_run_no_requeue_does_not_delay(
 
 @pytest.mark.django_db
 def test_enqueue_requeue_calls_delay_again(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """
     With --requeue, an existing run enqueues again.
     """
-
-    Run.objects.all().delete()
-
     fpath = tmp_path / "file.csv"
-    fpath.write_text("CID10;SEM_NOT\nA90;202605\n", encoding="utf-8")
+    _write_unique_csv(fpath, token=f"t3:{tmp_path}")
+    _ensure_run_absent_for_file(fpath)
 
     stub = _DelayStub()
     monkeypatch.setattr(cmd, "enqueue_sinan_run", stub)
@@ -181,10 +210,9 @@ def test_enqueue_validates_week_range(tmp_path: Path) -> None:
     """
     Week outside 1..53 raises CommandError.
     """
-
-    Run.objects.all().delete()
     fpath = tmp_path / "file.csv"
-    fpath.write_text("CID10;SEM_NOT\nA90;202605\n", encoding="utf-8")
+    _write_unique_csv(fpath, token=f"t4:{tmp_path}")
+    _ensure_run_absent_for_file(fpath)
 
     with pytest.raises(CommandError):
         call_command(
