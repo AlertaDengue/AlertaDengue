@@ -6,7 +6,6 @@ import csv
 import hashlib
 import io
 import json
-import os
 import re
 import shutil
 import sys
@@ -17,9 +16,78 @@ from typing import Any
 
 from dbfread import DBF
 
+UF_CODES: dict[str, int] = {
+    "AC": 12,
+    "AL": 27,
+    "AM": 13,
+    "AP": 16,
+    "BA": 29,
+    "CE": 23,
+    "DF": 53,
+    "ES": 32,
+    "GO": 52,
+    "MA": 21,
+    "MG": 31,
+    "MS": 50,
+    "MT": 51,
+    "PA": 15,
+    "PB": 25,
+    "PE": 26,
+    "PI": 22,
+    "PR": 41,
+    "RJ": 33,
+    "RN": 24,
+    "RO": 11,
+    "RR": 14,
+    "RS": 43,
+    "SC": 42,
+    "SE": 28,
+    "SP": 35,
+    "TO": 17,
+}
+
+_CODE_TO_UF: dict[int, str] = {v: k for k, v in UF_CODES.items()}
+_UF_SIGLAS: set[str] = set(UF_CODES.keys())
+
+_CID10_FIELDS: tuple[str, ...] = (
+    "ID_AGRAVO",
+    "CID10",
+    "CID10_CODIGO",
+    "CID10CODIGO",
+)
+_SEM_FIELDS: tuple[str, ...] = ("SEM_NOT", "SEM_NOTIF", "SE_NOTIF", "SE_NOTIF")
+
+_UF_FIELD_CANDIDATES: tuple[str, ...] = (
+    "SG_UF_NOT",
+    "SG_UF",
+    "UF",
+    "UF_NOT",
+    "ID_UF_NOT",
+    "CO_UF_NOT",
+    "ID_UF",
+    "CO_UF",
+)
+
+_DBF_UF_PRIMARY: tuple[str, ...] = ("SG_UF", "SG_UF_NOT", "UF")
+_CSV_UF_PRIMARY: tuple[str, ...] = ("SG_UF_NOT", "SG_UF", "UF")
+
 
 def _sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
-    """Compute SHA-256 hex digest for a file."""
+    """
+    Compute SHA-256 hex digest for a file.
+
+    Parameters
+    ----------
+    path
+        File path.
+    chunk_size
+        Chunk size for streaming reads.
+
+    Returns
+    -------
+    str
+        SHA-256 hex digest.
+    """
     h = hashlib.sha256()
     with path.open("rb") as f:
         while True:
@@ -33,26 +101,30 @@ def _sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
 @dataclass(frozen=True, slots=True)
 class RoutingInfo:
     """
-    Normalized routing info for placing an InfoDengue file.
+    Normalized routing info for placing a SINAN file.
 
     Attributes
     ----------
     src_path
         Source file path.
     country
-        Country code, lower-case (e.g., 'br', 'es').
+        Bucket code, lower-case (e.g., 'sp', 'es', 'br').
     fmt_dir
         Format directory ('csv' or 'dbf').
     cid10_norm
         Normalized CID10 string (e.g., 'A92.0', 'A90').
+    disease_code
+        Disease code used for enqueueing (e.g., 'A92', 'A90').
     disease_dir
         Disease directory (e.g., 'dengue', 'chik', 'unknown').
     sem_not_max
         Max SEM_NOT found (YYYYWW as int).
     year
         Year extracted from SEM_NOT (YYYY).
+    week
+        Week extracted from SEM_NOT (WW).
     uf
-        UF code (optional, when include_uf is enabled).
+        UF folder layer (kept empty to avoid nested UF folders by default).
     encoding
         Detected/used encoding for CSV, or DBF encoding used.
     delimiter
@@ -63,22 +135,19 @@ class RoutingInfo:
     country: str
     fmt_dir: str
     cid10_norm: str
+    disease_code: str
     disease_dir: str
     sem_not_max: int
     year: int
+    week: int
     uf: str
     encoding: str
     delimiter: str
 
 
-_CID10_FIELDS = ("ID_AGRAVO", "CID10", "CID10_CODIGO", "CID10CODIGO")
-_SEM_FIELDS = ("SEM_NOT", "SEM_NOTIF", "SE_NOTIF", "SE_NOTIF")
-_UF_FIELDS = ("SG_UF_NOT", "SG_UF", "UF")
-
-
 def _normalize_header(name: str) -> str:
     """
-    Normalize a header field name for robust matching.
+    Normalize a header/field name for robust matching.
 
     Parameters
     ----------
@@ -91,6 +160,56 @@ def _normalize_header(name: str) -> str:
         Normalized field name.
     """
     return name.strip().strip("\ufeff").strip().upper()
+
+
+def _find_first_index(
+    header: list[str], candidates: tuple[str, ...]
+) -> int | None:
+    """
+    Find the first matching index for candidates.
+
+    Parameters
+    ----------
+    header
+        Normalized header list.
+    candidates
+        Candidate field names.
+
+    Returns
+    -------
+    int | None
+        Index if found; otherwise None.
+    """
+    cand = {_normalize_header(c) for c in candidates}
+    for i, h in enumerate(header):
+        if h in cand:
+            return i
+    return None
+
+
+def _find_field_name(
+    field_names: list[str], candidates: tuple[str, ...]
+) -> str | None:
+    """
+    Find the actual field name matching candidates (case-insensitive).
+
+    Parameters
+    ----------
+    field_names
+        Field names as stored in the file.
+    candidates
+        Candidate field names.
+
+    Returns
+    -------
+    str | None
+        Matching original field name, otherwise None.
+    """
+    cand = {_normalize_header(c) for c in candidates}
+    for name in field_names:
+        if _normalize_header(name) in cand:
+            return name
+    return None
 
 
 def _parse_sem_not(value: str) -> int | None:
@@ -117,12 +236,6 @@ def _normalize_cid10(value: str) -> str:
     """
     Normalize CID10 values.
 
-    Examples
-    --------
-    - 'A920' -> 'A92.0'
-    - 'A92.0' -> 'A92.0'
-    - 'A90' -> 'A90'
-
     Parameters
     ----------
     value
@@ -133,8 +246,7 @@ def _normalize_cid10(value: str) -> str:
     str
         Normalized CID10.
     """
-    s = value.strip().upper()
-    s = s.replace(",", ".")
+    s = value.strip().upper().replace(",", ".")
     if not s:
         return ""
     if re.fullmatch(r"[A-Z]\d{2}\d", s):
@@ -142,9 +254,9 @@ def _normalize_cid10(value: str) -> str:
     return s
 
 
-def _disease_dir_from_cid10(cid10_norm: str) -> str:
+def _disease_code_from_cid10(cid10_norm: str) -> str:
     """
-    Map CID10 to disease directory.
+    Extract disease code (e.g. A92) from normalized CID10.
 
     Parameters
     ----------
@@ -154,37 +266,33 @@ def _disease_dir_from_cid10(cid10_norm: str) -> str:
     Returns
     -------
     str
-        Disease directory name.
+        Disease code (3 chars) or empty string.
     """
-    if cid10_norm.startswith("A90"):
-        return "dengue"
-    if cid10_norm.startswith("A92"):
-        return "chik"
-    return "unknown"
+    if not cid10_norm:
+        return ""
+    s = cid10_norm.replace(".", "")
+    return s[:3] if len(s) >= 3 else s
 
 
-def _infer_country_from_path(path: Path) -> str | None:
+def _disease_dir_from_code(disease_code: str) -> str:
     """
-    Infer country code from any path component.
+    Map disease code to disease directory.
 
     Parameters
     ----------
-    path
-        Path to inspect.
+    disease_code
+        Disease code (e.g. A90, A92).
 
     Returns
     -------
-    str | None
-        Country code if found, else None.
+    str
+        Disease directory name.
     """
-    for part in (path.name, *[p.name for p in path.parents]):
-        m = re.search(r"(^|[_\-.])(br|es)([_\-.]|$)", part.lower())
-        if m:
-            return m.group(2)
-    for p in path.parts:
-        if p.lower() in {"br", "es"}:
-            return p.lower()
-    return None
+    if disease_code.startswith("A90") or disease_code.startswith("A91"):
+        return "dengue"
+    if disease_code.startswith("A92"):
+        return "chik"
+    return "unknown"
 
 
 def _infer_fmt_dir_from_path(path: Path) -> str | None:
@@ -199,65 +307,13 @@ def _infer_fmt_dir_from_path(path: Path) -> str | None:
     Returns
     -------
     str | None
-        'csv' or 'dbf' when recognized, else None.
+        'csv' or 'dbf' when recognized; otherwise None.
     """
     ext = path.suffix.lower()
     if ext == ".csv":
         return "csv"
     if ext == ".dbf":
         return "dbf"
-    return None
-
-
-def _find_first_index(
-    header: list[str],
-    candidates: tuple[str, ...],
-) -> int | None:
-    """
-    Find the first matching index for candidates.
-
-    Parameters
-    ----------
-    header
-        Normalized header list.
-    candidates
-        Candidate field names.
-
-    Returns
-    -------
-    int | None
-        Index if found, else None.
-    """
-    cand = {_normalize_header(c) for c in candidates}
-    for i, h in enumerate(header):
-        if h in cand:
-            return i
-    return None
-
-
-def _find_field_name(
-    field_names: list[str],
-    candidates: tuple[str, ...],
-) -> str | None:
-    """
-    Find the actual field name matching candidates (case-insensitive).
-
-    Parameters
-    ----------
-    field_names
-        Field names as stored in the file.
-    candidates
-        Candidate field names.
-
-    Returns
-    -------
-    str | None
-        Matching original field name, else None.
-    """
-    cand = {_normalize_header(c) for c in candidates}
-    for name in field_names:
-        if _normalize_header(name) in cand:
-            return name
     return None
 
 
@@ -280,11 +336,18 @@ def _decode_dbf_value(value: Any, encoding: str) -> str:
     if value is None:
         return ""
     if isinstance(value, bytes):
-        try:
-            return value.decode(encoding, errors="ignore").strip()
-        except Exception:
-            return value.decode("ascii", errors="ignore").strip()
+        return value.decode(encoding, errors="replace").strip()
     return str(value).strip()
+
+
+def _csv_field_limit() -> None:
+    """
+    Increase CSV field size limit for very large text fields.
+    """
+    try:
+        csv.field_size_limit(10_000_000)
+    except OverflowError:
+        csv.field_size_limit(sys.maxsize)
 
 
 def _read_text_sample(path: Path, encoding: str, size: int = 16384) -> str:
@@ -298,14 +361,13 @@ def _read_text_sample(path: Path, encoding: str, size: int = 16384) -> str:
     encoding
         Text encoding.
     size
-        Max number of characters to read.
+        Maximum number of characters.
 
     Returns
     -------
     str
-        Sample.
+        Text sample.
     """
-    # with path.open("r", encoding=encoding, newline="") as f:
     with path.open("r", encoding=encoding, errors="replace", newline="") as f:
         return f.read(size)
 
@@ -331,12 +393,10 @@ def _header_from_sample(sample: str, delimiter: str) -> list[str] | None:
 
 
 def _choose_csv_delimiter_and_header(
-    csv_path: Path,
-    encoding: str,
-    include_uf: bool,
+    csv_path: Path, encoding: str
 ) -> tuple[str, list[str]]:
     """
-    Choose a CSV delimiter by validating required fields in the header.
+    Choose a CSV delimiter by validating CID10 and SEM_NOT presence.
 
     Parameters
     ----------
@@ -344,8 +404,6 @@ def _choose_csv_delimiter_and_header(
         CSV path.
     encoding
         Text encoding.
-    include_uf
-        Whether UF is required (it is not required even if enabled).
 
     Returns
     -------
@@ -362,10 +420,9 @@ def _choose_csv_delimiter_and_header(
 
     try:
         sniff = csv.Sniffer().sniff(sample, delimiters=";,\t|")
-        if sniff.delimiter and sniff.delimiter not in candidates:
-            candidates.insert(0, sniff.delimiter)
-        elif sniff.delimiter:
-            candidates.remove(sniff.delimiter)
+        if sniff.delimiter:
+            if sniff.delimiter in candidates:
+                candidates.remove(sniff.delimiter)
             candidates.insert(0, sniff.delimiter)
     except csv.Error:
         pass
@@ -380,7 +437,6 @@ def _choose_csv_delimiter_and_header(
         norm = [_normalize_header(h) for h in header]
         cid_idx = _find_first_index(norm, _CID10_FIELDS)
         sem_idx = _find_first_index(norm, _SEM_FIELDS)
-        uf_idx = _find_first_index(norm, _UF_FIELDS) if include_uf else None
 
         if cid_idx is None or sem_idx is None:
             best_errors.append(
@@ -398,10 +454,7 @@ def _choose_csv_delimiter_and_header(
 
 
 def _iter_csv_rows(
-    path: Path,
-    *,
-    encoding: str,
-    delimiter: str,
+    path: Path, *, encoding: str, delimiter: str
 ) -> Iterator[list[str]]:
     """
     Iterate CSV rows as lists.
@@ -426,10 +479,96 @@ def _iter_csv_rows(
             yield row
 
 
+def _uf_priority(primary: tuple[str, ...]) -> tuple[str, ...]:
+    """
+    Build a full UF candidate priority list.
+
+    Parameters
+    ----------
+    primary
+        Primary candidate order.
+
+    Returns
+    -------
+    tuple[str, ...]
+        Primary candidates followed by remaining candidates.
+    """
+    rest = tuple(c for c in _UF_FIELD_CANDIDATES if c not in primary)
+    return primary + rest
+
+
+_DBF_UF_FIELDS = _uf_priority(_DBF_UF_PRIMARY)
+_CSV_UF_FIELDS = _uf_priority(_CSV_UF_PRIMARY)
+
+
+def _uf_sigla_from_raw(raw: str) -> tuple[str | None, bool]:
+    """
+    Normalize a UF raw value into a UF sigla.
+
+    Parameters
+    ----------
+    raw
+        Raw UF value (e.g. "SP", "35", "BR", "").
+
+    Returns
+    -------
+    tuple[str | None, bool]
+        (sigla, unknown). sigla None means blank/BR. unknown means non-empty
+        that cannot be mapped.
+    """
+    s = raw.strip().upper()
+    if not s:
+        return None, False
+    if s == "BR":
+        return None, False
+    if s in _UF_SIGLAS:
+        return s, False
+    if s.isdigit():
+        sigla = _CODE_TO_UF.get(int(s))
+        return (sigla, False) if sigla else (None, True)
+    return None, True
+
+
+def _select_bucket_from_candidates(
+    *,
+    siglas_by_field: dict[str, set[str]],
+    unknown_by_field: dict[str, bool],
+    priority: tuple[str, ...],
+) -> str:
+    """
+    Select a bucket based on UF candidates (content-based).
+
+    The first candidate (by `priority`) that yields exactly one valid UF sigla
+    and no unknown values wins. Otherwise, falls back to BR.
+
+    Parameters
+    ----------
+    siglas_by_field
+        Mapping candidate -> set of UF siglas found.
+    unknown_by_field
+        Mapping candidate -> whether unknown UF-like values were found.
+    priority
+        Candidate evaluation order.
+
+    Returns
+    -------
+    str
+        Bucket label (UF sigla like "SP" or "BR").
+    """
+    for cand in priority:
+        if cand not in siglas_by_field:
+            continue
+        if unknown_by_field.get(cand, False):
+            continue
+        siglas = siglas_by_field[cand]
+        if len(siglas) == 1:
+            return next(iter(siglas))
+    return "BR"
+
+
 def _extract_csv_routing_info(
     csv_path: Path,
     *,
-    include_uf: bool,
     encoding: str | None,
     try_encodings: list[str],
     country_override: str | None,
@@ -441,14 +580,12 @@ def _extract_csv_routing_info(
     ----------
     csv_path
         CSV file path.
-    include_uf
-        Whether to include UF in routing.
     encoding
         Preferred encoding; when None, try `try_encodings`.
     try_encodings
         Encodings to try if `encoding` is None or fails.
     country_override
-        Optional country override.
+        Optional bucket override.
 
     Returns
     -------
@@ -471,26 +608,28 @@ def _extract_csv_routing_info(
             delimiter, header = _choose_csv_delimiter_and_header(
                 csv_path,
                 encoding=enc,
-                include_uf=include_uf,
             )
             norm_header = [_normalize_header(h) for h in header]
             cid_idx = _find_first_index(norm_header, _CID10_FIELDS)
             sem_idx = _find_first_index(norm_header, _SEM_FIELDS)
-            uf_idx = (
-                _find_first_index(norm_header, _UF_FIELDS)
-                if include_uf
-                else None
-            )
 
             if cid_idx is None or sem_idx is None:
                 raise ValueError("Header inválido (CID10/SEM_NOT ausentes)")
+
+            uf_idxs: dict[str, int] = {}
+            for cand in _CSV_UF_FIELDS:
+                idx = _find_first_index(norm_header, (cand,))
+                if idx is not None:
+                    uf_idxs[cand] = idx
 
             rows = _iter_csv_rows(csv_path, encoding=enc, delimiter=delimiter)
             _ = next(rows, None)
 
             cid10_norm = ""
             sem_max: int | None = None
-            uf = ""
+
+            siglas_by_field: dict[str, set[str]] = {c: set() for c in uf_idxs}
+            unknown_by_field: dict[str, bool] = {c: False for c in uf_idxs}
 
             for row in rows:
                 if cid_idx < len(row):
@@ -509,30 +648,42 @@ def _extract_csv_routing_info(
                     if sem is not None:
                         sem_max = sem if sem_max is None else max(sem_max, sem)
 
-                if include_uf and uf_idx is not None and not uf:
-                    if uf_idx < len(row):
-                        uf = row[uf_idx].strip().upper()
+                for cand, idx in uf_idxs.items():
+                    if idx >= len(row):
+                        continue
+                    sigla, unknown = _uf_sigla_from_raw(row[idx])
+                    unknown_by_field[cand] = unknown_by_field[cand] or unknown
+                    if sigla is not None:
+                        siglas_by_field[cand].add(sigla)
 
             if not cid10_norm:
                 raise ValueError("CSV sem CID10/ID_AGRAVO")
             if sem_max is None:
                 raise ValueError("CSV sem SEM_NOT válido")
 
-            country = (
-                country_override or _infer_country_from_path(csv_path) or "br"
+            bucket = _select_bucket_from_candidates(
+                siglas_by_field=siglas_by_field,
+                unknown_by_field=unknown_by_field,
+                priority=_CSV_UF_FIELDS,
             )
-            disease_dir = _disease_dir_from_cid10(cid10_norm)
-            year = int(str(sem_max)[:4])
+            country = country_override or bucket.lower()
+
+            disease_code = _disease_code_from_cid10(cid10_norm)
+            disease_dir = _disease_dir_from_code(disease_code)
+            year = sem_max // 100
+            week = sem_max % 100
 
             return RoutingInfo(
                 src_path=csv_path,
                 country=country,
                 fmt_dir="csv",
                 cid10_norm=cid10_norm,
+                disease_code=disease_code,
                 disease_dir=disease_dir,
                 sem_not_max=sem_max,
                 year=year,
-                uf=uf,
+                week=week,
+                uf="",
                 encoding=enc,
                 delimiter=delimiter,
             )
@@ -548,7 +699,6 @@ def _extract_csv_routing_info(
 def _extract_dbf_routing_info(
     dbf_path: Path,
     *,
-    include_uf: bool,
     encoding: str,
     country_override: str | None,
 ) -> RoutingInfo:
@@ -559,12 +709,10 @@ def _extract_dbf_routing_info(
     ----------
     dbf_path
         DBF file path.
-    include_uf
-        Whether to include UF in routing.
     encoding
         DBF encoding to use.
     country_override
-        Optional country override.
+        Optional bucket override.
 
     Returns
     -------
@@ -584,19 +732,24 @@ def _extract_dbf_routing_info(
     field_names = list(table.field_names)
     cid_field = _find_field_name(field_names, _CID10_FIELDS)
     sem_field = _find_field_name(field_names, _SEM_FIELDS)
-    uf_field = (
-        _find_field_name(field_names, _UF_FIELDS) if include_uf else None
-    )
 
     if cid_field is None:
         raise ValueError(f"DBF sem CID10/ID_AGRAVO: {dbf_path}")
     if sem_field is None:
         raise ValueError(f"DBF sem SEM_NOT: {dbf_path}")
 
+    uf_fields: dict[str, str] = {}
+    for cand in _DBF_UF_FIELDS:
+        fname = _find_field_name(field_names, (cand,))
+        if fname is not None:
+            uf_fields[cand] = fname
+
     cid10_norm = ""
     sem_max: int | None = None
-    uf = ""
     seen_any = False
+
+    siglas_by_field: dict[str, set[str]] = {c: set() for c in uf_fields}
+    unknown_by_field: dict[str, bool] = {c: False for c in uf_fields}
 
     for rec in table:
         seen_any = True
@@ -617,9 +770,12 @@ def _extract_dbf_routing_info(
         if sem is not None:
             sem_max = sem if sem_max is None else max(sem_max, sem)
 
-        if include_uf and uf_field and not uf:
-            u_raw = _decode_dbf_value(rec.get(uf_field), encoding)
-            uf = u_raw.upper()
+        for cand, fname in uf_fields.items():
+            u_raw = _decode_dbf_value(rec.get(fname), encoding)
+            sigla, unknown = _uf_sigla_from_raw(u_raw)
+            unknown_by_field[cand] = unknown_by_field[cand] or unknown
+            if sigla is not None:
+                siglas_by_field[cand].add(sigla)
 
     if not seen_any:
         raise ValueError(f"DBF sem registros: {dbf_path}")
@@ -628,19 +784,29 @@ def _extract_dbf_routing_info(
     if sem_max is None:
         raise ValueError(f"DBF sem SEM_NOT válido: {dbf_path}")
 
-    country = country_override or _infer_country_from_path(dbf_path) or "br"
-    disease_dir = _disease_dir_from_cid10(cid10_norm)
-    year = int(str(sem_max)[:4])
+    bucket = _select_bucket_from_candidates(
+        siglas_by_field=siglas_by_field,
+        unknown_by_field=unknown_by_field,
+        priority=_DBF_UF_FIELDS,
+    )
+    country = country_override or bucket.lower()
+
+    disease_code = _disease_code_from_cid10(cid10_norm)
+    disease_dir = _disease_dir_from_code(disease_code)
+    year = sem_max // 100
+    week = sem_max % 100
 
     return RoutingInfo(
         src_path=dbf_path,
         country=country,
         fmt_dir="dbf",
         cid10_norm=cid10_norm,
+        disease_code=disease_code,
         disease_dir=disease_dir,
         sem_not_max=sem_max,
         year=year,
-        uf=uf,
+        week=week,
+        uf="",
         encoding=encoding,
         delimiter="",
     )
@@ -669,10 +835,8 @@ def _build_filename(info: RoutingInfo) -> str:
         prefix = "Infodengue"
 
     sem = f"{info.sem_not_max:06d}"
-    if info.country.lower() == "br":
-        return f"{prefix}_{sem}{ext}"
-    cc = info.country.upper()
-    return f"{prefix}_{cc}_{sem}{ext}"
+    label = info.country.upper()
+    return f"{prefix}_{label}_{sem}{ext}"
 
 
 def _rel_dest_path(info: RoutingInfo, *, include_uf: bool) -> Path:
@@ -684,7 +848,7 @@ def _rel_dest_path(info: RoutingInfo, *, include_uf: bool) -> Path:
     info
         Routing info.
     include_uf
-        Whether UF should be included.
+        Kept for CLI compatibility. UF folder layer is not used by default.
 
     Returns
     -------
@@ -739,7 +903,7 @@ def _base_roots(base: Path) -> list[Path]:
 
 def _exists_in_any_base(rel_path: Path, bases: list[Path]) -> Path | None:
     """
-    Check if a relative path exists under any of the base roots.
+    Check if a relative path exists under any base root.
 
     Parameters
     ----------
@@ -772,30 +936,46 @@ def _resolve_collision(
     """
     Resolve destination collisions across imported + uploaded + in-run reserved.
 
-    If an identical file (by checksum) already exists at rel_path or any of its
-    versioned versions, we return None to signal it should be skipped.
+    Parameters
+    ----------
+    rel_path
+        Proposed destination relative path.
+    src_path
+        Source file.
+    imported_roots
+        Roots for imported existence checks.
+    uploaded_roots
+        Roots for uploaded existence checks.
+    reserved
+        Relative paths already reserved in this run.
+    on_exists
+        Collision policy: version, skip, error.
+
+    Returns
+    -------
+    Path | None
+        Final relative path, or None to signal skip.
     """
-    src_hash = _sha256_file(src_path)
+    bases = imported_roots + uploaded_roots
+    src_hash: str | None = None
 
-    def _get_match(target_rel: Path) -> bool:
-        """Check if target_rel matches src by checksum or reservation."""
-        if target_rel in reserved:
-            return True  # If reserved, we don't have its hash yet, assume collision
+    def _hash_src() -> str:
+        nonlocal src_hash
+        if src_hash is None:
+            src_hash = _sha256_file(src_path)
+        return src_hash
 
-        existing_full = _exists_in_any_base(
-            target_rel, imported_roots + uploaded_roots
-        )
-        if not existing_full:
-            return False
+    def _is_same(existing: Path) -> bool:
+        return _sha256_file(existing) == _hash_src()
 
-        # If it exists, check checksum
-        return _sha256_file(existing_full) == src_hash
+    occupied = rel_path in reserved
+    existing_full = _exists_in_any_base(rel_path, bases)
+    if existing_full is not None:
+        if _is_same(existing_full):
+            return None
+        occupied = True
 
-    # 1. Check canonical path
-    if _exists_in_any_base(rel_path, imported_roots + uploaded_roots):
-        if _get_match(rel_path):
-            return None  # ALREADY_EXISTS (same checksum)
-    elif rel_path not in reserved:
+    if not occupied:
         return rel_path
 
     if on_exists == "skip":
@@ -803,18 +983,20 @@ def _resolve_collision(
     if on_exists == "error":
         raise FileExistsError(str(rel_path))
 
-    # 2. Check versioned paths
     parent = rel_path.parent
     base_stem = _strip_numeric_suffix(rel_path.stem)
     suffix = rel_path.suffix
 
     for n in range(1, 1000):
         candidate = parent / f"{base_stem}_{n:02d}{suffix}"
-        if _exists_in_any_base(candidate, imported_roots + uploaded_roots):
-            if _get_match(candidate):
-                return None  # ALREADY_EXISTS (same checksum)
-        elif candidate not in reserved:
-            return candidate
+        if candidate in reserved:
+            continue
+        existing_full = _exists_in_any_base(candidate, bases)
+        if existing_full is not None:
+            if _is_same(existing_full):
+                return None
+            continue
+        return candidate
 
     raise FileExistsError(f"Sem slot livre para versionamento: {rel_path}")
 
@@ -860,7 +1042,41 @@ def move_to_canonical(
     dbf_encoding: str,
     on_exists: str,
 ) -> tuple[bool, Path | None, RoutingInfo | None, str | None]:
-    """Move one file to canonical imported path."""
+    """
+    Move one file to canonical imported path.
+
+    Parameters
+    ----------
+    src
+        Source file.
+    imported_base
+        Imported base directory.
+    uploaded_base
+        Uploaded base directory for collision checks.
+    reserved_relpaths
+        Reserved relative paths within the current run.
+    dry_run
+        Whether to skip the actual move.
+    include_uf
+        CLI compatibility; UF folder layer is disabled by default.
+    country
+        Bucket override (lowercase).
+    fmt_dir
+        Optional override for fmt dir.
+    csv_encoding
+        Optional preferred CSV encoding.
+    try_csv_encodings
+        Encodings to try for CSV.
+    dbf_encoding
+        Encoding for DBF decoding.
+    on_exists
+        Collision policy: version, skip, error.
+
+    Returns
+    -------
+    tuple[bool, Path | None, RoutingInfo | None, str | None]
+        (ok, dest, info, err). If err starts with "SKIP", it's a skip.
+    """
     fmt = fmt_dir or _infer_fmt_dir_from_path(src)
     if fmt not in {"csv", "dbf"}:
         return False, None, None, f"Formato não suportado: {src}"
@@ -872,14 +1088,12 @@ def move_to_canonical(
         if fmt == "dbf":
             info = _extract_dbf_routing_info(
                 src,
-                include_uf=include_uf,
                 encoding=dbf_encoding,
                 country_override=country,
             )
         else:
             info = _extract_csv_routing_info(
                 src,
-                include_uf=include_uf,
                 encoding=csv_encoding,
                 try_encodings=try_csv_encodings,
                 country_override=country,
@@ -895,7 +1109,7 @@ def move_to_canonical(
             on_exists=on_exists,
         )
         if rel_final is None:
-            return False, None, info, "SKIP (já existe)"
+            return False, None, info, "SKIP (already exists)"
 
         reserved_relpaths.add(rel_final)
         dest = imported_base / rel_final
@@ -904,7 +1118,6 @@ def move_to_canonical(
             return True, dest, info, None
 
         dest.parent.mkdir(parents=True, exist_ok=True)
-
         if dest.exists():
             raise FileExistsError(f"Destino já existe: {dest}")
 
@@ -924,20 +1137,21 @@ def _build_parser() -> argparse.ArgumentParser:
         Parser.
     """
     p = argparse.ArgumentParser(
-        prog="infodengue_move.py",
+        prog="mover_sinan_data.py",
         description=(
-            "Move CSV/DBF to canonical imported path using CID10 + max SEM_NOT."
+            "Move CSV/DBF to canonical imported path using CID10 + max SEM_NOT "
+            "and content-based UF bucketing."
         ),
     )
     p.add_argument("paths", nargs="+", help="Files and/or directories.")
     p.add_argument(
         "--imported-base",
-        default="/Storage/infodengue_data/sftp2/alertadengue/imported",
+        default="/Storage/infodengue_data/sftp2/sinan/raw_data/imported",
         help="Destination base directory for canonical placement.",
     )
     p.add_argument(
         "--uploaded-base",
-        default="/Storage/infodengue_data/sftp2/alertadengue/uploaded",
+        default="/Storage/infodengue_data/sftp2/sinan/raw_data/uploaded",
         help="Extra base directory used for collision checks.",
     )
     p.add_argument(
@@ -948,12 +1162,12 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--include-uf",
         action="store_true",
-        help="Include UF folder layer when UF is present.",
+        help="CLI compatibility. UF folder layer is disabled by default.",
     )
     p.add_argument(
         "--country",
         default=None,
-        help="Override country (e.g. br, es). If omitted, inferred.",
+        help="Override bucket (e.g. br, es, sp). If omitted, derived from data.",
     )
     p.add_argument(
         "--fmt-dir",
@@ -968,7 +1182,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--try-csv-encodings",
-        default="iso-8859-1,cp1252,utf-8,utf-8-sig",
+        default="iso-8859-1,cp1252,utf-8,utf-8-sig,latin-1",
         help="Comma-separated CSV encodings to try.",
     )
     p.add_argument(
@@ -1000,11 +1214,7 @@ def main() -> int:
         Exit code.
     """
     args = _build_parser().parse_args()
-
-    try:
-        csv.field_size_limit(10**7)
-    except OverflowError:
-        csv.field_size_limit(sys.maxsize)
+    _csv_field_limit()
 
     imported_base = Path(args.imported_base).resolve()
     uploaded_base = Path(args.uploaded_base).resolve()
@@ -1021,8 +1231,9 @@ def main() -> int:
         e.strip() for e in str(args.try_csv_encodings).split(",") if e.strip()
     ]
     reserved_relpaths: set[Path] = set()
-
     manifest_entries: list[dict[str, Any]] = []
+
+    country_override = args.country.lower() if args.country else None
 
     for src in files:
         processed += 1
@@ -1033,7 +1244,7 @@ def main() -> int:
             reserved_relpaths=reserved_relpaths,
             dry_run=bool(args.dry_run),
             include_uf=bool(args.include_uf),
-            country=args.country.lower() if args.country else None,
+            country=country_override,
             fmt_dir=args.fmt_dir,
             csv_encoding=args.csv_encoding,
             try_csv_encodings=try_encodings,
@@ -1041,24 +1252,23 @@ def main() -> int:
             on_exists=args.on_exists,
         )
 
-        if ok and dest is not None and err is None:
+        if ok and dest is not None and err is None and info is not None:
             moved += 1
             prefix = "DRY-RUN" if args.dry_run else "OK"
             print(f"{prefix}: {src} -> {dest}")
-            if info is not None:
-                manifest_entries.append(
-                    {
-                        "dest": str(dest),
-                        "country": info.country,
-                        "disease": info.cid10_norm,
-                        "disease_dir": info.disease_dir,
-                        "year": info.year,
-                        "week": info.sem_not_max % 100,
-                        "sem_not_max": info.sem_not_max,
-                        "uf": info.uf,
-                        "fmt": info.fmt_dir,
-                    }
-                )
+            manifest_entries.append(
+                {
+                    "dest": str(dest),
+                    "country": info.country.lower(),
+                    "disease": info.disease_code,
+                    "disease_dir": info.disease_dir,
+                    "year": info.year,
+                    "week": info.week,
+                    "sem_not_max": info.sem_not_max,
+                    "uf": info.country.upper(),
+                    "fmt": info.fmt_dir,
+                }
+            )
         elif err and err.startswith("SKIP"):
             skipped += 1
             print(f"SKIP: {src} ({err})")
@@ -1068,7 +1278,11 @@ def main() -> int:
 
     if args.manifest and manifest_entries:
         manifest_entries.sort(
-            key=lambda e: (e["country"] != "es", e["sem_not_max"]),
+            key=lambda e: (
+                e["country"] == "br",
+                e["country"],
+                e["sem_not_max"],
+            ),
         )
         manifest_path = Path(args.manifest)
         manifest_path.parent.mkdir(parents=True, exist_ok=True)
