@@ -1,5 +1,3 @@
-"""Settings for local/CI testing."""
-
 from __future__ import annotations
 
 import os
@@ -7,12 +5,14 @@ import sys
 from pathlib import Path
 
 from ad_main.settings.dev import *  # noqa: F403
+from django.db import connections
+from django.db.models.signals import pre_migrate
+from django.dispatch import receiver
 
 DEBUG = True
 
 
 def _load_dotenv_if_available(project_root: Path) -> None:
-    """Load .env files if python-dotenv is installed."""
     try:
         from dotenv import load_dotenv
     except ImportError:
@@ -37,29 +37,58 @@ if repo_root not in sys.path:
     sys.path.insert(0, repo_root)
 
 os.environ.setdefault("PYTHONPATH", repo_root)
-
 os.environ.setdefault("POSTGRES_HOST", "localhost")
 os.environ.setdefault("REDIS_HOST", "localhost")
 
-# --- Database configuration for tests ---
 
-# Set test names for all databases to ensure Django creates temporary databases
-for db in DATABASES.values():
-    if "TEST" not in db:
-        db["TEST"] = {}
-    if "NAME" in db and not db["NAME"].startswith("test_"):
-        db["TEST"]["NAME"] = f"test_{db['NAME']}"
-    elif "NAME" in db:
-        db["TEST"]["NAME"] = db["NAME"]
+def _base_db_name(name: str) -> str:
+    return name[5:] if name.startswith("test_") else name
 
-if not PSQL_DB.startswith("test_"):
-    PSQL_DB = f"test_{PSQL_DB}"
-if not PSQL_DBF.startswith("test_"):
-    PSQL_DBF = f"test_{PSQL_DBF}"
 
-DB_ENGINE = get_sqla_conn(psql_db=PSQL_DB)
-DB_ENGINE_FACTORY = get_sqla_conn
+def _configure_test_db(db: dict[str, object]) -> None:
+    name_obj = db.get("NAME")
+    if not isinstance(name_obj, str) or not name_obj:
+        return
 
+    base = _base_db_name(name_obj)
+    test_name = f"test_{base}"
+
+    test_cfg = db.setdefault("TEST", {})
+    if isinstance(test_cfg, dict):
+        test_cfg["NAME"] = test_name
+
+
+for db in DATABASES.values():  # noqa: F405
+    _configure_test_db(db)
+
+PSQL_DB = DATABASES["default"]["TEST"]["NAME"]  # noqa: F405
+if "dbf" in DATABASES:  # noqa: F405
+    PSQL_DBF = DATABASES["dbf"]["TEST"]["NAME"]  # noqa: F405
+else:
+    PSQL_DBF = PSQL_DB
+
+
+@receiver(pre_migrate)
+def _ensure_required_schemas(sender, using: str, **kwargs: object) -> None:
+    """
+    Ensure schemas/tables referenced by migrations exist in the test DB.
+
+    This avoids failures on FK constraints pointing to Dengue_global.Municipio.
+    """
+    if using != "default":
+        return
+
+    with connections[using].cursor() as cur:
+        cur.execute('CREATE SCHEMA IF NOT EXISTS "Dengue_global"')
+        cur.execute('CREATE SCHEMA IF NOT EXISTS "test_views"')
+        cur.execute(
+            'CREATE TABLE IF NOT EXISTS "Dengue_global"."Municipio" '
+            "(geocodigo integer PRIMARY KEY)"
+        )
+
+
+DB_ENGINE = get_sqla_conn(psql_db=PSQL_DB)  # noqa: F405
+DB_ENGINE_FACTORY = get_sqla_conn  # noqa: F405
 
 CACHES = {
     "default": {
@@ -68,9 +97,7 @@ CACHES = {
     }
 }
 
-PASSWORD_HASHERS = [
-    "django.contrib.auth.hashers.MD5PasswordHasher",
-]
+PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True
