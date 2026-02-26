@@ -12,7 +12,6 @@ import geopandas as gpd
 import pandas as pd
 from pyarrow import parquet as pq
 from simpledbf import Dbf5
-from upload.sinan.utils import chunk_gen
 
 from .sinan_specs import (
     SINAN_REQUIRED_COLS,
@@ -20,6 +19,7 @@ from .sinan_specs import (
     SINAN_SYNONYMS_FIELDS,
 )
 from .types import Chunk
+from .utils import chunk_gen
 
 DBF_ENCODING = "ISO-8859-1"
 

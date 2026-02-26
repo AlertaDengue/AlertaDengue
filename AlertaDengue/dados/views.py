@@ -29,7 +29,6 @@ from django.views.generic import TemplateView
 from django.views.generic.base import TemplateView, View
 from epiweeks import Week
 from gis.geotiff import convert_from_shapefile
-from upload.sinan.utils import UF_CODES
 
 from . import models as M
 from .charts.alerts import AlertCitiesCharts
@@ -48,6 +47,7 @@ from .dbdata import (  # get_notification_cases,
     MAP_ZOOM,
     STATE_INITIAL,
     STATE_NAME,
+    UF_CODES,
     Forecast,
     NotificationResume,
     RegionalParameters,

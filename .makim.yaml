@@ -154,7 +154,7 @@ groups:
         help: Run mypy (best-effort, skip third-party imports)
         run: |
           mypy --follow-imports=skip --ignore-missing-imports \
-            AlertaDengue/tests/dbdata
+            AlertaDengue/tests
 
       unit:
         help: Run tests with pytest (inside web container)
@@ -181,11 +181,18 @@ groups:
           post-run:
             - task: tests.teardown
         run: |
+          TTY_OPT=""
+          if [ ! -t 0 ]; then
+            TTY_OPT="-T"
+          fi
+
           CMD="PYTHONPATH=/opt/services/AlertaDengue \
             DJANGO_SETTINGS_MODULE=${{ args.settings }} \
             PGOPTIONS='-c search_path=test_views,public' \
             pytest -q ${{ args.path }} ${{ args.params }}"
+
           sugar --profile dev compose-ext run --rm --service web \
+            --options "$TTY_OPT" \
             --cmd "sh -lc \"$CMD\""
 
   develop:
@@ -272,6 +279,264 @@ groups:
             default: clearcache
         run: |
           ${{ env.manage_py }} ${{ args.subcommand }}
+
+  ingestion:
+    help: SINAN ingestion pipeline (host-side, Strategy A).
+    env-file: .envs/.env
+    env:
+      manage_py: python AlertaDengue/manage.py
+      ingestion_host_base: "${DOCKER_HOST_IMPORTED_FILES_DIR}"
+      ingestion_worker_base: "/opt/services/ingestion/sinan/imported"
+    tasks:
+      move:
+        help: Move CSV/DBF files to canonical imported path.
+        args:
+          paths:
+            help: Files or directories to process.
+            type: string
+            required: true
+          imported-base:
+            help: Destination base directory.
+            type: string
+            default: ""
+          uploaded-base:
+            help: Extra base for collision checks.
+            type: string
+            default: ""
+          manifest:
+            help: Write a JSON manifest of moved files to this path.
+            type: string
+            default: ""
+          dry-run:
+            help: Print planned actions without moving.
+            type: bool
+            action: store_true
+          include-uf:
+            help: Include UF folder layer when available.
+            type: bool
+            action: store_true
+          country:
+            help: Override country code (e.g. br, es).
+            type: string
+            default: ""
+          on-exists:
+            help: "Collision policy: version, skip, or error."
+            type: string
+            default: version
+        run: |
+          FLAGS=""
+          if [ -n "${{ args.imported_base }}" ]; then
+            FLAGS="$FLAGS --imported-base ${{ args.imported_base }}"
+          fi
+          if [ -n "${{ args.uploaded_base }}" ]; then
+            FLAGS="$FLAGS --uploaded-base ${{ args.uploaded_base }}"
+          fi
+          if [ -n "${{ args.manifest }}" ]; then
+            FLAGS="$FLAGS --manifest ${{ args.manifest }}"
+          fi
+          if [ "${{ args.dry_run }}" = "True" ]; then
+            FLAGS="$FLAGS --dry-run"
+          fi
+          if [ "${{ args.include_uf }}" = "True" ]; then
+            FLAGS="$FLAGS --include-uf"
+          fi
+          if [ -n "${{ args.country }}" ]; then
+            FLAGS="$FLAGS --country ${{ args.country }}"
+          fi
+          FLAGS="$FLAGS --on-exists ${{ args.on_exists }}"
+
+          python AlertaDengue/ingestion/management/commands/mover_sinan_data.py \
+            ${{ args.paths }} \
+            --imported-base "${DOCKER_HOST_IMPORTED_FILES_DIR}" \
+            --uploaded-base "${DOCKER_HOST_UPLOADED_FILES_DIR}" \
+            $FLAGS
+
+      enqueue:
+        help: Create a Run record and enqueue Celery processing.
+        hooks:
+          pre-run:
+            - task: develop.container-wait
+              args:
+                service: postgres
+                timeout: "30"
+            - task: develop.container-wait
+              args:
+                service: rabbitmq
+                timeout: "30"
+        args:
+          source-path:
+            help: Path to the source file (CSV/DBF/Parquet).
+            type: string
+            required: true
+          uf:
+            help: UF code (e.g. ES, BR).
+            type: string
+            required: true
+          disease:
+            help: CID10 disease code (e.g. A90, A92).
+            type: string
+            required: true
+          year:
+            help: Delivery year.
+            type: string
+            required: true
+          week:
+            help: Delivery epidemiological week.
+            type: string
+            required: true
+          requeue:
+            help: Re-enqueue even if run already exists.
+            type: bool
+            action: store_true
+        env:
+          PSQL_HOST: "localhost"
+          PSQL_PORT: "${{ env.PSQL_PORT }}"
+          CELERY_BROKER_URL: "${{ env.CELERY_BROKER_URL }}"
+        run: |
+          FLAGS=""
+          if [ "${{ args.requeue }}" = "True" ]; then
+            FLAGS="$FLAGS --requeue"
+          fi
+          if [ -n "${{ env.ingestion_host_base }}" ]; then
+            FLAGS="$FLAGS --host-base ${{ env.ingestion_host_base }}"
+            FLAGS="$FLAGS --worker-base ${{ env.ingestion_worker_base }}"
+          fi
+
+          cd AlertaDengue &&
+          python manage.py ingestion_enqueue_sinan \
+            "${{ args.source_path }}" \
+            --uf "${{ args.uf }}" \
+            --disease "${{ args.disease }}" \
+            --year "${{ args.year }}" \
+            --week "${{ args.week }}" \
+            $FLAGS
+
+      enqueue-manifest:
+        help: Read a manifest and enqueue runs in priority order (ES < BR, earlier weeks first).
+        hooks:
+          pre-run:
+            - task: develop.container-wait
+              args:
+                service: postgres
+                timeout: "30"
+            - task: develop.container-wait
+              args:
+                service: rabbitmq
+                timeout: "30"
+        args:
+          manifest:
+            help: Path to the JSON manifest from mover_sinan_data.py.
+            type: string
+            required: true
+          requeue:
+            help: Re-enqueue even if run already exists.
+            type: bool
+            action: store_true
+          dry-run:
+            help: Print the sorted plan without enqueuing.
+            type: bool
+            action: store_true
+        env:
+          PSQL_HOST: "localhost"
+          PSQL_PORT: "${{ env.PSQL_PORT }}"
+          CELERY_BROKER_URL: "${{ env.CELERY_BROKER_URL }}"
+        run: |
+          FLAGS=""
+          if [ "${{ args.requeue }}" = "True" ]; then
+            FLAGS="$FLAGS --requeue"
+          fi
+          if [ "${{ args.dry_run }}" = "True" ]; then
+            FLAGS="$FLAGS --dry-run"
+          fi
+          if [ -n "${{ env.ingestion_host_base }}" ]; then
+            FLAGS="$FLAGS --host-base ${{ env.ingestion_host_base }}"
+            FLAGS="$FLAGS --worker-base ${{ env.ingestion_worker_base }}"
+          fi
+
+          cd AlertaDengue &&
+          python manage.py ingestion_enqueue_manifest \
+            --manifest "${{ args.manifest }}" \
+            $FLAGS
+
+      run:
+        help: Full pipeline — move files then enqueue via manifest.
+        hooks:
+          pre-run:
+            - task: develop.container-wait
+              args:
+                service: postgres
+                timeout: "30"
+            - task: develop.container-wait
+              args:
+                service: rabbitmq
+                timeout: "30"
+        args:
+          paths:
+            help: Files or directories to move.
+            type: string
+            required: true
+          imported-base:
+            help: Destination base directory.
+            type: string
+            default: ""
+          uploaded-base:
+            help: Extra base for collision checks.
+            type: string
+            default: ""
+          dry-run:
+            help: Print planned actions without executing.
+            type: bool
+            action: store_true
+          requeue:
+            help: Re-enqueue even if run already exists.
+            type: bool
+            action: store_true
+        env:
+          PSQL_HOST: "localhost"
+          PSQL_PORT: "${{ env.PSQL_PORT }}"
+          CELERY_BROKER_URL: "${{ env.CELERY_BROKER_URL }}"
+        run: |
+          MANIFEST_FILE=$(mktemp --suffix=.json)
+
+          MOVE_FLAGS=""
+          if [ -n "${{ args.imported_base }}" ]; then
+            MOVE_FLAGS="$MOVE_FLAGS --imported-base ${{ args.imported_base }}"
+          fi
+          if [ -n "${{ args.uploaded_base }}" ]; then
+            MOVE_FLAGS="$MOVE_FLAGS --uploaded-base ${{ args.uploaded_base }}"
+          fi
+          if [ "${{ args.dry_run }}" = "True" ]; then
+            MOVE_FLAGS="$MOVE_FLAGS --dry-run"
+          fi
+          MOVE_FLAGS="$MOVE_FLAGS --manifest $MANIFEST_FILE"
+
+          echo "── Phase 1: Moving files ──"
+          python AlertaDengue/ingestion/management/commands/mover_sinan_data.py \
+            ${{ args.paths }} $MOVE_FLAGS
+
+          if [ "${{ args.dry_run }}" = "True" ]; then
+            echo "Dry-run mode — skipping enqueue."
+            cat "$MANIFEST_FILE"
+            rm -f "$MANIFEST_FILE"
+            exit 0
+          fi
+
+          ENQUEUE_FLAGS=""
+          if [ "${{ args.requeue }}" = "True" ]; then
+            ENQUEUE_FLAGS="$ENQUEUE_FLAGS --requeue"
+          fi
+          if [ -n "${{ env.ingestion_host_base }}" ]; then
+            ENQUEUE_FLAGS="$ENQUEUE_FLAGS --host-base ${{ env.ingestion_host_base }}"
+            ENQUEUE_FLAGS="$ENQUEUE_FLAGS --worker-base ${{ env.ingestion_worker_base }}"
+          fi
+
+          echo "── Phase 2: Enqueueing from manifest ──"
+          cd AlertaDengue &&
+          python manage.py ingestion_enqueue_manifest \
+            --manifest "$MANIFEST_FILE" \
+            $ENQUEUE_FLAGS
+
+          rm -f "$MANIFEST_FILE"
 
   release:
     vars:

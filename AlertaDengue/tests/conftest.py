@@ -1,5 +1,3 @@
-"""Pytest bootstrap for Django initialization."""
-
 from __future__ import annotations
 
 import os
@@ -7,12 +5,20 @@ import os
 import django
 
 
-def pytest_configure() -> None:
-    """Initialize Django before test collection imports Django models."""
-    from .test_utils import ensure_test_databases_exist
+def pytest_configure(config) -> None:
+    """
+    Configure Django initialization for tests.
 
-    ensure_test_databases_exist()
-
+    If pytest-django is available, it will handle django.setup() and DB setup.
+    If not, we fallback to calling django.setup() so importing models works.
+    """
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ad_main.settings.testing")
     os.environ.setdefault("PGOPTIONS", "-c search_path=test_views,public")
-    django.setup()
+
+    config.addinivalue_line(
+        "markers",
+        "django_db: uses the Django database",
+    )
+
+    if not config.pluginmanager.hasplugin("django"):
+        django.setup()
