@@ -390,8 +390,8 @@ groups:
             action: store_true
         env:
           PSQL_HOST: "localhost"
-          PSQL_PORT: "25432"
-          CELERY_BROKER_URL: "amqp://guest:guest@localhost:5672"
+          PSQL_PORT: "${{ env.PSQL_PORT }}"
+          CELERY_BROKER_URL: "${{ env.CELERY_BROKER_URL }}"
         run: |
           FLAGS=""
           if [ "${{ args.requeue }}" = "True" ]; then
@@ -438,8 +438,8 @@ groups:
             action: store_true
         env:
           PSQL_HOST: "localhost"
-          PSQL_PORT: "25432"
-          CELERY_BROKER_URL: "amqp://guest:guest@localhost:5672"
+          PSQL_PORT: "${{ env.PSQL_PORT }}"
+          CELERY_BROKER_URL: "${{ env.CELERY_BROKER_URL }}"
         run: |
           FLAGS=""
           if [ "${{ args.requeue }}" = "True" ]; then
@@ -493,8 +493,8 @@ groups:
             action: store_true
         env:
           PSQL_HOST: "localhost"
-          PSQL_PORT: "25432"
-          CELERY_BROKER_URL: "amqp://guest:guest@localhost:5672"
+          PSQL_PORT: "${{ env.PSQL_PORT }}"
+          CELERY_BROKER_URL: "${{ env.CELERY_BROKER_URL }}"
         run: |
           MANIFEST_FILE=$(mktemp --suffix=.json)
 
