@@ -1201,6 +1201,11 @@ def _build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Write a JSON manifest of moved files to this path.",
     )
+    p.add_argument(
+        "--include-existing",
+        action="store_true",
+        help="Include files in manifest even if they were already moved (skipped).",
+    )
     return p
 
 
@@ -1272,6 +1277,27 @@ def main() -> int:
         elif err and err.startswith("SKIP"):
             skipped += 1
             print(f"SKIP: {src} ({err})")
+            if args.include_existing and info is not None:
+                # Resolve destination path for the manifest entry
+                rel = _rel_dest_path(info, include_uf=bool(args.include_uf))
+                # Check where it exists for the 'dest' field
+                existing_full = _exists_in_any_base(
+                    rel, _base_roots(imported_base)
+                )
+                if existing_full:
+                    manifest_entries.append(
+                        {
+                            "dest": str(existing_full),
+                            "country": info.country.lower(),
+                            "disease": info.disease_code,
+                            "disease_dir": info.disease_dir,
+                            "year": info.year,
+                            "week": info.week,
+                            "sem_not_max": info.sem_not_max,
+                            "uf": info.country.upper(),
+                            "fmt": info.fmt_dir,
+                        }
+                    )
         else:
             failed += 1
             print(f"FAIL: {src} ({err})")

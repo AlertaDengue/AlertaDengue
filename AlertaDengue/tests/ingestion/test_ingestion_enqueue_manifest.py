@@ -116,3 +116,29 @@ def test_manifest_dry_run_does_not_call_enqueue(
     )
 
     assert capture.calls == []
+
+
+@pytest.mark.django_db
+def test_manifest_empty_graceful_exit(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """
+    Empty manifest list [] does not crash and prints a warning.
+    """
+    manifest_path = tmp_path / "empty.json"
+    manifest_path.write_text("[]", encoding="utf-8")
+
+    capture = _CallCapture()
+    monkeypatch.setattr(man, "call_command", capture)
+
+    call_command(
+        "ingestion_enqueue_manifest",
+        "--manifest",
+        str(manifest_path),
+    )
+
+    assert capture.calls == []
+    captured = capsys.readouterr()
+    assert "Manifest is empty" in captured.out
