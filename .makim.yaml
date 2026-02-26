@@ -367,7 +367,7 @@ groups:
           FLAGS="$FLAGS --on-exists ${{ args.on_exists }}"
 
           python AlertaDengue/ingestion/management/commands/mover_sinan_data.py \
-            ${{ args.paths }} \
+            "${{ args.paths }}" \
             --imported-base "${DOCKER_HOST_IMPORTED_FILES_DIR}" \
             --uploaded-base "${DOCKER_HOST_UPLOADED_FILES_DIR}" \
             $FLAGS
@@ -554,7 +554,7 @@ groups:
             MOVE_FLAGS="$MOVE_FLAGS --allow-outdated"
           fi
           python AlertaDengue/ingestion/management/commands/mover_sinan_data.py \
-            ${{ args.paths }} $MOVE_FLAGS
+            "${{ args.paths }}" $MOVE_FLAGS
 
           if [ "${{ args.dry_run }}" = "True" ]; then
             echo "Dry-run mode — skipping enqueue."
@@ -579,6 +579,39 @@ groups:
             $ENQUEUE_FLAGS
 
           rm -f "$MANIFEST_FILE"
+
+      watch:
+        help: Watch a directory for new SINAN files and trigger ingestion.
+        args:
+          path:
+            help: Directory to watch.
+            type: string
+            default: "/Storage/infodengue_data/sftp2/sinan/incoming/"
+          settle-time:
+            help: Wait N seconds after last modification to ensure upload is finished.
+            type: string
+            default: "5.0"
+          requeue:
+            help: Re-enqueue even if run already exists.
+            type: bool
+            action: store_true
+          include-existing:
+            help: Include files in manifest even if they were already moved.
+            type: bool
+            action: store_true
+        run: |
+          FLAGS=""
+          if [ "${{ args.requeue }}" = "True" ]; then
+            FLAGS="$FLAGS --requeue"
+          fi
+          if [ "${{ args.include_existing }}" = "True" ]; then
+            FLAGS="$FLAGS --include-existing"
+          fi
+
+          python AlertaDengue/ingestion/management/commands/ingestion_watcher.py \
+            --path "${{ args.path }}" \
+            --settle-time "${{ args.settle_time }}" \
+            $FLAGS
 
   release:
     vars:

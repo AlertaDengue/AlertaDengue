@@ -1340,7 +1340,7 @@ def main() -> int:
             failed += 1
             print(f"FAIL: {src} ({err})")
 
-    if args.manifest and manifest_entries:
+    if args.manifest:
         manifest_entries.sort(
             key=lambda e: (
                 e["country"] == "br",
