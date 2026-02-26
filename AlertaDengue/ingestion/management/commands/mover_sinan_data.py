@@ -1319,7 +1319,8 @@ def main() -> int:
                 rel = _rel_dest_path(info, include_uf=bool(args.include_uf))
                 # Check where it exists for the 'dest' field
                 existing_full = _exists_in_any_base(
-                    rel, _base_roots(imported_base)
+                    rel,
+                    _base_roots(imported_base) + _base_roots(uploaded_base),
                 )
                 if existing_full:
                     manifest_entries.append(
