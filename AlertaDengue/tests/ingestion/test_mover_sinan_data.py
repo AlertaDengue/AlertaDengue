@@ -296,3 +296,101 @@ def test_main_writes_sorted_manifest_es_before_br(
     entries = json.loads(manifest_path.read_text(encoding="utf-8"))
     assert entries[0]["country"] == "es"
     assert entries[1]["country"] == "br"
+
+
+def test_move_to_canonical_outdated_skip(tmp_path: Path) -> None:
+    """
+    If file is older than epiweek-window, it should be skipped.
+    """
+    src = tmp_path / "incoming" / "old.csv"
+    # 202301 is definitively old
+    _write_csv(src, "ID_AGRAVO;SEM_NOT;SG_UF_NOT\nA90;202301;ES\n")
+
+    ok, dest, info, err = mover.move_to_canonical(
+        src,
+        imported_base=tmp_path / "imported",
+        uploaded_base=tmp_path / "uploaded",
+        reserved_relpaths=set(),
+        dry_run=True,
+        include_uf=False,
+        country=None,
+        fmt_dir=None,
+        csv_encoding=None,
+        try_csv_encodings=["utf-8"],
+        dbf_encoding="iso-8859-1",
+        on_exists="version",
+        epiweek_window=58,
+    )
+
+    assert ok is False
+    assert err is not None
+    assert "OUTDATED" in err
+
+
+def test_move_to_canonical_outdated_allow(tmp_path: Path) -> None:
+    """
+    If allow_outdated=True, even an old file is moved.
+    """
+    src = tmp_path / "incoming" / "old.csv"
+    _write_csv(src, "ID_AGRAVO;SEM_NOT;SG_UF_NOT\nA90;202301;ES\n")
+
+    ok, dest, info, err = mover.move_to_canonical(
+        src,
+        imported_base=tmp_path / "imported",
+        uploaded_base=tmp_path / "uploaded",
+        reserved_relpaths=set(),
+        dry_run=True,
+        include_uf=False,
+        country=None,
+        fmt_dir=None,
+        csv_encoding=None,
+        try_csv_encodings=["utf-8"],
+        dbf_encoding="iso-8859-1",
+        on_exists="version",
+        epiweek_window=58,
+        allow_outdated=True,
+    )
+
+    assert ok is True
+    assert err is None
+
+
+def test_main_with_include_existing(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """
+    If --include-existing is set, skipped files (already moved) are in manifest.
+    """
+    imported_base = tmp_path / "imported"
+    uploaded_base = tmp_path / "uploaded"
+    src = tmp_path / "incoming" / "existing.csv"
+    content = "ID_AGRAVO;SEM_NOT;SG_UF_NOT\nA90;202610;ES\n"
+    _write_csv(src, content)
+
+    # Pre-populate uploaded so it will be skipped
+    canonical_dest = (
+        uploaded_base / "es/csv/dengue/2026/202610/DenInfodengue_ES_202610.csv"
+    )
+    _write_csv(canonical_dest, content)
+
+    manifest_path = tmp_path / "manifest.json"
+    argv = [
+        "mover_sinan_data.py",
+        str(src),
+        "--imported-base",
+        str(imported_base),
+        "--uploaded-base",
+        str(uploaded_base),
+        "--manifest",
+        str(manifest_path),
+        "--include-existing",
+        "--dry-run",
+    ]
+    monkeypatch.setattr(sys, "argv", argv)
+    exit_code = mover.main()
+
+    assert exit_code == 0
+    entries = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert len(entries) == 1
+    assert entries[0]["dest"] == str(canonical_dest)

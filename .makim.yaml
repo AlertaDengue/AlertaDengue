@@ -323,6 +323,18 @@ groups:
             help: "Collision policy: version, skip, or error."
             type: string
             default: version
+          include-existing:
+            help: Include files in manifest even if they were already moved.
+            type: bool
+            action: store_true
+          epiweek-window:
+            help: Skip files older than this number of weeks.
+            type: string
+            default: "58"
+          allow-outdated:
+            help: Ingest even if the file is older than the window.
+            type: bool
+            action: store_true
         run: |
           FLAGS=""
           if [ -n "${{ args.imported_base }}" ]; then
@@ -342,6 +354,15 @@ groups:
           fi
           if [ -n "${{ args.country }}" ]; then
             FLAGS="$FLAGS --country ${{ args.country }}"
+          fi
+          if [ "${{ args.include_existing }}" = "True" ]; then
+            FLAGS="$FLAGS --include-existing"
+          fi
+          if [ -n "${{ args.epiweek_window }}" ]; then
+            FLAGS="$FLAGS --epiweek-window ${{ args.epiweek_window }}"
+          fi
+          if [ "${{ args.allow_outdated }}" = "True" ]; then
+            FLAGS="$FLAGS --allow-outdated"
           fi
           FLAGS="$FLAGS --on-exists ${{ args.on_exists }}"
 
@@ -491,6 +512,18 @@ groups:
             help: Re-enqueue even if run already exists.
             type: bool
             action: store_true
+          include-existing:
+            help: Include files in manifest even if they were already moved.
+            type: bool
+            action: store_true
+          epiweek-window:
+            help: Skip files older than this number of weeks.
+            type: string
+            default: "58"
+          allow-outdated:
+            help: Ingest even if the file is older than the window.
+            type: bool
+            action: store_true
         env:
           PSQL_HOST: "localhost"
           PSQL_PORT: "${{ env.PSQL_PORT }}"
@@ -511,6 +544,15 @@ groups:
           MOVE_FLAGS="$MOVE_FLAGS --manifest $MANIFEST_FILE"
 
           echo "── Phase 1: Moving files ──"
+          if [ "${{ args.include_existing }}" = "True" ]; then
+            MOVE_FLAGS="$MOVE_FLAGS --include-existing"
+          fi
+          if [ -n "${{ args.epiweek_window }}" ]; then
+            MOVE_FLAGS="$MOVE_FLAGS --epiweek-window ${{ args.epiweek_window }}"
+          fi
+          if [ "${{ args.allow_outdated }}" = "True" ]; then
+            MOVE_FLAGS="$MOVE_FLAGS --allow-outdated"
+          fi
           python AlertaDengue/ingestion/management/commands/mover_sinan_data.py \
             ${{ args.paths }} $MOVE_FLAGS
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import datetime
 import hashlib
 import io
 import json
@@ -15,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from dbfread import DBF
+from epiweeks import Week
 
 UF_CODES: dict[str, int] = {
     "AC": 12,
@@ -1041,6 +1043,8 @@ def move_to_canonical(
     try_csv_encodings: list[str],
     dbf_encoding: str,
     on_exists: str,
+    epiweek_window: int | None = None,
+    allow_outdated: bool = False,
 ) -> tuple[bool, Path | None, RoutingInfo | None, str | None]:
     """
     Move one file to canonical imported path.
@@ -1098,6 +1102,26 @@ def move_to_canonical(
                 try_encodings=try_csv_encodings,
                 country_override=country,
             )
+
+        if epiweek_window is not None and not allow_outdated:
+            now = datetime.date.today()
+            current_week = Week.fromdate(now)
+            file_week = Week(info.year, info.week)
+
+            # epweeks supports Week - int, but Week - Week is not supported.
+            # We use startdate subtraction to get the delta in weeks.
+            weeks_ago = (
+                current_week.startdate() - file_week.startdate()
+            ).days // 7
+
+            if weeks_ago > int(epiweek_window):
+                return (
+                    False,
+                    None,
+                    info,
+                    f"OUTDATED: {info.sem_not_max} is {weeks_ago} weeks old "
+                    f"(window: {epiweek_window})",
+                )
 
         rel = _rel_dest_path(info, include_uf=include_uf)
         rel_final = _resolve_collision(
@@ -1201,6 +1225,22 @@ def _build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Write a JSON manifest of moved files to this path.",
     )
+    p.add_argument(
+        "--include-existing",
+        action="store_true",
+        help="Include files in manifest even if they were already moved (skipped).",
+    )
+    p.add_argument(
+        "--epiweek-window",
+        type=int,
+        default=None,
+        help="Skip files older than this number of weeks from now.",
+    )
+    p.add_argument(
+        "--allow-outdated",
+        action="store_true",
+        help="Ingest even if the file is older than the window.",
+    )
     return p
 
 
@@ -1250,6 +1290,8 @@ def main() -> int:
             try_csv_encodings=try_encodings,
             dbf_encoding=args.dbf_encoding,
             on_exists=args.on_exists,
+            epiweek_window=args.epiweek_window,
+            allow_outdated=bool(args.allow_outdated),
         )
 
         if ok and dest is not None and err is None and info is not None:
@@ -1272,6 +1314,28 @@ def main() -> int:
         elif err and err.startswith("SKIP"):
             skipped += 1
             print(f"SKIP: {src} ({err})")
+            if args.include_existing and info is not None:
+                # Resolve destination path for the manifest entry
+                rel = _rel_dest_path(info, include_uf=bool(args.include_uf))
+                # Check where it exists for the 'dest' field
+                existing_full = _exists_in_any_base(
+                    rel,
+                    _base_roots(imported_base) + _base_roots(uploaded_base),
+                )
+                if existing_full:
+                    manifest_entries.append(
+                        {
+                            "dest": str(existing_full),
+                            "country": info.country.lower(),
+                            "disease": info.disease_code,
+                            "disease_dir": info.disease_dir,
+                            "year": info.year,
+                            "week": info.week,
+                            "sem_not_max": info.sem_not_max,
+                            "uf": info.country.upper(),
+                            "fmt": info.fmt_dir,
+                        }
+                    )
         else:
             failed += 1
             print(f"FAIL: {src} ({err})")

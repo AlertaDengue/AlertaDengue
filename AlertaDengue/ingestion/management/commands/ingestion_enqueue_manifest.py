@@ -61,8 +61,14 @@ class Command(BaseCommand):
         except (json.JSONDecodeError, OSError) as exc:
             raise CommandError(f"Failed to read manifest: {exc}") from exc
 
-        if not isinstance(entries, list) or not entries:
-            raise CommandError("Manifest is empty or not a JSON list.")
+        if not isinstance(entries, list):
+            raise CommandError("Manifest is not a JSON list.")
+
+        if not entries:
+            self.stdout.write(
+                self.style.WARNING(f"Manifest is empty: {manifest_path}")
+            )
+            return
 
         entries.sort(key=_sort_key)
 
