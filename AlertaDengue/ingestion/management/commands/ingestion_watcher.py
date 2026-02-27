@@ -75,7 +75,7 @@ class IngestionWatcherHandler(FileSystemEventHandler):
             # We call makim directly to reuse the established pipeline
             cmd = ["makim", "ingestion.run", "--paths", src_path]
 
-            if self.include_existing:
+            if self.include_existing or self.requeue:
                 cmd.append("--include-existing")
             if self.requeue:
                 cmd.append("--requeue")
