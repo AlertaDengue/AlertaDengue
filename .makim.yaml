@@ -154,7 +154,7 @@ groups:
         help: Run mypy (best-effort, skip third-party imports)
         run: |
           mypy --follow-imports=skip --ignore-missing-imports \
-            AlertaDengue/tests
+            AlertaDengue/ingestion
 
       unit:
         help: Run tests with pytest (inside web container)
@@ -336,13 +336,19 @@ groups:
             type: bool
             action: store_true
         run: |
+          IMPORTED_BASE=${{ args.imported_base }}
+          if [ -z "$IMPORTED_BASE" ]; then
+            IMPORTED_BASE="${{ env.DOCKER_HOST_IMPORTED_FILES_DIR }}"
+          fi
+
+          UPLOADED_BASE=${{ args.uploaded_base }}
+          if [ -z "$UPLOADED_BASE" ]; then
+            UPLOADED_BASE="${{ env.DOCKER_HOST_UPLOADED_FILES_DIR }}"
+          fi
+
           FLAGS=""
-          if [ -n "${{ args.imported_base }}" ]; then
-            FLAGS="$FLAGS --imported-base ${{ args.imported_base }}"
-          fi
-          if [ -n "${{ args.uploaded_base }}" ]; then
-            FLAGS="$FLAGS --uploaded-base ${{ args.uploaded_base }}"
-          fi
+          FLAGS="$FLAGS --imported-base $IMPORTED_BASE"
+          FLAGS="$FLAGS --uploaded-base $UPLOADED_BASE"
           if [ -n "${{ args.manifest }}" ]; then
             FLAGS="$FLAGS --manifest ${{ args.manifest }}"
           fi
@@ -367,9 +373,9 @@ groups:
           FLAGS="$FLAGS --on-exists ${{ args.on_exists }}"
 
           python AlertaDengue/ingestion/management/commands/mover_sinan_data.py \
-            ${{ args.paths }} \
-            --imported-base "${DOCKER_HOST_IMPORTED_FILES_DIR}" \
-            --uploaded-base "${DOCKER_HOST_UPLOADED_FILES_DIR}" \
+            "${{ args.paths }}" \
+            --imported-base $IMPORTED_BASE \
+            --uploaded-base $UPLOADED_BASE \
             $FLAGS
 
       enqueue:
@@ -529,15 +535,21 @@ groups:
           PSQL_PORT: "${{ env.PSQL_PORT }}"
           CELERY_BROKER_URL: "${{ env.CELERY_BROKER_URL }}"
         run: |
+          UPLOADED_BASE=${{ args.uploaded_base }}
+          if [ -z "$UPLOADED_BASE" ]; then
+            UPLOADED_BASE="${{ env.DOCKER_HOST_UPLOADED_FILES_DIR }}"
+          fi
+
+          IMPORTED_BASE=${{ args.imported_base }}
+          if [ -z "$IMPORTED_BASE" ]; then
+            IMPORTED_BASE="${{ env.DOCKER_HOST_IMPORTED_FILES_DIR }}"
+          fi
+
           MANIFEST_FILE=$(mktemp --suffix=.json)
 
           MOVE_FLAGS=""
-          if [ -n "${{ args.imported_base }}" ]; then
-            MOVE_FLAGS="$MOVE_FLAGS --imported-base ${{ args.imported_base }}"
-          fi
-          if [ -n "${{ args.uploaded_base }}" ]; then
-            MOVE_FLAGS="$MOVE_FLAGS --uploaded-base ${{ args.uploaded_base }}"
-          fi
+          MOVE_FLAGS="$MOVE_FLAGS --imported-base $IMPORTED_BASE"
+          MOVE_FLAGS="$MOVE_FLAGS --uploaded-base $UPLOADED_BASE"
           if [ "${{ args.dry_run }}" = "True" ]; then
             MOVE_FLAGS="$MOVE_FLAGS --dry-run"
           fi
@@ -554,7 +566,7 @@ groups:
             MOVE_FLAGS="$MOVE_FLAGS --allow-outdated"
           fi
           python AlertaDengue/ingestion/management/commands/mover_sinan_data.py \
-            ${{ args.paths }} $MOVE_FLAGS
+            "${{ args.paths }}" $MOVE_FLAGS
 
           if [ "${{ args.dry_run }}" = "True" ]; then
             echo "Dry-run mode — skipping enqueue."
@@ -578,7 +590,49 @@ groups:
             --manifest "$MANIFEST_FILE" \
             $ENQUEUE_FLAGS
 
+          if [ ! -s "$MANIFEST_FILE" ]; then
+            echo "[WW] Manifest is empty after Phase 1. If files were skipped because they already exist, use --include-existing to force re-ingestion/manifest inclusion."
+          fi
           rm -f "$MANIFEST_FILE"
+
+      watch:
+        help: Watch a directory for new SINAN files and trigger ingestion.
+        args:
+          path:
+            help: Directory to watch.
+            type: string
+            default: ""
+          settle-time:
+            help: Wait N seconds after last modification to ensure upload is finished.
+            type: string
+            default: "5.0"
+          requeue:
+            help: Re-enqueue even if run already exists.
+            type: bool
+            action: store_true
+          include-existing:
+            help: Include files in manifest even if they were already moved.
+            type: bool
+            action: store_true
+        run: |
+
+          INCOMING_DIR="${{ args.path }}"
+          if [ -z "$INCOMING_DIR" ]; then
+            INCOMING_DIR="${{ env.DOCKER_HOST_INCOMING_DIR }}"
+          fi
+
+          FLAGS=""
+          if [ "${{ args.requeue }}" = "True" ]; then
+            FLAGS="$FLAGS --requeue"
+          fi
+          if [ "${{ args.include_existing }}" = "True" ]; then
+            FLAGS="$FLAGS --include-existing"
+          fi
+
+          python AlertaDengue/ingestion/management/commands/ingestion_watcher.py \
+            --path "${INCOMING_DIR}" \
+            --settle-time '${{ args.settle_time }}' \
+            $FLAGS
 
   release:
     vars:
