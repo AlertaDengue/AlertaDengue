@@ -7,6 +7,7 @@ import datetime
 import hashlib
 import io
 import json
+import logging
 import os
 import re
 import shutil
@@ -18,6 +19,8 @@ from typing import Any
 
 from dbfread import DBF
 from epiweeks import Week
+
+logger = logging.getLogger(__name__)
 
 UF_CODES: dict[str, int] = {
     "AC": 12,
@@ -1304,7 +1307,7 @@ def main() -> int:
         if ok and dest is not None and err is None and info is not None:
             moved += 1
             prefix = "DRY-RUN" if args.dry_run else "OK"
-            print(f"{prefix}: {src} -> {dest}")
+            logger.info(f"{prefix}: {src} -> {dest}")
             manifest_entries.append(
                 {
                     "dest": str(dest),
@@ -1320,19 +1323,19 @@ def main() -> int:
             )
         elif err and err.startswith("SKIP"):
             skipped += 1
-            print(f"SKIP: {src} ({err})")
+            logger.warning(f"SKIP: {src} ({err})")
             if args.include_existing and info is not None:
                 # Resolve destination path for the manifest entry
                 rel = _rel_dest_path(info, include_uf=bool(args.include_uf))
-                print(f"DEBUG: include-existing=True, rel_dest={rel}")
+                logger.warning(f"include-existing=True, rel_dest={rel}")
                 # Check where it exists for the 'dest' field
                 existing_full = _exists_in_any_base(
                     rel,
                     _base_roots(imported_base) + _base_roots(uploaded_base),
                 )
                 if existing_full:
-                    print(
-                        f"DEBUG: Found existing at {existing_full}, adding to manifest."
+                    logger.warning(
+                        f"Found existing at {existing_full}, adding to manifest."
                     )
                     manifest_entries.append(
                         {
@@ -1349,7 +1352,7 @@ def main() -> int:
                     )
         else:
             failed += 1
-            print(f"FAIL: {src} ({err})")
+            logger.error(f"FAIL: {src} ({err})")
 
     if args.manifest:
         manifest_entries.sort(
@@ -1365,9 +1368,11 @@ def main() -> int:
             json.dumps(manifest_entries, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
-        print(f"MANIFEST: {manifest_path} ({len(manifest_entries)} entries)")
+        logger.info(
+            f"MANIFEST: {manifest_path} ({len(manifest_entries)} entries)"
+        )
 
-    print(
+    logger.info(
         "SUMMARY: "
         f"processed={processed} moved={moved} skipped={skipped} "
         f"failed={failed}"
