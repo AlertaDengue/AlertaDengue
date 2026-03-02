@@ -925,6 +925,14 @@ class ReportCityView(TemplateView):
             year_week=year_week,
         )
 
+        no_data_chart = ""
+        chart_dengue_climate = no_data_chart
+        chart_dengue_incidence = no_data_chart
+        chart_chik_climate = no_data_chart
+        chart_chik_incidence = no_data_chart
+        chart_zika_climate = no_data_chart
+        chart_zika_incidence = no_data_chart
+
         total_n_dengue = 0
         total_n_dengue_last_year = 0
         total_n_chik = 0
