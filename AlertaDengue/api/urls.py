@@ -1,4 +1,4 @@
-from django.conf.urls import re_path
+from django.urls import re_path
 
 # local
 from .views import AlertCityView, EpiYearWeekView, NotificationReducedCSV_View
