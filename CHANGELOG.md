@@ -1,6 +1,14 @@
 Release Notes
 ---
 
+## [4.5.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.4.0...4.5.0) (2026-03-02)
+
+### Features
+
+* **ingestion:** add watchdog-based SINAN file watcher with tests ([#869](https://github.com/AlertaDengue/AlertaDengue/issues/869)) ([1350cd1](https://github.com/AlertaDengue/AlertaDengue/commit/1350cd16f8ef64fd8d66b5d988a61527e3424f74))
+* **ingestion:** host-run SINAN Makim workflow with epiweek cutoff guard ([#867](https://github.com/AlertaDengue/AlertaDengue/issues/867)) ([3c45d67](https://github.com/AlertaDengue/AlertaDengue/commit/3c45d67f9f18ce20cb4831dcfa7a5ed0923461c4))
+* Move ingestion as makim tasks and Add ingestion.enqueue-manifet task ([#863](https://github.com/AlertaDengue/AlertaDengue/issues/863)) ([49ce6c3](https://github.com/AlertaDengue/AlertaDengue/commit/49ce6c334fb1b8eb000cf0c3709a3783e6e7f1e9))
+
 ## [4.4.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.3.3...4.4.0) (2026-02-19)
 
 ### Features
