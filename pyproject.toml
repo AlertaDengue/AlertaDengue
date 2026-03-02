@@ -19,7 +19,7 @@ dbfread = "^2.0.7"
 dj-static = "^0.0.6"
 django-bootstrap4 = "^22.1"
 django-celery-results = "^2.5.1"
-django-chunked-upload = "<2.0.0"
+django-chunked-upload = { url = "https://github.com/juliomalegria/django-chunked-upload/archive/69dfedf148fe7793e372116ca3c88187f5d90ea2.tar.gz" }
 django-cprofile-middleware = "^1.0.5"
 django-leaflet = "^0.28.2"
 django-pymemcache = "^1.0.0"
@@ -107,7 +107,7 @@ profile = "black"
 src_paths = ["isort", "test"]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 check_untyped_defs = true
 strict = true
 ignore_missing_imports = true
