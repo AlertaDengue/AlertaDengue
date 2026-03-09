@@ -26,6 +26,7 @@ env:
   MEMCACHED_HOST: "localhost"
   MEMCACHED_PORT: 11211
   QUERY_CACHE_TIMEOUT: 86400
+  RABBITMQ_PORT: 35672
 
   POSTGRES_USER: postgres
   PSQL_DB: dengue
@@ -64,7 +65,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        python_version: ["3.10", "3.11"]
+        python_version: ["3.11"]
     concurrency:
       group: ci-${{ matrix.python_version }}-${{ github.ref }}
       cancel-in-progress: false
