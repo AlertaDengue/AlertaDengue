@@ -1,6 +1,16 @@
 Release Notes
 ---
 
+## [4.6.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.5.0...4.6.0) (2026-03-09)
+
+### Features
+
+* **DBF:** Remove legacy DBF app ([#874](https://github.com/AlertaDengue/AlertaDengue/issues/874)) ([fc22fe1](https://github.com/AlertaDengue/AlertaDengue/commit/fc22fe1041e88579c659bb3d8f0a68e4c4f9179f))
+
+### Bug Fixes
+
+* **report:** prevent 500 when zika dataset is empty ([#871](https://github.com/AlertaDengue/AlertaDengue/issues/871)) ([05aa964](https://github.com/AlertaDengue/AlertaDengue/commit/05aa964335b30e77070e296dad9b226da7ba537c))
+
 ## [4.5.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.4.0...4.5.0) (2026-03-02)
 
 ### Features
