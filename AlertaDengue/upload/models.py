@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Generator, Literal, Optional, Union
 
 import pandas as pd
-from chunked_upload.models import BaseChunkedUpload
+from chunked_upload.models import AbstractChunkedUpload
 from dados.models import City
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -27,7 +27,7 @@ def sinan_upload_log_path() -> str:
     return str(Path(settings.DBF_SINAN) / "log")
 
 
-class SINANChunkedUpload(BaseChunkedUpload):
+class SINANChunkedUpload(AbstractChunkedUpload):
     user = models.ForeignKey(
         User, related_name="uploads", on_delete=models.PROTECT
     )

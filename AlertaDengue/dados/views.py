@@ -73,8 +73,6 @@ def get_static(static_dir):
     return str(path_to_find.relative_to(_app_dir))
 
 
-DBF = apps.get_model("dbf", "DBF")
-
 locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
 
 

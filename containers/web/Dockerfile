@@ -21,7 +21,7 @@ RUN apt-get -qq update --yes \
   && apt-get -qq install --yes --no-install-recommends curl \
   build-essential git make postgresql-client vim \
   ca-certificates wget locales cron sudo inotify-tools \
-  libpq-dev pkg-config \
+  libpq-dev pkg-config gettext \
   && rm -rf /var/lib/apt/lists/* \
   /var/cache/apt/archives \
   /tmp/*
@@ -88,10 +88,10 @@ RUN chmod +x /opt/runwsgi.sh \
   && chmod +x /opt/runcelery.sh \
   && chmod +x /opt/runbeat.sh \
   && printf '%s\n' \
-     'if [ -f /opt/conda/etc/profile.d/conda.sh ]; then' \
-     '  . /opt/conda/etc/profile.d/conda.sh' \
-     '  conda activate alertadengue' \
-     'fi' > /home/deploy/.bashrc
+  'if [ -f /opt/conda/etc/profile.d/conda.sh ]; then' \
+  '  . /opt/conda/etc/profile.d/conda.sh' \
+  '  conda activate alertadengue' \
+  'fi' > /home/deploy/.bashrc
 
 ENTRYPOINT ["tini", "--", "/opt/entrypoint.sh"]
 CMD ["bash", "/opt/runwsgi.sh"]
