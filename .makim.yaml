@@ -595,6 +595,20 @@ groups:
           fi
           rm -f "$MANIFEST_FILE"
 
+      remerge:
+        help: Rerun the merge phase for a specific run_id (useful after staging fixes or transient errors).
+        args:
+          run-id:
+            help: Run UUID to re-merge.
+            type: string
+            required: true
+        env:
+          PSQL_HOST: "localhost"
+          PSQL_PORT: "${{ env.PSQL_PORT }}"
+        run: |
+          cd AlertaDengue &&
+          python manage.py shell -c "from ingestion.tasks import sinan_merge_run; res = sinan_merge_run('${{ args.run_id }}'); print(f'Merge completed: {res}')"
+
       watch:
         help: Watch a directory for new SINAN files and trigger ingestion.
         args:

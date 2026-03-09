@@ -61,6 +61,7 @@ django-pwa = "^2.0.1"
 numpy = "<2"
 django = "5.2.11"
 distlib = "^0.4.0"
+virtualenv = "^21.2.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.12.0"

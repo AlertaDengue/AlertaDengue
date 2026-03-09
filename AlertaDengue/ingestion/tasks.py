@@ -280,6 +280,27 @@ def sinan_merge_run(run_id: str) -> dict[str, int]:
         cols = ", ".join(SINAN_DEST_COLUMNS)
         updates = ", ".join(f"{c}=excluded.{c}" for c in SINAN_DEST_COLUMNS)
 
+        dedupe_sql = f"""
+            WITH ranked AS (
+                SELECT
+                    ctid,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY nu_notific, dt_notific, cid10_codigo, municipio_geocodigo
+                        ORDER BY created_at DESC NULLS LAST, ctid DESC
+                    ) AS rn
+                FROM {_stage_table()}
+                WHERE run_id = %s
+            ),
+            deleted AS (
+                DELETE FROM {_stage_table()} s
+                USING ranked r
+                WHERE s.ctid = r.ctid
+                  AND r.rn > 1
+                RETURNING 1
+            )
+            SELECT COUNT(*) AS deleted_rows FROM deleted;
+        """
+
         sql = f"""
             WITH upsert AS (
                 INSERT INTO {_notificacao_table()} ({cols})
@@ -306,6 +327,11 @@ def sinan_merge_run(run_id: str) -> dict[str, int]:
 
         with DB_ENGINE.begin() as conn:
             cursor = conn.connection.cursor()
+
+            cursor.execute(dedupe_sql, [str(run_id)])
+            deleted_rows_result = cursor.fetchone()
+            deleted_rows = deleted_rows_result[0] if deleted_rows_result else 0
+
             cursor.execute(sql, [str(run_id)])
             inserted, updated = cursor.fetchone()
 
@@ -315,6 +341,7 @@ def sinan_merge_run(run_id: str) -> dict[str, int]:
         meta_in = dict(Run.objects.get(pk=run_id).metadata or {})
         if se_min is not None and se_max is not None:
             meta_in["se_range"] = {"min": int(se_min), "max": int(se_max)}
+        meta_in["duplicates_removed"] = int(deleted_rows or 0)
         meta_out = _dump_meta(meta_in)
 
         loaded = int(inserted or 0) + int(updated or 0)
