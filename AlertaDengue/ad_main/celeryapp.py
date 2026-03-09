@@ -12,7 +12,7 @@ os.environ.setdefault(
 )
 
 
-app = Celery("ad_main", include=["dbf.tasks", "upload.tasks"])
+app = Celery("ad_main", include=["upload.tasks"])
 
 # Load all CELERY_* settings from the Django settings module
 app.config_from_object("django.conf:settings", namespace="CELERY")
