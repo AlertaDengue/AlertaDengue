@@ -648,6 +648,220 @@ groups:
             --settle-time '${{ args.settle_time }}' \
             $FLAGS
 
+      watch-start:
+        help: Start ingestion watcher in background (env/path aware).
+        args:
+          env:
+            help: Target environment (prod, staging, dev).
+            type: string
+            default: ""
+          path:
+            help: Override incoming path.
+            type: string
+            default: ""
+          settle-time:
+            help: Wait N seconds after last modification.
+            type: string
+            default: "5.0"
+          include-existing:
+            help: Include skipped files in manifest.
+            type: bool
+            action: store_true
+          requeue:
+            help: Re-enqueue even if run already exists.
+            type: bool
+            action: store_true
+          log-file:
+            help: Override log file path.
+            type: string
+            default: ""
+          pid-file:
+            help: Override pid file path.
+            type: string
+            default: ""
+          replace:
+            help: Stop existing watchers for the target path first.
+            type: bool
+            action: store_true
+        run: |
+          set -eu
+
+          INCOMING_DIR="${{ args.path }}"
+          LOG_FILE="${{ args.log_file }}"
+          PID_FILE="${{ args.pid_file }}"
+
+          if [ -z "${INCOMING_DIR}" ] && [ -n "${{ args.env }}" ]; then
+            case "${{ args.env }}" in
+              prod)
+                INCOMING_DIR="/Storage/infodengue_data/sftp2/sinan/incoming"
+                [ -z "${LOG_FILE}" ] && \
+                  LOG_FILE="/Storage/infodengue_data/logs/ingestion_watch.log"
+                ;;
+              staging)
+                INCOMING_DIR="/Storage/staging_data/sftp2/sinan/incoming"
+                [ -z "${LOG_FILE}" ] && \
+                  LOG_FILE="/Storage/staging_data/logs/ingestion_watch.log"
+                ;;
+              dev)
+                INCOMING_DIR="/Storage/dev_data/sftp2/sinan/incoming"
+                [ -z "${LOG_FILE}" ] && \
+                  LOG_FILE="/Storage/dev_data/logs/ingestion_watch.log"
+                ;;
+              *)
+                echo "[EE] invalid --env: ${{ args.env }}"
+                exit 2
+                ;;
+            esac
+          fi
+
+          if [ -z "${INCOMING_DIR}" ]; then
+            INCOMING_DIR="${DOCKER_HOST_INCOMING_DIR:-}"
+          fi
+
+          if [ -z "${LOG_FILE}" ]; then
+            LOG_FILE="/Storage/infodengue_data/logs/ingestion_watch.log"
+          fi
+
+          if [ -z "${PID_FILE}" ]; then
+            PID_FILE="${LOG_FILE}.pid"
+          fi
+
+          if [ -z "${INCOMING_DIR}" ]; then
+            echo "[EE] no incoming dir resolved (use --env or --path)"
+            exit 2
+          fi
+
+          mkdir -p "$(dirname "${LOG_FILE}")"
+
+          PATTERN="AlertaDengue/ingestion/management/commands/ingestion_watcher.py"
+          PIDS="$(pgrep -f "${PATTERN}.*--path ${INCOMING_DIR}(/)?( |$)" || true)"
+
+          if [ -n "${PIDS}" ] && [ "${{ args.replace }}" != "True" ]; then
+            echo "[WW] watcher already running for path=${INCOMING_DIR}"
+            echo "${PIDS}"
+            exit 1
+          fi
+
+          if [ -n "${PIDS}" ] && [ "${{ args.replace }}" = "True" ]; then
+            echo "[II] stopping existing watchers for path=${INCOMING_DIR}"
+            kill -TERM ${PIDS} || true
+            sleep 2
+          fi
+
+          FLAGS=""
+          [ "${{ args.requeue }}" = "True" ] && FLAGS="$FLAGS --requeue"
+          [ "${{ args.include_existing }}" = "True" ] && \
+            FLAGS="$FLAGS --include-existing"
+
+          CMD="python AlertaDengue/ingestion/management/commands/ingestion_watcher.py \
+            --path '${INCOMING_DIR}' \
+            --settle-time '${{ args.settle_time }}' \
+            ${FLAGS}"
+
+          nohup sh -lc "${CMD}" >> "${LOG_FILE}" 2>&1 &
+          echo $! > "${PID_FILE}"
+
+          echo "[II] watcher started pid=$(cat "${PID_FILE}")"
+          echo "[II] log=${LOG_FILE}"
+
+      watch-ps:
+        help: List host-side ingestion watcher processes (optionally by env/path).
+        args:
+          env:
+            help: Filter by environment (prod, staging, dev).
+            type: string
+            default: ""
+          path:
+            help: Filter by incoming path.
+            type: string
+            default: ""
+        run: |
+          set -eu
+
+          INCOMING_DIR="${{ args.path }}"
+
+          if [ -z "${INCOMING_DIR}" ] && [ -n "${{ args.env }}" ]; then
+            case "${{ args.env }}" in
+              prod) INCOMING_DIR="/Storage/infodengue_data/sftp2/sinan/incoming" ;;
+              staging) INCOMING_DIR="/Storage/staging_data/sftp2/sinan/incoming" ;;
+              dev) INCOMING_DIR="/Storage/dev_data/sftp2/sinan/incoming" ;;
+              *) echo "[EE] invalid --env: ${{ args.env }}"; exit 2 ;;
+            esac
+          fi
+
+          PATTERN="AlertaDengue/ingestion/management/commands/ingestion_watcher.py"
+
+          if [ -n "${INCOMING_DIR}" ]; then
+            echo "[II] watchers for path=${INCOMING_DIR}"
+            pgrep -af "${PATTERN}.*--path ${INCOMING_DIR}(/)?( |$)" || true
+            exit 0
+          fi
+
+          echo "[II] all watchers"
+          pgrep -af "${PATTERN}" || true
+
+      watch-stop:
+        help: Stop host-side ingestion watcher for an env/path.
+        args:
+          env:
+            help: Target environment (prod, staging, dev). Overrides .env.
+            type: string
+            default: ""
+          path:
+            help: Override incoming path.
+            type: string
+            default: ""
+          signal:
+            help: Signal to send first (TERM or INT).
+            type: string
+            default: TERM
+          force:
+            help: Send SIGKILL after a short wait.
+            type: bool
+            action: store_true
+        run: |
+          set -eu
+
+          INCOMING_DIR="${{ args.path }}"
+
+          if [ -z "${INCOMING_DIR}" ] && [ -n "${{ args.env }}" ]; then
+            case "${{ args.env }}" in
+              prod) INCOMING_DIR="/Storage/infodengue_data/sftp2/sinan/incoming" ;;
+              staging) INCOMING_DIR="/Storage/staging_data/sftp2/sinan/incoming" ;;
+              dev) INCOMING_DIR="/Storage/dev_data/sftp2/sinan/incoming" ;;
+              *) echo "[EE] invalid --env: ${{ args.env }}"; exit 2 ;;
+            esac
+          fi
+
+          if [ -z "${INCOMING_DIR}" ]; then
+            INCOMING_DIR="${DOCKER_HOST_INCOMING_DIR:-}"
+          fi
+
+          if [ -z "${INCOMING_DIR}" ]; then
+            echo "[EE] no incoming dir resolved (use --env or --path)"
+            exit 2
+          fi
+
+          PATTERN="AlertaDengue/ingestion/management/commands/ingestion_watcher.py"
+          PIDS="$(pgrep -f "${PATTERN}.*--path ${INCOMING_DIR}(/)?( |$)" || true)"
+
+          if [ -z "${PIDS}" ]; then
+            echo "[II] no watchers for path=${INCOMING_DIR}"
+            exit 0
+          fi
+
+          echo "[II] stopping watchers path=${INCOMING_DIR} pids=${PIDS}"
+          kill "-${{ args.signal }}" ${PIDS} || true
+
+          if [ "${{ args.force }}" = "True" ]; then
+            sleep 2
+            PIDS2="$(pgrep -f "${PATTERN}.*--path ${INCOMING_DIR}(/)?( |$)" || true)"
+            if [ -n "${PIDS2}" ]; then
+              echo "[WW] forcing kill pids=${PIDS2}"
+              kill -KILL ${PIDS2} || true
+            fi
+          fi
+
   release:
     vars:
       app: |
