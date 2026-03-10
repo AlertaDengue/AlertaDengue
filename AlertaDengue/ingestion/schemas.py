@@ -34,23 +34,16 @@ class RunError(BaseModel):
 class RunMetadata(BaseModel):
     """
     Metadata payload stored in ingestion.run.metadata.
-
-    Parameters
-    ----------
-    date_formats : dict[str, str | None]
-        Date formats inferred for DT_* columns, when detected.
-    source_columns : list[str]
-        Columns found in the source file header/schema.
-    se_range : dict[str, int] | None
-        Computed epidemiological week range, if available.
-    notes : list[str]
-        Informational notes for operators.
     """
 
     date_formats: dict[str, str | None] = Field(default_factory=dict)
     source_columns: list[str] = Field(default_factory=list)
     se_range: dict[str, int] | None = None
     notes: list[str] = Field(default_factory=list)
+
+    duplicates_removed: int = Field(default=0, ge=0)
+    rows_inserted: int = Field(default=0, ge=0)
+    rows_updated: int = Field(default=0, ge=0)
 
 
 SourceFormat = Literal["dbf", "csv", "parquet"]

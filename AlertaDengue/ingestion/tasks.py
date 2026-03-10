@@ -269,7 +269,7 @@ def sinan_merge_run(run_id: str) -> dict[str, int]:
     Returns
     -------
     dict[str, int]
-        Inserted/updated counts.
+        Inserted/updated/deleted counts.
     """
     Run.objects.filter(pk=run_id).update(
         status=RunStatus.MERGING,
@@ -285,7 +285,8 @@ def sinan_merge_run(run_id: str) -> dict[str, int]:
                 SELECT
                     ctid,
                     ROW_NUMBER() OVER (
-                        PARTITION BY nu_notific, dt_notific, cid10_codigo, municipio_geocodigo
+                        PARTITION BY nu_notific, dt_notific,
+                                     cid10_codigo, municipio_geocodigo
                         ORDER BY created_at DESC NULLS LAST, ctid DESC
                     ) AS rn
                 FROM {_stage_table()}
@@ -329,11 +330,12 @@ def sinan_merge_run(run_id: str) -> dict[str, int]:
             cursor = conn.connection.cursor()
 
             cursor.execute(dedupe_sql, [str(run_id)])
-            deleted_rows_result = cursor.fetchone()
-            deleted_rows = deleted_rows_result[0] if deleted_rows_result else 0
+            deleted_rows = int((cursor.fetchone() or [0])[0] or 0)
 
             cursor.execute(sql, [str(run_id)])
             inserted, updated = cursor.fetchone()
+            inserted_i = int(inserted or 0)
+            updated_i = int(updated or 0)
 
             cursor.execute(range_sql, [str(run_id)])
             se_min, se_max = cursor.fetchone()
@@ -341,10 +343,13 @@ def sinan_merge_run(run_id: str) -> dict[str, int]:
         meta_in = dict(Run.objects.get(pk=run_id).metadata or {})
         if se_min is not None and se_max is not None:
             meta_in["se_range"] = {"min": int(se_min), "max": int(se_max)}
-        meta_in["duplicates_removed"] = int(deleted_rows or 0)
+
+        meta_in["duplicates_removed"] = deleted_rows
+        meta_in["rows_inserted"] = inserted_i
+        meta_in["rows_updated"] = updated_i
         meta_out = _dump_meta(meta_in)
 
-        loaded = int(inserted or 0) + int(updated or 0)
+        loaded = inserted_i + updated_i
 
         Run.objects.filter(pk=run_id).update(
             rows_loaded=loaded,
@@ -354,7 +359,11 @@ def sinan_merge_run(run_id: str) -> dict[str, int]:
             updated_at=_now(),
         )
 
-        return {"inserted": int(inserted or 0), "updated": int(updated or 0)}
+        return {
+            "inserted": inserted_i,
+            "updated": updated_i,
+            "deleted": deleted_rows,
+        }
 
     except Exception as exc:
         run = Run.objects.get(pk=run_id)
