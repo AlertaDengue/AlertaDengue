@@ -81,6 +81,16 @@ class Migration(migrations.Migration):
             ],
             options={
                 "db_table": '"ingestion"."run"',
+                "indexes": [
+                    models.Index(
+                        fields=["uf", "disease", "-delivery_se"],
+                        name="ix_ing_run_scope",
+                    ),
+                    models.Index(
+                        fields=["status", "-created_at"],
+                        name="ix_ing_run_status_created",
+                    ),
+                ],
             },
         ),
         migrations.CreateModel(
@@ -166,46 +176,26 @@ class Migration(migrations.Migration):
             ],
             options={
                 "db_table": '"ingestion"."sinan_stage"',
+                "indexes": [
+                    models.Index(
+                        fields=["run"], name="ix_ing_sinan_stage_run"
+                    ),
+                    models.Index(
+                        fields=[
+                            "run",
+                            "cid10_codigo",
+                            "nu_notific",
+                            "municipio_geocodigo",
+                        ],
+                        name="ix_ing_sinan_stage_keys",
+                    ),
+                ],
+                "constraints": [
+                    models.UniqueConstraint(
+                        fields=["run", "chunk_id", "source_rownum"],
+                        name="ux_ing_sinan_stage_row",
+                    ),
+                ],
             },
-        ),
-        migrations.RunSQL(
-            sql=(
-                "CREATE INDEX IF NOT EXISTS ix_ing_run_scope "
-                "ON ingestion.run (uf, disease, delivery_se DESC);"
-            ),
-            reverse_sql="DROP INDEX IF EXISTS ix_ing_run_scope;",
-        ),
-        migrations.RunSQL(
-            sql=(
-                "CREATE INDEX IF NOT EXISTS ix_ing_run_status_created "
-                "ON ingestion.run (status, created_at DESC);"
-            ),
-            reverse_sql="DROP INDEX IF EXISTS ix_ing_run_status_created;",
-        ),
-        migrations.RunSQL(
-            sql=(
-                "CREATE INDEX IF NOT EXISTS ix_ing_sinan_stage_run "
-                "ON ingestion.sinan_stage (run_id);"
-            ),
-            reverse_sql="DROP INDEX IF EXISTS ix_ing_sinan_stage_run;",
-        ),
-        migrations.RunSQL(
-            sql=(
-                "CREATE INDEX IF NOT EXISTS ix_ing_sinan_stage_keys "
-                "ON ingestion.sinan_stage "
-                "(run_id, cid10_codigo, nu_notific, municipio_geocodigo);"
-            ),
-            reverse_sql="DROP INDEX IF EXISTS ix_ing_sinan_stage_keys;",
-        ),
-        migrations.RunSQL(
-            sql=(
-                "ALTER TABLE ingestion.sinan_stage "
-                "ADD CONSTRAINT ux_ing_sinan_stage_row "
-                "UNIQUE (run_id, chunk_id, source_rownum);"
-            ),
-            reverse_sql=(
-                "ALTER TABLE ingestion.sinan_stage "
-                "DROP CONSTRAINT IF EXISTS ux_ing_sinan_stage_row;"
-            ),
         ),
     ]
