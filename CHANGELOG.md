@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.7.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.6.0...4.7.0) (2026-03-11)
+
+### Features
+
+* **ingestion:** dedupe staging merges, persist run stats, and add Makim watcher tasks ([#878](https://github.com/AlertaDengue/AlertaDengue/issues/878)) ([2888229](https://github.com/AlertaDengue/AlertaDengue/commit/2888229c7cb290f65b2903984af41130778d3d7d))
+
 ## [4.6.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.5.0...4.6.0) (2026-03-09)
 
 ### Features
