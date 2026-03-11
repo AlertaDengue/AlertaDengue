@@ -72,6 +72,7 @@ class Run(models.Model):
     rows_parsed = models.BigIntegerField(default=0)
     rows_loaded = models.BigIntegerField(default=0)
     rows_failed = models.BigIntegerField(default=0)
+    rows_duplicate = models.BigIntegerField(default=0)
 
     metadata = models.JSONField(default=dict)
     errors = models.JSONField(default=list)

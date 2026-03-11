@@ -15,6 +15,8 @@ class RunAdmin(admin.ModelAdmin):
         "rows_read",
         "rows_parsed",
         "rows_loaded",
+        "rows_failed",
+        "rows_duplicate",
         "created_at",
         "updated_at",
     )
