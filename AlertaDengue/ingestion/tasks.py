@@ -182,8 +182,12 @@ def sinan_stage_run(run_id: str) -> None:
 
             total_read = 0
             total_parsed = 0
+            total_failed = 0
 
             for chunk in iterator:
+                original_len = len(chunk.df)
+                total_read += original_len
+
                 df = chunk.df.copy()
                 meta_out["source_columns"] = list(df.columns)
 
@@ -226,8 +230,8 @@ def sinan_stage_run(run_id: str) -> None:
                 )
                 execute_values(cursor, sql, rows, page_size=5000)
 
-                total_read += len(df)
                 total_parsed += len(df)
+                total_failed = total_read - total_parsed
 
                 meta_saved = _dump_meta(
                     {**meta_out, "date_formats": date_formats},
@@ -236,6 +240,7 @@ def sinan_stage_run(run_id: str) -> None:
                 Run.objects.filter(pk=run_id).update(
                     rows_read=total_read,
                     rows_parsed=total_parsed,
+                    rows_failed=total_failed,
                     metadata=meta_saved,
                     updated_at=_now(),
                 )
@@ -353,6 +358,7 @@ def sinan_merge_run(run_id: str) -> dict[str, int]:
 
         Run.objects.filter(pk=run_id).update(
             rows_loaded=loaded,
+            rows_duplicate=deleted_rows,
             status=RunStatus.COMPLETED,
             finished_at=_now(),
             metadata=meta_out,
