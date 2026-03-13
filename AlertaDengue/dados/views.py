@@ -868,15 +868,32 @@ class ReportCityView(TemplateView):
 
         def get_disease_params(disease_name):
             try:
-                params = RegionalParameters.get_station_data(
+                data = RegionalParameters.get_station_data(
                     geocode=int(geocode), disease=disease_name
-                )[0]
-                # TODO: Fix NA's in the parameters table
-                params = list(params)
-                if params[5] == "NA":
-                    params[5] = 0
-                return params
-            except (IndexError, TypeError):
+                )
+                if data:
+                    params = list(data[0])
+                    # TODO: Fix NA's in the parameters table
+                    if params[5] == "NA":
+                        params[5] = 0
+                    return params
+
+                # Fallback to dengue for station/climate metadata if missing
+                if disease_name != "dengue":
+                    dengue_data = RegionalParameters.get_station_data(
+                        geocode=int(geocode), disease="dengue"
+                    )
+                    if dengue_data:
+                        params = list(dengue_data[0])
+                        # Set thresholds to 0 as they might not apply to this disease
+                        # but keep station/climate info (indices 0-6)
+                        # limiar_preseason (7), limiar_posseason (8), limiar_epidemico (9)
+                        params[7] = 0
+                        params[8] = 0
+                        params[9] = 0
+                        return params
+                return None
+            except (IndexError, TypeError, Exception):
                 return None
 
         def get_var_params(params):
