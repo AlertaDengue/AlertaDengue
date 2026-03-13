@@ -124,7 +124,11 @@
       pré-epidêmicos, epidêmicos e pós-epidêmicos
       (casos por 100.000 habitantes){% endblocktranslate %}</p>
 
-    {{chart_dengue_incidence|safe}}
+    {% if chart_dengue_incidence %}
+      {{chart_dengue_incidence|safe}}
+    {% else %}
+      <p><i>{% translate "Nenhum registro encontrado no período monitorado." %}</i></p>
+    {% endif %}
 
     <br/>&nbsp;
 
@@ -157,7 +161,11 @@
       pré-epidêmicos, epidêmicos e pós-epidêmicos
       (casos por 100.000 habitantes){% endblocktranslate %}</p>
 
-    {{chart_chik_incidence|safe}}
+    {% if chart_chik_incidence %}
+      {{chart_chik_incidence|safe}}
+    {% else %}
+      <p><i>{% translate "Nenhum registro encontrado no período monitorado." %}</i></p>
+    {% endif %}
 
     <br/>&nbsp;
 
@@ -190,7 +198,11 @@
       pré-epidêmicos, epidêmicos e pós-epidêmicos
       (casos por 100.000 habitantes){% endblocktranslate %}</p>
 
-    {{chart_zika_incidence|safe}}
+    {% if chart_zika_incidence %}
+      {{chart_zika_incidence|safe}}
+    {% else %}
+      <p><i>{% translate "Nenhum registro encontrado no período monitorado." %}</i></p>
+    {% endif %}
 
     <br/>&nbsp;
 

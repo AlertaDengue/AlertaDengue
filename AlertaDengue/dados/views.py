@@ -963,15 +963,21 @@ class ReportCityView(TemplateView):
                     var_climate=get_var_climate(dengue_params),
                 )
 
-                chart_dengue_incidence = (
-                    ReportCityCharts.create_incidence_chart(
-                        df=df_dengue,
-                        year_week=year_week,
-                        threshold_pre_epidemic=dengue_params[7],
-                        threshold_pos_epidemic=dengue_params[8],
-                        threshold_epidemic=dengue_params[9],
+                if (
+                    df_dengue["casos notif."].sum() > 0
+                    or df_dengue["casos_est"].sum() > 0
+                ):
+                    chart_dengue_incidence = (
+                        ReportCityCharts.create_incidence_chart(
+                            df=df_dengue,
+                            year_week=year_week,
+                            threshold_pre_epidemic=dengue_params[7],
+                            threshold_pos_epidemic=dengue_params[8],
+                            threshold_epidemic=dengue_params[9],
+                        )
                     )
-                )
+                else:
+                    chart_dengue_incidence = None
 
             total_n_dengue = df_dengue[df_dengue.index // 100 == this_year][
                 "casos notif."
@@ -992,13 +998,21 @@ class ReportCityView(TemplateView):
                     var_climate=get_var_climate(chik_params),
                 )
 
-                chart_chik_incidence = ReportCityCharts.create_incidence_chart(
-                    df=df_chik,
-                    year_week=year_week,
-                    threshold_pre_epidemic=chik_params[7],
-                    threshold_pos_epidemic=chik_params[8],
-                    threshold_epidemic=chik_params[9],
-                )
+                if (
+                    df_chik["casos notif."].sum() > 0
+                    or df_chik["casos_est"].sum() > 0
+                ):
+                    chart_chik_incidence = (
+                        ReportCityCharts.create_incidence_chart(
+                            df=df_chik,
+                            year_week=year_week,
+                            threshold_pre_epidemic=chik_params[7],
+                            threshold_pos_epidemic=chik_params[8],
+                            threshold_epidemic=chik_params[9],
+                        )
+                    )
+                else:
+                    chart_chik_incidence = None
 
             total_n_chik = df_chik[df_chik.index // 100 == this_year][
                 "casos notif."
@@ -1019,13 +1033,21 @@ class ReportCityView(TemplateView):
                     var_climate=get_var_climate(zika_params),
                 )
 
-                chart_zika_incidence = ReportCityCharts.create_incidence_chart(
-                    df=df_zika,
-                    year_week=year_week,
-                    threshold_pre_epidemic=zika_params[7],
-                    threshold_pos_epidemic=zika_params[8],
-                    threshold_epidemic=zika_params[9],
-                )
+                if (
+                    df_zika["casos notif."].sum() > 0
+                    or df_zika["casos_est"].sum() > 0
+                ):
+                    chart_zika_incidence = (
+                        ReportCityCharts.create_incidence_chart(
+                            df=df_zika,
+                            year_week=year_week,
+                            threshold_pre_epidemic=zika_params[7],
+                            threshold_pos_epidemic=zika_params[8],
+                            threshold_epidemic=zika_params[9],
+                        )
+                    )
+                else:
+                    chart_zika_incidence = None
 
             total_n_zika = df_zika[df_zika.index // 100 == this_year][
                 "casos notif."
