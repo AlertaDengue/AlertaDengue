@@ -132,7 +132,9 @@
 
     <br/>&nbsp;
 
-    {{df_dengue|safe}}
+    {% if df_dengue %}
+      {{df_dengue|safe}}
+    {% endif %}
 
     {% else %}
     <p>
@@ -169,7 +171,9 @@
 
     <br/>&nbsp;
 
-    {{df_chik|safe}}
+    {% if df_chik %}
+      {{df_chik|safe}}
+    {% endif %}
 
     {% else %}
     <p>
@@ -206,7 +210,9 @@
 
     <br/>&nbsp;
 
-    {{df_zika|safe}}
+    {% if df_zika %}
+      {{df_zika|safe}}
+    {% endif %}
 
 
     {% else %}
