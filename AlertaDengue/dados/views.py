@@ -858,52 +858,94 @@ class ReportCityView(TemplateView):
 
         city = City.objects.get(pk=int(geocode))
 
-        regional_get_param = RegionalParameters.get_station_data(
-            geocode=int(geocode), disease="dengue"
-        )[0]
+        # param used by df.to_html
+        html_param = dict(
+            na_rep="",
+            float_format=lambda x: ("%d" % x) if not np.isnan(x) else "",
+            index=False,
+            classes="table table-striped table-bordered",
+        )
 
-        # TODO: Fix NA's in the parameters table
-        if regional_get_param[5] == "NA":
-            regional_get_param[5] = 0
+        def get_disease_params(disease_name):
+            try:
+                data = RegionalParameters.get_station_data(
+                    geocode=int(geocode), disease=disease_name
+                )
+                if data:
+                    params = list(data[0])
+                    # TODO: Fix NA's in the parameters table
+                    if params[5] == "NA":
+                        params[5] = 0
+                    return params
 
-        threshold_pre_epidemic = regional_get_param[7]
-        threshold_pos_epidemic = regional_get_param[8]
-        threshold_epidemic = regional_get_param[9]
+                # Fallback to dengue for station/climate metadata if missing
+                if disease_name != "dengue":
+                    dengue_data = RegionalParameters.get_station_data(
+                        geocode=int(geocode), disease="dengue"
+                    )
+                    if dengue_data:
+                        params = list(dengue_data[0])
+                        # Set thresholds to 0 as they might not apply to this disease
+                        # but keep station/climate info (indices 0-6)
+                        # limiar_preseason (7), limiar_posseason (8), limiar_epidemico (9)
+                        params[7] = 0
+                        params[8] = 0
+                        params[9] = 0
+                        return params
+                return None
+            except (IndexError, TypeError, Exception):
+                return None
 
-        # Create the dictionary with climate variables
+        def get_var_params(params):
+            if not params:
+                return {}, []
 
-        varcli_dict = {
-            "temp.min": [_("°C temperatura mínima")],
-            "temp.med": [_("°C temperatura média")],
-            "temp.max": [_("°C temperatura máxima")],
-            "umid.min": [_("% umidade mínima do ar")],
-            "umid.med": [_("% umidade média do ar")],
-            "umid.max": [_("% umidade máxima do ar")],
-        }
+            varcli_dict = {
+                "temp.min": [_("°C temperatura mínima")],
+                "temp.med": [_("°C temperatura média")],
+                "temp.max": [_("°C temperatura máxima")],
+                "umid.min": [_("% umidade mínima do ar")],
+                "umid.med": [_("% umidade média do ar")],
+                "umid.max": [_("% umidade máxima do ar")],
+            }
 
-        var_climate = {}
-        varcli_pair = {}
+            var_climate = {}
+            varcli_pair = {}
 
-        if regional_get_param[3]:
-            climate_title1 = regional_get_param[3]
-            climate_crit1 = regional_get_param[4]
-            varcli_pair[climate_title1] = climate_crit1
-            varcli_dict[regional_get_param[3].replace("_", ".")].append(
-                regional_get_param[4]
-            )
+            if params[3]:
+                climate_title1 = params[3]
+                climate_crit1 = params[4]
+                varcli_pair[climate_title1] = climate_crit1
+                varcli_dict[params[3].replace("_", ".")].append(params[4])
 
-        if regional_get_param[5]:
-            climate_title2 = regional_get_param[5]
-            climate_crit2 = regional_get_param[6]
-            varcli_pair[climate_title2] = climate_crit2
-            varcli_dict[regional_get_param[5].replace("_", ".")].append(
-                regional_get_param[6]
-            )
+            if params[5]:
+                climate_title2 = params[5]
+                climate_crit2 = params[6]
+                varcli_pair[climate_title2] = climate_crit2
+                varcli_dict[params[5].replace("_", ".")].append(params[6])
 
-        varcli_keys = [w.replace("_", ".") for w in list(varcli_pair.keys())]
+            varcli_keys = [
+                w.replace("_", ".") for w in list(varcli_pair.keys())
+            ]
+            for v in varcli_keys:
+                var_climate[v] = varcli_dict.get(v)
+            return var_climate, varcli_keys
 
-        for v in varcli_keys:
-            var_climate[v] = varcli_dict.get(v)
+        prepare_html = (
+            lambda df, keys: df[
+                [
+                    *keys,
+                    "casos notif.",
+                    "casos_est",
+                    "incidência",
+                    "nivel",
+                ]
+            ]
+            .iloc[-12:, :]
+            .reset_index()
+            .sort_values(by="SE", ascending=[False])
+            .to_html(**html_param)
+        )
 
         df_dengue = ReportCity.read_disease_data(
             disease="dengue",
@@ -954,19 +996,32 @@ class ReportCityView(TemplateView):
 
         if not df_dengue.empty:
             last_year_week_l.append(df_dengue.index.max())
+            dengue_params = get_disease_params("dengue")
 
-            chart_dengue_climate = ReportCityCharts.create_climate_chart(
-                df=df_dengue.reset_index()[["SE", *climate_cols]],
-                var_climate=var_climate,
-            )
+            if dengue_params:
+                v_climate, v_keys = get_var_params(dengue_params)
 
-            chart_dengue_incidence = ReportCityCharts.create_incidence_chart(
-                df=df_dengue,
-                year_week=year_week,
-                threshold_pre_epidemic=threshold_pre_epidemic,
-                threshold_pos_epidemic=threshold_pos_epidemic,
-                threshold_epidemic=threshold_epidemic,
-            )
+                if (
+                    df_dengue["casos notif."].sum() > 0
+                    or df_dengue["casos_est"].sum() > 0
+                ):
+                    chart_dengue_incidence = (
+                        ReportCityCharts.create_incidence_chart(
+                            df=df_dengue,
+                            year_week=year_week,
+                            threshold_pre_epidemic=dengue_params[7],
+                            threshold_pos_epidemic=dengue_params[8],
+                            threshold_epidemic=dengue_params[9],
+                        )
+                    )
+                    context["df_dengue_html"] = prepare_html(df_dengue, v_keys)
+                else:
+                    chart_dengue_incidence = None
+
+                chart_dengue_climate = ReportCityCharts.create_climate_chart(
+                    df=df_dengue.reset_index()[["SE", *climate_cols]],
+                    var_climate=v_climate,
+                )
 
             total_n_dengue = df_dengue[df_dengue.index // 100 == this_year][
                 "casos notif."
@@ -979,19 +1034,32 @@ class ReportCityView(TemplateView):
 
         if not df_chik.empty:
             last_year_week_l.append(df_chik.index.max())
+            chik_params = get_disease_params("chikungunya")
 
-            chart_chik_climate = ReportCityCharts.create_climate_chart(
-                df=df_chik.reset_index()[["SE", *climate_cols]],
-                var_climate=var_climate,
-            )
+            if chik_params:
+                v_climate, v_keys = get_var_params(chik_params)
 
-            chart_chik_incidence = ReportCityCharts.create_incidence_chart(
-                df=df_chik,
-                year_week=year_week,
-                threshold_pre_epidemic=threshold_pre_epidemic,
-                threshold_pos_epidemic=threshold_pos_epidemic,
-                threshold_epidemic=threshold_epidemic,
-            )
+                if (
+                    df_chik["casos notif."].sum() > 0
+                    or df_chik["casos_est"].sum() > 0
+                ):
+                    chart_chik_incidence = (
+                        ReportCityCharts.create_incidence_chart(
+                            df=df_chik,
+                            year_week=year_week,
+                            threshold_pre_epidemic=chik_params[7],
+                            threshold_pos_epidemic=chik_params[8],
+                            threshold_epidemic=chik_params[9],
+                        )
+                    )
+                    context["df_chik_html"] = prepare_html(df_chik, v_keys)
+                else:
+                    chart_chik_incidence = None
+
+                chart_chik_climate = ReportCityCharts.create_climate_chart(
+                    df=df_chik.reset_index()[["SE", *climate_cols]],
+                    var_climate=v_climate,
+                )
 
             total_n_chik = df_chik[df_chik.index // 100 == this_year][
                 "casos notif."
@@ -1004,19 +1072,34 @@ class ReportCityView(TemplateView):
 
         if not df_zika.empty:
             last_year_week_l.append(df_zika.index.max())
+            zika_params = get_disease_params("zika")
 
-            chart_zika_climate = ReportCityCharts.create_climate_chart(
-                df=df_zika.reset_index()[["SE", *climate_cols]],
-                var_climate=var_climate,
-            )
+            if zika_params:
+                v_climate, v_keys = get_var_params(zika_params)
 
-            chart_zika_incidence = ReportCityCharts.create_incidence_chart(
-                df=df_zika,
-                year_week=year_week,
-                threshold_pre_epidemic=threshold_pre_epidemic,
-                threshold_pos_epidemic=threshold_pos_epidemic,
-                threshold_epidemic=threshold_epidemic,
-            )
+                if (
+                    df_zika["casos notif."].sum() > 0
+                    or df_zika["casos_est"].sum() > 0
+                ):
+                    chart_zika_incidence = (
+                        ReportCityCharts.create_incidence_chart(
+                            df=df_zika,
+                            year_week=year_week,
+                            threshold_pre_epidemic=zika_params[7],
+                            threshold_pos_epidemic=zika_params[8],
+                            threshold_epidemic=zika_params[9],
+                        )
+                    )
+                    context["df_zika_html"] = prepare_html(df_zika, v_keys)
+                else:
+                    chart_zika_incidence = None
+
+                # Zika climate chart is usually not shown separately in the template,
+                # but we keep it here for consistency if needed.
+                chart_zika_climate = ReportCityCharts.create_climate_chart(
+                    df=df_zika.reset_index()[["SE", *climate_cols]],
+                    var_climate=v_climate,
+                )
 
             total_n_zika = df_zika[df_zika.index // 100 == this_year][
                 "casos notif."
@@ -1042,30 +1125,7 @@ class ReportCityView(TemplateView):
         max_alert_code = int(np.nanmax(disease_last_code))
         max_alert_color = ALERT_COLOR[max_alert_code]
 
-        # param used by df.to_html
-        html_param = dict(
-            na_rep="",
-            float_format=lambda x: ("%d" % x) if not np.isnan(x) else "",
-            index=False,
-            classes="table table-striped table-bordered",
-        )
-
-        cols_to_html = [
-            *varcli_keys,
-            "casos notif.",
-            "casos_est",
-            "incidência",
-            # 'pr(incid. subir)',
-            "nivel",
-        ]
-
-        prepare_html = (
-            lambda df: df[cols_to_html]
-            .iloc[-12:, :]
-            .reset_index()
-            .sort_values(by="SE", ascending=[False])
-            .to_html(**html_param)
-        )
+        prepare_html = None
 
         last_year_week_s = str(last_year_week)
         last_year = last_year_week_s[:4]
@@ -1079,9 +1139,9 @@ class ReportCityView(TemplateView):
                 "last_week": last_week,
                 "city_name": city.name,
                 "state_name": city.state,
-                "df_dengue": prepare_html(df_dengue),
-                "df_chik": prepare_html(df_chik),
-                "df_zika": prepare_html(df_zika),
+                "df_dengue": context.get("df_dengue_html", ""),
+                "df_chik": context.get("df_chik_html", ""),
+                "df_zika": context.get("df_zika_html", ""),
                 "chart_dengue_climate": chart_dengue_climate,
                 "chart_dengue_incidence": chart_dengue_incidence,
                 "chart_chik_climate": chart_chik_climate,

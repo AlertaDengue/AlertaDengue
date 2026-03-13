@@ -212,27 +212,37 @@ class RegionalParameters:
         return res
 
     @classmethod
-    def get_var_climate_info(cls, geocodes: list[int]) -> tuple[str, str]:
+    def get_var_climate_info(
+        cls, geocodes: list[int], disease: str = "dengue"
+    ) -> tuple[str, str]:
         """
-        Return (codigo_estacao_wu, varcli) for the first matching geocode.
+        Return (codigo_estacao_wu, varcli) for the first matching geocode and disease.
         """
         if not geocodes:
             pass
+
+        cid10_code = CID10.get(disease, "")
 
         sql = f"""
             SELECT DISTINCT codigo_estacao_wu, varcli
             FROM "{cls.SCHEMA}"."parameters"
             WHERE municipio_geocodigo IN :geocodes
+              AND cid10 = :cid10_code
         """
 
         df = _read_sql_df(
             DB_ENGINE,
             sql,
-            params={"geocodes": tuple(geocodes)},
+            params={
+                "geocodes": tuple(geocodes),
+                "cid10_code": cid10_code,
+            },
         )
 
         if df.empty:
-            raise IndexError("No climate info found for provided geocodes")
+            raise IndexError(
+                f"No climate info found for provided geocodes and disease {disease}"
+            )
 
         row = df.to_records(index=False).tolist()[0]
         return (str(row[0]), str(row[1]))
@@ -260,7 +270,7 @@ class RegionalParameters:
                 return cached
 
             sql = f"""
-                SELECT m.geocodigo, m.nome
+                SELECT DISTINCT m.geocodigo, m.nome
                 FROM "{cls.SCHEMA}"."Municipio" AS m
                 JOIN "{cls.SCHEMA}"."regional" AS r ON m.id_regional = r.id
                 JOIN "{cls.SCHEMA}"."parameters" AS p ON m.geocodigo = p.municipio_geocodigo
