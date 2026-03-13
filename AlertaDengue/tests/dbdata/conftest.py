@@ -153,8 +153,7 @@ def regional_parameters_tables(db_engine: Engine) -> Iterator[None]:
         )
 
         # Parameters
-        # Dengue (A90) for Rio
-        # Chik (A92.0) for Niterói
+        # Dengue (A90) and Chik (A92.0) for both cities
         conn.execute(
             text(
                 f"""
@@ -162,8 +161,10 @@ def regional_parameters_tables(db_engine: Engine) -> Iterator[None]:
             (municipio_geocodigo, cid10, codigo_estacao_wu, varcli, clicrit, varcli2, clicrit2, 
              limiar_preseason, limiar_posseason, limiar_epidemico)
             VALUES
-            (3304557, 'A90', '83743', 'p_rt1', 0.5, 'temp_min', 22.0, 100, 80, 300),
-            (3303302, 'A92.0', '83000', 'p_rt1', 0.6, 'temp_min', 23.0, 50, 40, 150)
+            (3304557, 'A90',   '83743', 'p_rt1', 0.5, 'temp_min', 22.0, 100, 80, 300),
+            (3304557, 'A92.0', '83743', 'p_rt1', 0.5, 'temp_min', 22.0, 25,  20, 75),
+            (3303302, 'A90',   '83000', 'p_rt1', 0.6, 'temp_min', 23.0, 90,  70, 250),
+            (3303302, 'A92.0', '83000', 'p_rt1', 0.6, 'temp_min', 23.0, 50,  40, 150)
         """
             )
         )
