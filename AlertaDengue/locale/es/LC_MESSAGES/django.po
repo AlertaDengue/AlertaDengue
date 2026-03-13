@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-26 17:14-0300\n"
+"POT-Creation-Date: 2026-03-13 13:10-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -152,7 +152,7 @@ msgstr "Total de casos en el estado"
 
 #: dados/charts/home.py:89 dados/charts/home.py:233 dados/charts/home.py:353
 #: dados/charts/states.py:109 dados/charts/states.py:270
-#: dados/templates/report_city.html:81 dados/templates/report_city.html:254
+#: dados/templates/report_city.html:81 dados/templates/report_city.html:272
 #: dados/templates/report_state.html:43 dados/templates/services_api.html:205
 #: forecast/models.py:142
 msgid "Semana epidemiológica"
@@ -745,7 +745,7 @@ msgstr ""
 "Alerta del municipio. Este alerta se actualiza semanalmente y está compuesto "
 "por los siguientes niveles:"
 
-#: dados/templates/about.html:469 dados/templates/report_city.html:225
+#: dados/templates/about.html:469 dados/templates/report_city.html:243
 msgid "Verde"
 msgstr "Verde"
 
@@ -757,7 +757,7 @@ msgstr ""
 "– Condiciones climáticas no favorables para la transmisión (en términos de "
 "temperatura o humedad) y baja actividad viral."
 
-#: dados/templates/about.html:480 dados/templates/report_city.html:229
+#: dados/templates/about.html:480 dados/templates/report_city.html:247
 msgid "Amarelo"
 msgstr "Amarillo"
 
@@ -769,7 +769,7 @@ msgstr ""
 "– Condiciones climáticas favorables para la transmisión (en términos de "
 "temperatura o humedad) y actividad viral presente (al menos 1 caso)."
 
-#: dados/templates/about.html:492 dados/templates/report_city.html:233
+#: dados/templates/about.html:492 dados/templates/report_city.html:251
 msgid "Laranja"
 msgstr "Naranja"
 
@@ -781,7 +781,7 @@ msgstr ""
 "– Incidencia en aumento (al menos 2 semanas con Rt &gt; 1) pero dentro de "
 "los niveles históricos."
 
-#: dados/templates/about.html:503 dados/templates/report_city.html:236
+#: dados/templates/about.html:503 dados/templates/report_city.html:254
 msgid "Vermelho"
 msgstr "Rojo"
 
@@ -1483,7 +1483,7 @@ msgstr "Cerrar"
 msgid "Saiba mais"
 msgstr "Lea más aquí"
 
-#: dados/templates/components/home/home_banners_section.html:63
+#: dados/templates/components/home/home_banners_section.html:51
 msgid "saiba mais"
 msgstr "Lea más aquí"
 
@@ -1924,8 +1924,8 @@ msgstr ""
 msgid "Situação da Dengue"
 msgstr "Situación del Dengue"
 
-#: dados/templates/report_city.html:117 dados/templates/report_city.html:150
-#: dados/templates/report_city.html:183
+#: dados/templates/report_city.html:117 dados/templates/report_city.html:156
+#: dados/templates/report_city.html:195
 msgid "Esse ano, até essa semana"
 msgstr "Este año, hasta esta semana"
 
@@ -1933,13 +1933,13 @@ msgstr "Este año, hasta esta semana"
 msgid "casos de Dengue foram registrados"
 msgstr "casos de Dengue han sido registrados"
 
-#: dados/templates/report_city.html:119 dados/templates/report_city.html:152
-#: dados/templates/report_city.html:185
+#: dados/templates/report_city.html:119 dados/templates/report_city.html:158
+#: dados/templates/report_city.html:197
 msgid "No ano passado, até essa semana"
 msgstr "En el año pasado, hasta esta semana"
 
-#: dados/templates/report_city.html:120 dados/templates/report_city.html:153
-#: dados/templates/report_city.html:186
+#: dados/templates/report_city.html:120 dados/templates/report_city.html:159
+#: dados/templates/report_city.html:198
 msgid "tinham sido registrados"
 msgstr "habían sido registrados"
 
@@ -1955,20 +1955,25 @@ msgstr ""
 " pre-epidémica, epidémica y post-epidémica\n"
 " (casos por cada 100.000 habitantes)"
 
-#: dados/templates/report_city.html:135 dados/templates/report_city.html:168
-#: dados/templates/report_city.html:202
+#: dados/templates/report_city.html:130 dados/templates/report_city.html:169
+#: dados/templates/report_city.html:208
+msgid "Nenhum registro encontrado no período monitorado."
+msgstr "No se encontraron registros en el período monitoreado."
+
+#: dados/templates/report_city.html:141 dados/templates/report_city.html:180
+#: dados/templates/report_city.html:220
 msgid "Sem dados disponíveis para geração dessa seção"
 msgstr "No hay datos disponibles para generar esta sección"
 
-#: dados/templates/report_city.html:146
+#: dados/templates/report_city.html:152
 msgid "Situação da Chikungunya"
 msgstr "Situación de la Chikungunya"
 
-#: dados/templates/report_city.html:151
+#: dados/templates/report_city.html:157
 msgid "casos de Chikungunya foram registrados"
 msgstr "casos de Chikungunya han sido registrados"
 
-#: dados/templates/report_city.html:155
+#: dados/templates/report_city.html:161
 msgid ""
 "A figura abaixo mostra a situação da chikungunya nos últimos dois anos.\n"
 "      As linhas horizontais correspondem aos limiares de incidência\n"
@@ -1981,15 +1986,15 @@ msgstr ""
 " pre-epidémicos, epidémicos y post-epidémicos\n"
 " (casos por 100.000 habitantes)"
 
-#: dados/templates/report_city.html:179
+#: dados/templates/report_city.html:191
 msgid "Situação da Zika"
 msgstr "Situacíon de la Zika"
 
-#: dados/templates/report_city.html:184
+#: dados/templates/report_city.html:196
 msgid "casos de Zika foram registrados"
 msgstr "casos de Zika han sido registrados"
 
-#: dados/templates/report_city.html:188
+#: dados/templates/report_city.html:200
 msgid ""
 "A figura abaixo mostra a situação da zika nos últimos dois anos.\n"
 "      As linhas horizontais correspondem aos limiares de incidência\n"
@@ -2002,71 +2007,71 @@ msgstr ""
 " pre-epidémicos, epidémicos y post-epidémicos\n"
 " (casos por 100.000 habitantes)"
 
-#: dados/templates/report_city.html:219
+#: dados/templates/report_city.html:237
 msgid "O código de Cores"
 msgstr "El código de Colores"
 
-#: dados/templates/report_city.html:221
+#: dados/templates/report_city.html:239
 msgid "As cores indicam niveis de atenção"
 msgstr "Las colores indican niveles de atencíon"
 
-#: dados/templates/report_city.html:225
+#: dados/templates/report_city.html:243
 msgid "condições climáticas desfavoráveis, seja"
 msgstr "condicíones climáticas desfavorables, sea"
 
-#: dados/templates/report_city.html:226
+#: dados/templates/report_city.html:244
 msgid "por baixa temperatura ou baixa umidade, e baixa incidência de casos"
 msgstr "por baja temperatura o baja humedad, y baja incidencia de casos"
 
-#: dados/templates/report_city.html:229
+#: dados/templates/report_city.html:247
 msgid "condições climáticas propícias para"
 msgstr "condiciones climáticas propicias para"
 
-#: dados/templates/report_city.html:230
+#: dados/templates/report_city.html:248
 msgid "aumento da população do vetor e transmissão de arboviroses"
 msgstr "aumento de población del vector y transmisión de arbovirosis"
 
-#: dados/templates/report_city.html:233
+#: dados/templates/report_city.html:251
 msgid "transmissão aumentada e sustentada da arbovirose"
 msgstr "transmisión aumentada y sostenida de la arbovirosis"
 
-#: dados/templates/report_city.html:236
+#: dados/templates/report_city.html:254
 #, fuzzy, python-format
 #| msgid "incidência alta, acima dos 90%% históricos"
 msgid "incidência alta, acima dos 90%% históricos"
 msgstr "incidencia alta, por encima del 90% histórico"
 
-#: dados/templates/report_city.html:250
+#: dados/templates/report_city.html:268
 msgid "Lista das variáveis apresentadas nas tabelas"
 msgstr "Lista de las variables presentadas en las tablas"
 
-#: dados/templates/report_city.html:257 dados/templates/services_api.html:217
+#: dados/templates/report_city.html:275 dados/templates/services_api.html:217
 msgid "Média das temperaturas mínimas diárias ao longo da semana"
 msgstr "Promedio de las temperaturas mínimas diarias durante la semana"
 
-#: dados/templates/report_city.html:259 dados/templates/services_api.html:218
+#: dados/templates/report_city.html:277 dados/templates/services_api.html:218
 msgid "Média das temperaturas diárias ao longo da semana"
 msgstr "Promedio de las temperaturas diarias durante la semana"
 
-#: dados/templates/report_city.html:261 dados/templates/services_api.html:219
+#: dados/templates/report_city.html:279 dados/templates/services_api.html:219
 msgid "Média das temperaturas máximas diárias ao longo da semana"
 msgstr "Promedio de las temperaturas máximas diarias durante la semana"
 
-#: dados/templates/report_city.html:264 dados/templates/services_api.html:220
+#: dados/templates/report_city.html:282 dados/templates/services_api.html:220
 msgid "Média da umidade relativa mínima diária do ar ao longo da semana"
 msgstr ""
 "Promedio de la humedad relativa mínima diaria del aire durante la semana"
 
-#: dados/templates/report_city.html:266 dados/templates/services_api.html:221
+#: dados/templates/report_city.html:284 dados/templates/services_api.html:221
 msgid "Média da umidade relativa diária do ar ao longo da semana"
 msgstr "Promedio de la humedad relativa diaria del aire durante la semana"
 
-#: dados/templates/report_city.html:268 dados/templates/services_api.html:222
+#: dados/templates/report_city.html:286 dados/templates/services_api.html:222
 msgid "Média da umidade relativa máxima diária do ar ao longo da semana"
 msgstr ""
 "Promedio de la humedad relativa máxima diaria del aire durante la semana"
 
-#: dados/templates/report_city.html:270 dados/templates/services_api.html:208
+#: dados/templates/report_city.html:288 dados/templates/services_api.html:208
 msgid ""
 "Número de casos notificados por semana (Os valores são atualizados "
 "retrospectivamente todas as semanas)"
@@ -2074,11 +2079,11 @@ msgstr ""
 "Número de casos notificados por semana (Los valores se actualizan "
 "retrospectivamente cada semana)"
 
-#: dados/templates/report_city.html:272 dados/templates/services_api.html:210
+#: dados/templates/report_city.html:290 dados/templates/services_api.html:210
 msgid "Taxa de incidência estimada por 100.000"
 msgstr "Tasa de incidencia estimada por 100.000 habitantes"
 
-#: dados/templates/report_city.html:274 dados/templates/services_api.html:206
+#: dados/templates/report_city.html:292 dados/templates/services_api.html:206
 msgid ""
 "Número estimado de casos por semana usando o modelo de nowcasting (nota: Os "
 "valores são atualizados retrospectivamente a cada semana)"
@@ -2086,7 +2091,7 @@ msgstr ""
 "Número estimado de casos por semana utilizando el modelo de nowcasting "
 "(nota: Los valores se actualizan retrospectivamente cada semana)"
 
-#: dados/templates/report_city.html:276 dados/templates/services_api.html:209
+#: dados/templates/report_city.html:294 dados/templates/services_api.html:209
 msgid ""
 "Probabilidade de (Rt> 1). Para emitir o alerta laranja, usamos o critério "
 "p_rt1> 0,95 por 3 semanas ou mais."
@@ -2094,7 +2099,7 @@ msgstr ""
 "Probabilidad de (Rt> 1). Para emitir la alerta naranja, utilizamos el "
 "criterio p_rt1> 0,95 durante 3 semanas o más."
 
-#: dados/templates/report_city.html:278 dados/templates/services_api.html:212
+#: dados/templates/report_city.html:296 dados/templates/services_api.html:212
 msgid ""
 "Nível de alerta (1 = verde, 2 = amarelo, 3 = laranja, 4 = vermelho), mais "
 "detalhes, consulte (Saiba mais)"
@@ -2102,11 +2107,11 @@ msgstr ""
 "Nivel de alerta (1 = verde, 2 = amarillo, 3 = naranja, 4 = rojo), para más "
 "detalles, consulte (Más información)"
 
-#: dados/templates/report_city.html:285
+#: dados/templates/report_city.html:303
 msgid "Notas"
 msgstr "Notas"
 
-#: dados/templates/report_city.html:288
+#: dados/templates/report_city.html:306
 msgid ""
 "Os dados do sinan mais recentes ainda não foram totalmente digitados.\n"
 "        Estimamos o número esperado de casos notificados considerando o "
@@ -2118,7 +2123,7 @@ msgstr ""
 "tiempo\n"
 "        hasta que los casos se ingresen"
 
-#: dados/templates/report_city.html:292
+#: dados/templates/report_city.html:310
 msgid ""
 "Algumas vezes, os casos da última semana ainda não estao disponíveis,\n"
 "        nesse caso, usa-se uma estimação com base na tendência de variação "
@@ -2130,11 +2135,11 @@ msgstr ""
 "variación de la\n"
 "        série"
 
-#: dados/templates/report_city.html:302
+#: dados/templates/report_city.html:320
 msgid "Créditos"
 msgstr "Créditos"
 
-#: dados/templates/report_city.html:304
+#: dados/templates/report_city.html:322
 msgid ""
 "Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como "
 "parceira entre"
@@ -2142,46 +2147,46 @@ msgstr ""
 "Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como "
 "parceira entre"
 
-#: dados/templates/report_city.html:307
+#: dados/templates/report_city.html:325
 msgid ""
 "Programa de Computação Científica, Fundação Oswaldo Cruz, Rio de Janeiro"
 msgstr ""
 "Programa de Computación Científica, Fundación Oswaldo Cruz, Río de Janeiro"
 
-#: dados/templates/report_city.html:309
+#: dados/templates/report_city.html:327
 msgid "Escola de Matemática Aplicada, Fundação Getúlio Vargas"
 msgstr "Escuela de Matemática Aplicada, Fundación Getúlio Vargas"
 
-#: dados/templates/report_city.html:310
+#: dados/templates/report_city.html:328
 msgid "Secretaria Estadual de Saúde do"
 msgstr "Secretaría Estatal de Salud de"
 
-#: dados/templates/report_city.html:311
+#: dados/templates/report_city.html:329
 msgid "Observatório de Dengue da UFMG"
 msgstr "Observatorio de Dengue de UFMG"
 
-#: dados/templates/report_city.html:318
+#: dados/templates/report_city.html:336
 msgid "Contato"
 msgstr "Contacto"
 
-#: dados/templates/report_city.html:319
+#: dados/templates/report_city.html:337
 msgid "Para mais detalhes sobre o sistema de alerta InfoDengue, consultar"
 msgstr ""
 "Para obtener más detalles sobre el sistema de alerta InfoDengue, consultar"
 
-#: dados/templates/report_city.html:327
+#: dados/templates/report_city.html:345
 msgid "verde"
 msgstr "verde"
 
-#: dados/templates/report_city.html:328
+#: dados/templates/report_city.html:346
 msgid "amarelo"
 msgstr "Amarillo"
 
-#: dados/templates/report_city.html:329
+#: dados/templates/report_city.html:347
 msgid "laranja"
 msgstr "Naranja"
 
-#: dados/templates/report_city.html:330
+#: dados/templates/report_city.html:348
 msgid "vermelho"
 msgstr "Rojo"
 
@@ -2953,108 +2958,32 @@ msgstr ""
 msgid "Entre em contato conosco"
 msgstr "Contáctenos"
 
-#: dados/views.py:1017
+#: dados/views.py:904
 msgid "°C temperatura mínima"
 msgstr "°C temperatura mínima"
 
-#: dados/views.py:1018
+#: dados/views.py:905
 msgid "°C temperatura média"
 msgstr "°C temperatura media"
 
-#: dados/views.py:1019
+#: dados/views.py:906
 msgid "°C temperatura máxima"
 msgstr "°C temperatura máxima"
 
-#: dados/views.py:1020
+#: dados/views.py:907
 #, python-format
 msgid "% umidade mínima do ar"
 msgstr "% humedad mínima del aire"
 
-#: dados/views.py:1021
+#: dados/views.py:908
 #, python-format
 msgid "% umidade média do ar"
 msgstr "% humedad media del aire"
 
-#: dados/views.py:1022
+#: dados/views.py:909
 #, python-format
 msgid "% umidade máxima do ar"
 msgstr "% humedad máxima del aire"
-
-#: dbf/forms.py:19
-msgid "Data da exportação"
-msgstr ""
-
-#: dbf/forms.py:20 upload/forms.py:25
-msgid "Ano de notificação"
-msgstr ""
-
-#: dbf/forms.py:22 upload/forms.py:29
-msgid "Abrangência"
-msgstr ""
-
-#: dbf/forms.py:25
-msgid "Nome do município (opcional)"
-msgstr ""
-
-#: dbf/forms.py:42 upload/forms.py:43
-msgid "Houve um erro durante o envio do arquivo. Por favor, tente novamente."
-msgstr ""
-
-#: dbf/models.py:63
-msgid "O ano de notificação não pode ser maior do que o ano atual"
-msgstr ""
-
-#: dbf/models.py:70
-msgid "Arquivo DBF inválido"
-msgstr ""
-
-#: dbf/templates/dbf_all_upload.html:5 dbf/templates/upload_successful.html:5
-msgid "Dados do SINAN recebidos"
-msgstr ""
-
-#: dbf/templates/dbf_all_upload.html:11 dbf/templates/dbf_upload.html:220
-#: dbf/templates/upload_successful.html:10
-msgid "Ultimos arquivos enviados:"
-msgstr ""
-
-#: dbf/templates/dbf_upload.html:65
-msgid "Envie aqui os dados atualizados do SINAN"
-msgstr ""
-
-#: dbf/templates/dbf_upload.html:213
-msgid "Enviar"
-msgstr ""
-
-#: dbf/utils.py:204
-msgid "Existem nesse arquivo notificações que não incluem a coluna ID_AGRAVO."
-msgstr ""
-
-#: dbf/validation.py:30
-msgid "Este arquivo não parece um DBF válido "
-msgstr ""
-
-#: dbf/validation.py:38
-msgid ""
-"Espera-se que o campo {} seja do tipo 'D' (data), mas o tipo do campo neste "
-"arquivo é '{}'."
-msgstr ""
-
-#: dbf/validation.py:54
-msgid ""
-"Este arquivo não contém {}, que é esperado em um arquivo válido do SINAN."
-msgstr ""
-
-#: dbf/views.py:53
-msgid ""
-"\n"
-"            O arquivo {dbf.file.name} exportado em {dbf.export_date:%d/%m/"
-"%Y}\n"
-"            com notificações do ano {dbf.notification_year}\n"
-"            foi enviado com sucesso. Você será informado por email\n"
-"            ({self.request.user.email}) assim que o processo de\n"
-"            importação for finalizado,\n"
-"            "
-msgstr ""
 
 #: forecast/models.py:21 upload/templates/sinan/overview.html:375
 msgid "Geocode"
@@ -3223,6 +3152,18 @@ msgstr "Gracias por usar InfoDengue"
 
 #: upload/forms.py:21
 msgid "CID10"
+msgstr ""
+
+#: upload/forms.py:25
+msgid "Ano de notificação"
+msgstr ""
+
+#: upload/forms.py:29
+msgid "Abrangência"
+msgstr ""
+
+#: upload/forms.py:43
+msgid "Houve um erro durante o envio do arquivo. Por favor, tente novamente."
 msgstr ""
 
 #: upload/templates/sinan/index.html:73
