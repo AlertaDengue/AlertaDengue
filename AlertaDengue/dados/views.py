@@ -1060,7 +1060,7 @@ class ReportCityView(TemplateView):
         )
 
         cols_to_html = [
-            *varcli_keys,
+            *climate_cols,
             "casos notif.",
             "casos_est",
             "incidência",

@@ -28,7 +28,9 @@ def test_get_regional_names(regional_parameters_tables: None) -> None:
 def test_get_var_climate_info(regional_parameters_tables: None) -> None:
     """Test get_var_climate_info returns correct tuple for geocode."""
     # 3304557 is Rio de Janeiro
-    station, varcli = RegionalParameters.get_var_climate_info([3304557])
+    station, varcli = RegionalParameters.get_var_climate_info(
+        [3304557], disease="dengue"
+    )
     assert station == "83743"
     assert varcli == "p_rt1"
 
@@ -171,10 +173,14 @@ class TestDiseaseFilterParameters:
     ) -> None:
         """get_var_climate_info returns weather station info that is the
         same regardless of which cid10 row is picked."""
-        station, varcli = RegionalParameters.get_var_climate_info([3304557])
+        station, varcli = RegionalParameters.get_var_climate_info(
+            [3304557], disease="dengue"
+        )
         assert station == "83743"
         assert varcli == "p_rt1"
 
-        station2, varcli2 = RegionalParameters.get_var_climate_info([3303302])
+        station2, varcli2 = RegionalParameters.get_var_climate_info(
+            [3303302], disease="chikungunya"
+        )
         assert station2 == "83000"
         assert varcli2 == "p_rt1"
