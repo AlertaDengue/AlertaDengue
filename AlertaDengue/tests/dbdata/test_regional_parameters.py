@@ -17,11 +17,6 @@ def clear_cache():
     cache.clear()
 
 
-# ---------------------------------------------------------------------------
-# Existing tests (updated for composite PK fixture data)
-# ---------------------------------------------------------------------------
-
-
 def test_get_regional_names(regional_parameters_tables: None) -> None:
     """Test get_regional_names returns correct list of active names."""
     names = RegionalParameters.get_regional_names("RJ")
@@ -67,11 +62,6 @@ def test_get_station_data(regional_parameters_tables: None) -> None:
     # Verify thresholds
     assert row[7] == 100  # pre
     assert row[9] == 300  # epid
-
-
-# ---------------------------------------------------------------------------
-# Disease-filter tests for composite PK
-# ---------------------------------------------------------------------------
 
 
 class TestDiseaseFilterParameters:
