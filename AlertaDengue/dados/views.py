@@ -858,52 +858,53 @@ class ReportCityView(TemplateView):
 
         city = City.objects.get(pk=int(geocode))
 
-        regional_get_param = RegionalParameters.get_station_data(
-            geocode=int(geocode), disease="dengue"
-        )[0]
+        def get_disease_params(disease_name):
+            try:
+                params = RegionalParameters.get_station_data(
+                    geocode=int(geocode), disease=disease_name
+                )[0]
+                # TODO: Fix NA's in the parameters table
+                params = list(params)
+                if params[5] == "NA":
+                    params[5] = 0
+                return params
+            except (IndexError, TypeError):
+                return None
 
-        # TODO: Fix NA's in the parameters table
-        if regional_get_param[5] == "NA":
-            regional_get_param[5] = 0
+        def get_var_climate(params):
+            if not params:
+                return {}
 
-        threshold_pre_epidemic = regional_get_param[7]
-        threshold_pos_epidemic = regional_get_param[8]
-        threshold_epidemic = regional_get_param[9]
+            varcli_dict = {
+                "temp.min": [_("°C temperatura mínima")],
+                "temp.med": [_("°C temperatura média")],
+                "temp.max": [_("°C temperatura máxima")],
+                "umid.min": [_("% umidade mínima do ar")],
+                "umid.med": [_("% umidade média do ar")],
+                "umid.max": [_("% umidade máxima do ar")],
+            }
 
-        # Create the dictionary with climate variables
+            var_climate = {}
+            varcli_pair = {}
 
-        varcli_dict = {
-            "temp.min": [_("°C temperatura mínima")],
-            "temp.med": [_("°C temperatura média")],
-            "temp.max": [_("°C temperatura máxima")],
-            "umid.min": [_("% umidade mínima do ar")],
-            "umid.med": [_("% umidade média do ar")],
-            "umid.max": [_("% umidade máxima do ar")],
-        }
+            if params[3]:
+                climate_title1 = params[3]
+                climate_crit1 = params[4]
+                varcli_pair[climate_title1] = climate_crit1
+                varcli_dict[params[3].replace("_", ".")].append(params[4])
 
-        var_climate = {}
-        varcli_pair = {}
+            if params[5]:
+                climate_title2 = params[5]
+                climate_crit2 = params[6]
+                varcli_pair[climate_title2] = climate_crit2
+                varcli_dict[params[5].replace("_", ".")].append(params[6])
 
-        if regional_get_param[3]:
-            climate_title1 = regional_get_param[3]
-            climate_crit1 = regional_get_param[4]
-            varcli_pair[climate_title1] = climate_crit1
-            varcli_dict[regional_get_param[3].replace("_", ".")].append(
-                regional_get_param[4]
-            )
-
-        if regional_get_param[5]:
-            climate_title2 = regional_get_param[5]
-            climate_crit2 = regional_get_param[6]
-            varcli_pair[climate_title2] = climate_crit2
-            varcli_dict[regional_get_param[5].replace("_", ".")].append(
-                regional_get_param[6]
-            )
-
-        varcli_keys = [w.replace("_", ".") for w in list(varcli_pair.keys())]
-
-        for v in varcli_keys:
-            var_climate[v] = varcli_dict.get(v)
+            varcli_keys = [
+                w.replace("_", ".") for w in list(varcli_pair.keys())
+            ]
+            for v in varcli_keys:
+                var_climate[v] = varcli_dict.get(v)
+            return var_climate
 
         df_dengue = ReportCity.read_disease_data(
             disease="dengue",
@@ -954,19 +955,23 @@ class ReportCityView(TemplateView):
 
         if not df_dengue.empty:
             last_year_week_l.append(df_dengue.index.max())
+            dengue_params = get_disease_params("dengue")
 
-            chart_dengue_climate = ReportCityCharts.create_climate_chart(
-                df=df_dengue.reset_index()[["SE", *climate_cols]],
-                var_climate=var_climate,
-            )
+            if dengue_params:
+                chart_dengue_climate = ReportCityCharts.create_climate_chart(
+                    df=df_dengue.reset_index()[["SE", *climate_cols]],
+                    var_climate=get_var_climate(dengue_params),
+                )
 
-            chart_dengue_incidence = ReportCityCharts.create_incidence_chart(
-                df=df_dengue,
-                year_week=year_week,
-                threshold_pre_epidemic=threshold_pre_epidemic,
-                threshold_pos_epidemic=threshold_pos_epidemic,
-                threshold_epidemic=threshold_epidemic,
-            )
+                chart_dengue_incidence = (
+                    ReportCityCharts.create_incidence_chart(
+                        df=df_dengue,
+                        year_week=year_week,
+                        threshold_pre_epidemic=dengue_params[7],
+                        threshold_pos_epidemic=dengue_params[8],
+                        threshold_epidemic=dengue_params[9],
+                    )
+                )
 
             total_n_dengue = df_dengue[df_dengue.index // 100 == this_year][
                 "casos notif."
@@ -979,19 +984,21 @@ class ReportCityView(TemplateView):
 
         if not df_chik.empty:
             last_year_week_l.append(df_chik.index.max())
+            chik_params = get_disease_params("chikungunya")
 
-            chart_chik_climate = ReportCityCharts.create_climate_chart(
-                df=df_chik.reset_index()[["SE", *climate_cols]],
-                var_climate=var_climate,
-            )
+            if chik_params:
+                chart_chik_climate = ReportCityCharts.create_climate_chart(
+                    df=df_chik.reset_index()[["SE", *climate_cols]],
+                    var_climate=get_var_climate(chik_params),
+                )
 
-            chart_chik_incidence = ReportCityCharts.create_incidence_chart(
-                df=df_chik,
-                year_week=year_week,
-                threshold_pre_epidemic=threshold_pre_epidemic,
-                threshold_pos_epidemic=threshold_pos_epidemic,
-                threshold_epidemic=threshold_epidemic,
-            )
+                chart_chik_incidence = ReportCityCharts.create_incidence_chart(
+                    df=df_chik,
+                    year_week=year_week,
+                    threshold_pre_epidemic=chik_params[7],
+                    threshold_pos_epidemic=chik_params[8],
+                    threshold_epidemic=chik_params[9],
+                )
 
             total_n_chik = df_chik[df_chik.index // 100 == this_year][
                 "casos notif."
@@ -1004,19 +1011,21 @@ class ReportCityView(TemplateView):
 
         if not df_zika.empty:
             last_year_week_l.append(df_zika.index.max())
+            zika_params = get_disease_params("zika")
 
-            chart_zika_climate = ReportCityCharts.create_climate_chart(
-                df=df_zika.reset_index()[["SE", *climate_cols]],
-                var_climate=var_climate,
-            )
+            if zika_params:
+                chart_zika_climate = ReportCityCharts.create_climate_chart(
+                    df=df_zika.reset_index()[["SE", *climate_cols]],
+                    var_climate=get_var_climate(zika_params),
+                )
 
-            chart_zika_incidence = ReportCityCharts.create_incidence_chart(
-                df=df_zika,
-                year_week=year_week,
-                threshold_pre_epidemic=threshold_pre_epidemic,
-                threshold_pos_epidemic=threshold_pos_epidemic,
-                threshold_epidemic=threshold_epidemic,
-            )
+                chart_zika_incidence = ReportCityCharts.create_incidence_chart(
+                    df=df_zika,
+                    year_week=year_week,
+                    threshold_pre_epidemic=zika_params[7],
+                    threshold_pos_epidemic=zika_params[8],
+                    threshold_epidemic=zika_params[9],
+                )
 
             total_n_zika = df_zika[df_zika.index // 100 == this_year][
                 "casos notif."
