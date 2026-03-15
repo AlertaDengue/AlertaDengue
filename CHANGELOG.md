@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.8.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.7.0...4.8.0) (2026-03-15)
+
+### Features
+
+* add disease-specific thresholds to charts + stabilize tests  ([#882](https://github.com/AlertaDengue/AlertaDengue/issues/882)) ([8394137](https://github.com/AlertaDengue/AlertaDengue/commit/839413728e1bc008fdcfbdcb2d31533f15bb4761))
+
 ## [4.7.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.6.0...4.7.0) (2026-03-11)
 
 ### Features
