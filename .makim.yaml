@@ -571,7 +571,7 @@ groups:
           if [ "${{ args.dry_run }}" = "True" ]; then
             echo "Dry-run mode — skipping enqueue."
             cat "$MANIFEST_FILE"
-            rm -f "$MANIFEST_FILE"
+            # rm -f "$MANIFEST_FILE"
             exit 0
           fi
 
@@ -719,7 +719,7 @@ groups:
           fi
 
           if [ -z "${LOG_FILE}" ]; then
-            LOG_FILE="/Storage/infodengue_data/logs/ingestion_watch.log"
+            LOG_FILE="/Storage/staging_data/logs/ingestion_watch.log"
           fi
 
           if [ -z "${PID_FILE}" ]; then
