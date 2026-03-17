@@ -160,12 +160,26 @@ def is_date_ambiguous(value: str) -> bool:
     return False
 
 
-def infer_date_format(values: Iterable[str]) -> str | None:
-    """Infer the most common date format in a collection of strings."""
-    dates = [d for d in set(values) if d and not is_date_ambiguous(d)]
+def infer_date_format(values: Iterable[object]) -> str | None:
+    """Infer the most common date format in a collection of values."""
+    dates: set[str] = set()
+
+    for value in values:
+        if value is None or pd.isna(value):
+            continue
+
+        text = str(value).strip()
+        if not text or text.lower() in {"nan", "nat", "none"}:
+            continue
+
+        if is_date_ambiguous(text):
+            continue
+
+        dates.add(text)
+
     scores = Counter(
         fmt
-        for fmt in (guess_datetime_format(d) for d in dates)
+        for fmt in (guess_datetime_format(text) for text in dates)
         if fmt is not None
     )
     return scores.most_common(1)[0][0] if scores else None
@@ -202,6 +216,13 @@ def parse_dt_notific_with_sem_not(
     choose_b = b.notna() & (a.isna() | (has_sem & (b_dist < a_dist)))
 
     chosen = a.where(~choose_b, b)
+
+    if chosen.isna().any():
+        # Fallback for formats not covered by strictly comparing YMD/YDM
+        # (e.g. DD/MM/YYYY, or timestamps)
+        fallback = pd.to_datetime(raw, errors="coerce")
+        chosen = chosen.where(chosen.notna(), fallback)
+
     out = chosen.dt.date
     return out.where(chosen.notna(), None)
 
