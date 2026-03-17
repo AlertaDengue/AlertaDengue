@@ -287,7 +287,7 @@ def _sinan_year_week_from_ts(
 
     weekday = dt_ts.dt.weekday
     offset = (weekday + 1) % 7
-    week_start = dt_ts - pd.to_timedelta(offset, unit="D")
+    week_start = dt_ts - pd.to_timedelta(offset.fillna(0), unit="D")
     week_end = week_start + pd.to_timedelta(6, unit="D")
 
     start_year = week_start.dt.year.astype("Int64")
@@ -316,7 +316,7 @@ def _sinan_year_week_from_ts(
     )
     jan4_weekday = jan4.dt.weekday
     jan4_offset = (jan4_weekday + 1) % 7
-    first_week_start = jan4 - pd.to_timedelta(jan4_offset, unit="D")
+    first_week_start = jan4 - pd.to_timedelta(jan4_offset.fillna(0), unit="D")
 
     week_no = ((week_start - first_week_start).dt.days // 7) + 1
 
