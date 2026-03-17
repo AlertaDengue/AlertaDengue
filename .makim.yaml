@@ -691,27 +691,12 @@ groups:
           PID_FILE="${{ args.pid_file }}"
 
           if [ -z "${INCOMING_DIR}" ] && [ -n "${{ args.env }}" ]; then
-            case "${{ args.env }}" in
-              prod)
-                INCOMING_DIR="/Storage/infodengue_data/sftp2/sinan/incoming"
-                [ -z "${LOG_FILE}" ] && \
-                  LOG_FILE="/Storage/infodengue_data/logs/ingestion_watch.log"
-                ;;
-              staging)
-                INCOMING_DIR="/Storage/staging_data/sftp2/sinan/incoming"
-                [ -z "${LOG_FILE}" ] && \
-                  LOG_FILE="/Storage/staging_data/logs/ingestion_watch.log"
-                ;;
-              dev)
-                INCOMING_DIR="/Storage/dev_data/sftp2/sinan/incoming"
-                [ -z "${LOG_FILE}" ] && \
-                  LOG_FILE="/Storage/dev_data/logs/ingestion_watch.log"
-                ;;
-              *)
-                echo "[EE] invalid --env: ${{ args.env }}"
-                exit 2
-                ;;
-            esac
+            # Fallback logic if env is provided but path is not.
+            # We prefer DOCKER_HOST_INCOMING_DIR if set, otherwise we construct it.
+            # But the user specifically wants to avoid hardcoded staging_data.
+            INCOMING_DIR="${DOCKER_HOST_INCOMING_DIR:-}"
+            [ -z "${LOG_FILE}" ] && \
+              LOG_FILE="${DOCKER_HOST_LOG_DIR:-/tmp}/ingestion_watch.log"
           fi
 
           if [ -z "${INCOMING_DIR}" ]; then
@@ -719,7 +704,9 @@ groups:
           fi
 
           if [ -z "${LOG_FILE}" ]; then
-            LOG_FILE="/Storage/staging_data/logs/ingestion_watch.log"
+          if [ -z "${LOG_FILE}" ]; then
+            LOG_FILE="${DOCKER_HOST_LOG_DIR:-/tmp}/ingestion_watch.log"
+          fi
           fi
 
           if [ -z "${PID_FILE}" ]; then
@@ -781,12 +768,7 @@ groups:
           INCOMING_DIR="${{ args.path }}"
 
           if [ -z "${INCOMING_DIR}" ] && [ -n "${{ args.env }}" ]; then
-            case "${{ args.env }}" in
-              prod) INCOMING_DIR="/Storage/infodengue_data/sftp2/sinan/incoming" ;;
-              staging) INCOMING_DIR="/Storage/staging_data/sftp2/sinan/incoming" ;;
-              dev) INCOMING_DIR="/Storage/dev_data/sftp2/sinan/incoming" ;;
-              *) echo "[EE] invalid --env: ${{ args.env }}"; exit 2 ;;
-            esac
+            INCOMING_DIR="${DOCKER_HOST_INCOMING_DIR:-}"
           fi
 
           PATTERN="AlertaDengue/ingestion/management/commands/ingestion_watcher.py"
@@ -825,12 +807,7 @@ groups:
           INCOMING_DIR="${{ args.path }}"
 
           if [ -z "${INCOMING_DIR}" ] && [ -n "${{ args.env }}" ]; then
-            case "${{ args.env }}" in
-              prod) INCOMING_DIR="/Storage/infodengue_data/sftp2/sinan/incoming" ;;
-              staging) INCOMING_DIR="/Storage/staging_data/sftp2/sinan/incoming" ;;
-              dev) INCOMING_DIR="/Storage/dev_data/sftp2/sinan/incoming" ;;
-              *) echo "[EE] invalid --env: ${{ args.env }}"; exit 2 ;;
-            esac
+            INCOMING_DIR="${DOCKER_HOST_INCOMING_DIR:-}"
           fi
 
           if [ -z "${INCOMING_DIR}" ]; then
