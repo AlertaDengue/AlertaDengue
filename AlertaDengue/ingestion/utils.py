@@ -2,15 +2,25 @@ from __future__ import annotations
 
 import datetime as dt
 from collections import Counter
-from typing import ForwardRef, Iterable, Iterator, Optional, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Iterable,
+    Iterator,
+    Optional,
+    Tuple,
+    Union,
+    cast,
+)
+
+if TYPE_CHECKING:
+    from upload.models import SINANUpload
 
 import numpy as np
 import pandas as pd
 from dateutil.parser import parse
 from epiweeks import Week
 from pandas.tseries.api import guess_datetime_format
-
-SINANUpload = ForwardRef("SINANUpload")
 
 
 def chunk_gen(chunksize: int, totalsize: int) -> Iterator[tuple[int, int]]:
@@ -160,12 +170,26 @@ def is_date_ambiguous(value: str) -> bool:
     return False
 
 
-def infer_date_format(values: Iterable[str]) -> str | None:
-    """Infer the most common date format in a collection of strings."""
-    dates = [d for d in set(values) if d and not is_date_ambiguous(d)]
+def infer_date_format(values: Iterable[object]) -> str | None:
+    """Infer the most common date format in a collection of values."""
+    dates: set[str] = set()
+
+    for value in values:
+        if value is None or pd.isna(value):
+            continue
+
+        text = str(value).strip()
+        if not text or text.lower() in {"nan", "nat", "none"}:
+            continue
+
+        if is_date_ambiguous(text):
+            continue
+
+        dates.add(text)
+
     scores = Counter(
         fmt
-        for fmt in (guess_datetime_format(d) for d in dates)
+        for fmt in (guess_datetime_format(text) for text in dates)
         if fmt is not None
     )
     return scores.most_common(1)[0][0] if scores else None
@@ -202,6 +226,13 @@ def parse_dt_notific_with_sem_not(
     choose_b = b.notna() & (a.isna() | (has_sem & (b_dist < a_dist)))
 
     chosen = a.where(~choose_b, b)
+
+    if chosen.isna().any():
+        # Fallback for formats not covered by strictly comparing YMD/YDM
+        # (e.g. DD/MM/YYYY, or timestamps)
+        fallback = pd.to_datetime(raw, errors="coerce")
+        chosen = chosen.where(chosen.notna(), fallback)
+
     out = chosen.dt.date
     return out.where(chosen.notna(), None)
 
@@ -222,7 +253,7 @@ def _to_py_int(value: object) -> int | None:
     """
     if pd.isna(value):
         return None
-    return int(value)
+    return int(cast(Any, value))
 
 
 def _sinan_year_week_from_ts(
@@ -256,7 +287,7 @@ def _sinan_year_week_from_ts(
 
     weekday = dt_ts.dt.weekday
     offset = (weekday + 1) % 7
-    week_start = dt_ts - pd.to_timedelta(offset, unit="D")
+    week_start = dt_ts - pd.to_timedelta(offset.fillna(0), unit="D")
     week_end = week_start + pd.to_timedelta(6, unit="D")
 
     start_year = week_start.dt.year.astype("Int64")
@@ -285,7 +316,7 @@ def _sinan_year_week_from_ts(
     )
     jan4_weekday = jan4.dt.weekday
     jan4_offset = (jan4_weekday + 1) % 7
-    first_week_start = jan4 - pd.to_timedelta(jan4_offset, unit="D")
+    first_week_start = jan4 - pd.to_timedelta(jan4_offset.fillna(0), unit="D")
 
     week_no = ((week_start - first_week_start).dt.days // 7) + 1
 

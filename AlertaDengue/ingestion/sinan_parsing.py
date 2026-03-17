@@ -65,7 +65,8 @@ def _to_date_series(col: pd.Series, fmt: str | None) -> pd.Series:
         if pd.isna(ts_any):
             return None
         ts = cast(pd.Timestamp, ts_any)
-        return cast(dt.datetime, ts.to_pydatetime()).date()
+        # Avoid UserWarning: Discarding nonzero nanoseconds in conversion.
+        return ts.floor("us").to_pydatetime().date()
 
     return col.apply(to_date)
 
