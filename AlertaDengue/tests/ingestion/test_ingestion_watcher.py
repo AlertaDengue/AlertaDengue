@@ -14,9 +14,6 @@ from ingestion.management.commands.ingestion_watcher import (
 from watchdog.events import FileSystemEvent
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 def _make_handler(
     *,
     action: MagicMock | None = None,
@@ -30,9 +27,6 @@ def _make_handler(
     )
 
 
-# ---------------------------------------------------------------------------
-# Extension parser
-# ---------------------------------------------------------------------------
 class TestParseExtensions:
     def test_default_csv_dbf(self):
         result = _parse_extensions(".csv,.dbf")
@@ -51,9 +45,6 @@ class TestParseExtensions:
         assert result == frozenset()
 
 
-# ---------------------------------------------------------------------------
-# Handler: event routing
-# ---------------------------------------------------------------------------
 class TestHandlerEventRouting:
     def test_ignores_directories(self):
         handler = _make_handler()
@@ -102,9 +93,6 @@ class TestHandlerEventRouting:
             assert "data.csv" not in handler.timers
 
 
-# ---------------------------------------------------------------------------
-# Handler: timer settle logic
-# ---------------------------------------------------------------------------
 class TestHandlerTimerSettle:
     def test_starts_timer(self):
         handler = _make_handler()
@@ -140,9 +128,6 @@ class TestHandlerTimerSettle:
             t2.start.assert_called_once()
 
 
-# ---------------------------------------------------------------------------
-# Handler: process_file
-# ---------------------------------------------------------------------------
 class TestHandlerProcessFile:
     @patch("ingestion.management.commands.ingestion_watcher.Path.exists")
     def test_invokes_action(self, mock_exists):
@@ -177,9 +162,6 @@ class TestHandlerProcessFile:
         mock_action.assert_called_once_with("error.csv")
 
 
-# ---------------------------------------------------------------------------
-# CommandAction
-# ---------------------------------------------------------------------------
 class TestCommandAction:
     @patch("ingestion.management.commands.ingestion_watcher.subprocess.run")
     def test_default_template(self, mock_run):
@@ -250,9 +232,6 @@ class TestCommandAction:
         action("fail.csv")
 
 
-# ---------------------------------------------------------------------------
-# LogOnlyAction
-# ---------------------------------------------------------------------------
 class TestLogOnlyAction:
     def test_does_not_raise(self):
         action = LogOnlyAction()

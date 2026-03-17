@@ -26,9 +26,6 @@ from watchdog.events import FileSystemEvent, FileSystemEventHandler
 from watchdog.observers.polling import PollingObserver
 
 
-# ---------------------------------------------------------------------------
-# Action backends
-# ---------------------------------------------------------------------------
 class FileAction(Protocol):
     """Protocol for pluggable processing actions."""
 
@@ -90,9 +87,6 @@ class LogOnlyAction:
         logger.info(f"[log-only] Would process: {src_path}")
 
 
-# ---------------------------------------------------------------------------
-# Watcher handler
-# ---------------------------------------------------------------------------
 class IngestionWatcherHandler(FileSystemEventHandler):
     """
     Handles file system events for SINAN ingestion.
@@ -125,8 +119,6 @@ class IngestionWatcherHandler(FileSystemEventHandler):
         self.extensions = extensions or frozenset({".csv", ".dbf"})
         self.timers: dict[str, Timer] = {}
 
-    # -- watchdog callbacks --------------------------------------------------
-
     def on_created(self, event: FileSystemEvent) -> None:
         if event.is_directory:
             return
@@ -136,8 +128,6 @@ class IngestionWatcherHandler(FileSystemEventHandler):
         if event.is_directory:
             return
         self._handle_event(event.src_path)
-
-    # -- internal ------------------------------------------------------------
 
     def _handle_event(self, src_path: str) -> None:
         path = Path(src_path)
@@ -171,9 +161,6 @@ class IngestionWatcherHandler(FileSystemEventHandler):
             )
 
 
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
