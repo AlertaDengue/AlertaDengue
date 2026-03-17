@@ -2,15 +2,25 @@ from __future__ import annotations
 
 import datetime as dt
 from collections import Counter
-from typing import ForwardRef, Iterable, Iterator, Optional, Tuple, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Iterable,
+    Iterator,
+    Optional,
+    Tuple,
+    Union,
+    cast,
+)
+
+if TYPE_CHECKING:
+    from upload.models import SINANUpload
 
 import numpy as np
 import pandas as pd
 from dateutil.parser import parse
 from epiweeks import Week
 from pandas.tseries.api import guess_datetime_format
-
-SINANUpload = ForwardRef("SINANUpload")
 
 
 def chunk_gen(chunksize: int, totalsize: int) -> Iterator[tuple[int, int]]:
@@ -243,7 +253,7 @@ def _to_py_int(value: object) -> int | None:
     """
     if pd.isna(value):
         return None
-    return int(value)
+    return int(cast(Any, value))
 
 
 def _sinan_year_week_from_ts(

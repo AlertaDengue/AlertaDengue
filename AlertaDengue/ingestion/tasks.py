@@ -24,7 +24,7 @@ from psycopg2.extras import execute_values
 
 from .types import DataChunk
 
-DB_ENGINE: Any = settings.DB_ENGINE
+DB_ENGINE: Any = getattr(settings, "DB_ENGINE")
 
 
 def _worker_hostname() -> str:
