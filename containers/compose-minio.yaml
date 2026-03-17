@@ -1,11 +1,11 @@
 services:
   minio:
-    image: minio/minio:RELEASE.2024-03-30T09-41-56Z # Use latest stable
-    container_name: minio-server
+    image: minio/minio:RELEASE.2024-03-30T09-41-56Z
+    hostname: minio-server
     restart: unless-stopped
     ports:
-      - "${MINIO_PORT_1:-9000}:9000" # S3 API
-      - "${MINIO_PORT_2:-9001}:9001" # Web Console
+      - "${MINIO_PORT_1:-9000}:9000"
+      - "${MINIO_PORT_2:-9001}:9001"
     environment:
       MINIO_ROOT_USER: "${MINIO_ROOT_USER:-admin}"
       MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD:-SuperSecretPassword123!}"
@@ -18,25 +18,23 @@ services:
       timeout: 5s
       retries: 5
 
-  # Optional: Automatically create the buckets on first boot
   minio-init:
     image: minio/mc:latest
-    container_name: minio-init
+    hostname: minio-init
     depends_on:
       minio:
         condition: service_healthy
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER:-admin} ${MINIO_ROOT_PASSWORD:-SuperSecretPassword123!} &&
-      /usr/bin/mc mb -p myminio/sinan-prod &&
-      /usr/bin/mc mb -p myminio/sinan-staging &&
-      /usr/bin/mc ilm add --expire-days 7 myminio/sinan-staging;
+      /usr/bin/mc alias set miniostore http://minio:9000 ${MINIO_ROOT_USER:-admin} ${MINIO_ROOT_PASSWORD:-SuperSecretPassword123!} &&
+      /usr/bin/mc mb -p miniostore/sinan-infodengue &&
+      /usr/bin/mc ilm add --expire-days 7 miniostore/sinan-infodengue;
       exit 0;
       "
 
   minio-materializer:
     image: minio/mc:latest
-    container_name: minio-materializer
+    hostname: minio-materializer
     depends_on:
       minio:
         condition: service_healthy
@@ -46,9 +44,9 @@ services:
       - ${DOCKER_HOST_INCOMING_DIR}:/incoming
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER:-admin} ${MINIO_ROOT_PASSWORD:-SuperSecretPassword123!} &&
+      /usr/bin/mc alias set miniostore http://minio:9000 ${MINIO_ROOT_USER:-admin} ${MINIO_ROOT_PASSWORD:-SuperSecretPassword123!} &&
       echo '[II] Starting mc mirror --watch...' &&
-      /usr/bin/mc mirror --watch --overwrite myminio/sinan-staging /incoming;
+      /usr/bin/mc mirror --watch miniostore/sinan-infodengue /incoming;
       "
 
 volumes:
