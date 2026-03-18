@@ -6,27 +6,26 @@ services:
     ports:
       - "${MINIO_PORT_1:-9000}:9000"
       - "${MINIO_PORT_2:-9001}:9001"
+    env_file:
+      - ../.envs/.env
     environment:
-      MINIO_ROOT_USER: "${MINIO_ROOT_USER:-admin}"
-      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD:-SuperSecretPassword123!}"
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
     volumes:
       - minio_data:/data
     command: server /data --console-address ":9001"
-    healthcheck:
-      test: ["CMD", "/usr/bin/mc", "ready", "local"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
   minio-init:
     image: minio/mc:latest
     hostname: minio-init
     depends_on:
       minio:
-        condition: service_healthy
+        condition: service_started
+    env_file:
+      - ../.envs/.env
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc alias set miniostore http://minio:9000 ${MINIO_ROOT_USER:-admin} ${MINIO_ROOT_PASSWORD:-SuperSecretPassword123!} &&
+      /usr/bin/mc alias set miniostore http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
       /usr/bin/mc mb -p miniostore/sinan-infodengue &&
       /usr/bin/mc ilm add --expire-days 7 miniostore/sinan-infodengue;
       exit 0;
@@ -37,14 +36,14 @@ services:
     hostname: minio-materializer
     depends_on:
       minio:
-        condition: service_healthy
+        condition: service_started
     env_file:
       - ../.envs/.env
     volumes:
       - ${DOCKER_HOST_INCOMING_DIR}:/incoming
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc alias set miniostore http://minio:9000 ${MINIO_ROOT_USER:-admin} ${MINIO_ROOT_PASSWORD:-SuperSecretPassword123!} &&
+      /usr/bin/mc alias set miniostore http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
       echo '[II] Starting mc mirror --watch...' &&
       /usr/bin/mc mirror --watch miniostore/sinan-infodengue /incoming;
       "
