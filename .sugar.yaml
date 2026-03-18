@@ -36,6 +36,7 @@ profiles:
     config-path:
       - containers/compose-base.yaml
       - containers/compose-staging.yaml
+      - containers/compose-minio.yaml
     services:
       default:
         - postgres
@@ -53,6 +54,7 @@ profiles:
         - name: web
         - name: celery
         - name: celery-beat
+        - name: minio
 
   prod:
     project-name: infodengue-prod
@@ -60,6 +62,7 @@ profiles:
     config-path:
       - containers/compose-base.yaml
       - containers/compose-prod.yaml
+      - containers/compose-minio.yaml
     services:
       default:
         - postgres
@@ -77,3 +80,4 @@ profiles:
         - name: web
         - name: celery
         - name: celery-beat
+        - name: minio

@@ -1174,18 +1174,12 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("paths", nargs="+", help="Files and/or directories.")
     p.add_argument(
         "--imported-base",
-        default=os.getenv(
-            "DOCKER_HOST_IMPORTED_FILES_DIR",
-            "/Storage/staging_data/sftp2/sinan/raw_data/imported",
-        ),
+        default=os.getenv("DOCKER_HOST_IMPORTED_FILES_DIR"),
         help="Destination base directory for canonical placement.",
     )
     p.add_argument(
         "--uploaded-base",
-        default=os.getenv(
-            "DOCKER_HOST_UPLOADED_FILES_DIR",
-            "/Storage/staging_data/sftp2/sinan/raw_data/uploaded",
-        ),
+        default=os.getenv("DOCKER_HOST_UPLOADED_FILES_DIR"),
         help="Extra base directory used for collision checks.",
     )
     p.add_argument(
