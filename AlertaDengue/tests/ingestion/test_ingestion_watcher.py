@@ -179,7 +179,7 @@ class TestCommandAction:
         mock_run.return_value = MagicMock(returncode=0)
         action = CommandAction()
 
-        # Filename with spaces and parentheses (the reported issue)
+        # Filename with spaces and parentheses
         path = "/data/ChikInfodengue_202553 (3).dbf"
         action(path)
 

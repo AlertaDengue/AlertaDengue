@@ -1,15 +1,5 @@
 """
 Standalone file-system watcher for SINAN ingestion.
-
-Watches a directory for new data files and triggers a configurable action
-when a file has settled (no further writes for ``--settle-time`` seconds).
-
-Uses ``PollingObserver`` (stat-based) instead of inotify so that files
-materialised via Docker bind-mount volumes are reliably detected.
-
-Designed to be decoupled from AlertaDengue internals: the processing
-action is configurable via ``--action`` and ``--action-command``, so any
-external command (makim, curl, custom script …) can be injected.
 """
 from __future__ import annotations
 
@@ -207,7 +197,6 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Watch subdirectories recursively.",
     )
 
-    # Action configuration
     parser.add_argument(
         "--action",
         type=str,
@@ -226,7 +215,6 @@ def _build_parser() -> argparse.ArgumentParser:
         ),
     )
 
-    # Legacy flags forwarded to CommandAction
     parser.add_argument(
         "--include-existing",
         action="store_true",

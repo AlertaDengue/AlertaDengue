@@ -691,9 +691,6 @@ groups:
           PID_FILE="${{ args.pid_file }}"
 
           if [ -z "${INCOMING_DIR}" ] && [ -n "${{ args.env }}" ]; then
-            # Fallback logic if env is provided but path is not.
-            # We prefer DOCKER_HOST_INCOMING_DIR if set, otherwise we construct it.
-            # But the user specifically wants to avoid hardcoded staging_data.
             INCOMING_DIR="${DOCKER_HOST_INCOMING_DIR:-}"
             [ -z "${LOG_FILE}" ] && \
               LOG_FILE="${DOCKER_HOST_LOG_DIR:-/tmp}/ingestion_watch.log"
