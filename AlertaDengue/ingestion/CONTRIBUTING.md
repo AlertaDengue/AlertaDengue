@@ -2,6 +2,22 @@
 
 Technical details and operational procedures for maintaining the SINAN ingestion pipeline.
 
+## Environment Configuration
+
+All environment variables should be defined in `.envs/.env`. Key variables for the ingestion pipeline:
+
+```bash
+# StorageBox Root (Host-side mount point)
+DOCKER_HOST_SINAN_ROOT=/mnt/storagebox-staging/sinan
+
+# Derived paths for the containerized services
+DOCKER_HOST_IMPORTED_FILES_DIR=${DOCKER_HOST_SINAN_ROOT}/raw_data/imported
+DOCKER_HOST_UPLOADED_FILES_DIR=${DOCKER_HOST_SINAN_ROOT}/raw_data/uploaded
+
+# Local transient ingress directory
+DOCKER_HOST_INCOMING_DIR=/Storage/staging_data/sinan/incoming
+```
+
 ## System Dependencies
 
 The ingestion system depends on several key Python libraries and external tools:
@@ -30,35 +46,37 @@ python manage.py migrate
 ## Setup & Infrastructure
 
 ### 1. StorageBox Mount (/etc/fstab)
-The Operational Source of Truth is the Hetzner StorageBox mounted at `/Storage2`. This mount MUST be accessible by the Celery workers.
+The operational source of truth is the Hetzner StorageBox mounted at the path defined by `DOCKER_HOST_SINAN_ROOT` (e.g., `/mnt/storagebox-staging/`).
 
-**SSHFS Example:**
+#### Recommended: CIFS/SMB (System-level)
+To mount the StorageBox sub-account `u364312-sub1` securely:
+
+1. **Install dependencies**: `sudo apt-get install cifs-utils`
+2. **Create credentials file**: Create `/etc/storagebox.creds` with:
+   ```text
+   username=uXXXXX-sub1
+   password=YOUR_PASSWORD_HERE
+   domain=YOUR_DOMAIN_IF_ANY
+   ```
+   *Set permissions: `sudo chmod 600 /etc/storagebox.creds`*
+3. **Mount Point**: `sudo mkdir -p /mnt/storagebox-staging`
+4. **fstab Entry**:
+   ```text
+   # /etc/fstab
+   //uxxxxx-sub1.your-storagebox.de/uxxxxx-sub1 /mnt/storagebox-staging cifs iocharset=utf8,rw,credentials=/etc/storagebox.creds,file_mode=0660,dir_mode=0770,uid=1000,gid=1000,_netdev 0 0
+   ```
+5. **Reload**: `sudo mount -a`
+
+#### Alternative: SSHFS
 ```text
 # /etc/fstab
-<user>@<user>.your-storagebox.de:/ /Storage2 fuse.sshfs _netdev,allow_other,IdentityFile=/root/.ssh/id_rsa,port=23 0 0
+u364312-sub1@u364312-sub1.your-storagebox.de:/ /Storage2 fuse.sshfs _netdev,allow_other,IdentityFile=/root/.ssh/id_rsa,port=23 0 0
 ```
 
 ### 2. MinIO Deployment (Sugar)
 Deploy the MinIO server and materializer (materializer) using **Sugar**:
 ```bash
 sugar --profile staging compose-ext start --services minio -- -d
-```
-
-## Binary Data Naming & Collision Logic
-
-When a file is moved from `/incoming` to `/Storage2`, the system applies a content-driven naming rule.
-
-```mermaid
-flowchart TD
-    Start([1. Start Move]) --> Extract[2. Extract UF, Disease, Epiweek]
-    Extract --> BuildBase[3. Build Canonical Name: Prefix_UF_YYYYWW.ext]
-    BuildBase --> CheckRoots{4. Exists in Any Base?}
-    
-    CheckRoots -- No --> Move((Move File))
-    CheckRoots -- Yes --> HashCheck{5. SHA256 Match?}
-    HashCheck -- Yes --> Skip[6. SKIP: Already Processed]
-    HashCheck -- No --> Suffix[7. Apply Numeric Suffix: _01, _02...]
-    Suffix --> CheckRoots
 ```
 
 ## Makim Operational Tasks

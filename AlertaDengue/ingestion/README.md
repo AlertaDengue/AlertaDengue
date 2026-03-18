@@ -8,9 +8,9 @@ The ingestion process follows a structured path through several storage layers, 
 
 | Layer | Type | Role |
 | :--- | :--- | :--- |
-| **MinIO** | Object Store | Ingress Gateway (Transient) |
-| **Incoming** | Local SSD | Watcher Buffer (Transient) |
-| **StorageBox** | Remote NAS (/Storage2) | Canonical Repository (Permanent Hub) |
+| **MinIO** | Object Store | Ingress Gateway (Transient ingress) |
+| **Incoming** | Local SSD | Watcher Buffer (Transient trigger) |
+| **StorageBox** | Remote NAS | Canonical Repository (Permanent Hub) |
 | **PostgreSQL**| Database | Final Data and Operations Metadata |
 
 ### Data Lifecycle Diagram
@@ -23,7 +23,7 @@ sequenceDiagram
     participant Host as Host FS (/incoming)
     participant Watcher as Ingestion Watcher (Worker)
     participant Mover as Mover Command (Phase 1)
-    participant StoragePath as StorageBox (/Storage2)
+    participant StoragePath as StorageBox (Canonical)
     participant Celery as Celery (Staging & Merge)
     participant DB as Postgres
 
@@ -41,14 +41,14 @@ sequenceDiagram
     Note over Mover, StoragePath: 4. Analysis & Rename (Phase 1)
     Mover->>Host: Extracts Disease, UF, Epiweek
     Mover->>Mover: Renames to Prefix_UF_YYYYWW.dbf
-    Mover->>StoragePath: Moves file to /Storage2 (Canonical)
+    Mover->>StoragePath: Moves file to StorageBox (Canonical)
 
     Note over Mover, Celery: 5. Enqueueing (Phase 2)
     Mover->>Celery: manage.py ingestion_enqueue_manifest
     Celery->>DB: Creates 'Run' record (status: QUEUED)
 
     Note over Celery, DB: 6. Processing (Phase 3)
-    Celery->>StoragePath: Reads from /Storage2
+    Celery->>StoragePath: Reads from Canonical Storage
     Celery->>DB: SQL UPSERT into Notificacao
     Celery->>DB: Updates 'Run' record (SUCCESS)
 ```
@@ -64,9 +64,26 @@ The `ingestion_watcher.py` triggers the `mover_sinan_data.py` script. This is wh
 - **Collision & Versioning**: If a file for the same week already exists:
     - Same SHA256 Identity -> **Skip** (already processed).
     - Different Identity -> **Version** (e.g., `_01.dbf`, `_02.dbf`).
-- **Canonical Destination**: Files are moved permanently to the **StorageBox (/Storage2)**.
+- **Canonical Destination**: Files are moved permanently to the **StorageBox** (mount point defined by `DOCKER_HOST_SINAN_ROOT`).
 
-**Path Example**: `/Storage2/sinan/raw_data/imported/es/dbf/dengue/2026/202611/DenInfodengue_ES_202611.dbf`
+**Path Example**: `/mnt/storagebox-staging/sinan/raw_data/imported/es/dbf/dengue/2026/202611/DenInfodengue_ES_202611.dbf`
+
+#### Binary Data Naming & Collision Logic
+
+When a file is moved from `/incoming` to the StorageBox, the system applies a content-driven naming rule.
+
+```mermaid
+flowchart TD
+    Start([1. Start Move]) --> Extract[2. Extract UF, Disease, Epiweek]
+    Extract --> BuildBase[3. Build Canonical Name: Prefix_UF_YYYYWW.ext]
+    BuildBase --> CheckRoots{4. Exists in Any Base?}
+    
+    CheckRoots -- No --> Move((Move File))
+    CheckRoots -- Yes --> HashCheck{5. SHA256 Match?}
+    HashCheck -- Yes --> Skip[6. SKIP: Already Processed]
+    HashCheck -- No --> Suffix[7. Apply Numeric Suffix: _01, _02...]
+    Suffix --> CheckRoots
+```
 
 ### 3. The Processor (Celery & Database)
 The system creates a **Run** record for auditing and dispatches a Celery task.
