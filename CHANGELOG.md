@@ -1,6 +1,16 @@
 Release Notes
 ---
 
+## [4.9.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.8.0...4.9.0) (2026-03-18)
+
+### Features
+
+* **ingestion:** integrate MinIO ingress and polling watcher for SINAN ingestion ([#890](https://github.com/AlertaDengue/AlertaDengue/issues/890)) ([889f254](https://github.com/AlertaDengue/AlertaDengue/commit/889f254548247797885cb0d5466e51a39de43213))
+
+### Bug Fixes
+
+* **types:** resolve mypy issues in ingestion parsing ([#888](https://github.com/AlertaDengue/AlertaDengue/issues/888)) ([dba2ef0](https://github.com/AlertaDengue/AlertaDengue/commit/dba2ef057d127defb936d6d6f8c45e174d94f1b6))
+
 ## [4.8.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.7.0...4.8.0) (2026-03-15)
 
 ### Features
