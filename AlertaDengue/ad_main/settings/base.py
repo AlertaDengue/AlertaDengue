@@ -499,11 +499,10 @@ PWA_APP_DESCRIPTION = (
 )
 PWA_APP_LANG = LANGUAGE_CODE
 PWA_APP_DIR = "ltr"
-PWA_APP_DISPLAY = "standalone"
 PWA_APP_START_URL = "/"
 PWA_APP_THEME_COLOR = "#0080ff"
 PWA_APP_BACKGROUND_COLOR = "#ffffff"
-
+PWA_APP_DISPLAY = "standalone"
 PWA_APP_ICONS = [
     {
         "src": "/static/img/logo-infodengue.png",
