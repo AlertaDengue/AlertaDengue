@@ -55,6 +55,8 @@ profiles:
         - name: celery
         - name: celery-beat
         - name: minio
+        - name: minio-init
+        - name: minio-materializer
 
   prod:
     project-name: infodengue-prod
@@ -81,3 +83,5 @@ profiles:
         - name: celery
         - name: celery-beat
         - name: minio
+        - name: minio-init
+        - name: minio-materializer
