@@ -1,6 +1,13 @@
 Release Notes
 ---
 
+## [4.9.1](https://github.com/AlertaDengue/AlertaDengue/compare/4.9.0...4.9.1) (2026-03-19)
+
+### Bug Fixes
+
+* **minio:** improve startup ordering and sugar service wiring ([#893](https://github.com/AlertaDengue/AlertaDengue/issues/893)) ([5beb71d](https://github.com/AlertaDengue/AlertaDengue/commit/5beb71da3cb1852abf5a06682fd8c1de5f6a0967))
+* **pwa:** keep app installable and disable service worker caching ([#895](https://github.com/AlertaDengue/AlertaDengue/issues/895)) ([bfdce85](https://github.com/AlertaDengue/AlertaDengue/commit/bfdce8559bc2bc88efde165d4e36aa8d62f95914))
+
 ## [4.9.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.8.0...4.9.0) (2026-03-18)
 
 ### Features
