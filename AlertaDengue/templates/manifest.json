@@ -5,16 +5,23 @@
   "lang": "{{ PWA_APP_LANG }}",
   "dir": "{{ PWA_APP_DIR }}",
   "start_url": "{{ PWA_APP_START_URL }}",
+  "scope": "{{ PWA_APP_SCOPE }}",
   "display": "{{ PWA_APP_DISPLAY }}",
+  "orientation": "{{ PWA_APP_ORIENTATION }}",
   "theme_color": "{{ PWA_APP_THEME_COLOR }}",
   "background_color": "{{ PWA_APP_BACKGROUND_COLOR }}",
   "icons": [
-    {% for icon in PWA_APP_ICONS %}
+    {% for icon in PWA_APP_ICONS %
+    }
     {
       "src": "{{ icon.src }}",
       "sizes": "{{ icon.sizes }}",
       "type": "{{ icon.type }}"
-    }{% if not forloop.last %},{% endif %}
-    {% endfor %}
+    }{% if not forloop.last %
+    },
+    {% endif %
+    }
+    {% endfor %
+    }
   ]
 }
