@@ -16,6 +16,9 @@ DOCKER_HOST_UPLOADED_FILES_DIR=${DOCKER_HOST_SINAN_ROOT}/raw_data/uploaded
 
 # Local transient ingress directory
 DOCKER_HOST_INCOMING_DIR=/Storage/staging_data/sinan/incoming
+
+# MinIO browser redirect URL
+MINIO_BROWSER_REDIRECT_URL=http://localhost:9001
 ```
 
 ## System Dependencies
