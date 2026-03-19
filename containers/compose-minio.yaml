@@ -11,16 +11,23 @@ services:
     environment:
       MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
       MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
+      MINIO_BROWSER_REDIRECT_URL: "${MINIO_BROWSER_REDIRECT_URL:-http://localhost:9001}"
     volumes:
       - minio_data:/data
     command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
 
   minio-init:
     image: minio/mc:latest
     hostname: minio-init
     depends_on:
       minio:
-        condition: service_started
+        condition: service_healthy
     env_file:
       - ../.envs/.env
     entrypoint: >
@@ -35,8 +42,10 @@ services:
     image: minio/mc:latest
     hostname: minio-materializer
     depends_on:
+      minio-init:
+        condition: service_completed_successfully
       minio:
-        condition: service_started
+        condition: service_healthy
     env_file:
       - ../.envs/.env
     volumes:
