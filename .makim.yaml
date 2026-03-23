@@ -91,7 +91,7 @@ groups:
           CWD=$(pwd)
           CMD_FLAG="${{ '--check' if args.check else '' }} --no-input"
 
-          for app in 'dbf'; do
+          for app in 'dados'; do
             echo -e "\nMaking migration files for: '${app}' ...\n"
 
             CMD="python manage.py makemigrations ${CMD_FLAG} ${app}"
@@ -154,7 +154,7 @@ groups:
         help: Run mypy (best-effort, skip third-party imports)
         run: |
           mypy --follow-imports=skip --ignore-missing-imports \
-            AlertaDengue/ingestion
+            AlertaDengue/dados/models.py
 
       unit:
         help: Run tests with pytest (inside web container)
