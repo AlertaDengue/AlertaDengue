@@ -216,7 +216,13 @@ DATABASES = {
     },
 }
 
-MIGRATION_MODULES = {"dados": None, "gis": None, "api": None}
+MIGRATION_MODULES = {
+    "dados": "dados.migrations",
+    "gis": None,
+    "api": None,
+    "forecast": None,
+    "chunked_upload": None,
+}
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 SESSION_COOKIE_HTTPONLY = True
