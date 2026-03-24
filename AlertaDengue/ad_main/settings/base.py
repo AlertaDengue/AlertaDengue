@@ -175,10 +175,10 @@ DB_ENGINE_FACTORY = get_sqla_conn
 
 
 DATABASE_ROUTERS = ["manager.router.DatabaseAppsRouter"]
+
 DATABASE_APPS_MAPPING = {
     "dados": "dados",
     "default": "default",
-    "forecast": "forecast",
 }
 
 DATABASES = {
@@ -206,23 +206,14 @@ DATABASES = {
         "HOST": PSQL_HOST,
         "PORT": PSQL_PORT,
     },
-    "forecast": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": PSQL_DB,
-        "USER": "forecast",
-        "PASSWORD": PSQL_PASSWORD,
-        "HOST": PSQL_HOST,
-        "PORT": PSQL_PORT,
-    },
 }
 
 MIGRATION_MODULES = {
     "dados": "dados.migrations",
     "gis": None,
     "api": None,
-    "forecast": None,
-    "chunked_upload": None,
 }
+
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 SESSION_COOKIE_HTTPONLY = True
