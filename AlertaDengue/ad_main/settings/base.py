@@ -108,7 +108,6 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "dados",
     "gis",
-    "forecast",
     "api",
     "upload",
     "ingestion",

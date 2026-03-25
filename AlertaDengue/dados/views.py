@@ -48,7 +48,6 @@ from .dbdata import (  # get_notification_cases,
     STATE_INITIAL,
     STATE_NAME,
     UF_CODES,
-    Forecast,
     NotificationResume,
     RegionalParameters,
     ReportCity,
@@ -340,21 +339,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
         cities_info: dict[int, dict[str, Any]] = {}
         bairros: dict[int, str] = {}
 
-        cid10 = CID10[disease_code]
-        forecast_date_min, forecast_date_max = Forecast.get_min_max_date(
-            geocode=geocode,
-            cid10=cid10,
-        )
-
-        if not forecast_date_max:
-            forecast_date_ref = None
-            epiweek = None
-        else:
-            forecast_date_ref = self._get("ref", forecast_date_max)
-            if not forecast_date_ref:
-                epiweek = None
-            else:
-                epiweek = episem(forecast_date_ref).replace("W", "")
+        epiweek = None
 
         for geocode_ in regional_geocodes:
             city_info = cache.get(f"city_info:{geocode_}")
@@ -450,9 +435,6 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
                 ),
                 "disease_label": disease_label,
                 "disease_code": disease_code,
-                "forecast_date_ref": forecast_date_ref,
-                "forecast_date_min": forecast_date_min,
-                "forecast_date_max": forecast_date_max,
                 "epiweek": epiweek,
                 "geojson_urls": [
                     f"/static/geojson/{g}.json" for g in regional_geocodes
