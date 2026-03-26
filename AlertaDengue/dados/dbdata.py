@@ -114,11 +114,6 @@ STATE_INITIAL = dict(zip(STATE_NAME.values(), STATE_NAME.keys()))
 MAP_CENTER = {k: v[1] for k, v in ALL_STATE_NAMES.items()}
 MAP_ZOOM = {k: v[2] for k, v in ALL_STATE_NAMES.items()}
 
-with open(PROJECT_ROOT / "data" / "municipalities.json", "r") as muns:
-    _mun_decoded = muns.read().encode().decode("utf-8-sig")
-    MUNICIPALITIES = json.loads(_mun_decoded)
-
-
 HIST_UF_MATERIALIZED_VIEWS: Final[dict[str, str]] = {
     "dengue": "hist_uf_dengue_materialized_view",
     "chik": "hist_uf_chik_materialized_view",
