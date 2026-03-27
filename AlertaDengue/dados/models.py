@@ -98,11 +98,9 @@ class ParameterUF(models.Model):
         db_column="state_name",
         help_text=_("Nome do estado"),
     )
-    cid10 = models.ForeignKey(
-        CID10,
+    cid10 = models.CharField(
         db_column="cid10",
-        to_field="code",
-        on_delete=models.DO_NOTHING,
+        max_length=16,
         help_text=_("Código CID10 da doença"),
     )
     limiar_preseason = models.FloatField(
@@ -138,4 +136,4 @@ class ParameterUF(models.Model):
 
     def __str__(self) -> str:
         """Return a readable UF/disease identifier."""
-        return f"{self.state_abbr} - {self.cid10.code}"
+        return f"{self.state_abbr} - {self.cid10}"
