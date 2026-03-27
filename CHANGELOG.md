@@ -1,6 +1,16 @@
 Release Notes
 ---
 
+## [4.10.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.9.1...4.10.0) (2026-03-27)
+
+### Features
+
+* **migrations:** add data migration to populate parameters_uf thresholds ([#903](https://github.com/AlertaDengue/AlertaDengue/issues/903)) ([1cd6cfd](https://github.com/AlertaDengue/AlertaDengue/commit/1cd6cfd376953cee3b130e511bc63824af23caf3))
+
+### Bug Fixes
+
+* **migrations:** create parameters_uf table and remove forecast dependencies ([#897](https://github.com/AlertaDengue/AlertaDengue/issues/897)) ([2cfa5be](https://github.com/AlertaDengue/AlertaDengue/commit/2cfa5be40b972bb3b2aca9025e7a45145ed7429d))
+
 ## [4.9.1](https://github.com/AlertaDengue/AlertaDengue/compare/4.9.0...4.9.1) (2026-03-19)
 
 ### Bug Fixes
