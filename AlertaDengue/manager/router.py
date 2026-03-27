@@ -79,7 +79,7 @@ class DatabaseAppsRouter(object):
 
         if allow and app_label in settings.MIGRATION_MODULES:
             if settings.MIGRATION_MODULES[app_label] is None:
-                allow = False
+                allow = True
         # Allow core and 3rd-party relationships here
         set_1 = {app_label}
         if self.core_apps - set_1 != self.core_apps:

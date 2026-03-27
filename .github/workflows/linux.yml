@@ -111,9 +111,10 @@ jobs:
         poetry run pre-commit install -t pre-commit -t commit-msg -t pre-push
         poetry run pre-commit run --all-files
 
-    - name: Build postgres database
+    - name: Build containers
       run: |
-        sugar --profile dev compose build --services postgres
+        sugar --profile dev compose build
+
 
     - name: Start postgres database
       run: |
@@ -121,17 +122,13 @@ jobs:
 
     - name: Start containers
       run: |
-        sugar --profile dev compose build
-        sugar --profile dev compose-ext start --options -d
+        sugar --profile dev compose-ext start --services web,celery -- -d
 
     - name: Container wait all
       run: |
           makim develop.container-wait-all --timeout 150
 
-    # - name: Lint (dbdata slice)
-      # run: makim tests.lint
-
-    - name: Unit tests (dbdata slice)
+    - name: Unit tests
       run: makim tests.unit
 
     - name: Setup tmate session
