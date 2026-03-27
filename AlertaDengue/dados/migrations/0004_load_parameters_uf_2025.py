@@ -55,7 +55,7 @@ def _load_dataset(
     db_alias: str,
     csv_path: Path,
 ) -> set[str]:
-    """Load one seasonal dataset into ParameterUF."""
+    """Load seasonal dataset into ParameterUF."""
     if not csv_path.exists():
         raise FileNotFoundError(f"CSV dataset not found: {csv_path}")
 
