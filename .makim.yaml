@@ -125,6 +125,50 @@ groups:
         run: |
           ${{ env.sugar_run_rm }} --cmd ${{ env.manage_py }} send_mail
 
+
+      backfill-chik-casprov:
+        help: Copy a chik parquet file into the running web container and run the one-time backfill command.
+        args:
+          parquet-path:
+            help: Host path to chik_fill.parquet.
+            type: string
+          container-path:
+            help: Destination path inside the web container.
+            type: string
+            default: /tmp/chik_fill.parquet
+          apply:
+            help: Apply the update instead of running only the diagnostics.
+            type: bool
+            action: store_true
+        env-file: .envs/.env
+        run: |
+          sugar --profile ${{ env.ENV }} compose-ext start \
+            --services postgres web -- -d
+
+          COMPOSE_FILE="containers/compose-${ENV}.yaml"
+          PROJECT_NAME="infodengue-${ENV}"
+          COMPOSE_CMD="docker compose --env-file .envs/.env \
+            --file containers/compose-base.yaml \
+            --file ${COMPOSE_FILE} \
+            --project-name ${PROJECT_NAME}"
+
+          WEB_CID=$($COMPOSE_CMD ps -q web)
+
+          if [ -z "$WEB_CID" ]; then
+            echo "[EE] web container not found."
+            exit 1
+          fi
+
+          docker cp "${{ args.parquet_path }}" \
+            "${WEB_CID}:${{ args.container_path }}"
+
+          CMD="python manage.py backfill_chik_casprov \
+          --parquet-path ${{ args.container_path }} \
+          ${{ '--apply' if args.apply else '' }}"
+
+          sugar --profile ${{ env.ENV }} compose-ext exec \
+            --service web --cmd "$CMD"
+
   # TESTS
   tests:
     help: Test tasks (dbdata TDD slice)
