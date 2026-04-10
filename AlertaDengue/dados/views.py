@@ -894,23 +894,31 @@ class ReportCityView(TemplateView):
             var_climate = {}
             varcli_pair = {}
 
-            if params[3]:
-                climate_title1 = params[3]
-                climate_crit1 = params[4]
-                varcli_pair[climate_title1] = climate_crit1
-                varcli_dict[params[3].replace("_", ".")].append(params[4])
+            def _add_param(raw_key, raw_value):
+                if not raw_key:
+                    return
 
-            if params[5]:
-                climate_title2 = params[5]
-                climate_crit2 = params[6]
-                varcli_pair[climate_title2] = climate_crit2
-                varcli_dict[params[5].replace("_", ".")].append(params[6])
+                normalized_key = raw_key.replace("_", ".")
 
-            varcli_keys = [
-                w.replace("_", ".") for w in list(varcli_pair.keys())
-            ]
-            for v in varcli_keys:
-                var_climate[v] = varcli_dict.get(v)
+                if normalized_key not in varcli_dict:
+                    logger.warning(
+                        "Ignoring invalid varclimate key %r in get_var_params. "
+                        "params=%r",
+                        raw_key,
+                        params,
+                    )
+                    return
+
+                varcli_pair[raw_key] = raw_value
+                varcli_dict[normalized_key].append(raw_value)
+
+            _add_param(params[3], params[4])
+            _add_param(params[5], params[6])
+
+            varcli_keys = [key.replace("_", ".") for key in varcli_pair.keys()]
+            for key in varcli_keys:
+                var_climate[key] = varcli_dict.get(key)
+
             return var_climate, varcli_keys
 
         prepare_html = (
