@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
 
-set -ex
-
-if [[ "$ENV" != "dev" ]]; then
-  # if in prod or staging environment: collectstatic and start wsgi
-  # python manage.py collectstatic --no-input
-  gunicorn ad_main.wsgi:application -w ${GUNICORN_WORKERS:-1} --timeout 9640 -b 0.0.0.0:${DJANGO_PORT:-8000}
+if [[ "${ENV:-dev}" != "dev" ]]; then
+  exec gunicorn ad_main.wsgi:application \
+    --workers "${GUNICORN_WORKERS:-4}" \
+    --threads "${GUNICORN_THREADS:-2}" \
+    --timeout "${GUNICORN_TIMEOUT:-120}" \
+    --bind "0.0.0.0:${DJANGO_PORT:-8000}"
 else
-  # if in dev environment: forget about uwsgi and
-  # collectstatic, just run the Django dev server
-  python manage.py runserver 0.0.0.0:${DJANGO_PORT:-8000}
+  exec python manage.py runserver "0.0.0.0:${DJANGO_PORT:-8000}"
 fi
-
-set +ex
