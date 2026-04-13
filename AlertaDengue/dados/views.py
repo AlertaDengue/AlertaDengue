@@ -1,6 +1,7 @@
 import datetime
 import json
 import locale
+import logging
 import os
 import random
 from collections import OrderedDict, defaultdict
@@ -12,6 +13,8 @@ from typing import Any
 import fiona
 import numpy as np
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 #
 from django.apps import apps
@@ -896,6 +899,15 @@ class ReportCityView(TemplateView):
 
             def _add_param(raw_key, raw_value):
                 if not raw_key:
+                    return
+
+                if not isinstance(raw_key, str):
+                    logger.warning(
+                        "Ignoring invalid varclimate key %r in get_var_params. "
+                        "params=%r",
+                        raw_key,
+                        params,
+                    )
                     return
 
                 normalized_key = raw_key.replace("_", ".")

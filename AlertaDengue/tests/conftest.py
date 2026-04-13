@@ -3,6 +3,15 @@ from __future__ import annotations
 import os
 
 import django
+import pytest
+from django.conf import settings
+from sqlalchemy.engine import Engine
+
+
+@pytest.fixture()
+def db_engine() -> Engine:
+    """Return the SQLAlchemy engine configured by Django settings."""
+    return getattr(settings, "DB_ENGINE")
 
 
 def pytest_configure(config) -> None:
