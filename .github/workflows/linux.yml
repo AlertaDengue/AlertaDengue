@@ -59,6 +59,8 @@ env:
   EPISCANNER_HOST_DIR: "/home/runner/storage/episcanner"
 
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  DOCKER_BUILDKIT: 1
+  COMPOSE_DOCKER_CLI_BUILD: 1
 
 jobs:
   build:
@@ -77,6 +79,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
     - name: Cache conda packages
       uses: actions/cache@v4
@@ -115,9 +120,8 @@ jobs:
 
     - name: Create env file
       run: |
-        pushd .envs
-        envsubst < .env.tpl > .env
-        popd
+        mkdir -p .envs
+        envsubst < .envs/.env.tpl > .envs/.env
 
     - name: Linting
       run: |
@@ -126,7 +130,7 @@ jobs:
 
     - name: Build containers
       run: |
-        sugar --profile dev compose build
+        sugar --profile dev compose build --no-cache
 
     - name: Start postgres database
       run: |
