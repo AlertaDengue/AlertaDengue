@@ -225,3 +225,16 @@ class TestGetVarParamsInvalidInput:
         assert mock_logger.warning.call_count == 2
         assert keys == []
         assert result == {}
+
+    def test_na_string_key_triggers_warning(self) -> None:
+        """An 'NA' string key (the original bug) is skipped with a warning."""
+        mock_logger = MagicMock(spec=logging.Logger)
+
+        params = _make_params(
+            key1="NA", value1="20", key2="temp_min", value2="20"
+        )
+        result, keys = _get_var_params(params, logger=mock_logger)
+
+        assert mock_logger.warning.call_count == 1
+        assert "NA" not in keys
+        assert "temp.min" in keys

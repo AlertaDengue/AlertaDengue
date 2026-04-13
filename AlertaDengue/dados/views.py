@@ -841,7 +841,10 @@ class ReportCityView(TemplateView):
             + "alerta_dengue@fiocruz.br</a>"
         )
 
-        city = City.objects.get(pk=int(geocode))
+        try:
+            city = City.objects.get(pk=int(geocode))
+        except City.DoesNotExist:
+            return self.raise_error(context, error_message_city_doesnt_exist)
 
         # param used by df.to_html
         html_param = dict(
@@ -859,6 +862,8 @@ class ReportCityView(TemplateView):
                 if data:
                     params = list(data[0])
                     # TODO: Fix NA's in the parameters table
+                    if params[3] == "NA":
+                        params[3] = 0
                     if params[5] == "NA":
                         params[5] = 0
                     return params
@@ -870,6 +875,11 @@ class ReportCityView(TemplateView):
                     )
                     if dengue_data:
                         params = list(dengue_data[0])
+                        # TODO: Fix NA's in the parameters table
+                        if params[3] == "NA":
+                            params[3] = 0
+                        if params[5] == "NA":
+                            params[5] = 0
                         # Set thresholds to 0 as they might not apply to this disease
                         # but keep station/climate info (indices 0-6)
                         # limiar_preseason (7), limiar_posseason (8), limiar_epidemico (9)
