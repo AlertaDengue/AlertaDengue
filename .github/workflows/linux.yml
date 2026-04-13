@@ -58,11 +58,12 @@ env:
   TEMP_FILES_DIR: "/tmp/"
   EPISCANNER_HOST_DIR: "/home/runner/storage/episcanner"
 
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     strategy:
       matrix:
         python_version: ["3.11"]
@@ -77,14 +78,26 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Cache conda packages
+      uses: actions/cache@v4
+      with:
+        path: ~/conda_pkgs_dir
+        key: ${{ runner.os }}-conda-${{ hashFiles('conda/base.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-conda-
+
     - uses: conda-incubator/setup-miniconda@v3
       with:
         miniforge-version: latest
         environment-file: conda/base.yaml
-        channels: conda-forge,nodefaults
+        channels: conda-forge
+        channel-priority: strict
         activate-environment: alertadengue
-        auto-update-conda: true
+        auto-update-conda: false
         conda-solver: libmamba
+        use-mamba: true
+        conda-remove-defaults: true
+        use-only-tar-bz2: true
 
     - name: Prepare data volumes
       run: |
@@ -115,7 +128,6 @@ jobs:
       run: |
         sugar --profile dev compose build
 
-
     - name: Start postgres database
       run: |
         sugar --profile dev compose-ext start --services postgres --options -d
@@ -126,7 +138,7 @@ jobs:
 
     - name: Container wait all
       run: |
-          makim develop.container-wait-all --timeout 150
+        makim develop.container-wait-all --timeout 150
 
     - name: Unit tests
       run: makim tests.unit
