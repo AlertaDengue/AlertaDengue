@@ -8,7 +8,7 @@ from collections import OrderedDict, defaultdict
 from copy import deepcopy
 from datetime import timedelta
 from pathlib import Path, PurePath
-from typing import Any
+from typing import Any, Final, Sequence, TypeGuard
 
 import fiona
 import numpy as np
