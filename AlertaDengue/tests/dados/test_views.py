@@ -91,11 +91,6 @@ def _get_var_params(
     return var_climate, varcli_keys
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-
 def _make_params(
     key1: Any = None,
     value1: Any = None,
