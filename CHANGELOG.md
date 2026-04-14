@@ -1,6 +1,17 @@
 Release Notes
 ---
 
+## [4.11.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.10.0...4.11.0) (2026-04-14)
+
+### Features
+
+* add one-off chik casprov backfill command and makim task ([#905](https://github.com/AlertaDengue/AlertaDengue/issues/905)) ([9096acf](https://github.com/AlertaDengue/AlertaDengue/commit/9096acf133b54482fcb4b219f77d22bd91e128c8))
+
+### Bug Fixes
+
+* **deploy:** make gunicorn workers, threads, and timeout configurable ([#908](https://github.com/AlertaDengue/AlertaDengue/issues/908)) ([5a33637](https://github.com/AlertaDengue/AlertaDengue/commit/5a3363731b37da24e96d64abdbc58ce509a44ce6))
+* **report:** handle invalid varclimate keys in get_var_params ([#910](https://github.com/AlertaDengue/AlertaDengue/issues/910)) ([15cb864](https://github.com/AlertaDengue/AlertaDengue/commit/15cb864a8cded417d49dabe9179e7d9f513c37c2))
+
 ## [4.10.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.9.1...4.10.0) (2026-03-27)
 
 ### Features
