@@ -1,17 +1,20 @@
 import datetime
 import json
 import locale
+import logging
 import os
 import random
 from collections import OrderedDict, defaultdict
 from copy import deepcopy
 from datetime import timedelta
 from pathlib import Path, PurePath
-from typing import Any
+from typing import Any, Final, Sequence, TypeGuard
 
 import fiona
 import numpy as np
 import pandas as pd
+
+logger = logging.getLogger(__name__)
 
 #
 from django.apps import apps
@@ -838,7 +841,10 @@ class ReportCityView(TemplateView):
             + "alerta_dengue@fiocruz.br</a>"
         )
 
-        city = City.objects.get(pk=int(geocode))
+        try:
+            city = City.objects.get(pk=int(geocode))
+        except City.DoesNotExist:
+            return self.raise_error(context, error_message_city_doesnt_exist)
 
         # param used by df.to_html
         html_param = dict(
@@ -856,6 +862,8 @@ class ReportCityView(TemplateView):
                 if data:
                     params = list(data[0])
                     # TODO: Fix NA's in the parameters table
+                    if params[3] == "NA":
+                        params[3] = 0
                     if params[5] == "NA":
                         params[5] = 0
                     return params
@@ -867,6 +875,11 @@ class ReportCityView(TemplateView):
                     )
                     if dengue_data:
                         params = list(dengue_data[0])
+                        # TODO: Fix NA's in the parameters table
+                        if params[3] == "NA":
+                            params[3] = 0
+                        if params[5] == "NA":
+                            params[5] = 0
                         # Set thresholds to 0 as they might not apply to this disease
                         # but keep station/climate info (indices 0-6)
                         # limiar_preseason (7), limiar_posseason (8), limiar_epidemico (9)
@@ -878,11 +891,14 @@ class ReportCityView(TemplateView):
             except (IndexError, TypeError, Exception):
                 return None
 
-        def get_var_params(params):
+        def get_var_params(
+            params: Sequence[Any] | None,
+        ) -> tuple[dict[str, list[Any]], list[str]]:
+            """Extract valid climate variables from params, ignoring invalid keys."""
             if not params:
                 return {}, []
 
-            varcli_dict = {
+            VALID_CLIMATE_VARS: Final[dict[str, list[str]]] = {
                 "temp.min": [_("°C temperatura mínima")],
                 "temp.med": [_("°C temperatura média")],
                 "temp.max": [_("°C temperatura máxima")],
@@ -891,26 +907,37 @@ class ReportCityView(TemplateView):
                 "umid.max": [_("% umidade máxima do ar")],
             }
 
-            var_climate = {}
-            varcli_pair = {}
+            def _is_valid_key(key: Any) -> TypeGuard[str]:
+                """Check if key is a non-empty string that maps to a valid climate var."""
+                if not isinstance(key, str) or not key.strip():
+                    return False
+                normalized = key.replace("_", ".")
+                return normalized in VALID_CLIMATE_VARS
 
-            if params[3]:
-                climate_title1 = params[3]
-                climate_crit1 = params[4]
-                varcli_pair[climate_title1] = climate_crit1
-                varcli_dict[params[3].replace("_", ".")].append(params[4])
+            def _add_param(raw_key: Any, raw_value: Any) -> None:
+                """Safely add a climate param if the key is valid."""
+                if not _is_valid_key(raw_key):
+                    if raw_key:
+                        logger.warning(
+                            "Skipping invalid varclimate key %r (params=%r)",
+                            raw_key,
+                            params,
+                        )
+                    return
 
-            if params[5]:
-                climate_title2 = params[5]
-                climate_crit2 = params[6]
-                varcli_pair[climate_title2] = climate_crit2
-                varcli_dict[params[5].replace("_", ".")].append(params[6])
+                normalized_key = raw_key.replace("_", ".")
+                varcli_pair[raw_key] = raw_value
+                VALID_CLIMATE_VARS[normalized_key].append(raw_value)
 
-            varcli_keys = [
-                w.replace("_", ".") for w in list(varcli_pair.keys())
-            ]
-            for v in varcli_keys:
-                var_climate[v] = varcli_dict.get(v)
+            var_climate: dict[str, list[Any]] = {}
+            varcli_pair: dict[str, Any] = {}
+
+            _add_param(params[3], params[4])
+            _add_param(params[5], params[6])
+
+            varcli_keys = [k.replace("_", ".") for k in varcli_pair]
+            var_climate = {k: VALID_CLIMATE_VARS[k] for k in varcli_keys}
+
             return var_climate, varcli_keys
 
         prepare_html = (

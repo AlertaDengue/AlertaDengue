@@ -198,7 +198,7 @@ groups:
         help: Run mypy (best-effort, skip third-party imports)
         run: |
           mypy --follow-imports=skip --ignore-missing-imports \
-            AlertaDengue/dados/models.py
+            AlertaDengue/tests/dados/
 
       unit:
         help: Run tests with pytest (inside web container)
