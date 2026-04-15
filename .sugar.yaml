@@ -12,6 +12,7 @@ profiles:
     config-path:
       - containers/compose-base.yaml
       - containers/compose-dev.yaml
+      - containers/compose-pgbackrest.yaml
     services:
       default:
         - postgres
@@ -29,6 +30,7 @@ profiles:
         - name: web
         - name: celery
         - name: celery-beat
+        - name: pgbackrest
 
   staging:
     project-name: infodengue-staging
@@ -37,6 +39,7 @@ profiles:
       - containers/compose-base.yaml
       - containers/compose-staging.yaml
       - containers/compose-minio.yaml
+      - containers/compose-pgbackrest.yaml
     services:
       default:
         - postgres
@@ -57,6 +60,7 @@ profiles:
         - name: minio
         - name: minio-init
         - name: minio-materializer
+        - name: pgbackrest
 
   prod:
     project-name: infodengue-prod
@@ -65,6 +69,7 @@ profiles:
       - containers/compose-base.yaml
       - containers/compose-prod.yaml
       - containers/compose-minio.yaml
+      - containers/compose-pgbackrest.yaml
     services:
       default:
         - postgres
@@ -85,3 +90,4 @@ profiles:
         - name: minio
         - name: minio-init
         - name: minio-materializer
+        - name: pgbackrest

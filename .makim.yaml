@@ -26,7 +26,6 @@ groups:
           echo "[II] Cleaned temporary files."
   # DJANGO
   django:
-  django:
     help: Run Django commands and manage the development server.
     env:
       sugar_run_rm: sugar run --service web --options --rm
@@ -50,10 +49,7 @@ groups:
           POSTGRES_HOST: localhost
           REDIS_HOST: localhost
         run: |
-          set -a
-          [ -f .envs/.env ] && . .envs/.env
-          set +a
-          sugar compose-ext start --services web -- -d
+          sugar compose-ext start --services web --options -d
           python AlertaDengue/manage.py shell
 
 
@@ -61,16 +57,13 @@ groups:
       collectstatic:
         help: Run the collectstatic for the backend service
         run: |
-          set -a
-          [ -f .envs/.env ] && . .envs/.env
-          set +a
           CMD="python manage.py collectstatic --no-input"
 
           sugar --profile ${ENV} compose-ext start \
-            --services postgres -- -d
+            --services postgres --options -d
 
           CMD="python manage.py collectstatic --no-input"
-          sugar --profile $ENV  compose-ext exec --service web --cmd "$CMD"
+          sugar --profile ${{ env.ENV }}  compose-ext exec --service web --cmd "$CMD"
           echo "[II] postgres is running."
 
       static-geofiles:
@@ -87,11 +80,8 @@ groups:
             type: bool
             action: store_true
         run: |
-          set -a
-          [ -f .envs/.env ] && . .envs/.env
-          set +a
           sugar compose-ext start \
-            --services postgres -- -d
+            --services postgres --options -d
 
           CWD=$(pwd)
           CMD_FLAG="${{ '--check' if args.check else '' }} --no-input"
@@ -114,11 +104,8 @@ groups:
       migrate:
         help: Migrate regarding to the current migration files
         run: |
-          set -a
-          [ -f .envs/.env ] && . .envs/.env
-          set +a
           sugar compose-ext start \
-            --services postgres -- -d
+            --services postgres --options -d
 
           CMD="python manage.py migrate --no-input"
           sugar --profile dev compose-ext run --rm --service web \
@@ -133,54 +120,27 @@ groups:
           ${{ env.sugar_run_rm }} --cmd ${{ env.manage_py }} send_mail
 
 
-  # DADOS
-  dados:
-    tasks:
-      backfill-casprov:
-        help: Copy a dengue or chik source file into the running web container and run the casprov backfill command.
+      backfill-chik-casprov:
+        help: Copy a chik parquet file into the running web container and run the one-time backfill command.
         args:
-          disease:
-            help: Disease target table to update.
-            type: string
-          input-path:
-            help: Host path to the source CSV or parquet file.
-            type: string
-          input-format:
-            help: Input file format.
+          parquet-path:
+            help: Host path to chik_fill.parquet.
             type: string
           container-path:
             help: Destination path inside the web container.
             type: string
-            default: /tmp/casprov_fill_input.csv
-          cutoff-date:
-            help: Only update rows with data_iniSE before this date.
-            type: string
-            default: "2023-06-01"
-          since-epiweek:
-            help: Optional lower SE bound, inclusive.
-            type: string
-            required: false
-            default: ""
-          until-epiweek:
-            help: Optional upper SE bound, inclusive.
-            type: string
-            required: false
-            default: ""
+            default: /tmp/chik_fill.parquet
           apply:
-            help: Apply the update instead of dry-run diagnostics.
+            help: Apply the update instead of running only the diagnostics.
             type: bool
             action: store_true
         run: |
-          set -a
-          [ -f .envs/.env ] && . .envs/.env
-          set +a
-
-          sugar --profile $ENV compose-ext start \
-            --services postgres web -- -d
+          sugar --profile ${{ env.ENV }} compose-ext start \
+            --services postgres web --options -d
 
           COMPOSE_FILE="containers/compose-${ENV}.yaml"
           PROJECT_NAME="infodengue-${ENV}"
-          COMPOSE_CMD="docker compose \
+          COMPOSE_CMD="docker compose --env-file .envs/.env \
             --file containers/compose-base.yaml \
             --file ${COMPOSE_FILE} \
             --project-name ${PROJECT_NAME}"
@@ -192,27 +152,14 @@ groups:
             exit 1
           fi
 
-          docker cp "${{ args.input_path }}" "${WEB_CID}:${{ args.container_path }}"
+          docker cp "${{ args.parquet_path }}" \
+            "${WEB_CID}:${{ args.container_path }}"
 
-          CMD="python manage.py backfill_casprov \
-            --disease ${{ args.disease }} \
-            --input-path ${{ args.container_path }} \
-            --input-format ${{ args.input_format }} \
-            --cutoff-date ${{ args.cutoff_date }}"
+          CMD="python manage.py backfill_chik_casprov \
+          --parquet-path ${{ args.container_path }} \
+          ${{ '--apply' if args.apply else '' }}"
 
-          if [ -n "${{ args.since_epiweek }}" ]; then
-            CMD="$CMD --since-epiweek ${{ args.since_epiweek }}"
-          fi
-
-          if [ -n "${{ args.until_epiweek }}" ]; then
-            CMD="$CMD --until-epiweek ${{ args.until_epiweek }}"
-          fi
-
-          if [ "${{ args.apply }}" = "True" ]; then
-            CMD="$CMD --apply"
-          fi
-
-          sugar --profile $ENV compose-ext exec \
+          sugar --profile ${{ env.ENV }} compose-ext exec \
             --service web --cmd "$CMD"
 
   # TESTS
@@ -269,9 +216,6 @@ groups:
           post-run:
             - task: tests.teardown
         run: |
-          set -a
-          [ -f .envs/.env ] && . .envs/.env
-          set +a
           TTY_OPT=""
           if [ ! -t 0 ]; then
             TTY_OPT="-T"
@@ -789,9 +733,7 @@ groups:
           fi
 
           if [ -z "${LOG_FILE}" ]; then
-          if [ -z "${LOG_FILE}" ]; then
             LOG_FILE="${DOCKER_HOST_LOG_DIR:-/tmp}/ingestion_watch.log"
-          fi
           fi
 
           if [ -z "${PID_FILE}" ]; then
@@ -925,7 +867,7 @@ groups:
           fi
 
   release:
-    vars:
+    env:
       app: |
         npx --yes \
           -p semantic-release \
@@ -942,9 +884,431 @@ groups:
     tasks:
       ci:
         help: run semantic release on CI
-        run: ${{ vars.app }} --ci
+        run: ${{ env.app }} --ci
 
       dry:
         help: run semantic release in dry-run mode
         run: |
-          ${{ vars.app }} --dry-run
+          ${{ env.app }} --dry-run
+
+  pgbackrest:
+    tasks:
+      render-conf:
+        help: "Render pgbackrest.conf into the pgbackrest container"
+        args:
+          profile:
+            help: "Target environment: dev|staging|prod"
+            type: string
+            required: true
+        run: |
+          set -euo pipefail
+
+          PROFILE="${{ args.profile }}"
+
+          case "$PROFILE" in
+            dev|staging|prod) ;;
+            *)
+              echo "Invalid --profile '$PROFILE' (use dev|staging|prod)" >&2
+              exit 2
+              ;;
+          esac
+
+          CONF_FILE="containers/pgbackrest/pgbackrest-${PROFILE}.conf"
+
+          if [[ -f "$CONF_FILE" ]]; then
+            echo "Using config from $CONF_FILE"
+            cp "$CONF_FILE" /tmp/pgbackrest.conf
+          else
+            echo "Using generated fallback config"
+            PROFILE="$PROFILE" \
+            python -c '
+          from pathlib import Path
+          import os
+          import textwrap
+
+          profile = os.environ["PROFILE"]
+
+          cfg = textwrap.dedent(f"""
+              [global]
+              repo1-path=/var/lib/pgbackrest
+              log-path=/var/log/pgbackrest
+              spool-path=/var/lib/pgbackrest/spool
+              lock-path=/var/lib/pgbackrest/spool
+              repo1-retention-full=2
+              repo1-retention-full-type=count
+              start-fast=y
+              process-max=2
+
+              [{profile}]
+              pg1-path=/var/lib/postgresql/data
+              pg1-socket-path=/var/run/postgresql
+              pg1-user=postgres
+          """).strip() + "\n"
+
+          Path("/tmp/pgbackrest.conf").write_text(cfg)
+          '
+          fi
+
+          sugar --profile "${{ args.profile }}" compose-ext start --services pgbackrest --options -d
+
+          sugar --profile "$PROFILE" compose exec \
+            --service pgbackrest \
+            --cmd "bash -lc 'cat > /etc/pgbackrest/pgbackrest.conf && chmod 640 /etc/pgbackrest/pgbackrest.conf'" \
+            -- -T < /tmp/pgbackrest.conf
+
+          rm -f /tmp/pgbackrest.conf
+          echo "OK: rendered into pgbackrest container: /etc/pgbackrest/pgbackrest.conf"
+
+      stanza-create:
+        help: "Create and validate pgBackRest stanza"
+        args:
+          profile:
+            help: "Target environment: dev|staging|prod"
+            type: string
+            required: true
+        run: |
+          set -euo pipefail
+
+          PROFILE="${{ args.profile }}"
+
+          case "$PROFILE" in
+            dev|staging|prod) ;;
+            *)
+              echo "Invalid --profile '$PROFILE' (use dev|staging|prod)" >&2
+              exit 2
+              ;;
+          esac
+
+          sugar --profile "$PROFILE" compose-ext start \
+            --services postgres pgbackrest \
+            --options -d
+
+          sugar --profile "$PROFILE" compose exec \
+            --service pgbackrest \
+            --cmd "bash -lc 'set -euo pipefail; pgbackrest --stanza=\"$PROFILE\" stanza-create; pgbackrest --stanza=\"$PROFILE\" check'" \
+            -- -T
+
+      bootstrap:
+        help: "Render config and create/check stanza"
+        args:
+          profile:
+            help: "Target environment: dev|staging|prod"
+            type: string
+            required: true
+        hooks:
+          pre-run:
+            - task: pgbackrest.render-conf
+              args:
+                profile: ${{ args.profile }}
+            - task: pgbackrest.stanza-create
+              args:
+                profile: ${{ args.profile }}
+        run: |
+          set -euo pipefail
+          echo "pgbackrest bootstrap complete"
+
+      backup-full:
+        help: "Run full backup and expire old backups"
+        args:
+          profile:
+            help: "Target environment: dev|staging|prod"
+            type: string
+            required: true
+        hooks:
+          pre-run:
+            - task: pgbackrest.bootstrap
+              args:
+                profile: ${{ args.profile }}
+        run: |
+          set -euo pipefail
+
+          PROFILE="${{ args.profile }}"
+
+          case "$PROFILE" in
+            dev|staging|prod) ;;
+            *)
+              echo "Invalid --profile '$PROFILE' (use dev|staging|prod)" >&2
+              exit 2
+              ;;
+          esac
+
+          sugar --profile "$PROFILE" compose exec \
+            --service pgbackrest \
+            --cmd "bash -lc 'set -euo pipefail; pgbackrest --stanza=\"$PROFILE\" --log-level-console=info --type=full backup; pgbackrest --stanza=\"$PROFILE\" expire'" \
+            -- -T
+
+      backup-schedule-add:
+        help: "Add one or more systemd user timers for pgBackRest backups"
+        args:
+          profile:
+            help: "Target environment: dev|staging|prod"
+            type: string
+            required: true
+          on_calendar:
+            help: "systemd OnCalendar expression(s). Use ';' to add multiple."
+            type: string
+            required: true
+        run: |
+          set -euo pipefail
+
+          PROFILE="${{ args.profile }}"
+          ON_CALENDAR_RAW="${{ args.on_calendar }}"
+
+          case "$PROFILE" in
+            dev|staging|prod) ;;
+            *)
+              echo "Invalid --profile '$PROFILE' (use dev|staging|prod)" >&2
+              exit 2
+              ;;
+          esac
+
+          export SYSTEMD_PAGER=cat
+          export SYSTEMD_LESS=
+
+          REPO_ROOT="$(pwd -P)"
+          MAKIM_BIN="$(command -v makim || true)"
+
+          [[ -n "$MAKIM_BIN" ]] || {
+            echo "makim not found in PATH (activate conda env first)" >&2
+            exit 3
+          }
+
+          ENV_BIN_DIR="$(dirname "$MAKIM_BIN")"
+          UNIT_DIR="${HOME}/.config/systemd/user"
+          mkdir -p "$UNIT_DIR"
+
+          SERVICE_TPL="${UNIT_DIR}/alertadengue-pgbackrest-backup@.service"
+
+          SERVICE_TPL="$SERVICE_TPL" \
+          REPO_ROOT="$REPO_ROOT" \
+          ENV_BIN_DIR="$ENV_BIN_DIR" \
+          MAKIM_BIN="$MAKIM_BIN" \
+          python -c '
+          from pathlib import Path
+          import os
+          import textwrap
+
+          service_path = Path(os.environ["SERVICE_TPL"])
+          repo_root = os.environ["REPO_ROOT"]
+          env_bin_dir = os.environ["ENV_BIN_DIR"]
+          makim_bin = os.environ["MAKIM_BIN"]
+
+          content = textwrap.dedent(f"""
+              [Unit]
+              Description=Alertadengue pgBackRest backup via Makim (%i)
+
+              [Service]
+              Type=oneshot
+              WorkingDirectory={repo_root}
+              Environment=COMPOSE_MENU=false
+              Environment=COMPOSE_INTERACTIVE_NO_CLI=1
+              Environment=PATH={env_bin_dir}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+              ExecStart=/usr/bin/bash -lc "{makim_bin} pgbackrest.backup-full --profile %i"
+
+              [Install]
+              WantedBy=default.target
+          """).strip() + "\n"
+          service_path.write_text(content)
+          '
+
+          systemctl --user daemon-reload
+
+          echo "$ON_CALENDAR_RAW" | tr ';' '\n' | while IFS= read -r expr; do
+            expr="$(echo "$expr" | xargs)"
+            [[ -n "$expr" ]] || continue
+
+            slug="$(echo "$expr" | tr -c 'A-Za-z0-9' '-' | tr -s '-' | sed 's/^-//; s/-$//')"
+            slug="${slug:0:48}"
+
+            TIMER_NAME="alertadengue-pgbackrest-backup-${PROFILE}-${slug}.timer"
+            TIMER_PATH="${UNIT_DIR}/${TIMER_NAME}"
+
+            TIMER_PATH="$TIMER_PATH" \
+            PROFILE="$PROFILE" \
+            EXPR="$expr" \
+            python -c '
+          from pathlib import Path
+          import os
+          import textwrap
+
+          timer_path = Path(os.environ["TIMER_PATH"])
+          profile = os.environ["PROFILE"]
+          expr = os.environ["EXPR"]
+
+          content = textwrap.dedent(f"""
+              [Unit]
+              Description=Alertadengue pgBackRest backup timer ({profile} - {expr})
+
+              [Timer]
+              OnCalendar={expr}
+              Persistent=true
+              Unit=alertadengue-pgbackrest-backup@{profile}.service
+
+              [Install]
+              WantedBy=timers.target
+          """).strip() + "\n"
+          timer_path.write_text(content)
+          '
+
+            systemctl --user daemon-reload
+            systemctl --user enable --now "$TIMER_NAME"
+            echo "Enabled: $TIMER_PATH"
+          done
+
+          echo
+          systemctl --user list-timers --all --no-pager | grep 'alertadengue-pgbackrest-backup' || true
+
+      backup-schedule-list:
+        help: "List registered Alertadengue pgBackRest systemd user timers"
+        run: |
+          set -euo pipefail
+
+          systemctl --user list-timers --all --no-pager | grep -E 'alertadengue-pgbackrest' || true
+
+          echo
+          echo "Systemd unit files in ~/.config/systemd/user/:"
+          ls ~/.config/systemd/user/alertadengue-pgbackrest* 2>/dev/null || echo "(none)"
+
+      backup-schedule-clean:
+        help: "Disable and remove all alertadengue-pgbackrest systemd timers and services"
+        run: |
+          set -euo pipefail
+
+          export SYSTEMD_PAGER=cat
+          export SYSTEMD_LESS=
+
+          UNIT_DIR="${HOME}/.config/systemd/user"
+
+          echo "Stopping and disabling timers..."
+          while IFS= read -r timer; do
+            [[ -n "$timer" ]] || continue
+            echo "Cleaning $timer..."
+            systemctl --user disable --now "$timer" || true
+          done < <(
+            systemctl --user list-unit-files --no-pager 2>/dev/null \
+              | awk '/alertadengue-pgbackrest.*\.timer/ {print $1}'
+          )
+
+          echo "Stopping template services..."
+          systemctl --user stop "alertadengue-pgbackrest-backup@dev.service" 2>/dev/null || true
+          systemctl --user stop "alertadengue-pgbackrest-backup@staging.service" 2>/dev/null || true
+          systemctl --user stop "alertadengue-pgbackrest-backup@prod.service" 2>/dev/null || true
+
+          echo "Removing unit files..."
+          rm -f "${UNIT_DIR}"/alertadengue-pgbackrest-backup-*.timer
+          rm -f "${UNIT_DIR}"/alertadengue-pgbackrest-backup@.timer
+          rm -f "${UNIT_DIR}"/alertadengue-pgbackrest-backup@.service
+
+          systemctl --user daemon-reload
+          systemctl --user reset-failed || true
+
+          echo "Cleanup complete."
+
+      backup-schedule-logs:
+        help: "Show latest logs for scheduled backups (dev|staging|prod)"
+        args:
+          profile:
+            help: "Target environment: dev|staging|prod"
+            type: string
+            required: true
+        run: |
+          set -euo pipefail
+
+          PROFILE="${{ args.profile }}"
+
+          case "$PROFILE" in
+            dev|staging|prod) ;;
+            *)
+              echo "Invalid --profile '$PROFILE' (use dev|staging|prod)" >&2
+              exit 2
+              ;;
+          esac
+
+          journalctl --user -u "alertadengue-pgbackrest-backup@${PROFILE}.service" -n 200 --no-pager
+
+      restore-latest:
+        help: "Restore latest backup and restart Postgres"
+        args:
+          profile:
+            help: "Target environment: dev|staging|prod"
+            type: string
+            required: true
+        run: |
+          set -euo pipefail
+
+          PROFILE="${{ args.profile }}"
+
+          case "$PROFILE" in
+            dev|staging|prod) ;;
+            *)
+              echo "Invalid --profile '$PROFILE' (use dev|staging|prod)" >&2
+              exit 2
+              ;;
+          esac
+
+          sugar --profile "$PROFILE" compose-ext stop postgres || true
+
+          sugar --profile "$PROFILE" compose exec \
+            --service pgbackrest \
+            --cmd "bash -lc 'set -euo pipefail; rm -rf /var/lib/postgresql/data/*; pgbackrest --stanza=\"$PROFILE\" --log-level-console=info restore'" \
+            -- -T
+
+          sugar --profile "$PROFILE" compose-ext start \
+            --services postgres \
+            --options -d
+
+      smoke-test:
+        help: "RW check after restore"
+        args:
+          profile:
+            help: "Target environment: dev|staging|prod"
+            type: string
+            required: true
+        run: |
+          set -euo pipefail
+
+          PROFILE="${{ args.profile }}"
+
+          case "$PROFILE" in
+            dev|staging|prod) ;;
+            *)
+              echo "Invalid --profile '$PROFILE' (use dev|staging|prod)" >&2
+              exit 2
+              ;;
+          esac
+
+          sugar --profile "$PROFILE" compose-ext start \
+            --services postgres \
+            --options -d
+
+          sugar --profile "$PROFILE" compose exec \
+            --service postgres \
+            --cmd "bash -lc '
+              set -euo pipefail
+
+              for _ in \$(seq 1 60); do
+                if pg_isready -U \"\${POSTGRES_USER:-postgres}\" -d \"\${POSTGRES_DB:-postgres}\" >/dev/null 2>&1; then
+                  break
+                fi
+                sleep 1
+              done
+
+              for _ in \$(seq 1 60); do
+                in_rec=\$(psql -tAc \"select pg_is_in_recovery();\" -U \"\${POSTGRES_USER:-postgres}\" -d \"\${POSTGRES_DB:-postgres}\" | tr -d \"[:space:]\")
+                if [[ \"\$in_rec\" == \"f\" ]]; then
+                  break
+                fi
+                sleep 1
+              done
+
+              in_rec=\$(psql -tAc \"select pg_is_in_recovery();\" -U \"\${POSTGRES_USER:-postgres}\" -d \"\${POSTGRES_DB:-postgres}\" | tr -d \"[:space:]\")
+              if [[ \"\$in_rec\" != \"f\" ]]; then
+                echo \"Postgres is still in recovery (read-only).\" >&2
+                exit 6
+              fi
+
+              psql -v ON_ERROR_STOP=1 -U \"\${POSTGRES_USER:-postgres}\" -d \"\${POSTGRES_DB:-postgres}\" -c \"create table if not exists makim_pgbackrest_smoke_test (id bigserial primary key, ts timestamptz not null default now());\"
+              psql -v ON_ERROR_STOP=1 -U \"\${POSTGRES_USER:-postgres}\" -d \"\${POSTGRES_DB:-postgres}\" -c \"insert into makim_pgbackrest_smoke_test default values;\"
+              psql -v ON_ERROR_STOP=1 -U \"\${POSTGRES_USER:-postgres}\" -d \"\${POSTGRES_DB:-postgres}\" -c \"select count(*) as rows from makim_pgbackrest_smoke_test;\"
+            '" \
+            -- -T

@@ -1,0 +1,43 @@
+services:
+  postgres:
+    environment:
+      PG_STANZA: ${ENV:-dev}
+    volumes:
+      - ${HOST_PGDATA}:/var/lib/postgresql/data
+      - pgsocket:/var/run/postgresql
+
+  pgbackrest:
+    hostname: pgbackrest
+    restart: unless-stopped
+    build:
+      context: ..
+      dockerfile: containers/pgbackrest/Dockerfile
+      args:
+        ENV: ${ENV}
+        HOST_UID: ${HOST_UID}
+        HOST_GID: ${HOST_GID}
+    env_file:
+      - ../.envs/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      - bash
+      - -lc
+      - sleep infinity
+    volumes:
+      - ${HOST_PGDATA}:/var/lib/postgresql/data:rw
+      - pgsocket:/var/run/postgresql
+      - pgbackrest_repo:/var/lib/pgbackrest
+      - pgbackrest_logs:/var/log/pgbackrest
+    networks:
+      - infodengue
+
+volumes:
+  pgsocket:
+  pgbackrest_repo:
+  pgbackrest_logs:
+
+networks:
+  infodengue:
+    name: infodengue
