@@ -3,7 +3,7 @@ services:
     environment:
       PGDATA: "/var/lib/postgresql/data"
     volumes:
-      - "${PG_DATA_STAGING:-/opt/data/infodengue/staging/pgdata}:/var/lib/postgresql/data"
+      - "${HOST_PGDATA:-/opt/data/infodengue/staging/pgdata}:/var/lib/postgresql/data"
 
   web:
     command: bash /opt/runwsgi.sh

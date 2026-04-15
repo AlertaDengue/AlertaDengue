@@ -1,7 +1,7 @@
 services:
   postgres:
     volumes:
-      - "${PG_DATA_PROD:-/opt/data/infodengue/prod/pgdata}:/var/lib/postgresql/data"
+      - "${HOST_PGDATA:-/opt/data/infodengue/prod/pgdata}:/var/lib/postgresql/data"
 
   web:
     command: /opt/runwsgi.sh

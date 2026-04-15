@@ -39,9 +39,7 @@ env:
   PSQL_DEV_PASSWORD: infodenguedev
 
   PG_RESTORE_STAGING: schemas
-  PG_DATA_DEV: "/home/runner/storage/postgres_data_dev"
-  PG_DATA_PROD: "/home/runner/storage/postgres_data_prod"
-  PG_DATA_STAGING: "/home/runner/storage/postgres_data_staging"
+  HOST_PGDATA: "/home/runner/storage/postgres_data_dev"
 
   DOCKER_HOST_DBF_SINAN: "/home/runner/storage/sftp2/alertadengue/sinan"
   DOCKER_HOST_UPLOADED_FILES_DIR: "/home/runner/storage/sftp2/alertadengue/sinan/uploaded"
