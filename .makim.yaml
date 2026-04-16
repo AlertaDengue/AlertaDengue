@@ -1,5 +1,4 @@
 backend: bash
-env-file: .envs/.env
 groups:
 
   clean:
@@ -27,7 +26,7 @@ groups:
           echo "[II] Cleaned temporary files."
   # DJANGO
   django:
-    env-file: .envs/.env
+  django:
     help: Run Django commands and manage the development server.
     env:
       sugar_run_rm: sugar run --service web --options --rm
@@ -47,11 +46,13 @@ groups:
 
       shell:
         help: Run the Django console interpreter inside the container.
-        env-file: .envs/.env
         env:
           POSTGRES_HOST: localhost
           REDIS_HOST: localhost
         run: |
+          set -a
+          [ -f .envs/.env ] && . .envs/.env
+          set +a
           sugar compose-ext start --services web -- -d
           python AlertaDengue/manage.py shell
 
@@ -59,15 +60,17 @@ groups:
       # CONTAINER
       collectstatic:
         help: Run the collectstatic for the backend service
-        env-file: .envs/.env
         run: |
+          set -a
+          [ -f .envs/.env ] && . .envs/.env
+          set +a
           CMD="python manage.py collectstatic --no-input"
 
           sugar --profile ${ENV} compose-ext start \
             --services postgres -- -d
 
           CMD="python manage.py collectstatic --no-input"
-          sugar --profile ${{ env.ENV }}  compose-ext exec --service web --cmd "$CMD"
+          sugar --profile $ENV  compose-ext exec --service web --cmd "$CMD"
           echo "[II] postgres is running."
 
       static-geofiles:
@@ -83,8 +86,10 @@ groups:
               Just check if the latest migration files were already created.
             type: bool
             action: store_true
-        env-file: .envs/.env
         run: |
+          set -a
+          [ -f .envs/.env ] && . .envs/.env
+          set +a
           sugar compose-ext start \
             --services postgres -- -d
 
@@ -108,8 +113,10 @@ groups:
 
       migrate:
         help: Migrate regarding to the current migration files
-        env-file: .envs/.env
         run: |
+          set -a
+          [ -f .envs/.env ] && . .envs/.env
+          set +a
           sugar compose-ext start \
             --services postgres -- -d
 
@@ -126,28 +133,54 @@ groups:
           ${{ env.sugar_run_rm }} --cmd ${{ env.manage_py }} send_mail
 
 
-      backfill-chik-casprov:
-        help: Copy a chik parquet file into the running web container and run the one-time backfill command.
+  # DADOS
+  dados:
+    tasks:
+      backfill-casprov:
+        help: Copy a dengue or chik source file into the running web container and run the casprov backfill command.
         args:
-          parquet-path:
-            help: Host path to chik_fill.parquet.
+          disease:
+            help: Disease target table to update.
+            type: string
+          input-path:
+            help: Host path to the source CSV or parquet file.
+            type: string
+          input-format:
+            help: Input file format.
             type: string
           container-path:
             help: Destination path inside the web container.
             type: string
-            default: /tmp/chik_fill.parquet
+            default: /tmp/casprov_fill_input.csv
+          cutoff-date:
+            help: Only update rows with data_iniSE before this date.
+            type: string
+            default: "2023-06-01"
+          since-epiweek:
+            help: Optional lower SE bound, inclusive.
+            type: string
+            required: false
+            default: ""
+          until-epiweek:
+            help: Optional upper SE bound, inclusive.
+            type: string
+            required: false
+            default: ""
           apply:
-            help: Apply the update instead of running only the diagnostics.
+            help: Apply the update instead of dry-run diagnostics.
             type: bool
             action: store_true
-        env-file: .envs/.env
         run: |
-          sugar --profile ${{ env.ENV }} compose-ext start \
+          set -a
+          [ -f .envs/.env ] && . .envs/.env
+          set +a
+
+          sugar --profile $ENV compose-ext start \
             --services postgres web -- -d
 
           COMPOSE_FILE="containers/compose-${ENV}.yaml"
           PROJECT_NAME="infodengue-${ENV}"
-          COMPOSE_CMD="docker compose --env-file .envs/.env \
+          COMPOSE_CMD="docker compose \
             --file containers/compose-base.yaml \
             --file ${COMPOSE_FILE} \
             --project-name ${PROJECT_NAME}"
@@ -159,20 +192,32 @@ groups:
             exit 1
           fi
 
-          docker cp "${{ args.parquet_path }}" \
-            "${WEB_CID}:${{ args.container_path }}"
+          docker cp "${{ args.input_path }}" "${WEB_CID}:${{ args.container_path }}"
 
-          CMD="python manage.py backfill_chik_casprov \
-          --parquet-path ${{ args.container_path }} \
-          ${{ '--apply' if args.apply else '' }}"
+          CMD="python manage.py backfill_casprov \
+            --disease ${{ args.disease }} \
+            --input-path ${{ args.container_path }} \
+            --input-format ${{ args.input_format }} \
+            --cutoff-date ${{ args.cutoff_date }}"
 
-          sugar --profile ${{ env.ENV }} compose-ext exec \
+          if [ -n "${{ args.since_epiweek }}" ]; then
+            CMD="$CMD --since-epiweek ${{ args.since_epiweek }}"
+          fi
+
+          if [ -n "${{ args.until_epiweek }}" ]; then
+            CMD="$CMD --until-epiweek ${{ args.until_epiweek }}"
+          fi
+
+          if [ "${{ args.apply }}" = "True" ]; then
+            CMD="$CMD --apply"
+          fi
+
+          sugar --profile $ENV compose-ext exec \
             --service web --cmd "$CMD"
 
   # TESTS
   tests:
     help: Test tasks (dbdata TDD slice)
-    env-file: .envs/.env
     tasks:
       setup:
         help: Setup infra for tests
@@ -215,7 +260,6 @@ groups:
             help: Additional pytest params
             type: string
             default: "-vv"
-        env-file: .envs/.env
         env:
           POSTGRES_HOST: localhost
           REDIS_HOST: localhost
@@ -225,6 +269,9 @@ groups:
           post-run:
             - task: tests.teardown
         run: |
+          set -a
+          [ -f .envs/.env ] && . .envs/.env
+          set +a
           TTY_OPT=""
           if [ ! -t 0 ]; then
             TTY_OPT="-T"
@@ -240,7 +287,6 @@ groups:
             --cmd "sh -lc \"$CMD\""
 
   develop:
-    env-file: .envs/.env
     help: Development tasks and utilities.
     env:
       manage_py: python AlertaDengue/manage.py
@@ -261,7 +307,6 @@ groups:
           timeout ${{ args.timeout }} ./containers/scripts/healthcheck.sh ${{ args.service }}
 
       container-wait-all:
-        env-file: .envs/.env
         help: Wait until container is healthy
         args:
           timeout:
@@ -326,7 +371,6 @@ groups:
 
   ingestion:
     help: SINAN ingestion pipeline (host-side, Strategy A).
-    env-file: .envs/.env
     env:
       manage_py: python AlertaDengue/manage.py
       ingestion_host_base: "${DOCKER_HOST_IMPORTED_FILES_DIR}"
