@@ -111,8 +111,8 @@ services:
     environment:
       MEMCACHED_HOST: "memcached"
       CELERY_BROKER_URL: "amqp://guest:guest@rabbitmq:5672"
-      PSQL_HOST: "${PSQL_HOST}"
-      PSQL_PORT: "${PSQL_PORT}"
+      PSQL_HOST: "postgres"
+      PSQL_PORT: "5432"
     volumes:
       - "${DOCKER_HOST_UPLOADED_FILES_DIR}:/opt/services/ingestion/sinan/uploaded"
       - "${DOCKER_HOST_IMPORTED_FILES_DIR}:/opt/services/ingestion/sinan/imported"

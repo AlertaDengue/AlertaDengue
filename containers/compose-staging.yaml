@@ -2,6 +2,8 @@ services:
   postgres:
     environment:
       PGDATA: "/var/lib/postgresql/data"
+    ports:
+      - "${PSQL_HOST_PORT}:5432"
     volumes:
       - "${HOST_PGDATA:-/opt/data/infodengue/staging/pgdata}:/var/lib/postgresql/data"
     command:
