@@ -4,6 +4,16 @@ services:
       PGDATA: "/var/lib/postgresql/data"
     volumes:
       - "${HOST_PGDATA:-/opt/data/infodengue/staging/pgdata}:/var/lib/postgresql/data"
+    command:
+      - postgres
+      - -p
+      - "5432"
+      - -c
+      - "unix_socket_directories=/var/run/postgresql"
+      - -c
+      - "max_worker_processes=8"
+      - -c
+      - "archive_mode=off"
 
   web:
     command: bash /opt/runwsgi.sh

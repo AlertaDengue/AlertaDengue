@@ -1,7 +1,22 @@
 services:
   postgres:
+    environment:
+      PGDATA: "/var/lib/postgresql/data"
     volumes:
       - "${HOST_PGDATA:-/opt/data/infodengue/prod/pgdata}:/var/lib/postgresql/data"
+      - ./pgbackrest/pgbackrest-prod.conf:/etc/pgbackrest/pgbackrest.conf
+    command:
+      - postgres
+      - -p
+      - "5432"
+      - -c
+      - "unix_socket_directories=/var/run/postgresql"
+      - -c
+      - "max_worker_processes=8"
+      - -c
+      - "archive_mode=on"
+      - -c
+      - "archive_command=pgbackrest --config=/etc/pgbackrest/pgbackrest.conf --stanza=prod archive-push %p"
 
   web:
     command: /opt/runwsgi.sh
