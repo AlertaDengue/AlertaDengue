@@ -11,6 +11,6 @@ dependencies:
   - pip:
       - compose-go >=2.20.2,<2.31.0
       - containers-sugar >=1.19,<2.0
-      - makim==1.27.0
+      - makim==1.29.0
       - pyogrio
       - distlib

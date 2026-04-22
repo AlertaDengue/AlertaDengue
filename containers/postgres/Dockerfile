@@ -21,6 +21,27 @@ RUN apt-get update \
       postgresql-plpython3-14 \
       postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
       postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts \
+      pgbackrest \
       && rm -rf /var/lib/apt/lists/*
 
-USER postgres
+RUN mkdir -p \
+      /var/lib/pgbackrest \
+      /var/lib/pgbackrest/spool \
+      /var/log/pgbackrest \
+      /backups \
+ && chown -R ${HOST_UID}:${HOST_GID} \
+      /var/lib/pgbackrest \
+      /var/log/pgbackrest \
+      /backups
+
+ARG ENV
+COPY containers/pgbackrest/pgbackrest-${ENV}.conf /etc/pgbackrest/pgbackrest.conf
+
+RUN chown ${HOST_UID}:${HOST_GID} /etc/pgbackrest/pgbackrest.conf \
+  && chmod 640 /etc/pgbackrest/pgbackrest.conf
+
+COPY containers/postgres/scripts/entrypoint.sh /usr/local/bin/pg-entrypoint
+RUN chmod +x /usr/local/bin/pg-entrypoint
+
+ENTRYPOINT ["pg-entrypoint"]
+CMD ["postgres"]
