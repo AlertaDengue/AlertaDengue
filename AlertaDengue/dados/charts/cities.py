@@ -49,6 +49,15 @@ class ReportCityCharts:
         df[_("limiar pós epidêmico")] = threshold_pos_epidemic
         df[_("limiar pré epidêmico")] = threshold_pre_epidemic
 
+        # Helper for unified hover
+        level_map = {
+            1: _("Verde"),
+            2: _("Amarelo"),
+            3: _("Laranja"),
+            4: _("Vermelho"),
+        }
+        df["nivel_nome"] = df["level_code"].map(level_map)
+
         figure = make_subplots(specs=[[{"secondary_y": True}]])
 
         figure.add_trace(
@@ -57,17 +66,14 @@ class ReportCityCharts:
                 y=df["casos notif."],
                 name=_("Notificações"),
                 mode="lines",
-                line={"color": "rgb(33,33,33)", "width": 3},
-                text=df.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hoverinfo="text",
-                hovertemplate="%(label1)s %(week)s <br> %(cases)s %(label2)s"
-                "<extra></extra>"
-                % {
-                    "label1": _("Semana"),
-                    "week": "%{text}",
-                    "cases": "%{y:1f}",
-                    "label2": _("Casos"),
-                },
+                line={"color": "#3A4750", "width": 2.5},
+                customdata=df[["nivel_nome", "incidência", "casos_est"]],
+                hovertemplate="<b>SE</b>: %{x}<br>"
+                "<b>Alerta</b>: %{customdata[0]}<br>"
+                "<b>Notificações</b>: %{y:.0f}<br>"
+                "<b>Incidência</b>: %{customdata[1]:.1f}<br>"
+                "<b>Estimados</b>: %{customdata[2]:.0f}<extra></extra>",
+                hoverlabel=dict(namelength=0),
             ),
             secondary_y=True,
         )
@@ -76,19 +82,10 @@ class ReportCityCharts:
             go.Scatter(
                 x=df["SE"],
                 y=df["casos_est"],
-                name=_("Casos Estimados (Nowcast)"),
+                name=_("Estimados (Nowcast)"),
                 mode="lines",
-                line={"color": "rgb(0,0,255)", "dash": "dot", "width": 3},
-                text=df.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hoverinfo="text",
-                hovertemplate="%(label1)s %(week)s <br> %(cases)s %(label2)s"
-                "<extra></extra>"
-                % {
-                    "label1": _("Semana"),
-                    "week": "%{text}",
-                    "cases": "%{y:1f}",
-                    "label2": _("Casos Estimados"),
-                },
+                line={"color": "#4169e1", "dash": "dot", "width": 3.5},
+                hoverinfo="skip",
             ),
             secondary_y=True,
         )
@@ -106,21 +103,9 @@ class ReportCityCharts:
                 go.Scatter(
                     x=df["SE"],
                     y=df[k],
-                    y0=df["incidência"],
                     name=k.title(),
                     marker={"color": c},
-                    text=df.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                    hoverinfo="text",
-                    hovertext=df["incidência"],
-                    hovertemplate="%(label1)s %(week)s <br>"
-                    "%(cases)s %(label2)s"
-                    "<extra></extra>"
-                    % {
-                        "label1": _("Semana"),
-                        "week": "%{text}",
-                        "cases": "%{y:.0f}",
-                        "label2": _("Incidências"),
-                    },
+                    hoverinfo="skip",
                 ),
                 secondary_y=False,
             )
@@ -146,24 +131,20 @@ class ReportCityCharts:
                     y=df[k],
                     marker={"color": c},
                     name=k.title(),
-                    width=0.8,  # Increase width
+                    width=0.8,
                     text=None,
-                    customdata=df.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                    hoverinfo="text",
-                    hovertemplate="%(label1)s %(week)s <br>"
-                    "%(cases)s %(label2)s"
-                    "<extra></extra>"
-                    % {
-                        "label1": _("Semana"),
-                        "week": "%{customdata}",
-                        "cases": "%{y:.0f}",
-                        "label2": _("Casos"),
-                    },
+                    hoverinfo="skip",
                 ),
                 secondary_y=True,
             )
 
         figure.update_layout(
+            hovermode="closest",
+            hoverlabel=dict(
+                bgcolor="rgba(240, 240, 240, 0.9)",
+                font_size=12,
+                font_family="Arial, sans-serif",
+            ),
             title=(
                 _("Limiares de incidência")
                 + ":"
@@ -194,6 +175,8 @@ class ReportCityCharts:
                 tickfont=dict(
                     family="Arial", size=12, color="rgb(82, 82, 82)"
                 ),
+                showspikes=False,
+                hoverformat=" ",
             ),
             yaxis=dict(
                 title=_("Incidência"),
@@ -217,6 +200,7 @@ class ReportCityCharts:
             width=1100,
             height=500,
             barmode="overlay",
+            bargap=0,
         )
 
         figure.update_yaxes(
@@ -264,18 +248,19 @@ class ReportCityCharts:
                 x=df_climate["SE"],
                 y=df_climate[varcli_keys[0]],
                 name=f"{varcli_keys[0]}",
-                # fill='tonextx',
                 marker={"color": "rgb(255, 204, 153)"},
-                text=df_climate.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hoverinfo="text",
-                hovertemplate="%(label1)s %(week)s <br>%(cases)s %(label2)s"
-                "<extra></extra>"
-                % {
-                    "label1": _("Semana"),
-                    "week": "%{text}",
-                    "cases": "%{y:.1f}",
-                    "label2": varcli_values[0][0],
-                },
+                customdata=df_climate[varcli_keys[1]]
+                if len(varcli_keys) == 2
+                else [None] * len(df_climate),
+                hovertemplate="SE: %{x}<br>"
+                + f"<b>{varcli_keys[0]}</b>: %{{y:.1f}}<br>"
+                + (
+                    f"<b>{varcli_keys[1]}</b>: %{{customdata:.1f}}"
+                    if len(varcli_keys) == 2
+                    else ""
+                )
+                + "<extra></extra>",
+                hoverlabel=dict(namelength=0),
             ),
             secondary_y=False,
         )
@@ -290,17 +275,7 @@ class ReportCityCharts:
                     varcli_values[0][0][0:2],
                 ),
                 marker={"color": "rgb(255,150,0)"},
-                text=df_climate.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                hoverinfo="text",
-                hovertemplate="%(label1)s %(week)s <br>%(label2)s: %(cases)s°C"
-                "<extra></extra>"
-                % {
-                    "label1": _("Semana"),
-                    "week": "%{text}",
-                    "label2": _("Limiar favorável"),
-                    "cases": "%{y:.1f}",
-                    # "varcli": varcli_values[0][0],
-                },
+                hoverinfo="skip",
             ),
             secondary_y=False,
         )
@@ -316,19 +291,8 @@ class ReportCityCharts:
                     x=df_climate["SE"],
                     y=df_climate[varcli_keys[1]],
                     name=f"{varcli_keys[1]}",
-                    # fill='tonextx',
                     marker={"color": "rgb(173, 216, 230)"},
-                    text=df_climate.SE.map(lambda v: f"{str(v)[-2:]}"),
-                    hoverinfo="text",
-                    hovertemplate="%(label1)s: %(week)s <br>"
-                    "%(cases)s %(varcli)s"
-                    "<extra></extra>"
-                    % {
-                        "label1": _("Semana"),
-                        "week": "%{text}",
-                        "cases": "%{y:.1f}",
-                        "varcli": varcli_values[1][0],
-                    },
+                    hoverinfo="skip",
                 ),
                 secondary_y=True,
             )
@@ -343,18 +307,7 @@ class ReportCityCharts:
                         varcli_values[1][0][0:2],
                     ),
                     marker={"color": "rgb(51, 172, 255)"},
-                    text=df_climate.SE.map(lambda v: "{}".format(str(v)[-2:])),
-                    hoverinfo="text",
-                    hovertemplate="%(label1)s %(week)s <br>"
-                    "%(label2)s: %(cases)s%%"
-                    "<extra></extra>"
-                    % {
-                        "label1": _("Semana"),
-                        "week": "%{text}",
-                        "label2": _("Limiar favorável"),
-                        "cases": "%{y:.1f}",
-                        # "varcli": varcli_values[1][0][0:2],
-                    },
+                    hoverinfo="skip",
                 ),
                 secondary_y=True,
             )
@@ -364,10 +317,11 @@ class ReportCityCharts:
             )
 
         figure.update_layout(
-            hovermode="x",
+            hovermode="closest",
             hoverlabel=dict(
+                bgcolor="rgba(240, 240, 240, 0.9)",
                 font_size=12,
-                font_family="Rockwell",
+                font_family="Arial, sans-serif",
             ),
             title=_("Condições climáticas para transmissão"),
             xaxis=dict(
@@ -380,6 +334,8 @@ class ReportCityCharts:
                 linecolor="rgb(204, 204, 204)",
                 linewidth=0,
                 gridcolor="rgb(176, 196, 222)",
+                showspikes=False,
+                hoverformat=" ",
             ),
             yaxis=dict(
                 title=f"{varcli_values[0][0]}",
