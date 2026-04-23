@@ -33,12 +33,12 @@ class ReportCityCharts:
         """
 
         df = df.reset_index()[
-            ["SE", "incidência", "casos notif.", "level_code"]
+            ["SE", "incidência", "casos notif.", "casos_est", "level_code"]
         ]
 
         df["SE"] = df.SE.map(lambda v: "%s/%s" % (str(v)[:4], str(v)[-2:]))
 
-        k = "incidência"
+        k = "casos notif."
 
         df[_("alerta verde")] = df[df.level_code == 1][k]
         df[_("alerta amarelo")] = df[df.level_code == 2][k]
@@ -56,7 +56,8 @@ class ReportCityCharts:
                 x=df["SE"],
                 y=df["casos notif."],
                 name=_("Notificações"),
-                marker={"color": "rgb(33,33,33)"},
+                mode="lines",
+                line={"color": "rgb(33,33,33)", "width": 3},
                 text=df.SE.map(lambda v: "{}".format(str(v)[-2:])),
                 hoverinfo="text",
                 hovertemplate="%(label1)s %(week)s <br> %(cases)s %(label2)s"
@@ -66,6 +67,27 @@ class ReportCityCharts:
                     "week": "%{text}",
                     "cases": "%{y:1f}",
                     "label2": _("Casos"),
+                },
+            ),
+            secondary_y=True,
+        )
+
+        figure.add_trace(
+            go.Scatter(
+                x=df["SE"],
+                y=df["casos_est"],
+                name=_("Casos Estimados (Nowcast)"),
+                mode="lines",
+                line={"color": "rgb(0,0,255)", "dash": "dot", "width": 3},
+                text=df.SE.map(lambda v: "{}".format(str(v)[-2:])),
+                hoverinfo="text",
+                hovertemplate="%(label1)s %(week)s <br> %(cases)s %(label2)s"
+                "<extra></extra>"
+                % {
+                    "label1": _("Semana"),
+                    "week": "%{text}",
+                    "cases": "%{y:1f}",
+                    "label2": _("Casos Estimados"),
                 },
             ),
             secondary_y=True,
@@ -124,19 +146,21 @@ class ReportCityCharts:
                     y=df[k],
                     marker={"color": c},
                     name=k.title(),
-                    text=df.SE.map(lambda v: "{}".format(str(v)[-2:])),
+                    width=0.8,  # Increase width
+                    text=None,
+                    customdata=df.SE.map(lambda v: "{}".format(str(v)[-2:])),
                     hoverinfo="text",
                     hovertemplate="%(label1)s %(week)s <br>"
                     "%(cases)s %(label2)s"
                     "<extra></extra>"
                     % {
                         "label1": _("Semana"),
-                        "week": "%{text}",
+                        "week": "%{customdata}",
                         "cases": "%{y:.0f}",
-                        "label2": _("Incidências"),
+                        "label2": _("Casos"),
                     },
                 ),
-                secondary_y=False,
+                secondary_y=True,
             )
 
         figure.update_layout(
@@ -192,10 +216,11 @@ class ReportCityCharts:
             paper_bgcolor="rgb(245, 246, 249)",
             width=1100,
             height=500,
+            barmode="overlay",
         )
 
         figure.update_yaxes(
-            title_text=_("Casos Notificados"),
+            title_text=_("Casos"),
             secondary_y=True,
             showline=False,
             showgrid=True,
@@ -204,10 +229,6 @@ class ReportCityCharts:
             linewidth=0,
             gridcolor="rgb(204, 204, 204)",
         )
-
-        for trace in figure["data"]:
-            if trace["name"] == "casos notif.":
-                trace["visible"] = "legendonly"
 
         return figure.to_html()
 

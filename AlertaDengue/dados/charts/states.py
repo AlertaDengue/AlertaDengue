@@ -60,13 +60,14 @@ class ReportStateCharts:
                     line=dict(color="white", width=1),
                 ),
                 width=0.5,
-                text=df.index.map(lambda v: f"{str(v)[-2:]}"),
+                text=None,
+                customdata=df.index.map(lambda v: f"{str(v)[-2:]}"),
                 hovertemplate="%(label1)s %(week)s <br>"
                 "%(cases)s %(label2)s"
                 "<extra></extra>"
                 % {
                     "label1": _("SE"),
-                    "week": "%{text}",
+                    "week": "%{customdata}",
                     "cases": "%{y:1f}",
                     "label2": _("Casos Notificados"),
                 },
