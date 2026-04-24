@@ -26,11 +26,10 @@ repos:
       - id: isort
         name: isort
         entry: isort
-        language: python
+        language: system
         files: ""
         exclude: ^.*/js/.*$
         types: [python]
         stages: [commit]
         pass_filenames: true
-        additional_dependencies: ["black"]
         args: ["--profile", "black", "-l", "79"]

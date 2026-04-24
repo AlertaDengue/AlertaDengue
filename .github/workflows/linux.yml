@@ -111,10 +111,8 @@ jobs:
         chmod 777 -R /tmp/dbf_duplicated_csv
         mkdir -p /home/runner/storage/episcanner
 
-    - name: Install toolchain and app dependencies
-      run: |
-        chmod +x scripts/install-deps.sh
-        ./scripts/install-deps.sh
+    - name: Install dependencies
+      run: bash ./scripts/install-deps.sh
 
     - name: Create env file
       run: |
@@ -123,8 +121,8 @@ jobs:
 
     - name: Linting
       run: |
-        poetry run pre-commit install -t pre-commit -t commit-msg -t pre-push
-        poetry run pre-commit run --all-files
+        pre-commit install -t pre-commit -t commit-msg -t pre-push
+        pre-commit run --all-files
 
     - name: Build containers
       run: |
