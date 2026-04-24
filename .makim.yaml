@@ -1,4 +1,5 @@
 backend: bash
+env-files: .envs/.env
 groups:
 
   clean:
@@ -59,7 +60,7 @@ groups:
         run: |
           CMD="python manage.py collectstatic --no-input"
 
-          sugar --profile ${ENV} compose-ext start \
+          sugar --profile ${{ env.ENV }} compose-ext start \
             --services postgres --options -d
 
           CMD="python manage.py collectstatic --no-input"
@@ -80,7 +81,7 @@ groups:
             type: bool
             action: store_true
         run: |
-          sugar compose-ext start \
+          sugar --profile ${{ env.ENV }} compose-ext start \
             --services postgres --options -d
 
           CWD=$(pwd)
@@ -91,7 +92,7 @@ groups:
 
             CMD="python manage.py makemigrations ${CMD_FLAG} ${app}"
 
-            sugar --profile dev compose-ext run --rm --service web \
+            sugar --profile ${{ env.ENV }} compose-ext run --rm --service web \
               --cmd "$CMD"
 
             echo "[II] postgres is running."
@@ -104,11 +105,11 @@ groups:
       migrate:
         help: Migrate regarding to the current migration files
         run: |
-          sugar compose-ext start \
+          sugar --profile ${{ env.ENV }} compose-ext start \
             --services postgres --options -d
 
           CMD="python manage.py migrate --no-input"
-          sugar --profile dev compose-ext run --rm --service web \
+          sugar --profile ${{ env.ENV }} compose-ext run --rm --service web \
            --cmd "$CMD"
 
           echo "[II] postgres is running."
