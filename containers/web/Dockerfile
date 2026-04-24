@@ -64,15 +64,10 @@ RUN conda env create -n $ENV_NAME \
 COPY --chown=${HOST_UID}:${HOST_GID} ./AlertaDengue  /opt/services/AlertaDengue
 WORKDIR /opt/services/AlertaDengue
 
-# Ensure Poetry installs venv inside the project and binaries are on PATH
-ENV POETRY_VIRTUALENVS_IN_PROJECT=true
-ENV POETRY_VIRTUALENVS_CREATE=true
-ENV PATH="/opt/services/AlertaDengue/.venv/bin:${PATH}"
-
-# Deps installer (uses conda/base.yaml via ENV_FILE)
-COPY --chown=${HOST_UID}:${HOST_GID} ./scripts/install-deps.sh /tmp/install-deps.sh
+# Deps installer
+COPY --chown=${HOST_UID}:${HOST_GID} ./scripts/install-*.sh ./scripts/
 COPY --chown=${HOST_UID}:${HOST_GID} .envs/.env.tpl pyproject.toml poetry.lock README.md ./
-RUN ENV_FILE=/tmp/environment.yaml bash /tmp/install-deps.sh dev
+RUN ENV=dev bash ./scripts/install-deps.sh
 
 # Runtime scripts
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/crontab_setup.sh /opt/services/crontab_setup.sh
