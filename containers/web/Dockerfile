@@ -61,13 +61,14 @@ RUN conda env create -n $ENV_NAME \
   && find /opt/conda/ -type f,l -name '*.pyc' -delete \
   && find /opt/conda/ -type f,l -name '*.js.map' -delete
 
-COPY --chown=${HOST_UID}:${HOST_GID} ./AlertaDengue  /opt/services/AlertaDengue
 WORKDIR /opt/services/AlertaDengue
-
-# Deps installer
-COPY --chown=${HOST_UID}:${HOST_GID} ./scripts/install-*.sh ./scripts/
-COPY --chown=${HOST_UID}:${HOST_GID} .envs/.env.tpl pyproject.toml poetry.lock README.md ./
+COPY --chown=${HOST_UID}:${HOST_GID} ./AlertaDengue ./AlertaDengue
+COPY --chown=${HOST_UID}:${HOST_GID} ./scripts ./scripts
+COPY --chown=${HOST_UID}:${HOST_GID} .envs .envs
+COPY --chown=${HOST_UID}:${HOST_GID} pyproject.toml poetry.lock README.md ./
 RUN ENV=dev bash ./scripts/install-deps.sh
+
+# WORKDIR /opt/services/AlertaDengue/AlertaDengue
 
 # Runtime scripts
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/crontab_setup.sh /opt/services/crontab_setup.sh

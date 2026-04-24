@@ -5,7 +5,12 @@ from ad_main.settings.base import *  # noqa: F401,F403
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
-INSTALLED_APPS = INSTALLED_APPS + ["django_extensions"]
+try:
+    import django_extensions  # noqa: F401
+
+    INSTALLED_APPS = INSTALLED_APPS + ["django_extensions"]
+except ImportError:
+    pass
 
 MIDDLEWARE = BASE_MIDDLEWARE + [
     "django_cprofile_middleware.middleware.ProfilerMiddleware",
