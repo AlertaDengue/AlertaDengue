@@ -9,5 +9,4 @@ cd "$SCRIPT_DIR/.."
 # Make uv install into the current interpreter (conda/venv)
 export UV_PYTHON="$(python -c 'import sys; print(sys.executable)')"
 
-python -m pip install uv
 uv pip install -e "."

@@ -11,4 +11,5 @@ export UV_PYTHON="$(python -c 'import sys; print(sys.executable)')"
 
 ${SCRIPT_DIR}/install-prod.sh
 
-uv pip install -e ".[dev]"
+uv pip install -e "."
+uv pip install pytest pytest-django pytest-cov

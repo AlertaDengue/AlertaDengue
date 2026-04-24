@@ -5,8 +5,6 @@ set -ex
 SCRIPT_PATH="${BASH_SOURCE:-$0}"
 SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 
-python -m pip install uv
-
 if [[ "$ENV" == "prod" ]]; then
   ${SCRIPT_DIR}/install-prod.sh
 else
