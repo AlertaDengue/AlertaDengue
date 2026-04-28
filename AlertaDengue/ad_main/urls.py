@@ -17,6 +17,7 @@ urlpatterns = [
     path("", include("pwa.urls")),
     re_path(r"^accounts/profile/$", RedirectView.as_view(url="/")),
     re_path(r"^accounts/", include("django.contrib.auth.urls")),
+    path("api-auth/", include("rest_framework.urls")),
     # apps
     path(r"", include("dados.urls")),
     re_path(r"^admin/doc/", include("django.contrib.admindocs.urls")),
