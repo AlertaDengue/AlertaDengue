@@ -1,6 +1,5 @@
-from django.urls import re_path
+from django.urls import include, path, re_path
 
-# local
 from .views import AlertCityView, EpiYearWeekView, NotificationReducedCSV_View
 
 app_name = "api"
@@ -13,6 +12,9 @@ urlpatterns = [
     ),
     re_path(r"^alertcity", AlertCityView.as_view(), name="alertcity"),
     re_path(
-        r"^epi_year_week$", EpiYearWeekView.as_view(), name="epi_year_week"
+        r"^epi_year_week$",
+        EpiYearWeekView.as_view(),
+        name="epi_year_week",
     ),
+    path("internal/", include("api.internal.urls")),
 ]
