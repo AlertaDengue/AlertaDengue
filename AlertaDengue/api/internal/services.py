@@ -1,5 +1,3 @@
-# api/internal/services.py
-
 import math
 from datetime import date, datetime
 from decimal import Decimal
