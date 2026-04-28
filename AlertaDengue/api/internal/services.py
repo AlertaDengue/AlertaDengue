@@ -1,16 +1,17 @@
+# api/internal/services.py
+
 import math
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
-import pandas as pd
 from django.db import connection
 
 from .schemas import NotificationQueryParams
 
 
 def normalize_value(value: Any) -> Any:
-    if pd.isna(value):
+    if value is None:
         return None
 
     if isinstance(value, float):
@@ -29,37 +30,21 @@ def normalize_value(value: Any) -> Any:
     return value
 
 
-def dataframe_to_json_records(dataframe: pd.DataFrame) -> list[dict[str, Any]]:
-    dataframe = dataframe.astype(object)
+def fetch_dicts(cursor) -> list[dict[str, Any]]:
+    columns = [column[0] for column in cursor.description]
 
     return [
-        {key: normalize_value(value) for key, value in row.items()}
-        for row in dataframe.to_dict(orient="records")
+        {
+            column: normalize_value(value)
+            for column, value in zip(columns, row, strict=True)
+        }
+        for row in cursor.fetchall()
     ]
 
 
-def list_notifications(query_params: dict[str, Any]) -> dict[str, Any]:
-    params = NotificationQueryParams.model_validate(
-        query_params.dict() if hasattr(query_params, "dict") else query_params
-    )
-
-    fields = [
-        "id",
-        "municipio_geocodigo",
-        "dt_notific",
-        "dt_sin_pri",
-        "dt_digita",
-        "se_notif",
-        "ano_notif",
-        "classi_fin",
-        "criterio",
-        "cid10_codigo",
-        "id_distrit",
-        "id_bairro",
-        "nm_bairro",
-        "nu_notific",
-    ]
-
+def build_notification_filters(
+    params: NotificationQueryParams,
+) -> tuple[str, dict[str, Any]]:
     where_clauses = []
     sql_params: dict[str, Any] = {}
 
@@ -91,9 +76,35 @@ def list_notifications(query_params: dict[str, Any]) -> dict[str, Any]:
         where_clauses.append("dt_notific <= %(date_end)s")
         sql_params["date_end"] = params.date_end
 
-    where_sql = ""
-    if where_clauses:
-        where_sql = "WHERE " + " AND ".join(where_clauses)
+    if not where_clauses:
+        return "", sql_params
+
+    return f"WHERE {' AND '.join(where_clauses)}", sql_params
+
+
+def list_notifications(query_params: dict[str, Any]) -> dict[str, Any]:
+    params = NotificationQueryParams.model_validate(
+        query_params.dict() if hasattr(query_params, "dict") else query_params
+    )
+
+    fields = [
+        "id",
+        "municipio_geocodigo",
+        "dt_notific",
+        "dt_sin_pri",
+        "dt_digita",
+        "se_notif",
+        "ano_notif",
+        "classi_fin",
+        "criterio",
+        "cid10_codigo",
+        "id_distrit",
+        "id_bairro",
+        "nm_bairro",
+        "nu_notific",
+    ]
+
+    where_sql, sql_params = build_notification_filters(params)
 
     sql_results = f"""
         SELECT {", ".join(fields)}
@@ -106,30 +117,28 @@ def list_notifications(query_params: dict[str, Any]) -> dict[str, Any]:
     sql_params["limit"] = params.limit
     sql_params["offset"] = params.offset
 
-    results_df = pd.read_sql_query(
-        sql_results,
-        connection,
-        params=sql_params,
-    )
+    with connection.cursor() as cursor:
+        cursor.execute(sql_results, sql_params)
+        results = fetch_dicts(cursor)
 
-    payload = {
+    payload: dict[str, Any] = {
         "limit": params.limit,
         "offset": params.offset,
-        "results": dataframe_to_json_records(results_df),
+        "results": results,
     }
 
     if params.include_count:
-        sql_count = f"""
-            SELECT COUNT(*)
-            FROM "Municipio"."Notificacao"
-            {where_sql}
-        """
-
         count_params = {
             key: value
             for key, value in sql_params.items()
             if key not in {"limit", "offset"}
         }
+
+        sql_count = f"""
+            SELECT COUNT(*)
+            FROM "Municipio"."Notificacao"
+            {where_sql}
+        """
 
         with connection.cursor() as cursor:
             cursor.execute(sql_count, count_params)
