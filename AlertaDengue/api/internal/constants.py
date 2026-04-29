@@ -1,0 +1,1 @@
+NOTIFICATION_API_GROUP_NAME = "Notification API Users"

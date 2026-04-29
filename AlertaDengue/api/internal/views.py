@@ -1,10 +1,9 @@
+from api.internal.permissions import HasNotificationAPIAccess
+from api.internal.services import list_notifications
 from django.db import DatabaseError
 from pydantic import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from .permissions import HasNotificationAPIAccess
-from .services import list_notifications
 
 
 class NotificationListView(APIView):
