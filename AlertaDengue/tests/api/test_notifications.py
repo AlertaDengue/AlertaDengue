@@ -97,6 +97,7 @@ def test_notifications_endpoint_allows_user_with_group(
             "year": 2024,
             "limit": 10,
             "offset": 0,
+            "include_count": "true",
         },
     )
 
@@ -133,6 +134,7 @@ def test_notifications_endpoint_returns_paginated_payload(
             "year": 2024,
             "limit": 1000,
             "offset": 0,
+            "include_count": "true",
         },
     )
 
@@ -176,6 +178,7 @@ def test_notifications_endpoint_filters_by_municipio_geocodigo(
             "municipio_geocodigo": 3550308,
             "limit": 1000,
             "offset": 0,
+            "include_count": "true",
         },
     )
 
@@ -201,6 +204,7 @@ def test_notifications_endpoint_filters_by_cid10(
             "cid10": "A92",
             "limit": 1000,
             "offset": 0,
+            "include_count": "true",
         },
     )
 
@@ -226,6 +230,7 @@ def test_notifications_endpoint_filters_by_year(
             "year": 2023,
             "limit": 1000,
             "offset": 0,
+            "include_count": "true",
         },
     )
 
@@ -253,6 +258,7 @@ def test_notifications_endpoint_filters_by_epiweek_range(
             "epiweek_end": 3,
             "limit": 1000,
             "offset": 0,
+            "include_count": "true",
         },
     )
 
@@ -279,6 +285,7 @@ def test_notifications_endpoint_filters_by_date_range(
             "date_end": "2024-02-28",
             "limit": 1000,
             "offset": 0,
+            "include_count": "true",
         },
     )
 
@@ -306,6 +313,7 @@ def test_notifications_endpoint_applies_limit_and_offset(
             "year": 2024,
             "limit": 1,
             "offset": 1,
+            "include_count": "true",
         },
     )
 
