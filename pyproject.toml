@@ -73,7 +73,7 @@ django-extensions = "^3.2.3"
 flake8 = "^6.0.0"
 isort = "^5.11.4"
 pre-commit = "^2.21.0"
-pytest = "^7.2.1"
+pytest = "^9.0.3"
 bpython = "^0.24"
 django-stubs = {version = "5.2.9", extras = ["compatible-mypy"]}
 django-stubs-ext = "5.2.9"
