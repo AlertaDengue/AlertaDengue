@@ -1,6 +1,19 @@
 Release Notes
 ---
 
+## [4.12.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.11.0...4.12.0) (2026-04-30)
+
+### Features
+
+* **api:** add internal notifications endpoint structure ([#923](https://github.com/AlertaDengue/AlertaDengue/issues/923)) ([38c18ba](https://github.com/AlertaDengue/AlertaDengue/commit/38c18ba979dd77eb1fcfabf2fe03480b4b51a916))
+* **pgbackrest:** implement environment-aware backups and systemd scheduling ([#916](https://github.com/AlertaDengue/AlertaDengue/issues/916)) ([bbb2535](https://github.com/AlertaDengue/AlertaDengue/commit/bbb2535f14ca499f4100f06cf2680f7a0923b8b8))
+* **security:** implement CSRF validation for staging settings ([#925](https://github.com/AlertaDengue/AlertaDengue/issues/925)) ([6ebc122](https://github.com/AlertaDengue/AlertaDengue/commit/6ebc122f208ea40bc203c10d8e6cb130cf43c6f9))
+
+### Bug Fixes
+
+* **charts:** align bar/line series and add nowcast integration ([#919](https://github.com/AlertaDengue/AlertaDengue/issues/919)) ([542bd5d](https://github.com/AlertaDengue/AlertaDengue/commit/542bd5db03af051f8f4b42e84a87fa4485d6b2f9))
+* **stack:** Migrate to uv and refactor dependency management workflow ([#920](https://github.com/AlertaDengue/AlertaDengue/issues/920)) ([e21ebc9](https://github.com/AlertaDengue/AlertaDengue/commit/e21ebc9227273f4c6f36bc877fb13a1a3b256fb3))
+
 ## [4.11.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.10.0...4.11.0) (2026-04-14)
 
 ### Features
