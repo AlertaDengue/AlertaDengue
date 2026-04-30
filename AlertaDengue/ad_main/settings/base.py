@@ -103,6 +103,8 @@ THIRD_PARTY_APPS = [
     "django_celery_results",
     "django_celery_beat",
     "pwa",
+    "rest_framework",
+    "rest_framework.authtoken",
 ]
 
 LOCAL_APPS = [
@@ -518,3 +520,15 @@ PWA_APP_STATUS_BAR_COLOR = "#469ad3"
 
 PWA_SERVICE_WORKER_PATH = PROJECT_ROOT / "static" / "js" / "serviceworker.js"
 PWA_APP_MANIFEST_FILE = PROJECT_ROOT / "templates" / "manifest.json"
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 1000,
+}
