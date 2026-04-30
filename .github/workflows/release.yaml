@@ -40,6 +40,11 @@ jobs:
     - name: Update npm
       run: npm -g update npm
 
+    - name: Install Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+
     - name: Create file with environment variables
       run: |
         pushd .envs
