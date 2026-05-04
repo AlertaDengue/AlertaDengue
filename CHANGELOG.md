@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.13.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.12.0...4.13.0) (2026-05-04)
+
+### Features
+
+* **home:** add glossary button to functionalities section ([#928](https://github.com/AlertaDengue/AlertaDengue/issues/928)) ([5912a0e](https://github.com/AlertaDengue/AlertaDengue/commit/5912a0e1a012b59ab468b85119c085744127a605))
+
 ## [4.12.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.11.0...4.12.0) (2026-04-30)
 
 ### Features
