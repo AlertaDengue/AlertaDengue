@@ -3662,3 +3662,11 @@ msgstr ""
 
 #~ msgid "Mapas estaduais"
 #~ msgstr "State map views"
+
+#: dados/templates/components/home/home_functionalities_section.html:110
+msgid "Consulte termos e conceitos importantes usados nos alertas, relatórios e indicadores do InfoDengue."
+msgstr "Consult important terms and concepts used in InfoDengue alerts, reports, and indicators."
+
+#: dados/templates/components/home/home_functionalities_section.html:115
+msgid "Glossário InfoDengue"
+msgstr "InfoDengue Glossary"

@@ -3668,3 +3668,11 @@ msgstr ""
 
 #~ msgid "Data de referência da previsão"
 #~ msgstr "Fecha de referencia para la previsión"
+
+#: dados/templates/components/home/home_functionalities_section.html:110
+msgid "Consulte termos e conceitos importantes usados nos alertas, relatórios e indicadores do InfoDengue."
+msgstr "Consulte términos y conceptos importantes utilizados en las alertas, informes e indicadores de InfoDengue."
+
+#: dados/templates/components/home/home_functionalities_section.html:115
+msgid "Glossário InfoDengue"
+msgstr "Glosario InfoDengue"
