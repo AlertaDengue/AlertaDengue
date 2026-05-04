@@ -306,17 +306,17 @@ msgid ""
 msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:5
-msgid "InfoDengue"
+msgid "Infodengue"
 msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:32
-msgid "Sobre o InfoDengue"
+msgid "Sobre o Infodengue"
 msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:35
 msgid ""
 "\n"
-"            O InfoDengue é um sistema de alerta para arboviroses baseado em "
+"            O Infodengue é um sistema de alerta para arboviroses baseado em "
 "dados híbridos gerados por meio da análise integrada\n"
 "            de dados minerados a partir da web social e de dados climáticos "
 "e epidemiológicos"
@@ -328,7 +328,7 @@ msgid ""
 "            Em 2021, o sistema ganhou amplitude nacional com o apoio do "
 "Ministério da Saúde realizando análises em nível estadual.\n"
 "            Com isso, mais secretarias passaram a receber semanalmente os "
-"boletins do InfoDengue. Implementado em 2015,\n"
+"boletins do Infodengue. Implementado em 2015,\n"
 "            o sistema foi desenvolvido por pesquisadores do Programa de "
 "Computação Científica (Fundação Oswaldo Cruz, RJ) e\n"
 "            da Escola de Matemática Aplicada (Fundação Getúlio Vargas) com a "
@@ -340,7 +340,7 @@ msgid ""
 "e chikungunya de todo o país, os estados ainda podem aderir ao sistema.</"
 "br>\n"
 "            Acesse <a href=\"/participe\"> como participar </a> para "
-"integrar o InfoDengue.\n"
+"integrar o Infodengue.\n"
 "            O estado participante recebe um relatório de análise de situação "
 "da dengue semanalmente.\n"
 "            A versão pública do site é acessada por muitas pessoas e é comum "
@@ -354,7 +354,7 @@ msgid ""
 "            ampliamos a inovação e o conhecimento das arboviroses.</p>\n"
 "            <p>\n"
 "            Vários desafios técnicos e científicos foram enfrentados durante "
-"o desenvolvimento do InfoDengue, resultando em diversas teses e\n"
+"o desenvolvimento do Infodengue, resultando em diversas teses e\n"
 "            dissertações. Como os desafios não terminam, continuamos e "
 "continuaremos sempre investigando novas soluções para gerar\n"
 "            informação útil para a gestão e para o avanço do conhecimento "
@@ -368,7 +368,7 @@ msgstr ""
 #: AlertaDengue/dados/templates/about.html:64
 msgid ""
 "\n"
-"        O sistema InfoDengue é um pipeline de coleta, harmonização e análise "
+"        O sistema Infodengue é um pipeline de coleta, harmonização e análise "
 "de dados semi-automatizado,\n"
 "        que gera indicadores de situação epidemiológica da dengue e outras "
 "arboviroses a nível municipal."
@@ -397,7 +397,7 @@ msgid ""
 "laboratorialmente, a maioria recebe classificação\n"
 "        final com base em critérios clínico-epidemiológicos. A partir dos "
 "casos notificados, são calculados os\n"
-"        indicadores de incidência que alimentam o InfoDengue."
+"        indicadores de incidência que alimentam o Infodengue."
 msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:79
@@ -552,7 +552,7 @@ msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:135
 msgid ""
-"Todos os códigos gerados para o InfoDengue, em sua maioria em R e Python, "
+"Todos os códigos gerados para o Infodengue, em sua maioria em R e Python, "
 "estão disponíveis em acesso aberto em​:"
 msgstr ""
 
@@ -651,7 +651,7 @@ msgid ""
 msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:199
-msgid "Como citar o InfoDengue"
+msgid "Como citar o Infodengue"
 msgstr ""
 
 #: AlertaDengue/dados/templates/about.html:220
@@ -1102,11 +1102,11 @@ msgid ""
 msgstr ""
 
 #: AlertaDengue/dados/templates/joinin.html:6
-msgid "Como participar do InfoDengue"
+msgid "Como participar do Infodengue"
 msgstr ""
 
 #: AlertaDengue/dados/templates/joinin.html:19
-msgid "É muito fácil consultar ou participar do Sistema de Alerta InfoDengue"
+msgid "É muito fácil consultar ou participar do Sistema de Alerta Infodengue"
 msgstr ""
 
 #: AlertaDengue/dados/templates/joinin.html:21
@@ -1527,7 +1527,7 @@ msgid "Contato"
 msgstr ""
 
 #: AlertaDengue/dados/templates/report_city.html:319
-msgid "Para mais detalhes sobre o sistema de alerta InfoDengue, consultar"
+msgid "Para mais detalhes sobre o sistema de alerta Infodengue, consultar"
 msgstr ""
 
 #: AlertaDengue/dados/templates/report_city.html:327
@@ -2043,7 +2043,7 @@ msgid ""
 "é um pacote Python para extrair dados da saúde. Com esta ferramenta, é "
 "possível fazer o download das semanas epidemiológicas com scripts em Python. "
 "Tutoriais sobre a utilização do PySUS para extração dos dados no sistema "
-"InfoDengue pode ser encontrada na "
+"Infodengue pode ser encontrada na "
 msgstr ""
 
 #: AlertaDengue/dados/templates/services_tutorial.html:63
@@ -2532,7 +2532,7 @@ msgstr ""
 
 #: AlertaDengue/templates/registration/password_reset_email.html:4
 msgid ""
-"Voce está recebendo esse e-mail por que pediu que sua senha no InfoDengue "
+"Voce está recebendo esse e-mail por que pediu que sua senha no Infodengue "
 "fosse redefinida."
 msgstr ""
 
@@ -2545,5 +2545,5 @@ msgid "Seu nome de usuário, caso você tenha esquecido, é:"
 msgstr ""
 
 #: AlertaDengue/templates/registration/password_reset_email.html:12
-msgid "Obrigado por usar o InfoDengue"
+msgid "Obrigado por usar o Infodengue"
 msgstr ""

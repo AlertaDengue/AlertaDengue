@@ -488,12 +488,12 @@ if SENTRY_DSN:
     )
 
 PWA_APP_NAME = (
-    "InfoDengue – Early warning system for arbovirus transmission "
+    "Infodengue – Early warning system for arbovirus transmission "
     "(dengue, chikungunya, and Zika)"
 )
-PWA_APP_SHORT_NAME = "InfoDengue"
+PWA_APP_SHORT_NAME = "Infodengue"
 PWA_APP_DESCRIPTION = (
-    "InfoDengue data portal for monitoring arbovirus transmission."
+    "Infodengue data portal for monitoring arbovirus transmission."
 )
 PWA_APP_LANG = LANGUAGE_CODE
 PWA_APP_DIR = "ltr"
