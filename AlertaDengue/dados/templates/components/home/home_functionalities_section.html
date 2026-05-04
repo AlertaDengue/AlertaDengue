@@ -14,7 +14,7 @@
     <div class="row justify-content-center g-3">
 
       <!-- API -->
-      <div class="col-12 col-sm-6 col-md-4 col-lg-2 d-flex">
+      <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
         <a href="/services/api"
            class="btn btn-menu-card w-100 h-100 d-flex flex-column
                   justify-content-center align-items-center text-center py-4"
@@ -31,7 +31,7 @@
       </div>
 
       <!-- Municipal Reports -->
-      <div class="col-12 col-sm-6 col-md-4 col-lg-2 d-flex">
+      <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
         <a href="/report/"
            class="btn btn-menu-card w-100 h-100 d-flex flex-column
                   justify-content-center align-items-center text-center py-4"
@@ -48,7 +48,7 @@
       </div>
 
       <!-- State Reports -->
-      <div class="col-12 col-sm-6 col-md-4 col-lg-2 d-flex">
+      <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
         <a href="/report/"
            class="btn btn-menu-card w-100 h-100 d-flex flex-column
                   justify-content-center align-items-center text-center py-4"
@@ -65,7 +65,7 @@
       </div>
 
       <!-- Technical Reports -->
-      <div class="col-12 col-sm-6 col-md-4 col-lg-2 d-flex">
+      <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
         <a href="/informacoes/#section1.1"
            class="btn btn-menu-card w-100 h-100 d-flex flex-column
                   justify-content-center align-items-center text-center py-4"
@@ -82,7 +82,7 @@
       </div>
 
       <!-- Tutorials -->
-      <div class="col-12 col-sm-6 col-md-4 col-lg-2 d-flex">
+      <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
         <a href="/services/tutorial"
            class="btn btn-menu-card w-100 h-100 d-flex flex-column
                   justify-content-center align-items-center text-center py-4"
@@ -98,8 +98,27 @@
         </a>
       </div>
 
+      <!-- Glossary -->
+      <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
+        <a href="https://lac.tghn.org/recursos/glossario-infodengue/"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="btn btn-menu-card w-100 h-100 d-flex flex-column
+                  justify-content-center align-items-center text-center py-4"
+           data-toggle="tooltip"
+           data-placement="bottom"
+           title="{% trans 'Consulte termos e conceitos importantes usados nos alertas, relatórios e indicadores do Infodengue.' %}">
+          <span class="mb-2">
+            <i class="fas fa-book fa-lg"></i>
+          </span>
+          <span class="font-weight-semibold">
+            {% trans "Glossário Infodengue" %}
+          </span>
+        </a>
+      </div>
+
       <!-- PWA Install tile (wrapper has its own id) -->
-      <div class="col-12 col-sm-6 col-md-4 col-lg-2 d-flex"
+      <div class="col-12 col-sm-6 col-md-4 col-lg d-flex"
            id="pwa-install-wrapper"
            style="display: none;">
         <button id="pwa-install-button"
