@@ -1,73 +1,352 @@
-# Contributing with InfoDengue
+# Contributing to InfoDengue
 
-### Prerequisites
+Thank you for contributing to InfoDengue.
 
-- Postgresql [(see documentation)](https://www.postgresql.org/download/linux/ubuntu/);
-- Git [(see documentation)](https://git-scm.com/docs/gittutorial);
-- Docker [(see documentation)](https://docs.docker.com/engine/install/ubuntu/);
-- Poetry [(see documentation)](https://python-poetry.org/docs/);
-- IDE (recommended: [VSCODE](https://code.visualstudio.com/download), [VSCODIUM](https://vscodium.com/#install) or [PYCHARM](https://www.jetbrains.com/pycharm/download/)).
+This guide describes the recommended workflow for setting up the AlertaDengue development environment, running tests, documenting changes, and submitting pull requests.
 
-### Setting up the environment
+## Prerequisites
 
- 1) Fork and clone both repositories:
-        > AlertaDengue: https://github.com/AlertaDengue/AlertaDengue
-        > Data: https://github.com/AlertaDengue/Data (Contains randomly generated data for testing and development.)
+Install the following tools:
 
- 2) Configure Demo Database in your local machine:
+- Git
+- Docker
+- Miniforge or Mambaforge
+- UV
+- Poetry
+- Makim
+- containers-sugar
 
-     Follow [Data/README.md](https://github.com/AlertaDengue/Data#readme) to build and deploy the Demo Database image.
+## Repository setup
 
- 3) Open the repository AlertaDengue with your IDE and use Miniforge ([see documentation](https://github.com/conda-forge/miniforge)) to create and activate the working environment ```(alertadengue-dev)```:
+Fork and clone the repository:
 
-        $ mamba env create -f conda/environment.yaml
-        $ conda activate alertadengue-dev
+```bash
+git clone git@github.com:<your-user>/AlertaDengue.git
+cd AlertaDengue
+````
 
- 4) Install the environment dependencies with Poetry ([see documentation](https://python-poetry.org/docs/)):
+Add the upstream remote:
 
-         $ poetry install
+```bash
+git remote add upstream git@github.com:AlertaDengue/AlertaDengue.git
+git fetch --all
+```
 
-### Building the app
+Some development workflows may also require the demo data repository:
 
-With the environment dependencies set, it's time to prepare it to deploy. Use the Makefile in your terminal to create a .env file in the root of the project, this file will contain variables which will be needed to the building.
+```bash
+git clone git@github.com:AlertaDengue/Data.git
+```
 
- 1) Create .env file using Makefile:
+Follow the `Data` repository documentation when working with demo databases or local test data.
 
-        $ make prepare-env
+## Development environment
 
- 2) Synchronize all Map and Static Files:
+Create the development environment:
 
-        $ make sync-static-geofiles
+```bash
+mamba env create -f conda/environment.yaml
+```
 
- 3) Build the app containers:
+Activate it:
 
-        $ make container-build
+```bash
+mamba activate alertadengue-dev
+```
 
-    _This step will possibly fail if the .env file isn't properly filled. Please check if there isn't any empty attribute that is stopping the build._
+If the environment already exists, update it with:
 
- 4) After the build, start the Docker images with the command:
+```bash
+mamba env update -f conda/environment.yaml --prune
+```
 
-        $ make container-start
+Install project dependencies:
 
+```bash
+bash scripts/install-deps.sh
+```
 
-### Setting up Git, GitHub
+This script is the preferred dependency installation entry point. It keeps the local environment aligned with the project dependency workflow using UV and Poetry.
 
-In order to push your work to the main project, you will need to configure the remotes Upstream and Origin within your local repository following the steps below, this will ensure you are working with the most updated version of the project. _For more details about commiting, check the Git Guides [here](https://github.com/git-guides)._
+Validate the environment:
 
-1) Add Origin & Upstream:
+```bash
+python AlertaDengue/manage.py check
+```
 
+## Environment configuration
 
-        $ git remote add origin git@github.com:<user>/AlertaDengue.git
-        $ git remote add upstream git@github.com:AlertaDengue/AlertaDengue.git
+Runtime configuration is loaded from:
 
-2) Fetch all branches:
+```text
+.envs/.env
+```
 
-        $ git fetch --all
+Create this file according to the environment you are working with and review it before starting services. Required values must be defined for the application and containers to start correctly.
 
-3) Commit & Create pull request
+Do not commit local `.env` files, credentials, secrets, or machine-specific paths.
 
-    When the changes in your branch are done (_please, read about [Best Practices](https://gist.github.com/luismts/495d982e8c5b1a0ced4a57cf3d93cf60) with Git before commiting_), it's time to push the commits to your fork and create a pull request so the maintainers can review and merge into the AlertaDengue repository.
+## Services
 
-        $ git push
+The project uses `containers-sugar` to manage services.
 
-    Your IDE should redirect you to the GitHub page with your Pull Request specifying the commits and the files that you have worked on. Write a message telling us about all your changes and click on Create Pull Request.
+Available profiles are defined in `sugar.yaml`:
+
+* `dev`
+* `staging`
+* `prod`
+
+For local development, use the `dev` profile.
+
+Start services:
+
+```bash
+sugar --profile dev compose-ext start -- -d
+```
+
+Check service status:
+
+```bash
+sugar --profile dev compose-ext ps
+```
+
+Restart services:
+
+```bash
+sugar --profile dev compose-ext restart -- -d
+```
+
+Stop services:
+
+```bash
+sugar --profile dev compose-ext stop
+```
+
+Restart selected services:
+
+```bash
+sugar --profile dev compose-ext restart \
+  --services postgres rabbitmq redis memcached web celery celery-beat \
+  -- -d
+```
+
+Use `sugar` instead of raw Compose commands so local and deployed workflows remain consistent.
+
+## Database
+
+Apply migrations:
+
+```bash
+python AlertaDengue/manage.py migrate
+```
+
+Create migrations after changing Django models:
+
+```bash
+python AlertaDengue/manage.py makemigrations
+```
+
+Create a superuser when needed:
+
+```bash
+python AlertaDengue/manage.py createsuperuser
+```
+
+Include migrations when model changes require them. Avoid committing unrelated migrations.
+
+## Tests
+
+The project exposes test tasks through Makim.
+
+Prepare the test environment:
+
+```bash
+makim tests.setup
+```
+
+Run unit tests:
+
+```bash
+makim tests.unit
+```
+
+Run lint checks:
+
+```bash
+makim tests.lint
+```
+
+Clean up the test environment when needed:
+
+```bash
+makim tests.teardown
+```
+
+Pull requests are also validated by CI. Before requesting review, run the relevant local Makim checks and make sure CI passes.
+
+## Code style
+
+Follow standard Python open-source practices:
+
+* keep pull requests focused;
+* prefer readable and explicit code;
+* add or update tests for behavior changes;
+* update documentation when setup, operations, APIs, or user-facing behavior changes;
+* avoid unrelated formatting changes;
+* avoid committing secrets, logs, cache files, local paths, or temporary files;
+* use type hints when they improve clarity;
+* keep Django management commands and Celery tasks idempotent where possible;
+* make operational failures explicit through clear logging.
+
+For ingestion and data-processing code, prioritize correctness, reproducibility, and recoverability.
+
+## Documentation
+
+Documentation lives under:
+
+```text
+docs/
+```
+
+Use focused documents instead of large mixed-purpose files.
+
+Current documentation areas include:
+
+```text
+docs/api/
+docs/ingestion/
+docs/pgbackrest/
+```
+
+The internal notification API documentation is available at:
+
+```text
+docs/api/internal_notification_api.md
+```
+
+Use it when working with notification API endpoints, payloads, authentication, or integration behavior.
+
+The SINAN ingestion documentation is available under:
+
+```text
+docs/ingestion/
+```
+
+It covers ingestion architecture, canonical storage layout, operational commands, and recovery procedures.
+
+The pgBackRest documentation is available at:
+
+```text
+docs/pgbackrest/README.md
+```
+
+Use it when working with PostgreSQL backup, restore, validation, or scheduled backup workflows.
+
+Operational documentation should prefer Makim and containers-sugar commands. Do not add legacy `make` commands.
+
+## Dependency updates
+
+When changing dependencies:
+
+1. Update the appropriate dependency files.
+2. Run the project dependency installer:
+
+```bash
+bash scripts/install-deps.sh
+```
+
+3. Run the relevant checks and tests.
+4. Mention the dependency change in the pull request description.
+
+Keep dependency-only changes isolated when possible, especially for major upgrades.
+
+## Git workflow
+
+Create a branch from the latest upstream branch:
+
+```bash
+git fetch upstream
+git checkout main
+git merge upstream/main
+git checkout -b <short-description>
+```
+
+Use clear commit messages:
+
+```text
+type(scope): short description
+```
+
+Examples:
+
+```text
+docs(api): update internal notification API guide
+docs(ingestion): add SINAN recovery guide
+fix(api): validate notification payload fields
+test(ingestion): cover requeue behavior
+refactor(tasks): simplify ingestion retry flow
+ci(tests): update unit test workflow
+```
+
+Common commit types:
+
+* `feat`
+* `fix`
+* `docs`
+* `test`
+* `refactor`
+* `chore`
+* `ci`
+
+Push your branch:
+
+```bash
+git push origin <short-description>
+```
+
+Then open a pull request against the upstream repository.
+
+## Pull requests
+
+A pull request should explain:
+
+* what changed;
+* why the change is needed;
+* how it was tested;
+* whether it affects migrations, deployment, ingestion, Celery, scheduled tasks, dependencies, documentation, APIs, or backup/restore workflows.
+
+Before requesting review, check that:
+
+* the branch is up to date with upstream;
+* the change is focused;
+* tests and lint checks pass locally when relevant;
+* CI passes;
+* documentation was updated when needed;
+* migrations are included when required;
+* no secrets, logs, local paths, or temporary files were committed.
+
+## Releases
+
+Releases should be prepared from a clean, tested branch.
+
+Before preparing a release, confirm that:
+
+* CI is passing;
+* migrations are reviewed;
+* dependency changes are understood;
+* documentation is updated;
+* operational changes are documented;
+* release notes or changelog entries are prepared when required.
+
+Release pull requests should clearly identify:
+
+* user-facing changes;
+* database migrations;
+* dependency updates;
+* deployment changes;
+* API changes;
+* ingestion, Celery, or scheduled-task changes;
+* backup and restore implications, when relevant;
+* rollback considerations, when relevant.
+
+Avoid mixing unrelated refactors into release preparation.
