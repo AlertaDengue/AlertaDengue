@@ -29,7 +29,7 @@ services:
       - pgsocket:/var/run/postgresql
       - pgbackrest_repo:/var/lib/pgbackrest
       - pgbackrest_logs:/var/log/pgbackrest
-      - ./pgbackrest/pgbackrest-prod.conf:/etc/pgbackrest/pgbackrest.conf
+      - ./pgbackrest/pgbackrest-${ENV}.conf:/etc/pgbackrest/pgbackrest.conf
     networks:
       - infodengue
 
