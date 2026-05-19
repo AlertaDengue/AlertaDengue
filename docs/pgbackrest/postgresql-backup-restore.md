@@ -257,6 +257,27 @@ docker exec infodengue-dev-postgres-1 \
   su - postgres -c "pgbackrest --stanza=dev check"
 ```
 
+If logs show `Permission denied` for files such as
+`/var/lib/pgbackrest/archive/prod/archive.info` or `backup.info`, verify that
+the repository is owned by the PostgreSQL runtime user:
+
+```bash
+docker exec infodengue-prod-postgres-1 \
+  find /var/lib/pgbackrest ! -user postgres -o ! -group postgres
+```
+
+The pgBackRest sidecar must run as the same `HOST_UID:HOST_GID` used by the
+postgres container. If an older root-run sidecar already created repository
+files, stop backup activity and repair ownership once:
+
+```bash
+docker exec -u root infodengue-prod-postgres-1 \
+  chown -R postgres:postgres /var/lib/pgbackrest /var/log/pgbackrest
+
+docker exec infodengue-prod-postgres-1 \
+  su - postgres -c "pgbackrest --stanza=prod check"
+```
+
 ### Backup Repository Empty / "no valid backups"
 
 ```bash
