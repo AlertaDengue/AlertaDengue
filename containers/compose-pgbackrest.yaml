@@ -8,6 +8,7 @@ services:
   pgbackrest:
     hostname: pgbackrest
     restart: unless-stopped
+    user: "${HOST_UID}:${HOST_GID}"
     build:
       context: ..
       dockerfile: containers/pgbackrest/Dockerfile
