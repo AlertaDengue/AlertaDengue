@@ -4,7 +4,6 @@ services:
       PGDATA: "/var/lib/postgresql/data"
     volumes:
       - "${HOST_PGDATA:-/opt/data/infodengue/prod/pgdata}:/var/lib/postgresql/data"
-      - ./pgbackrest/pgbackrest-prod.conf:/etc/pgbackrest/pgbackrest.conf
     command:
       - postgres
       - -p
