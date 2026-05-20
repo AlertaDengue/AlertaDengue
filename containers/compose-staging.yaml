@@ -14,8 +14,6 @@ services:
       - "unix_socket_directories=/var/run/postgresql"
       - -c
       - "max_worker_processes=8"
-      - -c
-      - "archive_mode=off"
 
   web:
     command: bash /opt/runwsgi.sh
