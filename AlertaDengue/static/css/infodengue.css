@@ -12,6 +12,7 @@
 .navbar-custom {
     color: #FFFFFF;
     background-color: #058ED0;
+    background-image: linear-gradient(135deg, #058ED0 0%, #003E7E 100%);
 }
 
 .navbar ul li {
