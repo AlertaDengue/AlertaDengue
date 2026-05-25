@@ -1,13 +1,18 @@
 .btn-menu-card {
   background-color: #058ED0;
+  background-image: linear-gradient(135deg, #058ED0 0%, #003E7E 100%);
   border-color: #058ED0;
   color: white;
   box-shadow: 2px 2px 7px #0c1b2b69;
-  transition: background-color 0.3s, border-color 0.3
+  transition: background-position 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
-.btn-menu-card:hover {
-  background-color: #0065b3ff;
-  border-color: #ffffffff;
+
+.btn-menu-card:hover,
+.btn-menu-card:focus {
+  background-color: #003E7E;
+  background-position: right center;
+  border-color: #FFFFFF;
   color: white;
   text-decoration: none;
+  box-shadow: 2px 4px 10px #0c1b2b80;
 }
