@@ -1,12 +1,21 @@
 .navbar-nav>li>a {
     color: #FFFFFF;
+    text-decoration: none;
+    text-decoration-color: #ffffff;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 5px;
+    text-shadow: #424344;
+    font-size: 18px;
 }
 
 .navbar-nav>li>a:hover,
 .navbar-nav>li>a:focus {
-    color: #003E7E;
+    color: #424344;
     /*Sets the text hover color on navbar*/
-    text-decoration: none;
+    text-decoration: underline;
+    text-decoration-thickness: 12px;
+    text-underline-offset: 5px;
+    font-size: 18px;
 }
 
 .navbar-custom {
@@ -218,10 +227,6 @@
 
 .content-inline * {
     display: inline !important;
-}
-
-#footer {
-    margin-top: 10px;
 }
 
 .legend i {
