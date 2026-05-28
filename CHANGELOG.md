@@ -1,6 +1,17 @@
 Release Notes
 ---
 
+## [4.14.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.13.0...4.14.0) (2026-05-28)
+
+### Features
+
+* **containers:** Fix pgBackRest repository ownership in sidecar ([#937](https://github.com/AlertaDengue/AlertaDengue/issues/937)) ([0ec627e](https://github.com/AlertaDengue/AlertaDengue/commit/0ec627e1c2697276283ef20fc2607df0aba2fb08))
+* **ui:** update team page and change layouts with brand gradients ([#939](https://github.com/AlertaDengue/AlertaDengue/issues/939)) ([8d499c5](https://github.com/AlertaDengue/AlertaDengue/commit/8d499c50788672b9d719472112b036e9c446be2b))
+
+### Bug Fixes
+
+* **pgbackrest:** align environment config and stanza naming ([#935](https://github.com/AlertaDengue/AlertaDengue/issues/935)) ([880f012](https://github.com/AlertaDengue/AlertaDengue/commit/880f01215e72591a0dccf910b03686accdc01613))
+
 ## [4.13.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.12.0...4.13.0) (2026-05-04)
 
 ### Features
