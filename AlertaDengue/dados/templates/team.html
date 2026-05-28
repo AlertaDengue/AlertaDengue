@@ -56,7 +56,7 @@
   .team-grid {
     display: grid;
     gap: 14px;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   }
 
   .team-card {
@@ -64,14 +64,14 @@
     border: 1px solid #DCEAF5;
     border-radius: 7px;
     box-shadow: 0 6px 18px rgba(0, 62, 126, 0.08);
-    min-height: 150px;
+    min-height: 190px;
     padding: 16px;
   }
 
   .team-person {
     align-items: center;
     display: flex;
-    gap: 12px;
+    gap: 16px;
     margin-bottom: 10px;
   }
 
@@ -82,11 +82,19 @@
     border-radius: 50%;
     color: #003E7E;
     display: flex;
-    flex: 0 0 58px;
+    flex: 0 0 120px;
     font-weight: 700;
-    height: 58px;
+    height: 120px;
     justify-content: center;
-    width: 58px;
+    overflow: hidden;
+    width: 120px;
+  }
+
+  .team-photo img {
+    display: block;
+    height: 100%;
+    object-fit: contain;
+    width: 100%;
   }
 
   .team-name {
@@ -174,6 +182,17 @@
       columns: 1;
     }
   }
+
+  @media (max-width: 479.98px) {
+    .team-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .team-person {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
 </style>
 {% endblock %}
 
@@ -194,19 +213,19 @@
     <h5 class="team-section-title">{% translate "Coordenação Geral" %}</h5>
     <div class="team-grid">
       <article class="team-card">
-        <div class="team-person"><div class="team-photo">CC</div><a class="team-name" href="https://lattes.cnpq.br/1929576902623348">Cláudia Torres Codeço</a></div>
+        <div class="team-person"><div class="team-photo"><img src="{% static 'img/team/claudia.png' %}" alt="{% translate 'Cláudia Torres Codeço' %}"></div><a class="team-name" href="https://lattes.cnpq.br/1929576902623348">Cláudia Torres Codeço</a></div>
         <p class="team-role">{% translate "PROCC/Fiocruz" %}</p>
       </article>
       <article class="team-card">
-        <div class="team-person"><div class="team-photo">FC</div><a class="team-name" href="https://lattes.cnpq.br/0309050626285266">Flávio Codeço Coelho</a></div>
+        <div class="team-person"><div class="team-photo"><img src="{% static 'img/team/flavio.jpg' %}" alt="{% translate 'Flávio Codeço Coelho' %}"></div><a class="team-name" href="https://lattes.cnpq.br/0309050626285266">Flávio Codeço Coelho</a></div>
         <p class="team-role">{% translate "Escola de Matemática Aplicada/FGV" %}</p>
       </article>
       <article class="team-card">
-        <div class="team-person"><div class="team-photo">LB</div><a class="team-name" href="https://lattes.cnpq.br/5241799121437269">Leonardo Soares Bastos</a></div>
+        <div class="team-person"><div class="team-photo"><img src="{% static 'img/team/leo.jpg' %}" alt="{% translate 'Leonardo Soares Bastos' %}"></div><a class="team-name" href="https://lattes.cnpq.br/5241799121437269">Leonardo Soares Bastos</a></div>
         <p class="team-role">{% translate "PROCC/Fiocruz" %}</p>
       </article>
       <article class="team-card">
-        <div class="team-person"><div class="team-photo">OC</div><a class="team-name" href="https://lattes.cnpq.br/9530671289607786">Oswaldo Gonçalves Cruz</a></div>
+        <div class="team-person"><div class="team-photo"><img src="{% static 'img/team/oswaldo.png' %}" alt="{% translate 'Oswaldo Gonçalves Cruz' %}"></div><a class="team-name" href="https://lattes.cnpq.br/9530671289607786">Oswaldo Gonçalves Cruz</a></div>
         <p class="team-role">{% translate "PROCC/Fiocruz" %}</p>
       </article>
     </div>
@@ -215,30 +234,31 @@
   <section class="team-section">
     <h5 class="team-section-title">{% translate "Dados e situação epidemiológica" %}</h5>
     <div class="team-grid">
-      <article class="team-card"><div class="team-person"><div class="team-photo">SO</div><a class="team-name" href="https://lattes.cnpq.br/2864482261450215">Sara de Souza Oliveira</a></div><p class="team-role">{% translate "Analista Infodengue - epidemiologia" %}</p></article>
-      <article class="team-card"><div class="team-person"><div class="team-photo">TR</div><a class="team-name" href="https://lattes.cnpq.br/4335590727747384">Thais I S Riback</a></div><p class="team-role">{% translate "Analista Infodengue - epidemiologia" %}</p></article>
-      <article class="team-card"><div class="team-person"><div class="team-photo">VG</div><a class="team-name" href="https://lattes.cnpq.br/8508944359245527">Vinicius Godinho</a></div><p class="team-role">{% translate "Analista Infodengue - ciência de dados" %}</p></article>
-      <article class="team-card"><div class="team-person"><div class="team-photo">EA</div><a class="team-name" href="https://lattes.cnpq.br/2326164285897270">Eduardo Correa Araujo</a></div><p class="team-role">{% translate "Analista Infodengue - ciência de dados" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/sara.jpg' %}" alt="{% translate 'Sara de Souza Oliveira' %}"></div><a class="team-name" href="https://lattes.cnpq.br/2864482261450215">Sara de Souza Oliveira</a></div><p class="team-role">{% translate "Analista Infodengue - epidemiologia" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/thais.jpg' %}" alt="{% translate 'Thais I S Riback' %}"></div><a class="team-name" href="https://lattes.cnpq.br/4335590727747384">Thais I S Riback</a></div><p class="team-role">{% translate "Analista Infodengue - epidemiologia" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/vinicius.jpg' %}" alt="{% translate 'Vinicius Godinho' %}"></div><a class="team-name" href="https://lattes.cnpq.br/8508944359245527">Vinicius Godinho</a></div><p class="team-role">{% translate "Analista Infodengue - ciência de dados" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/eduardo.jpg' %}" alt="{% translate 'Eduardo Correa Araujo' %}"></div><a class="team-name" href="https://lattes.cnpq.br/2326164285897270">Eduardo Correa Araujo</a></div><p class="team-role">{% translate "Analista Infodengue - ciência de dados" %}</p></article>
     </div>
   </section>
 
   <section class="team-section">
     <h5 class="team-section-title">{% translate "Desenvolvimento" %}</h5>
     <div class="team-grid">
-      <article class="team-card"><div class="team-person"><div class="team-photo">LV</div><a class="team-name" href="https://lattes.cnpq.br/2917646970654963">Luã Bida Vacaro</a></div><p class="team-role">{% translate "TI Infodengue & Mosqlimate" %}</p></article>
-      <article class="team-card"><div class="team-person"><div class="team-photo">SL</div><a class="team-name" href="https://esloch.github.io/cv/">Sandro Loch</a></div><p class="team-role">{% translate "Platform & Data Infrastructure Engineer" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/lua.jpeg' %}" alt="{% translate 'Luã Bida Vacaro' %}"></div><a class="team-name" href="https://lattes.cnpq.br/2917646970654963">Luã Bida Vacaro</a></div><p class="team-role">{% translate "TI Infodengue & Mosqlimate" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/sandro.jpeg' %}" alt="{% translate 'Sandro Loch' %}"></div><a class="team-name" href="https://esloch.github.io/cv/">Sandro Loch</a></div><p class="team-role">{% translate "Platform & Data Infrastructure Engineer" %}</p></article>
     </div>
   </section>
 
   <section class="team-section">
     <h5 class="team-section-title">{% translate "Pesquisa, comunicação e formação" %}</h5>
     <div class="team-grid">
-      <article class="team-card"><div class="team-person"><div class="team-photo">RL</div><a class="team-name" href="https://lattes.cnpq.br/2518752229392005">Raquel Martins Lana</a></div><p class="team-role">{% translate "Pesquisadora associada" %} - {% translate "Barcelona Supercomputing Center (BSC) - Espanha" %}</p></article>
-      <article class="team-card"><div class="team-person"><div class="team-photo">LF</div><a class="team-name" href="https://lattes.cnpq.br/2996805485281003">Laís Picinini Freitas</a></div><p class="team-role">{% translate "Pesquisadora associada" %} - {% translate "PROCC/Fiocruz" %}</p></article>
-      <article class="team-card"><div class="team-person"><div class="team-photo">IA</div><a class="team-name" href="https://lattes.cnpq.br/6555136792794111">Iasmim Ferreira de Almeida</a></div><p class="team-role">{% translate "Pesquisadora associada - Emap/FGV" %}</p></article>
-      <article class="team-card"><div class="team-person"><div class="team-photo">RA</div><a class="team-name" href="https://lattes.cnpq.br/0485886911362331">Ramila Alencar</a></div><p class="team-role">{% translate "Programa de Doutorado em Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}</p></article>
-      <article class="team-card"><div class="team-person"><div class="team-photo">AG</div><a class="team-name" href="https://lattes.cnpq.br/2651948797512226">Ayrton Gouveia</a></div><p class="team-role">{% translate "Programa de Doutorado em Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}</p></article>
-      <article class="team-card"><div class="team-person"><div class="team-photo">DF</div><a class="team-name" href="https://lattes.cnpq.br/0421717413079286">Danielle Andreza da Cruz Ferreira</a></div><p class="team-role">{% translate "Pesquisadora associada - UFMG" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/raquel.jpg' %}" alt="{% translate 'Raquel Martins Lana' %}"></div><a class="team-name" href="https://lattes.cnpq.br/2518752229392005">Raquel Martins Lana</a></div><p class="team-role">{% translate "Pesquisadora associada" %} - {% translate "Barcelona Supercomputing Center (BSC) - Espanha" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/lais.png' %}" alt="{% translate 'Laís Picinini Freitas' %}"></div><a class="team-name" href="https://lattes.cnpq.br/2996805485281003">Laís Picinini Freitas</a></div><p class="team-role">{% translate "Pesquisadora associada" %} - {% translate "PROCC/Fiocruz" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/iasmim.jpg' %}" alt="{% translate 'Iasmim Ferreira de Almeida' %}"></div><a class="team-name" href="https://lattes.cnpq.br/6555136792794111">Iasmim Ferreira de Almeida</a></div><p class="team-role">{% translate "Pesquisadora associada - Emap/FGV" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/ramila.webp' %}" alt="{% translate 'Ramila Alencar' %}"></div><a class="team-name" href="https://lattes.cnpq.br/0485886911362331">Ramila Alencar</a></div><p class="team-role">{% translate "Programa de Doutorado em Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/ayrton.jpeg' %}" alt="{% translate 'Ayrton Gouveia' %}"></div><a class="team-name" href="https://lattes.cnpq.br/2651948797512226">Ayrton Gouveia</a></div><p class="team-role">{% translate "Programa de Doutorado em Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/nathaly.jpeg' %}" alt="{% translate 'Nathaly Dutra' %}"></div><span class="team-name">Nathaly Dutra</span></div><p class="team-role">{% translate "Doutoranda no Programa de Epidemiologia e Saúde Pública da ENSP" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/danielle.jpg' %}" alt="{% translate 'Danielle Andreza da Cruz Ferreira' %}"></div><a class="team-name" href="https://lattes.cnpq.br/0421717413079286">Danielle Andreza da Cruz Ferreira</a></div><p class="team-role">{% translate "Pesquisadora associada - UFMG" %}</p></article>
     </div>
   </section>
 
