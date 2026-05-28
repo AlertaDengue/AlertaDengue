@@ -2,111 +2,338 @@
 {% load static %}
 {% load i18n %}
 
-  {% block title %}{% translate "Equipe" %}{% endblock %}
+{% block title %}{% translate "Equipe" %}{% endblock %}
 
-  {% block content %}
-  <div class="card" id="diseaseTabContent"
-    style="background-color: #e0eefd63;
-    margin-bottom: 20px;
-    border-radius: 7px">
+{% block extra_head %}
+<style>
+  .team-page {
+    color: #263238;
+  }
 
-    <div class="card-body">
+  .team-hero {
+    background: linear-gradient(135deg, #058ED0 0%, #003E7E 100%);
+    border-radius: 7px;
+    color: #FFFFFF;
+    margin-bottom: 24px;
+    padding: 28px;
+  }
 
-      <h5>{% blocktranslate %}
-        O Sistema de Alerta Info Dengue é desenvolvido pela parceria de pesquisadores e profissionais
-        de diversas instituições{% endblocktranslate %}:</h5><br>
-      <b>{% translate "Coordenação Geral" %}:</b>
+  .team-hero h4 {
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .team-hero p {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 0;
+    max-width: 860px;
+  }
+
+  .team-section {
+    margin-bottom: 26px;
+  }
+
+  .team-section-title {
+    align-items: center;
+    color: #003E7E;
+    display: flex;
+    font-size: 1.15rem;
+    font-weight: 700;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .team-section-title::before {
+    background: #058ED0;
+    border-radius: 2px;
+    content: "";
+    display: inline-block;
+    height: 22px;
+    width: 5px;
+  }
+
+  .team-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+
+  .team-card {
+    background: #FFFFFF;
+    border: 1px solid #DCEAF5;
+    border-radius: 7px;
+    box-shadow: 0 6px 18px rgba(0, 62, 126, 0.08);
+    min-height: 190px;
+    padding: 16px;
+  }
+
+  .team-person {
+    align-items: center;
+    display: flex;
+    gap: 16px;
+    margin-bottom: 10px;
+  }
+
+  .team-photo {
+    align-items: center;
+    background: #E0EEFD;
+    border: 3px solid #058ED0;
+    border-radius: 50%;
+    color: #003E7E;
+    display: flex;
+    flex: 0 0 120px;
+    font-weight: 700;
+    height: 120px;
+    justify-content: center;
+    overflow: hidden;
+    width: 120px;
+  }
+
+  .team-photo img {
+    display: block;
+    height: 100%;
+    object-fit: contain;
+    width: 100%;
+  }
+
+  .team-name {
+    color: #003E7E;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .team-role {
+    color: #4D5C63;
+    font-size: 0.92rem;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .team-card a {
+    color: #003E7E;
+    text-decoration: none;
+  }
+
+  .team-card a:hover,
+  .team-card a:focus {
+    color: #058ED0;
+    text-decoration: underline;
+  }
+
+  .team-list-card {
+    background: #F8FBFD;
+    border-left: 5px solid #058ED0;
+    border-radius: 7px;
+    padding: 16px 18px;
+  }
+
+  .team-list-card ul {
+    columns: 2;
+    margin-bottom: 0;
+    padding-left: 18px;
+  }
+
+  .team-list-card li {
+    break-inside: avoid;
+    margin-bottom: 8px;
+  }
+
+  .team-contact {
+    background: #E0EEFD;
+    border-radius: 7px;
+    margin-top: 24px;
+    padding: 18px;
+  }
+
+  .team-contact a {
+    color: #003E7E;
+    font-weight: 700;
+  }
+
+  .team-list-card ul.team-partnerships-list {
+    columns: 1;
+  }
+
+  .team-partnerships-list a {
+    color: #003E7E;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .team-partnerships-list a:hover {
+    color: #058ED0;
+    text-decoration: underline;
+  }
+
+  .team-partnerships-list ul {
+    columns: 1;
+    margin-top: 6px;
+    padding-left: 20px;
+    list-style-type: circle;
+  }
+
+  @media (max-width: 767.98px) {
+    .team-hero {
+      padding: 20px;
+    }
+
+    .team-list-card ul {
+      columns: 1;
+    }
+  }
+
+  @media (max-width: 479.98px) {
+    .team-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .team-person {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="team-page">
+  <section class="team-hero">
+    <h4>{% translate "Quem faz o Infodengue" %}</h4>
+    <p>{% blocktranslate trimmed %}
+      O Infodengue, fruto de uma articulação entre a Fiocruz e Emap/FVG, 
+      é um sistema criado e desenvolvido por pesquisadores de instituições 
+      públicas e privadas que buscam soluções para o monitoramento de doenças transmitidas por vetores. 
+      Nossa equipe é composta por uma rede multidisciplinar que engloba profissionais da saúde, 
+      da tecnologia de informação, ciência de dados, vigilância epidemiológica e comunicação.
+    {% endblocktranslate %}</p>
+  </section>
+
+  <section class="team-section">
+    <h5 class="team-section-title">{% translate "Coordenação Geral" %}</h5>
+    <div class="team-grid">
+      <article class="team-card">
+        <div class="team-person"><div class="team-photo"><img src="{% static 'img/team/claudia.png' %}" alt="{% translate 'Cláudia Torres Codeço' %}"></div><a class="team-name" href="https://lattes.cnpq.br/1929576902623348">Cláudia Torres Codeço</a></div>
+        <p class="team-role">{% translate "PROCC/Fiocruz" %}</p>
+      </article>
+      <article class="team-card">
+        <div class="team-person"><div class="team-photo"><img src="{% static 'img/team/flavio.jpg' %}" alt="{% translate 'Flávio Codeço Coelho' %}"></div><a class="team-name" href="https://lattes.cnpq.br/0309050626285266">Flávio Codeço Coelho</a></div>
+        <p class="team-role">{% translate "Escola de Matemática Aplicada/FGV" %}</p>
+      </article>
+      <article class="team-card">
+        <div class="team-person"><div class="team-photo"><img src="{% static 'img/team/leo.jpg' %}" alt="{% translate 'Leonardo Soares Bastos' %}"></div><a class="team-name" href="https://lattes.cnpq.br/5241799121437269">Leonardo Soares Bastos</a></div>
+        <p class="team-role">{% translate "PROCC/Fiocruz" %}</p>
+      </article>
+      <article class="team-card">
+        <div class="team-person"><div class="team-photo"><img src="{% static 'img/team/oswaldo.png' %}" alt="{% translate 'Oswaldo Gonçalves Cruz' %}"></div><a class="team-name" href="https://lattes.cnpq.br/9530671289607786">Oswaldo Gonçalves Cruz</a></div>
+        <p class="team-role">{% translate "PROCC/Fiocruz" %}</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="team-section">
+    <h5 class="team-section-title">{% translate "Dados e situação epidemiológica" %}</h5>
+    <div class="team-grid">
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/sara.jpg' %}" alt="{% translate 'Sara de Souza Oliveira' %}"></div><a class="team-name" href="https://lattes.cnpq.br/2864482261450215">Sara de Souza Oliveira</a></div><p class="team-role">{% translate "Analista Infodengue - epidemiologia" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/thais.jpg' %}" alt="{% translate 'Thais I S Riback' %}"></div><a class="team-name" href="https://lattes.cnpq.br/4335590727747384">Thais I S Riback</a></div><p class="team-role">{% translate "Analista Infodengue - epidemiologia" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/vinicius.jpg' %}" alt="{% translate 'Vinicius Godinho' %}"></div><a class="team-name" href="https://lattes.cnpq.br/8508944359245527">Vinicius Godinho</a></div><p class="team-role">{% translate "Analista Infodengue - ciência de dados" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/eduardo.jpg' %}" alt="{% translate 'Eduardo Correa Araujo' %}"></div><a class="team-name" href="https://lattes.cnpq.br/2326164285897270">Eduardo Correa Araujo</a></div><p class="team-role">{% translate "Analista Infodengue - ciência de dados" %}</p></article>
+    </div>
+  </section>
+
+  <section class="team-section">
+    <h5 class="team-section-title">{% translate "Desenvolvimento" %}</h5>
+    <div class="team-grid">
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/lua.jpeg' %}" alt="{% translate 'Luã Bida Vacaro' %}"></div><a class="team-name" href="https://lattes.cnpq.br/2917646970654963">Luã Bida Vacaro</a></div><p class="team-role">{% translate "TI Infodengue & Mosqlimate" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/sandro.jpeg' %}" alt="{% translate 'Sandro Loch' %}"></div><a class="team-name" href="https://esloch.github.io/cv/">Sandro Loch</a></div><p class="team-role">{% translate "Platform & Data Infrastructure Engineer" %}</p></article>
+    </div>
+  </section>
+
+  <section class="team-section">
+    <h5 class="team-section-title">{% translate "Pesquisa, comunicação e formação" %}</h5>
+    <div class="team-grid">
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/raquel.jpg' %}" alt="{% translate 'Raquel Martins Lana' %}"></div><a class="team-name" href="https://lattes.cnpq.br/2518752229392005">Raquel Martins Lana</a></div><p class="team-role">{% translate "Pesquisadora associada" %} - {% translate "Barcelona Supercomputing Center (BSC) - Espanha" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/lais.png' %}" alt="{% translate 'Laís Picinini Freitas' %}"></div><a class="team-name" href="https://lattes.cnpq.br/2996805485281003">Laís Picinini Freitas</a></div><p class="team-role">{% translate "Pesquisadora associada" %} - {% translate "PROCC/Fiocruz" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/iasmim.jpg' %}" alt="{% translate 'Iasmim Ferreira de Almeida' %}"></div><a class="team-name" href="https://lattes.cnpq.br/6555136792794111">Iasmim Ferreira de Almeida</a></div><p class="team-role">{% translate "Pesquisadora associada - Emap/FGV" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/ramila.webp' %}" alt="{% translate 'Ramila Alencar' %}"></div><a class="team-name" href="https://lattes.cnpq.br/0485886911362331">Ramila Alencar</a></div><p class="team-role">{% translate "Programa de Doutorado em Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/ayrton.jpeg' %}" alt="{% translate 'Ayrton Gouveia' %}"></div><a class="team-name" href="https://lattes.cnpq.br/2651948797512226">Ayrton Gouveia</a></div><p class="team-role">{% translate "Programa de Doutorado em Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/nathaly.jpeg' %}" alt="{% translate 'Nathaly Dutra' %}"></div><span class="team-name">Nathaly Dutra</span></div><p class="team-role">{% translate "Doutoranda no Programa de Epidemiologia e Saúde Pública da ENSP" %}</p></article>
+      <article class="team-card"><div class="team-person"><div class="team-photo"><img src="{% static 'img/team/danielle.jpg' %}" alt="{% translate 'Danielle Andreza da Cruz Ferreira' %}"></div><a class="team-name" href="https://lattes.cnpq.br/0421717413079286">Danielle Andreza da Cruz Ferreira</a></div><p class="team-role">{% translate "Pesquisadora associada - UFMG" %}</p></article>
+    </div>
+  </section>
+
+  <section class="team-section">
+    <h5 class="team-section-title">{% translate "Comunidade Infodengue" %}</h5>
+    <div class="team-list-card">
+      <p>{% translate "Agradecemos a todos que participaram da comunidade Infodengue." %}</p>
       <ul>
-        <li><a href="https://lattes.cnpq.br/1929576902623348">Cláudia Torres Codeço</a>: {% translate "PROCC/Fiocruz" %}
-        <li><a href="https://lattes.cnpq.br/0309050626285266">Flávio Codeço Coelho</a>: {% translate "Escola de Matemática Aplicada/FGV" %}
-        <li><a href="https://lattes.cnpq.br/5241799121437269">Leonardo Soares Bastos</a>: {% translate "PROCC/Fiocruz" %}
-        <li><a href="https://lattes.cnpq.br/9530671289607786">Oswaldo Gonçalves Cruz</a>: {% translate "PROCC/Fiocruz" %}
-      </ul>
-      <b>{% translate "Analistas de dados e de situação epidemiológica:" %}:</b>
-      <ul>
-        <li><a href="https://lattes.cnpq.br/2864482261450215">Sara de Souza Oliveira</a>: {% translate "Analista Infodengue - epidemiologia" %}
-        <li><a href="https://lattes.cnpq.br/4335590727747384">Thais I S Riback</a> - {% translate "Analista Infodengue - epidemiologia" %}
-        <li><a href="https://lattes.cnpq.br/5099258319176445">Lucas Monteiro Bianchi</a> - {% translate "Analista Infodengue - estatística e epidemiologia" %}
-        <li><a href="https://lattes.cnpq.br/8508944359245527">Vinicius Godinho</a>: {% translate "Analista Infodengue - ciência de dados" %}
-        <li><a href="https://lattes.cnpq.br/2326164285897270">Eduardo Correa Araujo</a>: {% translate "Analista Infodengue - ciência de dados" %}
-      </ul>
-      <b>{% translate "Desenvolvimento" %}:</b>
-      <ul>
-        <li><a href="https://lattes.cnpq.br/2917646970654963">Luã Bida Vacaro</a>: {% translate "TI Infodengue & Mosqlimate" %}
-        <li><a href="https://lattes.cnpq.br/7764277601641080">Ivan Ogasawara</a>: {% translate "Consultor externo" %}
-        <li><a href="https://esloch.github.io/cv/">Sandro Loch</a>: {% translate "Consultor externo" %}
-      </ul>
-      <b>{% translate "Pesquisadores Associados" %}:</b>
-      <ul>
-        <li><a href="https://lattes.cnpq.br/2518752229392005">Raquel Martins Lana</a>: {% translate "Barcelona Supercomputing Center (BSC) - Espanha" %}
-        <li><a href="https://lattes.cnpq.br/2996805485281003">Laís Picinini Freitas</a>: {% translate "PROCC/Fiocruz" %}
-      </ul>
-      <b>{% translate "Comunicação" %}:</b>
-      <ul>
-        <li><a href="https://lattes.cnpq.br/2219603304725763">Marcelle Chagas</a> - {% translate "comunicação e engajamento" %}
-      </ul>
-      <b>{% translate "Doutorandos e Mestrandos" %}:</b>
-      <ul>
-        <li><a href="https://lattes.cnpq.br/6555136792794111">Iasmim Ferreira de Almeida</a> - {% translate "Programa de Doutorado em Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}</li>
-        <li><a href="https://lattes.cnpq.br/0485886911362331">Ramila Alencar</a> - {% translate "Programa de Doutorado em Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}</li>
-        <li><a href="https://lattes.cnpq.br/2651948797512226">Ayrton Gouveia</a> - {% translate "Programa de Doutorado em Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}</li>
-        <li><a href="https://lattes.cnpq.br/0421717413079286">Danielle Andreza da Cruz Ferreira</a> - {% translate "Programa de Doutorado em Parasitologia - Universidade Federal de Minas Gerais (UFMG)" %}</li>
-        <li><a href="https://lattes.cnpq.br/9746873482395128">Dalila Oliveira</a> - {% translate "Programa de Mestrado em Medicina Tropical - IOC/Fiocruz" %}</li>
-        <li><a href="https://lattes.cnpq.br/3293230312200648">Jo de Napole Arruda Dias</a> - {% translate "Programa de Mestrado em Biologia Computacional e Sistemas - IOC/Fiocruz" %}</li>
-      </ul>
-      <b>{% translate "Agradecimentos a todos que participaram da comunidade Infodengue" %}:</b>
-      <ul>
+        <li><a href="https://lattes.cnpq.br/2219603304725763">Marcelle Chagas</a> - {% translate "Comunicação e engajamento" %}</li>
+        <li><a href="https://lattes.cnpq.br/7764277601641080">Ivan Ogasawara</a> - {% translate "Consultor externo" %}</li>
+        <li><a href="https://lattes.cnpq.br/5099258319176445">Lucas Monteiro Bianchi</a> - {% translate "Analista de dados" %}</li>
         <li><a href="https://lattes.cnpq.br/1316412551645220">Mauro Martins Teixeira</a> - {% translate "Observatório da Dengue/UFMG" %}</li>
         <li><a href="https://lattes.cnpq.br/5566477869758674">Magda C V C Ribeiro</a> - {% translate "Instituto de Biociências/UFPR" %}</li>
         <li><a href="https://lattes.cnpq.br/6064559192125515">Marcelo F C Gomes</a> - {% translate "PROCC/Fiocruz" %}</li>
         <li><a href="https://lattes.cnpq.br/4016632420686251">Daniel A M Villela</a> - {% translate "PROCC/Fiocruz" %}</li>
-        <li><a href="https://lattes.cnpq.br/4132749866565570">Nathaly Dutra</a> - {% translate "Aluna de mestrado do Programa de Epidemiologia em Saúde Pública - ENSP/Fiocruz" %}</li>
+        <li><a href="https://lattes.cnpq.br/6064559192125515">Marcelo F C Gomes</a> - {% translate "IOC/Fiocruz" %}</li>
+        <li><a href="https://lattes.cnpq.br/6064559192125515">Dalila Oliveira</a> - {% translate "Programa de Mestrado em Medicina Tropical - IOC/Fiocruz" %}</li>
+        <li><a href="https://lattes.cnpq.br/6064559192125515">Jo de Napole Arruda Dias</a> - {% translate "Programa de Mestrado em Biologia Computacional e Sistemas - IOC/Fiocruz" %}</li>
       </ul>
-      <b>{% translate "Parceria" %}:</b>
-      <ul>
-        <li><a href="https://observatorio.inweb.org.br">Observatório da Dengue</a>
-        <li><a href="http://www.saude.rj.gov.br/">Secretaria Estadual de Saúde do Rio de Janeiro</a>
-        <li><a href="https://saude.es.gov.br/">Secretaria Estadual de Saúde do Estado do Espirito Santo</a>
-        <li><a href="https://www.saude.pr.gov.br/">Secretaria Estadual de Saúde do Estado do Paraná</a>
-        <li><a href="https://www.saude.ce.gov.br/">Secretaria Estadual de Saúde do Estado do Ceará</a>
-        <li><a href="https://www.saude.mg.gov.br/">Secretaria Estadual de Saúde do Estado de Minas Gerais</a>
-        <li><a href="https://www.saude.ma.gov.br/">Secretaria Estadual de Saúde do Estado do Maranhão</a>
-        <li><a href="https://www.saude.sc.gov.br/">Secretaria Estadual de Saúde do Estado de Santa Catarina</a>
-        <li><a href="https://www.rio.rj.gov.br/web/sms">Secretaria Municipal de Saúde/Rio de Janeiro/RJ</a>
-        <li><a href="http://www.saude.riopreto.sp.gov.br/transparencia/">Secretaria Municipal de Saúde de São José do Rio Preto/SP</a>
-        <li><a href="https://www2.bauru.sp.gov.br/saude/">Secretaria Municipal de Saúde de Bauru/SP</a>
-        <li><a href="https://saude.sorocaba.sp.gov.br/">Secretaria Municipal de Saúde de Sorocaba/SP</a>
-        <li><a href="https://prefeitura.poa.br/sms">Secretaria Municipal de Saúde de Porto Alegre/RS</a>
-        <li><a href="http://www.riobranco.ac.gov.br/">Secretaria Municipal de Saúde de Rio Branco/AC</a>
-        <li><a href="https://www.vs.saude.ms.gov.br/">Secretaria de Vigilância em Saúde/MS</a>
-      </ul>
-      <b>{% translate "Apoio" %}:</b>
-      <ul>
-        <li> {% translate "DECIT/MS (2014 – 2016)" %}
-        <li> {% translate "Fiocruz Edital Inova 2019 (2019-2021)" %}
-        <li> {% translate "FNS/MS (2020-2021)" %}
-      </ul>
-      <b>{% translate "Oportunidade" %}:</b>
-      <ul>
+    </div>
+  </section>
+
+  <section class="team-section">
+    <h5 class="team-section-title">{% translate "Parcerias" %}</h5>
+    <div class="team-list-card">
+      <p>{% translate "O Infodengue mantém colaborações estratégicas e atua como parte interessada em outros projetos e programas, promovendo trocas e parcerias. Entre eles estão:" %}</p>
+      <ul class="team-partnerships-list">
         <li>
-          {% blocktrans trimmed %}
-          O infodengue está com uma vaga aberta para profissional com experiência em 
-          ciência de dados em saúde e programação R. 
-          Mais informações podem ser acessadas no 
-          {% endblocktrans %}
-          <a href="{% static 'docs/processo_seletivo_infodengue_2026_vagaDevR.pdf' %}"
-            target="_blank"
-            rel="noopener">
-            {% translate "edital" %}.
+          <a href="https://www.gov.br/saude/pt-br/centrais-de-conteudo/publicacoes/guias-e-manuais/2025/plano-de-contingencia-nacional-para-dengue-chikungunya-e-zika.pdf" target="_blank" rel="noopener">
+            {% translate "Coordenação-Geral de Vigilância de Arboviroses - Ministério da Saúde (CGArb)" %}
+          </a>
+          - {% translate "Plano de Contingência Nacional para Dengue, Chikungunya e Zika (documento que define as modelagens encomendadas ao infodengue como uma das estratégias para subsidiar a tomada de decisão na preparação para epidemias por arboviroses)." %}
+        </li>
+        <li>
+          {% translate "Organização Pan-Americana da Saúde (OPAS/OMS)" %}
+        </li>
+        <li>
+          <strong><a href="https://www.bsc.es/" target="_blank" rel="noopener">{% translate "Barcelona Supercomputing Center (BSC)" %}</a></strong>:
+          <ul>
+            <li>
+              <a href="https://www.bsc.es/research-and-development/projects/harmonize-harmonizing-multi-scale-spatiotemporal-data-health" target="_blank" rel="noopener">HARMONIZE</a>:
+              {% translate "Harmonizing multi-scale spatiotemporal data for health in climate." %}
+            </li>
+            <li>
+              <a href="https://www.bsc.es/es/research-and-development/projects/idextremes-digital-technology-development-award-climate-sensitive" target="_blank" rel="noopener">IDExtremes</a>:
+              {% translate "Digital Technology Development Award in Climate Sensitive Infectious Disease Modelling." %}
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="https://lac.tghn.org/projetos-pathfinder/infodengue/" target="_blank" rel="noopener">
+            {% translate "The Global Health Network Latin America and Caribbean (TGHN LAC)" %}
           </a>
         </li>
+        <li>
+          <a href="https://mosqlimate.org/" target="_blank" rel="noopener">{% translate "Mosqlimate" %}</a>
+        </li>
       </ul>
-
-      <p>
-        <b>{% translate "Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta Info Dengue?" %}
-          <i><a href='mailto:alerta_dengue@fiocruz.br'> {% translate "Entre em contato conosco" %}</a></i></b>.
-      </p>
     </div>
-  </div>
+  </section>
 
-  {% endblock %}
+  <section class="team-section">
+    <h5 class="team-section-title">{% translate "Apoio" %}</h5>
+    <div class="team-list-card">
+      <ul>
+        <li>{% translate "DECIT/MS (2014-2016)" %}</li>
+        <li>{% translate "Fiocruz Edital Inova 2019 (2019-2021)" %}</li>
+        <li>{% translate "FNS/MS (2020-2027)" %}</li>
+      </ul>
+    </div>
+  </section>
+
+  <p class="team-contact">
+    <strong>{% translate "Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta Infodengue?" %}</strong>
+    <a href="mailto:alerta_dengue@fiocruz.br">{% translate "Entre em contato conosco" %}</a>.
+  </p>
+</div>
+{% endblock %}

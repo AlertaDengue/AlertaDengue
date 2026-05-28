@@ -741,11 +741,6 @@ table#change-history tbody th {
     margin-right: -19em;
 }
 
-#footer {
-    clear: both;
-    padding: 10px;
-}
-
 /* COLUMN TYPES */
 
 .colMS {

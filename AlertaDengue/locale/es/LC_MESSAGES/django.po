@@ -2801,7 +2801,7 @@ msgstr "PROCC/Fiocruz"
 
 #: dados/templates/team.html:21
 msgid "Escola de Matemática Aplicada/FGV"
-msgstr "Escola de Matemática Aplicada/FGV"
+msgstr "Escuela de Matemática Aplicada/FGV"
 
 #: dados/templates/team.html:25
 #, fuzzy
@@ -2811,27 +2811,27 @@ msgstr "Situación Epidemiológica"
 
 #: dados/templates/team.html:27 dados/templates/team.html:28
 msgid "Analista Infodengue - epidemiologia"
-msgstr ""
+msgstr "Analista de Infodengue - Epidemiología"
 
 #: dados/templates/team.html:29
 msgid "Analista Infodengue - estatística e epidemiologia"
-msgstr ""
+msgstr "Analista de Infodengue - Estadística y Epidemiología"
 
 #: dados/templates/team.html:30 dados/templates/team.html:31
 msgid "Analista Infodengue - ciência de dados"
-msgstr ""
+msgstr "Analista de Infodengue - Ciencia de Datos"
 
 #: dados/templates/team.html:33
 msgid "Desenvolvimento"
-msgstr "Desarrollo"
+msgstr "Desarrolladores de Software"
 
 #: dados/templates/team.html:35
 msgid "TI Infodengue & Mosqlimate"
-msgstr ""
+msgstr "TI de Infodengue y Mosqlimate"
 
 #: dados/templates/team.html:36 dados/templates/team.html:37
 msgid "Consultor externo"
-msgstr ""
+msgstr "Consultor Externo"
 
 #: dados/templates/team.html:39
 #, fuzzy
@@ -2841,7 +2841,7 @@ msgstr "Investigador Asociado - PROCC/Fiocruz"
 
 #: dados/templates/team.html:41
 msgid "Barcelona Supercomputing Center (BSC) - Espanha"
-msgstr ""
+msgstr "Barcelona Supercomputing Center (BSC) - España"
 
 #: dados/templates/team.html:44
 msgid "Comunicação"
@@ -2864,19 +2864,17 @@ msgstr ""
 #| "Aluna de doutorado do Programa de Epidemiologia em Saúde Pública - ENSP/"
 #| "Fiocruz"
 msgid "Programa de Doutorado em Epidemiologia em Saúde Pública - ENSP/Fiocruz"
-msgstr ""
-"Estudiante de doctorado del \"Programa de Epidemiologia em Saúde Pública - "
-"ENSP/Fiocruz\""
+msgstr "Programa de Doctorado en Epidemiología y Salud Pública - ENSP/Fiocruz"
 
 #: dados/templates/team.html:53
 msgid ""
 "Programa de Doutorado em Parasitologia - Universidade Federal de Minas "
 "Gerais (UFMG)"
-msgstr ""
+msgstr "Programa de Doctorado en Parasitología - Universidad Federal de Minas Gerais (UFMG)"
 
 #: dados/templates/team.html:54
 msgid "Programa de Mestrado em Medicina Tropical - IOC/Fiocruz"
-msgstr ""
+msgstr "Programa de Maestría en Medicina Tropical - IOC/Fiocruz"
 
 #: dados/templates/team.html:55
 #, fuzzy
@@ -2884,9 +2882,7 @@ msgstr ""
 #| "Aluno de doutorado do Programa de Biologia Computacional e Sistemas - IOC/"
 #| "Fiocruz"
 msgid "Programa de Mestrado em Biologia Computacional e Sistemas - IOC/Fiocruz"
-msgstr ""
-"Estudiante de doctorado del \"Programa de Biología Computacional e Sistemas "
-"- IOC/Fiocruz\""
+msgstr "Programa de Maestría en Biología Computacional y Sistemas - IOC/Fiocruz"
 
 #: dados/templates/team.html:57
 msgid "Agradecimentos a todos que participaram da comunidade Infodengue"
@@ -2894,19 +2890,17 @@ msgstr ""
 
 #: dados/templates/team.html:59
 msgid "Observatório da Dengue/UFMG"
-msgstr "Observatório da Dengue/UFMG"
+msgstr "Observatorio del Dengue/UFMG"
 
 #: dados/templates/team.html:60
 msgid "Instituto de Biociências/UFPR"
-msgstr "Instituto de Biociências/UFPR"
+msgstr "Instituto de Biociencias/UFPR"
 
 #: dados/templates/team.html:63
 msgid ""
 "Aluna de mestrado do Programa de Epidemiologia em Saúde Pública - ENSP/"
 "Fiocruz"
-msgstr ""
-"Estudiante de maestría del \"Programa de Epidemiologia em Saúde Pública - "
-"ENSP/Fiocruz\""
+msgstr "Estudiante de maestría del Programa de Epidemiología en Salud Pública - ENSP/Fiocruz"
 
 #: dados/templates/team.html:65
 msgid "Parceria"
@@ -2922,7 +2916,7 @@ msgstr "DECIT/MS (2014 – 2016)"
 
 #: dados/templates/team.html:86
 msgid "Fiocruz Edital Inova 2019 (2019-2021)"
-msgstr "Fiocruz Edital Inova 2019 (2019-2021)"
+msgstr "Convocatoria Fiocruz Inova 2019 (2019-2021)"
 
 #: dados/templates/team.html:87
 msgid "FNS/MS (2020-2021)"
@@ -2956,7 +2950,7 @@ msgstr ""
 
 #: dados/templates/team.html:107
 msgid "Entre em contato conosco"
-msgstr "Contáctenos"
+msgstr "Póngase en contacto con nosotros"
 
 #: dados/views.py:904
 msgid "°C temperatura mínima"
@@ -3676,3 +3670,223 @@ msgstr "Consulte términos y conceptos importantes utilizados en las alertas, in
 #: dados/templates/components/home/home_functionalities_section.html:115
 msgid "Glossário Infodengue"
 msgstr "Glosario Infodengue"
+
+#: dados/templates/team.html
+msgid "Quem faz o InfoDengue"
+msgstr "Quiénes hacen InfoDengue"
+
+#: dados/templates/team.html
+msgid "O Sistema de Alerta Info Dengue é desenvolvido por uma rede de pesquisadores, profissionais de tecnologia, comunicação e vigilância epidemiológica de diversas instituições."
+msgstr "El Sistema de Alerta InfoDengue es desarrollado por una red de investigadores y profesionales de tecnología, comunicación y vigilancia epidemiológica de varias instituciones."
+
+#: dados/templates/team.html
+msgid "Dados e situação epidemiológica"
+msgstr "Datos y Situación Epidemiológica"
+
+#: dados/templates/team.html
+msgid "Analista InfoDengue - epidemiologia"
+msgstr "Analista de InfoDengue - epidemiología"
+
+#: dados/templates/team.html
+msgid "Analista InfoDengue - estatística e epidemiologia"
+msgstr "Analista de InfoDengue - estadística y epidemiología"
+
+#: dados/templates/team.html
+msgid "Analista InfoDengue - ciência de dados"
+msgstr "Analista de InfoDengue - ciencia de datos"
+
+#: dados/templates/team.html
+msgid "TI InfoDengue & Mosqlimate"
+msgstr "TI de InfoDengue y Mosqlimate"
+
+#: dados/templates/team.html
+msgid "Pesquisa, comunicação e formação"
+msgstr "Investigación, Comunicación y Formación"
+
+#: dados/templates/team.html
+msgid "Pesquisadora associada"
+msgstr "Investigadora Asociada"
+
+#: dados/templates/team.html
+msgid "Comunicação e engajamento"
+msgstr "Comunicación y Participación"
+
+#: dados/templates/team.html
+msgid "Comunidade InfoDengue"
+msgstr "Comunidad InfoDengue"
+
+#: dados/templates/team.html
+msgid "Agradecemos a todos que participaram da comunidade InfoDengue."
+msgstr "Agradecemos a todas las personas que han contribuido a la comunidad InfoDengue."
+
+#: dados/templates/team.html
+msgid "Parcerias"
+msgstr "Alianzas"
+
+#: dados/templates/team.html
+msgid "DECIT/MS (2014-2016)"
+msgstr "DECIT/MS (2014-2016)"
+
+#: dados/templates/team.html
+msgid "O InfoDengue está com uma vaga aberta para profissional com experiência em ciência de dados em saúde e programação R."
+msgstr "InfoDengue tiene una vacante abierta para un/a profesional con experiencia en ciencia de datos en salud y programación en R."
+
+#: dados/templates/team.html
+msgid "Acesse o edital"
+msgstr "Acceda a la convocatoria"
+
+#: dados/templates/team.html
+msgid "Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta InfoDengue?"
+msgstr "¿Le gustaría obtener más información o hacer preguntas sobre el Sistema de Alerta InfoDengue?"
+
+#: dados/templates/team.html
+msgid "Quem faz o Infodengue"
+msgstr "Quiénes Hacen Infodengue"
+
+#: dados/templates/team.html
+msgid "Platform & Data Infrastructure Engineer"
+msgstr "Ingeniero de Plataforma e Infraestructura de Datos"
+
+#: dados/templates/team.html
+msgid "Pesquisadora associada - Emap/FGV"
+msgstr "Investigadora Asociada - Emap/FGV"
+
+#: dados/templates/team.html
+msgid "Doutoranda no Programa de Epidemiologia e Saúde Pública da ENSP"
+msgstr "Doctoranda en el Programa de Epidemiología y Salud Pública de la ENSP"
+
+#: dados/templates/team.html
+msgid "Pesquisadora associada - UFMG"
+msgstr "Investigadora Asociada - UFMG"
+
+#: dados/templates/team.html
+msgid "Comunidade Infodengue"
+msgstr "Comunidad Infodengue"
+
+#: dados/templates/team.html
+msgid "Agradecemos a todos que participaram da comunidade Infodengue."
+msgstr "Agradecemos a todas las personas que han contribuido a la comunidad Infodengue."
+
+#: dados/templates/team.html
+msgid "Analista de dados"
+msgstr "Analista de Datos"
+
+#: dados/templates/team.html
+msgid "IOC/Fiocruz"
+msgstr "IOC/Fiocruz"
+
+#: dados/templates/team.html
+msgid "O Infodengue mantém colaborações estratégicas e atua como parte interessada em outros projetos e programas, promovendo trocas e parcerias. Entre eles estão:"
+msgstr "Infodengue mantiene colaboraciones estratégicas y participa como parte interesada en otros proyectos y programas, promoviendo intercambios y alianzas. Entre ellos están:"
+
+#: dados/templates/team.html
+msgid "Coordenação-Geral de Vigilância de Arboviroses - Ministério da Saúde (CGArb)"
+msgstr "Coordinación General de Vigilancia de Arbovirosis - Ministerio de Salud (CGArb)"
+
+#: dados/templates/team.html
+msgid "Plano de Contingência Nacional para Dengue, Chikungunya e Zika (documento que define as modelagens encomendadas ao infodengue como uma das estratégias para subsidiar a tomada de decisão na preparação para epidemias por arboviroses)."
+msgstr "Plan Nacional de Contingencia para Dengue, Chikungunya y Zika (documento que define los modelos encargados a Infodengue como una de las estrategias para apoyar la toma de decisiones en la preparación ante epidemias por arbovirosis)."
+
+#: dados/templates/team.html
+msgid "Organização Pan-Americana da Saúde (OPAS/OMS)"
+msgstr "Organización Panamericana de la Salud (OPS/OMS)"
+
+#: dados/templates/team.html
+msgid "Barcelona Supercomputing Center (BSC)"
+msgstr "Barcelona Supercomputing Center (BSC)"
+
+#: dados/templates/team.html
+msgid "Harmonizing multi-scale spatiotemporal data for health in climate."
+msgstr "Armonización de datos espaciotemporales multiescala para la salud en el clima."
+
+#: dados/templates/team.html
+msgid "Digital Technology Development Award in Climate Sensitive Infectious Disease Modelling."
+msgstr "Premio al Desarrollo de Tecnología Digital en Modelización de Enfermedades Infecciosas Sensibles al Clima."
+
+#: dados/templates/team.html
+msgid "The Global Health Network Latin America and Caribbean (TGHN LAC)"
+msgstr "The Global Health Network América Latina y el Caribe (TGHN LAC)"
+
+#: dados/templates/team.html
+msgid "Mosqlimate"
+msgstr "Mosqlimate"
+
+#: dados/templates/team.html
+msgid "FNS/MS (2020-2027)"
+msgstr "FNS/MS (2020-2027)"
+
+#: dados/templates/team.html
+msgid "Gostaria de ter mais informações ou tirar dúvidas sobre o Sistema de Alerta Infodengue?"
+msgstr "¿Desea obtener más información o resolver dudas sobre el Sistema de Alerta Infodengue?"
+
+#: dados/templates/team.html
+msgid "O Infodengue, fruto de uma articulação entre a Fiocruz e Emap/FVG, é um sistema criado e desenvolvido por pesquisadores de instituições públicas e privadas que buscam soluções para o monitoramento de doenças transmitidas por vetores. Nossa equipe é composta por uma rede multidisciplinar que engloba profissionais da saúde, da tecnologia de informação, ciência de dados, vigilância epidemiológica e comunicação."
+msgstr "Infodengue, resultado de una articulación entre Fiocruz y Emap/FGV, es un sistema creado y desarrollado por investigadores de instituciones públicas y privadas que buscan soluciones para el monitoreo de enfermedades transmitidas por vectores. Nuestro equipo está compuesto por una red multidisciplinaria que incluye profesionales de la salud, tecnología de la información, ciencia de datos, vigilancia epidemiológica y comunicación."
+
+#: dados/templates/team.html
+msgid "Cláudia Torres Codeço"
+msgstr "Cláudia Torres Codeço"
+
+#: dados/templates/team.html
+msgid "Flávio Codeço Coelho"
+msgstr "Flávio Codeço Coelho"
+
+#: dados/templates/team.html
+msgid "Leonardo Soares Bastos"
+msgstr "Leonardo Soares Bastos"
+
+#: dados/templates/team.html
+msgid "Oswaldo Gonçalves Cruz"
+msgstr "Oswaldo Gonçalves Cruz"
+
+#: dados/templates/team.html
+msgid "Sara de Souza Oliveira"
+msgstr "Sara de Souza Oliveira"
+
+#: dados/templates/team.html
+msgid "Thais I S Riback"
+msgstr "Thais I S Riback"
+
+#: dados/templates/team.html
+msgid "Vinicius Godinho"
+msgstr "Vinicius Godinho"
+
+#: dados/templates/team.html
+msgid "Eduardo Correa Araujo"
+msgstr "Eduardo Correa Araujo"
+
+#: dados/templates/team.html
+msgid "Luã Bida Vacaro"
+msgstr "Luã Bida Vacaro"
+
+#: dados/templates/team.html
+msgid "Sandro Loch"
+msgstr "Sandro Loch"
+
+#: dados/templates/team.html
+msgid "Raquel Martins Lana"
+msgstr "Raquel Martins Lana"
+
+#: dados/templates/team.html
+msgid "Laís Picinini Freitas"
+msgstr "Laís Picinini Freitas"
+
+#: dados/templates/team.html
+msgid "Iasmim Ferreira de Almeida"
+msgstr "Iasmim Ferreira de Almeida"
+
+#: dados/templates/team.html
+msgid "Ramila Alencar"
+msgstr "Ramila Alencar"
+
+#: dados/templates/team.html
+msgid "Ayrton Gouveia"
+msgstr "Ayrton Gouveia"
+
+#: dados/templates/team.html
+msgid "Nathaly Dutra"
+msgstr "Nathaly Dutra"
+
+#: dados/templates/team.html
+msgid "Danielle Andreza da Cruz Ferreira"
+msgstr "Danielle Andreza da Cruz Ferreira"
