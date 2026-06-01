@@ -135,7 +135,7 @@ jobs:
 
     - name: Start containers
       run: |
-        sugar --profile dev compose-ext start --services web,celery -- -d
+        sugar --profile dev compose-ext start --services web,celery,frontend -- -d
 
     - name: Container wait all
       run: |

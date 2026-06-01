@@ -6,17 +6,6 @@ defaults:
   project-name: infodengue-${{ env.ENV }}
 
 profiles:
-  frontend:
-    project-name: infodengue
-    env-file: .envs/.env
-    config-path:
-      - containers/compose-base.yaml
-    services:
-      default:
-        - frontend
-      available:
-        - name: postgres
-
   dev:
     project-name: infodengue-dev
     env-file: .envs/.env
@@ -26,6 +15,7 @@ profiles:
       - containers/compose-pgbackrest.yaml
     services:
       default:
+        - frontend
         - postgres
         - memcached
         - rabbitmq
@@ -34,6 +24,7 @@ profiles:
         - celery
         - celery-beat
       available:
+        - name: frontend
         - name: postgres
         - name: memcached
         - name: rabbitmq
