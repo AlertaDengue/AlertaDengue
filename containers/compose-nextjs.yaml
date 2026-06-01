@@ -1,6 +1,6 @@
 services:
   frontend:
-    hostname: frotnend
+    hostname: frontend
     build:
       context: ..
       dockerfile: containers/nextjs/Dockerfile
@@ -23,3 +23,9 @@ services:
       timeout: 10s
       retries: 5
       start_period: 40s
+    networks:
+      - infodengue
+
+networks:
+  infodengue:
+    driver: bridge
