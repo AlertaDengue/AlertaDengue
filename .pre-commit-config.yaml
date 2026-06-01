@@ -1,7 +1,7 @@
 default_language_version:
   python: python3.11
 
-default_stages: [pre-commit, pre-push]
+default_stages: [commit, push]
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -19,7 +19,6 @@ repos:
         files: ""
         exclude: ^$
         types: [python, file, python]
-        stages: [pre-commit]
         pass_filenames: true
         args: ["--line-length", "79"]
 
@@ -30,6 +29,5 @@ repos:
         files: ""
         exclude: ^.*/js/.*$
         types: [python]
-        stages: [pre-commit]
         pass_filenames: true
         args: ["--profile", "black", "-l", "79"]

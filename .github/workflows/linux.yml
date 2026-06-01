@@ -12,6 +12,7 @@ env:
   DEBUG: False
   ENV: dev
   DJANGO_PORT: 8000
+  FRONTEND_PORT: 8001
   HOST_UID: 1001
   HOST_GID: 1001
   SECRET_KEY: my-secret-key
@@ -143,9 +144,9 @@ jobs:
     - name: Unit tests
       run: makim tests.unit
 
-    - name: Setup tmate session
-      if: "${{ failure() }}"
-      uses: mxschmitt/action-tmate@v3
+    # - name: Setup tmate session
+    #   if: "${{ failure() }}"
+    #   uses: mxschmitt/action-tmate@v3
 
     - name: Show logs on failure
       if: ${{ failure() }}
