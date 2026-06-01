@@ -1,7 +1,7 @@
 FROM node:20-alpine AS base
 WORKDIR /app
 
-RUN apk add --no-cache bash sudo shadow
+RUN apk add --no-cache bash shadow
 
 ARG UID
 ARG GID

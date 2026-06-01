@@ -1,4 +1,4 @@
-export const BACKEND_PORT = process.env.DJANGO_PORT;
+export const DJANGO_PORT = process.env.DJANGO_PORT;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

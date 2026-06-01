@@ -10,7 +10,7 @@ services:
         - PORT=${FRONTEND_PORT}
     environment:
       PORT: ${FRONTEND_PORT}
-      BACKEND_PORT: ${DJANGO_PORT}
+      DJANGO_PORT: ${DJANGO_PORT}
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
     env_file:
