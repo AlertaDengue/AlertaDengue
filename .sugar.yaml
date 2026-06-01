@@ -13,6 +13,7 @@ profiles:
       - containers/compose-base.yaml
       - containers/compose-dev.yaml
       - containers/compose-pgbackrest.yaml
+      - containers/compose-nextjs.yaml
     services:
       default:
         - frontend

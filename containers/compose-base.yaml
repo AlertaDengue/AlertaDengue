@@ -1,31 +1,4 @@
 services:
-  frontend:
-    hostname: frotnend
-    build:
-      context: ..
-      dockerfile: containers/nextjs/Dockerfile
-      args:
-        - UID=${HOST_UID}
-        - GID=${HOST_GID}
-        - PORT=${FRONTEND_PORT}
-    environment:
-      PORT: ${FRONTEND_PORT}
-      BACKEND_PORT: ${DJANGO_PORT}
-    ports:
-      - ${FRONTEND_PORT}:${FRONTEND_PORT}
-    env_file:
-      - ../.envs/.env
-    user: "alertadengue:alertadengue"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:${FRONTEND_PORT}"]
-      interval: 60s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
-    networks:
-      - infodengue
-
   memcached:
     image: memcached:alpine
     entrypoint:

@@ -12,9 +12,7 @@ RUN deluser --remove-home node \
     && adduser -u ${UID} -G alertadengue -s /bin/bash -D alertadengue \
     && mkdir -p /opt/services/alertadengue /opt/conda \
     && chmod -R a+rwx /opt/conda /opt/services \
-    && chown -R alertadengue:alertadengue /opt/services \
-    && echo "alertadengue ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/alertadengue \
-    && chmod 0440 /etc/sudoers.d/alertadengue
+    && chown -R alertadengue:alertadengue /opt/services
 
 FROM base AS deps
 COPY frontend/package*.json ./
