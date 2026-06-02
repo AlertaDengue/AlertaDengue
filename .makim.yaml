@@ -281,6 +281,10 @@ groups:
               args:
                 timeout: ${{ args.timeout }}
                 service: celery
+            - task: develop.container-wait
+              args:
+                timeout: ${{ args.timeout }}
+                service: frontend
 
       clean:
         help: Clean all generated artifacts from the project.

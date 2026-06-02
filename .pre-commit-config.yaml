@@ -19,7 +19,6 @@ repos:
         files: ""
         exclude: ^$
         types: [python, file, python]
-        stages: [pre-commit]
         pass_filenames: true
         args: ["--line-length", "79"]
 
@@ -30,6 +29,5 @@ repos:
         files: ""
         exclude: ^.*/js/.*$
         types: [python]
-        stages: [pre-commit]
         pass_filenames: true
         args: ["--profile", "black", "-l", "79"]

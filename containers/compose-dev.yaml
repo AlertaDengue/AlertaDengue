@@ -1,4 +1,18 @@
 services:
+  frontend:
+    build:
+      context: ..
+      dockerfile: containers/nextjs/Dockerfile
+      target: deps
+    environment:
+        NODE_ENV: development
+        WATCHPACK_POLLING: "true"
+    volumes:
+      - ../frontend/:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+
   postgres:
     volumes:
       - "${HOST_PGDATA:-/opt/data/infodengue/dev/pgdata}:/var/lib/postgresql/data"

@@ -12,6 +12,7 @@ env:
   DEBUG: False
   ENV: dev
   DJANGO_PORT: 8000
+  FRONTEND_PORT: 8001
   HOST_UID: 1001
   HOST_GID: 1001
   SECRET_KEY: my-secret-key
@@ -119,14 +120,34 @@ jobs:
         mkdir -p .envs
         envsubst < .envs/.env.tpl > .envs/.env
 
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+        cache: "npm"
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install frontend dependencies
+      run: npm ci
+      working-directory: frontend
+
+    - name: Typecheck and build frontend
+      run: |
+        npm run typecheck
+        npm run build
+      working-directory: frontend
+
     - name: Linting
       run: |
         pre-commit install -t pre-commit -t commit-msg -t pre-push
         pre-commit run --all-files
 
-    - name: Build containers
+    - name: Build frontend
       run: |
-        sugar --profile dev compose build --no-cache
+        sugar --profile dev compose build --options --no-cache --services frontend
+
+    - name: Build backend
+      run: |
+        sugar --profile dev compose build --options --no-cache --services web,celery,celery-beat
 
     - name: Start postgres database
       run: |
@@ -134,7 +155,7 @@ jobs:
 
     - name: Start containers
       run: |
-        sugar --profile dev compose-ext start --services web,celery -- -d
+        sugar --profile dev compose-ext start --services web,celery,frontend -- -d
 
     - name: Container wait all
       run: |
