@@ -1251,12 +1251,33 @@ groups:
               ;;
           esac
 
-          sugar --profile "$PROFILE" compose-ext stop postgres || true
+          set -a
+          source .envs/.env
+          set +a
+
+          : "${HOST_PGDATA:?HOST_PGDATA is required}"
+
+          HOST_UID="${HOST_UID:-$(id -u)}"
+          HOST_GID="${HOST_GID:-$(id -g)}"
+
+          sugar --profile "$PROFILE" compose-ext stop \
+            --services postgres pgbackrest || true
+
+          sudo rm -rf "$HOST_PGDATA"
+          sudo mkdir -p "$HOST_PGDATA"
+          sudo chown -R "$HOST_UID:$HOST_GID" "$HOST_PGDATA"
+
+          sugar --profile "$PROFILE" compose-ext start \
+            --services pgbackrest \
+            --options -d
 
           sugar --profile "$PROFILE" compose exec \
             --service pgbackrest \
-            --cmd "bash -lc 'set -euo pipefail; rm -rf /var/lib/postgresql/data/*; pgbackrest --stanza=\"$PROFILE\" --log-level-console=info restore'" \
+            --cmd "bash -lc 'set -euo pipefail; pgbackrest --stanza=\"$PROFILE\" --log-level-console=info restore'" \
             -- -T
+
+          sugar --profile "$PROFILE" compose-ext stop \
+            --services pgbackrest || true
 
           sugar --profile "$PROFILE" compose-ext start \
             --services postgres \
