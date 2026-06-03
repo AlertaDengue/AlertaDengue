@@ -18,9 +18,6 @@ services:
         HOST_GID: ${HOST_GID}
     env_file:
       - ../.envs/.env
-    depends_on:
-      postgres:
-        condition: service_healthy
     command:
       - bash
       - -lc
