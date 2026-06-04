@@ -1,12 +1,12 @@
 services:
   memcached:
     image: memcached:alpine
-    entrypoint:
+    command:
       - memcached
       - -m
       - "64"
-    ports:
-      - "${MEMCACHED_PORT}:11211"
+      - -U
+      - "0"
     expose:
       - "11211"
     healthcheck:
