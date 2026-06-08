@@ -155,11 +155,9 @@ class AboutPageView(TemplateView):
 
 
 def download_technical_report_pdf(request, *args, **kwargs):
-    pdf_path = os.path.join(
-        settings.MEDIA_ROOT, "templates/about/technical-report.pdf"
-    )
+    pdf_path = Path(settings.TECHNICAL_REPORTS_ROOT) / "technical-report.pdf"
 
-    if not os.path.exists(pdf_path):
+    if not pdf_path.exists():
         raise Http404("Technical Report PDF not found")
 
     pdf_output = (
@@ -167,7 +165,7 @@ def download_technical_report_pdf(request, *args, **kwargs):
         "2024-26out2023.pdf"
     )
 
-    with open(pdf_path, "rb") as pdf_file:
+    with pdf_path.open("rb") as pdf_file:
         response = HttpResponse(
             pdf_file.read(), content_type="application/pdf"
         )

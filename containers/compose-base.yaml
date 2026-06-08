@@ -124,6 +124,8 @@ services:
   web:
     extends: base
     hostname: web
+    volumes:
+      - "${DOCKER_HOST_TECHNICAL_REPORTS_DIR:-/srv/workspace/infodengue/technical-reports}:/opt/services/technical-reports:ro"
     environment:
       DJANGO_PORT: "${DJANGO_PORT}"
       DJANGO_SETTINGS_MODULE: "ad_main.settings.${ENV}"
