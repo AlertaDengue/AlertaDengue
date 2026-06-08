@@ -24,6 +24,10 @@ services:
       DJANGO_SETTINGS_MODULE: "ad_main.settings.prod"
     volumes:
       - ../AlertaDengue/:/opt/services/AlertaDengue
+      - type: bind
+        source: "${DOCKER_HOST_TECHNICAL_REPORTS_DIR:-${HOME}/technical-reports}"
+        target: /opt/services/technical-reports
+        read_only: true
     depends_on:
       - postgres
       - redis
