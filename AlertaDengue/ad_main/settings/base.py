@@ -274,6 +274,9 @@ STATICFILES_FINDERS = [
 MEDIA_URL = "/img/"
 DBF_SINAN = os.getenv("DBF_SINAN")
 MEDIA_ROOT = os.getenv("MEDIA_ROOT")
+TECHNICAL_REPORTS_ROOT = Path(
+    os.getenv("TECHNICAL_REPORTS_ROOT") or "/opt/services/technical_reports"
+)
 IMPORTED_FILES = os.getenv("IMPORTED_FILES")
 TEMP_FILES_DIR = os.getenv("TEMP_FILES_DIR")
 DATA_DIR = PROJECT_ROOT.parent.parent / os.getenv("STORAGE", "")
