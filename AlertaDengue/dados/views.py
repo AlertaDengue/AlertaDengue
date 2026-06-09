@@ -169,9 +169,7 @@ def download_technical_report_pdf(request, *args, **kwargs):
         response = HttpResponse(
             pdf_file.read(), content_type="application/pdf"
         )
-        response[
-            "Content-Disposition"
-        ] = f'attachment; filename="{pdf_output}"'
+        response["Content-Disposition"] = f'inline; filename="{pdf_output}"'
         return response
 
 

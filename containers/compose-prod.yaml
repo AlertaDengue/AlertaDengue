@@ -25,8 +25,8 @@ services:
     volumes:
       - ../AlertaDengue/:/opt/services/AlertaDengue
       - type: bind
-        source: "${DOCKER_HOST_TECHNICAL_REPORTS_DIR:-${HOME}/technical-reports}"
-        target: /opt/services/technical-reports
+        source: "${DOCKER_HOST_TECHNICAL_REPORTS_DIR:-${HOME}/technical_reports}"
+        target: /opt/services/technical_reports
         read_only: true
     depends_on:
       - postgres
