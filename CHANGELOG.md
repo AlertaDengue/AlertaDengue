@@ -1,6 +1,18 @@
 Release Notes
 ---
 
+## [4.15.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.14.0...4.15.0) (2026-06-10)
+
+### Features
+
+* **frontend:** initial frontend setup ([492e095](https://github.com/AlertaDengue/AlertaDengue/commit/492e095bdc9cd0fe1e2697f05ab805d23f0412b7))
+
+### Bug Fixes
+
+* **docker:** remove public memcached port exposure ([#947](https://github.com/AlertaDengue/AlertaDengue/issues/947)) ([f27a926](https://github.com/AlertaDengue/AlertaDengue/commit/f27a926e82a935f7045d5a76ffcc95c26acdcb79))
+* **pgbackrest:** restore before starting postgres ([#945](https://github.com/AlertaDengue/AlertaDengue/issues/945)) ([462e166](https://github.com/AlertaDengue/AlertaDengue/commit/462e1667002e6b809f3d04e9ff9cfecb4bb515ae))
+* **reports:** restore technical report PDF path in production container ([#951](https://github.com/AlertaDengue/AlertaDengue/issues/951)) ([1a45473](https://github.com/AlertaDengue/AlertaDengue/commit/1a454733386e88ca7686b3af702b9c93a06aa62c))
+
 ## [4.14.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.13.0...4.14.0) (2026-05-28)
 
 ### Features
