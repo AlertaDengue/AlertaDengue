@@ -9,7 +9,7 @@ from copy import deepcopy
 from dataclasses import replace
 from datetime import timedelta
 from pathlib import Path, PurePath
-from typing import Any, Final, TypeGuard
+from typing import Any
 
 import fiona
 import numpy as np
@@ -69,6 +69,45 @@ from .models import City
 # local
 
 
+def get_var_params(
+    params: ReportParameters | None,
+) -> tuple[dict[str, list[Any]], list[str]]:
+    """Return valid climate variables and thresholds for a report."""
+    if not params:
+        return {}, []
+
+    valid_climate_vars: dict[str, list[Any]] = {
+        "temp.min": [_("°C temperatura mínima")],
+        "temp.med": [_("°C temperatura média")],
+        "temp.max": [_("°C temperatura máxima")],
+        "umid.min": [_("% umidade mínima do ar")],
+        "umid.med": [_("% umidade média do ar")],
+        "umid.max": [_("% umidade máxima do ar")],
+    }
+
+    varcli_pair: dict[str, Any] = {}
+
+    def add_param(raw_key: Any, raw_value: Any) -> None:
+        if not isinstance(raw_key, str) or not raw_key.strip():
+            if raw_key:
+                logger.warning("Skipping invalid varclimate key %r", raw_key)
+            return
+
+        normalized_key = raw_key.replace("_", ".")
+        if normalized_key not in valid_climate_vars:
+            logger.warning("Skipping invalid varclimate key %r", raw_key)
+            return
+
+        varcli_pair[raw_key] = raw_value
+        valid_climate_vars[normalized_key].append(raw_value)
+
+    add_param(params.varcli, params.clicrit)
+    add_param(params.varcli2, params.clicrit2)
+
+    varcli_keys = [key.replace("_", ".") for key in varcli_pair]
+    return {key: valid_climate_vars[key] for key in varcli_keys}, varcli_keys
+
+
 def get_static(static_dir):
     if not settings.DEBUG:
         return Path(static(static_dir))
@@ -77,7 +116,10 @@ def get_static(static_dir):
     return str(path_to_find.relative_to(_app_dir))
 
 
-locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
+try:
+    locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
+except locale.Error:
+    logger.warning("pt_BR.UTF-8 locale is unavailable; using process default")
 
 
 def _get_disease_label(disease_code: str) -> str:
@@ -875,55 +917,6 @@ class ReportCityView(TemplateView):
                 return None
             except Exception:
                 return None
-
-        def get_var_params(
-            params: ReportParameters | None,
-        ) -> tuple[dict[str, list[Any]], list[str]]:
-            """Extract valid climate variables from params, ignoring invalid keys."""
-            if not params:
-                return {}, []
-
-            VALID_CLIMATE_VARS: Final[dict[str, list[str]]] = {
-                "temp.min": [_("°C temperatura mínima")],
-                "temp.med": [_("°C temperatura média")],
-                "temp.max": [_("°C temperatura máxima")],
-                "umid.min": [_("% umidade mínima do ar")],
-                "umid.med": [_("% umidade média do ar")],
-                "umid.max": [_("% umidade máxima do ar")],
-            }
-
-            def _is_valid_key(key: Any) -> TypeGuard[str]:
-                """Check if key is a non-empty string that maps to a valid climate var."""
-                if not isinstance(key, str) or not key.strip():
-                    return False
-                normalized = key.replace("_", ".")
-                return normalized in VALID_CLIMATE_VARS
-
-            def _add_param(raw_key: Any, raw_value: Any) -> None:
-                """Safely add a climate param if the key is valid."""
-                if not _is_valid_key(raw_key):
-                    if raw_key:
-                        logger.warning(
-                            "Skipping invalid varclimate key %r (params=%r)",
-                            raw_key,
-                            params,
-                        )
-                    return
-
-                normalized_key = raw_key.replace("_", ".")
-                varcli_pair[raw_key] = raw_value
-                VALID_CLIMATE_VARS[normalized_key].append(raw_value)
-
-            var_climate: dict[str, list[Any]] = {}
-            varcli_pair: dict[str, Any] = {}
-
-            _add_param(params.varcli, params.clicrit)
-            _add_param(params.varcli2, params.clicrit2)
-
-            varcli_keys = [k.replace("_", ".") for k in varcli_pair]
-            var_climate = {k: VALID_CLIMATE_VARS[k] for k in varcli_keys}
-
-            return var_climate, varcli_keys
 
         prepare_html = (
             lambda df, keys: df[
