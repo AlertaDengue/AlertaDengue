@@ -60,6 +60,9 @@ The secure sequence is:
 
 ## Dependency Findings
 
+The findings below describe the pre-removal baseline. Completed changes are
+recorded in the execution log.
+
 ### 1. Direct REDEMET and airport-station website references
 
 | Location | Finding | Action |
@@ -243,6 +246,29 @@ Deliver each important change as a focused semantic commit:
 4. `test(redemet): remove legacy station helpers`
 5. `chore(database): add secure REDEMET cleanup`
 6. `chore(redemet): verify dependency removal`
+
+## Execution Log
+
+- [x] `26f23bc5` documents dependencies, safeguards, and tasks.
+- [x] `f2a57433` removes the station field from active report queries, adds the
+  immutable `ReportParameters` result, and updates real-function DB tests.
+- [x] `6c7af8c9` removes public legacy station references while retaining current
+  Mosqlimate and Copernicus attribution.
+- [x] `bf807bfc` removes legacy station objects from the bootstrap schema and adds
+  separate archive and guarded-removal production scripts.
+- [x] `79c68a52` removes the unused legacy `Clima_wu` test helper.
+- [x] `4ac1c1da` exposes the production varclimate helper and replaces duplicated
+  mock-based tests with direct unit tests.
+- [ ] Execute production audit and the two-phase database runbook after the
+  external varclimate loader contract is confirmed.
+
+Verification notes:
+
+- pre-commit, Black, isort, and Python compilation pass for changed code;
+- PostgreSQL-backed tests cannot run locally because production PostgreSQL owns
+  port `25432` and the separate `test_dengue` database is absent;
+- mypy cannot start in the local Poetry environment because
+  `mypy_django_plugin` is missing.
 
 ### Phase 0: Confirm scope and ownership
 
