@@ -2,16 +2,6 @@ import datetime
 from unittest import TestCase
 
 from dados import dbdata
-from dados.tests import legacy  # noqa
-from pandas._testing import assert_frame_equal
-
-# Paramaters
-cities = [3304557]
-year_week_start = 202003
-year_week_end = 202003
-var_climate = "temp_min"
-year_week = 202002
-station_id = "SBRJ"
 
 
 class TestLoadAlerta(TestCase):

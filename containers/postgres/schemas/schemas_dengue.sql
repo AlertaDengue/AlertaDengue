@@ -469,9 +469,7 @@ CREATE TABLE "Dengue_global".parameters (
     cid10 character varying DEFAULT NULL::bpchar,
     codmodelo character varying,
     varcli2 character varying(16) DEFAULT NULL::character varying,
-    clicrit2 numeric(5,0) DEFAULT NULL::numeric,
-    codigo_estacao_wu character varying,
-    estacao_wu_sec character varying
+    clicrit2 numeric(5,0) DEFAULT NULL::numeric
 );
 
 
@@ -520,12 +518,10 @@ CREATE TABLE "Dengue_global".regional_saude (
     id integer NOT NULL,
     municipio_geocodigo integer,
     id_regional integer,
-    codigo_estacao_wu character varying(16),
     nome_regional character varying(32),
     limiar_preseason real,
     limiar_posseason real,
     limiar_epidemico real,
-    estacao_wu_sec character varying(10),
     varcli character varying(10),
     tcrit double precision,
     ucrit double precision,
@@ -583,7 +579,7 @@ COMMENT ON TABLE "Municipio"."Bairro" IS 'Lista de bairros por localidade';
 CREATE TABLE "Municipio"."Clima_Satelite" (
     id bigint NOT NULL,
     data date NOT NULL,
-    "Municipio_geocodigo" integer NOT NULL,
+    "Municipio_geocodigo" integer NOT NULL
     ndvi integer NOT NULL,
     temperatura_max numeric(4,2) NOT NULL,
     temperaruta_min numeric(4,2) NOT NULL,
@@ -665,55 +661,6 @@ ALTER TABLE "Municipio"."Clima_cemaden_id_seq" OWNER TO administrador;
 ALTER SEQUENCE "Municipio"."Clima_cemaden_id_seq" OWNED BY "Municipio"."Clima_cemaden".id;
 
 
---
--- Name: Clima_wu; Type: TABLE; Schema: Municipio; Owner: administrador
---
-
-CREATE TABLE "Municipio"."Clima_wu" (
-    temp_min real,
-    temp_max real,
-    temp_med real,
-    data_dia date NOT NULL,
-    umid_min real,
-    umid_med real,
-    umid_max real,
-    pressao_min real,
-    pressao_med real,
-    pressao_max real,
-    "Estacao_wu_estacao_id" character varying(4) NOT NULL,
-    id bigint NOT NULL
-);
-
-
-ALTER TABLE "Municipio"."Clima_wu" OWNER TO administrador;
-
---
--- Name: TABLE "Clima_wu"; Type: COMMENT; Schema: Municipio; Owner: administrador
---
-
-COMMENT ON TABLE "Municipio"."Clima_wu" IS 'série temporal de variaveis meteorologicas diarias do WU';
-
-
---
--- Name: Clima_wu_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
---
-
-CREATE SEQUENCE "Municipio"."Clima_wu_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE "Municipio"."Clima_wu_id_seq" OWNER TO administrador;
-
---
--- Name: Clima_wu_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
---
-
-ALTER SEQUENCE "Municipio"."Clima_wu_id_seq" OWNED BY "Municipio"."Clima_wu".id;
-
 
 --
 -- Name: Estacao_cemaden; Type: TABLE; Schema: Municipio; Owner: administrador
@@ -737,27 +684,6 @@ ALTER TABLE "Municipio"."Estacao_cemaden" OWNER TO administrador;
 
 COMMENT ON TABLE "Municipio"."Estacao_cemaden" IS 'Metadados da estação do cemaden';
 
-
---
--- Name: Estacao_wu; Type: TABLE; Schema: Municipio; Owner: administrador
---
-
-CREATE TABLE "Municipio"."Estacao_wu" (
-    estacao_id character varying(4) NOT NULL,
-    latitude real NOT NULL,
-    longitude real NOT NULL,
-    "Localidades_id" integer,
-    nome character varying(128) NOT NULL
-);
-
-
-ALTER TABLE "Municipio"."Estacao_wu" OWNER TO administrador;
-
---
--- Name: TABLE "Estacao_wu"; Type: COMMENT; Schema: Municipio; Owner: administrador
---
-
-COMMENT ON TABLE "Municipio"."Estacao_wu" IS 'metadados das estacoes meteorologicas da WU';
 
 
 --
@@ -966,8 +892,7 @@ CREATE TABLE "Municipio"."Localidade" (
     populacao integer NOT NULL,
     geojson text NOT NULL,
     id integer NOT NULL,
-    "Municipio_geocodigo" integer NOT NULL,
-    codigo_estacao_wu character varying(5) DEFAULT NULL::character varying
+    "Municipio_geocodigo" integer NOT NULL
 );
 
 
@@ -2482,12 +2407,6 @@ ALTER TABLE ONLY "Municipio"."Clima_Satelite" ALTER COLUMN id SET DEFAULT nextva
 ALTER TABLE ONLY "Municipio"."Clima_cemaden" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Clima_cemaden_id_seq"'::regclass);
 
 
---
--- Name: Clima_wu id; Type: DEFAULT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Clima_wu" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Clima_wu_id_seq"'::regclass);
-
 
 --
 -- Name: Historico_alerta id; Type: DEFAULT; Schema: Municipio; Owner: administrador
@@ -2846,13 +2765,6 @@ ALTER TABLE ONLY "Municipio"."Clima_cemaden"
     ADD CONSTRAINT "Clima_cemaden_pk" PRIMARY KEY (id);
 
 
---
--- Name: Clima_wu Clima_wu_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Clima_wu"
-    ADD CONSTRAINT "Clima_wu_pk" PRIMARY KEY (id);
-
 
 --
 -- Name: Estacao_cemaden Estacao_cemaden_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
@@ -2861,13 +2773,6 @@ ALTER TABLE ONLY "Municipio"."Clima_wu"
 ALTER TABLE ONLY "Municipio"."Estacao_cemaden"
     ADD CONSTRAINT "Estacao_cemaden_pk" PRIMARY KEY (codestacao);
 
-
---
--- Name: Estacao_wu Estacao_wu_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Estacao_wu"
-    ADD CONSTRAINT "Estacao_wu_pk" PRIMARY KEY (estacao_id);
 
 
 --
@@ -3481,13 +3386,6 @@ CREATE INDEX "Clima_Satelite_idx_data" ON "Municipio"."Clima_Satelite" USING btr
 --
 
 CREATE INDEX "Dengue_idx_data" ON "Municipio"."Notificacao" USING btree (dt_notific DESC, se_notif DESC);
-
-
---
--- Name: WU_idx_data; Type: INDEX; Schema: Municipio; Owner: administrador
---
-
-CREATE INDEX "WU_idx_data" ON "Municipio"."Clima_wu" USING btree (data_dia DESC);
 
 
 --
@@ -4248,21 +4146,6 @@ GRANT SELECT ON TABLE "Municipio"."Clima_cemaden" TO infodenguedev;
 GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_cemaden_id_seq" TO dengue;
 
 
---
--- Name: TABLE "Clima_wu"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Clima_wu" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Clima_wu" TO dengue;
-GRANT SELECT ON TABLE "Municipio"."Clima_wu" TO infodenguedev;
-
-
---
--- Name: SEQUENCE "Clima_wu_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_wu_id_seq" TO dengue;
-
 
 --
 -- Name: TABLE "Estacao_cemaden"; Type: ACL; Schema: Municipio; Owner: administrador
@@ -4272,14 +4155,6 @@ GRANT ALL ON TABLE "Municipio"."Estacao_cemaden" TO "Dengue";
 GRANT ALL ON TABLE "Municipio"."Estacao_cemaden" TO dengue;
 GRANT SELECT ON TABLE "Municipio"."Estacao_cemaden" TO infodenguedev;
 
-
---
--- Name: TABLE "Estacao_wu"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Estacao_wu" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Estacao_wu" TO dengue;
-GRANT SELECT ON TABLE "Municipio"."Estacao_wu" TO infodenguedev;
 
 
 --

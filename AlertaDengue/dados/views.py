@@ -6,9 +6,10 @@ import os
 import random
 from collections import OrderedDict, defaultdict
 from copy import deepcopy
+from dataclasses import replace
 from datetime import timedelta
 from pathlib import Path, PurePath
-from typing import Any, Final, Sequence, TypeGuard
+from typing import Any
 
 import fiona
 import numpy as np
@@ -54,6 +55,7 @@ from .dbdata import (  # get_notification_cases,
     NotificationResume,
     RegionalParameters,
     ReportCity,
+    ReportParameters,
     ReportState,
     data_hist_uf,
     get_city_alert,
@@ -67,6 +69,45 @@ from .models import City
 # local
 
 
+def get_var_params(
+    params: ReportParameters | None,
+) -> tuple[dict[str, list[Any]], list[str]]:
+    """Return valid climate variables and thresholds for a report."""
+    if not params:
+        return {}, []
+
+    valid_climate_vars: dict[str, list[Any]] = {
+        "temp.min": [_("°C temperatura mínima")],
+        "temp.med": [_("°C temperatura média")],
+        "temp.max": [_("°C temperatura máxima")],
+        "umid.min": [_("% umidade mínima do ar")],
+        "umid.med": [_("% umidade média do ar")],
+        "umid.max": [_("% umidade máxima do ar")],
+    }
+
+    varcli_pair: dict[str, Any] = {}
+
+    def add_param(raw_key: Any, raw_value: Any) -> None:
+        if not isinstance(raw_key, str) or not raw_key.strip():
+            if raw_key:
+                logger.warning("Skipping invalid varclimate key %r", raw_key)
+            return
+
+        normalized_key = raw_key.replace("_", ".")
+        if normalized_key not in valid_climate_vars:
+            logger.warning("Skipping invalid varclimate key %r", raw_key)
+            return
+
+        varcli_pair[raw_key] = raw_value
+        valid_climate_vars[normalized_key].append(raw_value)
+
+    add_param(params.varcli, params.clicrit)
+    add_param(params.varcli2, params.clicrit2)
+
+    varcli_keys = [key.replace("_", ".") for key in varcli_pair]
+    return {key: valid_climate_vars[key] for key in varcli_keys}, varcli_keys
+
+
 def get_static(static_dir):
     if not settings.DEBUG:
         return Path(static(static_dir))
@@ -75,7 +116,10 @@ def get_static(static_dir):
     return str(path_to_find.relative_to(_app_dir))
 
 
-locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
+try:
+    locale.setlocale(locale.LC_TIME, locale="pt_BR.UTF-8")
+except locale.Error:
+    logger.warning("pt_BR.UTF-8 locale is unavailable; using process default")
 
 
 def _get_disease_label(disease_code: str) -> str:
@@ -850,91 +894,29 @@ class ReportCityView(TemplateView):
             classes="table table-striped table-bordered",
         )
 
-        def get_disease_params(disease_name):
+        def get_disease_params(disease_name: str) -> ReportParameters | None:
             try:
-                data = RegionalParameters.get_station_data(
+                params = RegionalParameters.get_report_parameters(
                     geocode=int(geocode), disease=disease_name
                 )
-                if data:
-                    params = list(data[0])
-                    # TODO: Fix NA's in the parameters table
-                    if params[3] == "NA":
-                        params[3] = 0
-                    if params[5] == "NA":
-                        params[5] = 0
+                if params:
                     return params
 
-                # Fallback to dengue for station/climate metadata if missing
+                # Preserve climate metadata when disease thresholds are missing.
                 if disease_name != "dengue":
-                    dengue_data = RegionalParameters.get_station_data(
+                    dengue_params = RegionalParameters.get_report_parameters(
                         geocode=int(geocode), disease="dengue"
                     )
-                    if dengue_data:
-                        params = list(dengue_data[0])
-                        # TODO: Fix NA's in the parameters table
-                        if params[3] == "NA":
-                            params[3] = 0
-                        if params[5] == "NA":
-                            params[5] = 0
-                        # Set thresholds to 0 as they might not apply to this disease
-                        # but keep station/climate info (indices 0-6)
-                        # limiar_preseason (7), limiar_posseason (8), limiar_epidemico (9)
-                        params[7] = 0
-                        params[8] = 0
-                        params[9] = 0
-                        return params
-                return None
-            except (IndexError, TypeError, Exception):
-                return None
-
-        def get_var_params(
-            params: Sequence[Any] | None,
-        ) -> tuple[dict[str, list[Any]], list[str]]:
-            """Extract valid climate variables from params, ignoring invalid keys."""
-            if not params:
-                return {}, []
-
-            VALID_CLIMATE_VARS: Final[dict[str, list[str]]] = {
-                "temp.min": [_("°C temperatura mínima")],
-                "temp.med": [_("°C temperatura média")],
-                "temp.max": [_("°C temperatura máxima")],
-                "umid.min": [_("% umidade mínima do ar")],
-                "umid.med": [_("% umidade média do ar")],
-                "umid.max": [_("% umidade máxima do ar")],
-            }
-
-            def _is_valid_key(key: Any) -> TypeGuard[str]:
-                """Check if key is a non-empty string that maps to a valid climate var."""
-                if not isinstance(key, str) or not key.strip():
-                    return False
-                normalized = key.replace("_", ".")
-                return normalized in VALID_CLIMATE_VARS
-
-            def _add_param(raw_key: Any, raw_value: Any) -> None:
-                """Safely add a climate param if the key is valid."""
-                if not _is_valid_key(raw_key):
-                    if raw_key:
-                        logger.warning(
-                            "Skipping invalid varclimate key %r (params=%r)",
-                            raw_key,
-                            params,
+                    if dengue_params:
+                        return replace(
+                            dengue_params,
+                            limiar_preseason=0,
+                            limiar_posseason=0,
+                            limiar_epidemico=0,
                         )
-                    return
-
-                normalized_key = raw_key.replace("_", ".")
-                varcli_pair[raw_key] = raw_value
-                VALID_CLIMATE_VARS[normalized_key].append(raw_value)
-
-            var_climate: dict[str, list[Any]] = {}
-            varcli_pair: dict[str, Any] = {}
-
-            _add_param(params[3], params[4])
-            _add_param(params[5], params[6])
-
-            varcli_keys = [k.replace("_", ".") for k in varcli_pair]
-            var_climate = {k: VALID_CLIMATE_VARS[k] for k in varcli_keys}
-
-            return var_climate, varcli_keys
+                return None
+            except Exception:
+                return None
 
         prepare_html = (
             lambda df, keys: df[
@@ -1010,14 +992,12 @@ class ReportCityView(TemplateView):
                     df_dengue["casos notif."].sum() > 0
                     or df_dengue["casos_est"].sum() > 0
                 ):
-                    chart_dengue_incidence = (
-                        ReportCityCharts.create_incidence_chart(
-                            df=df_dengue,
-                            year_week=year_week,
-                            threshold_pre_epidemic=dengue_params[7],
-                            threshold_pos_epidemic=dengue_params[8],
-                            threshold_epidemic=dengue_params[9],
-                        )
+                    chart_dengue_incidence = ReportCityCharts.create_incidence_chart(
+                        df=df_dengue,
+                        year_week=year_week,
+                        threshold_pre_epidemic=dengue_params.limiar_preseason,
+                        threshold_pos_epidemic=dengue_params.limiar_posseason,
+                        threshold_epidemic=dengue_params.limiar_epidemico,
                     )
                     context["df_dengue_html"] = prepare_html(df_dengue, v_keys)
                 else:
@@ -1048,14 +1028,12 @@ class ReportCityView(TemplateView):
                     df_chik["casos notif."].sum() > 0
                     or df_chik["casos_est"].sum() > 0
                 ):
-                    chart_chik_incidence = (
-                        ReportCityCharts.create_incidence_chart(
-                            df=df_chik,
-                            year_week=year_week,
-                            threshold_pre_epidemic=chik_params[7],
-                            threshold_pos_epidemic=chik_params[8],
-                            threshold_epidemic=chik_params[9],
-                        )
+                    chart_chik_incidence = ReportCityCharts.create_incidence_chart(
+                        df=df_chik,
+                        year_week=year_week,
+                        threshold_pre_epidemic=chik_params.limiar_preseason,
+                        threshold_pos_epidemic=chik_params.limiar_posseason,
+                        threshold_epidemic=chik_params.limiar_epidemico,
                     )
                     context["df_chik_html"] = prepare_html(df_chik, v_keys)
                 else:
@@ -1086,14 +1064,12 @@ class ReportCityView(TemplateView):
                     df_zika["casos notif."].sum() > 0
                     or df_zika["casos_est"].sum() > 0
                 ):
-                    chart_zika_incidence = (
-                        ReportCityCharts.create_incidence_chart(
-                            df=df_zika,
-                            year_week=year_week,
-                            threshold_pre_epidemic=zika_params[7],
-                            threshold_pos_epidemic=zika_params[8],
-                            threshold_epidemic=zika_params[9],
-                        )
+                    chart_zika_incidence = ReportCityCharts.create_incidence_chart(
+                        df=df_zika,
+                        year_week=year_week,
+                        threshold_pre_epidemic=zika_params.limiar_preseason,
+                        threshold_pos_epidemic=zika_params.limiar_posseason,
+                        threshold_epidemic=zika_params.limiar_epidemico,
                     )
                     context["df_zika_html"] = prepare_html(df_zika, v_keys)
                 else:

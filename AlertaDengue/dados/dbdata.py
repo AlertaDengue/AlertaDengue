@@ -7,6 +7,7 @@ import logging
 import unicodedata
 from collections import defaultdict
 from collections.abc import Sequence
+from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
 from typing import (
@@ -47,6 +48,21 @@ DISEASES_SHORT = ["dengue", "chik", "zika"]
 DISEASES_NAME = CID10.keys()
 ALERT_COLOR = {1: "verde", 2: "amarelo", 3: "laranja", 4: "vermelho"}
 ALERT_CODE = dict(zip(ALERT_COLOR.values(), ALERT_COLOR.keys()))
+
+
+@dataclass(frozen=True, slots=True)
+class ReportParameters:
+    """Disease-specific parameters used by city reports."""
+
+    cid10: str
+    municipio_geocodigo: int
+    varcli: Any
+    clicrit: Any
+    varcli2: Any
+    clicrit2: Any
+    limiar_preseason: Any
+    limiar_posseason: Any
+    limiar_epidemico: Any
 
 
 UF_CODES = {
@@ -207,42 +223,6 @@ class RegionalParameters:
         return res
 
     @classmethod
-    def get_var_climate_info(
-        cls, geocodes: list[int], disease: str = "dengue"
-    ) -> tuple[str, str]:
-        """
-        Return (codigo_estacao_wu, varcli) for the first matching geocode and disease.
-        """
-        if not geocodes:
-            pass
-
-        cid10_code = CID10.get(disease, "")
-
-        sql = f"""
-            SELECT DISTINCT codigo_estacao_wu, varcli
-            FROM "{cls.SCHEMA}"."parameters"
-            WHERE municipio_geocodigo IN :geocodes
-              AND cid10 = :cid10_code
-        """
-
-        df = _read_sql_df(
-            DB_ENGINE,
-            sql,
-            params={
-                "geocodes": tuple(geocodes),
-                "cid10_code": cid10_code,
-            },
-        )
-
-        if df.empty:
-            raise IndexError(
-                f"No climate info found for provided geocodes and disease {disease}"
-            )
-
-        row = df.to_records(index=False).tolist()[0]
-        return (str(row[0]), str(row[1]))
-
-    @classmethod
     def get_cities(
         cls,
         regional_name: str | None = None,
@@ -313,17 +293,16 @@ class RegionalParameters:
         return cities_by_region
 
     @classmethod
-    def get_station_data(cls, geocode: int, disease: str) -> tuple[Any, ...]:
-        """
-        Return climate thresholds for a geocode and disease.
-        """
+    def get_report_parameters(
+        cls, geocode: int, disease: str
+    ) -> ReportParameters | None:
+        """Return disease-specific parameters used by city reports."""
         cid10_code = CID10.get(disease, "")
 
         sql = f"""
-            SELECT 
+            SELECT
                 cid10,
                 municipio_geocodigo,
-                codigo_estacao_wu,
                 varcli,
                 clicrit,
                 varcli2,
@@ -332,7 +311,7 @@ class RegionalParameters:
                 limiar_posseason,
                 limiar_epidemico
             FROM "{cls.SCHEMA}"."parameters"
-            WHERE cid10 = :cid10_code 
+            WHERE cid10 = :cid10_code
               AND municipio_geocodigo = :geocode
         """
 
@@ -342,7 +321,10 @@ class RegionalParameters:
             params={"cid10_code": cid10_code, "geocode": geocode},
         )
 
-        return tuple(df.values)
+        if df.empty:
+            return None
+
+        return ReportParameters(**df.iloc[0].to_dict())
 
 
 # General util functions
