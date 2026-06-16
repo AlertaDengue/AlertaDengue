@@ -53,3 +53,18 @@ def test_home_technical_report_link_uses_download_route() -> None:
     assert (
         f'href="{reverse("dados:download_technical_report_pdf")}"' in content
     )
+
+
+def test_services_api_download_button_shows_selected_format() -> None:
+    content = Path(
+        "AlertaDengue/dados/templates/services_api.html"
+    ).read_text()
+
+    assert (
+        'label for="format">{% translate "Selecione o formato do arquivo de saída" %}</label>'
+        in content
+    )
+    assert 'id="download-button"' in content
+    assert 'id="download-format-label">CSV</span>' in content
+    assert "fa fa-download" in content
+    assert "syncDownloadButtonLabel" in content
