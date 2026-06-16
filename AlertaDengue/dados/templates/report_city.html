@@ -23,20 +23,24 @@
         font-weight: bold;
       }
 
-      .green-row td {
-        background: #8BFFB7;
+      .table-striped tbody tr.green-row > td,
+      .table tbody tr.green-row > td {
+        background: #8BFFB7 !important;
       }
 
-      .yellow-row td {
-        background: #FFEB5C;
+      .table-striped tbody tr.yellow-row > td,
+      .table tbody tr.yellow-row > td {
+        background: #FFEB5C !important;
       }
 
-      .orange-row td {
-        background: #FFCE5C;
+      .table-striped tbody tr.orange-row > td,
+      .table tbody tr.orange-row > td {
+        background: #FFCE5C !important;
       }
 
-      .red-row td {
-        background: #FF7C73;
+      .table-striped tbody tr.red-row > td,
+      .table tbody tr.red-row > td {
+        background: #FF7C73 !important;
       }
       .table.dataTable, .table td, .table th {
         border-collapse: collapse !important;
@@ -346,11 +350,18 @@
       '{% translate "amarelo" %}': 'yellow-row',
       '{% translate "laranja" %}': 'orange-row',
       '{% translate "vermelho" %}': 'red-row'
-    }
+    };
 
-    $('.table tr').each(function(i, obj){
-      $(this).addClass(cssClasses[$('td:last-child', this).text()]);
-    });
+    function applyAlertRowClass(row) {
+      var $row = $(row);
+      var level = $.trim($row.find('td:last-child').text());
+
+      $row.removeClass('green-row yellow-row orange-row red-row');
+
+      if (cssClasses[level]) {
+        $row.addClass(cssClasses[level]);
+      }
+    }
 
     $(document).ready( function () {
       $('.table').DataTable({
@@ -358,6 +369,14 @@
         "lengthMenu": [ 4, 8, 12 ],
         "order": [[ 0, "desc" ]],
         "searching": false,
+        "createdRow": function(row) {
+          applyAlertRowClass(row);
+        },
+        "drawCallback": function() {
+          $(this.api().rows({ page: 'current' }).nodes()).each(function() {
+            applyAlertRowClass(this);
+          });
+        },
         "language": {
           "url": "/static/libs/DataTables/i18n/pt_BR.json"
         }

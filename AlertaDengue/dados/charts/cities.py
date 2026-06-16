@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Any
 
 import pandas as pd
 import plotly.graph_objs as go
@@ -220,8 +221,8 @@ class ReportCityCharts:
     def create_climate_chart(
         cls,
         df: pd.DataFrame,
-        var_climate,
-    ):
+        var_climate: dict[str, list[Any]],
+    ) -> str:
         """
         :param df:
         :param var_climate:
@@ -231,15 +232,25 @@ class ReportCityCharts:
         varcli_keys = list(var_climate.keys())
         varcli_values = list(var_climate.values())
 
+        if not varcli_keys:
+            return ""
+
+        def get_series_label(index: int) -> str:
+            return str(varcli_values[index][0])
+
         df_climate = deepcopy(df[["SE", *varcli_keys]])
+        for column in varcli_keys:
+            df_climate[column] = pd.to_numeric(
+                df_climate[column], errors="coerce"
+            )
 
         df_climate["SE"] = df_climate.SE.map(
             lambda v: "%s/%s" % (str(v)[:4], str(v)[-2:])
         )
 
-        df_climate[f"threshold_{varcli_keys[0]}"] = var_climate.get(
+        df_climate[f"threshold_{varcli_keys[0]}"] = var_climate[
             varcli_keys[0]
-        )[1]
+        ][1]
 
         figure = make_subplots(specs=[[{"secondary_y": True}]])
         # Temperature
@@ -247,15 +258,16 @@ class ReportCityCharts:
             go.Scatter(
                 x=df_climate["SE"],
                 y=df_climate[varcli_keys[0]],
-                name=f"{varcli_keys[0]}",
-                marker={"color": "rgb(255, 204, 153)"},
+                name=get_series_label(0),
+                mode="lines",
+                line={"color": "rgb(255, 204, 153)", "width": 3},
                 customdata=df_climate[varcli_keys[1]]
                 if len(varcli_keys) == 2
                 else [None] * len(df_climate),
                 hovertemplate="SE: %{x}<br>"
-                + f"<b>{varcli_keys[0]}</b>: %{{y:.1f}}<br>"
+                + f"<b>{get_series_label(0)}</b>: %{{y:.1f}}<br>"
                 + (
-                    f"<b>{varcli_keys[1]}</b>: %{{customdata:.1f}}"
+                    f"<b>{get_series_label(1)}</b>: %{{customdata:.1f}}"
                     if len(varcli_keys) == 2
                     else ""
                 )
@@ -274,7 +286,8 @@ class ReportCityCharts:
                     varcli_values[0][1],
                     varcli_values[0][0][0:2],
                 ),
-                marker={"color": "rgb(255,150,0)"},
+                mode="lines",
+                line={"color": "rgb(255,150,0)", "width": 2},
                 hoverinfo="skip",
             ),
             secondary_y=False,
@@ -282,16 +295,17 @@ class ReportCityCharts:
 
         if len(varcli_keys) == 2:
 
-            df_climate[f"threshold_{varcli_keys[1]}"] = var_climate.get(
+            df_climate[f"threshold_{varcli_keys[1]}"] = var_climate[
                 varcli_keys[1]
-            )[1]
+            ][1]
             # Humidity
             figure.add_trace(
                 go.Scatter(
                     x=df_climate["SE"],
                     y=df_climate[varcli_keys[1]],
-                    name=f"{varcli_keys[1]}",
-                    marker={"color": "rgb(173, 216, 230)"},
+                    name=get_series_label(1),
+                    mode="lines",
+                    line={"color": "rgb(173, 216, 230)", "width": 3},
                     hoverinfo="skip",
                 ),
                 secondary_y=True,
@@ -306,7 +320,8 @@ class ReportCityCharts:
                         varcli_values[1][1],
                         varcli_values[1][0][0:2],
                     ),
-                    marker={"color": "rgb(51, 172, 255)"},
+                    mode="lines",
+                    line={"color": "rgb(51, 172, 255)", "width": 2},
                     hoverinfo="skip",
                 ),
                 secondary_y=True,
@@ -365,4 +380,4 @@ class ReportCityCharts:
             height=550,
         )
 
-        return figure.to_html()
+        return figure.to_html(full_html=False, include_plotlyjs=False)

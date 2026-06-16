@@ -108,6 +108,92 @@ def get_var_params(
     return {key: valid_climate_vars[key] for key in varcli_keys}, varcli_keys
 
 
+def _format_report_table_value(
+    value: Any,
+    decimal_places: int = 0,
+) -> str:
+    """Format numeric report values with stable precision."""
+    if pd.isna(value):
+        return ""
+
+    numeric_value = pd.to_numeric(value, errors="coerce")
+    if pd.isna(numeric_value):
+        return str(value)
+
+    format_spec = f".{decimal_places}f"
+    return format(float(numeric_value), format_spec)
+
+
+ALERT_LEVEL_LABELS = {
+    "verde": "verde",
+    "amarelo": "amarelo",
+    "laranja": "laranja",
+    "vermelho": "vermelho",
+}
+
+
+def _format_alert_level(value: Any) -> str:
+    if pd.isna(value):
+        return ""
+
+    level = str(value).strip().lower()
+    if level in ALERT_LEVEL_LABELS:
+        return _(ALERT_LEVEL_LABELS[level])
+
+    return str(value)
+
+
+def get_report_table_html(df: pd.DataFrame, keys: list[str]) -> str:
+    """Render the report table with per-column formatting."""
+    table_df = (
+        df[
+            [
+                *keys,
+                "casos notif.",
+                "casos_est",
+                "incidência",
+                "nivel",
+            ]
+        ]
+        .iloc[-12:, :]
+        .reset_index()
+        .sort_values(by="SE", ascending=[False])
+    )
+
+    climate_formatters = {
+        key: (
+            lambda value, decimal_places=1: _format_report_table_value(
+                value, decimal_places=decimal_places
+            )
+        )
+        for key in keys
+    }
+
+    formatters = {
+        "SE": lambda value: _format_report_table_value(
+            value, decimal_places=0
+        ),
+        **climate_formatters,
+        "casos notif.": lambda value: _format_report_table_value(
+            value, decimal_places=0
+        ),
+        "casos_est": lambda value: _format_report_table_value(
+            value, decimal_places=0
+        ),
+        "incidência": lambda value: _format_report_table_value(
+            value, decimal_places=1
+        ),
+        "nivel": _format_alert_level,
+    }
+
+    return table_df.to_html(
+        na_rep="",
+        index=False,
+        classes="table table-striped table-bordered",
+        formatters=formatters,
+    )
+
+
 def get_static(static_dir):
     if not settings.DEBUG:
         return Path(static(static_dir))
@@ -122,7 +208,7 @@ except locale.Error:
     logger.warning("pt_BR.UTF-8 locale is unavailable; using process default")
 
 
-def _get_disease_label(disease_code: str) -> str:
+def _get_disease_label(disease_code: str) -> str | None:
     return (
         "Dengue"
         if disease_code == "dengue"
@@ -886,14 +972,6 @@ class ReportCityView(TemplateView):
         except City.DoesNotExist:
             return self.raise_error(context, error_message_city_doesnt_exist)
 
-        # param used by df.to_html
-        html_param = dict(
-            na_rep="",
-            float_format=lambda x: ("%d" % x) if not np.isnan(x) else "",
-            index=False,
-            classes="table table-striped table-bordered",
-        )
-
         def get_disease_params(disease_name: str) -> ReportParameters | None:
             try:
                 params = RegionalParameters.get_report_parameters(
@@ -917,22 +995,6 @@ class ReportCityView(TemplateView):
                 return None
             except Exception:
                 return None
-
-        prepare_html = (
-            lambda df, keys: df[
-                [
-                    *keys,
-                    "casos notif.",
-                    "casos_est",
-                    "incidência",
-                    "nivel",
-                ]
-            ]
-            .iloc[-12:, :]
-            .reset_index()
-            .sort_values(by="SE", ascending=[False])
-            .to_html(**html_param)
-        )
 
         df_dengue = ReportCity.read_disease_data(
             disease="dengue",
@@ -972,15 +1034,6 @@ class ReportCityView(TemplateView):
 
         this_year = int(context["year_week"][:4])
 
-        climate_cols = [
-            "temp.min",
-            "temp.med",
-            "temp.max",
-            "umid.min",
-            "umid.med",
-            "umid.max",
-        ]
-
         if not df_dengue.empty:
             last_year_week_l.append(df_dengue.index.max())
             dengue_params = get_disease_params("dengue")
@@ -999,12 +1052,14 @@ class ReportCityView(TemplateView):
                         threshold_pos_epidemic=dengue_params.limiar_posseason,
                         threshold_epidemic=dengue_params.limiar_epidemico,
                     )
-                    context["df_dengue_html"] = prepare_html(df_dengue, v_keys)
+                    context["df_dengue_html"] = get_report_table_html(
+                        df_dengue, v_keys
+                    )
                 else:
                     chart_dengue_incidence = None
 
                 chart_dengue_climate = ReportCityCharts.create_climate_chart(
-                    df=df_dengue.reset_index()[["SE", *climate_cols]],
+                    df=df_dengue.reset_index()[["SE", *v_climate.keys()]],
                     var_climate=v_climate,
                 )
 
@@ -1035,12 +1090,14 @@ class ReportCityView(TemplateView):
                         threshold_pos_epidemic=chik_params.limiar_posseason,
                         threshold_epidemic=chik_params.limiar_epidemico,
                     )
-                    context["df_chik_html"] = prepare_html(df_chik, v_keys)
+                    context["df_chik_html"] = get_report_table_html(
+                        df_chik, v_keys
+                    )
                 else:
                     chart_chik_incidence = None
 
                 chart_chik_climate = ReportCityCharts.create_climate_chart(
-                    df=df_chik.reset_index()[["SE", *climate_cols]],
+                    df=df_chik.reset_index()[["SE", *v_climate.keys()]],
                     var_climate=v_climate,
                 )
 
@@ -1071,14 +1128,16 @@ class ReportCityView(TemplateView):
                         threshold_pos_epidemic=zika_params.limiar_posseason,
                         threshold_epidemic=zika_params.limiar_epidemico,
                     )
-                    context["df_zika_html"] = prepare_html(df_zika, v_keys)
+                    context["df_zika_html"] = get_report_table_html(
+                        df_zika, v_keys
+                    )
                 else:
                     chart_zika_incidence = None
 
                 # Zika climate chart is usually not shown separately in the template,
                 # but we keep it here for consistency if needed.
                 chart_zika_climate = ReportCityCharts.create_climate_chart(
-                    df=df_zika.reset_index()[["SE", *climate_cols]],
+                    df=df_zika.reset_index()[["SE", *v_climate.keys()]],
                     var_climate=v_climate,
                 )
 
@@ -1105,8 +1164,6 @@ class ReportCityView(TemplateView):
 
         max_alert_code = int(np.nanmax(disease_last_code))
         max_alert_color = ALERT_COLOR[max_alert_code]
-
-        prepare_html = None
 
         last_year_week_s = str(last_year_week)
         last_year = last_year_week_s[:4]
