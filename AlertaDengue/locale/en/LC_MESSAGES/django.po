@@ -2347,7 +2347,7 @@ msgstr "Select output file format"
 
 #: dados/templates/services_api.html:204
 msgid "Download"
-msgstr ""
+msgstr "Download"
 
 #: dados/templates/services_api.html:209
 msgid "Mostrar Dicionário de Dados"
