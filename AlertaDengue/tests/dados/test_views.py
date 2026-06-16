@@ -147,7 +147,10 @@ def test_create_climate_chart_returns_empty_without_variables() -> None:
 
 
 def test_report_city_template_uses_translated_alert_level_mapping() -> None:
-    html = Path("AlertaDengue/dados/templates/report_city.html").read_text()
+    html = (
+        Path(__file__).resolve().parents[2]
+        / "dados/templates/report_city.html"
+    ).read_text()
 
     assert "'{% translate \"verde\" %}': 'green-row'" in html
     assert "'{% translate \"amarelo\" %}': 'yellow-row'" in html

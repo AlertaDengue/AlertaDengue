@@ -56,8 +56,9 @@ def test_home_technical_report_link_uses_download_route() -> None:
 
 
 def test_services_api_download_button_shows_selected_format() -> None:
-    content = Path(
-        "AlertaDengue/dados/templates/services_api.html"
+    content = (
+        Path(__file__).resolve().parents[2]
+        / "dados/templates/services_api.html"
     ).read_text()
 
     assert (
