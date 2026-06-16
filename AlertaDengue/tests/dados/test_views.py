@@ -135,6 +135,9 @@ def test_create_climate_chart_coerces_numeric_series() -> None:
     assert "°C temperatura mínima" in html
     assert "temp.min" not in html
     assert "Limiar favorável" in html
+    assert '"responsive": true' in html
+    assert 'style="height:520px; width:100%;"' in html
+    assert '"width": 1100' not in html
 
 
 def test_create_climate_chart_returns_empty_without_variables() -> None:
@@ -150,3 +153,5 @@ def test_report_city_template_uses_translated_alert_level_mapping() -> None:
     assert "'{% translate \"amarelo\" %}': 'yellow-row'" in html
     assert "function normalizeLevel(value)" not in html
     assert ".table-striped tbody tr.yellow-row > td" in html
+    assert '<div class="plotly-chart w-100">' in html
+    assert ".plotly-chart .plotly-graph-div" in html
