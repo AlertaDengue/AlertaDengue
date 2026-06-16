@@ -23,20 +23,24 @@
         font-weight: bold;
       }
 
-      .green-row td {
-        background: #8BFFB7;
+      .table-striped tbody tr.green-row > td,
+      .table tbody tr.green-row > td {
+        background: #8BFFB7 !important;
       }
 
-      .yellow-row td {
-        background: #FFEB5C;
+      .table-striped tbody tr.yellow-row > td,
+      .table tbody tr.yellow-row > td {
+        background: #FFEB5C !important;
       }
 
-      .orange-row td {
-        background: #FFCE5C;
+      .table-striped tbody tr.orange-row > td,
+      .table tbody tr.orange-row > td {
+        background: #FFCE5C !important;
       }
 
-      .red-row td {
-        background: #FF7C73;
+      .table-striped tbody tr.red-row > td,
+      .table tbody tr.red-row > td {
+        background: #FF7C73 !important;
       }
       .table.dataTable, .table td, .table th {
         border-collapse: collapse !important;
@@ -342,15 +346,19 @@
 <script>
   $(document).ready(function(){
     var cssClasses = {
-      '{% translate "verde" %}': 'green-row',
-      '{% translate "amarelo" %}': 'yellow-row',
-      '{% translate "laranja" %}': 'orange-row',
-      '{% translate "vermelho" %}': 'red-row'
+      'verde': 'green-row',
+      'amarelo': 'yellow-row',
+      'laranja': 'orange-row',
+      'vermelho': 'red-row'
     };
+
+    function normalizeLevel(value) {
+      return $.trim(value).toLowerCase();
+    }
 
     function applyAlertRowClass(row) {
       var $row = $(row);
-      var level = $.trim($row.find('td:last-child').text());
+      var level = normalizeLevel($row.find('td:last-child').text());
 
       $row.removeClass('green-row yellow-row orange-row red-row');
 

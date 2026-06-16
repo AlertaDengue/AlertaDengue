@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from decimal import Decimal
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -119,3 +120,12 @@ def test_create_climate_chart_returns_empty_without_variables() -> None:
     df = pd.DataFrame({"SE": [202501]})
 
     assert ReportCityCharts.create_climate_chart(df=df, var_climate={}) == ""
+
+
+def test_report_city_template_uses_canonical_alert_level_mapping() -> None:
+    html = Path("AlertaDengue/dados/templates/report_city.html").read_text()
+
+    assert "'verde': 'green-row'" in html
+    assert "'amarelo': 'yellow-row'" in html
+    assert "function normalizeLevel(value)" in html
+    assert ".table-striped tbody tr.yellow-row > td" in html
