@@ -235,6 +235,9 @@ class ReportCityCharts:
         if not varcli_keys:
             return ""
 
+        def get_series_label(index: int) -> str:
+            return str(varcli_values[index][0])
+
         df_climate = deepcopy(df[["SE", *varcli_keys]])
         for column in varcli_keys:
             df_climate[column] = pd.to_numeric(
@@ -255,16 +258,16 @@ class ReportCityCharts:
             go.Scatter(
                 x=df_climate["SE"],
                 y=df_climate[varcli_keys[0]],
-                name=f"{varcli_keys[0]}",
+                name=get_series_label(0),
                 mode="lines",
                 line={"color": "rgb(255, 204, 153)", "width": 3},
                 customdata=df_climate[varcli_keys[1]]
                 if len(varcli_keys) == 2
                 else [None] * len(df_climate),
                 hovertemplate="SE: %{x}<br>"
-                + f"<b>{varcli_keys[0]}</b>: %{{y:.1f}}<br>"
+                + f"<b>{get_series_label(0)}</b>: %{{y:.1f}}<br>"
                 + (
-                    f"<b>{varcli_keys[1]}</b>: %{{customdata:.1f}}"
+                    f"<b>{get_series_label(1)}</b>: %{{customdata:.1f}}"
                     if len(varcli_keys) == 2
                     else ""
                 )
@@ -300,7 +303,7 @@ class ReportCityCharts:
                 go.Scatter(
                     x=df_climate["SE"],
                     y=df_climate[varcli_keys[1]],
-                    name=f"{varcli_keys[1]}",
+                    name=get_series_label(1),
                     mode="lines",
                     line={"color": "rgb(173, 216, 230)", "width": 3},
                     hoverinfo="skip",

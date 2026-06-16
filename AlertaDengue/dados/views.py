@@ -1014,15 +1014,6 @@ class ReportCityView(TemplateView):
 
         this_year = int(context["year_week"][:4])
 
-        climate_cols = [
-            "temp.min",
-            "temp.med",
-            "temp.max",
-            "umid.min",
-            "umid.med",
-            "umid.max",
-        ]
-
         if not df_dengue.empty:
             last_year_week_l.append(df_dengue.index.max())
             dengue_params = get_disease_params("dengue")
@@ -1048,7 +1039,7 @@ class ReportCityView(TemplateView):
                     chart_dengue_incidence = None
 
                 chart_dengue_climate = ReportCityCharts.create_climate_chart(
-                    df=df_dengue.reset_index()[["SE", *climate_cols]],
+                    df=df_dengue.reset_index()[["SE", *v_climate.keys()]],
                     var_climate=v_climate,
                 )
 
@@ -1086,7 +1077,7 @@ class ReportCityView(TemplateView):
                     chart_chik_incidence = None
 
                 chart_chik_climate = ReportCityCharts.create_climate_chart(
-                    df=df_chik.reset_index()[["SE", *climate_cols]],
+                    df=df_chik.reset_index()[["SE", *v_climate.keys()]],
                     var_climate=v_climate,
                 )
 
@@ -1126,7 +1117,7 @@ class ReportCityView(TemplateView):
                 # Zika climate chart is usually not shown separately in the template,
                 # but we keep it here for consistency if needed.
                 chart_zika_climate = ReportCityCharts.create_climate_chart(
-                    df=df_zika.reset_index()[["SE", *climate_cols]],
+                    df=df_zika.reset_index()[["SE", *v_climate.keys()]],
                     var_climate=v_climate,
                 )
 
