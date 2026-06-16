@@ -346,19 +346,15 @@
 <script>
   $(document).ready(function(){
     var cssClasses = {
-      'verde': 'green-row',
-      'amarelo': 'yellow-row',
-      'laranja': 'orange-row',
-      'vermelho': 'red-row'
+      '{% translate "verde" %}': 'green-row',
+      '{% translate "amarelo" %}': 'yellow-row',
+      '{% translate "laranja" %}': 'orange-row',
+      '{% translate "vermelho" %}': 'red-row'
     };
-
-    function normalizeLevel(value) {
-      return $.trim(value).toLowerCase();
-    }
 
     function applyAlertRowClass(row) {
       var $row = $(row);
-      var level = normalizeLevel($row.find('td:last-child').text());
+      var level = $.trim($row.find('td:last-child').text());
 
       $row.removeClass('green-row yellow-row orange-row red-row');
 

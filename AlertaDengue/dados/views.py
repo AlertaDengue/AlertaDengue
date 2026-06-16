@@ -124,6 +124,25 @@ def _format_report_table_value(
     return format(float(numeric_value), format_spec)
 
 
+ALERT_LEVEL_LABELS = {
+    "verde": "verde",
+    "amarelo": "amarelo",
+    "laranja": "laranja",
+    "vermelho": "vermelho",
+}
+
+
+def _format_alert_level(value: Any) -> str:
+    if pd.isna(value):
+        return ""
+
+    level = str(value).strip().lower()
+    if level in ALERT_LEVEL_LABELS:
+        return _(ALERT_LEVEL_LABELS[level])
+
+    return str(value)
+
+
 def get_report_table_html(df: pd.DataFrame, keys: list[str]) -> str:
     """Render the report table with per-column formatting."""
     table_df = (
@@ -164,6 +183,7 @@ def get_report_table_html(df: pd.DataFrame, keys: list[str]) -> str:
         "incidência": lambda value: _format_report_table_value(
             value, decimal_places=1
         ),
+        "nivel": _format_alert_level,
     }
 
     return table_df.to_html(
