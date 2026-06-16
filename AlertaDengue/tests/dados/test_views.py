@@ -132,7 +132,7 @@ def test_create_climate_chart_coerces_numeric_series() -> None:
         var_climate={"temp.min": ["°C temperatura mínima", 18]},
     )
 
-    assert "°C temperatura mínima" in html
+    assert "\u00b0C temperatura m\u00ednima" in html
     assert "temp.min" not in html
     assert "Limiar favorável" in html
     assert '"responsive": true' in html
