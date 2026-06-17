@@ -1,6 +1,13 @@
 Release Notes
 ---
 
+## [4.15.1](https://github.com/AlertaDengue/AlertaDengue/compare/4.15.0...4.15.1) (2026-06-17)
+
+### Bug Fixes
+
+* **dados:** restore Download label and stabilize climate chart test ([#958](https://github.com/AlertaDengue/AlertaDengue/issues/958)) ([e57e60c](https://github.com/AlertaDengue/AlertaDengue/commit/e57e60ccfb0b73db36bd543ea3a6509fdace98ef))
+* **report-city:** correct city report chart and table rendering ([#956](https://github.com/AlertaDengue/AlertaDengue/issues/956)) ([19a7203](https://github.com/AlertaDengue/AlertaDengue/commit/19a7203f92f899cebd23cad0df603a8bbc96eb37))
+
 ## [4.15.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.14.0...4.15.0) (2026-06-10)
 
 ### Features
