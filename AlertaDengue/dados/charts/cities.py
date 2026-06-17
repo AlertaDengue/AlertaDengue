@@ -362,7 +362,8 @@ class ReportCityCharts:
                 gridcolor="rgb(176, 196, 222)",
             ),
             showlegend=True,
-            margin=dict(l=90, r=10, t=130, b=20),
+            autosize=True,
+            margin=dict(l=70, r=40, t=80, b=100),
             legend=dict(
                 orientation="h",
                 yanchor="middle",
@@ -376,8 +377,11 @@ class ReportCityCharts:
             ),
             plot_bgcolor="rgb(255, 255, 255)",
             paper_bgcolor="rgb(245, 246, 249)",
-            width=1100,
-            height=550,
+            height=520,
         )
 
-        return figure.to_html(full_html=False, include_plotlyjs=False)
+        return figure.to_html(
+            full_html=False,
+            include_plotlyjs=False,
+            config={"responsive": True},
+        )

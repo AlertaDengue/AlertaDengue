@@ -38,6 +38,10 @@
     .hidden {
         display: none;
     }
+
+    .download-button-label {
+        margin-left: 0.5rem;
+    }
 </style>
 
 <script>
@@ -61,6 +65,9 @@
         $("#geocode-search").on("input", function(e) {
           geocode_search($(e.target).val());
         });
+
+        $("#format").on("change", syncDownloadButtonLabel);
+        syncDownloadButtonLabel();
     });
 </script>
 
@@ -170,7 +177,7 @@
             </div>
 
             <div class="form-group">
-                <label for="format">{% translate "Data da Semana Epidemiológica de término da consulta" %}</label>
+                <label for="format">{% translate "Selecione o formato do arquivo de saída" %}</label>
                 <select id="format"
                         class="form-control"
                         aria-describedby="formatHelp"
@@ -188,9 +195,15 @@
                 </div>
             </div>
             <div class="form-group">
-                <input type="submit" class="btn btn-primary"
-                       value='{% translate "Download" %}'
-                />
+                <button type="submit"
+                        id="download-button"
+                        class="btn btn-primary"
+                        aria-describedby="formatHelp">
+                    <span class="fa fa-download" aria-hidden="true"></span>
+                    <span class="download-button-label">
+                        {% translate "Download" %} <span id="download-format-label">CSV</span>
+                    </span>
+                </button>
 
             <a class="btn btn-primary" data-toggle="collapse" href="#expan_dict" role="button" aria-expanded="false" aria-controls="expan_dict">
                 {% translate "Mostrar Dicionário de Dados" %}
@@ -237,6 +250,16 @@
     var epiWeekStart;
     var epiYearEnd;
     var epiWeekEnd;
+
+    function syncDownloadButtonLabel() {
+        var format = $('#format option:selected').text();
+
+        $('#download-format-label').text(format);
+        $('#download-button').attr(
+            'aria-label',
+            '{% translate "Download" %} ' + format
+        );
+    }
 
     function getEpiYearWeek(epidate, func) {
         var url = '/api/epi_year_week?epidate=' + epidate;

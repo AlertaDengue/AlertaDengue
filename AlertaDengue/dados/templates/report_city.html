@@ -47,6 +47,10 @@
         border: 1px solid #aaaaaa!important;
       }
 
+      .plotly-chart .plotly-graph-div {
+        width: 100% !important;
+      }
+
 </style>
 <script src="{% static '/libs/plotlyjs/plotly-latest.min.js' %}"></script>
 {% endblock %}
@@ -105,7 +109,9 @@
       aumentada para a possivel circulação sustentada de arbovirus e para a
       implementação de controle vetorial{% endblocktranslate %}.</p>
 
-      {{chart_dengue_climate|safe}}
+      <div class="plotly-chart w-100">
+        {{chart_dengue_climate|safe}}
+      </div>
 
       <br/>&nbsp;
   </div>

@@ -131,10 +131,13 @@ def test_create_climate_chart_coerces_numeric_series() -> None:
         df=df,
         var_climate={"temp.min": ["°C temperatura mínima", 18]},
     )
-
-    assert "°C temperatura mínima" in html
+    assert r"\u00b0C temperatura m\u00ednima" in html
     assert "temp.min" not in html
-    assert "Limiar favorável" in html
+    assert r"Limiar favor\u00e1vel 18\u00b0C" in html
+    assert '"responsive": true' in html
+    assert "height:520px" in html
+    assert "width:100%" in html
+    assert '"width": 1100' not in html
 
 
 def test_create_climate_chart_returns_empty_without_variables() -> None:
@@ -144,9 +147,14 @@ def test_create_climate_chart_returns_empty_without_variables() -> None:
 
 
 def test_report_city_template_uses_translated_alert_level_mapping() -> None:
-    html = Path("AlertaDengue/dados/templates/report_city.html").read_text()
+    html = (
+        Path(__file__).resolve().parents[2]
+        / "dados/templates/report_city.html"
+    ).read_text()
 
     assert "'{% translate \"verde\" %}': 'green-row'" in html
     assert "'{% translate \"amarelo\" %}': 'yellow-row'" in html
     assert "function normalizeLevel(value)" not in html
     assert ".table-striped tbody tr.yellow-row > td" in html
+    assert '<div class="plotly-chart w-100">' in html
+    assert ".plotly-chart .plotly-graph-div" in html

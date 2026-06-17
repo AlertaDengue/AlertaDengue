@@ -2393,15 +2393,15 @@ msgstr "Arbovirus"
 msgid "Selecione a arbovirose para a consulta"
 msgstr "Seleccione el arbovirus para la consulta"
 
-#: dados/templates/services_api.html:182
+#: dados/templates/services_api.html:180 dados/templates/services_api.html:189
 msgid "Selecione o formato do arquivo de saída"
 msgstr "Seleccione el formato del archivo de salida"
 
-#: dados/templates/services_api.html:192
+#: dados/templates/services_api.html:204
 msgid "Download"
 msgstr "Descargar"
 
-#: dados/templates/services_api.html:196
+#: dados/templates/services_api.html:209
 msgid "Mostrar Dicionário de Dados"
 msgstr "Mostrar Diccionario de Datos"
 

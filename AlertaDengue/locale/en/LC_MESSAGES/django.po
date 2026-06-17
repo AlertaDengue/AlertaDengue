@@ -2341,15 +2341,15 @@ msgstr "Arbovirosis"
 msgid "Selecione a arbovirose para a consulta"
 msgstr "Select arbovirosis for the consultation"
 
-#: dados/templates/services_api.html:182
+#: dados/templates/services_api.html:180 dados/templates/services_api.html:189
 msgid "Selecione o formato do arquivo de saída"
 msgstr "Select output file format"
 
-#: dados/templates/services_api.html:192
+#: dados/templates/services_api.html:204
 msgid "Download"
-msgstr ""
+msgstr "Download"
 
-#: dados/templates/services_api.html:196
+#: dados/templates/services_api.html:209
 msgid "Mostrar Dicionário de Dados"
 msgstr "Show Data Dictionary"
 
