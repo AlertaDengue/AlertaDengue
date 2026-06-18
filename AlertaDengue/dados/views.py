@@ -292,8 +292,8 @@ TECHNICAL_REPORTS = {
             "2024-26out2023.pdf"
         ),
     },
-    "imdc-2026": {
-        "filename": "imdc-technical-report-01-2026.pdf",
+    "epidemiological-situation-analysis-2026": {
+        "filename": "epidemiological-situation-analysis-01-2026.pdf",
         "output_filename": "RELATÓRIO TÉCNICO 01_2026.pdf",
     },
 }
