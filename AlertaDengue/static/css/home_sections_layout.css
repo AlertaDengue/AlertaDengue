@@ -15,15 +15,33 @@
 
 
 
+#carouselTop .carousel-inner,
+#carouselTop .carousel-item,
 #carouselTop .banner-slide {
-  position: relative !important;
   width: 100% !important;
 }
 
+#carouselTop .banner-slide {
+  position: relative !important;
+  aspect-ratio: 651.75 / 255;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+#carouselTop .banner-slide > a:first-child {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
 #carouselTop .banner-img {
+  position: absolute;
+  inset: 0;
   display: block !important;
   width: 100% !important;
-  height: auto !important;
+  height: 100% !important;
+  object-fit: cover;
+  object-position: center;
 }
 
 #carouselTop .carousel-indicators {
