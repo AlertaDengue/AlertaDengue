@@ -3889,3 +3889,23 @@ msgstr "Nathaly Dutra"
 #: dados/templates/team.html
 msgid "Danielle Andreza da Cruz Ferreira"
 msgstr "Danielle Andreza da Cruz Ferreira"
+
+#: dados/templates/components/home/home_banners_section.html
+msgid "Projeção comparada à média dos anos anteriores no segundo semestre"
+msgstr "Projected values compared with the average of previous years in the second half of the year"
+
+#: dados/templates/components/home/home_banners_section.html
+msgid "NOVO RELATÓRIO TÉCNICO"
+msgstr "NEW TECHNICAL REPORT"
+
+#: dados/templates/components/home/home_banners_section.html
+msgid "Análise de situação epidemiológica da dengue em ano de El Niño"
+msgstr "Epidemiological situation analysis of dengue in an El Niño year"
+
+#: dados/templates/components/home/home_banners_section.html
+msgid "Entenda como o fenômeno El Niño pode impactar o clima e o risco de epidemias de dengue no Brasil."
+msgstr "Understand how El Niño can affect the climate and the risk of dengue epidemics in Brazil."
+
+#: dados/templates/components/home/home_banners_section.html
+msgid "Ler relatório"
+msgstr "Read report"

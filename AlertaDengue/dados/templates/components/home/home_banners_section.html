@@ -24,26 +24,57 @@
 
           {# 2) Epidemiological situation analysis #}
           <div class="carousel-item">
-            <div class="banner-slide">
-              <img
-                class="d-block banner-img img-fluid"
-                src="{% static 'img/home/banners/banner_epidemiological_situation_'|add:lang_suffix|add:'.png' %}"
-                alt=""
-              >
-              <a
-                href="{% url 'dados:download_technical_report_pdf' report_key='epidemiological-situation-analysis-2026' %}"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="btn btn-primary banner-report-cta"
-              >
-                {% trans "ler relatório" %}
-              </a>
-            </div>
+            <section class="banner-slide banner-slide--report el-nino-banner">
+              <div class="container-fluid px-3 px-lg-4">
+                <div class="row align-items-center">
+                  <div class="col-lg-7 mb-4 mb-lg-0">
+                    <div class="el-nino-chart-card">
+                      <img
+                        src="{% static 'img/reports/el-nino-chart.svg' %}"
+                        class="img-fluid el-nino-chart"
+                        alt="{% translate 'Projeção comparada à média dos anos anteriores no segundo semestre' %}"
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-lg-5">
+                    <div class="el-nino-banner-content">
+                      <img
+                        src="{% static 'img/logo-infodengue.png' %}"
+                        alt="InfoDengue"
+                        class="el-nino-logo"
+                      >
+
+                      <span class="el-nino-badge">
+                        {% translate "NOVO RELATÓRIO TÉCNICO" %}
+                      </span>
+
+                      <h2 class="el-nino-title">
+                        {% translate "Análise de situação epidemiológica da dengue em ano de El Niño" %}
+                      </h2>
+
+                      <p class="el-nino-description">
+                        {% translate "Entenda como o fenômeno El Niño pode impactar o clima e o risco de epidemias de dengue no Brasil." %}
+                      </p>
+
+                      <a
+                        href="{% url 'dados:download_technical_report_pdf' report_key='epidemiological-situation-analysis-2026' %}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="btn btn-primary el-nino-report-button"
+                      >
+                        {% translate "Ler relatório" %}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
 
           {# 1) Hero #}
           <div class="carousel-item active">
-            <div class="banner-slide">
+            <div class="banner-slide banner-slide--hero">
               <img
                 class="d-block banner-img img-fluid"
                 src="{% static 'img/home/banners/banner_home_'|add:lang_suffix|add:'.svg' %}"

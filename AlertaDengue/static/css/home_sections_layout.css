@@ -21,15 +21,18 @@
   width: 100% !important;
 }
 
+#carouselTop .carousel-item {
+  min-height: 520px;
+}
+
 #carouselTop .banner-slide {
   position: relative !important;
-  aspect-ratio: 651.75 / 255;
+  min-height: inherit;
   overflow: hidden;
   background-color: #ffffff;
 }
 
-
-#carouselTop .banner-img {
+#carouselTop .banner-slide--hero .banner-img {
   position: absolute;
   inset: 0;
   display: block !important;
@@ -37,6 +40,93 @@
   height: 100% !important;
   object-fit: cover;
   object-position: center;
+}
+
+#carouselTop .el-nino-banner {
+  display: flex;
+  align-items: center;
+  color: #ffffff;
+  background-color: #00153f;
+  background-image: linear-gradient(135deg, rgba(0, 27, 77, 0.94) 0%, rgba(0, 47, 108, 0.92) 44%, rgba(0, 63, 136, 0.92) 100%), url("../img/reports/el-nino-banner-bg.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  padding: 1.5rem 1rem 1.75rem;
+}
+
+#carouselTop .el-nino-banner .container-fluid {
+  width: 100%;
+}
+
+#carouselTop .el-nino-chart-card {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 0.9rem;
+  border: 1px solid rgba(0, 180, 255, 0.55);
+  border-radius: 16px;
+  background: rgba(5, 21, 59, 0.62);
+  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.26);
+}
+
+#carouselTop .el-nino-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+#carouselTop .el-nino-banner-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+  max-width: 420px;
+}
+
+#carouselTop .el-nino-logo {
+  width: 156px;
+  height: auto;
+}
+
+#carouselTop .el-nino-badge {
+  display: inline-block;
+  padding: 0.35rem 0.95rem;
+  border: 1px solid rgba(0, 174, 239, 0.85);
+  border-radius: 999px;
+  background-color: rgba(2, 18, 61, 0.46);
+  color: #8ce9ff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+#carouselTop .el-nino-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+#carouselTop .el-nino-description {
+  margin: 0;
+  color: rgba(234, 244, 255, 0.92);
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+#carouselTop .el-nino-report-button.btn.btn-primary {
+  padding: 0.55rem 1.1rem;
+  border: 0;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.24);
+}
+
+#carouselTop .el-nino-report-button.btn.btn-primary:hover,
+#carouselTop .el-nino-report-button.btn.btn-primary:focus {
+  text-decoration: none;
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
 }
 
 #carouselTop .carousel-indicators {
@@ -53,45 +143,19 @@
   left: 65% !important;
   transform: translateX(-50%) !important;
   bottom: 26% !important;
-
+  z-index: 2;
   padding: 0.32rem 0.6rem !important;
   font-size: 0.82rem !important;
   border-radius: 7px !important;
 }
 
-
-#carouselTop .banner-report-cta.btn.btn-primary {
-  position: absolute !important;
-  left: 68% !important;
-  transform: translateX(-50%) !important;
-  bottom: 20% !important;
-  z-index: 2;
-
-  padding: 0.32rem 0.75rem !important;
-  font-size: 0.82rem !important;
-  border-radius: 7px !important;
-  text-transform: lowercase;
-  white-space: nowrap;
-}
-#carouselTop .banner-report-cta.btn.btn-primary:hover,
-#carouselTop .banner-report-cta.btn.btn-primary:focus {
-  text-decoration: none;
-  box-shadow: 0 0 0 0.12rem rgba(0, 62, 126, 0.25);
-}
-
-@media (max-width: 575.98px) {
-  #carouselTop .banner-cta.btn.btn-primary {
-    left: 65% !important;
-    bottom: 10% !important;
-    padding: 0.15rem 0.7rem !important;
-    font-size: 0.78rem !important;
+@media (min-width: 576px) {
+  #carouselTop .carousel-item {
+    min-height: 430px;
   }
 
-  #carouselTop .banner-report-cta.btn.btn-primary {
-    left: 68% !important;
-    bottom: 12% !important;
-    padding: 0.15rem 0.55rem !important;
-    font-size: 0.78rem !important;
+  #carouselTop .el-nino-banner {
+    padding: 1.6rem 1.25rem 1.75rem;
   }
 }
 
@@ -102,24 +166,41 @@
     padding: 0.3rem 0.7rem !important;
     font-size: 0.8rem !important;
   }
+}
 
-  #carouselTop .banner-report-cta.btn.btn-primary {
-    left: 66% !important;
-    bottom: 18% !important;
-    padding: 0.3rem 0.7rem !important;
-    font-size: 0.8rem !important;
+@media (max-width: 575.98px) {
+  #carouselTop .banner-cta.btn.btn-primary {
+    left: 65% !important;
+    bottom: 10% !important;
+    padding: 0.15rem 0.7rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  #carouselTop .el-nino-title {
+    font-size: 1.34rem;
+  }
+
+  #carouselTop .el-nino-description {
+    font-size: 0.92rem;
   }
 }
 
 @media (min-width: 992px) {
+  #carouselTop .carousel-item {
+    min-height: 344px;
+  }
+
+  #carouselTop .el-nino-banner {
+    padding: 1.5rem 1.8rem;
+  }
+
+  #carouselTop .el-nino-chart-card {
+    margin: 0;
+  }
+
   #carouselTop .banner-cta.btn.btn-primary {
     left: 60% !important;
     bottom: 26% !important;
-  }
-
-  #carouselTop .banner-report-cta.btn.btn-primary {
-    left: 67% !important;
-    bottom: 20% !important;
   }
 }
 
