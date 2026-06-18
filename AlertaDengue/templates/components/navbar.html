@@ -67,6 +67,16 @@
             </a>
           </li>
 
+          <!-- Products -->
+          <li class="py-2">
+            <a href="{% url 'dados:products' %}"
+               data-toggle="tooltip"
+               data-placement="bottom"
+               title="{% trans 'Veja os relatórios, publicações, teses e ferramentas produzidas pela equipe do Infodengue.' %}">
+              {% translate "Produtos" %}
+            </a>
+          </li>
+
           <!-- About us -->
           <li class="py-2">
             <a href="{% url 'dados:about' %}"

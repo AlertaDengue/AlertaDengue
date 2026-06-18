@@ -552,49 +552,6 @@
     </div>
   </section>
 
-  <!-- Epi-Scanner -->
-  <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
-          {% translate "Epi-Scanner" %}
-        </h4>
-      </div>
-      <div class="card-body">
-        <p>
-          {% blocktrans trimmed %}
-          Além da análise de situação de transmissão de arboviroses, o
-          Infodengue desenvolve e disponibiliza outros recursos para apoio à
-          tomada de decisão. Um recurso adicional do projeto é o
-          {% endblocktrans %}
-          <a href="https://info.dengue.mat.br/epi-scanner/"
-             target="_blank"
-             rel="noopener noreferrer">Epi-Scanner</a>,
-          {% blocktrans trimmed %}
-          uma metodologia criada para estimar os parâmetros epidemiológicos de
-          cada epidemia e município do país. Dentre os parâmetros estimados
-          estão a semana de pico, o número de reprodução e o número total de
-          casos na temporada.
-          {% endblocktrans %}
-        </p>
-        <p>
-          {% blocktrans trimmed %}
-          Mais detalhes podem ser encontrados no
-          {% endblocktrans %}
-          <a href="https://info.dengue.mat.br/epi-scanner/"
-             target="_blank"
-             rel="noopener noreferrer">dashboard</a>
-          {% blocktrans trimmed %}
-          do produto. O artigo que descreve a metodologia pode ser acessado
-          {% endblocktrans %}
-          <a href="https://royalsocietypublishing.org/doi/full/10.1098/rsos.241261"
-             target="_blank"
-             rel="noopener noreferrer">{% translate "aqui" %}</a>.
-        </p>
-      </div>
-    </div>
-  </section>
-
   <!-- Desafio Infodengue–Mosqlimate -->
   <section class="mb-4">
     <div class="card border-0 shadow-sm">
@@ -629,43 +586,11 @@
              rel="noopener noreferrer">{% translate "aqui" %}</a>.
           {% blocktrans trimmed %}
           Os relatórios gerados por essa iniciativa estão disponíveis na
-          seção <em>Relatórios técnicos</em>.
           {% endblocktrans %}
+          <a href="{% url 'dados:products' %}"
+             target="_self"
+             rel="noopener noreferrer">{% translate "seção Produtos" %}</a>.
         </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Relatórios técnicos -->
-  <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
-          {% translate "Relatórios técnicos" %}
-        </h4>
-      </div>
-      <div class="card-body">
-        <ul>
-          <li>
-            <a href="{% url 'dados:download_technical_report_pdf' %}">
-              {% translate "Reflexões sobre o risco de arboviroses em 2024" %}
-            </a>
-          </li>
-          <li>
-            <a href="https://zenodo.org/records/13929005"
-               target="_blank"
-               rel="noopener noreferrer">
-              {% translate "Previsões para a temporada de dengue de 2024-2025" %}
-            </a>
-          </li>
-          <li>
-            <a href="https://zenodo.org/records/17516518"
-               target="_blank"
-               rel="noopener noreferrer">
-              {% translate "Previsões para a temporada de dengue de 2025-2026" %}
-            </a>
-          </li>
-        </ul>
       </div>
     </div>
   </section>
