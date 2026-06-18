@@ -47,10 +47,10 @@
   align-items: center;
   color: #ffffff;
   background-color: #00153f;
-  background-image: linear-gradient(135deg, rgba(0, 27, 77, 0.94) 0%, rgba(0, 47, 108, 0.92) 44%, rgba(0, 63, 136, 0.92) 100%), url("../img/reports/el-nino-banner-bg.svg");
-  background-position: center;
+  background-image: linear-gradient(135deg, rgba(0, 27, 77, 0.94) 0%, rgba(0, 47, 108, 0.92) 44%, rgba(0, 63, 136, 0.92) 100%), url("../img/reports/wave_banner_background.png");
+  background-position: center, center;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: cover, 869px 340px;
   padding: 1.5rem 1rem 1.75rem;
 }
 
