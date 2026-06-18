@@ -64,8 +64,8 @@
   padding: 0.9rem;
   border: 1px solid rgba(0, 180, 255, 0.55);
   border-radius: 16px;
-  background: rgba(5, 21, 59, 0.62);
-  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.26);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 22px 46px rgba(1, 14, 43, 0.28);
 }
 
 #carouselTop .el-nino-chart {

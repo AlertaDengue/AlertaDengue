@@ -26,7 +26,7 @@ L 607.990625 323.39625
 L 607.990625 0 
 L 0 0 
 z
-" style="fill: #ffffff"/>
+" style="fill: none"/>
   </g>
   <g id="axes_1">
    <g id="patch_2">
@@ -35,7 +35,7 @@ L 600.790625 299.518125
 L 600.790625 22.318125 
 L 42.790625 22.318125 
 z
-" style="fill: #ffffff"/>
+" style="fill: none"/>
    </g>
    <g id="FillBetweenPolyCollection_1">
     <path d="M 68.154261 177.548136 

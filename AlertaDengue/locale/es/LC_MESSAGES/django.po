@@ -3892,7 +3892,7 @@ msgid "Danielle Andreza da Cruz Ferreira"
 msgstr "Danielle Andreza da Cruz Ferreira"
 
 #: dados/templates/components/home/home_banners_section.html
-msgid "Projeção comparada à média dos anos anteriores no segundo semestre"
+msgid "Projeção comparada com a média dos anos anteriores no segundo semestre"
 msgstr "Proyección comparada con el promedio de los años anteriores en el segundo semestre"
 
 #: dados/templates/components/home/home_banners_section.html
@@ -3900,13 +3900,13 @@ msgid "NOVO RELATÓRIO TÉCNICO"
 msgstr "NUEVO INFORME TÉCNICO"
 
 #: dados/templates/components/home/home_banners_section.html
-msgid "Análise de situação epidemiológica da dengue em ano de El Niño"
+msgid "Análise da situação epidemiológica da dengue em ano de El Niño"
 msgstr "Análisis de la situación epidemiológica del dengue en un año de El Niño"
 
 #: dados/templates/components/home/home_banners_section.html
 msgid "Entenda como o fenômeno El Niño pode impactar o clima e o risco de epidemias de dengue no Brasil."
-msgstr "Comprenda cómo el fenómeno de El Niño puede afectar el clima y el riesgo de epidemias de dengue en Brasil."
+msgstr "Conozca cómo el fenómeno de El Niño puede afectar el clima y el riesgo de epidemias de dengue en Brasil."
 
 #: dados/templates/components/home/home_banners_section.html
-msgid "Ler relatório"
-msgstr "Leer informe"
+msgid "Ler o relatório"
+msgstr "Leer el informe"

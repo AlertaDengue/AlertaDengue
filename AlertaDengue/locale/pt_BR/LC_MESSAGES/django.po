@@ -2565,7 +2565,7 @@ msgstr "Duração"
 #~ msgstr "Carregar mais"
 
 #: dados/templates/components/home/home_banners_section.html
-msgid "Projeção comparada à média dos anos anteriores no segundo semestre"
+msgid "Projeção comparada com a média dos anos anteriores no segundo semestre"
 msgstr "Projeção comparada à média dos anos anteriores no segundo semestre"
 
 #: dados/templates/components/home/home_banners_section.html
@@ -2573,7 +2573,7 @@ msgid "NOVO RELATÓRIO TÉCNICO"
 msgstr "NOVO RELATÓRIO TÉCNICO"
 
 #: dados/templates/components/home/home_banners_section.html
-msgid "Análise de situação epidemiológica da dengue em ano de El Niño"
+msgid "Análise da situação epidemiológica da dengue em ano de El Niño"
 msgstr "Análise de situação epidemiológica da dengue em ano de El Niño"
 
 #: dados/templates/components/home/home_banners_section.html
@@ -2581,5 +2581,5 @@ msgid "Entenda como o fenômeno El Niño pode impactar o clima e o risco de epid
 msgstr "Entenda como o fenômeno El Niño pode impactar o clima e o risco de epidemias de dengue no Brasil."
 
 #: dados/templates/components/home/home_banners_section.html
-msgid "Ler relatório"
+msgid "Ler o relatório"
 msgstr "Ler relatório"
