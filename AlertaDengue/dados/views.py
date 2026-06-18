@@ -284,16 +284,35 @@ class AboutPageView(TemplateView):
         return context
 
 
-def download_technical_report_pdf(request, *args, **kwargs):
-    pdf_path = Path(settings.TECHNICAL_REPORTS_ROOT) / "technical-report.pdf"
+TECHNICAL_REPORTS = {
+    "default": {
+        "filename": "technical-report.pdf",
+        "output_filename": (
+            "RELATÓRIO TÉCNICO 02_23 clima e arboviroses - projeções para "
+            "2024-26out2023.pdf"
+        ),
+    },
+    "imdc-2026": {
+        "filename": "imdc-technical-report-01-2026.pdf",
+        "output_filename": "RELATÓRIO TÉCNICO 01_2026.pdf",
+    },
+}
+
+
+def download_technical_report_pdf(
+    request, report_key="default", *args, **kwargs
+):
+    report = TECHNICAL_REPORTS.get(report_key)
+
+    if report is None:
+        raise Http404("Technical Report PDF not found")
+
+    pdf_path = Path(settings.TECHNICAL_REPORTS_ROOT) / report["filename"]
 
     if not pdf_path.exists():
         raise Http404("Technical Report PDF not found")
 
-    pdf_output = (
-        "RELATÓRIO TÉCNICO 02_23 clima e arboviroses - projeções para "
-        "2024-26out2023.pdf"
-    )
+    pdf_output = report["output_filename"]
 
     with pdf_path.open("rb") as pdf_file:
         response = HttpResponse(
