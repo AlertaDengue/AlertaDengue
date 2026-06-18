@@ -15,6 +15,15 @@
 
 
 
+.home-banners-panel {
+  margin: 0.25rem 0 0;
+}
+
+#carouselTop {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
 #carouselTop .carousel-inner,
 #carouselTop .carousel-item,
 #carouselTop .banner-slide {
@@ -22,14 +31,18 @@
 }
 
 #carouselTop .carousel-item {
-  min-height: 520px;
+  min-height: 0;
 }
 
 #carouselTop .banner-slide {
   position: relative !important;
-  min-height: inherit;
   overflow: hidden;
   background-color: #ffffff;
+}
+
+#carouselTop .banner-slide--hero {
+  min-height: 0;
+  aspect-ratio: 869 / 340;
 }
 
 #carouselTop .banner-slide--hero .banner-img {
@@ -42,6 +55,12 @@
   object-position: center;
 }
 
+#carouselTop .hero-banner-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
 #carouselTop .el-nino-banner {
   display: flex;
   align-items: center;
@@ -50,19 +69,35 @@
   background-image: linear-gradient(135deg, rgba(0, 27, 77, 0.94) 0%, rgba(0, 47, 108, 0.92) 44%, rgba(0, 63, 136, 0.92) 100%), url("../img/reports/wave_banner_background.png");
   background-position: center, center;
   background-repeat: no-repeat;
-  background-size: cover, 869px 340px;
-  padding: 1.5rem 1rem 1.75rem;
+  background-size: cover, cover;
+  padding: 1.25rem 0.75rem 1.5rem;
 }
 
-#carouselTop .el-nino-banner .container-fluid {
+#carouselTop .el-nino-banner-container {
   width: 100%;
+}
+
+#carouselTop .el-nino-banner-row {
+  row-gap: 1.25rem;
+}
+
+#carouselTop .el-nino-chart-column,
+#carouselTop .el-nino-content-column {
+  display: flex;
+}
+
+#carouselTop .el-nino-chart-column {
+  align-items: center;
+}
+
+#carouselTop .el-nino-content-column {
+  align-items: center;
 }
 
 #carouselTop .el-nino-chart-card {
-  max-width: none;
   width: 100%;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0.85rem;
   border: 1px solid rgba(0, 180, 255, 0.8);
   border-radius: 16px;
   background: transparent;
@@ -77,14 +112,16 @@
 
 #carouselTop .el-nino-banner-content {
   display: flex;
+  width: 100%;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.85rem;
   max-width: 420px;
+  margin: 0 auto;
 }
 
 #carouselTop .el-nino-logo {
-  width: 156px;
+  width: min(100%, 190px);
   height: auto;
 }
 
@@ -141,44 +178,53 @@
 
 #carouselTop .banner-cta.btn.btn-primary {
   position: absolute !important;
-  left: 65% !important;
+  left: 64% !important;
+  bottom: 14% !important;
   transform: translateX(-50%) !important;
-  bottom: 26% !important;
   z-index: 2;
-  padding: 0.32rem 0.6rem !important;
+  pointer-events: auto;
+  padding: 0.4rem 0.85rem !important;
   font-size: 0.82rem !important;
   border-radius: 7px !important;
 }
 
-@media (min-width: 576px) {
-  #carouselTop .carousel-item {
-    min-height: 430px;
+@media (max-width: 575.98px) {
+  .home-banners-panel {
+    padding: 0.5rem 0.5rem 0.75rem;
+  }
+
+  #carouselTop .banner-slide--hero {
+    aspect-ratio: 16 / 9;
+  }
+
+  #carouselTop .hero-banner-overlay {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 0 1rem;
+  }
+
+  #carouselTop .banner-cta.btn.btn-primary {
+    position: static !important;
+    transform: none !important;
+    padding: 0.35rem 0.85rem !important;
+    font-size: 0.8rem !important;
   }
 
   #carouselTop .el-nino-banner {
-    padding: 1.6rem 1.25rem 1.75rem;
+    padding: 1rem 0.75rem 1.5rem;
+    background-size: cover, auto 100%;
+    background-position: center, center top;
   }
-}
 
-@media (min-width: 576px) and (max-width: 991.98px) {
-  #carouselTop .banner-cta.btn.btn-primary {
-    left: 58% !important;
-    bottom: 20% !important;
-    padding: 0.3rem 0.7rem !important;
-    font-size: 0.8rem !important;
-  }
-}
-
-@media (max-width: 575.98px) {
-  #carouselTop .banner-cta.btn.btn-primary {
-    left: 65% !important;
-    bottom: 10% !important;
-    padding: 0.15rem 0.7rem !important;
-    font-size: 0.78rem !important;
+  #carouselTop .el-nino-banner-content {
+    align-items: center;
+    text-align: center;
+    max-width: 100%;
   }
 
   #carouselTop .el-nino-title {
-    font-size: 1.34rem;
+    font-size: 1.28rem;
   }
 
   #carouselTop .el-nino-description {
@@ -186,22 +232,57 @@
   }
 }
 
+@media (min-width: 576px) {
+  .home-banners-panel {
+    padding: 0.65rem 0.75rem 0.85rem;
+  }
+
+  #carouselTop .el-nino-banner {
+    padding: 1.35rem 1rem 1.6rem;
+    background-size: cover, 869px 340px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+  #carouselTop .banner-slide--hero {
+    aspect-ratio: 869 / 340;
+  }
+
+  #carouselTop .banner-cta.btn.btn-primary {
+    left: 61% !important;
+    bottom: 12% !important;
+  }
+
+  #carouselTop .el-nino-banner-content {
+    max-width: 100%;
+  }
+}
+
 @media (min-width: 992px) {
+  .home-banners-panel {
+    padding: 0.75rem 0.9rem 0.95rem;
+  }
+
   #carouselTop .carousel-item {
     min-height: 344px;
   }
 
   #carouselTop .el-nino-banner {
-    padding: 1.5rem 1.8rem;
+    min-height: 344px;
+    padding: 1.35rem 1.5rem 1.6rem;
   }
 
   #carouselTop .el-nino-chart-card {
-    margin: 0;
+    padding: 1rem;
+  }
+
+  #carouselTop .el-nino-content-column {
+    justify-content: flex-end;
   }
 
   #carouselTop .banner-cta.btn.btn-primary {
     left: 60% !important;
-    bottom: 26% !important;
+    bottom: 14% !important;
   }
 }
 

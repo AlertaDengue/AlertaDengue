@@ -8,10 +8,10 @@
 
 <div class="card mb-0 p-0 home-section-card">
 
-  <div class="col-lg-12 col-md-12 col-sm-12 mb-3 mt-2">
+  <div class="home-banners-panel">
     <div class="feature-banners">
 
-      <div id="carouselTop" class="carousel slide"
+      <div id="carouselTop" class="carousel slide home-banners-carousel"
            data-ride="carousel" data-interval="7000">
 
         <ol class="carousel-indicators">
@@ -25,9 +25,9 @@
           {# 2) Epidemiological situation analysis #}
           <div class="carousel-item">
             <section class="banner-slide banner-slide--report el-nino-banner">
-              <div class="container-fluid px-3 px-lg-4">
-                <div class="row align-items-center">
-                  <div class="col-lg-8 mb-4 mb-lg-0">
+              <div class="container-fluid el-nino-banner-container px-3 px-md-4">
+                <div class="row align-items-center justify-content-between el-nino-banner-row">
+                  <div class="col-12 col-lg-8 mb-4 mb-lg-0 el-nino-chart-column">
                     <div class="el-nino-chart-card">
                       <img
                         src="{% static 'img/reports/enso.svg' %}"
@@ -37,7 +37,7 @@
                     </div>
                   </div>
 
-                  <div class="col-lg-4">
+                  <div class="col-12 col-lg-4 el-nino-content-column">
                     <div class="el-nino-banner-content">
                       <img
                         src="{% static 'img/info-dengue-logo-multicidades.png' %}"
@@ -80,10 +80,12 @@
                 src="{% static 'img/home/banners/banner_home_'|add:lang_suffix|add:'.svg' %}"
                 alt=""
               >
-              <a type="button" onclick="location.href='/informacoes/'"
-                      class="btn btn-primary banner-cta">
-                {% trans "saiba mais" %}
-              </a>
+              <div class="hero-banner-overlay">
+                <a type="button" onclick="location.href='/informacoes/'"
+                        class="btn btn-primary banner-cta">
+                  {% trans "saiba mais" %}
+                </a>
+              </div>
             </div>
           </div>
 
