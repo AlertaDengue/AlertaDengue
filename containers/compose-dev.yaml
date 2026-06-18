@@ -25,6 +25,10 @@ services:
       DEBUG: 1
     volumes:
       - ../AlertaDengue/:/opt/services/AlertaDengue
+      - type: bind
+        source: "${DOCKER_HOST_TECHNICAL_REPORTS_DIR:-/srv/workspace/infodengue/technical_reports}"
+        target: /opt/services/technical_reports
+        read_only: true
 
   celery:
     environment:
