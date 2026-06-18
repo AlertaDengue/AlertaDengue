@@ -31,18 +31,18 @@
 }
 
 #carouselTop .carousel-item {
-  min-height: 0;
+  min-height: 520px;
 }
 
 #carouselTop .banner-slide {
   position: relative !important;
+  min-height: inherit;
   overflow: hidden;
   background-color: #ffffff;
 }
 
 #carouselTop .banner-slide--hero {
-  min-height: 0;
-  aspect-ratio: 869 / 340;
+  min-height: inherit;
 }
 
 #carouselTop .banner-slide--hero .banner-img {
@@ -62,6 +62,7 @@
 }
 
 #carouselTop .el-nino-banner {
+  min-height: inherit;
   display: flex;
   align-items: center;
   color: #ffffff;
@@ -70,6 +71,7 @@
   background-position: center, center;
   background-repeat: no-repeat;
   background-size: cover, cover;
+  background-attachment: scroll;
   padding: 1.25rem 0.75rem 1.5rem;
 }
 
@@ -193,9 +195,6 @@
     padding: 0.5rem 0.5rem 0.75rem;
   }
 
-  #carouselTop .banner-slide--hero {
-    aspect-ratio: 16 / 9;
-  }
 
   #carouselTop .hero-banner-overlay {
     display: flex;
@@ -213,8 +212,8 @@
 
   #carouselTop .el-nino-banner {
     padding: 1rem 0.75rem 1.5rem;
-    background-size: cover, auto 100%;
-    background-position: center, center top;
+    background-size: cover, cover;
+    background-position: center, center;
   }
 
   #carouselTop .el-nino-banner-content {
@@ -237,17 +236,17 @@
     padding: 0.65rem 0.75rem 0.85rem;
   }
 
+  #carouselTop .carousel-item {
+    min-height: 430px;
+  }
+
   #carouselTop .el-nino-banner {
     padding: 1.35rem 1rem 1.6rem;
-    background-size: cover, 869px 340px;
+    background-size: cover, cover;
   }
 }
 
 @media (min-width: 576px) and (max-width: 991.98px) {
-  #carouselTop .banner-slide--hero {
-    aspect-ratio: 869 / 340;
-  }
-
   #carouselTop .banner-cta.btn.btn-primary {
     left: 61% !important;
     bottom: 12% !important;
