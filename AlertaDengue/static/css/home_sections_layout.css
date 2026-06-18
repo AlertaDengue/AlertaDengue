@@ -59,13 +59,14 @@
 }
 
 #carouselTop .el-nino-chart-card {
-  max-width: 620px;
+  max-width: none;
+  width: 100%;
   margin: 0 auto;
-  padding: 0.9rem;
-  border: 1px solid rgba(0, 180, 255, 0.55);
+  padding: 1rem;
+  border: 1px solid rgba(0, 180, 255, 0.8);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 22px 46px rgba(1, 14, 43, 0.28);
+  background: transparent;
+  box-shadow: 0 22px 46px rgba(1, 14, 43, 0.22);
 }
 
 #carouselTop .el-nino-chart {
