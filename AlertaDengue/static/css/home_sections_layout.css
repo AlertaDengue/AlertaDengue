@@ -28,11 +28,6 @@
   background-color: #ffffff;
 }
 
-#carouselTop .banner-slide > a:first-child {
-  position: absolute;
-  inset: 0;
-  display: block;
-}
 
 #carouselTop .banner-img {
   position: absolute;
@@ -64,11 +59,38 @@
   border-radius: 7px !important;
 }
 
+
+#carouselTop .banner-report-cta.btn.btn-primary {
+  position: absolute !important;
+  left: 68% !important;
+  transform: translateX(-50%) !important;
+  bottom: 20% !important;
+  z-index: 2;
+
+  padding: 0.32rem 0.75rem !important;
+  font-size: 0.82rem !important;
+  border-radius: 7px !important;
+  text-transform: lowercase;
+  white-space: nowrap;
+}
+#carouselTop .banner-report-cta.btn.btn-primary:hover,
+#carouselTop .banner-report-cta.btn.btn-primary:focus {
+  text-decoration: none;
+  box-shadow: 0 0 0 0.12rem rgba(0, 62, 126, 0.25);
+}
+
 @media (max-width: 575.98px) {
   #carouselTop .banner-cta.btn.btn-primary {
     left: 65% !important;
     bottom: 10% !important;
     padding: 0.15rem 0.7rem !important;
+    font-size: 0.78rem !important;
+  }
+
+  #carouselTop .banner-report-cta.btn.btn-primary {
+    left: 68% !important;
+    bottom: 12% !important;
+    padding: 0.15rem 0.55rem !important;
     font-size: 0.78rem !important;
   }
 }
@@ -80,12 +102,24 @@
     padding: 0.3rem 0.7rem !important;
     font-size: 0.8rem !important;
   }
+
+  #carouselTop .banner-report-cta.btn.btn-primary {
+    left: 66% !important;
+    bottom: 18% !important;
+    padding: 0.3rem 0.7rem !important;
+    font-size: 0.8rem !important;
+  }
 }
 
 @media (min-width: 992px) {
   #carouselTop .banner-cta.btn.btn-primary {
     left: 60% !important;
     bottom: 26% !important;
+  }
+
+  #carouselTop .banner-report-cta.btn.btn-primary {
+    left: 67% !important;
+    bottom: 20% !important;
   }
 }
 
