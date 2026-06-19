@@ -3895,6 +3895,10 @@ msgid "Projeção comparada com a média dos anos anteriores no segundo semestre
 msgstr "Projection compared with the average of previous years in the second half of the year"
 
 #: dados/templates/components/home/home_banners_section.html
+msgid "Forecast versus média dos anos anteriores no segundo semestre"
+msgstr "Forecast versus the average of previous years in the second half of the year"
+
+#: dados/templates/components/home/home_banners_section.html
 msgid "NOVO RELATÓRIO TÉCNICO"
 msgstr "NEW TECHNICAL REPORT"
 

@@ -1417,8 +1417,7 @@ L 600.790625 22.318125
 " style="fill: none; stroke: #eaf4ff; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
    </g>
    <g id="text_16">
-    <!-- Forecast vs média dos anos anteriores no 2° semestre -->
-    <g transform="translate(158.282187 16.318125) scale(0.12 -0.12)">
+        <g transform="translate(158.282187 16.318125) scale(0.12 -0.12)">
      <defs>
       <path id="DejaVuSans-46" d="M 628 4666 
 L 3309 4666 
