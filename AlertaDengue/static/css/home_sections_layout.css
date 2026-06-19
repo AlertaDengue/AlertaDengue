@@ -15,59 +15,348 @@
 
 
 
-#carouselTop .banner-slide {
-  position: relative !important;
-  width: 100% !important;
+.home-banners-panel {
+  margin: 0.25rem 0 0;
+  padding: 0.5rem;
 }
 
-#carouselTop .banner-img {
-  display: block !important;
+#carouselTop {
+  --home-banner-height: 400px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#carouselTop .carousel-inner,
+#carouselTop .carousel-item,
+#carouselTop .banner-slide {
   width: 100% !important;
-  height: auto !important;
+  height: var(--home-banner-height);
+  min-height: var(--home-banner-height);
+}
+
+#carouselTop .carousel-item {
+  min-height: var(--home-banner-height);
+}
+
+#carouselTop .banner-slide {
+  position: relative !important;
+  min-height: var(--home-banner-height);
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+#carouselTop .banner-slide--hero,
+#carouselTop .el-nino-banner {
+  height: var(--home-banner-height);
+  min-height: var(--home-banner-height);
+}
+
+#carouselTop .banner-slide--hero .banner-img {
+  display: block !important;
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  object-position: center;
+}
+
+#carouselTop .hero-banner-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#carouselTop .el-nino-banner {
+  display: flex;
+  align-items: center;
+  color: #ffffff;
+  background-color: #00153f;
+  background-image:
+    linear-gradient(
+      135deg,
+      rgba(0, 27, 77, 0.86) 0%,
+      rgba(0, 47, 108, 0.78) 44%,
+      rgba(0, 63, 136, 0.76) 100%
+    ),
+    url("../img/reports/wave_banner_background.png");
+  background-position: center, center;
+  background-repeat: no-repeat;
+  background-size: cover, cover;
+  background-attachment: scroll;
+  padding: 1.1rem 1.25rem;
+}
+
+#carouselTop .el-nino-banner-container {
+  width: 100%;
+  height: 100%;
+}
+
+#carouselTop .el-nino-banner-row {
+  height: 100%;
+  row-gap: 1rem;
+}
+
+#carouselTop .el-nino-chart-column {
+  display: flex;
+  align-items: center;
+}
+
+#carouselTop .el-nino-content-column {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+#carouselTop .el-nino-chart-card {
+  width: 100%;
+  padding: 0.5rem;
+  overflow: visible;
+  margin: 0 auto;
+  border: 1px solid rgba(0, 180, 255, 0.8);
+  border-radius: 16px;
+  background: rgba(0, 20, 60, 0.16);
+  box-shadow: 0 22px 46px rgba(1, 14, 43, 0.22);
+}
+
+#carouselTop .el-nino-chart-title {
+  margin: 0 0 0.35rem;
+  color: #cecece;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+}
+
+
+#carouselTop .el-nino-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  object-fit: contain;
+}
+
+#carouselTop .el-nino-banner-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  max-width: 360px;
+  height: 100%;
+}
+
+#carouselTop .el-nino-logo {
+  width: 140px;
+  height: auto;
+}
+
+#carouselTop .el-nino-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid rgba(0, 174, 239, 0.85);
+  border-radius: 999px;
+  background-color: rgba(2, 18, 61, 0.46);
+  color: #8ce9ff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+#carouselTop .el-nino-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+#carouselTop .el-nino-title-highlight {
+  color: #1aaeff;
+}
+
+#carouselTop .el-nino-description {
+  margin: 0;
+  color: rgba(234, 244, 255, 0.92);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+#carouselTop .el-nino-report-button.btn.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.25rem;
+  white-space: nowrap;
+  padding: 0.45rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.24);
+}
+
+#carouselTop .el-nino-report-button.btn.btn-primary:hover,
+#carouselTop .el-nino-report-button.btn.btn-primary:focus {
+  text-decoration: none;
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
 }
 
 #carouselTop .carousel-indicators {
-  bottom: -12px !important;
+  bottom: 0.45rem !important;
+  margin-bottom: 0;
+  align-items: center;
 }
 
 #carouselTop .carousel-indicators li {
-  width: 7px !important;
-  height: 7px !important;
+  width: 6px !important;
+  height: 6px !important;
+  margin: 0 4px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background-color: rgba(255, 255, 255, 0.55) !important;
+  box-shadow: 0 0 8px rgba(179, 179, 179, 0.45);
+  opacity: 1 !important;
+  transition:
+    width 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+#carouselTop .carousel-indicators li.active {
+  width: 14px !important;
+  background-color: #acacac !important;
+  box-shadow: 0 0 12px rgba(123, 132, 136, 0.85);
 }
 
 #carouselTop .banner-cta.btn.btn-primary {
   position: absolute !important;
-  left: 65% !important;
+  left: 60% !important;
+  bottom: 14% !important;
   transform: translateX(-50%) !important;
-  bottom: 26% !important;
+  z-index: 2;
+  pointer-events: auto;
 
-  padding: 0.32rem 0.6rem !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0.45rem 1rem !important;
+  border: 0 !important;
+  border-radius: 999px !important;
   font-size: 0.82rem !important;
-  border-radius: 7px !important;
+  font-weight: 600 !important;
+  white-space: nowrap;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.24);
+}
+
+#carouselTop .banner-cta.btn.btn-primary:hover,
+#carouselTop .banner-cta.btn.btn-primary:focus {
+  text-decoration: none;
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
 }
 
 @media (max-width: 575.98px) {
+  #carouselTop {
+    --home-banner-height: 650px;
+  }
+
+  .home-banners-panel {
+    padding: 0.5rem;
+  }
+
+  #carouselTop .el-nino-banner {
+    align-items: flex-start;
+    padding: 1rem 0.75rem 1.75rem;
+  }
+
+  #carouselTop .el-nino-chart-column {
+    align-items: flex-start;
+  }
+
+  #carouselTop .el-nino-chart-card {
+    padding: 0.45rem;
+  }
+
+  #carouselTop .el-nino-chart {
+    max-height: 280px;
+  }
+
+  #carouselTop .el-nino-banner-content {
+    align-items: center;
+    text-align: center;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    gap: 0.45rem;
+  }
+
+  #carouselTop .el-nino-logo {
+    width: 135px;
+  }
+
+  #carouselTop .el-nino-title {
+    font-size: 1.25rem;
+  }
+
+  #carouselTop .el-nino-description {
+    font-size: 0.86rem;
+  }
+
+  #carouselTop .hero-banner-overlay {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 0 1rem;
+  }
+
   #carouselTop .banner-cta.btn.btn-primary {
-    left: 65% !important;
-    bottom: 10% !important;
-    padding: 0.15rem 0.7rem !important;
-    font-size: 0.78rem !important;
+    position: static !important;
+    transform: none !important;
+    padding: 0.45rem 1rem !important;
+    font-size: 0.82rem !important;
+    border-radius: 999px !important;
   }
 }
 
 @media (min-width: 576px) and (max-width: 991.98px) {
+  #carouselTop {
+    --home-banner-height: 700px;
+  }
+
+  .home-banners-panel {
+    padding: 0.65rem 0.75rem 0.85rem;
+  }
+
+  #carouselTop .el-nino-banner {
+    padding: 1.25rem 1rem 1.75rem;
+  }
+
+  #carouselTop .el-nino-banner-content {
+    max-width: 620px;
+    margin: 0 auto;
+    align-items: center;
+    text-align: center;
+  }
+
   #carouselTop .banner-cta.btn.btn-primary {
-    left: 58% !important;
-    bottom: 20% !important;
-    padding: 0.3rem 0.7rem !important;
-    font-size: 0.8rem !important;
+    left: 61% !important;
+    bottom: 12% !important;
   }
 }
 
 @media (min-width: 992px) {
-  #carouselTop .banner-cta.btn.btn-primary {
-    left: 60% !important;
-    bottom: 26% !important;
+  .home-banners-panel {
+    padding: 0.75rem 0.9rem 0.95rem;
+  }
+
+  #carouselTop {
+    --home-banner-height: 400px;
+  }
+
+  #carouselTop .el-nino-content-column {
+    justify-content: center;
   }
 }
 

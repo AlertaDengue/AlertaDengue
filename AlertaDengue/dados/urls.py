@@ -70,7 +70,7 @@ urlpatterns = [
         name="about",
     ),
     re_path(
-        r"^download_technical_report_pdf/$",
+        r"^download_technical_report_pdf(?:/(?P<report_key>[-\w]+))?/$",
         download_technical_report_pdf,
         name="download_technical_report_pdf",
     ),
