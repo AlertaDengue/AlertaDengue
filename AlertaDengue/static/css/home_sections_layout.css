@@ -204,13 +204,30 @@
 }
 
 #carouselTop .carousel-indicators {
-  bottom: 0 !important;
-  margin-bottom: 0.35rem;
+  bottom: 0.45rem !important;
+  margin-bottom: 0;
+  align-items: center;
 }
 
 #carouselTop .carousel-indicators li {
-  width: 7px !important;
-  height: 7px !important;
+  width: 6px !important;
+  height: 6px !important;
+  margin: 0 4px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background-color: rgba(255, 255, 255, 0.55) !important;
+  box-shadow: 0 0 8px rgba(179, 179, 179, 0.45);
+  opacity: 1 !important;
+  transition:
+    width 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+#carouselTop .carousel-indicators li.active {
+  width: 14px !important;
+  background-color: #acacac !important;
+  box-shadow: 0 0 12px rgba(123, 132, 136, 0.85);
 }
 
 #carouselTop .banner-cta.btn.btn-primary {
