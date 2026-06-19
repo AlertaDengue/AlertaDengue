@@ -15,9 +15,8 @@
            data-ride="carousel" data-interval="7000">
 
         <ol class="carousel-indicators">
-          <li data-target="#carouselTop" data-slide-to="1"
-              class="active"></li>
-          <li data-target="#carouselTop" data-slide-to="0"></li>
+          <li data-target="#carouselTop" data-slide-to="0" class="active"></li>
+          <li data-target="#carouselTop" data-slide-to="1"></li>
         </ol>
 
         <div class="carousel-inner">
@@ -29,9 +28,9 @@
                 <div class="row align-items-center justify-content-between el-nino-banner-row">
                   <div class="col-12 col-lg-8 mb-4 mb-lg-0 el-nino-chart-column">
                     <div class="el-nino-chart-card">
-                      <h3 class="el-nino-chart-title">
+                      <h2 class="el-nino-chart-title">
                         {% translate "Forecast versus média dos anos anteriores no segundo semestre" %}
-                      </h3>
+                      </h2>
 
                       <img
                         src="{% static 'img/reports/enso.svg' %}"
@@ -54,9 +53,11 @@
                       </span>
 
                       <h2 class="el-nino-title">
-                        {% translate "Análise da situação epidemiológica da dengue em ano de" %}
-                        <br>
-                        <span class="el-nino-title-highlight">El Niño</span>
+                        {% blocktrans trimmed %}
+                          Análise da situação epidemiológica da dengue em ano de
+                          <br>
+                          <span class="el-nino-title-highlight">El Niño</span>
+                        {% endblocktrans %}
                       </h2>
 
                       <p class="el-nino-description">
