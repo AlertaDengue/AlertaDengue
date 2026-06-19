@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.16.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.15.1...4.16.0) (2026-06-19)
+
+### Features
+
+* **home:** update technical report banner ([#962](https://github.com/AlertaDengue/AlertaDengue/issues/962)) ([e82f774](https://github.com/AlertaDengue/AlertaDengue/commit/e82f7749e6230d1d36e671280b75568692a5e804))
+
 ## [4.15.1](https://github.com/AlertaDengue/AlertaDengue/compare/4.15.0...4.15.1) (2026-06-17)
 
 ### Bug Fixes
