@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-19 09:29-0300\n"
+"POT-Creation-Date: 2026-06-22 10:29-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -304,7 +304,7 @@ msgid ""
 "para manutenção programada."
 msgstr ""
 
-#: dados/templates/about.html:11 templates/components/navbar.html:76
+#: dados/templates/about.html:11 templates/components/navbar.html:86
 msgid "Sobre nós"
 msgstr "Sobre nosotros"
 
@@ -884,50 +884,10 @@ msgid "curso online"
 msgstr ""
 
 #: dados/templates/about.html:560
-#: dados/templates/components/home/home_other_products_section.html:25
-#: dados/templates/components/home/home_other_products_section.html:29
-msgid "Epi-Scanner"
-msgstr "Epi-Scanner"
-
-#: dados/templates/about.html:565
-msgid ""
-"Além da análise de situação de transmissão de arboviroses, o Infodengue "
-"desenvolve e disponibiliza outros recursos para apoio à tomada de decisão. "
-"Um recurso adicional do projeto é o"
-msgstr ""
-"Además del análisis de la situación de transmisión de arbovirosis, "
-"Infodengue desarrolla y pone a disposición otros recursos de apoyo a la toma "
-"de decisiones. Un recurso adicional del proyecto es el"
-
-#: dados/templates/about.html:573
-msgid ""
-"uma metodologia criada para estimar os parâmetros epidemiológicos de cada "
-"epidemia e município do país. Dentre os parâmetros estimados estão a semana "
-"de pico, o número de reprodução e o número total de casos na temporada."
-msgstr ""
-"una metodología creada para estimar los parámetros epidemiológicos de cada "
-"epidemia y de cada municipio del país. Entre los parámetros estimados se "
-"incluyen la semana de pico, el número de reproducción y el número total de "
-"casos en la temporada."
-
-#: dados/templates/about.html:581
-msgid "Mais detalhes podem ser encontrados no"
-msgstr "Más detalles pueden encontrarse en el"
-
-#: dados/templates/about.html:587
-msgid "do produto. O artigo que descreve a metodologia pode ser acessado"
-msgstr ""
-"del producto. El artículo que describe la metodología puede consultarse"
-
-#: dados/templates/about.html:592 dados/templates/about.html:629
-msgid "aqui"
-msgstr "aquí"
-
-#: dados/templates/about.html:603
 msgid "Desafio Infodengue-Mosqlimate de previsão de epidemias de dengue"
 msgstr "Desafío Infodengue-Mosqlimate de predicción de epidemias de dengue"
 
-#: dados/templates/about.html:608
+#: dados/templates/about.html:565
 msgid ""
 "Além dos relatórios semanais, desde 2024, o Infodengue, em parceria com o "
 "projeto"
@@ -935,7 +895,7 @@ msgstr ""
 "Además de los informes semanales, desde 2024 Infodengue, en asociación con "
 "el proyecto"
 
-#: dados/templates/about.html:615
+#: dados/templates/about.html:572
 msgid ""
 "tem organizado um desafio de previsão de longo prazo de dengue, em nível "
 "estadual, com o objetivo de combinar os esforços de diferentes estratégias "
@@ -949,38 +909,29 @@ msgstr ""
 "informe que se remite al Ministerio de Salud como apoyo a la preparación de "
 "la siguiente temporada."
 
-#: dados/templates/about.html:624
+#: dados/templates/about.html:581
 msgid "Mais informações sobre a competição podem ser encontradas"
 msgstr "Más información sobre la competencia puede encontrarse"
 
-#: dados/templates/about.html:630
-msgid ""
-"Os relatórios gerados por essa iniciativa estão disponíveis na seção "
-"<em>Relatórios técnicos</em>."
+#: dados/templates/about.html:586
+msgid "aqui"
+msgstr "aquí"
+
+#: dados/templates/about.html:587
+msgid "Os relatórios gerados por essa iniciativa estão disponíveis na"
 msgstr ""
 
-#: dados/templates/about.html:644
-#: dados/templates/components/home/home_functionalities_section.html:79
-msgid "Relatórios técnicos"
-msgstr "Informes técnicos"
+#: dados/templates/about.html:592
+#, fuzzy
+#| msgid "Produtos"
+msgid "seção Produtos"
+msgstr "Productos"
 
-#: dados/templates/about.html:651
-msgid "Reflexões sobre o risco de arboviroses em 2024"
-msgstr "Reflexiones sobre el riesgo de arbovirus en 2024"
-
-#: dados/templates/about.html:658
-msgid "Previsões para a temporada de dengue de 2024-2025"
-msgstr "Pronósticos para la temporada de dengue 2024-2025"
-
-#: dados/templates/about.html:665
-msgid "Previsões para a temporada de dengue de 2025-2026"
-msgstr "Pronósticos para la temporada de dengue 2025-2026"
-
-#: dados/templates/about.html:678
+#: dados/templates/about.html:603
 msgid "Projetos de pesquisa"
 msgstr "Proyectos de investigación"
 
-#: dados/templates/about.html:686
+#: dados/templates/about.html:611
 msgid ""
 "ARBOFRONTEIRA: Prevendo epidemias de doenças transmitidas por mosquitos no "
 "arco sul do país"
@@ -988,7 +939,7 @@ msgstr ""
 "ARBOFRONTERA: Prediciendo epidemias de enfermedades transmitidas por "
 "mosquitos en el arco sur del país"
 
-#: dados/templates/about.html:689
+#: dados/templates/about.html:614
 msgid ""
 "\n"
 "          O objetivo dessa proposta é gerar indicadores para a vigilância "
@@ -1029,16 +980,16 @@ msgstr ""
 "Bernardo de Irigoyen (ARG). Los modelos se incorporarán a Infodengue y se "
 "pondrán a disposición informes específicos para cada región."
 
-#: dados/templates/about.html:707 dados/templates/about.html:741
-#: dados/templates/about.html:758
+#: dados/templates/about.html:632 dados/templates/about.html:666
+#: dados/templates/about.html:683
 msgid "Financiamento:"
 msgstr "Financiamiento:"
 
-#: dados/templates/about.html:714
+#: dados/templates/about.html:639
 msgid "Prevendo epidemias de doenças transmitidas por mosquitos"
 msgstr "Predicción de epidemias de enfermedades transmitidas por mosquitos"
 
-#: dados/templates/about.html:717
+#: dados/templates/about.html:642
 msgid ""
 "\n"
 "          Esse projeto visa fornecer projeções a médio prazo para a "
@@ -1091,11 +1042,11 @@ msgstr ""
 "para cada enfermedad, de modo que las predicciones sean accesibles a los "
 "tomadores de decisiones y a la población general."
 
-#: dados/templates/about.html:748
+#: dados/templates/about.html:673
 msgid "EVIGILANCIA: monitoramento integrado e contínuo de arboviroses"
 msgstr "EVIGILANCIA: monitoreo integrado y continuo de arbovirosis"
 
-#: dados/templates/about.html:751
+#: dados/templates/about.html:676
 msgid ""
 "\n"
 "          Este projeto visou a consolidação do sistema de alerta para\n"
@@ -1111,23 +1062,23 @@ msgstr ""
 "integrado de información derivada de datos regionales climáticos y "
 "epidemiológicos: Infodengue."
 
-#: dados/templates/about.html:769
+#: dados/templates/about.html:694
 msgid "Como citar o Infodengue"
 msgstr "Cómo citar a Infodengue"
 
-#: dados/templates/about.html:808
-msgid "Produções científicas associadas ao Infodengue"
-msgstr "Producciones científicas asociadas a Infodengue"
+#: dados/templates/about.html:733 dados/templates/products.html:159
+msgid "Produções científicas associadas ao InfoDengue"
+msgstr "Producciones científicas asociadas a InfoDengue"
 
-#: dados/templates/about.html:978
+#: dados/templates/about.html:903
 msgid "Eventos"
 msgstr "Eventos"
 
-#: dados/templates/about.html:995
+#: dados/templates/about.html:920
 msgid "Como colaborar"
 msgstr "Cómo colaborar"
 
-#: dados/templates/about.html:999
+#: dados/templates/about.html:924
 msgid ""
 "Se sua cidade não está no Infodengue, entre em contato com a Secretaria de "
 "Saúde"
@@ -1135,7 +1086,7 @@ msgstr ""
 "Si tu ciudad no está en Infodengue, ponte en contacto con la Secretaría de "
 "Salud"
 
-#: dados/templates/about.html:1000
+#: dados/templates/about.html:925
 msgid ""
 "Se é um estudante ou pesquisador e gostaria de contribuir com análises e "
 "modelos, nos escreva"
@@ -1143,11 +1094,11 @@ msgstr ""
 "Si eres estudiante o investigador y te gustaría contribuir con análisis y "
 "modelos, escríbenos"
 
-#: dados/templates/about.html:1001
+#: dados/templates/about.html:926
 msgid "Se quiser contribuir com patrocínios, escreva-nos"
 msgstr "Si desea contribuir con patrocinios, escríbanos"
 
-#: dados/templates/about.html:1002
+#: dados/templates/about.html:927
 msgid ""
 "Se quiser aprender a usar o infodengue, tem sugestões, críticas ou se "
 "percebeu algum erro no site, escreva-nos"
@@ -1155,30 +1106,30 @@ msgstr ""
 "Si quieres aprender a usar Infodengue, tienes sugerencias o críticas, o si "
 "has detectado algún error en el sitio, escríbenos"
 
-#: dados/templates/about.html:1004
+#: dados/templates/about.html:929
 msgid ""
 "Vencer as arboviroses é um trabalho de todos, toda colaboração é bem vinda!"
 msgstr ""
 "Derrotar las arbovirosis es tarea de todos; ¡toda colaboración es bienvenida!"
 
-#: dados/templates/about.html:1015
+#: dados/templates/about.html:940
 msgid "Videos relacionados"
 msgstr "Videos relacionados"
 
-#: dados/templates/about.html:1024
+#: dados/templates/about.html:949
 msgid "Entenda o modelo mais usado para representar a pandemia de COVID-19"
 msgstr ""
 "Comprende el modelo más utilizado para representar la pandemia de COVID-19"
 
-#: dados/templates/about.html:1040
+#: dados/templates/about.html:965
 msgid "Curso PySUS - Aula 1"
 msgstr "Curso PySUS - Clase 1"
 
-#: dados/templates/about.html:1059
+#: dados/templates/about.html:984
 msgid "Mais videos da série no canal"
 msgstr "Más videos de la serie en el canal"
 
-#: dados/templates/about.html:1063
+#: dados/templates/about.html:988
 msgid "A Matemática das Epidemias"
 msgstr "Las Matemáticas de las Epidemias"
 
@@ -1515,22 +1466,22 @@ msgstr "Cerrar"
 msgid "Saiba mais"
 msgstr "Lea más aquí"
 
-#: dados/templates/components/home/home_banners_section.html:33
+#: dados/templates/components/home/home_banners_section.html:32
 msgid "Forecast versus média dos anos anteriores no segundo semestre"
 msgstr ""
 "Pronóstico versus el promedio de los años anteriores en el segundo semestre"
 
-#: dados/templates/components/home/home_banners_section.html:39
+#: dados/templates/components/home/home_banners_section.html:38
 msgid "Projeção comparada com a média dos anos anteriores no segundo semestre"
 msgstr ""
 "Proyección comparada con el promedio de los años anteriores en el segundo "
 "semestre"
 
-#: dados/templates/components/home/home_banners_section.html:53
+#: dados/templates/components/home/home_banners_section.html:52
 msgid "NOVO RELATÓRIO TÉCNICO"
 msgstr "NUEVO INFORME TÉCNICO"
 
-#: dados/templates/components/home/home_banners_section.html:57
+#: dados/templates/components/home/home_banners_section.html:56
 #, fuzzy
 #| msgid "Análise da situação epidemiológica da dengue em ano de El Niño"
 msgid ""
@@ -1539,7 +1490,7 @@ msgid ""
 msgstr ""
 "Análisis de la situación epidemiológica del dengue en un año de El Niño"
 
-#: dados/templates/components/home/home_banners_section.html:65
+#: dados/templates/components/home/home_banners_section.html:64
 msgid ""
 "Entenda como o fenômeno El Niño pode impactar o clima e o risco de epidemias "
 "de dengue no Brasil."
@@ -1547,11 +1498,11 @@ msgstr ""
 "Conozca cómo el fenómeno de El Niño puede afectar el clima y el riesgo de "
 "epidemias de dengue en Brasil."
 
-#: dados/templates/components/home/home_banners_section.html:74
+#: dados/templates/components/home/home_banners_section.html:73
 msgid "Ler o relatório"
 msgstr "Leer el informe"
 
-#: dados/templates/components/home/home_banners_section.html:94
+#: dados/templates/components/home/home_banners_section.html:97
 msgid "saiba mais"
 msgstr "Lea más aquí"
 
@@ -1600,6 +1551,11 @@ msgstr "Informes estatales"
 msgid "Análises adicionais sobre a situação das arboviroses no país."
 msgstr "Análisis adicionales sobre la situación de las arbovirosis en el país."
 
+#: dados/templates/components/home/home_functionalities_section.html:79
+#: dados/templates/products.html:41 dados/templates/products.html:104
+msgid "Relatórios técnicos"
+msgstr "Informes técnicos"
+
 #: dados/templates/components/home/home_functionalities_section.html:91
 msgid "Exemplo de acesso aos dados da API usando R e Python."
 msgstr "Ejemplo de acceso a los datos de la API utilizando R y Python."
@@ -1640,6 +1596,11 @@ msgstr ""
 "Análisis de parámetros epidemiológicos como la semana pico, el número de "
 "reproducción y el total de casos por epidemia a nivel municipal."
 
+#: dados/templates/components/home/home_other_products_section.html:25
+#: dados/templates/components/home/home_other_products_section.html:29
+msgid "Epi-Scanner"
+msgstr "Epi-Scanner"
+
 #: dados/templates/components/home/home_other_products_section.html:32
 msgid "Visualize os parâmetros epidemiológicos de cada epidemia."
 msgstr "Visualice los parámetros epidemiológicos de cada epidemia."
@@ -1669,10 +1630,12 @@ msgstr ""
 "en salud."
 
 #: dados/templates/components/home/home_other_products_section.html:69
+#: dados/templates/products.html:92
 msgid "Canal do YouTube"
 msgstr "Canal de YouTube"
 
 #: dados/templates/components/home/home_other_products_section.html:72
+#: dados/templates/products.html:93
 msgid "Vídeos sobre modelos, dados e vigilância em saúde."
 msgstr "Vídeos sobre modelos, datos y vigilancia en salud."
 
@@ -1953,6 +1916,81 @@ msgid ""
 msgstr ""
 "Modelo GAM espacial de la positividad de ovitrampas en el municipio de Río "
 "de Janeiro."
+
+#: dados/templates/products.html:11 dados/templates/products.html:20
+#: templates/components/navbar.html:76
+msgid "Produtos"
+msgstr "Productos"
+
+#: dados/templates/products.html:19
+msgid "InfoDengue / AlertaDengue"
+msgstr "InfoDengue / AlertaDengue"
+
+#: dados/templates/products.html:22
+msgid ""
+"Esta página reúne produtos técnicos e científicos desenvolvidos pela equipe "
+"InfoDengue/AlertaDengue para apoiar a vigilância, análise e comunicação "
+"sobre arboviroses no Brasil. Estão organizados aqui relatórios técnicos, "
+"ferramentas, webinários, publicações científicas, teses e outros materiais "
+"associados ao monitoramento de dengue, chikungunya, zika e fatores "
+"ambientais relacionados."
+msgstr ""
+"Esta página reúne productos técnicos y científicos desarrollados por el "
+"equipo InfoDengue/AlertaDengue para apoyar la vigilancia, el análisis y la "
+"comunicación sobre las arbovirosis en Brasil. Aquí se organizan informes "
+"técnicos, herramientas, seminarios web, publicaciones científicas, tesis y "
+"otros materiales asociados al monitoreo de dengue, chikungunya, zika y "
+"factores ambientales relacionados."
+
+#: dados/templates/products.html:25
+msgid ""
+"O objetivo é facilitar o acesso a conteúdos produzidos ao longo dos anos, "
+"concentrando evidências, documentação técnica e recursos de apoio à tomada "
+"de decisão em saúde pública."
+msgstr ""
+"El objetivo es facilitar el acceso a contenidos producidos a lo largo de los "
+"años, concentrando evidencias, documentación técnica y recursos de apoyo a "
+"la toma de decisiones en salud pública."
+
+#: dados/templates/products.html:32
+msgid "Navegação"
+msgstr "Navegación"
+
+#: dados/templates/products.html:37
+msgid "Ferramentas"
+msgstr "Herramientas"
+
+#: dados/templates/products.html:45 dados/templates/products.html:143
+msgid "Webinários IMDC"
+msgstr "Seminarios web IMDC"
+
+#: dados/templates/products.html:49
+msgid "Produções científicas"
+msgstr "Producciones científicas"
+
+#: dados/templates/products.html:53 dados/templates/products.html:291
+msgid "Teses e dissertações"
+msgstr "Tesis y disertaciones"
+
+#: dados/templates/products.html:65
+msgid "Ferramentas e painéis"
+msgstr "Herramientas y paneles"
+
+#: dados/templates/products.html:75
+msgid "Monitoramento epidêmico em tempo real"
+msgstr "Monitoreo epidémico en tiempo real"
+
+#: dados/templates/products.html:84
+msgid "Acesso a dados do DATASUS"
+msgstr "Acceso a los datos de DATASUS"
+
+#: dados/templates/products.html:163
+msgid ""
+"No texto abaixo, os itens acompanham o recorte consolidado no documento "
+"enviado para a criação desta página."
+msgstr ""
+"Los elementos a continuación siguen el recorte consolidado del documento "
+"utilizado para crear esta página."
 
 #: dados/templates/report_city.html:61
 #: dados/templates/report_filter_city.html:34
@@ -3201,6 +3239,12 @@ msgstr ""
 
 #: templates/components/navbar.html:75
 msgid ""
+"Veja os relatórios, publicações, teses e ferramentas produzidas pela equipe "
+"do Infodengue."
+msgstr ""
+
+#: templates/components/navbar.html:85
+msgid ""
 "Informações sobre o projeto Infodengue, seus objetivos, histórico e "
 "principais parceiros."
 msgstr ""
@@ -3368,6 +3412,42 @@ msgstr ""
 #: upload/templates/sinan/status.html:31 upload/templates/sinan/status.html:44
 msgid "Task duration"
 msgstr ""
+
+#~ msgid ""
+#~ "Além da análise de situação de transmissão de arboviroses, o Infodengue "
+#~ "desenvolve e disponibiliza outros recursos para apoio à tomada de "
+#~ "decisão. Um recurso adicional do projeto é o"
+#~ msgstr ""
+#~ "Además del análisis de la situación de transmisión de arbovirosis, "
+#~ "Infodengue desarrolla y pone a disposición otros recursos de apoyo a la "
+#~ "toma de decisiones. Un recurso adicional del proyecto es el"
+
+#~ msgid ""
+#~ "uma metodologia criada para estimar os parâmetros epidemiológicos de cada "
+#~ "epidemia e município do país. Dentre os parâmetros estimados estão a "
+#~ "semana de pico, o número de reprodução e o número total de casos na "
+#~ "temporada."
+#~ msgstr ""
+#~ "una metodología creada para estimar los parámetros epidemiológicos de "
+#~ "cada epidemia y de cada municipio del país. Entre los parámetros "
+#~ "estimados se incluyen la semana de pico, el número de reproducción y el "
+#~ "número total de casos en la temporada."
+
+#~ msgid "Mais detalhes podem ser encontrados no"
+#~ msgstr "Más detalles pueden encontrarse en el"
+
+#~ msgid "do produto. O artigo que descreve a metodologia pode ser acessado"
+#~ msgstr ""
+#~ "del producto. El artículo que describe la metodología puede consultarse"
+
+#~ msgid "Reflexões sobre o risco de arboviroses em 2024"
+#~ msgstr "Reflexiones sobre el riesgo de arbovirus en 2024"
+
+#~ msgid "Previsões para a temporada de dengue de 2024-2025"
+#~ msgstr "Pronósticos para la temporada de dengue 2024-2025"
+
+#~ msgid "Previsões para a temporada de dengue de 2025-2026"
+#~ msgstr "Pronósticos para la temporada de dengue 2025-2026"
 
 #~ msgid "Incidências"
 #~ msgstr "Incidencias"

@@ -3,223 +3,66 @@
 {% load i18n %}
 
 {% block extra_head %}
-<link href="{% static '/css/about_styles.css' %}" rel="stylesheet">
-<link href="{% static '/css/home_menu_buttons.css' %}" rel="stylesheet">
-<style>
-  .products-hero {
-    background: #f7fbfd;
-    border: 1px solid rgba(0, 62, 126, 0.12);
-    border-radius: 1.5rem;
-    box-shadow: 0 12px 30px rgba(4, 30, 62, 0.06);
-  }
-
-  .products-hero__panel {
-    height: 100%;
-    background: #ffffff;
-    border: 1px solid rgba(0, 62, 126, 0.12);
-    border-radius: 1.25rem;
-    box-shadow: 0 10px 24px rgba(4, 30, 62, 0.05);
-    padding: 1.75rem;
-  }
-
-  .products-hero__eyebrow {
-    color: #058ed0;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    font-size: 0.78rem;
-    font-weight: 700;
-  }
-
-  .products-hero__summary {
-    color: #3e4f63;
-    margin-bottom: 0;
-    font-size: 1.02rem;
-  }
-
-  .products-nav-card {
-    height: 100%;
-    background: #ffffff;
-    border: 1px solid rgba(0, 62, 126, 0.12);
-    border-radius: 1.25rem;
-    box-shadow: 0 10px 24px rgba(4, 30, 62, 0.05);
-    padding: 1.5rem;
-  }
-
-  .products-nav-list {
-    display: grid;
-    gap: 0.65rem;
-  }
-
-  .products-nav-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.8rem 0.95rem;
-    border-radius: 0.9rem;
-    border: 1px solid rgba(5, 142, 208, 0.14);
-    background: #f8fcfe;
-    color: #003e7e;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background-color 0.18s ease, border-color 0.18s ease,
-      box-shadow 0.18s ease, transform 0.18s ease;
-  }
-
-  .products-nav-link:hover,
-  .products-nav-link:focus {
-    background: #eef8fc;
-    border-color: rgba(5, 142, 208, 0.34);
-    color: #003e7e;
-    text-decoration: none;
-    box-shadow: 0 6px 16px rgba(4, 30, 62, 0.08);
-    transform: translateY(-1px);
-  }
-
-  .products-nav-link:focus-visible {
-    outline: 3px solid rgba(5, 142, 208, 0.25);
-    outline-offset: 2px;
-  }
-
-  .products-nav-link__arrow {
-    color: #058ed0;
-    font-size: 1.1rem;
-    line-height: 1;
-    flex: 0 0 auto;
-  }
-
-  .product-card {
-    border: 1px solid rgba(0, 62, 126, 0.12);
-    border-radius: 1rem;
-    box-shadow: 0 10px 24px rgba(4, 30, 62, 0.05);
-    overflow: hidden;
-  }
-
-  .product-card .card-header {
-    background: #f8fcfe;
-    color: #003e7e;
-    border-bottom: 1px solid rgba(0, 62, 126, 0.12);
-  }
-
-  .year-details {
-    border: 1px solid rgba(0, 62, 126, 0.12);
-    border-radius: 1rem;
-    background: #fff;
-    overflow: hidden;
-    box-shadow: 0 8px 20px rgba(4, 30, 62, 0.05);
-  }
-
-  .year-details + .year-details {
-    margin-top: 1rem;
-  }
-
-  .year-details > summary {
-    list-style: none;
-    cursor: pointer;
-    padding: 1rem 1.1rem;
-    font-weight: 700;
-    color: #003e7e;
-    background: linear-gradient(180deg, rgba(5, 142, 208, 0.08) 0%, rgba(5, 142, 208, 0.02) 100%);
-  }
-
-  .year-details > summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .year-details .year-body {
-    padding: 1rem 1.1rem 0.25rem;
-  }
-
-  .year-list {
-    margin-bottom: 0;
-    padding-left: 1.1rem;
-  }
-
-  .year-list li + li {
-    margin-top: 0.75rem;
-  }
-
-  .muted-note {
-    color: #617284;
-  }
-
-  @media (max-width: 991.98px) {
-    .products-hero__panel,
-    .products-nav-card {
-      padding: 1.25rem;
-    }
-  }
-</style>
+<link href="{% static 'css/home_sections_layout.css' %}" rel="stylesheet">
+<link href="{% static 'css/home_menu_buttons.css' %}" rel="stylesheet">
+<link href="{% static 'css/products.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block title %}{% translate "Produtos" %}{% endblock %}
 
 {% block content %}
 <div class="container py-4 py-lg-5">
-  <section class="products-hero p-4 p-lg-5 mb-4">
-    <div class="row align-items-center">
+  <section class="products-hero mb-4">
+    <div class="row align-items-stretch">
       <div class="col-lg-8 mb-4 mb-lg-0">
-        <div class="products-hero__panel">
-          <div class="products-hero__eyebrow mb-2">InfoDengue / AlertaDengue</div>
-          <h1 class="display-4 font-weight-bold mb-3">{% translate "Produtos" %}</h1>
-          <p class="lead mb-3">
-            {% blocktrans trimmed %}
-            Esta página reúne produtos técnicos e científicos desenvolvidos
-            pela equipe InfoDengue/AlertaDengue para apoiar a vigilância,
-            análise e comunicação sobre arboviroses no Brasil. Estão
-            organizados aqui relatórios técnicos, ferramentas, webinários,
-            publicações científicas, teses e outros materiais associados ao
-            monitoramento de dengue, chikungunya, zika e fatores ambientais
-            relacionados.
-            {% endblocktrans %}
+        <div class="products-hero__copy">
+          <div class="products-hero__eyebrow mb-2">{% trans "InfoDengue / AlertaDengue" %}</div>
+          <h1 class="display-4 font-weight-bold mb-3 products-hero__title">{% trans "Produtos" %}</h1>
+          <p class="lead products-hero__lead mb-3">
+            {% blocktrans trimmed %}Esta página reúne produtos técnicos e científicos desenvolvidos pela equipe InfoDengue/AlertaDengue para apoiar a vigilância, análise e comunicação sobre arboviroses no Brasil. Estão organizados aqui relatórios técnicos, ferramentas, webinários, publicações científicas, teses e outros materiais associados ao monitoramento de dengue, chikungunya, zika e fatores ambientais relacionados.{% endblocktrans %}
           </p>
           <p class="products-hero__summary">
-            {% blocktrans trimmed %}
-            O objetivo é facilitar o acesso a conteúdos produzidos ao longo
-            dos anos, concentrando evidências, documentação técnica e recursos
-            de apoio à tomada de decisão em saúde pública.
-            {% endblocktrans %}
+            {% blocktrans trimmed %}O objetivo é facilitar o acesso a conteúdos produzidos ao longo dos anos, concentrando evidências, documentação técnica e recursos de apoio à tomada de decisão em saúde pública.{% endblocktrans %}
           </p>
         </div>
       </div>
-      <div class="col-lg-4">
-        <nav class="products-nav-card" aria-labelledby="products-nav-title">
-          <h2 id="products-nav-title" class="h5 text-uppercase mb-3"
-              style="color: #003e7e;">
-            {% translate "Navegação" %}
-          </h2>
-          <div class="products-nav-list" role="list">
-            <a class="products-nav-link" href="#ferramentas">
-              <span>{% translate "Ferramentas" %}</span>
-              <span class="products-nav-link__arrow" aria-hidden="true">→</span>
-            </a>
-            <a class="products-nav-link" href="#relatorios">
-              <span>{% translate "Relatórios técnicos" %}</span>
-              <span class="products-nav-link__arrow" aria-hidden="true">→</span>
-            </a>
-            <a class="products-nav-link" href="#webinarios">
-              <span>{% translate "Webinários IMDC" %}</span>
-              <span class="products-nav-link__arrow" aria-hidden="true">→</span>
-            </a>
-            <a class="products-nav-link" href="#publicacoes">
-              <span>{% translate "Produções científicas" %}</span>
-              <span class="products-nav-link__arrow" aria-hidden="true">→</span>
-            </a>
-            <a class="products-nav-link" href="#teses">
-              <span>{% translate "Teses e dissertações" %}</span>
-              <span class="products-nav-link__arrow" aria-hidden="true">→</span>
-            </a>
+      <div class="col-lg-4 d-flex">
+        <nav class="card products-nav-card w-100" aria-labelledby="products-nav-title">
+          <div class="card-header home-section-header d-flex align-items-center">
+            <h2 id="products-nav-title" class="h5 mb-0 products-section-title">{% trans "Navegação" %}</h2>
+          </div>
+          <div class="card-body products-nav-body">
+            <div class="products-nav-list" role="list">
+              <a class="products-nav-link" href="#ferramentas">
+                <span>{% trans "Ferramentas" %}</span>
+                <span class="products-nav-link__arrow" aria-hidden="true">→</span>
+              </a>
+              <a class="products-nav-link" href="#relatorios">
+                <span>{% trans "Relatórios técnicos" %}</span>
+                <span class="products-nav-link__arrow" aria-hidden="true">→</span>
+              </a>
+              <a class="products-nav-link" href="#webinarios">
+                <span>{% trans "Webinários IMDC" %}</span>
+                <span class="products-nav-link__arrow" aria-hidden="true">→</span>
+              </a>
+              <a class="products-nav-link" href="#publicacoes">
+                <span>{% trans "Produções científicas" %}</span>
+                <span class="products-nav-link__arrow" aria-hidden="true">→</span>
+              </a>
+              <a class="products-nav-link" href="#teses">
+                <span>{% trans "Teses e dissertações" %}</span>
+                <span class="products-nav-link__arrow" aria-hidden="true">→</span>
+              </a>
+            </div>
           </div>
         </nav>
       </div>
     </div>
   </section>
-
-
   <section id="ferramentas" class="mb-4">
-    <div class="card product-card">
-      <div class="card-header">
-        <h2 class="h4 mb-0">{% translate "Ferramentas e dashboards" %}</h2>
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h2 class="h4 mb-0 products-section-title">{% translate "Ferramentas e painéis" %}</h2>
       </div>
       <div class="card-body">
         <div class="row">
@@ -229,7 +72,7 @@
                target="_blank" rel="noopener noreferrer">
               <i class="fas fa-chart-line fa-2x mb-2"></i>
               <strong>Epi-Scanner</strong>
-              <span class="small mt-1">Real-time epidemic scanner</span>
+              <span class="small mt-1">{% trans "Monitoramento epidêmico em tempo real" %}</span>
             </a>
           </div>
           <div class="col-md-4 d-flex mb-3 mb-md-0">
@@ -238,7 +81,7 @@
                target="_blank" rel="noopener noreferrer">
               <i class="fas fa-database fa-2x mb-2"></i>
               <strong>PySUS</strong>
-              <span class="small mt-1">Acesso a dados do DATASUS</span>
+              <span class="small mt-1">{% trans "Acesso a dados do DATASUS" %}</span>
             </a>
           </div>
           <div class="col-md-4 d-flex">
@@ -247,7 +90,7 @@
                target="_blank" rel="noopener noreferrer">
               <i class="fab fa-youtube fa-2x mb-2"></i>
               <strong>{% translate "Canal do YouTube" %}</strong>
-              <span class="small mt-1">Vídeos sobre modelos, dados e vigilância</span>
+              <span class="small mt-1">{% trans "Vídeos sobre modelos, dados e vigilância em saúde." %}</span>
             </a>
           </div>
         </div>
@@ -256,29 +99,38 @@
   </section>
 
   <section id="relatorios" class="mb-4">
-    <div class="card product-card">
-      <div class="card-header">
-        <h2 class="h4 mb-0">{% translate "Relatórios técnicos" %}</h2>
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h2 class="h4 mb-0 products-section-title">{% translate "Relatórios técnicos" %}</h2>
       </div>
       <div class="card-body">
         <ul class="mb-0">
           <li>
-            <a href="{% url 'dados:download_technical_report_pdf' %}">
-              {% translate "Reflexões sobre o risco de arboviroses em 2024" %}
-            </a>
-          </li>
-          <li>
-            <a href="https://zenodo.org/records/13929005" target="_blank" rel="noopener noreferrer">
-              {% translate "Previsões para a temporada de dengue de 2024-2025" %}
+            <a href="{% url 'dados:download_technical_report_pdf' report_key='epidemiological-situation-analysis-2026' %}">
+              Análise de situação epidemiológica da dengue em ano de El Niño
             </a>
           </li>
           <li>
             <a href="https://zenodo.org/records/17516518" target="_blank" rel="noopener noreferrer">
-              {% translate "Previsões para a temporada de dengue de 2025-2026" %}
+              Relatório IMDC 2025: Previsões para a temporada 2025-2026 de dengue
             </a>
           </li>
           <li>
-            <span class="muted-note">Pathfinder Infodengue: Mapeamento de processos orientado por dados para o desenvolvimento de soluções e capacidades em pesquisa. Fiocruz/TGHN LAC, 2025.</span>
+            <a href="https://zenodo.org/records/13929005" target="_blank" rel="noopener noreferrer">
+              Relatório IMDC 2024: Previsões para a temporada 2024-2025 de dengue
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'dados:download_technical_report_pdf' %}">
+              Reflexões sobre o risco de arboviroses em 2024
+            </a>
+          </li>
+          <li>
+            <a href="https://lac.tghn.org/projetos-pathfinder/infodengue/"
+               target="_blank"
+               rel="noopener noreferrer">
+              Pathfinder Infodengue: Mapeamento de processos orientado por dados para o desenvolvimento de soluções e capacidades em pesquisa. Fiocruz/TGHN LAC, 2025.
+            </a>
           </li>
         </ul>
       </div>
@@ -286,30 +138,29 @@
   </section>
 
   <section id="webinarios" class="mb-4">
-    <div class="card product-card">
-      <div class="card-header">
-        <h2 class="h4 mb-0">{% translate "Webinários IMDC" %}</h2>
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h2 class="h4 mb-0 products-section-title">{% translate "Webinários IMDC" %}</h2>
       </div>
       <div class="card-body">
         <ul class="mb-0">
           <li>Preparación para la temporada de dengue 2025: perspectivas de los modelos predictivos</li>
           <li>Webinar for the official announcement of the results of the validation of the second IMDC</li>
           <li>Webinar with the official results and predictions for the upcoming season</li>
-          <li>Dengue forecasts for 2026: results of the 2nd InfoDengue-Mosqlimate Challenge</li>
+          <li>Dengue forecasts for 2026: results of the 2nd InfoDengue–Mosqlimate Challenge</li>
         </ul>
       </div>
     </div>
   </section>
 
   <section id="publicacoes" class="mb-4">
-    <div class="card product-card">
-      <div class="card-header">
-        <h2 class="h4 mb-0">{% translate "Produções científicas associadas com o Infodengue" %}</h2>
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h2 class="h4 mb-0 products-section-title">{% translate "Produções científicas associadas ao InfoDengue" %}</h2>
       </div>
       <div class="card-body">
         <p class="muted-note mb-4">
-          No texto abaixo, os itens acompanham o recorte consolidado no documento
-          enviado para a criação desta página.
+          {% blocktrans trimmed %}No texto abaixo, os itens acompanham o recorte consolidado no documento enviado para a criação desta página.{% endblocktrans %}
         </p>
 
         <details class="year-details" open>
@@ -435,9 +286,9 @@
   </section>
 
   <section id="teses" class="mb-4">
-    <div class="card product-card">
-      <div class="card-header">
-        <h2 class="h4 mb-0">{% translate "Teses e dissertações" %}</h2>
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h2 class="h4 mb-0 products-section-title">{% translate "Teses e dissertações" %}</h2>
       </div>
       <div class="card-body">
         <details class="year-details" open>
