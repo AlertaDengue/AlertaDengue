@@ -1066,9 +1066,7 @@ msgstr ""
 msgid "Como citar o Infodengue"
 msgstr "Cómo citar a Infodengue"
 
-#: dados/templates/about.html:733 dados/templates/products.html:205
-#, fuzzy
-#| msgid "Produções científicas associadas ao InfoDengue"
+#: dados/templates/products.html:205
 msgid "Produções científicas associadas ao Infodengue"
 msgstr "Producciones científicas asociadas a InfoDengue"
 
@@ -1991,6 +1989,22 @@ msgstr "Abrir la grabación del seminario web en inglés en YouTube"
 #: dados/templates/products.html:166 dados/templates/products.html:193
 msgid "Open Spanish webinar recording on YouTube"
 msgstr "Abrir la grabación del seminario web en español en YouTube"
+#: dados/templates/products.html
+msgid "Preparação para a temporada de dengue 2025: perspectivas de modelos preditivos (1º IMDC)"
+msgstr "Preparación para la temporada de dengue 2025: perspectivas de los modelos predictivo (1º IMDC)"
+#: dados/templates/products.html
+msgid "Preparação para a temporada de dengue 2026: perspectivas e modelos preditivos (2º IMDC)"
+msgstr "Preparación para la temporada de dengue 2026: perspectivas de los modelos preditivos (2º IMDC)"
+#: dados/templates/products.html
+msgid "Webinar for the official announcement of the results of the validation of the second IMDC"
+msgstr "Webinar for the official announcement of the results of the validation of the second IMDC"
+#: dados/templates/products.html
+msgid "Webinar with the official results and predictions for the upcoming season"
+msgstr "Webinar with the official results and predictions for the upcoming season"
+
+
+
+
 
 #: dados/templates/products.html:209
 msgid ""

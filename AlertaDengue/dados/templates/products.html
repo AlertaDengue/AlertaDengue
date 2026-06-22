@@ -11,7 +11,6 @@
 {% block title %}{% translate "Produtos" %}{% endblock %}
 
 {% block content %}
-{% get_current_language as LANGUAGE_CODE %}
 <div class="container py-4 py-lg-5">
   <section class="products-hero mb-4">
     <div class="row align-items-stretch">
@@ -152,13 +151,7 @@
           <li>
             <div class="products-webinar-item">
               <div class="products-webinar-item__title">
-                {% if LANGUAGE_CODE|slice:":2" == "pt" %}
-                  Preparação para a temporada de dengue 2025: perspectivas de modelos preditivos (1º IMDC)
-                {% elif LANGUAGE_CODE|slice:":2" == "es" %}
-                  Preparación para la temporada de dengue 2025: perspectivas de los modelos predictivo (1º IMDC)
-                {% else %}
-                  Preparing for the 2025 dengue season: insights from predictive models (1st IMDC)
-                {% endif %}
+                {% blocktrans trimmed %}Preparação para a temporada de dengue 2025: perspectivas de modelos preditivos (1º IMDC){% endblocktrans %}
               </div>
               <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
                 <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=9fVgqHS-Ksk" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open Portuguese webinar recording on YouTube' %}">PT</a>
@@ -170,7 +163,7 @@
           <li>
             <div class="products-webinar-item">
               <div class="products-webinar-item__title">
-                Webinar for the official announcement of the results of the validation of the second IMDC
+                {% trans "Webinar for the official announcement of the results of the validation of the second IMDC" %}
               </div>
               <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
                 <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=YexrCASlqIE" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open English webinar recording on YouTube' %}">EN</a>
@@ -180,7 +173,7 @@
           <li>
             <div class="products-webinar-item">
               <div class="products-webinar-item__title">
-                Webinar with the official results and predictions for the upcoming season
+                {% trans "Webinar with the official results and predictions for the upcoming season" %}
               </div>
               <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
                 <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=Sb3lv3hGwGg" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open English webinar recording on YouTube' %}">EN</a>
@@ -190,13 +183,7 @@
           <li>
             <div class="products-webinar-item">
               <div class="products-webinar-item__title">
-                {% if LANGUAGE_CODE|slice:":2" == "pt" %}
-                  Preparação para a temporada de dengue 2026: perspectivas e modelos preditivos (2º IMDC)
-                {% elif LANGUAGE_CODE|slice:":2" == "es" %}
-                  Preparación para la temporada de dengue 2026: perspectivas de los modelos preditivos (2º IMDC)
-                {% else %}
-                  Preparing for the 2026 dengue season: insights from predictive models (2nd IMDC)
-                {% endif %}
+                {% blocktrans trimmed %}Preparação para a temporada de dengue 2026: perspectivas e modelos preditivos (2º IMDC){% endblocktrans %}
               </div>
               <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
                 <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=EXv7ZOci5Lw&t=2185s" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open Portuguese webinar recording on YouTube' %}">PT</a>
