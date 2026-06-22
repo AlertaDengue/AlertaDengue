@@ -4,6 +4,8 @@
 
 {% block extra_head %}
 <link href="{% static '/css/about_styles.css' %}" rel="stylesheet">
+<link href="{% static 'css/home_sections_layout.css' %}" rel="stylesheet">
+<link href="{% static 'css/products.css' %}" rel="stylesheet">
 
 {% endblock %}
 
@@ -16,9 +18,9 @@
 
   <!-- Sobre o Infodengue -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm ">
-        <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+        <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Sobre o Infodengue" %}
         </h4>
       </div>
@@ -102,9 +104,9 @@
 
   <!-- Sobre o sistema -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Sobre o sistema" %}
         </h4>
       </div>
@@ -145,9 +147,9 @@
 
   <!-- Coleta de dados -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Coleta de dados" %}
         </h4>
       </div>
@@ -208,9 +210,9 @@
 
   <!-- Harmonização e análise de dados -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Harmonização e análise de dados" %}
         </h4>
       </div>
@@ -457,8 +459,7 @@
 
         <ul>
           <li>
-            <span class="badge badge-pill"
-                  style="background-color:#00e320; color:#000;">
+            <span class="badge badge-pill about-alert-level about-alert-level--green">
               {% translate "Verde" %}
             </span>
             {% blocktrans trimmed %}
@@ -468,8 +469,7 @@
           </li>
 
           <li>
-            <span class="badge badge-pill"
-                  style="background-color:#f1ff00; color:#000;">
+            <span class="badge badge-pill about-alert-level about-alert-level--yellow">
               {% translate "Amarelo" %}
             </span>
             {% blocktrans trimmed %}
@@ -480,8 +480,7 @@
           </li>
 
           <li>
-            <span class="badge badge-pill"
-                  style="background-color:#ff8800; color:#fff;">
+            <span class="badge badge-pill about-alert-level about-alert-level--orange">
               {% translate "Laranja" %}
             </span>
             {% blocktrans trimmed %}
@@ -491,8 +490,7 @@
           </li>
 
           <li>
-            <span class="badge badge-pill"
-                  style="background-color:#fc0000; color:#fff;">
+            <span class="badge badge-pill about-alert-level about-alert-level--red">
               {% translate "Vermelho" %}
             </span>
             {% blocktrans trimmed %}
@@ -554,9 +552,9 @@
 
   <!-- Desafio Infodengue–Mosqlimate -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Desafio Infodengue-Mosqlimate de previsão de epidemias de dengue" %}
         </h4>
       </div>
@@ -597,9 +595,9 @@
 
   <!-- Projetos de pesquisa -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Projetos de pesquisa" %}
         </h4>
       </div>
@@ -688,9 +686,9 @@
 
   <!-- Como citar o Infodengue -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Como citar o Infodengue" %}
         </h4>
       </div>
@@ -727,9 +725,9 @@
 
   <!-- Eventos -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Eventos" %}
         </h4>
       </div>
@@ -744,9 +742,9 @@
 
   <!-- Como colaborar -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Como colaborar" %}
         </h4>
       </div>
@@ -764,9 +762,9 @@
 
   <!-- Videos relacionados -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Videos relacionados" %}
         </h4>
       </div>
