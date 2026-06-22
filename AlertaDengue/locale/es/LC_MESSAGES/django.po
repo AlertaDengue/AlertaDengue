@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-22 10:29-0300\n"
+"POT-Creation-Date: 2026-06-22 15:41-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1066,8 +1066,10 @@ msgstr ""
 msgid "Como citar o Infodengue"
 msgstr "Cómo citar a Infodengue"
 
-#: dados/templates/about.html:733 dados/templates/products.html:159
-msgid "Produções científicas associadas ao InfoDengue"
+#: dados/templates/about.html:733 dados/templates/products.html:205
+#, fuzzy
+#| msgid "Produções científicas associadas ao InfoDengue"
+msgid "Produções científicas associadas ao Infodengue"
 msgstr "Producciones científicas asociadas a InfoDengue"
 
 #: dados/templates/about.html:903
@@ -1552,7 +1554,7 @@ msgid "Análises adicionais sobre a situação das arboviroses no país."
 msgstr "Análisis adicionales sobre la situación de las arbovirosis en el país."
 
 #: dados/templates/components/home/home_functionalities_section.html:79
-#: dados/templates/products.html:41 dados/templates/products.html:104
+#: dados/templates/products.html:39 dados/templates/products.html:102
 msgid "Relatórios técnicos"
 msgstr "Informes técnicos"
 
@@ -1630,12 +1632,12 @@ msgstr ""
 "en salud."
 
 #: dados/templates/components/home/home_other_products_section.html:69
-#: dados/templates/products.html:92
+#: dados/templates/products.html:90 dados/templates/products.html:147
 msgid "Canal do YouTube"
 msgstr "Canal de YouTube"
 
 #: dados/templates/components/home/home_other_products_section.html:72
-#: dados/templates/products.html:93
+#: dados/templates/products.html:91
 msgid "Vídeos sobre modelos, dados e vigilância em saúde."
 msgstr "Vídeos sobre modelos, datos y vigilancia en salud."
 
@@ -1917,16 +1919,16 @@ msgstr ""
 "Modelo GAM espacial de la positividad de ovitrampas en el municipio de Río "
 "de Janeiro."
 
-#: dados/templates/products.html:11 dados/templates/products.html:20
+#: dados/templates/products.html:11 dados/templates/products.html:21
 #: templates/components/navbar.html:76
 msgid "Produtos"
 msgstr "Productos"
 
-#: dados/templates/products.html:19
+#: dados/templates/products.html:20
 msgid "Infodengue / AlertaDengue"
 msgstr "Infodengue / AlertaDengue"
 
-#: dados/templates/products.html:22
+#: dados/templates/products.html:23
 msgid ""
 "Esta página reúne produtos técnicos e científicos desenvolvidos pela equipe "
 "Infodengue/AlertaDengue para apoiar a vigilância, análise e comunicação "
@@ -1942,39 +1944,55 @@ msgstr ""
 "otros materiales asociados al monitoreo de dengue, chikungunya, Zika y "
 "factores ambientales relacionados."
 
-#: dados/templates/products.html:32
+#: dados/templates/products.html:30
 msgid "Navegação"
 msgstr "Navegación"
 
-#: dados/templates/products.html:37
+#: dados/templates/products.html:35
 msgid "Ferramentas"
 msgstr "Herramientas"
 
-#: dados/templates/products.html:45 dados/templates/products.html:143
+#: dados/templates/products.html:43 dados/templates/products.html:141
 msgid "Webinários IMDC"
 msgstr "Seminarios web IMDC"
 
-#: dados/templates/products.html:49
+#: dados/templates/products.html:47
 msgid "Produções científicas"
 msgstr "Producciones científicas"
 
-#: dados/templates/products.html:53 dados/templates/products.html:291
+#: dados/templates/products.html:51 dados/templates/products.html:337
 msgid "Teses e dissertações"
 msgstr "Tesis y disertaciones"
 
-#: dados/templates/products.html:65
+#: dados/templates/products.html:63
 msgid "Ferramentas e painéis"
 msgstr "Herramientas y paneles"
 
-#: dados/templates/products.html:75
+#: dados/templates/products.html:73
 msgid "Monitoramento epidêmico em tempo real"
 msgstr "Monitoreo epidémico en tiempo real"
 
-#: dados/templates/products.html:84
+#: dados/templates/products.html:82
 msgid "Acesso a dados do DATASUS"
 msgstr "Acceso a los datos de DATASUS"
 
-#: dados/templates/products.html:163
+#: dados/templates/products.html:163 dados/templates/products.html:190
+msgid "Language-specific webinar recordings"
+msgstr "Grabaciones del seminario web por idioma"
+
+#: dados/templates/products.html:164 dados/templates/products.html:191
+msgid "Open Portuguese webinar recording on YouTube"
+msgstr "Abrir la grabación del seminario web en portugués en YouTube"
+
+#: dados/templates/products.html:165 dados/templates/products.html:192
+msgid "Open English webinar recording on YouTube"
+msgstr "Abrir la grabación del seminario web en inglés en YouTube"
+
+#: dados/templates/products.html:166 dados/templates/products.html:193
+msgid "Open Spanish webinar recording on YouTube"
+msgstr "Abrir la grabación del seminario web en español en YouTube"
+
+#: dados/templates/products.html:209
 msgid ""
 "No texto abaixo, os itens acompanham o recorte consolidado no documento "
 "enviado para a criação desta página."

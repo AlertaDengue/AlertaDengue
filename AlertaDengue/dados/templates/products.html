@@ -11,6 +11,7 @@
 {% block title %}{% translate "Produtos" %}{% endblock %}
 
 {% block content %}
+{% get_current_language as LANGUAGE_CODE %}
 <div class="container py-4 py-lg-5">
   <section class="products-hero mb-4">
     <div class="row align-items-stretch">
@@ -149,40 +150,60 @@
       <div class="card-body">
         <ul class="mb-0 products-webinar-list">
           <li>
-            <a class="products-webinar-item-link"
-               href="http://lac.tghn.org/actividades-y-eventos/webinarios-lac/dengue-predictive-models/"
-               target="_blank"
-               rel="noopener noreferrer">
-              <span>Preparación para la temporada de dengue 2025: perspectivas de los modelos predictivos</span>
-              <i class="fab fa-youtube" aria-hidden="true"></i>
-            </a>
+            <div class="products-webinar-item">
+              <div class="products-webinar-item__title">
+                {% if LANGUAGE_CODE|slice:":2" == "pt" %}
+                  Preparação para a temporada de dengue 2025: perspectivas de modelos preditivos (1º IMDC)
+                {% elif LANGUAGE_CODE|slice:":2" == "es" %}
+                  Preparación para la temporada de dengue 2025: perspectivas de los modelos predictivo (1º IMDC)
+                {% else %}
+                  Preparing for the 2025 dengue season: insights from predictive models (1st IMDC)
+                {% endif %}
+              </div>
+              <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=9fVgqHS-Ksk" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open Portuguese webinar recording on YouTube' %}">PT</a>
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=lrgg_HIRPfI" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open English webinar recording on YouTube' %}">EN</a>
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=8ZENF-kK_VQ" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open Spanish webinar recording on YouTube' %}">ES</a>
+              </div>
+            </div>
           </li>
           <li>
-            <a class="products-webinar-item-link"
-               href="https://www.youtube.com/watch?v=YexrCASlqIE"
-               target="_blank"
-               rel="noopener noreferrer">
-              <span>Webinar for the official announcement of the results of the validation of the second IMDC</span>
-              <i class="fab fa-youtube" aria-hidden="true"></i>
-            </a>
+            <div class="products-webinar-item">
+              <div class="products-webinar-item__title">
+                Webinar for the official announcement of the results of the validation of the second IMDC
+              </div>
+              <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=YexrCASlqIE" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open English webinar recording on YouTube' %}">EN</a>
+              </div>
+            </div>
           </li>
           <li>
-            <a class="products-webinar-item-link"
-               href="https://www.youtube.com/watch?v=Sb3lv3hGwGg"
-               target="_blank"
-               rel="noopener noreferrer">
-              <span>Webinar with the official results and predictions for the upcoming season</span>
-              <i class="fab fa-youtube" aria-hidden="true"></i>
-            </a>
-          </li>
+            <div class="products-webinar-item">
+              <div class="products-webinar-item__title">
+                Webinar with the official results and predictions for the upcoming season
+              </div>
+              <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=Sb3lv3hGwGg" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open English webinar recording on YouTube' %}">EN</a>
+              </div>
+            </div>
+          </li>          
           <li>
-            <a class="products-webinar-item-link"
-               href="https://www.youtube.com/watch?v=mXTe6UC-7WM"
-               target="_blank"
-               rel="noopener noreferrer">
-              <span>Dengue forecasts for 2026: results of the 2nd Infodengue–Mosqlimate Challenge</span>
-              <i class="fab fa-youtube" aria-hidden="true"></i>
-            </a>
+            <div class="products-webinar-item">
+              <div class="products-webinar-item__title">
+                {% if LANGUAGE_CODE|slice:":2" == "pt" %}
+                  Preparação para a temporada de dengue 2026: perspectivas e modelos preditivos (2º IMDC)
+                {% elif LANGUAGE_CODE|slice:":2" == "es" %}
+                  Preparación para la temporada de dengue 2026: perspectivas de los modelos preditivos (2º IMDC)
+                {% else %}
+                  Preparing for the 2026 dengue season: insights from predictive models (2nd IMDC)
+                {% endif %}
+              </div>
+              <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=EXv7ZOci5Lw&t=2185s" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open Portuguese webinar recording on YouTube' %}">PT</a>
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=mXTe6UC-7WM" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open English webinar recording on YouTube' %}">EN</a>
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=If_6LrGCJfs&t=1s" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open Spanish webinar recording on YouTube' %}">ES</a>
+              </div>
+            </div>
           </li>
         </ul>
       </div>
