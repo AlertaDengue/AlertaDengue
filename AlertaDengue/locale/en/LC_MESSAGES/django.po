@@ -3083,7 +3083,7 @@ msgstr "Mosqlimate"
 
 #: dados/templates/team.html:302
 msgid "Intelligent Surveillance of Arboviruses and Climate"
-msgstr ""
+msgstr "Intelligent Surveillance of Arboviruses and Climate"
 
 #: dados/templates/team.html:305
 msgid "Barcelona Supercomputing Center (BSC)"
@@ -3132,6 +3132,46 @@ msgstr ""
 #: dados/templates/team.html:339
 msgid "Entre em contato conosco"
 msgstr "Contact us"
+
+#: dados/templates/team.html
+msgid "Doutoranda no Programa de Epidemiologia e Saúde Pública da ENSP/Fiocruz"
+msgstr "PhD candidate in the Epidemiology and Public Health Program at ENSP/Fiocruz"
+
+#: dados/templates/team.html
+msgid "Doutorando no Programa de Epidemiologia e Saúde Pública da ENSP/Fiocruz"
+msgstr "PhD candidate in the Epidemiology and Public Health Program at ENSP/Fiocruz"
+
+#: dados/templates/team.html
+msgid "Logo da OPAS/OMS"
+msgstr "PAHO/WHO logo"
+
+#: dados/templates/team.html
+msgid "Logo da Mosqlimate"
+msgstr "Mosqlimate logo"
+
+#: dados/templates/team.html
+msgid "Logo do Barcelona Supercomputing Center"
+msgstr "Barcelona Supercomputing Center logo"
+
+#: dados/templates/team.html
+msgid "Logo da KWAR-AI"
+msgstr "KWAR-AI logo"
+
+#: dados/templates/team.html
+msgid "Cooperação técnica em vigilância, preparação e resposta a arboviroses nas Américas."
+msgstr "Technical cooperation in surveillance, preparedness, and response to arboviruses in the Americas."
+
+#: dados/templates/team.html
+msgid "Colaboração em modelagem climática e desenvolvimento de tecnologia para saúde sensível ao clima."
+msgstr "Collaboration in climate modeling and technology development for climate-sensitive health."
+
+#: dados/templates/team.html
+msgid "Rede de colaboração que apoia o Pathfinder InfoDengue e outras atividades de formação, recursos e pesquisa em saúde global."
+msgstr "Collaborative network supporting Pathfinder InfoDengue and other training, resource, and global health research activities."
+
+#: dados/templates/team.html
+msgid "Inteligência epidemiológica com IA para apoiar pesquisa, vigilância e tomada de decisão em saúde."
+msgstr "AI-powered epidemiological intelligence to support research, surveillance, and decision-making in health."
 
 #: dados/views.py:80
 msgid "°C temperatura mínima"
