@@ -3126,7 +3126,7 @@ msgid "Mosqlimate"
 msgstr "Mosqlimate"
 
 #: dados/templates/team.html:302
-msgid "Intelligent Surveillance of Arboviruses and Climate"
+msgid "Intelligent surveillance of arboviruses and climate."
 msgstr "Vigilancia inteligente de arbovirus y clima."
 
 #: dados/templates/team.html:305
@@ -3208,16 +3208,16 @@ msgid "Cooperação técnica em vigilância, preparação e resposta a arboviros
 msgstr "Cooperación técnica en vigilancia, preparación y respuesta ante arbovirosis en las Américas."
 
 #: dados/templates/team.html
-msgid "Colaboração em modelagem climática e desenvolvimento de tecnologia para saúde sensível ao clima."
-msgstr "Colaboración en modelización climática y desarrollo tecnológico para la salud sensible al clima."
+msgid "Colaboração em modelagem climática e tecnologia para saúde sensível ao clima."
+msgstr "Colaboración en modelización climática y tecnología para la salud sensible al clima."
 
 #: dados/templates/team.html
-msgid "Rede de colaboração que apoia o Pathfinder InfoDengue e outras atividades de formação, recursos e pesquisa em saúde global."
-msgstr "Red de colaboración que apoya Pathfinder InfoDengue y otras actividades de formación, recursos e investigación en salud global."
+msgid "Rede de colaboração para Pathfinder InfoDengue, formação e pesquisa em saúde global."
+msgstr "Red de colaboración para Pathfinder InfoDengue, formación e investigación en salud global."
 
 #: dados/templates/team.html
-msgid "Inteligência epidemiológica com IA para apoiar pesquisa, vigilância e tomada de decisão em saúde."
-msgstr "Inteligencia epidemiológica con IA para apoyar la investigación, la vigilancia y la toma de decisiones en salud."
+msgid "IA para apoiar pesquisa, vigilância e tomada de decisão em saúde."
+msgstr "IA para apoyar la investigación, la vigilancia y la toma de decisiones en salud."
 
 #: dados/views.py:80
 msgid "°C temperatura mínima"
@@ -3474,3 +3474,11 @@ msgstr ""
 #: upload/templates/sinan/status.html:31 upload/templates/sinan/status.html:44
 msgid "Task duration"
 msgstr ""
+
+#: dados/templates/team.html
+msgid "Acessar site"
+msgstr "Acceder al sitio"
+
+#: dados/templates/team.html
+msgid "Projetos relacionados"
+msgstr "Proyectos relacionados"

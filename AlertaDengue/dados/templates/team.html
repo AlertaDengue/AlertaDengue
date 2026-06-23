@@ -96,66 +96,58 @@
   <section class="team-section">
     <h5 class="team-section-title">{% translate "Parcerias" %}</h5>
     <div class="team-partnerships-panel">
-      <p class="team-partnerships__intro">{% blocktranslate trimmed %}O Infodengue mantém colaborações estratégicas e atua como parte interessada em outros projetos e programas, promovendo trocas e parcerias. Entre eles estão:{% endblocktranslate %}</p>
+      <p class="team-partnerships__intro">{% blocktranslate trimmed %}Parceiros e colaborações estratégicas do Infodengue.{% endblocktranslate %}</p>
       <div class="team-partnerships-grid">
         <article class="team-partner-card">
           <div class="team-partner-card__logo team-partner-card__logo--placeholder" aria-hidden="true">
             <span>CGArb</span>
           </div>
           <div class="team-partner-card__body">
-            <h6 class="team-partner-card__title">
-              <a href="https://www.gov.br/saude/pt-br/centrais-de-conteudo/publicacoes/guias-e-manuais/2025/plano-de-contingencia-nacional-para-dengue-chikungunya-e-zika.pdf" target="_blank" rel="noopener noreferrer">
-                {% translate "Coordenação-Geral de Vigilância de Arboviroses - Ministério da Saúde (CGArb)" %}
-              </a>
-            </h6>
-            <p class="team-partner-card__text">{% blocktranslate trimmed %}Plano de Contingência Nacional para Dengue, Chikungunya e Zika (documento que define as modelagens encomendadas ao infodengue como uma das estratégias para subsidiar a tomada de decisão na preparação para epidemias por arboviroses).{% endblocktranslate %}</p>
+            <h6 class="team-partner-card__title">{% translate "Coordenação-Geral de Vigilância de Arboviroses - Ministério da Saúde (CGArb)" %}</h6>
+            <p class="team-partner-card__text">{% blocktranslate trimmed %}Plano nacional de contingência para apoiar a preparação e a tomada de decisão em arboviroses.{% endblocktranslate %}</p>
+            <div class="team-partner-card__footer">
+              <a class="team-partner-card__link" href="https://www.gov.br/saude/pt-br/centrais-de-conteudo/publicacoes/guias-e-manuais/2025/plano-de-contingencia-nacional-para-dengue-chikungunya-e-zika.pdf" target="_blank" rel="noopener noreferrer">{% trans "Acessar site" %}<span aria-hidden="true">↗</span></a>
+            </div>
           </div>
         </article>
         <article class="team-partner-card">
           <div class="team-partner-card__logo team-partner-card__logo--logo">
-            <img src="{% static 'img/team/partners/opas-logo.png' %}" alt="{% translate 'Logo da OPAS/OMS' %}" loading="lazy">
+            <img class="team-partner-card__image" src="{% static 'img/team/partners/opas-logo.png' %}" alt="{% translate 'Logo da OPAS/OMS' %}" loading="lazy">
           </div>
           <div class="team-partner-card__body">
-            <h6 class="team-partner-card__title">
-              <a href="https://www.paho.org/pt/brasil" target="_blank" rel="noopener noreferrer">
-                {% translate "Organização Pan-Americana da Saúde (OPAS/OMS)" %}
-              </a>
-            </h6>
+            <h6 class="team-partner-card__title">{% translate "Organização Pan-Americana da Saúde (OPAS/OMS)" %}</h6>
             <p class="team-partner-card__text">{% blocktranslate trimmed %}Cooperação técnica em vigilância, preparação e resposta a arboviroses nas Américas.{% endblocktranslate %}</p>
+            <div class="team-partner-card__footer">
+              <a class="team-partner-card__link" href="https://www.paho.org/pt/brasil" target="_blank" rel="noopener noreferrer">{% trans "Acessar site" %}<span aria-hidden="true">↗</span></a>
+            </div>
           </div>
         </article>
         <article class="team-partner-card">
           <div class="team-partner-card__logo team-partner-card__logo--logo">
-            <img src="{% static 'img/team/partners/mosqlimate-logo.svg' %}" alt="{% translate 'Logo da Mosqlimate' %}" loading="lazy">
+            <img class="team-partner-card__image team-partner-card__image--mosqlimate" src="{% static 'img/team/partners/mosqlimate-logo.svg' %}" alt="{% translate 'Logo da Mosqlimate' %}" loading="lazy">
           </div>
           <div class="team-partner-card__body">
-            <h6 class="team-partner-card__title">
-              <a href="https://mosqlimate.org/" target="_blank" rel="noopener noreferrer">{% translate "Mosqlimate" %}</a>
-            </h6>
-            <p class="team-partner-card__text">{% translate "Intelligent Surveillance of Arboviruses and Climate" %}</p>
+            <h6 class="team-partner-card__title">{% translate "Mosqlimate" %}</h6>
+            <p class="team-partner-card__text">{% blocktranslate trimmed %}Intelligent surveillance of arboviruses and climate.{% endblocktranslate %}</p>
+            <div class="team-partner-card__footer">
+              <a class="team-partner-card__link" href="https://mosqlimate.org/" target="_blank" rel="noopener noreferrer">{% trans "Acessar site" %}<span aria-hidden="true">↗</span></a>
+            </div>
           </div>
         </article>
         <article class="team-partner-card">
           <div class="team-partner-card__logo team-partner-card__logo--logo">
-            <img src="{% static 'img/team/partners/bsc-logo.svg' %}" alt="{% translate 'Logo do Barcelona Supercomputing Center' %}" loading="lazy">
+            <img class="team-partner-card__image team-partner-card__image--bsc" src="{% static 'img/team/partners/bsc-logo.svg' %}" alt="{% translate 'Logo do Barcelona Supercomputing Center' %}" loading="lazy">
           </div>
           <div class="team-partner-card__body">
-            <h6 class="team-partner-card__title">
-              <a href="https://www.bsc.es/" target="_blank" rel="noopener noreferrer">
-                {% translate "Barcelona Supercomputing Center (BSC)" %}
-              </a>
-            </h6>
-            <p class="team-partner-card__text">{% blocktranslate trimmed %}Colaboração em modelagem climática e desenvolvimento de tecnologia para saúde sensível ao clima.{% endblocktranslate %}</p>
-            <ul class="team-partner-card__projects">
-              <li>
-                <a href="https://www.bsc.es/research-and-development/projects/harmonize-harmonizing-multi-scale-spatiotemporal-data-health" target="_blank" rel="noopener noreferrer">HARMONIZE</a>
-                <span>{% translate "Harmonizing multi-scale spatiotemporal data for health in climate." %}</span>
-              </li>
-              <li>
-                <a href="https://www.bsc.es/es/research-and-development/projects/idextremes-digital-technology-development-award-climate-sensitive" target="_blank" rel="noopener noreferrer">IDExtremes</a>
-                <span>{% translate "Digital Technology Development Award in Climate Sensitive Infectious Disease Modelling." %}</span>
-              </li>
+            <h6 class="team-partner-card__title">{% translate "Barcelona Supercomputing Center (BSC)" %}</h6>
+            <p class="team-partner-card__text">{% blocktranslate trimmed %}Colaboração em modelagem climática e tecnologia para saúde sensível ao clima.{% endblocktranslate %}</p>
+            <ul class="team-partner-card__chips" aria-label="{% translate 'Projetos relacionados' %}">
+              <li><a href="https://www.bsc.es/research-and-development/projects/harmonize-harmonizing-multi-scale-spatiotemporal-data-health" target="_blank" rel="noopener noreferrer">HARMONIZE</a></li>
+              <li><a href="https://www.bsc.es/es/research-and-development/projects/idextremes-digital-technology-development-award-climate-sensitive" target="_blank" rel="noopener noreferrer">IDExtremes</a></li>
             </ul>
+            <div class="team-partner-card__footer">
+              <a class="team-partner-card__link" href="https://www.bsc.es/" target="_blank" rel="noopener noreferrer">{% trans "Acessar site" %}<span aria-hidden="true">↗</span></a>
+            </div>
           </div>
         </article>
         <article class="team-partner-card">
@@ -163,23 +155,23 @@
             <span>TGHN LAC</span>
           </div>
           <div class="team-partner-card__body">
-            <h6 class="team-partner-card__title">
-              <a href="https://lac.tghn.org/projetos-pathfinder/infodengue/" target="_blank" rel="noopener noreferrer">
-                {% translate "The Global Health Network Latin America and Caribbean (TGHN LAC)" %}
-              </a>
-            </h6>
-            <p class="team-partner-card__text">{% blocktranslate trimmed %}Rede de colaboração que apoia o Pathfinder InfoDengue e outras atividades de formação, recursos e pesquisa em saúde global.{% endblocktranslate %}</p>
+            <h6 class="team-partner-card__title">{% translate "The Global Health Network Latin America and Caribbean (TGHN LAC)" %}</h6>
+            <p class="team-partner-card__text">{% blocktranslate trimmed %}Rede de colaboração para Pathfinder InfoDengue, formação e pesquisa em saúde global.{% endblocktranslate %}</p>
+            <div class="team-partner-card__footer">
+              <a class="team-partner-card__link" href="https://lac.tghn.org/projetos-pathfinder/infodengue/" target="_blank" rel="noopener noreferrer">{% trans "Acessar site" %}<span aria-hidden="true">↗</span></a>
+            </div>
           </div>
         </article>
         <article class="team-partner-card">
           <div class="team-partner-card__logo team-partner-card__logo--logo">
-            <img src="{% static 'img/team/partners/kwar-ai-logo.png' %}" alt="{% translate 'Logo da KWAR-AI' %}" loading="lazy">
+            <img class="team-partner-card__image team-partner-card__image--kwar" src="{% static 'img/team/partners/kwar-ai-logo.png' %}" alt="{% translate 'Logo da KWAR-AI' %}" loading="lazy">
           </div>
           <div class="team-partner-card__body">
-            <h6 class="team-partner-card__title">
-              <a href="https://kwar-ai.com.br/" target="_blank" rel="noopener noreferrer">{% translate "KWAR-AI" %}</a>
-            </h6>
-            <p class="team-partner-card__text">{% blocktranslate trimmed %}Inteligência epidemiológica com IA para apoiar pesquisa, vigilância e tomada de decisão em saúde.{% endblocktranslate %}</p>
+            <h6 class="team-partner-card__title">{% translate "KWAR-AI" %}</h6>
+            <p class="team-partner-card__text">{% blocktranslate trimmed %}IA para apoiar pesquisa, vigilância e tomada de decisão em saúde.{% endblocktranslate %}</p>
+            <div class="team-partner-card__footer">
+              <a class="team-partner-card__link" href="https://kwar-ai.com.br/" target="_blank" rel="noopener noreferrer">{% trans "Acessar site" %}<span aria-hidden="true">↗</span></a>
+            </div>
           </div>
         </article>
       </div>

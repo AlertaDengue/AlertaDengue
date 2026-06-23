@@ -3047,31 +3047,16 @@ msgid "Parcerias"
 msgstr "Partnerships"
 
 #: dados/templates/team.html:287
-msgid ""
-"O Infodengue mantém colaborações estratégicas e atua como parte interessada "
-"em outros projetos e programas, promovendo trocas e parcerias. Entre eles "
-"estão:"
-msgstr ""
-"Infodengue maintains strategic collaborations and participates as a "
-"stakeholder in other projects and programs, promoting exchange and "
-"partnerships. These include:"
+msgid "Parceiros e colaborações estratégicas do Infodengue."
+msgstr "Strategic partners and collaborators of Infodengue."
 
 #: dados/templates/team.html:291
-msgid ""
-"Coordenação-Geral de Vigilância de Arboviroses - Ministério da Saúde (CGArb)"
-msgstr ""
-"General Coordination for Arbovirus Surveillance - Ministry of Health (CGArb)"
+msgid "Coordenação-Geral de Vigilância de Arboviroses - Ministério da Saúde (CGArb)"
+msgstr "General Coordination for Arbovirus Surveillance - Ministry of Health (CGArb)"
 
 #: dados/templates/team.html:293
-msgid ""
-"Plano de Contingência Nacional para Dengue, Chikungunya e Zika (documento "
-"que define as modelagens encomendadas ao infodengue como uma das estratégias "
-"para subsidiar a tomada de decisão na preparação para epidemias por "
-"arboviroses)."
-msgstr ""
-"National Contingency Plan for Dengue, Chikungunya, and Zika (a document that "
-"defines the modeling commissioned from Infodengue as one of the strategies "
-"to support decision-making in preparing for arbovirus epidemics)."
+msgid "Plano nacional de contingência para apoiar a preparação e a tomada de decisão em arboviroses."
+msgstr "National contingency plan to support preparedness and decision-making for arboviruses."
 
 #: dados/templates/team.html:297
 msgid "Organização Pan-Americana da Saúde (OPAS/OMS)"
@@ -3082,8 +3067,8 @@ msgid "Mosqlimate"
 msgstr "Mosqlimate"
 
 #: dados/templates/team.html:302
-msgid "Intelligent Surveillance of Arboviruses and Climate"
-msgstr "Intelligent Surveillance of Arboviruses and Climate"
+msgid "Intelligent surveillance of arboviruses and climate."
+msgstr "Intelligent surveillance of arboviruses and climate."
 
 #: dados/templates/team.html:305
 msgid "Barcelona Supercomputing Center (BSC)"
@@ -3162,16 +3147,16 @@ msgid "Cooperação técnica em vigilância, preparação e resposta a arboviros
 msgstr "Technical cooperation in surveillance, preparedness, and response to arboviruses in the Americas."
 
 #: dados/templates/team.html
-msgid "Colaboração em modelagem climática e desenvolvimento de tecnologia para saúde sensível ao clima."
-msgstr "Collaboration in climate modeling and technology development for climate-sensitive health."
+msgid "Colaboração em modelagem climática e tecnologia para saúde sensível ao clima."
+msgstr "Collaboration in climate modeling and technology for climate-sensitive health."
 
 #: dados/templates/team.html
-msgid "Rede de colaboração que apoia o Pathfinder InfoDengue e outras atividades de formação, recursos e pesquisa em saúde global."
-msgstr "Collaborative network supporting Pathfinder InfoDengue and other training, resource, and global health research activities."
+msgid "Rede de colaboração para Pathfinder InfoDengue, formação e pesquisa em saúde global."
+msgstr "Collaborative network supporting Pathfinder InfoDengue, training, and global health research."
 
 #: dados/templates/team.html
-msgid "Inteligência epidemiológica com IA para apoiar pesquisa, vigilância e tomada de decisão em saúde."
-msgstr "AI-powered epidemiological intelligence to support research, surveillance, and decision-making in health."
+msgid "IA para apoiar pesquisa, vigilância e tomada de decisão em saúde."
+msgstr "AI to support research, surveillance, and decision-making in health."
 
 #: dados/views.py:80
 msgid "°C temperatura mínima"
@@ -3428,3 +3413,11 @@ msgstr ""
 #: upload/templates/sinan/status.html:31 upload/templates/sinan/status.html:44
 msgid "Task duration"
 msgstr ""
+
+#: dados/templates/team.html
+msgid "Acessar site"
+msgstr "Visit website"
+
+#: dados/templates/team.html
+msgid "Projetos relacionados"
+msgstr "Related projects"

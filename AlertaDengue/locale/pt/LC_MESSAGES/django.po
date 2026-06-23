@@ -2547,3 +2547,7 @@ msgstr ""
 #: AlertaDengue/templates/registration/password_reset_email.html:12
 msgid "Obrigado por usar o Infodengue"
 msgstr ""
+
+#: dados/templates/team.html
+msgid "Intelligent surveillance of arboviruses and climate."
+msgstr "Vigilância inteligente de arboviroses e clima."
