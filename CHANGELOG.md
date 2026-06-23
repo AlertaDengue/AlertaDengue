@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## [4.17.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.16.0...4.17.0) (2026-06-23)
+
+### Features
+
+* **dango-templates:** create the products page and split product content from about ([#964](https://github.com/AlertaDengue/AlertaDengue/issues/964)) ([5f18b71](https://github.com/AlertaDengue/AlertaDengue/commit/5f18b7121bfd3fe1f46887d66046b7f75fffd223))
+
 ## [4.16.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.15.1...4.16.0) (2026-06-19)
 
 ### Features
