@@ -2846,7 +2846,7 @@ msgstr "Who Builds Infodengue"
 
 #: dados/templates/team.html:203
 msgid ""
-"O Infodengue, fruto de uma articulação entre a Fiocruz e Emap/FVG, é um "
+"O Infodengue, fruto de uma parceria entre a Fiocruz e Emap/FGV, é um "
 "sistema criado e desenvolvido por pesquisadores de instituições públicas e "
 "privadas que buscam soluções para o monitoramento de doenças transmitidas "
 "por vetores. Nossa equipe é composta por uma rede multidisciplinar que "
