@@ -299,6 +299,14 @@ TECHNICAL_REPORTS = {
 }
 
 
+class ProductsPageView(TemplateView):
+    template_name = "products.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
 def download_technical_report_pdf(
     request, report_key="default", *args, **kwargs
 ):

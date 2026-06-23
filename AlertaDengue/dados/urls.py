@@ -15,6 +15,7 @@ from .views import (
     GeoJsonView,
     GeoTiffView,
     JoininPageView,
+    ProductsPageView,
     ReportCityView,
     ReportStateData,
     ReportStateView,
@@ -68,6 +69,11 @@ urlpatterns = [
         r"^informacoes/$",
         cache_page(60 * 60 * 60 * 24)(AboutPageView.as_view()),
         name="about",
+    ),
+    re_path(
+        r"^produtos/$",
+        cache_page(60 * 60 * 60 * 24)(ProductsPageView.as_view()),
+        name="products",
     ),
     re_path(
         r"^download_technical_report_pdf(?:/(?P<report_key>[-\w]+))?/$",

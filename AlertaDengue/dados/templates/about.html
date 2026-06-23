@@ -4,6 +4,8 @@
 
 {% block extra_head %}
 <link href="{% static '/css/about_styles.css' %}" rel="stylesheet">
+<link href="{% static 'css/home_sections_layout.css' %}" rel="stylesheet">
+<link href="{% static 'css/products.css' %}" rel="stylesheet">
 
 {% endblock %}
 
@@ -16,9 +18,9 @@
 
   <!-- Sobre o Infodengue -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm ">
-        <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+        <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Sobre o Infodengue" %}
         </h4>
       </div>
@@ -102,9 +104,9 @@
 
   <!-- Sobre o sistema -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Sobre o sistema" %}
         </h4>
       </div>
@@ -145,9 +147,9 @@
 
   <!-- Coleta de dados -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Coleta de dados" %}
         </h4>
       </div>
@@ -208,9 +210,9 @@
 
   <!-- Harmonização e análise de dados -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Harmonização e análise de dados" %}
         </h4>
       </div>
@@ -457,8 +459,7 @@
 
         <ul>
           <li>
-            <span class="badge badge-pill"
-                  style="background-color:#00e320; color:#000;">
+            <span class="badge badge-pill about-alert-level about-alert-level--green">
               {% translate "Verde" %}
             </span>
             {% blocktrans trimmed %}
@@ -468,8 +469,7 @@
           </li>
 
           <li>
-            <span class="badge badge-pill"
-                  style="background-color:#f1ff00; color:#000;">
+            <span class="badge badge-pill about-alert-level about-alert-level--yellow">
               {% translate "Amarelo" %}
             </span>
             {% blocktrans trimmed %}
@@ -480,8 +480,7 @@
           </li>
 
           <li>
-            <span class="badge badge-pill"
-                  style="background-color:#ff8800; color:#fff;">
+            <span class="badge badge-pill about-alert-level about-alert-level--orange">
               {% translate "Laranja" %}
             </span>
             {% blocktrans trimmed %}
@@ -491,8 +490,7 @@
           </li>
 
           <li>
-            <span class="badge badge-pill"
-                  style="background-color:#fc0000; color:#fff;">
+            <span class="badge badge-pill about-alert-level about-alert-level--red">
               {% translate "Vermelho" %}
             </span>
             {% blocktrans trimmed %}
@@ -552,54 +550,11 @@
     </div>
   </section>
 
-  <!-- Epi-Scanner -->
-  <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
-          {% translate "Epi-Scanner" %}
-        </h4>
-      </div>
-      <div class="card-body">
-        <p>
-          {% blocktrans trimmed %}
-          Além da análise de situação de transmissão de arboviroses, o
-          Infodengue desenvolve e disponibiliza outros recursos para apoio à
-          tomada de decisão. Um recurso adicional do projeto é o
-          {% endblocktrans %}
-          <a href="https://info.dengue.mat.br/epi-scanner/"
-             target="_blank"
-             rel="noopener noreferrer">Epi-Scanner</a>,
-          {% blocktrans trimmed %}
-          uma metodologia criada para estimar os parâmetros epidemiológicos de
-          cada epidemia e município do país. Dentre os parâmetros estimados
-          estão a semana de pico, o número de reprodução e o número total de
-          casos na temporada.
-          {% endblocktrans %}
-        </p>
-        <p>
-          {% blocktrans trimmed %}
-          Mais detalhes podem ser encontrados no
-          {% endblocktrans %}
-          <a href="https://info.dengue.mat.br/epi-scanner/"
-             target="_blank"
-             rel="noopener noreferrer">dashboard</a>
-          {% blocktrans trimmed %}
-          do produto. O artigo que descreve a metodologia pode ser acessado
-          {% endblocktrans %}
-          <a href="https://royalsocietypublishing.org/doi/full/10.1098/rsos.241261"
-             target="_blank"
-             rel="noopener noreferrer">{% translate "aqui" %}</a>.
-        </p>
-      </div>
-    </div>
-  </section>
-
   <!-- Desafio Infodengue–Mosqlimate -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Desafio Infodengue-Mosqlimate de previsão de epidemias de dengue" %}
         </h4>
       </div>
@@ -629,52 +584,20 @@
              rel="noopener noreferrer">{% translate "aqui" %}</a>.
           {% blocktrans trimmed %}
           Os relatórios gerados por essa iniciativa estão disponíveis na
-          seção <em>Relatórios técnicos</em>.
           {% endblocktrans %}
+          <a href="{% url 'dados:products' %}"
+             target="_self"
+             rel="noopener noreferrer">{% translate "seção Produtos" %}</a>.
         </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Relatórios técnicos -->
-  <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
-          {% translate "Relatórios técnicos" %}
-        </h4>
-      </div>
-      <div class="card-body">
-        <ul>
-          <li>
-            <a href="{% url 'dados:download_technical_report_pdf' %}">
-              {% translate "Reflexões sobre o risco de arboviroses em 2024" %}
-            </a>
-          </li>
-          <li>
-            <a href="https://zenodo.org/records/13929005"
-               target="_blank"
-               rel="noopener noreferrer">
-              {% translate "Previsões para a temporada de dengue de 2024-2025" %}
-            </a>
-          </li>
-          <li>
-            <a href="https://zenodo.org/records/17516518"
-               target="_blank"
-               rel="noopener noreferrer">
-              {% translate "Previsões para a temporada de dengue de 2025-2026" %}
-            </a>
-          </li>
-        </ul>
       </div>
     </div>
   </section>
 
   <!-- Projetos de pesquisa -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Projetos de pesquisa" %}
         </h4>
       </div>
@@ -763,9 +686,9 @@
 
   <!-- Como citar o Infodengue -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Como citar o Infodengue" %}
         </h4>
       </div>
@@ -800,181 +723,11 @@
     </div>
   </section>
 
-  <!-- Produções científicas associadas -->
-  <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
-          {% translate "Produções científicas associadas ao Infodengue" %}
-        </h4>
-      </div>
-      <div class="card-body">
-        <div class="mb-3">
-          <h5>2022</h5>
-          <ul>
-            <li>
-              Codeco C.T., Oliveira S.S., Ferreira D.A.C., Riback T.I.S.,
-              Bastos L.S., Lana R.M., Almeida I.F., Godinho V.B., Cruz O.G.,
-              and Coelho F.C. Fast expansion of dengue in brazil. The Lancet
-              Regional Health - Americas,
-              <a href="https://www.thelancet.com/action/showPdf?pii=S2667-193X%2822%2900091-6">
-                link
-              </a>
-            </li>
-            <li>
-              Miller S, Preis T, Mizzi G, Bastos LS, Gomes, MFC, Coelho FC,
-              Codeço CT, Moat SH. Faster indicators of chikungunya incidence
-              using Google searches Plos Computational Biology,
-              <a href="https://journals.plos.org/plosntds/article?id=10.1371/journal.pntd.0010441">
-                link
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div class="mb-3">
-          <h5>2021</h5>
-          <ul>
-            <li>
-              Alves L.D., Lana R.M., and Coelho F.C. A framework for
-              weather-driven dengue virus transmission dynamics in different
-              Brazilian regions. International Journal of Environmental
-              Research and Public Health,
-              <a href="https://pubmed.ncbi.nlm.nih.gov/34574418/">
-                link
-              </a>
-            </li>
-            <li>
-              Colon-Gonzalez, Bastos, et al. (2021) Probabilistic seasonal
-              dengue forecasting in Vietnam: A modelling study using
-              superensembles PLOS Medicine,
-              <a href="https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1003542">
-                link
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div class="mb-3">
-          <h5>2020</h5>
-          <ul>
-            <li>
-              Elisa Mussumeci, Flávio Codeço Coelho. Large-scale multivariate
-              forecasting models for Dengue - LSTM versus random forest
-              regression, Spatial and Spatio-temporal Epidemiology,
-              <a href="https://doi.org/10.1016/j.sste.2020.100372.">
-                link
-              </a>
-            </li>
-            <li>
-              Lowe R., Lee S., Lana R.M., Codeço C.T., Castro M.C., and
-              Pascual M. Emerging arboviruses in the urbanized amazon
-              rainforest. BMJ,
-              <a href="https://doi.org/10.1136/bmj.m4385">
-                link
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div class="mb-3">
-          <h5>2019</h5>
-          <ul>
-            <li>
-              Bastos LS, Economou T, Gomes MG, Villela DAM, Coelho OG,
-              Stoner O, Bailey T, Codeço CT. A modelling approach for
-              correcting reporting delays in disease surveillance data.
-              Statistics in Medicine,
-              <a href="https://onlinelibrary.wiley.com/doi/full/10.1002/sim.8303">
-                link
-              </a>
-            </li>
-            <li>
-              Coelho FC, Codeço CT. Precision epidemiology of arboviral
-              diseases. Journal of Public Health and Emergency,
-              <a href="https://cdn.amegroups.cn/journals/ales/files/journals/29/articles/4940/public/4940-PB1-3757-R1.pdf">
-                link
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div class="mb-3">
-          <h5>2018</h5>
-          <ul>
-            <li>
-              Santos, B.C., Coelho F.C., Armstrong M, Sarraceni V, Lemos C.
-              Zika: an ongoing threat to women and infant. Cadernos de Saude
-              Publica,
-              <a href="https://www.scielosp.org/article/csp/2018.v34n11/e00038218/en/">
-                link
-              </a>
-            </li>
-            <li>
-              Codeço, C.T., Villela A.M.D. , Coelho F.C. Estimating the
-              effective reproduction number of dengue considering
-              temperature-dependent generation intervals. Epidemics,
-              <a href="https://www.sciencedirect.com/science/article/pii/S1755436517300907">
-                link
-              </a>
-            </li>
-            <li>
-              Codeço, C.T., Coelho F.C., Cruz, O.G., Oliveira, S. Castro, T.
-              Bastos, L.S. Infodengue: A nowcasting system for the surveillance
-              of arboviruses in Brazil. Revue d'Épidémiologie et de Santé
-              Publique,
-              <a href="https://www.sciencedirect.com/science/article/abs/pii/S0398762018311088">
-                link
-              </a>
-            </li>
-            <li>
-              Lana R.M., Morais M.M., Lima T.F.M., Carneiro T.G.S.,
-              Stolerman L.M., Santos J.P.C., Cortês J.J.C., Eiras A.E., and
-              Codeço C.T. Assessment of a trap based aedes aegypti
-              surveillance program using mathematical modeling. PLOS ONE,
-              <a href="https://doi.org/10.1371/journal.pone.0190673">
-                link
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div class="mb-3">
-          <h5>2017</h5>
-          <ul>
-            <li>
-              Lana R.M., Gomes M.F.C., Lima T.F.M., Honório N.A., and Codeço
-              C.T. The introduction of dengue follows transportation
-              infrastructure changes in the state of acre, brazil: A
-              network-based analysis. PLOS Neglected Tropical Diseases,
-              <a href="https://doi.org/10.1371/journal.pntd.0006070">
-                link
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div class="mb-3">
-          <h5>2016</h5>
-          <ul>
-            <li>
-              Coelho et al. Epidemiological data accessibility in Brazil, The
-              Lancet ID,
-              <a href="https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(16)30007-X/fulltext">
-                link
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- Eventos -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Eventos" %}
         </h4>
       </div>
@@ -989,9 +742,9 @@
 
   <!-- Como colaborar -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Como colaborar" %}
         </h4>
       </div>
@@ -1009,9 +762,9 @@
 
   <!-- Videos relacionados -->
   <section class="mb-4">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header about-section-header">
-        <h4 class="mb-0" style="color: #ffffff !important;" >
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h4 class="mb-0 products-section-title">
           {% translate "Videos relacionados" %}
         </h4>
       </div>

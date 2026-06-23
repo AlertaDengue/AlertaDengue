@@ -1,0 +1,444 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block extra_head %}
+<link href="{% static 'css/home_sections_layout.css' %}" rel="stylesheet">
+<link href="{% static 'css/home_menu_buttons.css' %}" rel="stylesheet">
+<link href="{% static 'css/products.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block title %}{% translate "Produtos" %}{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-lg-5">
+  <section class="products-hero mb-4">
+    <div class="row align-items-stretch">
+      <div class="col-lg-8 mb-4 mb-lg-0">
+        <div class="products-hero__copy">
+          <div class="products-hero__eyebrow mb-2">{% trans "Infodengue / AlertaDengue" %}</div>
+          <h1 class="display-4 font-weight-bold mb-3 products-hero__title">{% trans "Produtos" %}</h1>
+          <p class="lead products-hero__lead mb-3">
+            {% blocktrans trimmed %}Esta página reúne produtos técnicos e científicos desenvolvidos pela equipe Infodengue/AlertaDengue para apoiar a vigilância, análise e comunicação sobre arboviroses no Brasil. Estão organizados aqui relatórios técnicos, ferramentas, webinários, publicações científicas, teses e outros materiais associados ao monitoramento de dengue, chikungunya, Zika e fatores ambientais relacionados.{% endblocktrans %}
+          </p>
+        </div>
+      </div>
+      <div class="col-lg-4 d-flex">
+        <nav class="card products-nav-card w-100" aria-labelledby="products-nav-title">
+          <div class="card-header home-section-header d-flex align-items-center">
+            <h2 id="products-nav-title" class="h5 mb-0 products-section-title">{% trans "Navegação" %}</h2>
+          </div>
+          <div class="card-body products-nav-body">
+            <div class="products-nav-list" role="list">
+              <a class="products-nav-link" href="#ferramentas">
+                <span>{% trans "Ferramentas" %}</span>
+                <span class="products-nav-link__arrow" aria-hidden="true">→</span>
+              </a>
+              <a class="products-nav-link" href="#relatorios">
+                <span>{% trans "Relatórios técnicos" %}</span>
+                <span class="products-nav-link__arrow" aria-hidden="true">→</span>
+              </a>
+              <a class="products-nav-link" href="#webinarios">
+                <span>{% trans "Webinários IMDC" %}</span>
+                <span class="products-nav-link__arrow" aria-hidden="true">→</span>
+              </a>
+              <a class="products-nav-link" href="#publicacoes">
+                <span>{% trans "Produções científicas" %}</span>
+                <span class="products-nav-link__arrow" aria-hidden="true">→</span>
+              </a>
+              <a class="products-nav-link" href="#teses">
+                <span>{% trans "Teses e dissertações" %}</span>
+                <span class="products-nav-link__arrow" aria-hidden="true">→</span>
+              </a>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </section>
+  <section id="ferramentas" class="mb-4">
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h2 class="h4 mb-0 products-section-title">{% translate "Ferramentas e painéis" %}</h2>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 d-flex mb-3 mb-md-0">
+            <a class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
+               href="https://info.dengue.mat.br/epi-scanner/"
+               target="_blank" rel="noopener noreferrer">
+              <i class="fas fa-chart-line fa-2x mb-2"></i>
+              <strong>Epi-Scanner</strong>
+              <span class="small mt-1">{% trans "Monitoramento epidêmico em tempo real" %}</span>
+            </a>
+          </div>
+          <div class="col-md-4 d-flex mb-3 mb-md-0">
+            <a class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
+               href="https://pysus.readthedocs.io/en/latest/"
+               target="_blank" rel="noopener noreferrer">
+              <i class="fas fa-database fa-2x mb-2"></i>
+              <strong>PySUS</strong>
+              <span class="small mt-1">{% trans "Acesso a dados do DATASUS" %}</span>
+            </a>
+          </div>
+          <div class="col-md-4 d-flex">
+            <a class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
+               href="https://www.youtube.com/@infodenguebrazil8805"
+               target="_blank" rel="noopener noreferrer">
+              <i class="fab fa-youtube fa-2x mb-2"></i>
+              <strong>{% translate "Canal do YouTube" %}</strong>
+              <span class="small mt-1">{% trans "Vídeos sobre modelos, dados e vigilância em saúde." %}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="relatorios" class="mb-4">
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h2 class="h4 mb-0 products-section-title">{% translate "Relatórios técnicos" %}</h2>
+      </div>
+      <div class="card-body">
+        <ul class="mb-0">
+          <li>
+            <a href="{% url 'dados:download_technical_report_pdf' report_key='epidemiological-situation-analysis-2026' %}">
+              Análise de situação epidemiológica da dengue em ano de El Niño
+            </a>
+          </li>
+          <li>
+            <a href="https://zenodo.org/records/17516518" target="_blank" rel="noopener noreferrer">
+              Relatório IMDC 2025: Previsões para a temporada 2025-2026 de dengue
+            </a>
+          </li>
+          <li>
+            <a href="https://zenodo.org/records/13929005" target="_blank" rel="noopener noreferrer">
+              Relatório IMDC 2024: Previsões para a temporada 2024-2025 de dengue
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'dados:download_technical_report_pdf' %}">
+              Reflexões sobre o risco de arboviroses em 2024
+            </a>
+          </li>
+          <li>
+            <a href="https://media.tghn.org/medialibrary/2026/05/Pathfinder_InfoDengue_PT.pdf"
+               target="_blank"
+               rel="noopener noreferrer">
+              Pathfinder Infodengue: Mapeamento de processos orientado por dados para o desenvolvimento de soluções e capacidades em pesquisa. Fiocruz/TGHN LAC, 2025.
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="webinarios" class="mb-4">
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center justify-content-between flex-wrap">
+        <h2 class="h4 mb-0 products-section-title">{% translate "Webinários IMDC" %}</h2>
+        <a class="products-webinar-link"
+           href="https://www.youtube.com/@infodenguebrazil8805"
+           target="_blank"
+           rel="noopener noreferrer">
+          <i class="fab fa-youtube" aria-hidden="true"></i>
+          <span>{% translate "Canal do YouTube" %}</span>
+        </a>
+      </div>
+      <div class="card-body">
+        <ul class="mb-0 products-webinar-list">
+          <li>
+            <div class="products-webinar-item">
+              <div class="products-webinar-item__title">
+                {% blocktrans trimmed %}Preparação para a temporada de dengue 2025: perspectivas de modelos preditivos (1º IMDC){% endblocktrans %}
+              </div>
+              <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=9fVgqHS-Ksk" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open Portuguese webinar recording on YouTube' %}">PT</a>
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=lrgg_HIRPfI" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open English webinar recording on YouTube' %}">EN</a>
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=8ZENF-kK_VQ" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open Spanish webinar recording on YouTube' %}">ES</a>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="products-webinar-item">
+              <div class="products-webinar-item__title">
+                {% trans "Webinar for the official announcement of the results of the validation of the second IMDC" %}
+              </div>
+              <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=YexrCASlqIE" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open English webinar recording on YouTube' %}">EN</a>
+              </div>
+            </div>
+          </li>
+          <li>
+            <div class="products-webinar-item">
+              <div class="products-webinar-item__title">
+                {% trans "Webinar with the official results and predictions for the upcoming season" %}
+              </div>
+              <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=Sb3lv3hGwGg" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open English webinar recording on YouTube' %}">EN</a>
+              </div>
+            </div>
+          </li>          
+          <li>
+            <div class="products-webinar-item">
+              <div class="products-webinar-item__title">
+                {% blocktrans trimmed %}Preparação para a temporada de dengue 2026: perspectivas e modelos preditivos (2º IMDC){% endblocktrans %}
+              </div>
+              <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=EXv7ZOci5Lw&t=2185s" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open Portuguese webinar recording on YouTube' %}">PT</a>
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=mXTe6UC-7WM" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open English webinar recording on YouTube' %}">EN</a>
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=If_6LrGCJfs&t=1s" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open Spanish webinar recording on YouTube' %}">ES</a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="publicacoes" class="mb-4">
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h2 class="h4 mb-0 products-section-title">{% translate "Produções científicas associadas ao Infodengue" %}</h2>
+      </div>
+      <div class="card-body">
+        <p class="muted-note mb-4">
+          {% blocktrans trimmed %}No texto abaixo, os itens acompanham o recorte consolidado no documento enviado para a criação desta página.{% endblocktrans %}
+        </p>
+
+        <details class="year-details" open>
+          <summary>2025</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><a href="https://www.medrxiv.org/content/10.1101/2025.10.06.25337235v2" target="_blank" rel="noopener noreferrer"><strong>The Role of Climate Change in the Expansion of Dengue.</strong></a> medRxiv, 2025.</li>
+              <li><a href="https://www.medrxiv.org/content/10.1101/2025.08.01.25332773v1" target="_blank" rel="noopener noreferrer"><strong>Spatiotemporal relationships between extreme weather events and arbovirus transmission across Brazil.</strong></a> medRxiv, 2025.</li>
+              <li><a href="https://www.sciencedirect.com/science/article/pii/S2468042725000739" target="_blank" rel="noopener noreferrer"><strong>A statistical model for forecasting probabilistic epidemic bands for dengue cases in Brazil.</strong></a> Infectious Disease Modelling, 2025.</li>
+              <li><a href="https://journals.plos.org/plosntds/article?id=10.1371/journal.pntd.0013175" target="_blank" rel="noopener noreferrer"><strong>Unraveling regional variability in Dengue outbreaks in Brazil: leveraging the Moving Epidemics Method (MEM) and climate data to optimize vector control strategies.</strong></a> PLOS Neglected Tropical Diseases, 19(6), e0013175.</li>
+              <li><a href="https://www.thelancet.com/journals/lanepe/article/PIIS2666-7762(25)00063-8/fulltext?uuid=uuid%3A71e0d7ad-5769-4568-8bd9-60239f17863b" target="_blank" rel="noopener noreferrer"><strong>Strengthening resilience to emerging vector-borne diseases in Europe: lessons learnt from countries facing endemic transmission.</strong></a> The Lancet Regional Health - Europe, 53.</li>
+              <li><a href="https://www.pnas.org/doi/abs/10.1073/pnas.2508989123" target="_blank" rel="noopener noreferrer"><strong>Leveraging probabilistic forecasts for dengue preparedness and control: The 2024 Dengue Forecasting Sprint in Brazil.</strong></a> Proceedings of the National Academy of Sciences, 123(7), e2508989123.</li>
+              <li><a href="https://royalsocietypublishing.org/doi/full/10.1098/rsos.241261" target="_blank" rel="noopener noreferrer"><strong>Large-scale epidemiological modelling: scanning for mosquito-borne diseases spatio-temporal patterns in Brazil.</strong></a> Royal Society Open Science, 12(5), 241261.</li>
+              <li><a href="https://journals.plos.org/plosone/article/citation?id=10.1371/journal.pone.0330902" target="_blank" rel="noopener noreferrer"><strong>Assessing mosquito dynamics and dengue transmission in Foz do Iguaçu, Brazil through an enhanced temperature-dependent mathematical model.</strong></a> PLoS One, 20(9), e0330902.</li>
+              <li><a href="https://www.thelancet.com/journals/lanam/article/PIIS2667-193X(25)00163-2/fulltext" target="_blank" rel="noopener noreferrer"><strong>Introduction, establishment, and distribution of Aedes aegypti and dengue in a temperate capital of Brazil: a retrospective surveillance-based study.</strong></a> The Lancet Regional Health - Americas, 48:101153.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2024</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><a href="https://www.annualreviews.org/content/journals/10.1146/annurev-ento-040124-015101" target="_blank" rel="noopener noreferrer"><strong>Harmonizing multisource data to inform vector-borne disease risk management strategies.</strong></a> Annual Review of Entomology, 70.</li>
+              <li><a href="https://arxiv.org/abs/2410.18945" target="_blank" rel="noopener noreferrer"><strong>Mosqlimate: a platform to providing automatable access to data and forecasting models for arbovirus disease.</strong></a> arXiv preprint, 2024.</li>
+              <li><a href="https://www.medrxiv.org/content/10.1101/2024.09.02.24312934v1" target="_blank" rel="noopener noreferrer"><strong>Dengue nowcasting in Brazil by combining official surveillance data and Google Trends information.</strong></a> medRxiv, 2024.</li>
+              <li><a href="https://www.medrxiv.org/content/10.1101/2024.11.09.24315999v2" target="_blank" rel="noopener noreferrer"><strong>A roadmap to account for reporting delays for public health situational awareness - a case study with COVID-19 and dengue in United States jurisdictions.</strong></a> medRxiv, 2024.</li>
+              <li><a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4872336" target="_blank" rel="noopener noreferrer"><strong>Beyond the Metropolises: The Spread of Chikungunya in the Interior of Brazil.</strong></a> SSRN, 4872336.</li>
+              <li><a href="https://cadernos.ensp.fiocruz.br/ojs/index.php/csp/article/view/10345" target="_blank" rel="noopener noreferrer"><strong>Beyond the metropolises: the decentralization of chikungunya to non-metropolitan areas across Brazil.</strong></a> Cadernos de Saúde Pública, 42(1):e00129025.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2023</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><a href="https://www.sciencedirect.com/science/article/abs/pii/S1877584523000539" target="_blank" rel="noopener noreferrer"><strong>Joint spatial modeling of the risks of co-circulating mosquito-borne diseases in Ceará, Brazil.</strong></a> Spatial and Spatio-temporal Epidemiology, 47, 100616.</li>
+              <li><a href="https://www.jmir.org/2023/1/e40554/" target="_blank" rel="noopener noreferrer"><strong>A Platform for Data-Centric, Continuous Epidemiological Analyses (EpiGraphHub): Descriptive Analysis.</strong></a> Journal of Medical Internet Research, 25, e40554.</li>
+              <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9890876/" target="_blank" rel="noopener noreferrer"><strong>Epidemic models and their use.</strong></a> Physics of Life Reviews, 45, 29-30.</li>
+              <li><a href="https://www.thelancet.com/journals/lanam/article/PIIS2667-193X(23)00145-X/fulltext" target="_blank" rel="noopener noreferrer"><strong>The expansion of chikungunya in Brazil.</strong></a> The Lancet Regional Health - Americas, 25.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2022</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><a href="https://www.thelancet.com/action/showPdf?pii=S2667-193X%2822%2900091-6" target="_blank" rel="noopener noreferrer"><strong>Fast expansion of dengue in Brazil.</strong></a> The Lancet Regional Health - Americas.</li>
+              <li><a href="https://journals.plos.org/plosntds/article?id=10.1371/journal.pntd.0010441" target="_blank" rel="noopener noreferrer"><strong>Faster indicators of chikungunya incidence using Google searches.</strong></a> PLOS Computational Biology.</li>
+              <li><a href="https://journals.plos.org/plosntds/article?id=10.1371/journal.pntd.0010746" target="_blank" rel="noopener noreferrer"><strong>How heterogeneous is the dengue transmission profile in Brazil? A study in six Brazilian states.</strong></a> PLoS Neglected Tropical Diseases, 16(9), e0010746.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2021</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><a href="https://pubmed.ncbi.nlm.nih.gov/34574418/" target="_blank" rel="noopener noreferrer"><strong>A framework for weather-driven dengue virus transmission dynamics in different Brazilian regions.</strong></a> International Journal of Environmental Research and Public Health.</li>
+              <li><a href="https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1003542" target="_blank" rel="noopener noreferrer"><strong>Probabilistic seasonal dengue forecasting in Vietnam: A modelling study using superensembles.</strong></a> PLOS Medicine.</li>
+              <li><a href="https://www.taylorfrancis.com/chapters/edit/10.1201/9781003148883-10/modelling-misreported-data-leonardo-bastos-luiz-carvalho-marcelo-gomes" target="_blank" rel="noopener noreferrer"><strong>Modelling misreported data.</strong></a> In Building a Platform for Data-Driven Pandemic Prediction.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2020</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><a href="https://doi.org/10.1016/j.sste.2020.100372" target="_blank" rel="noopener noreferrer"><strong>Large-scale multivariate forecasting models for Dengue - LSTM versus random forest regression.</strong></a> Spatial and Spatio-temporal Epidemiology.</li>
+              <li><a href="https://doi.org/10.1136/bmj.m4385" target="_blank" rel="noopener noreferrer"><strong>Emerging arboviruses in the urbanized amazon rainforest.</strong></a> BMJ.</li>
+              <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7328382/" target="_blank" rel="noopener noreferrer"><strong>Predicting re-emergence times of dengue epidemics at low reproductive numbers: DENV1 in Rio de Janeiro, 1986-1990.</strong></a> Journal of the Royal Society Interface, 17, 20200273.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2019</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><a href="https://onlinelibrary.wiley.com/doi/full/10.1002/sim.8303" target="_blank" rel="noopener noreferrer"><strong>A modelling approach for correcting reporting delays in disease surveillance data.</strong></a> Statistics in Medicine.</li>
+              <li><a href="https://cdn.amegroups.cn/journals/ales/files/journals/29/articles/4940/public/4940-PB1-3757-R1.pdf" target="_blank" rel="noopener noreferrer"><strong>Precision epidemiology of arboviral diseases.</strong></a> Journal of Public Health and Emergency.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2018</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><a href="https://www.scielosp.org/article/csp/2018.v34n11/e00038218/en/" target="_blank" rel="noopener noreferrer"><strong>Zika: an ongoing threat to women and infant.</strong></a> Cadernos de Saúde Pública.</li>
+              <li><a href="https://www.sciencedirect.com/science/article/pii/S1755436517300907" target="_blank" rel="noopener noreferrer"><strong>Estimating the effective reproduction number of dengue considering temperature-dependent generation intervals.</strong></a> Epidemics.</li>
+              <li><a href="https://www.sciencedirect.com/science/article/abs/pii/S0398762018311088" target="_blank" rel="noopener noreferrer"><strong>Infodengue: A nowcasting system for the surveillance of arboviruses in Brazil.</strong></a> Revue d'Épidémiologie et de Santé Publique.</li>
+              <li><a href="https://doi.org/10.1371/journal.pone.0190673" target="_blank" rel="noopener noreferrer"><strong>Assessment of a trap based Aedes aegypti surveillance program using mathematical modeling.</strong></a> PLOS ONE.</li>
+              <li><a href="https://doi.org/10.1371/journal.pone.0205001" target="_blank" rel="noopener noreferrer"><strong>Estimating under-observation and the full size of the 2016 Zika epidemic in Rio de Janeiro.</strong></a> PLoS One, 13(10), e0205001.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2017</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><a href="https://doi.org/10.1371/journal.pntd.0006070" target="_blank" rel="noopener noreferrer"><strong>The introduction of dengue follows transportation infrastructure changes in the state of Acre, Brazil: A network-based analysis.</strong></a> PLOS Neglected Tropical Diseases.</li>
+              <li><a href="https://doi.org/10.1371/journal.pntd.0005729" target="_blank" rel="noopener noreferrer"><strong>Dengue prediction by the web: Tweets are a useful tool for estimating and forecasting Dengue at country and city level.</strong></a> PLoS Neglected Tropical Diseases, 11(7), e0005729.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2016</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><a href="https://www.thelancet.com/journals/laninf/article/PIIS1473-3099(16)30007-X/fulltext" target="_blank" rel="noopener noreferrer"><strong>Epidemiological data accessibility in Brazil.</strong></a> The Lancet Infectious Diseases.</li>
+              <li><a href="https://www.mdpi.com/1660-4601/13/9/920" target="_blank" rel="noopener noreferrer"><strong>Dengueme: a tool for the modeling and simulation of dengue spatiotemporal dynamics.</strong></a> International Journal of Environmental Research and Public Health, 13(9), 920.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section id="teses" class="mb-4">
+    <div class="card products-section-card">
+      <div class="card-header home-section-header d-flex align-items-center">
+        <h2 class="h4 mb-0 products-section-title">{% translate "Teses e dissertações" %}</h2>
+      </div>
+      <div class="card-body">
+        <details class="year-details" open>
+          <summary>2026</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><strong>Yasmin Toledo dos Santos.</strong> Desigualdades no acesso à confirmação laboratorial de dengue: aspectos individuais, epidemiológicos e de vigilância epidemiológica. Dissertação (Mestrado em Epidemiologia em Saúde Pública) - Fundação Oswaldo Cruz. Orientador: Cláudia Torres Codeço.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2025</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><strong>Dalila Machado Botelho Oliveira.</strong> Potencial do Epidemic Intelligence from Open Sources (EIOS) como ferramenta complementar para a detecção precoce de surtos de dengue e chikungunya: uma análise baseada em dados do Brasil. Dissertação (Mestrado em Medicina Tropical). Orientadora: Cláudia Torres Codeço. Co-orientadora: Alexandra Almeida.</li>
+              <li><strong>Iasmim Ferreira de Almeida.</strong> Dengue e chikungunya nos municípios brasileiros: padrões de transmissão e seus determinantes, 2010-2024. Tese (Doutorado em Epidemiologia em Saúde Pública) - Fundação Oswaldo Cruz. Orientadora: Cláudia Torres Codeço. Co-orientadora: Raquel Lana.</li>
+              <li><strong>Jo de Napole Arruda Dias.</strong> Modelagem preditiva para dengue: integração de dados epidemiológicos, climáticos e comportamentais utilizando BART. Dissertação (Mestrado em Biologia Computacional e Sistemas) - Fundação Oswaldo Cruz. Orientador: Leonardo Soares Bastos.</li>
+              <li><strong>Danielle Andreza da Cruz Ferreira.</strong> Da introdução ao estabelecimento de Aedes aegypti e da dengue em uma área urbana do Sul do Brasil: padrões espaço-temporais e fatores de risco. Tese (Doutorado em Parasitologia) - Universidade Federal de Minas Gerais. Orientador: Ricardo Toshio Fujiwara, coorientadoras: Raquel Martins Lana e Laís Picinini Freitas.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2024</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><strong>Julie Souza.</strong> Extending PINNs for Parameter Estimation and Analysis of Epidemic Models in the Presence of Environmental Drivers. Tese (Doutorado em Modelagem Matemática) - Fundação Getúlio Vargas. Orientador: Flávio Codeço Coelho.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2023</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><strong>Guilherme dos Santos.</strong> A multivariate approach for correcting reporting delays in infectious disease surveillance. Dissertação (Mestrado em Estatística) - Universidade Federal do Rio de Janeiro. Coorientador: Leonardo Soares Bastos.</li>
+              <li><strong>Bruna Drumond Silveira.</strong> Tipologias intraurbanas de receptividade e vulnerabilidade à dengue, chikungunya e Zika nos espaços intraurbanos brasileiros. Tese (Doutorado em Saúde Pública) - Fundação Oswaldo Cruz. Orientador: Christovam Barcellos, coorientadora: Cláudia Torres Codeço.</li>
+              <li><strong>Henrique Berenger.</strong> Aplicações de Transformers na previsão de séries temporais em epidemiologia. Dissertação (Modelagem Matemática da Informação) - Fundação Getúlio Vargas. Orientador: Flávio Codeço Coelho.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2022</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><strong>Nathaly Pereira Dutra Gonçalves.</strong> Análise da distribuição dos critérios de confirmação dos casos de chikungunya em residentes do estado do Rio de Janeiro no período de 2015 a 2020. Dissertação (Mestrado em Epidemiologia em Saúde Pública) - Fundação Oswaldo Cruz. Orientadora: Cláudia Torres Codeço.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2021</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><strong>Iasmim Almeida.</strong> Caracterização dos perfis epidemiológicos de dengue nos municípios de seis estados brasileiros, 2010-2019. Dissertação (Mestrado em Epidemiologia em Saúde Pública) - Fundação Oswaldo Cruz. Orientadora: Cláudia Torres Codeço. Co-orientador: Raquel Lana.</li>
+              <li><strong>Valter de Assis Moreno Jr.</strong> Estimation of the SIR model parameters using neural networks. Dissertação (Modelagem Matemática da Informação) - Fundação Getúlio Vargas. Orientador: Flávio Codeço Coelho.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2019</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><strong>Ana Carolina Arruda.</strong> Avaliação do sistema de vigilância sentinela de arboviroses no Rio de Janeiro. Dissertação (Mestrado em Epidemiologia em Saúde Pública) - Fundação Oswaldo Cruz. Orientadora: Cláudia Torres Codeço. Co-orientador: Leonardo Bastos.</li>
+              <li><strong>Giovanni Mizzi.</strong> Improving dengue fever surveillance with online data. PhD thesis, University of Warwick. Supervisors: Suzy Moat and Tobias Preis. Coorientador: Leonardo Soares Bastos.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2018</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><strong>Thaina Castro da Silva.</strong> Estimação do número reprodutivo da dengue a partir de dados de vigilância. Dissertação (Mestrado em Epidemiologia em Saúde Pública) - Fundação Oswaldo Cruz. Orientador: Daniel Villela. Coorientadora: Cláudia Torres Codeço.</li>
+              <li><strong>Marcio Maciel Bastos.</strong> Estimating the under observation and the Full Size of Zika epidemic of 2016 in Rio de Janeiro. Dissertação (Modelagem Matemática da Informação) - Fundação Getúlio Vargas. Orientador: Flávio Codeço Coelho.</li>
+              <li><strong>Elisa Mussumeci.</strong> A Machine Learning approach to Dengue Forecasting: Comparing LSTM Random Forest and Lasso. Dissertação (Modelagem Matemática da Informação) - Fundação Getúlio Vargas. Orientador: Flávio Codeço Coelho.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2017</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><strong>Cecilia Marques Toledo.</strong> Modelos de transmissão e risco de introdução e propagação de dengue em área de clima temperado. Tese (Doutorado em Bioquímica e Imunologia) - Universidade Federal de Minas Gerais. Orientador: Mauro Teixeira, coorientadora: Cláudia Torres Codeço.</li>
+              <li><strong>Raquel Martins Lana.</strong> Malária e Dengue: Análise da dinâmica espacial e temporal em relação às alterações ambientais, climáticas e do comportamento humano no estado do Acre, região Amazônica. Tese (Doutorado em Epidemiologia em Saúde Pública) - Fundação Oswaldo Cruz. Orientadora: Cláudia Torres Codeço.</li>
+              <li><strong>Leon Diniz Alves.</strong> Modelagem espaço-temporal da dengue e seus determinantes climáticos. Tese (Biologia Computacional e Sistemas) - Fundação Oswaldo Cruz. Orientador: Flávio Codeço Coelho, coorientadora: Raquel Martins Lana.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="year-details">
+          <summary>2016</summary>
+          <div class="year-body">
+            <ul class="year-list">
+              <li><strong>Sara de Souza Oliveira.</strong> Desenvolvimento de um sistema de alerta para dengue usando dados de ovitrampas. Dissertação (Mestrado em Epidemiologia em Saúde Pública) - Fundação Oswaldo Cruz. Orientadora: Cláudia Torres Codeço.</li>
+              <li><strong>Rayane Cupolillo Ferreira.</strong> O padrão etário na dinâmica temporal da dengue no Rio de Janeiro. Dissertação (Mestrado em Epidemiologia em Saúde Pública) - Fundação Oswaldo Cruz. Orientadora: Paula Luz, coorientadora: Cláudia Torres Codeço.</li>
+              <li><strong>Cecilia Pessanha Lima.</strong> Comparando a saúde no Brasil com os países da OCDE: minerando dados de saúde pública. Dissertação (Modelagem Matemática da Informação) - Fundação Getúlio Vargas. Orientador: Flávio Codeço Coelho.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}
