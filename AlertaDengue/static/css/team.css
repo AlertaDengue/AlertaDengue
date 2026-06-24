@@ -201,7 +201,7 @@
   color: #003e7e;
   display: flex;
   justify-content: center;
-  min-height: 88px;
+  min-height: 120px;
   padding: 12px 16px;
 }
 
@@ -211,23 +211,30 @@
 
 .team-partner-card__image {
   display: block;
-  max-height: 58px;
-  max-width: 150px;
+  max-height: 85px;
+  max-width: 260px;
   object-fit: contain;
   width: auto;
 }
 
 .team-partner-card__image--mosqlimate {
-  max-width: 286px;
+  max-height: 85px;
+  max-width: 260px;
 }
 
 .team-partner-card__image--bsc {
-  max-width: 256px;
+  max-height: 85px;
+  max-width: 260px;
+}
+
+.team-partner-card__image--tghn {
+  max-height: 95px;
+  max-width: 320px;
 }
 
 .team-partner-card__image--kwar {
-  max-height: 62px;
-  max-width: 126px;
+  max-height: 85px;
+  max-width: 180px;
 }
 
 .team-partner-card__logo--placeholder {
