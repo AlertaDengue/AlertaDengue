@@ -41,7 +41,7 @@ The cleanup does not delete every commented path blindly. The variables fall int
 | Phase 2: Remove Safe Residual Env Entries | Complete | Remove stale commented env entries and prune unused legacy variables from `.envs/.env.tpl`. | `chore(env): remove legacy storage path variables` |
 | Phase 3: Clean Stale Code Comments | Complete | Remove commented legacy storage settings and define the active container-facing `IMPORTED_FILES_DIR` setting. | `chore(settings): drop legacy storage comments` |
 | Phase 4: Align Ingestion Path Naming | Complete | Add `IMPORTED_FILES_DIR` as the container-facing imported storage path, separate from host-side `DOCKER_HOST_IMPORTED_FILES_DIR`, and remove the undocumented `/IMPORTED_FILES` fallback. | `fix(ingestion): define imported files container path` |
-| Phase 5: Remove Host Residual Directories | Deferred | Host directory deletion requires deployment verification and backup/snapshot confirmation outside the repository. | `ops(storage): remove retired host storage directories` |
+| Phase 5: Remove Host Residual Directories | In progress | Added a host-audit script for retired directories. Actual deletion remains a separate ops step after backup/snapshot confirmation. | `ops(storage): prepare retired host path cleanup` |
 
 ## Original Commented Path Inventory
 
@@ -192,6 +192,11 @@ Only after a deployed release has run successfully with the cleaned compose conf
 2. Confirm no systemd units, cron jobs, or deployment scripts outside this repository reference the path.
 3. Remove retired host directories in a maintenance window.
 
+Repo-side helper:
+
+- `scripts/audit-retired-storage-paths.sh`
+- Purpose: list candidate and protected paths, show local disk usage when present, scan repo and common system locations for references, and print manual removal commands without executing them.
+
 Candidate host directories from commented variables:
 
 - `/opt/data/staging/sftp2/alertadengue`
@@ -215,6 +220,7 @@ Do not remove these without explicit migration/backup confirmation:
 - `rg --glob '!node_modules/**' --glob '!.git/**' --glob '!docs/unused-volume-path-cleanup-plan.md' 'MEDIA_ROOT|IMPORTED_FILES\\b|TEMP_FILES_DIR|STORAGE|DOCKER_HOST_DBF_SINAN|DOCKER_HOST_PQDIR|DOCKER_HOST_INCIDENCE_MAPS|DOCKER_HOST_STATIC|DOCKER_HOST_MEDIA_ROOT|DOCKER_HOST_TEMP_PARQUET_DIR|/IMPORTED_FILES' .envs containers AlertaDengue docs README_MAPSERVER.md`
 - `docker compose --env-file .envs/.env -f containers/compose-base.yaml config`
 - `docker compose --env-file .envs/.env -f containers/compose-base.yaml -f containers/compose-staging.yaml config`
+- `bash scripts/audit-retired-storage-paths.sh`
 - Run ingestion unit tests that cover source-path resolution and mover behavior.
 - Run upload tests or a manual upload smoke test if `DBF_SINAN` or uploaded-path mounts are changed.
 - Run a MinIO materializer smoke test if incoming storage is changed.
