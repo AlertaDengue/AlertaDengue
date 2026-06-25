@@ -16,7 +16,11 @@ def imported_files_root() -> Path:
     Path
         Imported files root.
     """
-    root = getattr(settings, "IMPORTED_FILES_DIR", "/IMPORTED_FILES")
+    root = getattr(
+        settings,
+        "IMPORTED_FILES_DIR",
+        "/opt/services/ingestion/sinan/imported",
+    )
     return Path(root)
 
 

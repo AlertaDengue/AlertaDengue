@@ -273,13 +273,12 @@ STATICFILES_FINDERS = [
 
 MEDIA_URL = "/img/"
 DBF_SINAN = os.getenv("DBF_SINAN")
-MEDIA_ROOT = os.getenv("MEDIA_ROOT")
+IMPORTED_FILES_DIR = os.getenv(
+    "IMPORTED_FILES_DIR", "/opt/services/ingestion/sinan/imported"
+)
 TECHNICAL_REPORTS_ROOT = Path(
     os.getenv("TECHNICAL_REPORTS_ROOT") or "/opt/services/technical_reports"
 )
-IMPORTED_FILES = os.getenv("IMPORTED_FILES")
-TEMP_FILES_DIR = os.getenv("TEMP_FILES_DIR")
-DATA_DIR = PROJECT_ROOT.parent.parent / os.getenv("STORAGE", "")
 
 
 def build_templates(debug: bool) -> list[dict[str, Any]]:
