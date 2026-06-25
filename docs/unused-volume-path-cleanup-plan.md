@@ -35,7 +35,7 @@ The cleanup does not delete every commented path blindly. The variables fall int
 | Phase 2: Remove Safe Residual Env Entries | Complete | Remove stale commented env entries and prune unused legacy variables from `.envs/.env.tpl`. | `chore(env): remove legacy storage path variables` |
 | Phase 3: Clean Stale Code Comments | Complete | Remove commented legacy storage settings and define the active container-facing `IMPORTED_FILES_DIR` setting. | `chore(settings): drop legacy storage comments` |
 | Phase 4: Align Ingestion Path Naming | Complete | Add `IMPORTED_FILES_DIR` as the container-facing imported storage path, separate from host-side `DOCKER_HOST_IMPORTED_FILES_DIR`, and remove the undocumented `/IMPORTED_FILES` fallback. | `fix(ingestion): define imported files container path` |
-| Phase 5: Remove Host Residual Directories | In progress | Added a profile-driven host-audit script for retired directories. Actual deletion remains a separate ops step after backup/snapshot confirmation. | `ops(storage): prepare retired host path cleanup` |
+| Phase 5: Remove Host Residual Directories | In progress | Keep the final removal manual: review the retired variable names and host paths, confirm backups, then remove them directly on the target host. | `ops(storage): document manual retired host cleanup` |
 
 ## Original Commented Path Inventory
 
@@ -186,11 +186,15 @@ Only after a deployed release has run successfully with the cleaned compose conf
 2. Confirm no systemd units, cron jobs, or deployment scripts outside this repository reference the path.
 3. Remove retired host directories in a maintenance window.
 
-Repo-side helper:
+Manual host checklist:
 
-- `scripts/audit-retired-storage-paths.sh`
-- Purpose: list candidate and protected paths, show local disk usage when present, scan repo and common system locations for references, and print manual removal commands without executing them.
-- Input model: use `--profile staging|prod` and explicit `--retired-path` overrides when a profile has environment-specific retired paths. Do not derive retired paths from removed env variables.
+- Confirm the retired variable names are no longer referenced in tracked configuration:
+  `DOCKER_HOST_DBF_SINAN`, `DOCKER_HOST_PQDIR`, `DOCKER_HOST_INCIDENCE_MAPS`, `DOCKER_HOST_STATIC`, `DOCKER_HOST_MEDIA_ROOT`, `DOCKER_HOST_TEMP_PARQUET_DIR`, `MEDIA_ROOT`, `IMPORTED_FILES`, `TEMP_FILES_DIR`, `STORAGE`.
+- Confirm the active variables remain unchanged:
+  `DBF_SINAN`, `DOCKER_HOST_SINAN_ROOT`, `DOCKER_HOST_IMPORTED_FILES_DIR`, `DOCKER_HOST_UPLOADED_FILES_DIR`, `DOCKER_HOST_INCOMING_DIR`, `DOCKER_HOST_SHAPEFILES_DIR`, `SHAPEFILE_PATH`, `EPISCANNER_HOST_DIR`, `HOST_PGDATA`.
+- On the target host, list and inspect each retired path before removal.
+- Confirm no systemd unit, cron job, deployment script, or external mount still references the retired paths.
+- Remove retired paths manually during a maintenance window after backup or snapshot confirmation.
 
 Candidate host directories from commented variables:
 
@@ -215,8 +219,7 @@ Do not remove these without explicit migration/backup confirmation:
 - `rg --glob '!node_modules/**' --glob '!.git/**' --glob '!docs/unused-volume-path-cleanup-plan.md' 'MEDIA_ROOT|IMPORTED_FILES\\b|TEMP_FILES_DIR|STORAGE|DOCKER_HOST_DBF_SINAN|DOCKER_HOST_PQDIR|DOCKER_HOST_INCIDENCE_MAPS|DOCKER_HOST_STATIC|DOCKER_HOST_MEDIA_ROOT|DOCKER_HOST_TEMP_PARQUET_DIR|/IMPORTED_FILES' .envs containers AlertaDengue docs README_MAPSERVER.md`
 - `docker compose --env-file .envs/.env -f containers/compose-base.yaml config`
 - `docker compose --env-file .envs/.env -f containers/compose-base.yaml -f containers/compose-staging.yaml config`
-- `bash scripts/audit-retired-storage-paths.sh --profile staging`
-- `bash scripts/audit-retired-storage-paths.sh --profile prod --retired-path /old/path`
+- Validate `.github/workflows/linux.yml` no longer carries the retired variables in its env block.
 - Run ingestion unit tests that cover source-path resolution and mover behavior.
 - Run upload tests or a manual upload smoke test if `DBF_SINAN` or uploaded-path mounts are changed.
 - Run a MinIO materializer smoke test if incoming storage is changed.
