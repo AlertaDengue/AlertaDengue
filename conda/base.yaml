@@ -6,6 +6,7 @@ dependencies:
   - python=3.11.*
   - pip
   - uv
+  - poetry
   - pre-commit
   - black==22.12.0
   - isort==5.11.4
