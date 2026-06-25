@@ -2,13 +2,7 @@
 
 Issue: https://github.com/AlertaDengue/AlertaDengue/issues/950
 
-This plan maps the path and volume variables that were commented as unused in `.envs/.env`, correlates their references, and tracks the phased cleanup. The GitHub issue page was not accessible from this environment, so this inventory is based on the checked-out repository state.
-
 ## Scope
-
-Primary source:
-
-- `.envs/.env` lines 68-91
 
 Correlated surfaces:
 
@@ -29,7 +23,7 @@ The cleanup does not delete every commented path blindly. The variables fall int
 
 | Group | Variables | Recommendation |
 | --- | --- | --- |
-| Removed residual cleanup | `MEDIA_ROOT`, `IMPORTED_FILES`, `TEMP_FILES_DIR`, `STORAGE`, `DOCKER_HOST_DBF_SINAN`, `DOCKER_HOST_PQDIR`, `DOCKER_HOST_INCIDENCE_MAPS`, `DOCKER_HOST_STATIC`, `DOCKER_HOST_MEDIA_ROOT` | Removed from tracked env template and stale settings. Also removed from the local untracked `.envs/.env` used by this staging checkout. |
+| Removed residual cleanup | `MEDIA_ROOT`, `IMPORTED_FILES`, `TEMP_FILES_DIR`, `STORAGE`, `DOCKER_HOST_DBF_SINAN`, `DOCKER_HOST_PQDIR`, `DOCKER_HOST_INCIDENCE_MAPS`, `DOCKER_HOST_STATIC`, `DOCKER_HOST_MEDIA_ROOT` | Removed from tracked env template and stale settings. |
 | Resolved compose risk | `DOCKER_HOST_UPLOADED_FILES_DIR`, `DOCKER_HOST_TEMP_PARQUET_DIR` | `DOCKER_HOST_UPLOADED_FILES_DIR` is active because ingestion collision checks use uploaded storage. `DOCKER_HOST_TEMP_PARQUET_DIR` compose mounts were removed because only compose referenced the host bind mount. |
 | Strong dependencies, not cleanup candidates | `DBF_SINAN`, `DOCKER_HOST_SINAN_ROOT`, `DOCKER_HOST_IMPORTED_FILES_DIR`, `DOCKER_HOST_INCOMING_DIR`, `SHAPEFILE_PATH`, `DOCKER_HOST_SHAPEFILES_DIR` | Keep until the owning workflow is migrated. These paths are active application, ingestion, MinIO, or GIS dependencies. |
 
@@ -41,23 +35,23 @@ The cleanup does not delete every commented path blindly. The variables fall int
 | Phase 2: Remove Safe Residual Env Entries | Complete | Remove stale commented env entries and prune unused legacy variables from `.envs/.env.tpl`. | `chore(env): remove legacy storage path variables` |
 | Phase 3: Clean Stale Code Comments | Complete | Remove commented legacy storage settings and define the active container-facing `IMPORTED_FILES_DIR` setting. | `chore(settings): drop legacy storage comments` |
 | Phase 4: Align Ingestion Path Naming | Complete | Add `IMPORTED_FILES_DIR` as the container-facing imported storage path, separate from host-side `DOCKER_HOST_IMPORTED_FILES_DIR`, and remove the undocumented `/IMPORTED_FILES` fallback. | `fix(ingestion): define imported files container path` |
-| Phase 5: Remove Host Residual Directories | In progress | Added a host-audit script for retired directories. Actual deletion remains a separate ops step after backup/snapshot confirmation. | `ops(storage): prepare retired host path cleanup` |
+| Phase 5: Remove Host Residual Directories | In progress | Added a profile-driven host-audit script for retired directories. Actual deletion remains a separate ops step after backup/snapshot confirmation. | `ops(storage): prepare retired host path cleanup` |
 
 ## Original Commented Path Inventory
 
-| Variable | Original commented value in `.envs/.env` | Current result | Dependency strength | Removal advice |
+| Variable | Original commented values | Current result | Dependency strength | Removal advice |
 | --- | --- | --- | --- | --- |
 | `MEDIA_ROOT` | `/MEDIA_ROOT` | Removed from settings/template. | Weak residual. | Complete. |
 | `IMPORTED_FILES` | `/IMPORTED_FILES` | Removed and replaced by `IMPORTED_FILES_DIR` for container-facing imported storage. | Medium naming residual. | Complete. |
 | `TEMP_FILES_DIR` | `/tmp` | Removed from settings/template. | Weak residual. | Complete. |
 | `STORAGE` | `/Storage` | Removed from settings/template. | Weak residual. | Complete. |
-| `DOCKER_HOST_DBF_SINAN` | `/opt/data/staging/sftp2/alertadengue` | Removed from template and local env. | Weak residual. | Complete, with `DBF_SINAN` retained as the app storage setting. |
+| `DOCKER_HOST_DBF_SINAN` | `/opt/data/staging/sftp2/alertadengue` | Removed from template. | Weak residual. | Complete, with `DBF_SINAN` retained as the app storage setting. |
 | `DOCKER_HOST_UPLOADED_FILES_DIR` | `${DOCKER_HOST_SINAN_ROOT}/uploaded` | Restored as active because `mover_sinan_data.py` uses uploaded storage for collision checks. | Strong current dependency. | Keep. |
 | `DOCKER_HOST_TEMP_PARQUET_DIR` | `/opt/data/staging/tmp/dbfs_parquet` | Removed from active compose mounts and template. | Compose-only dependency. | Complete. |
-| `DOCKER_HOST_PQDIR` | `/opt/data/staging/sftp2/alertadengue/dbfs_parquet` | Removed from local env. | Weak residual. | Complete. |
-| `DOCKER_HOST_INCIDENCE_MAPS` | `/opt/data/staging/img/incidence_maps` | Removed from template and local env. | Weak residual. | Complete. |
-| `DOCKER_HOST_STATIC` | `/opt/services/staging_AlertaDengue/staticfiles` | Removed from template and local env. | Weak residual. | Complete. |
-| `DOCKER_HOST_MEDIA_ROOT` | `/opt/data/staging/sftp2/alertadengue/uploaded` | Removed from local env. | Weak residual. | Complete. |
+| `DOCKER_HOST_PQDIR` | `/opt/data/staging/sftp2/alertadengue/dbfs_parquet` | Removed from tracked configuration. | Weak residual. | Complete. |
+| `DOCKER_HOST_INCIDENCE_MAPS` | `/opt/data/staging/img/incidence_maps` | Removed from tracked configuration. | Weak residual. | Complete. |
+| `DOCKER_HOST_STATIC` | `/opt/services/staging_AlertaDengue/staticfiles` | Removed from tracked configuration. | Weak residual. | Complete. |
+| `DOCKER_HOST_MEDIA_ROOT` | `/opt/data/staging/sftp2/alertadengue/uploaded` | Removed from tracked configuration. | Weak residual. | Complete. |
 
 ## Strong Dependency Paths
 
@@ -128,7 +122,7 @@ Goal: solve the immediate broken/ambiguous compose issue.
 
 ### Phase 2: Remove Safe Residual Env Entries
 
-Remove these commented entries from `.envs/.env` after Phase 1:
+Remove these commented entries from `commented yaml files` after Phase 1:
 
 - `MEDIA_ROOT`
 - `IMPORTED_FILES`
@@ -196,6 +190,7 @@ Repo-side helper:
 
 - `scripts/audit-retired-storage-paths.sh`
 - Purpose: list candidate and protected paths, show local disk usage when present, scan repo and common system locations for references, and print manual removal commands without executing them.
+- Input model: use `--profile staging|prod` and explicit `--retired-path` overrides when a profile has environment-specific retired paths. Do not derive retired paths from removed env variables.
 
 Candidate host directories from commented variables:
 
@@ -220,16 +215,17 @@ Do not remove these without explicit migration/backup confirmation:
 - `rg --glob '!node_modules/**' --glob '!.git/**' --glob '!docs/unused-volume-path-cleanup-plan.md' 'MEDIA_ROOT|IMPORTED_FILES\\b|TEMP_FILES_DIR|STORAGE|DOCKER_HOST_DBF_SINAN|DOCKER_HOST_PQDIR|DOCKER_HOST_INCIDENCE_MAPS|DOCKER_HOST_STATIC|DOCKER_HOST_MEDIA_ROOT|DOCKER_HOST_TEMP_PARQUET_DIR|/IMPORTED_FILES' .envs containers AlertaDengue docs README_MAPSERVER.md`
 - `docker compose --env-file .envs/.env -f containers/compose-base.yaml config`
 - `docker compose --env-file .envs/.env -f containers/compose-base.yaml -f containers/compose-staging.yaml config`
-- `bash scripts/audit-retired-storage-paths.sh`
+- `bash scripts/audit-retired-storage-paths.sh --profile staging`
+- `bash scripts/audit-retired-storage-paths.sh --profile prod --retired-path /old/path`
 - Run ingestion unit tests that cover source-path resolution and mover behavior.
 - Run upload tests or a manual upload smoke test if `DBF_SINAN` or uploaded-path mounts are changed.
 - Run a MinIO materializer smoke test if incoming storage is changed.
 
 ## Recommended First Change Set
 
-The smallest safe change set for issue 950 is:
+The smallest safe change set is:
 
 1. Fix `DOCKER_HOST_UPLOADED_FILES_DIR` and `DOCKER_HOST_TEMP_PARQUET_DIR` so compose no longer references commented or undefined variables.
-2. Remove only variables proven to be residual from `.envs/.env` and `.envs/.env.tpl`.
+2. Remove only variables proven to be residual from `.envs/.env.tpl`.
 3. Remove stale commented Django settings.
 4. Leave strong dependency paths intact.
