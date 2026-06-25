@@ -336,10 +336,6 @@ groups:
             help: Destination base directory.
             type: string
             default: ""
-          uploaded-base:
-            help: Extra base for collision checks.
-            type: string
-            default: ""
           manifest:
             help: Write a JSON manifest of moved files to this path.
             type: string
@@ -378,14 +374,8 @@ groups:
             IMPORTED_BASE="${{ env.DOCKER_HOST_IMPORTED_FILES_DIR }}"
           fi
 
-          UPLOADED_BASE=${{ args.uploaded_base }}
-          if [ -z "$UPLOADED_BASE" ]; then
-            UPLOADED_BASE="${{ env.DOCKER_HOST_UPLOADED_FILES_DIR }}"
-          fi
-
           FLAGS=""
           FLAGS="$FLAGS --imported-base $IMPORTED_BASE"
-          FLAGS="$FLAGS --uploaded-base $UPLOADED_BASE"
           if [ -n "${{ args.manifest }}" ]; then
             FLAGS="$FLAGS --manifest ${{ args.manifest }}"
           fi
@@ -412,7 +402,6 @@ groups:
           python AlertaDengue/ingestion/management/commands/mover_sinan_data.py \
             "${{ args.paths }}" \
             --imported-base $IMPORTED_BASE \
-            --uploaded-base $UPLOADED_BASE \
             $FLAGS
 
       enqueue:
@@ -543,10 +532,6 @@ groups:
             help: Destination base directory.
             type: string
             default: ""
-          uploaded-base:
-            help: Extra base for collision checks.
-            type: string
-            default: ""
           dry-run:
             help: Print planned actions without executing.
             type: bool
@@ -572,11 +557,6 @@ groups:
           PSQL_PORT: "${{ env.PSQL_PORT }}"
           CELERY_BROKER_URL: "${{ env.CELERY_BROKER_URL }}"
         run: |
-          UPLOADED_BASE=${{ args.uploaded_base }}
-          if [ -z "$UPLOADED_BASE" ]; then
-            UPLOADED_BASE="${{ env.DOCKER_HOST_UPLOADED_FILES_DIR }}"
-          fi
-
           IMPORTED_BASE=${{ args.imported_base }}
           if [ -z "$IMPORTED_BASE" ]; then
             IMPORTED_BASE="${{ env.DOCKER_HOST_IMPORTED_FILES_DIR }}"
@@ -586,7 +566,6 @@ groups:
 
           MOVE_FLAGS=""
           MOVE_FLAGS="$MOVE_FLAGS --imported-base $IMPORTED_BASE"
-          MOVE_FLAGS="$MOVE_FLAGS --uploaded-base $UPLOADED_BASE"
           if [ "${{ args.dry_run }}" = "True" ]; then
             MOVE_FLAGS="$MOVE_FLAGS --dry-run"
           fi

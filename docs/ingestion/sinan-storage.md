@@ -28,7 +28,7 @@ MinIO is an ingress gateway. It should not be treated as the permanent source of
 The materializer copies MinIO objects into the incoming directory:
 
 ```text
-/Storage/infodengue_data/sinan/incoming/
+${DOCKER_HOST_INCOMING_DIR}
 ```
 
 This directory is watched by the ingestion watcher.
@@ -111,8 +111,8 @@ Typical variables include:
 ```bash
 DOCKER_HOST_SINAN_ROOT=/mnt/storagebox-infodengue/sinan
 DOCKER_HOST_IMPORTED_FILES_DIR=${DOCKER_HOST_SINAN_ROOT}/imported
-DOCKER_HOST_INCOMING_DIR=/Storage/infodengue_data/sinan/incoming
+DOCKER_HOST_INCOMING_DIR=/opt/data/staging/sinan/incoming
 MINIO_BROWSER_REDIRECT_URL=http://localhost:9001
 ```
 
-Use environment-specific values for staging and production.
+Use environment-specific values for staging and production. The ingestion workflow uses only the incoming directory and the canonical imported root; there is no separate `uploaded_base` path in the current design.

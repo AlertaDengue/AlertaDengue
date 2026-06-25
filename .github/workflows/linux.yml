@@ -42,19 +42,11 @@ env:
   PG_RESTORE_STAGING: schemas
   HOST_PGDATA: "/home/runner/storage/postgres_data_dev"
 
-  DOCKER_HOST_DBF_SINAN: "/home/runner/storage/sftp2/alertadengue/sinan"
-  DOCKER_HOST_UPLOADED_FILES_DIR: "/home/runner/storage/sftp2/alertadengue/sinan/uploaded"
-  DOCKER_HOST_IMPORTED_FILES_DIR: "/home/runner/storage/sftp2/alertadengue/sinan/imported"
   DOCKER_HOST_SINAN_ROOT: "/home/runner/storage/sftp2/alertadengue/sinan"
-  DOCKER_HOST_SHAPEFILES_DIR: "/home/runner/storage/shapefiles"
-  DOCKER_HOST_TEMP_PARQUET_DIR: "/tmp/dbf_parquet"
-  DOCKER_HOST_STATIC: "/home/runner/storage/staticfiles"
+  DOCKER_HOST_IMPORTED_FILES_DIR: "/home/runner/storage/sftp2/alertadengue/sinan/imported"
 
   DBF_SINAN: /DBF_SINAN
-  IMPORTED_FILES: /IMPORTED_FILES
-  MEDIA_ROOT: /MEDIA_ROOT
-  STORAGE: "/home/runner/storage/"
-  TEMP_FILES_DIR: "/tmp/"
+  IMPORTED_FILES_DIR: /opt/services/ingestion/sinan/imported
   EPISCANNER_HOST_DIR: "/home/runner/storage/episcanner"
 
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true

@@ -935,12 +935,11 @@ def _resolve_collision(
     *,
     src_path: Path,
     imported_roots: list[Path],
-    uploaded_roots: list[Path],
     reserved: set[Path],
     on_exists: str,
 ) -> Path | None:
     """
-    Resolve destination collisions across imported + uploaded + in-run reserved.
+    Resolve destination collisions across imported storage and in-run reserved.
 
     Parameters
     ----------
@@ -950,8 +949,6 @@ def _resolve_collision(
         Source file.
     imported_roots
         Roots for imported existence checks.
-    uploaded_roots
-        Roots for uploaded existence checks.
     reserved
         Relative paths already reserved in this run.
     on_exists
@@ -962,7 +959,6 @@ def _resolve_collision(
     Path | None
         Final relative path, or None to signal skip.
     """
-    bases = imported_roots + uploaded_roots
     src_hash: str | None = None
 
     def _hash_src() -> str:
@@ -975,7 +971,7 @@ def _resolve_collision(
         return _sha256_file(existing) == _hash_src()
 
     occupied = rel_path in reserved
-    existing_full = _exists_in_any_base(rel_path, bases)
+    existing_full = _exists_in_any_base(rel_path, imported_roots)
     if existing_full is not None:
         if _is_same(existing_full):
             return None
@@ -997,7 +993,7 @@ def _resolve_collision(
         candidate = parent / f"{base_stem}_{n:02d}{suffix}"
         if candidate in reserved:
             continue
-        existing_full = _exists_in_any_base(candidate, bases)
+        existing_full = _exists_in_any_base(candidate, imported_roots)
         if existing_full is not None:
             if _is_same(existing_full):
                 return None
@@ -1037,7 +1033,6 @@ def move_to_canonical(
     src: Path,
     *,
     imported_base: Path,
-    uploaded_base: Path,
     reserved_relpaths: set[Path],
     dry_run: bool,
     include_uf: bool,
@@ -1059,8 +1054,6 @@ def move_to_canonical(
         Source file.
     imported_base
         Imported base directory.
-    uploaded_base
-        Uploaded base directory for collision checks.
     reserved_relpaths
         Reserved relative paths within the current run.
     dry_run
@@ -1090,8 +1083,6 @@ def move_to_canonical(
         return False, None, None, f"Formato não suportado: {src}"
 
     imported_roots = _base_roots(imported_base)
-    uploaded_roots = _base_roots(uploaded_base)
-
     try:
         if fmt == "dbf":
             info = _extract_dbf_routing_info(
@@ -1132,7 +1123,6 @@ def move_to_canonical(
             rel,
             src_path=src,
             imported_roots=imported_roots,
-            uploaded_roots=uploaded_roots,
             reserved=reserved_relpaths,
             on_exists=on_exists,
         )
@@ -1176,11 +1166,6 @@ def _build_parser() -> argparse.ArgumentParser:
         "--imported-base",
         default=os.getenv("DOCKER_HOST_IMPORTED_FILES_DIR"),
         help="Destination base directory for canonical placement.",
-    )
-    p.add_argument(
-        "--uploaded-base",
-        default=os.getenv("DOCKER_HOST_UPLOADED_FILES_DIR"),
-        help="Extra base directory used for collision checks.",
     )
     p.add_argument(
         "--dry-run",
@@ -1261,8 +1246,6 @@ def main() -> int:
     _csv_field_limit()
 
     imported_base = Path(args.imported_base).resolve()
-    uploaded_base = Path(args.uploaded_base).resolve()
-
     inputs = [Path(p).resolve() for p in args.paths]
     files = _expand_inputs(inputs)
 
@@ -1284,7 +1267,6 @@ def main() -> int:
         ok, dest, info, err = move_to_canonical(
             src,
             imported_base=imported_base,
-            uploaded_base=uploaded_base,
             reserved_relpaths=reserved_relpaths,
             dry_run=bool(args.dry_run),
             include_uf=bool(args.include_uf),
@@ -1325,7 +1307,7 @@ def main() -> int:
                 # Check where it exists for the 'dest' field
                 existing_full = _exists_in_any_base(
                     rel,
-                    _base_roots(imported_base) + _base_roots(uploaded_base),
+                    _base_roots(imported_base),
                 )
                 if existing_full:
                     logger.warning(
