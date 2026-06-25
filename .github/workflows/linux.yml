@@ -44,7 +44,6 @@ env:
 
   DOCKER_HOST_SINAN_ROOT: "/home/runner/storage/sftp2/alertadengue/sinan"
   DOCKER_HOST_IMPORTED_FILES_DIR: "${DOCKER_HOST_SINAN_ROOT}/imported"
-  DOCKER_HOST_UPLOADED_FILES_DIR: "${DOCKER_HOST_SINAN_ROOT}/uploaded"
 
   DBF_SINAN: /DBF_SINAN
   IMPORTED_FILES_DIR: /opt/services/ingestion/sinan/imported

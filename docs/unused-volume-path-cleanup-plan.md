@@ -24,14 +24,14 @@ The cleanup does not delete every commented path blindly. The variables fall int
 | Group | Variables | Recommendation |
 | --- | --- | --- |
 | Removed residual cleanup | `MEDIA_ROOT`, `IMPORTED_FILES`, `TEMP_FILES_DIR`, `STORAGE`, `DOCKER_HOST_DBF_SINAN`, `DOCKER_HOST_PQDIR`, `DOCKER_HOST_INCIDENCE_MAPS`, `DOCKER_HOST_STATIC`, `DOCKER_HOST_MEDIA_ROOT` | Removed from tracked env template and stale settings. |
-| Resolved compose risk | `DOCKER_HOST_UPLOADED_FILES_DIR`, `DOCKER_HOST_TEMP_PARQUET_DIR` | `DOCKER_HOST_UPLOADED_FILES_DIR` is active because ingestion collision checks use uploaded storage. `DOCKER_HOST_TEMP_PARQUET_DIR` compose mounts were removed because only compose referenced the host bind mount. |
+| Resolved compose risk | `DOCKER_HOST_UPLOADED_FILES_DIR`, `DOCKER_HOST_TEMP_PARQUET_DIR` | Both were removed from tracked runtime configuration after the ingestion workflow was aligned to canonical imported storage only. |
 | Strong dependencies, not cleanup candidates | `DBF_SINAN`, `DOCKER_HOST_SINAN_ROOT`, `DOCKER_HOST_IMPORTED_FILES_DIR`, `DOCKER_HOST_INCOMING_DIR`, `SHAPEFILE_PATH`, `DOCKER_HOST_SHAPEFILES_DIR` | Keep until the owning workflow is migrated. These paths are active application, ingestion, MinIO, or GIS dependencies. |
 
 ## Execution Tracker
 
 | Phase | Status | Summary | Semantic commit message |
 | --- | --- | --- | --- |
-| Phase 1: Make Compose Deterministic | Complete | Keep `DOCKER_HOST_UPLOADED_FILES_DIR` active because ingestion collision checks use uploaded storage; remove active `DOCKER_HOST_TEMP_PARQUET_DIR` compose mounts because no active code references the bind-mounted parquet temp path. | `fix(compose): make SINAN storage mounts deterministic` |
+| Phase 1: Make Compose Deterministic | Complete | Remove obsolete uploaded and parquet-temp path assumptions from tracked runtime configuration so the ingestion flow depends only on canonical imported storage. | `fix(compose): make SINAN storage mounts deterministic` |
 | Phase 2: Remove Safe Residual Env Entries | Complete | Remove stale commented env entries and prune unused legacy variables from `.envs/.env.tpl`. | `chore(env): remove legacy storage path variables` |
 | Phase 3: Clean Stale Code Comments | Complete | Remove commented legacy storage settings and define the active container-facing `IMPORTED_FILES_DIR` setting. | `chore(settings): drop legacy storage comments` |
 | Phase 4: Align Ingestion Path Naming | Complete | Add `IMPORTED_FILES_DIR` as the container-facing imported storage path, separate from host-side `DOCKER_HOST_IMPORTED_FILES_DIR`, and remove the undocumented `/IMPORTED_FILES` fallback. | `fix(ingestion): define imported files container path` |
@@ -46,7 +46,7 @@ The cleanup does not delete every commented path blindly. The variables fall int
 | `TEMP_FILES_DIR` | `/tmp` | Removed from settings/template. | Weak residual. | Complete. |
 | `STORAGE` | `/Storage` | Removed from settings/template. | Weak residual. | Complete. |
 | `DOCKER_HOST_DBF_SINAN` | `/opt/data/staging/sftp2/alertadengue` | Removed from template. | Weak residual. | Complete, with `DBF_SINAN` retained as the app storage setting. |
-| `DOCKER_HOST_UPLOADED_FILES_DIR` | `${DOCKER_HOST_SINAN_ROOT}/uploaded` | Restored as active because `mover_sinan_data.py` uses uploaded storage for collision checks. | Strong current dependency. | Keep. |
+| `DOCKER_HOST_UPLOADED_FILES_DIR` | `${DOCKER_HOST_SINAN_ROOT}/uploaded` | Removed from tracked configuration after mover collision handling was simplified to canonical imported storage only. | Legacy residual. | Complete. |
 | `DOCKER_HOST_TEMP_PARQUET_DIR` | `/opt/data/staging/tmp/dbfs_parquet` | Removed from active compose mounts and template. | Compose-only dependency. | Complete. |
 | `DOCKER_HOST_PQDIR` | `/opt/data/staging/sftp2/alertadengue/dbfs_parquet` | Removed from tracked configuration. | Weak residual. | Complete. |
 | `DOCKER_HOST_INCIDENCE_MAPS` | `/opt/data/staging/img/incidence_maps` | Removed from tracked configuration. | Weak residual. | Complete. |
@@ -86,7 +86,7 @@ Relevant references:
 
 Main issue resolution:
 
-- `DOCKER_HOST_UPLOADED_FILES_DIR` is now active because uploaded storage is still used for ingestion collision checks.
+- `DOCKER_HOST_UPLOADED_FILES_DIR` no longer participates in the tracked ingestion workflow.
 - `DOCKER_HOST_TEMP_PARQUET_DIR` no longer appears in compose mounts.
 
 This removes the empty-source bind mount failure that compose produced before Phase 1.
@@ -107,16 +107,11 @@ This removes the empty-source bind mount failure that compose produced before Ph
 
 Goal: solve the immediate broken/ambiguous compose issue.
 
-1. Decide the replacement for `DOCKER_HOST_UPLOADED_FILES_DIR`.
-   - Option A: restore it as an active variable derived from `${DOCKER_HOST_SINAN_ROOT}/uploaded` if uploaded storage is still required.
-   - Option B: remove the uploaded mounts from `base`, `celery`, and `celery-beat` if upload collision checks and old uploaded storage are retired.
-   - Option C: inline a compose default, for example `${DOCKER_HOST_UPLOADED_FILES_DIR:-${DOCKER_HOST_SINAN_ROOT}/uploaded}`, only if nested interpolation is verified with the project compose version.
-
-2. Decide whether `/tmp/dbf_parquet` is still needed.
+1. Decide whether `/tmp/dbf_parquet` is still needed.
    - If yes, restore `DOCKER_HOST_TEMP_PARQUET_DIR` as an active variable.
    - If no, remove the `DOCKER_HOST_TEMP_PARQUET_DIR:/tmp/dbf_parquet` mounts from `celery` and `celery-beat`, and keep temporary parquet work inside container-local `/tmp`.
 
-3. Validate compose resolution:
+2. Validate compose resolution:
    - `docker compose --env-file .envs/.env -f containers/compose-base.yaml config`
    - Include any environment-specific compose overlays used by staging/prod.
 
@@ -150,7 +145,6 @@ Keep these template entries:
 
 - `DBF_SINAN`
 - `DOCKER_HOST_IMPORTED_FILES_DIR`
-- `DOCKER_HOST_UPLOADED_FILES_DIR` only if Phase 1 keeps it active
 - `DOCKER_HOST_SHAPEFILES_DIR`
 - `DOCKER_HOST_TIFFS_DIR`
 
@@ -191,7 +185,7 @@ Manual host checklist:
 - Confirm the retired variable names are no longer referenced in tracked configuration:
   `DOCKER_HOST_DBF_SINAN`, `DOCKER_HOST_PQDIR`, `DOCKER_HOST_INCIDENCE_MAPS`, `DOCKER_HOST_STATIC`, `DOCKER_HOST_MEDIA_ROOT`, `DOCKER_HOST_TEMP_PARQUET_DIR`, `MEDIA_ROOT`, `IMPORTED_FILES`, `TEMP_FILES_DIR`, `STORAGE`.
 - Confirm the active variables remain unchanged:
-  `DBF_SINAN`, `DOCKER_HOST_SINAN_ROOT`, `DOCKER_HOST_IMPORTED_FILES_DIR`, `DOCKER_HOST_UPLOADED_FILES_DIR`, `DOCKER_HOST_INCOMING_DIR`, `DOCKER_HOST_SHAPEFILES_DIR`, `SHAPEFILE_PATH`, `EPISCANNER_HOST_DIR`, `HOST_PGDATA`.
+  `DBF_SINAN`, `DOCKER_HOST_SINAN_ROOT`, `DOCKER_HOST_IMPORTED_FILES_DIR`, `DOCKER_HOST_INCOMING_DIR`, `DOCKER_HOST_SHAPEFILES_DIR`, `SHAPEFILE_PATH`, `EPISCANNER_HOST_DIR`, `HOST_PGDATA`.
 - On the target host, list and inspect each retired path before removal.
 - Confirm no systemd unit, cron job, deployment script, or external mount still references the retired paths.
 - Remove retired paths manually during a maintenance window after backup or snapshot confirmation.
@@ -221,14 +215,14 @@ Do not remove these without explicit migration/backup confirmation:
 - `docker compose --env-file .envs/.env -f containers/compose-base.yaml -f containers/compose-staging.yaml config`
 - Validate `.github/workflows/linux.yml` no longer carries the retired variables in its env block.
 - Run ingestion unit tests that cover source-path resolution and mover behavior.
-- Run upload tests or a manual upload smoke test if `DBF_SINAN` or uploaded-path mounts are changed.
+- Run upload tests or a manual upload smoke test if `DBF_SINAN` storage behavior is changed.
 - Run a MinIO materializer smoke test if incoming storage is changed.
 
 ## Recommended First Change Set
 
 The smallest safe change set is:
 
-1. Fix `DOCKER_HOST_UPLOADED_FILES_DIR` and `DOCKER_HOST_TEMP_PARQUET_DIR` so compose no longer references commented or undefined variables.
+1. Remove obsolete `DOCKER_HOST_UPLOADED_FILES_DIR` and `DOCKER_HOST_TEMP_PARQUET_DIR` assumptions from tracked runtime configuration.
 2. Remove only variables proven to be residual from `.envs/.env.tpl`.
 3. Remove stale commented Django settings.
 4. Leave strong dependency paths intact.

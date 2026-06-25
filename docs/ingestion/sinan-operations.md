@@ -30,7 +30,7 @@ The MinIO materializer mirrors files from the `sinan-infodengue` bucket into the
 Restart the materialization services with Sugar:
 
 ```bash
-sugar --profile prod compose-ext restart \
+sugar --profile staging compose-ext restart \
   --services minio minio-init minio-materializer \
   -- -d
 ```
@@ -40,13 +40,13 @@ sugar --profile prod compose-ext restart \
 Check whether the ingestion watcher is running:
 
 ```bash
-makim ingestion.watch-ps --env prod
+makim ingestion.watch-ps --env staging
 ```
 
 The watcher should monitor:
 
 ```text
-/Storage/infodengue_data/sinan/incoming/
+/Storage/staging_data/sinan/incoming/
 ```
 
 For production recovery safety, the watcher should run with:
@@ -61,7 +61,7 @@ Run ingestion for a single file:
 
 ```bash
 makim ingestion.run \
-  --paths /Storage/infodengue_data/sinan/incoming/DENGUE_202617.csv \
+  --paths /Storage/staging_data/sinan/incoming/DENGUE_202617.csv \
   --include-existing \
   --requeue
 ```
@@ -113,6 +113,8 @@ Found existing at /mnt/storagebox-infodengue/sinan/imported/..., adding to manif
 ```
 
 This is not an error. It means the canonical file already exists and will be used to rebuild the manifest and enqueue processing.
+
+Recovery and collision handling use the canonical imported root only. The workflow does not depend on a separate uploaded-base path.
 
 ## Empty incoming directory
 

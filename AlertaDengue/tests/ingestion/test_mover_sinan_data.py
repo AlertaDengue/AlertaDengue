@@ -36,12 +36,9 @@ def test_move_to_canonical_csv_dry_run_bucket_es(tmp_path: Path) -> None:
     )
 
     imported_base = tmp_path / "imported"
-    uploaded_base = tmp_path / "uploaded"
-
     ok, dest, info, err = mover.move_to_canonical(
         src,
         imported_base=imported_base,
-        uploaded_base=uploaded_base,
         reserved_relpaths=set(),
         dry_run=True,
         include_uf=False,
@@ -77,12 +74,9 @@ def test_csv_priority_prefers_sg_uf_not_over_sg_uf(tmp_path: Path) -> None:
     )
 
     imported_base = tmp_path / "imported"
-    uploaded_base = tmp_path / "uploaded"
-
     ok, dest, info, err = mover.move_to_canonical(
         src,
         imported_base=imported_base,
-        uploaded_base=uploaded_base,
         reserved_relpaths=set(),
         dry_run=True,
         include_uf=False,
@@ -110,10 +104,8 @@ def test_collision_versioning_creates_suffix_with_bucket(
     label in the filename.
     """
     imported_base = tmp_path / "imported"
-    uploaded_base = tmp_path / "uploaded"
-
     existing = (
-        uploaded_base / "br/csv/dengue/2026/202605/DenInfodengue_BR_202605.csv"
+        imported_base / "br/csv/dengue/2026/202605/DenInfodengue_BR_202605.csv"
     )
     _write_csv(existing, "ID_AGRAVO;SEM_NOT\nA90;202605\n")
 
@@ -123,7 +115,6 @@ def test_collision_versioning_creates_suffix_with_bucket(
     ok, dest, info, err = mover.move_to_canonical(
         src,
         imported_base=imported_base,
-        uploaded_base=uploaded_base,
         reserved_relpaths=set(),
         dry_run=True,
         include_uf=False,
@@ -146,14 +137,13 @@ def test_checksum_skip_if_identical_exists(tmp_path: Path) -> None:
     """
     If destination exists with the same checksum, return SKIP.
 
-    This checks the uploaded/imported checksum dedupe.
+    This checks checksum dedupe against canonical imported storage.
     """
     imported_base = tmp_path / "imported"
-    uploaded_base = tmp_path / "uploaded"
 
     content = "ID_AGRAVO;SEM_NOT\nA90;202605\n"
     existing = (
-        uploaded_base / "br/csv/dengue/2026/202605/DenInfodengue_BR_202605.csv"
+        imported_base / "br/csv/dengue/2026/202605/DenInfodengue_BR_202605.csv"
     )
     _write_csv(existing, content)
 
@@ -163,7 +153,6 @@ def test_checksum_skip_if_identical_exists(tmp_path: Path) -> None:
     ok, dest, info, err = mover.move_to_canonical(
         src,
         imported_base=imported_base,
-        uploaded_base=uploaded_base,
         reserved_relpaths=set(),
         dry_run=True,
         include_uf=False,
@@ -233,12 +222,10 @@ def test_dbf_priority_prefers_sg_uf(
     monkeypatch.setattr(mover, "DBF", _fake_dbf)
 
     imported_base = tmp_path / "imported"
-    uploaded_base = tmp_path / "uploaded"
 
     ok, dest, info, err = mover.move_to_canonical(
         src,
         imported_base=imported_base,
-        uploaded_base=uploaded_base,
         reserved_relpaths=set(),
         dry_run=True,
         include_uf=False,
@@ -267,7 +254,6 @@ def test_main_writes_sorted_manifest_es_before_br(
     Manifest should list ES before BR when both are present.
     """
     imported_base = tmp_path / "imported"
-    uploaded_base = tmp_path / "uploaded"
 
     es_src = tmp_path / "incoming" / "a.csv"
     br_src = tmp_path / "incoming" / "b.csv"
@@ -283,8 +269,6 @@ def test_main_writes_sorted_manifest_es_before_br(
         str(br_src),
         "--imported-base",
         str(imported_base),
-        "--uploaded-base",
-        str(uploaded_base),
         "--manifest",
         str(manifest_path),
         "--dry-run",
@@ -309,7 +293,6 @@ def test_move_to_canonical_outdated_skip(tmp_path: Path) -> None:
     ok, dest, info, err = mover.move_to_canonical(
         src,
         imported_base=tmp_path / "imported",
-        uploaded_base=tmp_path / "uploaded",
         reserved_relpaths=set(),
         dry_run=True,
         include_uf=False,
@@ -337,7 +320,6 @@ def test_move_to_canonical_outdated_allow(tmp_path: Path) -> None:
     ok, dest, info, err = mover.move_to_canonical(
         src,
         imported_base=tmp_path / "imported",
-        uploaded_base=tmp_path / "uploaded",
         reserved_relpaths=set(),
         dry_run=True,
         include_uf=False,
@@ -363,14 +345,13 @@ def test_main_with_include_existing(
     If --include-existing is set, skipped files (already moved) are in manifest.
     """
     imported_base = tmp_path / "imported"
-    uploaded_base = tmp_path / "uploaded"
     src = tmp_path / "incoming" / "existing.csv"
     content = "ID_AGRAVO;SEM_NOT;SG_UF_NOT\nA90;202610;ES\n"
     _write_csv(src, content)
 
-    # Pre-populate uploaded so it will be skipped
+    # Pre-populate canonical imported storage so it will be skipped
     canonical_dest = (
-        uploaded_base / "es/csv/dengue/2026/202610/DenInfodengue_ES_202610.csv"
+        imported_base / "es/csv/dengue/2026/202610/DenInfodengue_ES_202610.csv"
     )
     _write_csv(canonical_dest, content)
 
@@ -380,8 +361,6 @@ def test_main_with_include_existing(
         str(src),
         "--imported-base",
         str(imported_base),
-        "--uploaded-base",
-        str(uploaded_base),
         "--manifest",
         str(manifest_path),
         "--include-existing",

@@ -115,7 +115,6 @@ services:
       PSQL_PORT: "5432"
     volumes:
       - "${DOCKER_HOST_SINAN_ROOT}:/opt/services/ingestion/sinan"
-      - "${DOCKER_HOST_UPLOADED_FILES_DIR}:/opt/services/ingestion/sinan/uploaded"
       - "${DOCKER_HOST_IMPORTED_FILES_DIR}:/opt/services/ingestion/sinan/imported"
       # - "${DOCKER_HOST_SHAPEFILES_DIR}:/srv/deploy/shapefile"
     user: "${HOST_UID}:${HOST_GID}"
@@ -166,7 +165,6 @@ services:
       CELERY_WORKER_POOL: ${CELERY_WORKER_POOL:-prefork}
       CELERY_LOGLEVEL: ${CELERY_LOGLEVEL:-INFO}
     volumes:
-      - ${DOCKER_HOST_UPLOADED_FILES_DIR}:/opt/services/ingestion/sinan/uploaded
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/opt/services/ingestion/sinan/imported
       - ${EPISCANNER_HOST_DIR}:/opt/services/episcanner
     user: ${HOST_UID}:${HOST_GID}
@@ -195,7 +193,6 @@ services:
       CELERY_LOGLEVEL: ${CELERY_LOGLEVEL:-INFO}
       CELERYBEAT_SCHEDULE: /tmp/celerybeat-schedule
     volumes:
-      - ${DOCKER_HOST_UPLOADED_FILES_DIR}:/opt/services/ingestion/sinan/uploaded
       - ${DOCKER_HOST_IMPORTED_FILES_DIR}:/opt/services/ingestion/sinan/imported
       - ${EPISCANNER_HOST_DIR}:/opt/services/episcanner
     user: ${HOST_UID}:${HOST_GID}
