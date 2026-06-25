@@ -2,7 +2,7 @@
 
 This document describes the SINAN ingestion workflow used by AlertaDengue.
 
-SINAN files are received through MinIO, materialized into a local incoming directory, detected by the ingestion watcher, moved to canonical storage, and processed asynchronously through Celery.
+SINAN files are received through MinIO, materialized into a local incoming directory, detected by the ingestion watcher, moved to canonical imported storage, and processed asynchronously through Celery.
 
 ## Overview
 
@@ -37,7 +37,7 @@ sinan-infodengue
 Incoming directory watched by the ingestion watcher:
 
 ```text
-/Storage/infodengue_data/sinan/incoming/
+${DOCKER_HOST_INCOMING_DIR}
 ```
 
 Canonical imported storage:
@@ -119,7 +119,7 @@ The ingestion command reads the file, detects the disease, UF, year, epidemiolog
 
 If the canonical imported destination already exists, the mover checks the file identity there. Identical files are skipped. Different files for the same canonical period may be versioned with a numeric suffix.
 
-This phase produces a manifest used by the enqueue step.
+This phase produces a manifest used by the enqueue step. The workflow no longer depends on any separate `uploaded_base` location.
 
 ### Phase 2: enqueue
 

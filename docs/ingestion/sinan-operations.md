@@ -37,6 +37,12 @@ sugar --profile staging compose-ext restart \
 
 ## Watcher
 
+Start the ingestion watcher:
+
+```bash
+makim ingestion.watch-start --env staging --include-existing --requeue
+```
+
 Check whether the ingestion watcher is running:
 
 ```bash
@@ -46,13 +52,13 @@ makim ingestion.watch-ps --env staging
 The watcher should monitor:
 
 ```text
-/Storage/staging_data/sinan/incoming/
+/opt/data/staging/sinan/incoming/
 ```
 
-For production recovery safety, the watcher should run with:
+The watcher log is written to:
 
 ```text
---include-existing --requeue
+/opt/data/staging/logs/ingestion_watch.log
 ```
 
 ## Manual ingestion
@@ -61,7 +67,7 @@ Run ingestion for a single file:
 
 ```bash
 makim ingestion.run \
-  --paths /Storage/staging_data/sinan/incoming/DENGUE_202617.csv \
+  --paths /opt/data/staging/sinan/incoming/DENGUE_202617.csv \
   --include-existing \
   --requeue
 ```
@@ -70,7 +76,7 @@ Run ingestion for all files available in the incoming directory:
 
 ```bash
 makim ingestion.run \
-  --paths /Storage/infodengue_data/sinan/incoming \
+  --paths /opt/data/staging/sinan/incoming \
   --include-existing \
   --requeue
 ```
@@ -87,10 +93,11 @@ mamba activate alertadengue
 
 python AlertaDengue/manage.py check
 
-makim ingestion.watch-ps --env prod
+makim ingestion.watch-start --env staging --include-existing --requeue
+makim ingestion.watch-ps --env staging
 
 makim ingestion.run \
-  --paths /Storage/infodengue_data/sinan/incoming \
+  --paths /opt/data/staging/sinan/incoming \
   --include-existing \
   --requeue
 ```
@@ -114,7 +121,7 @@ Found existing at /mnt/storagebox-infodengue/sinan/imported/..., adding to manif
 
 This is not an error. It means the canonical file already exists and will be used to rebuild the manifest and enqueue processing.
 
-Recovery and collision handling use the canonical imported root only. The workflow does not depend on a separate uploaded-base path.
+Recovery and collision handling use the canonical imported root only. The workflow does not depend on a separate `uploaded_base` path.
 
 ## Empty incoming directory
 
