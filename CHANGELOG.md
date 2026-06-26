@@ -1,6 +1,16 @@
 Release Notes
 ---
 
+## [4.18.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.17.0...4.18.0) (2026-06-26)
+
+### Features
+
+* **team:** modernize partnerships section with logos ([#965](https://github.com/AlertaDengue/AlertaDengue/issues/965)) ([70cc46d](https://github.com/AlertaDengue/AlertaDengue/commit/70cc46d6c7ed18f2b1585a44625b0f95d3431901))
+
+### Bug Fixes
+
+* **deps:** resolve Poetry install failure in conda environment ([#970](https://github.com/AlertaDengue/AlertaDengue/issues/970)) ([c449912](https://github.com/AlertaDengue/AlertaDengue/commit/c4499127c39b4a1c500705c8b1f64262521b01cc))
+
 ## [4.17.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.16.0...4.17.0) (2026-06-23)
 
 ### Features
