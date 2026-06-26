@@ -1,19 +1,41 @@
 /* footer.css */
 .iframe-infodengue {
-    padding: 20px;
+    padding: 1.5rem;
     width: 100%;
     background-color: #058ED0;
     background-image: linear-gradient(135deg, #058ED0 0%, #003E7E 100%);
-    text-align: center;
     border-radius: 8px;
-    border: 10;
 }
 
-.logo {
-    width: 50%;
+.site-footer {
+    overflow: hidden;
+}
+
+.footer-logo {
+    width: 100%;
+    max-width: 128px;
+    height: auto;
+}
+
+.site-footer__text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.site-footer__sponsor {
+    white-space: nowrap;
 }
 
 .footer {
-    /* padding: 50px 0px; */
-    margin-left: 32px;
+    margin-left: 0;
+}
+
+@media (max-width: 767.98px) {
+    .iframe-infodengue {
+        padding: 1.25rem 1rem;
+    }
+
+    .footer-logo {
+        max-width: 112px;
+    }
 }

@@ -1,23 +1,38 @@
 {% load static %}
 {% load i18n %}
 
-<div class="row clearfix">
-    <div class="col-md-12 column">
-    <!-- logo bar -->
-        <div class="float-left">
-            <a href="/">
-                <img class="media-object" src="{% static '/img/info-dengue-logo-multicidades.png' %}" alt="INFO-DENGUE">
-            </a>
-        </div>
-        <div class="float-right">
-            <a href="http://www.procc.fiocruz.br">
-                <img class="media-object" src="{% static '/img/fiocruz.gif' %}" height="83px" alt="FIOCRUZ">
-            </a>
-        </div>
-        <div class="float-right">
-            <a href="http://emap.fgv.br">
-                <img class="media-object" src="{% static '/img/emap.jpg' %}" height="83px" alt="EMAP">
-            </a>
-        </div>
+<div class="site-header d-flex flex-column flex-lg-row align-items-center justify-content-between">
+    <div class="site-header__brand mb-3 mb-lg-0">
+        <a href="/" class="d-inline-flex align-items-center" aria-label="{% trans 'Página inicial do Infodengue' %}">
+            <img
+                class="site-logo img-fluid"
+                src="{% static '/img/info-dengue-logo-multicidades.png' %}"
+                alt="INFO-DENGUE">
+        </a>
+    </div>
+
+    <div class="site-header__partners d-flex flex-wrap align-items-center justify-content-center justify-content-lg-end">
+        <a
+            href="http://emap.fgv.br"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="site-header__partner-link"
+            aria-label="EMAP">
+            <img
+                class="partner-logo img-fluid"
+                src="{% static '/img/emap.jpg' %}"
+                alt="EMAP">
+        </a>
+        <a
+            href="http://www.procc.fiocruz.br"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="site-header__partner-link"
+            aria-label="Fiocruz">
+            <img
+                class="partner-logo img-fluid"
+                src="{% static '/img/fiocruz.gif' %}"
+                alt="FIOCRUZ">
+        </a>
     </div>
 </div>

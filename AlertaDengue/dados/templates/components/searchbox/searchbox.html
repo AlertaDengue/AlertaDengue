@@ -1,13 +1,8 @@
 {% load i18n %}
 {% block searchbox_component %}
 
-{% block extra_head %}
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-{% endblock %}
-
 <select
-  class="js-select2"
+  class="js-select2 site-searchbox"
   id="searchbox"
 >
     <option></option>
@@ -20,7 +15,7 @@
   $(document).ready(function() {
     $("#searchbox").select2({
       placeholder: "{% blocktranslate %}Encontre um município{% endblocktranslate %}",
-      width: "220px"
+      width: "100%"
     });
     $('#searchbox').on('select2:select', function (e) {
       var city = e.params.data;
