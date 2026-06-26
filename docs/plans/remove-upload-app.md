@@ -29,17 +29,17 @@ historical record of a deployed schema. A final `upload` migration must be
 created while `upload` is still in `INSTALLED_APPS`; use the next migration
 number after `0024_alter_sinanuploadlogstatus_status`.
 
-The final migration should contain only these `DeleteModel` operations, in
-this order:
+The final migration should use `SeparateDatabaseAndState`: ordered irreversible
+`RunSQL` table drops without `CASCADE`, plus these `DeleteModel` state
+operations in this order:
 
 1. `SINANUpload`
 2. `SINANChunkedUpload`
 3. `SINANUploadLogStatus`
 
 This order first removes foreign keys from `SINANUpload` to the other two
-tables. It must not use `CASCADE`, raw table drops, or migration-history
-edits. `makemigrations upload` should generate the operations after removing
-the three models from `upload/models.py`; review the migration before use.
+tables. The database operations must not use `CASCADE`, and the migration must
+not edit migration history. Review the emitted SQL before use.
 
 Keep the migration source and app package through the release that runs
 `migrate`. Remove the application package and its migrations only in the next
