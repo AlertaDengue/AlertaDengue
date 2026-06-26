@@ -1170,21 +1170,6 @@ celery = ">=5.2.7,<6.0"
 Django = ">=3.2.25"
 
 [[package]]
-name = "django-chunked-upload"
-version = "2.0.0"
-description = "Upload large files to Django in multiple chunks, with the ability to resume if the upload is interrupted."
-optional = false
-python-versions = "*"
-groups = ["main"]
-files = [
-    {file = "69dfedf148fe7793e372116ca3c88187f5d90ea2.tar.gz", hash = "sha256:718ec6aefb2fab0a471ad3b7222003c72b6984a2eebc8500575ca978444bc3a7"},
-]
-
-[package.source]
-type = "url"
-url = "https://github.com/juliomalegria/django-chunked-upload/archive/69dfedf148fe7793e372116ca3c88187f5d90ea2.tar.gz"
-
-[[package]]
 name = "django-cprofile-middleware"
 version = "1.0.5"
 description = "Easily add cProfile profiling to django views."
@@ -4245,4 +4230,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.12"
-content-hash = "794d4bb9efc4c8ad684dfedf25fa2b43c329907615a36b7be4c27c0eac1760ce"
+content-hash = "f5ebe30d907aebdfd67fcad12d70b76a22e6606779f31ff5919ce59164e91f66"

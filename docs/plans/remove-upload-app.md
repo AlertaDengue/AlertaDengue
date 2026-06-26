@@ -138,3 +138,16 @@ the retained full database backup plus a reviewed restoration procedure for
 the archived data and any referenced files under `DBF_SINAN`. Do not drop
 `archive_upload` or delete stored files until the agreed retention period has
 expired and the archive has been tested by the authorized recovery process.
+
+## Execution Status
+
+Development execution completed on 2026-06-26. The schema-only backup is
+`20260626_00_upload_app_schema.sql`. `archive_upload` preserves 3,026 chunk
+rows, 3,884 upload rows, 3,884 log-status rows, and zero generic chunked-upload
+rows in `dengue`; `infodengue` has a separate zero-row generic-table archive.
+
+The terminal migration was applied before the package was removed. Both
+development bootstrap schemas were regenerated without `archive_upload` or the
+retired `chunked_upload_chunkedupload` table. Production remains pending: run
+the matching archive scripts, validate their manifests, apply the migration,
+and retain the full database and file backups for the agreed period.

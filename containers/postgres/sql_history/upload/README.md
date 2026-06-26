@@ -23,5 +23,8 @@ psql -X -v ON_ERROR_STOP=1 \
 
 The scripts use transactions and explicit preconditions. The removal script
 does not use `CASCADE`; an unknown database dependency must abort the removal.
-See `docs/plans/remove-upload-app.md` for the complete release procedure,
+For a database that has only the generic third-party table, run
+`20260626_01b_archive_orphaned_chunked_upload.sql` followed by
+`20260626_02b_remove_orphaned_chunked_upload_table.sql`. See
+`docs/plans/remove-upload-app.md` for the complete release procedure,
 validation queries, and recovery boundaries.

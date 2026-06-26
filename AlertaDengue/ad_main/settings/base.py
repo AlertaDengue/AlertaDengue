@@ -9,15 +9,10 @@ specific overrides live in ``dev.py`` and ``prod.py``.
 from __future__ import annotations
 
 import os
-from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Optional
 
-import pandas as pd
-import psycopg2
-from django.conf import settings
 from django.contrib.messages import constants as messages
-from django.core.files.storage import FileSystemStorage
 from dotenv import load_dotenv
 from sentry_sdk import init as sentry_init
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -97,7 +92,6 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "leaflet",
     "bootstrap4",
-    "chunked_upload",
     "manager.router",
     "maintenance_mode",
     "django_celery_results",
@@ -111,7 +105,6 @@ LOCAL_APPS = [
     "dados",
     "gis",
     "api",
-    "upload",
     "ingestion",
 ]
 
@@ -136,18 +129,6 @@ MESSAGE_TAGS = {
     messages.WARNING: "alert-warning",
     messages.ERROR: "alert-danger",
 }
-
-CHUNKED_UPLOAD_PATH = "uploaded/chunked_uploads/%Y/%m/%d"
-
-
-class DBFSINANStorage(FileSystemStorage):
-    """Storage backend for DBF SINAN uploads."""
-
-    def __init__(self, location: str = "/DBF_SINAN", *args, **kwargs) -> None:
-        super().__init__(location=location, *args, **kwargs)
-
-
-CHUNKED_UPLOAD_STORAGE_CLASS = DBFSINANStorage
 
 ROOT_URLCONF = "ad_main.urls"
 WSGI_APPLICATION = "ad_main.wsgi.application"
@@ -272,7 +253,6 @@ STATICFILES_FINDERS = [
 ]
 
 MEDIA_URL = "/img/"
-DBF_SINAN = os.getenv("DBF_SINAN")
 IMPORTED_FILES_DIR = os.getenv(
     "IMPORTED_FILES_DIR", "/opt/services/ingestion/sinan/imported"
 )

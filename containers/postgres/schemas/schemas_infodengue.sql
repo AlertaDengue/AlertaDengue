@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.3 (Ubuntu 15.3-0ubuntu0.23.04.1)
--- Dumped by pg_dump version 15.3 (Ubuntu 15.3-0ubuntu0.23.04.1)
+-- Dumped from database version 14.23 (Debian 14.23-1.pgdg11+1)
+-- Dumped by pg_dump version 14.18 (Debian 14.18-1.pgdg110+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -15,15 +15,6 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
---
--- Name: public; Type: SCHEMA; Schema: -; Owner: dengueadmin
---
-
--- *not* creating schema, since initdb creates it
-
-
-ALTER SCHEMA public OWNER TO dengueadmin;
 
 --
 -- Name: topology; Type: SCHEMA; Schema: -; Owner: postgres
@@ -49,7 +40,7 @@ CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION postgis IS 'PostGIS geometry, geography, and raster spatial types and functions';
@@ -63,7 +54,7 @@ CREATE EXTENSION IF NOT EXISTS postgis_raster WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION postgis_raster; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION postgis_raster; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION postgis_raster IS 'PostGIS raster types and functions';
@@ -77,7 +68,7 @@ CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;
 
 
 --
--- Name: EXTENSION postgis_topology; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION postgis_topology; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION postgis_topology IS 'PostGIS topology spatial types and functions';
@@ -659,47 +650,6 @@ ALTER SEQUENCE public.auth_user_user_permissions_id_seq OWNED BY public.auth_use
 
 
 --
--- Name: chunked_upload_chunkedupload; Type: TABLE; Schema: public; Owner: dengueadmin
---
-
-CREATE TABLE public.chunked_upload_chunkedupload (
-    id integer NOT NULL,
-    upload_id character varying(32) NOT NULL,
-    file character varying(255) NOT NULL,
-    filename character varying(255) NOT NULL,
-    "offset" bigint NOT NULL,
-    created_on timestamp with time zone NOT NULL,
-    status smallint NOT NULL,
-    completed_on timestamp with time zone,
-    user_id integer,
-    CONSTRAINT chunked_upload_chunkedupload_status_check CHECK ((status >= 0))
-);
-
-
-ALTER TABLE public.chunked_upload_chunkedupload OWNER TO dengueadmin;
-
---
--- Name: chunked_upload_chunkedupload_id_seq; Type: SEQUENCE; Schema: public; Owner: dengueadmin
---
-
-CREATE SEQUENCE public.chunked_upload_chunkedupload_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.chunked_upload_chunkedupload_id_seq OWNER TO dengueadmin;
-
---
--- Name: chunked_upload_chunkedupload_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: dengueadmin
---
-
-ALTER SEQUENCE public.chunked_upload_chunkedupload_id_seq OWNED BY public.chunked_upload_chunkedupload.id;
-
-
---
 -- Name: dbf_dbf; Type: TABLE; Schema: public; Owner: dengueadmin
 --
 
@@ -983,13 +933,6 @@ ALTER TABLE ONLY public.auth_user_user_permissions ALTER COLUMN id SET DEFAULT n
 
 
 --
--- Name: chunked_upload_chunkedupload id; Type: DEFAULT; Schema: public; Owner: dengueadmin
---
-
-ALTER TABLE ONLY public.chunked_upload_chunkedupload ALTER COLUMN id SET DEFAULT nextval('public.chunked_upload_chunkedupload_id_seq'::regclass);
-
-
---
 -- Name: dbf_dbf id; Type: DEFAULT; Schema: public; Owner: dengueadmin
 --
 
@@ -1168,22 +1111,6 @@ ALTER TABLE ONLY public.auth_user
 
 
 --
--- Name: chunked_upload_chunkedupload chunked_upload_chunkedupload_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
---
-
-ALTER TABLE ONLY public.chunked_upload_chunkedupload
-    ADD CONSTRAINT chunked_upload_chunkedupload_pkey PRIMARY KEY (id);
-
-
---
--- Name: chunked_upload_chunkedupload chunked_upload_chunkedupload_upload_id_key; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
---
-
-ALTER TABLE ONLY public.chunked_upload_chunkedupload
-    ADD CONSTRAINT chunked_upload_chunkedupload_upload_id_key UNIQUE (upload_id);
-
-
---
 -- Name: dbf_dbf dbf_dbf_pkey; Type: CONSTRAINT; Schema: public; Owner: dengueadmin
 --
 
@@ -1354,20 +1281,6 @@ CREATE INDEX auth_user_username_6821ab7c_like ON public.auth_user USING btree (u
 
 
 --
--- Name: chunked_upload_chunkedupload_upload_id_23703435_like; Type: INDEX; Schema: public; Owner: dengueadmin
---
-
-CREATE INDEX chunked_upload_chunkedupload_upload_id_23703435_like ON public.chunked_upload_chunkedupload USING btree (upload_id varchar_pattern_ops);
-
-
---
--- Name: chunked_upload_chunkedupload_user_id_70ff6dbf; Type: INDEX; Schema: public; Owner: dengueadmin
---
-
-CREATE INDEX chunked_upload_chunkedupload_user_id_70ff6dbf ON public.chunked_upload_chunkedupload USING btree (user_id);
-
-
---
 -- Name: dbf_dbf_4095e96b; Type: INDEX; Schema: public; Owner: dengueadmin
 --
 
@@ -1473,14 +1386,6 @@ ALTER TABLE ONLY public.auth_user_user_permissions
 
 
 --
--- Name: chunked_upload_chunkedupload chunked_upload_chunkedupload_user_id_70ff6dbf_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueadmin
---
-
-ALTER TABLE ONLY public.chunked_upload_chunkedupload
-    ADD CONSTRAINT chunked_upload_chunkedupload_user_id_70ff6dbf_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
 -- Name: dbf_dbf dbf_dbf_uploaded_by_id_ad662eb4_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: dengueadmin
 --
 
@@ -1510,14 +1415,6 @@ ALTER TABLE ONLY public.django_admin_log
 
 ALTER TABLE ONLY public.django_admin_log
     ADD CONSTRAINT django_admin_log_user_id_c564eba6_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: SCHEMA public; Type: ACL; Schema: -; Owner: dengueadmin
---
-
-REVOKE USAGE ON SCHEMA public FROM PUBLIC;
-GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
 --
