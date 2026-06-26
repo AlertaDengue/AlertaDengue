@@ -2,24 +2,11 @@ from __future__ import annotations
 
 import datetime as dt
 from collections import Counter
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Iterable,
-    Iterator,
-    Optional,
-    Tuple,
-    Union,
-    cast,
-)
-
-if TYPE_CHECKING:
-    from upload.models import SINANUpload
+from typing import Any, Iterable, Iterator, Optional, Union, cast
 
 import numpy as np
 import pandas as pd
 from dateutil.parser import parse
-from epiweeks import Week
 from pandas.tseries.api import guess_datetime_format
 
 
@@ -415,84 +402,15 @@ def normalize_cid10(value: object, default_cid: str) -> str:
 
 
 def convert_data_types(col: pd.Series, dtype: type) -> pd.Series:
-    if dtype == int:
+    if dtype is int:
         col = pd.to_numeric(col, errors="coerce").fillna(0).astype(int)
-    elif dtype == float:
+    elif dtype is float:
         col = pd.to_numeric(col, errors="coerce").fillna(0.0)
-    elif dtype == str:
+    elif dtype is str:
         col = col.fillna("").astype(str)
     else:
         raise ValueError(f"Unsupported dtype: {dtype}")
     return col
-
-
-def parse_dates(df: pd.DataFrame, sinan: SINANUpload) -> pd.DataFrame:
-    """Parse SINAN date columns, keeping best-effort format tracking."""
-    dt_cols = [
-        "DT_SIN_PRI",
-        "DT_DIGITA",
-        "DT_NASC",
-        "DT_NOTIFIC",
-        "DT_CHIK_S1",
-        "DT_CHIK_S2",
-        "DT_PRNT",
-        "DT_SORO",
-        "DT_NS1",
-        "DT_VIRAL",
-        "DT_PCR",
-    ]
-    formats: dict[str, str | None] = {}
-    sinan_formats = sinan.date_formats or {}
-
-    if df.empty:
-        return df
-
-    if "DT_NOTIFIC" in df.columns:
-        if "SEM_NOT" in df.columns:
-            df["DT_NOTIFIC"] = parse_dt_notific_with_sem_not(
-                df["DT_NOTIFIC"],
-                df["SEM_NOT"],
-            )
-        else:
-            fmt: str | None = None
-            if df["DT_NOTIFIC"].dtype == "object":
-                fmt = infer_date_format(df["DT_NOTIFIC"].astype(str).tolist())
-                formats["DT_NOTIFIC"] = fmt
-            df["DT_NOTIFIC"] = convert_date(df["DT_NOTIFIC"], fmt)
-
-    for dt_col in dt_cols:
-        if dt_col not in df.columns or dt_col == "DT_NOTIFIC":
-            continue
-
-        fmt = None
-        if df[dt_col].dtype == "object":
-            fmt = infer_date_format(df[dt_col].astype(str).tolist())
-            formats[dt_col] = fmt
-
-        df[dt_col] = convert_date(df[dt_col], fmt)
-
-    for col, fmt in formats.items():
-        if col not in sinan_formats:
-            sinan_formats[col] = fmt
-
-        if not sinan_formats[col]:
-            sinan_formats[col] = fmt
-
-        if fmt and sinan_formats[col] != fmt:
-            sinan.status.warning(
-                f"A date discrepancy were found for the column {col}. "
-                "Please contact the moderation"
-            )
-            sinan.status.debug(
-                f"DATE FORMAT CHANGED FROM '{sinan_formats[col]}' TO '{fmt}'"
-            )
-            sinan_formats[col] = fmt
-
-    if sinan.date_formats != sinan_formats:
-        sinan.date_formats = sinan_formats
-        sinan.save()
-
-    return df
 
 
 def parse_data(df: pd.DataFrame, default_cid: str, year: int) -> pd.DataFrame:
