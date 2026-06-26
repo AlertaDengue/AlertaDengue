@@ -3,19 +3,16 @@
 {% load static %}
 
 {% block extra_head %}
-
 <script>
   function openReport() {
-    var state_initial = $('#state option:selected').val();
-    var report_type = $('#report-type option:selected').val();
-    window.location.href = '/report/' +  state_initial + '/' + report_type;
+    var stateInitial = $('#state option:selected').val();
+    var reportType = $('#report-type option:selected').val();
+    window.location.href = '/report/' + stateInitial + '/' + reportType;
     return false;
   }
-  
- </script>
+</script>
 
-<link href="{% static '/css/report_styles.css' %}" rel="stylesheet"> <!-- or 'css/new_styles.css' -->
-
+<link href="{% static '/css/report_styles.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -31,12 +28,12 @@
 {% block title %}{% translate "Relatórios" %}{% endblock %}
 
 {% block content %}
-<form id="form-report" onsubmit="return openReport();">
+<form id="form-report" class="site-report-form" onsubmit="return openReport();">
   <div class="row">
     <div class="col-md-12">
       <div class="form-group">
         <label for="report-type">{% translate "Tipo de Relatório" %}:</label>
-        <select id="report-type" class="form-control" required style="width:400px;">
+        <select id="report-type" class="form-control report-filter-select" required>
           <option value="city">{% translate "Municipal" %}</option>
           <option value="state">{% translate "Estadual" %}</option>
         </select>
@@ -47,7 +44,7 @@
 
       <div class="form-group">
         <label for="state">{% translate "Unidade Federal" %}:</label>
-        <select id="state" class="form-control" required style="width:400px;">
+        <select id="state" class="form-control report-filter-select" required>
           <option value="">{% translate "Selecione uma Unidade Federal" %}</option>
           {{ options_states|safe }}
         </select>
@@ -56,7 +53,7 @@
         </small>
       </div>
 
-      <div class="form-group">
+      <div class="form-group mb-0">
         <button class="btn btn-primary" type="submit">
           {% translate "Abrir Relatório" %}
         </button>

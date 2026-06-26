@@ -2,22 +2,18 @@
 {% load static %}
 
 {% block home_functionalities_section %}
-
 <div class="card mb-0 p-0 home-section-card">
   <div class="card-header home-section-header d-flex align-items-center">
-    <h4 style="color: #ffffff !important;" class="mb-0">
+    <h4 class="mb-0 text-white">
       {% trans "Funcionalidades" %}
-    </h3>
+    </h4>
   </div>
 
   <div class="card-body">
     <div class="row justify-content-center g-3">
-
-      <!-- API -->
       <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
         <a href="/services/api"
-           class="btn btn-menu-card w-100 h-100 d-flex flex-column
-                  justify-content-center align-items-center text-center py-4"
+           class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
            data-toggle="tooltip"
            data-placement="bottom"
            title="{% trans 'Acesso aos dados utilizados para gerar os resultados apresentados no site.' %}">
@@ -30,11 +26,9 @@
         </a>
       </div>
 
-      <!-- Municipal Reports -->
       <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
         <a href="/report/"
-           class="btn btn-menu-card w-100 h-100 d-flex flex-column
-                  justify-content-center align-items-center text-center py-4"
+           class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
            data-toggle="tooltip"
            data-placement="bottom"
            title="{% trans 'Informações sobre o número de casos, nível de alerta e condições climáticas para a transmissão de arboviroses a nível municipal.' %}">
@@ -47,11 +41,9 @@
         </a>
       </div>
 
-      <!-- State Reports -->
       <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
         <a href="/report/"
-           class="btn btn-menu-card w-100 h-100 d-flex flex-column
-                  justify-content-center align-items-center text-center py-4"
+           class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
            data-toggle="tooltip"
            data-placement="bottom"
            title="{% trans 'Informações sobre o número de casos e nível de alerta para as regionais de saúde de cada estado.' %}">
@@ -64,11 +56,9 @@
         </a>
       </div>
 
-      <!-- Technical Reports -->
       <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
         <a href="{% url 'dados:download_technical_report_pdf' %}"
-           class="btn btn-menu-card w-100 h-100 d-flex flex-column
-                  justify-content-center align-items-center text-center py-4"
+           class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
            data-toggle="tooltip"
            data-placement="bottom"
            title="{% trans 'Análises adicionais sobre a situação das arboviroses no país.' %}">
@@ -81,11 +71,9 @@
         </a>
       </div>
 
-      <!-- Tutorials -->
       <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
         <a href="/services/tutorial"
-           class="btn btn-menu-card w-100 h-100 d-flex flex-column
-                  justify-content-center align-items-center text-center py-4"
+           class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
            data-toggle="tooltip"
            data-placement="bottom"
            title="{% trans 'Exemplo de acesso aos dados da API usando R e Python.' %}">
@@ -98,13 +86,11 @@
         </a>
       </div>
 
-      <!-- Glossary -->
       <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
         <a href="https://lac.tghn.org/recursos/glossario-infodengue/"
            target="_blank"
            rel="noopener noreferrer"
-           class="btn btn-menu-card w-100 h-100 d-flex flex-column
-                  justify-content-center align-items-center text-center py-4"
+           class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
            data-toggle="tooltip"
            data-placement="bottom"
            title="{% trans 'Consulte termos e conceitos importantes usados nos alertas, relatórios e indicadores do Infodengue.' %}">
@@ -117,14 +103,11 @@
         </a>
       </div>
 
-      <!-- PWA Install tile (wrapper has its own id) -->
-      <div class="col-12 col-sm-6 col-md-4 col-lg d-flex"
-           id="pwa-install-wrapper"
-           style="display: none;">
+      <div class="col-12 col-sm-6 col-md-4 col-lg d-none"
+           id="pwa-install-wrapper">
         <button id="pwa-install-button"
                 type="button"
-                class="btn btn-menu-card w-100 h-100 d-flex flex-column
-                       justify-content-center align-items-center text-center py-4"
+                class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
                 data-toggle="tooltip"
                 data-placement="bottom"
                 title="{% trans 'Instale o aplicativo do Infodengue neste dispositivo.' %}">
@@ -136,18 +119,10 @@
           </span>
         </button>
       </div>
-
     </div>
   </div>
 </div>
-
 {% endblock %}
-
-<script>
-  $(function () {
-    $('[data-toggle="tooltip"]').tooltip();
-  });
-</script>
 
 <script>
   (function () {
@@ -161,7 +136,6 @@
       }
     }
 
-    // 1) React when the page is loaded
     document.addEventListener("DOMContentLoaded", function () {
       const wrapper = document.getElementById("pwa-install-wrapper");
       const button = document.getElementById("pwa-install-button");
@@ -176,13 +150,11 @@
         window.matchMedia("(display-mode: standalone)").matches ||
         window.navigator.standalone === true;
 
-      // If installed (this browser) or running as PWA: tile disappears
       if (alreadyInstalled || isStandalone) {
         removeInstallTile();
         return;
       }
 
-      // User clicks on "Instalar aplicativo"
       button.addEventListener("click", async function (event) {
         event.preventDefault();
 
@@ -202,18 +174,17 @@
       });
     });
 
-    // 2) Browser says: app can be installed
     window.addEventListener("beforeinstallprompt", function (event) {
       event.preventDefault();
       deferredPrompt = event;
 
       const wrapper = document.getElementById("pwa-install-wrapper");
       if (wrapper) {
-        wrapper.style.display = "flex";
+        wrapper.classList.remove("d-none");
+        wrapper.classList.add("d-flex");
       }
     });
 
-    // 3) App actually installed (via our button or via address bar)
     window.addEventListener("appinstalled", function () {
       window.localStorage.setItem(STORAGE_KEY, "1");
       removeInstallTile();

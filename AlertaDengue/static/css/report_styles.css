@@ -4,18 +4,26 @@
     vertical-align: bottom;
     font-size: 16px;
     font-weight: bold;
-  }
-  
-  .col-field {
+}
+
+.col-field {
     text-align: left;
     vertical-align: middle;
-  }
-  
-  .c {
+}
+
+.c {
     text-align: center;
-  }
-  
-  .pt-2 {
+}
+
+.pt-2 {
     padding-top: 20px;
-  }
-  
+}
+
+.site-report-form {
+    max-width: 820px;
+}
+
+.report-filter-select {
+    width: min(100%, 400px);
+    max-width: 100%;
+}

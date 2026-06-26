@@ -13,9 +13,7 @@
 {% trans "Amarelo: clima favorável e presença de arbovirus <br> Laranja: tendência de aumento de casos <br> Vermelho: alta incidência em relação ao histórico" as stack_text %}
 
 <div class="row justify-content-md-center">
-  <!-- Grid column -->
   <div class="col-sm-12 mb-1 mb-xl-0">
-    <!-- Section: Live preview -->
     <section>
       <ul class="nav nav-tabs"
           id="diseaseTab"
@@ -68,10 +66,9 @@
         </li>
       </ul>
 
-      <div class="tab-content mt-0 mb-0 p-3" 
+      <div class="tab-content mt-0 mb-0 p-3"
         id="diseaseTabContent"
       >
-        <!-- Description -->
         <h6><small class="px-1" style="color:#888888;">
           {{ count_cities|lookup:'dengue'|lookup:state | safe }}
           {% translate "Municípios monitorados" %}. {% translate "Última atualização na SE" %}:
@@ -169,19 +166,7 @@
           </div>
         </div>
       </div>
-
     </section>
   </div>
 </div>
 {% endblock %}
-
-<script>
-  $('[data-toggle="tooltip"]').tooltip()
-  document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll('[data-toggle="tooltip"]').forEach(el => {
-      new bootstrap.Tooltip(el, {
-        html: true
-      });
-    });
-  });
-</script>
