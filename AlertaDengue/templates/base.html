@@ -39,20 +39,17 @@
 <body>
   {% include 'components/messages.html' %}
 
-  <div class="container-fluid d-flex flex-column min-vh-100">
-    <section class="site-header-section py-3 py-md-4">
-      <div class="container site-shell">
+  <div class="site-app d-flex flex-column min-vh-100">
+    <header class="site-header">
+      <div class="site-shell">
         {% include 'components/header.html' %}
+        {% include 'components/navbar.html' %}
       </div>
-    </section>
+    </header>
 
-    <main role="main" class="flex-fill">
-      <div class="container site-shell px-3 px-md-4">
-        <section class="site-navbar-wrapper mt-2 mt-md-3 mb-0">
-          {% include 'components/navbar.html' %}
-        </section>
-
-        <h3 class="site-page-title mb-3 mt-3 mt-md-4">{% block title %}{% endblock %}</h3>
+    <main role="main" class="site-main flex-fill">
+      <div class="site-shell site-content">
+        <h3 class="site-page-title">{% block title %}{% endblock %}</h3>
         {% block breadcrumbs %}{% endblock %}
 
         {% if settings.MAINTENANCE_MODE and not user.is_authenticated %}
@@ -63,16 +60,51 @@
       </div>
     </main>
 
-    <footer class="footer py-4 mt-4">
-      <div class="container site-shell">
+    <footer class="site-footer">
+      <div class="site-shell site-footer-inner">
         {% include 'components/footer.html' %}
       </div>
     </footer>
   </div>
 
   <script>
-    $(function () {
+    function initGlobalTooltips() {
+      if (typeof $.fn.tooltip !== "function") {
+        return;
+      }
+
       $('[data-toggle="tooltip"]').tooltip();
+    }
+
+    function initSiteSearchbox() {
+      var $searchbox = $("#searchbox");
+
+      if (!$searchbox.length || typeof $.fn.select2 !== "function") {
+        return;
+      }
+
+      if (!$searchbox.hasClass("select2-hidden-accessible")) {
+        $searchbox.select2({
+          placeholder: $searchbox.data("placeholder"),
+          width: "100%",
+          dropdownAutoWidth: true
+        });
+      }
+
+      $searchbox
+        .off("select2:select.siteSearch")
+        .on("select2:select.siteSearch", function (event) {
+          var city = event.params.data;
+
+          if (city && city.id) {
+            window.location.href = "/alerta/" + city.id;
+          }
+        });
+    }
+
+    $(function () {
+      initGlobalTooltips();
+      initSiteSearchbox();
     });
   </script>
 </body>

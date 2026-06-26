@@ -1,41 +1,57 @@
-/* footer.css */
-.iframe-infodengue {
-    padding: 1.5rem;
+.site-footer {
     width: 100%;
-    background-color: #058ED0;
-    background-image: linear-gradient(135deg, #058ED0 0%, #003E7E 100%);
-    border-radius: 8px;
+    margin-top: auto;
+    color: #FFFFFF;
+    background-color: #003E7E;
+    background-image: linear-gradient(135deg, #003E7E 0%, #05588E 100%);
 }
 
-.site-footer {
-    overflow: hidden;
+.site-footer-inner {
+    padding-top: 1.6rem;
+    padding-bottom: 1.8rem;
+}
+
+.site-footer-grid {
+    row-gap: 1rem;
 }
 
 .footer-logo {
+    display: block;
     width: 100%;
-    max-width: 128px;
+    max-width: 136px;
     height: auto;
 }
 
-.site-footer__text {
-    font-size: 0.95rem;
-    line-height: 1.6;
+.site-footer__description {
+    font-size: 0.98rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.92);
 }
 
 .site-footer__sponsor {
-    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.12);
+    color: #FFFFFF;
+    font-weight: 600;
 }
 
-.footer {
-    margin-left: 0;
+.site-footer__sponsor:hover,
+.site-footer__sponsor:focus {
+    background: rgba(255, 255, 255, 0.2);
+    color: #FFFFFF;
 }
 
-@media (max-width: 767.98px) {
-    .iframe-infodengue {
-        padding: 1.25rem 1rem;
+@media (max-width: 991.98px) {
+    .site-footer-inner {
+        padding-top: 1.4rem;
+        padding-bottom: 1.6rem;
     }
 
     .footer-logo {
-        max-width: 112px;
+        max-width: 120px;
     }
 }

@@ -1,28 +1,13 @@
 {% load i18n %}
 {% block searchbox_component %}
-
 <select
-  class="js-select2 site-searchbox"
+  class="form-control js-select2 site-searchbox"
   id="searchbox"
   aria-label="{% translate 'Buscar município' %}"
->
-    <option></option>
-    {% for city in options_cities %}
-      <option value="{{ city.geocode }}">{{ city.name }} - {{ city.state }}</option>
-    {% endfor %}
+  data-placeholder="{% blocktranslate %}Encontre um município{% endblocktranslate %}">
+  <option></option>
+  {% for city in options_cities %}
+    <option value="{{ city.geocode }}">{{ city.name }} - {{ city.state }}</option>
+  {% endfor %}
 </select>
-
-<script>
-  $(document).ready(function() {
-    $("#searchbox").select2({
-      placeholder: "{% blocktranslate %}Encontre um município{% endblocktranslate %}",
-      width: "100%"
-    });
-    $('#searchbox').on('select2:select', function (e) {
-      var city = e.params.data;
-      window.location.href = '/alerta/' + city.id;
-    });
-  });
-</script>
-
 {% endblock %}

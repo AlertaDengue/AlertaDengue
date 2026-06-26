@@ -3,10 +3,9 @@
 {% load searchbox_component %}
 
 {% block menu-bar %}
-
-<nav class="navbar navbar-expand-md navbar-light navbar-custom site-navbar w-100 px-3 py-2">
+<nav class="site-navbar navbar navbar-expand-md navbar-dark" aria-label="{% trans 'Navegação principal' %}">
   <button
-      class="navbar-toggler ml-auto"
+      class="navbar-toggler site-navbar-toggler ml-auto"
       type="button"
       data-toggle="collapse"
       data-target="#navbarSupportedContent"
@@ -17,78 +16,83 @@
   </button>
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav align-items-md-center">
+    <ul class="navbar-nav site-nav-list align-items-md-center">
       <li class="nav-item">
         <a
-            class="nav-link {% if request.resolver_match.url_name == 'main' %}active{% endif %}"
+            class="nav-link site-nav-link {% if request.resolver_match.url_name == 'main' %}active{% endif %}"
             href="{% url 'dados:main' %}"
             data-toggle="tooltip"
             data-placement="bottom"
             title="{% trans 'Página inicial com visão geral da situação das arboviroses e principais recursos do Infodengue.' %}">
-          {% translate "Início" %}
+          <i class="fas fa-house" aria-hidden="true"></i>
+          <span>{% translate "Início" %}</span>
         </a>
       </li>
 
       <li class="nav-item">
         <a
-            class="nav-link {% if request.resolver_match.url_name == 'data_public_services' or request.resolver_match.url_name == 'services_tutorial_R' or request.resolver_match.url_name == 'tutorial_api_R' or request.resolver_match.url_name == 'services_tutorial_Python' or request.resolver_match.url_name == 'tutorial_api_python' or request.resolver_match.url_name == 'data_public_services_type' %}active{% endif %}"
+            class="nav-link site-nav-link {% if request.resolver_match.url_name == 'data_public_services' or request.resolver_match.url_name == 'services_tutorial_R' or request.resolver_match.url_name == 'tutorial_api_R' or request.resolver_match.url_name == 'services_tutorial_Python' or request.resolver_match.url_name == 'tutorial_api_python' or request.resolver_match.url_name == 'data_public_services_type' %}active{% endif %}"
             href="{% url 'dados:data_public_services' %}"
             data-toggle="tooltip"
             data-placement="bottom"
             title="{% trans 'Acesse os dados por meio da API e de notebooks de documentação com exemplos.' %}">
-          {% translate "Dados" %}
+          <i class="fas fa-database" aria-hidden="true"></i>
+          <span>{% translate "Dados" %}</span>
         </a>
       </li>
 
       <li class="nav-item">
         <a
-            class="nav-link {% if request.resolver_match.url_name == 'report' or request.resolver_match.url_name == 'report_filter' or request.resolver_match.url_name == 'report_state' or request.resolver_match.url_name == 'report_city' %}active{% endif %}"
+            class="nav-link site-nav-link {% if request.resolver_match.url_name == 'report' or request.resolver_match.url_name == 'report_filter' or request.resolver_match.url_name == 'report_state' or request.resolver_match.url_name == 'report_city' %}active{% endif %}"
             href="{% url 'dados:report' %}"
             data-toggle="tooltip"
             data-placement="bottom"
             title="{% trans 'Consulte relatórios municipais e estaduais com indicadores epidemiológicos e níveis de alerta.' %}">
-          {% translate "Relatórios" %}
-        </a>
-      </li>
-
-      <li class="nav-item site-navbar__search">
-        {% searchbox_component %}
-      </li>
-
-      <li class="nav-item">
-        <a
-            class="nav-link {% if request.resolver_match.url_name == 'team' %}active{% endif %}"
-            href="{% url 'dados:team' %}"
-            data-toggle="tooltip"
-            data-placement="bottom"
-            title="{% trans 'Conheça a equipe responsável pelo desenvolvimento, manutenção e análise dos dados do Infodengue.' %}">
-          {% translate "Equipe" %}
+          <i class="fas fa-chart-line" aria-hidden="true"></i>
+          <span>{% translate "Relatórios" %}</span>
         </a>
       </li>
 
       <li class="nav-item">
         <a
-            class="nav-link {% if request.resolver_match.url_name == 'products' %}active{% endif %}"
+            class="nav-link site-nav-link {% if request.resolver_match.url_name == 'products' %}active{% endif %}"
             href="{% url 'dados:products' %}"
             data-toggle="tooltip"
             data-placement="bottom"
             title="{% trans 'Veja os relatórios, publicações, teses e ferramentas produzidas pela equipe do Infodengue.' %}">
-          {% translate "Produtos" %}
+          <i class="fas fa-box-open" aria-hidden="true"></i>
+          <span>{% translate "Produtos" %}</span>
         </a>
       </li>
 
       <li class="nav-item">
         <a
-            class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}"
+            class="nav-link site-nav-link {% if request.resolver_match.url_name == 'team' %}active{% endif %}"
+            href="{% url 'dados:team' %}"
+            data-toggle="tooltip"
+            data-placement="bottom"
+            title="{% trans 'Conheça a equipe responsável pelo desenvolvimento, manutenção e análise dos dados do Infodengue.' %}">
+          <i class="fas fa-users" aria-hidden="true"></i>
+          <span>{% translate "Equipe" %}</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a
+            class="nav-link site-nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}"
             href="{% url 'dados:about' %}"
             data-toggle="tooltip"
             data-placement="bottom"
             title="{% trans 'Informações sobre o projeto Infodengue, seus objetivos, histórico e principais parceiros.' %}">
-          {% translate "Sobre nós" %}
+          <i class="fas fa-circle-info" aria-hidden="true"></i>
+          <span>{% translate "Sobre nós" %}</span>
         </a>
       </li>
     </ul>
+
+    <div class="site-search">
+      {% searchbox_component %}
+    </div>
   </div>
 </nav>
-
 {% endblock %}
