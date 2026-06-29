@@ -57,9 +57,9 @@ body {
 }
 
 .partner-logo {
+    display: block;
     width: auto;
     height: auto;
-    max-width: 120px;
     max-height: 40px;
 }
 
@@ -551,7 +551,6 @@ h5 {
     }
 
     .partner-logo {
-        max-width: 100px;
         max-height: 34px;
     }
 
