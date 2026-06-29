@@ -28,21 +28,42 @@
     color: rgba(255, 255, 255, 0.92);
 }
 
-.site-footer__sponsor {
+.site-footer .site-footer__sponsor,
+.site-footer .site-footer__sponsor:visited {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.85rem 1.25rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.12);
-    color: #FFFFFF;
+    gap: 0.25rem;
+    padding: 0.58rem 0.92rem;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.92);
+    opacity: 0.92;
     font-weight: 600;
+    line-height: 1.1;
+    text-decoration: none;
+    transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+
 }
 
-.site-footer__sponsor:hover,
-.site-footer__sponsor:focus {
-    background: rgba(255, 255, 255, 0.2);
-    color: #FFFFFF;
+.site-footer .site-footer__sponsor svg,
+.site-footer .site-footer__sponsor i {
+    color: inherit;
+    fill: currentColor;
+}
+
+.site-footer .site-footer__sponsor:hover,
+.site-footer .site-footer__sponsor:focus {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.6);
+    color: #ffffff;
+    text-decoration: none;
+    opacity: 1;
+}
+
+.site-footer .site-footer__sponsor:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.18);
 }
 
 @media (max-width: 991.98px) {

@@ -3,7 +3,13 @@ body {
     color: #24364b;
 }
 
-.site-app {
+.site-app,
+.site-header,
+.site-navbar,
+.site-main,
+.site-searchbox,
+.municipality-search,
+.site-content {
     width: 100%;
 }
 
@@ -15,9 +21,8 @@ body {
 }
 
 .site-header {
-    width: 100%;
-    color: #FFFFFF;
-    background-color: #058ED0;
+    color: #fff;
+    background-color: #058ed0;
     background-image: linear-gradient(180deg, #047fc0 0%, #045b93 100%);
     box-shadow: 0 10px 24px rgba(0, 38, 76, 0.14);
 }
@@ -27,8 +32,14 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.6rem 0 0.5rem;
+    padding: 0.45rem 0 0.4rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.site-brand,
+.site-brand__link {
+    display: flex;
+    align-items: center;
 }
 
 .site-brand {
@@ -37,15 +48,19 @@ body {
 
 .site-brand__link {
     display: inline-flex;
-    align-items: center;
+}
+
+.site-logo,
+.partner-logo,
+.home-product-logo {
+    display: block;
+    width: auto;
+    height: auto;
 }
 
 .site-logo {
-    display: block;
-    width: auto;
-    max-width: min(100%, 285px);
-    max-height: 60px;
-    height: auto;
+    max-width: min(100%, 520px);
+    max-height: 98px;
 }
 
 .partner-logos {
@@ -53,18 +68,19 @@ body {
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
+    align-self: center;
     gap: 0.5rem 0.9rem;
 }
 
-.partner-logo {
-    display: block;
-    width: auto;
-    height: auto;
-    max-height: 40px;
+.partner-logo--emap {
+    max-height: 51px;
+}
+
+.partner-logo--fiocruz {
+    max-height: 25px;
 }
 
 .site-navbar {
-    width: 100%;
     min-height: 52px;
     padding: 0;
 }
@@ -75,9 +91,9 @@ body {
 
 .site-navbar-toggler {
     margin: 0.4rem 0 0.55rem;
+    padding: 0.35rem 0.6rem;
     border: 1px solid rgba(255, 255, 255, 0.35);
     border-radius: 0.75rem;
-    padding: 0.35rem 0.6rem;
 }
 
 .site-navbar-toggler:focus {
@@ -102,7 +118,11 @@ body {
     font-weight: 600;
     line-height: 1.2;
     text-decoration: none;
-    transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+    transition:
+        background-color 0.18s ease,
+        color 0.18s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
 }
 
 .site-nav-link i {
@@ -113,25 +133,20 @@ body {
 
 .site-nav-link:hover,
 .site-nav-link:focus {
-    color: #FFFFFF !important;
+    color: #fff !important;
     background: rgba(255, 255, 255, 0.12);
     text-decoration: none;
     transform: translateY(-1px);
 }
 
 .site-nav-link.active {
-    color: #FFFFFF !important;
+    color: #fff !important;
     background: rgba(255, 255, 255, 0.18);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
 }
 
 .site-searchbox {
-    width: 100%;
     min-height: 44px;
-}
-
-.municipality-search {
-    width: 100%;
 }
 
 .municipality-search .select2-container {
@@ -145,7 +160,7 @@ body {
     border: 1px solid rgba(0, 62, 126, 0.16);
     border-radius: 0.85rem;
     box-shadow: 0 10px 24px rgba(0, 35, 70, 0.12);
-    background: #ffffff;
+    background: #fff;
 }
 
 .municipality-search .select2-selection__rendered {
@@ -166,12 +181,10 @@ body {
 }
 
 .site-main {
-    width: 100%;
     padding: 1.2rem 0 2.4rem;
 }
 
 .site-content {
-    width: 100%;
     max-width: 1240px;
     margin: 0 auto;
 }
@@ -185,7 +198,7 @@ body {
 
 .site-page-title {
     margin: 0 0 1rem;
-    color: #003E7E !important;
+    color: #003e7e !important;
     font-size: clamp(1.65rem, 2.1vw, 2.35rem);
     font-weight: 700;
     line-height: 1.15;
@@ -201,29 +214,28 @@ body {
     background: transparent;
 }
 
-.navbar-nav>li>a {
-    color: #FFFFFF;
+.navbar-nav > li > a {
+    color: #fff;
     text-decoration: none;
-    text-decoration-color: #ffffff;
+    text-decoration-color: #fff;
     text-decoration-thickness: 1px;
     text-underline-offset: 5px;
     text-shadow: #424344;
     font-size: 18px;
 }
 
-.navbar-nav>li>a:hover,
-.navbar-nav>li>a:focus {
+.navbar-nav > li > a:hover,
+.navbar-nav > li > a:focus {
     color: #424344;
     text-decoration: underline;
     text-decoration-thickness: 12px;
     text-underline-offset: 5px;
-    font-size: 18px;
 }
 
 .navbar-custom {
-    color: #FFFFFF;
-    background-color: #058ED0;
-    background-image: linear-gradient(135deg, #058ED0 0%, #003E7E 100%);
+    color: #fff;
+    background-color: #058ed0;
+    background-image: linear-gradient(135deg, #058ed0 0%, #003e7e 100%);
 }
 
 .navbar ul li {
@@ -249,51 +261,41 @@ body {
     background-color: #519452 !important;
 }
 
+.card-yellow {
+    border-color: #d4dc53;
+    border-width: medium;
+    background-color: #d4dc53 !important;
+}
+
+.card-orange {
+    border-color: #e8824c;
+    border-width: medium;
+    background-color: #e8824c !important;
+}
+
+.card-red {
+    border-color: #fb4a4c;
+    border-width: medium;
+    background-color: #fb4a4c !important;
+}
+
 .card-green .btn-link,
 .card-yellow .btn-link,
 .card-orange .btn-link,
 .card-red .btn-link {
-    color: white !important;
-}
-
-.card-yellow {
-    border-color: #D4DC53;
-    border-width: medium;
-    background-color: #D4DC53 !important;
-}
-
-.card-orange {
-    border-color: #E8824C;
-    border-width: medium;
-    background-color: #E8824C !important;
-}
-
-.card-red {
-    border-color: #FB4A4C;
-    border-width: medium;
-    background-color: #FB4A4C !important;
+    color: #fff !important;
 }
 
 .bluebox {
-    color: #FFFFFF;
-    background-color: #058ED0;
+    color: #fff;
+    background-color: #058ed0;
 }
-
-.boxrow {}
-
-.col-md-3.bluebox {}
-
-.col-md-6.bluebox {}
 
 .col-md-2 {
     alignment: center;
 }
 
 .logos {
-    -webkit-filter: grayscale(100%);
-    -moz-filter: grayscale(100%);
-    -o-filter: grayscale(100%);
-    -ms-filter: grayscale(100%);
     filter: grayscale(100%);
 }
 
@@ -318,7 +320,7 @@ body {
     border-radius: 3px;
 }
 
-.bs-callout+.bs-callout {
+.bs-callout + .bs-callout {
     margin-top: -5px;
 }
 
@@ -375,17 +377,12 @@ body {
     clear: both;
     font-weight: normal;
     line-height: 20px;
-    color: #333333;
+    color: #333;
     white-space: nowrap;
     background-color: #fff;
-    border: 1px solid #ccc;
     border: 1px solid rgba(0, 0, 0, 0.2);
-    -webkit-border-radius: 8px;
-    -moz-border-radius: 8px;
     border-radius: 8px;
-    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
-    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
-    box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .tt-selectable {
@@ -394,12 +391,8 @@ body {
 
 .tt-cursor {
     background-color: #ccc;
-    -webkit-border-radius: 8px;
-    -moz-border-radius: 8px;
     border-radius: 8px;
-    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
-    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
-    box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .page-header {
@@ -422,14 +415,14 @@ body {
     margin-bottom: 10px;
 }
 
-.vertical-align>[class^="col-"],
-.vertical-align>[class*=" col-"] {
+.vertical-align > [class^="col-"],
+.vertical-align > [class*=" col-"] {
     display: flex;
     align-items: center;
 }
 
-.bluebox>h3 {
-    color: white !important;
+.bluebox > h3 {
+    color: #fff !important;
 }
 
 .content-inline * {
@@ -442,7 +435,11 @@ body {
 
 .btn {
     border-radius: 0.85rem;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        background-color 0.18s ease,
+        border-color 0.18s ease;
 }
 
 .btn:hover,
@@ -465,21 +462,13 @@ body {
     border-color: #075e96;
 }
 
-h3 {
-    color: #003E7E !important;
-}
-
-h4 {
-    color: #003E7E !important;
-}
-
+h3,
+h4,
 h5 {
-    color: #003E7E !important;
+    color: #003e7e !important;
 }
 
 .home-product-logo {
-    width: auto;
-    height: auto;
     max-height: 64px;
 }
 
@@ -501,7 +490,7 @@ h5 {
 }
 
 .city-alert-search__title {
-    color: #003E7E !important;
+    color: #003e7e !important;
     font-size: 1.3rem;
     font-weight: 700;
 }
@@ -541,8 +530,8 @@ h5 {
     }
 
     .site-logo {
-        max-width: min(100%, 245px);
-        max-height: 50px;
+        max-width: min(100%, 260px);
+        max-height: 46px;
     }
 
     .partner-logos {
@@ -550,8 +539,12 @@ h5 {
         justify-content: flex-start;
     }
 
-    .partner-logo {
-        max-height: 34px;
+    .partner-logo--emap {
+        max-height: 38px;
+    }
+
+    .partner-logo--fiocruz {
+        max-height: 26px;
     }
 
     .site-navbar .navbar-collapse {
