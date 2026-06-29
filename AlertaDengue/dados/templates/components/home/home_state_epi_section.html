@@ -13,12 +13,15 @@
         {% trans "Encontre os níveis de alerta da sua cidade" %}
       </h4>
       <p class="city-alert-search__subtitle mb-0">
-        {% trans "Busque um município para abrir diretamente o painel de alerta com situação epidemiológica e indicadores mais recentes." %}
+        {% trans "Selecione um município para visualizar o relatório epidemiológico completo, incluindo níveis de alerta, séries históricas, mapas e indicadores atualizados." %}
       </p>
     </div>
 
     <div class="city-alert-search__form">
       {% searchbox_component %}
+      <p class="small text-muted mb-0 mt-2">
+        {% trans "Ao selecionar um município, você será direcionado para o relatório epidemiológico da cidade." %}
+      </p>
     </div>
   </div>
 </section>

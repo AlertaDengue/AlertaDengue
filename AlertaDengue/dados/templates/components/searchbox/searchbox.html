@@ -5,7 +5,7 @@
     class="form-control js-select2 municipality-search__control site-searchbox"
     id="searchbox"
     aria-label="{% translate 'Buscar município' %}"
-    data-placeholder="{% blocktranslate %}Encontre um município{% endblocktranslate %}">
+    data-placeholder="{% blocktranslate %}Selecione um município...{% endblocktranslate %}">
     <option></option>
     {% for city in options_cities %}
       <option value="{{ city.geocode }}">{{ city.name }} - {{ city.state }}</option>
