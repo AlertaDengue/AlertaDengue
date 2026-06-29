@@ -1,21 +1,37 @@
 {% load i18n %}
 {% load lookup %}
 {% load static %}
-
 {% load hashthis %}
-
+{% load searchbox_component %}
 
 {% block home_state_epi_section %}
+<section class="card mb-4 p-0 home-section-card city-alert-search"
+         aria-labelledby="city-alert-search-title">
+  <div class="card-body city-alert-search__body">
+    <div class="city-alert-search__copy">
+      <h4 id="city-alert-search-title" class="city-alert-search__title mb-2">
+        {% trans "Encontre os níveis de alerta da sua cidade" %}
+      </h4>
+      <p class="city-alert-search__subtitle mb-0">
+        {% trans "Busque um município para abrir diretamente o painel de alerta com situação epidemiológica e indicadores mais recentes." %}
+      </p>
+    </div>
+
+    <div class="city-alert-search__form">
+      {% searchbox_component %}
+    </div>
+  </div>
+</section>
 
 <div class="card mb-0 p-0 home-section-card"
      id="state-epi-card">
   <div class="card-header home-section-header d-flex flex-column flex-md-row
               align-items-md-center justify-content-between">
     <div>
-      <h4 style="color: #ffffff !important;" class="mb-1">
+      <h4 class="mb-1 text-white">
         {% trans "Situação epidemiológica por estado" %}
-      </h3>
-      <p style="color: #ffffff !important;" class="small text-muted mb-0">
+      </h4>
+      <p class="small text-white-50 mb-0">
         {% trans "Selecione um estado para visualizar mapas de incidência, número de casos ou situação epidemiológica dos municípios." %}
       </p>
     </div>
@@ -45,16 +61,14 @@
     </div>
   </div>
 </div>
-
 {% endblock %}
+
 <script type="text/javascript">
   (function ($) {
     $(function () {
       var $select = $('#state-select');
       var $panel = $('#state-chart-panel');
       var $card = $('#state-epi-card');
-
-      // change this to 'RJ' if you prefer that as default
       var defaultState = 'RJ';
 
       function scrollToCard() {
@@ -94,7 +108,6 @@
           });
       }
 
-      // When the user changes the state
       $select.on('change', function () {
         var state = $(this).val();
 
@@ -106,7 +119,6 @@
         loadState(state);
       });
 
-      // Load default state on first render, if it exists in the options
       if (
         defaultState &&
         $select.find('option[value="' + defaultState + '"]').length

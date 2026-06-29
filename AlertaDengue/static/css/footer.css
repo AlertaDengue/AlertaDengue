@@ -7,8 +7,8 @@
 }
 
 .site-footer-inner {
-    padding-top: 1.6rem;
-    padding-bottom: 1.8rem;
+    padding-top: 1.25rem;
+    padding-bottom: 1.4rem;
 }
 
 .site-footer-grid {
@@ -47,8 +47,8 @@
 
 @media (max-width: 991.98px) {
     .site-footer-inner {
-        padding-top: 1.4rem;
-        padding-bottom: 1.6rem;
+        padding-top: 1.15rem;
+        padding-bottom: 1.3rem;
     }
 
     .footer-logo {

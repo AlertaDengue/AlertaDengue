@@ -1,6 +1,5 @@
 {% load static %}
 {% load i18n %}
-{% load searchbox_component %}
 
 {% block menu-bar %}
 <nav class="site-navbar navbar navbar-expand-md navbar-dark" aria-label="{% trans 'Navegação principal' %}">
@@ -90,9 +89,6 @@
       </li>
     </ul>
 
-    <div class="site-search">
-      {% searchbox_component %}
-    </div>
   </div>
 </nav>
 {% endblock %}
