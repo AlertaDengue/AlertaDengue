@@ -80,13 +80,32 @@
           </div>
 
           {# 1) Hero #}
-          <div class="carousel-item">
+          <div class="carousel-item carousel-item--hero">
             <div class="banner-slide banner-slide--hero">
               <img
                 class="d-block banner-img img-fluid"
                 src="{% static 'img/home/banners/banner_home_'|add:lang_suffix|add:'.svg' %}"
                 alt=""
               >
+              <section class="home-banner-mobile-content" aria-label="{% trans 'Banner introdutório do Infodengue' %}">
+                <h2 class="home-banner-mobile-content__title">
+                  {% trans "Integrate analysis of epidemiological and climate data" %}
+                </h2>
+
+                <div class="home-banner-mobile-update">
+                  <h3 class="home-banner-mobile-update__title">{% trans "Weekly update" %}</h3>
+                  <ul class="home-banner-mobile-update__list">
+                    <li>{% trans "Estimated incidence" %}</li>
+                    <li>{% trans "Attention level of municipalities" %}</li>
+                  </ul>
+                </div>
+
+                <img
+                  class="home-banner-mobile-content__logo"
+                  src="{% static 'img/info-dengue-logo.png' %}"
+                  alt="InfoDengue"
+                >
+              </section>
               <div class="hero-banner-overlay">
                 <a
                   href="/informacoes/"

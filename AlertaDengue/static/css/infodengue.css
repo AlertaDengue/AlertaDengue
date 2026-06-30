@@ -687,6 +687,14 @@ h5 {
         padding-right: 0.75rem;
     }
 
+    #carouselTop .el-nino-banner-row {
+        row-gap: 0.35rem;
+    }
+
+    #carouselTop .el-nino-chart-column {
+        margin-bottom: 0.6rem !important;
+    }
+
     .state-charts-tabs {
         flex-wrap: wrap;
         gap: 0.35rem;

@@ -8,6 +8,78 @@
 
 <link href="{% static 'css/home_sections_layout.css' %}" rel="stylesheet" type="text/css">
 <link href="{% static 'css/home_menu_buttons.css' %}" rel="stylesheet" type="text/css">
+<style>
+#carouselTop .carousel-item--hero .home-banner-mobile-content {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  #carouselTop .carousel-item--hero .banner-slide--hero {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding: 1.5rem 1.25rem 2.75rem;
+    background: linear-gradient(180deg, #f4f9ff 0%, #e9f4fe 100%);
+  }
+
+  #carouselTop .carousel-item--hero .banner-img,
+  #carouselTop .carousel-item--hero .hero-banner-overlay {
+    display: none !important;
+  }
+
+  #carouselTop .carousel-item--hero .home-banner-mobile-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.1rem;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    text-align: center;
+  }
+
+  #carouselTop .carousel-item--hero .home-banner-mobile-content__title {
+    margin: 0;
+    color: #003e7e;
+    font-size: clamp(1.35rem, 4.7vw, 1.6rem);
+    font-weight: 700;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  #carouselTop .carousel-item--hero .home-banner-mobile-update {
+    width: 100%;
+    max-width: 22rem;
+    padding: 1rem 1rem 0.95rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.86);
+    box-shadow: 0 12px 26px rgba(0, 62, 126, 0.08);
+  }
+
+  #carouselTop .carousel-item--hero .home-banner-mobile-update__title {
+    margin: 0 0 0.6rem;
+    color: #0a78bc;
+    font-size: clamp(1rem, 3.8vw, 1.1rem);
+    font-weight: 700;
+  }
+
+  #carouselTop .carousel-item--hero .home-banner-mobile-update__list {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: #35506a;
+    font-size: clamp(0.95rem, 3.6vw, 1rem);
+    line-height: 1.5;
+    text-align: left;
+  }
+
+  #carouselTop .carousel-item--hero .home-banner-mobile-content__logo {
+    width: min(58vw, 220px);
+    max-width: 100%;
+    height: auto;
+  }
+}
+</style>
 {% endblock %}
 
 {% block content %}
