@@ -15,7 +15,7 @@
 <div class="row justify-content-md-center">
   <div class="col-sm-12 mb-1 mb-xl-0">
     <section>
-      <ul class="nav nav-tabs"
+      <ul class="nav nav-tabs state-charts-tabs"
           id="diseaseTab"
           role="tablist">
         <li class="nav-item waves-effect waves-light">
@@ -66,7 +66,7 @@
         </li>
       </ul>
 
-      <div class="tab-content mt-0 mb-0 p-3"
+      <div class="tab-content state-charts-content mt-0 mb-0 p-3"
         id="diseaseTabContent"
       >
         <h6><small class="px-1" style="color:#888888;">
@@ -78,17 +78,23 @@
             id="dengue-{{ state }}"
             role="tabpanel"
             aria-labelledby="dengue-{{ state }}-tab">
-          <div class="row">
-            <div class="col-md-4 w-100 position-relative">
-              {{ chart_scatter|lookup:'dengue'|lookup:state | safe }}
+          <div class="row state-charts-row">
+            <div class="col-md-4 w-100 position-relative state-chart-column">
+              <div class="state-chart-frame">
+                {{ chart_scatter|lookup:'dengue'|lookup:state | safe }}
+              </div>
               {% include "components/tooltip.html" with class="tooltip-charts" placement="bottom" text=dengue_scatter %}
             </div>
-            <div class="col-md-4 w-100 position-relative">
-              {{ chart_indicator|lookup:'dengue'|lookup:state | safe }}
+            <div class="col-md-4 w-100 position-relative state-chart-column">
+              <div class="state-chart-frame">
+                {{ chart_indicator|lookup:'dengue'|lookup:state | safe }}
+              </div>
               {% include "components/tooltip.html" with class="tooltip-charts" placement="bottom" text=indicator_text %}
             </div>
-            <div class="col-md-4 w-100 position-relative">
-              {{ chart_stack|lookup:'dengue'|lookup:state | safe }}
+            <div class="col-md-4 w-100 position-relative state-chart-column">
+              <div class="state-chart-frame">
+                {{ chart_stack|lookup:'dengue'|lookup:state | safe }}
+              </div>
               {% include "components/tooltip.html" with class="tooltip-charts tooltip-stack" placement="bottom" text=stack_text %}
             </div>
           </div>
@@ -103,17 +109,23 @@
             id="chikungunya-{{ state }}"
             role="tabpanel"
             aria-labelledby="chikungunya-{{ state }}-tab">
-          <div class="row">
-            <div class="col-md-4 w-100 position-relative">
-              {{ chart_scatter|lookup:'chikungunya'|lookup:state | safe }}
+          <div class="row state-charts-row">
+            <div class="col-md-4 w-100 position-relative state-chart-column">
+              <div class="state-chart-frame">
+                {{ chart_scatter|lookup:'chikungunya'|lookup:state | safe }}
+              </div>
               {% include "components/tooltip.html" with class="tooltip-charts" placement="bottom" text=chik_scatter %}
             </div>
-            <div class="col-md-4 w-100 position-relative">
-              {{ chart_indicator|lookup:'chikungunya'|lookup:state | safe }}
+            <div class="col-md-4 w-100 position-relative state-chart-column">
+              <div class="state-chart-frame">
+                {{ chart_indicator|lookup:'chikungunya'|lookup:state | safe }}
+              </div>
               {% include "components/tooltip.html" with class="tooltip-charts" placement="bottom" text=indicator_text %}
             </div>
-            <div class="col-md-4 w-100 position-relative">
-              {{ chart_stack|lookup:'chikungunya'|lookup:state | safe }}
+            <div class="col-md-4 w-100 position-relative state-chart-column">
+              <div class="state-chart-frame">
+                {{ chart_stack|lookup:'chikungunya'|lookup:state | safe }}
+              </div>
               {% include "components/tooltip.html" with class="tooltip-charts tooltip-stack" placement="bottom" text=stack_text %}
             </div>
           </div>
@@ -128,17 +140,23 @@
             id="zika-{{ state }}"
             role="tabpanel"
             aria-labelledby="zika-{{ state }}-tab">
-          <div class="row">
-            <div class="col-md-4 w-100 position-relative">
-              {{ chart_scatter|lookup:'zika'|lookup:state | safe }}
+          <div class="row state-charts-row">
+            <div class="col-md-4 w-100 position-relative state-chart-column">
+              <div class="state-chart-frame">
+                {{ chart_scatter|lookup:'zika'|lookup:state | safe }}
+              </div>
               {% include "components/tooltip.html" with class="tooltip-charts" placement="bottom" text=zika_scatter %}
             </div>
-            <div class="col-md-4 w-100 position-relative">
-              {{ chart_indicator|lookup:'zika'|lookup:state | safe }}
+            <div class="col-md-4 w-100 position-relative state-chart-column">
+              <div class="state-chart-frame">
+                {{ chart_indicator|lookup:'zika'|lookup:state | safe }}
+              </div>
               {% include "components/tooltip.html" with class="tooltip-charts" placement="bottom" text=indicator_text %}
             </div>
-            <div class="col-md-4 w-100 position-relative">
-              {{ chart_stack|lookup:'zika'|lookup:state | safe }}
+            <div class="col-md-4 w-100 position-relative state-chart-column">
+              <div class="state-chart-frame">
+                {{ chart_stack|lookup:'zika'|lookup:state | safe }}
+              </div>
               {% include "components/tooltip.html" with class="tooltip-charts tooltip-stack" placement="bottom" text=stack_text %}
             </div>
           </div>
@@ -153,15 +171,21 @@
             id="incidence_map-{{ state }}"
             role="tabpanel"
             aria-labelledby="incidence_map-{{ state }}-tab">
-          <div class="row">
-            <div class="col-md-4 w-100 position-relative">
-              {{ create_maps|lookup:'dengue'|lookup:state | safe }}
+          <div class="row state-charts-row">
+            <div class="col-md-4 w-100 position-relative state-chart-column">
+              <div class="state-chart-frame">
+                {{ create_maps|lookup:'dengue'|lookup:state | safe }}
+              </div>
             </div>
-            <div class="col-md-4 w-100 position-relative">
-              {{ create_maps|lookup:'chikungunya'|lookup:state | safe }}
+            <div class="col-md-4 w-100 position-relative state-chart-column">
+              <div class="state-chart-frame">
+                {{ create_maps|lookup:'chikungunya'|lookup:state | safe }}
+              </div>
             </div>
-            <div class="col-md-4 w-100 position-relative">
-              {{ create_maps|lookup:'zika'|lookup:state | safe }}
+            <div class="col-md-4 w-100 position-relative state-chart-column">
+              <div class="state-chart-frame">
+                {{ create_maps|lookup:'zika'|lookup:state | safe }}
+              </div>
             </div>
           </div>
         </div>

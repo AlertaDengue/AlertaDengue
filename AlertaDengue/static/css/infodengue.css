@@ -96,6 +96,11 @@ body {
     border-radius: 0.75rem;
 }
 
+.site-header-toggle {
+    display: none;
+    margin: 0;
+}
+
 .site-navbar-toggler:focus {
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.18);
@@ -187,6 +192,11 @@ body {
 .site-content {
     max-width: 1240px;
     margin: 0 auto;
+}
+
+.site-content img {
+    max-width: 100%;
+    height: auto;
 }
 
 .site-content > .container,
@@ -506,6 +516,23 @@ h5 {
     width: min(100%, 400px);
 }
 
+.state-charts-content,
+.state-chart-column,
+.state-chart-frame,
+.products-hero,
+.products-section-card,
+.products-nav-card {
+    min-width: 0;
+}
+
+.state-chart-frame {
+    max-width: 100%;
+}
+
+.state-chart-frame .plotly-graph-div {
+    max-width: 100% !important;
+}
+
 @media (min-width: 768px) {
     .site-navbar .navbar-collapse {
         display: flex !important;
@@ -521,39 +548,61 @@ h5 {
 
 @media (max-width: 767.98px) {
     .site-header-inner {
-        align-items: flex-start;
-        padding-top: 0.55rem;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem 0.75rem;
+        padding: 0.45rem 0 0.3rem;
     }
 
     .site-brand {
-        width: 100%;
+        flex: 1 1 auto;
+        width: auto;
     }
 
     .site-logo {
-        max-width: min(100%, 260px);
-        max-height: 46px;
+        max-width: min(100%, 240px);
+        max-height: 44px;
+    }
+
+    .site-header-toggle {
+        display: inline-flex;
+        align-self: center;
+    }
+
+    .site-navbar-toggler--nav {
+        display: none;
     }
 
     .partner-logos {
+        order: 3;
         width: 100%;
         justify-content: flex-start;
+        gap: 0.35rem 0.7rem;
+        padding-top: 0.1rem;
+        opacity: 0.88;
     }
 
     .partner-logo--emap {
-        max-height: 38px;
+        max-height: 30px;
     }
 
     .partner-logo--fiocruz {
-        max-height: 26px;
+        max-height: 24px;
+    }
+
+    .site-navbar {
+        min-height: 0;
     }
 
     .site-navbar .navbar-collapse {
+        padding-top: 0.1rem;
         padding-bottom: 0.45rem;
     }
 
     .site-nav-list {
         gap: 0.2rem;
-        padding: 0.1rem 0 0.35rem;
+        width: 100%;
+        padding: 0.15rem 0 0.35rem;
     }
 
     .site-nav-link {
@@ -564,6 +613,7 @@ h5 {
 
     .site-page-title {
         margin-bottom: 0.8rem;
+        overflow-wrap: anywhere;
     }
 
     .city-alert-search__body {
@@ -575,5 +625,71 @@ h5 {
     .city-alert-search__form {
         flex-basis: auto;
         width: 100%;
+    }
+
+    .city-alert-search__title,
+    .city-alert-search__subtitle,
+    .products-hero__title,
+    .products-hero__lead,
+    .products-section-card .card-body a {
+        overflow-wrap: anywhere;
+    }
+
+    .home-banners-panel {
+        padding: 0.35rem;
+    }
+
+    #carouselTop .el-nino-banner-container,
+    #carouselTop .el-nino-banner-row,
+    .site-content .products-hero > .row,
+    .site-content .products-section-card > .card-body > .row,
+    .site-content .home-section-card > .card-body > .row,
+    .state-charts-row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    #carouselTop .el-nino-banner-row > [class*="col-"],
+    .site-content .products-hero > .row > [class*="col-"],
+    .site-content .products-section-card > .card-body > .row > [class*="col-"],
+    .site-content .home-section-card > .card-body > .row > [class*="col-"],
+    .state-charts-row > [class*="col-"] {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    .state-charts-tabs {
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        border-bottom: 0;
+    }
+
+    .state-charts-tabs .nav-item {
+        margin-bottom: 0;
+    }
+
+    .state-charts-tabs .nav-link {
+        height: 100%;
+        white-space: normal;
+        text-align: center;
+    }
+
+    .state-charts-content {
+        padding: 0.85rem !important;
+    }
+
+    .state-chart-frame {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .state-chart-frame > * {
+        min-width: 0;
+    }
+
+    .background-panel {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 }

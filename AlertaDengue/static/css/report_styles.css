@@ -27,3 +27,15 @@
     width: min(100%, 400px);
     max-width: 100%;
 }
+
+@media (max-width: 767.98px) {
+    .site-report-form .row {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .site-report-form .col-md-12 {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}

@@ -72,7 +72,18 @@
         padding-bottom: 1.3rem;
     }
 
+    .site-footer-grid {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
     .footer-logo {
         max-width: 120px;
+    }
+
+    .site-footer .site-footer__sponsor,
+    .site-footer .site-footer__sponsor:visited {
+        max-width: 100%;
+        white-space: normal;
     }
 }
