@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-01 07:22-0300\n"
+"POT-Creation-Date: 2026-07-01 08:35-0300\n"
 "PO-Revision-Date: 2016-05-31 15:41-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -912,8 +912,6 @@ msgstr ""
 "reports</em> section."
 
 #: dados/templates/about.html:590
-#, fuzzy
-#| msgid "Produtos"
 msgid "seção Produtos"
 msgstr "Products"
 
@@ -1708,10 +1706,8 @@ msgid "Informações detalhadas sobre o Estado"
 msgstr "Detailed information about the state"
 
 #: dados/templates/components/home/home_state_epi_section.html:13
-#, fuzzy
-#| msgid "contacte a secretaria de saúde de sua cidade"
 msgid "Encontre os níveis de alerta da sua cidade"
-msgstr "contact your local health department"
+msgstr "Find your city's alert levels"
 
 #: dados/templates/components/home/home_state_epi_section.html:16
 msgid ""
@@ -1719,12 +1715,16 @@ msgid ""
 "incluindo níveis de alerta, séries históricas, mapas e indicadores "
 "atualizados."
 msgstr ""
+"Select a municipality to view the complete epidemiological report, "
+"including alert levels, historical series, maps, and updated indicators."
 
 #: dados/templates/components/home/home_state_epi_section.html:23
 msgid ""
 "Ao selecionar um município, você será direcionado para o relatório "
 "epidemiológico da cidade."
 msgstr ""
+"When you select a municipality, you will be redirected to the city's "
+"epidemiological report."
 
 #: dados/templates/components/home/home_state_epi_section.html:35
 msgid "Situação epidemiológica por estado"
@@ -1780,14 +1780,10 @@ msgid "Municípios"
 msgstr "Municipalities"
 
 #: dados/templates/components/searchbox/searchbox.html:7
-#, fuzzy
-#| msgid "Encontre um município"
 msgid "Buscar município"
 msgstr "Find a municipality"
 
 #: dados/templates/components/searchbox/searchbox.html:8
-#, fuzzy
-#| msgid "Selecione um município"
 msgid "Selecione um município..."
 msgstr "Select a city"
 
@@ -3267,7 +3263,6 @@ msgid "% umidade máxima do ar"
 msgstr "% Maximum air humidity"
 
 #: templates/components/footer.html:8
-#| msgid "Infodengue"
 msgid "Infodengue Logo"
 msgstr "Infodengue"
 
@@ -3288,12 +3283,10 @@ msgid "Apoie o projeto Infodengue no GitHub Sponsors"
 msgstr "Support the Infodengue project on GitHub Sponsors"
 
 #: templates/components/header.html:9
-#| msgid "Como participar do Infodengue"
 msgid "Página inicial do Infodengue"
 msgstr "Infodengue home page"
 
 #: templates/components/header.html:24 templates/components/navbar.html:13
-#| msgid "Navegação"
 msgid "Alternar navegação"
 msgstr "Toggle navigation"
 
@@ -3302,7 +3295,6 @@ msgid "Instituições parceiras"
 msgstr "Partner institutions"
 
 #: templates/components/navbar.html:5
-#| msgid "Navegação"
 msgid "Navegação principal"
 msgstr "Main navigation"
 
@@ -3335,7 +3327,9 @@ msgstr ""
 msgid ""
 "Veja os relatórios, publicações, teses e ferramentas produzidas pela equipe "
 "do Infodengue."
-msgstr "View the reports, publications, theses, and tools produced by the Infodengue team."
+msgstr ""
+"View the reports, publications, theses, and tools produced by the Infodengue "
+"team."
 
 #: templates/components/navbar.html:73
 msgid ""

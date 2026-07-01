@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-01 07:22-0300\n"
+"POT-Creation-Date: 2026-07-01 08:36-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -922,8 +922,6 @@ msgid "Os relatórios gerados por essa iniciativa estão disponíveis na"
 msgstr ""
 
 #: dados/templates/about.html:590
-#, fuzzy
-#| msgid "Produtos"
 msgid "seção Produtos"
 msgstr "Productos"
 
@@ -1478,7 +1476,6 @@ msgid "NOVO RELATÓRIO TÉCNICO"
 msgstr "NUEVO INFORME TÉCNICO"
 
 #: dados/templates/components/home/home_banners_section.html:56
-#| msgid "Análise da situação epidemiológica da dengue em ano de El Niño"
 msgid ""
 "Análise da situação epidemiológica da dengue em ano de <br> <span class=\"el-"
 "nino-title-highlight\">El Niño</span>"
@@ -1736,10 +1733,8 @@ msgid "Informações detalhadas sobre o Estado"
 msgstr "Información detallada sobre el estado"
 
 #: dados/templates/components/home/home_state_epi_section.html:13
-#, fuzzy
-#| msgid "contacte a secretaria de saúde de sua cidade"
 msgid "Encontre os níveis de alerta da sua cidade"
-msgstr "póngase en contacto con la secretaría de salud de su ciudad"
+msgstr "Encuentre los niveles de alerta de su ciudad"
 
 #: dados/templates/components/home/home_state_epi_section.html:16
 msgid ""
@@ -1747,12 +1742,17 @@ msgid ""
 "incluindo níveis de alerta, séries históricas, mapas e indicadores "
 "atualizados."
 msgstr ""
+"Seleccione un municipio para visualizar el informe epidemiológico completo, "
+"incluidos los niveles de alerta, las series históricas, los mapas y los "
+"indicadores actualizados."
 
 #: dados/templates/components/home/home_state_epi_section.html:23
 msgid ""
 "Ao selecionar um município, você será direcionado para o relatório "
 "epidemiológico da cidade."
 msgstr ""
+"Al seleccionar un municipio, será redirigido al informe epidemiológico de "
+"la ciudad."
 
 #: dados/templates/components/home/home_state_epi_section.html:35
 msgid "Situação epidemiológica por estado"
@@ -1810,14 +1810,10 @@ msgid "Municípios"
 msgstr "Municipios"
 
 #: dados/templates/components/searchbox/searchbox.html:7
-#, fuzzy
-#| msgid "Encontre um município"
 msgid "Buscar município"
 msgstr "Encuentre un municipio"
 
 #: dados/templates/components/searchbox/searchbox.html:8
-#, fuzzy
-#| msgid "Selecione um município"
 msgid "Selecione um município..."
 msgstr "Seleccione un municipio"
 
@@ -3306,7 +3302,6 @@ msgid "% umidade máxima do ar"
 msgstr "% humedad máxima del aire"
 
 #: templates/components/footer.html:8
-#| msgid "Infodengue"
 msgid "Infodengue Logo"
 msgstr "Infodengue"
 
@@ -3327,12 +3322,10 @@ msgid "Apoie o projeto Infodengue no GitHub Sponsors"
 msgstr "Apoya el proyecto Infodengue en GitHub Sponsors"
 
 #: templates/components/header.html:9
-#| msgid "Como participar do Infodengue"
 msgid "Página inicial do Infodengue"
 msgstr "Página principal de Infodengue"
 
 #: templates/components/header.html:24 templates/components/navbar.html:13
-#| msgid "Navegação"
 msgid "Alternar navegação"
 msgstr "Alternar navegación"
 
@@ -3341,7 +3334,6 @@ msgid "Instituições parceiras"
 msgstr "Instituciones asociadas"
 
 #: templates/components/navbar.html:5
-#| msgid "Navegação"
 msgid "Navegação principal"
 msgstr "Navegación principal"
 
