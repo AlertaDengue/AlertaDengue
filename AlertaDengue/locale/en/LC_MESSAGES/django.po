@@ -3267,7 +3267,6 @@ msgid "% umidade máxima do ar"
 msgstr "% Maximum air humidity"
 
 #: templates/components/footer.html:8
-#, fuzzy
 #| msgid "Infodengue"
 msgid "Infodengue Logo"
 msgstr "Infodengue"

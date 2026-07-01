@@ -1478,7 +1478,6 @@ msgid "NOVO RELATÓRIO TÉCNICO"
 msgstr "NUEVO INFORME TÉCNICO"
 
 #: dados/templates/components/home/home_banners_section.html:56
-#, fuzzy
 #| msgid "Análise da situação epidemiológica da dengue em ano de El Niño"
 msgid ""
 "Análise da situação epidemiológica da dengue em ano de <br> <span class=\"el-"
@@ -3307,7 +3306,6 @@ msgid "% umidade máxima do ar"
 msgstr "% humedad máxima del aire"
 
 #: templates/components/footer.html:8
-#, fuzzy
 #| msgid "Infodengue"
 msgid "Infodengue Logo"
 msgstr "Infodengue"
