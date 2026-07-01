@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-24 08:35-0300\n"
+"POT-Creation-Date: 2026-07-01 07:22-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -304,7 +304,7 @@ msgid ""
 "para manutenção programada."
 msgstr ""
 
-#: dados/templates/about.html:13 templates/components/navbar.html:86
+#: dados/templates/about.html:13 templates/components/navbar.html:87
 msgid "Sobre nós"
 msgstr "Sobre nosotros"
 
@@ -1498,28 +1498,48 @@ msgstr ""
 msgid "Ler o relatório"
 msgstr "Leer el informe"
 
-#: dados/templates/components/home/home_banners_section.html:97
+#: dados/templates/components/home/home_banners_section.html:90
+msgid "Banner introdutório do Infodengue"
+msgstr "Banner introductorio de Infodengue"
+
+#: dados/templates/components/home/home_banners_section.html:92
+msgid "Integrate analysis of epidemiological and climate data"
+msgstr "Integra el análisis de datos epidemiológicos y climáticos"
+
+#: dados/templates/components/home/home_banners_section.html:96
+msgid "Weekly update"
+msgstr "Actualización semanal"
+
+#: dados/templates/components/home/home_banners_section.html:98
+msgid "Estimated incidence"
+msgstr "Incidencia estimada"
+
+#: dados/templates/components/home/home_banners_section.html:99
+msgid "Attention level of municipalities"
+msgstr "Nivel de atención de los municipios"
+
+#: dados/templates/components/home/home_banners_section.html:116
 msgid "saiba mais"
 msgstr "Lea más aquí"
 
-#: dados/templates/components/home/home_functionalities_section.html:9
+#: dados/templates/components/home/home_functionalities_section.html:8
 msgid "Funcionalidades"
 msgstr "Funcionalidades"
 
-#: dados/templates/components/home/home_functionalities_section.html:23
+#: dados/templates/components/home/home_functionalities_section.html:19
 msgid ""
 "Acesso aos dados utilizados para gerar os resultados apresentados no site."
 msgstr ""
 "Acceso a los datos utilizados para generar los resultados presentados en el "
 "sitio."
 
-#: dados/templates/components/home/home_functionalities_section.html:28
+#: dados/templates/components/home/home_functionalities_section.html:24
 #: dados/templates/services_api.html:83 dados/templates/services_api.html:90
 #: dados/templates/services_api_doc.html:54
 msgid "API"
 msgstr "API"
 
-#: dados/templates/components/home/home_functionalities_section.html:40
+#: dados/templates/components/home/home_functionalities_section.html:34
 msgid ""
 "Informações sobre o número de casos, nível de alerta e condições climáticas "
 "para a transmissão de arboviroses a nível municipal."
@@ -1527,11 +1547,11 @@ msgstr ""
 "Información sobre el número de casos, el nivel de alerta y las condiciones "
 "climáticas para la transmisión de arbovirosis a nivel municipal."
 
-#: dados/templates/components/home/home_functionalities_section.html:45
+#: dados/templates/components/home/home_functionalities_section.html:39
 msgid "Relatórios municipais"
 msgstr "Informes municipales"
 
-#: dados/templates/components/home/home_functionalities_section.html:57
+#: dados/templates/components/home/home_functionalities_section.html:49
 msgid ""
 "Informações sobre o número de casos e nível de alerta para as regionais de "
 "saúde de cada estado."
@@ -1539,28 +1559,28 @@ msgstr ""
 "Información sobre el número de casos y el nivel de alerta para las regiones "
 "sanitarias de cada estado."
 
-#: dados/templates/components/home/home_functionalities_section.html:62
+#: dados/templates/components/home/home_functionalities_section.html:54
 msgid "Relatórios estaduais"
 msgstr "Informes estatales"
 
-#: dados/templates/components/home/home_functionalities_section.html:74
+#: dados/templates/components/home/home_functionalities_section.html:64
 msgid "Análises adicionais sobre a situação das arboviroses no país."
 msgstr "Análisis adicionales sobre la situación de las arbovirosis en el país."
 
-#: dados/templates/components/home/home_functionalities_section.html:79
+#: dados/templates/components/home/home_functionalities_section.html:69
 #: dados/templates/products.html:38 dados/templates/products.html:101
 msgid "Relatórios técnicos"
 msgstr "Informes técnicos"
 
-#: dados/templates/components/home/home_functionalities_section.html:91
+#: dados/templates/components/home/home_functionalities_section.html:79
 msgid "Exemplo de acesso aos dados da API usando R e Python."
 msgstr "Ejemplo de acceso a los datos de la API utilizando R y Python."
 
-#: dados/templates/components/home/home_functionalities_section.html:96
+#: dados/templates/components/home/home_functionalities_section.html:84
 msgid "Tutoriais"
 msgstr "Tutoriales"
 
-#: dados/templates/components/home/home_functionalities_section.html:110
+#: dados/templates/components/home/home_functionalities_section.html:96
 msgid ""
 "Consulte termos e conceitos importantes usados nos alertas, relatórios e "
 "indicadores do Infodengue."
@@ -1568,23 +1588,23 @@ msgstr ""
 "Consulte términos y conceptos importantes utilizados en las alertas, "
 "informes e indicadores de Infodengue."
 
-#: dados/templates/components/home/home_functionalities_section.html:115
+#: dados/templates/components/home/home_functionalities_section.html:101
 msgid "Glossário Infodengue"
 msgstr "Glosario Infodengue"
 
-#: dados/templates/components/home/home_functionalities_section.html:130
+#: dados/templates/components/home/home_functionalities_section.html:113
 msgid "Instale o aplicativo do Infodengue neste dispositivo."
 msgstr "Instale la aplicación Infodengue en este dispositivo."
 
-#: dados/templates/components/home/home_functionalities_section.html:135
+#: dados/templates/components/home/home_functionalities_section.html:118
 msgid "Instalar Infodengue"
 msgstr "Instalar Infodengue"
 
-#: dados/templates/components/home/home_other_products_section.html:9
+#: dados/templates/components/home/home_other_products_section.html:8
 msgid "Outros Produtos"
 msgstr "Otros productos"
 
-#: dados/templates/components/home/home_other_products_section.html:23
+#: dados/templates/components/home/home_other_products_section.html:21
 msgid ""
 "Análise de parâmetros epidemiológicos como a semana de pico, número de "
 "reprodução e total de casos por epidemia a nível municipal."
@@ -1592,16 +1612,16 @@ msgstr ""
 "Análisis de parámetros epidemiológicos como la semana pico, el número de "
 "reproducción y el total de casos por epidemia a nivel municipal."
 
-#: dados/templates/components/home/home_other_products_section.html:25
-#: dados/templates/components/home/home_other_products_section.html:29
+#: dados/templates/components/home/home_other_products_section.html:23
+#: dados/templates/components/home/home_other_products_section.html:26
 msgid "Epi-Scanner"
 msgstr "Epi-Scanner"
 
-#: dados/templates/components/home/home_other_products_section.html:32
+#: dados/templates/components/home/home_other_products_section.html:29
 msgid "Visualize os parâmetros epidemiológicos de cada epidemia."
 msgstr "Visualice los parámetros epidemiológicos de cada epidemia."
 
-#: dados/templates/components/home/home_other_products_section.html:44
+#: dados/templates/components/home/home_other_products_section.html:41
 msgid ""
 "Biblioteca em Python que permite o acesso a conjuntos de dados "
 "disponibilizados pelo DATASUS."
@@ -1609,15 +1629,15 @@ msgstr ""
 "Biblioteca en Python que permite el acceso a conjuntos de datos "
 "disponibilizados por DATASUS."
 
-#: dados/templates/components/home/home_other_products_section.html:49
+#: dados/templates/components/home/home_other_products_section.html:46
 msgid "PySUS"
 msgstr "PySUS"
 
-#: dados/templates/components/home/home_other_products_section.html:52
+#: dados/templates/components/home/home_other_products_section.html:49
 msgid "Acesse bancos de dados públicos do DATASUS."
 msgstr "Acceda a bases de datos públicas de DATASUS."
 
-#: dados/templates/components/home/home_other_products_section.html:64
+#: dados/templates/components/home/home_other_products_section.html:61
 msgid ""
 "Canal do Infodengue no YouTube, com vídeos sobre modelos, dados e vigilância "
 "em saúde."
@@ -1625,12 +1645,12 @@ msgstr ""
 "Canal de Infodengue en YouTube, con vídeos sobre modelos, datos y vigilancia "
 "en salud."
 
-#: dados/templates/components/home/home_other_products_section.html:69
+#: dados/templates/components/home/home_other_products_section.html:66
 #: dados/templates/products.html:89 dados/templates/products.html:146
 msgid "Canal do YouTube"
 msgstr "Canal de YouTube"
 
-#: dados/templates/components/home/home_other_products_section.html:72
+#: dados/templates/components/home/home_other_products_section.html:69
 #: dados/templates/products.html:90
 msgid "Vídeos sobre modelos, dados e vigilância em saúde."
 msgstr "Vídeos sobre modelos, datos y vigilancia en salud."
@@ -1657,11 +1677,11 @@ msgstr ""
 
 #: dados/templates/components/home/home_state_charts.html:9
 msgid ""
-"Registrados: casos notificados de zika por semana de início de sintomas "
+"Registrados: casos notificados de Zika por semana de início de sintomas "
 "(dados incompletos) <br> Estimados: estimativa utilizando modelo de nowcast "
 "(ver saiba mais)"
 msgstr ""
-"Registrados: casos de zika notificados por semana de inicio de síntomas "
+"Registrados: casos de Zika notificados por semana de inicio de síntomas "
 "(datos incompletos) <br> Estimados: estimación utilizando un modelo de "
 "nowcasting (ver más información)."
 
@@ -1682,45 +1702,64 @@ msgstr ""
 "de aumento de casos <br> Rojo: alta incidencia en comparación con el "
 "histórico."
 
-#: dados/templates/components/home/home_state_charts.html:31
+#: dados/templates/components/home/home_state_charts.html:29
 msgid "Gráficos sobre Dengue"
 msgstr "Gráficos sobre dengue"
 
-#: dados/templates/components/home/home_state_charts.html:43
+#: dados/templates/components/home/home_state_charts.html:41
 msgid "Gráficos sobre Chikungunya"
 msgstr "Gráficos sobre chikungunya"
 
-#: dados/templates/components/home/home_state_charts.html:54
+#: dados/templates/components/home/home_state_charts.html:52
 msgid "Gráficos sobre Zika"
 msgstr "Gráficos sobre zika"
 
-#: dados/templates/components/home/home_state_charts.html:65
+#: dados/templates/components/home/home_state_charts.html:63
 msgid "Veja o mapa de incidência das doenças no estado"
 msgstr "Vea el mapa de incidencia de las enfermedades en el estado."
 
-#: dados/templates/components/home/home_state_charts.html:66
+#: dados/templates/components/home/home_state_charts.html:64
 msgid "Mapa incidência"
 msgstr "Mapa de incidencia"
 
-#: dados/templates/components/home/home_state_charts.html:77
+#: dados/templates/components/home/home_state_charts.html:74
 msgid "Municípios monitorados"
 msgstr "Municipios monitoreados"
 
-#: dados/templates/components/home/home_state_charts.html:77
+#: dados/templates/components/home/home_state_charts.html:74
 msgid "Última atualização na SE"
 msgstr "Última actualización en la SE"
 
-#: dados/templates/components/home/home_state_charts.html:101
-#: dados/templates/components/home/home_state_charts.html:126
-#: dados/templates/components/home/home_state_charts.html:151
+#: dados/templates/components/home/home_state_charts.html:104
+#: dados/templates/components/home/home_state_charts.html:135
+#: dados/templates/components/home/home_state_charts.html:166
 msgid "Informações detalhadas sobre o Estado"
 msgstr "Información detallada sobre el estado"
 
+#: dados/templates/components/home/home_state_epi_section.html:13
+#, fuzzy
+#| msgid "contacte a secretaria de saúde de sua cidade"
+msgid "Encontre os níveis de alerta da sua cidade"
+msgstr "póngase en contacto con la secretaría de salud de su ciudad"
+
 #: dados/templates/components/home/home_state_epi_section.html:16
+msgid ""
+"Selecione um município para visualizar o relatório epidemiológico completo, "
+"incluindo níveis de alerta, séries históricas, mapas e indicadores "
+"atualizados."
+msgstr ""
+
+#: dados/templates/components/home/home_state_epi_section.html:23
+msgid ""
+"Ao selecionar um município, você será direcionado para o relatório "
+"epidemiológico da cidade."
+msgstr ""
+
+#: dados/templates/components/home/home_state_epi_section.html:35
 msgid "Situação epidemiológica por estado"
 msgstr "Situación epidemiológica por estado"
 
-#: dados/templates/components/home/home_state_epi_section.html:19
+#: dados/templates/components/home/home_state_epi_section.html:38
 msgid ""
 "Selecione um estado para visualizar mapas de incidência, número de casos ou "
 "situação epidemiológica dos municípios."
@@ -1728,19 +1767,19 @@ msgstr ""
 "Seleccione un estado para visualizar mapas de incidencia, número de casos o "
 "la situación epidemiológica de los municipios."
 
-#: dados/templates/components/home/home_state_epi_section.html:28
+#: dados/templates/components/home/home_state_epi_section.html:47
 msgid "Selecione um estado"
 msgstr "Seleccione un estado"
 
-#: dados/templates/components/home/home_state_epi_section.html:43
-#: dados/templates/components/home/home_state_epi_section.html:73
+#: dados/templates/components/home/home_state_epi_section.html:62
+#: dados/templates/components/home/home_state_epi_section.html:90
 msgid ""
 "Selecione um estado no campo acima para visualizar os gráficos de incidência."
 msgstr ""
 "Seleccione un estado en el campo superior para visualizar los gráficos de "
 "incidencia."
 
-#: dados/templates/components/home/home_state_epi_section.html:91
+#: dados/templates/components/home/home_state_epi_section.html:108
 msgid "Não foi possível carregar os dados deste estado."
 msgstr "No fue posible cargar los datos de este estado."
 
@@ -1771,9 +1810,17 @@ msgstr "Municipios en la regional"
 msgid "Municípios"
 msgstr "Municipios"
 
-#: dados/templates/components/searchbox/searchbox.html:22
-msgid "Encontre um município"
+#: dados/templates/components/searchbox/searchbox.html:7
+#, fuzzy
+#| msgid "Encontre um município"
+msgid "Buscar município"
 msgstr "Encuentre un municipio"
+
+#: dados/templates/components/searchbox/searchbox.html:8
+#, fuzzy
+#| msgid "Selecione um município"
+msgid "Selecione um município..."
+msgstr "Seleccione un municipio"
 
 #: dados/templates/dashboard_cities.html:56
 #, python-format
@@ -1914,7 +1961,7 @@ msgstr ""
 "de Janeiro."
 
 #: dados/templates/products.html:11 dados/templates/products.html:20
-#: templates/components/navbar.html:76
+#: templates/components/navbar.html:63
 msgid "Produtos"
 msgstr "Productos"
 
@@ -1928,15 +1975,15 @@ msgid ""
 "Infodengue/AlertaDengue para apoiar a vigilância, análise e comunicação "
 "sobre arboviroses no Brasil. Estão organizados aqui relatórios técnicos, "
 "ferramentas, webinários, publicações científicas, teses e outros materiais "
-"associados ao monitoramento de dengue, chikungunya, Zika e fatores "
+"associados ao monitoramento de dengue, chikungunya e Zika, além de fatores "
 "ambientais relacionados."
 msgstr ""
 "Esta página reúne productos técnicos y científicos desarrollados por el "
 "equipo Infodengue/AlertaDengue para apoyar la vigilancia, el análisis y la "
 "comunicación sobre las arbovirosis en Brasil. Aquí se organizan informes "
 "técnicos, herramientas, seminarios web, publicaciones científicas, tesis y "
-"otros materiales asociados al monitoreo de dengue, chikungunya, Zika y "
-"factores ambientales relacionados."
+"otros materiales asociados al monitoreo de dengue, chikungunya y Zika, "
+"además de factores ambientales relacionados."
 
 #: dados/templates/products.html:29
 msgid "Navegação"
@@ -2020,7 +2067,7 @@ msgstr ""
 
 #: dados/templates/products.html:203
 msgid "Produções científicas associadas ao Infodengue"
-msgstr "Producciones científicas asociadas a InfoDengue"
+msgstr "Producciones científicas asociadas a Infodengue"
 
 #: dados/templates/products.html:207
 msgid ""
@@ -2033,8 +2080,8 @@ msgstr ""
 #: dados/templates/report_city.html:61
 #: dados/templates/report_filter_city.html:34
 #: dados/templates/report_filter_city.html:41
-#: dados/templates/report_filter_report_type.html:25
-#: dados/templates/report_filter_report_type.html:31
+#: dados/templates/report_filter_report_type.html:22
+#: dados/templates/report_filter_report_type.html:28
 #: dados/templates/report_filter_state.html:35
 #: dados/templates/report_filter_state.html:42
 #: dados/templates/report_state.html:20 templates/components/navbar.html:51
@@ -2043,7 +2090,7 @@ msgstr "Informes"
 
 #: dados/templates/report_city.html:62
 #: dados/templates/report_filter_city.html:35
-#: dados/templates/report_filter_report_type.html:40
+#: dados/templates/report_filter_report_type.html:37
 msgid "Municipal"
 msgstr "Municipal"
 
@@ -2371,34 +2418,34 @@ msgid "Selecione um dia da Semana Epidemiológica desejada"
 msgstr "Seleccione un día de la Semana Epidemiológica deseada"
 
 #: dados/templates/report_filter_city.html:66
-#: dados/templates/report_filter_report_type.html:61
+#: dados/templates/report_filter_report_type.html:58
 #: dados/templates/report_filter_state.html:56
 msgid "Abrir Relatório"
 msgstr "Abrir informe"
 
-#: dados/templates/report_filter_report_type.html:38
+#: dados/templates/report_filter_report_type.html:35
 msgid "Tipo de Relatório"
 msgstr "Tipo de informe"
 
-#: dados/templates/report_filter_report_type.html:41
+#: dados/templates/report_filter_report_type.html:38
 #: dados/templates/report_filter_state.html:36
 #: dados/templates/report_state.html:21
 msgid "Estadual"
 msgstr "Estatal"
 
-#: dados/templates/report_filter_report_type.html:44
+#: dados/templates/report_filter_report_type.html:41
 msgid "Selecione o tipo do relatório"
 msgstr "Seleccione el tipo de informe deseado"
 
-#: dados/templates/report_filter_report_type.html:49
+#: dados/templates/report_filter_report_type.html:46
 msgid "Unidade Federal"
 msgstr "Unidad Federal"
 
-#: dados/templates/report_filter_report_type.html:51
+#: dados/templates/report_filter_report_type.html:48
 msgid "Selecione uma Unidade Federal"
 msgstr "Seleccione una Unidad Federal"
 
-#: dados/templates/report_filter_report_type.html:55
+#: dados/templates/report_filter_report_type.html:52
 msgid "Selecione a Unidade Federal desejada para a consulta"
 msgstr "Seleccione la Unidad Federal deseada para la consulta"
 
@@ -2448,7 +2495,7 @@ msgstr "Municipios por regional"
 #: dados/templates/services_tutorial.html:17
 #: dados/templates/services_tutorial_Python.html:174
 #: dados/templates/services_tutorial_R.html:174
-#: templates/components/navbar.html:41
+#: templates/components/navbar.html:39
 msgid "Dados"
 msgstr "Datos"
 
@@ -2891,7 +2938,7 @@ msgstr ""
 msgid "Por favor, aguarde."
 msgstr "Por favor, espere."
 
-#: dados/templates/team.html:5 templates/components/navbar.html:66
+#: dados/templates/team.html:5 templates/components/navbar.html:75
 msgid "Equipe"
 msgstr "Equipo"
 
@@ -3259,25 +3306,48 @@ msgstr "% humedad media del aire"
 msgid "% umidade máxima do ar"
 msgstr "% humedad máxima del aire"
 
-#: templates/components/footer.html:6
+#: templates/components/footer.html:8
 #, fuzzy
 #| msgid "Infodengue"
 msgid "Infodengue Logo"
 msgstr "Infodengue"
 
-#: templates/components/footer.html:9
+#: templates/components/footer.html:14
 msgid ""
-"A organização Alertadengue reúne Epidemiologistas, Cientistas de dados, e "
-"estudantes, que atuam em parceria com os órgão governamentais de Saúde para "
-"ajudar a gestão de doenças transmitidas por mosquitos como a dengue, zika e "
-"Chikungunya."
+"A organização Infodengue reúne epidemiologistas, cientistas de dados e "
+"estudantes, que atuam em parceria com os órgãos governamentais de Saúde para "
+"ajudar a gestão de doenças transmitidas por mosquitos como dengue, "
+"chikungunya e Zika."
 msgstr ""
-"La organización Alertadengue reúne epidemiólogos, científicos de datos y "
+"La organización Infodengue reúne epidemiólogos, científicos de datos y "
 "estudiantes que colaboran con las entidades gubernamentales de salud para "
-"ayudar en la gestión de enfermedades transmitidas por mosquitos como el "
-"dengue, zika y Chikungunya."
+"ayudar en la gestión de enfermedades transmitidas por mosquitos como dengue, "
+"chikungunya y Zika."
 
-#: templates/components/navbar.html:30
+#: templates/components/footer.html:24
+msgid "Apoie o projeto Infodengue no GitHub Sponsors"
+msgstr "Apoya el proyecto Infodengue en GitHub Sponsors"
+
+#: templates/components/header.html:9
+#| msgid "Como participar do Infodengue"
+msgid "Página inicial do Infodengue"
+msgstr "Página principal de Infodengue"
+
+#: templates/components/header.html:24 templates/components/navbar.html:13
+#| msgid "Navegação"
+msgid "Alternar navegação"
+msgstr "Alternar navegación"
+
+#: templates/components/header.html:28
+msgid "Instituições parceiras"
+msgstr "Instituciones asociadas"
+
+#: templates/components/navbar.html:5
+#| msgid "Navegação"
+msgid "Navegação principal"
+msgstr "Navegación principal"
+
+#: templates/components/navbar.html:25
 msgid ""
 "Página inicial com visão geral da situação das arboviroses e principais "
 "recursos do Infodengue."
@@ -3285,18 +3355,18 @@ msgstr ""
 "Página principal con una visión general de la situación de las arbovirosis y "
 "los principales recursos de Infodengue."
 
-#: templates/components/navbar.html:31
+#: templates/components/navbar.html:27
 msgid "Início"
 msgstr "Inicio"
 
-#: templates/components/navbar.html:40
+#: templates/components/navbar.html:37
 msgid ""
 "Acesse os dados por meio da API e de notebooks de documentação com exemplos."
 msgstr ""
 "Acceda a los datos a través de la API y de notebooks de documentación con "
 "ejemplos."
 
-#: templates/components/navbar.html:50
+#: templates/components/navbar.html:49
 msgid ""
 "Consulte relatórios municipais e estaduais com indicadores epidemiológicos e "
 "níveis de alerta."
@@ -3304,19 +3374,19 @@ msgstr ""
 "Consulte informes municipales y estatales con indicadores epidemiológicos y "
 "niveles de alerta."
 
-#: templates/components/navbar.html:65
+#: templates/components/navbar.html:61
+msgid ""
+"Veja os relatórios, publicações, teses e ferramentas produzidas pela equipe "
+"do Infodengue."
+msgstr ""
+
+#: templates/components/navbar.html:73
 msgid ""
 "Conheça a equipe responsável pelo desenvolvimento, manutenção e análise dos "
 "dados do Infodengue."
 msgstr ""
 "Conozca al equipo responsable del desarrollo, mantenimiento y análisis de "
 "los datos de Infodengue."
-
-#: templates/components/navbar.html:75
-msgid ""
-"Veja os relatórios, publicações, teses e ferramentas produzidas pela equipe "
-"do Infodengue."
-msgstr ""
 
 #: templates/components/navbar.html:85
 msgid ""
@@ -3366,127 +3436,10 @@ msgstr "Tu nombre de usuario, en caso de que lo hayas olvidado, es:"
 msgid "Obrigado por usar o Infodengue"
 msgstr "Gracias por usar Infodengue"
 
-#: upload/forms.py:21
-msgid "CID10"
-msgstr ""
-
-#: upload/forms.py:25
-msgid "Ano de notificação"
-msgstr ""
-
-#: upload/forms.py:29
-msgid "Abrangência"
-msgstr ""
-
-#: upload/forms.py:43
-msgid "Houve um erro durante o envio do arquivo. Por favor, tente novamente."
-msgstr ""
-
-#: upload/templates/sinan/index.html:73
-msgid "Add Files"
-msgstr ""
-
-#: upload/templates/sinan/index.html:75
-msgid "Submit"
-msgstr ""
-
-#: upload/templates/sinan/index.html:78
-msgid "Last Uploads"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:78
-msgid "File size"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:86
-msgid "Updates"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:94
-msgid "Inserts"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:103
-#: upload/templates/sinan/status.html:41
-msgid "Residues"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:111
-msgid "uploaded at"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:111
-msgid "in"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:111
-msgid "seconds"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:119
-msgid "cs_sexo distribution"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:136
-msgid "criterio distribution"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:153
 #, fuzzy
-#| msgid "Total de casos no estado"
-msgid "Total cases"
-msgstr "Total de casos en el estado"
-
-#: upload/templates/sinan/overview.html:175
-msgid "municipio_geocodigo distribution"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:193
-msgid "Rollback data"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:221
-msgid "Delete inserts and updates"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:225
-msgid "Are you sure you want to proceed?"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:226
-msgid ""
-"It will delete all inserted and updated rows by the file in the "
-"'Municipio'.'Notificacao' table"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:229
-msgid "Yes"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:230
-msgid "No"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:345
-#: upload/templates/sinan/overview.html:361
-msgid "Cases"
-msgstr ""
-
-#: upload/templates/sinan/overview.html:375
-msgid "Geocode"
-msgstr ""
-
-#: upload/templates/sinan/status.html:29 upload/templates/sinan/status.html:42
-msgid "New inserts"
-msgstr ""
-
-#: upload/templates/sinan/status.html:30 upload/templates/sinan/status.html:43
-msgid "Updated rows"
-msgstr ""
-
-#: upload/templates/sinan/status.html:31 upload/templates/sinan/status.html:44
-msgid "Task duration"
-msgstr ""
+#~| msgid "Total de casos no estado"
+#~ msgid "Total cases"
+#~ msgstr "Total de casos en el estado"
 
 #, fuzzy
 #~| msgid ""
