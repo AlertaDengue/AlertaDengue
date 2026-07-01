@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-01 08:36-0300\n"
+"POT-Creation-Date: 2026-07-01 08:54-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1751,8 +1751,8 @@ msgid ""
 "Ao selecionar um município, você será direcionado para o relatório "
 "epidemiológico da cidade."
 msgstr ""
-"Al seleccionar un municipio, será redirigido al informe epidemiológico de "
-"la ciudad."
+"Al seleccionar un municipio, será redirigido al informe epidemiológico de la "
+"ciudad."
 
 #: dados/templates/components/home/home_state_epi_section.html:35
 msgid "Situação epidemiológica por estado"
@@ -2961,111 +2961,42 @@ msgstr ""
 msgid "Coordenação Geral"
 msgstr "Coordinación General"
 
-#: dados/templates/team.html:28
-msgid "Cláudia Torres Codeço"
-msgstr "Cláudia Torres Codeço"
-
-#: dados/templates/team.html:29 dados/templates/team.html:37
-#: dados/templates/team.html:41 dados/templates/team.html:68
-#: dados/templates/team.html:87 dados/templates/team.html:88
-msgid "PROCC/Fiocruz"
-msgstr "PROCC/Fiocruz"
-
-#: dados/templates/team.html:32
-msgid "Flávio Codeço Coelho"
-msgstr "Flávio Codeço Coelho"
-
-#: dados/templates/team.html:33
-msgid "Escola de Matemática Aplicada/FGV"
-msgstr "Escuela de Matemática Aplicada/FGV"
-
-#: dados/templates/team.html:36
-msgid "Leonardo Soares Bastos"
-msgstr "Leonardo Soares Bastos"
-
-#: dados/templates/team.html:40
-msgid "Oswaldo Gonçalves Cruz"
-msgstr "Oswaldo Gonçalves Cruz"
-
 #: dados/templates/team.html:47
 msgid "Dados e situação epidemiológica"
 msgstr "Datos y Situación Epidemiológica"
-
-#: dados/templates/team.html:49
-msgid "Sara de Souza Oliveira"
-msgstr "Sara de Souza Oliveira"
 
 #: dados/templates/team.html:49 dados/templates/team.html:50
 msgid "Analista Infodengue - epidemiologia"
 msgstr "Analista de Infodengue - Epidemiología"
 
-#: dados/templates/team.html:50
-msgid "Thais I S Riback"
-msgstr "Thais I S Riback"
-
-#: dados/templates/team.html:51
-msgid "Vinicius Godinho"
-msgstr "Vinicius Godinho"
-
 #: dados/templates/team.html:51 dados/templates/team.html:52
 msgid "Analista Infodengue - ciência de dados"
 msgstr "Analista de Infodengue - Ciencia de Datos"
-
-#: dados/templates/team.html:52
-msgid "Eduardo Correa Araujo"
-msgstr "Eduardo Correa Araujo"
 
 #: dados/templates/team.html:57
 msgid "Desenvolvimento"
 msgstr "Desarrolladores de Software"
 
 #: dados/templates/team.html:59
-msgid "Luã Bida Vacaro"
-msgstr "Luã Bida Vacaro"
-
-#: dados/templates/team.html:59
 msgid "TI Infodengue & Mosqlimate"
 msgstr "TI de Infodengue y Mosqlimate"
 
 #: dados/templates/team.html:60
-msgid "Sandro Loch"
-msgstr "Sandro Loch"
-
-#: dados/templates/team.html:60
-msgid "Platform & Data Infrastructure Engineer"
-msgstr "Ingeniero de Plataforma e Infraestructura de Datos"
+msgid "Engenheiro de plataforma e infraestrutura de dados"
+msgstr "Ingeniero de plataforma e infraestructura de datos"
 
 #: dados/templates/team.html:65
 msgid "Pesquisa, comunicação e formação"
 msgstr "Investigación, Comunicación y Formación"
 
-#: dados/templates/team.html:67
-msgid "Raquel Martins Lana"
-msgstr "Raquel Martins Lana"
-
 #: dados/templates/team.html:67 dados/templates/team.html:68
+#: dados/templates/team.html:69 dados/templates/team.html:73
 msgid "Pesquisadora associada"
 msgstr "Investigadora Asociada"
 
 #: dados/templates/team.html:67
-msgid "Barcelona Supercomputing Center (BSC) - Espanha"
-msgstr "Barcelona Supercomputing Center (BSC) - España"
-
-#: dados/templates/team.html:68
-msgid "Laís Picinini Freitas"
-msgstr "Laís Picinini Freitas"
-
-#: dados/templates/team.html:69
-msgid "Iasmim Ferreira de Almeida"
-msgstr "Iasmim Ferreira de Almeida"
-
-#: dados/templates/team.html:69
-msgid "Pesquisadora associada - Emap/FGV"
-msgstr "Investigadora Asociada - Emap/FGV"
-
-#: dados/templates/team.html:70
-msgid "Ramila Alencar"
-msgstr "Ramila Alencar"
+msgid "Espanha"
+msgstr "España"
 
 #: dados/templates/team.html:70 dados/templates/team.html:72
 msgid "Doutoranda no Programa de Epidemiologia e Saúde Pública da ENSP/Fiocruz"
@@ -3073,25 +3004,9 @@ msgstr ""
 "Doctoranda en el Programa de Epidemiología y Salud Pública de la ENSP/Fiocruz"
 
 #: dados/templates/team.html:71
-msgid "Ayrton Gouveia"
-msgstr "Ayrton Gouveia"
-
-#: dados/templates/team.html:71
 msgid "Doutorando no Programa de Epidemiologia e Saúde Pública da ENSP/Fiocruz"
 msgstr ""
 "Doctorando en el Programa de Epidemiología y Salud Pública de la ENSP/Fiocruz"
-
-#: dados/templates/team.html:72
-msgid "Nathaly Dutra"
-msgstr "Nathaly Dutra"
-
-#: dados/templates/team.html:73
-msgid "Danielle Andreza da Cruz Ferreira"
-msgstr "Danielle Andreza da Cruz Ferreira"
-
-#: dados/templates/team.html:73
-msgid "Pesquisadora associada - UFMG"
-msgstr "Investigadora Asociada - UFMG"
 
 #: dados/templates/team.html:78
 msgid "Comunidade Infodengue"
@@ -3115,51 +3030,21 @@ msgstr "Consultor Externo"
 msgid "Analista de dados"
 msgstr "Analista de Datos"
 
-#: dados/templates/team.html:85
-msgid "Observatório da Dengue/UFMG"
-msgstr "Observatorio del Dengue/UFMG"
-
-#: dados/templates/team.html:86
-msgid "Instituto de Biociências/UFPR"
-msgstr "Instituto de Biociencias/UFPR"
-
-#: dados/templates/team.html:89
-msgid "IOC/Fiocruz"
-msgstr "IOC/Fiocruz"
-
-#: dados/templates/team.html:90
-msgid "Programa de Mestrado em Medicina Tropical - IOC/Fiocruz"
-msgstr "Programa de Maestría en Medicina Tropical - IOC/Fiocruz"
-
-#: dados/templates/team.html:91
-#, fuzzy
-#| msgid ""
-#| "Aluno de doutorado do Programa de Biologia Computacional e Sistemas - IOC/"
-#| "Fiocruz"
-msgid "Programa de Mestrado em Biologia Computacional e Sistemas - IOC/Fiocruz"
-msgstr ""
-"Programa de Maestría en Biología Computacional y Sistemas - IOC/Fiocruz"
-
 #: dados/templates/team.html:97
 msgid "Parcerias"
 msgstr "Alianzas"
 
 #: dados/templates/team.html:99
 msgid "Parceiros e colaborações estratégicas do Infodengue."
-msgstr ""
-
-#: dados/templates/team.html:106
-msgid ""
-"Coordenação-Geral de Vigilância de Arboviroses - Ministério da Saúde (CGArb)"
-msgstr ""
-"Coordinación General de Vigilancia de Arbovirosis - Ministerio de Salud "
-"(CGArb)"
+msgstr "Socios y colaboraciones estratégicas de Infodengue."
 
 #: dados/templates/team.html:107
 msgid ""
 "Plano nacional de contingência para apoiar a preparação e a tomada de "
 "decisão em arboviroses."
 msgstr ""
+"Plan nacional de contingencia para apoyar la preparación y la toma de "
+"decisiones en arbovirosis."
 
 #: dados/templates/team.html:109 dados/templates/team.html:121
 #: dados/templates/team.html:133 dados/templates/team.html:149
@@ -3170,10 +3055,6 @@ msgstr "Acceder al sitio"
 #: dados/templates/team.html:115
 msgid "Logo da OPAS/OMS"
 msgstr "Logotipo de la OPS/OMS"
-
-#: dados/templates/team.html:118
-msgid "Organização Pan-Americana da Saúde (OPAS/OMS)"
-msgstr "Organización Panamericana de la Salud (OPS/OMS)"
 
 #: dados/templates/team.html:119
 msgid ""
@@ -3187,21 +3068,13 @@ msgstr ""
 msgid "Logo da Mosqlimate"
 msgstr "Logotipo de Mosqlimate"
 
-#: dados/templates/team.html:130
-msgid "Mosqlimate"
-msgstr "Mosqlimate"
-
 #: dados/templates/team.html:131
-msgid "Intelligent surveillance of arboviruses and climate."
+msgid "Vigilância inteligente de arbovírus e clima."
 msgstr "Vigilancia inteligente de arbovirus y clima."
 
 #: dados/templates/team.html:139
 msgid "Logo do Barcelona Supercomputing Center"
 msgstr "Logotipo del Barcelona Supercomputing Center"
-
-#: dados/templates/team.html:142
-msgid "Barcelona Supercomputing Center (BSC)"
-msgstr "Barcelona Supercomputing Center (BSC)"
 
 #: dados/templates/team.html:143
 msgid ""
@@ -3216,28 +3089,21 @@ msgstr "Proyectos relacionados"
 
 #: dados/templates/team.html:155
 msgid "Logo da Global Health Network"
-msgstr ""
-
-#: dados/templates/team.html:158
-msgid "The Global Health Network Latin America and Caribbean (TGHN LAC)"
-msgstr "The Global Health Network América Latina y el Caribe (TGHN LAC)"
+msgstr "Logotipo de The Global Health Network"
 
 #: dados/templates/team.html:159
+#| msgid ""
+#| "Rede de colaboração para Pathfinder InfoDengue, formação e pesquisa em "
+#| "saúde global."
 msgid ""
-"Rede de colaboração para Pathfinder InfoDengue, formação e pesquisa em saúde "
+"Rede de colaboração para Pathfinder Infodengue, formação e pesquisa em saúde "
 "global."
 msgstr ""
-"Red de colaboración para Pathfinder InfoDengue, formación e investigación en "
+"Red de colaboración para Pathfinder Infodengue, formación e investigación en "
 "salud global."
 
 #: dados/templates/team.html:167
 msgid "Logo da KWAR-AI"
-msgstr "Logotipo de KWAR-AI"
-
-#: dados/templates/team.html:170
-#, fuzzy
-#| msgid "Logo da KWAR-AI"
-msgid "KWAR-AI"
 msgstr "Logotipo de KWAR-AI"
 
 #: dados/templates/team.html:171
@@ -3249,18 +3115,6 @@ msgstr ""
 #: dados/templates/team.html:182
 msgid "Apoio"
 msgstr "Apoyo"
-
-#: dados/templates/team.html:185
-msgid "DECIT/MS (2014-2016)"
-msgstr "DECIT/MS (2014-2016)"
-
-#: dados/templates/team.html:186
-msgid "Fiocruz Edital Inova 2019 (2019-2021)"
-msgstr "Convocatoria Fiocruz Inova 2019 (2019-2021)"
-
-#: dados/templates/team.html:187
-msgid "FNS/MS (2020-2027)"
-msgstr "FNS/MS (2020-2027)"
 
 #: dados/templates/team.html:193
 msgid ""
@@ -3425,6 +3279,132 @@ msgstr "Tu nombre de usuario, en caso de que lo hayas olvidado, es:"
 #: templates/registration/password_reset_email.html:12
 msgid "Obrigado por usar o Infodengue"
 msgstr "Gracias por usar Infodengue"
+
+#~ msgid "Cláudia Torres Codeço"
+#~ msgstr "Cláudia Torres Codeço"
+
+#~ msgid "PROCC/Fiocruz"
+#~ msgstr "PROCC/Fiocruz"
+
+#~ msgid "Flávio Codeço Coelho"
+#~ msgstr "Flávio Codeço Coelho"
+
+#~ msgid "Escola de Matemática Aplicada/FGV"
+#~ msgstr "Escuela de Matemática Aplicada/FGV"
+
+#~ msgid "Leonardo Soares Bastos"
+#~ msgstr "Leonardo Soares Bastos"
+
+#~ msgid "Oswaldo Gonçalves Cruz"
+#~ msgstr "Oswaldo Gonçalves Cruz"
+
+#~ msgid "Sara de Souza Oliveira"
+#~ msgstr "Sara de Souza Oliveira"
+
+#~ msgid "Thais I S Riback"
+#~ msgstr "Thais I S Riback"
+
+#~ msgid "Vinicius Godinho"
+#~ msgstr "Vinicius Godinho"
+
+#~ msgid "Eduardo Correa Araujo"
+#~ msgstr "Eduardo Correa Araujo"
+
+#~ msgid "Luã Bida Vacaro"
+#~ msgstr "Luã Bida Vacaro"
+
+#~ msgid "Sandro Loch"
+#~ msgstr "Sandro Loch"
+
+#~ msgid "Platform & Data Infrastructure Engineer"
+#~ msgstr "Ingeniero de Plataforma e Infraestructura de Datos"
+
+#~ msgid "Raquel Martins Lana"
+#~ msgstr "Raquel Martins Lana"
+
+#~ msgid "Barcelona Supercomputing Center (BSC) - Espanha"
+#~ msgstr "Barcelona Supercomputing Center (BSC) - España"
+
+#~ msgid "Laís Picinini Freitas"
+#~ msgstr "Laís Picinini Freitas"
+
+#~ msgid "Iasmim Ferreira de Almeida"
+#~ msgstr "Iasmim Ferreira de Almeida"
+
+#~ msgid "Pesquisadora associada - Emap/FGV"
+#~ msgstr "Investigadora Asociada - Emap/FGV"
+
+#~ msgid "Ramila Alencar"
+#~ msgstr "Ramila Alencar"
+
+#~ msgid "Ayrton Gouveia"
+#~ msgstr "Ayrton Gouveia"
+
+#~ msgid "Nathaly Dutra"
+#~ msgstr "Nathaly Dutra"
+
+#~ msgid "Danielle Andreza da Cruz Ferreira"
+#~ msgstr "Danielle Andreza da Cruz Ferreira"
+
+#~ msgid "Pesquisadora associada - UFMG"
+#~ msgstr "Investigadora Asociada - UFMG"
+
+#~ msgid "Observatório da Dengue/UFMG"
+#~ msgstr "Observatorio del Dengue/UFMG"
+
+#~ msgid "Instituto de Biociências/UFPR"
+#~ msgstr "Instituto de Biociencias/UFPR"
+
+#~ msgid "IOC/Fiocruz"
+#~ msgstr "IOC/Fiocruz"
+
+#~ msgid "Programa de Mestrado em Medicina Tropical - IOC/Fiocruz"
+#~ msgstr "Programa de Maestría en Medicina Tropical - IOC/Fiocruz"
+
+#, fuzzy
+#~| msgid ""
+#~| "Aluno de doutorado do Programa de Biologia Computacional e Sistemas - "
+#~| "IOC/Fiocruz"
+#~ msgid ""
+#~ "Programa de Mestrado em Biologia Computacional e Sistemas - IOC/Fiocruz"
+#~ msgstr ""
+#~ "Programa de Maestría en Biología Computacional y Sistemas - IOC/Fiocruz"
+
+#~ msgid ""
+#~ "Coordenação-Geral de Vigilância de Arboviroses - Ministério da Saúde "
+#~ "(CGArb)"
+#~ msgstr ""
+#~ "Coordinación General de Vigilancia de Arbovirosis - Ministerio de Salud "
+#~ "(CGArb)"
+
+#~ msgid "Organização Pan-Americana da Saúde (OPAS/OMS)"
+#~ msgstr "Organización Panamericana de la Salud (OPS/OMS)"
+
+#~ msgid "Mosqlimate"
+#~ msgstr "Mosqlimate"
+
+#~ msgid "Intelligent surveillance of arboviruses and climate."
+#~ msgstr "Vigilancia inteligente de arbovirus y clima."
+
+#~ msgid "Barcelona Supercomputing Center (BSC)"
+#~ msgstr "Barcelona Supercomputing Center (BSC)"
+
+#~ msgid "The Global Health Network Latin America and Caribbean (TGHN LAC)"
+#~ msgstr "The Global Health Network América Latina y el Caribe (TGHN LAC)"
+
+#, fuzzy
+#~| msgid "Logo da KWAR-AI"
+#~ msgid "KWAR-AI"
+#~ msgstr "Logotipo de KWAR-AI"
+
+#~ msgid "DECIT/MS (2014-2016)"
+#~ msgstr "DECIT/MS (2014-2016)"
+
+#~ msgid "Fiocruz Edital Inova 2019 (2019-2021)"
+#~ msgstr "Convocatoria Fiocruz Inova 2019 (2019-2021)"
+
+#~ msgid "FNS/MS (2020-2027)"
+#~ msgstr "FNS/MS (2020-2027)"
 
 #, fuzzy
 #~| msgid "Total de casos no estado"
