@@ -103,7 +103,6 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "dados",
-    "gis",
     "api",
     "ingestion",
 ]
@@ -192,7 +191,6 @@ DATABASES = {
 
 MIGRATION_MODULES = {
     "dados": "dados.migrations",
-    "gis": None,
     "api": None,
 }
 
@@ -312,24 +310,6 @@ def build_templates(debug: bool) -> list[dict[str, Any]]:
 
     return [config]
 
-
-MAPSERVER_URL = os.getenv("MAPSERVER_URL")
-MAPSERVER_LOG_PATH = os.getenv("MAPSERVER_LOG_PATH")
-SHAPEFILE_PATH = os.getenv("SHAPEFILE_PATH")
-MAPFILE_PATH = os.getenv("MAPFILE_PATH")
-RASTER_PATH = os.getenv("RASTER_PATH")
-
-RASTER_METEROLOGICAL_DATA_RANGE = {
-    "ndvi": (-2000.0, +10000.0),
-    "lst_day_1km": (0.0, 20000.0),
-    "lst_night_1km": (-30.0, 30.0),
-    "relative_humidity_2m_above_ground": (0.0, 100.0),
-    "specific_humidity_2m_above_ground": (0.0, 1.0),
-    "precipitation": (0.0, 200.0),
-}
-RASTER_METEROLOGICAL_FACTOR_INCREASE = os.getenv(
-    "RASTER_METEROLOGICAL_FACTOR_INCREASE"
-)
 
 MEMCACHED_HOST = os.getenv("MEMCACHED_HOST")
 MEMCACHED_PORT = os.getenv("MEMCACHED_PORT")
