@@ -1706,19 +1706,24 @@ msgid "Informações detalhadas sobre o Estado"
 msgstr "Detailed information about the state"
 
 #: dados/templates/components/home/home_search_city.html:12
-msgid "Encontre seu município"
-msgstr "Find your municipality"
+msgid "Acompanhe as notificações e níveis de alerta de arboviroses na sua cidade"
+msgstr "Track arbovirus notifications and alert levels in your city"
 
 #: dados/templates/components/home/home_search_city.html:18
-msgid "Selecione um município para acessar seu relatório epidemiológico."
-msgstr "Select a municipality to open its epidemiological report."
+msgid ""
+"Busque um município para acessar o relatório epidemiológico completo, "
+"incluindo níveis de alerta, séries históricas, mapas e indicadores "
+"atualizados."
+msgstr ""
+"Search for a municipality to access the full epidemiological report, "
+"including alert levels, historical series, maps, and updated indicators."
 
 #: dados/templates/components/home/home_search_city.html:24
 msgid ""
-"Ao selecionar um município, você será direcionado para o relatório "
+"Ao escolher um município, você será direcionado para o relatório "
 "epidemiológico da cidade."
 msgstr ""
-"When you select a municipality, you will be redirected to the city's "
+"When you choose a municipality, you will be redirected to the city's "
 "epidemiological report."
 
 #: dados/templates/components/home/home_state_epi_section.html:35

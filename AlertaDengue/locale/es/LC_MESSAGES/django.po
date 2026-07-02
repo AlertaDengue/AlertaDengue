@@ -1733,19 +1733,25 @@ msgid "Informações detalhadas sobre o Estado"
 msgstr "Información detallada sobre el estado"
 
 #: dados/templates/components/home/home_search_city.html:12
-msgid "Encontre seu município"
-msgstr "Encuentre su municipio"
+msgid "Acompanhe as notificações e níveis de alerta de arboviroses na sua cidade"
+msgstr "Siga las notificaciones y niveles de alerta de arbovirosis en su ciudad"
 
 #: dados/templates/components/home/home_search_city.html:18
-msgid "Selecione um município para acessar seu relatório epidemiológico."
-msgstr "Seleccione un municipio para acceder a su informe epidemiológico."
+msgid ""
+"Busque um município para acessar o relatório epidemiológico completo, "
+"incluindo níveis de alerta, séries históricas, mapas e indicadores "
+"atualizados."
+msgstr ""
+"Busque un municipio para acceder al informe epidemiológico completo, "
+"incluidos los niveles de alerta, las series históricas, los mapas y los "
+"indicadores actualizados."
 
 #: dados/templates/components/home/home_search_city.html:24
 msgid ""
-"Ao selecionar um município, você será direcionado para o relatório "
+"Ao escolher um município, você será direcionado para o relatório "
 "epidemiológico da cidade."
 msgstr ""
-"Al seleccionar un municipio, será redirigido al informe epidemiológico de la "
+"Al elegir un municipio, será redirigido al informe epidemiológico de la "
 "ciudad."
 
 #: dados/templates/components/home/home_state_epi_section.html:35
