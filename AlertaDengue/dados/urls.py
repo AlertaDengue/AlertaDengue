@@ -13,7 +13,6 @@ from .views import (
     ChartsMainView,
     DataPublicServicesPageView,
     GeoJsonView,
-    GeoTiffView,
     JoininPageView,
     ProductsPageView,
     ReportCityView,
@@ -150,11 +149,6 @@ urlpatterns = [
         r"^sinan/(\d{4})/(\d{1,2})",
         cache_page(60 * 60 * 60 * 24)(SinanCasesView.as_view()),
         name="sinan",
-    ),
-    re_path(
-        r"^geotiff/%s/%s/$" % (__geocode, __disease),
-        cache_page(60 * 60 * 60 * 24)(GeoTiffView.as_view()),
-        name="geotiff",
     ),
     re_path(
         r"^geojson/%s/%s/$" % (__geocode, __disease),
