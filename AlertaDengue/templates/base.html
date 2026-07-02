@@ -15,9 +15,13 @@
 
   <link href="{% static '/css/infodengue.css' %}" rel="stylesheet">
   <link href="{% static '/css/footer.css' %}" rel="stylesheet">
+  <link
+      href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+      rel="stylesheet">
 
   <script src="{% static '/libs/jquery/jquery-3.3.1.js' %}"></script>
   <script src="{% static '/js/typeahead.bundle.min.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
   {% bootstrap_css %}
   {% bootstrap_javascript %}
@@ -35,20 +39,17 @@
 <body>
   {% include 'components/messages.html' %}
 
-  <div class="container-fluid d-flex flex-column min-vh-100">
-    <section class="mb-0">
-      <div class="container">
+  <div class="site-app d-flex flex-column min-vh-100">
+    <header class="site-header">
+      <div class="site-shell">
         {% include 'components/header.html' %}
+        {% include 'components/navbar.html' %}
       </div>
-    </section>
+    </header>
 
-    <main role="main" class="flex-fill">
-      <div class="container pt-0 pb-0">
-        <section class="mt-3 mb-0 p-0">
-          {% include 'components/navbar.html' %}
-        </section>
-
-        <h3 class="mb-3 mt-4">{% block title %}{% endblock %}</h3>
+    <main role="main" class="site-main flex-fill">
+      <div class="site-shell site-content">
+        <h3 class="site-page-title">{% block title %}{% endblock %}</h3>
         {% block breadcrumbs %}{% endblock %}
 
         {% if settings.MAINTENANCE_MODE and not user.is_authenticated %}
@@ -59,16 +60,55 @@
       </div>
     </main>
 
-    <footer class="footer py-4">
-      <div class="container">
+    <footer class="site-footer">
+      <div class="site-shell site-footer-inner">
         {% include 'components/footer.html' %}
       </div>
     </footer>
   </div>
 
   <script>
-    $(function () {
+    function initGlobalTooltips() {
+      if (typeof $.fn.tooltip !== "function") {
+        return;
+      }
+
       $('[data-toggle="tooltip"]').tooltip();
+    }
+
+    function initSiteSearchbox() {
+      var $searchboxes = $(".js-select2[data-placeholder]");
+
+      if (!$searchboxes.length || typeof $.fn.select2 !== "function") {
+        return;
+      }
+
+      $searchboxes.each(function () {
+        var $searchbox = $(this);
+
+        if (!$searchbox.hasClass("select2-hidden-accessible")) {
+          $searchbox.select2({
+            placeholder: $searchbox.data("placeholder"),
+            width: "100%",
+            dropdownAutoWidth: true
+          });
+        }
+
+        $searchbox
+          .off("select2:select.siteSearch")
+          .on("select2:select.siteSearch", function (event) {
+            var city = event.params.data;
+
+            if (city && city.id) {
+              window.location.href = "/alerta/" + city.id;
+            }
+          });
+      });
+    }
+
+    $(function () {
+      initGlobalTooltips();
+      initSiteSearchbox();
     });
   </script>
 </body>

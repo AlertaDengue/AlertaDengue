@@ -1,0 +1,32 @@
+{% load i18n %}
+{% load static %}
+{% load searchbox_component %}
+
+
+{% block home_search_city %}
+
+<section class="card mb-0 p-0 home-section-card city-alert-search"
+         aria-labelledby="city-alert-search-title">
+  <div class="card-header home-section-header d-flex align-items-center">
+    <h4 id="city-alert-search-title" class="mb-0 text-white">
+      {% trans "Acompanhe as notificações e níveis de alerta de arboviroses na sua cidade" %}
+    </h4>
+  </div>
+
+  <div class="card-body city-alert-search__body">
+    <div class="city-alert-search__copy">
+      <p class="city-alert-search__subtitle mb-0">
+        {% trans "Busque um município para acessar o relatório epidemiológico completo, incluindo níveis de alerta, séries históricas, mapas e indicadores atualizados." %}
+      </p>
+    </div>
+
+    <div class="city-alert-search__form">
+      {% searchbox_component %}
+      <p class="city-alert-search__helper mb-0">
+        {% trans "Ao escolher um município, você será direcionado para o relatório epidemiológico da cidade." %}
+      </p>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
