@@ -483,15 +483,15 @@ h5 {
 }
 
 .city-alert-search {
-    background: linear-gradient(180deg, #f9fbfd 0%, #f1f7fb 100%);
+    background: #ffffff63;
 }
 
 .city-alert-search__body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1.25rem;
-    padding: 1.35rem 1.5rem;
+    gap: 1.5rem;
+    padding: 1.65rem 1.75rem;
 }
 
 .city-alert-search__copy {
@@ -499,21 +499,39 @@ h5 {
     min-width: 0;
 }
 
-.city-alert-search__title {
-    color: #003e7e !important;
-    font-size: 1.3rem;
-    font-weight: 700;
-}
-
 .city-alert-search__subtitle {
-    max-width: 42rem;
+    max-width: 34rem;
     color: #516b84;
+    font-size: 1rem;
     line-height: 1.55;
 }
 
 .city-alert-search__form {
-    flex: 0 0 min(100%, 400px);
-    width: min(100%, 400px);
+    flex: 0 1 500px;
+    width: min(100%, 500px);
+    margin-left: auto;
+}
+
+.city-alert-search__helper {
+    margin-top: 0.65rem;
+    color: #6f8397;
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
+.city-alert-search .municipality-search .select2-selection {
+    min-height: 50px;
+    border-color: rgba(0, 62, 126, 0.2);
+    box-shadow: 0 12px 28px rgba(0, 35, 70, 0.14);
+}
+
+.city-alert-search .municipality-search .select2-selection__rendered {
+    line-height: 48px !important;
+    padding-left: 1.05rem !important;
+}
+
+.city-alert-search .municipality-search .select2-selection__arrow {
+    height: 48px !important;
 }
 
 .state-charts-content,
@@ -648,16 +666,18 @@ h5 {
     .city-alert-search__body {
         flex-direction: column;
         align-items: stretch;
-        padding: 1.2rem 1rem;
+        gap: 1rem;
+        padding: 1.35rem 1rem;
     }
 
     .city-alert-search__form {
         flex-basis: auto;
         width: 100%;
+        margin-left: 0;
     }
 
-    .city-alert-search__title,
     .city-alert-search__subtitle,
+    .city-alert-search__helper,
     .products-hero__title,
     .products-hero__lead,
     .products-section-card .card-body a {

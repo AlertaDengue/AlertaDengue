@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load i18n static home_components lookup %}
-
 {% block extra_head %}
 <meta property="og:image" content="{% static 'img/screenshot.png' %}">
 <meta property="og:image:secure_url" content="{% static 'img/screenshot.png' %}">
@@ -94,6 +93,10 @@
 
   <section class="mb-4">
     {% home_other_products_section %}
+  </section>
+
+  <section class="mb-4">
+    {% home_search_city %}
   </section>
 
   <section class="mb-4" id="uf-incidence-section">

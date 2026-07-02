@@ -1705,20 +1705,15 @@ msgstr "Last update (epidemiological week)"
 msgid "Informações detalhadas sobre o Estado"
 msgstr "Detailed information about the state"
 
-#: dados/templates/components/home/home_state_epi_section.html:13
-msgid "Encontre os níveis de alerta da sua cidade"
-msgstr "Find your city's alert levels"
+#: dados/templates/components/home/home_search_city.html:12
+msgid "Encontre seu município"
+msgstr "Find your municipality"
 
-#: dados/templates/components/home/home_state_epi_section.html:16
-msgid ""
-"Selecione um município para visualizar o relatório epidemiológico completo, "
-"incluindo níveis de alerta, séries históricas, mapas e indicadores "
-"atualizados."
-msgstr ""
-"Select a municipality to view the complete epidemiological report, including "
-"alert levels, historical series, maps, and updated indicators."
+#: dados/templates/components/home/home_search_city.html:18
+msgid "Selecione um município para acessar seu relatório epidemiológico."
+msgstr "Select a municipality to open its epidemiological report."
 
-#: dados/templates/components/home/home_state_epi_section.html:23
+#: dados/templates/components/home/home_search_city.html:24
 msgid ""
 "Ao selecionar um município, você será direcionado para o relatório "
 "epidemiológico da cidade."

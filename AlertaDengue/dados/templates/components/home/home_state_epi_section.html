@@ -2,29 +2,10 @@
 {% load lookup %}
 {% load static %}
 {% load hashthis %}
-{% load searchbox_component %}
+
 
 {% block home_state_epi_section %}
-<section class="card mb-4 p-0 home-section-card city-alert-search"
-         aria-labelledby="city-alert-search-title">
-  <div class="card-body city-alert-search__body">
-    <div class="city-alert-search__copy">
-      <h4 id="city-alert-search-title" class="city-alert-search__title mb-2">
-        {% trans "Encontre os níveis de alerta da sua cidade" %}
-      </h4>
-      <p class="city-alert-search__subtitle mb-0">
-        {% trans "Selecione um município para visualizar o relatório epidemiológico completo, incluindo níveis de alerta, séries históricas, mapas e indicadores atualizados." %}
-      </p>
-    </div>
 
-    <div class="city-alert-search__form">
-      {% searchbox_component %}
-      <p class="small text-muted mb-0 mt-2">
-        {% trans "Ao selecionar um município, você será direcionado para o relatório epidemiológico da cidade." %}
-      </p>
-    </div>
-  </div>
-</section>
 
 <div class="card mb-0 p-0 home-section-card"
      id="state-epi-card">

@@ -1732,21 +1732,15 @@ msgstr "Última actualización en la SE"
 msgid "Informações detalhadas sobre o Estado"
 msgstr "Información detallada sobre el estado"
 
-#: dados/templates/components/home/home_state_epi_section.html:13
-msgid "Encontre os níveis de alerta da sua cidade"
-msgstr "Encuentre los niveles de alerta de su ciudad"
+#: dados/templates/components/home/home_search_city.html:12
+msgid "Encontre seu município"
+msgstr "Encuentre su municipio"
 
-#: dados/templates/components/home/home_state_epi_section.html:16
-msgid ""
-"Selecione um município para visualizar o relatório epidemiológico completo, "
-"incluindo níveis de alerta, séries históricas, mapas e indicadores "
-"atualizados."
-msgstr ""
-"Seleccione un municipio para visualizar el informe epidemiológico completo, "
-"incluidos los niveles de alerta, las series históricas, los mapas y los "
-"indicadores actualizados."
+#: dados/templates/components/home/home_search_city.html:18
+msgid "Selecione um município para acessar seu relatório epidemiológico."
+msgstr "Seleccione un municipio para acceder a su informe epidemiológico."
 
-#: dados/templates/components/home/home_state_epi_section.html:23
+#: dados/templates/components/home/home_search_city.html:24
 msgid ""
 "Ao selecionar um município, você será direcionado para o relatório "
 "epidemiológico da cidade."
