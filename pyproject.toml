@@ -9,7 +9,6 @@ repository = "https://github.com/AlertaDengue/AlertaDengue"
 homepage = "https://github.com/AlertaDengue/AlertaDengue"
 packages = [
     { include = "ad_main/*.py", from = "AlertaDengue" },
-
 ]
 
 [tool.poetry.dependencies]
@@ -43,7 +42,7 @@ django-celery-beat = "^2.6.0"
 redis = "^5.0.1"
 django-redis = "^5.4.0"
 epiweeks = "^2.3.0"
-episcanner-downloader = { git = "https://github.com/AlertaDengue/episcanner-downloader", tag = "1.0.12"  }
+episcanner-downloader = { git = "https://github.com/AlertaDengue/episcanner-downloader", tag = "1.0.12" }
 duckdb = "^0.9.2"
 urllib3 = "1.26.15"
 pyarrow = ">=15,<16"
@@ -66,70 +65,141 @@ pydantic = "^2.12.5"
 djangorestframework = "^3.16.0"
 
 [tool.poetry.group.dev.dependencies]
+bandit = "^1.8.6"
 black = "^22.12.0"
 compose-go = "^2.20.2"
 django-extensions = "^3.2.3"
+django-stubs = { version = "5.2.9", extras = ["compatible-mypy"] }
+django-stubs-ext = "5.2.9"
+djlint = "^1.36.4"
 flake8 = "^6.0.0"
 isort = "^5.11.4"
+mccabe = "^0.7.0"
+mypy = "^1.18.2"
 pre-commit = "^2.21.0"
 pytest = "^7.2.1"
-bpython = "^0.24"
-django-stubs = {version = "5.2.9", extras = ["compatible-mypy"]}
-django-stubs-ext = "5.2.9"
 pytest-django = "^4.12.0"
+bpython = "^0.24"
+ruff = "^0.12.0"
+vulture = "^2.14"
 
 [build-system]
 requires = ["poetry-core>=1.9.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.black]
-# https://github.com/psf/black
-target-version = ["py310"]
+[tool.ruff]
 line-length = 79
-color = true
+target-version = "py311"
+fix = true
+force-exclude = true
+src = ["AlertaDengue"]
+exclude = [
+    "docs",
+    "node_modules",
+    "frontend/.next",
+    "frontend/node_modules",
+    "build",
+    "dist",
+    "staticfiles",
+    "AlertaDengue/dados/migrations",
+    "AlertaDengue/ingestion/migrations",
+]
 
-exclude = '''
-/(
-    \.git
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv
-    | _build
-    | buck-out
-    | build
-    | dist
-    | env
-    | venv
-    | migrations/*
-)/
-'''
+[tool.ruff.lint]
+select = ["F", "I001", "RUF", "YTT"]
+ignore = ["RUF012"]
 
-[tool.isort]
-profile = "black"
-src_paths = ["isort", "test"]
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+force-sort-within-sections = true
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.bandit]
+exclude_dirs = [
+    "AlertaDengue/tests",
+    "AlertaDengue/api/tests",
+    "AlertaDengue/dados/tests",
+    "AlertaDengue/gis/tests",
+    "AlertaDengue/dados/migrations",
+    "AlertaDengue/ingestion/migrations",
+]
+
+[tool.vulture]
+paths = [
+    "AlertaDengue/ad_main",
+    "AlertaDengue/api",
+    "AlertaDengue/dados",
+    "AlertaDengue/gis",
+    "AlertaDengue/ingestion",
+    "AlertaDengue/manager",
+]
+exclude = [
+    "AlertaDengue/*/migrations/*.py",
+    "AlertaDengue/*/tests/*.py",
+    "AlertaDengue/tests/*.py",
+]
+ignore_names = [
+    "urlpatterns",
+    "app_name",
+    "default_app_config",
+]
+min_confidence = 80
 
 [tool.mypy]
 python_version = "3.11"
+plugins = ["mypy_django_plugin.main"]
+files = [
+    "AlertaDengue/ad_main",
+    "AlertaDengue/api",
+    "AlertaDengue/dados",
+    "AlertaDengue/gis",
+    "AlertaDengue/ingestion",
+    "AlertaDengue/manager",
+]
 check_untyped_defs = true
-strict = true
 ignore_missing_imports = true
 warn_unused_ignores = true
 warn_redundant_casts = true
 warn_unused_configs = true
 exclude = [
-    'tests/',
+    '^AlertaDengue/tests/',
+    '^AlertaDengue/.*/tests/',
+    '^AlertaDengue/.*/migrations/',
 ]
-plugins = ["mypy_django_plugin.main"]
 
 [tool.django-stubs]
 django_settings_module = "ad_main.settings.testing"
 
 [[tool.mypy.overrides]]
 module = [
-  "requests",
+    "requests",
 ]
 ignore_missing_imports = true
+
+[tool.djlint]
+profile = "django"
+indent = 2
+max_line_length = 79
+format_css = true
+format_js = true
+custom_blocks = "raw"
+include = "H017,H030"
+exclude = ".git,node_modules,frontend/.next,docs"
+
+[tool.djlint.html]
+indent_size = 2
+max_preserve_newlines = 2
+
+[tool.djlint.css]
+indent_size = 2
+
+[tool.djlint.js]
+indent_size = 2
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "ad_main.settings.testing"
