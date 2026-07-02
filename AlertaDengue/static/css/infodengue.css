@@ -655,7 +655,38 @@ h5 {
     .site-nav-link {
         width: 100%;
         justify-content: flex-start;
-        padding: 0.7rem 0.1rem !important;
+        padding: 0.75rem 0.7rem !important;
+        color: #fff !important;
+        font-size: 1.05rem;
+        font-weight: 700;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    }
+
+    .site-nav-link i {
+        color: #fff;
+        opacity: 1;
+    }
+
+    .site-nav-link:hover,
+    .site-nav-link:focus,
+    .site-nav-link.active {
+        color: #fff !important;
+        text-decoration: none;
+    }
+
+    .site-nav-link:hover,
+    .site-nav-link:focus {
+        background: rgba(255, 255, 255, 0.16);
+        box-shadow:
+            inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+            0 6px 16px rgba(0, 27, 62, 0.16);
+    }
+
+    .site-nav-link.active {
+        background: rgba(255, 255, 255, 0.22);
+        box-shadow:
+            inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+            0 8px 18px rgba(0, 27, 62, 0.18);
     }
 
     .site-page-title {
