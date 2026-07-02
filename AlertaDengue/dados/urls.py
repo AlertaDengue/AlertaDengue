@@ -90,17 +90,17 @@ urlpatterns = [
         name="joinin",
     ),
     re_path(
-        r"^services/(?P<service>maps|api)?$",
+        r"^services/(?P<service>api)?$",
         DataPublicServicesPageView.as_view(),
         name="data_public_services",
     ),
     re_path(
-        r"^services/(?P<service>maps|tutorial)?$",
+        r"^services/(?P<service>tutorial)?$",
         DataPublicServicesPageView.as_view(),
         name="data_public_services",
     ),
     re_path(
-        r"^services/(?P<service>maps|tutorial)/(?P<service_type>R)$",
+        r"^services/(?P<service>tutorial)/(?P<service_type>R)$",
         DataPublicServicesPageView.as_view(
             template_name="services_tutorial_R.html"
         ),
@@ -114,7 +114,7 @@ urlpatterns = [
         name="tutorial_api_R",
     ),
     re_path(
-        r"^services/(?P<service>maps|tutorial)/(?P<service_type>Python)$",
+        r"^services/(?P<service>tutorial)/(?P<service_type>Python)$",
         DataPublicServicesPageView.as_view(
             template_name="services_tutorial_Python.html"
         ),
@@ -128,7 +128,7 @@ urlpatterns = [
         name="tutorial_api_python",
     ),
     re_path(
-        r"^services/(?P<service>maps|api)/(?P<service_type>doc)$",
+        r"^services/(?P<service>api)/(?P<service_type>doc)$",
         DataPublicServicesPageView.as_view(),
         name="data_public_services_type",
     ),

@@ -355,9 +355,7 @@ class DataPublicServicesPageView(TemplateView):
             None if "service_type" not in kwargs else kwargs["service_type"]
         )
 
-        if service == "maps":
-            self.template_name = "services_maps.html"
-        elif service == "tutorial":
+        if service == "tutorial":
             if service_type is None:
                 self.template_name = "services_tutorial.html"
             elif service_type == "R":
