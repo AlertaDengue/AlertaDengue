@@ -1,6 +1,12 @@
 Release Notes
 ---
 
+## Unreleased
+
+### Refactors
+
+* **gis:** remove the legacy gis app, move `sync_geofiles` into `dados`, and retire MapServer/GeoTIFF endpoints
+
 ## [4.18.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.17.0...4.18.0) (2026-06-26)
 
 ### Features

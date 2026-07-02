@@ -1,15 +1,13 @@
 import json
 import os
 from pathlib import Path
-from typing import Final, List, Sequence, Tuple
+from typing import Final, Sequence
 
 import fiona
 import geojson
 import geopandas as gpd
 import shapely
 from dados import dbdata, maps
-
-# local
 from django.conf import settings
 from django.core.cache import cache
 from django.core.management.base import BaseCommand
@@ -17,7 +15,7 @@ from shapely.geometry import MultiPolygon, shape
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 
-from ...geodf import extract_boundaries
+from ...geoutils import extract_boundaries
 
 DB_ENGINE: Final[Engine] = settings.DB_ENGINE
 
@@ -25,18 +23,6 @@ DB_ENGINE: Final[Engine] = settings.DB_ENGINE
 def get_all_active_cities(
     db_engine: Engine = DB_ENGINE,
 ) -> list[tuple[str, str]]:
-    """Retrieve active city geocodes and names.
-
-    Parameters
-    ----------
-    db_engine
-        SQLAlchemy engine used to execute the query.
-
-    Returns
-    -------
-    list[tuple[str, str]]
-        List of (geocode, name).
-    """
     cache_key = "get_all_active_cities"
     cached: Sequence[tuple[str, str]] | None = cache.get(cache_key)
     if cached is not None:
@@ -64,14 +50,7 @@ class Command(BaseCommand):
     help = "Generates geojson files and save into staticfiles folder"
 
     def create_geojson(self, f_path, geocode):
-        """
-        :param f_path:
-        :param geocode:
-        :return:
-        """
-
         f_name = f_path / f"{geocode}.json"
-
         geojson_city = geojson.dumps(maps.get_city_geojson(int(geocode)))
 
         with open(f_name, "w") as f:
@@ -84,23 +63,15 @@ class Command(BaseCommand):
         )
 
     def get_geojson(self, f_path, geocode):
-
         f_name = f_path / f"{geocode}.json"
 
         with open(f_name, "r") as f:
             return json.load(f)
 
     def create_shapefile(self, f_path, geocode):
-        """
-        :param f_path:
-        :param geocode:
-        :return:
-        """
-
         geojson_path = f_path / "geojson" / f"{geocode}.json"
         shpfile_path = f_path / "shapefile" / f"{geocode}.shp"
 
-        # creates the shapefile
         with fiona.open(geojson_path) as geojson_file:
             with fiona.open(
                 shpfile_path,
@@ -113,18 +84,10 @@ class Command(BaseCommand):
                     shp.write(item)
 
     def simplify_geojson(self, f_path, geocode):
-        """
-        :param f_path:
-        :param geocode:
-        :return:
-        """
-
         geojson_simplified_path = Path(
             f_path / "geojson_simplified" / f"{geocode}.json"
         )
-
         geojson_original_path = Path(f_path / "geojson" / f"{geocode}.json")
-
         geojson_simplified_dir_path = geojson_simplified_path.parent
 
         geojson_simplified_dir_path.mkdir(parents=True, exist_ok=True)
@@ -137,7 +100,6 @@ class Command(BaseCommand):
             )
             return
 
-        # creates the shapefile
         with fiona.open(geojson_original_path, "r") as shp:
             polygon_list = [shape(pol["geometry"]) for pol in shp]
 
@@ -170,19 +132,10 @@ class Command(BaseCommand):
         )
 
     def create_geojson_by_state(self, geojson_simplified_path):
-        # create jsonfiles by state
-        # note: uses 2 steps to minimize memory consumption
-
-        # create a dictionary with geocode by ufs
         geojson_codes_states = {
             state_code: [] for state_code in dbdata.STATE_NAME.keys()
         }
-        for (
-            geocode,
-            _,
-            _,
-            state_name,
-        ) in dbdata.get_all_active_cities_state():
+        for geocode, _, _, state_name in dbdata.get_all_active_cities_state():
             state_code = dbdata.STATE_INITIAL[state_name]
             geojson_codes_states[state_code].append(geocode)
 
@@ -196,7 +149,6 @@ class Command(BaseCommand):
                 geojson_content = self.get_geojson(
                     geojson_simplified_path, geocode
                 )
-                # add id attribute
                 geojson_states[state_code]["features"].append(geojson_content)
 
         for state_code, geojson_state in geojson_states.items():
@@ -213,14 +165,7 @@ class Command(BaseCommand):
             )
 
     def extract_geo_info_table(self, f_path, geocode):
-        """
-        :param f_path:
-        :param geocode:
-        :return:
-        """
-
         shpfile_path = f_path / "shapefile" / f"{geocode}.shp"
-
         gdf = gpd.read_file(shpfile_path)
 
         bounds = extract_boundaries(gdf).tolist()
@@ -232,22 +177,17 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         geocodes = list(dict(get_all_active_cities()).keys())
 
-        SERVE_STATIC = (
+        serve_static = (
             settings.STATICFILES_DIRS[0]
             if settings.DEBUG
             else settings.STATIC_ROOT
         )
-
-        path_root = Path(SERVE_STATIC)
-
+        path_root = Path(serve_static)
         f_geojson_path = path_root / "geojson"
-
         f_geojson_simplified_path = path_root / "geojson_simplified"
-
         f_shapefile_path = path_root / "shapefile"
 
         f_geojson_path.mkdir(parents=True, exist_ok=True)
-
         f_shapefile_path.mkdir(parents=True, exist_ok=True)
 
         geo_info = {}
@@ -258,7 +198,6 @@ class Command(BaseCommand):
             self.simplify_geojson(path_root, geocode)
             geo_info.update(self.extract_geo_info_table(path_root, geocode))
 
-        # f_geojson_simplified_path.mkdir(parents=True, exist_ok=True)
         self.create_geojson_by_state(f_geojson_simplified_path)
 
         with open(os.path.join(f_geojson_path, "geo_info.json"), "w") as f:

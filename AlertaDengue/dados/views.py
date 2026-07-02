@@ -11,7 +11,6 @@ from datetime import timedelta
 from pathlib import Path, PurePath
 from typing import Any
 
-import fiona
 import numpy as np
 import pandas as pd
 
@@ -32,7 +31,6 @@ from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
 from django.views.generic.base import TemplateView, View
 from epiweeks import Week
-from gis.geotiff import convert_from_shapefile
 
 from . import models as M
 from .charts.alerts import AlertCitiesCharts
@@ -357,25 +355,7 @@ class DataPublicServicesPageView(TemplateView):
             None if "service_type" not in kwargs else kwargs["service_type"]
         )
 
-        if service == "maps":
-            if service_type is None:
-
-                geo_info_path = find("geojson/geo_info.json")
-
-                with open(geo_info_path) as f:
-                    geo_info_json = json.load(f)
-
-                    context.update(
-                        {
-                            "geocodes": sorted(list(geo_info_json.keys())),
-                            "mapserver_url": settings.MAPSERVER_URL,
-                            "geo_info": geo_info_json,
-                        }
-                    )
-                self.template_name = "services_maps.html"
-            else:
-                self.template_name = "services_maps_doc.html"
-        elif service == "tutorial":
+        if service == "tutorial":
             if service_type is None:
                 self.template_name = "services_tutorial.html"
             elif service_type == "R":
@@ -794,38 +774,6 @@ class ChartsMainView(TemplateView):
             }
         )
         return context
-
-
-# Check if it's necessary
-class GeoTiffView(View):
-    def get(self, request, geocodigo, disease):
-        """
-        :param kwargs:
-        :return:
-        """
-        geocode = geocodigo
-
-        # load shapefile
-        for path in (settings.STATIC_ROOT, settings.STATICFILES_DIRS[0]):
-            if not os.path.isdir(path):
-                continue
-            shp_path = os.path.join(path, "shapefile")
-
-        shp = fiona.open(os.path.join(shp_path, "%s.shp" % geocode))
-
-        result = convert_from_shapefile(
-            shapefile=shp, rgb_color=get_last_color_alert(geocode, disease)
-        )
-
-        response = HttpResponse(
-            result, content_type="application/force-download"
-        )
-
-        response["Content-Disposition"] = (
-            "attachment; filename=%s.tiff" % geocode
-        )
-
-        return response
 
 
 class GeoJsonView(View):
