@@ -402,9 +402,15 @@ def build_result_backend(debug: bool) -> str:
 
 
 BOOTSTRAP4 = {
+    "css_url": {
+        "href": "/static/libs/bootstrap/4.6.2/bootstrap.min.css",
+    },
+    "javascript_url": {
+        "url": "/static/libs/bootstrap/4.6.2/bootstrap.bundle.min.js",
+    },
     "form_renderers": {
         "default": "dados.forms.FormRendererWithHiddenFieldErrors"
-    }
+    },
 }
 
 LEAFLET_CONFIG = {
