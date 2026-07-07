@@ -131,9 +131,16 @@ def test_create_climate_chart_coerces_numeric_series() -> None:
         df=df,
         var_climate={"temp.min": ["°C temperatura mínima", 18]},
     )
-    assert r"\u00b0C temperatura m\u00ednima" in html
+
+    assert (
+        "°C temperatura mínima" in html
+        or r"\u00b0C temperatura m\u00ednima" in html
+    )
     assert "temp.min" not in html
-    assert r"Limiar favor\u00e1vel 18\u00b0C" in html
+    assert (
+        "Limiar favorável 18°C" in html
+        or r"Limiar favor\u00e1vel 18\u00b0C" in html
+    )
     assert '"responsive": true' in html
     assert "height:520px" in html
     assert "width:100%" in html

@@ -1,0 +1,14 @@
+{
+  "default": {
+    "filename": "epidemiological-situation-analysis-02-2026.pdf",
+    "output_filename": "RELATÓRIO TÉCNICO 02_2026.pdf"
+  },
+  "epidemiological-situation-analysis-2026": {
+    "filename": "epidemiological-situation-analysis-02-2026.pdf",
+    "output_filename": "RELATÓRIO TÉCNICO 02_2026.pdf"
+  },
+  "technical-report-2023": {
+    "filename": "technical-report.pdf",
+    "output_filename": "RELATÓRIO TÉCNICO 02_23 clima e arboviroses - projeções para 2024-26out2023.pdf"
+  }
+}

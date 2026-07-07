@@ -63,6 +63,17 @@ from .dbdata import (  # get_notification_cases,
 from .episem import episem, episem2date
 from .maps import get_city_info
 from .models import City
+from .technical_reports import serve_technical_report_pdf
+
+
+def download_technical_report_pdf(
+    request, report_key="default", *args, **kwargs
+):
+    """View to serve technical report PDFs, delegating to the service implementation."""
+    return serve_technical_report_pdf(
+        request, report_key=report_key, *args, **kwargs
+    )
+
 
 # local
 
@@ -282,50 +293,12 @@ class AboutPageView(TemplateView):
         return context
 
 
-TECHNICAL_REPORTS = {
-    "default": {
-        "filename": "technical-report.pdf",
-        "output_filename": (
-            "RELATÓRIO TÉCNICO 02_23 clima e arboviroses - projeções para "
-            "2024-26out2023.pdf"
-        ),
-    },
-    "epidemiological-situation-analysis-2026": {
-        "filename": "epidemiological-situation-analysis-01-2026.pdf",
-        "output_filename": "RELATÓRIO TÉCNICO 01_2026.pdf",
-    },
-}
-
-
 class ProductsPageView(TemplateView):
     template_name = "products.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
-
-
-def download_technical_report_pdf(
-    request, report_key="default", *args, **kwargs
-):
-    report = TECHNICAL_REPORTS.get(report_key)
-
-    if report is None:
-        raise Http404("Technical Report PDF not found")
-
-    pdf_path = Path(settings.TECHNICAL_REPORTS_ROOT) / report["filename"]
-
-    if not pdf_path.exists():
-        raise Http404("Technical Report PDF not found")
-
-    pdf_output = report["output_filename"]
-
-    with pdf_path.open("rb") as pdf_file:
-        response = HttpResponse(
-            pdf_file.read(), content_type="application/pdf"
-        )
-        response["Content-Disposition"] = f'inline; filename="{pdf_output}"'
-        return response
 
 
 class TeamPageView(TemplateView):
