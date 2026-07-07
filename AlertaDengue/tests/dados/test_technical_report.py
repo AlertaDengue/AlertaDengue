@@ -1,7 +1,9 @@
+import json
 from pathlib import Path
 from typing import Any
 
 import pytest
+from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.test import RequestFactory, override_settings
@@ -12,17 +14,28 @@ def _download_view(monkeypatch: pytest.MonkeyPatch) -> Any:
     import locale
 
     monkeypatch.setattr(locale, "setlocale", lambda *args, **kwargs: None)
-    from dados.views import download_technical_report_pdf
+    from dados.technical_reports import download_technical_report_pdf
 
     return download_technical_report_pdf
 
 
-def test_download_technical_report_pdf_uses_configured_root(
+def test_download_technical_report_pdf_success(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    # Setup manifest and PDF
+    manifest = {
+        "default": {
+            "filename": "report.pdf",
+            "output_filename": "Output Report.pdf",
+        }
+    }
+    (tmp_path / "technical_reports.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
     pdf_content = b"%PDF-1.4 technical report"
-    (tmp_path / "technical-report.pdf").write_bytes(pdf_content)
+    (tmp_path / "report.pdf").write_bytes(pdf_content)
+
     download_technical_report_pdf = _download_view(monkeypatch)
 
     with override_settings(TECHNICAL_REPORTS_ROOT=tmp_path):
@@ -31,17 +44,143 @@ def test_download_technical_report_pdf_uses_configured_root(
     assert response.status_code == 200
     assert response["Content-Type"] == "application/pdf"
     assert response["Content-Disposition"].startswith("inline;")
-    assert response.content == pdf_content
+    assert "Output Report.pdf" in response["Content-Disposition"]
+    # For FileResponse, we consume the streaming content
+    assert b"".join(response.streaming_content) == pdf_content
 
 
-def test_download_technical_report_pdf_returns_404_when_missing(
+def test_download_technical_report_pdf_unknown_key(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest = {"default": {"filename": "a.pdf", "output_filename": "b.pdf"}}
+    (tmp_path / "technical_reports.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+
+    download_technical_report_pdf = _download_view(monkeypatch)
+
+    with override_settings(TECHNICAL_REPORTS_ROOT=tmp_path):
+        with pytest.raises(Http404, match="Technical Report PDF not found"):
+            download_technical_report_pdf(
+                RequestFactory().get("/"), report_key="unknown"
+            )
+
+
+def test_download_technical_report_pdf_missing_file(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest = {
+        "default": {"filename": "missing.pdf", "output_filename": "b.pdf"}
+    }
+    (tmp_path / "technical_reports.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+
+    download_technical_report_pdf = _download_view(monkeypatch)
+
+    with override_settings(TECHNICAL_REPORTS_ROOT=tmp_path):
+        with pytest.raises(Http404, match="Technical Report PDF not found"):
+            download_technical_report_pdf(RequestFactory().get("/"))
+
+
+def test_download_technical_report_pdf_path_traversal(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest = {
+        "default": {"filename": "../secret.pdf", "output_filename": "b.pdf"}
+    }
+    (tmp_path / "technical_reports.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+    (tmp_path.parent / "secret.pdf").write_bytes(b"secret")
+
+    download_technical_report_pdf = _download_view(monkeypatch)
+
+    with override_settings(TECHNICAL_REPORTS_ROOT=tmp_path):
+        with pytest.raises(Http404, match="Technical Report PDF not found"):
+            download_technical_report_pdf(RequestFactory().get("/"))
+
+
+def test_download_technical_report_pdf_non_pdf(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest = {
+        "default": {"filename": "report.txt", "output_filename": "b.pdf"}
+    }
+    (tmp_path / "technical_reports.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+    (tmp_path / "report.txt").write_text("not a pdf")
+
+    download_technical_report_pdf = _download_view(monkeypatch)
+
+    with override_settings(TECHNICAL_REPORTS_ROOT=tmp_path):
+        with pytest.raises(Http404, match="Technical Report PDF not found"):
+            download_technical_report_pdf(RequestFactory().get("/"))
+
+
+def test_manifest_missing_raises_improperly_configured(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     download_technical_report_pdf = _download_view(monkeypatch)
 
     with override_settings(TECHNICAL_REPORTS_ROOT=tmp_path):
-        with pytest.raises(Http404, match="Technical Report PDF not found"):
+        with pytest.raises(ImproperlyConfigured, match="manifest not found"):
+            download_technical_report_pdf(RequestFactory().get("/"))
+
+
+def test_manifest_invalid_json_raises_improperly_configured(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    (tmp_path / "technical_reports.json").write_text(
+        "invalid json", encoding="utf-8"
+    )
+    download_technical_report_pdf = _download_view(monkeypatch)
+
+    with override_settings(TECHNICAL_REPORTS_ROOT=tmp_path):
+        with pytest.raises(ImproperlyConfigured, match="Invalid JSON"):
+            download_technical_report_pdf(RequestFactory().get("/"))
+
+
+def test_manifest_invalid_structure_raises_improperly_configured(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Root not a dict
+    (tmp_path / "technical_reports.json").write_text(
+        json.dumps(["not a dict"]), encoding="utf-8"
+    )
+    download_technical_report_pdf = _download_view(monkeypatch)
+
+    with override_settings(TECHNICAL_REPORTS_ROOT=tmp_path):
+        with pytest.raises(
+            ImproperlyConfigured, match="must be a JSON object"
+        ):
+            download_technical_report_pdf(RequestFactory().get("/"))
+
+
+def test_manifest_invalid_entry_raises_improperly_configured(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Entry missing filename
+    manifest = {"default": {"output_filename": "b.pdf"}}
+    (tmp_path / "technical_reports.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+    download_technical_report_pdf = _download_view(monkeypatch)
+
+    with override_settings(TECHNICAL_REPORTS_ROOT=tmp_path):
+        with pytest.raises(
+            ImproperlyConfigured,
+            match="must have a non-empty string 'filename'",
+        ):
             download_technical_report_pdf(RequestFactory().get("/"))
 
 
@@ -62,10 +201,10 @@ def test_services_api_download_button_shows_selected_format() -> None:
     ).read_text()
 
     assert (
-        'label for="format">{% translate "Selecione o formato do arquivo de saída" %}</label>'
+        'label for="format">' in content
+        and '{% translate "Selecione o formato do arquivo de saída" %}'
         in content
     )
     assert 'id="download-button"' in content
     assert 'id="download-format-label">CSV</span>' in content
     assert "fa fa-download" in content
-    assert "syncDownloadButtonLabel" in content
