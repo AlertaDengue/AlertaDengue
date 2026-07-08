@@ -12,4 +12,5 @@ export UV_PYTHON="$(python -c 'import sys; print(sys.executable)')"
 ${SCRIPT_DIR}/install-prod.sh
 
 uv pip install -e "."
+poetry install --with dev
 uv pip install pytest pytest-django pytest-cov
