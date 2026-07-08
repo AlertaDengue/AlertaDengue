@@ -4,15 +4,15 @@ export const DJANGO_PORT = process.env.DJANGO_PORT;
 const nextConfig = {
   reactStrictMode: true,
 
-  output: 'standalone',
+  output: "standalone",
 
   experimental: {
     optimizePackageImports: [
-      '@tanstack/react-query',
-      'axios',
-      'lucide-react',
-      'date-fns',
-      'lodash'
+      "@tanstack/react-query",
+      "axios",
+      "lucide-react",
+      "date-fns",
+      "lodash",
     ],
   },
 
@@ -21,18 +21,18 @@ const nextConfig = {
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.optimization.splitChunks = {
-        chunks: 'all',
+        chunks: "all",
         cacheGroups: {
           vendor: {
             test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
+            name: "vendors",
+            chunks: "all",
             maxSize: 244000,
           },
           common: {
-            name: 'common',
+            name: "common",
             minChunks: 2,
-            chunks: 'all',
+            chunks: "all",
             enforce: true,
             maxSize: 244000,
           },
@@ -44,31 +44,29 @@ const nextConfig = {
   },
 
   async redirects() {
-    return [
-    ];
+    return [];
   },
 
   async rewrites() {
-    return [
-    ]
+    return [];
   },
 
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: "/(.*)",
         headers: [
           {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
+            key: "X-Content-Type-Options",
+            value: "nosniff",
           },
           {
-            key: 'X-Frame-Options',
-            value: 'DENY',
+            key: "X-Frame-Options",
+            value: "DENY",
           },
           {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
           },
         ],
       },

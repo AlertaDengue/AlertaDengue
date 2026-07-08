@@ -3,31 +3,101 @@ default_language_version:
 
 default_stages: [commit]
 
+exclude: >-
+  (^docs/|(^|.*/)migrations/|(^|.*/)devcontainer\.json$|^\.git/|^\.eggs/|
+  (^|.*/)node_modules/|(^|.*/)\.next/|(^|.*/)build/|(^|.*/)dist/|
+  (^|.*/)staticfiles/)
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.5.0
     hooks:
+      - id: trailing-whitespace
+        exclude: ^LICENSE$
       - id: end-of-file-fixer
-        exclude: LICENSE
+        exclude: ^LICENSE$
+      - id: check-json
+        exclude: ^(notebooks/DB_DEMO\.ipynb|AlertaDengue/templates/manifest\.json)$
+      - id: check-toml
+      - id: check-xml
+      - id: debug-statements
+      - id: check-builtin-literals
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: detect-private-key
 
   - repo: local
     hooks:
-      - id: black
-        name: black
-        entry: black
+      - id: djlint-reformat-django
+        name: djLint reformat (Django)
+        entry: poetry run djlint --reformat --profile=django
         language: system
-        files: ""
-        exclude: ^$
-        types: [python, file, python]
+        files: ^AlertaDengue/(dados/templates|templates)/.*\.html$
         pass_filenames: true
-        args: ["--line-length", "79"]
 
-      - id: isort
-        name: isort
-        entry: isort
+      - id: djlint-django
+        name: djLint check (Django)
+        entry: poetry run djlint --check --profile=django
         language: system
-        files: ""
-        exclude: ^.*/js/.*$
-        types: [python]
+        files: ^AlertaDengue/(dados/templates|templates)/.*\.html$
         pass_filenames: true
-        args: ["--profile", "black", "-l", "79"]
+
+      - id: ruff-format
+        name: Ruff format
+        entry: poetry run ruff format
+        language: system
+        files: ^AlertaDengue/.*\.py$
+        pass_filenames: true
+
+      - id: ruff-linter
+        name: Ruff lint
+        entry: poetry run ruff check
+        language: system
+        files: ^AlertaDengue/.*\.py$
+        pass_filenames: true
+
+      - id: bandit
+        name: Bandit
+        entry: poetry run bandit --configfile pyproject.toml -iii -lll
+        language: system
+        files: ^AlertaDengue/.*\.py$
+
+      - id: vulture
+        name: Vulture
+        entry: poetry run python scripts/run-vulture.py
+        language: system
+        files: ^AlertaDengue/.*\.py$
+
+      - id: mccabe
+        name: McCabe
+        entry: poetry run python -m mccabe --min 25
+        language: system
+        files: ^AlertaDengue/(ad_main|api|dados|ingestion|manager)/.*\.py$
+        pass_filenames: true
+
+      - id: mypy
+        name: mypy
+        entry: bash scripts/run-mypy-precommit.sh
+        language: system
+        files: ^AlertaDengue/.*\.py$
+
+      - id: prettier
+        name: Prettier
+        entry: bash scripts/run-prettier-precommit.sh
+        language: system
+        files: ^frontend/(src/.*\.(ts|tsx|css)|.*\.(json|mjs))$
+        pass_filenames: true
+
+      - id: eslint
+        name: ESLint
+        entry: npm --prefix frontend run lint
+        language: system
+        files: ^frontend/.*\.(ts|tsx|js|jsx|mjs)$
+        pass_filenames: false
+
+      - id: tsc
+        name: TypeScript
+        entry: npm --prefix frontend run typecheck
+        language: system
+        files: ^frontend/.*\.(ts|tsx|mts)$
+        pass_filenames: false
