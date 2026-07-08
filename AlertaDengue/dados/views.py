@@ -1,14 +1,12 @@
+from collections import OrderedDict, defaultdict
+from copy import deepcopy
+from dataclasses import replace
 import datetime
 import json
 import locale
 import logging
-import os
-import random
-from collections import OrderedDict, defaultdict
-from copy import deepcopy
-from dataclasses import replace
-from datetime import timedelta
 from pathlib import Path, PurePath
+import random
 from typing import Any
 
 import numpy as np
@@ -17,19 +15,18 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 #
-from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles.finders import find
 from django.core.cache import cache
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 
 # from django.shortcuts import redirect
 from django.templatetags.static import static
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
-from django.views.generic.base import TemplateView, View
+from django.views.generic.base import View
 from epiweeks import Week
 
 from . import models as M
@@ -233,8 +230,7 @@ def hex_to_rgb(value):
     value = value.lstrip("#")
     lv = len(value)
     return tuple(
-        int(value[i : i + lv // 3], 16)
-        for i in range(0, lv, lv // 3)  # noqa: E203
+        int(value[i : i + lv // 3], 16) for i in range(0, lv, lv // 3)
     )
 
 
@@ -341,7 +337,10 @@ class DataPublicServicesPageView(TemplateView):
 
                 options_cities = ""
                 for state_abbv, state_name in STATE_NAME.items():
-                    for (geocode, city_name,) in RegionalParameters.get_cities(
+                    for (
+                        geocode,
+                        city_name,
+                    ) in RegionalParameters.get_cities(
                         state_name=state_name
                     ).items():
                         options_cities += """
@@ -661,9 +660,9 @@ class ChartsMainView(TemplateView):
             )
 
             # count_cities_by_uf('Santa Catarina', 'dengue')
-            count_cities[disease][
-                state_abbv
-            ] = notif_resume.count_cities_by_uf(state_name, disease)
+            count_cities[disease][state_abbv] = (
+                notif_resume.count_cities_by_uf(state_name, disease)
+            )
 
             df = data_hist_uf(state_abbv=state_abbv, disease=disease)
 
@@ -752,7 +751,7 @@ class ChartsMainView(TemplateView):
 class GeoJsonView(View):
     def get(self, request, geocodigo, disease):
         cache_key = f"geojson_{geocodigo}"
-        geojson = cache.get(cache_key)  # NOQA F811
+        geojson = cache.get(cache_key)
 
         if not geojson:
             # Get the path of the GeoJSON file
@@ -776,9 +775,9 @@ class GeoJsonView(View):
 
         # Create the HTTP response with the GeoJSON
         response = HttpResponse(geojson, content_type="application/json")
-        response[
-            "Content-Disposition"
-        ] = f"attachment; filename={geocodigo}.json"
+        response["Content-Disposition"] = (
+            f"attachment; filename={geocodigo}.json"
+        )
         return response
 
     def get_geojson_path(self, geocodigo):
@@ -1150,7 +1149,6 @@ class ReportStateData(TemplateView):
     template_name = "components/report_state/report_state_charts.html"
 
     def get_context_data(self, **kwargs):
-
         context = super(ReportStateData, self).get_context_data(**kwargs)
         state_abbv = context["state"]
         year_week = int(context["year_week"])

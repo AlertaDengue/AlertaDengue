@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import os
-import sys
 from pathlib import Path
+import sys
 
-from ad_main.settings.dev import *  # noqa: F403
 from django.db import connections
 from django.db.models.signals import pre_migrate
 from django.dispatch import receiver
+
+from ad_main.settings.dev import *  # noqa: F403
 
 DEBUG = True
 

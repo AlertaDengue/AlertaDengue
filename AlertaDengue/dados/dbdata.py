@@ -2,32 +2,27 @@
 
 from __future__ import annotations
 
-import json
-import logging
-import unicodedata
 from collections import defaultdict
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
-from functools import lru_cache
+import logging
 from typing import (
     Any,
-    Callable,
     Final,
     List,
-    Literal,
     Optional,
     Tuple,
     TypeVar,
 )
+import unicodedata
 
-import numpy as np
-import pandas as pd
-import psycopg2
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.text import slugify
 from epiweeks import Week
+import numpy as np
+import pandas as pd
 from sqlalchemy import bindparam, text
 from sqlalchemy.engine import Engine, Row
 
@@ -713,9 +708,7 @@ def get_epiyears(
     FROM public.epiyear_summary_materialized_view
     WHERE uf = :state_name{disease_filter}
     ORDER BY ano_notif, se_notif
-    """.format(
-        disease_filter=disease_filter
-    )
+    """.format(disease_filter=disease_filter)
 
     with db_engine.connect() as conn:
         result = conn.execute(text(sql_text_query), parameters)
@@ -964,7 +957,7 @@ class ReportCity:
         # However, preserving the logic from original code: `ew_start = ew_end - 200`
 
         sql = f"""
-            SELECT 
+            SELECT
                 "SE" AS "SE",
                 casos AS "casos notif.",
                 casos_est AS "casos_est",
@@ -976,16 +969,16 @@ class ReportCity:
                 umidmin AS "umid.min",
                 umidmed AS "umid.med",
                 umidmax AS "umid.max",
-                CASE 
+                CASE
                     WHEN nivel = 1 THEN 'verde'
                     WHEN nivel = 2 THEN 'amarelo'
                     WHEN nivel = 3 THEN 'laranja'
                     WHEN nivel = 4 THEN 'vermelho'
-                    ELSE '-' 
+                    ELSE '-'
                 END AS nivel,
                 nivel AS level_code
             FROM "Municipio"."{table_name}"
-            WHERE 
+            WHERE
                 "SE" BETWEEN :ew_start AND :ew_end
                 AND municipio_geocodigo = :geocode
             ORDER BY "SE"
@@ -1023,8 +1016,8 @@ class ReportState:
         if res is None:
             uf_name = ALL_STATE_NAMES[state][0]
 
-            sql = f"""
-                SELECT 
+            sql = """
+                SELECT
                     m.id_regional AS id_regional,
                     m.regional AS nome_regional,
                     m.geocodigo AS municipio_geocodigo,
@@ -1094,7 +1087,7 @@ class ReportState:
                 m.nome AS municipio_nome
             FROM "Municipio"."{table_name}" AS h
             JOIN "Dengue_global"."Municipio" AS m ON h.municipio_geocodigo = m.geocodigo
-            WHERE 
+            WHERE
                 h."SE" BETWEEN :ew_start AND :ew_end
                 AND h.municipio_geocodigo IN :geocodes
             ORDER BY h."SE"

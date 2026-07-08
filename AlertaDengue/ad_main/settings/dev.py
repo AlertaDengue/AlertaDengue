@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ad_main.settings.base import *  # noqa: F401,F403
+from ad_main.settings.base import *  # noqa: F403
 
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
@@ -8,11 +8,12 @@ ALLOWED_HOSTS = ["*"]
 try:
     import django_extensions  # noqa: F401
 
-    INSTALLED_APPS = INSTALLED_APPS + ["django_extensions"]
+    INSTALLED_APPS = [*INSTALLED_APPS, "django_extensions"]
 except ImportError:
     pass
 
-MIDDLEWARE = BASE_MIDDLEWARE + [
+MIDDLEWARE = [
+    *BASE_MIDDLEWARE,
     "django_cprofile_middleware.middleware.ProfilerMiddleware",
 ]
 DJANGO_CPROFILE_MIDDLEWARE_REQUIRE_STAFF = False

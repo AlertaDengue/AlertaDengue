@@ -1,8 +1,9 @@
-from dados.dbdata import STATE_NAME, RegionalParameters
-from dados.models import City
 from django import template
 from django.conf import settings
 from django.core.cache import cache
+
+from dados.dbdata import STATE_NAME, RegionalParameters
+from dados.models import City
 
 register = template.Library()
 

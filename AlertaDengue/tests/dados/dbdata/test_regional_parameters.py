@@ -4,11 +4,13 @@ Tests for RegionalParameters class in dbdata.py.
 Covers the composite PK (municipio_geocodigo, cid10) parameters table
 and verifies that disease-specific filtering returns correct thresholds.
 """
+
 from __future__ import annotations
 
-import pytest
-from dados.dbdata import RegionalParameters
 from django.core.cache import cache
+import pytest
+
+from dados.dbdata import RegionalParameters
 
 
 @pytest.fixture(autouse=True)

@@ -3,17 +3,18 @@ import os
 from pathlib import Path
 from typing import Final, Sequence
 
+from django.conf import settings
+from django.core.cache import cache
+from django.core.management.base import BaseCommand
 import fiona
 import geojson
 import geopandas as gpd
 import shapely
-from dados import dbdata, maps
-from django.conf import settings
-from django.core.cache import cache
-from django.core.management.base import BaseCommand
 from shapely.geometry import MultiPolygon, shape
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
+
+from dados import dbdata, maps
 
 from ...geoutils import extract_boundaries
 

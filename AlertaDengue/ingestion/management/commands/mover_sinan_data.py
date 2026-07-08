@@ -2,19 +2,19 @@
 from __future__ import annotations
 
 import argparse
+from collections.abc import Iterator
 import csv
+from dataclasses import dataclass
 import datetime
 import hashlib
 import io
 import json
 import logging
 import os
+from pathlib import Path
 import re
 import shutil
 import sys
-from collections.abc import Iterator
-from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
 from dbfread import DBF

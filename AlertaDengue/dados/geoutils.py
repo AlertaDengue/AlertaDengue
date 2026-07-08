@@ -1,5 +1,5 @@
-import numpy as np
 from geopandas import GeoDataFrame
+import numpy as np
 
 
 def extract_boundaries(gdf: GeoDataFrame):

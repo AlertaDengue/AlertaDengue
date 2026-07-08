@@ -3,8 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
 from django.core.management import call_command
+import pytest
+
 from ingestion.management.commands import ingestion_enqueue_manifest as man
 
 

@@ -1,9 +1,10 @@
-import json
 from datetime import datetime
+import json
 
-from dados.episem import episem
 from django.http import HttpResponse
 from django.views.generic.base import View
+
+from dados.episem import episem
 
 # local
 from .db import STATE_NAME, AlertCity, NotificationQueries

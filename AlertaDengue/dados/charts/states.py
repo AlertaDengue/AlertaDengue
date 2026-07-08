@@ -4,10 +4,10 @@ Module for plotting charts in the states reports
 
 from copy import deepcopy
 
+from django.utils.translation import gettext as _
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
-from django.utils.translation import gettext as _
 
 # from plotly.subplots import make_subplots
 

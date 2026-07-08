@@ -4,10 +4,10 @@ Module for plotting in the homepage charts
 
 from copy import deepcopy
 
+from django.utils.translation import gettext as _
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
-from django.utils.translation import gettext as _
 
 
 def _create_scatter_chart(df: pd.DataFrame) -> go.Figure:

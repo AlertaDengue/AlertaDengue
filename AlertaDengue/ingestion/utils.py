@@ -1,17 +1,16 @@
 from __future__ import annotations
 
-import datetime as dt
 from collections import Counter
+import datetime as dt
 from typing import Any, Iterable, Iterator, Optional, Union, cast
 
+from dateutil.parser import parse
 import numpy as np
 import pandas as pd
-from dateutil.parser import parse
 from pandas.tseries.api import guess_datetime_format
 
 
 def chunk_gen(chunksize: int, totalsize: int) -> Iterator[tuple[int, int]]:
-
     chunks = totalsize // chunksize
     for i in range(chunks):
         yield i * chunksize, (i + 1) * chunksize

@@ -5,17 +5,18 @@ import hashlib
 from pathlib import Path
 from typing import Any
 
-import pytest
 from django.conf import settings
 from django.utils import timezone
+import pytest
+from sqlalchemy import text
+from sqlalchemy.engine import Engine
+
 from ingestion.models import Run, RunStatus, SourceFormat
 from ingestion.tasks import (
     SINAN_DEST_COLUMNS,
     sinan_merge_run,
     sinan_stage_run,
 )
-from sqlalchemy import text
-from sqlalchemy.engine import Engine
 
 _SINAN_TEST_COLUMNS: list[str] = [
     "ID_MUNICIP",

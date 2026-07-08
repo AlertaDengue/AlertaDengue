@@ -6,9 +6,9 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any, Final
 
-import pandas as pd
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection, transaction
+import pandas as pd
 
 KEY_COLUMNS: Final[list[str]] = ["municipio_geocodigo", "SE"]
 
@@ -67,7 +67,7 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.rename(columns=rename_map)
 
-    required_columns = set(KEY_COLUMNS + ["casprov"])
+    required_columns = {*KEY_COLUMNS, "casprov"}
     missing = required_columns.difference(df.columns)
     if missing:
         raise CommandError(
@@ -208,7 +208,6 @@ def collect_diagnostics(
         stage_scope_filters.append(f's."SE" <= {until_epiweek}')
 
     target_scope_sql = " AND ".join(scope_filters)
-    stage_scope_sql = " AND ".join(stage_scope_filters)
 
     stage_rows = fetch_int(f"SELECT COUNT(*) FROM {stage_table};")
 

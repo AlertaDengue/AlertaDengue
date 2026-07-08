@@ -1,10 +1,11 @@
 from datetime import datetime
 from typing import Literal
 
-from ad_main.celeryapp import app
 from celery.schedules import crontab
-from dados.dbdata import ALL_STATE_NAMES
 from scanner.scanner import EpiScanner
+
+from ad_main.celeryapp import app
+from dados.dbdata import ALL_STATE_NAMES
 
 app.conf.beat_schedule = {
     "episcanner-dengue-current-year": {

@@ -1,5 +1,6 @@
-from api.internal.views import NotificationListView
 from django.urls import path
+
+from api.internal.views import NotificationListView
 
 app_name = "internal"
 

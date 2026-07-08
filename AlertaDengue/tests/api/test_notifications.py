@@ -1,12 +1,13 @@
 from pathlib import Path
 
-import pytest
-from api.internal.constants import NOTIFICATION_API_GROUP_NAME
 from django.contrib.auth.models import Group, User
 from django.db import connection
 from django.urls import reverse
+import pytest
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
+
+from api.internal.constants import NOTIFICATION_API_GROUP_NAME
 
 CURRENT_DIR = Path(__file__).resolve().parent.parent
 NOTIFICATION_SQL_FIXTURE = (

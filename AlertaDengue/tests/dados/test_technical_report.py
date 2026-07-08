@@ -2,12 +2,12 @@ import json
 from pathlib import Path
 from typing import Any
 
-import pytest
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
 from django.template.loader import render_to_string
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
+import pytest
 
 
 def _download_view() -> Any:

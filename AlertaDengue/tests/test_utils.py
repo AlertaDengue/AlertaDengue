@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import os
 from logging import getLogger
+import os
 
 import psycopg2
 

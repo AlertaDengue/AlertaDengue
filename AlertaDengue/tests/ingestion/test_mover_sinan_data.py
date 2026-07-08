@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-import json
-import sys
 from dataclasses import dataclass
+import json
 from pathlib import Path
+import sys
 from typing import Any
 
 import pytest
+
 from ingestion.management.commands import mover_sinan_data as mover
 
 
@@ -32,7 +33,7 @@ def test_move_to_canonical_csv_dry_run_bucket_es(tmp_path: Path) -> None:
     src = tmp_path / "incoming" / "DENGON_ES_202605_Infodengue.csv"
     _write_csv(
         src,
-        "ID_AGRAVO;SEM_NOT;SG_UF_NOT\n" "A90;202605;ES\n" "A90;202605;ES\n",
+        "ID_AGRAVO;SEM_NOT;SG_UF_NOT\nA90;202605;ES\nA90;202605;ES\n",
     )
 
     imported_base = tmp_path / "imported"

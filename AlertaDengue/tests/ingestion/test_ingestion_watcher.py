@@ -1,17 +1,17 @@
 """Tests for the decoupled ingestion watcher."""
+
 from __future__ import annotations
 
-from pathlib import Path
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, patch
 
-import pytest
+from watchdog.events import FileSystemEvent
+
 from ingestion.management.commands.ingestion_watcher import (
     CommandAction,
     IngestionWatcherHandler,
     LogOnlyAction,
     _parse_extensions,
 )
-from watchdog.events import FileSystemEvent
 
 
 def _make_handler(

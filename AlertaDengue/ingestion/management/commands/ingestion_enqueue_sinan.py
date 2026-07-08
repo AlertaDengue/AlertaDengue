@@ -8,6 +8,7 @@ from typing import Any
 from django.core.management.base import BaseCommand, CommandError
 from django.db import IntegrityError, transaction
 from django.utils import timezone
+
 from ingestion.models import Run, RunStatus, SourceFormat
 from ingestion.schemas import RunError
 from ingestion.tasks import enqueue_sinan_run
@@ -152,7 +153,7 @@ class Command(BaseCommand):
                 updated_fields.append("delivery_week")
 
             if updated_fields:
-                run.save(update_fields=updated_fields + ["updated_at"])
+                run.save(update_fields=[*updated_fields, "updated_at"])
                 self.stdout.write(
                     self.style.SUCCESS(
                         f"Updated fields: {', '.join(updated_fields)}"
