@@ -4,8 +4,9 @@ Contract tests for data_hist_uf().
 
 from __future__ import annotations
 
-from dados.dbdata import data_hist_uf
 from django.core.cache import cache
+
+from dados.dbdata import data_hist_uf
 
 
 def test_data_hist_uf_orders_desc(hist_uf_dengue_table: None) -> None:

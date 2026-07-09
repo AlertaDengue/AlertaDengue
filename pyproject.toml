@@ -114,6 +114,13 @@ convention = "numpy"
 combine-as-imports = true
 force-sort-within-sections = true
 
+[tool.ruff.lint.per-file-ignores]
+# TODO: These settings modules still rely on wildcard imports from base/prod
+# settings and should be refactored away from F405 later.
+"AlertaDengue/ad_main/settings/dev.py" = ["F405"]
+"AlertaDengue/ad_main/settings/prod.py" = ["F405"]
+"AlertaDengue/ad_main/settings/staging.py" = ["F405"]
+
 [tool.ruff.format]
 quote-style = "double"
 

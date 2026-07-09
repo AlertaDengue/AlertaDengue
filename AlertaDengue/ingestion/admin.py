@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from django.contrib import admin
+
 from ingestion.models import Run
 
 

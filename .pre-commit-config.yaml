@@ -23,7 +23,11 @@ repos:
       - id: debug-statements
       - id: check-builtin-literals
       - id: check-case-conflict
+      # These hooks are intentionally manual during the phased lint rollout.
+      # Run them explicitly with:
+      #   pre-commit run <hook-id> --hook-stage manual
       - id: check-docstring-first
+        stages: [manual]
       - id: detect-private-key
 
   - repo: local
@@ -34,6 +38,7 @@ repos:
         language: system
         files: ^AlertaDengue/(dados/templates|templates)/.*\.html$
         pass_filenames: true
+        stages: [manual]
 
       - id: djlint-django
         name: djLint check (Django)
@@ -41,6 +46,7 @@ repos:
         language: system
         files: ^AlertaDengue/(dados/templates|templates)/.*\.html$
         pass_filenames: true
+        stages: [manual]
 
       - id: ruff-format
         name: Ruff format
@@ -61,12 +67,14 @@ repos:
         entry: poetry run bandit --configfile pyproject.toml -iii -lll
         language: system
         files: ^AlertaDengue/.*\.py$
+        stages: [manual]
 
       - id: vulture
         name: Vulture
         entry: poetry run python scripts/run-vulture.py
         language: system
         files: ^AlertaDengue/.*\.py$
+        stages: [manual]
 
       - id: mccabe
         name: McCabe
@@ -80,6 +88,7 @@ repos:
         entry: bash scripts/run-mypy-precommit.sh
         language: system
         files: ^AlertaDengue/.*\.py$
+        stages: [manual]
 
       - id: prettier
         name: Prettier

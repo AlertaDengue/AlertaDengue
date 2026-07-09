@@ -1,12 +1,12 @@
-from typing import Any, Optional
-
-import pandas as pd
-from dados.dbdata import CID10, STATE_NAME, get_disease_suffix  # noqa:F401
+from typing import Optional
 
 # local
 from django.conf import settings
+import pandas as pd
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
+
+from dados.dbdata import CID10, STATE_NAME, get_disease_suffix  # noqa:F401
 
 DB_ENGINE = settings.DB_ENGINE
 
@@ -140,9 +140,7 @@ class NotificationQueries:
                     ON notif.municipio_geocodigo = municipio.geocodigo
             ) AS tb
             WHERE {}
-            """.format(
-            self._age_field, clean_filters
-        )
+            """.format(self._age_field, clean_filters)
 
         with db_engine.connect() as conn:
             result = conn.execute(text(sql))
@@ -170,9 +168,7 @@ class NotificationQueries:
                     ON notif.municipio_geocodigo = municipio.geocodigo
             ) AS tb
             WHERE {}
-            """.format(
-            self._age_field, dist_filters
-        )
+            """.format(self._age_field, dist_filters)
 
         with db_engine.connect() as conn:
             result = conn.execute(text(sql))
@@ -253,9 +249,7 @@ class NotificationQueries:
         {}
         GROUP BY age
         ORDER BY age
-        """.format(
-            self._age_field, _dist_filters, gender_filter
-        )
+        """.format(self._age_field, _dist_filters, gender_filter)
 
         with db_engine.connect() as conn:
             result = conn.execute(text(sql))
@@ -302,9 +296,7 @@ class NotificationQueries:
         WHERE {}
         GROUP BY age
         ORDER BY age
-        """.format(
-            self._age_field, _dist_filters
-        )
+        """.format(self._age_field, _dist_filters)
 
         with db_engine.connect() as conn:
             result = conn.execute(text(sql))
@@ -362,9 +354,7 @@ class NotificationQueries:
         ) AS tb
         WHERE {} AND cs_sexo IN ('F', 'M')
         GROUP BY cs_sexo;
-        """.format(
-            self._age_field, _dist_filters
-        )
+        """.format(self._age_field, _dist_filters)
 
         with db_engine.connect() as conn:
             result = conn.execute(text(sql))
@@ -390,12 +380,9 @@ class NotificationQueries:
         FROM public.epiyear_summary_materialized_view
         WHERE uf = :state_name{disease_filter}
         ORDER BY ano_notif, se_notif
-        """.format(
-            disease_filter=disease_filter
-        )
+        """.format(disease_filter=disease_filter)
 
         with db_engine.connect() as conn:
-
             result = conn.execute(text(sql_text_query), parameters)
             df = pd.DataFrame(result.fetchall(), columns=result.keys())
             return pd.crosstab(
@@ -424,9 +411,7 @@ class NotificationQueries:
         WHERE {}
         GROUP BY dt_week
         ORDER BY dt_week
-        """.format(
-            self._age_field, _dist_filters
-        )
+        """.format(self._age_field, _dist_filters)
 
         with db_engine.connect() as conn:
             result = conn.execute(text(sql))

@@ -1,7 +1,8 @@
 from typing import Any, Dict
 
-from dados.dbdata import STATE_NAME
 from django import template
+
+from dados.dbdata import STATE_NAME
 
 register = template.Library()
 

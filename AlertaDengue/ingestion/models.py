@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-import uuid
 from typing import Any
+import uuid
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
 from ingestion.schemas import RunError, RunMetadata
 
 

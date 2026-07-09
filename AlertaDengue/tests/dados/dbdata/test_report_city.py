@@ -1,12 +1,13 @@
 """
 Tests for ReportCity class in dbdata.py.
 """
+
 from __future__ import annotations
 
-import pandas as pd
-import pytest
-from dados.dbdata import ReportCity
 from django.core.cache import cache
+import pytest
+
+from dados.dbdata import ReportCity
 
 
 @pytest.fixture(autouse=True)

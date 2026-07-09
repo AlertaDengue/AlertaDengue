@@ -1,7 +1,6 @@
-import json
 from dataclasses import dataclass
+import json
 from pathlib import Path
-from typing import Any
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -111,8 +110,8 @@ def serve_technical_report_pdf(request, report_key="default", *args, **kwargs):
     response = FileResponse(
         pdf_path.open("rb"), content_type="application/pdf"
     )
-    response[
-        "Content-Disposition"
-    ] = f'inline; filename="{report.output_filename}"'
+    response["Content-Disposition"] = (
+        f'inline; filename="{report.output_filename}"'
+    )
 
     return response

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
-from typing import Iterator
 
 from django.conf import settings
 

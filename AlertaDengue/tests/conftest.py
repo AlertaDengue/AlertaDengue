@@ -3,8 +3,8 @@ from __future__ import annotations
 import os
 
 import django
-import pytest
 from django.conf import settings
+import pytest
 from sqlalchemy.engine import Engine
 
 

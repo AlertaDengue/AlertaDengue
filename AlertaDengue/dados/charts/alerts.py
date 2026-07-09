@@ -1,12 +1,12 @@
 import json
 from time import mktime
 
+from django.utils.translation import gettext as _
 import pandas as pd
 import plotly.graph_objs as go
 
 # local
 from dados.dbdata import load_series
-from django.utils.translation import gettext as _
 
 
 def int_or_none(x):
@@ -93,7 +93,6 @@ class AlertCitiesCharts:
     def create_alert_chart(
         cls, geocode, nome, disease_label, disease_code="dengue", epiweek=0
     ):
-
         result = cls.prepare_data(
             geocode, nome, disease_label, disease_code, epiweek
         )

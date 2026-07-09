@@ -1,7 +1,8 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pandas as pd
 import pytest
+
 from AlertaDengue.api.db import AlertCity
 
 
@@ -54,9 +55,7 @@ def test_alert_city_search_with_weeks(mock_engine):
     (
         args,
         kwargs,
-    ) = (
-        mock_engine.connect.return_value.__enter__.return_value.execute.call_args
-    )
+    ) = mock_engine.connect.return_value.__enter__.return_value.execute.call_args
     params = kwargs.get("parameters", args[1] if len(args) > 1 else {})
     assert params["ew_start"] == 202301
     assert params["ew_end"] == 202302

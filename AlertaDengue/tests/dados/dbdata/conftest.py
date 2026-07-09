@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 
-import pytest
 from django.conf import settings
+import pytest
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 
@@ -156,7 +156,7 @@ def regional_parameters_tables(db_engine: Engine) -> Iterator[None]:
         conn.execute(
             text(
                 f"""
-            INSERT INTO "{schema}"."parameters" 
+            INSERT INTO "{schema}"."parameters"
             (municipio_geocodigo, cid10, varcli, clicrit, varcli2, clicrit2,
              limiar_preseason, limiar_posseason, limiar_epidemico)
             VALUES
@@ -262,7 +262,7 @@ def report_data_tables(db_engine: Engine) -> Iterator[None]:
         conn.execute(
             text(
                 """
-            INSERT INTO "Municipio"."Historico_alerta" 
+            INSERT INTO "Municipio"."Historico_alerta"
             ("SE", "data_iniSE", municipio_geocodigo, casos, casos_est, nivel, p_inc100k, p_rt1)
             VALUES
             (202401, '2024-01-01', 3304557, 10, 15, 2, 5.0, 0.8),
@@ -283,7 +283,7 @@ def report_data_tables(db_engine: Engine) -> Iterator[None]:
         conn.execute(
             text(
                 """
-            INSERT INTO "Dengue_global"."Municipio" (geocodigo, nome, uf, id_regional, regional) 
+            INSERT INTO "Dengue_global"."Municipio" (geocodigo, nome, uf, id_regional, regional)
             VALUES (3304557, 'Rio de Janeiro', 'Rio de Janeiro', 1, 'Metropolitana I')
         """
             )

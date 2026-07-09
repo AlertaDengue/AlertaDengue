@@ -2,17 +2,18 @@
 
 from __future__ import annotations
 
-import logging
 from decimal import Decimal
+import logging
 from pathlib import Path
 from typing import Any
 
+from django.utils.translation import override
 import pandas as pd
 import pytest
+
 from dados.charts.cities import ReportCityCharts
 from dados.dbdata import ReportParameters
 from dados.views import get_report_table_html, get_var_params
-from django.utils.translation import override
 
 
 def make_parameters(

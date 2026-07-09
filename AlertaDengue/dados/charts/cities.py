@@ -1,9 +1,9 @@
 from copy import deepcopy
 from typing import Any
 
+from django.utils.translation import gettext as _
 import pandas as pd
 import plotly.graph_objs as go
-from django.utils.translation import gettext as _
 from plotly.subplots import make_subplots
 
 
@@ -294,7 +294,6 @@ class ReportCityCharts:
         )
 
         if len(varcli_keys) == 2:
-
             df_climate[f"threshold_{varcli_keys[1]}"] = var_climate[
                 varcli_keys[1]
             ][1]

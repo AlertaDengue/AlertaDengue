@@ -1,14 +1,15 @@
 """
 Standalone file-system watcher for SINAN ingestion.
 """
+
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 import shlex
 import subprocess
-import time
-from pathlib import Path
 from threading import Timer
+import time
 from typing import Protocol
 
 from loguru import logger
@@ -19,8 +20,7 @@ from watchdog.observers.polling import PollingObserver
 class FileAction(Protocol):
     """Protocol for pluggable processing actions."""
 
-    def __call__(self, src_path: str) -> None:
-        ...
+    def __call__(self, src_path: str) -> None: ...
 
 
 class CommandAction:

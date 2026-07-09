@@ -1,12 +1,12 @@
-from ad_main.settings.base import *  # noqa: F401,F403
+from ad_main.settings.base import *  # noqa: F403
 
 DEBUG = False
 
-MIDDLEWARE = (
-    ["django.middleware.cache.UpdateCacheMiddleware"]
-    + BASE_MIDDLEWARE
-    + ["django.middleware.cache.FetchFromCacheMiddleware"]
-)
+MIDDLEWARE = [
+    "django.middleware.cache.UpdateCacheMiddleware",
+    *BASE_MIDDLEWARE,
+    "django.middleware.cache.FetchFromCacheMiddleware",
+]
 
 TEMPLATES = build_templates(debug=DEBUG)
 CACHES = build_caches(debug=DEBUG)

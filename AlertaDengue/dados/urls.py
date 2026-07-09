@@ -1,8 +1,9 @@
-from dados.dbdata import STATE_NAME
 from django.shortcuts import redirect
 from django.urls import re_path
 from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
+
+from dados.dbdata import STATE_NAME
 
 # local
 from .views import (

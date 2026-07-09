@@ -3,9 +3,9 @@ import os
 import unittest
 
 import django
-import pandas as pd
 from django.test import TestCase
 from django.urls import reverse
+import pandas as pd
 
 # local
 from .. import settings

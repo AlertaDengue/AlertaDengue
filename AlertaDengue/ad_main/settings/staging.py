@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from ad_main.settings.prod import *  # noqa: F403,F401
+from ad_main.settings.prod import *  # noqa: F403
 
 
 def env_list(name: str, default: str = "") -> list[str]:
@@ -44,15 +44,15 @@ DEFAULT_ALLOWED_HOSTS = [
 
 CERTBOT_DOMAINS = env_list("CERTBOT_DOMAIN")
 
-ALLOWED_HOSTS = (
-    DEFAULT_ALLOWED_HOSTS
-    + env_list("ALLOWED_HOSTS")
-    + [
+ALLOWED_HOSTS = [
+    *DEFAULT_ALLOWED_HOSTS,
+    *env_list("ALLOWED_HOSTS"),
+    *[
         f"{prefix}{domain}"
         for prefix in ["www.", ""]
         for domain in CERTBOT_DOMAINS
-    ]
-)
+    ],
+]
 
 # CSRF Protection
 CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS")

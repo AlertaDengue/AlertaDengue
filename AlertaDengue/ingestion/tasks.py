@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable, Protocol
+from typing import Any, Iterable
 
-import numpy as np
-import pandas as pd
 from celery import chain, shared_task
 from django.conf import settings
 from django.utils import timezone
+import numpy as np
+import pandas as pd
+from psycopg2.extras import execute_values
+
 from ingestion.models import Run, RunStatus, SourceFormat
 from ingestion.schemas import RunError, RunMetadata
 from ingestion.services import resolve_source_path
@@ -20,7 +21,6 @@ from ingestion.sinan_specs import (
     SINAN_SYNONYMS_FIELDS,
 )
 from ingestion.sources import iter_csv, iter_dbf, iter_parquet
-from psycopg2.extras import execute_values
 
 from .types import DataChunk
 

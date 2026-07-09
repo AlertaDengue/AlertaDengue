@@ -3,9 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-import pytest
 from django.core.management import call_command
 from django.core.management.base import CommandError
+import pytest
+
 from ingestion.management.commands import ingestion_enqueue_sinan as cmd
 from ingestion.models import Run, RunStatus
 
@@ -23,7 +24,7 @@ def _write_unique_csv(path: Path, *, token: str) -> None:
     """
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
-        "CID10;SEM_NOT\n" "A90;202605\n" f"{token}\n",
+        f"CID10;SEM_NOT\nA90;202605\n{token}\n",
         encoding="utf-8",
     )
 

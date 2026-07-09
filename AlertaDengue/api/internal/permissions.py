@@ -1,5 +1,6 @@
-from api.internal.constants import NOTIFICATION_API_GROUP_NAME
 from rest_framework.permissions import BasePermission
+
+from api.internal.constants import NOTIFICATION_API_GROUP_NAME
 
 
 class HasNotificationAPIAccess(BasePermission):
