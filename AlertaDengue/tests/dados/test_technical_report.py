@@ -183,7 +183,8 @@ def test_home_technical_report_link_uses_download_route() -> None:
     )
 
     assert (
-        f'href="{reverse("dados:download_technical_report_pdf")}"' in content
+        f'href="{reverse("dados:download_technical_report_pdf", kwargs={"report_key": "technical-report-2023"})}"'
+        in content
     )
 
 
