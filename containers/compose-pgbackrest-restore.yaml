@@ -1,0 +1,17 @@
+services:
+  postgres:
+    environment:
+      PG_STANZA: prod
+      PG_ARCHIVE_MODE: "off"
+    volumes:
+      - type: bind
+        source: ${PGBACKREST_SOURCE_REPO:?PGBACKREST_SOURCE_REPO is required}
+        target: /var/lib/pgbackrest-source
+        read_only: true
+
+  pgbackrest:
+    volumes:
+      - type: bind
+        source: ${PGBACKREST_SOURCE_REPO:?PGBACKREST_SOURCE_REPO is required}
+        target: /var/lib/pgbackrest-source
+        read_only: true

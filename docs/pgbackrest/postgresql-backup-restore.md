@@ -1,223 +1,153 @@
-# PostgreSQL Backup & Restore with pgBackRest — AlertaDengue
+# PostgreSQL backup and restore with pgBackRest
 
-> **Production-ready backup orchestration** using pgBackRest + Makim + Docker sidecar architecture.  
-> **Environment-agnostic**: same workflow for `dev`, `staging`, `prod` via dynamic configuration.
+This repository uses PostgreSQL 14 and pgBackRest with a sidecar container.
+The committed pgBackRest configuration is a secret-free template. Runtime
+configs are rendered under `.runtime/pgbackrest/` and are not committed.
 
----
+Both `postgres` and `pgbackrest` mount the same rendered config at
+`/etc/pgbackrest/pgbackrest.conf`. `pg1-path` must match PostgreSQL
+`data_directory`, which is `/var/lib/postgresql/data` in these compose files.
 
-## Quick Start (Dev Environment)
+## Steady-state backups
+
+Bootstrap a repository for an existing cluster:
 
 ```bash
-# 1. Bootstrap: render config + create stanza + validate
 makim pgbackrest.bootstrap --profile dev
+```
 
-# 2. Run a full backup
+Run a full backup:
+
+```bash
 makim pgbackrest.backup-full --profile dev
-
-# 3. Verify backup status
-docker exec infodengue-dev-postgres-1 \
-  su - postgres -c "pgbackrest --stanza=dev info"
-
-# 4. Test restore workflow (optional, destructive)
-makim pgbackrest.restore-latest --profile dev
-makim pgbackrest.smoke-test --profile dev
 ```
 
-All commands use `--profile dev` by default. Replace with `staging` or `prod` for other environments.
-
----
-
-## Architecture
-
-### Sidecar Pattern
-
-```
-┌─────────────────┐     ┌─────────────────┐
-│   postgres      │────▶│   pgbackrest    │
-│   (PostgreSQL)  │ WAL │   (backup mgr)  │
-└────────┬────────┘     └────────┬────────┘
-         │                       │
-         ▼                       ▼
-┌─────────────────┐ ┌─────────────────┐
-│ pgsocket        │ │ pgbackrest_repo │
-│ (shared socket) │ │ (Docker volume) │
-└─────────────────┘ └─────────────────┘
-```
-
-### Shared Resources
-
-| Resource | Type | Purpose |
-|----------|------|---------|
-| `/var/lib/postgresql/data` | bind mount | Live PostgreSQL data |
-| `/var/run/postgresql` | Docker volume (`pgsocket`) | Unix socket for local connections |
-| `/var/lib/pgbackrest` | Docker volume (`pgbackrest_repo`) | Backup repository (WAL + backups) |
-| `/var/log/pgbackrest` | Docker volume (`pgbackrest_logs`) | pgBackRest operation logs |
-
-> **Storage Model**: All pgBackRest data lives in **Docker-managed volumes**, not host paths. Never manipulate these volumes directly on the host.
-
----
-
-## Requirements
-
-| Dependency | Minimum Version | Purpose |
-|------------|----------------|---------|
-| Docker / Docker Compose | v20.10+ | Container orchestration |
-| `containers-sugar` | latest | AlertaDengue compose wrapper |
-| Makim | ≥ 1.29.0 | Task automation with Jinja templating |
-| PostgreSQL | 15+ | Database engine (pgBackRest compatible) |
-
-### Environment Setup
+Inspect the repository:
 
 ```bash
-# Activate your conda environment (provides sugar + makim)
-conda activate alertadengue-dev
-
-# Verify tools are available
-which makim sugar docker
+docker compose \
+  --env-file .envs/.env \
+  --file containers/compose-base.yaml \
+  --file containers/compose-dev.yaml \
+  --file containers/compose-pgbackrest.yaml \
+  --project-name infodengue-dev \
+  exec -T pgbackrest pgbackrest --stanza=dev info
 ```
 
----
+`bootstrap` is only idempotent for the same PostgreSQL cluster and repository.
+If the PostgreSQL system identifier changes, create a fresh repository instead
+of reusing the old one.
 
-## Configuration
+## Runtime configuration
 
-### Dynamic Configuration Engine
-
-The `render-conf` task generates `pgbackrest.conf` on-the-fly using profile-aware templating:
-
-```python
-# Internal logic (simplified)
-profile = os.environ.get("PROFILE", "dev")  # dev | staging | prod
-cfg = f"""
-[global]
-repo1-path=/var/lib/pgbackrest
-repo1-retention-full=2
-
-[{profile}]  # ← Dynamic stanza name
-pg1-path=/var/lib/postgresql/data
-pg1-socket-path=/var/run/postgresql
-pg1-user=postgres
-"""
-```
-
-**Benefit**: No hardcoded environments. One config template serves all profiles without leakage.
-
-### PostgreSQL Settings (Required)
-
-Ensure these are set in your PostgreSQL configuration (`postgresql.conf` or via env):
-
-```ini
-archive_mode = on
-archive_command = 'pgbackrest --config=/etc/pgbackrest/pgbackrest.conf --stanza=${PROFILE} archive-push %p'
-wal_level = replica
-```
-
-> The `${PROFILE}` variable is injected at runtime by the Makim task.
-
----
-
-## Makim Tasks Reference (Dev-Focused)
-
-### Core Workflow
-
-| Task | Command | Description |
-|------|---------|-------------|
-| **Bootstrap** | `makim pgbackrest.bootstrap --profile dev` | Render config + create stanza + validate (one-time setup) |
-| **Backup** | `makim pgbackrest.backup-full --profile dev` | Execute full backup + apply retention policy |
-| **Restore** | `makim pgbackrest.restore-latest --profile dev` | Stop DB → wipe PGDATA → restore latest backup → start DB |
-| **Validate** | `makim pgbackrest.smoke-test --profile dev` | Post-restore check: DB writable, not in recovery mode |
-
-### Configuration Management
-
-| Task | Command | Description |
-|------|---------|-------------|
-| Render config (container) | `makim pgbackrest.render-conf --profile dev --target container` | Generate and inject `pgbackrest.conf` into pgbackrest container |
-| Render config (host) | `makim pgbackrest.render-conf --profile dev --target host --src ./pgbackrest.conf` | Output config to host filesystem for inspection |
-
-### Scheduling (systemd user timers)
-
-| Task | Command | Description |
-|------|---------|-------------|
-| Add schedule | `makim pgbackrest.backup-schedule-add --profile dev --on-calendar "*-*-* 03:00:00"` | Create systemd timer for automated backups |
-| Multiple schedules | `--on-calendar "*-*-* 02:00:00;*-*-* 14:00:00"` | Semicolon-separated OnCalendar expressions |
-| List timers | `makim pgbackrest.backup-schedule-list` | Show active pgBackRest timers |
-| View logs | `makim pgbackrest.backup-schedule-logs --profile dev` | Show recent journalctl logs for scheduled jobs |
-
-### Utility
-
-| Task | Command | Description |
-|------|---------|-------------|
-| Stanza create | `makim pgbackrest.stanza-create --profile dev` | Initialize backup namespace (normally called via bootstrap) |
-| Inspect repo | `docker exec infodengue-dev-postgres-1 su - postgres -c "pgbackrest --stanza=dev info"` | View backup sets, WAL status, retention |
-
----
-
-## Typical Dev Workflow
+Render a normal config:
 
 ```bash
-# Initial setup (run once)
-makim pgbackrest.bootstrap --profile dev
-
-# Daily operation
-makim pgbackrest.backup-full --profile dev
-
-# Verify backups exist
-docker exec infodengue-dev-postgres-1 \
-  su - postgres -c "pgbackrest --stanza=dev info"
-
-# Test restore (optional, wipes PGDATA)
-makim pgbackrest.restore-latest --profile dev
-makim pgbackrest.smoke-test --profile dev
-
-# Automate: schedule daily 3AM backups
-makim pgbackrest.backup-schedule-add \
-  --profile dev \
-  --on-calendar "*-*-* 03:00:00"
+makim pgbackrest.render-conf --profile staging
 ```
 
----
-
-## Backup Transfer & Migration
-
-### Export Repository (Source Server)
+Render the restore-only config used to refresh staging from production:
 
 ```bash
-docker run --rm \
-  -v infodengue-dev_pgbackrest_repo:/source:ro \
-  -v "$PWD":/backup \
-  alpine sh -c "cd /source && tar -czf /backup/pgbackrest-repo-dev.tar.gz ."
+makim pgbackrest.render-restore-conf
 ```
 
-### Transfer to Target
+Generated files:
 
-```bash
-# Option A: SCP (simple)
-scp pgbackrest-repo-dev.tar.gz user@target:/tmp/
-
-# Option B: Streaming (no temp file, recommended)
-docker run --rm \
-  -v infodengue-dev_pgbackrest_repo:/source:ro \
-  alpine sh -c "cd /source && tar -czf - ." \
-  | ssh user@target 'cat > /tmp/pgbackrest-repo-dev.tar.gz'
+```text
+.runtime/pgbackrest/pgbackrest-dev.conf
+.runtime/pgbackrest/pgbackrest-staging.conf
+.runtime/pgbackrest/pgbackrest-prod.conf
+.runtime/pgbackrest/pgbackrest-restore-prod-to-staging.conf
 ```
 
-### Import on Target Server
+The renderer uses `PSQL_USER` from `.envs/.env`. It rejects invalid stanza
+names, empty PostgreSQL users, and relative repository paths. Generated files
+are written atomically with mode `0640`.
 
-```bash
-docker run --rm \
-  -v infodengue-dev_pgbackrest_repo:/target \
-  -v /tmp:/backup \
-  alpine sh -c "cd /target && tar -xzf /backup/pgbackrest-repo-dev.tar.gz"
+If pgBackRest secrets are introduced later, pass them through Docker secrets or
+another file-based secret source. Do not commit secrets into the template.
+
+## Container model
+
+Shared paths:
+
+```text
+/var/lib/postgresql/data
+/var/run/postgresql
+/var/lib/pgbackrest
+/var/log/pgbackrest
 ```
 
-### Post-Import Setup (Target)
+Normal mode:
+
+1. PostgreSQL archives WAL with `archive_mode=on`.
+2. pgBackRest stores backups and WAL in the environment repository.
+
+Restore mode for production-to-staging refresh:
+
+1. The transferred production repository is mounted read-only at `/var/lib/pgbackrest-source`.
+2. The restore config points `repo1-path` at `/var/lib/pgbackrest-source`.
+3. PostgreSQL starts with `PG_STANZA=prod` and `PG_ARCHIVE_MODE=off`.
+4. Recovery still requires archived WAL from `archive/prod`, even after a full backup.
+5. After validation, restore-mode containers stop and staging returns to its own empty repository.
+
+Do not keep `backup/prod` and `backup/staging` in the same permanent
+repository.
+
+## Restore workflows
+
+`makim pgbackrest.restore-profile-backup --profile <profile> --backup-set <full-backup-label> --confirm RESTORE-PROFILE-BACKUP`
+restores an explicit full backup inside one environment. It runs a read-only
+repository preflight, validates and canonicalizes `HOST_PGDATA`, prints the
+deletion target before cleanup, and never uses unguarded `rm -rf`.
+
+Production-to-staging refresh is a separate workflow. It uses a transferred
+production repository, restore-only config, and the dedicated task:
 
 ```bash
-# Bootstrap the target environment
-makim pgbackrest.bootstrap --profile dev
+makim pgbackrest.refresh-staging-from-prod \
+  --source-repo /srv/backups/pgbackrest-prod-repo \
+  --backup-set <prod-backup-label> \
+  --confirm REFRESH-STAGING-FROM-PROD
+```
 
-# Restore and validate
-makim pgbackrest.restore-latest --profile dev
-makim pgbackrest.smoke-test --profile dev
+`restore-profile-backup` reads and restores from the selected environment's own
+repository and stanza. `refresh-staging-from-prod` reads from a transferred
+production repository mounted read-only, restores stanza `prod` into staging,
+validates the database, then creates a new `staging` stanza and full staging
+backup in a separate repository.
+
+Do not:
+
+1. Copy live `PGDATA`.
+2. Run cross-environment restores without an explicit backup label.
+3. Remove `backup_label` or `recovery.signal` manually.
+4. Run migrations before restore validation.
+
+## Validation
+
+After restore, validate PostgreSQL before starting application services:
+
+```sql
+SELECT pg_is_in_recovery();
+SELECT current_setting('data_directory');
+SELECT pg_database_size(current_database());
+SELECT to_regclass('"Dengue_global"."Municipio"');
+```
+
+Compare database size with the source backup or the source environment; do not
+rely on one hardcoded expected size.
+
+The smoke test uses a temporary table inside a transaction so it does not leave
+permanent objects behind.
+
+## UID and GID requirements
+
+Both PostgreSQL and pgBackRest images align the container `postgres` user with
+host numeric IDs from `HOST_UID` and `HOST_GID`. The host paths and Docker
+volumes used for `PGDATA` and runtime configs must be readable and writable by
+those numeric IDs.
 ```
 
 > **Incremental Backup Warning**: pgBackRest incrementals depend on prior full backups + WAL archive. Always transfer the **entire repository**, not individual files.
@@ -232,7 +162,7 @@ makim pgbackrest.smoke-test --profile dev
 
 **Fix**: Update `.makim.yaml` to use `su` instead:
 ```yaml
-# Replace in stanza-create, backup-full, restore-latest tasks:
+# Replace in stanza-create, backup-full, restore-profile-backup tasks:
 # FROM: gosu postgres pgbackrest ...
 # TO:
 su - postgres -c "pgbackrest --stanza=$PROFILE ..."
@@ -300,9 +230,8 @@ docker exec infodengue-dev-postgres-1 \
 docker exec infodengue-dev-postgres-1 \
   ls -la /var/lib/postgresql/data/ | grep -E "signal|conf"
 
-# Remove recovery signals if restore is complete (dev only)
-docker exec infodengue-dev-postgres-1 \
-  bash -c 'rm -f /var/lib/postgresql/data/standby.signal /var/lib/postgresql/data/recovery.signal'
+# If recovery does not complete, inspect pgBackRest logs and the selected
+# backup/archive metadata instead of removing signal files manually.
 ```
 
 ### systemd Timer Not Firing
@@ -336,7 +265,10 @@ docker exec infodengue-dev-postgres-1 \
   su - postgres -c "pgbackrest --stanza=dev info" | grep -q "backup set" && echo "✓ Backup exists"
 
 # Restore + smoke test passed
-makim pgbackrest.restore-latest --profile dev
+makim pgbackrest.restore-profile-backup \
+  --profile dev \
+  --backup-set 20260711-123456F \
+  --confirm RESTORE-PROFILE-BACKUP
 makim pgbackrest.smoke-test --profile dev && echo "✓ Smoke test passed"
 ```
 
@@ -367,7 +299,10 @@ makim pgbackrest.backup-full --profile dev
 docker exec infodengue-dev-postgres-1 su - postgres -c "pgbackrest --stanza=dev info"
 
 # RESTORE + VALIDATE
-makim pgbackrest.restore-latest --profile dev
+makim pgbackrest.restore-profile-backup \
+  --profile dev \
+  --backup-set 20260711-123456F \
+  --confirm RESTORE-PROFILE-BACKUP
 makim pgbackrest.smoke-test --profile dev
 
 # SCHEDULE
