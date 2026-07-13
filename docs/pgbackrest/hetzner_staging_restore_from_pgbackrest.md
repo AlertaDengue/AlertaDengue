@@ -1,244 +1,177 @@
-## 1. Generate/validate pgBackRest backup on source host
+# Refresh staging from a production pgBackRest backup
+
+This workflow restores a `prod` backup into staging without copying live
+`PGDATA`. The restore uses stanza `prod` only while recovering the cloned
+cluster. After recovery completes, staging gets a new empty repository and a
+separate `staging` stanza.
+
+Stanza names do not change database contents. Restoring `prod` into staging
+produces a PostgreSQL cluster with production data; it only becomes the staging
+database after recovery completes and you switch back to the normal staging
+repository.
+
+The transferred production repository is temporary and must stay read-only for
+the full refresh. The permanent staging repository starts empty.
+
+## 1. Create and validate a full production backup
+
+Run on the production host:
 
 ```bash
-cd /opt/services/staging_AlertaDengue
+cd /opt/services/infodengue
 
-makim pgbackrest.render-conf --profile staging
-makim pgbackrest.stanza-create --profile staging
-makim pgbackrest.backup-full --profile staging
-makim pgbackrest.smoke-test --profile staging
+makim pgbackrest.bootstrap --profile prod
+makim pgbackrest.backup-full --profile prod
 ```
 
-Check backup:
+Inspect the backup and choose an explicit backup label:
 
 ```bash
-docker exec -it infodengue-staging-pgbackrest-1 pgbackrest info
+docker compose \
+  --env-file .envs/.env \
+  --file containers/compose-base.yaml \
+  --file containers/compose-prod.yaml \
+  --file containers/compose-pgbackrest.yaml \
+  --project-name infodengue-prod \
+  exec -T pgbackrest pgbackrest --stanza=prod info
 ```
 
-## 2. Find pgBackRest repo path on source
+## 2. Transfer the complete production repository
 
-```bash
-docker inspect infodengue-staging-pgbackrest-1 \
-  --format '{{range .Mounts}}{{println .Source "->" .Destination}}{{end}}'
-```
-
-Use the path mounted to:
-
-```text
-/var/lib/pgbackrest
-```
-
-Example:
-
-```text
-/Storage/docker_data/volumes/infodengue-staging_pgbackrest_repo/_data
-```
-
-## 3. Send pgBackRest repo to Hetzner host
-
-```bash
-sudo rsync -aHAX --numeric-ids --delete --info=progress2 \
-  -e "ssh -i /home/$USER/.ssh/id_ed25519" \
-  /Storage/docker_data/volumes/infodengue-staging_pgbackrest_repo/_data/ \
-  devops@[IP_ADDRESS]:/srv/workspace/infodengue/staging/pgbackrest/
-```
-
-Verify on Hetzner:
-
-```bash
-ssh devops@[IP_ADDRESS]
-
-find /srv/workspace/infodengue/staging/pgbackrest -maxdepth 2 -type d
-```
-
-Expected:
-
-```text
-archive/staging
-backup/staging
-spool
-```
-
-## 4. Prepare Hetzner host paths
-
-```bash
-sudo mkdir -p /srv/workspace/infodengue/staging/pgdata
-sudo mkdir -p /srv/workspace/infodengue/staging/pgbackrest
-
-sudo chown -R devops:devops /srv/workspace/infodengue/staging
-```
-
-## 5. Ensure compose mounts the correct pgBackRest config
-
-For staging, use:
-
-```yaml
-- ./pgbackrest/pgbackrest-staging.conf:/etc/pgbackrest/pgbackrest.conf
-```
-
-Or use an env variable:
-
-```yaml
-- ./pgbackrest/pgbackrest-${ENV}.conf:/etc/pgbackrest/pgbackrest.conf
-```
-
-with:
-
-```env
-PG_BACKREST_PROFILE=staging
-```
-
-## 6. Start pgBackRest/Postgres containers
-
-```bash
-cd /opt/services/infodengue/AlertaDengue
-
-makim pgbackrest.render-conf --profile staging
-```
-
-Verify mounts:
-
-```bash
-docker inspect infodengue-staging-pgbackrest-1 \
-  --format '{{range .Mounts}}{{println .Source "->" .Destination}}{{end}}'
-
-docker inspect infodengue-staging-postgres-1 \
-  --format '{{range .Mounts}}{{println .Source "->" .Destination}}{{end}}'
-```
-
-Expected:
-
-```text
-/srv/workspace/infodengue/pgdata -> /var/lib/postgresql/data
-...pgbackrest_repo... -> /var/lib/pgbackrest
-pgbackrest-staging.conf -> /etc/pgbackrest/pgbackrest.conf
-```
-
-## 7. Copy repo into Docker pgBackRest volume if compose uses named volume
-
-If `/var/lib/pgbackrest` is mounted from Docker volume:
+Copy the full repository, not live `PGDATA`:
 
 ```bash
 sudo rsync -aHAX --numeric-ids --delete --info=progress2 \
-  /srv/workspace/infodengue/staging/pgbackrest/ \
-  /var/lib/docker/volumes/infodengue-staging_pgbackrest_repo/_data/
+  /var/lib/docker/volumes/infodengue-prod_pgbackrest_repo/_data/ \
+  devops@<staging-host>:/srv/backups/pgbackrest-prod-repo/
 ```
 
-## 8. Restore cleanly
+## 3. Validate the transferred repository
 
-Stop PostgreSQL:
+Run on the staging host:
 
 ```bash
-sugar compose-ext stop --services postgres
+test -f /srv/backups/pgbackrest-prod-repo/backup/prod/backup.info
+test -f /srv/backups/pgbackrest-prod-repo/archive/prod/archive.info
+find /srv/backups/pgbackrest-prod-repo/backup/prod -maxdepth 1 -mindepth 1 -type d
 ```
 
-Clean PGDATA:
+The restore task requires both `backup/prod` and `archive/prod`, and it
+requires an explicit backup-set directory under `backup/prod/`.
+
+## 4. Run the guarded staging refresh task
+
+The staging `.envs/.env` must resolve to `ENV=staging`.
 
 ```bash
-sudo rm -rf /srv/workspace/infodengue/pgdata/*
-sudo chown -R devops:devops /srv/workspace/infodengue/pgdata
+cd /opt/services/infodengue
+
+makim pgbackrest.refresh-staging-from-prod \
+  --source-repo /srv/backups/pgbackrest-prod-repo \
+  --backup-set <prod-backup-label> \
+  --confirm REFRESH-STAGING-FROM-PROD
 ```
 
-Restore:
+The task does this:
 
-```bash
-makim pgbackrest.restore-latest --profile staging
-```
+1. Stops only staging PostgreSQL and pgBackRest.
+2. Validates the guarded staging `HOST_PGDATA` path.
+3. Cleans staging `PGDATA`.
+4. Removes only the `infodengue-staging_pgbackrest_repo` volume.
+5. Renders `.runtime/pgbackrest/pgbackrest-restore-prod-to-staging.conf`.
+6. Mounts the transferred production repository read-only at `/var/lib/pgbackrest-source`.
+7. Restores `--stanza=prod --set=<prod-backup-label> --archive-mode=off`.
+8. Waits for recovery to finish.
+9. Validates the cloned database.
+10. Stops restore-mode containers.
+11. Renders the normal staging config.
+12. Creates a fresh staging stanza and full staging backup.
 
-## 9. Patch PostgreSQL memory for small Hetzner host
+## 5. Validate the restored database
 
-If the restored prod config has high memory values:
-
-```bash
-grep -E "shared_buffers|max_connections|work_mem|maintenance_work_mem|huge_pages" \
-  /srv/workspace/infodengue/pgdata/postgresql.conf
-```
-
-Patch for 8 GB host:
-
-```bash
-sudo sed -i \
-  -e "s/^max_connections = .*/max_connections = 100/" \
-  -e "s/^shared_buffers = .*/shared_buffers = 512MB/" \
-  -e "s/^maintenance_work_mem = .*/maintenance_work_mem = 128MB/" \
-  -e "s/^work_mem = .*/work_mem = 8MB/" \
-  -e "s/^huge_pages = .*/huge_pages = off/" \
-  /srv/workspace/infodengue/pgdata/postgresql.conf
-```
-
-Recommended swap:
-
-```bash
-sudo fallocate -l 8G /swapfile
-sudo chmod 600 /swapfile
-sudo mkswap /swapfile
-sudo swapon /swapfile
-
-echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-```
-
-## 10. Start and validate PostgreSQL
-
-```bash
-docker restart infodengue-staging-postgres-1
-docker logs -f infodengue-staging-postgres-1
-```
-
-Expected:
-
-```text
-database system is ready to accept connections
-```
-
-Validate DB:
-
-```bash
-docker exec -it infodengue-staging-postgres-1 bash
-su postgres
-psql -d dengue
-```
+The task already checks these queries:
 
 ```sql
-SELECT datname, pg_size_pretty(pg_database_size(datname))
-FROM pg_database
-ORDER BY pg_database_size(datname) DESC;
-
-SELECT schema_name
-FROM information_schema.schemata
-ORDER BY schema_name;
-
-SELECT COUNT(*) FROM django_migrations;
+SELECT pg_is_in_recovery();
+SELECT current_setting('data_directory');
+SELECT pg_database_size(current_database());
+SELECT to_regclass('"Dengue_global"."Municipio"');
 ```
 
-Expected:
-
-```text
-dengue around 30-40 GB
-schema includes Dengue_global
-django_migrations already populated
-```
-
-## 11. Start app services
+Run a manual check if needed:
 
 ```bash
-sugar compose-ext start -- -d
+docker compose \
+  --env-file .envs/.env \
+  --file containers/compose-base.yaml \
+  --file containers/compose-staging.yaml \
+  --file containers/compose-pgbackrest.yaml \
+  --project-name infodengue-staging \
+  exec -T postgres psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" \
+  -c "SELECT pg_is_in_recovery(), current_setting('data_directory'), to_regclass('\"Dengue_global\".\"Municipio\"');"
 ```
 
-Then:
+Compare the restored database size against the source backup before starting any
+application service.
+
+## 6. Create and validate the new staging backup
+
+The refresh task ends by creating and validating a fresh staging backup in the
+new staging repository. Confirm the result:
 
 ```bash
-docker exec -it infodengue-staging-web-1 bash
-python AlertaDengue/manage.py migrate --check
-python AlertaDengue/manage.py check
+docker compose \
+  --env-file .envs/.env \
+  --file containers/compose-base.yaml \
+  --file containers/compose-staging.yaml \
+  --file containers/compose-pgbackrest.yaml \
+  --project-name infodengue-staging \
+  exec -T pgbackrest pgbackrest --stanza=staging info
 ```
 
-Main rules:
+## 7. Start application services only after database validation
 
-```text
-Never rsync live PGDATA.
-Send pgBackRest repo, then restore.
-Ensure stanza/config/profile match.
-Ensure pgBackRest and Postgres share the same PGDATA mount.
-Patch production memory settings before starting on a smaller VM.
-Do not run migrations before validating the restored DB.
+Do not run migrations before restore validation.
+
+```bash
+docker compose \
+  --env-file .envs/.env \
+  --file containers/compose-base.yaml \
+  --file containers/compose-staging.yaml \
+  --project-name infodengue-staging \
+  up -d web celery celery-beat
 ```
+
+## Troubleshooting
+
+`missing stanza path`
+Diagnosis: the rendered config points `repo1-path` at the wrong repository or the wrong config file is mounted.
+Safe actions: re-run `makim pgbackrest.render-conf --profile staging` or `makim pgbackrest.render-restore-conf`, then inspect `docker compose config`.
+
+`backup and archive info do not match database`
+Diagnosis: the copied repository is incomplete or backup and archive data came from different transfers.
+Safe actions: copy the complete production repository again and verify both `backup/prod` and `archive/prod` before retrying.
+
+`role postgres does not exist`
+Diagnosis: this cluster uses `PSQL_USER` from `.envs/.env`, not a hardcoded `postgres` role.
+Safe actions: connect with `POSTGRES_USER` or `PSQL_USER`, then re-run the validation query.
+
+`permission denied`
+Diagnosis: the host path, Docker bind mount, or generated runtime config has incompatible ownership or mode.
+Safe actions: verify numeric `HOST_UID` and `HOST_GID`, ensure `.runtime/pgbackrest/*.conf` is readable, and check the source repository path permissions.
+
+`unable to find valid repository`
+Diagnosis: restore mode started without the read-only production repository mounted at `/var/lib/pgbackrest-source`.
+Safe actions: confirm `PGBACKREST_SOURCE_REPO` is absolute, exists, and appears in `docker compose config`.
+
+`could not locate required checkpoint record`
+Diagnosis: the selected backup set is incomplete or required WAL is missing from `archive/prod`.
+Safe actions: choose a valid explicit backup label, verify the copied archive, and repeat the repository transfer if needed.
+
+`nested PGDATA`
+Diagnosis: the staging bind mount contains an unexpected nested data directory after a previous manual restore attempt.
+Safe actions: inspect `current_setting('data_directory')`, remove only the guarded contents of `HOST_PGDATA`, and rerun the guarded refresh task.
+
+`stale Docker network endpoint`
+Diagnosis: Docker kept an endpoint after a failed stop/remove cycle.
+Safe actions: stop only the staging `postgres` and `pgbackrest` services again, remove those service containers, then rerun the refresh task.

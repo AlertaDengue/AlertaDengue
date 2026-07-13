@@ -12,10 +12,6 @@ services:
       - "unix_socket_directories=/var/run/postgresql"
       - -c
       - "max_worker_processes=8"
-      - -c
-      - "archive_mode=on"
-      - -c
-      - "archive_command=pgbackrest --config=/etc/pgbackrest/pgbackrest.conf --stanza=prod archive-push %p"
 
   web:
     command: /opt/runwsgi.sh

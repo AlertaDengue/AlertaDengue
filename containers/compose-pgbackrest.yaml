@@ -1,9 +1,10 @@
 services:
   postgres:
     volumes:
-      - pgsocket:/var/run/postgresql
-      - pgbackrest_repo:/var/lib/pgbackrest
-      - pgbackrest_logs:/var/log/pgbackrest
+      - type: bind
+        source: ${PGBACKREST_CONFIG_FILE:-../.runtime/pgbackrest/pgbackrest-${ENV}.conf}
+        target: /etc/pgbackrest/pgbackrest.conf
+        read_only: true
 
   pgbackrest:
     hostname: pgbackrest
@@ -13,7 +14,6 @@ services:
       context: ..
       dockerfile: containers/pgbackrest/Dockerfile
       args:
-        ENV: ${ENV}
         HOST_UID: ${HOST_UID}
         HOST_GID: ${HOST_GID}
     env_file:
@@ -23,11 +23,22 @@ services:
       - -lc
       - sleep infinity
     volumes:
-      - ${HOST_PGDATA}:/var/lib/postgresql/data:rw
-      - pgsocket:/var/run/postgresql
-      - pgbackrest_repo:/var/lib/pgbackrest
-      - pgbackrest_logs:/var/log/pgbackrest
-      - ./pgbackrest/pgbackrest-${ENV}.conf:/etc/pgbackrest/pgbackrest.conf
+      - type: bind
+        source: ${HOST_PGDATA}
+        target: /var/lib/postgresql/data
+      - type: volume
+        source: pgsocket
+        target: /var/run/postgresql
+      - type: volume
+        source: pgbackrest_repo
+        target: /var/lib/pgbackrest
+      - type: volume
+        source: pgbackrest_logs
+        target: /var/log/pgbackrest
+      - type: bind
+        source: ${PGBACKREST_CONFIG_FILE:-../.runtime/pgbackrest/pgbackrest-${ENV}.conf}
+        target: /etc/pgbackrest/pgbackrest.conf
+        read_only: true
     networks:
       - infodengue
 
@@ -35,3 +46,7 @@ volumes:
   pgsocket:
   pgbackrest_repo:
   pgbackrest_logs:
+
+networks:
+  infodengue:
+    driver: bridge

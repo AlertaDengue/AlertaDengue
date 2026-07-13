@@ -25,6 +25,7 @@ RUN mkdir -p \
   && chown -R ${HOST_UID}:${HOST_GID} \
     /etc/pgbackrest \
     /var/lib/pgbackrest \
+    /var/lib/pgbackrest/spool \
     /var/log/pgbackrest \
     /var/run/postgresql
 

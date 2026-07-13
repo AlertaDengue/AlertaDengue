@@ -25,23 +25,21 @@ RUN apt-get update \
       && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p \
+      /etc/pgbackrest \
       /var/lib/pgbackrest \
       /var/lib/pgbackrest/spool \
       /var/log/pgbackrest \
       /backups \
  && chown -R ${HOST_UID}:${HOST_GID} \
+      /etc/pgbackrest \
       /var/lib/pgbackrest \
+      /var/lib/pgbackrest/spool \
       /var/log/pgbackrest \
       /backups
 
-ARG ENV
-COPY containers/pgbackrest/pgbackrest-${ENV}.conf /etc/pgbackrest/pgbackrest.conf
-
-RUN chown ${HOST_UID}:${HOST_GID} /etc/pgbackrest/pgbackrest.conf \
-  && chmod 640 /etc/pgbackrest/pgbackrest.conf
-
 COPY containers/postgres/scripts/entrypoint.sh /usr/local/bin/pg-entrypoint
-RUN chmod +x /usr/local/bin/pg-entrypoint
+COPY containers/pgbackrest/wait_for_postgres.sh /usr/local/bin/wait-for-postgres
+RUN chmod +x /usr/local/bin/pg-entrypoint /usr/local/bin/wait-for-postgres
 
 ENTRYPOINT ["pg-entrypoint"]
 CMD ["postgres"]

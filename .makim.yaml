@@ -878,7 +878,7 @@ groups:
   pgbackrest:
     tasks:
       render-conf:
-        help: "Render pgbackrest.conf into the pgbackrest container"
+        help: "Render the runtime pgBackRest config for dev|staging|prod"
         args:
           profile:
             help: "Target environment: dev|staging|prod"
@@ -892,59 +892,61 @@ groups:
           case "$PROFILE" in
             dev|staging|prod) ;;
             *)
-              echo "Invalid --profile '$PROFILE' (use dev|staging|prod)" >&2
+              echo "[EE] Invalid --profile '$PROFILE' (use dev|staging|prod)." >&2
               exit 2
               ;;
           esac
 
-          CONF_FILE="containers/pgbackrest/pgbackrest-${PROFILE}.conf"
+          set -a
+          source .envs/.env
+          set +a
 
-          if [[ -f "$CONF_FILE" ]]; then
-            echo "Using config from $CONF_FILE"
-            cp "$CONF_FILE" /tmp/pgbackrest.conf
-          else
-            echo "Using generated fallback config"
-            PROFILE="$PROFILE" \
-            python -c '
-          from pathlib import Path
-          import os
-          import textwrap
+          : "${PSQL_USER:?PSQL_USER is required in .envs/.env}"
 
-          profile = os.environ["PROFILE"]
+          OUTPUT_PATH=".runtime/pgbackrest/pgbackrest-${PROFILE}.conf"
 
-          cfg = textwrap.dedent(f"""
-              [global]
-              repo1-path=/var/lib/pgbackrest
-              log-path=/var/log/pgbackrest
-              spool-path=/var/lib/pgbackrest/spool
-              lock-path=/var/lib/pgbackrest/spool
-              repo1-retention-full=2
-              repo1-retention-full-type=count
-              start-fast=y
-              process-max=2
+          python containers/pgbackrest/render_config.py \
+            --template containers/pgbackrest/pgbackrest.conf.template \
+            --output "$OUTPUT_PATH" \
+            --stanza "$PROFILE" \
+            --repo-path /var/lib/pgbackrest \
+            --pg-user "$PSQL_USER" \
+            --retention-full "${PGBACKREST_RETENTION_FULL:-2}" \
+            --process-max "${PGBACKREST_PROCESS_MAX:-2}"
 
-              [{profile}]
-              pg1-path=/var/lib/postgresql/data
-              pg1-socket-path=/var/run/postgresql
-              pg1-user=postgres
-          """).strip() + "\n"
+          echo "$OUTPUT_PATH"
 
-          Path("/tmp/pgbackrest.conf").write_text(cfg)
-          '
+      render-restore-conf:
+        help: "Render the temporary restore config for restoring prod into staging"
+        run: |
+          set -euo pipefail
+
+          set -a
+          source .envs/.env
+          set +a
+
+          : "${PSQL_USER:?PSQL_USER is required in .envs/.env}"
+
+          if [ "${ENV:-}" != "staging" ]; then
+            echo "[EE] .envs/.env must resolve to ENV=staging for restore rendering." >&2
+            exit 2
           fi
 
-          sugar --profile "${{ args.profile }}" compose-ext start --services pgbackrest --options -d
+          OUTPUT_PATH=".runtime/pgbackrest/pgbackrest-restore-prod-to-staging.conf"
 
-          sugar --profile "$PROFILE" compose exec \
-            --service pgbackrest \
-            --cmd "bash -lc 'cat > /etc/pgbackrest/pgbackrest.conf && chmod 640 /etc/pgbackrest/pgbackrest.conf'" \
-            -- -T < /tmp/pgbackrest.conf
+          python containers/pgbackrest/render_config.py \
+            --template containers/pgbackrest/pgbackrest.conf.template \
+            --output "$OUTPUT_PATH" \
+            --stanza prod \
+            --repo-path /var/lib/pgbackrest-source \
+            --pg-user "$PSQL_USER" \
+            --retention-full "${PGBACKREST_RETENTION_FULL:-2}" \
+            --process-max "${PGBACKREST_RESTORE_PROCESS_MAX:-4}"
 
-          rm -f /tmp/pgbackrest.conf
-          echo "OK: rendered into pgbackrest container: /etc/pgbackrest/pgbackrest.conf"
+          echo "$OUTPUT_PATH"
 
-      stanza-create:
-        help: "Create and validate pgBackRest stanza"
+      wait-postgres:
+        help: "Wait until PostgreSQL accepts local connections"
         args:
           profile:
             help: "Target environment: dev|staging|prod"
@@ -958,22 +960,88 @@ groups:
           case "$PROFILE" in
             dev|staging|prod) ;;
             *)
-              echo "Invalid --profile '$PROFILE' (use dev|staging|prod)" >&2
+              echo "[EE] Invalid --profile '$PROFILE' (use dev|staging|prod)." >&2
               exit 2
               ;;
           esac
 
-          sugar --profile "$PROFILE" compose-ext start \
-            --services postgres pgbackrest \
-            --options -d
+          COMPOSE_CMD=(
+            docker compose
+            --env-file .envs/.env
+            --file containers/compose-base.yaml
+            --file "containers/compose-${PROFILE}.yaml"
+            --file containers/compose-pgbackrest.yaml
+            --project-name "infodengue-${PROFILE}"
+          )
 
-          sugar --profile "$PROFILE" compose exec \
-            --service pgbackrest \
-            --cmd "bash -lc 'set -euo pipefail; pgbackrest --stanza=\"$PROFILE\" stanza-create; pgbackrest --stanza=\"$PROFILE\" check'" \
-            -- -T
+          "${COMPOSE_CMD[@]}" exec -T postgres wait-for-postgres ready
+
+      stanza-create:
+        help: "Create a pgBackRest stanza for the selected profile"
+        args:
+          profile:
+            help: "Target environment: dev|staging|prod"
+            type: string
+            required: true
+        run: |
+          set -euo pipefail
+
+          PROFILE="${{ args.profile }}"
+
+          case "$PROFILE" in
+            dev|staging|prod) ;;
+            *)
+              echo "[EE] Invalid --profile '$PROFILE' (use dev|staging|prod)." >&2
+              exit 2
+              ;;
+          esac
+
+          COMPOSE_CMD=(
+            docker compose
+            --env-file .envs/.env
+            --file containers/compose-base.yaml
+            --file "containers/compose-${PROFILE}.yaml"
+            --file containers/compose-pgbackrest.yaml
+            --project-name "infodengue-${PROFILE}"
+          )
+
+          "${COMPOSE_CMD[@]}" exec -T pgbackrest sh -lc \
+            "set -euo pipefail; pgbackrest --stanza='${PROFILE}' stanza-create"
+
+      check:
+        help: "Run pgBackRest check for the selected profile"
+        args:
+          profile:
+            help: "Target environment: dev|staging|prod"
+            type: string
+            required: true
+        run: |
+          set -euo pipefail
+
+          PROFILE="${{ args.profile }}"
+
+          case "$PROFILE" in
+            dev|staging|prod) ;;
+            *)
+              echo "[EE] Invalid --profile '$PROFILE' (use dev|staging|prod)." >&2
+              exit 2
+              ;;
+          esac
+
+          COMPOSE_CMD=(
+            docker compose
+            --env-file .envs/.env
+            --file containers/compose-base.yaml
+            --file "containers/compose-${PROFILE}.yaml"
+            --file containers/compose-pgbackrest.yaml
+            --project-name "infodengue-${PROFILE}"
+          )
+
+          "${COMPOSE_CMD[@]}" exec -T pgbackrest sh -lc \
+            "set -euo pipefail; pgbackrest --stanza='${PROFILE}' check"
 
       bootstrap:
-        help: "Render config and create/check stanza"
+        help: "Render config, recreate postgres/pgbackrest, create stanza, and check it"
         args:
           profile:
             help: "Target environment: dev|staging|prod"
@@ -984,15 +1052,38 @@ groups:
             - task: pgbackrest.render-conf
               args:
                 profile: ${{ args.profile }}
-            - task: pgbackrest.stanza-create
-              args:
-                profile: ${{ args.profile }}
         run: |
           set -euo pipefail
-          echo "pgbackrest bootstrap complete"
+
+          PROFILE="${{ args.profile }}"
+
+          case "$PROFILE" in
+            dev|staging|prod) ;;
+            *)
+              echo "[EE] Invalid --profile '$PROFILE' (use dev|staging|prod)." >&2
+              exit 2
+              ;;
+          esac
+
+          COMPOSE_CMD=(
+            docker compose
+            --env-file .envs/.env
+            --file containers/compose-base.yaml
+            --file "containers/compose-${PROFILE}.yaml"
+            --file containers/compose-pgbackrest.yaml
+            --project-name "infodengue-${PROFILE}"
+          )
+
+          "${COMPOSE_CMD[@]}" up -d --force-recreate postgres pgbackrest
+
+          makim pgbackrest.wait-postgres --profile "$PROFILE"
+          makim pgbackrest.stanza-create --profile "$PROFILE"
+          makim pgbackrest.check --profile "$PROFILE"
+
+          echo "[II] pgBackRest bootstrap completed for ${PROFILE}."
 
       backup-full:
-        help: "Run full backup and expire old backups"
+        help: "Render config, verify stanza health, and run a full backup"
         args:
           profile:
             help: "Target environment: dev|staging|prod"
@@ -1000,7 +1091,7 @@ groups:
             required: true
         hooks:
           pre-run:
-            - task: pgbackrest.bootstrap
+            - task: pgbackrest.render-conf
               args:
                 profile: ${{ args.profile }}
         run: |
@@ -1011,15 +1102,37 @@ groups:
           case "$PROFILE" in
             dev|staging|prod) ;;
             *)
-              echo "Invalid --profile '$PROFILE' (use dev|staging|prod)" >&2
+              echo "[EE] Invalid --profile '$PROFILE' (use dev|staging|prod)." >&2
               exit 2
               ;;
           esac
 
-          sugar --profile "$PROFILE" compose exec \
-            --service pgbackrest \
-            --cmd "bash -lc 'set -euo pipefail; pgbackrest --stanza=\"$PROFILE\" --log-level-console=info --type=full backup; pgbackrest --stanza=\"$PROFILE\" expire'" \
-            -- -T
+          COMPOSE_CMD=(
+            docker compose
+            --env-file .envs/.env
+            --file containers/compose-base.yaml
+            --file "containers/compose-${PROFILE}.yaml"
+            --file containers/compose-pgbackrest.yaml
+            --project-name "infodengue-${PROFILE}"
+          )
+
+          "${COMPOSE_CMD[@]}" up -d --force-recreate postgres pgbackrest
+
+          makim pgbackrest.wait-postgres --profile "$PROFILE"
+
+          if ! "${COMPOSE_CMD[@]}" exec -T pgbackrest sh -lc \
+            "pgbackrest --stanza='${PROFILE}' info >/dev/null 2>&1"; then
+            echo "[EE] Stanza '${PROFILE}' does not exist. Run 'makim pgbackrest.bootstrap --profile ${PROFILE}' first." >&2
+            exit 1
+          fi
+
+          makim pgbackrest.check --profile "$PROFILE"
+
+          "${COMPOSE_CMD[@]}" exec -T pgbackrest sh -lc \
+            "set -euo pipefail; \
+            pgbackrest --stanza='${PROFILE}' --log-level-console=info --type=full backup; \
+            pgbackrest --stanza='${PROFILE}' expire; \
+            pgbackrest --stanza='${PROFILE}' info"
 
       backup-schedule-add:
         help: "Add one or more systemd user timers for pgBackRest backups"
@@ -1210,22 +1323,47 @@ groups:
 
           journalctl --user -u "alertadengue-pgbackrest-backup@${PROFILE}.service" -n 200 --no-pager
 
-      restore-latest:
-        help: "Restore latest backup and restart Postgres"
+      restore-profile-backup:
+        help: "Restore an explicit full backup label inside one environment after guarded preflight"
         args:
           profile:
             help: "Target environment: dev|staging|prod"
+            type: string
+            required: true
+          backup-set:
+            help: "Explicit full backup label to restore"
+            type: string
+            required: true
+          confirm:
+            help: "Confirmation string. Must be RESTORE-PROFILE-BACKUP."
             type: string
             required: true
         run: |
           set -euo pipefail
 
           PROFILE="${{ args.profile }}"
+          BACKUP_SET="${{ args.backup_set }}"
+          CONFIRM="${{ args.confirm }}"
+          PROJECT_NAME="infodengue-${PROFILE}"
+          PHASE="initial validation"
+          POSTGRES_STARTED=0
+
+          cleanup_profile_restore() {
+            status="$1"
+            if [ "$status" -ne 0 ]; then
+              echo "[EE] restore-profile-backup failed during phase: ${PHASE}" >&2
+              if [ "${POSTGRES_STARTED}" -eq 1 ]; then
+                "${COMPOSE_CMD[@]}" stop postgres pgbackrest || true
+              fi
+            fi
+          }
+
+          trap 'status=$?; cleanup_profile_restore "$status"; exit "$status"' EXIT
 
           case "$PROFILE" in
             dev|staging|prod) ;;
             *)
-              echo "Invalid --profile '$PROFILE' (use dev|staging|prod)" >&2
+              echo "[EE] Invalid --profile '$PROFILE' (use dev|staging|prod)." >&2
               exit 2
               ;;
           esac
@@ -1236,34 +1374,327 @@ groups:
 
           : "${HOST_PGDATA:?HOST_PGDATA is required}"
 
+          case "$PROJECT_NAME" in
+            "infodengue-${PROFILE}"*) ;;
+            *)
+              echo "[EE] Compose project name must start with infodengue-${PROFILE}." >&2
+              exit 2
+              ;;
+          esac
+
+          COMPOSE_CMD=(
+            docker compose
+            --env-file .envs/.env
+            --file containers/compose-base.yaml
+            --file "containers/compose-${PROFILE}.yaml"
+            --file containers/compose-pgbackrest.yaml
+            --project-name "${PROJECT_NAME}"
+          )
+          PROFILE_REPO_VOLUME="${PROJECT_NAME}_pgbackrest_repo"
+
+          VALIDATED_INPUTS="$(
+            python containers/pgbackrest/refresh_staging.py validate-profile-restore-inputs \
+              --profile "$PROFILE" \
+              --host-pgdata "$HOST_PGDATA" \
+              --backup-set "$BACKUP_SET" \
+              --confirm "$CONFIRM"
+          )"
+
+          PROFILE="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^PROFILE=/{print $2}')"
+          HOST_PGDATA_CANON="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^HOST_PGDATA_CANON=/{print $2}')"
+          BACKUP_SET="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^BACKUP_SET=/{print $2}')"
+
+          PHASE="render profile config"
+          makim pgbackrest.render-conf --profile "$PROFILE"
+          CONFIG_PATH="$(realpath ".runtime/pgbackrest/pgbackrest-${PROFILE}.conf")"
+          PG_IMAGE_ID="$("${COMPOSE_CMD[@]}" images -q pgbackrest | awk 'NF {print; exit}')"
+          if [ -z "$PG_IMAGE_ID" ]; then
+            echo "[EE] Unable to determine the pgBackRest image for ${PROFILE}." >&2
+            exit 2
+          fi
+          PROFILE_REPO_MOUNTPOINT="$(docker volume inspect "${PROFILE_REPO_VOLUME}" --format '{{ .Mountpoint }}')"
+
+          PHASE="preflight repository metadata"
+          PRECHECK_INFO_JSON="$(
+            docker run --rm \
+              --mount "type=bind,src=${PROFILE_REPO_MOUNTPOINT},dst=/var/lib/pgbackrest,readonly" \
+              --mount "type=bind,src=${CONFIG_PATH},dst=/etc/pgbackrest/pgbackrest.conf,readonly" \
+              "$PG_IMAGE_ID" \
+              pgbackrest --stanza="$PROFILE" --output=json info
+          )"
+
+          SOURCE_BACKUP_INFO="$(
+            printf '%s\n' "$PRECHECK_INFO_JSON" | \
+              python containers/pgbackrest/refresh_staging.py validate-pgbackrest-info \
+                --stanza "$PROFILE" \
+                --backup-set "$BACKUP_SET"
+          )"
+          SOURCE_BACKUP_DB_SIZE="$(printf '%s\n' "$SOURCE_BACKUP_INFO" | awk -F= '/^SOURCE_BACKUP_DB_SIZE=/{print $2}')"
+
+          echo "[II] Canonical PGDATA deletion target: ${HOST_PGDATA_CANON}"
+          echo "[II] Selected ${PROFILE} backup label: ${BACKUP_SET}"
+          echo "[II] Selected ${PROFILE} backup size: ${SOURCE_BACKUP_DB_SIZE} bytes"
+
+          PHASE="stop profile services"
+          "${COMPOSE_CMD[@]}" stop postgres pgbackrest || true
+          "${COMPOSE_CMD[@]}" rm -f -s postgres pgbackrest || true
+
+          PHASE="clean guarded pgdata"
+          sudo mkdir -p "$HOST_PGDATA_CANON"
+          sudo find "$HOST_PGDATA_CANON" -mindepth 1 -delete
           HOST_UID="${HOST_UID:-$(id -u)}"
           HOST_GID="${HOST_GID:-$(id -g)}"
+          sudo chown "$HOST_UID:$HOST_GID" "$HOST_PGDATA_CANON"
+          sudo chmod 0700 "$HOST_PGDATA_CANON"
 
-          sugar --profile "$PROFILE" compose-ext stop \
-            --services postgres pgbackrest || true
+          PHASE="run pgbackrest restore"
+          env PGBACKREST_BACKUP_SET="$BACKUP_SET" PGBACKREST_STANZA="$PROFILE" \
+            "${COMPOSE_CMD[@]}" run --rm --no-deps pgbackrest sh -lc \
+              'set -euo pipefail; pgbackrest --stanza="$PGBACKREST_STANZA" --set="$PGBACKREST_BACKUP_SET" --archive-mode=off restore'
 
-          sudo rm -rf "$HOST_PGDATA"
-          sudo mkdir -p "$HOST_PGDATA"
-          sudo chown -R "$HOST_UID:$HOST_GID" "$HOST_PGDATA"
+          PHASE="start restored postgres"
+          "${COMPOSE_CMD[@]}" up -d --force-recreate postgres
+          POSTGRES_STARTED=1
 
-          sugar --profile "$PROFILE" compose-ext start \
-            --services pgbackrest \
-            --options -d
+          PHASE="wait for postgres readiness"
+          "${COMPOSE_CMD[@]}" exec -T postgres env TIMEOUT_SECONDS=180 \
+            wait-for-postgres ready
+          PHASE="wait for recovery completion"
+          "${COMPOSE_CMD[@]}" exec -T postgres env TIMEOUT_SECONDS=240 \
+            wait-for-postgres recovery-complete
 
-          sugar --profile "$PROFILE" compose exec \
-            --service pgbackrest \
-            --cmd "bash -lc 'set -euo pipefail; pgbackrest --stanza=\"$PROFILE\" --log-level-console=info restore'" \
-            -- -T
+          PHASE="validate restored database"
+          VALIDATION_OUTPUT=$("${COMPOSE_CMD[@]}" exec -T postgres bash -lc '
+            set -euo pipefail
+            data_dir=$(psql -tA -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT current_setting('\''data_directory'\'');")
+            db_size=$(psql -tA -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT pg_database_size(current_database());")
+            municipio_exists=$(psql -tA -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT to_regclass('\''\"Dengue_global\".\"Municipio\"'\'') IS NOT NULL;")
+            in_recovery=$(psql -tA -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT pg_is_in_recovery();")
+            printf "DATA_DIR=%s\nDB_SIZE=%s\nMUNICIPIO_EXISTS=%s\nIN_RECOVERY=%s\n" "$data_dir" "$db_size" "$municipio_exists" "$in_recovery"
+          ')
 
-          sugar --profile "$PROFILE" compose-ext stop \
-            --services pgbackrest || true
+          DATA_DIR="$(printf '%s\n' "$VALIDATION_OUTPUT" | awk -F= '/^DATA_DIR=/{print $2}')"
+          DB_SIZE="$(printf '%s\n' "$VALIDATION_OUTPUT" | awk -F= '/^DB_SIZE=/{print $2}')"
+          MUNICIPIO_EXISTS="$(printf '%s\n' "$VALIDATION_OUTPUT" | awk -F= '/^MUNICIPIO_EXISTS=/{print $2}')"
+          IN_RECOVERY="$(printf '%s\n' "$VALIDATION_OUTPUT" | awk -F= '/^IN_RECOVERY=/{print $2}')"
 
-          sugar --profile "$PROFILE" compose-ext start \
-            --services postgres \
-            --options -d
+          python containers/pgbackrest/refresh_staging.py validate-restore \
+            --source-db-size "$SOURCE_BACKUP_DB_SIZE" \
+            --data-directory "$DATA_DIR" \
+            --db-size "$DB_SIZE" \
+            --relation-exists "$MUNICIPIO_EXISTS" \
+            --in-recovery "$IN_RECOVERY"
+
+          trap - EXIT
+          echo "[II] Restore finished for ${PROFILE}."
+
+      refresh-staging-from-prod:
+        help: "Refresh staging from an explicit production backup set mounted read-only"
+        args:
+          source-repo:
+            help: "Absolute host path to the transferred production pgBackRest repository"
+            type: string
+            required: true
+          backup-set:
+            help: "Explicit prod backup set label to restore"
+            type: string
+            required: true
+          confirm:
+            help: "Confirmation string. Must be REFRESH-STAGING-FROM-PROD."
+            type: string
+            required: true
+        run: |
+          set -euo pipefail
+
+          SOURCE_REPO="${{ args.source_repo }}"
+          BACKUP_SET="${{ args.backup_set }}"
+          CONFIRM="${{ args.confirm }}"
+          PROFILE="staging"
+          PROJECT_NAME="infodengue-staging"
+          STAGING_REPO_VOLUME="infodengue-staging_pgbackrest_repo"
+          RESTORE_CONFIG=".runtime/pgbackrest/pgbackrest-restore-prod-to-staging.conf"
+          PHASE="initial validation"
+          RESTORE_CONTAINERS_STARTED=0
+
+          cleanup_restore_mode() {
+            status="$1"
+            if [ "$status" -ne 0 ]; then
+              echo "[EE] refresh-staging-from-prod failed during phase: ${PHASE}" >&2
+              if [ "${RESTORE_CONTAINERS_STARTED}" -eq 1 ]; then
+                "${RESTORE_COMPOSE_CMD[@]}" stop postgres pgbackrest || true
+              fi
+            fi
+          }
+
+          trap 'status=$?; cleanup_restore_mode "$status"; exit "$status"' EXIT
+
+          set -a
+          source .envs/.env
+          set +a
+
+          if [ "${ENV:-}" != "staging" ]; then
+            echo "[EE] .envs/.env must resolve to ENV=staging." >&2
+            exit 2
+          fi
+
+          : "${HOST_PGDATA:?HOST_PGDATA is required}"
+
+          VALIDATED_INPUTS="$(
+            python containers/pgbackrest/refresh_staging.py validate-inputs \
+              --source-repo "$SOURCE_REPO" \
+              --host-pgdata "$HOST_PGDATA" \
+              --backup-set "$BACKUP_SET" \
+              --confirm "$CONFIRM"
+          )"
+
+          SOURCE_REPO_CANON="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^SOURCE_REPO_CANON=/{print $2}')"
+          HOST_PGDATA_CANON="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^HOST_PGDATA_CANON=/{print $2}')"
+          BACKUP_SET="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^BACKUP_SET=/{print $2}')"
+
+          COMPOSE_CMD=(
+            docker compose
+            --env-file .envs/.env
+            --file containers/compose-base.yaml
+            --file containers/compose-staging.yaml
+            --file containers/compose-pgbackrest.yaml
+            --project-name "${PROJECT_NAME}"
+          )
+
+          RESTORE_COMPOSE_CMD=(
+            env
+            "PGBACKREST_SOURCE_REPO=${SOURCE_REPO_CANON}"
+            "PGBACKREST_CONFIG_FILE=../${RESTORE_CONFIG}"
+            docker compose
+            --env-file .envs/.env
+            --file containers/compose-base.yaml
+            --file containers/compose-staging.yaml
+            --file containers/compose-pgbackrest.yaml
+            --file containers/compose-pgbackrest-restore.yaml
+            --project-name "${PROJECT_NAME}"
+          )
+
+          PHASE="render restore config"
+          makim pgbackrest.render-restore-conf
+
+          PHASE="preflight source repository"
+          PRECHECK_INFO_JSON="$(
+            "${RESTORE_COMPOSE_CMD[@]}" run --rm --no-deps pgbackrest \
+              pgbackrest --stanza=prod --output=json info
+          )"
+
+          SOURCE_BACKUP_INFO="$(
+            printf '%s\n' "$PRECHECK_INFO_JSON" | \
+              python containers/pgbackrest/refresh_staging.py validate-pgbackrest-info \
+                --stanza prod \
+                --backup-set "$BACKUP_SET"
+          )"
+          SOURCE_BACKUP_DB_SIZE="$(printf '%s\n' "$SOURCE_BACKUP_INFO" | awk -F= '/^SOURCE_BACKUP_DB_SIZE=/{print $2}')"
+
+          echo "[II] Canonical source repository: ${SOURCE_REPO_CANON}"
+          echo "[II] Canonical staging PGDATA: ${HOST_PGDATA_CANON}"
+          echo "[II] Selected source backup label: ${BACKUP_SET}"
+          echo "[II] Selected source backup size: ${SOURCE_BACKUP_DB_SIZE} bytes"
+
+          PHASE="stop staging services"
+          "${COMPOSE_CMD[@]}" stop postgres pgbackrest || true
+          "${COMPOSE_CMD[@]}" rm -f -s postgres pgbackrest || true
+
+          PHASE="clean guarded staging pgdata"
+          sudo mkdir -p "$HOST_PGDATA_CANON"
+          sudo find "$HOST_PGDATA_CANON" -mindepth 1 -delete
+          HOST_UID="${HOST_UID:-$(id -u)}"
+          HOST_GID="${HOST_GID:-$(id -g)}"
+          sudo chown "$HOST_UID:$HOST_GID" "$HOST_PGDATA_CANON"
+          sudo chmod 0700 "$HOST_PGDATA_CANON"
+
+          PHASE="validate staging repository volume"
+          if docker volume ls --format '{{.Name}}' | grep -Fx "${STAGING_REPO_VOLUME}" >/dev/null; then
+            docker volume inspect "${STAGING_REPO_VOLUME}" --format '{{ json .Labels }}' | \
+              python containers/pgbackrest/refresh_staging.py validate-volume-labels
+            PHASE="remove staging repository volume"
+            docker volume rm "${STAGING_REPO_VOLUME}"
+          fi
+
+          PHASE="start restore-mode pgbackrest"
+          RESTORE_CONTAINERS_STARTED=1
+          "${RESTORE_COMPOSE_CMD[@]}" up -d --force-recreate pgbackrest
+
+          PHASE="run pgbackrest restore"
+          env PGBACKREST_BACKUP_SET="$BACKUP_SET" \
+            "${RESTORE_COMPOSE_CMD[@]}" exec -T pgbackrest sh -lc \
+              'set -euo pipefail; pgbackrest --stanza=prod --set="$PGBACKREST_BACKUP_SET" --archive-mode=off restore'
+
+          PHASE="start restore-mode postgres"
+          "${RESTORE_COMPOSE_CMD[@]}" up -d --force-recreate postgres
+
+          PHASE="wait for restore-mode postgres readiness"
+          "${RESTORE_COMPOSE_CMD[@]}" exec -T postgres env TIMEOUT_SECONDS=180 \
+            wait-for-postgres ready
+
+          PHASE="wait for restore recovery completion"
+          "${RESTORE_COMPOSE_CMD[@]}" exec -T postgres env TIMEOUT_SECONDS=240 \
+            wait-for-postgres recovery-complete
+
+          PHASE="validate restored database"
+          VALIDATION_OUTPUT=$("${RESTORE_COMPOSE_CMD[@]}" exec -T postgres bash -lc '
+            set -euo pipefail
+            data_dir=$(psql -tA -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT current_setting('\''data_directory'\'');")
+            db_size=$(psql -tA -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT pg_database_size(current_database());")
+            municipio_exists=$(psql -tA -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT to_regclass('\''\"Dengue_global\".\"Municipio\"'\'') IS NOT NULL;")
+            in_recovery=$(psql -tA -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT pg_is_in_recovery();")
+            printf "DATA_DIR=%s\nDB_SIZE=%s\nMUNICIPIO_EXISTS=%s\nIN_RECOVERY=%s\n" "$data_dir" "$db_size" "$municipio_exists" "$in_recovery"
+          ')
+
+          printf '%s\n' "$VALIDATION_OUTPUT"
+
+          DATA_DIR=$(printf '%s\n' "$VALIDATION_OUTPUT" | awk -F= '/^DATA_DIR=/{print $2}')
+          DB_SIZE=$(printf '%s\n' "$VALIDATION_OUTPUT" | awk -F= '/^DB_SIZE=/{print $2}')
+          MUNICIPIO_EXISTS=$(printf '%s\n' "$VALIDATION_OUTPUT" | awk -F= '/^MUNICIPIO_EXISTS=/{print $2}')
+          IN_RECOVERY=$(printf '%s\n' "$VALIDATION_OUTPUT" | awk -F= '/^IN_RECOVERY=/{print $2}')
+
+          python containers/pgbackrest/refresh_staging.py validate-restore \
+            --source-db-size "$SOURCE_BACKUP_DB_SIZE" \
+            --data-directory "$DATA_DIR" \
+            --db-size "$DB_SIZE" \
+            --relation-exists "$MUNICIPIO_EXISTS" \
+            --in-recovery "$IN_RECOVERY"
+
+          PHASE="stop restore-mode containers"
+          "${RESTORE_COMPOSE_CMD[@]}" stop postgres pgbackrest || true
+          RESTORE_CONTAINERS_STARTED=0
+
+          PHASE="render staging config"
+          makim pgbackrest.render-conf --profile staging
+
+          PHASE="start staging services"
+          "${COMPOSE_CMD[@]}" up -d --force-recreate postgres pgbackrest
+
+          PHASE="wait for staging postgres readiness"
+          makim pgbackrest.wait-postgres --profile staging
+          PHASE="create staging stanza"
+          makim pgbackrest.stanza-create --profile staging
+          PHASE="check staging stanza"
+          makim pgbackrest.check --profile staging
+
+          PHASE="create final staging backup"
+          "${COMPOSE_CMD[@]}" exec -T pgbackrest sh -lc \
+            "set -euo pipefail; \
+            pgbackrest --stanza=staging --log-level-console=info --type=full backup; \
+            pgbackrest --stanza=staging info"
+
+          FINAL_BACKUP_LABEL=$("${COMPOSE_CMD[@]}" exec -T pgbackrest sh -lc \
+            "pgbackrest --stanza=staging info" | awk '/full backup:/ {label=$3} END {print label}')
+
+          if [ -z "$FINAL_BACKUP_LABEL" ]; then
+            echo "[EE] Unable to determine the final staging backup label." >&2
+            exit 1
+          fi
+
+          trap - EXIT
+          echo "[II] Final staging backup label: $FINAL_BACKUP_LABEL"
 
       smoke-test:
-        help: "RW check after restore"
+        help: "Validate that the restored database is writable without leaving permanent data behind"
         args:
           profile:
             help: "Target environment: dev|staging|prod"
@@ -1277,43 +1708,25 @@ groups:
           case "$PROFILE" in
             dev|staging|prod) ;;
             *)
-              echo "Invalid --profile '$PROFILE' (use dev|staging|prod)" >&2
+              echo "[EE] Invalid --profile '$PROFILE' (use dev|staging|prod)." >&2
               exit 2
               ;;
           esac
 
-          sugar --profile "$PROFILE" compose-ext start \
-            --services postgres \
-            --options -d
+          COMPOSE_CMD=(
+            docker compose
+            --env-file .envs/.env
+            --file containers/compose-base.yaml
+            --file "containers/compose-${PROFILE}.yaml"
+            --file containers/compose-pgbackrest.yaml
+            --project-name "infodengue-${PROFILE}"
+          )
 
-          sugar --profile "$PROFILE" compose exec \
-            --service postgres \
-            --cmd "bash -lc '
+          "${COMPOSE_CMD[@]}" up -d postgres
+
+          "${COMPOSE_CMD[@]}" exec -T postgres bash -lc '
               set -euo pipefail
-
-              for _ in \$(seq 1 60); do
-                if pg_isready -U \"\${POSTGRES_USER:-postgres}\" -d \"\${POSTGRES_DB:-postgres}\" >/dev/null 2>&1; then
-                  break
-                fi
-                sleep 1
-              done
-
-              for _ in \$(seq 1 60); do
-                in_rec=\$(psql -tAc \"select pg_is_in_recovery();\" -U \"\${POSTGRES_USER:-postgres}\" -d \"\${POSTGRES_DB:-postgres}\" | tr -d \"[:space:]\")
-                if [[ \"\$in_rec\" == \"f\" ]]; then
-                  break
-                fi
-                sleep 1
-              done
-
-              in_rec=\$(psql -tAc \"select pg_is_in_recovery();\" -U \"\${POSTGRES_USER:-postgres}\" -d \"\${POSTGRES_DB:-postgres}\" | tr -d \"[:space:]\")
-              if [[ \"\$in_rec\" != \"f\" ]]; then
-                echo \"Postgres is still in recovery (read-only).\" >&2
-                exit 6
-              fi
-
-              psql -v ON_ERROR_STOP=1 -U \"\${POSTGRES_USER:-postgres}\" -d \"\${POSTGRES_DB:-postgres}\" -c \"create table if not exists makim_pgbackrest_smoke_test (id bigserial primary key, ts timestamptz not null default now());\"
-              psql -v ON_ERROR_STOP=1 -U \"\${POSTGRES_USER:-postgres}\" -d \"\${POSTGRES_DB:-postgres}\" -c \"insert into makim_pgbackrest_smoke_test default values;\"
-              psql -v ON_ERROR_STOP=1 -U \"\${POSTGRES_USER:-postgres}\" -d \"\${POSTGRES_DB:-postgres}\" -c \"select count(*) as rows from makim_pgbackrest_smoke_test;\"
-            '" \
-            -- -T
+              env TIMEOUT_SECONDS=60 wait-for-postgres ready
+              env TIMEOUT_SECONDS=60 wait-for-postgres recovery-complete
+              psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "BEGIN; CREATE TEMP TABLE makim_pgbackrest_smoke_test (id integer); INSERT INTO makim_pgbackrest_smoke_test VALUES (1); SELECT count(*) AS rows FROM makim_pgbackrest_smoke_test; ROLLBACK;"
+          '
