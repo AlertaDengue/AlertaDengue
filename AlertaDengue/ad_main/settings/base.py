@@ -5,7 +5,6 @@ This module contains configuration shared by all environments. Environment-
 specific overrides live in ``dev.py`` and ``prod.py``.
 """
 
-
 from __future__ import annotations
 
 import os
@@ -38,7 +37,7 @@ def read_admins(value: str) -> tuple[tuple[str, str], ...]:
         Parsed admins in Django's expected format.
     """
     if not value:
-        return tuple()
+        return ()
 
     pairs: list[tuple[str, str]] = []
     for item in value.split(","):
@@ -417,10 +416,10 @@ LEAFLET_CONFIG = {
     "DEFAULT_CENTER": (-22.907000, -43.431000),
     "DEFAULT_ZOOM": 8,
     "MAXIMUM_ZOOM": 13,
-    "TILES": ("http://{s}.basemaps.cartocdn.com/" "light_all/{z}/{x}/{y}.png"),
+    "TILES": ("http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"),
     "MINIMAP": False,
     "ATTRIBUTION_PREFIX": (
-        "Fonte: <a href=http://info.dengue.mat.br>" "info.dengue.mat.br</a>"
+        "Fonte: <a href=http://info.dengue.mat.br>info.dengue.mat.br</a>"
     ),
     "PLUGINS": {
         "cluster": {
@@ -456,7 +455,7 @@ if SENTRY_DSN:
     )
 
 PWA_APP_NAME = (
-    "Infodengue – Early warning system for arbovirus transmission "
+    "Infodengue - Early warning system for arbovirus transmission "
     "(dengue, chikungunya, and Zika)"
 )
 PWA_APP_SHORT_NAME = "Infodengue"
