@@ -1,6 +1,8 @@
 Release Notes
 ---
 
+## [4.18.1](https://github.com/AlertaDengue/AlertaDengue/compare/4.18.0...4.18.1) (2026-07-14)
+
 ## Unreleased
 
 ### Refactors
