@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load i18n %}
 {% load static %}
 
@@ -16,13 +16,12 @@
     <script src="{% static '/js/highcharts-more.js' %}"></script>
     <script src="{% static '/js/modules/exporting.js' %}"></script>
     <script src="{% static '/libs/jquery/jquery.sparkline.min.js' %}"></script>
-{% endblock %}
+{% endblock extra_head %}
 
-
-{% block title %}{% translate "Alerta Dengue Rio" %}{% endblock %}
+{% block title %}{% translate "Alerta Dengue Rio" %}{% endblock title %}
 
 {% block content %}
-    <br>
+    <br />
     {% for ap in APS %}
         <div id="alerta-chart-{{ ap }}" style="min-width: 500px; height: 400px; margin: 10px"
              data-highcharts-chart="{{ forloop.counter0 }}"></div>
@@ -173,5 +172,4 @@
     </script>
 
 
-
-{% endblock %}
+{% endblock content %}

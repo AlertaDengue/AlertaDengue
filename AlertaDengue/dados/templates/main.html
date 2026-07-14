@@ -1,12 +1,12 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load i18n static home_components lookup %}
 {% block extra_head %}
-<meta property="og:image" content="{% static 'img/screenshot.png' %}">
-<meta property="og:image:secure_url" content="{% static 'img/screenshot.png' %}">
+<meta property="og:image" content="{% static "img/screenshot.png" %}" />
+<meta property="og:image:secure_url" content="{% static "img/screenshot.png" %}" />
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-<link href="{% static 'css/home_sections_layout.css' %}" rel="stylesheet" type="text/css">
-<link href="{% static 'css/home_menu_buttons.css' %}" rel="stylesheet" type="text/css">
+<link href="{% static "css/home_sections_layout.css" %}" rel="stylesheet" type="text/css" />
+<link href="{% static "css/home_menu_buttons.css" %}" rel="stylesheet" type="text/css" />
 <style>
 #carouselTop .carousel-item--hero .home-banner-mobile-content {
   display: none;
@@ -79,7 +79,7 @@
   }
 }
 </style>
-{% endblock %}
+{% endblock extra_head %}
 
 {% block content %}
 <div class="container-fluid p-0 mb-1 mt-0">
@@ -107,4 +107,4 @@
     {% home_state_epi_section %}
   </section>
 </div>
-{% endblock %}
+{% endblock content %}

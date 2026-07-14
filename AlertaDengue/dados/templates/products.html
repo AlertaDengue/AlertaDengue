@@ -1,14 +1,14 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
 {% load i18n %}
 
 {% block extra_head %}
-<link href="{% static 'css/home_sections_layout.css' %}" rel="stylesheet">
-<link href="{% static 'css/home_menu_buttons.css' %}" rel="stylesheet">
-<link href="{% static 'css/products.css' %}" rel="stylesheet">
-{% endblock %}
+<link href="{% static "css/home_sections_layout.css" %}" rel="stylesheet" />
+<link href="{% static "css/home_menu_buttons.css" %}" rel="stylesheet" />
+<link href="{% static "css/products.css" %}" rel="stylesheet" />
+{% endblock extra_head %}
 
-{% block title %}{% translate "Produtos" %}{% endblock %}
+{% block title %}{% translate "Produtos" %}{% endblock content %}
 
 {% block content %}
 <div class="py-4 py-lg-5">
@@ -103,7 +103,7 @@
       <div class="card-body">
         <ul class="mb-0">
           <li>
-            <a href="{% url 'dados:download_technical_report_pdf' report_key='epidemiological-situation-analysis-2026' %}">
+            <a href="{% url "dados:download_technical_report_pdf" report_key="epidemiological-situation-analysis-2026" %}">
               Análise de situação epidemiológica da dengue em ano de El Niño
             </a>
           </li>
@@ -118,7 +118,7 @@
             </a>
           </li>
           <li>
-            <a href="{% url 'dados:download_technical_report_pdf' report_key='technical-report-2023' %}">
+            <a href="{% url "dados:download_technical_report_pdf" report_key="technical-report-2023" %}">
               Reflexões sobre o risco de arboviroses em 2024
             </a>
           </li>
@@ -153,10 +153,10 @@
               <div class="products-webinar-item__title">
                 {% blocktrans trimmed %}Preparação para a temporada de dengue 2025: perspectivas de modelos preditivos (1º IMDC){% endblocktrans %}
               </div>
-              <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
-                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=9fVgqHS-Ksk" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open Portuguese webinar recording on YouTube' %}">PT</a>
-                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=lrgg_HIRPfI" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open English webinar recording on YouTube' %}">EN</a>
-                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=8ZENF-kK_VQ" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open Spanish webinar recording on YouTube' %}">ES</a>
+              <div class="products-webinar-language-links" aria-label="{% trans "Language-specific webinar recordings" %}">
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=9fVgqHS-Ksk" target="_blank" rel="noopener noreferrer" aria-label="{% trans "Open Portuguese webinar recording on YouTube" %}">PT</a>
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=lrgg_HIRPfI" target="_blank" rel="noopener noreferrer" aria-label="{% trans "Open English webinar recording on YouTube" %}">EN</a>
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=8ZENF-kK_VQ" target="_blank" rel="noopener noreferrer" aria-label="{% trans "Open Spanish webinar recording on YouTube" %}">ES</a>
               </div>
             </div>
           </li>
@@ -165,8 +165,8 @@
               <div class="products-webinar-item__title">
                 {% trans "Webinar for the official announcement of the results of the validation of the second IMDC" %}
               </div>
-              <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
-                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=YexrCASlqIE" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open English webinar recording on YouTube' %}">EN</a>
+              <div class="products-webinar-language-links" aria-label="{% trans "Language-specific webinar recordings" %}">
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=YexrCASlqIE" target="_blank" rel="noopener noreferrer" aria-label="{% trans "Open English webinar recording on YouTube" %}">EN</a>
               </div>
             </div>
           </li>
@@ -175,8 +175,8 @@
               <div class="products-webinar-item__title">
                 {% trans "Webinar with the official results and predictions for the upcoming season" %}
               </div>
-              <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
-                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=Sb3lv3hGwGg" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open English webinar recording on YouTube' %}">EN</a>
+              <div class="products-webinar-language-links" aria-label="{% trans "Language-specific webinar recordings" %}">
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=Sb3lv3hGwGg" target="_blank" rel="noopener noreferrer" aria-label="{% trans "Open English webinar recording on YouTube" %}">EN</a>
               </div>
             </div>
           </li>
@@ -185,10 +185,10 @@
               <div class="products-webinar-item__title">
                 {% blocktrans trimmed %}Preparação para a temporada de dengue 2026: perspectivas e modelos preditivos (2º IMDC){% endblocktrans %}
               </div>
-              <div class="products-webinar-language-links" aria-label="{% trans 'Language-specific webinar recordings' %}">
-                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=EXv7ZOci5Lw&t=2185s" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open Portuguese webinar recording on YouTube' %}">PT</a>
-                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=mXTe6UC-7WM" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open English webinar recording on YouTube' %}">EN</a>
-                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=If_6LrGCJfs&t=1s" target="_blank" rel="noopener noreferrer" aria-label="{% trans 'Open Spanish webinar recording on YouTube' %}">ES</a>
+              <div class="products-webinar-language-links" aria-label="{% trans "Language-specific webinar recordings" %}">
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=EXv7ZOci5Lw&t=2185s" target="_blank" rel="noopener noreferrer" aria-label="{% trans "Open Portuguese webinar recording on YouTube" %}">PT</a>
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=mXTe6UC-7WM" target="_blank" rel="noopener noreferrer" aria-label="{% trans "Open English webinar recording on YouTube" %}">EN</a>
+                <a class="products-webinar-language-link" href="https://www.youtube.com/watch?v=If_6LrGCJfs&t=1s" target="_blank" rel="noopener noreferrer" aria-label="{% trans "Open Spanish webinar recording on YouTube" %}">ES</a>
               </div>
             </div>
           </li>
@@ -441,4 +441,4 @@
     </div>
   </section>
 </div>
-{% endblock %}
+{% endblock content %}
