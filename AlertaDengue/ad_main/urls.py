@@ -23,4 +23,5 @@ urlpatterns = [
     re_path(r"^admin/doc/", include("django.contrib.admindocs.urls")),
     re_path(r"^api/", include("api.urls")),
     re_path(r"^status/$", status),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    *static(settings.STATIC_URL, document_root=settings.STATIC_ROOT),
+]
