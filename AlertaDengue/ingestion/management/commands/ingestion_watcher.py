@@ -51,15 +51,16 @@ class CommandAction:
 
     def __call__(self, src_path: str) -> None:
         quoted_path = shlex.quote(src_path)
-        cmd_str = self.template.replace("{path}", quoted_path)
+        command = self.template.replace("{path}", quoted_path)
+        args = shlex.split(command)
 
         if self.include_existing or self.requeue:
-            cmd_str += " --include-existing"
+            args.append("--include-existing")
         if self.requeue:
-            cmd_str += " --requeue"
+            args.append("--requeue")
 
-        logger.debug(f"Executing: {cmd_str}")
-        result = subprocess.run(cmd_str, shell=True, check=False)
+        logger.debug(f"Executing: {shlex.join(args)}")
+        result = subprocess.run(args, check=False)
 
         name = Path(src_path).name
         if result.returncode == 0:

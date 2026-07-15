@@ -170,25 +170,32 @@ class TestCommandAction:
 
         action("/data/CHIK_ES_2026.csv")
 
-        mock_run.assert_called_once()
-        cmd = mock_run.call_args[0][0]
-        assert "makim ingestion.run --paths /data/CHIK_ES_2026.csv" == cmd
+        mock_run.assert_called_once_with(
+            [
+                "makim",
+                "ingestion.run",
+                "--paths",
+                "/data/CHIK_ES_2026.csv",
+            ],
+            check=False,
+        )
 
     @patch("ingestion.management.commands.ingestion_watcher.subprocess.run")
     def test_quoting_with_special_characters(self, mock_run):
         mock_run.return_value = MagicMock(returncode=0)
         action = CommandAction()
 
-        # Filename with spaces and parentheses
         path = "/data/ChikInfodengue_202553 (3).dbf"
         action(path)
 
-        mock_run.assert_called_once()
-        cmd = mock_run.call_args[0][0]
-        # shlex.quote will wrap it in single quotes
-        assert (
-            "makim ingestion.run --paths '/data/ChikInfodengue_202553 (3).dbf'"
-            == cmd
+        mock_run.assert_called_once_with(
+            [
+                "makim",
+                "ingestion.run",
+                "--paths",
+                path,
+            ],
+            check=False,
         )
 
     @patch("ingestion.management.commands.ingestion_watcher.subprocess.run")
@@ -198,8 +205,10 @@ class TestCommandAction:
 
         action("/tmp/test.csv")
 
-        cmd = mock_run.call_args[0][0]
-        assert cmd == "echo /tmp/test.csv"
+        mock_run.assert_called_once_with(
+            ["echo", "/tmp/test.csv"],
+            check=False,
+        )
 
     @patch("ingestion.management.commands.ingestion_watcher.subprocess.run")
     def test_include_existing_flag(self, mock_run):
@@ -208,9 +217,16 @@ class TestCommandAction:
 
         action("test.csv")
 
-        cmd = mock_run.call_args[0][0]
-        assert "--include-existing" in cmd
-        assert "--requeue" not in cmd
+        mock_run.assert_called_once_with(
+            [
+                "makim",
+                "ingestion.run",
+                "--paths",
+                "test.csv",
+                "--include-existing",
+            ],
+            check=False,
+        )
 
     @patch("ingestion.management.commands.ingestion_watcher.subprocess.run")
     def test_requeue_flag(self, mock_run):
@@ -219,17 +235,34 @@ class TestCommandAction:
 
         action("test.csv")
 
-        cmd = mock_run.call_args[0][0]
-        assert "--include-existing" in cmd
-        assert "--requeue" in cmd
+        mock_run.assert_called_once_with(
+            [
+                "makim",
+                "ingestion.run",
+                "--paths",
+                "test.csv",
+                "--include-existing",
+                "--requeue",
+            ],
+            check=False,
+        )
 
     @patch("ingestion.management.commands.ingestion_watcher.subprocess.run")
     def test_nonzero_return_does_not_raise(self, mock_run):
         mock_run.return_value = MagicMock(returncode=1)
         action = CommandAction()
 
-        # Should not raise
         action("fail.csv")
+
+        mock_run.assert_called_once_with(
+            [
+                "makim",
+                "ingestion.run",
+                "--paths",
+                "fail.csv",
+            ],
+            check=False,
+        )
 
 
 class TestLogOnlyAction:
