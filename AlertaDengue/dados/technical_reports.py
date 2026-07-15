@@ -77,7 +77,12 @@ def load_technical_reports_manifest() -> dict[str, TechnicalReport]:
     return reports
 
 
-def serve_technical_report_pdf(request, report_key="default", *args, **kwargs):
+def serve_technical_report_pdf(
+    _request,
+    report_key="default",
+    *_args,
+    **_kwargs,
+):
     """Service to serve technical report PDFs from a manifest."""
     try:
         reports = load_technical_reports_manifest()

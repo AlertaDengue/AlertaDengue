@@ -229,10 +229,10 @@ def _get_meta_int(meta: dict[str, Any], key: str) -> int:
 
 
 @pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("municipio_notificacao_table")
 def test_stage_and_merge_persists_metrics_no_duplicates(
     tmp_path: Path,
     db_engine: Engine,
-    municipio_notificacao_table: None,
 ) -> None:
     """
     Stage + merge a delivery without duplicate casos_unicos keys.
@@ -285,10 +285,10 @@ def test_stage_and_merge_persists_metrics_no_duplicates(
 
 
 @pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("municipio_notificacao_table")
 def test_merge_deduplicates_stage_and_updates_existing_row(
     tmp_path: Path,
     db_engine: Engine,
-    municipio_notificacao_table: None,
 ) -> None:
     """
     Duplicate casos_unicos keys must be deduped before UPSERT.

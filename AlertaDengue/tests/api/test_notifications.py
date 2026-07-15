@@ -22,6 +22,7 @@ def api_client():
 
 @pytest.fixture()
 def notification_api_group(db):
+    _ = db
     group, _ = Group.objects.get_or_create(
         name=NOTIFICATION_API_GROUP_NAME,
     )
@@ -30,6 +31,7 @@ def notification_api_group(db):
 
 @pytest.fixture()
 def notification_api_client(db, api_client, notification_api_group):
+    _ = db
     user = User.objects.create_user(
         username="notification-api-user",
         password="test-password",
@@ -44,6 +46,7 @@ def notification_api_client(db, api_client, notification_api_group):
 
 @pytest.fixture()
 def unauthorized_api_client(db, api_client):
+    _ = db
     user = User.objects.create_user(
         username="regular-user",
         password="test-password",
@@ -57,6 +60,7 @@ def unauthorized_api_client(db, api_client):
 
 @pytest.fixture()
 def notification_data(db):
+    _ = db
     sql = NOTIFICATION_SQL_FIXTURE.read_text(encoding="utf-8")
 
     with connection.cursor() as cursor:
@@ -84,9 +88,9 @@ def test_notifications_endpoint_rejects_user_without_group(
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("notification_data")
 def test_notifications_endpoint_allows_user_with_group(
     notification_api_client,
-    notification_data,
 ):
     url = reverse("api:internal:notifications")
 
@@ -106,9 +110,9 @@ def test_notifications_endpoint_allows_user_with_group(
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("notification_data")
 def test_notifications_endpoint_exists(
     notification_api_client,
-    notification_data,
 ):
     url = reverse("api:internal:notifications")
 
@@ -121,9 +125,9 @@ def test_notifications_endpoint_exists(
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("notification_data")
 def test_notifications_endpoint_returns_paginated_payload(
     notification_api_client,
-    notification_data,
 ):
     url = reverse("api:internal:notifications")
 
@@ -167,9 +171,9 @@ def test_notifications_endpoint_returns_paginated_payload(
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("notification_data")
 def test_notifications_endpoint_filters_by_municipio_geocodigo(
     notification_api_client,
-    notification_data,
 ):
     url = reverse("api:internal:notifications")
 
@@ -193,9 +197,9 @@ def test_notifications_endpoint_filters_by_municipio_geocodigo(
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("notification_data")
 def test_notifications_endpoint_filters_by_cid10(
     notification_api_client,
-    notification_data,
 ):
     url = reverse("api:internal:notifications")
 
@@ -219,9 +223,9 @@ def test_notifications_endpoint_filters_by_cid10(
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("notification_data")
 def test_notifications_endpoint_filters_by_year(
     notification_api_client,
-    notification_data,
 ):
     url = reverse("api:internal:notifications")
 
@@ -245,9 +249,9 @@ def test_notifications_endpoint_filters_by_year(
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("notification_data")
 def test_notifications_endpoint_filters_by_epiweek_range(
     notification_api_client,
-    notification_data,
 ):
     url = reverse("api:internal:notifications")
 
@@ -273,9 +277,9 @@ def test_notifications_endpoint_filters_by_epiweek_range(
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("notification_data")
 def test_notifications_endpoint_filters_by_date_range(
     notification_api_client,
-    notification_data,
 ):
     url = reverse("api:internal:notifications")
 
@@ -300,9 +304,9 @@ def test_notifications_endpoint_filters_by_date_range(
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("notification_data")
 def test_notifications_endpoint_applies_limit_and_offset(
     notification_api_client,
-    notification_data,
 ):
     url = reverse("api:internal:notifications")
 

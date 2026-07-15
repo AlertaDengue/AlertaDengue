@@ -175,7 +175,7 @@ class Command(BaseCommand):
 
         return {geocode: {"bounds": bounds, "width": width, "height": height}}
 
-    def handle(self, *args, **options):
+    def handle(self, *_args, **_options):
         geocodes = list(dict(get_all_active_cities()).keys())
 
         serve_static = (

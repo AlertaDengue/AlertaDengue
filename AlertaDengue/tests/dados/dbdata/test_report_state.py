@@ -9,13 +9,15 @@ import pytest
 
 from dados.dbdata import ReportState
 
+pytestmark = pytest.mark.usefixtures("report_data_tables")
+
 
 @pytest.fixture(autouse=True)
 def clear_cache():
     cache.clear()
 
 
-def test_get_regional_by_state(report_data_tables: None) -> None:
+def test_get_regional_by_state() -> None:
     """Test get_regional_by_state returns correct DataFrame."""
     # Fixture: 3304557 (Rio), id_regional=1, 'Metropolitana I', UF='RJ'
 
@@ -36,7 +38,7 @@ def test_get_regional_by_state(report_data_tables: None) -> None:
     assert row["id_regional"] == 1
 
 
-def test_create_report_state_data(report_data_tables: None) -> None:
+def test_create_report_state_data() -> None:
     """Test create_report_state_data returns history for multiple cities."""
     # Data inserted: Rio (3304557) with SE 202401, 202402
 
@@ -63,9 +65,7 @@ def test_create_report_state_data(report_data_tables: None) -> None:
     assert df["municipio_nome"].iloc[0] == "Rio de Janeiro"
 
 
-def test_create_report_state_data_multiple_cities(
-    report_data_tables: None,
-) -> None:
+def test_create_report_state_data_multiple_cities() -> None:
     """Test filtering by multiple geocodes works correctly."""
     # Assuming fixture has only Rio. Let's rely on fixture having Rio.
     # If we query Rio + nonexistent, should return Rio only.

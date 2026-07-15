@@ -395,7 +395,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
     template_name = "alerta_municipio.html"
 
     @classmethod
-    def as_view(cls, **initkwargs):
+    def as_view(_cls, **initkwargs):
         view = super().as_view(**initkwargs)
         return cache_page(60 * 60 * 8)(view)  # Cache the view for 15 minutes
 

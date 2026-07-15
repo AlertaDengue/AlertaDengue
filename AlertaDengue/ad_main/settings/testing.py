@@ -78,6 +78,7 @@ def _ensure_required_schemas(sender, using: str, **kwargs: object) -> None:
     """
     if using != "default":
         return
+    _ = sender
 
     with connections[using].cursor() as cur:
         cur.execute('CREATE SCHEMA IF NOT EXISTS "Dengue_global"')
