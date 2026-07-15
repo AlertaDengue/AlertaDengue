@@ -7,12 +7,12 @@
 if (typeof exports.decycle !== 'function') {
     exports.decycle = function decycle(object) {
         'use strict';
-        var objects = [],  
-            paths = [];    
+        var objects = [],
+            paths = [];
         return (function derez(value, path) {
-            var i,         
-                name,      
-                nu;        
+            var i,
+                name,
+                nu;
             switch (typeof value) {
             case 'object':
                 if (!value) {
@@ -89,9 +89,9 @@ if (typeof exports.retrocycle !== 'function') {
     };
 }
 }) (
-  (typeof exports !== 'undefined') ? 
-    exports : 
-    (window.JSON ? 
+  (typeof exports !== 'undefined') ?
+    exports :
+    (window.JSON ?
       (window.JSON) :
       (window.JSON = {})
     )
@@ -221,7 +221,7 @@ module.exports = JSON2;
     function f(n) {
         return n < 10 ? '0' + n : n;
     }
-    /* DDOPSON-2012-04-16 - mutating global prototypes is NOT allowed for a well-behaved module.  
+    /* DDOPSON-2012-04-16 - mutating global prototypes is NOT allowed for a well-behaved module.
      * It's also unneeded, since Date already defines toJSON() to the same ISOwhatever format below
      * Thus, we skip this logic for the CommonJS case where 'exports' is defined
      */
@@ -252,7 +252,7 @@ module.exports = JSON2;
         escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
         gap,
         indent,
-        meta = {   
+        meta = {
             '\b': '\\b',
             '\t': '\\t',
             '\n': '\\n',
@@ -272,9 +272,9 @@ module.exports = JSON2;
         }) + '"' : '"' + string + '"';
     }
     function str(key, holder) {
-        var i,         
-            k,         
-            v,         
+        var i,
+            k,
+            v,
             length,
             mind = gap,
             partial,
@@ -404,9 +404,9 @@ module.exports = JSON2;
         };
     }
 })(
-  (typeof exports !== 'undefined') ? 
-    exports : 
-    (window.JSON ? 
+  (typeof exports !== 'undefined') ?
+    exports :
+    (window.JSON ?
       (window.JSON) :
       (window.JSON = {})
     )
@@ -851,8 +851,8 @@ function Response(req, options) {
   options = options || {};
   this.req = req;
   this.xhr = this.req.xhr;
-  this.text = this.req.method !='HEAD' 
-     ? this.xhr.responseText 
+  this.text = this.req.method !='HEAD'
+     ? this.xhr.responseText
      : null;
   this.setStatusProperties(this.xhr.status);
   this.header = this.headers = parseHeader(this.xhr.getAllResponseHeaders());
@@ -984,7 +984,7 @@ function Request(method, url) {
     var err = null;
     var res = null;
     try {
-      res = new Response(self); 
+      res = new Response(self);
     } catch(e) {
       err = new Error('Parser is unable to parse the response');
       err.parse = true;
@@ -1224,41 +1224,41 @@ Request.prototype.attach = function(field, file, filename){
  *
  * Examples:
  *
- *      
+ *
  *       request.get('/search')
  *         .end(callback)
  *
- *      
+ *
  *       request.get('/search')
  *         .send({ search: 'query' })
  *         .send({ range: '1..5' })
  *         .send({ order: 'desc' })
  *         .end(callback)
  *
- *      
+ *
  *       request.post('/user')
  *         .type('json')
  *         .send('{"name":"tj"})
  *         .end(callback)
  *
- *      
+ *
  *       request.post('/user')
  *         .send({ name: 'tj' })
  *         .end(callback)
  *
- *      
+ *
  *       request.post('/user')
  *         .type('form')
  *         .send('name=tj')
  *         .end(callback)
  *
- *      
+ *
  *       request.post('/user')
  *         .type('form')
  *         .send({ name: 'tj' })
  *         .end(callback)
  *
- *      
+ *
   *      request.post('/user')
   *        .send('name=tobi')
   *        .send('species=ferret')
@@ -1532,7 +1532,7 @@ arguments[4][4][0].apply(exports,arguments)
  *
  * TODO: combatible error handling?
  */
-module.exports = function(arr, fn, initial){  
+module.exports = function(arr, fn, initial){
   var idx = 0;
   var len = arr.length;
   var curr = arguments.length == 3
@@ -2222,7 +2222,7 @@ module.exports = function(target){
 function parseParams(str){
   var urlParams = {},
       match,
-      pl     = /\+/g, 
+      pl     = /\+/g,
       search = /([^&=]+)=?([^&]*)/g,
       decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
       query  = str.split("?")[1];

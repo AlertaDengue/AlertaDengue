@@ -1,7 +1,7 @@
 This directory contains generated source code.
 
 WHAT FILES TO USE
-- The files for classic mode are available in the /code folder. In this mode, 
+- The files for classic mode are available in the /code folder. In this mode,
   styles are set as options in the chart configuration.
 - The JavaScript files for styled mode are available under the /code/js/ folder.
   In these files, most presentational code is removed, so without styling it

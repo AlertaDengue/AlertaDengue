@@ -568,7 +568,7 @@ a.Color(this.end),this.pos))}});a.seriesTypes.solidgauge=a.extendClass(a.seriesT
 d.translate(a.y,null,null,null,!0),k=r(s(a.options.radius,c.radius,100))*i[2]/200,m=r(s(a.options.innerRadius,c.innerRadius,60))*i[2]/200,n=d.toColor(a.y,a),o=Math.min(d.startAngleRad,d.endAngleRad),l=Math.max(d.startAngleRad,d.endAngleRad);n==="none"&&(n=a.color||b.color||"none");if(n!=="none")a.color=n;j=Math.max(o-f,Math.min(l+f,j));c.wrap===!1&&(j=Math.max(o,Math.min(l,j)));o=Math.min(j,d.startAngleRad);j=Math.max(j,d.startAngleRad);j-o>2*Math.PI&&(j=o+2*Math.PI);a.shapeArgs=m={x:i[0],y:i[1],
 r:k,innerR:m,start:o,end:j,fill:n};a.startR=k;if(e){if(a=m.d,e.animate(m),a)m.d=a}else a.graphic=g.arc(m).attr({stroke:c.borderColor||"none","stroke-width":c.borderWidth||0,fill:n,"sweep-flag":0}).add(b.group)})},animate:function(b){if(!b)this.startAngleRad=this.yAxis.startAngleRad,a.seriesTypes.pie.prototype.animate.call(this,b)}})});
 /*
- 
+
  Highcharts funnel module
 
  (c) 2010-2014 Torstein Honsi

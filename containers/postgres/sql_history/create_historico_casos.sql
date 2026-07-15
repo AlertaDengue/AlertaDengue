@@ -1,8 +1,8 @@
 ﻿DROP MATERIALIZED VIEW IF EXISTS "Municipio".historico_casos;
 
-CREATE MATERIALIZED VIEW "Municipio".historico_casos AS 
+CREATE MATERIALIZED VIEW "Municipio".historico_casos AS
 
-SELECT 
+SELECT
     dengue."data_iniSE",
     dengue."SE",
     COALESCE(dengue.casos_est, 0.0) +
@@ -18,7 +18,7 @@ SELECT
       COALESCE(chik.casos, 0) +
       COALESCE(zika.casos, 0) AS casos,
     dengue.municipio_geocodigo
-FROM 
+FROM
     "Municipio"."Historico_alerta" AS dengue
     FULL OUTER JOIN "Municipio"."Historico_alerta_chik" AS chik
         ON dengue."SE" = chik."SE"

@@ -17,7 +17,7 @@
          * (c) 2010-2016 Torstein Honsi
          *
          * License: www.highcharts.com/license
-         * 
+         *
          * Sand-Signika theme for Highcharts JS
          * @author Torstein Honsi
          */

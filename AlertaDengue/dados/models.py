@@ -141,7 +141,12 @@ class ParameterUF(models.Model):
 
 class EpiscannerSirParams(models.Model):
     cid10 = models.CharField(max_length=10)
-    geocode = models.BigIntegerField()
+    geocode = models.ForeignKey(
+        City,
+        to_field="geocode",
+        db_column="geocode",
+        on_delete=models.DO_NOTHING,
+    )
     year = models.IntegerField()
     ep_ini = models.CharField(max_length=20, null=True, blank=True)
     ep_pw = models.CharField(max_length=20)
@@ -154,6 +159,8 @@ class EpiscannerSirParams(models.Model):
     total_cases = models.FloatField()
     alpha = models.FloatField()
     sum_res = models.FloatField()
+    t_ini = models.IntegerField(null=True, blank=True)
+    t_end = models.IntegerField(null=True, blank=True)
 
     class Meta:
         db_table = "episcanner.sir_params"

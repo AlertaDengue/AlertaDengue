@@ -76,13 +76,14 @@ def _ensure_required_schemas(sender, using: str, **_kwargs: object) -> None:
 
     This avoids failures on FK constraints pointing to Dengue_global.Municipio.
     """
-    if using != "default":
+    if using != "default" and using != "dados":
         return
     _ = sender
 
     with connections[using].cursor() as cur:
         cur.execute('CREATE SCHEMA IF NOT EXISTS "Dengue_global"')
         cur.execute('CREATE SCHEMA IF NOT EXISTS "test_views"')
+        cur.execute('CREATE SCHEMA IF NOT EXISTS "episcanner"')
         cur.execute(
             'CREATE TABLE IF NOT EXISTS "Dengue_global"."Municipio" '
             "(geocodigo integer PRIMARY KEY)"

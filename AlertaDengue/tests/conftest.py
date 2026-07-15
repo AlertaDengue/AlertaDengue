@@ -23,6 +23,7 @@ def pytest_configure(config) -> None:
     """
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ad_main.settings.testing")
     os.environ.setdefault("PGOPTIONS", "-c search_path=test_views,public")
+    os.environ.setdefault("PSQL_HOST", "localhost")
 
     config.addinivalue_line(
         "markers",
