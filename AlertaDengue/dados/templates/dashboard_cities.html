@@ -2,7 +2,6 @@
 {% load i18n %}
 {% load static %}
 {% block extra_head %}
-    {% load series %}
     <meta property="og:image" content="{% static '/img/screenshot.png' %}" />
     <meta property="og:image:secure_url" content="{% static '/img/screenshot.png' %}" />
     <style>
@@ -58,5 +57,4 @@
 {% endblocktranslate %}{% endblock title %}
 
 {% block content %}
-    {% total_series %}
-{% endblock content %}
+    {% endblock content %}
