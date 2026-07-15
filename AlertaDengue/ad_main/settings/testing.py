@@ -70,7 +70,7 @@ else:
 
 
 @receiver(pre_migrate)
-def _ensure_required_schemas(sender, using: str, **kwargs: object) -> None:
+def _ensure_required_schemas(sender, using: str, **_kwargs: object) -> None:
     """
     Ensure schemas/tables referenced by migrations exist in the test DB.
 
@@ -78,6 +78,7 @@ def _ensure_required_schemas(sender, using: str, **kwargs: object) -> None:
     """
     if using != "default":
         return
+    _ = sender
 
     with connections[using].cursor() as cur:
         cur.execute('CREATE SCHEMA IF NOT EXISTS "Dengue_global"')

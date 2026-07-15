@@ -9,13 +9,15 @@ import pytest
 
 from dados.dbdata import ReportCity
 
+pytestmark = pytest.mark.usefixtures("report_data_tables")
+
 
 @pytest.fixture(autouse=True)
 def clear_cache():
     cache.clear()
 
 
-def test_read_disease_data_dengue(report_data_tables: None) -> None:
+def test_read_disease_data_dengue() -> None:
     """Test read_disease_data returns correct DataFrame for dengue."""
     # 3304557 is Rio de Janeiro
     # Data inserted in fixture: SE 202401, 202402
@@ -63,7 +65,7 @@ def test_read_disease_data_invalid_disease() -> None:
         )
 
 
-def test_read_disease_data_filter_range(report_data_tables: None) -> None:
+def test_read_disease_data_filter_range() -> None:
     """Test read_disease_data filters by SE range (last 200 weeks)."""
     # Fixture has 202401, 202402.
     # If we ask for 202401, it should return that and anything up to 200 weeks prior.

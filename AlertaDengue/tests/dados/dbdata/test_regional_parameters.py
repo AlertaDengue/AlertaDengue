@@ -12,13 +12,15 @@ import pytest
 
 from dados.dbdata import RegionalParameters
 
+pytestmark = pytest.mark.usefixtures("regional_parameters_tables")
+
 
 @pytest.fixture(autouse=True)
 def clear_cache():
     cache.clear()
 
 
-def test_get_regional_names(regional_parameters_tables: None) -> None:
+def test_get_regional_names() -> None:
     """Test get_regional_names returns correct list of active names."""
     names = RegionalParameters.get_regional_names("RJ")
     assert "Metropolitana I" in names
@@ -26,7 +28,7 @@ def test_get_regional_names(regional_parameters_tables: None) -> None:
     assert len(names) == 2
 
 
-def test_get_cities_by_state(regional_parameters_tables: None) -> None:
+def test_get_cities_by_state() -> None:
     """Test get_cities returns all cities in state when no region specified."""
     cities = RegionalParameters.get_cities(state_name="RJ")
     assert 3304557 in cities
@@ -35,7 +37,7 @@ def test_get_cities_by_state(regional_parameters_tables: None) -> None:
     assert cities[3303302] == "Niterói"
 
 
-def test_get_cities_by_region(regional_parameters_tables: None) -> None:
+def test_get_cities_by_region() -> None:
     """Test get_cities returns cities only in specified region."""
     cities = RegionalParameters.get_cities(
         regional_name="Metropolitana I", state_name="RJ"
@@ -44,7 +46,7 @@ def test_get_cities_by_region(regional_parameters_tables: None) -> None:
     assert 3303302 not in cities  # Niteroi is in Metro II (in our mock data)
 
 
-def test_get_report_parameters(regional_parameters_tables: None) -> None:
+def test_get_report_parameters() -> None:
     """Test get_report_parameters returns climate and disease thresholds."""
     params = RegionalParameters.get_report_parameters(3304557, "dengue")
 
@@ -59,9 +61,7 @@ def test_get_report_parameters(regional_parameters_tables: None) -> None:
 class TestDiseaseFilterParameters:
     """Verify disease-specific parameter selection."""
 
-    def test_disease_thresholds_differ(
-        self, regional_parameters_tables: None
-    ) -> None:
+    def test_disease_thresholds_differ(self) -> None:
         dengue = RegionalParameters.get_report_parameters(3304557, "dengue")
         chik = RegionalParameters.get_report_parameters(3304557, "chikungunya")
 
@@ -74,9 +74,7 @@ class TestDiseaseFilterParameters:
         assert dengue.limiar_epidemico == 300
         assert chik.limiar_epidemico == 75
 
-    def test_niteroi_thresholds(
-        self, regional_parameters_tables: None
-    ) -> None:
+    def test_niteroi_thresholds(self) -> None:
         params = RegionalParameters.get_report_parameters(
             3303302, "chikungunya"
         )
@@ -88,21 +86,15 @@ class TestDiseaseFilterParameters:
         assert params.limiar_posseason == 40
         assert params.limiar_epidemico == 150
 
-    def test_nonexistent_disease_returns_none(
-        self, regional_parameters_tables: None
-    ) -> None:
+    def test_nonexistent_disease_returns_none(self) -> None:
         assert (
             RegionalParameters.get_report_parameters(3304557, "zika") is None
         )
 
-    def test_regional_names_not_duplicated(
-        self, regional_parameters_tables: None
-    ) -> None:
+    def test_regional_names_not_duplicated(self) -> None:
         assert len(RegionalParameters.get_regional_names("RJ")) == 2
 
-    def test_cities_not_duplicated(
-        self, regional_parameters_tables: None
-    ) -> None:
+    def test_cities_not_duplicated(self) -> None:
         cities = RegionalParameters.get_cities(state_name="RJ")
 
         assert len(cities) == 2

@@ -17,7 +17,7 @@ class ReportStateCharts:
 
     @classmethod
     def create_notific_chart(
-        cls,
+        _cls,
         df: pd.DataFrame,
     ) -> go.Figure:
         """
@@ -174,7 +174,7 @@ class ReportStateCharts:
 
     @classmethod
     def create_level_chart(
-        cls,
+        _cls,
         df: pd.DataFrame,
     ) -> px.bar:
         """

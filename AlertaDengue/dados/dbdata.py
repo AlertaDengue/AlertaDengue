@@ -582,6 +582,7 @@ def load_series(
     """
     cache_key = "load_series-{}-{}".format(cidade, disease)
     cached = cache.get(cache_key)
+    _ = epiweek
 
     key_str = str(cidade)
     key_int = int(cidade)

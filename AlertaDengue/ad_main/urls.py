@@ -8,7 +8,7 @@ from django.views.generic import RedirectView
 admin.autodiscover()
 
 
-def status(request):
+def status(_request):
     return JsonResponse({"status": "ok"})
 
 

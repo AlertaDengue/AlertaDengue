@@ -51,7 +51,7 @@ class Command(BaseCommand):
             help="Print the sorted enqueue plan without enqueuing.",
         )
 
-    def handle(self, *args: Any, **options: Any) -> None:
+    def handle(self, *_args: Any, **options: Any) -> None:
         manifest_path = Path(options["manifest"]).expanduser()
         if not manifest_path.exists():
             raise CommandError(f"Manifest not found: {manifest_path}")
