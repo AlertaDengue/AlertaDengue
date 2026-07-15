@@ -303,11 +303,13 @@ class TestSaveSirParams:
             ]
             _save_sir_params(disease, TEST_YEAR, params)
 
-        from dados.tasks import DISEASE_CID10
+        from dados.dbdata import CID10
+
+        _normalize = lambda d: "chikungunya" if d == "chik" else d
 
         for disease in ("dengue", "chik", "zika"):
             row = EpiscannerSirParams.objects.using("dados").get(
-                cid10=DISEASE_CID10[disease],
+                cid10=CID10[_normalize(disease)],
                 geocode_id=3304557,
                 year=TEST_YEAR,
             )

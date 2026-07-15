@@ -9,11 +9,14 @@ from sqlalchemy import text
 from ad_main.celeryapp import app
 from dados.dbdata import (
     ALL_STATE_NAMES,
+    CID10,
     DB_ENGINE,
+    get_disease_suffix,
 )
 
-DISEASE_TABLE_SUFFIX = {"dengue": "", "chik": "_chik", "zika": "_zika"}
-DISEASE_CID10 = {"dengue": "A90", "chik": "A92.0", "zika": "A928"}
+
+def _normalize_disease(disease: str) -> str:
+    return "chikungunya" if disease == "chik" else disease
 
 
 app.conf.beat_schedule = {
@@ -38,7 +41,8 @@ app.conf.beat_schedule = {
 def _fetch_alert_data(
     state_abbr: str, disease: str, year: int
 ) -> pd.DataFrame:
-    suffix = DISEASE_TABLE_SUFFIX[disease]
+    long_name = _normalize_disease(disease)
+    suffix = get_disease_suffix(long_name)
     state_name = ALL_STATE_NAMES[state_abbr][0]
     se_start = year * 100 + 1
     se_end = year * 100 + 53
@@ -74,7 +78,8 @@ def _fetch_alert_data(
 def _save_sir_params(disease: str, year: int, results: list) -> int:
     from dados.models import EpiscannerSirParams
 
-    cid10 = DISEASE_CID10[disease]
+    long_name = _normalize_disease(disease)
+    cid10 = CID10[long_name]
     saved = 0
 
     for r in results:

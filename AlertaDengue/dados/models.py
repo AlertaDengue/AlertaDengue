@@ -163,7 +163,7 @@ class EpiscannerSirParams(models.Model):
     t_end = models.IntegerField(null=True, blank=True)
 
     class Meta:
-        db_table = "episcanner.sir_params"
+        db_table = '"episcanner"."sir_params"'
         constraints = [
             models.UniqueConstraint(
                 fields=["cid10", "geocode", "year"],
