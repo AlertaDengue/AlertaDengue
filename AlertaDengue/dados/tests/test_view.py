@@ -8,6 +8,8 @@ from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 
+SKIP_REASON = "Issue #334"
+
 
 class TestAlertaStaticPageView(TestCase):
     def test_about(self):
@@ -27,7 +29,9 @@ class TestAlertaStaticPageView(TestCase):
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(
-            reverse("dados:data_public_services", kwargs={"service": "maps"})
+            reverse(
+                "dados:data_public_services", kwargs={"service": "tutorial"}
+            )
         )
         self.assertEqual(response.status_code, 200)
 
@@ -40,7 +44,7 @@ class TestAlertaStaticPageView(TestCase):
         response = self.client.get(
             reverse(
                 "dados:data_public_services_type",
-                kwargs={"service": "maps", "service_type": "doc"},
+                kwargs={"service": "api", "service_type": "doc"},
             )
         )
         self.assertEqual(response.status_code, 200)
@@ -52,7 +56,7 @@ class TestAlertaPageView(TestCase):
         settings.DATA_DIR = os.path.dirname(__file__)
         self.response = self.client.get(reverse("dados:mrj", args=["dengue"]))
 
-    @skip
+    @skip(SKIP_REASON)
     def test_casos_por_ap(self):
         casos_por_ap = {
             "1.0": 0,
@@ -70,7 +74,7 @@ class TestAlertaPageView(TestCase):
             json.loads(self.response.context["casos_por_ap"]), casos_por_ap
         )
 
-    @skip
+    @skip(SKIP_REASON)
     def test_alerta(self):
         alerta = {
             1.0: 1,
@@ -87,12 +91,12 @@ class TestAlertaPageView(TestCase):
 
         self.assertEqual(self.response.context["alerta"], alerta)
 
-    @skip
+    @skip(SKIP_REASON)
     def test_novos_casos(self):
         novos_casos = 143
         self.assertEqual(self.response.context["novos_casos"], novos_casos)
 
-    @skip
+    @skip(SKIP_REASON)
     def test_series_casos(self):
         series_casos = {
             "1.0": [3, 6, 4, 2, 5, 3, 12, 14, 10, 0, 0, 0],
@@ -108,32 +112,32 @@ class TestAlertaPageView(TestCase):
         }
         self.assertEqual(self.response.context["series_casos"], series_casos)
 
-    @skip
+    @skip(SKIP_REASON)
     def test_SE(self):
         SE = 20
         self.assertEqual(self.response.context["SE"], SE)
 
-    @skip
+    @skip(SKIP_REASON)
     def test_data1(self):
         data1 = "18 de maio de 2015"
         self.assertEqual(self.response.context["data1"], data1)
 
-    @skip
+    @skip(SKIP_REASON)
     def test_data2(self):
         data2 = "24 de maio de 2015"
         self.assertEqual(self.response.context["data2"], data2)
 
-    @skip
+    @skip(SKIP_REASON)
     def test_last_year(self):
         last_year = 0
         self.assertEqual(self.response.context["last_year"], last_year)
 
-    @skip
+    @skip(SKIP_REASON)
     def test_look_back(self):
         look_back = 12
         self.assertEqual(self.response.context["look_back"], look_back)
 
-    @skip
+    @skip(SKIP_REASON)
     def test_total_series(self):
         total_series = (
             "98, 134, 177, 241, 247, 371, 703, 466, 495, 136, 142, 143"

@@ -67,9 +67,7 @@ def download_technical_report_pdf(
     request, report_key="default", *args, **kwargs
 ):
     """View to serve technical report PDFs, delegating to the service implementation."""
-    return serve_technical_report_pdf(
-        request, report_key=report_key, *args, **kwargs
-    )
+    return serve_technical_report_pdf(request, report_key)
 
 
 # local

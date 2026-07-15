@@ -50,6 +50,38 @@ def test_download_technical_report_pdf_success(
     assert _consume_response(response) == pdf_content
 
 
+def test_download_technical_report_pdf_wrapper_passes_selected_key(
+    tmp_path: Path,
+) -> None:
+    manifest = {
+        "default": {
+            "filename": "default.pdf",
+            "output_filename": "Default.pdf",
+        },
+        "technical-report-2023": {
+            "filename": "selected.pdf",
+            "output_filename": "Selected.pdf",
+        },
+    }
+    (tmp_path / "technical_reports.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+    (tmp_path / "default.pdf").write_bytes(b"%PDF-1.4 default")
+    selected_pdf = b"%PDF-1.4 selected"
+    (tmp_path / "selected.pdf").write_bytes(selected_pdf)
+
+    from dados.views import download_technical_report_pdf
+
+    with override_settings(TECHNICAL_REPORTS_ROOT=tmp_path):
+        response = download_technical_report_pdf(
+            RequestFactory().get("/"), report_key="technical-report-2023"
+        )
+
+    assert response.status_code == 200
+    assert "Selected.pdf" in response["Content-Disposition"]
+    assert _consume_response(response) == selected_pdf
+
+
 def test_download_technical_report_pdf_unknown_key(
     tmp_path: Path,
 ) -> None:
