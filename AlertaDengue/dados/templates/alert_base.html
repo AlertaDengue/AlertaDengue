@@ -69,7 +69,7 @@
 
 <div>
 
-
+ 
 {% endblock %}
 
 
@@ -99,13 +99,13 @@
         <input id="disease-chik" type="radio" name="disease" value="chik" {% if disease_code == 'chikungunya' %}
             checked="checked" {% endif %} onchange="window.location.href='./chikungunya'" /> Chikungunya
         <input id="disease-zika" type="radio" name="disease" value="zika" {% if disease_code == 'zika' %} checked="checked"
-            {% endif %} onchange="window.location.href='./zika'" /> Zika
+            {% endif %} onchange="window.location.href='./zika'" /> Zika 
     </div>
     </br>
-    <div style="text-align:center;">
+    <div style="text-align:center;"> 
         <div style="margin: auto;">
             {% blocktranslate with prt=prt1|floatformat %}<b>Chance de alerta
-                <span class="label label-warning">laranja</span> ou
+                <span class="label label-warning">laranja</span> ou 
                 <span class="label label-danger">vermelho</span>  de {{ disease_label }}
                 para o município de {{ nome }} na próxima semana:</b> {{ prt }}%
                 {% endblocktranslate %}

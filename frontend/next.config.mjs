@@ -7,7 +7,13 @@ const nextConfig = {
   output: "standalone",
 
   experimental: {
-    optimizePackageImports: ["@tanstack/react-query", "axios", "lucide-react", "date-fns", "lodash"],
+    optimizePackageImports: [
+      "@tanstack/react-query",
+      "axios",
+      "lucide-react",
+      "date-fns",
+      "lodash",
+    ],
   },
 
   compress: true,
