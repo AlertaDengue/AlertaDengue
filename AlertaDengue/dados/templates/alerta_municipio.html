@@ -1,12 +1,12 @@
-{% extends 'alert_base.html' %}
+{% extends "alert_base.html" %}
 
-{% load humanize i18n%}
+{% load humanize i18n %}
 {% load i18n %}
 {% load static %}
 
 {% block alert_js %}
 dataurls ;
-{% endblock %}
+{% endblock alert_js %}
 
 {% block alert_js_main_init %}
 info.update = function (props) {
@@ -16,4 +16,4 @@ info.update = function (props) {
 
 get_map_bounds = function() {return geojson.getBounds();};
 
-{% endblock %}
+{% endblock alert_js_main_init %}

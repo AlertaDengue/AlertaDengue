@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load i18n %}
 {% load static %}
 
@@ -15,10 +15,9 @@
     <script src="{% static '/js/highcharts.js' %}"></script>
     <script src="{% static '/js/highcharts-more.js' %}"></script>
     <script src="{% static '/js/modules/exporting.js' %}"></script>
-{% endblock %}
+{% endblock extra_head %}
 
-
-{% block title %}Séries Históricas{% endblock %}
+{% block title %}Séries Históricas{% endblock title %}
 
 {% block content %}
     <h4>{% translate "O Alerta de Dengue e calculado usando dados que incluem os apresentados abaixo." %}</h4>
@@ -138,5 +137,4 @@
     </script>
 
 
-
-{% endblock %}
+{% endblock content %}

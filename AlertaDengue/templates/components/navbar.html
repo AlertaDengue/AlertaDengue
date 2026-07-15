@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block menu-bar %}
-<nav class="site-navbar navbar navbar-expand-md navbar-dark" aria-label="{% trans 'Navegação principal' %}">
+<nav class="site-navbar navbar navbar-expand-md navbar-dark" aria-label="{% trans "Navegação principal" %}">
   <button
       class="navbar-toggler site-navbar-toggler site-navbar-toggler--nav ml-auto"
       type="button"
@@ -10,7 +10,7 @@
       data-target="#navbarSupportedContent"
       aria-controls="navbarSupportedContent"
       aria-expanded="false"
-      aria-label="{% trans 'Alternar navegação' %}">
+      aria-label="{% trans "Alternar navegação" %}">
     <span class="navbar-toggler-icon"></span>
   </button>
 
@@ -22,7 +22,7 @@
             href="{% url 'dados:main' %}"
             data-toggle="tooltip"
             data-placement="bottom"
-            title="{% trans 'Página inicial com visão geral da situação das arboviroses e principais recursos do Infodengue.' %}">
+            title="{% trans "Página inicial com visão geral da situação das arboviroses e principais recursos do Infodengue." %}">
           <i class="fas fa-house" aria-hidden="true"></i>
           <span>{% translate "Início" %}</span>
         </a>
@@ -34,7 +34,7 @@
             href="{% url 'dados:data_public_services' %}"
             data-toggle="tooltip"
             data-placement="bottom"
-            title="{% trans 'Acesse os dados por meio da API e de notebooks de documentação com exemplos.' %}">
+            title="{% trans "Acesse os dados por meio da API e de notebooks de documentação com exemplos." %}">
           <i class="fas fa-database" aria-hidden="true"></i>
           <span>{% translate "Dados" %}</span>
         </a>
@@ -46,7 +46,7 @@
             href="{% url 'dados:report' %}"
             data-toggle="tooltip"
             data-placement="bottom"
-            title="{% trans 'Consulte relatórios municipais e estaduais com indicadores epidemiológicos e níveis de alerta.' %}">
+            title="{% trans "Consulte relatórios municipais e estaduais com indicadores epidemiológicos e níveis de alerta." %}">
           <i class="fas fa-chart-line" aria-hidden="true"></i>
           <span>{% translate "Relatórios" %}</span>
         </a>
@@ -58,7 +58,7 @@
             href="{% url 'dados:products' %}"
             data-toggle="tooltip"
             data-placement="bottom"
-            title="{% trans 'Veja os relatórios, publicações, teses e ferramentas produzidas pela equipe do Infodengue.' %}">
+            title="{% trans "Veja os relatórios, publicações, teses e ferramentas produzidas pela equipe do Infodengue." %}">
           <i class="fas fa-box-open" aria-hidden="true"></i>
           <span>{% translate "Produtos" %}</span>
         </a>
@@ -70,7 +70,7 @@
             href="{% url 'dados:team' %}"
             data-toggle="tooltip"
             data-placement="bottom"
-            title="{% trans 'Conheça a equipe responsável pelo desenvolvimento, manutenção e análise dos dados do Infodengue.' %}">
+            title="{% trans "Conheça a equipe responsável pelo desenvolvimento, manutenção e análise dos dados do Infodengue." %}">
           <i class="fas fa-users" aria-hidden="true"></i>
           <span>{% translate "Equipe" %}</span>
         </a>
@@ -82,7 +82,7 @@
             href="{% url 'dados:about' %}"
             data-toggle="tooltip"
             data-placement="bottom"
-            title="{% trans 'Informações sobre o projeto Infodengue, seus objetivos, histórico e principais parceiros.' %}">
+            title="{% trans "Informações sobre o projeto Infodengue, seus objetivos, histórico e principais parceiros." %}">
           <i class="fas fa-circle-info" aria-hidden="true"></i>
           <span>{% translate "Sobre nós" %}</span>
         </a>
@@ -91,4 +91,4 @@
 
   </div>
 </nav>
-{% endblock %}
+{% endblock menu-bar %}
