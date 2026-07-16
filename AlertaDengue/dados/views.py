@@ -6,7 +6,6 @@ import json
 import locale
 import logging
 from pathlib import Path, PurePath
-import random
 from typing import Any, cast
 
 import numpy as np
@@ -16,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 #
 from django.conf import settings
-from django.contrib import messages
 from django.contrib.staticfiles.finders import find
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
@@ -32,7 +30,6 @@ from epiweeks import Week
 
 from ad_main.typed_settings import get_project_root
 
-from . import models as M
 from .charts.alerts import AlertCitiesCharts
 from .charts.cities import ReportCityCharts
 from .charts.home import (
@@ -565,45 +562,6 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
         )
 
         return context
-
-
-class SinanCasesView(View):
-    def get(self, request, year, sample):
-        sample = int(sample)
-        try:
-            assert int(year) in [2010, 2011, 2012, 2013]
-        except AssertionError:
-            messages.error(
-                self.request,
-                "O projeto conté dados apenas dos anos 2010 a 2013.",
-            )
-
-        sample = 1 if sample == 0 else sample / 100.0
-        cases = '{"type":"FeatureCollection", "features":['
-        if int(year) == 2010:
-            dados = M.Dengue_2010.objects.geojson()
-        elif int(year) == 2011:
-            dados = M.Dengue_2011.objects.geojson()
-        elif int(year) == 2012:
-            dados = M.Dengue_2012.objects.geojson()
-        elif int(year) == 2013:
-            dados = M.Dengue_2013.objects.geojson()
-        else:
-            dados = []
-
-        if len(dados) < 5500:
-            sample = 1
-        for c in random.sample(list(dados), int(len(dados) * sample)):
-            cases += (
-                '{"type":"Feature","geometry":'
-                + c.geojson
-                + ', "properties":{"data":"'
-                + c.dt_notific.isoformat()
-                + '"}},'
-            )
-        cases = cases[:-1] + "]}"
-        # json.loads(cases)
-        return HttpResponse(cases, content_type="application/json")
 
 
 class ChartsMainView(TemplateView):
