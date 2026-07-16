@@ -1,6 +1,13 @@
 from __future__ import annotations
 
 from ad_main.settings.base import *  # noqa: F403
+from ad_main.settings.base import (
+    BASE_MIDDLEWARE,
+    INSTALLED_APPS,
+    build_caches,
+    build_result_backend,
+    build_templates,
+)
 
 DEBUG = True
 ALLOWED_HOSTS = ["*"]

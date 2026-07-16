@@ -14,11 +14,12 @@ from shapely.geometry import MultiPolygon, shape
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 
+from ad_main.typed_settings import get_db_engine, get_query_cache_timeout
 from dados import dbdata, maps
 
 from ...geoutils import extract_boundaries
 
-DB_ENGINE: Final[Engine] = settings.DB_ENGINE
+DB_ENGINE: Final[Engine] = get_db_engine()
 
 
 def get_all_active_cities(
@@ -43,7 +44,7 @@ def get_all_active_cities(
     with db_engine.connect() as conn:
         res = conn.execute(stmt).fetchall()
 
-    cache.set(cache_key, res, settings.QUERY_CACHE_TIMEOUT)
+    cache.set(cache_key, res, get_query_cache_timeout())
     return list(res)
 
 
@@ -133,7 +134,7 @@ class Command(BaseCommand):
         )
 
     def create_geojson_by_state(self, geojson_simplified_path):
-        geojson_codes_states = {
+        geojson_codes_states: dict[str, list[str]] = {
             state_code: [] for state_code in dbdata.STATE_NAME.keys()
         }
         for geocode, _, _, state_name in dbdata.get_all_active_cities_state():
@@ -181,7 +182,7 @@ class Command(BaseCommand):
         serve_static = (
             settings.STATICFILES_DIRS[0]
             if settings.DEBUG
-            else settings.STATIC_ROOT
+            else str(settings.STATIC_ROOT)
         )
         path_root = Path(serve_static)
         f_geojson_path = path_root / "geojson"

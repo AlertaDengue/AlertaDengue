@@ -1,14 +1,14 @@
 from typing import Optional
 
 # local
-from django.conf import settings
 import pandas as pd
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 
+from ad_main.typed_settings import get_db_engine
 from dados.dbdata import CID10, STATE_NAME, get_disease_suffix  # noqa:F401
 
-DB_ENGINE = settings.DB_ENGINE
+DB_ENGINE = get_db_engine()
 
 
 class NotificationQueries:

@@ -1,3 +1,5 @@
+from typing import cast
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -12,6 +14,9 @@ def status(_request):
     return JsonResponse({"status": "ok"})
 
 
+static_url = cast(str, settings.STATIC_URL)
+static_root = cast(str, settings.STATIC_ROOT)
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("pwa.urls")),
@@ -23,5 +28,5 @@ urlpatterns = [
     re_path(r"^admin/doc/", include("django.contrib.admindocs.urls")),
     re_path(r"^api/", include("api.urls")),
     re_path(r"^status/$", status),
-    *static(settings.STATIC_URL, document_root=settings.STATIC_ROOT),
+    *static(static_url, document_root=static_root),
 ]

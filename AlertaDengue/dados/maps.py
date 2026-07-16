@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from typing import Any, Final
 
-from django.conf import settings
 import geojson
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 
-DB_ENGINE: Final[Engine] = settings.DB_ENGINE
+from ad_main.typed_settings import get_db_engine
+
+DB_ENGINE: Final[Engine] = get_db_engine()
 
 
 def get_city_geojson(

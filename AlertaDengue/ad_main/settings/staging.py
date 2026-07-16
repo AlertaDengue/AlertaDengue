@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from ad_main.settings.prod import *  # noqa: F403
+from ad_main.settings.prod import MIDDLEWARE, TEMPLATES
 
 
 def env_list(name: str, default: str = "") -> list[str]:
