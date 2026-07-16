@@ -54,12 +54,11 @@ def read_admins(value: str) -> tuple[tuple[str, str], ...]:
 # parent.parent.parent.parent == /opt/services
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent.parent
 # APP_DIRS = BASE_DIR / "AlertaDengue"
-PROJECT_ROOT = BASE_DIR / "AlertaDengue"
+PROJECT_ROOT: Path = BASE_DIR / "AlertaDengue"
 
 SECRET_KEY = os.getenv("SECRET_KEY")
-ALLOWED_HOSTS = (
-    os.getenv("ALLOWED_HOSTS").split(",") if os.getenv("ALLOWED_HOSTS") else []
-)
+allowed_hosts = os.getenv("ALLOWED_HOSTS")
+ALLOWED_HOSTS = allowed_hosts.split(",") if allowed_hosts else []
 ADMINS = read_admins(os.getenv("ADMINS", ""))
 
 MAINTENANCE_MODE = os.getenv("MAINTENANCE", "False").lower() == "true"
@@ -106,7 +105,7 @@ LOCAL_APPS = [
     "ingestion",
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS: list[str] = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 BASE_MIDDLEWARE: list[str] = [
     "django.middleware.security.SecurityMiddleware",
@@ -156,7 +155,7 @@ DB_ENGINE_FACTORY = get_sqla_conn
 
 DATABASE_ROUTERS = ["manager.router.DatabaseAppsRouter"]
 
-DATABASE_APPS_MAPPING = {
+DATABASE_APPS_MAPPING: dict[str, str] = {
     "dados": "dados",
     "default": "default",
 }
@@ -253,7 +252,7 @@ MEDIA_URL = "/img/"
 IMPORTED_FILES_DIR = os.getenv(
     "IMPORTED_FILES_DIR", "/opt/services/ingestion/sinan/imported"
 )
-TECHNICAL_REPORTS_ROOT = Path(
+TECHNICAL_REPORTS_ROOT: Path = Path(
     os.getenv("TECHNICAL_REPORTS_ROOT") or "/opt/services/technical_reports"
 )
 

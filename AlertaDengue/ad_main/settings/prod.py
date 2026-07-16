@@ -1,4 +1,10 @@
 from ad_main.settings.base import *  # noqa: F403
+from ad_main.settings.base import (
+    BASE_MIDDLEWARE,
+    build_caches,
+    build_result_backend,
+    build_templates,
+)
 
 DEBUG = False
 

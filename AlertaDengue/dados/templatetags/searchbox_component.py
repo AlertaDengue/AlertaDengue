@@ -1,7 +1,7 @@
 from django import template
-from django.conf import settings
 from django.core.cache import cache
 
+from ad_main.typed_settings import get_query_cache_timeout
 from dados.dbdata import STATE_NAME, RegionalParameters
 from dados.models import City
 
@@ -32,7 +32,7 @@ def searchbox_component(context):
     cache.set(
         cache_name,
         options_cities,
-        settings.QUERY_CACHE_TIMEOUT,
+        get_query_cache_timeout(),
     )
 
     context = {

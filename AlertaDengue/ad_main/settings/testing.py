@@ -8,6 +8,7 @@ from django.db import connections
 from django.db.models.signals import pre_migrate
 from django.dispatch import receiver
 
+from ad_main.settings.base import DATABASES, get_sqla_conn
 from ad_main.settings.dev import *  # noqa: F403
 
 DEBUG = True
@@ -59,12 +60,12 @@ def _configure_test_db(db: dict[str, object]) -> None:
         test_cfg["NAME"] = test_name
 
 
-for db in DATABASES.values():  # noqa: F405
+for db in DATABASES.values():
     _configure_test_db(db)
 
-PSQL_DB = DATABASES["default"]["TEST"]["NAME"]  # noqa: F405
-if "dbf" in DATABASES:  # noqa: F405
-    PSQL_DBF = DATABASES["dbf"]["TEST"]["NAME"]  # noqa: F405
+PSQL_DB = DATABASES["default"]["TEST"]["NAME"]
+if "dbf" in DATABASES:
+    PSQL_DBF = DATABASES["dbf"]["TEST"]["NAME"]
 else:
     PSQL_DBF = PSQL_DB
 
@@ -90,8 +91,8 @@ def _ensure_required_schemas(sender, using: str, **_kwargs: object) -> None:
         )
 
 
-DB_ENGINE = get_sqla_conn(psql_db=PSQL_DB)  # noqa: F405
-DB_ENGINE_FACTORY = get_sqla_conn  # noqa: F405
+DB_ENGINE = get_sqla_conn(psql_db=PSQL_DB)
+DB_ENGINE_FACTORY = get_sqla_conn
 
 CACHES = {
     "default": {

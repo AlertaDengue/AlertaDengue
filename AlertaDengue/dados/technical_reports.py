@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 import json
-from pathlib import Path
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import FileResponse, Http404
+
+from ad_main.typed_settings import get_technical_reports_root
 
 
 @dataclass(frozen=True, slots=True)
@@ -22,7 +22,7 @@ def load_technical_reports_manifest() -> dict[str, TechnicalReport]:
     The manifest is expected to be located at:
     Path(settings.TECHNICAL_REPORTS_ROOT) / "technical_reports.json"
     """
-    root = Path(settings.TECHNICAL_REPORTS_ROOT)
+    root = get_technical_reports_root()
     manifest_path = root / "technical_reports.json"
 
     if not manifest_path.exists():
@@ -94,7 +94,7 @@ def serve_technical_report_pdf(
     if report is None:
         raise Http404("Technical Report PDF not found")
 
-    root = Path(settings.TECHNICAL_REPORTS_ROOT).resolve()
+    root = get_technical_reports_root().resolve()
 
     # Resolve path and check for traversal
     try:

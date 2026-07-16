@@ -1,5 +1,7 @@
 from django.conf import settings
 
+from ad_main.typed_settings import get_database_apps_mapping
+
 
 class DatabaseAppsRouter(object):
     """
@@ -19,15 +21,17 @@ class DatabaseAppsRouter(object):
     def db_for_read(self, model, **hints):
         """ "Point all read operations to the specific database."""
         db = None
-        if model._meta.app_label in settings.DATABASE_APPS_MAPPING:
-            db = settings.DATABASE_APPS_MAPPING[model._meta.app_label]
+        apps_mapping = get_database_apps_mapping()
+        if model._meta.app_label in apps_mapping:
+            db = apps_mapping[model._meta.app_label]
         return db
 
     def db_for_write(self, model, **hints):
         """Point all write operations to the specific database."""
         db = None
-        if model._meta.app_label in settings.DATABASE_APPS_MAPPING:
-            db = settings.DATABASE_APPS_MAPPING[model._meta.app_label]
+        apps_mapping = get_database_apps_mapping()
+        if model._meta.app_label in apps_mapping:
+            db = apps_mapping[model._meta.app_label]
         return db
 
     def allow_relation(self, obj1, obj2, **hints):
@@ -35,8 +39,9 @@ class DatabaseAppsRouter(object):
         label1 = obj1._meta.app_label
         label2 = obj2._meta.app_label
 
-        db_obj1 = settings.DATABASE_APPS_MAPPING.get(label1)
-        db_obj2 = settings.DATABASE_APPS_MAPPING.get(label2)
+        apps_mapping = get_database_apps_mapping()
+        db_obj1 = apps_mapping.get(label1)
+        db_obj2 = apps_mapping.get(label2)
 
         allow = None
 
@@ -53,7 +58,7 @@ class DatabaseAppsRouter(object):
     def allow_syncdb(self, db, model):
         """Make sure that apps only appear in the related database."""
         allow = None
-        apps_mapping = settings.DATABASE_APPS_MAPPING  # alias
+        apps_mapping = get_database_apps_mapping()
 
         if db in apps_mapping.values():
             allow = apps_mapping.get(model._meta.app_label) == db
@@ -68,7 +73,7 @@ class DatabaseAppsRouter(object):
         return allow
 
     def allow_migrate(self, db, app_label, **hints):
-        apps_mapping = settings.DATABASE_APPS_MAPPING  # alias
+        apps_mapping = get_database_apps_mapping()
         allow = True
 
         if "target_db" in hints:
