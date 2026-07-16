@@ -607,7 +607,9 @@ def load_series(
         cache.set(cache_key, result, QUERY_CACHE_TIMEOUT)
         return {key_str: None, key_int: None}
 
-    series = defaultdict(lambda: defaultdict(list))
+    series: dict[str, dict[str, object]] = defaultdict(
+        lambda: defaultdict(list)
+    )
 
     series[key_str]["dia"] = dados_alerta.data_iniSE.tolist()
     series[key_str]["nivel"] = dados_alerta.nivel.tolist()
