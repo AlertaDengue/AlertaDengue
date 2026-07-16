@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+from typing import TypedDict
 from unittest.mock import patch
 
 from django.conf import settings
@@ -12,7 +13,14 @@ from sqlalchemy import text
 from sqlalchemy.engine import Engine
 
 TEST_YEAR = 2024
-CITIES = {
+
+
+class CityFixture(TypedDict):
+    name: str
+    geocodes: list[int]
+
+
+CITIES: dict[str, CityFixture] = {
     "RJ": {
         "name": "Rio de Janeiro",
         "geocodes": [3304557, 3303302],  # Rio de Janeiro, Niterói

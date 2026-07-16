@@ -271,7 +271,7 @@ def _create_indicator_chart(df: pd.DataFrame, state_abbv: str) -> go.Indicator:
     return fig.to_html(full_html=False, include_plotlyjs=False, config=config)
 
 
-def _create_stack_chart(df: pd.DataFrame) -> px.bar():
+def _create_stack_chart(df: pd.DataFrame) -> go.Figure:
     """
     Create chart of the epidemiological situation of cities
     by levels in the week.
