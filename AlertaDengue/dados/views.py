@@ -7,7 +7,7 @@ import locale
 import logging
 from pathlib import Path, PurePath
 import random
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -19,7 +19,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.staticfiles.finders import find
 from django.core.cache import cache
-from django.http import HttpResponse
+from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpRequest, HttpResponse
 
 # from django.shortcuts import redirect
 from django.templatetags.static import static
@@ -28,6 +29,8 @@ from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView
 from django.views.generic.base import View
 from epiweeks import Week
+
+from ad_main.typed_settings import get_project_root
 
 from . import models as M
 from .charts.alerts import AlertCitiesCharts
@@ -201,8 +204,13 @@ def get_report_table_html(df: pd.DataFrame, keys: list[str]) -> str:
 def get_static(static_dir):
     if not settings.DEBUG:
         return Path(static(static_dir))
-    _app_dir = settings.PROJECT_ROOT
-    path_to_find = PurePath(find(static_dir))
+    _app_dir = get_project_root()
+    static_path = find(static_dir)
+    if static_path is None:
+        raise ImproperlyConfigured(
+            f"Static asset {static_dir!r} could not be resolved"
+        )
+    path_to_find = PurePath(static_path)
     return str(path_to_find.relative_to(_app_dir))
 
 
@@ -222,6 +230,10 @@ def _get_disease_label(disease_code: str) -> str | None:
         if disease_code == "zika"
         else None
     )
+
+
+def _get_state_name(state: str) -> str:
+    return cast(str, STATE_NAME[state])
 
 
 def hex_to_rgb(value):
@@ -265,6 +277,8 @@ def get_last_color_alert(geocode, disease, color_type="rgb"):
 
 class _GetMethod:
     """"""
+
+    request: HttpRequest
 
     def _get(self, param, default=None):
         """
@@ -334,7 +348,8 @@ class DataPublicServicesPageView(TemplateView):
                 self.template_name = "services_api.html"
 
                 options_cities = ""
-                for state_abbv, state_name in STATE_NAME.items():
+                for state_abbv, raw_state_name in STATE_NAME.items():
+                    state_name = cast(str, raw_state_name)
                     for (
                         geocode,
                         city_name,
@@ -426,7 +441,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
         year_week = str(int(str(last_se)))
 
         codes_uf = {v: k for k, v in UF_CODES.items()}
-        uf_code = codes_uf.get(int(str(geocode)[:2]))
+        uf_code = codes_uf[int(str(geocode)[:2])]
 
         regionals = ReportState.get_regional_by_state(uf_code)
         regional_id = regionals.loc[
@@ -640,8 +655,8 @@ class ChartsMainView(TemplateView):
         states_alert = defaultdict(dict)
         notif_resume = NotificationResume
 
-        state_abbv = context["state"]
-        state_name = STATE_NAME.get(state_abbv)
+        state_abbv = cast(str, context["state"])
+        state_name = _get_state_name(state_abbv)
         states_alert[state_abbv] = state_abbv
 
         # Use as an argument to fetch in database
@@ -779,8 +794,11 @@ class GeoJsonView(View):
         return response
 
     def get_geojson_path(self, geocodigo):
+        static_root = settings.STATIC_ROOT
+        if static_root is None:
+            raise ImproperlyConfigured("STATIC_ROOT must be configured")
         for path in (
-            Path(settings.STATIC_ROOT),
+            Path(static_root),
             Path(settings.STATICFILES_DIRS[0]),
         ):
             geojson_path = path / "geojson" / f"{geocodigo}.json"
@@ -846,8 +864,9 @@ class ReportView(TemplateView):
         self.template_name = "report_filter_city.html"
 
         options_cities = ""
+        state = cast(str, context["state"])
         for geocode, city_name in RegionalParameters.get_cities(
-            state_name=STATE_NAME[context["state"]]
+            state_name=_get_state_name(state)
         ).items():
             options_cities += """
             <option value="%(geocode)s">
@@ -960,12 +979,12 @@ class ReportCityView(TemplateView):
         )
 
         no_data_chart = ""
-        chart_dengue_climate = no_data_chart
-        chart_dengue_incidence = no_data_chart
-        chart_chik_climate = no_data_chart
-        chart_chik_incidence = no_data_chart
-        chart_zika_climate = no_data_chart
-        chart_zika_incidence = no_data_chart
+        chart_dengue_climate: str | None = no_data_chart
+        chart_dengue_incidence: str | None = no_data_chart
+        chart_chik_climate: str | None = no_data_chart
+        chart_chik_incidence: str | None = no_data_chart
+        chart_zika_climate: str | None = no_data_chart
+        chart_zika_incidence: str | None = no_data_chart
 
         total_n_dengue = 0
         total_n_dengue_last_year = 0
@@ -1231,10 +1250,12 @@ class AlertaStateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        state = cast(str, context["state"])
+        disease = cast(str, context["disease"])
 
         cities_alert = NotificationResume.get_cities_alert_by_state(
-            self._state_name[context["state"]],
-            context["disease"],
+            _get_state_name(state),
+            disease,
         )
 
         last_update = get_last_SE().enddate()
