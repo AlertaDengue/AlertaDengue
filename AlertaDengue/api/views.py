@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.views.generic.base import View
 
 from dados.episem import episem
@@ -12,6 +12,8 @@ from .db import STATE_NAME, AlertCity, NotificationQueries
 
 class _GetMethod:
     """"""
+
+    request: HttpRequest
 
     def _get(self, param, default=None, cast=None, error_message=None):
         """
@@ -39,16 +41,12 @@ class NotificationReducedCSV_View(View, _GetMethod):
 
     _state_name = STATE_NAME
 
-    request = None
-
-    def get(self, request):
+    def get(self, request: HttpRequest) -> HttpResponse:
         """
 
         :param kwargs:
         :return:
         """
-        self.request = request
-
         state_name = self._get("state_abv", default="").upper()
 
         if state_name not in self._state_name:
@@ -105,10 +103,7 @@ class NotificationReducedCSV_View(View, _GetMethod):
 class AlertCityView(View, _GetMethod):
     """ """
 
-    request = None
-
-    def get(self, request):
-        self.request = request
+    def get(self, request: HttpRequest) -> HttpResponse:
         format = ""
 
         try:
@@ -201,10 +196,7 @@ class EpiYearWeekView(View, _GetMethod):
     JSON output
     """
 
-    request = None
-
-    def get(self, request):
-        self.request = request
+    def get(self, request: HttpRequest) -> HttpResponse:
         output_format = "json"
 
         try:
