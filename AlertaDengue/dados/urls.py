@@ -20,7 +20,6 @@ from .views import (
     ReportStateData,
     ReportStateView,
     ReportView,
-    SinanCasesView,
     TeamPageView,
     download_technical_report_pdf,
 )
@@ -146,11 +145,6 @@ urlpatterns = [
         cache_page(60 * 60 * 8)(AlertaMunicipioPageView.as_view()),
         name="alerta_cidade",
     ),  # Caches the view for the specified number of seconds (8 hours)
-    re_path(
-        r"^sinan/(\d{4})/(\d{1,2})",
-        cache_page(60 * 60 * 60 * 24)(SinanCasesView.as_view()),
-        name="sinan",
-    ),
     re_path(
         r"^geojson/%s/%s/$" % (__geocode, __disease),
         cache_page(60 * 60 * 60 * 24)(GeoJsonView.as_view()),
