@@ -53,7 +53,6 @@ def lastepiday(year=int):
 
 
 def episem(x, sep="W", out="YW"):
-
     """
     Return Brazilian corresponding epidemiological week from x.
 

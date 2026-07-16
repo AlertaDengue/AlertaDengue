@@ -1,4 +1,5 @@
 """pyreaddbc Python package"""
+
 from importlib import metadata as importlib_metadata
 
 
