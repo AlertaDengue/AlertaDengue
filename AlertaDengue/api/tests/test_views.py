@@ -1,20 +1,22 @@
 import io
 import os
+from typing import Final
 import unittest
 
 import django
+from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 import pandas as pd
 
 # local
-from .. import settings
-from ..db import MRJ_GEOCODE
+
+MRJ_GEOCODE: Final = 3304557
 
 
 class TestApiView(TestCase):
     def setUp(self):
-        settings.DATA_DIR = os.path.dirname(__file__)
+        setattr(settings, "DATA_DIR", os.path.dirname(__file__))
 
     def test_notification_reduced_csv_view(self):
         """
@@ -47,26 +49,28 @@ class TestApiView(TestCase):
     def test_alert_rj(self):
         geocode = MRJ_GEOCODE
         # test epidemic start week missing
+        missing_week_query: dict[str, str | int] = {
+            "disease": "dengue",
+            "geocode": geocode,
+            "format": "json",
+        }
         response = self.client.get(
-            reverse("api:alertcity"),
-            {"disease": "dengue", "geocode": geocode, "format": "json"},
+            reverse("api:alertcity"), missing_week_query
         )
         self.assertEqual(response.status_code, 200)
         result = response.json()
         assert result["error_message"] == "Epidemic start week sent is empty."
 
         # test json format
-        response = self.client.get(
-            reverse("api:alertcity"),
-            {
-                "disease": "dengue",
-                "geocode": geocode,
-                "format": "json",
-                "ew_start": 1,
-                "ew_end": 50,
-                "e_year": 2017,
-            },
-        )
+        json_query: dict[str, str | int] = {
+            "disease": "dengue",
+            "geocode": geocode,
+            "format": "json",
+            "ew_start": 1,
+            "ew_end": 50,
+            "e_year": 2017,
+        }
+        response = self.client.get(reverse("api:alertcity"), json_query)
         self.assertEqual(response.status_code, 200)
         result = response.json()
         assert "error_message" not in result
@@ -75,17 +79,15 @@ class TestApiView(TestCase):
             assert 201701 <= r["se"] <= 201750
 
         # test csv format
-        response = self.client.get(
-            reverse("api:alertcity"),
-            {
-                "disease": "dengue",
-                "geocode": geocode,
-                "format": "csv",
-                "ew_start": "1",
-                "ew_end": "50",
-                "e_year": "2017",
-            },
-        )
+        csv_query: dict[str, str | int] = {
+            "disease": "dengue",
+            "geocode": geocode,
+            "format": "csv",
+            "ew_start": "1",
+            "ew_end": "50",
+            "e_year": "2017",
+        }
+        response = self.client.get(reverse("api:alertcity"), csv_query)
         self.assertEqual(response.status_code, 200)
         buffer = io.BytesIO(response.content)
         df = pd.read_csv(buffer)
@@ -95,9 +97,13 @@ class TestApiView(TestCase):
     def test_alert_curitiba(self):
         geocode = 4106902
         # test epidemic start week missing
+        missing_week_query: dict[str, str | int] = {
+            "disease": "dengue",
+            "geocode": geocode,
+            "format": "json",
+        }
         response = self.client.get(
-            reverse("api:alertcity"),
-            {"disease": "dengue", "geocode": geocode, "format": "json"},
+            reverse("api:alertcity"), missing_week_query
         )
         self.assertEqual(response.status_code, 200)
         result = response.json()
@@ -105,17 +111,15 @@ class TestApiView(TestCase):
         assert result["error_message"] == "Epidemic start week sent is empty."
 
         # test json format
-        response = self.client.get(
-            reverse("api:alertcity"),
-            {
-                "disease": "dengue",
-                "geocode": geocode,
-                "format": "json",
-                "ew_start": 1,
-                "ew_end": 50,
-                "e_year": 2017,
-            },
-        )
+        json_query: dict[str, str | int] = {
+            "disease": "dengue",
+            "geocode": geocode,
+            "format": "json",
+            "ew_start": 1,
+            "ew_end": 50,
+            "e_year": 2017,
+        }
+        response = self.client.get(reverse("api:alertcity"), json_query)
 
         self.assertEqual(response.status_code, 200)
 
@@ -127,17 +131,15 @@ class TestApiView(TestCase):
             assert 201701 <= r["SE"] <= 201750
 
         # test csv format
-        response = self.client.get(
-            reverse("api:alertcity"),
-            {
-                "disease": "dengue",
-                "geocode": geocode,
-                "format": "csv",
-                "ew_start": "1",
-                "ew_end": "50",
-                "e_year": "2017",
-            },
-        )
+        csv_query: dict[str, str | int] = {
+            "disease": "dengue",
+            "geocode": geocode,
+            "format": "csv",
+            "ew_start": "1",
+            "ew_end": "50",
+            "e_year": "2017",
+        }
+        response = self.client.get(reverse("api:alertcity"), csv_query)
         self.assertEqual(response.status_code, 200)
         buffer = io.BytesIO(response.content)
         df = pd.read_csv(buffer)
