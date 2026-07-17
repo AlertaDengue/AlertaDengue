@@ -10,7 +10,7 @@ import plotly.express as px
 import plotly.graph_objs as go
 
 
-def _create_scatter_chart(df: pd.DataFrame) -> go.Figure:
+def _create_scatter_chart(df: pd.DataFrame) -> str:
     """
     Create chart with historical data from data cases and cases_est.
 
@@ -157,7 +157,7 @@ def _create_scatter_chart(df: pd.DataFrame) -> go.Figure:
     return fig.to_html(full_html=False, include_plotlyjs=False, config=config)
 
 
-def _create_indicator_chart(df: pd.DataFrame, state_abbv: str) -> go.Indicator:
+def _create_indicator_chart(df: pd.DataFrame, state_abbv: str) -> str:
     """
     Create the charts with the number of favorable cities for transmission
     when the receptivity is different from 0.
@@ -271,7 +271,7 @@ def _create_indicator_chart(df: pd.DataFrame, state_abbv: str) -> go.Indicator:
     return fig.to_html(full_html=False, include_plotlyjs=False, config=config)
 
 
-def _create_stack_chart(df: pd.DataFrame) -> go.Figure:
+def _create_stack_chart(df: pd.DataFrame) -> str:
     """
     Create chart of the epidemiological situation of cities
     by levels in the week.
