@@ -1,4 +1,4 @@
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 from copy import deepcopy
 from dataclasses import replace
 import datetime
@@ -603,14 +603,27 @@ class ChartsMainView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ChartsMainView, self).get_context_data(**kwargs)
 
-        create_scatter_chart = defaultdict(dict)
-        create_indicator_chart = defaultdict(dict)
-        create_stack_chart = defaultdict(dict)
-        count_cities = defaultdict(dict)
-        create_maps = defaultdict(dict)
-        last_se = defaultdict(dict)
-        empty_charts_count = defaultdict(dict)
-        states_alert = defaultdict(dict)
+        diseases = tuple(DISEASES_NAME)
+        create_scatter_chart: dict[str, dict[str, str]] = {
+            disease: {} for disease in diseases
+        }
+        create_indicator_chart: dict[str, dict[str, str]] = {
+            disease: {} for disease in diseases
+        }
+        create_stack_chart: dict[str, dict[str, str]] = {
+            disease: {} for disease in diseases
+        }
+        count_cities: dict[str, dict[str, int]] = {
+            disease: {} for disease in diseases
+        }
+        create_maps: dict[str, dict[str, str]] = {
+            disease: {} for disease in diseases
+        }
+        last_se: dict[str, str] = {}
+        empty_charts_count: dict[str, int] = {
+            disease: 0 for disease in diseases
+        }
+        states_alert: dict[str, str] = {}
         notif_resume = NotificationResume
 
         state_abbv = cast(str, context["state"])
@@ -618,13 +631,11 @@ class ChartsMainView(TemplateView):
         states_alert[state_abbv] = state_abbv
 
         # Use as an argument to fetch in database
-        for disease in tuple(DISEASES_NAME):
+        for disease in diseases:
             no_data_chart = f"""
                 <div class='alert alert-primary' align='center'>
                   There are insufficient data to generate the chart on {disease}
                 </div>"""
-
-            empty_charts_count[disease] = 0
 
             create_maps[disease][state_abbv] = self.get_img_map(
                 state_abbv, disease
