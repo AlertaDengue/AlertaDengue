@@ -40,7 +40,7 @@ repos:
       - id: debug-statements
       - id: check-builtin-literals
       - id: check-case-conflict
-      # These hooks are intentionally manual during the phased lint rollout.
+      # Rollout-only hooks remain manual until they are validated separately.
       # Run them explicitly with:
       #   pre-commit run <hook-id> --hook-stage manual
       - id: check-docstring-first
@@ -49,6 +49,7 @@ repos:
 
   - repo: local
     hooks:
+      # Repository-wide formatters stay manual by design.
       - id: djlint-reformat-django
         name: djLint reformat (Django)
         entry: poetry run djlint --reformat --profile=django
@@ -63,7 +64,6 @@ repos:
         language: system
         files: ^AlertaDengue/dados/templates/.*\.html$
         exclude: ^AlertaDengue/dados/templates/components/tutorial/notebook-API-(Python|R)-en\.html$
-        stages: [manual]
 
       - id: ruff-format
         name: Ruff format
@@ -92,7 +92,6 @@ repos:
         language: system
         files: ^AlertaDengue/.*\.py$
         pass_filenames: false
-        stages: [manual]
 
       - id: mccabe
         name: McCabe
