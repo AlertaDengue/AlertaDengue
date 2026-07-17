@@ -1,90 +1,72 @@
-
 {% extends 'base.html' %}
 {% load lookup %}
 {% load i18n %}
 {% load static %}
 {% load hashthis %}
 {% load report_state %}
-
 {% block extra_head %}
-
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-
-  <link href="{% static '/css/report_state_section.css' %}" rel="stylesheet" type="text/css">
-
+  <link href="{% static '/css/report_state_section.css' %}"
+        rel="stylesheet"
+        type="text/css">
 {% endblock %}
-
 {% block breadcrumbs %}
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="/report">{% translate "Relatórios" %}</a></li>
       <li class="breadcrumb-item"><a href="/report">{% translate "Estadual" %}</a></li>
       <li class="breadcrumb-item active"><a href="/report/{{ state }}/state">{{ state }}</a></li>
-  </ol>
-</nav>
+    </ol>
+  </nav>
 {% endblock %}
-
-
 {% block title %}
-{% translate "Relatório Estadual da Situação das Arboviroses em " %}{{state_name}}
+  {% translate "Relatório Estadual da Situação das Arboviroses em " %}{{ state_name }}
 {% endblock %}
-
 {% block content %}
-
-<div class="row">
-  <div class="col-md-12">
-
-    <!--
+  <div class="row">
+    <div class="col-md-12">
+      <!--
     # ----------------------
     #	MAIN BODY - FIRST PAGE
     # ----------------------
     -->
-    <p>
-      {% translate "Semana epidemiológica" %} : {{ last_week }}/{{ last_year }}
-    </p>
-    <p>{% blocktranslate %}
+      <p>
+        {% translate "Semana epidemiológica" %} : {{ last_week }}/{{ last_year }}
+      </p>
+      <p>
+        {% blocktranslate %}
       Esse é o relatório resumido da situação de alerta de arboviroses no
       estado, detalhado por Regional de Saúde. Para acessar estatísticas
       gerais do estado, consulte a{% endblocktranslate %}
-      <a href="/alerta/{{ state }}/dengue" target="__blank__">{% translate "página de estados" %}</a>.
-      {% translate "E para consultar um município específico, consulte a" %}
-      <a href="/report/{{ state }}/city" target="__blank__">{% translate "página de relatórios municipais" %}</a>,
-      {% translate "ou clique no nome do município na lista que aparece ao clicar no botão" %} <i>{% translate "Municipios por regional" %}</i>.
-    </p>
+        <a href="/alerta/{{ state }}/dengue" target="__blank__">{% translate "página de estados" %}</a>.
+        {% translate "E para consultar um município específico, consulte a" %}
+        <a href="/report/{{ state }}/city" target="__blank__">{% translate "página de relatórios municipais" %}</a>,
+        {% translate "ou clique no nome do município na lista que aparece ao clicar no botão" %} <i>{% translate "Municipios por regional" %}</i>.
+      </p>
+    </div>
   </div>
-</div>
-
-<!-- begin maps -->
-<div class="container">
-  <div class="row"
-    style="background-color: #e0eefd63;
-      border-radius: 14px;">
-
+  <!-- begin maps -->
+  <div class="container">
+    <div class="row" style="background-color: #e0eefd63; border-radius: 14px;">
+    </div>
   </div>
-</div>
-<!-- end maps -->
-
-<!-- begin colapse -->
-<div class="container">
-  <div class="row justify-content-center"
-    style="background-color: #e0eefd63;
-      margin-bottom: 20px;
-      border-radius: 7px">
-    <div class="col-md-12 p-1">
-      <div class="card-primary">
-          {% regional_collapse_component %}
+  <!-- end maps -->
+  <!-- begin colapse -->
+  <div class="container">
+    <div class="row justify-content-center"
+         style="background-color: #e0eefd63;
+                margin-bottom: 20px;
+                border-radius: 7px">
+      <div class="col-md-12 p-1">
+        <div class="card-primary">{% regional_collapse_component %}</div>
       </div>
     </div>
   </div>
-</div>
-<!-- end collapse-->
-
-<!-- begin color code -->
-<div class="container">
-  <div class="row p-1">
-    <div class="col-md-12 p-2">
-
-  </div>
-</div>
-<!-- end color code -->
-{% endblock %}
+  <!-- end collapse-->
+  <!-- begin color code -->
+  <div class="container">
+    <div class="row p-1">
+      <div class="col-md-12 p-2"></div>
+    </div>
+    <!-- end color code -->
+  {% endblock %}

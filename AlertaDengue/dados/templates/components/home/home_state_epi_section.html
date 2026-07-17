@@ -2,52 +2,42 @@
 {% load lookup %}
 {% load static %}
 {% load hashthis %}
-
 {% block home_state_epi_section %}
-
-<div class="card mb-0 p-0 home-section-card"
-     id="state-epi-card">
-  <div class="card-header home-section-header d-flex flex-column flex-md-row
-              align-items-md-center justify-content-between">
-    <div>
-      <h4 class="mb-1 text-white">
-        {% trans "Situação epidemiológica por estado" %}
-      </h4>
-      <p class="small text-white-50 mb-0">
-        {% trans "Selecione um estado para visualizar mapas de incidência, número de casos ou situação epidemiológica dos municípios." %}
-      </p>
+  <div class="card mb-0 p-0 home-section-card" id="state-epi-card">
+    <div class="card-header home-section-header d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+      <div>
+        <h4 class="mb-1 text-white">
+          {% trans "Situação epidemiológica por estado" %}
+        </h4>
+        <p class="small text-white-50 mb-0">
+          {% trans "Selecione um estado para visualizar mapas de incidência, número de casos ou situação epidemiológica dos municípios." %}
+        </p>
+      </div>
+      <div class="d-flex flex-column align-items-md-end mt-3 mt-md-0">
+        <div class="state-epi-select-wrapper p-2">
+          <select id="state-select" class="form-control state-epi-select">
+            <option value="">{% trans "Selecione um estado" %}</option>
+            {% for abbr, name in states_name.items %}
+              <option value="{{ abbr }}"{% if abbr == "RJ" %} selected{% endif %}>
+                {{ name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
     </div>
-
-    <div class="d-flex flex-column align-items-md-end mt-3 mt-md-0">
-      <div class="state-epi-select-wrapper p-2">
-        <select id="state-select"
-                class="form-control state-epi-select">
-          <option value="">
-            {% trans "Selecione um estado" %}
-          </option>
-          {% for abbr, name in states_name.items %}
-            <option value="{{ abbr }}"{% if abbr == "RJ" %} selected{% endif %}>
-              {{ name }}
-            </option>
-          {% endfor %}
-        </select>
+    <div class="card mt-4 mb-4 p-4">
+      <div id="state-chart-panel" class="background-panel">
+        <p class="text-muted mb-0">
+          {% trans "Selecione um estado no campo acima para visualizar os gráficos de incidência." %}
+        </p>
       </div>
     </div>
   </div>
-
-  <div class="card mt-4 mb-4 p-4">
-    <div id="state-chart-panel" class="background-panel">
-      <p class="text-muted mb-0">
-        {% trans "Selecione um estado no campo acima para visualizar os gráficos de incidência." %}
-      </p>
-    </div>
-  </div>
-</div>
 {% endblock home_state_epi_section %}
-
 <script type="text/javascript">
-  (function ($) {
-    $(function () {
+  (function($) {
+    $(function() {
       var $select = $('#state-select');
       var $panel = $('#state-chart-panel');
       var $card = $('#state-epi-card');
@@ -55,7 +45,7 @@
 
       function scrollToCard() {
         if ($card.length &&
-            window.matchMedia('(max-width: 767px)').matches) {
+          window.matchMedia('(max-width: 767px)').matches) {
           $card[0].scrollIntoView({
             behavior: 'smooth',
             block: 'start'
@@ -66,31 +56,31 @@
       function renderEmptyMessage() {
         $panel.html(
           '<p class="text-muted mb-0">' +
-            '{% trans "Selecione um estado no campo acima para visualizar os gráficos de incidência." %}' +
+          '{% trans "Selecione um estado no campo acima para visualizar os gráficos de incidência." %}' +
           '</p>'
         );
       }
 
       function loadState(state) {
         $.ajax({
-          url: '/chartshome/' + state,
-          method: 'GET',
-          dataType: 'html'
-        })
-          .done(function (data) {
+            url: '/chartshome/' + state,
+            method: 'GET',
+            dataType: 'html'
+          })
+          .done(function(data) {
             $panel.html(data);
             scrollToCard();
           })
-          .fail(function () {
+          .fail(function() {
             $panel.html(
               '<div class="alert alert-danger mb-0">' +
-                '{% trans "Não foi possível carregar os dados deste estado." %}' +
+              '{% trans "Não foi possível carregar os dados deste estado." %}' +
               '</div>'
             );
           });
       }
 
-      $select.on('change', function () {
+      $select.on('change', function() {
         var state = $(this).val();
 
         if (!state) {

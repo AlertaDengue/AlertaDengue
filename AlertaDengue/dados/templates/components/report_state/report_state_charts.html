@@ -1,156 +1,147 @@
 {% load lookup %}
 {% load i18n %}
-
 {% load hashthis %}
-
 {% block content %}
-
-<div class="container mt-3">
-  <!-- Nav tabs -->
-  <ul class="nav nav-tabs" role="tablist">
-    <li class="nav-item">
-      <a class="nav-link active" data-toggle="tab" href="#dengue-{{ regional_id }}">Dengue</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#chikungunya-{{ regional_id }}">Chikungunya</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" href="#zika-{{ regional_id }}">Zika</a>
-    </li>
-  </ul>
-
-  <!-- Tab panes -->
-  <div class="tab-content">
-    <div id="dengue-{{ regional_id }}" class="container tab-pane active"><br>
-      <div class="row">
-        <div class="col-6 col-sm-12 col-md-6">
-          {{ notif_chart|lookup:'dengue'| safe }}
+  <div class="container mt-3">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active"
+           data-toggle="tab"
+           href="#dengue-{{ regional_id }}">Dengue</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link"
+           data-toggle="tab"
+           href="#chikungunya-{{ regional_id }}">Chikungunya</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#zika-{{ regional_id }}">Zika</a>
+      </li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+      <div id="dengue-{{ regional_id }}" class="container tab-pane active">
+        <br>
+        <div class="row">
+          <div class="col-6 col-sm-12 col-md-6">
+            {{ notif_chart|lookup:'dengue'| safe }}
+          </div>
+          <div class="col-6 col-sm-12 col-md-6">
+            {{ level_chart|lookup:'dengue'| safe }}
+          </div>
         </div>
-        <div class="col-6 col-sm-12 col-md-6">
-          {{ level_chart|lookup:'dengue'| safe }}
+        <div class="my-3">
+          <p style="display: flex; justify-content: flex-end">
+            <a class="btn btn-primary mb-2"
+               data-toggle="collapse"
+               href="#-collapseName-dengue-{{ regional_id }}"
+               role="button"
+               aria-expanded="false"
+               aria-controls="-collapseName-dengue-{{ regional_id }}">
+              {% translate "Municípios na regional" %}
+            </a>
+          </p>
+          <div class="collapse" id="-collapseName-dengue-{{ regional_id }}">
+            <div class="card card-body">
+              <div class="col-12 container">
+                <h5 class="text-secondary">{% translate "Municípios" %}:</h5>
+                {% for key,value in cities.items %}
+                  <a href="https://info.dengue.mat.br/report/{{ state_abbv }}/{{ key }}/{{ year_week }}">
+                    <b>| {{ value }} </b>
+                  </a>
+                  {% endfor %} <b>|</b>
+                </div>
+              </div>
+            </br>
+            <p class="text-secondary pl-2"></p>
+          </div>
         </div>
       </div>
-      <div  class="my-3">
-        <p style="display: flex; justify-content: flex-end">
-          <a
-            class="btn btn-primary mb-2"
-            data-toggle="collapse"
-            href="#-collapseName-dengue-{{ regional_id }}"
-            role="button"
-            aria-expanded="false"
-            aria-controls="-collapseName-dengue-{{ regional_id }}"
-            >
-            {% translate "Municípios na regional" %}
-          </a>
-        </p>
-        <div class="collapse" id="-collapseName-dengue-{{ regional_id }}">
-          <div class="card card-body">
-            <div class="col-12 container">
-              <h5 class="text-secondary">{% translate "Municípios" %}:</h5>
-              {% for key,value in cities.items %}
-                <a href="https://info.dengue.mat.br/report/{{ state_abbv }}/{{ key }}/{{ year_week }}">
-                  <b>| {{ value }} </b>
-                </a>
-              {% endfor %} <b>|</b>
-            </div>
-          </div></br>
-          <p class="text-secondary pl-2">
+      <div id="chikungunya-{{ regional_id }}" class="container tab-pane fade">
+        <br>
+        <div class="row">
+          <div class="col-6 col-sm-12 col-md-6">
+            {{ notif_chart|lookup:'chikungunya'| safe }}
+          </div>
+          <div class="col-6 col-sm-12 col-md-6">
+            {{ level_chart|lookup:'chikungunya'| safe }}
+          </div>
+        </div>
+        <div class="my-3">
+          <p style="display: flex; justify-content: flex-end">
+            <a class="btn btn-primary mb-2"
+               data-toggle="collapse"
+               href="#-collapseName-chik-{{ regional_id }}"
+               role="button"
+               aria-expanded="false"
+               aria-controls="-collapseName-chik-{{ regional_id }}">
+              {% translate "Municípios na regional" %}
+            </a>
           </p>
-        </div>
-    </div>
-    </div>
-
-    <div id="chikungunya-{{ regional_id }}" class="container tab-pane fade"><br>
-      <div class="row">
-        <div class="col-6 col-sm-12 col-md-6">
-          {{ notif_chart|lookup:'chikungunya'| safe }}
-        </div>
-        <div class="col-6 col-sm-12 col-md-6">
-          {{ level_chart|lookup:'chikungunya'| safe }}
+          <div class="collapse" id="-collapseName-chik-{{ regional_id }}">
+            <div class="card card-body">
+              <div class="col-12 container">
+                <h5 class="text-secondary">Municípios:</h5>
+                {% for key,value in cities.items %}
+                  <a href="https://info.dengue.mat.br/report/{{ state_abbv }}/{{ key }}/{{ year_week }}">
+                    <b>| {{ value }} </b>
+                  </a>
+                  {% endfor %} <b>|</b>
+                </div>
+              </div>
+            </br>
+            <p class="text-secondary pl-2"></p>
+          </div>
         </div>
       </div>
-      <div  class="my-3">
-        <p style="display: flex; justify-content: flex-end">
-          <a
-            class="btn btn-primary mb-2"
-            data-toggle="collapse"
-            href="#-collapseName-chik-{{ regional_id }}"
-            role="button"
-            aria-expanded="false"
-            aria-controls="-collapseName-chik-{{ regional_id }}"
-            >
-            {% translate "Municípios na regional" %}
-          </a>
-        </p>
-        <div class="collapse" id="-collapseName-chik-{{ regional_id }}">
-          <div class="card card-body">
-            <div class="col-12 container">
-              <h5 class="text-secondary">Municípios:</h5>
-              {% for key,value in cities.items %}
-                <a href="https://info.dengue.mat.br/report/{{ state_abbv }}/{{ key }}/{{ year_week }}">
-                  <b>| {{ value }} </b>
-                </a>
-              {% endfor %} <b>|</b>
-            </div>
-          </div></br>
-          <p class="text-secondary pl-2">
+      <div id="zika-{{ regional_id }}" class="container tab-pane fade">
+        <br>
+        <div class="row">
+          <div class="col-6 col-sm-12 col-md-6">
+            {{ notif_chart|lookup:'zika'| safe }}
+          </div>
+          <div class="col-6 col-sm-12 col-md-6">
+            {{ level_chart|lookup:'zika'| safe }}
+          </div>
+        </div>
+        <div class="my-3">
+          <p style="display: flex; justify-content: flex-end">
+            <a class="btn btn-primary mb-2"
+               data-toggle="collapse"
+               href="#-collapseName-zika-{{ regional_id }}"
+               role="button"
+               aria-expanded="false"
+               aria-controls="-collapseName-zika-{{ regional_id }}">
+              {% translate "Municípios na regional" %}
+            </a>
           </p>
-        </div>
-    </div>
-    </div>
-
-    <div id="zika-{{ regional_id }}" class="container tab-pane fade"><br>
-      <div class="row">
-        <div class="col-6 col-sm-12 col-md-6">
-          {{ notif_chart|lookup:'zika'| safe }}
-        </div>
-        <div class="col-6 col-sm-12 col-md-6">
-          {{ level_chart|lookup:'zika'| safe }}
+          <div class="collapse" id="-collapseName-zika-{{ regional_id }}">
+            <div class="card card-body">
+              <div class="col-12 container">
+                <h5 class="text-secondary">Municípios:</h5>
+                {% for key,value in cities.items %}
+                  <a href="https://info.dengue.mat.br/report/{{ state_abbv }}/{{ key }}/{{ year_week }}">
+                    <b>| {{ value }} </b>
+                  </a>
+                  {% endfor %} <b>|</b>
+                </div>
+              </div>
+            </br>
+            <p class="text-secondary pl-2"></p>
+          </div>
         </div>
       </div>
-      <div  class="my-3">
-        <p style="display: flex; justify-content: flex-end">
-          <a
-            class="btn btn-primary mb-2"
-            data-toggle="collapse"
-            href="#-collapseName-zika-{{ regional_id }}"
-            role="button"
-            aria-expanded="false"
-            aria-controls="-collapseName-zika-{{ regional_id }}"
-            >
-            {% translate "Municípios na regional" %}
-          </a>
-        </p>
-        <div class="collapse" id="-collapseName-zika-{{ regional_id }}">
-          <div class="card card-body">
-            <div class="col-12 container">
-              <h5 class="text-secondary">Municípios:</h5>
-              {% for key,value in cities.items %}
-                <a href="https://info.dengue.mat.br/report/{{ state_abbv }}/{{ key }}/{{ year_week }}">
-                  <b>| {{ value }} </b>
-                </a>
-              {% endfor %} <b>|</b>
-            </div>
-          </div></br>
-          <p class="text-secondary pl-2">
-          </p>
-        </div>
     </div>
-    </div>
-
   </div>
-
-</div>
-
 {% endblock %}
-
 <script type="text/javascript">
-
-  $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (event) {
+  $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function(event) {
     var doc = $(".tab-pane.active .plotly-graph-div");
     for (var i = 0; i < doc.length; i++) {
-        Plotly.relayout(doc[i], {autosize: true});
+      Plotly.relayout(doc[i], {
+        autosize: true
+      });
     }
-})
-
+  })
 </script>

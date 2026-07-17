@@ -1,19 +1,14 @@
 {% extends "alert_base.html" %}
-
 {% load humanize i18n %}
 {% load i18n %}
 {% load static %}
-
 {% block alert_js %}
-dataurls ;
+  dataurls ;
 {% endblock alert_js %}
-
 {% block alert_js_main_init %}
-info.update = function (props) {
-    this._div.innerHTML = '<h4>{% blocktranslate %}Número de casos estimados na semana{% endblocktranslate %}:</h4>' + (props ?
-            '<b>' + props.name + ': ' + props.casos + '</b><br />' : '{% blocktranslate %}Passe o mouse sobre o mapa{% endblocktranslate %}');
-};
-
-get_map_bounds = function() {return geojson.getBounds();};
-
+  info.update = function (props) {
+  this._div.innerHTML = '<h4>{% blocktranslate %}Número de casos estimados na semana{% endblocktranslate %}:</h4>' + (props ?
+  '<b>' + props.name + ': ' + props.casos + '</b><br />' : '{% blocktranslate %}Passe o mouse sobre o mapa{% endblocktranslate %}');
+  };
+  get_map_bounds = function() {return geojson.getBounds();};
 {% endblock alert_js_main_init %}

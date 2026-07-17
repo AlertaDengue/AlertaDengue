@@ -1,270 +1,282 @@
 {% extends 'base.html' %}
-
-{% load humanize i18n%}
+{% load humanize i18n %}
 {% load i18n %}
 {% load static %}
-
 {% block extra_head %}
-{% load leaflet_tags %}
-{% leaflet_js %}
-{% leaflet_css %}
-{% leaflet_js plugins="ALL" %}
-
-<meta property="og:image" content="{% static '/img/screenshot.png' %}" />
-<meta property="og:image:secure_url" content="{% static '/img/screenshot.png' %}" />
-
-<style>
+  {% load leaflet_tags %}
+  {% leaflet_js %}
+  {% leaflet_css %}
+  {% leaflet_js plugins="ALL" %}
+  <meta property="og:image" content="{% static '/img/screenshot.png' %}" />
+  <meta property="og:image:secure_url"
+        content="{% static '/img/screenshot.png' %}" />
+  <style>
     .leaflet-container {
-        height: 80%;
-        width: 100%;
+      height: 80%;
+      width: 100%;
 
     }
 
     #main {
-        width: 100%;
-        height: 80%;
+      width: 100%;
+      height: 80%;
     }
 
     .info {
-        padding: 6px 8px;
-        font: 14px/16px Arial, Helvetica, sans-serif;
-        background: white;
-        background: rgba(255, 255, 255, 0.8);
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-        border-radius: 5px;
+      padding: 6px 8px;
+      font: 14px/16px Arial, Helvetica, sans-serif;
+      background: white;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      border-radius: 5px;
     }
 
     .info h4 {
-        margin: 0 0 5px;
-        color: #777;
+      margin: 0 0 5px;
+      color: #777;
     }
 
     .legend {
-        text-align: left;
-        line-height: 18px;
-        color: #555;
+      text-align: left;
+      line-height: 18px;
+      color: #555;
     }
 
     .legend i {
-        width: 18px;
-        height: 18px;
-        float: left;
-        margin-right: 8px;
-        opacity: 0.7;
+      width: 18px;
+      height: 18px;
+      float: left;
+      margin-right: 8px;
+      opacity: 0.7;
     }
-</style>
-<script src="{% static '/js/Autolinker.min.js' %}"></script>
-<script src="{% static '/libs/jquery/jquery.sparkline.min.js' %}"></script>
-<script src="{% static '/js/infodengue.js' %}"></script>
-<script src="{% static '/libs/plotlyjs/plotly-latest.min.js' %}"></script>
-<style>
+  </style>
+  <script src="{% static '/js/Autolinker.min.js' %}"></script>
+  <script src="{% static '/libs/jquery/jquery.sparkline.min.js' %}"></script>
+  <script src="{% static '/js/infodengue.js' %}"></script>
+  <script src="{% static '/libs/plotlyjs/plotly-latest.min.js' %}"></script>
+  <style>
     .jqstooltip {
-        box-sizing: content-box;
+      box-sizing: content-box;
     }
-</style>
+  </style>
 {% endblock %}
-
 {% block title %}
-{% blocktranslate %}Situação da {{disease_label}} - {{ nome }} em {{ data2 }}{% endblocktranslate %}
-
-<div>
-
-
-{% endblock %}
-
-
-
-{% block content %}
-
-<div class="row">
-  <div class="col-md-12">
-
-    <div class="panel panel-default">
-        <div class="panel-body">
+  {% blocktranslate %}Situação da {{disease_label}} - {{ nome }} em {{ data2 }}{% endblocktranslate %}
+  <div>
+  {% endblock %}
+  {% block content %}
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel panel-default">
+          <div class="panel-body">
             <li>{% blocktranslate with populacao=populacao|intword %}<b>População:</b> {{ populacao }} de
             habitantes.{% endblocktranslate %}</li>
             <li>{% blocktranslate with incidencia=incidencia|floatformat %}<b>Incidência estimada na SE {{ WEEK }}:</b> {{ incidencia }} por 100
             mil habitantes. {% endblocktranslate %}</li>
             <li id="section1" class="panel-title"><b>{% translate "Relatório da Situação das Arboviroses em" %}: </b>
-            <a href="{% url 'dados:report_city' state=state_abv geocode=geocode year_week=SE %}"> {{ nome }} </a></li>
+              <a href="{% url 'dados:report_city' state=state_abv geocode=geocode year_week=SE %}"> {{ nome }} </a></li>
             <li id="section1" class="panel-title"><b>{% translate "Para mais detalhes, acesse a página de Relatório Estadual" %}:</b>
-            <a href="{% url 'dados:alerta_uf' disease=disease_code state=state_abv %}">{{state}}</a></li>
+              <a href="{% url 'dados:alerta_uf' disease=disease_code state=state_abv %}">{{ state }}</a></li>
+          </div>
         </div>
-    </div>
-    </br>
-    <div class="panel panel-default" style="padding:0px; margin: auto;">
+      </br>
+      <div class="panel panel-default" style="padding:0px; margin: auto;">
         {% blocktranslate %}Selecione a doença a ser visualizada:{% endblocktranslate %}
-        <input id="disease-dengue" type="radio" name="disease" value="dengue" {% if disease_code == 'dengue' %}
-            checked="checked" {% endif %} onchange="window.location.href='./dengue'" /> Dengue
-        <input id="disease-chik" type="radio" name="disease" value="chik" {% if disease_code == 'chikungunya' %}
-            checked="checked" {% endif %} onchange="window.location.href='./chikungunya'" /> Chikungunya
-        <input id="disease-zika" type="radio" name="disease" value="zika" {% if disease_code == 'zika' %} checked="checked"
-            {% endif %} onchange="window.location.href='./zika'" /> Zika
-    </div>
+        <input id="disease-dengue"
+               type="radio"
+               name="disease"
+               value="dengue"
+               {% if disease_code == 'dengue' %}checked="checked"{% endif %}
+               onchange="window.location.href='./dengue'" /> Dengue
+        <input id="disease-chik"
+               type="radio"
+               name="disease"
+               value="chik"
+               {% if disease_code == 'chikungunya' %}checked="checked"{% endif %}
+               onchange="window.location.href='./chikungunya'" /> Chikungunya
+        <input id="disease-zika"
+               type="radio"
+               name="disease"
+               value="zika"
+               {% if disease_code == 'zika' %}checked="checked"{% endif %}
+               onchange="window.location.href='./zika'" /> Zika
+      </div>
     </br>
     <div style="text-align:center;">
-        <div style="margin: auto;">
-            {% blocktranslate with prt=prt1|floatformat %}<b>Chance de alerta
+      <div style="margin: auto;">
+        {% blocktranslate with prt=prt1|floatformat %}<b>Chance de alerta
                 <span class="label label-warning">laranja</span> ou
                 <span class="label label-danger">vermelho</span>  de {{ disease_label }}
                 para o município de {{ nome }} na próxima semana:</b> {{ prt }}%
                 {% endblocktranslate %}
-
-            {{ chart_alert | safe }}
-
-        </div>
+        {{ chart_alert | safe }}
+      </div>
     </div>
-
     <!-- MAP attention level alert -->
-
     <br>
     <p>
       {% trans "O mapa abaixo mostra os níveis de atenção dos municípios pertencentes à mesma regional de saúde de " %}
       {{ nome }}, {% trans "que está destacado com bordas azuis." %} {% trans "Para ver os casos estimados e o alerta das últimas semanas, clique sobre o município." %}
     </p>
-
     <div class="row justify-content-center"
-        style="background-color: #e0eefd63;
-        margin-left: 25px;
-        margin-right: 25px;
-        border-radius: 8px">
-
-        {% leaflet_map "main" callback="main_map_init" %}
-        <div class="col-md-6 bluebox p-3">
-            <h3><span class="glyphicon glyphicon-signal" aria-hidden="true"></span>
-                {% blocktranslate %}Níveis de Atenção{% endblocktranslate %}</h3>
-
-            <div id="accordion">
-                <div class="card card-green">
-                    <div id="card-header-green" class="card-header">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-card-green"
-                                aria-expanded="true" aria-controls="collapse-card-green">
-                                {% translate "Nível Verde" %}
-                            </button>
-                        </h5>
-                    </div>
-                    <div id="collapse-card-green" class="collapse show" aria-labelledby="card-header-green"
-                        data-parent="#accordion">
-                        <div class="card-body">
-                            {% blocktranslate %}Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições
+         style="background-color: #e0eefd63;
+                margin-left: 25px;
+                margin-right: 25px;
+                border-radius: 8px">
+      {% leaflet_map "main" callback="main_map_init" %}
+      <div class="col-md-6 bluebox p-3">
+        <h3>
+          <span class="glyphicon glyphicon-signal" aria-hidden="true"></span>
+          {% blocktranslate %}Níveis de Atenção{% endblocktranslate %}</h3>
+          <div id="accordion">
+            <div class="card card-green">
+              <div id="card-header-green" class="card-header">
+                <h5 class="mb-0">
+                  <button class="btn btn-link"
+                          data-toggle="collapse"
+                          data-target="#collapse-card-green"
+                          aria-expanded="true"
+                          aria-controls="collapse-card-green">
+                    {% translate "Nível Verde" %}
+                  </button>
+                </h5>
+              </div>
+              <div id="collapse-card-green"
+                   class="collapse show"
+                   aria-labelledby="card-header-green"
+                   data-parent="#accordion">
+                <div class="card-body">
+                  {% blocktranslate %}Sem Risco. Quando o mapa está verde, não existe transmissão e nem condições
                             ideais para a reprodução do Mosquito.{% endblocktranslate %}
-                        </div>
-                    </div>
                 </div>
-                <div class="card card-yellow">
-                    <div id="card-header-yellow" class="card-header">
-                        <h5 class="mb-0">
-                            <button class="btn btn-link collapsed" data-toggle="collapse"
-                                data-target="#collapse-card-yellow" aria-expanded="false"
-                                aria-controls="collapse-card-yellow">
-                                {% translate "Nível Amarelo" %}
-                            </button>
-                        </h5>
-                    </div>
-                    <div id="collapse-card-yellow" class="collapse" aria-labelledby="card-header-yellow"
-                        data-parent="#accordion">
-                        <div class="card-body">
-                            {% blocktranslate %}Estação da {{disease_label}}. No nível amarelo, temos condições climáticas
+              </div>
+            </div>
+            <div class="card card-yellow">
+              <div id="card-header-yellow" class="card-header">
+                <h5 class="mb-0">
+                  <button class="btn btn-link collapsed"
+                          data-toggle="collapse"
+                          data-target="#collapse-card-yellow"
+                          aria-expanded="false"
+                          aria-controls="collapse-card-yellow">
+                    {% translate "Nível Amarelo" %}
+                  </button>
+                </h5>
+              </div>
+              <div id="collapse-card-yellow"
+                   class="collapse"
+                   aria-labelledby="card-header-yellow"
+                   data-parent="#accordion">
+                <div class="card-body">
+                  {% blocktranslate %}Estação da {{disease_label}}. No nível amarelo, temos condições climáticas
                             propícias à reprodução do mosquito. Mas ainda sem transmissão significativa da
                             Doença.{% endblocktranslate %}
-                        </div>
-                    </div>
                 </div>
-                <div class="card card-orange">
-                    <div id="card-header-orange" class="card-header">
-                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-card-orange"
-                            aria-expanded="false" aria-controls="collapse-card-orange">
-                            {% translate "Nível Laranja" %}
-                        </button>
-                    </div>
-                    <div id="collapse-card-orange" class="collapse" aria-labelledby="card-header-orange"
-                        data-parent="#accordion">
-                        <div class="card-body">
-                            {% blocktranslate %}Transmissão de {{disease_label}}. No nível laranja, já observamos uma incidência
+              </div>
+            </div>
+            <div class="card card-orange">
+              <div id="card-header-orange" class="card-header">
+                <button class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#collapse-card-orange"
+                        aria-expanded="false"
+                        aria-controls="collapse-card-orange">
+                  {% translate "Nível Laranja" %}
+                </button>
+              </div>
+              <div id="collapse-card-orange"
+                   class="collapse"
+                   aria-labelledby="card-header-orange"
+                   data-parent="#accordion">
+                <div class="card-body">
+                  {% blocktranslate %}Transmissão de {{disease_label}}. No nível laranja, já observamos uma incidência
                             pronunciada da {{disease_label}}, mas ainda não podemos afirmar com confiança que teremos
                             epidemia.{% endblocktranslate %}
-                        </div>
-                    </div>
                 </div>
-                <div class="card card-red">
-                    <div id="card-header-red" class="card-header">
-                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-card-red"
-                            aria-expanded="false" aria-controls="collapse-card-red">
-                            {% translate "Nível Vermelho" %}
-                        </button>
-                    </div>
-                    <div id="collapse-card-red" class="collapse" aria-labelledby="card-header-red" data-parent="#accordion">
-                        <div class="card-body">
-                            {% blocktranslate %}Atividade aumentada. Neste nível tem-se alta
+              </div>
+            </div>
+            <div class="card card-red">
+              <div id="card-header-red" class="card-header">
+                <button class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#collapse-card-red"
+                        aria-expanded="false"
+                        aria-controls="collapse-card-red">
+                  {% translate "Nível Vermelho" %}
+                </button>
+              </div>
+              <div id="collapse-card-red"
+                   class="collapse"
+                   aria-labelledby="card-header-red"
+                   data-parent="#accordion">
+                <div class="card-body">
+                  {% blocktranslate %}Atividade aumentada. Neste nível tem-se alta
                             atividade de transmissão e contágio. Todo o cuidado é pouco, e
                             precisamos ficar atentos aos sintomas da {{disease_label}} e procurar o médico imediatamente em
                             caso suspeita de {{disease_label}}.{% endblocktranslate %}
-                        </div>
-                    </div>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
-
         <div class="col-md-3 bluebox p-3">
-            <h3><span class="badge badge-info">{{ novos_casos }}</span>
-                {% translate "Casos estimados" %}</h3>
-
-            <p>{% blocktranslate %} São estimados entre <b>{{ min_est }}</b> e <b>{{ max_est }} novos casos</b> na Semana
+          <h3>
+            <span class="badge badge-info">{{ novos_casos }}</span>
+            {% translate "Casos estimados" %}
+          </h3>
+          <p>{% blocktranslate %} São estimados entre <b>{{ min_est }}</b> e <b>{{ max_est }} novos casos</b> na Semana
                 Epidemiológica {{ SE }}: {{ data1 }} a {{ data2 }}. Com {{ total_observed }} casos notificados oficialmente
                 até o momento{% endblocktranslate %}</p>
-            <h4>{% blocktranslate %} Últimas {{ look_back }} semanas: {% endblocktranslate %}</h4>
-            <span class="totalsparkline" style="display: inline-block; width: 250px;"></span>
-
-            <p></p>
-            {% comment %}<h4>Há um ano:</h4>
-            <p>Há um ano atrás, nesta mesma semana, observamos <b>{{ last_year }}</b> casos</p>{% endcomment %}
+          <h4>{% blocktranslate %} Últimas {{ look_back }} semanas: {% endblocktranslate %}</h4>
+          <span class="totalsparkline" style="display: inline-block; width: 250px;"></span>
+          <p></p>
+          {% comment %}<h4>Há um ano:</h4>
+          <p>Há um ano atrás, nesta mesma semana, observamos <b>{{ last_year }}</b> casos</p>{% endcomment %}
         </div>
-
         <div class="col-md-3 bluebox p-3">
-            <h3><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {% blocktranslate %}Suspeita de um
+          <h3><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {% blocktranslate %}Suspeita de um
                 criadouro?{% endblocktranslate %}</h3>
-            <p>
-                {% blocktranslate %}Em caso de suspeita de criadouro de mosquitos, {% endblocktranslate %}
-                {# RJ #}
-                {% if state == 'Rio de Janeiro' %}
-                {% if geocode == 3304557 %}
+          <p>
+            {% blocktranslate %}Em caso de suspeita de criadouro de mosquitos, {% endblocktranslate %}
+            {# RJ #}
+            {% if state == 'Rio de Janeiro' %}
+              {% if geocode == 3304557 %}
                 {% blocktranslate %}contacte a {% endblocktranslate %}
-                <a href="http://www.1746.rio.gov.br/" style="color: #FFFFFF" target="_blank">
-                    {% blocktranslate %}central de apoio ao cidadão: 1746.{% endblocktranslate %}
+                <a href="http://www.1746.rio.gov.br/"
+                   style="color: #FFFFFF"
+                   target="_blank">
+                  {% blocktranslate %}central de apoio ao cidadão: 1746.{% endblocktranslate %}
                 </a>
-                {% else %}
+              {% else %}
                 {% blocktranslate %}contacte a central de apoio ao cidadão: 1746.{% endblocktranslate %}
-                {% endif %}
-                {# ES #}
-                {% elif state == 'Espírito Santos' %}
-                {% blocktranslate %}contacte a secretaria de saúde de sua cidade{% endblocktranslate %}
-                {# PR #}
-                {% elif state == 'Paraná' %}
-                <a href="http://www.dengue.pr.gov.br/modules/conteudo/conteudo.php?conteudo=19" style="color: #FFFFFF"
-                    target="_blank">
-                    {% blocktranslate %}contacte a secretaria de saúde de sua cidade.{% endblocktranslate %}
-                </a>
-                {# CE #}
-                {% elif state == 'Ceará' %}
-                {% blocktranslate %}contacte a central de apoio ao cidadão: 0800.285.0880{% endblocktranslate %}
-                {# MG #}
-                {% elif state == 'Minas Gerais' %}
-                {% blocktranslate %}contacte a secretaria de saúde de sua cidade{% endblocktranslate %}
-                {# SP #}
-                {% elif state == 'São Paulo' %}
-                {% blocktranslate %}contacte a secretaria de saúde de sua cidade{% endblocktranslate %}
-                {% endif %}
-            </p>
+              {% endif %}
+              {# ES #}
+            {% elif state == 'Espírito Santos' %}
+              {% blocktranslate %}contacte a secretaria de saúde de sua cidade{% endblocktranslate %}
+              {# PR #}
+            {% elif state == 'Paraná' %}
+              <a href="http://www.dengue.pr.gov.br/modules/conteudo/conteudo.php?conteudo=19"
+                 style="color: #FFFFFF"
+                 target="_blank">
+                {% blocktranslate %}contacte a secretaria de saúde de sua cidade.{% endblocktranslate %}
+              </a>
+              {# CE #}
+            {% elif state == 'Ceará' %}
+              {% blocktranslate %}contacte a central de apoio ao cidadão: 0800.285.0880{% endblocktranslate %}
+              {# MG #}
+            {% elif state == 'Minas Gerais' %}
+              {% blocktranslate %}contacte a secretaria de saúde de sua cidade{% endblocktranslate %}
+              {# SP #}
+            {% elif state == 'São Paulo' %}
+              {% blocktranslate %}contacte a secretaria de saúde de sua cidade{% endblocktranslate %}
+            {% endif %}
+          </p>
         </div>
+      </div>
+      <!-- <-- -> -->
     </div>
-
-<!-- <-- -> -->
   </div>
-</div>
-
-
-<script>
+  <script>
     // MAPA
     var geocode = "{{geocode}}";
     var casos_por_ap = {{ casos_por_ap| safe }};
@@ -277,17 +289,26 @@
     var aps = L.layerGroup();
     var features = L.layerGroup();
     var info = L.control();
-    var legend = L.control({ position: 'bottomright' });
+    var legend = L.control({
+      position: 'bottomright'
+    });
 
     // @override this
     var dataurls = {{geojson_urls|safe}};
 
-    var alertLevels = [
-        { name: '{% blocktranslate %}Baixo Risco{% endblocktranslate %}', color: '#0D6B0D' },
-        { name: '{% blocktranslate %}Atenção{% endblocktranslate %}', color: '#FBFC75' },
-        { name: '{% blocktranslate %}Transmissão{% endblocktranslate %}', color: '#E45205' },
-        { name: '{% blocktranslate %}Atividade aumentada{% endblocktranslate %}', color: '#FF0205' },
-    ];
+    var alertLevels = [{
+      name: '{% blocktranslate %}Baixo Risco{% endblocktranslate %}',
+      color: '#0D6B0D'
+    }, {
+      name: '{% blocktranslate %}Atenção{% endblocktranslate %}',
+      color: '#FBFC75'
+    }, {
+      name: '{% blocktranslate %}Transmissão{% endblocktranslate %}',
+      color: '#E45205'
+    }, {
+      name: '{% blocktranslate %}Atividade aumentada{% endblocktranslate %}',
+      color: '#FF0205'
+    }, ];
 
     const colors = {
       0: "#cccccc",
@@ -309,57 +330,59 @@
     });
 
     function isInArray(el, array) {
-        return (array.indexOf(el) >= 0) ? true : false;
+      return (array.indexOf(el) >= 0) ? true : false;
     }
 
     function bestFitZoom(map) {
-        // declaring the group variable
-        var group = new L.featureGroup;
-        // map._layers gives all the layers of the map including main container
-        // so looping in all those layers filtering those having feature
-        $.each(map._layers, function (ml) { group.addLayer(this) })
-        map.fitBounds(group.getBounds());
+      // declaring the group variable
+      var group = new L.featureGroup;
+      // map._layers gives all the layers of the map including main container
+      // so looping in all those layers filtering those having feature
+      $.each(map._layers, function(ml) {
+        group.addLayer(this)
+      })
+      map.fitBounds(group.getBounds());
     }
 
     function style(feature, focus = false) {
-        var i = +feature.properties.alerta || 0;
-        return {
-            weight: focus ? 2 : 1.5,
-            opacity: 1,
-            color: focus ? '#3388ff' : 'white',
-            dashArray: focus ? '' : '3',
-            fillOpacity: 0.7,
-            fillColor: alertLevels[i].color
-        };
+      var i = +feature.properties.alerta || 0;
+      return {
+        weight: focus ? 2 : 1.5,
+        opacity: 1,
+        color: focus ? '#3388ff' : 'white',
+        dashArray: focus ? '' : '3',
+        fillOpacity: 0.7,
+        fillColor: alertLevels[i].color
+      };
     }
 
     function highlightFeature(e) {
-        var layer = e.target;
+      var layer = e.target;
 
-        layer.setStyle({
-            weight: 5,
-            color: '#666',
-            dashArray: '',
-            fillOpacity: 0.7
-        });
+      layer.setStyle({
+        weight: 5,
+        color: '#666',
+        dashArray: '',
+        fillOpacity: 0.7
+      });
 
 
-        if (!L.Browser.ie && !L.Browser.opera) {
-            layer.bringToFront();
-        }
+      if (!L.Browser.ie && !L.Browser.opera) {
+        layer.bringToFront();
+      }
 
-        info.update(layer.feature.properties);
-        layer.bringToBack()
+      info.update(layer.feature.properties);
+      layer.bringToBack()
     }
 
     function resetHighlight(e) {
-        const codigo = e.target.feature.properties.geocodigo || e.target.feature.properties.COD_AP_SMS;
-        const focus = String(codigo) === String(geocode);
-        e.target.setStyle(style(e.target.feature, focus));
-        info.update();
-        if (focused_layer) {
-          focused_layer.bringToFront();
-        }
+      const codigo = e.target.feature.properties.geocodigo || e.target.feature.properties.COD_AP_SMS;
+      const focus = String(codigo) === String(geocode);
+      e.target.setStyle(style(e.target.feature, focus));
+      info.update();
+      if (focused_layer) {
+        focused_layer.bringToFront();
+      }
     }
 
     function renderSparkline(selector, series) {
@@ -367,87 +390,88 @@
       const levels = series.map(d => d[1]);
 
       $(selector).sparkline(values, {
-          type: 'bar',
-          width: "14em",
-          height: "5em",
-          barWidth: "9em",
-          colorMap: levels.map(level => colors[level] || "#cccccc"),
-          tooltipFormat: '{' + '{value}' + '} {% blocktranslate %}casos{% endblocktranslate %}'
+        type: 'bar',
+        width: "14em",
+        height: "5em",
+        barWidth: "9em",
+        colorMap: levels.map(level => colors[level] || "#cccccc"),
+        tooltipFormat: '{' + '{value}' + '} {% blocktranslate %}casos{% endblocktranslate %}'
       });
     }
 
     function apply_map_settings(map) {
-        //map.dragging.disable();
-        map.scrollWheelZoom.disable();
-        map.touchZoom.disable();
-        map.doubleClickZoom.disable();
-        map.boxZoom.disable();
-        map.keyboard.disable();
-        map.touchZoom.disable();
-        map.doubleClickZoom.disable();
-        //$(".leaflet-control-zoom").css("visibility", "hidden");
+      //map.dragging.disable();
+      map.scrollWheelZoom.disable();
+      map.touchZoom.disable();
+      map.doubleClickZoom.disable();
+      map.boxZoom.disable();
+      map.keyboard.disable();
+      map.touchZoom.disable();
+      map.doubleClickZoom.disable();
+      //$(".leaflet-control-zoom").css("visibility", "hidden");
     }
 
     // {% block alert_js %} {% endblock %}
 
     function main_map_init(map, options) {
-        $(document).data('map', map)
+      $(document).data('map', map)
 
-        // control that shows state info on hover
-        info.onAdd = function (map) {
-            this._div = L.DomUtil.create('div', 'info');
-            this.update();
-            return this._div;
-        };
+      // control that shows state info on hover
+      info.onAdd = function(map) {
+        this._div = L.DomUtil.create('div', 'info');
+        this.update();
+        return this._div;
+      };
 
-        legend.onAdd = function () {
-            var div = L.DomUtil.create('div', 'info legend'),
-                labels = alertLevels.map(function (alertLevel) {
-                    return '<i style="background:' + alertLevel.color + '"></i> ' + alertLevel.name;
-                }).reverse();
+      legend.onAdd = function() {
+        var div = L.DomUtil.create('div', 'info legend'),
+          labels = alertLevels.map(function(alertLevel) {
+            return '<i style="background:' + alertLevel.color + '"></i> ' + alertLevel.name;
+          }).reverse();
 
-            labels.push('O: {% blocktranslate %}Unidades de Saúde{% endblocktranslate %}');
-            div.innerHTML = labels.join('<br>');
-            return div;
-        };
+        labels.push('O: {% blocktranslate %}Unidades de Saúde{% endblocktranslate %}');
+        div.innerHTML = labels.join('<br>');
+        return div;
+      };
 
-        legend.addTo(map);
+      legend.addTo(map);
 
-        var CrossIcon = L.icon({
-            iconUrl: "{% static '/img/32px-Red_Cross_icon.png' %}",
-            iconSize: [16, 16],
-            iconAnchor: [8, 8],
-            popupAnchor: [8, -8]
-        });
+      var CrossIcon = L.icon({
+        iconUrl: "{% static '/img/32px-Red_Cross_icon.png' %}",
+        iconSize: [16, 16],
+        iconAnchor: [8, 8],
+        popupAnchor: [8, -8]
+      });
 
-        // @override at alert_js_main_init
-        var map_bounds = [];
+      // @override at alert_js_main_init
+      var map_bounds = [];
 
-        {% block alert_js_main_init %} {% endblock %}
+      {% block alert_js_main_init %} {% endblock %}
 
-        load_map_layer(dataurls, map);
+      load_map_layer(dataurls, map);
 
-        info.addTo(map);
+      info.addTo(map);
 
-        var overlayMaps = {
-            '{% blocktranslate %}Áreas de Planejamento{% endblocktranslate %}': aps,
-            '{% blocktranslate %}Unidades de Saúde{% endblocktranslate %}': features
-        };
-        var controls = L.control.layers(null, overlayMaps, { collapsed: true });
+      var overlayMaps = {
+        '{% blocktranslate %}Áreas de Planejamento{% endblocktranslate %}': aps,
+        '{% blocktranslate %}Unidades de Saúde{% endblocktranslate %}': features
+      };
+      var controls = L.control.layers(null, overlayMaps, {
+        collapsed: true
+      });
 
-        apply_map_settings(map);
+      apply_map_settings(map);
 
-        controls.addTo(map);
+      controls.addTo(map);
 
-        $(window).on("resize", function () {
-            $("#main").height($(window).height() * 0.7);
-            map.invalidateSize();
-            try {
-                map.fitBounds(get_map_bounds());
-            } catch (err) { }
-        }).trigger("resize")
+      $(window).on("resize", function() {
+        $("#main").height($(window).height() * 0.7);
+        map.invalidateSize();
+        try {
+          map.fitBounds(get_map_bounds());
+        } catch (err) {}
+      }).trigger("resize")
 
     }
-
-</script>
+  </script>
 {% endblock %}
