@@ -8,7 +8,7 @@
   function openReport() {
     var epidate = $('#epidate').val();
     var url = '/api/epi_year_week?epidate=' + epidate;
- 
+
     $.ajax({
         dataType: 'json',
         url: url,
@@ -19,10 +19,10 @@
           );
         }
     });
- 
+
     return false;
   }
- 
+
 </script>
 
 <link href="{% static '/css/report_styles.css' %}" rel="stylesheet">
