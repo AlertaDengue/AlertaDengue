@@ -744,7 +744,7 @@ class GeoJsonView(View):
                 geojson_data = json.load(f)
 
             # Modify the properties of the GeoJSON with the alert color
-            hex_color = self.get_last_color_alert(
+            hex_color = get_last_color_alert(
                 geocodigo, disease, color_type="hex"
             )
             geojson_data["features"][0]["properties"]["fill"] = hex_color
@@ -901,7 +901,7 @@ class ReportCityView(TemplateView):
         )
 
         try:
-            city = City.objects.get(pk=int(geocode))
+            city = City._default_manager.get(pk=int(geocode))
         except City.DoesNotExist:
             return self.raise_error(context, error_message_city_doesnt_exist)
 
