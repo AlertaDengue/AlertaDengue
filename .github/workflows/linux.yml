@@ -158,6 +158,9 @@ jobs:
 
         pre-commit run --files "${files[@]}"
 
+    - name: Mypy
+      run: bash scripts/run-mypy-precommit.sh
+
     - name: Build frontend
       run: |
         sugar --profile dev compose build --options --no-cache --services frontend
