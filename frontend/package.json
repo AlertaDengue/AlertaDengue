@@ -1,6 +1,6 @@
 {
   "name": "AlertaDengue",
-  "version": "4.18.1",
+  "version": "4.19.0",
   "private": true,
   "engines": {
     "node": ">=20.9.0"
