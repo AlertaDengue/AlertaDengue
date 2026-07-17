@@ -3,10 +3,27 @@ default_language_version:
 
 default_stages: [commit]
 
-exclude: >-
-  (^docs/|(^|.*/)migrations/|(^|.*/)devcontainer\.json$|^\.git/|^\.eggs/|
-  (^|.*/)node_modules/|(^|.*/)\.next/|(^|.*/)build/|(^|.*/)dist/|
-  (^|.*/)staticfiles/)
+# Vendored, generated, and historical files excluded from automatic fixes.
+exclude: |
+  (?x)^(
+    docs/|
+    (^|.*/)migrations/|
+    (^|.*/)devcontainer\.json$|
+    \.git/|
+    \.eggs/|
+    (^|.*/)node_modules/|
+    (^|.*/)\.next/|
+    (^|.*/)build/|
+    (^|.*/)dist/|
+    (^|.*/)staticfiles/|
+    AlertaDengue/admin/js/|
+    AlertaDengue/static/libs/|
+    AlertaDengue/static/js/highstock-all\.js$|
+    AlertaDengue/static/cap_sms\.geojson$|
+    AlertaDengue/static/img/reports/enso\.svg$|
+    containers/postgres/sql_history/|
+    (^|.*/).*\.min\.js$
+  )
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -23,7 +40,7 @@ repos:
       - id: debug-statements
       - id: check-builtin-literals
       - id: check-case-conflict
-      # These hooks are intentionally manual during the phased lint rollout.
+      # Rollout-only hooks remain manual until they are validated separately.
       # Run them explicitly with:
       #   pre-commit run <hook-id> --hook-stage manual
       - id: check-docstring-first
@@ -32,21 +49,21 @@ repos:
 
   - repo: local
     hooks:
+      # Repository-wide formatters stay manual by design.
       - id: djlint-reformat-django
         name: djLint reformat (Django)
         entry: poetry run djlint --reformat --profile=django
         language: system
-        files: ^AlertaDengue/(dados/templates|templates)/.*\.html$
-        pass_filenames: true
+        files: ^AlertaDengue/dados/templates/.*\.html$
+        exclude: ^AlertaDengue/dados/templates/components/tutorial/notebook-API-(Python|R)-en\.html$
         stages: [manual]
 
       - id: djlint-django
         name: djLint check (Django)
         entry: poetry run djlint --check --profile=django
         language: system
-        files: ^AlertaDengue/(dados/templates|templates)/.*\.html$
-        pass_filenames: true
-        stages: [manual]
+        files: ^AlertaDengue/dados/templates/.*\.html$
+        exclude: ^AlertaDengue/dados/templates/components/tutorial/notebook-API-(Python|R)-en\.html$
 
       - id: ruff-format
         name: Ruff format
@@ -64,17 +81,17 @@ repos:
 
       - id: bandit
         name: Bandit
-        entry: poetry run bandit --configfile pyproject.toml -iii -lll
+        entry: poetry run bandit --configfile pyproject.toml -iii -lll -r AlertaDengue
         language: system
         files: ^AlertaDengue/.*\.py$
-        stages: [manual]
+        pass_filenames: false
 
       - id: vulture
         name: Vulture
         entry: poetry run python scripts/run-vulture.py
         language: system
         files: ^AlertaDengue/.*\.py$
-        stages: [manual]
+        pass_filenames: false
 
       - id: mccabe
         name: McCabe
@@ -88,7 +105,7 @@ repos:
         entry: bash scripts/run-mypy-precommit.sh
         language: system
         files: ^AlertaDengue/.*\.py$
-        stages: [manual]
+        pass_filenames: false
 
       - id: prettier
         name: Prettier

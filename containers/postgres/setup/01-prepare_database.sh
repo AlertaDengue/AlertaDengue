@@ -8,7 +8,7 @@ PSQL_CMD="psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER""
 DENGUEADMIN="dengueadmin"
 
 for dbname in "${DENGUEADMIN}" "${PSQL_DB}" "${PSQL_DBF}" "test_${PSQL_DB}" "test_${PSQL_DBF}"; do
-   echo "SELECT 'CREATE DATABASE "${dbname}" 
+   echo "SELECT 'CREATE DATABASE "${dbname}"
         WITH OWNER "${PSQL_USER}"
         ENCODING "UTF8"' WHERE NOT EXISTS (
       SELECT FROM pg_database WHERE datname = '"${dbname}"')\gexec" | ${PSQL_CMD}

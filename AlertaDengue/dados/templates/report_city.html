@@ -1,394 +1,368 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load static %}
-
 {% block extra_head %}
+  <link rel="stylesheet"
+        type="text/css"
+        href="{% static '/libs/DataTables/datatables.min.css' %}" />
+  <script type="text/javascript"
+          src="{% static '/libs/DataTables/datatables.min.js' %}"></script>
+  {# .table-striped tbody tr.yellow-row > td #}
+  <style>
+    .box {
+      border: 1px #dfdfdf solid;
+      padding: 20px;
+      margin-bottom: 20px;
+      background-color: #f5f5f5;
+    }
 
-<link rel="stylesheet"
-      type="text/css" href="{% static '/libs/DataTables/datatables.min.css' %}"/>
+    .table tr td:nth-child(1) {
+      background: #fafafa !important;
+      font-weight: bold;
+    }
 
-<script type="text/javascript"
-        src="{% static '/libs/DataTables/datatables.min.js' %}"></script>
+    .table-striped tbody tr.green-row>td,
+    .table tbody tr.green-row>td {
+      background: #8BFFB7 !important;
+    }
 
-<style>
-      .box {
-        border: 1px #dfdfdf solid;
-        padding: 20px;
-        margin-bottom: 20px;
-        background-color: #f5f5f5;
-      }
+    .table-striped tbody tr.yellow-row>td,
+    .table tbody tr.yellow-row>td {
+      background: #FFEB5C !important;
+    }
 
-      .table tr td:nth-child(1){
-        background: #fafafa!important;
-        font-weight: bold;
-      }
+    .table-striped tbody tr.orange-row>td,
+    .table tbody tr.orange-row>td {
+      background: #FFCE5C !important;
+    }
 
-      .table-striped tbody tr.green-row > td,
-      .table tbody tr.green-row > td {
-        background: #8BFFB7 !important;
-      }
+    .table-striped tbody tr.red-row>td,
+    .table tbody tr.red-row>td {
+      background: #FF7C73 !important;
+    }
 
-      .table-striped tbody tr.yellow-row > td,
-      .table tbody tr.yellow-row > td {
-        background: #FFEB5C !important;
-      }
+    .table.dataTable,
+    .table td,
+    .table th {
+      border-collapse: collapse !important;
+      border: 1px solid #aaaaaa !important;
+    }
 
-      .table-striped tbody tr.orange-row > td,
-      .table tbody tr.orange-row > td {
-        background: #FFCE5C !important;
-      }
-
-      .table-striped tbody tr.red-row > td,
-      .table tbody tr.red-row > td {
-        background: #FF7C73 !important;
-      }
-      .table.dataTable, .table td, .table th {
-        border-collapse: collapse !important;
-        border: 1px solid #aaaaaa!important;
-      }
-
-      .plotly-chart .plotly-graph-div {
-        width: 100% !important;
-      }
-
-</style>
-<script src="{% static '/libs/plotlyjs/plotly-latest.min.js' %}"></script>
+    .plotly-chart .plotly-graph-div {
+      width: 100% !important;
+    }
+  </style>
+  <script src="{% static '/libs/plotlyjs/plotly-latest.min.js' %}"></script>
 {% endblock %}
-
 {% block breadcrumbs %}
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="/report">{% translate "Relatórios" %}</a></li>
       <li class="breadcrumb-item"><a href="/report">{% translate "Municipal" %}</a></li>
       <li class="breadcrumb-item"><a href="/report/{{ state }}/city">{{ state }}</a></li>
       <li class="breadcrumb-item active" aria-current="page">{{ city_name }}</li>
-  </ol>
-</nav>
+    </ol>
+  </nav>
 {% endblock %}
-
-{% block title %}{% translate "Relatório da Situação das Arboviroses em " %} {{city_name}} -
-{{state_name}} {% endblock %}
-
+{% block title %}{% translate "Relatório da Situação das Arboviroses em " %} {{ city_name }} -
+  {{ state_name }} {% endblock %}
 {% block content %}
-
-<!--
+  <!--
 # ---------------------------------
 # 	CAIXA LATERAL - PRIMEIRA PAGINA
 # ---------------------------------
 -->
-
-<div class="row">
-  <div class="col-md-12">
-
-    <!--
+  <div class="row">
+    <div class="col-md-12">
+      <!--
     # ----------------------
     #	MAIN BODY - FIRST PAGE
     # ----------------------
     -->
-    <p>
-      {% translate "Semana epidemiológica" %}: {{last_week}}/{{last_year}}
-    </p>
-    <p>
-      <!--
+      <p>
+        {% translate "Semana epidemiológica" %}: {{ last_week }}/{{ last_year }}
+      </p>
+      <p>
+        <!--
       usar a cor correspondente ao nivel de
       alerta mais alto considerando as 3 doenças
       -->
-      {% translate "Situação de alerta do município" %}: {{max_alert_color}}
-    </p>
+        {% translate "Situação de alerta do município" %}: {{ max_alert_color }}
+      </p>
+    </div>
   </div>
-</div>
-
-<div class="row">
-  <div class="col-md-12">
+  <div class="row">
+    <div class="col-md-12">
       <h3>{% translate "Condições climáticas para transmissão de arboviroses" %}</h3>
-
       <p>{% blocktranslate %}A figura abaixo mostra o indicador meteorológico de receptividade do
       município para a transmissão de arboviroses. Quando o indicador está
       acima do limiar (linha horizontal), existem condições ambientais
       favoraveis à transmissão viral. Isso significa que a atenção precisa ser
       aumentada para a possivel circulação sustentada de arbovirus e para a
       implementação de controle vetorial{% endblocktranslate %}.</p>
-
-      <div class="plotly-chart w-100">
-        {{chart_dengue_climate|safe}}
+      <div class="plotly-chart w-100">{{ chart_dengue_climate|safe }}</div>
+      <br />
+      &nbsp;
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <h3>{% translate "Situação da Dengue" %}</h3>
+      {% if total_n_dengue >= 0 %}
+        <p>
+          <i><b>
+            {% translate "Esse ano, até essa semana" %}, {{ total_n_dengue }}
+            {% translate "casos de Dengue foram registrados" %}.
+            {% translate "No ano passado, até essa semana" %}, {{ total_n_dengue_last_year }}
+          {% translate "tinham sido registrados" %}.</b></i></br>
+          {% blocktranslate %}A figura abaixo mostra a situação da dengue nos últimos dois anos.
+      As linhas horizontais correspondem aos limiares de incidência
+      pré-epidêmicos, epidêmicos e pós-epidêmicos
+      (casos por 100.000 habitantes){% endblocktranslate %}</p>
+          {% if chart_dengue_incidence %}
+            {{ chart_dengue_incidence|safe }}
+          {% else %}
+            <p><i>{% translate "Nenhum registro encontrado no período monitorado." %}</i></p>
+          {% endif %}
+          <br />
+          &nbsp;
+          {% if df_dengue %}
+            {{ df_dengue|safe }}
+          {% endif %}
+        {% else %}
+          <p>{% translate "Sem dados disponíveis para geração dessa seção" %}.</p>
+        {% endif %}
+        <br />
       </div>
-
-      <br/>&nbsp;
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-12">
-
-    <h3>{% translate "Situação da Dengue" %}</h3>
-
-    {% if total_n_dengue >= 0 %}
-    <p><i><b>
-      {% translate "Esse ano, até essa semana" %}, {{total_n_dengue}}
-      {% translate "casos de Dengue foram registrados" %}.
-      {% translate "No ano passado, até essa semana" %}, {{total_n_dengue_last_year}}
-      {% translate "tinham sido registrados" %}.</b></i></br>
-
-      {% blocktranslate %}A figura abaixo mostra a situação da dengue nos últimos dois anos.
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <h3>{% translate "Situação da Chikungunya" %}</h3>
+        {% if total_n_chik >= 0 %}
+          <p>
+            <i><b>
+              {% translate "Esse ano, até essa semana" %}, {{ total_n_chik }}
+              {% translate "casos de Chikungunya foram registrados" %}.
+              {% translate "No ano passado, até essa semana" %}, {{ total_n_chik_last_year }}
+            {% translate "tinham sido registrados" %}.</b></i></br>
+            {% blocktranslate %}A figura abaixo mostra a situação da chikungunya nos últimos dois anos.
       As linhas horizontais correspondem aos limiares de incidência
       pré-epidêmicos, epidêmicos e pós-epidêmicos
       (casos por 100.000 habitantes){% endblocktranslate %}</p>
-
-    {% if chart_dengue_incidence %}
-      {{chart_dengue_incidence|safe}}
-    {% else %}
-      <p><i>{% translate "Nenhum registro encontrado no período monitorado." %}</i></p>
-    {% endif %}
-
-    <br/>&nbsp;
-
-    {% if df_dengue %}
-      {{df_dengue|safe}}
-    {% endif %}
-
-    {% else %}
-    <p>
-      {% translate "Sem dados disponíveis para geração dessa seção" %}.
-    </p>
-    {% endif %}
-
-    <br/>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-12">
-
-    <h3>{% translate "Situação da Chikungunya" %}</h3>
-
-    {% if total_n_chik >= 0 %}
-    <p><i><b>
-        {% translate "Esse ano, até essa semana" %}, {{total_n_chik}}
-        {% translate "casos de Chikungunya foram registrados" %}.
-        {% translate "No ano passado, até essa semana" %}, {{total_n_chik_last_year}}
-        {% translate "tinham sido registrados" %}.</b></i></br>
-
-      {% blocktranslate %}A figura abaixo mostra a situação da chikungunya nos últimos dois anos.
+            {% if chart_chik_incidence %}
+              {{ chart_chik_incidence|safe }}
+            {% else %}
+              <p><i>{% translate "Nenhum registro encontrado no período monitorado." %}</i></p>
+            {% endif %}
+            <br />
+            &nbsp;
+            {% if df_chik %}
+              {{ df_chik|safe }}
+            {% endif %}
+          {% else %}
+            <p>{% translate "Sem dados disponíveis para geração dessa seção" %}.</p>
+          {% endif %}
+          <br />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <h3>{% translate "Situação da Zika" %}</h3>
+          {% if total_n_zika >= 0 %}
+            <p>
+              <i><b>
+                {% translate "Esse ano, até essa semana" %}, {{ total_n_zika }}
+                {% translate "casos de Zika foram registrados" %}.
+                {% translate "No ano passado, até essa semana" %}, {{ total_n_zika_last_year }}
+              {% translate "tinham sido registrados" %}.</b></i></br>
+              {% blocktranslate %}A figura abaixo mostra a situação da zika nos últimos dois anos.
       As linhas horizontais correspondem aos limiares de incidência
       pré-epidêmicos, epidêmicos e pós-epidêmicos
       (casos por 100.000 habitantes){% endblocktranslate %}</p>
-
-    {% if chart_chik_incidence %}
-      {{chart_chik_incidence|safe}}
-    {% else %}
-      <p><i>{% translate "Nenhum registro encontrado no período monitorado." %}</i></p>
-    {% endif %}
-
-    <br/>&nbsp;
-
-    {% if df_chik %}
-      {{df_chik|safe}}
-    {% endif %}
-
-    {% else %}
-    <p>
-      {% translate "Sem dados disponíveis para geração dessa seção" %}.
-    </p>
-    {% endif %}
-
-    <br/>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-12">
-
-    <h3>{% translate "Situação da Zika" %}</h3>
-
-    {% if total_n_zika >= 0 %}
-    <p><i><b>
-      {% translate "Esse ano, até essa semana" %}, {{total_n_zika}}
-      {% translate "casos de Zika foram registrados" %}.
-      {% translate "No ano passado, até essa semana" %}, {{total_n_zika_last_year}}
-      {% translate "tinham sido registrados" %}.</b></i></br>
-
-      {% blocktranslate %}A figura abaixo mostra a situação da zika nos últimos dois anos.
-      As linhas horizontais correspondem aos limiares de incidência
-      pré-epidêmicos, epidêmicos e pós-epidêmicos
-      (casos por 100.000 habitantes){% endblocktranslate %}</p>
-
-    {% if chart_zika_incidence %}
-      {{chart_zika_incidence|safe}}
-    {% else %}
-      <p><i>{% translate "Nenhum registro encontrado no período monitorado." %}</i></p>
-    {% endif %}
-
-    <br/>&nbsp;
-
-    {% if df_zika %}
-      {{df_zika|safe}}
-    {% endif %}
-
-
-    {% else %}
-    <p>
-      {% translate "Sem dados disponíveis para geração dessa seção" %}.
-    </p>
-    {% endif %}
-
-    <br/>&nbsp;
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-2"></div>
-  <div id="color-code" class="col-md-8 box">
-    <!--
+              {% if chart_zika_incidence %}
+                {{ chart_zika_incidence|safe }}
+              {% else %}
+                <p><i>{% translate "Nenhum registro encontrado no período monitorado." %}</i></p>
+              {% endif %}
+              <br />
+              &nbsp;
+              {% if df_zika %}
+                {{ df_zika|safe }}
+              {% endif %}
+            {% else %}
+              <p>{% translate "Sem dados disponíveis para geração dessa seção" %}.</p>
+            {% endif %}
+            <br />
+            &nbsp;
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-2"></div>
+          <div id="color-code" class="col-md-8 box">
+            <!--
     # ---------------------
     # BOX - CODIGO DE CORES
     # ---------------------
-    -->
-
-    <h3>{% translate "O código de Cores" %}</h3>
-
-    {% translate "As cores indicam niveis de atenção" %}
-
-    <ul>
-      <li class="bullet-green">
-        <strong>{% translate "Verde" %}:</strong> {% translate "condições climáticas desfavoráveis, seja" %}
-        {% translate "por baixa temperatura ou baixa umidade, e baixa incidência de casos" %}.
-      </li>
-      <li class="bullet-yellow">
-        <strong>{% translate "Amarelo" %}:</strong> {% translate "condições climáticas propícias para" %}
-        {% translate "aumento da população do vetor e transmissão de arboviroses" %}.
-      </li>
-      <li class="bullet-orange">
-        <strong>{% translate "Laranja" %}:</strong> {% translate "transmissão aumentada e sustentada da arbovirose" %}.
-      </li>
-      <li class="bullet-red">
-        <strong>{% translate "Vermelho" %}:</strong> {% translate "incidência alta, acima dos 90% históricos" %}.
-      </li>
-    </ul>
-  </div>
-</div>
-<br/>
-<div class="row">
-  <div id="var-tables" class="col-md-12">
-    <!--
+-->
+            <h3>{% translate "O código de Cores" %}</h3>
+            {% translate "As cores indicam niveis de atenção" %}
+            <ul>
+              <li class="bullet-green">
+                <strong>{% translate "Verde" %}:</strong> {% translate "condições climáticas desfavoráveis, seja" %}
+                {% translate "por baixa temperatura ou baixa umidade, e baixa incidência de casos" %}.
+              </li>
+              <li class="bullet-yellow">
+                <strong>{% translate "Amarelo" %}:</strong> {% translate "condições climáticas propícias para" %}
+                {% translate "aumento da população do vetor e transmissão de arboviroses" %}.
+              </li>
+              <li class="bullet-orange">
+                <strong>{% translate "Laranja" %}:</strong> {% translate "transmissão aumentada e sustentada da arbovirose" %}.
+              </li>
+              <li class="bullet-red">
+                <strong>{% translate "Vermelho" %}:</strong> {% translate "incidência alta, acima dos 90% históricos" %}.
+              </li>
+            </ul>
+          </div>
+        </div>
+        <br />
+        <div class="row">
+          <div id="var-tables" class="col-md-12">
+            <!--
     # ----------------------------------------
     # Variáves nas Tabelas, Créditos e Contato
     # ----------------------------------------
-    -->
-
-    <h3>{% translate "Lista das variáveis apresentadas nas tabelas" %}</h3>
-
-    <ul>
-      <li><b>SE</b>:
-        {% translate "Semana epidemiológica" %}</li>
-
-      <li><b>temp.min</b>:
-        {% translate "Média das temperaturas mínimas diárias ao longo da semana" %}</li>
-      <li><b>temp.med</b>:
-        {% translate "Média das temperaturas diárias ao longo da semana" %}</li>
-      <li><b>temp.max</b>:
-        {% translate "Média das temperaturas máximas diárias ao longo da semana" %}</li>
-
-      <li><b>umid.min</b>:
-        {% translate "Média da umidade relativa mínima diária do ar ao longo da semana" %}</li>
-      <li><b>umid.med</b>:
-        {% translate "Média da umidade relativa diária do ar ao longo da semana" %}</li>        
-      <li><b>umid.max</b>:
-        {% translate "Média da umidade relativa máxima diária do ar ao longo da semana" %}</li>
-      <li><b>casos notif</b>:
-        {% translate "Número de casos notificados por semana (Os valores são atualizados retrospectivamente todas as semanas)" %}</li>
-      <li><b>incidência</b>:
-        {% translate "Taxa de incidência estimada por 100.000" %}</li>
-      <li><b>casos_est</b> :
-        {% translate "Número estimado de casos por semana usando o modelo de nowcasting (nota: Os valores são atualizados retrospectivamente a cada semana)" %}</li>
-      <li><b>pr(inc subir)</b>:
-        {% translate "Probabilidade de (Rt> 1). Para emitir o alerta laranja, usamos o critério p_rt1> 0,95 por 3 semanas ou mais." %}</li>
-      <li><b>nivel</b>:
-        {% translate "Nível de alerta (1 = verde, 2 = amarelo, 3 = laranja, 4 = vermelho), mais detalhes, consulte (Saiba mais)" %}</li>
-      </ul>
-  </div>
-</div>
-
-<div class="row">
-  <div id="notes" class="col-md-12">
-    <h3>{% translate "Notas" %}</h3>
-
-    <ul>
-      <li>{% blocktranslate %}Os dados do sinan mais recentes ainda não foram totalmente digitados.
+-->
+            <h3>{% translate "Lista das variáveis apresentadas nas tabelas" %}</h3>
+            <ul>
+              <li>
+                <b>SE</b>:
+                {% translate "Semana epidemiológica" %}
+              </li>
+              <li>
+                <b>temp.min</b>:
+                {% translate "Média das temperaturas mínimas diárias ao longo da semana" %}
+              </li>
+              <li>
+                <b>temp.med</b>:
+                {% translate "Média das temperaturas diárias ao longo da semana" %}
+              </li>
+              <li>
+                <b>temp.max</b>:
+                {% translate "Média das temperaturas máximas diárias ao longo da semana" %}
+              </li>
+              <li>
+                <b>umid.min</b>:
+                {% translate "Média da umidade relativa mínima diária do ar ao longo da semana" %}
+              </li>
+              <li>
+                <b>umid.med</b>:
+                {% translate "Média da umidade relativa diária do ar ao longo da semana" %}
+              </li>
+              <li>
+                <b>umid.max</b>:
+                {% translate "Média da umidade relativa máxima diária do ar ao longo da semana" %}
+              </li>
+              <li>
+                <b>casos notif</b>:
+                {% translate "Número de casos notificados por semana (Os valores são atualizados retrospectivamente todas as semanas)" %}
+              </li>
+              <li>
+                <b>incidência</b>:
+                {% translate "Taxa de incidência estimada por 100.000" %}
+              </li>
+              <li>
+                <b>casos_est</b> :
+                {% translate "Número estimado de casos por semana usando o modelo de nowcasting (nota: Os valores são atualizados retrospectivamente a cada semana)" %}
+              </li>
+              <li>
+                <b>pr(inc subir)</b>:
+                {% translate "Probabilidade de (Rt> 1). Para emitir o alerta laranja, usamos o critério p_rt1> 0,95 por 3 semanas ou mais." %}
+              </li>
+              <li>
+                <b>nivel</b>:
+                {% translate "Nível de alerta (1 = verde, 2 = amarelo, 3 = laranja, 4 = vermelho), mais detalhes, consulte (Saiba mais)" %}
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="row">
+          <div id="notes" class="col-md-12">
+            <h3>{% translate "Notas" %}</h3>
+            <ul>
+              <li>{% blocktranslate %}Os dados do sinan mais recentes ainda não foram totalmente digitados.
         Estimamos o número esperado de casos notificados considerando o tempo
         até os casos serem digitados{% endblocktranslate %}.
-      </li>
-      <li>{% blocktranslate %}Algumas vezes, os casos da última semana ainda não estao disponíveis,
+            </li>
+            <li>{% blocktranslate %}Algumas vezes, os casos da última semana ainda não estao disponíveis,
         nesse caso, usa-se uma estimação com base na tendência de variação da
         série{% endblocktranslate %}.
-      </li>
-    </ul>
-  </div>
-</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div id="credits" class="col-md-12">
+        <h3>{% translate "Créditos" %}</h3>
+        {% translate "Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como parceira entre" %}:
+        <ul>
+          <li>{% translate "Programa de Computação Científica, Fundação Oswaldo Cruz, Rio de Janeiro" %}.
+          </li>
+          <li>{% translate "Escola de Matemática Aplicada, Fundação Getúlio Vargas" %}.</li>
+          <li>{% translate "Secretaria Estadual de Saúde do" %} {{ state_name }}.</li>
+          <li>{% translate "Observatório de Dengue da UFMG" %}.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div id="contact" class="col-md-12">
+        <h3>{% translate "Contato" %}</h3>
+        {% translate "Para mais detalhes sobre o sistema de alerta Infodengue, consultar" %}:
+        <a href="http://info.dengue.mat.br">http://info.dengue.mat.br</a>
+      </div>
+    </div>
+    <script>
+      $(document).ready(function() {
+        var cssClasses = {
+          '{% translate "verde" %}': 'green-row',
+          '{% translate "amarelo" %}': 'yellow-row',
+          '{% translate "laranja" %}': 'orange-row',
+          '{% translate "vermelho" %}': 'red-row'
+        };
 
-<div class="row">
-  <div id="credits" class="col-md-12">
-    <h3>{% translate "Créditos" %}</h3>
+        function applyAlertRowClass(row) {
+          var $row = $(row);
+          var level = $.trim($row.find('td:last-child').text());
 
-    {% translate "Este foi um projeto desenvolvido com apoio da SVS/MS e é operado como parceira entre" %}:
+          $row.removeClass('green-row yellow-row orange-row red-row');
 
-    <ul>
-      <li>{% translate "Programa de Computação Científica, Fundação Oswaldo Cruz, Rio de Janeiro" %}.
-      </li>
-      <li>{% translate "Escola de Matemática Aplicada, Fundação Getúlio Vargas" %}.</li>
-      <li>{% translate "Secretaria Estadual de Saúde do" %} {{state_name}}.</li>
-      <li>{% translate "Observatório de Dengue da UFMG" %}.</li>
-    </ul>
-  </div>
-</div>
-
-<div class="row">
-  <div id="contact" class="col-md-12">
-    <h3>{% translate "Contato" %}</h3>
-    {% translate "Para mais detalhes sobre o sistema de alerta Infodengue, consultar" %}:
-    <a href="http://info.dengue.mat.br">http://info.dengue.mat.br</a>
-  </div>
-</div>
-
-<script>
-  $(document).ready(function(){
-    var cssClasses = {
-      '{% translate "verde" %}': 'green-row',
-      '{% translate "amarelo" %}': 'yellow-row',
-      '{% translate "laranja" %}': 'orange-row',
-      '{% translate "vermelho" %}': 'red-row'
-    };
-
-    function applyAlertRowClass(row) {
-      var $row = $(row);
-      var level = $.trim($row.find('td:last-child').text());
-
-      $row.removeClass('green-row yellow-row orange-row red-row');
-
-      if (cssClasses[level]) {
-        $row.addClass(cssClasses[level]);
-      }
-    }
-
-    $(document).ready( function () {
-      $('.table').DataTable({
-        "pageLength": 4,
-        "lengthMenu": [ 4, 8, 12 ],
-        "order": [[ 0, "desc" ]],
-        "searching": false,
-        "createdRow": function(row) {
-          applyAlertRowClass(row);
-        },
-        "drawCallback": function() {
-          $(this.api().rows({ page: 'current' }).nodes()).each(function() {
-            applyAlertRowClass(this);
-          });
-        },
-        "language": {
-          "url": "/static/libs/DataTables/i18n/pt_BR.json"
+          if (cssClasses[level]) {
+            $row.addClass(cssClasses[level]);
+          }
         }
-      } );
-    } );
-  });
-</script>
 
-{% endblock %}
+        $(document).ready(function() {
+          $('.table').DataTable({
+            "pageLength": 4,
+            "lengthMenu": [4, 8, 12],
+            "order": [
+              [0, "desc"]
+            ],
+            "searching": false,
+            "createdRow": function(row) {
+              applyAlertRowClass(row);
+            },
+            "drawCallback": function() {
+              $(this.api().rows({
+                page: 'current'
+              }).nodes()).each(function() {
+                applyAlertRowClass(this);
+              });
+            },
+            "language": {
+              "url": "/static/libs/DataTables/i18n/pt_BR.json"
+            }
+          });
+        });
+      });
+    </script>
+  {% endblock %}

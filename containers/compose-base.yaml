@@ -126,7 +126,7 @@ services:
       DJANGO_PORT: "${DJANGO_PORT}"
       DJANGO_SETTINGS_MODULE: "ad_main.settings.${ENV}"
       DEBUG: "${DEBUG}"
-      MAINTENANCE_MODE: "${MAINTENANCE_MODE}"     
+      MAINTENANCE_MODE: "${MAINTENANCE_MODE}"
     env_file:
       - ../.envs/.env
     ports:

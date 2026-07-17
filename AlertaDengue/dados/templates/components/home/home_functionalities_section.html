@@ -1,131 +1,108 @@
 {% load i18n %}
 {% load static %}
-
 {% block home_functionalities_section %}
-<div class="card mb-0 p-0 home-section-card">
-  <div class="card-header home-section-header d-flex align-items-center">
-    <h4 class="mb-0 text-white">
-      {% trans "Funcionalidades" %}
-    </h4>
-  </div>
-
-  <div class="card-body">
-    <div class="row justify-content-center g-3">
-      <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
-        <a href="/services/api"
-           class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
-           data-toggle="tooltip"
-           data-placement="bottom"
-           title="{% trans 'Acesso aos dados utilizados para gerar os resultados apresentados no site.' %}">
-          <span class="mb-2">
-            <i class="fas fa-code fa-lg"></i>
-          </span>
-          <span class="font-weight-semibold">
-            {% trans "API" %}
-          </span>
-        </a>
-      </div>
-
-      <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
-        <a href="/report/"
-           class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
-           data-toggle="tooltip"
-           data-placement="bottom"
-           title="{% trans 'Informações sobre o número de casos, nível de alerta e condições climáticas para a transmissão de arboviroses a nível municipal.' %}">
-          <span class="mb-2">
-            <i class="fas fa-city fa-lg"></i>
-          </span>
-          <span class="font-weight-semibold">
-            {% trans "Relatórios municipais" %}
-          </span>
-        </a>
-      </div>
-
-      <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
-        <a href="/report/"
-           class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
-           data-toggle="tooltip"
-           data-placement="bottom"
-           title="{% trans 'Informações sobre o número de casos e nível de alerta para as regionais de saúde de cada estado.' %}">
-          <span class="mb-2">
-            <i class="fas fa-map-marked-alt fa-lg"></i>
-          </span>
-          <span class="font-weight-semibold">
-            {% trans "Relatórios estaduais" %}
-          </span>
-        </a>
-      </div>
-
-      <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
-        <a href="{% url 'dados:download_technical_report_pdf' report_key='technical-report-2023' %}"
-           class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
-           data-toggle="tooltip"
-           data-placement="bottom"
-           title="{% trans 'Análises adicionais sobre a situação das arboviroses no país.' %}">
-          <span class="mb-2">
-            <i class="fas fa-file-medical-alt fa-lg"></i>
-          </span>
-          <span class="font-weight-semibold">
-            {% trans "Relatórios técnicos" %}
-          </span>
-        </a>
-      </div>
-
-      <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
-        <a href="/services/tutorial"
-           class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
-           data-toggle="tooltip"
-           data-placement="bottom"
-           title="{% trans 'Exemplo de acesso aos dados da API usando R e Python.' %}">
-          <span class="mb-2">
-            <i class="fas fa-chalkboard-teacher fa-lg"></i>
-          </span>
-          <span class="font-weight-semibold">
-            {% trans "Tutoriais" %}
-          </span>
-        </a>
-      </div>
-
-      <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
-        <a href="https://lac.tghn.org/recursos/glossario-infodengue/"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
-           data-toggle="tooltip"
-           data-placement="bottom"
-           title="{% trans 'Consulte termos e conceitos importantes usados nos alertas, relatórios e indicadores do Infodengue.' %}">
-          <span class="mb-2">
-            <i class="fas fa-book fa-lg"></i>
-          </span>
-          <span class="font-weight-semibold">
-            {% trans "Glossário Infodengue" %}
-          </span>
-        </a>
-      </div>
-
-      <div class="col-12 col-sm-6 col-md-4 col-lg d-none"
-           id="pwa-install-wrapper">
-        <button id="pwa-install-button"
-                type="button"
-                class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
-                data-toggle="tooltip"
-                data-placement="bottom"
-                title="{% trans 'Instale o aplicativo do Infodengue neste dispositivo.' %}">
-          <span class="mb-2">
-            <i class="fas fa-mobile-alt fa-lg"></i>
-          </span>
-          <span class="font-weight-semibold" id="pwa-install-label">
-            {% trans "Instalar Infodengue" %}
-          </span>
-        </button>
+  <div class="card mb-0 p-0 home-section-card">
+    <div class="card-header home-section-header d-flex align-items-center">
+      <h4 class="mb-0 text-white">{% trans "Funcionalidades" %}</h4>
+    </div>
+    <div class="card-body">
+      <div class="row justify-content-center g-3">
+        <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
+          <a href="/services/api"
+             class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
+             data-toggle="tooltip"
+             data-placement="bottom"
+             title="{% trans 'Acesso aos dados utilizados para gerar os resultados apresentados no site.' %}">
+            <span class="mb-2">
+              <i class="fas fa-code fa-lg"></i>
+            </span>
+            <span class="font-weight-semibold">{% trans "API" %}</span>
+          </a>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
+          <a href="/report/"
+             class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
+             data-toggle="tooltip"
+             data-placement="bottom"
+             title="{% trans 'Informações sobre o número de casos, nível de alerta e condições climáticas para a transmissão de arboviroses a nível municipal.' %}">
+            <span class="mb-2">
+              <i class="fas fa-city fa-lg"></i>
+            </span>
+            <span class="font-weight-semibold">{% trans "Relatórios municipais" %}</span>
+          </a>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
+          <a href="/report/"
+             class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
+             data-toggle="tooltip"
+             data-placement="bottom"
+             title="{% trans 'Informações sobre o número de casos e nível de alerta para as regionais de saúde de cada estado.' %}">
+            <span class="mb-2">
+              <i class="fas fa-map-marked-alt fa-lg"></i>
+            </span>
+            <span class="font-weight-semibold">{% trans "Relatórios estaduais" %}</span>
+          </a>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
+          <a href="{% url 'dados:download_technical_report_pdf' report_key='technical-report-2023' %}"
+             class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
+             data-toggle="tooltip"
+             data-placement="bottom"
+             title="{% trans 'Análises adicionais sobre a situação das arboviroses no país.' %}">
+            <span class="mb-2">
+              <i class="fas fa-file-medical-alt fa-lg"></i>
+            </span>
+            <span class="font-weight-semibold">{% trans "Relatórios técnicos" %}</span>
+          </a>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
+          <a href="/services/tutorial"
+             class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
+             data-toggle="tooltip"
+             data-placement="bottom"
+             title="{% trans 'Exemplo de acesso aos dados da API usando R e Python.' %}">
+            <span class="mb-2">
+              <i class="fas fa-chalkboard-teacher fa-lg"></i>
+            </span>
+            <span class="font-weight-semibold">{% trans "Tutoriais" %}</span>
+          </a>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg d-flex">
+          <a href="https://lac.tghn.org/recursos/glossario-infodengue/"
+             target="_blank"
+             rel="noopener noreferrer"
+             class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
+             data-toggle="tooltip"
+             data-placement="bottom"
+             title="{% trans 'Consulte termos e conceitos importantes usados nos alertas, relatórios e indicadores do Infodengue.' %}">
+            <span class="mb-2">
+              <i class="fas fa-book fa-lg"></i>
+            </span>
+            <span class="font-weight-semibold">{% trans "Glossário Infodengue" %}</span>
+          </a>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg d-none"
+             id="pwa-install-wrapper">
+          <button id="pwa-install-button"
+                  type="button"
+                  class="btn btn-menu-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-4"
+                  data-toggle="tooltip"
+                  data-placement="bottom"
+                  title="{% trans 'Instale o aplicativo do Infodengue neste dispositivo.' %}">
+            <span class="mb-2">
+              <i class="fas fa-mobile-alt fa-lg"></i>
+            </span>
+            <span class="font-weight-semibold" id="pwa-install-label">
+              {% trans "Instalar Infodengue" %}
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}
-
 <script>
-  (function () {
+  (function() {
     const STORAGE_KEY = "infodengue_pwa_installed";
     let deferredPrompt = null;
 
@@ -136,7 +113,7 @@
       }
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
       const wrapper = document.getElementById("pwa-install-wrapper");
       const button = document.getElementById("pwa-install-button");
 
@@ -155,7 +132,7 @@
         return;
       }
 
-      button.addEventListener("click", async function (event) {
+      button.addEventListener("click", async function(event) {
         event.preventDefault();
 
         if (!deferredPrompt) {
@@ -174,7 +151,7 @@
       });
     });
 
-    window.addEventListener("beforeinstallprompt", function (event) {
+    window.addEventListener("beforeinstallprompt", function(event) {
       event.preventDefault();
       deferredPrompt = event;
 
@@ -185,7 +162,7 @@
       }
     });
 
-    window.addEventListener("appinstalled", function () {
+    window.addEventListener("appinstalled", function() {
       window.localStorage.setItem(STORAGE_KEY, "1");
       removeInstallTile();
       deferredPrompt = null;

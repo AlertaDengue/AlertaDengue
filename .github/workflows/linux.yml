@@ -133,33 +133,7 @@ jobs:
     - name: Linting
       run: |
         set -euo pipefail
-        # TODO: full `pre-commit run --all-files` is intentionally deferred in
-        # this rollout phase.
-        # TODO: the legacy baseline will be cleaned up in phased PRs.
-        # TODO: changed-files mode keeps CI green while preventing new issues.
-        if [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
-          base_sha="${{ github.event.pull_request.base.sha }}"
-        else
-          base_sha="${{ github.event.before }}"
-        fi
-
-        if [[ -z "${base_sha}" || "${base_sha}" =~ ^0+$ ]]; then
-          mapfile -t files < <(git ls-files)
-        else
-          mapfile -t files < <(
-            git diff --name-only --diff-filter=ACMRTUXB "${base_sha}" HEAD
-          )
-        fi
-
-        if [[ "${#files[@]}" -eq 0 ]]; then
-          echo "No changed files to lint."
-          exit 0
-        fi
-
-        pre-commit run --files "${files[@]}"
-
-    - name: Mypy
-      run: bash scripts/run-mypy-precommit.sh
+        pre-commit run --all-files
 
     - name: Build frontend
       run: |

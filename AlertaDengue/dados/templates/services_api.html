@@ -2,80 +2,69 @@
 {% load i18n %}
 {% load static %}
 {% load lookup %}
-
 {% block extra_head %}
-<meta property="og:image"
-      content="{% static '/img/screenshot.png' %}"/>
-<meta property="og:image:secure_url"
-      content="{% static '/img/screenshot.png' %}"/>
-
-
-<script src="{% static '/libs/bootstrap-select/bootstrap-select.min.js' %}"
-        type="text/javascript"></script>
-
-<script src="{% static '/js/infodengue.js' %}"
-        type="text/javascript"></script>
-
-<link href="{% static '/libs/bootstrap-select/bootstrap-select.min.css' %}"
-        type="text/css" rel="stylesheet" />
-
-
-<style type="text/css">
+  <meta property="og:image" content="{% static '/img/screenshot.png' %}" />
+  <meta property="og:image:secure_url"
+        content="{% static '/img/screenshot.png' %}" />
+  <script src="{% static '/libs/bootstrap-select/bootstrap-select.min.js' %}"
+          type="text/javascript"></script>
+  <script src="{% static '/js/infodengue.js' %}" type="text/javascript"></script>
+  <link href="{% static '/libs/bootstrap-select/bootstrap-select.min.css' %}"
+        type="text/css"
+        rel="stylesheet" />
+  <style type="text/css">
     .form .col-head {
-        text-align: right;
-        font-weight: bold;
-        vertical-align: middle;
+      text-align: right;
+      font-weight: bold;
+      vertical-align: middle;
     }
 
     .form .row {
-        padding: 5px;
+      padding: 5px;
     }
 
     .word-break {
-        word-break: break-all;
+      word-break: break-all;
     }
 
     .hidden {
-        display: none;
+      display: none;
     }
 
     .download-button-label {
-        margin-left: 0.5rem;
+      margin-left: 0.5rem;
     }
-</style>
-
-<script>
+  </style>
+  <script>
     function geocode_search(val) {
-        var cond = ':contains("' + val.toUpperCase() + '")';
+      var cond = ':contains("' + val.toUpperCase() + '")';
 
-        $('#geocode').prop('selectedIndex',0);
+      $('#geocode').prop('selectedIndex', 0);
 
-        $('#geocode option').not(cond).prop('disabled', true);
-        $('#geocode option').not(cond).addClass('hidden');
-        $('#geocode option' + cond).prop('disabled', false);
-        $('#geocode option' + cond).removeClass('hidden');
+      $('#geocode option').not(cond).prop('disabled', true);
+      $('#geocode option').not(cond).addClass('hidden');
+      $('#geocode option' + cond).prop('disabled', false);
+      $('#geocode option' + cond).removeClass('hidden');
 
-        $('#geocode').prop(
-            'selectedIndex',
-            $('#geocode option' + cond).first().index()
-        );
+      $('#geocode').prop(
+        'selectedIndex',
+        $('#geocode option' + cond).first().index()
+      );
     }
 
-    $(document).ready(function(){
-        $("#geocode-search").on("input", function(e) {
-          geocode_search($(e.target).val());
-        });
+    $(document).ready(function() {
+      $("#geocode-search").on("input", function(e) {
+        geocode_search($(e.target).val());
+      });
 
-        $("#format").on("change", syncDownloadButtonLabel);
-        syncDownloadButtonLabel();
+      $("#format").on("change", syncDownloadButtonLabel);
+      syncDownloadButtonLabel();
     });
-</script>
-
+  </script>
 {% endblock %}
-
 {% block breadcrumbs %}
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
       <li class="breadcrumb-item">
         <a href="/services">{% translate "Dados" %}</a>
       </li>
@@ -83,244 +72,228 @@
         <a href='/services/api'>{% translate "API" %}</a>
       </li>
       <li class="breadcrumb-item active" aria-current="page">{{ services }}</li>
-  </ol>
-</nav>
+    </ol>
+  </nav>
 {% endblock %}
-
-{% block title %}{% translate "API" %}{% endblock %}
-
+{% block title %}
+  {% translate "API" %}
+{% endblock %}
 {% block content %}
-
-
-<form onsubmit="return download();">
+  <form onsubmit="return download();">
     <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-                <a href="{% url 'dados:data_public_services' %}api/doc">
-                    {% translate "Para mais informações, acesse a documentação do serviço da API." %}
-                </a>
-            </div>
-
-            <div class="form-group">
-                <label for="geocode-search">{% translate "Filtro Município (código IBGE, nome do município ou U.F.)" %}:</label>
-
-                <input id="geocode-search" type="text" maxlength="30"
-                       class="form-control  input-sm"
-                       placeholder='{% translate "Digite aqui o filtro desejado para a consulta de municípios" %}'
-                       aria-describedby="geocode-searchHelp"
-                />
-
-                <small id="geocode-searchHelp" class="form-text text-muted">
-                  {% translate "Digite o código IBGE, nome do município ou U.F. para buscar o município desejado." %}
-                </small>
-            </div>
-
-            <div class="form-group">
-                <label for="geocode">{% translate "Município" %}:</label>
-
-                <select id="geocode"
-                        class="form-control"
-                        data-live-search="true"
-                        data-title="{% blocktranslate %}Selecione municipio(s){% endblocktranslate %}"
-                        data-actions-box="true"
-                        data-selected-text-format="static"
-                        aria-describedby="geocodeHelp"
-                        required="required"
-                >
-                    <option value="">{% translate "Selecione o município desejado" %}</option>
-                    {{options_cities|safe}}
-                </select>
-
-                <small id="geocodeHelp" class="form-text text-muted">
-                  {% translate "Selecione o município desejado para a consulta" %}
-                </small>
-            </div>
-
-            <div class="form-group">
-                <label for="epidate_start">{% translate "Data da Semana Epidemiológica de início da consulta" %}</label>
-                <input type="date" class="form-control"
-                       id="epidate_start"
-                       value="{{date_query_start}}"
-                       aria-describedby="date_startHelp"
-                       required="required" style="width:200px;">
-                <small id="date_startHelp" class="form-text text-muted">
-                  {% translate "Selecione um dia da Semana Epidemiológica de início da consulta" %}
-                </small>
-            </div>
-
-            <div class="form-group">
-                <label for="epidate_end">{% translate "Data da Semana Epidemiológica de término da consulta" %}</label>
-                <input type="date" class="form-control"
-                       id="epidate_end"
-                       value="{{date_query_end}}"
-                       aria-describedby="date_endHelp"
-                       required="required" style="width:200px;">
-                <small id="date_endHelp" class="form-text text-muted">
-                  {% translate "Selecione um dia da Semana Epidemiológica de término da consulta" %}
-                </small>
-            </div>
-
-            <div class="form-group">
-                <label for="disease">{% translate "Arbovirose" %}</label>
-                <select id="disease"
-                        class="form-control"
-                        aria-describedby="diseaseHelp"
-                        required="required"
-                >
-                    <option value="dengue" selected="selected">Dengue</option>
-                    <option value="chikungunya">Chikungunya</option>
-                    <option value="zika">Zika</option>
-                </select>
-                <small id="diseaseHelp" class="form-text text-muted">
-                  {% translate "Selecione a arbovirose para a consulta" %}
-                </small>
-            </div>
-
-            <div class="form-group">
-                <label for="format">{% translate "Selecione o formato do arquivo de saída" %}</label>
-                <select id="format"
-                        class="form-control"
-                        aria-describedby="formatHelp"
-                >
-                    <option value="csv" selected="selected">CSV</option>
-                    <option value="json">JSON</option>
-                </select>
-                <small id="formatHelp" class="form-text text-muted">
-                  {% translate "Selecione o formato do arquivo de saída" %}
-                </small>
-            </div>
-
-            <div class="row">
-                <div class="col-md-12 column py-3" id="message-url">
-                </div>
-            </div>
-            <div class="form-group">
-                <button type="submit"
-                        id="download-button"
-                        class="btn btn-primary"
-                        aria-describedby="formatHelp">
-                    <span class="fa fa-download" aria-hidden="true"></span>
-                    <span class="download-button-label">
-                        {% translate "Download" %} <span id="download-format-label">CSV</span>
-                    </span>
-                </button>
-
-            <a class="btn btn-primary" data-toggle="collapse" href="#expan_dict" role="button" aria-expanded="false" aria-controls="expan_dict">
-                {% translate "Mostrar Dicionário de Dados" %}
-            </a>
-            </div>
-            <div class="collapse" id="expan_dict">
-            <div class="card card-body">
-
-                <h5><b>{% translate "Dicionário de Dados" %}</b></h5>
-                <ul>
-                <p><li><b>{% translate "data_ini_SE" %}</b> : {% translate "Primeiro dia da semana epidemiológica (Domingo)" %}</p></li>
-                <p><li><b>{% translate "SE" %}</b>: {% translate "Semana epidemiológica" %}</p></li>
-                <p><li><b>{% translate "casos_est" %}</b> : {% translate "Número estimado de casos por semana usando o modelo de nowcasting (nota: Os valores são atualizados retrospectivamente a cada semana)" %}</p></li>
-                <p><li><b>{% translate "cases_est_min and cases_est_max" %}</b>: {% translate "Intervalo de credibilidade de 95% do número estimado de casos" %}</p></li>
-                <p><li><b>{% translate "casos" %}</b>: {% translate "Número de casos notificados por semana (Os valores são atualizados retrospectivamente todas as semanas)" %}</p></li>
-                <p><li><b>{% translate "p_rt1" %}</b>: {% translate "Probabilidade de (Rt> 1). Para emitir o alerta laranja, usamos o critério p_rt1> 0,95 por 3 semanas ou mais." %}</p></li>
-                <p><li><b>{% translate "p_inc100k" %}</b>: {% translate "Taxa de incidência estimada por 100.000" %}</p></li>
-                <p><li><b>{% translate "Localidade_id" %}</b>: {% translate "Divisão submunicipal (atualmente implementada apenas no Rio de Janeiro)" %}</p></li>
-                <p><li><b>{% translate "nivel" %}</b>: {% translate "Nível de alerta (1 = verde, 2 = amarelo, 3 = laranja, 4 = vermelho), mais detalhes, consulte (Saiba mais)" %}</p></li>
-                <p><li><b>{% translate "id" %}</b>: {% translate "Índice numérico" %}</a></p></li>
-                <p><li><b>{% translate "versao_modelo" %}</b>: {% translate "Versão do modelo (uso interno)" %}</p></li>
-                <p><li><b>{% translate "Rt" %}</b>: {% translate "Estimativa pontual do número reprodutivo de casos, ver " %}<a href="/informacoes/">{% translate "Saiba Mais" %}</a></p></li>
-                <p><li><b>{% translate "pop" %}</b>: {% translate "População estimada (IBGE)" %}</p></li>
-                <p><li><b>{% translate "tempmin" %}</b>: {% translate "Média das temperaturas mínimas diárias ao longo da semana" %}</p></li>
-                <p><li><b>{% translate "tempmed" %}</b>: {% translate "Média das temperaturas diárias ao longo da semana" %}</p></li>
-                <p><li><b>{% translate "tempmax" %}</b>: {% translate "Média das temperaturas máximas diárias ao longo da semana" %}</p></li>
-                <p><li><b>{% translate "umidmin" %}</b>: {% translate "Média da umidade relativa mínima diária do ar ao longo da semana" %}</p></li>
-                <p><li><b>{% translate "umidmed" %}</b>: {% translate "Média da umidade relativa diária do ar ao longo da semana" %}</p></li>
-                <p><li><b>{% translate "umidmax" %}</b>: {% translate "Média da umidade relativa máxima diária do ar ao longo da semana" %}</p></li>
-                <p><li><b>{% translate "receptivo" %}</b>: {% translate "Indica receptividade climática, ou seja, condições para alta capacidade vetorial. 0 = desfavorável, 1 = favorável, 2 = favorável nesta semana e na semana passada, 3 = favorável por pelo menos três semanas (suficiente para completar um ciclo de transmissão)" %}</p></li>
-                <p><li><b>{% translate "transmissao" %}</b>: {% translate "Evidência de transmissão sustentada: 0 = nenhuma evidência, 1 = possível, 2 = provável, 3 = altamente provável" %}</p></li>
-                <p><li><b>{% translate "nivel_inc" %}</b>: {% translate "Incidência estimada abaixo do limiar pré-epidemia, 1 = acima do limiar pré-epidemia, mas abaixo do limiar epidêmico, 2 = acima do limiar epidêmico" %}</p></li>
-                <p><li><b>{% translate "notif_accum_year" %}</b>: {% translate "Número acumulado de casos no ano" %}</p></li>
-                </ul>
-
-            </div>
-            </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <a href="{% url 'dados:data_public_services' %}api/doc">
+            {% translate "Para mais informações, acesse a documentação do serviço da API." %}
+          </a>
         </div>
-    </div>
-</form>
+        <div class="form-group">
+          <label for="geocode-search">{% translate "Filtro Município (código IBGE, nome do município ou U.F.)" %}:</label>
+          <input id="geocode-search"
+                 type="text"
+                 maxlength="30"
+                 class="form-control  input-sm"
+                 placeholder='{% translate "Digite aqui o filtro desejado para a consulta de municípios" %}'
+                 aria-describedby="geocode-searchHelp" />
+          <small id="geocode-searchHelp" class="form-text text-muted">
+            {% translate "Digite o código IBGE, nome do município ou U.F. para buscar o município desejado." %}
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="geocode">{% translate "Município" %}:</label>
+          <select id="geocode"
+                  class="form-control"
+                  data-live-search="true"
+                  data-title="{% blocktranslate %}Selecione municipio(s){% endblocktranslate %}"
+                  data-actions-box="true"
+                  data-selected-text-format="static"
+                  aria-describedby="geocodeHelp"
+                  required="required">
+            <option value="">{% translate "Selecione o município desejado" %}</option>
+            {{ options_cities|safe }}
+          </select>
+          <small id="geocodeHelp" class="form-text text-muted">
+            {% translate "Selecione o município desejado para a consulta" %}
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="epidate_start">{% translate "Data da Semana Epidemiológica de início da consulta" %}</label>
+          <input type="date"
+                 class="form-control"
+                 id="epidate_start"
+                 value="{{ date_query_start }}"
+                 aria-describedby="date_startHelp"
+                 required="required"
+                 style="width:200px">
+          <small id="date_startHelp" class="form-text text-muted">
+            {% translate "Selecione um dia da Semana Epidemiológica de início da consulta" %}
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="epidate_end">{% translate "Data da Semana Epidemiológica de término da consulta" %}</label>
+          <input type="date"
+                 class="form-control"
+                 id="epidate_end"
+                 value="{{ date_query_end }}"
+                 aria-describedby="date_endHelp"
+                 required="required"
+                 style="width:200px">
+          <small id="date_endHelp" class="form-text text-muted">
+            {% translate "Selecione um dia da Semana Epidemiológica de término da consulta" %}
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="disease">{% translate "Arbovirose" %}</label>
+          <select id="disease"
+                  class="form-control"
+                  aria-describedby="diseaseHelp"
+                  required="required">
+            <option value="dengue" selected="selected">Dengue</option>
+            <option value="chikungunya">Chikungunya</option>
+            <option value="zika">Zika</option>
+          </select>
+          <small id="diseaseHelp" class="form-text text-muted">
+            {% translate "Selecione a arbovirose para a consulta" %}
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="format">{% translate "Selecione o formato do arquivo de saída" %}</label>
+          <select id="format" class="form-control" aria-describedby="formatHelp">
+            <option value="csv" selected="selected">CSV</option>
+            <option value="json">JSON</option>
+          </select>
+          <small id="formatHelp" class="form-text text-muted">
+            {% translate "Selecione o formato do arquivo de saída" %}
+          </small>
+        </div>
+        <div class="row">
+          <div class="col-md-12 column py-3" id="message-url"></div>
+        </div>
+        <div class="form-group">
+          <button type="submit"
+                  id="download-button"
+                  class="btn btn-primary"
+                  aria-describedby="formatHelp">
+            <span class="fa fa-download" aria-hidden="true"></span>
+            <span class="download-button-label">
+              {% translate "Download" %} <span id="download-format-label">CSV</span>
+            </span>
+          </button>
+          <a class="btn btn-primary"
+             data-toggle="collapse"
+             href="#expan_dict"
+             role="button"
+             aria-expanded="false"
+             aria-controls="expan_dict">
+            {% translate "Mostrar Dicionário de Dados" %}
+          </a>
+        </div>
+        <div class="collapse" id="expan_dict">
+          <div class="card card-body">
+            <h5><b>{% translate "Dicionário de Dados" %}</b></h5>
+            <ul>
+              <p><li><b>{% translate "data_ini_SE" %}</b> : {% translate "Primeiro dia da semana epidemiológica (Domingo)" %}</p></li>
+                <p><li><b>{% translate "SE" %}</b>: {% translate "Semana epidemiológica" %}</p></li>
+                  <p><li><b>{% translate "casos_est" %}</b> : {% translate "Número estimado de casos por semana usando o modelo de nowcasting (nota: Os valores são atualizados retrospectivamente a cada semana)" %}</p></li>
+                    <p><li><b>{% translate "cases_est_min and cases_est_max" %}</b>: {% translate "Intervalo de credibilidade de 95% do número estimado de casos" %}</p></li>
+                      <p><li><b>{% translate "casos" %}</b>: {% translate "Número de casos notificados por semana (Os valores são atualizados retrospectivamente todas as semanas)" %}</p></li>
+                        <p><li><b>{% translate "p_rt1" %}</b>: {% translate "Probabilidade de (Rt> 1). Para emitir o alerta laranja, usamos o critério p_rt1> 0,95 por 3 semanas ou mais." %}</p></li>
+                          <p><li><b>{% translate "p_inc100k" %}</b>: {% translate "Taxa de incidência estimada por 100.000" %}</p></li>
+                            <p><li><b>{% translate "Localidade_id" %}</b>: {% translate "Divisão submunicipal (atualmente implementada apenas no Rio de Janeiro)" %}</p></li>
+                              <p><li><b>{% translate "nivel" %}</b>: {% translate "Nível de alerta (1 = verde, 2 = amarelo, 3 = laranja, 4 = vermelho), mais detalhes, consulte (Saiba mais)" %}</p></li>
+                                <p><li><b>{% translate "id" %}</b>: {% translate "Índice numérico" %}</a></p></li>
+                                  <p><li><b>{% translate "versao_modelo" %}</b>: {% translate "Versão do modelo (uso interno)" %}</p></li>
+                                    <p><li><b>{% translate "Rt" %}</b>: {% translate "Estimativa pontual do número reprodutivo de casos, ver " %}<a href="/informacoes/">{% translate "Saiba Mais" %}</a></p></li>
+                                      <p><li><b>{% translate "pop" %}</b>: {% translate "População estimada (IBGE)" %}</p></li>
+                                        <p><li><b>{% translate "tempmin" %}</b>: {% translate "Média das temperaturas mínimas diárias ao longo da semana" %}</p></li>
+                                          <p><li><b>{% translate "tempmed" %}</b>: {% translate "Média das temperaturas diárias ao longo da semana" %}</p></li>
+                                            <p><li><b>{% translate "tempmax" %}</b>: {% translate "Média das temperaturas máximas diárias ao longo da semana" %}</p></li>
+                                              <p><li><b>{% translate "umidmin" %}</b>: {% translate "Média da umidade relativa mínima diária do ar ao longo da semana" %}</p></li>
+                                                <p><li><b>{% translate "umidmed" %}</b>: {% translate "Média da umidade relativa diária do ar ao longo da semana" %}</p></li>
+                                                  <p><li><b>{% translate "umidmax" %}</b>: {% translate "Média da umidade relativa máxima diária do ar ao longo da semana" %}</p></li>
+                                                    <p><li><b>{% translate "receptivo" %}</b>: {% translate "Indica receptividade climática, ou seja, condições para alta capacidade vetorial. 0 = desfavorável, 1 = favorável, 2 = favorável nesta semana e na semana passada, 3 = favorável por pelo menos três semanas (suficiente para completar um ciclo de transmissão)" %}</p></li>
+                                                      <p><li><b>{% translate "transmissao" %}</b>: {% translate "Evidência de transmissão sustentada: 0 = nenhuma evidência, 1 = possível, 2 = provável, 3 = altamente provável" %}</p></li>
+                                                        <p><li><b>{% translate "nivel_inc" %}</b>: {% translate "Incidência estimada abaixo do limiar pré-epidemia, 1 = acima do limiar pré-epidemia, mas abaixo do limiar epidêmico, 2 = acima do limiar epidêmico" %}</p></li>
+                                                          <p><li><b>{% translate "notif_accum_year" %}</b>: {% translate "Número acumulado de casos no ano" %}</p></li>
+                                                          </ul>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </form>
+                                                <script>
+                                                  var epiYearStart;
+                                                  var epiWeekStart;
+                                                  var epiYearEnd;
+                                                  var epiWeekEnd;
 
-<script>
-    var epiYearStart;
-    var epiWeekStart;
-    var epiYearEnd;
-    var epiWeekEnd;
+                                                  function syncDownloadButtonLabel() {
+                                                    var format = $('#format option:selected').text();
 
-    function syncDownloadButtonLabel() {
-        var format = $('#format option:selected').text();
+                                                    $('#download-format-label').text(format);
+                                                    $('#download-button').attr(
+                                                      'aria-label',
+                                                      '{% translate "Download" %} ' + format
+                                                    );
+                                                  }
 
-        $('#download-format-label').text(format);
-        $('#download-button').attr(
-            'aria-label',
-            '{% translate "Download" %} ' + format
-        );
-    }
+                                                  function getEpiYearWeek(epidate, func) {
+                                                    var url = '/api/epi_year_week?epidate=' + epidate;
 
-    function getEpiYearWeek(epidate, func) {
-        var url = '/api/epi_year_week?epidate=' + epidate;
+                                                    $.ajax({
+                                                      dataType: 'json',
+                                                      url: url,
+                                                      success: function(data) {
+                                                        func(data)
+                                                      }
+                                                    });
+                                                  }
 
-        $.ajax({
-          dataType: 'json',
-          url: url,
-          success: function(data) {
-            func(data)
-          }
-        });
-    }
+                                                  function download() {
+                                                    getEpiYearWeek(
+                                                      $('#epidate_start').val(),
+                                                      function(result) {
+                                                        epiYearStart = result['epi_year'];
+                                                        epiWeekStart = result['epi_week'];
 
-    function download() {
-        getEpiYearWeek(
-            $('#epidate_start').val(),
-            function(result) {
-                epiYearStart = result['epi_year'];
-                epiWeekStart = result['epi_week'];
+                                                        getEpiYearWeek(
+                                                          $('#epidate_end').val(),
+                                                          function(result) {
+                                                            epiYearEnd = result['epi_year'];
+                                                            epiWeekEnd = result['epi_week'];
 
-                getEpiYearWeek(
-                    $('#epidate_end').val(),
-                    function(result) {
-                        epiYearEnd = result['epi_year'];
-                        epiWeekEnd= result['epi_week'];
+                                                            downloadOpen();
+                                                          }
+                                                        );
+                                                      }
+                                                    );
 
-                        downloadOpen();
-                    }
-                );
-            }
-        );
+                                                    return false;
+                                                  }
 
-        return false;
-    }
+                                                  function downloadOpen() {
+                                                    var url = (
+                                                      '{% url 'api:alertcity'%}/?' +
+                                                      'geocode=<geocode>&' +
+                                                      'disease=<disease>&' +
+                                                      'format=<format>&' +
+                                                      'ew_start=<ew_start>&' +
+                                                      'ey_start=<ey_start>&' +
+                                                      'ew_end=<ew_end>&' +
+                                                      'ey_end=<ey_end>'
+                                                    );
 
-    function downloadOpen() {
-        var url = (
-            '{% url 'api:alertcity'%}/?' +
-            'geocode=<geocode>&' +
-            'disease=<disease>&' +
-            'format=<format>&'+
-            'ew_start=<ew_start>&' +
-            'ey_start=<ey_start>&' +
-            'ew_end=<ew_end>&' +
-            'ey_end=<ey_end>'
-        );
+                                                    var geocode = $('#geocode option:selected').val();
 
-        var geocode = $('#geocode option:selected').val();
+                                                    url = url.replace('<geocode>', geocode);
+                                                    url = url.replace('<disease>', $('#disease option:selected').val());
+                                                    url = url.replace('<format>', $('#format option:selected').val());
+                                                    url = url.replace('<ew_start>', epiWeekStart);
+                                                    url = url.replace('<ey_start>', epiYearStart);
+                                                    url = url.replace('<ew_end>', epiWeekEnd);
+                                                    url = url.replace('<ey_end>', epiYearEnd);
 
-        url = url.replace('<geocode>', geocode);
-        url = url.replace('<disease>', $('#disease option:selected').val());
-        url = url.replace('<format>', $('#format option:selected').val());
-        url = url.replace('<ew_start>', epiWeekStart);
-        url = url.replace('<ey_start>', epiYearStart);
-        url = url.replace('<ew_end>', epiWeekEnd);
-        url = url.replace('<ey_end>', epiYearEnd);
-
-        window.open(url, '_blank');
-    }
-
-
-
-</script>
-{% endblock %}
+                                                    window.open(url, '_blank');
+                                                  }
+                                                </script>
+                                              {% endblock %}

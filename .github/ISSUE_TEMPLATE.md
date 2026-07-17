@@ -15,7 +15,7 @@
 # Entradas / Input
 
 * [Dados / Datos] de entrada / Input data
-* Origem / Origen / Source 
+* Origem / Origen / Source
 * Formatos / Input format
 * Significado de cada atributo / Meaning of each attribute
 
