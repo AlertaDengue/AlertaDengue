@@ -38,12 +38,13 @@ implement models, migrations, or schema changes.
 | Total catalog objects | 31 |
 | Active | 10 |
 | Indirectly used | 2 |
+| External access | 2 |
 | Research-only | 0 |
 | Unused | 0 |
 | Legacy | 16 |
 | Temporary | 1 |
 | Backup | 0 |
-| Unknown | 2 |
+| Unknown | 0 |
 
 ### Retention totals
 
@@ -118,6 +119,9 @@ implement models, migrations, or schema changes.
 - `archive` records an approved future lifecycle action only. No table or
   materialized view is modified by this document.
 - `usage`, `retention`, and `ORM status` are independent classifications.
+- Valid `usage` classifications in this inventory are `active`,
+  `indirectly-used`, `external-access`, `research-only`, `unused`, `legacy`,
+  `temporary`, `backup`, and `unknown`.
 - Current code references are documented even when maintainers have approved an
   object for legacy/archive handling.
 
@@ -150,7 +154,7 @@ implement models, migrations, or schema changes.
 | `Historico_alerta_zika` | table | active | retain | map-unmanaged | read-write-external | `postgres` | none | raw SQL | PK `id`; unique `("SE", municipio_geocodigo, "Localidade_id")`; approx. rows `4057247`; size `1328365568` bytes | Read through disease-suffix SQL in current code. No current Django model exists for this table. |
 | `Localidade` | table | legacy | archive | do-not-map | unknown | `administrador` | none | no runtime evidence found | PK `id`; approx. rows `10`; size `1400832` bytes | `Localidade` belonged to the legacy Redemet workflow. Maintainers approved archival and no ORM mapping. Physical archival requires a separate reviewed database change after the `Ovitrampa.Localidade_id` dependency is resolved. |
 | `Notificacao` | table | active | retain | map-unmanaged | read-write-application | `administrador` | none | raw SQL and ingestion UPSERT | PK `id`; unique `(nu_notific, dt_notific, cid10_codigo, municipio_geocodigo)`; approx. rows `37097472`; size `13733748736` bytes | Queried by `api/internal/services.py` and `api/db.py`; written by `ingestion/tasks.py` merge logic. No current Django model exists for this table, so intended ORM work remains separate from current ownership. |
-| `Ovitrampa` | table | unknown | retain | map-unmanaged | unknown | `administrador` | none | no runtime evidence found | PK `id`; FK `Localidade_id -> Municipio.Localidade(id)`; approx. rows `0`; size `8192` bytes | The table is explicitly approved for retention and unmanaged ORM mapping. Suggested model: `Ovitrap` with primary key `id`. `Localidade_id` currently references `Municipio.Localidade(id)`, but `Localidade` is approved for archival and must not receive an ORM model. The `Ovitrap` model must not require a mapped `Localidade` model; the legacy FK column may need to be represented through its raw database column or another explicitly reviewed strategy. Physical archival of `Localidade` requires a separate reviewed database change that resolves this dependency first. |
+| `Ovitrampa` | table | external-access | retain | map-unmanaged | unknown | `administrador` | none | no runtime evidence found | PK `id`; FK `Localidade_id -> Municipio.Localidade(id)`; approx. rows `0`; size `8192` bytes | The table is retained for confirmed external access and future unmanaged ORM mapping. Suggested model: `Ovitrap` with primary key `id`. `Localidade_id` currently references `Municipio.Localidade(id)`, but `Localidade` is approved for archival and must not receive an ORM model. The `Ovitrap` model must not require a mapped `Localidade` model; the legacy FK column may need to be represented through its raw database column or another explicitly reviewed strategy. Access policy remains unresolved in current evidence. Physical archival of `Localidade` requires a separate reviewed database change that resolves this dependency first. |
 | `Tweet` | table | legacy | archive | do-not-map | unknown | `administrador` | none | no runtime evidence found | PK `id`; FK `CID10_codigo -> Dengue_global.CID10(codigo)`; approx. rows `3879263`; size `317546496` bytes | `Tweet` contains historical data but must not receive an ORM model. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
 | `alerta_mrj` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; unique `(aps, se)`; approx. rows `6274`; size `1114112` bytes | This table belongs to a retired reporting workflow. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
 | `alerta_mrj_chik` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; unique `(aps, se)`; approx. rows `6270`; size `1114112` bytes | This table belongs to a retired reporting workflow. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
@@ -168,7 +172,7 @@ No live objects were found in `forecast`, and no target-schema objects from
 | Object | Type | Usage | Retention | ORM status | Access | Database owner | Django ownership | Current query mechanism | Catalog summary | Evidence and notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `copernicus_arg` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | no PK; approx. rows `4420298`; size `729317376` bytes | `copernicus_arg` is approved for archival and must not receive an ORM model. This PR records lifecycle and ORM decisions only. |
-| `copernicus_bra` | table | unknown | pending-decision | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | no PK; unique `(date, geocode)`; approx. rows `51006972`; size `10261078016` bytes | Present live and in the dump, but no current Python runtime reference was found. |
+| `copernicus_bra` | table | external-access | pending-decision | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | no PK; unique `(date, geocode)`; approx. rows `51006972`; size `10261078016` bytes | Present live and in the dump. Confirmed external consumers exist outside the AlertaDengue application, but retention and access policy still require a separate decision. |
 | `copernicus_foz_do_iguacu` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `index`; approx. rows `86496`; size `8462336` bytes | `copernicus_foz_do_iguacu` is approved for archival and must not receive an ORM model. This PR records lifecycle and ORM decisions only. |
 
 ## Schema `episcanner`
@@ -218,7 +222,7 @@ No live objects were found in `forecast`, and no target-schema objects from
 
 ### Pending decisions
 
-- ownership and retention of `weather.copernicus_bra`
+- retention and access policy for `weather.copernicus_bra`
 - write policy for `Municipio.Ovitrampa`
 - handling of the legacy `Ovitrampa.Localidade_id` relationship
 - code removal or replacement required before archiving
@@ -269,9 +273,11 @@ Additional constraints:
 ## Remaining Blockers
 
 - `weather.copernicus_bra`
-  - remains `usage: unknown`, `retention: pending-decision`,
+  - remains `usage: external-access`, `retention: pending-decision`,
     `orm_status: do-not-map`, `access: unknown`, `django ownership: none`
 - `Municipio.Ovitrampa`
+  - remains `usage: external-access`, `retention: retain`,
+    `orm_status: map-unmanaged`, `access: unknown`, `django ownership: none`
   - write policy remains unverified in current repository evidence
 - `Municipio.Ovitrampa` and `Municipio.Localidade`
   - the legacy `Localidade_id` foreign-key relationship needs an explicitly
