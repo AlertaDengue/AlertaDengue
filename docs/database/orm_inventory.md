@@ -173,7 +173,7 @@ not be confused with PostgreSQL schemas.
 | `alerta_mrj` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; unique `(aps, se)`; approx. rows `6274`; size `1114112` bytes | This table belongs to a retired reporting workflow. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
 | `alerta_mrj_chik` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; unique `(aps, se)`; approx. rows `6270`; size `1114112` bytes | This table belongs to a retired reporting workflow. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
 | `alerta_mrj_zika` | table | legacy | archive | do-not-map | unknown | `postgres` | none | no runtime evidence found | PK `id`; unique `(aps, se)`; size `24576` bytes | This table belongs to a retired reporting workflow. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
-| `historico_casos` | materialized view | legacy | archive | do-not-map | read-only | `dengueadmin` | none | raw SQL | no PK; approx. rows `4796063`; size `358580224` bytes | The materialized view is queried only by `NotificationResume.tail_estimated_cases()` in `dados/dbdata.py`. That method is currently called by `AlertaStateView` in `dados/views.py`, and `AlertaStateView` is currently registered for `/alerta/<state>/<disease>`. Maintainers have classified this flow as legacy. Physical archival of this materialized view requires a separate code change that removes or replaces this call path first. This PR records lifecycle and ORM decisions only. |
+| `historico_casos` | materialized view | legacy | archive | do-not-map | read-only | `dengueadmin` | none | no runtime evidence found | no PK; approx. rows `4796063`; size `358580224` bytes | Its incorrect disease-combining semantics were removed from the application by replacing the legacy dashboard query with disease-specific `Historico_alerta*` queries. No current application reference remains. It is ready for a separate reviewed archival change only after deployment validation. |
 | `sprint202425` | table | temporary | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; approx. rows `4187433`; size `655433728` bytes | Time-bounded working table. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
 
 ## Schema `forecast`
@@ -239,7 +239,7 @@ No live objects were found in `forecast`, and no target-schema objects from
 - retention and access policy for `weather.copernicus_bra`
 - write policy for `Municipio.Ovitrampa`
 - handling of the legacy `Ovitrampa.Localidade_id` relationship
-- code removal or replacement required before archiving
+- deployment validation required before separately archiving
   `Municipio.historico_casos`
 - database foreign-key handling required before archiving
   `Municipio.Localidade`
@@ -279,8 +279,8 @@ issue and database change.
 
 Additional constraints:
 
-- `historico_casos` must not be archived until its current application call
-  path is removed or replaced.
+- `historico_casos` must not be archived until the replacement application
+  path has been validated after deployment.
 - `Localidade` must not be archived until the
   `Ovitrampa.Localidade_id` dependency is resolved.
 
@@ -297,7 +297,26 @@ Additional constraints:
   - the legacy `Localidade_id` foreign-key relationship needs an explicitly
     reviewed ORM and database strategy before `Localidade` can be archived
 - `Municipio.historico_casos`
-  - current legacy application call path must be removed or replaced before
-    archival
+  - replacement disease-specific queries require deployment validation before
+    a separate reviewed archival change
 - External consumers not covered by this repository
   - still unverified where relevant
+
+## Related `public` materialized views
+
+These objects are outside the original schema inventory scope. No database
+object is modified by this application-code change.
+
+- `public.city_count_by_uf_dengue_materialized_view`,
+  `public.city_count_by_uf_chikungunya_materialized_view`, and
+  `public.city_count_by_uf_zika_materialized_view` remain in use for the
+  homepage's existing monitored-municipality count. A direct full-history
+  count reproduced the existing values across all 81 UF/disease combinations,
+  but representative queries scanned millions of historical rows and were not
+  suitable for the homepage request path. These views therefore remain active
+  and are not archival candidates in this PR.
+- The retained count preserves the established “Municípios monitorados”
+  population. No database object is modified by this PR; any future physical
+  archival belongs to a separate reviewed database change.
+- `public.epiyear_summary_materialized_view` remains pending external-consumer
+  verification because the public `/api/notif_reduced` endpoint is retained.
