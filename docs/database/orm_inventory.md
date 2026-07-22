@@ -6,6 +6,20 @@ Scope: `Dengue_global`, `Municipio`, `forecast`, `weather`, `episcanner`
 
 This document is a Phase 1 inventory for ORM planning only. It does not
 implement models, migrations, or schema changes.
+The Phase 1 catalog inventory intentionally covers only `Dengue_global`,
+`Municipio`, `forecast`, `weather`, and `episcanner`, because those schemas
+require classification of retained, external, legacy, unmanaged, or
+unresolved database objects. The application-owned PostgreSQL schema
+`ingestion` is outside this inventory scope. Its `run` and `sinan_stage`
+tables already have canonical Django models, `ingestion.Run` mapped to
+`"ingestion"."run"` and `ingestion.SinanStage` mapped to
+`"ingestion"."sinan_stage"`, and migration
+`AlertaDengue/ingestion/migrations/0001_initial.py` creates the PostgreSQL
+schema plus both tables. Those objects are application-owned and
+migration-managed, so they are not candidates for unmanaged ORM mapping and
+must not be added to the 31-object inventory. `AlertaDengue/ingestion/schemas.py`
+contains Python/Pydantic validation schemas for ingestion payloads and must
+not be confused with PostgreSQL schemas.
 
 ## Method
 
