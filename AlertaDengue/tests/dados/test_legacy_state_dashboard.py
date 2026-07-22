@@ -12,43 +12,142 @@ import pytest
 from sqlalchemy.sql.elements import BindParameter
 
 from api.views import NotificationReducedCSV_View
-from dados.dbdata import get_estimated_cases_by_cities
+from dados.dbdata import (
+    QUERY_CACHE_TIMEOUT,
+    count_monitored_municipalities,
+    get_estimated_cases_by_cities,
+)
 from dados.views import (
     AlertaStateView,
     ChartsMainView,
-    _count_municipalities,
 )
 
 
 @pytest.mark.parametrize(
-    ("geocodes", "expected"),
+    ("disease", "view_name"),
     [
-        ([3304557, 3304557], 1),
-        ([3304557, 3550308], 2),
-        ([3304557, None, float("nan")], 1),
-        ([], 0),
+        ("dengue", "city_count_by_uf_dengue_materialized_view"),
+        (
+            "chikungunya",
+            "city_count_by_uf_chikungunya_materialized_view",
+        ),
+        ("zika", "city_count_by_uf_zika_materialized_view"),
     ],
 )
-def test_count_municipalities_uses_distinct_non_null_geocodes(
-    geocodes: list[object], expected: int
+@patch("dados.dbdata.cache")
+def test_monitored_count_uses_disease_view_and_binds_state(
+    query_cache: MagicMock,
+    disease: str,
+    view_name: str,
 ) -> None:
-    frame = pd.DataFrame({"municipio_geocodigo": geocodes})
+    engine = MagicMock()
+    result = (
+        engine.connect.return_value.__enter__.return_value.execute.return_value
+    )
+    result.scalar_one_or_none.return_value = 92
+    query_cache.get.return_value = None
 
-    count = _count_municipalities(frame)
+    count = count_monitored_municipalities(
+        state_name="Rio de Janeiro",
+        disease=disease,
+        db_engine=engine,
+    )
 
-    assert count == expected
+    statement, params = (
+        engine.connect.return_value.__enter__.return_value.execute.call_args.args
+    )
+    assert f"public.{view_name}" in str(statement)
+    assert "WHERE uf = :state_name" in str(statement)
+    assert params == {"state_name": "Rio de Janeiro"}
+    assert count == 92
     assert isinstance(count, int)
+    cache_key = f"count_monitored_municipalities:Rio de Janeiro:{disease}"
+    query_cache.get.assert_called_once_with(cache_key)
+    query_cache.set.assert_called_once_with(cache_key, 92, QUERY_CACHE_TIMEOUT)
 
 
-def test_count_municipalities_accepts_empty_state_history() -> None:
-    assert _count_municipalities(pd.DataFrame()) == 0
+def test_monitored_count_rejects_invalid_disease() -> None:
+    with pytest.raises(ValueError, match="Unsupported disease"):
+        count_monitored_municipalities("Rio de Janeiro", "influenza")
+
+
+@patch("dados.dbdata.cache")
+def test_monitored_count_returns_and_caches_zero_for_missing_row(
+    query_cache: MagicMock,
+) -> None:
+    engine = MagicMock()
+    result = (
+        engine.connect.return_value.__enter__.return_value.execute.return_value
+    )
+    result.scalar_one_or_none.return_value = None
+    query_cache.get.return_value = None
+
+    count = count_monitored_municipalities(
+        "Rio de Janeiro", "dengue", db_engine=engine
+    )
+
+    assert count == 0
+    assert isinstance(count, int)
+    cache_key = "count_monitored_municipalities:Rio de Janeiro:dengue"
+    query_cache.get.assert_called_once_with(cache_key)
+    query_cache.set.assert_called_once_with(cache_key, 0, QUERY_CACHE_TIMEOUT)
+
+
+@pytest.mark.parametrize("cached_count", [0, 92])
+@patch("dados.dbdata.cache")
+def test_monitored_count_cache_hit_does_not_connect(
+    query_cache: MagicMock,
+    cached_count: int,
+) -> None:
+    query_cache.get.return_value = cached_count
+    engine = MagicMock()
+
+    count = count_monitored_municipalities(
+        "Rio de Janeiro", "dengue", db_engine=engine
+    )
+
+    assert count == cached_count
+    assert isinstance(count, int)
+    query_cache.get.assert_called_once_with(
+        "count_monitored_municipalities:Rio de Janeiro:dengue"
+    )
+    query_cache.set.assert_not_called()
+    engine.connect.assert_not_called()
+
+
+@patch("dados.dbdata.cache")
+def test_monitored_count_cache_separates_state_and_disease(
+    query_cache: MagicMock,
+) -> None:
+    query_cache.get.side_effect = [78, 853]
+    engine = MagicMock()
+
+    assert (
+        count_monitored_municipalities(
+            "Espírito Santo", "zika", db_engine=engine
+        )
+        == 78
+    )
+    assert (
+        count_monitored_municipalities(
+            "Minas Gerais", "zika", db_engine=engine
+        )
+        == 853
+    )
+    assert query_cache.get.call_args_list == [
+        call("count_monitored_municipalities:Espírito Santo:zika"),
+        call("count_monitored_municipalities:Minas Gerais:zika"),
+    ]
+    engine.connect.assert_not_called()
 
 
 @patch("dados.views._create_stack_chart", return_value="stack")
 @patch("dados.views.data_hist_uf")
+@patch("dados.views.count_monitored_municipalities")
 @patch.object(ChartsMainView, "get_img_map", return_value="map")
 def test_charts_main_view_preserves_count_cities_context(
     _get_img_map: MagicMock,
+    monitored_count: MagicMock,
     data_hist_uf: MagicMock,
     _create_stack_chart: MagicMock,
 ) -> None:
@@ -69,14 +168,20 @@ def test_charts_main_view_preserves_count_cities_context(
         state_history([3304557]),
         state_history([3304557, 3550308, 4106902]),
     ]
+    monitored_count.side_effect = [92, 91, 90]
 
     context = ChartsMainView().get_context_data(state="RJ")
 
     assert context["count_cities"] == {
-        "dengue": {"RJ": 2},
-        "chikungunya": {"RJ": 1},
-        "zika": {"RJ": 3},
+        "dengue": {"RJ": 92},
+        "chikungunya": {"RJ": 91},
+        "zika": {"RJ": 90},
     }
+    assert monitored_count.call_args_list == [
+        call(state_name="Rio de Janeiro", disease="dengue"),
+        call(state_name="Rio de Janeiro", disease="chikungunya"),
+        call(state_name="Rio de Janeiro", disease="zika"),
+    ]
     assert data_hist_uf.call_args_list == [
         call(state_abbv="RJ", disease="dengue"),
         call(state_abbv="RJ", disease="chikungunya"),

@@ -132,6 +132,12 @@ HIST_UF_MATERIALIZED_VIEWS: Final[dict[str, str]] = {
     "zika": "hist_uf_zika_materialized_view",
 }
 
+CITY_COUNT_MATERIALIZED_VIEWS: Final[dict[str, str]] = {
+    "dengue": "city_count_by_uf_dengue_materialized_view",
+    "chikungunya": "city_count_by_uf_chikungunya_materialized_view",
+    "zika": "city_count_by_uf_zika_materialized_view",
+}
+
 
 def _read_sql_df(
     engine: Engine,
@@ -172,6 +178,31 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
 
     cache.set(cache_name, res, QUERY_CACHE_TIMEOUT)
     return res
+
+
+def count_monitored_municipalities(
+    state_name: str,
+    disease: str,
+    db_engine: Engine = DB_ENGINE,
+) -> int:
+    """Return the established full-history municipality count (cached)."""
+    view = CITY_COUNT_MATERIALIZED_VIEWS.get(disease)
+    if view is None:
+        raise ValueError(f"Unsupported disease: {disease!r}")
+
+    cache_name = f"count_monitored_municipalities:{state_name}:{disease}"
+    cached = cache.get(cache_name)
+    if cached is not None:
+        return int(cached)
+
+    stmt = text(f"SELECT city_count FROM public.{view} WHERE uf = :state_name")
+    with db_engine.connect() as conn:
+        result = conn.execute(stmt, {"state_name": state_name})
+        value = result.scalar_one_or_none()
+
+    count = int(value) if value is not None else 0
+    cache.set(cache_name, count, QUERY_CACHE_TIMEOUT)
+    return count
 
 
 class RegionalParameters:

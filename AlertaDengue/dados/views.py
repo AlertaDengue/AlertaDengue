@@ -51,6 +51,7 @@ from .dbdata import (  # get_notification_cases,
     ReportCity,
     ReportParameters,
     ReportState,
+    count_monitored_municipalities,
     data_hist_uf,
     get_cities_alert_by_state,
     get_city_alert,
@@ -232,13 +233,6 @@ def _get_disease_label(disease_code: str) -> str | None:
 
 def _get_state_name(state: str) -> str:
     return cast(str, STATE_NAME[state])
-
-
-def _count_municipalities(state_history: pd.DataFrame) -> int:
-    """Count distinct non-null municipalities in state-history data."""
-    if state_history.empty:
-        return 0
-    return int(state_history["municipio_geocodigo"].nunique(dropna=True))
 
 
 def hex_to_rgb(value):
@@ -633,6 +627,7 @@ class ChartsMainView(TemplateView):
         }
         states_alert: dict[str, str] = {}
         state_abbv = cast(str, context["state"])
+        state_name = _get_state_name(state_abbv)
         states_alert[state_abbv] = state_abbv
 
         # Use as an argument to fetch in database
@@ -647,7 +642,10 @@ class ChartsMainView(TemplateView):
             )
 
             df = data_hist_uf(state_abbv=state_abbv, disease=disease)
-            count_cities[disease][state_abbv] = _count_municipalities(df)
+            count_cities[disease][state_abbv] = count_monitored_municipalities(
+                state_name=state_name,
+                disease=disease,
+            )
 
             if disease == "dengue":
                 if not df.empty:
