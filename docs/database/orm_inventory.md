@@ -308,9 +308,15 @@ These objects are outside the original schema inventory scope. No database
 object is modified by this application-code change.
 
 - `public.city_count_by_uf_dengue_materialized_view`,
-  `public.city_count_by_uf_chik_materialized_view`, and
-  `public.city_count_by_uf_zika_materialized_view` are archival candidates after
-  deployment validation; their application query was replaced by a distinct
-  municipality count from the already-loaded disease-specific state history.
+  `public.city_count_by_uf_chikungunya_materialized_view`, and
+  `public.city_count_by_uf_zika_materialized_view` remain in use for the
+  homepage's existing monitored-municipality count. A direct full-history
+  count reproduced the existing values across all 81 UF/disease combinations,
+  but representative queries scanned millions of historical rows and were not
+  suitable for the homepage request path. These views therefore remain active
+  and are not archival candidates in this PR.
+- The retained count preserves the established “Municípios monitorados”
+  population. No database object is modified by this PR; any future physical
+  archival belongs to a separate reviewed database change.
 - `public.epiyear_summary_materialized_view` remains pending external-consumer
   verification because the public `/api/notif_reduced` endpoint is retained.
