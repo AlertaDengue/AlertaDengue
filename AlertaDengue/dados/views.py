@@ -47,13 +47,14 @@ from .dbdata import (  # get_notification_cases,
     STATE_INITIAL,
     STATE_NAME,
     UF_CODES,
-    NotificationResume,
     RegionalParameters,
     ReportCity,
     ReportParameters,
     ReportState,
     data_hist_uf,
+    get_cities_alert_by_state,
     get_city_alert,
+    get_estimated_cases_by_cities,
     get_last_alert,
     get_last_SE,
 )
@@ -231,6 +232,13 @@ def _get_disease_label(disease_code: str) -> str | None:
 
 def _get_state_name(state: str) -> str:
     return cast(str, STATE_NAME[state])
+
+
+def _count_municipalities(state_history: pd.DataFrame) -> int:
+    """Count distinct non-null municipalities in state-history data."""
+    if state_history.empty:
+        return 0
+    return int(state_history["municipio_geocodigo"].nunique(dropna=True))
 
 
 def hex_to_rgb(value):
@@ -624,10 +632,7 @@ class ChartsMainView(TemplateView):
             disease: 0 for disease in diseases
         }
         states_alert: dict[str, str] = {}
-        notif_resume = NotificationResume
-
         state_abbv = cast(str, context["state"])
-        state_name = _get_state_name(state_abbv)
         states_alert[state_abbv] = state_abbv
 
         # Use as an argument to fetch in database
@@ -641,12 +646,8 @@ class ChartsMainView(TemplateView):
                 state_abbv, disease
             )
 
-            # count_cities_by_uf('Santa Catarina', 'dengue')
-            count_cities[disease][state_abbv] = (
-                notif_resume.count_cities_by_uf(state_name, disease)
-            )
-
             df = data_hist_uf(state_abbv=state_abbv, disease=disease)
+            count_cities[disease][state_abbv] = _count_municipalities(df)
 
             if disease == "dengue":
                 if not df.empty:
@@ -1222,7 +1223,7 @@ class AlertaStateView(TemplateView):
         state = cast(str, context["state"])
         disease = cast(str, context["disease"])
 
-        cities_alert = NotificationResume.get_cities_alert_by_state(
+        cities_alert = get_cities_alert_by_state(
             _get_state_name(state),
             disease,
         )
@@ -1238,7 +1239,11 @@ class AlertaStateView(TemplateView):
         geo_ids = list(mun_dict.keys())
 
         if geo_ids:
-            df = NotificationResume.tail_estimated_cases(geo_ids, 12)
+            df = get_estimated_cases_by_cities(
+                geo_ids=geo_ids,
+                disease=disease,
+                n=12,
+            )
             if isinstance(df, pd.DataFrame) and not df.empty:
                 df = df.sort_values(["municipio_geocodigo", "data_iniSE"])
                 case_series = {
