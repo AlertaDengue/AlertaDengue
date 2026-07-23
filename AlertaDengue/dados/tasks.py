@@ -3,6 +3,7 @@ from typing import Literal
 
 from celery.schedules import crontab
 from episcanner.scanner import EpiScanner
+from epiweeks import Week
 import pandas as pd
 from sqlalchemy import text
 
@@ -44,8 +45,8 @@ def _fetch_alert_data(
     long_name = _normalize_disease(disease)
     suffix = get_disease_suffix(long_name)
     state_name = ALL_STATE_NAMES[state_abbr][0]
-    se_start = year * 100 + 1
-    se_end = year * 100 + 53
+    se_start = int(Week(year - 1, 45).cdcformat())
+    se_end = int(Week(year, 44).cdcformat())
 
     sql = f"""
     SELECT
