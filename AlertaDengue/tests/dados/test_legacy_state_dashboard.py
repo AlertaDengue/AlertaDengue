@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import date
 from unittest.mock import MagicMock, call, patch
 
+from django.core.cache import cache
 from django.test import RequestFactory
 from django.urls import resolve, reverse
 import pandas as pd
@@ -14,13 +15,18 @@ from sqlalchemy.sql.elements import BindParameter
 from api.views import NotificationReducedCSV_View
 from dados.dbdata import (
     QUERY_CACHE_TIMEOUT,
+    _build_monitored_municipalities_cache_key,
     count_monitored_municipalities,
     get_estimated_cases_by_cities,
 )
-from dados.views import (
-    AlertaStateView,
-    ChartsMainView,
-)
+from dados.views import AlertaStateView, ChartsMainView
+
+
+def _assert_memcached_safe(key: str) -> None:
+    assert key
+    assert len(key.encode("ascii")) < 250
+    assert all(32 <= ord(char) <= 126 for char in key)
+    assert not any(char.isspace() for char in key)
 
 
 @pytest.mark.parametrize(
@@ -50,6 +56,7 @@ def test_monitored_count_uses_disease_view_and_binds_state(
     count = count_monitored_municipalities(
         state_name="Rio de Janeiro",
         disease=disease,
+        state_abbv="RJ",
         db_engine=engine,
     )
 
@@ -61,7 +68,7 @@ def test_monitored_count_uses_disease_view_and_binds_state(
     assert params == {"state_name": "Rio de Janeiro"}
     assert count == 92
     assert isinstance(count, int)
-    cache_key = f"count_monitored_municipalities:Rio de Janeiro:{disease}"
+    cache_key = f"count_monitored_municipalities:rj:{disease}"
     query_cache.get.assert_called_once_with(cache_key)
     query_cache.set.assert_called_once_with(cache_key, 92, QUERY_CACHE_TIMEOUT)
 
@@ -83,12 +90,15 @@ def test_monitored_count_returns_and_caches_zero_for_missing_row(
     query_cache.get.return_value = None
 
     count = count_monitored_municipalities(
-        "Rio de Janeiro", "dengue", db_engine=engine
+        "Rio de Janeiro",
+        "dengue",
+        state_abbv="RJ",
+        db_engine=engine,
     )
 
     assert count == 0
     assert isinstance(count, int)
-    cache_key = "count_monitored_municipalities:Rio de Janeiro:dengue"
+    cache_key = "count_monitored_municipalities:rj:dengue"
     query_cache.get.assert_called_once_with(cache_key)
     query_cache.set.assert_called_once_with(cache_key, 0, QUERY_CACHE_TIMEOUT)
 
@@ -103,13 +113,16 @@ def test_monitored_count_cache_hit_does_not_connect(
     engine = MagicMock()
 
     count = count_monitored_municipalities(
-        "Rio de Janeiro", "dengue", db_engine=engine
+        "Rio de Janeiro",
+        "dengue",
+        state_abbv="RJ",
+        db_engine=engine,
     )
 
     assert count == cached_count
     assert isinstance(count, int)
     query_cache.get.assert_called_once_with(
-        "count_monitored_municipalities:Rio de Janeiro:dengue"
+        "count_monitored_municipalities:rj:dengue"
     )
     query_cache.set.assert_not_called()
     engine.connect.assert_not_called()
@@ -124,21 +137,69 @@ def test_monitored_count_cache_separates_state_and_disease(
 
     assert (
         count_monitored_municipalities(
-            "Espírito Santo", "zika", db_engine=engine
+            "Espírito Santo",
+            "zika",
+            state_abbv="ES",
+            db_engine=engine,
         )
         == 78
     )
     assert (
         count_monitored_municipalities(
-            "Minas Gerais", "zika", db_engine=engine
+            "Minas Gerais",
+            "zika",
+            state_abbv="MG",
+            db_engine=engine,
         )
         == 853
     )
     assert query_cache.get.call_args_list == [
-        call("count_monitored_municipalities:Espírito Santo:zika"),
-        call("count_monitored_municipalities:Minas Gerais:zika"),
+        call("count_monitored_municipalities:es:zika"),
+        call("count_monitored_municipalities:mg:zika"),
     ]
     engine.connect.assert_not_called()
+
+
+def test_count_monitored_municipalities_key_uses_uf_for_states_with_spaces() -> (
+    None
+):
+    key = _build_monitored_municipalities_cache_key(
+        state_name="Rio de Janeiro",
+        disease="dengue",
+        state_abbv="RJ",
+    )
+
+    assert key == "count_monitored_municipalities:rj:dengue"
+    _assert_memcached_safe(key)
+
+
+def test_count_monitored_municipalities_key_normalizes_non_ascii_state_name() -> (
+    None
+):
+    key = _build_monitored_municipalities_cache_key(
+        state_name="Espírito Santo",
+        disease="dengue",
+    )
+
+    assert key == "count_monitored_municipalities:espirito-santo:dengue"
+    _assert_memcached_safe(key)
+
+
+def test_count_monitored_municipalities_key_varies_by_disease() -> None:
+    dengue_key = _build_monitored_municipalities_cache_key(
+        state_name="São Paulo",
+        disease="dengue",
+        state_abbv="SP",
+    )
+    zika_key = _build_monitored_municipalities_cache_key(
+        state_name="São Paulo",
+        disease="zika",
+        state_abbv="SP",
+    )
+
+    assert dengue_key != zika_key
+    _assert_memcached_safe(dengue_key)
+    _assert_memcached_safe(zika_key)
 
 
 @patch("dados.views._create_stack_chart", return_value="stack")
@@ -178,15 +239,145 @@ def test_charts_main_view_preserves_count_cities_context(
         "zika": {"RJ": 90},
     }
     assert monitored_count.call_args_list == [
-        call(state_name="Rio de Janeiro", disease="dengue"),
-        call(state_name="Rio de Janeiro", disease="chikungunya"),
-        call(state_name="Rio de Janeiro", disease="zika"),
+        call(state_name="Rio de Janeiro", disease="dengue", state_abbv="RJ"),
+        call(
+            state_name="Rio de Janeiro",
+            disease="chikungunya",
+            state_abbv="RJ",
+        ),
+        call(state_name="Rio de Janeiro", disease="zika", state_abbv="RJ"),
     ]
     assert data_hist_uf.call_args_list == [
         call(state_abbv="RJ", disease="dengue"),
         call(state_abbv="RJ", disease="chikungunya"),
         call(state_abbv="RJ", disease="zika"),
     ]
+
+
+class _FakeResult:
+    def __init__(self, row: tuple[int] | None) -> None:
+        self._row = row
+
+    def fetchone(self) -> tuple[int] | None:
+        return self._row
+
+    def scalar_one_or_none(self) -> int | None:
+        if self._row is None:
+            return None
+        return self._row[0]
+
+
+class _FakeConnection:
+    def __init__(
+        self,
+        row: tuple[int] | None,
+        calls: list[dict[str, object]],
+    ) -> None:
+        self._row = row
+        self._calls = calls
+
+    def execute(self, stmt, params):
+        self._calls.append({"stmt": str(stmt), "params": dict(params)})
+        return _FakeResult(self._row)
+
+    def __enter__(self) -> _FakeConnection:
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        return None
+
+
+class _FakeEngine:
+    def __init__(self, row: tuple[int] | None = (7,)) -> None:
+        self.calls: list[dict[str, object]] = []
+        self._row = row
+
+    def connect(self) -> _FakeConnection:
+        return _FakeConnection(self._row, self.calls)
+
+
+@pytest.fixture(autouse=True)
+def clear_cache() -> None:
+    cache.clear()
+    yield
+    cache.clear()
+
+
+def test_count_monitored_municipalities_reuses_cached_result() -> None:
+    engine = _FakeEngine(row=(9,))
+
+    first = count_monitored_municipalities(
+        state_name="Rio de Janeiro",
+        disease="dengue",
+        state_abbv="RJ",
+        db_engine=engine,
+    )
+    second = count_monitored_municipalities(
+        state_name="Rio de Janeiro",
+        disease="dengue",
+        state_abbv="RJ",
+        db_engine=engine,
+    )
+
+    assert first == 9
+    assert second == 9
+    assert len(engine.calls) == 1
+    assert engine.calls[0]["params"] == {"state_name": "Rio de Janeiro"}
+
+
+def test_chartshome_rj_returns_200_with_real_helper(
+    monkeypatch: pytest.MonkeyPatch,
+    rf: RequestFactory,
+) -> None:
+    engine = _FakeEngine(row=(12,))
+    real_helper = count_monitored_municipalities
+
+    def _real_helper_with_fake_engine(
+        state_name: str,
+        disease: str = "dengue",
+        state_abbv: str | None = None,
+        db_engine=None,
+    ) -> int:
+        return real_helper(
+            state_name=state_name,
+            disease=disease,
+            state_abbv=state_abbv,
+            db_engine=engine,
+        )
+
+    df = pd.DataFrame(
+        {
+            "SE": [202401],
+            "casos_est": [5],
+            "casos": [3],
+            "municipio_geocodigo": [3304557],
+            "nivel": [2],
+            "state_abbv": ["RJ"],
+        }
+    )
+
+    monkeypatch.setattr(
+        "dados.views.count_monitored_municipalities",
+        _real_helper_with_fake_engine,
+    )
+    monkeypatch.setattr("dados.views.data_hist_uf", lambda **_: df.copy())
+    monkeypatch.setattr(
+        "dados.views._create_scatter_chart", lambda df: "<div>scatter</div>"
+    )
+    monkeypatch.setattr(
+        "dados.views._create_indicator_chart",
+        lambda df, state_abbv: "<div>indicator</div>",
+    )
+    monkeypatch.setattr(
+        "dados.views._create_stack_chart", lambda df: "<div>stack</div>"
+    )
+
+    request = rf.get("/chartshome/RJ")
+    response = ChartsMainView.as_view()(request, state="RJ")
+
+    assert response.status_code == 200
+    assert len(engine.calls) == 3
+    assert cache.get("count_monitored_municipalities:rj:dengue") == 12
 
 
 def _query_engine() -> MagicMock:
@@ -212,7 +403,8 @@ def _query_engine() -> MagicMock:
     ],
 )
 def test_estimated_cases_select_only_the_disease_table(
-    disease: str, table_name: str
+    disease: str,
+    table_name: str,
 ) -> None:
     engine = _query_engine()
 
@@ -329,7 +521,8 @@ def test_alerta_state_view_uses_route_disease_for_case_series(
 
 def test_legacy_state_dashboard_route_remains_available() -> None:
     path = reverse(
-        "dados:alerta_uf", kwargs={"state": "RJ", "disease": "zika"}
+        "dados:alerta_uf",
+        kwargs={"state": "RJ", "disease": "zika"},
     )
     match = resolve(path)
 
@@ -344,7 +537,8 @@ def test_reduced_notification_api_contract(
 ) -> None:
     notification_queries.return_value.get_disease_dist.return_value = (
         pd.DataFrame(
-            {"casos": [3]}, index=pd.Index(["Dengue"], name="category")
+            {"casos": [3]},
+            index=pd.Index(["Dengue"], name="category"),
         )
     )
     request = RequestFactory().get(

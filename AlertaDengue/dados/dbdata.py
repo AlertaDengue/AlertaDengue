@@ -45,6 +45,33 @@ ALERT_COLOR = {1: "verde", 2: "amarelo", 3: "laranja", 4: "vermelho"}
 ALERT_CODE = dict(zip(ALERT_COLOR.values(), ALERT_COLOR.keys()))
 
 
+def _normalize_cache_key_component(value: str) -> str:
+    """Return a deterministic ASCII-safe cache key component."""
+    normalized = slugify(value)
+    if normalized:
+        return normalized
+
+    # Fall back to ASCII normalization if slugify strips everything.
+    ascii_value = unicodedata.normalize("NFKD", value).encode(
+        "ascii", "ignore"
+    )
+    normalized = ascii_value.decode("ascii").strip().lower()
+    return normalized.replace(" ", "-") or "unknown"
+
+
+def _build_monitored_municipalities_cache_key(
+    state_name: str,
+    disease: str,
+    state_abbv: str | None = None,
+) -> str:
+    state_component = (
+        state_abbv.strip().lower()
+        if state_abbv and state_abbv.strip()
+        else _normalize_cache_key_component(state_name)
+    )
+    return f"count_monitored_municipalities:{state_component}:{disease}"
+
+
 @dataclass(frozen=True, slots=True)
 class ReportParameters:
     """Disease-specific parameters used by city reports."""
@@ -183,6 +210,7 @@ def data_hist_uf(state_abbv: str, disease: str = "dengue") -> pd.DataFrame:
 def count_monitored_municipalities(
     state_name: str,
     disease: str,
+    state_abbv: str | None = None,
     db_engine: Engine = DB_ENGINE,
 ) -> int:
     """Return the established full-history municipality count (cached)."""
@@ -190,7 +218,11 @@ def count_monitored_municipalities(
     if view is None:
         raise ValueError(f"Unsupported disease: {disease!r}")
 
-    cache_name = f"count_monitored_municipalities:{state_name}:{disease}"
+    cache_name = _build_monitored_municipalities_cache_key(
+        state_name=state_name,
+        disease=disease,
+        state_abbv=state_abbv,
+    )
     cached = cache.get(cache_name)
     if cached is not None:
         return int(cached)

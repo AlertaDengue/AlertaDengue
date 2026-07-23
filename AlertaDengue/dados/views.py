@@ -645,6 +645,7 @@ class ChartsMainView(TemplateView):
             count_cities[disease][state_abbv] = count_monitored_municipalities(
                 state_name=state_name,
                 disease=disease,
+                state_abbv=state_abbv,
             )
 
             if disease == "dengue":
