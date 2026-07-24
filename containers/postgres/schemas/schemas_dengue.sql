@@ -35,6 +35,15 @@ CREATE SCHEMA "Municipio";
 ALTER SCHEMA "Municipio" OWNER TO "Dengue";
 
 --
+-- Name: archive_ovitrampa; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA archive_ovitrampa;
+
+
+ALTER SCHEMA archive_ovitrampa OWNER TO postgres;
+
+--
 -- Name: ingestion; Type: SCHEMA; Schema: -; Owner: dengueadmin
 --
 
@@ -716,48 +725,6 @@ ALTER SEQUENCE "Dengue_global".regional_saude_id_seq OWNED BY "Dengue_global".re
 
 
 --
--- Name: Bairro; Type: TABLE; Schema: Municipio; Owner: administrador
---
-
-CREATE TABLE "Municipio"."Bairro" (
-    nome text NOT NULL,
-    bairro_id integer NOT NULL,
-    "Localidade_id" integer NOT NULL,
-    id bigint NOT NULL
-);
-
-
-ALTER TABLE "Municipio"."Bairro" OWNER TO administrador;
-
---
--- Name: TABLE "Bairro"; Type: COMMENT; Schema: Municipio; Owner: administrador
---
-
-COMMENT ON TABLE "Municipio"."Bairro" IS 'Lista de bairros por localidade';
-
-
---
--- Name: Bairro_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
---
-
-CREATE SEQUENCE "Municipio"."Bairro_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE "Municipio"."Bairro_id_seq" OWNER TO administrador;
-
---
--- Name: Bairro_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
---
-
-ALTER SEQUENCE "Municipio"."Bairro_id_seq" OWNED BY "Municipio"."Bairro".id;
-
-
---
 -- Name: Clima_Satelite; Type: TABLE; Schema: Municipio; Owner: administrador
 --
 
@@ -1142,29 +1109,6 @@ ALTER SEQUENCE "Municipio"."Historico_alerta_zika_id_seq" OWNED BY "Municipio"."
 
 
 --
--- Name: Localidade; Type: TABLE; Schema: Municipio; Owner: administrador
---
-
-CREATE TABLE "Municipio"."Localidade" (
-    nome character varying(32) NOT NULL,
-    populacao integer NOT NULL,
-    geojson text NOT NULL,
-    id integer NOT NULL,
-    "Municipio_geocodigo" integer NOT NULL,
-    codigo_estacao_wu character varying(5) DEFAULT NULL::character varying
-);
-
-
-ALTER TABLE "Municipio"."Localidade" OWNER TO administrador;
-
---
--- Name: TABLE "Localidade"; Type: COMMENT; Schema: Municipio; Owner: administrador
---
-
-COMMENT ON TABLE "Municipio"."Localidade" IS 'Sub-unidades de analise no municipio';
-
-
---
 -- Name: Notificacao; Type: TABLE; Schema: Municipio; Owner: administrador
 --
 
@@ -1234,46 +1178,6 @@ ALTER TABLE "Municipio"."Notificacao_id_seq" OWNER TO administrador;
 --
 
 ALTER SEQUENCE "Municipio"."Notificacao_id_seq" OWNED BY "Municipio"."Notificacao".id;
-
-
---
--- Name: Ovitrampa; Type: TABLE; Schema: Municipio; Owner: administrador
---
-
-CREATE TABLE "Municipio"."Ovitrampa" (
-    "Municipio_geocodigo" integer NOT NULL,
-    latitude real NOT NULL,
-    longitude real NOT NULL,
-    "Arm_codigo" integer NOT NULL,
-    "Perdida" boolean NOT NULL,
-    "Positiva" boolean,
-    "Ovos" integer,
-    "Localidade_id" integer NOT NULL,
-    id integer NOT NULL
-);
-
-
-ALTER TABLE "Municipio"."Ovitrampa" OWNER TO administrador;
-
---
--- Name: Ovitrampa_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
---
-
-CREATE SEQUENCE "Municipio"."Ovitrampa_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE "Municipio"."Ovitrampa_id_seq" OWNER TO administrador;
-
---
--- Name: Ovitrampa_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
---
-
-ALTER SEQUENCE "Municipio"."Ovitrampa_id_seq" OWNED BY "Municipio"."Ovitrampa".id;
 
 
 --
@@ -1518,6 +1422,111 @@ ALTER TABLE "Municipio".sprint202425_id_seq OWNER TO dengueadmin;
 --
 
 ALTER SEQUENCE "Municipio".sprint202425_id_seq OWNED BY "Municipio".sprint202425.id;
+
+
+--
+-- Name: Bairro; Type: TABLE; Schema: archive_ovitrampa; Owner: administrador
+--
+
+CREATE TABLE archive_ovitrampa."Bairro" (
+    nome text NOT NULL,
+    bairro_id integer NOT NULL,
+    "Localidade_id" integer NOT NULL,
+    id bigint NOT NULL
+);
+
+
+ALTER TABLE archive_ovitrampa."Bairro" OWNER TO administrador;
+
+--
+-- Name: TABLE "Bairro"; Type: COMMENT; Schema: archive_ovitrampa; Owner: administrador
+--
+
+COMMENT ON TABLE archive_ovitrampa."Bairro" IS 'Lista de bairros por localidade';
+
+
+--
+-- Name: Bairro_id_seq; Type: SEQUENCE; Schema: archive_ovitrampa; Owner: administrador
+--
+
+CREATE SEQUENCE archive_ovitrampa."Bairro_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE archive_ovitrampa."Bairro_id_seq" OWNER TO administrador;
+
+--
+-- Name: Bairro_id_seq; Type: SEQUENCE OWNED BY; Schema: archive_ovitrampa; Owner: administrador
+--
+
+ALTER SEQUENCE archive_ovitrampa."Bairro_id_seq" OWNED BY archive_ovitrampa."Bairro".id;
+
+
+--
+-- Name: Localidade; Type: TABLE; Schema: archive_ovitrampa; Owner: administrador
+--
+
+CREATE TABLE archive_ovitrampa."Localidade" (
+    nome character varying(32) NOT NULL,
+    populacao integer NOT NULL,
+    geojson text NOT NULL,
+    id integer NOT NULL,
+    "Municipio_geocodigo" integer NOT NULL,
+    codigo_estacao_wu character varying(5) DEFAULT NULL::character varying
+);
+
+
+ALTER TABLE archive_ovitrampa."Localidade" OWNER TO administrador;
+
+--
+-- Name: TABLE "Localidade"; Type: COMMENT; Schema: archive_ovitrampa; Owner: administrador
+--
+
+COMMENT ON TABLE archive_ovitrampa."Localidade" IS 'Sub-unidades de analise no municipio';
+
+
+--
+-- Name: Ovitrampa; Type: TABLE; Schema: archive_ovitrampa; Owner: administrador
+--
+
+CREATE TABLE archive_ovitrampa."Ovitrampa" (
+    "Municipio_geocodigo" integer NOT NULL,
+    latitude real NOT NULL,
+    longitude real NOT NULL,
+    "Arm_codigo" integer NOT NULL,
+    "Perdida" boolean NOT NULL,
+    "Positiva" boolean,
+    "Ovos" integer,
+    "Localidade_id" integer NOT NULL,
+    id integer NOT NULL
+);
+
+
+ALTER TABLE archive_ovitrampa."Ovitrampa" OWNER TO administrador;
+
+--
+-- Name: Ovitrampa_id_seq; Type: SEQUENCE; Schema: archive_ovitrampa; Owner: administrador
+--
+
+CREATE SEQUENCE archive_ovitrampa."Ovitrampa_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE archive_ovitrampa."Ovitrampa_id_seq" OWNER TO administrador;
+
+--
+-- Name: Ovitrampa_id_seq; Type: SEQUENCE OWNED BY; Schema: archive_ovitrampa; Owner: administrador
+--
+
+ALTER SEQUENCE archive_ovitrampa."Ovitrampa_id_seq" OWNED BY archive_ovitrampa."Ovitrampa".id;
 
 
 --
@@ -2879,13 +2888,6 @@ ALTER TABLE ONLY "Dengue_global".regional_saude ALTER COLUMN id SET DEFAULT next
 
 
 --
--- Name: Bairro id; Type: DEFAULT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Bairro" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Bairro_id_seq"'::regclass);
-
-
---
 -- Name: Clima_Satelite id; Type: DEFAULT; Schema: Municipio; Owner: administrador
 --
 
@@ -2935,13 +2937,6 @@ ALTER TABLE ONLY "Municipio"."Notificacao" ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- Name: Ovitrampa id; Type: DEFAULT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Ovitrampa" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Ovitrampa_id_seq"'::regclass);
-
-
---
 -- Name: Tweet id; Type: DEFAULT; Schema: Municipio; Owner: administrador
 --
 
@@ -2974,6 +2969,20 @@ ALTER TABLE ONLY "Municipio".alerta_mrj_zika ALTER COLUMN id SET DEFAULT nextval
 --
 
 ALTER TABLE ONLY "Municipio".sprint202425 ALTER COLUMN id SET DEFAULT nextval('"Municipio".sprint202425_id_seq'::regclass);
+
+
+--
+-- Name: Bairro id; Type: DEFAULT; Schema: archive_ovitrampa; Owner: administrador
+--
+
+ALTER TABLE ONLY archive_ovitrampa."Bairro" ALTER COLUMN id SET DEFAULT nextval('archive_ovitrampa."Bairro_id_seq"'::regclass);
+
+
+--
+-- Name: Ovitrampa id; Type: DEFAULT; Schema: archive_ovitrampa; Owner: administrador
+--
+
+ALTER TABLE ONLY archive_ovitrampa."Ovitrampa" ALTER COLUMN id SET DEFAULT nextval('archive_ovitrampa."Ovitrampa_id_seq"'::regclass);
 
 
 --
@@ -3220,14 +3229,6 @@ ALTER TABLE ONLY "Dengue_global".regional_saude
 
 
 --
--- Name: Bairro Bairro_pkey; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Bairro"
-    ADD CONSTRAINT "Bairro_pkey" PRIMARY KEY (id);
-
-
---
 -- Name: Clima_Satelite Clima_Satelite_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
 --
 
@@ -3292,27 +3293,11 @@ ALTER TABLE ONLY "Municipio"."Historico_alerta_zika"
 
 
 --
--- Name: Localidade Localidade_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Localidade"
-    ADD CONSTRAINT "Localidade_pk" PRIMARY KEY (id);
-
-
---
 -- Name: Notificacao Notificacao_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
 --
 
 ALTER TABLE ONLY "Municipio"."Notificacao"
     ADD CONSTRAINT "Notificacao_pk" PRIMARY KEY (id);
-
-
---
--- Name: Ovitrampa Ovitrampa_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Ovitrampa"
-    ADD CONSTRAINT "Ovitrampa_pk" PRIMARY KEY (id);
 
 
 --
@@ -3433,6 +3418,30 @@ ALTER TABLE ONLY "Municipio".alerta_mrj_chik
 
 ALTER TABLE ONLY "Municipio".alerta_mrj_zika
     ADD CONSTRAINT unique_zika_aps_se UNIQUE (se, aps);
+
+
+--
+-- Name: Bairro Bairro_pkey; Type: CONSTRAINT; Schema: archive_ovitrampa; Owner: administrador
+--
+
+ALTER TABLE ONLY archive_ovitrampa."Bairro"
+    ADD CONSTRAINT "Bairro_pkey" PRIMARY KEY (id);
+
+
+--
+-- Name: Localidade Localidade_pk; Type: CONSTRAINT; Schema: archive_ovitrampa; Owner: administrador
+--
+
+ALTER TABLE ONLY archive_ovitrampa."Localidade"
+    ADD CONSTRAINT "Localidade_pk" PRIMARY KEY (id);
+
+
+--
+-- Name: Ovitrampa Ovitrampa_pk; Type: CONSTRAINT; Schema: archive_ovitrampa; Owner: administrador
+--
+
+ALTER TABLE ONLY archive_ovitrampa."Ovitrampa"
+    ADD CONSTRAINT "Ovitrampa_pk" PRIMARY KEY (id);
 
 
 --
@@ -4254,27 +4263,27 @@ ALTER TABLE ONLY "Dengue_global".alerta_regional_zika
 
 
 --
--- Name: Bairro Bairro_Localidade; Type: FK CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Bairro"
-    ADD CONSTRAINT "Bairro_Localidade" FOREIGN KEY ("Localidade_id") REFERENCES "Municipio"."Localidade"(id);
-
-
---
--- Name: Ovitrampa Ovitrampa_Localidade; Type: FK CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Ovitrampa"
-    ADD CONSTRAINT "Ovitrampa_Localidade" FOREIGN KEY ("Localidade_id") REFERENCES "Municipio"."Localidade"(id);
-
-
---
 -- Name: Tweet Tweet_CID10; Type: FK CONSTRAINT; Schema: Municipio; Owner: administrador
 --
 
 ALTER TABLE ONLY "Municipio"."Tweet"
     ADD CONSTRAINT "Tweet_CID10" FOREIGN KEY ("CID10_codigo") REFERENCES "Dengue_global"."CID10"(codigo);
+
+
+--
+-- Name: Bairro Bairro_Localidade; Type: FK CONSTRAINT; Schema: archive_ovitrampa; Owner: administrador
+--
+
+ALTER TABLE ONLY archive_ovitrampa."Bairro"
+    ADD CONSTRAINT "Bairro_Localidade" FOREIGN KEY ("Localidade_id") REFERENCES archive_ovitrampa."Localidade"(id);
+
+
+--
+-- Name: Ovitrampa Ovitrampa_Localidade; Type: FK CONSTRAINT; Schema: archive_ovitrampa; Owner: administrador
+--
+
+ALTER TABLE ONLY archive_ovitrampa."Ovitrampa"
+    ADD CONSTRAINT "Ovitrampa_Localidade" FOREIGN KEY ("Localidade_id") REFERENCES archive_ovitrampa."Localidade"(id);
 
 
 --
@@ -4594,16 +4603,6 @@ GRANT SELECT ON SEQUENCE "Dengue_global".regional_saude_id_seq TO "Read_only";
 
 
 --
--- Name: TABLE "Bairro"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Bairro" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Bairro" TO dengue;
-GRANT SELECT ON TABLE "Municipio"."Bairro" TO infodenguedev;
-GRANT SELECT ON TABLE "Municipio"."Bairro" TO analista;
-
-
---
 -- Name: TABLE "Clima_Satelite"; Type: ACL; Schema: Municipio; Owner: administrador
 --
 
@@ -4728,16 +4727,6 @@ GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Historico_alerta_zika_id_seq" TO den
 
 
 --
--- Name: TABLE "Localidade"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Localidade" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Localidade" TO dengue;
-GRANT SELECT ON TABLE "Municipio"."Localidade" TO infodenguedev;
-GRANT SELECT ON TABLE "Municipio"."Localidade" TO analista;
-
-
---
 -- Name: TABLE "Notificacao"; Type: ACL; Schema: Municipio; Owner: administrador
 --
 
@@ -4752,23 +4741,6 @@ GRANT SELECT ON TABLE "Municipio"."Notificacao" TO analista;
 --
 
 GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Notificacao_id_seq" TO dengue;
-
-
---
--- Name: TABLE "Ovitrampa"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Ovitrampa" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Ovitrampa" TO dengue;
-GRANT SELECT ON TABLE "Municipio"."Ovitrampa" TO infodenguedev;
-GRANT SELECT ON TABLE "Municipio"."Ovitrampa" TO analista;
-
-
---
--- Name: SEQUENCE "Ovitrampa_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Ovitrampa_id_seq" TO dengue;
 
 
 --
@@ -4851,6 +4823,43 @@ GRANT SELECT ON TABLE "Municipio".historico_casos TO analista;
 
 GRANT SELECT ON TABLE "Municipio".sprint202425 TO infodenguedev;
 GRANT SELECT ON TABLE "Municipio".sprint202425 TO analista;
+
+
+--
+-- Name: TABLE "Bairro"; Type: ACL; Schema: archive_ovitrampa; Owner: administrador
+--
+
+GRANT ALL ON TABLE archive_ovitrampa."Bairro" TO "Dengue";
+GRANT ALL ON TABLE archive_ovitrampa."Bairro" TO dengue;
+GRANT SELECT ON TABLE archive_ovitrampa."Bairro" TO infodenguedev;
+GRANT SELECT ON TABLE archive_ovitrampa."Bairro" TO analista;
+
+
+--
+-- Name: TABLE "Localidade"; Type: ACL; Schema: archive_ovitrampa; Owner: administrador
+--
+
+GRANT ALL ON TABLE archive_ovitrampa."Localidade" TO "Dengue";
+GRANT ALL ON TABLE archive_ovitrampa."Localidade" TO dengue;
+GRANT SELECT ON TABLE archive_ovitrampa."Localidade" TO infodenguedev;
+GRANT SELECT ON TABLE archive_ovitrampa."Localidade" TO analista;
+
+
+--
+-- Name: TABLE "Ovitrampa"; Type: ACL; Schema: archive_ovitrampa; Owner: administrador
+--
+
+GRANT ALL ON TABLE archive_ovitrampa."Ovitrampa" TO "Dengue";
+GRANT ALL ON TABLE archive_ovitrampa."Ovitrampa" TO dengue;
+GRANT SELECT ON TABLE archive_ovitrampa."Ovitrampa" TO infodenguedev;
+GRANT SELECT ON TABLE archive_ovitrampa."Ovitrampa" TO analista;
+
+
+--
+-- Name: SEQUENCE "Ovitrampa_id_seq"; Type: ACL; Schema: archive_ovitrampa; Owner: administrador
+--
+
+GRANT SELECT,USAGE ON SEQUENCE archive_ovitrampa."Ovitrampa_id_seq" TO dengue;
 
 
 --
@@ -4938,14 +4947,14 @@ GRANT SELECT ON TABLE public.django_session TO infodenguedev;
 
 
 --
--- Name: TABLE geography_columns; Type: ACL; Schema: public; Owner: dengueadmin
+-- Name: TABLE geography_columns; Type: ACL; Schema: public; Owner: postgres
 --
 
 GRANT SELECT ON TABLE public.geography_columns TO infodenguedev;
 
 
 --
--- Name: TABLE geometry_columns; Type: ACL; Schema: public; Owner: dengueadmin
+-- Name: TABLE geometry_columns; Type: ACL; Schema: public; Owner: postgres
 --
 
 GRANT SELECT ON TABLE public.geometry_columns TO infodenguedev;
@@ -4973,7 +4982,7 @@ GRANT SELECT ON TABLE public.hist_uf_zika_materialized_view TO infodenguedev;
 
 
 --
--- Name: TABLE spatial_ref_sys; Type: ACL; Schema: public; Owner: dengueadmin
+-- Name: TABLE spatial_ref_sys; Type: ACL; Schema: public; Owner: postgres
 --
 
 GRANT SELECT ON TABLE public.spatial_ref_sys TO infodenguedev;
