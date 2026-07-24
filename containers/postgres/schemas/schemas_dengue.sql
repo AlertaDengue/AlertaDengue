@@ -35,6 +35,15 @@ CREATE SCHEMA "Municipio";
 ALTER SCHEMA "Municipio" OWNER TO "Dengue";
 
 --
+-- Name: archive_alertas_regionais; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA archive_alertas_regionais;
+
+
+ALTER SCHEMA archive_alertas_regionais OWNER TO postgres;
+
+--
 -- Name: archive_ovitrampa; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
@@ -389,171 +398,6 @@ ALTER TABLE "Dengue_global"."Municipio" OWNER TO administrador;
 --
 
 COMMENT ON TABLE "Dengue_global"."Municipio" IS 'Municipio integrado ao sistema de alerta';
-
-
---
--- Name: alerta_regional_chik; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
---
-
-CREATE TABLE "Dengue_global".alerta_regional_chik (
-    id bigint NOT NULL,
-    id_regional integer NOT NULL,
-    data_inise date NOT NULL,
-    se integer NOT NULL,
-    casos_est real,
-    casos_est_min real,
-    casos_est_max real,
-    casos integer,
-    p_rt1 real,
-    p_inc100k real,
-    uf character varying(2),
-    nivel smallint,
-    tweet numeric(5,0),
-    rt numeric(5,0),
-    pop numeric(7,0),
-    tempmin numeric(4,0),
-    tempmed numeric(4,0),
-    tempmax numeric(4,0),
-    umidmin numeric(4,0),
-    umidmed numeric(4,0),
-    umidmax numeric(4,0),
-    receptivo smallint,
-    transmissao smallint,
-    nivel_inc smallint
-);
-
-
-ALTER TABLE "Dengue_global".alerta_regional_chik OWNER TO dengueadmin;
-
---
--- Name: alerta_regional_chik_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
---
-
-CREATE SEQUENCE "Dengue_global".alerta_regional_chik_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE "Dengue_global".alerta_regional_chik_id_seq OWNER TO dengueadmin;
-
---
--- Name: alerta_regional_chik_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
---
-
-ALTER SEQUENCE "Dengue_global".alerta_regional_chik_id_seq OWNED BY "Dengue_global".alerta_regional_chik.id;
-
-
---
--- Name: alerta_regional_dengue; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
---
-
-CREATE TABLE "Dengue_global".alerta_regional_dengue (
-    id bigint NOT NULL,
-    id_regional integer NOT NULL,
-    data_inise date NOT NULL,
-    se integer NOT NULL,
-    casos_est real,
-    casos_est_min real,
-    casos_est_max real,
-    casos integer,
-    p_rt1 real,
-    p_inc100k real,
-    uf character varying(2),
-    nivel smallint,
-    tweet numeric(5,0),
-    rt numeric(5,0),
-    pop numeric(7,0),
-    tempmin numeric(4,0),
-    tempmed numeric(4,0),
-    tempmax numeric(4,0),
-    umidmin numeric(4,0),
-    umidmed numeric(4,0),
-    umidmax numeric(4,0),
-    receptivo smallint,
-    transmissao smallint,
-    nivel_inc smallint
-);
-
-
-ALTER TABLE "Dengue_global".alerta_regional_dengue OWNER TO dengueadmin;
-
---
--- Name: alerta_regional_dengue_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
---
-
-CREATE SEQUENCE "Dengue_global".alerta_regional_dengue_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE "Dengue_global".alerta_regional_dengue_id_seq OWNER TO dengueadmin;
-
---
--- Name: alerta_regional_dengue_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
---
-
-ALTER SEQUENCE "Dengue_global".alerta_regional_dengue_id_seq OWNED BY "Dengue_global".alerta_regional_dengue.id;
-
-
---
--- Name: alerta_regional_zika; Type: TABLE; Schema: Dengue_global; Owner: dengueadmin
---
-
-CREATE TABLE "Dengue_global".alerta_regional_zika (
-    id bigint NOT NULL,
-    id_regional integer NOT NULL,
-    data_inise date NOT NULL,
-    se integer NOT NULL,
-    casos_est real,
-    casos_est_min real,
-    casos_est_max real,
-    casos integer,
-    p_rt1 real,
-    p_inc100k real,
-    uf character varying(2),
-    nivel smallint,
-    tweet numeric(5,0),
-    rt numeric(5,0),
-    pop numeric(7,0),
-    tempmin numeric(4,0),
-    tempmed numeric(4,0),
-    tempmax numeric(4,0),
-    umidmin numeric(4,0),
-    umidmed numeric(4,0),
-    umidmax numeric(4,0),
-    receptivo smallint,
-    transmissao smallint,
-    nivel_inc smallint
-);
-
-
-ALTER TABLE "Dengue_global".alerta_regional_zika OWNER TO dengueadmin;
-
---
--- Name: alerta_regional_zika_id_seq; Type: SEQUENCE; Schema: Dengue_global; Owner: dengueadmin
---
-
-CREATE SEQUENCE "Dengue_global".alerta_regional_zika_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE "Dengue_global".alerta_regional_zika_id_seq OWNER TO dengueadmin;
-
---
--- Name: alerta_regional_zika_id_seq; Type: SEQUENCE OWNED BY; Schema: Dengue_global; Owner: dengueadmin
---
-
-ALTER SEQUENCE "Dengue_global".alerta_regional_zika_id_seq OWNED BY "Dengue_global".alerta_regional_zika.id;
 
 
 --
@@ -1224,141 +1068,6 @@ ALTER SEQUENCE "Municipio"."Tweet_id_seq" OWNED BY "Municipio"."Tweet".id;
 
 
 --
--- Name: alerta_mrj; Type: TABLE; Schema: Municipio; Owner: dengueadmin
---
-
-CREATE TABLE "Municipio".alerta_mrj (
-    id bigint NOT NULL,
-    aps character varying(6) NOT NULL,
-    se integer NOT NULL,
-    data date NOT NULL,
-    tweets integer,
-    casos integer,
-    casos_est real,
-    casos_estmin real,
-    casos_estmax real,
-    tmin real,
-    rt real,
-    prt1 real,
-    inc real,
-    nivel integer
-);
-
-
-ALTER TABLE "Municipio".alerta_mrj OWNER TO dengueadmin;
-
---
--- Name: alerta_mrj_chik; Type: TABLE; Schema: Municipio; Owner: dengueadmin
---
-
-CREATE TABLE "Municipio".alerta_mrj_chik (
-    id bigint NOT NULL,
-    aps character varying(6) NOT NULL,
-    se integer NOT NULL,
-    data date NOT NULL,
-    tweets integer,
-    casos integer,
-    casos_est real,
-    casos_estmin real,
-    casos_estmax real,
-    tmin real,
-    rt real,
-    prt1 real,
-    inc real,
-    nivel integer
-);
-
-
-ALTER TABLE "Municipio".alerta_mrj_chik OWNER TO dengueadmin;
-
---
--- Name: alerta_mrj_chik_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: dengueadmin
---
-
-CREATE SEQUENCE "Municipio".alerta_mrj_chik_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE "Municipio".alerta_mrj_chik_id_seq OWNER TO dengueadmin;
-
---
--- Name: alerta_mrj_chik_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: dengueadmin
---
-
-ALTER SEQUENCE "Municipio".alerta_mrj_chik_id_seq OWNED BY "Municipio".alerta_mrj_chik.id;
-
-
---
--- Name: alerta_mrj_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: dengueadmin
---
-
-CREATE SEQUENCE "Municipio".alerta_mrj_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE "Municipio".alerta_mrj_id_seq OWNER TO dengueadmin;
-
---
--- Name: alerta_mrj_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: dengueadmin
---
-
-ALTER SEQUENCE "Municipio".alerta_mrj_id_seq OWNED BY "Municipio".alerta_mrj.id;
-
-
---
--- Name: alerta_mrj_zika; Type: TABLE; Schema: Municipio; Owner: postgres
---
-
-CREATE TABLE "Municipio".alerta_mrj_zika (
-    id bigint NOT NULL,
-    aps character varying(6) NOT NULL,
-    se integer NOT NULL,
-    data date NOT NULL,
-    tweets integer,
-    casos integer,
-    casos_est real,
-    casos_estmin real,
-    casos_estmax real,
-    tmin real,
-    rt real,
-    prt1 real,
-    inc real,
-    nivel integer
-);
-
-
-ALTER TABLE "Municipio".alerta_mrj_zika OWNER TO postgres;
-
---
--- Name: alerta_mrj_zika_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: postgres
---
-
-CREATE SEQUENCE "Municipio".alerta_mrj_zika_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE "Municipio".alerta_mrj_zika_id_seq OWNER TO postgres;
-
---
--- Name: alerta_mrj_zika_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: postgres
---
-
-ALTER SEQUENCE "Municipio".alerta_mrj_zika_id_seq OWNED BY "Municipio".alerta_mrj_zika.id;
-
-
---
 -- Name: historico_casos; Type: MATERIALIZED VIEW; Schema: Municipio; Owner: dengueadmin
 --
 
@@ -1422,6 +1131,306 @@ ALTER TABLE "Municipio".sprint202425_id_seq OWNER TO dengueadmin;
 --
 
 ALTER SEQUENCE "Municipio".sprint202425_id_seq OWNED BY "Municipio".sprint202425.id;
+
+
+--
+-- Name: alerta_mrj; Type: TABLE; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+CREATE TABLE archive_alertas_regionais.alerta_mrj (
+    id bigint NOT NULL,
+    aps character varying(6) NOT NULL,
+    se integer NOT NULL,
+    data date NOT NULL,
+    tweets integer,
+    casos integer,
+    casos_est real,
+    casos_estmin real,
+    casos_estmax real,
+    tmin real,
+    rt real,
+    prt1 real,
+    inc real,
+    nivel integer
+);
+
+
+ALTER TABLE archive_alertas_regionais.alerta_mrj OWNER TO dengueadmin;
+
+--
+-- Name: alerta_mrj_chik; Type: TABLE; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+CREATE TABLE archive_alertas_regionais.alerta_mrj_chik (
+    id bigint NOT NULL,
+    aps character varying(6) NOT NULL,
+    se integer NOT NULL,
+    data date NOT NULL,
+    tweets integer,
+    casos integer,
+    casos_est real,
+    casos_estmin real,
+    casos_estmax real,
+    tmin real,
+    rt real,
+    prt1 real,
+    inc real,
+    nivel integer
+);
+
+
+ALTER TABLE archive_alertas_regionais.alerta_mrj_chik OWNER TO dengueadmin;
+
+--
+-- Name: alerta_mrj_chik_id_seq; Type: SEQUENCE; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+CREATE SEQUENCE archive_alertas_regionais.alerta_mrj_chik_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE archive_alertas_regionais.alerta_mrj_chik_id_seq OWNER TO dengueadmin;
+
+--
+-- Name: alerta_mrj_chik_id_seq; Type: SEQUENCE OWNED BY; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER SEQUENCE archive_alertas_regionais.alerta_mrj_chik_id_seq OWNED BY archive_alertas_regionais.alerta_mrj_chik.id;
+
+
+--
+-- Name: alerta_mrj_id_seq; Type: SEQUENCE; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+CREATE SEQUENCE archive_alertas_regionais.alerta_mrj_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE archive_alertas_regionais.alerta_mrj_id_seq OWNER TO dengueadmin;
+
+--
+-- Name: alerta_mrj_id_seq; Type: SEQUENCE OWNED BY; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER SEQUENCE archive_alertas_regionais.alerta_mrj_id_seq OWNED BY archive_alertas_regionais.alerta_mrj.id;
+
+
+--
+-- Name: alerta_mrj_zika; Type: TABLE; Schema: archive_alertas_regionais; Owner: postgres
+--
+
+CREATE TABLE archive_alertas_regionais.alerta_mrj_zika (
+    id bigint NOT NULL,
+    aps character varying(6) NOT NULL,
+    se integer NOT NULL,
+    data date NOT NULL,
+    tweets integer,
+    casos integer,
+    casos_est real,
+    casos_estmin real,
+    casos_estmax real,
+    tmin real,
+    rt real,
+    prt1 real,
+    inc real,
+    nivel integer
+);
+
+
+ALTER TABLE archive_alertas_regionais.alerta_mrj_zika OWNER TO postgres;
+
+--
+-- Name: alerta_mrj_zika_id_seq; Type: SEQUENCE; Schema: archive_alertas_regionais; Owner: postgres
+--
+
+CREATE SEQUENCE archive_alertas_regionais.alerta_mrj_zika_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE archive_alertas_regionais.alerta_mrj_zika_id_seq OWNER TO postgres;
+
+--
+-- Name: alerta_mrj_zika_id_seq; Type: SEQUENCE OWNED BY; Schema: archive_alertas_regionais; Owner: postgres
+--
+
+ALTER SEQUENCE archive_alertas_regionais.alerta_mrj_zika_id_seq OWNED BY archive_alertas_regionais.alerta_mrj_zika.id;
+
+
+--
+-- Name: alerta_regional_chik; Type: TABLE; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+CREATE TABLE archive_alertas_regionais.alerta_regional_chik (
+    id bigint NOT NULL,
+    id_regional integer NOT NULL,
+    data_inise date NOT NULL,
+    se integer NOT NULL,
+    casos_est real,
+    casos_est_min real,
+    casos_est_max real,
+    casos integer,
+    p_rt1 real,
+    p_inc100k real,
+    uf character varying(2),
+    nivel smallint,
+    tweet numeric(5,0),
+    rt numeric(5,0),
+    pop numeric(7,0),
+    tempmin numeric(4,0),
+    tempmed numeric(4,0),
+    tempmax numeric(4,0),
+    umidmin numeric(4,0),
+    umidmed numeric(4,0),
+    umidmax numeric(4,0),
+    receptivo smallint,
+    transmissao smallint,
+    nivel_inc smallint
+);
+
+
+ALTER TABLE archive_alertas_regionais.alerta_regional_chik OWNER TO dengueadmin;
+
+--
+-- Name: alerta_regional_chik_id_seq; Type: SEQUENCE; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+CREATE SEQUENCE archive_alertas_regionais.alerta_regional_chik_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE archive_alertas_regionais.alerta_regional_chik_id_seq OWNER TO dengueadmin;
+
+--
+-- Name: alerta_regional_chik_id_seq; Type: SEQUENCE OWNED BY; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER SEQUENCE archive_alertas_regionais.alerta_regional_chik_id_seq OWNED BY archive_alertas_regionais.alerta_regional_chik.id;
+
+
+--
+-- Name: alerta_regional_dengue; Type: TABLE; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+CREATE TABLE archive_alertas_regionais.alerta_regional_dengue (
+    id bigint NOT NULL,
+    id_regional integer NOT NULL,
+    data_inise date NOT NULL,
+    se integer NOT NULL,
+    casos_est real,
+    casos_est_min real,
+    casos_est_max real,
+    casos integer,
+    p_rt1 real,
+    p_inc100k real,
+    uf character varying(2),
+    nivel smallint,
+    tweet numeric(5,0),
+    rt numeric(5,0),
+    pop numeric(7,0),
+    tempmin numeric(4,0),
+    tempmed numeric(4,0),
+    tempmax numeric(4,0),
+    umidmin numeric(4,0),
+    umidmed numeric(4,0),
+    umidmax numeric(4,0),
+    receptivo smallint,
+    transmissao smallint,
+    nivel_inc smallint
+);
+
+
+ALTER TABLE archive_alertas_regionais.alerta_regional_dengue OWNER TO dengueadmin;
+
+--
+-- Name: alerta_regional_dengue_id_seq; Type: SEQUENCE; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+CREATE SEQUENCE archive_alertas_regionais.alerta_regional_dengue_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE archive_alertas_regionais.alerta_regional_dengue_id_seq OWNER TO dengueadmin;
+
+--
+-- Name: alerta_regional_dengue_id_seq; Type: SEQUENCE OWNED BY; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER SEQUENCE archive_alertas_regionais.alerta_regional_dengue_id_seq OWNED BY archive_alertas_regionais.alerta_regional_dengue.id;
+
+
+--
+-- Name: alerta_regional_zika; Type: TABLE; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+CREATE TABLE archive_alertas_regionais.alerta_regional_zika (
+    id bigint NOT NULL,
+    id_regional integer NOT NULL,
+    data_inise date NOT NULL,
+    se integer NOT NULL,
+    casos_est real,
+    casos_est_min real,
+    casos_est_max real,
+    casos integer,
+    p_rt1 real,
+    p_inc100k real,
+    uf character varying(2),
+    nivel smallint,
+    tweet numeric(5,0),
+    rt numeric(5,0),
+    pop numeric(7,0),
+    tempmin numeric(4,0),
+    tempmed numeric(4,0),
+    tempmax numeric(4,0),
+    umidmin numeric(4,0),
+    umidmed numeric(4,0),
+    umidmax numeric(4,0),
+    receptivo smallint,
+    transmissao smallint,
+    nivel_inc smallint
+);
+
+
+ALTER TABLE archive_alertas_regionais.alerta_regional_zika OWNER TO dengueadmin;
+
+--
+-- Name: alerta_regional_zika_id_seq; Type: SEQUENCE; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+CREATE SEQUENCE archive_alertas_regionais.alerta_regional_zika_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE archive_alertas_regionais.alerta_regional_zika_id_seq OWNER TO dengueadmin;
+
+--
+-- Name: alerta_regional_zika_id_seq; Type: SEQUENCE OWNED BY; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER SEQUENCE archive_alertas_regionais.alerta_regional_zika_id_seq OWNED BY archive_alertas_regionais.alerta_regional_zika.id;
 
 
 --
@@ -2846,27 +2855,6 @@ ALTER SEQUENCE weather.copernicus_foz_do_iguacu_index_seq OWNED BY weather.coper
 
 
 --
--- Name: alerta_regional_chik id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueadmin
---
-
-ALTER TABLE ONLY "Dengue_global".alerta_regional_chik ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".alerta_regional_chik_id_seq'::regclass);
-
-
---
--- Name: alerta_regional_dengue id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueadmin
---
-
-ALTER TABLE ONLY "Dengue_global".alerta_regional_dengue ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".alerta_regional_dengue_id_seq'::regclass);
-
-
---
--- Name: alerta_regional_zika id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueadmin
---
-
-ALTER TABLE ONLY "Dengue_global".alerta_regional_zika ALTER COLUMN id SET DEFAULT nextval('"Dengue_global".alerta_regional_zika_id_seq'::regclass);
-
-
---
 -- Name: macroregional id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueadmin
 --
 
@@ -2944,31 +2932,52 @@ ALTER TABLE ONLY "Municipio"."Tweet" ALTER COLUMN id SET DEFAULT nextval('"Munic
 
 
 --
--- Name: alerta_mrj id; Type: DEFAULT; Schema: Municipio; Owner: dengueadmin
---
-
-ALTER TABLE ONLY "Municipio".alerta_mrj ALTER COLUMN id SET DEFAULT nextval('"Municipio".alerta_mrj_id_seq'::regclass);
-
-
---
--- Name: alerta_mrj_chik id; Type: DEFAULT; Schema: Municipio; Owner: dengueadmin
---
-
-ALTER TABLE ONLY "Municipio".alerta_mrj_chik ALTER COLUMN id SET DEFAULT nextval('"Municipio".alerta_mrj_chik_id_seq'::regclass);
-
-
---
--- Name: alerta_mrj_zika id; Type: DEFAULT; Schema: Municipio; Owner: postgres
---
-
-ALTER TABLE ONLY "Municipio".alerta_mrj_zika ALTER COLUMN id SET DEFAULT nextval('"Municipio".alerta_mrj_zika_id_seq'::regclass);
-
-
---
 -- Name: sprint202425 id; Type: DEFAULT; Schema: Municipio; Owner: dengueadmin
 --
 
 ALTER TABLE ONLY "Municipio".sprint202425 ALTER COLUMN id SET DEFAULT nextval('"Municipio".sprint202425_id_seq'::regclass);
+
+
+--
+-- Name: alerta_mrj id; Type: DEFAULT; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_mrj ALTER COLUMN id SET DEFAULT nextval('archive_alertas_regionais.alerta_mrj_id_seq'::regclass);
+
+
+--
+-- Name: alerta_mrj_chik id; Type: DEFAULT; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_mrj_chik ALTER COLUMN id SET DEFAULT nextval('archive_alertas_regionais.alerta_mrj_chik_id_seq'::regclass);
+
+
+--
+-- Name: alerta_mrj_zika id; Type: DEFAULT; Schema: archive_alertas_regionais; Owner: postgres
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_mrj_zika ALTER COLUMN id SET DEFAULT nextval('archive_alertas_regionais.alerta_mrj_zika_id_seq'::regclass);
+
+
+--
+-- Name: alerta_regional_chik id; Type: DEFAULT; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_regional_chik ALTER COLUMN id SET DEFAULT nextval('archive_alertas_regionais.alerta_regional_chik_id_seq'::regclass);
+
+
+--
+-- Name: alerta_regional_dengue id; Type: DEFAULT; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_regional_dengue ALTER COLUMN id SET DEFAULT nextval('archive_alertas_regionais.alerta_regional_dengue_id_seq'::regclass);
+
+
+--
+-- Name: alerta_regional_zika id; Type: DEFAULT; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_regional_zika ALTER COLUMN id SET DEFAULT nextval('archive_alertas_regionais.alerta_regional_zika_id_seq'::regclass);
 
 
 --
@@ -3149,30 +3158,6 @@ ALTER TABLE ONLY "Dengue_global"."Municipio"
 
 
 --
--- Name: alerta_regional_chik alertaregionalchik_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
---
-
-ALTER TABLE ONLY "Dengue_global".alerta_regional_chik
-    ADD CONSTRAINT alertaregionalchik_pk PRIMARY KEY (id);
-
-
---
--- Name: alerta_regional_dengue alertaregionaldengue_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
---
-
-ALTER TABLE ONLY "Dengue_global".alerta_regional_dengue
-    ADD CONSTRAINT alertaregionaldengue_pk PRIMARY KEY (id);
-
-
---
--- Name: alerta_regional_zika alertaregionalzika_pk; Type: CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
---
-
-ALTER TABLE ONLY "Dengue_global".alerta_regional_zika
-    ADD CONSTRAINT alertaregionalzika_pk PRIMARY KEY (id);
-
-
---
 -- Name: estado estado_pkey; Type: CONSTRAINT; Schema: Dengue_global; Owner: administrador
 --
 
@@ -3309,30 +3294,6 @@ ALTER TABLE ONLY "Municipio"."Tweet"
 
 
 --
--- Name: alerta_mrj_chik alerta_mrj_chik_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueadmin
---
-
-ALTER TABLE ONLY "Municipio".alerta_mrj_chik
-    ADD CONSTRAINT alerta_mrj_chik_pk PRIMARY KEY (id);
-
-
---
--- Name: alerta_mrj alerta_mrj_pk; Type: CONSTRAINT; Schema: Municipio; Owner: dengueadmin
---
-
-ALTER TABLE ONLY "Municipio".alerta_mrj
-    ADD CONSTRAINT alerta_mrj_pk PRIMARY KEY (id);
-
-
---
--- Name: alerta_mrj_zika alerta_mrj_zika_pk; Type: CONSTRAINT; Schema: Municipio; Owner: postgres
---
-
-ALTER TABLE ONLY "Municipio".alerta_mrj_zika
-    ADD CONSTRAINT alerta_mrj_zika_pk PRIMARY KEY (id);
-
-
---
 -- Name: Historico_alerta alertas_unicos; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
 --
 
@@ -3365,30 +3326,6 @@ ALTER TABLE ONLY "Municipio"."Notificacao"
 
 
 --
--- Name: alerta_mrj previsao; Type: CONSTRAINT; Schema: Municipio; Owner: dengueadmin
---
-
-ALTER TABLE ONLY "Municipio".alerta_mrj
-    ADD CONSTRAINT previsao UNIQUE (aps, se);
-
-
---
--- Name: alerta_mrj_chik previsao_chik; Type: CONSTRAINT; Schema: Municipio; Owner: dengueadmin
---
-
-ALTER TABLE ONLY "Municipio".alerta_mrj_chik
-    ADD CONSTRAINT previsao_chik UNIQUE (aps, se);
-
-
---
--- Name: alerta_mrj_zika previsao_zika; Type: CONSTRAINT; Schema: Municipio; Owner: postgres
---
-
-ALTER TABLE ONLY "Municipio".alerta_mrj_zika
-    ADD CONSTRAINT previsao_zika UNIQUE (aps, se);
-
-
---
 -- Name: sprint202425 sprint202425_pkey; Type: CONSTRAINT; Schema: Municipio; Owner: dengueadmin
 --
 
@@ -3397,26 +3334,98 @@ ALTER TABLE ONLY "Municipio".sprint202425
 
 
 --
--- Name: alerta_mrj unique_aps_se; Type: CONSTRAINT; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj_chik alerta_mrj_chik_pk; Type: CONSTRAINT; Schema: archive_alertas_regionais; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY "Municipio".alerta_mrj
+ALTER TABLE ONLY archive_alertas_regionais.alerta_mrj_chik
+    ADD CONSTRAINT alerta_mrj_chik_pk PRIMARY KEY (id);
+
+
+--
+-- Name: alerta_mrj alerta_mrj_pk; Type: CONSTRAINT; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_mrj
+    ADD CONSTRAINT alerta_mrj_pk PRIMARY KEY (id);
+
+
+--
+-- Name: alerta_mrj_zika alerta_mrj_zika_pk; Type: CONSTRAINT; Schema: archive_alertas_regionais; Owner: postgres
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_mrj_zika
+    ADD CONSTRAINT alerta_mrj_zika_pk PRIMARY KEY (id);
+
+
+--
+-- Name: alerta_regional_chik alertaregionalchik_pk; Type: CONSTRAINT; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_regional_chik
+    ADD CONSTRAINT alertaregionalchik_pk PRIMARY KEY (id);
+
+
+--
+-- Name: alerta_regional_dengue alertaregionaldengue_pk; Type: CONSTRAINT; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_regional_dengue
+    ADD CONSTRAINT alertaregionaldengue_pk PRIMARY KEY (id);
+
+
+--
+-- Name: alerta_regional_zika alertaregionalzika_pk; Type: CONSTRAINT; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_regional_zika
+    ADD CONSTRAINT alertaregionalzika_pk PRIMARY KEY (id);
+
+
+--
+-- Name: alerta_mrj previsao; Type: CONSTRAINT; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_mrj
+    ADD CONSTRAINT previsao UNIQUE (aps, se);
+
+
+--
+-- Name: alerta_mrj_chik previsao_chik; Type: CONSTRAINT; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_mrj_chik
+    ADD CONSTRAINT previsao_chik UNIQUE (aps, se);
+
+
+--
+-- Name: alerta_mrj_zika previsao_zika; Type: CONSTRAINT; Schema: archive_alertas_regionais; Owner: postgres
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_mrj_zika
+    ADD CONSTRAINT previsao_zika UNIQUE (aps, se);
+
+
+--
+-- Name: alerta_mrj unique_aps_se; Type: CONSTRAINT; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_mrj
     ADD CONSTRAINT unique_aps_se UNIQUE (se, aps);
 
 
 --
--- Name: alerta_mrj_chik unique_chik_aps_se; Type: CONSTRAINT; Schema: Municipio; Owner: dengueadmin
+-- Name: alerta_mrj_chik unique_chik_aps_se; Type: CONSTRAINT; Schema: archive_alertas_regionais; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY "Municipio".alerta_mrj_chik
+ALTER TABLE ONLY archive_alertas_regionais.alerta_mrj_chik
     ADD CONSTRAINT unique_chik_aps_se UNIQUE (se, aps);
 
 
 --
--- Name: alerta_mrj_zika unique_zika_aps_se; Type: CONSTRAINT; Schema: Municipio; Owner: postgres
+-- Name: alerta_mrj_zika unique_zika_aps_se; Type: CONSTRAINT; Schema: archive_alertas_regionais; Owner: postgres
 --
 
-ALTER TABLE ONLY "Municipio".alerta_mrj_zika
+ALTER TABLE ONLY archive_alertas_regionais.alerta_mrj_zika
     ADD CONSTRAINT unique_zika_aps_se UNIQUE (se, aps);
 
 
@@ -4239,35 +4248,35 @@ ALTER TABLE ONLY "Dengue_global".regional
 
 
 --
--- Name: alerta_regional_dengue regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
---
-
-ALTER TABLE ONLY "Dengue_global".alerta_regional_dengue
-    ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
-
-
---
--- Name: alerta_regional_chik regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
---
-
-ALTER TABLE ONLY "Dengue_global".alerta_regional_chik
-    ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
-
-
---
--- Name: alerta_regional_zika regional_fk; Type: FK CONSTRAINT; Schema: Dengue_global; Owner: dengueadmin
---
-
-ALTER TABLE ONLY "Dengue_global".alerta_regional_zika
-    ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
-
-
---
 -- Name: Tweet Tweet_CID10; Type: FK CONSTRAINT; Schema: Municipio; Owner: administrador
 --
 
 ALTER TABLE ONLY "Municipio"."Tweet"
     ADD CONSTRAINT "Tweet_CID10" FOREIGN KEY ("CID10_codigo") REFERENCES "Dengue_global"."CID10"(codigo);
+
+
+--
+-- Name: alerta_regional_dengue regional_fk; Type: FK CONSTRAINT; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_regional_dengue
+    ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
+
+
+--
+-- Name: alerta_regional_chik regional_fk; Type: FK CONSTRAINT; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_regional_chik
+    ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
+
+
+--
+-- Name: alerta_regional_zika regional_fk; Type: FK CONSTRAINT; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_alertas_regionais.alerta_regional_zika
+    ADD CONSTRAINT regional_fk FOREIGN KEY (id_regional) REFERENCES "Dengue_global".regional(id);
 
 
 --
@@ -4478,54 +4487,6 @@ GRANT SELECT ON TABLE "Dengue_global"."Municipio" TO "Read_only";
 GRANT SELECT ON TABLE "Dengue_global"."Municipio" TO infodenguedev;
 GRANT SELECT ON TABLE "Dengue_global"."Municipio" TO analista;
 GRANT SELECT ON TABLE "Dengue_global"."Municipio" TO mosqlimate_dev;
-
-
---
--- Name: TABLE alerta_regional_chik; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
---
-
-GRANT SELECT ON TABLE "Dengue_global".alerta_regional_chik TO "Read_only";
-GRANT SELECT ON TABLE "Dengue_global".alerta_regional_chik TO infodenguedev;
-GRANT SELECT ON TABLE "Dengue_global".alerta_regional_chik TO analista;
-
-
---
--- Name: SEQUENCE alerta_regional_chik_id_seq; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
---
-
-GRANT SELECT ON SEQUENCE "Dengue_global".alerta_regional_chik_id_seq TO "Read_only";
-
-
---
--- Name: TABLE alerta_regional_dengue; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
---
-
-GRANT SELECT ON TABLE "Dengue_global".alerta_regional_dengue TO "Read_only";
-GRANT SELECT ON TABLE "Dengue_global".alerta_regional_dengue TO infodenguedev;
-GRANT SELECT ON TABLE "Dengue_global".alerta_regional_dengue TO analista;
-
-
---
--- Name: SEQUENCE alerta_regional_dengue_id_seq; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
---
-
-GRANT SELECT ON SEQUENCE "Dengue_global".alerta_regional_dengue_id_seq TO "Read_only";
-
-
---
--- Name: TABLE alerta_regional_zika; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
---
-
-GRANT SELECT ON TABLE "Dengue_global".alerta_regional_zika TO "Read_only";
-GRANT SELECT ON TABLE "Dengue_global".alerta_regional_zika TO infodenguedev;
-GRANT SELECT ON TABLE "Dengue_global".alerta_regional_zika TO analista;
-
-
---
--- Name: SEQUENCE alerta_regional_zika_id_seq; Type: ACL; Schema: Dengue_global; Owner: dengueadmin
---
-
-GRANT SELECT ON SEQUENCE "Dengue_global".alerta_regional_zika_id_seq TO "Read_only";
 
 
 --
@@ -4761,55 +4722,6 @@ GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Tweet_id_seq" TO dengue;
 
 
 --
--- Name: TABLE alerta_mrj; Type: ACL; Schema: Municipio; Owner: dengueadmin
---
-
-GRANT ALL ON TABLE "Municipio".alerta_mrj TO dengue;
-GRANT SELECT ON TABLE "Municipio".alerta_mrj TO infodenguedev;
-GRANT SELECT ON TABLE "Municipio".alerta_mrj TO analista;
-
-
---
--- Name: TABLE alerta_mrj_chik; Type: ACL; Schema: Municipio; Owner: dengueadmin
---
-
-GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE "Municipio".alerta_mrj_chik TO "Dengue";
-GRANT ALL ON TABLE "Municipio".alerta_mrj_chik TO dengue;
-GRANT SELECT ON TABLE "Municipio".alerta_mrj_chik TO infodenguedev;
-GRANT SELECT ON TABLE "Municipio".alerta_mrj_chik TO analista;
-
-
---
--- Name: SEQUENCE alerta_mrj_chik_id_seq; Type: ACL; Schema: Municipio; Owner: dengueadmin
---
-
-GRANT SELECT,USAGE ON SEQUENCE "Municipio".alerta_mrj_chik_id_seq TO dengue;
-
-
---
--- Name: SEQUENCE alerta_mrj_id_seq; Type: ACL; Schema: Municipio; Owner: dengueadmin
---
-
-GRANT SELECT,USAGE ON SEQUENCE "Municipio".alerta_mrj_id_seq TO dengue;
-
-
---
--- Name: TABLE alerta_mrj_zika; Type: ACL; Schema: Municipio; Owner: postgres
---
-
-GRANT ALL ON TABLE "Municipio".alerta_mrj_zika TO dengue;
-GRANT SELECT ON TABLE "Municipio".alerta_mrj_zika TO infodenguedev;
-GRANT SELECT ON TABLE "Municipio".alerta_mrj_zika TO analista;
-
-
---
--- Name: SEQUENCE alerta_mrj_zika_id_seq; Type: ACL; Schema: Municipio; Owner: postgres
---
-
-GRANT SELECT,USAGE ON SEQUENCE "Municipio".alerta_mrj_zika_id_seq TO dengue;
-
-
---
 -- Name: TABLE historico_casos; Type: ACL; Schema: Municipio; Owner: dengueadmin
 --
 
@@ -4823,6 +4735,103 @@ GRANT SELECT ON TABLE "Municipio".historico_casos TO analista;
 
 GRANT SELECT ON TABLE "Municipio".sprint202425 TO infodenguedev;
 GRANT SELECT ON TABLE "Municipio".sprint202425 TO analista;
+
+
+--
+-- Name: TABLE alerta_mrj; Type: ACL; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+GRANT ALL ON TABLE archive_alertas_regionais.alerta_mrj TO dengue;
+GRANT SELECT ON TABLE archive_alertas_regionais.alerta_mrj TO infodenguedev;
+GRANT SELECT ON TABLE archive_alertas_regionais.alerta_mrj TO analista;
+
+
+--
+-- Name: TABLE alerta_mrj_chik; Type: ACL; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+GRANT SELECT,INSERT,REFERENCES,TRIGGER,TRUNCATE,UPDATE ON TABLE archive_alertas_regionais.alerta_mrj_chik TO "Dengue";
+GRANT ALL ON TABLE archive_alertas_regionais.alerta_mrj_chik TO dengue;
+GRANT SELECT ON TABLE archive_alertas_regionais.alerta_mrj_chik TO infodenguedev;
+GRANT SELECT ON TABLE archive_alertas_regionais.alerta_mrj_chik TO analista;
+
+
+--
+-- Name: SEQUENCE alerta_mrj_chik_id_seq; Type: ACL; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+GRANT SELECT,USAGE ON SEQUENCE archive_alertas_regionais.alerta_mrj_chik_id_seq TO dengue;
+
+
+--
+-- Name: SEQUENCE alerta_mrj_id_seq; Type: ACL; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+GRANT SELECT,USAGE ON SEQUENCE archive_alertas_regionais.alerta_mrj_id_seq TO dengue;
+
+
+--
+-- Name: TABLE alerta_mrj_zika; Type: ACL; Schema: archive_alertas_regionais; Owner: postgres
+--
+
+GRANT ALL ON TABLE archive_alertas_regionais.alerta_mrj_zika TO dengue;
+GRANT SELECT ON TABLE archive_alertas_regionais.alerta_mrj_zika TO infodenguedev;
+GRANT SELECT ON TABLE archive_alertas_regionais.alerta_mrj_zika TO analista;
+
+
+--
+-- Name: SEQUENCE alerta_mrj_zika_id_seq; Type: ACL; Schema: archive_alertas_regionais; Owner: postgres
+--
+
+GRANT SELECT,USAGE ON SEQUENCE archive_alertas_regionais.alerta_mrj_zika_id_seq TO dengue;
+
+
+--
+-- Name: TABLE alerta_regional_chik; Type: ACL; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE archive_alertas_regionais.alerta_regional_chik TO "Read_only";
+GRANT SELECT ON TABLE archive_alertas_regionais.alerta_regional_chik TO infodenguedev;
+GRANT SELECT ON TABLE archive_alertas_regionais.alerta_regional_chik TO analista;
+
+
+--
+-- Name: SEQUENCE alerta_regional_chik_id_seq; Type: ACL; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+GRANT SELECT ON SEQUENCE archive_alertas_regionais.alerta_regional_chik_id_seq TO "Read_only";
+
+
+--
+-- Name: TABLE alerta_regional_dengue; Type: ACL; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE archive_alertas_regionais.alerta_regional_dengue TO "Read_only";
+GRANT SELECT ON TABLE archive_alertas_regionais.alerta_regional_dengue TO infodenguedev;
+GRANT SELECT ON TABLE archive_alertas_regionais.alerta_regional_dengue TO analista;
+
+
+--
+-- Name: SEQUENCE alerta_regional_dengue_id_seq; Type: ACL; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+GRANT SELECT ON SEQUENCE archive_alertas_regionais.alerta_regional_dengue_id_seq TO "Read_only";
+
+
+--
+-- Name: TABLE alerta_regional_zika; Type: ACL; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE archive_alertas_regionais.alerta_regional_zika TO "Read_only";
+GRANT SELECT ON TABLE archive_alertas_regionais.alerta_regional_zika TO infodenguedev;
+GRANT SELECT ON TABLE archive_alertas_regionais.alerta_regional_zika TO analista;
+
+
+--
+-- Name: SEQUENCE alerta_regional_zika_id_seq; Type: ACL; Schema: archive_alertas_regionais; Owner: dengueadmin
+--
+
+GRANT SELECT ON SEQUENCE archive_alertas_regionais.alerta_regional_zika_id_seq TO "Read_only";
 
 
 --

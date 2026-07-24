@@ -38,11 +38,13 @@ not be confused with PostgreSQL schemas.
   code under `AlertaDengue/api`, `AlertaDengue/dados`, and
   `AlertaDengue/ingestion`, excluding migrations and tests from active/runtime
   claims.
-- GitHub issue references for `#817`, `#1008`, `#1013`, and `#1015` were
+- GitHub issue references for `#817`, `#1008`, `#1013`, `#1015`, and `#1019` were
   inspected on 2026-07-24 through the GitHub API.
 - Repository state now includes reviewed SQL history for the approved
-  `archive_ovitrampa` batch. That implements the archival procedure locally,
-  but it does not mean any shared environment has already executed it.
+  `archive_ovitrampa` and `archive_alertas_regionais` batches. Those
+  procedures are implemented and validated locally in disposable PostgreSQL
+  databases, but that does not mean any shared environment has already
+  executed them.
 
 ## Summary Counts
 
@@ -66,8 +68,8 @@ not be confused with PostgreSQL schemas.
 | Metric | Count |
 | --- | ---: |
 | Total catalog objects | 31 |
-| Retain | 12 |
-| Archive | 18 |
+| Retain | 13 |
+| Archive | 17 |
 | Pending retention decisions | 1 |
 
 ### ORM totals
@@ -90,11 +92,11 @@ not be confused with PostgreSQL schemas.
   - `weather`: 3
   - `episcanner`: 1
 - `containers/postgres/schemas/schemas_dengue.sql` is now the authoritative
-  post-archive repository representation validated in a disposable PostgreSQL
-  database for issue `#1015`.
-- The checked-in dump therefore records the reviewed `archive_ovitrampa`
-  target state even when another local or shared database has not executed the
-  archive scripts yet.
+  post-archive repository representation validated in disposable PostgreSQL
+  databases for issues `#1015` and `#1019`.
+- The checked-in dump therefore records the reviewed `archive_ovitrampa` and
+  `archive_alertas_regionais` target states even when another local or shared
+  database has not executed the archive scripts yet.
 - No target-schema objects were found only in the live catalog.
 - No target-schema objects were found only in the repository dump.
 - The previous pass incorrectly listed `forecast.chunked_upload_chunkedupload`.
@@ -150,15 +152,15 @@ not be confused with PostgreSQL schemas.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `CID10` | table | active | retain | existing-unmanaged | read-only | `administrador` | unmanaged | mixed: unmanaged model and raw SQL | PK `codigo`; approx. rows `8349`; size `933888` bytes | Queried in `api/db.py` joins and backed by `dados.models.CID10`. Retain as current read-only lookup. |
 | `Municipio` | table | active | retain | existing-unmanaged | read-only | `administrador` | unmanaged | mixed: unmanaged model and raw SQL | PK `geocodigo`; approx. rows `5570`; size `24002560` bytes | Used by `dados/maps.py`, `dados/dbdata.py`, `dados/tasks.py`, `api/db.py`, and `sync_geofiles.py`. Live table still contains `geojson` and `populacao`, confirming the current unmanaged model is incomplete. |
-| `alerta_regional_chik` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; FK `id_regional -> Dengue_global.regional(id)`; size `8192` bytes | Maintainers approved archival and no ORM mapping. This table belongs to a retired reporting workflow. This PR records lifecycle and ORM decisions only. |
-| `alerta_regional_dengue` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; FK `id_regional -> Dengue_global.regional(id)`; size `8192` bytes | Maintainers approved archival and no ORM mapping. This table belongs to a retired reporting workflow. This PR records lifecycle and ORM decisions only. |
-| `alerta_regional_zika` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; FK `id_regional -> Dengue_global.regional(id)`; size `8192` bytes | Maintainers approved archival and no ORM mapping. This table belongs to a retired reporting workflow. This PR records lifecycle and ORM decisions only. |
+| `alerta_regional_chik` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; FK `id_regional -> Dengue_global.regional(id)`; size `8192` bytes | This retired reporting table now belongs to the implemented `archive_alertas_regionais` batch. Repository SQL history adds archive, validation, and restoration scripts that move it to `archive_alertas_regionais.alerta_regional_chik` while preserving the FK to active `Dengue_global.regional(id)`. The flow was validated locally on 2026-07-24 in a disposable PostgreSQL database; staging and production remain unchanged. |
+| `alerta_regional_dengue` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; FK `id_regional -> Dengue_global.regional(id)`; size `8192` bytes | This retired reporting table now belongs to the implemented `archive_alertas_regionais` batch. Repository SQL history adds archive, validation, and restoration scripts that move it to `archive_alertas_regionais.alerta_regional_dengue` while preserving the FK to active `Dengue_global.regional(id)`. The flow was validated locally on 2026-07-24 in a disposable PostgreSQL database; staging and production remain unchanged. |
+| `alerta_regional_zika` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; FK `id_regional -> Dengue_global.regional(id)`; size `8192` bytes | This retired reporting table now belongs to the implemented `archive_alertas_regionais` batch. Repository SQL history adds archive, validation, and restoration scripts that move it to `archive_alertas_regionais.alerta_regional_zika` while preserving the FK to active `Dengue_global.regional(id)`. The flow was validated locally on 2026-07-24 in a disposable PostgreSQL database; staging and production remain unchanged. |
 | `estado` | table | indirectly-used | retain | map-unmanaged | read-only | `administrador` | none | indirect dependency only | PK `geocodigo`; approx. rows `27`; size `11165696` bytes | No direct current repository query to `Dengue_global.estado` was found. Live `pg_catalog` dependencies show `public.hist_uf_dengue_materialized_view`, `public.hist_uf_chik_materialized_view`, and `public.hist_uf_zika_materialized_view` depend on this table; all three are used by current runtime code in `dados/dbdata.py` for state-history queries. Suggested model: `State` with natural primary key `geocodigo`. |
 | `macroregional` | table | indirectly-used | retain | map-unmanaged | read-only | `dengueadmin` | none | indirect dependency only | PK `id`; approx. rows `118`; size `40960` bytes | `Dengue_global.regional.id_macroregional` has a live FK to `Dengue_global.macroregional.id`. `regional` is retained and is a confirmed ORM candidate, so `macroregional` must also be retained and mapped. The ORM relationship must reflect the real database FK. Suggested model: `Macroregion` with primary key `id`. |
 | `parameters` | table | active | retain | map-unmanaged | read-only | `dengueadmin` | none | raw SQL | PK `(municipio_geocodigo, cid10)`; approx. rows `11091`; size `2416640` bytes | Queried by `RegionalParameters` in `dados/dbdata.py` for current report and selection flows. Composite PK is real in the live catalog. No current Django model exists for this table. |
 | `parameters_uf` | table | active | retain | existing-managed | read-write-application | `postgres` | managed | Django-managed table plus data migrations | PK `(state_code, cid10)`; approx. rows `52`; size `49152` bytes | Live catalog confirms the composite PK exists today. Current codebase keeps the managed model in `dados.models.ParameterUF`; direct runtime reads are not prominent, but the object is current application-owned state introduced by issues `#897` and `#903`. |
 | `regional` | table | active | retain | map-unmanaged | read-only | `dengueadmin` | none | raw SQL | PK `id`; FK `id_macroregional -> Dengue_global.macroregional(id)`; approx. rows `451`; size `131072` bytes | Directly queried by `RegionalParameters.get_regional_names()` and `get_cities()` in `dados/dbdata.py`. No current Django model exists for this table; it remains a Phase 2 unmanaged mapping candidate. |
-| `regional_saude` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; unique `municipio_geocodigo`; approx. rows `5563`; size `1015808` bytes | This table belonged to the legacy Redemet workflow. It remains approved for archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
+| `regional_saude` | table | legacy | retain | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; unique `municipio_geocodigo`; approx. rows `5563`; size `1015808` bytes | This table belonged to the legacy Redemet workflow, but issue `#1019` explicitly keeps it active and out of the `archive_alertas_regionais` batch. Repository SQL history now validates that `Dengue_global.regional_saude` stays in place while the six retired regional-alert tables move around it. Staging and production execution remain pending. |
 
 ## Schema `Municipio`
 
@@ -175,9 +177,9 @@ not be confused with PostgreSQL schemas.
 | `Notificacao` | table | active | retain | map-unmanaged | read-write-application | `administrador` | none | raw SQL and ingestion UPSERT | PK `id`; unique `(nu_notific, dt_notific, cid10_codigo, municipio_geocodigo)`; approx. rows `37097472`; size `13733748736` bytes | Queried by `api/internal/services.py` and `api/db.py`; written by `ingestion/tasks.py` merge logic. No current Django model exists for this table, so intended ORM work remains separate from current ownership. |
 | `Ovitrampa` | table | legacy | archive | do-not-map | unknown | `administrador` | none | no runtime evidence found | PK `id`; FK `Localidade_id -> Municipio.Localidade(id)`; approx. rows `0`; size `8192` bytes | `Ovitrampa` is part of the approved `archive_ovitrampa` batch with `Bairro` and `Localidade`. Repository SQL history now implements archive, validation, and restoration scripts that preserve the `Ovitrampa.Localidade_id` relationship by moving all three tables together. Current repository and maintainer evidence found no active application path or known external consumer, so `Ovitrampa` is no longer a retained unmanaged ORM candidate. |
 | `Tweet` | table | legacy | archive | do-not-map | unknown | `administrador` | none | no runtime evidence found | PK `id`; FK `CID10_codigo -> Dengue_global.CID10(codigo)`; approx. rows `3879263`; size `317546496` bytes | `Tweet` contains historical data but must not receive an ORM model. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
-| `alerta_mrj` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; unique `(aps, se)`; approx. rows `6274`; size `1114112` bytes | This table belongs to a retired reporting workflow. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
-| `alerta_mrj_chik` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; unique `(aps, se)`; approx. rows `6270`; size `1114112` bytes | This table belongs to a retired reporting workflow. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
-| `alerta_mrj_zika` | table | legacy | archive | do-not-map | unknown | `postgres` | none | no runtime evidence found | PK `id`; unique `(aps, se)`; size `24576` bytes | This table belongs to a retired reporting workflow. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
+| `alerta_mrj` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; unique `(aps, se)`; approx. rows `6274`; size `1114112` bytes | This retired reporting table now belongs to the implemented `archive_alertas_regionais` batch. Repository SQL history adds archive, validation, and restoration scripts that move it to `archive_alertas_regionais.alerta_mrj` while preserving owner, grants, defaults, and unique constraints. The flow was validated locally on 2026-07-24 in a disposable PostgreSQL database; staging and production remain unchanged. |
+| `alerta_mrj_chik` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; unique `(aps, se)`; approx. rows `6270`; size `1114112` bytes | This retired reporting table now belongs to the implemented `archive_alertas_regionais` batch. Repository SQL history adds archive, validation, and restoration scripts that move it to `archive_alertas_regionais.alerta_mrj_chik` while preserving owner, grants, defaults, and unique constraints. The flow was validated locally on 2026-07-24 in a disposable PostgreSQL database; staging and production remain unchanged. |
+| `alerta_mrj_zika` | table | legacy | archive | do-not-map | unknown | `postgres` | none | no runtime evidence found | PK `id`; unique `(aps, se)`; size `24576` bytes | This retired reporting table now belongs to the implemented `archive_alertas_regionais` batch. Repository SQL history adds archive, validation, and restoration scripts that move it to `archive_alertas_regionais.alerta_mrj_zika` while preserving owner, grants, defaults, and unique constraints. The flow was validated locally on 2026-07-24 in a disposable PostgreSQL database; staging and production remain unchanged. |
 | `historico_casos` | materialized view | legacy | archive | do-not-map | read-only | `dengueadmin` | none | no runtime evidence found | no PK; approx. rows `4796063`; size `358580224` bytes | Its incorrect disease-combining semantics were removed from the application by replacing the legacy dashboard query with disease-specific `Historico_alerta*` queries. No current application reference remains. It is ready for a separate reviewed archival change only after deployment validation. |
 | `sprint202425` | table | temporary | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; approx. rows `4187433`; size `655433728` bytes | Time-bounded working table. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
 
@@ -246,16 +248,15 @@ No live objects were found in `forecast`, and no target-schema objects from
 
 ## Approved for archival, not ORM mapping
 
-This PR records approved lifecycle decisions only. No table or materialized
-view is modified by this PR. Actual archival requires a separate reviewed
-issue and database change.
+Repository SQL history now contains reviewed archival procedures for selected
+approved batches. Local disposable validation exists for the implemented
+batches below, but no staging or production database was modified here.
 
 ### `Dengue_global`
 
 - `alerta_regional_chik`
 - `alerta_regional_dengue`
 - `alerta_regional_zika`
-- `regional_saude`
 
 ### `Municipio`
 
@@ -284,6 +285,11 @@ Additional constraints:
 - The `archive_ovitrampa` batch is implemented in repository SQL history and
   validated in a disposable database, but production remains unchanged until
   an operator executes the reviewed scripts there.
+- The `archive_alertas_regionais` batch is implemented in repository SQL
+  history and validated in a disposable database, but production remains
+  unchanged until an operator executes the reviewed scripts there.
+- `Dengue_global.regional_saude` remains active and was explicitly excluded
+  from `archive_alertas_regionais`.
 
 ## Remaining Blockers
 
