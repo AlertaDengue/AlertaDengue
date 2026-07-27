@@ -1,6 +1,6 @@
 # ORM Inventory for EPIC #1008 Phase 1
 
-Date: 2026-07-24
+Date: 2026-07-27
 
 Scope: `Dengue_global`, `Municipio`, `forecast`, `weather`, `episcanner`
 
@@ -38,13 +38,13 @@ not be confused with PostgreSQL schemas.
   code under `AlertaDengue/api`, `AlertaDengue/dados`, and
   `AlertaDengue/ingestion`, excluding migrations and tests from active/runtime
   claims.
-- GitHub issue references for `#817`, `#1008`, `#1013`, `#1015`, and `#1019` were
-  inspected on 2026-07-24 through the GitHub API.
+- GitHub issue references for `#817`, `#1008`, `#1013`, `#1015`, `#1019`, and
+  `#1023` were inspected on 2026-07-27 through the GitHub API.
 - Repository state now includes reviewed SQL history for the approved
-  `archive_ovitrampa` and `archive_alertas_regionais` batches. Those
-  procedures are implemented and validated locally in disposable PostgreSQL
-  databases, but that does not mean any shared environment has already
-  executed them.
+  `archive_ovitrampa`, `archive_alertas_regionais`, and `archive_cemaden`
+  batches. Those procedures are implemented and validated locally in
+  disposable PostgreSQL databases, but that does not mean any shared
+  environment has already executed them.
 
 ## Summary Counts
 
@@ -93,10 +93,10 @@ not be confused with PostgreSQL schemas.
   - `episcanner`: 1
 - `containers/postgres/schemas/schemas_dengue.sql` is now the authoritative
   post-archive repository representation validated in disposable PostgreSQL
-  databases for issues `#1015` and `#1019`.
+  databases for issues `#1015`, `#1019`, and `#1023`.
 - The checked-in dump therefore records the reviewed `archive_ovitrampa` and
-  `archive_alertas_regionais` target states even when another local or shared
-  database has not executed the archive scripts yet.
+  `archive_alertas_regionais` and `archive_cemaden` target states even when
+  another local or shared database has not executed the archive scripts yet.
 - No target-schema objects were found only in the live catalog.
 - No target-schema objects were found only in the repository dump.
 - The previous pass incorrectly listed `forecast.chunked_upload_chunkedupload`.
@@ -168,8 +168,8 @@ not be confused with PostgreSQL schemas.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `Bairro` | table | legacy | archive | do-not-map | unknown | `administrador` | none | no runtime evidence found | PK `id`; FK `Localidade_id -> Municipio.Localidade(id)`; approx. rows `184`; size `40960` bytes | `Bairro` belonged to the legacy satellite/Cemaden climate workflow. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
 | `Clima_Satelite` | table | legacy | archive | do-not-map | unknown | `administrador` | none | no runtime evidence found | PK `id`; size `16384` bytes | This table belongs to a retired climate ingestion path. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
-| `Clima_cemaden` | table | legacy | archive | do-not-map | unknown | `administrador` | none | no runtime evidence found | PK `id`; approx. rows `36515064`; size `4429135872` bytes | This table belongs to a retired climate ingestion path. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
-| `Estacao_cemaden` | table | legacy | archive | do-not-map | unknown | `administrador` | none | no runtime evidence found | PK `codestacao`; approx. rows `645`; size `131072` bytes | This table belongs to a retired climate ingestion path. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
+| `Clima_cemaden` | table | legacy | archive | do-not-map | unknown | `administrador` | none | no runtime evidence found | PK `id`; approx. rows `36515064`; size `4429135872` bytes | This retired climate table now belongs to the implemented `archive_cemaden` batch with `Municipio.Estacao_cemaden`. Maintainer review recorded on 2026-07-27 confirmed there is no active external producer and no external consumer. Repository SQL history now adds archive, validation, and restoration scripts that move it to `archive_cemaden."Clima_cemaden"` while preserving the owned sequence, indexes, defaults, comments, ownership, and ACLs. The flow was validated locally on 2026-07-27 in a disposable PostgreSQL database; staging and production remain unchanged. |
+| `Estacao_cemaden` | table | legacy | archive | do-not-map | unknown | `administrador` | none | no runtime evidence found | PK `codestacao`; approx. rows `645`; size `131072` bytes | This retired climate metadata table now belongs to the implemented `archive_cemaden` batch with `Municipio.Clima_cemaden`. Maintainer review recorded on 2026-07-27 confirmed there is no active external producer and no external consumer. Repository SQL history now adds archive, validation, and restoration scripts that move it to `archive_cemaden."Estacao_cemaden"` while preserving indexes, defaults, comments, ownership, and ACLs. The flow was validated locally on 2026-07-27 in a disposable PostgreSQL database; staging and production remain unchanged. |
 | `Historico_alerta` | table | active | retain | map-unmanaged | read-write-external | `administrador` | none | raw SQL | PK `id`; unique `("SE", municipio_geocodigo, "Localidade_id")`; approx. rows `4786759`; size `2484256768` bytes | Directly read by `dados/tasks.py`, `dados/dbdata.py`, and `sync_geofiles.py`. Live dependents include `Municipio.historico_casos` and public materialized views. No current Django model exists for this table. |
 | `Historico_alerta_chik` | table | active | retain | map-unmanaged | read-write-external | `administrador` | none | raw SQL | PK `id`; unique `("SE", municipio_geocodigo, "Localidade_id")`; approx. rows `4532807`; size `2495504384` bytes | Read through disease-suffix SQL and written by `backfill_casprov.py`. No current Django model exists for this table. |
 | `Historico_alerta_zika` | table | active | retain | map-unmanaged | read-write-external | `postgres` | none | raw SQL | PK `id`; unique `("SE", municipio_geocodigo, "Localidade_id")`; approx. rows `4057247`; size `1328365568` bytes | Read through disease-suffix SQL in current code. No current Django model exists for this table. |

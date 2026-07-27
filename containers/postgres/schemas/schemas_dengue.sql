@@ -44,6 +44,15 @@ CREATE SCHEMA archive_alertas_regionais;
 ALTER SCHEMA archive_alertas_regionais OWNER TO postgres;
 
 --
+-- Name: archive_cemaden; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA archive_cemaden;
+
+
+ALTER SCHEMA archive_cemaden OWNER TO postgres;
+
+--
 -- Name: archive_ovitrampa; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
@@ -615,49 +624,6 @@ ALTER SEQUENCE "Municipio"."Clima_Satelite_id_seq" OWNED BY "Municipio"."Clima_S
 
 
 --
--- Name: Clima_cemaden; Type: TABLE; Schema: Municipio; Owner: administrador
---
-
-CREATE TABLE "Municipio"."Clima_cemaden" (
-    valor real NOT NULL,
-    sensor character varying(32) NOT NULL,
-    id bigint NOT NULL,
-    datahora timestamp without time zone NOT NULL,
-    "Estacao_cemaden_codestacao" character varying(10) NOT NULL
-);
-
-
-ALTER TABLE "Municipio"."Clima_cemaden" OWNER TO administrador;
-
---
--- Name: TABLE "Clima_cemaden"; Type: COMMENT; Schema: Municipio; Owner: administrador
---
-
-COMMENT ON TABLE "Municipio"."Clima_cemaden" IS 'dados de clima - CEMADEN';
-
-
---
--- Name: Clima_cemaden_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
---
-
-CREATE SEQUENCE "Municipio"."Clima_cemaden_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE "Municipio"."Clima_cemaden_id_seq" OWNER TO administrador;
-
---
--- Name: Clima_cemaden_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
---
-
-ALTER SEQUENCE "Municipio"."Clima_cemaden_id_seq" OWNED BY "Municipio"."Clima_cemaden".id;
-
-
---
 -- Name: Clima_wu; Type: TABLE; Schema: Municipio; Owner: administrador
 --
 
@@ -705,29 +671,6 @@ ALTER TABLE "Municipio"."Clima_wu_id_seq" OWNER TO administrador;
 --
 
 ALTER SEQUENCE "Municipio"."Clima_wu_id_seq" OWNED BY "Municipio"."Clima_wu".id;
-
-
---
--- Name: Estacao_cemaden; Type: TABLE; Schema: Municipio; Owner: administrador
---
-
-CREATE TABLE "Municipio"."Estacao_cemaden" (
-    codestacao character varying(32) NOT NULL,
-    nome character varying(128) NOT NULL,
-    municipio character varying(128),
-    uf character varying(2),
-    latitude real NOT NULL,
-    longitude real NOT NULL
-);
-
-
-ALTER TABLE "Municipio"."Estacao_cemaden" OWNER TO administrador;
-
---
--- Name: TABLE "Estacao_cemaden"; Type: COMMENT; Schema: Municipio; Owner: administrador
---
-
-COMMENT ON TABLE "Municipio"."Estacao_cemaden" IS 'Metadados da estação do cemaden';
 
 
 --
@@ -1431,6 +1374,72 @@ ALTER TABLE archive_alertas_regionais.alerta_regional_zika_id_seq OWNER TO dengu
 --
 
 ALTER SEQUENCE archive_alertas_regionais.alerta_regional_zika_id_seq OWNED BY archive_alertas_regionais.alerta_regional_zika.id;
+
+
+--
+-- Name: Clima_cemaden; Type: TABLE; Schema: archive_cemaden; Owner: administrador
+--
+
+CREATE TABLE archive_cemaden."Clima_cemaden" (
+    valor real NOT NULL,
+    sensor character varying(32) NOT NULL,
+    id bigint NOT NULL,
+    datahora timestamp without time zone NOT NULL,
+    "Estacao_cemaden_codestacao" character varying(10) NOT NULL
+);
+
+
+ALTER TABLE archive_cemaden."Clima_cemaden" OWNER TO administrador;
+
+--
+-- Name: TABLE "Clima_cemaden"; Type: COMMENT; Schema: archive_cemaden; Owner: administrador
+--
+
+COMMENT ON TABLE archive_cemaden."Clima_cemaden" IS 'dados de clima - CEMADEN';
+
+
+--
+-- Name: Clima_cemaden_id_seq; Type: SEQUENCE; Schema: archive_cemaden; Owner: administrador
+--
+
+CREATE SEQUENCE archive_cemaden."Clima_cemaden_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE archive_cemaden."Clima_cemaden_id_seq" OWNER TO administrador;
+
+--
+-- Name: Clima_cemaden_id_seq; Type: SEQUENCE OWNED BY; Schema: archive_cemaden; Owner: administrador
+--
+
+ALTER SEQUENCE archive_cemaden."Clima_cemaden_id_seq" OWNED BY archive_cemaden."Clima_cemaden".id;
+
+
+--
+-- Name: Estacao_cemaden; Type: TABLE; Schema: archive_cemaden; Owner: administrador
+--
+
+CREATE TABLE archive_cemaden."Estacao_cemaden" (
+    codestacao character varying(32) NOT NULL,
+    nome character varying(128) NOT NULL,
+    municipio character varying(128),
+    uf character varying(2),
+    latitude real NOT NULL,
+    longitude real NOT NULL
+);
+
+
+ALTER TABLE archive_cemaden."Estacao_cemaden" OWNER TO administrador;
+
+--
+-- Name: TABLE "Estacao_cemaden"; Type: COMMENT; Schema: archive_cemaden; Owner: administrador
+--
+
+COMMENT ON TABLE archive_cemaden."Estacao_cemaden" IS 'Metadados da estação do cemaden';
 
 
 --
@@ -2883,13 +2892,6 @@ ALTER TABLE ONLY "Municipio"."Clima_Satelite" ALTER COLUMN id SET DEFAULT nextva
 
 
 --
--- Name: Clima_cemaden id; Type: DEFAULT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Clima_cemaden" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Clima_cemaden_id_seq"'::regclass);
-
-
---
 -- Name: Clima_wu id; Type: DEFAULT; Schema: Municipio; Owner: administrador
 --
 
@@ -2978,6 +2980,13 @@ ALTER TABLE ONLY archive_alertas_regionais.alerta_regional_dengue ALTER COLUMN i
 --
 
 ALTER TABLE ONLY archive_alertas_regionais.alerta_regional_zika ALTER COLUMN id SET DEFAULT nextval('archive_alertas_regionais.alerta_regional_zika_id_seq'::regclass);
+
+
+--
+-- Name: Clima_cemaden id; Type: DEFAULT; Schema: archive_cemaden; Owner: administrador
+--
+
+ALTER TABLE ONLY archive_cemaden."Clima_cemaden" ALTER COLUMN id SET DEFAULT nextval('archive_cemaden."Clima_cemaden_id_seq"'::regclass);
 
 
 --
@@ -3222,27 +3231,11 @@ ALTER TABLE ONLY "Municipio"."Clima_Satelite"
 
 
 --
--- Name: Clima_cemaden Clima_cemaden_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Clima_cemaden"
-    ADD CONSTRAINT "Clima_cemaden_pk" PRIMARY KEY (id);
-
-
---
 -- Name: Clima_wu Clima_wu_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
 --
 
 ALTER TABLE ONLY "Municipio"."Clima_wu"
     ADD CONSTRAINT "Clima_wu_pk" PRIMARY KEY (id);
-
-
---
--- Name: Estacao_cemaden Estacao_cemaden_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Estacao_cemaden"
-    ADD CONSTRAINT "Estacao_cemaden_pk" PRIMARY KEY (codestacao);
 
 
 --
@@ -3427,6 +3420,22 @@ ALTER TABLE ONLY archive_alertas_regionais.alerta_mrj_chik
 
 ALTER TABLE ONLY archive_alertas_regionais.alerta_mrj_zika
     ADD CONSTRAINT unique_zika_aps_se UNIQUE (se, aps);
+
+
+--
+-- Name: Clima_cemaden Clima_cemaden_pk; Type: CONSTRAINT; Schema: archive_cemaden; Owner: administrador
+--
+
+ALTER TABLE ONLY archive_cemaden."Clima_cemaden"
+    ADD CONSTRAINT "Clima_cemaden_pk" PRIMARY KEY (id);
+
+
+--
+-- Name: Estacao_cemaden Estacao_cemaden_pk; Type: CONSTRAINT; Schema: archive_cemaden; Owner: administrador
+--
+
+ALTER TABLE ONLY archive_cemaden."Estacao_cemaden"
+    ADD CONSTRAINT "Estacao_cemaden_pk" PRIMARY KEY (codestacao);
 
 
 --
@@ -3897,20 +3906,6 @@ CREATE INDEX "WU_idx_data" ON "Municipio"."Clima_wu" USING btree (data_dia DESC)
 
 
 --
--- Name: chuva_idx_data; Type: INDEX; Schema: Municipio; Owner: administrador
---
-
-CREATE INDEX chuva_idx_data ON "Municipio"."Clima_cemaden" USING btree (datahora DESC);
-
-
---
--- Name: estacoes_idx; Type: INDEX; Schema: Municipio; Owner: administrador
---
-
-CREATE INDEX estacoes_idx ON "Municipio"."Clima_cemaden" USING btree ("Estacao_cemaden_codestacao");
-
-
---
 -- Name: historico_casos_data_inise_idx; Type: INDEX; Schema: Municipio; Owner: dengueadmin
 --
 
@@ -3936,6 +3931,20 @@ CREATE INDEX notificacao_api_city_cid10_year_date_id_idx ON "Municipio"."Notific
 --
 
 CREATE INDEX notificacao_cid10_idx ON "Municipio"."Notificacao" USING btree (cid10_codigo);
+
+
+--
+-- Name: chuva_idx_data; Type: INDEX; Schema: archive_cemaden; Owner: administrador
+--
+
+CREATE INDEX chuva_idx_data ON archive_cemaden."Clima_cemaden" USING btree (datahora DESC);
+
+
+--
+-- Name: estacoes_idx; Type: INDEX; Schema: archive_cemaden; Owner: administrador
+--
+
+CREATE INDEX estacoes_idx ON archive_cemaden."Clima_cemaden" USING btree ("Estacao_cemaden_codestacao");
 
 
 --
@@ -4581,23 +4590,6 @@ GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_Satelite_id_seq" TO dengue;
 
 
 --
--- Name: TABLE "Clima_cemaden"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Clima_cemaden" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Clima_cemaden" TO dengue;
-GRANT SELECT ON TABLE "Municipio"."Clima_cemaden" TO infodenguedev;
-GRANT SELECT ON TABLE "Municipio"."Clima_cemaden" TO analista;
-
-
---
--- Name: SEQUENCE "Clima_cemaden_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_cemaden_id_seq" TO dengue;
-
-
---
 -- Name: TABLE "Clima_wu"; Type: ACL; Schema: Municipio; Owner: administrador
 --
 
@@ -4612,16 +4604,6 @@ GRANT SELECT ON TABLE "Municipio"."Clima_wu" TO analista;
 --
 
 GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_wu_id_seq" TO dengue;
-
-
---
--- Name: TABLE "Estacao_cemaden"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Estacao_cemaden" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Estacao_cemaden" TO dengue;
-GRANT SELECT ON TABLE "Municipio"."Estacao_cemaden" TO infodenguedev;
-GRANT SELECT ON TABLE "Municipio"."Estacao_cemaden" TO analista;
 
 
 --
@@ -4832,6 +4814,33 @@ GRANT SELECT ON TABLE archive_alertas_regionais.alerta_regional_zika TO analista
 --
 
 GRANT SELECT ON SEQUENCE archive_alertas_regionais.alerta_regional_zika_id_seq TO "Read_only";
+
+
+--
+-- Name: TABLE "Clima_cemaden"; Type: ACL; Schema: archive_cemaden; Owner: administrador
+--
+
+GRANT ALL ON TABLE archive_cemaden."Clima_cemaden" TO "Dengue";
+GRANT ALL ON TABLE archive_cemaden."Clima_cemaden" TO dengue;
+GRANT SELECT ON TABLE archive_cemaden."Clima_cemaden" TO infodenguedev;
+GRANT SELECT ON TABLE archive_cemaden."Clima_cemaden" TO analista;
+
+
+--
+-- Name: SEQUENCE "Clima_cemaden_id_seq"; Type: ACL; Schema: archive_cemaden; Owner: administrador
+--
+
+GRANT SELECT,USAGE ON SEQUENCE archive_cemaden."Clima_cemaden_id_seq" TO dengue;
+
+
+--
+-- Name: TABLE "Estacao_cemaden"; Type: ACL; Schema: archive_cemaden; Owner: administrador
+--
+
+GRANT ALL ON TABLE archive_cemaden."Estacao_cemaden" TO "Dengue";
+GRANT ALL ON TABLE archive_cemaden."Estacao_cemaden" TO dengue;
+GRANT SELECT ON TABLE archive_cemaden."Estacao_cemaden" TO infodenguedev;
+GRANT SELECT ON TABLE archive_cemaden."Estacao_cemaden" TO analista;
 
 
 --
