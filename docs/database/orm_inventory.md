@@ -38,13 +38,13 @@ not be confused with PostgreSQL schemas.
   code under `AlertaDengue/api`, `AlertaDengue/dados`, and
   `AlertaDengue/ingestion`, excluding migrations and tests from active/runtime
   claims.
-- GitHub issue references for `#817`, `#1008`, `#1013`, `#1015`, `#1019`, and
-  `#1023` were inspected on 2026-07-27 through the GitHub API.
+- GitHub issue references for `#817`, `#1008`, `#1013`, `#1015`, `#1019`,
+  `#1023`, and `#1025` were inspected on 2026-07-27 through the GitHub API.
 - Repository state now includes reviewed SQL history for the approved
-  `archive_ovitrampa`, `archive_alertas_regionais`, and `archive_cemaden`
-  batches. Those procedures are implemented and validated locally in
-  disposable PostgreSQL databases, but that does not mean any shared
-  environment has already executed them.
+  `archive_ovitrampa`, `archive_alertas_regionais`, `archive_cemaden`, and
+  `archive_copernicus` batches. Those procedures are implemented and validated
+  locally in disposable PostgreSQL databases, but that does not mean any
+  shared environment has already executed them.
 
 ## Summary Counts
 
@@ -93,10 +93,11 @@ not be confused with PostgreSQL schemas.
   - `episcanner`: 1
 - `containers/postgres/schemas/schemas_dengue.sql` is now the authoritative
   post-archive repository representation validated in disposable PostgreSQL
-  databases for issues `#1015`, `#1019`, and `#1023`.
+  databases for issues `#1015`, `#1019`, `#1023`, and `#1025`.
 - The checked-in dump therefore records the reviewed `archive_ovitrampa` and
-  `archive_alertas_regionais` and `archive_cemaden` target states even when
-  another local or shared database has not executed the archive scripts yet.
+  `archive_alertas_regionais`, `archive_cemaden`, and `archive_copernicus`
+  target states even when another local or shared database has not executed
+  the archive scripts yet.
 - No target-schema objects were found only in the live catalog.
 - No target-schema objects were found only in the repository dump.
 - The previous pass incorrectly listed `forecast.chunked_upload_chunkedupload`.
@@ -192,9 +193,9 @@ No live objects were found in `forecast`, and no target-schema objects from
 
 | Object | Type | Usage | Retention | ORM status | Access | Database owner | Django ownership | Current query mechanism | Catalog summary | Evidence and notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `copernicus_arg` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | no PK; approx. rows `4420298`; size `729317376` bytes | `copernicus_arg` is approved for archival and must not receive an ORM model. This PR records lifecycle and ORM decisions only. |
+| `copernicus_arg` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | no PK; approx. rows `4420298`; size `729317376` bytes | This retired legacy weather table now belongs to the implemented `archive_copernicus` batch with `weather.copernicus_foz_do_iguacu`. Maintainer review recorded on 2026-07-27 confirmed there is no active external producer or consumer for this table, while `weather.copernicus_bra` remains active and out of scope. Repository SQL history now adds archive, validation, and restoration scripts that move it to `archive_copernicus.copernicus_arg` while preserving ownership and ACLs. The flow was validated locally on 2026-07-27 in a disposable PostgreSQL database; staging and production remain unchanged. |
 | `copernicus_bra` | table | external-access | pending-decision | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | no PK; unique `(date, geocode)`; approx. rows `51006972`; size `10261078016` bytes | Present live and in the dump. Confirmed external consumers exist outside the AlertaDengue application, but retention and access policy still require a separate decision. |
-| `copernicus_foz_do_iguacu` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `index`; approx. rows `86496`; size `8462336` bytes | `copernicus_foz_do_iguacu` is approved for archival and must not receive an ORM model. This PR records lifecycle and ORM decisions only. |
+| `copernicus_foz_do_iguacu` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `index`; approx. rows `86496`; size `8462336` bytes | This retired legacy weather table now belongs to the implemented `archive_copernicus` batch with `weather.copernicus_arg`. Maintainer review recorded on 2026-07-27 confirmed there is no active external producer or consumer for this table, while `weather.copernicus_bra` remains active and out of scope. Repository SQL history now adds archive, validation, and restoration scripts that move it to `archive_copernicus.copernicus_foz_do_iguacu` while preserving the owned sequence, primary key, default, ownership, and ACLs. The flow was validated locally on 2026-07-27 in a disposable PostgreSQL database; staging and production remain unchanged. |
 
 ## Schema `episcanner`
 
@@ -288,6 +289,9 @@ Additional constraints:
 - The `archive_alertas_regionais` batch is implemented in repository SQL
   history and validated in a disposable database, but production remains
   unchanged until an operator executes the reviewed scripts there.
+- The `archive_copernicus` batch is implemented in repository SQL history and
+  validated in a disposable database, but production remains unchanged until
+  an operator executes the reviewed scripts there.
 - `Dengue_global.regional_saude` remains active and was explicitly excluded
   from `archive_alertas_regionais`.
 
