@@ -53,6 +53,15 @@ CREATE SCHEMA archive_cemaden;
 ALTER SCHEMA archive_cemaden OWNER TO postgres;
 
 --
+-- Name: archive_copernicus; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA archive_copernicus;
+
+
+ALTER SCHEMA archive_copernicus OWNER TO postgres;
+
+--
 -- Name: archive_ovitrampa; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
@@ -1443,6 +1452,71 @@ COMMENT ON TABLE archive_cemaden."Estacao_cemaden" IS 'Metadados da estação do
 
 
 --
+-- Name: copernicus_arg; Type: TABLE; Schema: archive_copernicus; Owner: dengueadmin
+--
+
+CREATE TABLE archive_copernicus.copernicus_arg (
+    date timestamp without time zone,
+    geocode text,
+    temp_max double precision,
+    precip_max double precision,
+    umid_max double precision,
+    pressao_max double precision,
+    temp_med double precision,
+    precip_med double precision,
+    umid_med double precision,
+    pressao_med double precision,
+    temp_min double precision,
+    precip_min double precision,
+    umid_min double precision,
+    pressao_min double precision,
+    precip_tot double precision,
+    epiweek text
+);
+
+
+ALTER TABLE archive_copernicus.copernicus_arg OWNER TO dengueadmin;
+
+--
+-- Name: copernicus_foz_do_iguacu; Type: TABLE; Schema: archive_copernicus; Owner: dengueadmin
+--
+
+CREATE TABLE archive_copernicus.copernicus_foz_do_iguacu (
+    index integer NOT NULL,
+    datetime timestamp without time zone NOT NULL,
+    geocodigo bigint NOT NULL,
+    temp real NOT NULL,
+    precip real NOT NULL,
+    pressao real NOT NULL,
+    umid real NOT NULL
+);
+
+
+ALTER TABLE archive_copernicus.copernicus_foz_do_iguacu OWNER TO dengueadmin;
+
+--
+-- Name: copernicus_foz_do_iguacu_index_seq; Type: SEQUENCE; Schema: archive_copernicus; Owner: dengueadmin
+--
+
+CREATE SEQUENCE archive_copernicus.copernicus_foz_do_iguacu_index_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE archive_copernicus.copernicus_foz_do_iguacu_index_seq OWNER TO dengueadmin;
+
+--
+-- Name: copernicus_foz_do_iguacu_index_seq; Type: SEQUENCE OWNED BY; Schema: archive_copernicus; Owner: dengueadmin
+--
+
+ALTER SEQUENCE archive_copernicus.copernicus_foz_do_iguacu_index_seq OWNED BY archive_copernicus.copernicus_foz_do_iguacu.index;
+
+
+--
 -- Name: Bairro; Type: TABLE; Schema: archive_ovitrampa; Owner: administrador
 --
 
@@ -2773,32 +2847,6 @@ CREATE MATERIALIZED VIEW public.uf_total_zika_view AS
 ALTER TABLE public.uf_total_zika_view OWNER TO postgres;
 
 --
--- Name: copernicus_arg; Type: TABLE; Schema: weather; Owner: dengueadmin
---
-
-CREATE TABLE weather.copernicus_arg (
-    date timestamp without time zone,
-    geocode text,
-    temp_max double precision,
-    precip_max double precision,
-    umid_max double precision,
-    pressao_max double precision,
-    temp_med double precision,
-    precip_med double precision,
-    umid_med double precision,
-    pressao_med double precision,
-    temp_min double precision,
-    precip_min double precision,
-    umid_min double precision,
-    pressao_min double precision,
-    precip_tot double precision,
-    epiweek text
-);
-
-
-ALTER TABLE weather.copernicus_arg OWNER TO dengueadmin;
-
---
 -- Name: copernicus_bra; Type: TABLE; Schema: weather; Owner: dengueadmin
 --
 
@@ -2823,45 +2871,6 @@ CREATE TABLE weather.copernicus_bra (
 
 
 ALTER TABLE weather.copernicus_bra OWNER TO dengueadmin;
-
---
--- Name: copernicus_foz_do_iguacu; Type: TABLE; Schema: weather; Owner: dengueadmin
---
-
-CREATE TABLE weather.copernicus_foz_do_iguacu (
-    index integer NOT NULL,
-    datetime timestamp without time zone NOT NULL,
-    geocodigo bigint NOT NULL,
-    temp real NOT NULL,
-    precip real NOT NULL,
-    pressao real NOT NULL,
-    umid real NOT NULL
-);
-
-
-ALTER TABLE weather.copernicus_foz_do_iguacu OWNER TO dengueadmin;
-
---
--- Name: copernicus_foz_do_iguacu_index_seq; Type: SEQUENCE; Schema: weather; Owner: dengueadmin
---
-
-CREATE SEQUENCE weather.copernicus_foz_do_iguacu_index_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE weather.copernicus_foz_do_iguacu_index_seq OWNER TO dengueadmin;
-
---
--- Name: copernicus_foz_do_iguacu_index_seq; Type: SEQUENCE OWNED BY; Schema: weather; Owner: dengueadmin
---
-
-ALTER SEQUENCE weather.copernicus_foz_do_iguacu_index_seq OWNED BY weather.copernicus_foz_do_iguacu.index;
-
 
 --
 -- Name: macroregional id; Type: DEFAULT; Schema: Dengue_global; Owner: dengueadmin
@@ -2987,6 +2996,13 @@ ALTER TABLE ONLY archive_alertas_regionais.alerta_regional_zika ALTER COLUMN id 
 --
 
 ALTER TABLE ONLY archive_cemaden."Clima_cemaden" ALTER COLUMN id SET DEFAULT nextval('archive_cemaden."Clima_cemaden_id_seq"'::regclass);
+
+
+--
+-- Name: copernicus_foz_do_iguacu index; Type: DEFAULT; Schema: archive_copernicus; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_copernicus.copernicus_foz_do_iguacu ALTER COLUMN index SET DEFAULT nextval('archive_copernicus.copernicus_foz_do_iguacu_index_seq'::regclass);
 
 
 --
@@ -3141,13 +3157,6 @@ ALTER TABLE ONLY public.django_content_type ALTER COLUMN id SET DEFAULT nextval(
 --
 
 ALTER TABLE ONLY public.django_migrations ALTER COLUMN id SET DEFAULT nextval('public.django_migrations_id_seq'::regclass);
-
-
---
--- Name: copernicus_foz_do_iguacu index; Type: DEFAULT; Schema: weather; Owner: dengueadmin
---
-
-ALTER TABLE ONLY weather.copernicus_foz_do_iguacu ALTER COLUMN index SET DEFAULT nextval('weather.copernicus_foz_do_iguacu_index_seq'::regclass);
 
 
 --
@@ -3436,6 +3445,14 @@ ALTER TABLE ONLY archive_cemaden."Clima_cemaden"
 
 ALTER TABLE ONLY archive_cemaden."Estacao_cemaden"
     ADD CONSTRAINT "Estacao_cemaden_pk" PRIMARY KEY (codestacao);
+
+
+--
+-- Name: copernicus_foz_do_iguacu copernicus_foz_do_iguacu_pkey; Type: CONSTRAINT; Schema: archive_copernicus; Owner: dengueadmin
+--
+
+ALTER TABLE ONLY archive_copernicus.copernicus_foz_do_iguacu
+    ADD CONSTRAINT copernicus_foz_do_iguacu_pkey PRIMARY KEY (index);
 
 
 --
@@ -3804,14 +3821,6 @@ ALTER TABLE ONLY public.django_session
 
 ALTER TABLE ONLY weather.copernicus_bra
     ADD CONSTRAINT copernicus_bra_unique_date_geocode UNIQUE (date, geocode);
-
-
---
--- Name: copernicus_foz_do_iguacu copernicus_foz_do_iguacu_pkey; Type: CONSTRAINT; Schema: weather; Owner: dengueadmin
---
-
-ALTER TABLE ONLY weather.copernicus_foz_do_iguacu
-    ADD CONSTRAINT copernicus_foz_do_iguacu_pkey PRIMARY KEY (index);
 
 
 --
@@ -4844,6 +4853,24 @@ GRANT SELECT ON TABLE archive_cemaden."Estacao_cemaden" TO analista;
 
 
 --
+-- Name: TABLE copernicus_arg; Type: ACL; Schema: archive_copernicus; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE archive_copernicus.copernicus_arg TO analista;
+GRANT SELECT ON TABLE archive_copernicus.copernicus_arg TO infodenguedev;
+GRANT SELECT ON TABLE archive_copernicus.copernicus_arg TO mosqlimate_dev;
+
+
+--
+-- Name: TABLE copernicus_foz_do_iguacu; Type: ACL; Schema: archive_copernicus; Owner: dengueadmin
+--
+
+GRANT SELECT ON TABLE archive_copernicus.copernicus_foz_do_iguacu TO infodenguedev;
+GRANT SELECT ON TABLE archive_copernicus.copernicus_foz_do_iguacu TO analista;
+GRANT SELECT ON TABLE archive_copernicus.copernicus_foz_do_iguacu TO mosqlimate_dev;
+
+
+--
 -- Name: TABLE "Bairro"; Type: ACL; Schema: archive_ovitrampa; Owner: administrador
 --
 
@@ -5030,30 +5057,12 @@ GRANT SELECT ON TABLE public.uf_total_zika_view TO infodenguedev;
 
 
 --
--- Name: TABLE copernicus_arg; Type: ACL; Schema: weather; Owner: dengueadmin
---
-
-GRANT SELECT ON TABLE weather.copernicus_arg TO analista;
-GRANT SELECT ON TABLE weather.copernicus_arg TO infodenguedev;
-GRANT SELECT ON TABLE weather.copernicus_arg TO mosqlimate_dev;
-
-
---
 -- Name: TABLE copernicus_bra; Type: ACL; Schema: weather; Owner: dengueadmin
 --
 
 GRANT SELECT ON TABLE weather.copernicus_bra TO analista;
 GRANT SELECT ON TABLE weather.copernicus_bra TO infodenguedev;
 GRANT SELECT ON TABLE weather.copernicus_bra TO mosqlimate_dev;
-
-
---
--- Name: TABLE copernicus_foz_do_iguacu; Type: ACL; Schema: weather; Owner: dengueadmin
---
-
-GRANT SELECT ON TABLE weather.copernicus_foz_do_iguacu TO infodenguedev;
-GRANT SELECT ON TABLE weather.copernicus_foz_do_iguacu TO analista;
-GRANT SELECT ON TABLE weather.copernicus_foz_do_iguacu TO mosqlimate_dev;
 
 
 --
