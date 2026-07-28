@@ -6,6 +6,7 @@ BEGIN;
 
 SET LOCAL lock_timeout = '5s';
 SET LOCAL statement_timeout = '5min';
+SET LOCAL temp_file_limit = '1GB';
 
 DO $guard$
 DECLARE
@@ -161,24 +162,7 @@ SELECT 'archive_historico_casos.historico_casos' AS object_name,
        MIN("data_iniSE") AS earliest_data_inise,
        MAX("data_iniSE") AS latest_data_inise
 FROM archive_historico_casos.historico_casos
-UNION ALL
-SELECT '"Municipio"."Historico_alerta"',
-       COUNT(*),
-       MIN("data_iniSE"),
-       MAX("data_iniSE")
-FROM "Municipio"."Historico_alerta"
-UNION ALL
-SELECT '"Municipio"."Historico_alerta_chik"',
-       COUNT(*),
-       MIN("data_iniSE"),
-       MAX("data_iniSE")
-FROM "Municipio"."Historico_alerta_chik"
-UNION ALL
-SELECT '"Municipio"."Historico_alerta_zika"',
-       COUNT(*),
-       MIN("data_iniSE"),
-       MAX("data_iniSE")
-FROM "Municipio"."Historico_alerta_zika";
+;
 
 SELECT c.oid::regclass AS relation_name,
        coalesce(array_to_string(c.relacl, ','), '') AS acl
