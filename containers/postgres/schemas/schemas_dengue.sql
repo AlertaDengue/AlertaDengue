@@ -80,6 +80,15 @@ CREATE SCHEMA archive_mosqlimate;
 ALTER SCHEMA archive_mosqlimate OWNER TO postgres;
 
 --
+-- Name: archive_tweets; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA archive_tweets;
+
+
+ALTER SCHEMA archive_tweets OWNER TO postgres;
+
+--
 -- Name: archive_ovitrampa; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
@@ -995,10 +1004,10 @@ ALTER SEQUENCE "Municipio"."Notificacao_id_seq" OWNED BY "Municipio"."Notificaca
 
 
 --
--- Name: Tweet; Type: TABLE; Schema: Municipio; Owner: administrador
+-- Name: Tweet; Type: TABLE; Schema: archive_tweets; Owner: administrador
 --
 
-CREATE TABLE "Municipio"."Tweet" (
+CREATE TABLE archive_tweets."Tweet" (
     id bigint NOT NULL,
     "Municipio_geocodigo" integer NOT NULL,
     data_dia date NOT NULL,
@@ -1007,20 +1016,20 @@ CREATE TABLE "Municipio"."Tweet" (
 );
 
 
-ALTER TABLE "Municipio"."Tweet" OWNER TO administrador;
+ALTER TABLE archive_tweets."Tweet" OWNER TO administrador;
 
 --
--- Name: TABLE "Tweet"; Type: COMMENT; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Tweet"; Type: COMMENT; Schema: archive_tweets; Owner: administrador
 --
 
-COMMENT ON TABLE "Municipio"."Tweet" IS 'Série de tweets diários';
+COMMENT ON TABLE archive_tweets."Tweet" IS 'Série de tweets diários';
 
 
 --
--- Name: Tweet_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
+-- Name: Tweet_id_seq; Type: SEQUENCE; Schema: archive_tweets; Owner: administrador
 --
 
-CREATE SEQUENCE "Municipio"."Tweet_id_seq"
+CREATE SEQUENCE archive_tweets."Tweet_id_seq"
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1028,13 +1037,13 @@ CREATE SEQUENCE "Municipio"."Tweet_id_seq"
     CACHE 1;
 
 
-ALTER TABLE "Municipio"."Tweet_id_seq" OWNER TO administrador;
+ALTER TABLE archive_tweets."Tweet_id_seq" OWNER TO administrador;
 
 --
--- Name: Tweet_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
+-- Name: Tweet_id_seq; Type: SEQUENCE OWNED BY; Schema: archive_tweets; Owner: administrador
 --
 
-ALTER SEQUENCE "Municipio"."Tweet_id_seq" OWNED BY "Municipio"."Tweet".id;
+ALTER SEQUENCE archive_tweets."Tweet_id_seq" OWNED BY archive_tweets."Tweet".id;
 
 
 -- Name: historico_casos; Type: MATERIALIZED VIEW; Schema: archive_historico_casos; Owner: dengueadmin
@@ -2952,10 +2961,10 @@ ALTER TABLE ONLY "Municipio"."Notificacao" ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- Name: Tweet id; Type: DEFAULT; Schema: Municipio; Owner: administrador
+-- Name: Tweet id; Type: DEFAULT; Schema: archive_tweets; Owner: administrador
 --
 
-ALTER TABLE ONLY "Municipio"."Tweet" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Tweet_id_seq"'::regclass);
+ALTER TABLE ONLY archive_tweets."Tweet" ALTER COLUMN id SET DEFAULT nextval('archive_tweets."Tweet_id_seq"'::regclass);
 
 
 -- Name: sprint202425 id; Type: DEFAULT; Schema: archive_mosqlimate; Owner: dengueadmin
@@ -3303,10 +3312,10 @@ ALTER TABLE ONLY "Municipio"."Notificacao"
 
 
 --
--- Name: Tweet Tweet_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Tweet Tweet_pk; Type: CONSTRAINT; Schema: archive_tweets; Owner: administrador
 --
 
-ALTER TABLE ONLY "Municipio"."Tweet"
+ALTER TABLE ONLY archive_tweets."Tweet"
     ADD CONSTRAINT "Tweet_pk" PRIMARY KEY (id);
 
 
@@ -3915,10 +3924,10 @@ CREATE INDEX "Dengue_idx_data" ON "Municipio"."Notificacao" USING btree (dt_noti
 
 
 --
--- Name: Tweets_idx_data; Type: INDEX; Schema: Municipio; Owner: administrador
+-- Name: Tweets_idx_data; Type: INDEX; Schema: archive_tweets; Owner: administrador
 --
 
-CREATE INDEX "Tweets_idx_data" ON "Municipio"."Tweet" USING btree (data_dia DESC);
+CREATE INDEX "Tweets_idx_data" ON archive_tweets."Tweet" USING btree (data_dia DESC);
 
 
 --
@@ -4279,10 +4288,10 @@ ALTER TABLE ONLY "Dengue_global".regional
 
 
 --
--- Name: Tweet Tweet_CID10; Type: FK CONSTRAINT; Schema: Municipio; Owner: administrador
+-- Name: Tweet Tweet_CID10; Type: FK CONSTRAINT; Schema: archive_tweets; Owner: administrador
 --
 
-ALTER TABLE ONLY "Municipio"."Tweet"
+ALTER TABLE ONLY archive_tweets."Tweet"
     ADD CONSTRAINT "Tweet_CID10" FOREIGN KEY ("CID10_codigo") REFERENCES "Dengue_global"."CID10"(codigo);
 
 
@@ -4709,20 +4718,20 @@ GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Notificacao_id_seq" TO dengue;
 
 
 --
--- Name: TABLE "Tweet"; Type: ACL; Schema: Municipio; Owner: administrador
+-- Name: TABLE "Tweet"; Type: ACL; Schema: archive_tweets; Owner: administrador
 --
 
-GRANT ALL ON TABLE "Municipio"."Tweet" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Tweet" TO dengue;
-GRANT SELECT ON TABLE "Municipio"."Tweet" TO infodenguedev;
-GRANT SELECT ON TABLE "Municipio"."Tweet" TO analista;
+GRANT ALL ON TABLE archive_tweets."Tweet" TO "Dengue";
+GRANT ALL ON TABLE archive_tweets."Tweet" TO dengue;
+GRANT SELECT ON TABLE archive_tweets."Tweet" TO infodenguedev;
+GRANT SELECT ON TABLE archive_tweets."Tweet" TO analista;
 
 
 --
--- Name: SEQUENCE "Tweet_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
+-- Name: SEQUENCE "Tweet_id_seq"; Type: ACL; Schema: archive_tweets; Owner: administrador
 --
 
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Tweet_id_seq" TO dengue;
+GRANT SELECT,USAGE ON SEQUENCE archive_tweets."Tweet_id_seq" TO dengue;
 
 
 -- Name: TABLE historico_casos; Type: ACL; Schema: archive_historico_casos; Owner: dengueadmin
