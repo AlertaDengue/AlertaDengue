@@ -63,6 +63,9 @@ flows use the disease-specific `"Historico_alerta"*` tables instead of
 `Historico_alerta_chik`, and `Historico_alerta_zika` tables remain unchanged
 and out of scope for this batch.
 
+External usage was reviewed, no active external consumer or refresh process
+was identified, and the archival was approved.
+
 ## Recovery boundary
 
 `20260727_90_restore_legacy_historico_casos.sql` is the reviewed reverse

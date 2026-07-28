@@ -54,6 +54,40 @@ BEGIN
             'the active Historico_alerta* tables must remain in "Municipio"';
     END IF;
 
+    IF to_regclass('"Municipio"."Notificacao"') IS NULL THEN
+        RAISE EXCEPTION
+            '"Municipio"."Notificacao" must remain present';
+    END IF;
+
+    IF (
+        SELECT c.relkind
+        FROM pg_class AS c
+        JOIN pg_namespace AS n
+          ON n.oid = c.relnamespace
+        WHERE n.nspname = 'Municipio'
+          AND c.relname = 'Notificacao'
+    ) <> 'r' THEN
+        RAISE EXCEPTION
+            '"Municipio"."Notificacao" must remain an ordinary table';
+    END IF;
+
+    IF to_regclass('public.epiyear_summary_materialized_view') IS NULL THEN
+        RAISE EXCEPTION
+            'public.epiyear_summary_materialized_view must remain present';
+    END IF;
+
+    IF (
+        SELECT c.relkind
+        FROM pg_class AS c
+        JOIN pg_namespace AS n
+          ON n.oid = c.relnamespace
+        WHERE n.nspname = 'public'
+          AND c.relname = 'epiyear_summary_materialized_view'
+    ) <> 'm' THEN
+        RAISE EXCEPTION
+            'public.epiyear_summary_materialized_view must remain a materialized view';
+    END IF;
+
     IF EXISTS (
         SELECT 1
         FROM pg_rewrite AS r
@@ -101,7 +135,11 @@ SELECT n.nspname AS schema_name,
        c.relkind,
        pg_get_userbyid(c.relowner) AS owner,
        pg_total_relation_size(c.oid) AS total_size,
-       obj_description(c.oid, 'pg_class') AS relation_comment
+       obj_description(c.oid, 'pg_class') AS relation_comment,
+       CASE
+           WHEN c.relkind = 'm' THEN c.relispopulated
+           ELSE NULL
+       END AS is_populated
 FROM pg_class AS c
 JOIN pg_namespace AS n
   ON n.oid = c.relnamespace
@@ -111,8 +149,11 @@ WHERE (n.nspname = 'archive_historico_casos'
        AND c.relname IN (
            'Historico_alerta',
            'Historico_alerta_chik',
-           'Historico_alerta_zika'
+           'Historico_alerta_zika',
+           'Notificacao'
        ))
+   OR (n.nspname = 'public'
+       AND c.relname = 'epiyear_summary_materialized_view')
 ORDER BY n.nspname, c.relname;
 
 SELECT 'archive_historico_casos.historico_casos' AS object_name,
@@ -139,6 +180,24 @@ SELECT '"Municipio"."Historico_alerta_zika"',
        MAX("data_iniSE")
 FROM "Municipio"."Historico_alerta_zika";
 
+SELECT c.oid::regclass AS relation_name,
+       coalesce(array_to_string(c.relacl, ','), '') AS acl
+FROM pg_class AS c
+JOIN pg_namespace AS n
+  ON n.oid = c.relnamespace
+WHERE (n.nspname = 'archive_historico_casos'
+       AND c.relname = 'historico_casos')
+   OR (n.nspname = 'Municipio'
+       AND c.relname IN (
+           'Historico_alerta',
+           'Historico_alerta_chik',
+           'Historico_alerta_zika',
+           'Notificacao'
+       ))
+   OR (n.nspname = 'public'
+       AND c.relname = 'epiyear_summary_materialized_view')
+ORDER BY 1;
+
 SELECT schemaname,
        tablename,
        indexname,
@@ -156,5 +215,29 @@ ORDER BY schemaname, tablename, indexname;
 
 SELECT pg_get_viewdef('archive_historico_casos.historico_casos'::regclass, true)
     AS materialized_view_definition;
+
+SELECT src_ns.nspname AS source_schema,
+       src.relname AS source_relation,
+       src.relkind AS source_relkind
+FROM pg_depend AS d
+JOIN pg_rewrite AS r
+  ON r.oid = d.objid
+JOIN pg_class AS mv
+  ON mv.oid = r.ev_class
+JOIN pg_class AS src
+  ON src.oid = d.refobjid
+JOIN pg_namespace AS src_ns
+  ON src_ns.oid = src.relnamespace
+WHERE mv.oid = 'archive_historico_casos.historico_casos'::regclass
+  AND src.oid <> mv.oid
+ORDER BY src_ns.nspname, src.relname;
+
+SELECT pg_describe_object(d.classid, d.objid, d.objsubid) AS object,
+       pg_describe_object(d.refclassid, d.refobjid, d.refobjsubid) AS depends_on,
+       d.deptype
+FROM pg_depend AS d
+WHERE d.objid = 'archive_historico_casos.historico_casos'::regclass
+   OR d.refobjid = 'archive_historico_casos.historico_casos'::regclass
+ORDER BY 1, 2;
 
 COMMIT;

@@ -54,6 +54,16 @@ BEGIN
             'the active Historico_alerta* tables must remain present during restoration';
     END IF;
 
+    IF to_regclass('"Municipio"."Notificacao"') IS NULL THEN
+        RAISE EXCEPTION
+            '"Municipio"."Notificacao" must remain present during restoration';
+    END IF;
+
+    IF to_regclass('public.epiyear_summary_materialized_view') IS NULL THEN
+        RAISE EXCEPTION
+            'public.epiyear_summary_materialized_view must remain present during restoration';
+    END IF;
+
     IF EXISTS (
         SELECT 1
         FROM pg_rewrite AS r
@@ -148,6 +158,16 @@ BEGIN
     ) <> 3 THEN
         RAISE EXCEPTION
             'the active Historico_alerta* tables changed unexpectedly during restoration';
+    END IF;
+
+    IF to_regclass('"Municipio"."Notificacao"') IS NULL THEN
+        RAISE EXCEPTION
+            '"Municipio"."Notificacao" is missing after restoration';
+    END IF;
+
+    IF to_regclass('public.epiyear_summary_materialized_view') IS NULL THEN
+        RAISE EXCEPTION
+            'public.epiyear_summary_materialized_view is missing after restoration';
     END IF;
 
     IF EXISTS (
