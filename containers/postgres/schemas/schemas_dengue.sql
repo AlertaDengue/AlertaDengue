@@ -71,6 +71,15 @@ CREATE SCHEMA archive_historico_casos;
 ALTER SCHEMA archive_historico_casos OWNER TO postgres;
 
 --
+-- Name: archive_mosqlimate; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA archive_mosqlimate;
+
+
+ALTER SCHEMA archive_mosqlimate OWNER TO postgres;
+
+--
 -- Name: archive_ovitrampa; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
@@ -1046,11 +1055,10 @@ CREATE MATERIALIZED VIEW archive_historico_casos.historico_casos AS
 
 ALTER TABLE archive_historico_casos.historico_casos OWNER TO dengueadmin;
 
---
--- Name: sprint202425; Type: TABLE; Schema: Municipio; Owner: dengueadmin
+-- Name: sprint202425; Type: TABLE; Schema: archive_mosqlimate; Owner: dengueadmin
 --
 
-CREATE TABLE "Municipio".sprint202425 (
+CREATE TABLE archive_mosqlimate.sprint202425 (
     date date,
     year bigint,
     epiweek bigint,
@@ -1069,13 +1077,13 @@ CREATE TABLE "Municipio".sprint202425 (
 );
 
 
-ALTER TABLE "Municipio".sprint202425 OWNER TO dengueadmin;
+ALTER TABLE archive_mosqlimate.sprint202425 OWNER TO dengueadmin;
 
 --
--- Name: sprint202425_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: dengueadmin
+-- Name: sprint202425_id_seq; Type: SEQUENCE; Schema: archive_mosqlimate; Owner: dengueadmin
 --
 
-CREATE SEQUENCE "Municipio".sprint202425_id_seq
+CREATE SEQUENCE archive_mosqlimate.sprint202425_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -1084,13 +1092,13 @@ CREATE SEQUENCE "Municipio".sprint202425_id_seq
     CACHE 1;
 
 
-ALTER TABLE "Municipio".sprint202425_id_seq OWNER TO dengueadmin;
+ALTER TABLE archive_mosqlimate.sprint202425_id_seq OWNER TO dengueadmin;
 
 --
--- Name: sprint202425_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: dengueadmin
+-- Name: sprint202425_id_seq; Type: SEQUENCE OWNED BY; Schema: archive_mosqlimate; Owner: dengueadmin
 --
 
-ALTER SEQUENCE "Municipio".sprint202425_id_seq OWNED BY "Municipio".sprint202425.id;
+ALTER SEQUENCE archive_mosqlimate.sprint202425_id_seq OWNED BY archive_mosqlimate.sprint202425.id;
 
 
 --
@@ -2950,11 +2958,10 @@ ALTER TABLE ONLY "Municipio"."Notificacao" ALTER COLUMN id SET DEFAULT nextval('
 ALTER TABLE ONLY "Municipio"."Tweet" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Tweet_id_seq"'::regclass);
 
 
---
--- Name: sprint202425 id; Type: DEFAULT; Schema: Municipio; Owner: dengueadmin
+-- Name: sprint202425 id; Type: DEFAULT; Schema: archive_mosqlimate; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY "Municipio".sprint202425 ALTER COLUMN id SET DEFAULT nextval('"Municipio".sprint202425_id_seq'::regclass);
+ALTER TABLE ONLY archive_mosqlimate.sprint202425 ALTER COLUMN id SET DEFAULT nextval('archive_mosqlimate.sprint202425_id_seq'::regclass);
 
 
 --
@@ -3335,11 +3342,10 @@ ALTER TABLE ONLY "Municipio"."Notificacao"
     ADD CONSTRAINT casos_unicos UNIQUE (nu_notific, dt_notific, cid10_codigo, municipio_geocodigo);
 
 
---
--- Name: sprint202425 sprint202425_pkey; Type: CONSTRAINT; Schema: Municipio; Owner: dengueadmin
+-- Name: sprint202425 sprint202425_pkey; Type: CONSTRAINT; Schema: archive_mosqlimate; Owner: dengueadmin
 --
 
-ALTER TABLE ONLY "Municipio".sprint202425
+ALTER TABLE ONLY archive_mosqlimate.sprint202425
     ADD CONSTRAINT sprint202425_pkey PRIMARY KEY (id);
 
 
@@ -4726,12 +4732,11 @@ GRANT SELECT ON TABLE archive_historico_casos.historico_casos TO infodenguedev;
 GRANT SELECT ON TABLE archive_historico_casos.historico_casos TO analista;
 
 
---
--- Name: TABLE sprint202425; Type: ACL; Schema: Municipio; Owner: dengueadmin
+-- Name: TABLE sprint202425; Type: ACL; Schema: archive_mosqlimate; Owner: dengueadmin
 --
 
-GRANT SELECT ON TABLE "Municipio".sprint202425 TO infodenguedev;
-GRANT SELECT ON TABLE "Municipio".sprint202425 TO analista;
+GRANT SELECT ON TABLE archive_mosqlimate.sprint202425 TO infodenguedev;
+GRANT SELECT ON TABLE archive_mosqlimate.sprint202425 TO analista;
 
 
 --
