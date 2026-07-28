@@ -62,6 +62,15 @@ CREATE SCHEMA archive_copernicus;
 ALTER SCHEMA archive_copernicus OWNER TO postgres;
 
 --
+-- Name: archive_historico_casos; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA archive_historico_casos;
+
+
+ALTER SCHEMA archive_historico_casos OWNER TO postgres;
+
+--
 -- Name: archive_ovitrampa; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
@@ -1019,11 +1028,10 @@ ALTER TABLE "Municipio"."Tweet_id_seq" OWNER TO administrador;
 ALTER SEQUENCE "Municipio"."Tweet_id_seq" OWNED BY "Municipio"."Tweet".id;
 
 
---
--- Name: historico_casos; Type: MATERIALIZED VIEW; Schema: Municipio; Owner: dengueadmin
+-- Name: historico_casos; Type: MATERIALIZED VIEW; Schema: archive_historico_casos; Owner: dengueadmin
 --
 
-CREATE MATERIALIZED VIEW "Municipio".historico_casos AS
+CREATE MATERIALIZED VIEW archive_historico_casos.historico_casos AS
  SELECT dengue."data_iniSE",
     dengue."SE",
     (COALESCE(dengue.casos_est, (0.0)::real) + COALESCE(chik.casos_est, (0.0)::real)) AS casos_est,
@@ -1036,7 +1044,7 @@ CREATE MATERIALIZED VIEW "Municipio".historico_casos AS
   WITH NO DATA;
 
 
-ALTER TABLE "Municipio".historico_casos OWNER TO dengueadmin;
+ALTER TABLE archive_historico_casos.historico_casos OWNER TO dengueadmin;
 
 --
 -- Name: sprint202425; Type: TABLE; Schema: Municipio; Owner: dengueadmin
@@ -3914,18 +3922,17 @@ CREATE INDEX "Tweets_idx_data" ON "Municipio"."Tweet" USING btree (data_dia DESC
 CREATE INDEX "WU_idx_data" ON "Municipio"."Clima_wu" USING btree (data_dia DESC);
 
 
---
--- Name: historico_casos_data_inise_idx; Type: INDEX; Schema: Municipio; Owner: dengueadmin
---
-
-CREATE INDEX historico_casos_data_inise_idx ON "Municipio".historico_casos USING btree ("data_iniSE" DESC);
-
-
---
--- Name: historico_casos_municipio_geocodigo_idx; Type: INDEX; Schema: Municipio; Owner: dengueadmin
+-- Name: historico_casos_data_inise_idx; Type: INDEX; Schema: archive_historico_casos; Owner: dengueadmin
 --
 
-CREATE INDEX historico_casos_municipio_geocodigo_idx ON "Municipio".historico_casos USING btree (municipio_geocodigo DESC);
+CREATE INDEX historico_casos_data_inise_idx ON archive_historico_casos.historico_casos USING btree ("data_iniSE" DESC);
+
+
+--
+-- Name: historico_casos_municipio_geocodigo_idx; Type: INDEX; Schema: archive_historico_casos; Owner: dengueadmin
+--
+
+CREATE INDEX historico_casos_municipio_geocodigo_idx ON archive_historico_casos.historico_casos USING btree (municipio_geocodigo DESC);
 
 
 --
@@ -4712,12 +4719,11 @@ GRANT SELECT ON TABLE "Municipio"."Tweet" TO analista;
 GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Tweet_id_seq" TO dengue;
 
 
---
--- Name: TABLE historico_casos; Type: ACL; Schema: Municipio; Owner: dengueadmin
+-- Name: TABLE historico_casos; Type: ACL; Schema: archive_historico_casos; Owner: dengueadmin
 --
 
-GRANT SELECT ON TABLE "Municipio".historico_casos TO infodenguedev;
-GRANT SELECT ON TABLE "Municipio".historico_casos TO analista;
+GRANT SELECT ON TABLE archive_historico_casos.historico_casos TO infodenguedev;
+GRANT SELECT ON TABLE archive_historico_casos.historico_casos TO analista;
 
 
 --
