@@ -168,7 +168,7 @@ not be confused with PostgreSQL schemas.
 | Object | Type | Usage | Retention | ORM status | Access | Database owner | Django ownership | Current query mechanism | Catalog summary | Evidence and notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `Bairro` | table | legacy | archive | do-not-map | unknown | `administrador` | none | no runtime evidence found | PK `id`; FK `Localidade_id -> Municipio.Localidade(id)`; approx. rows `184`; size `40960` bytes | `Bairro` belonged to the legacy satellite/Cemaden climate workflow. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
-| `Clima_Satelite` | table | legacy | archive | do-not-map | unknown | `administrador` | none | no runtime evidence found | PK `id`; size `16384` bytes | This table belongs to a retired climate ingestion path. Maintainers approved archival and no ORM mapping. This PR records lifecycle and ORM decisions only. |
+| `Clima_Satelite` | table | legacy | delete | do-not-map | unknown | `administrador` | none | no runtime evidence found | PK `id`; size `16384` bytes; rows at audit `0` | This table stored precipitation, temperature, and NVDI satellite data for a retired climate ingestion path. The reviewed `clima_satelite_removal` batch now adds preflight, guarded removal, and validation SQL for physical deletion because the audited live object was empty and had no active repository or local database dependency. Archive is not applicable because no data exists. The checked-in schema definition was removed. Operational database removal must use the reviewed preflight, removal, and validation batch under `containers/postgres/sql_history/clima_satelite_removal/`. Staging and production remain unchanged. |
 | `Clima_cemaden` | table | legacy | archive | do-not-map | unknown | `administrador` | none | no runtime evidence found | PK `id`; approx. rows `36515064`; size `4429135872` bytes | This retired climate table now belongs to the implemented `archive_cemaden` batch with `Municipio.Estacao_cemaden`. Maintainer review recorded on 2026-07-27 confirmed there is no active external producer and no external consumer. Repository SQL history now adds archive, validation, and restoration scripts that move it to `archive_cemaden."Clima_cemaden"` while preserving the owned sequence, indexes, defaults, comments, ownership, and ACLs. The flow was validated locally on 2026-07-27 in a disposable PostgreSQL database; staging and production remain unchanged. |
 | `Estacao_cemaden` | table | legacy | archive | do-not-map | unknown | `administrador` | none | no runtime evidence found | PK `codestacao`; approx. rows `645`; size `131072` bytes | This retired climate metadata table now belongs to the implemented `archive_cemaden` batch with `Municipio.Clima_cemaden`. Maintainer review recorded on 2026-07-27 confirmed there is no active external producer and no external consumer. Repository SQL history now adds archive, validation, and restoration scripts that move it to `archive_cemaden."Estacao_cemaden"` while preserving indexes, defaults, comments, ownership, and ACLs. The flow was validated locally on 2026-07-27 in a disposable PostgreSQL database; staging and production remain unchanged. |
 | `Historico_alerta` | table | active | retain | map-unmanaged | read-write-external | `administrador` | none | raw SQL | PK `id`; unique `("SE", municipio_geocodigo, "Localidade_id")`; approx. rows `4786759`; size `2484256768` bytes | Directly read by `dados/tasks.py`, `dados/dbdata.py`, and `sync_geofiles.py`. Live dependents now remain limited to the retained public materialized views that still power active homepage and API flows. No current Django model exists for this table. |
@@ -260,7 +260,6 @@ batches below, but no staging or production database was modified here.
 ### `Municipio`
 
 - `Bairro`
-- `Clima_Satelite`
 - `Clima_cemaden`
 - `Estacao_cemaden`
 - `Localidade`
@@ -276,6 +275,23 @@ batches below, but no staging or production database was modified here.
 
 - `copernicus_arg`
 - `copernicus_foz_do_iguacu`
+
+## Approved for removal, not ORM mapping
+
+### `Municipio`
+
+- `Clima_Satelite`
+
+Additional constraints:
+
+- The reviewed `clima_satelite_removal` batch removes only
+  `"Municipio"."Clima_Satelite"` and its owned sequence
+  `"Municipio"."Clima_Satelite_id_seq"`.
+- The July 29, 2026 audit confirmed zero rows, no active repository dependency,
+  and no active local database dependency.
+- Archive is not applicable because no data exists.
+- The checked-in schema definition was removed. Operational database removal
+  must use the reviewed preflight, removal, and validation batch.
 
 Additional constraints:
 
