@@ -614,52 +614,6 @@ ALTER SEQUENCE "Dengue_global".regional_saude_id_seq OWNED BY "Dengue_global".re
 
 
 --
--- Name: Clima_Satelite; Type: TABLE; Schema: Municipio; Owner: administrador
---
-
-CREATE TABLE "Municipio"."Clima_Satelite" (
-    id bigint NOT NULL,
-    data date NOT NULL,
-    "Municipio_geocodigo" integer NOT NULL,
-    ndvi integer NOT NULL,
-    temperatura_max numeric(4,2) NOT NULL,
-    temperaruta_min numeric(4,2) NOT NULL,
-    precipitacao integer NOT NULL
-);
-
-
-ALTER TABLE "Municipio"."Clima_Satelite" OWNER TO administrador;
-
---
--- Name: TABLE "Clima_Satelite"; Type: COMMENT; Schema: Municipio; Owner: administrador
---
-
-COMMENT ON TABLE "Municipio"."Clima_Satelite" IS 'Precipitação, temperatura e NVDI
-(Normalized Difference Vegetation Index)';
-
-
---
--- Name: Clima_Satelite_id_seq; Type: SEQUENCE; Schema: Municipio; Owner: administrador
---
-
-CREATE SEQUENCE "Municipio"."Clima_Satelite_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE "Municipio"."Clima_Satelite_id_seq" OWNER TO administrador;
-
---
--- Name: Clima_Satelite_id_seq; Type: SEQUENCE OWNED BY; Schema: Municipio; Owner: administrador
---
-
-ALTER SEQUENCE "Municipio"."Clima_Satelite_id_seq" OWNED BY "Municipio"."Clima_Satelite".id;
-
-
---
 -- Name: Clima_wu; Type: TABLE; Schema: Municipio; Owner: administrador
 --
 
@@ -2787,13 +2741,6 @@ ALTER TABLE ONLY "Dengue_global".regional_saude ALTER COLUMN id SET DEFAULT next
 
 
 --
--- Name: Clima_Satelite id; Type: DEFAULT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Clima_Satelite" ALTER COLUMN id SET DEFAULT nextval('"Municipio"."Clima_Satelite_id_seq"'::regclass);
-
-
---
 -- Name: Clima_wu id; Type: DEFAULT; Schema: Municipio; Owner: administrador
 --
 
@@ -3121,14 +3068,6 @@ ALTER TABLE ONLY "Dengue_global".regional_saude
 
 ALTER TABLE ONLY "Dengue_global".regional_saude
     ADD CONSTRAINT regional_saude_uq_municipio_geocodigo UNIQUE (municipio_geocodigo);
-
-
---
--- Name: Clima_Satelite Clima_Satelite_pk; Type: CONSTRAINT; Schema: Municipio; Owner: administrador
---
-
-ALTER TABLE ONLY "Municipio"."Clima_Satelite"
-    ADD CONSTRAINT "Clima_Satelite_pk" PRIMARY KEY (id);
 
 
 --
@@ -3775,13 +3714,6 @@ CREATE INDEX "Alerta_idx_data" ON "Municipio"."Historico_alerta" USING btree ("d
 --
 
 CREATE INDEX "Alerta_zika_idx_data" ON "Municipio"."Historico_alerta_zika" USING btree ("data_iniSE" DESC);
-
-
---
--- Name: Clima_Satelite_idx_data; Type: INDEX; Schema: Municipio; Owner: administrador
---
-
-CREATE INDEX "Clima_Satelite_idx_data" ON "Municipio"."Clima_Satelite" USING btree (id);
 
 
 --
@@ -4469,23 +4401,6 @@ GRANT SELECT ON TABLE "Dengue_global".regional_saude TO analista;
 
 GRANT SELECT,USAGE ON SEQUENCE "Dengue_global".regional_saude_id_seq TO dengue;
 GRANT SELECT ON SEQUENCE "Dengue_global".regional_saude_id_seq TO "Read_only";
-
-
---
--- Name: TABLE "Clima_Satelite"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT ALL ON TABLE "Municipio"."Clima_Satelite" TO "Dengue";
-GRANT ALL ON TABLE "Municipio"."Clima_Satelite" TO dengue;
-GRANT SELECT ON TABLE "Municipio"."Clima_Satelite" TO infodenguedev;
-GRANT SELECT ON TABLE "Municipio"."Clima_Satelite" TO analista;
-
-
---
--- Name: SEQUENCE "Clima_Satelite_id_seq"; Type: ACL; Schema: Municipio; Owner: administrador
---
-
-GRANT SELECT,USAGE ON SEQUENCE "Municipio"."Clima_Satelite_id_seq" TO dengue;
 
 
 --
