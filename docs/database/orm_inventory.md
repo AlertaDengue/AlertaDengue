@@ -41,10 +41,14 @@ not be confused with PostgreSQL schemas.
 - GitHub issue references for `#817`, `#1008`, `#1013`, `#1015`, `#1019`,
   `#1023`, and `#1025` were inspected on 2026-07-27 through the GitHub API.
 - Repository state now includes reviewed SQL history for the approved
-  `archive_ovitrampa`, `archive_alertas_regionais`, `archive_cemaden`, and
-  `archive_copernicus` batches. Those procedures are implemented and validated
-  locally in disposable PostgreSQL databases, but that does not mean any
-  shared environment has already executed them.
+  `archive_ovitrampa`, `archive_alertas_regionais`, `archive_cemaden`,
+  `archive_copernicus`, `archive_historico_casos`, `archive_mosqlimate`,
+  `archive_redemet`, `archive_tweets`, and `archive_upload` batches. Their
+  export and guarded-removal procedures now require a verified persistent
+  archive package, a disposable restore receipt, and source-manifest
+  revalidation before removal. They are implemented and validated locally in
+  disposable PostgreSQL databases, but that does not mean any shared
+  environment has already executed them.
 
 ## Summary Counts
 
@@ -92,12 +96,13 @@ not be confused with PostgreSQL schemas.
   - `weather`: 3
   - `episcanner`: 1
 - `containers/postgres/schemas/schemas_dengue.sql` is now the authoritative
-  post-archive repository representation validated in disposable PostgreSQL
-  databases for issues `#1015`, `#1019`, `#1023`, and `#1025`.
-- The checked-in dump therefore records the reviewed `archive_ovitrampa` and
-  `archive_alertas_regionais`, `archive_cemaden`, and `archive_copernicus`
-  target states even when another local or shared database has not executed
-  the archive scripts yet.
+  active-bootstrap repository representation. It intentionally excludes the
+  completed archive schemas, whose canonical export/remove workflow lives under
+  `containers/postgres/sql_history/archive_schemas_export/` and
+  `docs/database/archive_schemas_export.md`.
+- The checked-in bootstrap dump therefore records only the retained active
+  schemas and objects, while the reviewed archive target state is preserved in
+  the external archive export workflow.
 - No target-schema objects were found only in the live catalog.
 - No target-schema objects were found only in the repository dump.
 - The previous pass incorrectly listed `forecast.chunked_upload_chunkedupload`.
@@ -181,7 +186,7 @@ not be confused with PostgreSQL schemas.
 | `alerta_mrj` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; unique `(aps, se)`; approx. rows `6274`; size `1114112` bytes | This retired reporting table now belongs to the implemented `archive_alertas_regionais` batch. Repository SQL history adds archive, validation, and restoration scripts that move it to `archive_alertas_regionais.alerta_mrj` while preserving owner, grants, defaults, and unique constraints. The flow was validated locally on 2026-07-24 in a disposable PostgreSQL database; staging and production remain unchanged. |
 | `alerta_mrj_chik` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; unique `(aps, se)`; approx. rows `6270`; size `1114112` bytes | This retired reporting table now belongs to the implemented `archive_alertas_regionais` batch. Repository SQL history adds archive, validation, and restoration scripts that move it to `archive_alertas_regionais.alerta_mrj_chik` while preserving owner, grants, defaults, and unique constraints. The flow was validated locally on 2026-07-24 in a disposable PostgreSQL database; staging and production remain unchanged. |
 | `alerta_mrj_zika` | table | legacy | archive | do-not-map | unknown | `postgres` | none | no runtime evidence found | PK `id`; unique `(aps, se)`; size `24576` bytes | This retired reporting table now belongs to the implemented `archive_alertas_regionais` batch. Repository SQL history adds archive, validation, and restoration scripts that move it to `archive_alertas_regionais.alerta_mrj_zika` while preserving owner, grants, defaults, and unique constraints. The flow was validated locally on 2026-07-24 in a disposable PostgreSQL database; staging and production remain unchanged. |
-| `historico_casos` | materialized view | legacy | archive | do-not-map | read-only | `dengueadmin` | none | no runtime evidence found | no PK; approx. rows `4796063`; size `358580224` bytes | This legacy materialized view is a denormalized compatibility layer for historical state summary and variation flows built from `Municipio.Historico_alerta` and `Municipio.Historico_alerta_chik`. PR `#1011` removed the final in-repository application dependency by replacing the combined summary path with disease-specific `Historico_alerta*` queries, and current repository search found no active read or write path left. External usage was reviewed, no active external consumer or refresh process was identified, and the archival was approved. Repository SQL history now implements the reviewed `archive_historico_casos` batch that moves the materialized view to `archive_historico_casos.historico_casos` while preserving indexes, ownership, ACLs, comments, definition, and populated contents. The shared validation path is now catalog-bounded and explicitly avoids copying `Municipio.Notificacao`, refreshing the materialized view, or recreating production-sized fixtures. The full `archive -> validate -> restore -> archive -> validate` cycle was rerun locally on 2026-07-28 in a disposable `template0` database loaded with schema-only objects plus representative fixture rows; staging and production remain unchanged. |
+| `historico_casos` | materialized view | legacy | archive | do-not-map | read-only | `dengueadmin` | none | no runtime evidence found | no PK; approx. rows `4796063`; size `358580224` bytes | This legacy materialized view is a denormalized compatibility layer for historical state summary and variation flows built from `Municipio.Historico_alerta` and `Municipio.Historico_alerta_chik`. PR `#1011` removed the final in-repository application dependency by replacing the combined summary path with disease-specific `Historico_alerta*` queries, and current repository search found no active read or write path left. External usage was reviewed, no active external consumer or refresh process was identified, and the archival was approved. Repository SQL history now implements the reviewed `archive_historico_casos` batch that moves the materialized view to `archive_historico_casos.historico_casos` while preserving indexes, ownership, ACLs, comments, definition, and populated contents. On July 29, 2026, the archive export workflow was validated locally end to end with a custom-format dump, a disposable restore, and a guarded removal cycle. That restore required compatible copies of the retained `"Municipio"."Historico_alerta"` and `"Municipio"."Historico_alerta_chik"` source rows so PostgreSQL could repopulate the archived materialized view during `MATERIALIZED VIEW DATA`. The active bootstrap dump now excludes the archive schema, and the canonical recovery path is documented in `docs/database/archive_schemas_export.md`. Staging and production remain unchanged. |
 | `sprint202425` | table | legacy | archive | do-not-map | unknown | `dengueadmin` | none | no runtime evidence found | PK `id`; approx. rows `4187433`; size `655433728` bytes | `Municipio.sprint202425` is a frozen historical dataset prepared for the Mosqlimate event held in 2025. It contains modeling-specific training and target fields and is not a backup of `Municipio.Notificacao`. The dataset is retained in `archive_mosqlimate` for reproducibility and historical reference. Retention: archive. ORM status: do-not-map. Deletion is not authorized. The absent relations `Municipio.Notificacao__20220806` and `Municipio.Corrigido2022` were not present in the audited local catalog; the reviewed removal batch now deletes them only when found in another environment. |
 
 ## Schema `forecast`
