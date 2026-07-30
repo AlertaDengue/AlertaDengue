@@ -44,8 +44,10 @@ not be confused with PostgreSQL schemas.
   `archive_ovitrampa`, `archive_alertas_regionais`, `archive_cemaden`,
   `archive_copernicus`, `archive_historico_casos`, `archive_mosqlimate`,
   `archive_redemet`, `archive_tweets`, and `archive_upload` batches. Their
-  export and guarded-removal procedures are implemented and validated locally
-  in disposable PostgreSQL databases, but that does not mean any shared
+  export and guarded-removal procedures now require a verified persistent
+  archive package, a disposable restore receipt, and source-manifest
+  revalidation before removal. They are implemented and validated locally in
+  disposable PostgreSQL databases, but that does not mean any shared
   environment has already executed them.
 
 ## Summary Counts

@@ -1,12 +1,11 @@
 # Export And Remove Completed Archive Schemas
 
-This workflow externalizes the completed archive schemas from the active
-`dengue` database without touching live local, staging, or production data
-during repository validation.
+`archive_schemas_workflow.sh` is the only supported operational entrypoint for
+the reviewed archive export and removal flow.
 
 ## Scope
 
-Exact schemas:
+Approved archive schemas:
 
 - `archive_redemet`
 - `archive_upload`
@@ -18,53 +17,107 @@ Exact schemas:
 - `archive_mosqlimate`
 - `archive_tweets`
 
-## External foreign keys retained
+Protected active objects that must remain unchanged:
 
-The archive dump intentionally keeps four validated foreign keys to active
-lookup tables:
+- `"Municipio"."Notificacao"`
+- `weather.copernicus_bra`
+- `"Dengue_global".regional_saude`
+- `"Dengue_global".regional`
+- `"Dengue_global"."CID10"`
+
+Retained external archive foreign keys:
 
 - `archive_alertas_regionais.alerta_regional_chik.regional_fk`
 - `archive_alertas_regionais.alerta_regional_dengue.regional_fk`
 - `archive_alertas_regionais.alerta_regional_zika.regional_fk`
 - `archive_tweets."Tweet"."Tweet_CID10"`
 
-All use `ON DELETE NO ACTION` and `ON UPDATE NO ACTION`.
+All four remain validated with `ON DELETE NO ACTION` and `ON UPDATE NO ACTION`.
 
-## Shared-environment order
+## Required Workflow
 
-1. backup/snapshot readiness
-2. run `20260729_00_audit_archive_schemas.sql`
-3. run `20260729_01_preflight_archive_schemas_export.sql`
-4. generate the custom-format dump and checksum with `export_archive_schemas.sh`
-5. inspect TOC and extracted schema SQL
-6. restore into a disposable database with minimal lookup fixtures and the
-   retained `Historico_alerta*` sources required by
-   `archive_historico_casos.historico_casos`
-7. validate restored objects, row counts, and FK policy
-8. run `20260729_02_preflight_archive_schemas_removal.sql`
-9. execute `20260729_03_remove_archive_schemas.sql` in the maintenance window
-10. run `20260729_04_validate_archive_schemas_removed.sql`
-11. monitor application and worker activity
+Use a persistent output root outside the Git worktree, `/tmp`, `/var/tmp`, and
+PostgreSQL `data_directory`:
 
-## Safety rules
+```bash
+export ARCHIVE_EXPORT_ROOT=/opt/services/infodengue/database_exports/archive_schemas
 
-- no `CASCADE`
-- no `DROP SCHEMA ... CASCADE`
-- no live local removal during repository validation
-- no staging or production execution in this repository task
-- explicit checked-in manifest only
-- protected active lookup tables stay in place:
-  - `"Municipio"."Notificacao"`
-  - `weather.copernicus_bra`
-  - `"Dengue_global".regional_saude`
-  - `"Dengue_global".regional`
-  - `"Dengue_global"."CID10"`
+./containers/postgres/sql_history/archive_schemas_export/archive_schemas_workflow.sh export
 
-## Rollback
+./containers/postgres/sql_history/archive_schemas_export/archive_schemas_workflow.sh verify \
+  --package /absolute/path/printed/by/export
 
-Rollback uses the verified archive dump plus minimal restore fixtures for
-`"Dengue_global".regional(id)` and `"Dengue_global"."CID10"(codigo)`.
-Repopulating `archive_historico_casos.historico_casos` also requires
-compatible `"Municipio"."Historico_alerta"` and
-`"Municipio"."Historico_alerta_chik"` source data because PostgreSQL restores
-the materialized view contents through the retained view definition.
+./containers/postgres/sql_history/archive_schemas_export/archive_schemas_workflow.sh remove \
+  --package /same/absolute/path \
+  --confirm-database dengue \
+  --confirm-remove REMOVE_NINE_ARCHIVE_SCHEMAS
+
+./containers/postgres/sql_history/archive_schemas_export/archive_schemas_workflow.sh status
+```
+
+The immutable package path format is:
+
+```text
+${ARCHIVE_EXPORT_ROOT}/${PGDATABASE}/archive_schemas_<UTC_TIMESTAMP>_<SOURCE_FINGERPRINT>/
+```
+
+`LATEST_VERIFIED` is updated only after the disposable restore and verification
+receipt pass.
+
+## Safety Rules
+
+- Never run `20260729_03_remove_archive_schemas.sql` directly.
+- Export and restore validation are mandatory before removal.
+- Removal is blocked if checksum, TOC, source identity, inventory, exact row
+  counts, FK manifests, dependencies, or the verification receipt differ after
+  export.
+- The final package must remain outside Git, `/tmp`, `/var/tmp`, and `PGDATA`.
+- No `CASCADE`.
+- No `TRUNCATE`.
+- No active object definitions or data in the archive dump.
+
+## Package Contents
+
+Exported package files:
+
+- `dengue_archive_schemas.dump`
+- `dengue_archive_schemas.dump.sha256`
+- `dengue_archive_schemas.toc`
+- `dengue_archive_schemas.schema.sql`
+- `archive_inventory.tsv`
+- `archive_row_counts.tsv`
+- `archive_dependencies.tsv`
+- `archive_external_fks.tsv`
+- `archive_internal_fks.tsv`
+- `protected_active_objects.tsv`
+- `source_identity.tsv`
+- `export_command.txt`
+- `capacity_preflight.tsv`
+- `package_manifest.sha256`
+- `README_restore.md`
+
+Verification adds:
+
+- `restore_validation.tsv`
+- `verification_receipt.tsv`
+- `verification_receipt.sha256`
+
+Removal adds:
+
+- `removal_receipt.tsv`
+- `removal_receipt.sha256`
+
+## Restore Notes
+
+The package intentionally keeps the four validated foreign keys to active
+lookup tables.
+
+The exported archive also retains the materialized-view definition for
+`archive_historico_casos.historico_casos`. Full restore validation therefore
+requires compatible `Municipio.Historico_alerta` and
+`Municipio.Historico_alerta_chik` source structures and rows so PostgreSQL can
+repopulate the archived materialized view during `MATERIALIZED VIEW DATA`
+restore.
+
+Standalone restore without those compatible active-reference fixtures remains
+future work.
