@@ -1,6 +1,20 @@
 -- Remove the completed archive schemas after verified export and restore.
 -- Explicit manifest only. No CASCADE.
 
+DO $$
+BEGIN
+    IF current_setting('archive.removal_authorized', true) IS DISTINCT FROM '1'
+       OR current_setting('archive.package_path', true) IS NULL
+       OR current_setting('archive.dump_sha256', true) IS NULL
+       OR current_setting('archive.verification_receipt_sha256', true) IS NULL
+       OR current_setting('archive.source_database_oid', true) IS NULL
+       OR current_setting('archive.source_inventory_sha256', true) IS NULL
+       OR current_setting('archive.source_row_counts_sha256', true) IS NULL THEN
+        RAISE EXCEPTION 'Direct execution is not supported. Use archive_schemas_workflow.sh remove with a verified persistent package.';
+    END IF;
+END
+$$;
+
 BEGIN;
 
 SET LOCAL lock_timeout = '5s';
@@ -11,6 +25,16 @@ DECLARE
     protected_before record;
     protected_after record;
 BEGIN
+    IF current_setting('archive.removal_authorized', true) IS DISTINCT FROM '1'
+       OR current_setting('archive.package_path', true) IS NULL
+       OR current_setting('archive.dump_sha256', true) IS NULL
+       OR current_setting('archive.verification_receipt_sha256', true) IS NULL
+       OR current_setting('archive.source_database_oid', true) IS NULL
+       OR current_setting('archive.source_inventory_sha256', true) IS NULL
+       OR current_setting('archive.source_row_counts_sha256', true) IS NULL THEN
+        RAISE EXCEPTION 'Direct execution is not supported. Use archive_schemas_workflow.sh remove with a verified persistent package.';
+    END IF;
+
     IF pg_is_in_recovery() THEN
         RAISE EXCEPTION 'refuse archive schema removal while PostgreSQL is in recovery';
     END IF;
