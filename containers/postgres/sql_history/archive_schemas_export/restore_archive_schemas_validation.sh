@@ -312,8 +312,8 @@ assert_nonempty_file "${PACKAGE_DIR}/archive_dependencies.tsv"
 assert_nonempty_file "${PACKAGE_DIR}/archive_external_fks.tsv"
 assert_nonempty_file "${PACKAGE_DIR}/archive_internal_fks.tsv"
 assert_nonempty_file "${PACKAGE_DIR}/dengue_archive_schemas.schema.sql"
-assert_nonempty_file "$REGIONAL_KEYS_FILE"
-assert_nonempty_file "$CID10_KEYS_FILE"
+assert_regular_file "$REGIONAL_KEYS_FILE"
+assert_regular_file "$CID10_KEYS_FILE"
 
 tmp_dir="$(mktemp -d)"
 
