@@ -34,6 +34,28 @@ SET statement_timeout = '5min';
 SET lock_timeout = '5s';
 BEGIN;
 SELECT pg_advisory_xact_lock(hashtext('AlertaDengue.archive_dbf_upload'));
+DO $dbf_fk_validation$
+DECLARE
+    source_schema text := 'archive_dbf_upload';
+    expected_fk_count constant integer := 2;
+    actual_fk_count integer;
+    matched_fk_count integer;
+BEGIN
+    SELECT count(*) INTO actual_fk_count FROM pg_catalog.pg_constraint AS con
+    WHERE con.contype='f' AND con.conrelid IN (to_regclass(format('%I.%I',source_schema,'dbf_dbf')),to_regclass(format('%I.%I',source_schema,'dbf_dbfchunkedupload')));
+    IF actual_fk_count <> expected_fk_count THEN RAISE EXCEPTION 'Expected exactly % outbound FKs, found %',expected_fk_count,actual_fk_count; END IF;
+    WITH expected(table_name,constraint_name,source_column) AS (VALUES
+      ('dbf_dbf','dbf_dbf_uploaded_by_id_ad662eb4_fk_auth_user_id','uploaded_by_id'),
+      ('dbf_dbfchunkedupload','dbf_dbfchunkedupload_user_id_c7cc2beb_fk_auth_user_id','user_id'))
+    SELECT count(*) INTO matched_fk_count FROM expected exp JOIN pg_catalog.pg_constraint con
+      ON con.contype='f' AND con.conname=exp.constraint_name AND con.conrelid=to_regclass(format('%I.%I',source_schema,exp.table_name))
+     AND con.confrelid='public.auth_user'::regclass AND pg_catalog.array_length(con.conkey,1)=1 AND pg_catalog.array_length(con.confkey,1)=1
+    JOIN pg_catalog.pg_attribute sa ON sa.attrelid=con.conrelid AND sa.attnum=con.conkey[1] AND NOT sa.attisdropped
+    JOIN pg_catalog.pg_attribute ra ON ra.attrelid=con.confrelid AND ra.attnum=con.confkey[1] AND NOT ra.attisdropped
+    WHERE sa.attname=exp.source_column AND ra.attname='id' AND con.confmatchtype='s' AND con.confupdtype='a' AND con.confdeltype='a' AND con.condeferrable AND con.condeferred AND con.convalidated;
+    IF matched_fk_count <> expected_fk_count THEN RAISE EXCEPTION 'Reviewed DBF outbound FK catalog structure does not match in schema %',source_schema; END IF;
+END
+$dbf_fk_validation$;
 DO $$
 DECLARE n integer;
 BEGIN

@@ -6,7 +6,11 @@ SET default_transaction_read_only = on;
 BEGIN;
 
 SELECT current_database() AS database_name,
-       current_database()::regdatabase::oid AS database_oid,
+       (
+         SELECT oid
+         FROM pg_catalog.pg_database
+         WHERE datname = current_database()
+       ) AS database_oid,
        current_setting('server_version') AS server_version,
        current_setting('server_version_num') AS server_version_num,
        pg_is_in_recovery() AS is_in_recovery,
@@ -101,21 +105,52 @@ FROM pg_constraint con
 WHERE con.contype='f' AND con.conrelid IN ('public.dbf_dbf'::regclass,'public.dbf_dbfchunkedupload'::regclass)
 ORDER BY 1,2;
 
-DO $$
-DECLARE n integer;
+DO $dbf_fk_validation$
+DECLARE
+    source_schema text := 'public';
+    expected_fk_count constant integer := 2;
+    actual_fk_count integer;
+    matched_fk_count integer;
 BEGIN
-  SELECT count(*) INTO n FROM pg_constraint con
-  WHERE con.contype='f' AND con.conrelid='public.dbf_dbfchunkedupload'::regclass
-    AND con.confrelid='public.auth_user'::regclass
-    AND con.conname='dbf_dbfchunkedupload_user_id_c7cc2beb_fk_auth_user_id'
-    AND pg_get_constraintdef(con.oid)='FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED';
-  IF n <> 1 THEN RAISE EXCEPTION 'reviewed DBF chunk outbound FK definition is not exact'; END IF;
-  SELECT count(*) INTO n FROM pg_constraint con
-  WHERE con.contype='f' AND con.conrelid='public.dbf_dbf'::regclass
-    AND con.confrelid='public.auth_user'::regclass
-    AND con.conname='dbf_dbf_uploaded_by_id_ad662eb4_fk_auth_user_id';
-  IF n <> 1 THEN RAISE EXCEPTION 'reviewed DBF upload outbound FK is missing'; END IF;
-END $$;
+    SELECT count(*) INTO actual_fk_count
+    FROM pg_catalog.pg_constraint AS con
+    WHERE con.contype = 'f'
+      AND con.conrelid IN (
+          to_regclass(format('%I.%I', source_schema, 'dbf_dbf')),
+          to_regclass(format('%I.%I', source_schema, 'dbf_dbfchunkedupload'))
+      );
+    IF actual_fk_count <> expected_fk_count THEN
+        RAISE EXCEPTION 'Expected exactly % outbound FKs from %.dbf_dbf and %.dbf_dbfchunkedupload, found %', expected_fk_count, source_schema, source_schema, actual_fk_count;
+    END IF;
+    WITH expected(table_name, constraint_name, source_column) AS (
+        VALUES
+            ('dbf_dbf', 'dbf_dbf_uploaded_by_id_ad662eb4_fk_auth_user_id', 'uploaded_by_id'),
+            ('dbf_dbfchunkedupload', 'dbf_dbfchunkedupload_user_id_c7cc2beb_fk_auth_user_id', 'user_id')
+    )
+    SELECT count(*) INTO matched_fk_count
+    FROM expected AS exp
+    JOIN pg_catalog.pg_constraint AS con
+      ON con.contype = 'f'
+     AND con.conname = exp.constraint_name
+     AND con.conrelid = to_regclass(format('%I.%I', source_schema, exp.table_name))
+     AND con.confrelid = 'public.auth_user'::regclass
+     AND pg_catalog.array_length(con.conkey, 1) = 1
+     AND pg_catalog.array_length(con.confkey, 1) = 1
+    JOIN pg_catalog.pg_attribute AS source_attribute
+      ON source_attribute.attrelid = con.conrelid AND source_attribute.attnum = con.conkey[1]
+     AND NOT source_attribute.attisdropped
+    JOIN pg_catalog.pg_attribute AS referenced_attribute
+      ON referenced_attribute.attrelid = con.confrelid AND referenced_attribute.attnum = con.confkey[1]
+     AND NOT referenced_attribute.attisdropped
+    WHERE source_attribute.attname = exp.source_column
+      AND referenced_attribute.attname = 'id'
+      AND con.confmatchtype = 's' AND con.confupdtype = 'a' AND con.confdeltype = 'a'
+      AND con.condeferrable AND con.condeferred AND con.convalidated;
+    IF matched_fk_count <> expected_fk_count THEN
+        RAISE EXCEPTION 'Reviewed DBF outbound FK catalog structure does not match in schema %: expected %, matched %', source_schema, expected_fk_count, matched_fk_count;
+    END IF;
+END
+$dbf_fk_validation$;
 
 SELECT d.classid::regclass AS dependency_class, d.objid, d.refobjid, d.deptype,
        d.objsubid, d.refobjsubid
@@ -158,4 +193,4 @@ END $$;
 SELECT 'historical_period_validation' AS check_name,
        'NOT_INDEPENDENTLY_VERIFIABLE' AS status,
        'DBF tables contain no epidemiological-week field; operator must confirm cutoff 202552 before archive' AS detail;
-COMMIT;
+ROLLBACK;

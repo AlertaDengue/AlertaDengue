@@ -17,6 +17,28 @@ BEGIN
     AND conrelid NOT IN ('public.dbf_dbf'::regclass, 'public.dbf_dbfchunkedupload'::regclass))
   THEN RAISE EXCEPTION 'unexpected active dependency on DBF target'; END IF;
 END $$;
+DO $dbf_fk_validation$
+DECLARE
+    source_schema text := 'public';
+    expected_fk_count constant integer := 2;
+    actual_fk_count integer;
+    matched_fk_count integer;
+BEGIN
+    SELECT count(*) INTO actual_fk_count FROM pg_catalog.pg_constraint AS con
+    WHERE con.contype = 'f' AND con.conrelid IN (to_regclass(format('%I.%I', source_schema, 'dbf_dbf')), to_regclass(format('%I.%I', source_schema, 'dbf_dbfchunkedupload')));
+    IF actual_fk_count <> expected_fk_count THEN RAISE EXCEPTION 'Expected exactly % outbound FKs, found %', expected_fk_count, actual_fk_count; END IF;
+    WITH expected(table_name, constraint_name, source_column) AS (VALUES
+      ('dbf_dbf','dbf_dbf_uploaded_by_id_ad662eb4_fk_auth_user_id','uploaded_by_id'),
+      ('dbf_dbfchunkedupload','dbf_dbfchunkedupload_user_id_c7cc2beb_fk_auth_user_id','user_id'))
+    SELECT count(*) INTO matched_fk_count FROM expected exp JOIN pg_catalog.pg_constraint con
+      ON con.contype='f' AND con.conname=exp.constraint_name AND con.conrelid=to_regclass(format('%I.%I',source_schema,exp.table_name))
+     AND con.confrelid='public.auth_user'::regclass AND pg_catalog.array_length(con.conkey,1)=1 AND pg_catalog.array_length(con.confkey,1)=1
+    JOIN pg_catalog.pg_attribute sa ON sa.attrelid=con.conrelid AND sa.attnum=con.conkey[1] AND NOT sa.attisdropped
+    JOIN pg_catalog.pg_attribute ra ON ra.attrelid=con.confrelid AND ra.attnum=con.confkey[1] AND NOT ra.attisdropped
+    WHERE sa.attname=exp.source_column AND ra.attname='id' AND con.confmatchtype='s' AND con.confupdtype='a' AND con.confdeltype='a' AND con.condeferrable AND con.condeferred AND con.convalidated;
+    IF matched_fk_count <> expected_fk_count THEN RAISE EXCEPTION 'Reviewed DBF outbound FK catalog structure does not match in schema %', source_schema; END IF;
+END
+$dbf_fk_validation$;
 CREATE TEMP TABLE dbf_archive_before AS
 SELECT c.oid::regclass::text AS object_name,
        (xpath('/row/count/text()', query_to_xml(format('SELECT count(*) AS count FROM %I.%I',n.nspname,c.relname),false,true,'')))[1]::text::bigint AS exact_rows,
@@ -45,6 +67,28 @@ CREATE SCHEMA archive_dbf_upload;
 ALTER SCHEMA archive_dbf_upload OWNER TO CURRENT_USER;
 ALTER TABLE public.dbf_dbf SET SCHEMA archive_dbf_upload;
 ALTER TABLE public.dbf_dbfchunkedupload SET SCHEMA archive_dbf_upload;
+DO $dbf_fk_validation$
+DECLARE
+    source_schema text := 'archive_dbf_upload';
+    expected_fk_count constant integer := 2;
+    actual_fk_count integer;
+    matched_fk_count integer;
+BEGIN
+    SELECT count(*) INTO actual_fk_count FROM pg_catalog.pg_constraint AS con
+    WHERE con.contype = 'f' AND con.conrelid IN (to_regclass(format('%I.%I', source_schema, 'dbf_dbf')), to_regclass(format('%I.%I', source_schema, 'dbf_dbfchunkedupload')));
+    IF actual_fk_count <> expected_fk_count THEN RAISE EXCEPTION 'Expected exactly % outbound FKs, found %', expected_fk_count, actual_fk_count; END IF;
+    WITH expected(table_name, constraint_name, source_column) AS (VALUES
+      ('dbf_dbf','dbf_dbf_uploaded_by_id_ad662eb4_fk_auth_user_id','uploaded_by_id'),
+      ('dbf_dbfchunkedupload','dbf_dbfchunkedupload_user_id_c7cc2beb_fk_auth_user_id','user_id'))
+    SELECT count(*) INTO matched_fk_count FROM expected exp JOIN pg_catalog.pg_constraint con
+      ON con.contype='f' AND con.conname=exp.constraint_name AND con.conrelid=to_regclass(format('%I.%I',source_schema,exp.table_name))
+     AND con.confrelid='public.auth_user'::regclass AND pg_catalog.array_length(con.conkey,1)=1 AND pg_catalog.array_length(con.confkey,1)=1
+    JOIN pg_catalog.pg_attribute sa ON sa.attrelid=con.conrelid AND sa.attnum=con.conkey[1] AND NOT sa.attisdropped
+    JOIN pg_catalog.pg_attribute ra ON ra.attrelid=con.confrelid AND ra.attnum=con.confkey[1] AND NOT ra.attisdropped
+    WHERE sa.attname=exp.source_column AND ra.attname='id' AND con.confmatchtype='s' AND con.confupdtype='a' AND con.confdeltype='a' AND con.condeferrable AND con.condeferred AND con.convalidated;
+    IF matched_fk_count <> expected_fk_count THEN RAISE EXCEPTION 'Reviewed DBF outbound FK catalog structure does not match in schema %', source_schema; END IF;
+END
+$dbf_fk_validation$;
 DO $$
 BEGIN
   IF to_regclass('public.dbf_dbf') IS NOT NULL OR to_regclass('public.dbf_dbfchunkedupload') IS NOT NULL
@@ -79,14 +123,6 @@ BEGIN
     WHERE d.deptype='a' AND s.oid='archive_dbf_upload.dbf_dbfchunkedupload_id_seq'::regclass
       AND t.oid='archive_dbf_upload.dbf_dbfchunkedupload'::regclass AND d.refobjsubid=1)
   THEN RAISE EXCEPTION 'dbf_dbfchunkedupload_id_seq ownership was not preserved'; END IF;
-  IF (SELECT count(*) FROM pg_constraint WHERE contype='f'
-      AND conrelid IN ('archive_dbf_upload.dbf_dbf'::regclass,'archive_dbf_upload.dbf_dbfchunkedupload'::regclass)
-      AND confrelid='public.auth_user'::regclass) <> 2
-  THEN RAISE EXCEPTION 'outbound auth_user foreign-key inventory changed'; END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_constraint con JOIN pg_namespace ns ON ns.oid=con.connamespace
-    WHERE ns.nspname='archive_dbf_upload' AND con.conname='dbf_dbfchunkedupload_user_id_c7cc2beb_fk_auth_user_id'
-      AND pg_get_constraintdef(con.oid)='FOREIGN KEY (user_id) REFERENCES public.auth_user(id) DEFERRABLE INITIALLY DEFERRED')
-  THEN RAISE EXCEPTION 'chunked-upload outbound FK definition changed'; END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_attrdef d JOIN pg_class c ON c.oid=d.adrelid JOIN pg_namespace ns ON ns.oid=c.relnamespace
     WHERE ns.nspname='archive_dbf_upload' AND c.relname='dbf_dbf'
       AND pg_get_expr(d.adbin,d.adrelid) LIKE '%archive_dbf_upload.dbf_dbf_id_seq%')
