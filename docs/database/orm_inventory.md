@@ -25,10 +25,11 @@ not be confused with PostgreSQL schemas.
 
 - Django connection probe used:
   `poetry run python AlertaDengue/manage.py shell -c "from django.db import connection; connection.ensure_connection(); print(connection.vendor)"`
-- Resolved application connection on 2026-07-21:
-  PostgreSQL via `AlertaDengue/manage.py shell`, host `localhost`, port
-  `25432`, database `dengue`.
-- Live catalog inspection succeeded through the Django-configured connection.
+- Resolved the application connection externally through the approved libpq
+  configuration; no connection endpoint or database identity is recorded in
+  this inventory.
+- Live catalog inspection succeeded through the externally configured
+  connection.
 - Catalog coverage came from `pg_catalog` and `information_schema` for ordinary
   tables, partitioned tables, foreign tables, views, and materialized views in
   the five target schemas.
@@ -231,6 +232,22 @@ No live objects were found in `forecast`, and no target-schema objects from
 - None. Maintainer decisions in this PR reduce pending ORM decisions to zero.
 
 ## Phase 1 Conclusion
+
+### Legacy SINAN upload lifecycle
+
+The legacy `public.upload_sinanchunkedupload`, `public.upload_sinanupload`,
+and `public.upload_sinanuploadlogstatus` tables are retired and have no active
+runtime dependency. Remaining references in the removed Django upload app and
+its migrations are migration/history-only; they are not current ORM models or
+active ingestion code. The exact three tables and their three owned sequences
+were moved to `archive_sinan_upload` by the guarded workflow in
+`containers/postgres/sql_history/archive_sinan_upload/`. The current
+replacement is `ingestion.run` plus `ingestion.sinan_stage`, which remain
+application-owned and active. Archive, rollback/restore, export validation, and
+permanent removal are separate operations. External-consumer confirmation and
+uploaded-file/log retention remain operational checks. The bootstrap schema
+snapshot intentionally excludes the archive schema, following the PR #1038
+standard.
 
 ### Ready for Phase 2
 

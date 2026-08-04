@@ -5,7 +5,7 @@
 The retired SINAN upload workflow was used through epidemiological week
 `202552`. The current flow is watcher/MinIO → `ingestion.run` →
 `ingestion.sinan_stage` → merge, active from `202553`. The repository runtime
-gate passed on commit `ce57f16ca1d62cb67924d14fe22f9d5d057fbd3b`: no active
+gate passed on the current branch commit: no active
 model, endpoint, task, pipeline, or dynamic lookup depends on the legacy
 objects. The database data has timestamps but no authoritative epiweek field,
 so it cannot independently prove the lifecycle boundary. Operator confirmation
@@ -98,6 +98,17 @@ transaction. The script is deliberately one-time and non-idempotent.
 
 ## Step 3 — Post-archive verification
 
+Use the read-only validation script:
+
+```bash
+"${PSQL[@]}" \
+  -v expected_database_name="${PGDATABASE}" \
+  -f "${SQL_DIR}/20260804_02_validate_sinan_upload_archive.sql"
+```
+
+It must finish with `ROLLBACK` after validating the complete archive state.
+The one-time archive script must not be rerun.
+
 Run these read-only queries with the connection setup above:
 
 ```sql
@@ -143,7 +154,23 @@ The six public lookups must be null, the six archive lookups must resolve, and
 all recorded counts, sequence states, ownership/defaults, constraints, and
 indexes must match the preflight.
 
-## Step 4 — Export verified archive package
+## Step 4 — Rollback/restore before removal
+
+When a separately reviewed rollback is required before permanent removal, move
+the exact archived objects back to `public`:
+
+```bash
+"${PSQL[@]}" \
+  -v expected_database_name="${PGDATABASE}" \
+  -f "${SQL_DIR}/20260804_80_restore_sinan_upload.sql"
+```
+
+The restore script is transactional and validates that counts, sequence state,
+defaults, ownership, constraints, indexes, and FKs are preserved. It removes
+the archive schema only after it is empty. This is a schema rollback; it is not
+a dump restore over an active database.
+
+## Step 5 — Export verified archive package
 
 The PR #1038 archive/export workflow is hard-coded for its previous archive
 schemas and does not select `archive_sinan_upload`; no duplicate shell wrapper
@@ -166,7 +193,7 @@ UTC timestamp, database name/OID, Git commit, exact six-object inventory,
 counts, sequence states, constraints, indexes, dependencies, grants, dump
 hash, TOC, and schema-only SQL.
 
-## Step 5 — Disposable restore validation
+## Step 6 — Disposable restore validation
 
 Create a disposable database from `template0`, install only extensions proven
 necessary, and derive minimal compatible fixtures from the reviewed outbound
@@ -177,7 +204,7 @@ constraints, indexes, the external FK, and grants where roles exist. Record a
 PASS receipt, then drop the disposable database. Do not restore over an active
 database.
 
-## Step 6 — Permanent removal
+## Step 7 — Permanent removal
 
 **Permanent removal is a separate operation and is not part of archival.**
 
@@ -248,4 +275,6 @@ names. The exact six source objects are absent from `public`, so the database
 archive gate is `BLOCKED`: the target inventory is already archived and the
 preflight must not be weakened or rerun as an archive against unrelated
 objects. The runtime gate remains PASS. Archive and removal were not executed
-during this correction.
+during this correction. The required disposable round-trip is the authoritative
+completion check: validate archive, restore to `public`, preflight, archive,
+and validate again; permanent removal remains unexecuted.
