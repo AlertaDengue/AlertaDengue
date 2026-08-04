@@ -71,8 +71,8 @@ BEGIN
   IF (xpath('/row/count/text()', query_to_xml('SELECT count(*) AS count FROM archive_dbf_upload.dbf_dbf',false,true,'')))[1]::text::bigint <> :'expected_dbf_rows'::bigint
      OR (xpath('/row/count/text()', query_to_xml('SELECT count(*) AS count FROM archive_dbf_upload.dbf_dbfchunkedupload',false,true,'')))[1]::text::bigint <> :'expected_dbfchunkedupload_rows'::bigint
   THEN RAISE EXCEPTION 'row count mismatch'; END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_sequences WHERE schemaname='archive_dbf_upload' AND sequencename='dbf_dbf_id_seq' AND last_value IS NOT DISTINCT FROM :'expected_dbf_id_seq_last_value'::bigint AND is_called = :'expected_dbf_id_seq_is_called'::boolean)
-     OR NOT EXISTS (SELECT 1 FROM pg_sequences WHERE schemaname='archive_dbf_upload' AND sequencename='dbf_dbfchunkedupload_id_seq' AND last_value IS NOT DISTINCT FROM :'expected_dbfchunkedupload_id_seq_last_value'::bigint AND is_called = :'expected_dbfchunkedupload_id_seq_is_called'::boolean)
+  IF NOT EXISTS (SELECT 1 FROM archive_dbf_upload.dbf_dbf_id_seq WHERE last_value IS NOT DISTINCT FROM :'expected_dbf_id_seq_last_value'::bigint AND is_called = :'expected_dbf_id_seq_is_called'::boolean)
+     OR NOT EXISTS (SELECT 1 FROM archive_dbf_upload.dbf_dbfchunkedupload_id_seq WHERE last_value IS NOT DISTINCT FROM :'expected_dbfchunkedupload_id_seq_last_value'::bigint AND is_called = :'expected_dbfchunkedupload_id_seq_is_called'::boolean)
   THEN RAISE EXCEPTION 'sequence value mismatch'; END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.deptype='a' AND d.objid='archive_dbf_upload.dbf_dbf_id_seq'::regclass AND d.refobjid='archive_dbf_upload.dbf_dbf'::regclass AND d.refobjsubid=1)
      OR NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.deptype='a' AND d.objid='archive_dbf_upload.dbf_dbfchunkedupload_id_seq'::regclass AND d.refobjid='archive_dbf_upload.dbf_dbfchunkedupload'::regclass AND d.refobjsubid=1)

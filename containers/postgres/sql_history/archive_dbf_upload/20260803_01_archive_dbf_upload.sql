@@ -45,13 +45,19 @@ SELECT c.oid::regclass::text AS object_name,
        pg_total_relation_size(c.oid) AS total_size
 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
 WHERE c.oid IN ('public.dbf_dbf'::regclass, 'public.dbf_dbfchunkedupload'::regclass);
-CREATE TEMP TABLE dbf_sequence_before AS
-SELECT seq.oid::regclass::text AS sequence_name, tbl.oid::regclass::text AS owned_table,
-       att.attname AS owned_column, s.last_value, s.is_called
-FROM pg_class seq JOIN pg_depend dep ON dep.objid=seq.oid AND dep.deptype='a'
-JOIN pg_class tbl ON tbl.oid=dep.refobjid JOIN pg_attribute att ON att.attrelid=tbl.oid AND att.attnum=dep.refobjsubid
-JOIN pg_sequences s ON s.schemaname='public' AND s.sequencename=seq.relname
-WHERE seq.oid IN ('public.dbf_dbf_id_seq'::regclass,'public.dbf_dbfchunkedupload_id_seq'::regclass);
+CREATE TEMP TABLE dbf_sequence_state_before ON COMMIT DROP AS
+SELECT 'dbf_dbf_id_seq'::text AS sequence_name, last_value, is_called
+FROM public.dbf_dbf_id_seq
+UNION ALL
+SELECT 'dbf_dbfchunkedupload_id_seq'::text, last_value, is_called
+FROM public.dbf_dbfchunkedupload_id_seq;
+DO $$
+BEGIN
+  IF (SELECT count(*) FROM dbf_sequence_state_before) <> 2
+     OR EXISTS (SELECT 1 FROM dbf_sequence_state_before
+               WHERE sequence_name NOT IN ('dbf_dbf_id_seq','dbf_dbfchunkedupload_id_seq'))
+  THEN RAISE EXCEPTION 'sequence snapshot before archive is not exact'; END IF;
+END $$;
 CREATE TEMP TABLE dbf_metadata_before AS
 SELECT 'column' AS kind, c.relname||':'||a.attnum::text AS object_name,
        a.attname||':'||format_type(a.atttypid,a.atttypmod)||':'||a.attnotnull::text||':'||COALESCE(pg_get_expr(ad.adbin,ad.adrelid),'') AS definition
@@ -97,12 +103,30 @@ BEGIN
   IF to_regclass('archive_dbf_upload.dbf_dbf') IS NULL OR to_regclass('archive_dbf_upload.dbf_dbfchunkedupload') IS NULL
      OR to_regclass('archive_dbf_upload.dbf_dbf_id_seq') IS NULL OR to_regclass('archive_dbf_upload.dbf_dbfchunkedupload_id_seq') IS NULL
   THEN RAISE EXCEPTION 'archived table/sequence inventory is incomplete'; END IF;
-  IF EXISTS (SELECT 1 FROM dbf_archive_before b JOIN pg_class c ON c.oid=to_regclass('archive_dbf_upload.'||split_part(b.object_name,'.',2))
-             WHERE b.exact_rows <> (xpath('/row/count/text()', query_to_xml(format('SELECT count(*) AS count FROM %s',c.oid::regclass),false,true,'')))[1]::text::bigint)
+  IF (SELECT exact_rows FROM dbf_archive_before WHERE object_name='dbf_dbf') IS DISTINCT FROM
+       (xpath('/row/count/text()', query_to_xml('SELECT count(*) AS count FROM archive_dbf_upload.dbf_dbf',false,true,'')))[1]::text::bigint
+     OR (SELECT exact_rows FROM dbf_archive_before WHERE object_name='dbf_dbfchunkedupload') IS DISTINCT FROM
+       (xpath('/row/count/text()', query_to_xml('SELECT count(*) AS count FROM archive_dbf_upload.dbf_dbfchunkedupload',false,true,'')))[1]::text::bigint
   THEN RAISE EXCEPTION 'row count changed during archive'; END IF;
-  IF EXISTS (SELECT 1 FROM dbf_sequence_before b JOIN pg_sequences s ON s.schemaname='archive_dbf_upload'
-             AND s.sequencename=split_part(b.sequence_name,'.',2)
-             WHERE b.last_value IS DISTINCT FROM s.last_value OR b.is_called IS DISTINCT FROM s.is_called)
+  IF (SELECT count(*) FROM (
+        SELECT 'dbf_dbf_id_seq'::text AS sequence_name, last_value, is_called
+        FROM archive_dbf_upload.dbf_dbf_id_seq
+        UNION ALL
+        SELECT 'dbf_dbfchunkedupload_id_seq'::text, last_value, is_called
+        FROM archive_dbf_upload.dbf_dbfchunkedupload_id_seq
+      ) AS states) <> 2
+  THEN RAISE EXCEPTION 'sequence snapshot after archive is not exact'; END IF;
+  IF EXISTS (SELECT 1 FROM (
+        SELECT 'dbf_dbf_id_seq'::text AS sequence_name, last_value, is_called
+        FROM archive_dbf_upload.dbf_dbf_id_seq
+        UNION ALL
+        SELECT 'dbf_dbfchunkedupload_id_seq'::text, last_value, is_called
+        FROM archive_dbf_upload.dbf_dbfchunkedupload_id_seq
+      ) AS after_state
+      FULL JOIN dbf_sequence_state_before before_state USING (sequence_name)
+      WHERE after_state.sequence_name IS NULL OR before_state.sequence_name IS NULL
+         OR after_state.last_value IS DISTINCT FROM before_state.last_value
+         OR after_state.is_called IS DISTINCT FROM before_state.is_called)
   THEN RAISE EXCEPTION 'sequence value changed during archive'; END IF;
   IF EXISTS (SELECT 1 FROM pg_depend d JOIN pg_class s ON s.oid=d.objid JOIN pg_class t ON t.oid=d.refobjid
              WHERE d.deptype='a' AND s.oid IN ('archive_dbf_upload.dbf_dbf_id_seq'::regclass,'archive_dbf_upload.dbf_dbfchunkedupload_id_seq'::regclass)
@@ -113,6 +137,7 @@ BEGIN
   THEN RAISE EXCEPTION 'protected active object disappeared'; END IF;
   IF EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
              WHERE n.nspname='archive_dbf_upload'
+               AND c.relkind IN ('r','S')
                AND c.relname NOT IN ('dbf_dbf','dbf_dbfchunkedupload','dbf_dbf_id_seq','dbf_dbfchunkedupload_id_seq'))
   THEN RAISE EXCEPTION 'unexpected archive object exists'; END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_depend d JOIN pg_class s ON s.oid=d.objid JOIN pg_class t ON t.oid=d.refobjid
@@ -162,7 +187,8 @@ SELECT tgrelid::regclass,tgname,pg_get_triggerdef(oid) FROM pg_trigger
 WHERE tgrelid IN ('archive_dbf_upload.dbf_dbf'::regclass,'archive_dbf_upload.dbf_dbfchunkedupload'::regclass) AND NOT tgisinternal;
 DO $$
 BEGIN
-  IF EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace ns ON ns.oid=c.relnamespace WHERE ns.nspname='archive_dbf_upload')
+  IF EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace ns ON ns.oid=c.relnamespace
+             WHERE ns.nspname='archive_dbf_upload' AND c.relkind NOT IN ('r','S','i'))
   THEN RAISE EXCEPTION 'archive schema contains unexpected objects'; END IF;
 END $$;
 COMMIT;
