@@ -4,14 +4,22 @@
 \if :{?expected_database_name}
 \else
   \echo 'ERROR: expected_database_name is required'
-  \quit 3
+  DO $error$
+  BEGIN
+    RAISE EXCEPTION 'expected_database_name is required';
+  END
+  $error$;
 \endif
 SELECT current_database() = :'expected_database_name' AS database_name_matches
 \gset
 \if :database_name_matches
 \else
   \echo 'ERROR: connected database does not match expected_database_name'
-  \quit 3
+  DO $error$
+  BEGIN
+    RAISE EXCEPTION 'connected database does not match expected_database_name';
+  END
+  $error$;
 \endif
 
 BEGIN;
