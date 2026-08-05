@@ -1,29 +1,36 @@
-# Upload archive schema export
+# Archive schema export
 
-This workflow adapts the reviewed archive export standard to exactly two
-schemas: `archive_dbf_upload` and `archive_sinan_upload`.
+`archive_schemas_workflow.sh` accepts a comma-separated selection from this
+explicit allowlist only:
 
-All libpq connection settings, including `PGDATABASE` and `PGUSER`, must be
-provided by the shell or libpq service configuration. The workflow does not
-set endpoints, credentials, or local defaults.
+`archive_redemet`, `archive_upload`, `archive_ovitrampa`,
+`archive_alertas_regionais`, `archive_cemaden`, `archive_copernicus`,
+`archive_historico_casos`, `archive_mosqlimate`, `archive_tweets`,
+`archive_dbf_upload`, `archive_sinan_upload`.
 
-Set the persistent output location outside the repository, `/tmp`, and
-PostgreSQL `data_directory`:
+When `--schemas` is omitted, export and status select all allowlisted schemas
+currently present. Verify reads the selected schemas from the package. An
+explicit selection is always validated for empty, duplicate, malformed, and
+non-allowlisted names.
+
+Examples:
 
 ```bash
-export ARCHIVE_EXPORT_ROOT=/opt/services/infodengue/database_exports/archive_schemas
-./archive_schemas_workflow.sh export
-./archive_schemas_workflow.sh verify --package /absolute/path/printed/by/export
+archive_schemas_workflow.sh export --schemas archive_dbf_upload,archive_sinan_upload
+archive_schemas_workflow.sh export --schemas archive_tweets
+archive_schemas_workflow.sh export --schemas archive_tweets,archive_dbf_upload,archive_sinan_upload
+archive_schemas_workflow.sh verify --package /absolute/path/to/package --schemas archive_dbf_upload,archive_sinan_upload
+archive_schemas_workflow.sh status --schemas archive_dbf_upload,archive_sinan_upload
 ```
 
-Export creates a private package containing the custom-format dump, SHA-256
-checksums, receipt-ready manifest, inventory, exact row counts, sequence state,
-constraints, indexes, dependencies, grants, TOC, and schema-only SQL.
+All libpq settings must come from the shell or libpq service configuration.
+Never place connection values or credentials in the repository.
 
-Verification restores into a disposable database created from `template0`,
-checks all package metadata and row counts, then drops only the restored
-archive tables and schemas without cascading dependencies. The current database is never
-removed by verification. Live removal is intentionally disabled in this
-adaptation.
+Every package records `selected_schemas.tsv`, a custom-format dump, checksums,
+source and Git metadata, inventory, exact row counts, sequences, constraints,
+indexes, dependencies, external/internal FKs, grants, protected objects,
+`pg_restore --list`, schema-only SQL, and receipts.
 
-Generated packages are operational evidence and must remain outside Git.
+Verify restores into a disposable `template0` database and tests removal only
+there. Restore validation must pass before any removal consideration. Live
+removal remains disabled in this workflow; never remove current local schemas.

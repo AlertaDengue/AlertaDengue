@@ -1,25 +1,43 @@
-# Upload archive schema export
+# Archive schema export
 
-The reviewed archive export/remove standard is adapted for the legacy upload
-schemas `archive_dbf_upload` and `archive_sinan_upload` only. The allowlist is
-deliberately exact; no other archive schema is exported or removed.
+The workflow supports only the following selected archive schemas:
 
-Connection settings are external. Configure libpq in the shell or its service
-file before invoking the workflow; repository files contain no host, port,
-user, password, DSN, or local endpoint defaults.
+- `archive_redemet`
+- `archive_upload`
+- `archive_ovitrampa`
+- `archive_alertas_regionais`
+- `archive_cemaden`
+- `archive_copernicus`
+- `archive_historico_casos`
+- `archive_mosqlimate`
+- `archive_tweets`
+- `archive_dbf_upload`
+- `archive_sinan_upload`
+
+This is an allowlisted selection, not arbitrary `archive_*` input. If
+`--schemas` is omitted, export/status use all allowlisted schemas currently
+present; verify uses the package’s `selected_schemas.tsv`.
 
 ```bash
-export ARCHIVE_EXPORT_ROOT=/opt/services/infodengue/database_exports/archive_schemas
-containers/postgres/sql_history/archive_schemas_export/archive_schemas_workflow.sh export
-containers/postgres/sql_history/archive_schemas_export/archive_schemas_workflow.sh verify --package /absolute/package/path
+archive_schemas_workflow.sh export \
+  --schemas archive_dbf_upload,archive_sinan_upload
+archive_schemas_workflow.sh export --schemas archive_tweets
+archive_schemas_workflow.sh export \
+  --schemas archive_tweets,archive_dbf_upload,archive_sinan_upload
+archive_schemas_workflow.sh verify \
+  --package /absolute/path/to/package \
+  --schemas archive_dbf_upload,archive_sinan_upload
+archive_schemas_workflow.sh status \
+  --schemas archive_dbf_upload,archive_sinan_upload
 ```
 
-The package includes the dump and checksum, receipt inputs, inventory, exact
-row counts, sequence state, constraints, indexes, dependencies, grants,
-`pg_restore --list`, and schema-only SQL. Verification creates a disposable
-database from `template0`, restores the package, validates row-count parity,
-and tests explicit schema removal there without cascading dependencies. It never removes the
-current local database schemas.
+External libpq configuration is required. Do not put production values,
+credentials, DSNs, or connection details in repository files.
 
-The active replacement objects `ingestion.run` and `ingestion.sinan_stage`
-remain outside this archive allowlist and must remain present.
+Export records selected schemas, dump and SHA-256, receipts, source database
+metadata, Git metadata, inventory, exact row counts, sequence state,
+constraints, indexes, dependencies, external/internal FKs, owners/grants,
+protected objects, TOC, and schema-only SQL. Restore validation creates only
+the minimal fixtures required by reviewed foreign keys, restores into a
+disposable database from `template0`, validates selected manifests, and tests
+removal only in that disposable database. Live removal remains disabled.
