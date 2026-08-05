@@ -67,9 +67,13 @@ FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname IN (
 SQL
 cmp -s "${PACKAGE_DIR}/archive_row_counts.tsv" "${tmp_dir}/row_counts.tsv" || fatal 'restored row counts differ from source'
 
-PGDATABASE="$RESTORE_DB" psql -X -v ON_ERROR_STOP=1 -f - > "${PACKAGE_DIR}/removal_test.tsv" <<'SQL'
+PGDATABASE="$RESTORE_DB" psql -X -A -t -F $'\t' -v ON_ERROR_STOP=1 -f - > "${PACKAGE_DIR}/removal_test.tsv" <<'SQL'
 BEGIN;
 DO $$ DECLARE r record; BEGIN
+  FOR r IN SELECT n.nspname,c.relname,con.conname FROM pg_constraint con
+           JOIN pg_class c ON c.oid=con.conrelid JOIN pg_namespace n ON n.oid=c.relnamespace
+           WHERE n.nspname IN ('archive_dbf_upload','archive_sinan_upload') AND con.contype = 'f' ORDER BY 1,2,3
+  LOOP EXECUTE format('ALTER TABLE %I.%I DROP CONSTRAINT %I',r.nspname,r.relname,r.conname); END LOOP;
   FOR r IN SELECT n.nspname,c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
            WHERE n.nspname IN ('archive_dbf_upload','archive_sinan_upload') AND c.relkind IN ('r','m') ORDER BY 1,2
   LOOP EXECUTE format('DROP TABLE %I.%I',r.nspname,r.relname); END LOOP;

@@ -842,7 +842,7 @@ pg_dump --format=custom --compress=9 --strict-names --lock-wait-timeout=5s --ver
 EOF
   set_private_mode "$command_file"
 
-  psql -X -v ON_ERROR_STOP=1 -f "${SCRIPT_DIR}/20260729_00_audit_archive_schemas.sql" >/dev/null
+  assert_current_archive_schema_set_exact
   pg_dump \
     --format=custom \
     --compress=9 \
