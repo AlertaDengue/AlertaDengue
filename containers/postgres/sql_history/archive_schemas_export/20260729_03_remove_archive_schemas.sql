@@ -1,5 +1,5 @@
--- Remove the completed archive schemas after verified export and restore.
--- Explicit manifest only. No CASCADE.
+-- Remove only the verified DBF and SINAN upload archive schemas.
+-- The workflow sets the session evidence immediately before this script runs.
 
 DO $$
 BEGIN
@@ -9,7 +9,9 @@ BEGIN
        OR current_setting('archive.verification_receipt_sha256', true) IS NULL
        OR current_setting('archive.source_database_oid', true) IS NULL
        OR current_setting('archive.source_inventory_sha256', true) IS NULL
-       OR current_setting('archive.source_row_counts_sha256', true) IS NULL THEN
+       OR current_setting('archive.source_row_counts_sha256', true) IS NULL
+       OR current_setting('archive.selected_schemas', true) IS DISTINCT FROM
+          'archive_dbf_upload,archive_sinan_upload' THEN
         RAISE EXCEPTION 'Direct execution is not supported. Use archive_schemas_workflow.sh remove with a verified persistent package.';
     END IF;
 END
@@ -31,7 +33,9 @@ BEGIN
        OR current_setting('archive.verification_receipt_sha256', true) IS NULL
        OR current_setting('archive.source_database_oid', true) IS NULL
        OR current_setting('archive.source_inventory_sha256', true) IS NULL
-       OR current_setting('archive.source_row_counts_sha256', true) IS NULL THEN
+       OR current_setting('archive.source_row_counts_sha256', true) IS NULL
+       OR current_setting('archive.selected_schemas', true) IS DISTINCT FROM
+          'archive_dbf_upload,archive_sinan_upload' THEN
         RAISE EXCEPTION 'Direct execution is not supported. Use archive_schemas_workflow.sh remove with a verified persistent package.';
     END IF;
 
@@ -67,59 +71,62 @@ BEGIN
         RAISE EXCEPTION 'protected active object snapshot is incomplete';
     END IF;
 
-    -- alertas regionais
-    DROP TABLE archive_alertas_regionais.alerta_mrj;
-    DROP TABLE archive_alertas_regionais.alerta_mrj_chik;
-    DROP TABLE archive_alertas_regionais.alerta_mrj_zika;
-    DROP TABLE archive_alertas_regionais.alerta_regional_chik;
-    DROP TABLE archive_alertas_regionais.alerta_regional_dengue;
-    DROP TABLE archive_alertas_regionais.alerta_regional_zika;
-    DROP SCHEMA archive_alertas_regionais;
+    IF EXISTS (
+        SELECT 1
+        FROM pg_depend AS d
+        JOIN pg_class AS dependent ON dependent.oid = d.objid
+        JOIN pg_namespace AS dependent_ns ON dependent_ns.oid = dependent.relnamespace
+        JOIN pg_class AS referenced ON referenced.oid = d.refobjid
+        JOIN pg_namespace AS referenced_ns ON referenced_ns.oid = referenced.relnamespace
+        WHERE referenced_ns.nspname IN ('archive_dbf_upload', 'archive_sinan_upload')
+          AND dependent_ns.nspname NOT IN ('archive_dbf_upload', 'archive_sinan_upload', 'pg_toast')
+    ) THEN
+        RAISE EXCEPTION 'an object outside the selected archive schemas depends on a removal target';
+    END IF;
 
-    -- cemaden
-    DROP TABLE archive_cemaden."Clima_cemaden";
-    DROP TABLE archive_cemaden."Estacao_cemaden";
-    DROP SCHEMA archive_cemaden;
+    IF EXISTS (
+        SELECT 1
+        FROM pg_class AS c
+        JOIN pg_namespace AS n ON n.oid = c.relnamespace
+        WHERE n.nspname IN ('archive_dbf_upload', 'archive_sinan_upload')
+          AND c.relkind NOT IN ('i', 't')
+          AND (n.nspname, c.relname, c.relkind) NOT IN (
+              ('archive_dbf_upload', 'dbf_dbf', 'r'),
+              ('archive_dbf_upload', 'dbf_dbfchunkedupload', 'r'),
+              ('archive_dbf_upload', 'dbf_dbf_id_seq', 'S'),
+              ('archive_dbf_upload', 'dbf_dbfchunkedupload_id_seq', 'S'),
+              ('archive_sinan_upload', 'upload_sinanupload', 'r'),
+              ('archive_sinan_upload', 'upload_sinanchunkedupload', 'r'),
+              ('archive_sinan_upload', 'upload_sinanuploadlogstatus', 'r'),
+              ('archive_sinan_upload', 'upload_sinanupload_id_seq', 'S'),
+              ('archive_sinan_upload', 'upload_sinanchunkedupload_id_seq', 'S'),
+              ('archive_sinan_upload', 'upload_sinanuploadlogstatus_id_seq', 'S')
+          )
+    ) THEN
+        RAISE EXCEPTION 'selected archive schemas contain an unexpected object';
+    END IF;
 
-    -- copernicus
-    DROP TABLE archive_copernicus.copernicus_arg;
-    DROP TABLE archive_copernicus.copernicus_foz_do_iguacu;
-    DROP SCHEMA archive_copernicus;
+    -- Detach owned sequences so each object is removed by an explicit statement.
+    ALTER SEQUENCE archive_dbf_upload.dbf_dbf_id_seq OWNED BY NONE;
+    ALTER SEQUENCE archive_dbf_upload.dbf_dbfchunkedupload_id_seq OWNED BY NONE;
+    ALTER SEQUENCE archive_sinan_upload.upload_sinanupload_id_seq OWNED BY NONE;
+    ALTER SEQUENCE archive_sinan_upload.upload_sinanchunkedupload_id_seq OWNED BY NONE;
+    ALTER SEQUENCE archive_sinan_upload.upload_sinanuploadlogstatus_id_seq OWNED BY NONE;
 
-    -- historico_casos
-    DROP MATERIALIZED VIEW archive_historico_casos.historico_casos;
-    DROP SCHEMA archive_historico_casos;
+    -- Drop referencing tables before their referenced tables.
+    DROP TABLE archive_sinan_upload.upload_sinanupload;
+    DROP TABLE archive_sinan_upload.upload_sinanuploadlogstatus;
+    DROP TABLE archive_sinan_upload.upload_sinanchunkedupload;
+    DROP TABLE archive_dbf_upload.dbf_dbf;
+    DROP TABLE archive_dbf_upload.dbf_dbfchunkedupload;
 
-    -- mosqlimate
-    DROP TABLE archive_mosqlimate.sprint202425;
-    DROP SCHEMA archive_mosqlimate;
-
-    -- ovitrampa
-    DROP TABLE archive_ovitrampa."Bairro";
-    DROP TABLE archive_ovitrampa."Ovitrampa";
-    DROP TABLE archive_ovitrampa."Localidade";
-    DROP SCHEMA archive_ovitrampa;
-
-    -- redemet
-    DROP TABLE archive_redemet.clima_wu;
-    DROP TABLE archive_redemet.estacao_wu;
-    DROP TABLE archive_redemet.localidade_station_codes;
-    DROP TABLE archive_redemet.manifest;
-    DROP TABLE archive_redemet.parameters_station_codes;
-    DROP TABLE archive_redemet.regional_saude_station_codes;
-    DROP SCHEMA archive_redemet;
-
-    -- tweets
-    DROP TABLE archive_tweets."Tweet";
-    DROP SCHEMA archive_tweets;
-
-    -- upload
-    DROP TABLE archive_upload.chunked_upload;
-    DROP TABLE archive_upload.manifest;
-    DROP TABLE archive_upload.sinan_chunked_upload;
-    DROP TABLE archive_upload.sinan_upload;
-    DROP TABLE archive_upload.sinan_upload_log_status;
-    DROP SCHEMA archive_upload;
+    DROP SEQUENCE archive_sinan_upload.upload_sinanupload_id_seq;
+    DROP SEQUENCE archive_sinan_upload.upload_sinanuploadlogstatus_id_seq;
+    DROP SEQUENCE archive_sinan_upload.upload_sinanchunkedupload_id_seq;
+    DROP SEQUENCE archive_dbf_upload.dbf_dbf_id_seq;
+    DROP SEQUENCE archive_dbf_upload.dbf_dbfchunkedupload_id_seq;
+    DROP SCHEMA archive_sinan_upload;
+    DROP SCHEMA archive_dbf_upload;
 
     FOR protected_before IN
         SELECT * FROM protected_snapshot ORDER BY schema_name, relation_name
@@ -156,15 +163,8 @@ BEGIN
         SELECT 1
         FROM pg_namespace
         WHERE nspname IN (
-            'archive_redemet',
-            'archive_upload',
-            'archive_ovitrampa',
-            'archive_alertas_regionais',
-            'archive_cemaden',
-            'archive_copernicus',
-            'archive_historico_casos',
-            'archive_mosqlimate',
-            'archive_tweets'
+            'archive_dbf_upload',
+            'archive_sinan_upload'
         )
     ) THEN
         RAISE EXCEPTION 'one or more archive schemas remain after removal';

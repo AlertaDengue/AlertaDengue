@@ -20,6 +20,7 @@ archive_schemas_workflow.sh export --schemas archive_dbf_upload,archive_sinan_up
 archive_schemas_workflow.sh export --schemas archive_tweets
 archive_schemas_workflow.sh export --schemas archive_tweets,archive_dbf_upload,archive_sinan_upload
 archive_schemas_workflow.sh verify --package /absolute/path/to/package --schemas archive_dbf_upload,archive_sinan_upload
+archive_schemas_workflow.sh remove --package /absolute/path/to/package --schemas archive_dbf_upload,archive_sinan_upload --confirm-database "${PGDATABASE}" --confirm-remove REMOVE_APPROVED_ARCHIVE_SCHEMAS
 archive_schemas_workflow.sh status --schemas archive_dbf_upload,archive_sinan_upload
 ```
 
@@ -35,6 +36,8 @@ source and Git metadata, inventory, exact row counts, sequences, constraints,
 indexes, dependencies, external/internal FKs, grants, protected objects,
 `pg_restore --list`, schema-only SQL, and receipts.
 
-Verify restores into a disposable `template0` database and tests removal only
-there. Restore validation must pass before any removal consideration. Live
-removal remains disabled in this workflow; never remove current local schemas.
+Verify restores into a disposable `template0` database and tests removal there.
+Live removal is limited to the exact `archive_dbf_upload,archive_sinan_upload`
+selection, requires the verified package, a passing disposable-removal result,
+the connected database confirmation, and the exact approval token. It removes
+only the explicit upload objects recorded for that package.

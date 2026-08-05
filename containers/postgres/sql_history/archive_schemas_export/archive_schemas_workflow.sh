@@ -21,6 +21,7 @@ readonly DEFAULT_OUTPUT_MARGIN_BYTES=$((2 * 1024 * 1024 * 1024))
 readonly DEFAULT_PGDATA_MARGIN_BYTES=$((5 * 1024 * 1024 * 1024))
 readonly REQUIRED_INODES=10000
 readonly DIRECT_SQL_MESSAGE="Direct execution is not supported. Use archive_schemas_workflow.sh remove with a verified persistent package."
+readonly REMOVABLE_SCHEMA_LABEL='archive_dbf_upload,archive_sinan_upload'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../../../.." && pwd)"
@@ -33,7 +34,7 @@ require_cmd() {
   }
 }
 
-for cmd in awk cmp createdb date df dropdb find git grep mktemp pg_dump pg_restore psql realpath rm sed sha256sum stat sync; do
+for cmd in awk cmp createdb date df dropdb find git grep mktemp pg_dump pg_restore psql realpath rm sed sha256sum sort stat sync; do
   require_cmd "$cmd"
 done
 
@@ -128,6 +129,11 @@ read_package_selected_schemas() {
   local raw
   raw="$(paste -sd, "${package_dir}/selected_schemas.tsv")"
   parse_schema_list "$raw"
+}
+
+assert_removable_schema_selection() {
+  [[ "$SELECTED_SCHEMA_LABEL" == "$REMOVABLE_SCHEMA_LABEL" ]] \
+    || fatal "live removal is restricted to: ${REMOVABLE_SCHEMA_LABEL}"
 }
 
 tmp_dir=""
@@ -823,6 +829,17 @@ ROLLBACK;
 SQL
 }
 
+snapshot_immutable_package_artifacts() {
+  local package_dir="$1"
+  local output="$2"
+  : > "$output"
+  while IFS= read -r -d '' artifact; do
+    assert_regular_file "$artifact"
+    printf '%s\t%s\n' "$(sha_file "$artifact")" "$(basename "$artifact")" >> "$output"
+  done < <(find "$package_dir" -mindepth 1 -maxdepth 1 -type f \
+    ! -name removal_receipt.tsv ! -name removal_receipt.tsv.sha256 -print0 | sort -z)
+}
+
 write_removal_receipt() {
   local package_dir="$1"
   local before_db_size="$2"
@@ -832,7 +849,7 @@ write_removal_receipt() {
   local after_db_size
   after_db_size="$(db_setting 'SELECT pg_database_size(current_database())')"
   {
-    printf 'status\tPASSED\n'
+    printf 'status\tPASS\n'
     printf 'database_size_before_bytes\t%s\n' "$before_db_size"
     printf 'archive_size_before_bytes\t%s\n' "$before_archive_size"
     printf 'removal_started_at_utc\t%s\n' "$started_at"
@@ -1116,8 +1133,10 @@ cmd_remove() {
   [[ -n "$package_dir" ]] || fatal 'remove requires --package /absolute/path'
   [[ -n "$schemas_raw" ]] || fatal 'remove requires explicit --schemas'
   parse_schema_list "$schemas_raw"
-  fatal 'live archive removal is disabled; disposable removal is performed during verify'
-  [[ "$confirm_database" == "$PGDATABASE" ]] || fatal 'connected database name does not match --confirm-database'
+  assert_removable_schema_selection
+  local connected_database
+  connected_database="$(db_setting 'SELECT current_database()')"
+  [[ "$confirm_database" == "$connected_database" ]] || fatal 'connected database name does not match --confirm-database'
   [[ "$confirm_remove" == 'REMOVE_APPROVED_ARCHIVE_SCHEMAS' ]] || fatal 'remove requires --confirm-remove REMOVE_APPROVED_ARCHIVE_SCHEMAS'
 
   package_dir="$(validate_package_location "$package_dir")"
@@ -1128,18 +1147,21 @@ cmd_remove() {
   (cd "$package_dir" && sha256sum -c verification_receipt.tsv.sha256 >/dev/null)
   [[ "$(kv_get "${package_dir}/verification_receipt.tsv" status)" == 'VERIFIED' ]] || fatal 'verification receipt is not VERIFIED'
   [[ "$(kv_get "${package_dir}/verification_receipt.tsv" absolute_package_path)" == "$package_dir" ]] || fatal 'package path differs from verification receipt path'
+  assert_nonempty_file "${package_dir}/removal_test.tsv"
+  [[ "$(kv_get "${package_dir}/removal_test.tsv" disposable_removal)" == 'PASS' ]] || fatal 'removal test is not PASS'
+  [[ ! -e "${package_dir}/removal_receipt.tsv" && ! -e "${package_dir}/removal_receipt.tsv.sha256" ]] \
+    || fatal 'removal receipt already exists; refusing to replace it'
 
-  local before_dump_sig before_receipt_sig before_manifest_sig
-  before_dump_sig="$(stat -c '%i:%s:%Y' "${package_dir}/dengue_archive_schemas.dump")"
-  before_receipt_sig="$(stat -c '%i:%s:%Y' "${package_dir}/verification_receipt.tsv")"
-  before_manifest_sig="$(stat -c '%i:%s:%Y' "${package_dir}/package_manifest.sha256")"
+  local immutable_before immutable_after
+  immutable_before="${tmp_dir}/immutable-before.tsv"
+  immutable_after="${tmp_dir}/immutable-after.tsv"
+  snapshot_immutable_package_artifacts "$package_dir" "$immutable_before"
 
   revalidate_current_source "$package_dir" "${tmp_dir}/current"
   run_lock_preflight
 
-  [[ "$before_dump_sig" == "$(stat -c '%i:%s:%Y' "${package_dir}/dengue_archive_schemas.dump")" ]] || fatal 'package dump changed during remove preflight'
-  [[ "$before_receipt_sig" == "$(stat -c '%i:%s:%Y' "${package_dir}/verification_receipt.tsv")" ]] || fatal 'verification receipt changed during remove preflight'
-  [[ "$before_manifest_sig" == "$(stat -c '%i:%s:%Y' "${package_dir}/package_manifest.sha256")" ]] || fatal 'package manifest changed during remove preflight'
+  snapshot_immutable_package_artifacts "$package_dir" "$immutable_after"
+  cmp -s "$immutable_before" "$immutable_after" || fatal 'package artifacts changed during remove preflight'
   [[ -r "${package_dir}/dengue_archive_schemas.dump" ]] || fatal 'package dump is not readable after preflight'
   [[ -r "${package_dir}/verification_receipt.tsv" ]] || fatal 'verification receipt is not readable after preflight'
 
@@ -1157,19 +1179,21 @@ cmd_remove() {
     -v archive_source_database_oid="$(kv_get "${package_dir}/source_identity.tsv" database_oid)" \
     -v archive_source_inventory_sha256="$(sha_file "${package_dir}/archive_inventory.tsv")" \
     -v archive_source_row_counts_sha256="$(sha_file "${package_dir}/archive_row_counts.tsv")" \
-    -c "SELECT set_config('archive.removal_authorized', '1', false)" \
-    -c "SELECT set_config('archive.package_path', '$package_dir', false)" \
-    -c "SELECT set_config('archive.dump_sha256', '$(sha_file "${package_dir}/dengue_archive_schemas.dump")', false)" \
-    -c "SELECT set_config('archive.verification_receipt_sha256', '$(sha_file "${package_dir}/verification_receipt.tsv")', false)" \
-    -c "SELECT set_config('archive.source_database_oid', '$(kv_get "${package_dir}/source_identity.tsv" database_oid)', false)" \
-    -c "SELECT set_config('archive.source_inventory_sha256', '$(sha_file "${package_dir}/archive_inventory.tsv")', false)" \
-    -c "SELECT set_config('archive.source_row_counts_sha256', '$(sha_file "${package_dir}/archive_row_counts.tsv")', false)" \
+    -v archive_selected_schemas="$SELECTED_SCHEMA_LABEL" \
+    -c "SELECT set_config('archive.removal_authorized', :'archive_removal_authorized', false)" \
+    -c "SELECT set_config('archive.package_path', :'archive_package_path', false)" \
+    -c "SELECT set_config('archive.dump_sha256', :'archive_dump_sha256', false)" \
+    -c "SELECT set_config('archive.verification_receipt_sha256', :'archive_verification_receipt_sha256', false)" \
+    -c "SELECT set_config('archive.source_database_oid', :'archive_source_database_oid', false)" \
+    -c "SELECT set_config('archive.source_inventory_sha256', :'archive_source_inventory_sha256', false)" \
+    -c "SELECT set_config('archive.source_row_counts_sha256', :'archive_source_row_counts_sha256', false)" \
+    -c "SELECT set_config('archive.selected_schemas', :'archive_selected_schemas', false)" \
     -f "${SCRIPT_DIR}/20260729_03_remove_archive_schemas.sql" >/dev/null
 
   psql -X -v ON_ERROR_STOP=1 -f "${SCRIPT_DIR}/20260729_04_validate_archive_schemas_removed.sql" >/dev/null
   write_removal_receipt "$package_dir" "$before_db_size" "$before_archive_size" "$started_at"
 
-  printf 'ARCHIVE_REMOVAL_STATUS=PASSED\n'
+  printf 'ARCHIVE_REMOVAL_STATUS=PASS\n'
   printf 'ARCHIVE_PACKAGE_PATH=%s\n' "$package_dir"
   printf 'REMOVAL_RECEIPT=%s\n' "${package_dir}/removal_receipt.tsv"
 }
@@ -1238,6 +1262,7 @@ cmd_status() {
       fi
       if [[ -f "${package_dir}/removal_receipt.tsv" && -f "${package_dir}/removal_receipt.tsv.sha256" ]]; then
         (cd "$package_dir" && sha256sum -c removal_receipt.tsv.sha256 >/dev/null 2>&1) \
+          && [[ "$(kv_get "${package_dir}/removal_receipt.tsv" status)" == 'PASS' ]] \
           && printf 'removal_receipt_status=PASS\n' || printf 'removal_receipt_status=FAIL\n'
       else
         printf 'removal_receipt_status=MISSING\n'

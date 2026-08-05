@@ -12,6 +12,11 @@ done
 grep -q 'selected_schemas.tsv' "$WORKFLOW" "$RESTORE"
 grep -q 'createdb -T template0' "$RESTORE"
 grep -q 'disposable_removal' "$RESTORE"
+grep -q "REMOVABLE_SCHEMA_LABEL='archive_dbf_upload,archive_sinan_upload'" "$WORKFLOW"
+grep -q "assert_removable_schema_selection" "$WORKFLOW"
+grep -q "removal test is not PASS" "$WORKFLOW"
+grep -q "archive_sinan_upload.upload_sinanupload" "${SCRIPT_DIR}/20260729_03_remove_archive_schemas.sql"
+grep -q "archive_dbf_upload.dbf_dbfchunkedupload" "${SCRIPT_DIR}/20260729_03_remove_archive_schemas.sql"
 
 if [[ -z "${PGDATABASE:-}" || -z "${PGUSER:-}" ]]; then
   printf 'archive schema static tests: PASS (live tests require external libpq configuration)\n'
