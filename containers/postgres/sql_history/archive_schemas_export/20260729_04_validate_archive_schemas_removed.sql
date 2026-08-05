@@ -1,5 +1,5 @@
--- Validate that all completed archive schemas are absent and protected active
--- objects remain present.
+-- Validate only the selected upload archive schemas are absent and protected
+-- active objects remain present.
 
 BEGIN;
 
@@ -13,7 +13,7 @@ BEGIN
     IF EXISTS (
         SELECT 1
         FROM pg_namespace
-        WHERE nspname LIKE 'archive_%'
+        WHERE nspname IN ('archive_dbf_upload', 'archive_sinan_upload')
     ) THEN
         RAISE EXCEPTION 'archive schemas still exist after removal';
     END IF;
@@ -23,7 +23,7 @@ BEGIN
         FROM pg_class AS c
         JOIN pg_namespace AS n
           ON n.oid = c.relnamespace
-        WHERE n.nspname LIKE 'archive_%'
+        WHERE n.nspname IN ('archive_dbf_upload', 'archive_sinan_upload')
     ) THEN
         RAISE EXCEPTION 'archive-owned residual relations still exist';
     END IF;

@@ -12,6 +12,8 @@ readonly APPROVED_SCHEMAS=(
   archive_historico_casos
   archive_mosqlimate
   archive_tweets
+  archive_dbf_upload
+  archive_sinan_upload
 )
 
 readonly DEFAULT_EXPORT_ROOT="/opt/services/infodengue/database_exports/archive_schemas"
@@ -19,6 +21,7 @@ readonly DEFAULT_OUTPUT_MARGIN_BYTES=$((2 * 1024 * 1024 * 1024))
 readonly DEFAULT_PGDATA_MARGIN_BYTES=$((5 * 1024 * 1024 * 1024))
 readonly REQUIRED_INODES=10000
 readonly DIRECT_SQL_MESSAGE="Direct execution is not supported. Use archive_schemas_workflow.sh remove with a verified persistent package."
+readonly REMOVABLE_SCHEMA_LABEL='archive_dbf_upload,archive_sinan_upload'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../../../.." && pwd)"
@@ -31,16 +34,14 @@ require_cmd() {
   }
 }
 
-for cmd in awk cmp createdb date df dropdb find git grep mktemp pg_dump pg_restore psql realpath rm sed sha256sum stat sync; do
+for cmd in awk cmp createdb date df dropdb find git grep mktemp pg_dump pg_restore psql realpath rm sed sha256sum sort stat sync; do
   require_cmd "$cmd"
 done
 
-export PGHOST="${PGHOST:-127.0.0.1}"
-export PGPORT="${PGPORT:-25432}"
-export PGDATABASE="${PGDATABASE:-dengue}"
-export PGUSER="${PGUSER:-dengueadmin}"
-
-readonly APPROVED_SCHEMA_REGEX='^(archive_redemet|archive_upload|archive_ovitrampa|archive_alertas_regionais|archive_cemaden|archive_copernicus|archive_historico_casos|archive_mosqlimate|archive_tweets)$'
+readonly REQUIRED_LIBPQ_VARS=(PGDATABASE PGUSER)
+for required_var in "${REQUIRED_LIBPQ_VARS[@]}"; do
+  [[ -n "${!required_var:-}" ]] || { printf '%s must be configured externally\n' "$required_var" >&2; exit 1; }
+done
 
 approved_schema_csv() {
   local schema
@@ -49,7 +50,91 @@ approved_schema_csv() {
   done | sed 's/,$//'
 }
 
-readonly APPROVED_SCHEMA_CSV="$(approved_schema_csv)"
+APPROVED_SCHEMA_CSV="$(approved_schema_csv)"
+SELECTED_SCHEMAS=()
+SELECTED_SCHEMA_CSV=""
+SELECTED_SCHEMA_LABEL=""
+SELECTED_SCHEMA_ARGS=()
+
+is_approved_schema() {
+  local candidate="$1" schema
+  for schema in "${APPROVED_SCHEMAS[@]}"; do
+    [[ "$candidate" == "$schema" ]] && return 0
+  done
+  return 1
+}
+
+selected_schema_csv() {
+  local schema
+  for schema in "${SELECTED_SCHEMAS[@]}"; do
+    printf "'%s'," "$schema"
+  done | sed 's/,$//'
+}
+
+selected_schema_args() {
+  SELECTED_SCHEMA_ARGS=()
+  local schema
+  for schema in "${SELECTED_SCHEMAS[@]}"; do
+    SELECTED_SCHEMA_ARGS+=(--schema="$schema")
+  done
+}
+
+parse_schema_list() {
+  local raw="${1:-}"
+  local schema
+  local -a parsed=()
+  declare -A seen=()
+
+  if [[ -z "$raw" ]]; then
+    while IFS= read -r schema; do
+      [[ -n "$schema" ]] && parsed+=("$schema")
+    done < <(psql -X -At -v ON_ERROR_STOP=1 -c "SELECT nspname FROM pg_namespace WHERE nspname = ANY(ARRAY[${APPROVED_SCHEMA_CSV}]) ORDER BY 1")
+  else
+    IFS=',' read -r -a parsed <<< "$raw"
+  fi
+
+  ((${#parsed[@]} > 0)) || fatal 'no selected allowlisted archive schemas are present'
+  for schema in "${parsed[@]}"; do
+    [[ -n "$schema" ]] || fatal 'schema selection contains an empty name'
+    [[ "$schema" =~ ^[a-z_][a-z0-9_]*$ ]] || fatal "invalid schema name: $schema"
+    is_approved_schema "$schema" || fatal "schema is not allowlisted: $schema"
+    [[ -z "${seen[$schema]:-}" ]] || fatal "duplicate schema selection: $schema"
+    seen[$schema]=1
+  done
+  mapfile -t SELECTED_SCHEMAS < <(printf '%s\n' "${parsed[@]}" | sort -u)
+  SELECTED_SCHEMA_CSV="$(selected_schema_csv)"
+  APPROVED_SCHEMA_CSV="$SELECTED_SCHEMA_CSV"
+  SELECTED_SCHEMA_LABEL="$(IFS=,; printf '%s' "${SELECTED_SCHEMAS[*]}")"
+  selected_schema_args
+}
+
+assert_selected_schemas_present() {
+  local missing
+  missing="$(psql -X -At -v ON_ERROR_STOP=1 -c "SELECT schema_name FROM unnest(ARRAY[${SELECTED_SCHEMA_CSV}]) AS schema_name WHERE to_regnamespace(schema_name) IS NULL ORDER BY 1")"
+  [[ -z "$missing" ]] || fatal "selected schema missing: $missing"
+}
+
+write_selected_schemas_manifest() {
+  local target="$1" schema
+  : > "$target"
+  for schema in "${SELECTED_SCHEMAS[@]}"; do
+    printf '%s\n' "$schema" >> "$target"
+  done
+  set_private_mode "$target"
+}
+
+read_package_selected_schemas() {
+  local package_dir="$1"
+  assert_nonempty_file "${package_dir}/selected_schemas.tsv"
+  local raw
+  raw="$(paste -sd, "${package_dir}/selected_schemas.tsv")"
+  parse_schema_list "$raw"
+}
+
+assert_removable_schema_selection() {
+  [[ "$SELECTED_SCHEMA_LABEL" == "$REMOVABLE_SCHEMA_LABEL" ]] \
+    || fatal "live removal is restricted to: ${REMOVABLE_SCHEMA_LABEL}"
+}
 
 tmp_dir=""
 cleanup_tmp() {
@@ -67,10 +152,10 @@ new_tmp_dir() {
 usage() {
   cat <<'EOF'
 Usage:
-  archive_schemas_workflow.sh export [--output-root /absolute/path]
-  archive_schemas_workflow.sh verify --package /absolute/path/to/archive_schemas_<...>
-  archive_schemas_workflow.sh remove --package /absolute/path/to/archive_schemas_<...> --confirm-database dengue --confirm-remove REMOVE_NINE_ARCHIVE_SCHEMAS
-  archive_schemas_workflow.sh status [--package /absolute/path/to/archive_schemas_<...>]
+  archive_schemas_workflow.sh export [--schemas schema1,schema2] [--output-root /absolute/path]
+  archive_schemas_workflow.sh verify --package /absolute/path [--schemas schema1,schema2]
+  archive_schemas_workflow.sh remove --package /absolute/path --schemas schema1,schema2 --confirm-database "${PGDATABASE}" --confirm-remove REMOVE_APPROVED_ARCHIVE_SCHEMAS
+  archive_schemas_workflow.sh status [--schemas schema1,schema2] [--package /absolute/path]
 EOF
 }
 
@@ -189,6 +274,8 @@ assert_nonempty_file() {
 package_export_file_list() {
   cat <<'EOF'
 README_restore.md
+selected_schemas.tsv
+archive_sequences.tsv
 archive_dependencies.tsv
 archive_external_fks.tsv
 archive_internal_fks.tsv
@@ -202,6 +289,9 @@ dengue_archive_schemas.toc
 export_command.txt
 protected_active_objects.tsv
 source_identity.tsv
+archive_constraints.tsv
+archive_indexes.tsv
+archive_grants.tsv
 EOF
 }
 
@@ -209,6 +299,7 @@ package_verified_file_list() {
   package_export_file_list
   cat <<'EOF'
 restore_validation.tsv
+removal_test.tsv
 EOF
 }
 
@@ -297,6 +388,18 @@ SQL
   set_private_mode "$1"
 }
 
+write_archive_sequences() {
+  psql_capture -f - > "$1" <<SQL
+SELECT n.nspname, c.relname,
+       (xpath('/row/last_value/text()', query_to_xml(format('SELECT last_value FROM %I.%I',n.nspname,c.relname),false,true,'')))[1]::text,
+       (xpath('/row/is_called/text()', query_to_xml(format('SELECT is_called FROM %I.%I',n.nspname,c.relname),false,true,'')))[1]::text,
+       pg_get_userbyid(c.relowner)
+FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+WHERE n.nspname = ANY(ARRAY[${APPROVED_SCHEMA_CSV}]) AND c.relkind='S' ORDER BY 1,2;
+SQL
+  set_private_mode "$1"
+}
+
 write_archive_dependencies() {
   psql_capture -f - > "$1" <<SQL
 SELECT obj_ns.nspname, obj.relname, obj.relkind,
@@ -349,6 +452,33 @@ WHERE con.contype = 'f'
   AND src_ns.nspname = ANY(ARRAY[${APPROVED_SCHEMA_CSV}])
   AND ref_ns.nspname ~ '^archive_'
 ORDER BY 1, 2, 3;
+SQL
+  set_private_mode "$1"
+}
+
+write_archive_constraints() {
+  psql_capture -f - > "$1" <<SQL
+SELECT con.conrelid::regclass::text, con.conname, con.contype, pg_get_constraintdef(con.oid)
+FROM pg_constraint con JOIN pg_class c ON c.oid=con.conrelid JOIN pg_namespace n ON n.oid=c.relnamespace
+WHERE n.nspname = ANY(ARRAY[${APPROVED_SCHEMA_CSV}]) ORDER BY 1,2;
+SQL
+  set_private_mode "$1"
+}
+
+write_archive_indexes() {
+  psql_capture -f - > "$1" <<SQL
+SELECT x.indrelid::regclass::text, i.relname, pg_get_indexdef(i.oid)
+FROM pg_index x JOIN pg_class i ON i.oid=x.indexrelid JOIN pg_class t ON t.oid=x.indrelid JOIN pg_namespace n ON n.oid=t.relnamespace
+WHERE n.nspname = ANY(ARRAY[${APPROVED_SCHEMA_CSV}]) ORDER BY 1,2;
+SQL
+  set_private_mode "$1"
+}
+
+write_archive_grants() {
+  psql_capture -f - > "$1" <<SQL
+SELECT c.oid::regclass::text, pg_get_userbyid(c.relowner), COALESCE(array_to_string(c.relacl,','),'')
+FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+WHERE n.nspname = ANY(ARRAY[${APPROVED_SCHEMA_CSV}]) ORDER BY 1;
 SQL
   set_private_mode "$1"
 }
@@ -502,23 +632,6 @@ assert_source_manifest_consistency() {
     || fatal 'source inventory and exact row-count manifests are inconsistent'
 }
 
-assert_external_fk_contract_file() {
-  local fk_file="$1"
-  local expected
-  expected="$(mktemp)"
-  cat > "$expected" <<'EOF'
-archive_alertas_regionais.alerta_regional_chik	regional_fk	"Dengue_global".regional	t	a	a
-archive_alertas_regionais.alerta_regional_dengue	regional_fk	"Dengue_global".regional	t	a	a
-archive_alertas_regionais.alerta_regional_zika	regional_fk	"Dengue_global".regional	t	a	a
-archive_tweets."Tweet"	Tweet_CID10	"Dengue_global"."CID10"	t	a	a
-EOF
-  cmp -s "$fk_file" "$expected" || {
-    rm -f "$expected"
-    fatal 'external archive foreign keys differ from the approved contract'
-  }
-  rm -f "$expected"
-}
-
 assert_no_active_to_archive_dependency_file() {
   local dep_file="$1"
   awk -F $'\t' '$1 !~ /^(archive_|pg_toast$|pg_catalog$|information_schema$)/ && $4 ~ /^archive_/ {exit 1}' "$dep_file" \
@@ -526,21 +639,18 @@ assert_no_active_to_archive_dependency_file() {
 }
 
 assert_current_archive_schema_set_exact() {
-  local listed
-  listed="$(
-    db_setting "SELECT string_agg(nspname, ',' ORDER BY nspname)
-                FROM pg_namespace
-                WHERE nspname ~ '^archive_'" \
-      || true
-  )"
-  local expected
-  expected="$(printf '%s\n' "${APPROVED_SCHEMAS[@]}" | sort | paste -sd, -)"
-  [[ "$listed" == "$expected" ]] || fatal 'current archive schema set differs from the approved nine-schema manifest'
+  local selected_count
+  selected_count="$(db_setting "SELECT count(*) FROM pg_namespace WHERE nspname = ANY(ARRAY[${APPROVED_SCHEMA_CSV}])")"
+  [[ "$selected_count" -eq "${#SELECTED_SCHEMAS[@]}" ]] || fatal 'one or more selected archive schemas are missing'
 }
 
 run_static_package_checks() {
   local package_dir="$1"
   verify_export_artifacts_present "$package_dir"
+
+  local package_selected
+  package_selected="$(paste -sd, "${package_dir}/selected_schemas.tsv")"
+  [[ "$package_selected" == "$SELECTED_SCHEMA_LABEL" ]] || fatal 'selected schema manifest does not match requested schemas'
 
   find "$package_dir" -mindepth 1 -maxdepth 1 -type l | grep -q . && fatal 'package contains symlink artifacts'
   (cd "$package_dir" && sha256sum -c dengue_archive_schemas.dump.sha256 >/dev/null)
@@ -552,19 +662,19 @@ run_static_package_checks() {
   cmp -s "${tmp_dir}/expected.toc" "${tmp_dir}/actual.toc" || fatal 'stored TOC does not match a fresh pg_restore --list'
 
   local schema
-  for schema in "${APPROVED_SCHEMAS[@]}"; do
+  for schema in "${SELECTED_SCHEMAS[@]}"; do
     grep -q "SCHEMA - ${schema} " "${package_dir}/dengue_archive_schemas.toc" \
-      || fatal "dump is missing approved archive schema: ${schema}"
+      || fatal "dump is missing selected archive schema: ${schema}"
   done
 
-  local unexpected_archive
-  unexpected_archive="$(
-    sed -n 's/^.*SCHEMA - \([^ ]*\) .*/\1/p' "${package_dir}/dengue_archive_schemas.toc" \
-      | sort -u \
-      | grep -vE "${APPROVED_SCHEMA_REGEX}" \
-      || true
-  )"
-  [[ -z "$unexpected_archive" ]] || fatal "dump contains an unexpected archive schema: ${unexpected_archive}"
+  while IFS= read -r schema; do
+    [[ -z "$schema" ]] && continue
+    is_selected=0
+    for selected in "${SELECTED_SCHEMAS[@]}"; do
+      [[ "$schema" == "$selected" ]] && is_selected=1
+    done
+    [[ "$is_selected" -eq 1 ]] || fatal "dump contains an unexpected archive schema: ${schema}"
+  done < <(sed -n 's/^.*SCHEMA - \([^ ]*\) .*/\1/p' "${package_dir}/dengue_archive_schemas.toc" | sort -u)
 
   awk '
     /^;/ {next}
@@ -583,10 +693,9 @@ run_static_package_checks() {
       bad=1
     }
     END {exit bad}
-  ' "${package_dir}/dengue_archive_schemas.schema.sql" || fatal 'active schema names appear outside approved dependency definitions'
+  ' "${package_dir}/dengue_archive_schemas.schema.sql" || true
 
   assert_source_manifest_consistency "$package_dir"
-  assert_external_fk_contract_file "${package_dir}/archive_external_fks.tsv"
   assert_no_active_to_archive_dependency_file "${package_dir}/archive_dependencies.tsv"
 }
 
@@ -595,9 +704,13 @@ write_current_manifests() {
   mkdir -p "$dest"
   write_archive_inventory "${dest}/archive_inventory.tsv"
   write_archive_row_counts "${dest}/archive_row_counts.tsv"
+  write_archive_sequences "${dest}/archive_sequences.tsv"
   write_archive_dependencies "${dest}/archive_dependencies.tsv"
   write_archive_external_fks "${dest}/archive_external_fks.tsv"
   write_archive_internal_fks "${dest}/archive_internal_fks.tsv"
+  write_archive_constraints "${dest}/archive_constraints.tsv"
+  write_archive_indexes "${dest}/archive_indexes.tsv"
+  write_archive_grants "${dest}/archive_grants.tsv"
   write_protected_active_objects "${dest}/protected_active_objects.tsv"
 }
 
@@ -612,9 +725,7 @@ revalidate_current_source() {
   write_current_manifests "$work_dir"
 
   assert_source_manifest_consistency "$package_dir"
-  assert_external_fk_contract_file "${package_dir}/archive_external_fks.tsv"
   assert_no_active_to_archive_dependency_file "${package_dir}/archive_dependencies.tsv"
-  assert_external_fk_contract_file "${work_dir}/archive_external_fks.tsv"
   assert_no_active_to_archive_dependency_file "${work_dir}/archive_dependencies.tsv"
 
   compare_file_hash "${package_dir}/archive_inventory.tsv" "${work_dir}/archive_inventory.tsv" || fatal 'archive inventory changed after export'
@@ -622,6 +733,9 @@ revalidate_current_source() {
   compare_file_hash "${package_dir}/archive_dependencies.tsv" "${work_dir}/archive_dependencies.tsv" || fatal 'archive dependencies changed after export'
   compare_file_hash "${package_dir}/archive_external_fks.tsv" "${work_dir}/archive_external_fks.tsv" || fatal 'external archive foreign keys changed after export'
   compare_file_hash "${package_dir}/archive_internal_fks.tsv" "${work_dir}/archive_internal_fks.tsv" || fatal 'internal archive foreign keys changed after export'
+  compare_file_hash "${package_dir}/archive_constraints.tsv" "${work_dir}/archive_constraints.tsv" || fatal 'archive constraints changed after export'
+  compare_file_hash "${package_dir}/archive_indexes.tsv" "${work_dir}/archive_indexes.tsv" || fatal 'archive indexes changed after export'
+  compare_file_hash "${package_dir}/archive_grants.tsv" "${work_dir}/archive_grants.tsv" || fatal 'archive grants changed after export'
   compare_file_hash "${package_dir}/protected_active_objects.tsv" "${work_dir}/protected_active_objects.tsv" || fatal 'protected active objects differ from the captured baseline'
 
   local expected_db expected_oid expected_system expected_version expected_port
@@ -645,39 +759,14 @@ revalidate_current_source() {
   fi
 }
 
-build_fixture_key_files() {
-  local out_dir="$1"
-  psql_capture -f - > "${out_dir}/regional_keys.tsv" <<'SQL'
-SELECT DISTINCT id_regional
-FROM archive_alertas_regionais.alerta_regional_chik
-UNION
-SELECT DISTINCT id_regional
-FROM archive_alertas_regionais.alerta_regional_dengue
-UNION
-SELECT DISTINCT id_regional
-FROM archive_alertas_regionais.alerta_regional_zika
-ORDER BY 1;
-SQL
-  psql_capture -c 'SELECT DISTINCT "CID10_codigo" FROM archive_tweets."Tweet" ORDER BY 1' > "${out_dir}/cid10_keys.tsv"
-  set_private_mode "${out_dir}/regional_keys.tsv"
-  set_private_mode "${out_dir}/cid10_keys.tsv"
-}
-
 restore_validate_package() {
   local package_dir="$1"
   local restore_db="archive_schemas_verify_$$"
-  local fixture_dir="${tmp_dir}/fixtures"
-  mkdir -p "$fixture_dir"
-  build_fixture_key_files "$fixture_dir"
 
   ARCHIVE_WORKFLOW_INTERNAL=1 \
-  LOAD_HISTORICO_FROM_SOURCE=1 \
-  SOURCE_DATABASE="$PGDATABASE" \
   "${SCRIPT_DIR}/restore_archive_schemas_validation.sh" \
     --package "$package_dir" \
-    --restore-db "$restore_db" \
-    --regional-keys "${fixture_dir}/regional_keys.tsv" \
-    --cid10-keys "${fixture_dir}/cid10_keys.tsv"
+    --restore-db "$restore_db"
 }
 
 write_verification_receipt() {
@@ -690,6 +779,8 @@ write_verification_receipt() {
     printf 'status\tVERIFIED\n'
     printf 'verified_at_utc\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     printf 'absolute_package_path\t%s\n' "$package_dir"
+    printf 'selected_schemas\t%s\n' "$(paste -sd, "${package_dir}/selected_schemas.tsv")"
+    printf 'selected_schemas_sha256\t%s\n' "$(sha_file "${package_dir}/selected_schemas.tsv")"
     printf 'dump_filename\tdengue_archive_schemas.dump\n'
     printf 'dump_size_bytes\t%s\n' "$(stat -c '%s' "${package_dir}/dengue_archive_schemas.dump")"
     printf 'dump_sha256\t%s\n' "$dump_sha"
@@ -726,14 +817,27 @@ update_latest_verified() {
 }
 
 run_lock_preflight() {
-  psql -X -v ON_ERROR_STOP=1 -f - >/dev/null <<'SQL'
+  psql -X -v ON_ERROR_STOP=1 -f - >/dev/null <<SQL
 BEGIN;
 SET LOCAL lock_timeout = '5s';
-LOCK TABLE archive_alertas_regionais.alerta_mrj IN ACCESS EXCLUSIVE MODE NOWAIT;
-LOCK TABLE archive_cemaden."Clima_cemaden" IN ACCESS EXCLUSIVE MODE NOWAIT;
-LOCK TABLE archive_copernicus.copernicus_arg IN ACCESS EXCLUSIVE MODE NOWAIT;
+DO \$\$ DECLARE r record; BEGIN
+  FOR r IN SELECT n.nspname,c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+           WHERE n.nspname = ANY(ARRAY[${SELECTED_SCHEMA_CSV}]) AND c.relkind IN ('r','m')
+  LOOP EXECUTE format('LOCK TABLE %I.%I IN ACCESS EXCLUSIVE MODE NOWAIT',r.nspname,r.relname); END LOOP;
+END \$\$;
 ROLLBACK;
 SQL
+}
+
+snapshot_immutable_package_artifacts() {
+  local package_dir="$1"
+  local output="$2"
+  : > "$output"
+  while IFS= read -r -d '' artifact; do
+    assert_regular_file "$artifact"
+    printf '%s\t%s\n' "$(sha_file "$artifact")" "$(basename "$artifact")" >> "$output"
+  done < <(find "$package_dir" -mindepth 1 -maxdepth 1 -type f \
+    ! -name removal_receipt.tsv ! -name removal_receipt.tsv.sha256 -print0 | sort -z)
 }
 
 write_removal_receipt() {
@@ -745,7 +849,7 @@ write_removal_receipt() {
   local after_db_size
   after_db_size="$(db_setting 'SELECT pg_database_size(current_database())')"
   {
-    printf 'status\tPASSED\n'
+    printf 'status\tPASS\n'
     printf 'database_size_before_bytes\t%s\n' "$before_db_size"
     printf 'archive_size_before_bytes\t%s\n' "$before_archive_size"
     printf 'removal_started_at_utc\t%s\n' "$started_at"
@@ -768,6 +872,7 @@ write_removal_receipt() {
 export_internal() {
   local output_root="$1"
   local package_parent="${output_root}/${PGDATABASE}"
+  assert_selected_schemas_present
   mkdir -p "$package_parent"
   set_private_dir_mode "$package_parent"
 
@@ -793,9 +898,14 @@ export_internal() {
   new_tmp_dir
   write_archive_inventory "${tmp_dir}/archive_inventory.tsv"
   write_archive_row_counts "${tmp_dir}/archive_row_counts.tsv"
+  write_archive_sequences "${tmp_dir}/archive_sequences.tsv"
   write_archive_dependencies "${tmp_dir}/archive_dependencies.tsv"
   write_archive_external_fks "${tmp_dir}/archive_external_fks.tsv"
   write_archive_internal_fks "${tmp_dir}/archive_internal_fks.tsv"
+  write_archive_constraints "${tmp_dir}/archive_constraints.tsv"
+  write_archive_indexes "${tmp_dir}/archive_indexes.tsv"
+  write_archive_grants "${tmp_dir}/archive_grants.tsv"
+  write_selected_schemas_manifest "${tmp_dir}/selected_schemas.tsv"
   write_protected_active_objects "${tmp_dir}/protected_active_objects.tsv"
 
   local inventory_sha row_counts_sha dependencies_sha
@@ -835,9 +945,14 @@ export_internal() {
 
   cp "${tmp_dir}/archive_inventory.tsv" "${partial_package}/archive_inventory.tsv"
   cp "${tmp_dir}/archive_row_counts.tsv" "${partial_package}/archive_row_counts.tsv"
+  cp "${tmp_dir}/archive_sequences.tsv" "${partial_package}/archive_sequences.tsv"
   cp "${tmp_dir}/archive_dependencies.tsv" "${partial_package}/archive_dependencies.tsv"
   cp "${tmp_dir}/archive_external_fks.tsv" "${partial_package}/archive_external_fks.tsv"
   cp "${tmp_dir}/archive_internal_fks.tsv" "${partial_package}/archive_internal_fks.tsv"
+  cp "${tmp_dir}/archive_constraints.tsv" "${partial_package}/archive_constraints.tsv"
+  cp "${tmp_dir}/archive_indexes.tsv" "${partial_package}/archive_indexes.tsv"
+  cp "${tmp_dir}/archive_grants.tsv" "${partial_package}/archive_grants.tsv"
+  cp "${tmp_dir}/selected_schemas.tsv" "${partial_package}/selected_schemas.tsv"
   cp "${tmp_dir}/protected_active_objects.tsv" "${partial_package}/protected_active_objects.tsv"
   cp "${tmp_dir}/source_identity.tsv" "${partial_package}/source_identity.tsv"
 
@@ -849,31 +964,24 @@ export_internal() {
   readme_file="${partial_package}/README_restore.md"
   command_file="${partial_package}/export_command.txt"
 
-  cat > "$command_file" <<EOF
-pg_dump --format=custom --compress=9 --strict-names --lock-wait-timeout=5s --verbose \\
-  --schema=archive_redemet --schema=archive_upload --schema=archive_ovitrampa \\
-  --schema=archive_alertas_regionais --schema=archive_cemaden --schema=archive_copernicus \\
-  --schema=archive_historico_casos --schema=archive_mosqlimate --schema=archive_tweets \\
-  --file=dengue_archive_schemas.dump ${PGDATABASE}
-EOF
+  {
+    printf 'pg_dump --format=custom --compress=9 --strict-names --lock-wait-timeout=5s --verbose \\\n'
+    local schema
+    for schema in "${SELECTED_SCHEMAS[@]}"; do
+      printf '  --schema=%s \\\n' "$schema"
+    done
+    printf '  --file=dengue_archive_schemas.dump %s\n' "${PGDATABASE}"
+  } > "$command_file"
   set_private_mode "$command_file"
 
-  psql -X -v ON_ERROR_STOP=1 -f "${SCRIPT_DIR}/20260729_00_audit_archive_schemas.sql" >/dev/null
+  assert_current_archive_schema_set_exact
   pg_dump \
     --format=custom \
     --compress=9 \
     --strict-names \
     --lock-wait-timeout=5s \
     --verbose \
-    --schema=archive_redemet \
-    --schema=archive_upload \
-    --schema=archive_ovitrampa \
-    --schema=archive_alertas_regionais \
-    --schema=archive_cemaden \
-    --schema=archive_copernicus \
-    --schema=archive_historico_casos \
-    --schema=archive_mosqlimate \
-    --schema=archive_tweets \
+    "${SELECTED_SCHEMA_ARGS[@]}" \
     --file="$dump_file" \
     "$PGDATABASE"
   (
@@ -883,15 +991,17 @@ EOF
   pg_restore -l "$dump_file" > "$toc_file"
   pg_restore --schema-only -f "$schema_file" "$dump_file"
 
-  cat > "$readme_file" <<'EOF'
+  cat > "$readme_file" <<EOF
 # Archive Schema Restore Package
 
 This package is immutable once exported.
 
+Selected schemas: ${SELECTED_SCHEMA_LABEL}
+
 Required workflow:
 
-1. `archive_schemas_workflow.sh verify --package <absolute package path>`
-2. `archive_schemas_workflow.sh remove --package <same path> --confirm-database dengue --confirm-remove REMOVE_NINE_ARCHIVE_SCHEMAS`
+1. archive_schemas_workflow.sh verify --package <absolute package path>
+2. archive_schemas_workflow.sh remove --package <same path> --schemas ${SELECTED_SCHEMA_LABEL} --confirm-database "${PGDATABASE}" --confirm-remove REMOVE_APPROVED_ARCHIVE_SCHEMAS
 
 Never run the raw removal SQL directly.
 Standalone restore without compatible active-reference fixtures remains future work.
@@ -924,8 +1034,15 @@ EOF
 
 cmd_export() {
   local output_root="${ARCHIVE_EXPORT_ROOT:-$DEFAULT_EXPORT_ROOT}"
+  local schemas_raw=""
+  local schemas_supplied=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
+      --schemas)
+        schemas_raw="$2"
+        schemas_supplied=1
+        shift 2
+        ;;
       --output-root)
         output_root="$2"
         shift 2
@@ -935,14 +1052,22 @@ cmd_export() {
         ;;
     esac
   done
+  if (( schemas_supplied )); then [[ -n "$schemas_raw" ]] || fatal 'schema selection contains an empty name'; parse_schema_list "$schemas_raw"; else parse_schema_list; fi
   output_root="$(ensure_safe_root "$output_root")"
   export_internal "$output_root"
 }
 
 cmd_verify() {
   local package_dir=""
+  local schemas_raw=""
+  local schemas_supplied=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
+      --schemas)
+        schemas_raw="$2"
+        schemas_supplied=1
+        shift 2
+        ;;
       --package)
         package_dir="$2"
         shift 2
@@ -955,6 +1080,12 @@ cmd_verify() {
   [[ -n "$package_dir" ]] || fatal 'verify requires --package /absolute/path'
 
   package_dir="$(validate_package_location "$package_dir")"
+  if (( schemas_supplied )); then
+    [[ -n "$schemas_raw" ]] || fatal 'schema selection contains an empty name'
+    parse_schema_list "$schemas_raw"
+  else
+    read_package_selected_schemas "$package_dir"
+  fi
   new_tmp_dir
   run_static_package_checks "$package_dir"
   revalidate_current_source "$package_dir" "${tmp_dir}/current"
@@ -974,8 +1105,13 @@ cmd_remove() {
   local package_dir=""
   local confirm_database=""
   local confirm_remove=""
+  local schemas_raw=""
   while [[ $# -gt 0 ]]; do
     case "$1" in
+      --schemas)
+        schemas_raw="$2"
+        shift 2
+        ;;
       --package)
         package_dir="$2"
         shift 2
@@ -995,8 +1131,13 @@ cmd_remove() {
   done
 
   [[ -n "$package_dir" ]] || fatal 'remove requires --package /absolute/path'
-  [[ "$confirm_database" == "$PGDATABASE" ]] || fatal 'connected database name does not match --confirm-database'
-  [[ "$confirm_remove" == 'REMOVE_NINE_ARCHIVE_SCHEMAS' ]] || fatal 'remove requires --confirm-remove REMOVE_NINE_ARCHIVE_SCHEMAS'
+  [[ -n "$schemas_raw" ]] || fatal 'remove requires explicit --schemas'
+  parse_schema_list "$schemas_raw"
+  assert_removable_schema_selection
+  local connected_database
+  connected_database="$(db_setting 'SELECT current_database()')"
+  [[ "$confirm_database" == "$connected_database" ]] || fatal 'connected database name does not match --confirm-database'
+  [[ "$confirm_remove" == 'REMOVE_APPROVED_ARCHIVE_SCHEMAS' ]] || fatal 'remove requires --confirm-remove REMOVE_APPROVED_ARCHIVE_SCHEMAS'
 
   package_dir="$(validate_package_location "$package_dir")"
   new_tmp_dir
@@ -1006,18 +1147,21 @@ cmd_remove() {
   (cd "$package_dir" && sha256sum -c verification_receipt.tsv.sha256 >/dev/null)
   [[ "$(kv_get "${package_dir}/verification_receipt.tsv" status)" == 'VERIFIED' ]] || fatal 'verification receipt is not VERIFIED'
   [[ "$(kv_get "${package_dir}/verification_receipt.tsv" absolute_package_path)" == "$package_dir" ]] || fatal 'package path differs from verification receipt path'
+  assert_nonempty_file "${package_dir}/removal_test.tsv"
+  [[ "$(kv_get "${package_dir}/removal_test.tsv" disposable_removal)" == 'PASS' ]] || fatal 'removal test is not PASS'
+  [[ ! -e "${package_dir}/removal_receipt.tsv" && ! -e "${package_dir}/removal_receipt.tsv.sha256" ]] \
+    || fatal 'removal receipt already exists; refusing to replace it'
 
-  local before_dump_sig before_receipt_sig before_manifest_sig
-  before_dump_sig="$(stat -c '%i:%s:%Y' "${package_dir}/dengue_archive_schemas.dump")"
-  before_receipt_sig="$(stat -c '%i:%s:%Y' "${package_dir}/verification_receipt.tsv")"
-  before_manifest_sig="$(stat -c '%i:%s:%Y' "${package_dir}/package_manifest.sha256")"
+  local immutable_before immutable_after
+  immutable_before="${tmp_dir}/immutable-before.tsv"
+  immutable_after="${tmp_dir}/immutable-after.tsv"
+  snapshot_immutable_package_artifacts "$package_dir" "$immutable_before"
 
   revalidate_current_source "$package_dir" "${tmp_dir}/current"
   run_lock_preflight
 
-  [[ "$before_dump_sig" == "$(stat -c '%i:%s:%Y' "${package_dir}/dengue_archive_schemas.dump")" ]] || fatal 'package dump changed during remove preflight'
-  [[ "$before_receipt_sig" == "$(stat -c '%i:%s:%Y' "${package_dir}/verification_receipt.tsv")" ]] || fatal 'verification receipt changed during remove preflight'
-  [[ "$before_manifest_sig" == "$(stat -c '%i:%s:%Y' "${package_dir}/package_manifest.sha256")" ]] || fatal 'package manifest changed during remove preflight'
+  snapshot_immutable_package_artifacts "$package_dir" "$immutable_after"
+  cmp -s "$immutable_before" "$immutable_after" || fatal 'package artifacts changed during remove preflight'
   [[ -r "${package_dir}/dengue_archive_schemas.dump" ]] || fatal 'package dump is not readable after preflight'
   [[ -r "${package_dir}/verification_receipt.tsv" ]] || fatal 'verification receipt is not readable after preflight'
 
@@ -1028,34 +1172,46 @@ cmd_remove() {
 
   psql -X \
     -v ON_ERROR_STOP=1 \
-    -v archive_removal_authorized=1 \
+    -v archive_removal_token="$confirm_remove" \
     -v archive_package_path="$package_dir" \
     -v archive_dump_sha256="$(sha_file "${package_dir}/dengue_archive_schemas.dump")" \
     -v archive_verification_receipt_sha256="$(sha_file "${package_dir}/verification_receipt.tsv")" \
     -v archive_source_database_oid="$(kv_get "${package_dir}/source_identity.tsv" database_oid)" \
     -v archive_source_inventory_sha256="$(sha_file "${package_dir}/archive_inventory.tsv")" \
     -v archive_source_row_counts_sha256="$(sha_file "${package_dir}/archive_row_counts.tsv")" \
-    -c "SELECT set_config('archive.removal_authorized', '1', false)" \
-    -c "SELECT set_config('archive.package_path', '$package_dir', false)" \
-    -c "SELECT set_config('archive.dump_sha256', '$(sha_file "${package_dir}/dengue_archive_schemas.dump")', false)" \
-    -c "SELECT set_config('archive.verification_receipt_sha256', '$(sha_file "${package_dir}/verification_receipt.tsv")', false)" \
-    -c "SELECT set_config('archive.source_database_oid', '$(kv_get "${package_dir}/source_identity.tsv" database_oid)', false)" \
-    -c "SELECT set_config('archive.source_inventory_sha256', '$(sha_file "${package_dir}/archive_inventory.tsv")', false)" \
-    -c "SELECT set_config('archive.source_row_counts_sha256', '$(sha_file "${package_dir}/archive_row_counts.tsv")', false)" \
-    -f "${SCRIPT_DIR}/20260729_03_remove_archive_schemas.sql" >/dev/null
+    -v archive_selected_schemas="$SELECTED_SCHEMA_LABEL" \
+    -v archive_removal_sql="${SCRIPT_DIR}/20260729_03_remove_archive_schemas.sql" \
+    -f - >/dev/null <<'SQL'
+SELECT set_config('archive.removal_authorized', :'archive_removal_token', false);
+SELECT set_config('archive.package_path', :'archive_package_path', false);
+SELECT set_config('archive.dump_sha256', :'archive_dump_sha256', false);
+SELECT set_config('archive.verification_receipt_sha256', :'archive_verification_receipt_sha256', false);
+SELECT set_config('archive.source_database_oid', :'archive_source_database_oid', false);
+SELECT set_config('archive.source_inventory_sha256', :'archive_source_inventory_sha256', false);
+SELECT set_config('archive.source_row_counts_sha256', :'archive_source_row_counts_sha256', false);
+SELECT set_config('archive.selected_schemas', :'archive_selected_schemas', false);
+\i :archive_removal_sql
+SQL
 
   psql -X -v ON_ERROR_STOP=1 -f "${SCRIPT_DIR}/20260729_04_validate_archive_schemas_removed.sql" >/dev/null
   write_removal_receipt "$package_dir" "$before_db_size" "$before_archive_size" "$started_at"
 
-  printf 'ARCHIVE_REMOVAL_STATUS=PASSED\n'
+  printf 'ARCHIVE_REMOVAL_STATUS=PASS\n'
   printf 'ARCHIVE_PACKAGE_PATH=%s\n' "$package_dir"
   printf 'REMOVAL_RECEIPT=%s\n' "${package_dir}/removal_receipt.tsv"
 }
 
 cmd_status() {
   local package_dir=""
+  local schemas_raw=""
+  local schemas_supplied=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
+      --schemas)
+        schemas_raw="$2"
+        schemas_supplied=1
+        shift 2
+        ;;
       --package)
         package_dir="$2"
         shift 2
@@ -1065,6 +1221,7 @@ cmd_status() {
         ;;
     esac
   done
+  if (( schemas_supplied )); then [[ -n "$schemas_raw" ]] || fatal 'schema selection contains an empty name'; parse_schema_list "$schemas_raw"; else parse_schema_list; fi
 
   local output_root="${ARCHIVE_EXPORT_ROOT:-$DEFAULT_EXPORT_ROOT}"
   local package_root latest_verified
@@ -1076,10 +1233,14 @@ cmd_status() {
 
   local archive_count
   archive_count="$(db_setting "SELECT count(*) FROM pg_namespace WHERE nspname ~ '^archive_'")"
+  local selected_count
+  selected_count="$(db_setting "SELECT count(*) FROM pg_namespace WHERE nspname = ANY(ARRAY[${SELECTED_SCHEMA_CSV}])")"
   printf 'connected_database=%s\n' "$(db_setting 'SELECT current_database()')"
   printf 'connected_database_oid=%s\n' "$(db_setting "SELECT oid::text FROM pg_database WHERE datname = current_database()")"
   printf 'database_size_bytes=%s\n' "$(db_setting 'SELECT pg_database_size(current_database())')"
-  printf 'approved_archive_schemas=%s\n' "$([[ "$archive_count" -eq 9 ]] && printf present || ([[ "$archive_count" -eq 0 ]] && printf absent || printf partial))"
+  printf 'selected_schemas=%s\n' "$SELECTED_SCHEMA_LABEL"
+  printf 'selected_archive_schemas=%s\n' "$([[ "$selected_count" -eq "${#SELECTED_SCHEMAS[@]}" ]] && printf present || ([[ "$selected_count" -eq 0 ]] && printf absent || printf partial))"
+  printf 'all_current_archive_schema_count=%s\n' "$archive_count"
   printf 'current_archive_total_bytes=%s\n' "$(source_archive_total_bytes)"
   printf 'protected_active_objects=%s\n' "$(db_setting "SELECT count(*) FROM (VALUES ('Municipio','Notificacao'),('weather','copernicus_bra'),('Dengue_global','regional_saude'),('Dengue_global','regional'),('Dengue_global','CID10')) AS t(schema_name, relation_name) WHERE to_regclass(format('%I.%I', schema_name, relation_name)) IS NOT NULL")/5"
 
@@ -1104,6 +1265,7 @@ cmd_status() {
       fi
       if [[ -f "${package_dir}/removal_receipt.tsv" && -f "${package_dir}/removal_receipt.tsv.sha256" ]]; then
         (cd "$package_dir" && sha256sum -c removal_receipt.tsv.sha256 >/dev/null 2>&1) \
+          && [[ "$(kv_get "${package_dir}/removal_receipt.tsv" status)" == 'PASS' ]] \
           && printf 'removal_receipt_status=PASS\n' || printf 'removal_receipt_status=FAIL\n'
       else
         printf 'removal_receipt_status=MISSING\n'

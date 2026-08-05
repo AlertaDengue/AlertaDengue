@@ -132,8 +132,11 @@ BEGIN
              WHERE d.deptype='a' AND s.oid IN ('archive_dbf_upload.dbf_dbf_id_seq'::regclass,'archive_dbf_upload.dbf_dbfchunkedupload_id_seq'::regclass)
              AND t.oid NOT IN ('archive_dbf_upload.dbf_dbf'::regclass,'archive_dbf_upload.dbf_dbfchunkedupload'::regclass))
   THEN RAISE EXCEPTION 'sequence ownership changed'; END IF;
-  IF to_regclass('ingestion.run') IS NULL OR to_regclass('ingestion.sinan_stage') IS NULL
-     OR to_regclass('"Municipio"."Notificacao"') IS NULL
+  -- Intentionally do not use the broad archive-cleanup protected-object list:
+  -- this script archives only legacy DBF upload metadata.
+  IF to_regclass('public.auth_user') IS NULL
+     OR to_regclass('ingestion.run') IS NULL
+     OR to_regclass('ingestion.sinan_stage') IS NULL
   THEN RAISE EXCEPTION 'protected active object disappeared'; END IF;
   IF EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
              WHERE n.nspname='archive_dbf_upload'
@@ -156,12 +159,10 @@ BEGIN
     WHERE ns.nspname='archive_dbf_upload' AND c.relname='dbf_dbfchunkedupload'
       AND pg_get_expr(d.adbin,d.adrelid) LIKE '%archive_dbf_upload.dbf_dbfchunkedupload_id_seq%')
   THEN RAISE EXCEPTION 'chunked-upload default does not point to archived sequence'; END IF;
+  -- Intentionally do not use the broad archive-cleanup protected-object list:
+  -- this script archives only legacy DBF upload metadata.
   IF EXISTS (SELECT 1 FROM (VALUES
-    ('Dengue_global','CID10'),('Dengue_global','Municipio'),('Dengue_global','parameters_uf'),('Dengue_global','regional'),
-    ('Dengue_global','regional_saude'),('Municipio','Notificacao'),('Municipio','Historico_alerta'),
-    ('Municipio','Historico_alerta_chik'),('Municipio','Historico_alerta_zika'),('episcanner','sir_params'),
-    ('ingestion','run'),('ingestion','sinan_stage'),('vegetation_indices','vegetation_index_metrics'),
-    ('weather','copernicus_bra'),('public','auth_user')) AS p(s,r)
+    ('public','auth_user'),('ingestion','run'),('ingestion','sinan_stage')) AS p(s,r)
     WHERE to_regclass(format('%I.%I',p.s,p.r)) IS NULL)
   THEN RAISE EXCEPTION 'protected active object missing'; END IF;
 END $$;

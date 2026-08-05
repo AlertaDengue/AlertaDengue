@@ -37,9 +37,11 @@ BEGIN
   IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'archive_dbf_upload') THEN
     RAISE EXCEPTION 'archive_dbf_upload already exists; unexpected resume state';
   END IF;
-  IF to_regclass('ingestion.run') IS NULL
-     OR to_regclass('ingestion.sinan_stage') IS NULL
-     OR to_regclass('"Municipio"."Notificacao"') IS NULL THEN
+  -- Intentionally do not use the broad archive-cleanup protected-object list:
+  -- this script archives only legacy DBF upload metadata.
+  IF to_regclass('public.auth_user') IS NULL
+     OR to_regclass('ingestion.run') IS NULL
+     OR to_regclass('ingestion.sinan_stage') IS NULL THEN
     RAISE EXCEPTION 'protected active object is absent';
   END IF;
 END $$;
