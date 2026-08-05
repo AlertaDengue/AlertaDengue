@@ -34,37 +34,18 @@ BEGIN
   IF EXISTS (SELECT 1 FROM pg_constraint WHERE contype='f' AND confrelid IN ('public.dbf_dbf'::regclass,'public.dbf_dbfchunkedupload'::regclass,'public.dbf_sendtopartner'::regclass) AND conrelid NOT IN ('public.dbf_dbf'::regclass,'public.dbf_dbfchunkedupload'::regclass,'public.dbf_sendtopartner'::regclass)) THEN RAISE EXCEPTION 'unexpected inbound dependency'; END IF;
 END $guard$;
 
-CREATE TEMP TABLE preflight_target_counts (table_name text, exact_rows bigint, total_bytes bigint) ON COMMIT DROP;
-DO $counts$
-DECLARE
-  target record;
-  exact_rows bigint;
-  total_bytes bigint;
-BEGIN
-  FOR target IN
-    SELECT *
-      FROM (VALUES
-        ('public'::text, 'dbf_dbf'::text),
-        ('public'::text, 'dbf_dbfchunkedupload'::text),
-        ('public'::text, 'dbf_sendtopartner'::text)
-      ) AS target_tables(schema_name, table_name)
-  LOOP
-    EXECUTE format(
-      'SELECT count(*) FROM %I.%I',
-      target.schema_name,
-      target.table_name
-    ) INTO exact_rows;
-    EXECUTE format(
-      'SELECT pg_total_relation_size(%L::regclass)',
-      format('%I.%I', target.schema_name, target.table_name)
-    ) INTO total_bytes;
-    INSERT INTO preflight_target_counts(table_name, exact_rows, total_bytes)
-    VALUES (format('%I.%I', target.schema_name, target.table_name), exact_rows, total_bytes);
-  END LOOP;
-END $counts$;
-SELECT table_name, exact_rows, total_bytes
-  FROM preflight_target_counts
- ORDER BY table_name;
+SELECT 'public.dbf_dbf' AS table_name, count(*) AS exact_rows,
+       pg_total_relation_size('public.dbf_dbf'::regclass) AS total_bytes
+  FROM public.dbf_dbf
+UNION ALL
+SELECT 'public.dbf_dbfchunkedupload', count(*),
+       pg_total_relation_size('public.dbf_dbfchunkedupload'::regclass)
+  FROM public.dbf_dbfchunkedupload
+UNION ALL
+SELECT 'public.dbf_sendtopartner', count(*),
+       pg_total_relation_size('public.dbf_sendtopartner'::regclass)
+  FROM public.dbf_sendtopartner
+ORDER BY table_name;
 SELECT c.oid::regclass AS object_name, pg_get_userbyid(c.relowner) AS owner_name, coalesce(array_to_string(c.relacl,','),'') AS grants, obj_description(c.oid,'pg_class') AS comment FROM pg_class c WHERE c.oid IN ('public.dbf_dbf'::regclass,'public.dbf_dbfchunkedupload'::regclass,'public.dbf_sendtopartner'::regclass,'public.dbf_dbf_id_seq'::regclass,'public.dbf_dbfchunkedupload_id_seq'::regclass,'public.dbf_sendtopartner_id_seq'::regclass) ORDER BY 1;
 SELECT table_name, column_name, data_type, is_nullable, column_default FROM information_schema.columns WHERE table_schema='public' AND table_name IN ('dbf_dbf','dbf_dbfchunkedupload','dbf_sendtopartner') ORDER BY 1,ordinal_position;
 SELECT conrelid::regclass AS table_name, conname, contype, pg_get_constraintdef(oid) AS definition, convalidated FROM pg_constraint WHERE conrelid IN ('public.dbf_dbf'::regclass,'public.dbf_dbfchunkedupload'::regclass,'public.dbf_sendtopartner'::regclass) ORDER BY 1,2;
@@ -73,5 +54,8 @@ SELECT sequence_name, last_value, is_called FROM (SELECT 'dbf_dbf_id_seq' sequen
 SELECT 'dbf_dbf.uploaded_at' AS evidence, min(uploaded_at)::date AS min_date, max(uploaded_at)::date AS max_date FROM public.dbf_dbf UNION ALL SELECT 'dbf_dbf.export_date',min(export_date),max(export_date) FROM public.dbf_dbf UNION ALL SELECT 'dbf_dbfchunkedupload.created_on',min(created_on)::date,max(created_on)::date FROM public.dbf_dbfchunkedupload UNION ALL SELECT 'dbf_dbfchunkedupload.completed_on',min(completed_on)::date,max(completed_on)::date FROM public.dbf_dbfchunkedupload;
 SELECT min(notification_year) AS notification_year_min, max(notification_year) AS notification_year_max, count(*) FILTER (WHERE notification_year < 1900 OR notification_year > 2100) AS invalid_or_extreme_years FROM public.dbf_dbf;
 SELECT 'dbf_sendtopartner has no date columns' AS date_evidence;
+SELECT count(*) FILTER (WHERE status) AS active_rows,
+       count(*) FILTER (WHERE NOT status) AS inactive_rows
+  FROM public.dbf_sendtopartner;
 SELECT conrelid::regclass,conname,confrelid::regclass,pg_get_constraintdef(oid) FROM pg_constraint WHERE contype='f' AND conrelid IN ('public.dbf_dbf'::regclass,'public.dbf_dbfchunkedupload'::regclass,'public.dbf_sendtopartner'::regclass);
 ROLLBACK;
