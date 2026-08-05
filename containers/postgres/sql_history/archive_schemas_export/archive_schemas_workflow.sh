@@ -820,11 +820,11 @@ run_lock_preflight() {
   psql -X -v ON_ERROR_STOP=1 -f - >/dev/null <<SQL
 BEGIN;
 SET LOCAL lock_timeout = '5s';
-DO $$ DECLARE r record; BEGIN
+DO \$\$ DECLARE r record; BEGIN
   FOR r IN SELECT n.nspname,c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
            WHERE n.nspname = ANY(ARRAY[${SELECTED_SCHEMA_CSV}]) AND c.relkind IN ('r','m')
   LOOP EXECUTE format('LOCK TABLE %I.%I IN ACCESS EXCLUSIVE MODE NOWAIT',r.nspname,r.relname); END LOOP;
-END $$;
+END \$\$;
 ROLLBACK;
 SQL
 }
