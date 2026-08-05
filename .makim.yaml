@@ -114,13 +114,6 @@ groups:
 
           echo "[II] postgres is running."
 
-
-      send-mail-partner:
-        help: Send email to partners.
-        run: |
-          ${{ env.sugar_run_rm }} --cmd ${{ env.manage_py }} send_mail
-
-
       backfill-chik-casprov:
         help: Copy a chik parquet file into the running web container and run the one-time backfill command.
         args:
