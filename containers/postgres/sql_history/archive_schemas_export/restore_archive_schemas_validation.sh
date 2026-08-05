@@ -159,6 +159,12 @@ SQL
 PGDATABASE="$RESTORE_DB" psql -X -A -t -F $'\t' -v ON_ERROR_STOP=1 -f - > "${tmp_dir}/dependencies.tsv" <<SQL
 SELECT obj_ns.nspname,obj.relname,obj.relkind,ref_ns.nspname,ref.relname,ref.relkind,d.deptype FROM pg_depend d JOIN pg_class obj ON obj.oid=d.objid JOIN pg_namespace obj_ns ON obj_ns.oid=obj.relnamespace JOIN pg_class ref ON ref.oid=d.refobjid JOIN pg_namespace ref_ns ON ref_ns.oid=ref.relnamespace WHERE obj_ns.nspname = ANY(ARRAY[${SELECTED_CSV}]) OR ref_ns.nspname = ANY(ARRAY[${SELECTED_CSV}]) ORDER BY 1,2,4,5,7;
 SQL
+PGDATABASE="$RESTORE_DB" psql -X -A -t -F $'\t' -v ON_ERROR_STOP=1 -f - > "${tmp_dir}/external_fks.tsv" <<SQL
+SELECT con.conrelid::regclass::text,con.conname,con.confrelid::regclass::text,con.convalidated,con.confdeltype,con.confupdtype FROM pg_constraint con JOIN pg_namespace src_ns ON src_ns.oid=con.connamespace JOIN pg_class ref_cls ON ref_cls.oid=con.confrelid JOIN pg_namespace ref_ns ON ref_ns.oid=ref_cls.relnamespace WHERE con.contype='f' AND src_ns.nspname = ANY(ARRAY[${SELECTED_CSV}]) AND ref_ns.nspname !~ '^archive_' ORDER BY 1,2,3;
+SQL
+PGDATABASE="$RESTORE_DB" psql -X -A -t -F $'\t' -v ON_ERROR_STOP=1 -f - > "${tmp_dir}/internal_fks.tsv" <<SQL
+SELECT con.conrelid::regclass::text,con.conname,con.confrelid::regclass::text,con.convalidated,con.confdeltype,con.confupdtype FROM pg_constraint con JOIN pg_namespace src_ns ON src_ns.oid=con.connamespace JOIN pg_class ref_cls ON ref_cls.oid=con.confrelid JOIN pg_namespace ref_ns ON ref_ns.oid=ref_cls.relnamespace WHERE con.contype='f' AND src_ns.nspname = ANY(ARRAY[${SELECTED_CSV}]) AND ref_ns.nspname ~ '^archive_' ORDER BY 1,2,3;
+SQL
 
 normalize_inventory() { awk -F $'\t' 'BEGIN{OFS="\t"}{print $1,$2,$3,$5,$6}' "$1" | sort; }
 normalize_deps() { awk -F $'\t' '$1 != "pg_toast" && $4 != "pg_toast"' "$1" | sort; }
@@ -169,6 +175,8 @@ normalize_deps() { awk -F $'\t' '$1 != "pg_toast" && $4 != "pg_toast"' "$1" | so
 [[ "$(sha_file "${PACKAGE_DIR}/archive_indexes.tsv")" == "$(sha_file "${tmp_dir}/indexes.tsv")" ]] || fatal 'restored indexes differ'
 [[ "$(sha_file "${PACKAGE_DIR}/archive_grants.tsv")" == "$(sha_file "${tmp_dir}/grants.tsv")" ]] || fatal 'restored grants differ'
 [[ "$(normalize_deps "${PACKAGE_DIR}/archive_dependencies.tsv")" == "$(normalize_deps "${tmp_dir}/dependencies.tsv")" ]] || fatal 'restored dependencies differ'
+[[ "$(sha_file "${PACKAGE_DIR}/archive_external_fks.tsv")" == "$(sha_file "${tmp_dir}/external_fks.tsv")" ]] || fatal 'restored external foreign keys differ'
+[[ "$(sha_file "${PACKAGE_DIR}/archive_internal_fks.tsv")" == "$(sha_file "${tmp_dir}/internal_fks.tsv")" ]] || fatal 'restored internal foreign keys differ'
 
 PGDATABASE="$RESTORE_DB" psql -X -A -t -F $'\t' -v ON_ERROR_STOP=1 -f - > "${PACKAGE_DIR}/removal_test.tsv" <<SQL
 BEGIN;
