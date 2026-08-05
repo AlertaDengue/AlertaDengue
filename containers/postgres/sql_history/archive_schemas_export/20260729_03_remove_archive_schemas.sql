@@ -3,7 +3,8 @@
 
 DO $$
 BEGIN
-    IF current_setting('archive.removal_authorized', true) IS DISTINCT FROM '1'
+    IF current_setting('archive.removal_authorized', true) IS DISTINCT FROM
+       'REMOVE_APPROVED_ARCHIVE_SCHEMAS'
        OR current_setting('archive.package_path', true) IS NULL
        OR current_setting('archive.dump_sha256', true) IS NULL
        OR current_setting('archive.verification_receipt_sha256', true) IS NULL
@@ -27,7 +28,8 @@ DECLARE
     protected_before record;
     protected_after record;
 BEGIN
-    IF current_setting('archive.removal_authorized', true) IS DISTINCT FROM '1'
+    IF current_setting('archive.removal_authorized', true) IS DISTINCT FROM
+       'REMOVE_APPROVED_ARCHIVE_SCHEMAS'
        OR current_setting('archive.package_path', true) IS NULL
        OR current_setting('archive.dump_sha256', true) IS NULL
        OR current_setting('archive.verification_receipt_sha256', true) IS NULL

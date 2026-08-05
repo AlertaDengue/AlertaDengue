@@ -1172,7 +1172,7 @@ cmd_remove() {
 
   psql -X \
     -v ON_ERROR_STOP=1 \
-    -v archive_removal_authorized=1 \
+    -v archive_removal_token="$confirm_remove" \
     -v archive_package_path="$package_dir" \
     -v archive_dump_sha256="$(sha_file "${package_dir}/dengue_archive_schemas.dump")" \
     -v archive_verification_receipt_sha256="$(sha_file "${package_dir}/verification_receipt.tsv")" \
@@ -1180,15 +1180,18 @@ cmd_remove() {
     -v archive_source_inventory_sha256="$(sha_file "${package_dir}/archive_inventory.tsv")" \
     -v archive_source_row_counts_sha256="$(sha_file "${package_dir}/archive_row_counts.tsv")" \
     -v archive_selected_schemas="$SELECTED_SCHEMA_LABEL" \
-    -c "SELECT set_config('archive.removal_authorized', :'archive_removal_authorized', false)" \
-    -c "SELECT set_config('archive.package_path', :'archive_package_path', false)" \
-    -c "SELECT set_config('archive.dump_sha256', :'archive_dump_sha256', false)" \
-    -c "SELECT set_config('archive.verification_receipt_sha256', :'archive_verification_receipt_sha256', false)" \
-    -c "SELECT set_config('archive.source_database_oid', :'archive_source_database_oid', false)" \
-    -c "SELECT set_config('archive.source_inventory_sha256', :'archive_source_inventory_sha256', false)" \
-    -c "SELECT set_config('archive.source_row_counts_sha256', :'archive_source_row_counts_sha256', false)" \
-    -c "SELECT set_config('archive.selected_schemas', :'archive_selected_schemas', false)" \
-    -f "${SCRIPT_DIR}/20260729_03_remove_archive_schemas.sql" >/dev/null
+    -v archive_removal_sql="${SCRIPT_DIR}/20260729_03_remove_archive_schemas.sql" \
+    -f - >/dev/null <<'SQL'
+SELECT set_config('archive.removal_authorized', :'archive_removal_token', false);
+SELECT set_config('archive.package_path', :'archive_package_path', false);
+SELECT set_config('archive.dump_sha256', :'archive_dump_sha256', false);
+SELECT set_config('archive.verification_receipt_sha256', :'archive_verification_receipt_sha256', false);
+SELECT set_config('archive.source_database_oid', :'archive_source_database_oid', false);
+SELECT set_config('archive.source_inventory_sha256', :'archive_source_inventory_sha256', false);
+SELECT set_config('archive.source_row_counts_sha256', :'archive_source_row_counts_sha256', false);
+SELECT set_config('archive.selected_schemas', :'archive_selected_schemas', false);
+\i :archive_removal_sql
+SQL
 
   psql -X -v ON_ERROR_STOP=1 -f "${SCRIPT_DIR}/20260729_04_validate_archive_schemas_removed.sql" >/dev/null
   write_removal_receipt "$package_dir" "$before_db_size" "$before_archive_size" "$started_at"
