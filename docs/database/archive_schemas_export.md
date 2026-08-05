@@ -34,6 +34,11 @@ archive_schemas_workflow.sh status \
 External libpq configuration is required. Do not put production values,
 credentials, DSNs, or connection details in repository files.
 
+The raw `20260729_00_audit_archive_schemas.sql` file is legacy and
+nine-schema-only by design. Selected exports must use
+`archive_schemas_workflow.sh --schemas`; the wrapper performs selected-schema
+validation and does not invoke that raw audit.
+
 Export records selected schemas, dump and SHA-256, receipts, source database
 metadata, Git metadata, inventory, exact row counts, sequence state,
 constraints, indexes, dependencies, external/internal FKs, owners/grants,

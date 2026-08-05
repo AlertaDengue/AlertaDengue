@@ -26,6 +26,10 @@ archive_schemas_workflow.sh status --schemas archive_dbf_upload,archive_sinan_up
 All libpq settings must come from the shell or libpq service configuration.
 Never place connection values or credentials in the repository.
 
+`20260729_00_audit_archive_schemas.sql` is a legacy raw SQL audit for the
+original nine-schema set and intentionally requires all nine schemas. Do not
+use it for selected exports; use this wrapper with `--schemas`.
+
 Every package records `selected_schemas.tsv`, a custom-format dump, checksums,
 source and Git metadata, inventory, exact row counts, sequences, constraints,
 indexes, dependencies, external/internal FKs, grants, protected objects,

@@ -1,4 +1,7 @@
--- Audit the completed archive schemas and their active lookup dependencies.
+-- LEGACY NINE-SCHEMA-ONLY AUDIT.
+-- This historical raw SQL audit intentionally validates the original nine
+-- archive schemas as one complete set. It is not the audit path for selected
+-- exports. For selected schemas, use archive_schemas_workflow.sh --schemas.
 -- Read-only, fails on safety mismatches.
 
 BEGIN;
