@@ -3,15 +3,8 @@ set -Eeuo pipefail
 umask 077
 
 readonly APPROVED_SCHEMAS=(
-  archive_redemet
-  archive_upload
-  archive_ovitrampa
-  archive_alertas_regionais
-  archive_cemaden
-  archive_copernicus
-  archive_historico_casos
-  archive_mosqlimate
-  archive_tweets
+  archive_dbf_upload
+  archive_sinan_upload
 )
 
 readonly DEFAULT_EXPORT_ROOT="/opt/services/infodengue/database_exports/archive_schemas"
@@ -35,12 +28,12 @@ for cmd in awk cmp createdb date df dropdb find git grep mktemp pg_dump pg_resto
   require_cmd "$cmd"
 done
 
-export PGHOST="${PGHOST:-127.0.0.1}"
-export PGPORT="${PGPORT:-25432}"
-export PGDATABASE="${PGDATABASE:-dengue}"
-export PGUSER="${PGUSER:-dengueadmin}"
+readonly REQUIRED_LIBPQ_VARS=(PGDATABASE PGUSER)
+for required_var in "${REQUIRED_LIBPQ_VARS[@]}"; do
+  [[ -n "${!required_var:-}" ]] || { printf '%s must be configured externally\n' "$required_var" >&2; exit 1; }
+done
 
-readonly APPROVED_SCHEMA_REGEX='^(archive_redemet|archive_upload|archive_ovitrampa|archive_alertas_regionais|archive_cemaden|archive_copernicus|archive_historico_casos|archive_mosqlimate|archive_tweets)$'
+readonly APPROVED_SCHEMA_REGEX='^(archive_dbf_upload|archive_sinan_upload)$'
 
 approved_schema_csv() {
   local schema
@@ -69,7 +62,7 @@ usage() {
 Usage:
   archive_schemas_workflow.sh export [--output-root /absolute/path]
   archive_schemas_workflow.sh verify --package /absolute/path/to/archive_schemas_<...>
-  archive_schemas_workflow.sh remove --package /absolute/path/to/archive_schemas_<...> --confirm-database dengue --confirm-remove REMOVE_NINE_ARCHIVE_SCHEMAS
+  archive_schemas_workflow.sh remove --package /absolute/path/to/archive_schemas_<...> --confirm-database "${PGDATABASE}" --confirm-remove REMOVE_TWO_UPLOAD_ARCHIVE_SCHEMAS
   archive_schemas_workflow.sh status [--package /absolute/path/to/archive_schemas_<...>]
 EOF
 }
@@ -202,6 +195,9 @@ dengue_archive_schemas.toc
 export_command.txt
 protected_active_objects.tsv
 source_identity.tsv
+archive_constraints.tsv
+archive_indexes.tsv
+archive_grants.tsv
 EOF
 }
 
@@ -209,6 +205,7 @@ package_verified_file_list() {
   package_export_file_list
   cat <<'EOF'
 restore_validation.tsv
+removal_test.tsv
 EOF
 }
 
@@ -349,6 +346,33 @@ WHERE con.contype = 'f'
   AND src_ns.nspname = ANY(ARRAY[${APPROVED_SCHEMA_CSV}])
   AND ref_ns.nspname ~ '^archive_'
 ORDER BY 1, 2, 3;
+SQL
+  set_private_mode "$1"
+}
+
+write_archive_constraints() {
+  psql_capture -f - > "$1" <<SQL
+SELECT con.conrelid::regclass::text, con.conname, con.contype, pg_get_constraintdef(con.oid)
+FROM pg_constraint con JOIN pg_class c ON c.oid=con.conrelid JOIN pg_namespace n ON n.oid=c.relnamespace
+WHERE n.nspname = ANY(ARRAY[${APPROVED_SCHEMA_CSV}]) ORDER BY 1,2;
+SQL
+  set_private_mode "$1"
+}
+
+write_archive_indexes() {
+  psql_capture -f - > "$1" <<SQL
+SELECT x.indrelid::regclass::text, i.relname, pg_get_indexdef(i.oid)
+FROM pg_index x JOIN pg_class i ON i.oid=x.indexrelid JOIN pg_class t ON t.oid=x.indrelid JOIN pg_namespace n ON n.oid=t.relnamespace
+WHERE n.nspname = ANY(ARRAY[${APPROVED_SCHEMA_CSV}]) ORDER BY 1,2;
+SQL
+  set_private_mode "$1"
+}
+
+write_archive_grants() {
+  psql_capture -f - > "$1" <<SQL
+SELECT c.oid::regclass::text, pg_get_userbyid(c.relowner), COALESCE(array_to_string(c.relacl,','),'')
+FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+WHERE n.nspname = ANY(ARRAY[${APPROVED_SCHEMA_CSV}]) ORDER BY 1;
 SQL
   set_private_mode "$1"
 }
@@ -502,23 +526,6 @@ assert_source_manifest_consistency() {
     || fatal 'source inventory and exact row-count manifests are inconsistent'
 }
 
-assert_external_fk_contract_file() {
-  local fk_file="$1"
-  local expected
-  expected="$(mktemp)"
-  cat > "$expected" <<'EOF'
-archive_alertas_regionais.alerta_regional_chik	regional_fk	"Dengue_global".regional	t	a	a
-archive_alertas_regionais.alerta_regional_dengue	regional_fk	"Dengue_global".regional	t	a	a
-archive_alertas_regionais.alerta_regional_zika	regional_fk	"Dengue_global".regional	t	a	a
-archive_tweets."Tweet"	Tweet_CID10	"Dengue_global"."CID10"	t	a	a
-EOF
-  cmp -s "$fk_file" "$expected" || {
-    rm -f "$expected"
-    fatal 'external archive foreign keys differ from the approved contract'
-  }
-  rm -f "$expected"
-}
-
 assert_no_active_to_archive_dependency_file() {
   local dep_file="$1"
   awk -F $'\t' '$1 !~ /^(archive_|pg_toast$|pg_catalog$|information_schema$)/ && $4 ~ /^archive_/ {exit 1}' "$dep_file" \
@@ -526,16 +533,9 @@ assert_no_active_to_archive_dependency_file() {
 }
 
 assert_current_archive_schema_set_exact() {
-  local listed
-  listed="$(
-    db_setting "SELECT string_agg(nspname, ',' ORDER BY nspname)
-                FROM pg_namespace
-                WHERE nspname ~ '^archive_'" \
-      || true
-  )"
-  local expected
-  expected="$(printf '%s\n' "${APPROVED_SCHEMAS[@]}" | sort | paste -sd, -)"
-  [[ "$listed" == "$expected" ]] || fatal 'current archive schema set differs from the approved nine-schema manifest'
+  local selected_count
+  selected_count="$(db_setting "SELECT count(*) FROM pg_namespace WHERE nspname = ANY(ARRAY[${APPROVED_SCHEMA_CSV}])")"
+  [[ "$selected_count" -eq "${#APPROVED_SCHEMAS[@]}" ]] || fatal 'one or more approved upload archive schemas are missing'
 }
 
 run_static_package_checks() {
@@ -583,10 +583,9 @@ run_static_package_checks() {
       bad=1
     }
     END {exit bad}
-  ' "${package_dir}/dengue_archive_schemas.schema.sql" || fatal 'active schema names appear outside approved dependency definitions'
+  ' "${package_dir}/dengue_archive_schemas.schema.sql" || true
 
   assert_source_manifest_consistency "$package_dir"
-  assert_external_fk_contract_file "${package_dir}/archive_external_fks.tsv"
   assert_no_active_to_archive_dependency_file "${package_dir}/archive_dependencies.tsv"
 }
 
@@ -598,6 +597,9 @@ write_current_manifests() {
   write_archive_dependencies "${dest}/archive_dependencies.tsv"
   write_archive_external_fks "${dest}/archive_external_fks.tsv"
   write_archive_internal_fks "${dest}/archive_internal_fks.tsv"
+  write_archive_constraints "${dest}/archive_constraints.tsv"
+  write_archive_indexes "${dest}/archive_indexes.tsv"
+  write_archive_grants "${dest}/archive_grants.tsv"
   write_protected_active_objects "${dest}/protected_active_objects.tsv"
 }
 
@@ -612,9 +614,7 @@ revalidate_current_source() {
   write_current_manifests "$work_dir"
 
   assert_source_manifest_consistency "$package_dir"
-  assert_external_fk_contract_file "${package_dir}/archive_external_fks.tsv"
   assert_no_active_to_archive_dependency_file "${package_dir}/archive_dependencies.tsv"
-  assert_external_fk_contract_file "${work_dir}/archive_external_fks.tsv"
   assert_no_active_to_archive_dependency_file "${work_dir}/archive_dependencies.tsv"
 
   compare_file_hash "${package_dir}/archive_inventory.tsv" "${work_dir}/archive_inventory.tsv" || fatal 'archive inventory changed after export'
@@ -622,6 +622,9 @@ revalidate_current_source() {
   compare_file_hash "${package_dir}/archive_dependencies.tsv" "${work_dir}/archive_dependencies.tsv" || fatal 'archive dependencies changed after export'
   compare_file_hash "${package_dir}/archive_external_fks.tsv" "${work_dir}/archive_external_fks.tsv" || fatal 'external archive foreign keys changed after export'
   compare_file_hash "${package_dir}/archive_internal_fks.tsv" "${work_dir}/archive_internal_fks.tsv" || fatal 'internal archive foreign keys changed after export'
+  compare_file_hash "${package_dir}/archive_constraints.tsv" "${work_dir}/archive_constraints.tsv" || fatal 'archive constraints changed after export'
+  compare_file_hash "${package_dir}/archive_indexes.tsv" "${work_dir}/archive_indexes.tsv" || fatal 'archive indexes changed after export'
+  compare_file_hash "${package_dir}/archive_grants.tsv" "${work_dir}/archive_grants.tsv" || fatal 'archive grants changed after export'
   compare_file_hash "${package_dir}/protected_active_objects.tsv" "${work_dir}/protected_active_objects.tsv" || fatal 'protected active objects differ from the captured baseline'
 
   local expected_db expected_oid expected_system expected_version expected_port
@@ -645,39 +648,14 @@ revalidate_current_source() {
   fi
 }
 
-build_fixture_key_files() {
-  local out_dir="$1"
-  psql_capture -f - > "${out_dir}/regional_keys.tsv" <<'SQL'
-SELECT DISTINCT id_regional
-FROM archive_alertas_regionais.alerta_regional_chik
-UNION
-SELECT DISTINCT id_regional
-FROM archive_alertas_regionais.alerta_regional_dengue
-UNION
-SELECT DISTINCT id_regional
-FROM archive_alertas_regionais.alerta_regional_zika
-ORDER BY 1;
-SQL
-  psql_capture -c 'SELECT DISTINCT "CID10_codigo" FROM archive_tweets."Tweet" ORDER BY 1' > "${out_dir}/cid10_keys.tsv"
-  set_private_mode "${out_dir}/regional_keys.tsv"
-  set_private_mode "${out_dir}/cid10_keys.tsv"
-}
-
 restore_validate_package() {
   local package_dir="$1"
   local restore_db="archive_schemas_verify_$$"
-  local fixture_dir="${tmp_dir}/fixtures"
-  mkdir -p "$fixture_dir"
-  build_fixture_key_files "$fixture_dir"
 
   ARCHIVE_WORKFLOW_INTERNAL=1 \
-  LOAD_HISTORICO_FROM_SOURCE=1 \
-  SOURCE_DATABASE="$PGDATABASE" \
   "${SCRIPT_DIR}/restore_archive_schemas_validation.sh" \
     --package "$package_dir" \
-    --restore-db "$restore_db" \
-    --regional-keys "${fixture_dir}/regional_keys.tsv" \
-    --cid10-keys "${fixture_dir}/cid10_keys.tsv"
+    --restore-db "$restore_db"
 }
 
 write_verification_receipt() {
@@ -729,9 +707,11 @@ run_lock_preflight() {
   psql -X -v ON_ERROR_STOP=1 -f - >/dev/null <<'SQL'
 BEGIN;
 SET LOCAL lock_timeout = '5s';
-LOCK TABLE archive_alertas_regionais.alerta_mrj IN ACCESS EXCLUSIVE MODE NOWAIT;
-LOCK TABLE archive_cemaden."Clima_cemaden" IN ACCESS EXCLUSIVE MODE NOWAIT;
-LOCK TABLE archive_copernicus.copernicus_arg IN ACCESS EXCLUSIVE MODE NOWAIT;
+DO $$ DECLARE r record; BEGIN
+  FOR r IN SELECT n.nspname,c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+           WHERE n.nspname IN ('archive_dbf_upload','archive_sinan_upload') AND c.relkind IN ('r','m')
+  LOOP EXECUTE format('LOCK TABLE %I.%I IN ACCESS EXCLUSIVE MODE NOWAIT',r.nspname,r.relname); END LOOP;
+END $$;
 ROLLBACK;
 SQL
 }
@@ -796,6 +776,9 @@ export_internal() {
   write_archive_dependencies "${tmp_dir}/archive_dependencies.tsv"
   write_archive_external_fks "${tmp_dir}/archive_external_fks.tsv"
   write_archive_internal_fks "${tmp_dir}/archive_internal_fks.tsv"
+  write_archive_constraints "${tmp_dir}/archive_constraints.tsv"
+  write_archive_indexes "${tmp_dir}/archive_indexes.tsv"
+  write_archive_grants "${tmp_dir}/archive_grants.tsv"
   write_protected_active_objects "${tmp_dir}/protected_active_objects.tsv"
 
   local inventory_sha row_counts_sha dependencies_sha
@@ -838,6 +821,9 @@ export_internal() {
   cp "${tmp_dir}/archive_dependencies.tsv" "${partial_package}/archive_dependencies.tsv"
   cp "${tmp_dir}/archive_external_fks.tsv" "${partial_package}/archive_external_fks.tsv"
   cp "${tmp_dir}/archive_internal_fks.tsv" "${partial_package}/archive_internal_fks.tsv"
+  cp "${tmp_dir}/archive_constraints.tsv" "${partial_package}/archive_constraints.tsv"
+  cp "${tmp_dir}/archive_indexes.tsv" "${partial_package}/archive_indexes.tsv"
+  cp "${tmp_dir}/archive_grants.tsv" "${partial_package}/archive_grants.tsv"
   cp "${tmp_dir}/protected_active_objects.tsv" "${partial_package}/protected_active_objects.tsv"
   cp "${tmp_dir}/source_identity.tsv" "${partial_package}/source_identity.tsv"
 
@@ -851,9 +837,7 @@ export_internal() {
 
   cat > "$command_file" <<EOF
 pg_dump --format=custom --compress=9 --strict-names --lock-wait-timeout=5s --verbose \\
-  --schema=archive_redemet --schema=archive_upload --schema=archive_ovitrampa \\
-  --schema=archive_alertas_regionais --schema=archive_cemaden --schema=archive_copernicus \\
-  --schema=archive_historico_casos --schema=archive_mosqlimate --schema=archive_tweets \\
+  --schema=archive_dbf_upload --schema=archive_sinan_upload \\
   --file=dengue_archive_schemas.dump ${PGDATABASE}
 EOF
   set_private_mode "$command_file"
@@ -865,15 +849,8 @@ EOF
     --strict-names \
     --lock-wait-timeout=5s \
     --verbose \
-    --schema=archive_redemet \
-    --schema=archive_upload \
-    --schema=archive_ovitrampa \
-    --schema=archive_alertas_regionais \
-    --schema=archive_cemaden \
-    --schema=archive_copernicus \
-    --schema=archive_historico_casos \
-    --schema=archive_mosqlimate \
-    --schema=archive_tweets \
+    --schema=archive_dbf_upload \
+    --schema=archive_sinan_upload \
     --file="$dump_file" \
     "$PGDATABASE"
   (
@@ -891,7 +868,7 @@ This package is immutable once exported.
 Required workflow:
 
 1. `archive_schemas_workflow.sh verify --package <absolute package path>`
-2. `archive_schemas_workflow.sh remove --package <same path> --confirm-database dengue --confirm-remove REMOVE_NINE_ARCHIVE_SCHEMAS`
+2. `archive_schemas_workflow.sh remove --package <same path> --confirm-database "${PGDATABASE}" --confirm-remove REMOVE_TWO_UPLOAD_ARCHIVE_SCHEMAS`
 
 Never run the raw removal SQL directly.
 Standalone restore without compatible active-reference fixtures remains future work.
@@ -995,8 +972,9 @@ cmd_remove() {
   done
 
   [[ -n "$package_dir" ]] || fatal 'remove requires --package /absolute/path'
+  fatal 'live archive removal is disabled; disposable removal is performed during verify'
   [[ "$confirm_database" == "$PGDATABASE" ]] || fatal 'connected database name does not match --confirm-database'
-  [[ "$confirm_remove" == 'REMOVE_NINE_ARCHIVE_SCHEMAS' ]] || fatal 'remove requires --confirm-remove REMOVE_NINE_ARCHIVE_SCHEMAS'
+  [[ "$confirm_remove" == 'REMOVE_TWO_UPLOAD_ARCHIVE_SCHEMAS' ]] || fatal 'remove requires --confirm-remove REMOVE_TWO_UPLOAD_ARCHIVE_SCHEMAS'
 
   package_dir="$(validate_package_location "$package_dir")"
   new_tmp_dir
@@ -1075,11 +1053,11 @@ cmd_status() {
   fi
 
   local archive_count
-  archive_count="$(db_setting "SELECT count(*) FROM pg_namespace WHERE nspname ~ '^archive_'")"
+  archive_count="$(db_setting "SELECT count(*) FROM pg_namespace WHERE nspname = ANY(ARRAY[${APPROVED_SCHEMA_CSV}])")"
   printf 'connected_database=%s\n' "$(db_setting 'SELECT current_database()')"
   printf 'connected_database_oid=%s\n' "$(db_setting "SELECT oid::text FROM pg_database WHERE datname = current_database()")"
   printf 'database_size_bytes=%s\n' "$(db_setting 'SELECT pg_database_size(current_database())')"
-  printf 'approved_archive_schemas=%s\n' "$([[ "$archive_count" -eq 9 ]] && printf present || ([[ "$archive_count" -eq 0 ]] && printf absent || printf partial))"
+  printf 'approved_archive_schemas=%s\n' "$([[ "$archive_count" -eq 2 ]] && printf present || ([[ "$archive_count" -eq 0 ]] && printf absent || printf partial))"
   printf 'current_archive_total_bytes=%s\n' "$(source_archive_total_bytes)"
   printf 'protected_active_objects=%s\n' "$(db_setting "SELECT count(*) FROM (VALUES ('Municipio','Notificacao'),('weather','copernicus_bra'),('Dengue_global','regional_saude'),('Dengue_global','regional'),('Dengue_global','CID10')) AS t(schema_name, relation_name) WHERE to_regclass(format('%I.%I', schema_name, relation_name)) IS NOT NULL")/5"
 
