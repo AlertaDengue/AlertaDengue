@@ -32,6 +32,10 @@ Out of scope:
 The reviewed outbound FKs are `dbf_dbf.uploaded_by_id` and
 `dbf_dbfchunkedupload.user_id`, both referencing `public.auth_user(id)`.
 
+Staging note: The DBF archive operation requires the active ingestion pipeline
+objects and `public.auth_user`, but it does not require `episcanner.sir_params`
+or other unrelated archive-cleanup protected objects.
+
 ## Requirements
 
 - Use a PostgreSQL client compatible with PostgreSQL 14.
