@@ -40,7 +40,7 @@ assert_file "${PACKAGE_DIR}/archive_indexes.tsv"
 assert_file "${PACKAGE_DIR}/archive_grants.tsv"
 
 mapfile -t SELECTED_SCHEMAS < "${PACKAGE_DIR}/selected_schemas.tsv"
-(${#SELECTED_SCHEMAS[@]} > 0) || fatal 'selected_schemas.tsv is empty'
+(( ${#SELECTED_SCHEMAS[@]} > 0 )) || fatal 'selected_schemas.tsv is empty'
 declare -A SEEN=()
 for schema in "${SELECTED_SCHEMAS[@]}"; do
   [[ "$schema" =~ ^[a-z_][a-z0-9_]*$ ]] || fatal "invalid selected schema: $schema"
@@ -139,7 +139,7 @@ pg_restore --exit-on-error --section=post-data --dbname="$RESTORE_DB" "${PACKAGE
 
 capture_inventory() { PGDATABASE="$RESTORE_DB" psql -X -A -t -F $'\t' -v ON_ERROR_STOP=1 -f -; }
 capture_inventory > "${tmp_dir}/inventory.tsv" <<SQL
-SELECT n.nspname,c.relname,c.relkind,pg_get_userbyid(c.relowner),COALESCE(obj_description(c.oid,'pg_class'),''),COALESCE(array_to_string(c.relacl,','),'') FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname = ANY(ARRAY[${SELECTED_CSV}]) AND c.relkind IN ('r','m','S','i') ORDER BY 1,2,3;
+SELECT n.nspname,c.relname,c.relkind,c.oid,pg_get_userbyid(c.relowner),COALESCE(obj_description(c.oid,'pg_class'),''),COALESCE(array_to_string(c.relacl,','),'') FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname = ANY(ARRAY[${SELECTED_CSV}]) AND c.relkind IN ('r','m','S','i') ORDER BY 1,2,3;
 SQL
 capture_inventory > "${tmp_dir}/row_counts.tsv" <<SQL
 SELECT n.nspname,c.relname,c.relkind,CASE WHEN c.relkind='m' THEN (SELECT CASE WHEN ispopulated THEN 't' ELSE 'f' END FROM pg_matviews WHERE schemaname=n.nspname AND matviewname=c.relname) ELSE '' END,(xpath('/row/count/text()',query_to_xml(format('SELECT count(*) AS count FROM %I.%I',n.nspname,c.relname),false,true,'')))[1]::text FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname = ANY(ARRAY[${SELECTED_CSV}]) AND c.relkind IN ('r','m') ORDER BY 1,2;
@@ -175,8 +175,10 @@ BEGIN;
 DO \$\$ DECLARE r record; BEGIN
   FOR r IN SELECT n.nspname,c.relname,con.conname FROM pg_constraint con JOIN pg_class c ON c.oid=con.conrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname = ANY(ARRAY[${SELECTED_CSV}]) AND con.contype='f' ORDER BY 1,2,3
   LOOP EXECUTE format('ALTER TABLE %I.%I DROP CONSTRAINT %I',r.nspname,r.relname,r.conname); END LOOP;
-  FOR r IN SELECT n.nspname,c.relname,c.relkind FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname = ANY(ARRAY[${SELECTED_CSV}]) AND c.relkind IN ('r','m','S') ORDER BY 1,2 DESC
+  FOR r IN SELECT n.nspname,c.relname,c.relkind FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname = ANY(ARRAY[${SELECTED_CSV}]) AND c.relkind IN ('r','m') ORDER BY 1,2 DESC
   LOOP IF r.relkind='m' THEN EXECUTE format('DROP MATERIALIZED VIEW %I.%I',r.nspname,r.relname); ELSE EXECUTE format('DROP TABLE %I.%I',r.nspname,r.relname); END IF; END LOOP;
+  FOR r IN SELECT n.nspname,c.relname FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname = ANY(ARRAY[${SELECTED_CSV}]) AND c.relkind='S' ORDER BY 1,2
+  LOOP EXECUTE format('DROP SEQUENCE %I.%I',r.nspname,r.relname); END LOOP;
   FOR r IN SELECT nspname FROM pg_namespace WHERE nspname = ANY(ARRAY[${SELECTED_CSV}]) ORDER BY 1
   LOOP EXECUTE format('DROP SCHEMA %I',r.nspname); END LOOP;
 END \$\$;

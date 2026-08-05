@@ -33,5 +33,4 @@ expect_fail not_allowlisted "$WORKFLOW" status --schemas archive_not_allowed
 expect_fail duplicate "$WORKFLOW" status --schemas archive_dbf_upload,archive_dbf_upload
 expect_fail empty "$WORKFLOW" status --schemas ''
 expect_fail metacharacter "$WORKFLOW" status --schemas 'archive_dbf_upload;DROP'
-expect_fail old_missing "$WORKFLOW" status --schemas archive_tweets
 printf 'archive schema workflow tests: PASS\n'

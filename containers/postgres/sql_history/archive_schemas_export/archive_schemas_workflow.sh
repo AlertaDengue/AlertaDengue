@@ -983,8 +983,8 @@ Selected schemas: ${SELECTED_SCHEMA_LABEL}
 
 Required workflow:
 
-1. `archive_schemas_workflow.sh verify --package <absolute package path>`
-2. `archive_schemas_workflow.sh remove --package <same path> --schemas ${SELECTED_SCHEMA_LABEL} --confirm-database "${PGDATABASE}" --confirm-remove REMOVE_APPROVED_ARCHIVE_SCHEMAS`
+1. archive_schemas_workflow.sh verify --package <absolute package path>
+2. archive_schemas_workflow.sh remove --package <same path> --schemas ${SELECTED_SCHEMA_LABEL} --confirm-database "${PGDATABASE}" --confirm-remove REMOVE_APPROVED_ARCHIVE_SCHEMAS
 
 Never run the raw removal SQL directly.
 Standalone restore without compatible active-reference fixtures remains future work.
@@ -1018,10 +1018,12 @@ EOF
 cmd_export() {
   local output_root="${ARCHIVE_EXPORT_ROOT:-$DEFAULT_EXPORT_ROOT}"
   local schemas_raw=""
+  local schemas_supplied=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --schemas)
         schemas_raw="$2"
+        schemas_supplied=1
         shift 2
         ;;
       --output-root)
@@ -1033,7 +1035,7 @@ cmd_export() {
         ;;
     esac
   done
-  parse_schema_list "$schemas_raw"
+  if (( schemas_supplied )); then [[ -n "$schemas_raw" ]] || fatal 'schema selection contains an empty name'; parse_schema_list "$schemas_raw"; else parse_schema_list; fi
   output_root="$(ensure_safe_root "$output_root")"
   export_internal "$output_root"
 }
@@ -1041,10 +1043,12 @@ cmd_export() {
 cmd_verify() {
   local package_dir=""
   local schemas_raw=""
+  local schemas_supplied=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --schemas)
         schemas_raw="$2"
+        schemas_supplied=1
         shift 2
         ;;
       --package)
@@ -1059,7 +1063,8 @@ cmd_verify() {
   [[ -n "$package_dir" ]] || fatal 'verify requires --package /absolute/path'
 
   package_dir="$(validate_package_location "$package_dir")"
-  if [[ -n "$schemas_raw" ]]; then
+  if (( schemas_supplied )); then
+    [[ -n "$schemas_raw" ]] || fatal 'schema selection contains an empty name'
     parse_schema_list "$schemas_raw"
   else
     read_package_selected_schemas "$package_dir"
@@ -1172,10 +1177,12 @@ cmd_remove() {
 cmd_status() {
   local package_dir=""
   local schemas_raw=""
+  local schemas_supplied=0
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --schemas)
         schemas_raw="$2"
+        schemas_supplied=1
         shift 2
         ;;
       --package)
@@ -1187,7 +1194,7 @@ cmd_status() {
         ;;
     esac
   done
-  parse_schema_list "$schemas_raw"
+  if (( schemas_supplied )); then [[ -n "$schemas_raw" ]] || fatal 'schema selection contains an empty name'; parse_schema_list "$schemas_raw"; else parse_schema_list; fi
 
   local output_root="${ARCHIVE_EXPORT_ROOT:-$DEFAULT_EXPORT_ROOT}"
   local package_root latest_verified
