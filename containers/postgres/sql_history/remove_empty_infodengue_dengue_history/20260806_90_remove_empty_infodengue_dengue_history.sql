@@ -17,6 +17,11 @@ BEGIN;
 SET LOCAL lock_timeout = '5s';
 SET LOCAL statement_timeout = '5min';
 SELECT pg_advisory_xact_lock(hashtext('AlertaDengue.remove_empty_infodengue_dengue_history'));
+SELECT set_config(
+  'infodengue.empty_dengue_history_removal_approval',
+  :'removal_approval',
+  true
+);
 
 DO $guard$
 BEGIN
@@ -26,7 +31,10 @@ BEGIN
   IF pg_is_in_recovery() THEN
     RAISE EXCEPTION 'database is in recovery';
   END IF;
-  IF :'removal_approval' <> 'REMOVE_APPROVED_EMPTY_INFODENGUE_DENGUE_HISTORY' THEN
+  IF current_setting(
+       'infodengue.empty_dengue_history_removal_approval',
+       true
+     ) <> 'REMOVE_APPROVED_EMPTY_INFODENGUE_DENGUE_HISTORY' THEN
     RAISE EXCEPTION 'explicit removal approval token is invalid';
   END IF;
   IF to_regclass('public."Dengue_2010"') IS NULL
