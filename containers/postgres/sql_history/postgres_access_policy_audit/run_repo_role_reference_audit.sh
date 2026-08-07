@@ -33,8 +33,10 @@ for token in "${tokens[@]}"; do
         else
           redacted_line="<environment-like file; matched role: ${token}>"
         fi
+      elif [[ ${line,,} == *password* || ${line,,} == *pass* || ${line,,} == *secret* || ${line,,} == *token* || ${line,,} == *key* || ${line,,} == *dsn* || ${line,,} == *url* ]]; then
+        redacted_line="<REDACTED credential-bearing line; token present>"
       else
-        redacted_line=$(printf '%s' "$line" | sed -E 's/((export[[:space:]]+)?[A-Za-z0-9_]*((PASSWORD|PASS|SECRET|TOKEN|KEY|URL|DSN))[A-Za-z0-9_]*[[:space:]]*[:=][[:space:]]*)[^[:space:],;]*/\1<REDACTED>/Ig')
+        redacted_line=$line
       fi
       redacted_line=${redacted_line//$'\t'/ }
       printf '%s\t%s\t%s\t%s\n' "$token" "${file#"$repo_root"/}" "$line_number" "$redacted_line" >> "$output_file"
