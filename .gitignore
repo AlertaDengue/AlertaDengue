@@ -98,3 +98,11 @@ rever/
 containers/postgres/dumps/*
 staging_data/
 .runtime/pgbackrest/
+
+# Generated PostgreSQL audit and export artifacts
+*.resolved.sql
+/database_audits/
+/database_exports/
+*.dump
+*.dump.sha256
+*.restore.list

@@ -4,7 +4,7 @@ Issue reference: #1040.
 
 ## Current purpose and audit-first policy
 
-This policy documents an audit-first review of PostgreSQL roles after separating development, staging, and production. It does not authorize a role, ownership, or privilege change. Gather versioned audit evidence in every environment first, assess service usage and deployment references, and make any cleanup proposal in a separate PR with explicit production SQL.
+This policy documents an audit-first review of PostgreSQL roles after separating development, staging, and production. It does not authorize a role, ownership, or privilege change. Development and staging validation are required before production execution. Production execution requires explicit approval, an evidence package, confirmation of the expected database name, and retained logs. Assess service usage and deployment references, and make any cleanup proposal in a separate, approved PR with explicit production SQL; do not run ad hoc production cleanup.
 
 Development-only credentials must not exist in production. Applications should not use `dengueadmin` unless that use is explicitly justified, documented, and evidenced.
 

@@ -2,11 +2,24 @@
 # Read-only repository reference audit for PostgreSQL access-policy candidates.
 set -euo pipefail
 
+if [[ $# -ne 1 ]]; then
+  echo "Usage: $0 <development|staging|production>" >&2
+  exit 64
+fi
+
+environment_label=$1
+if [[ ! $environment_label =~ ^[A-Za-z0-9._-]+$ ]]; then
+  echo "Environment label may contain only letters, numbers, dot, underscore, and hyphen." >&2
+  exit 64
+fi
+
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 repo_root=$(cd -- "$script_dir/../../../.." && pwd)
-output_dir=${REPO_ROLE_AUDIT_OUTPUT_DIR:-"$repo_root/database_audits"}
+audit_root=${POSTGRES_ACCESS_AUDIT_ROOT:-/opt/services/infodengue/database_audits}
+audited_utc=$(date -u +%Y%m%dT%H%M%SZ)
+output_dir="${audit_root}/postgres_access_policy_${environment_label}_${audited_utc}"
 mkdir -p "$output_dir"
-output_file="$output_dir/repo_role_references_$(date -u +%Y%m%dT%H%M%SZ).tsv"
+output_file="$output_dir/repo_role_references.tsv"
 printf 'searched_token\tfile_path\tline_number\tredacted_line\n' > "$output_file"
 
 tokens=(infodenguedev analista mosqlimate_dev dengueadmin)
@@ -20,8 +33,10 @@ for token in "${tokens[@]}"; do
         else
           redacted_line="<environment-like file; matched role: ${token}>"
         fi
+      elif [[ ${line,,} == *password* || ${line,,} == *pass* || ${line,,} == *secret* || ${line,,} == *token* || ${line,,} == *key* || ${line,,} == *dsn* || ${line,,} == *url* ]]; then
+        redacted_line="<REDACTED credential-bearing line; token present>"
       else
-        redacted_line=$(printf '%s' "$line" | sed -E 's/([A-Za-z0-9_]*(PASSWORD|PASS|SECRET|TOKEN|KEY|URL|DSN)[A-Za-z0-9_]*[[:space:]]*[:=])[[:space:]]*[^[:space:],;]*/\1<REDACTED>/Ig')
+        redacted_line=$line
       fi
       redacted_line=${redacted_line//$'\t'/ }
       printf '%s\t%s\t%s\t%s\n' "$token" "${file#"$repo_root"/}" "$line_number" "$redacted_line" >> "$output_file"
