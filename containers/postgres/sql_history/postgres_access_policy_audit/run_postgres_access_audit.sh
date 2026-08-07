@@ -97,15 +97,15 @@ for database in "${databases[@]}"; do
     SELECT n.nspname, c.relname,
            CASE c.relkind WHEN 'r' THEN 'table' WHEN 'p' THEN 'partitioned_table' WHEN 'v' THEN 'view'
                           WHEN 'm' THEN 'materialized_view' WHEN 'S' THEN 'sequence' END,
-           r.rolname, CASE WHEN c.relkind IN ('r', 'p', 'm') THEN pg_total_relation_size(c.oid)::text ELSE '' END
+           r.rolname AS owner_name, CASE WHEN c.relkind IN ('r', 'p', 'm') THEN pg_total_relation_size(c.oid)::text ELSE '' END
     FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace JOIN pg_roles r ON r.oid = c.relowner
     WHERE c.relkind IN ('r', 'p', 'v', 'm', 'S') AND n.nspname NOT IN ('pg_catalog', 'information_schema')
     UNION ALL
-    SELECT n.nspname, p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')', 'function', r.rolname, ''
+    SELECT n.nspname, p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')', 'function', r.rolname AS owner_name, ''
     FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace JOIN pg_roles r ON r.oid = p.proowner
     WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
     UNION ALL
-    SELECT n.nspname, t.typname, 'type', r.rolname, ''
+    SELECT n.nspname, t.typname, 'type', r.rolname AS owner_name, ''
     FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace JOIN pg_roles r ON r.oid = t.typowner
     WHERE n.nspname NOT IN ('pg_catalog', 'information_schema') AND t.typtype IN ('b', 'c', 'd', 'e', 'r')
     ORDER BY 1, 2, 3;"
@@ -113,11 +113,11 @@ for database in "${databases[@]}"; do
   write_header "${prefix}_candidate_owned_objects.tsv" $'schema_name\tobject_name\tobject_type\towner_name\ttotal_bytes'
   run_tsv "$database" "${prefix}_candidate_owned_objects.tsv" "
     SELECT * FROM (
-      SELECT n.nspname, c.relname, CASE c.relkind WHEN 'r' THEN 'table' WHEN 'p' THEN 'partitioned_table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized_view' WHEN 'S' THEN 'sequence' END, r.rolname, CASE WHEN c.relkind IN ('r', 'p', 'm') THEN pg_total_relation_size(c.oid)::text ELSE '' END
+      SELECT n.nspname, c.relname, CASE c.relkind WHEN 'r' THEN 'table' WHEN 'p' THEN 'partitioned_table' WHEN 'v' THEN 'view' WHEN 'm' THEN 'materialized_view' WHEN 'S' THEN 'sequence' END, r.rolname AS owner_name, CASE WHEN c.relkind IN ('r', 'p', 'm') THEN pg_total_relation_size(c.oid)::text ELSE '' END
       FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace JOIN pg_roles r ON r.oid = c.relowner
       WHERE c.relkind IN ('r', 'p', 'v', 'm', 'S') AND n.nspname NOT IN ('pg_catalog', 'information_schema')
-      UNION ALL SELECT n.nspname, p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')', 'function', r.rolname, '' FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace JOIN pg_roles r ON r.oid = p.proowner WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
-      UNION ALL SELECT n.nspname, t.typname, 'type', r.rolname, '' FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace JOIN pg_roles r ON r.oid = t.typowner WHERE n.nspname NOT IN ('pg_catalog', 'information_schema') AND t.typtype IN ('b', 'c', 'd', 'e', 'r')
+      UNION ALL SELECT n.nspname, p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')', 'function', r.rolname AS owner_name, '' FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace JOIN pg_roles r ON r.oid = p.proowner WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
+      UNION ALL SELECT n.nspname, t.typname, 'type', r.rolname AS owner_name, '' FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace JOIN pg_roles r ON r.oid = t.typowner WHERE n.nspname NOT IN ('pg_catalog', 'information_schema') AND t.typtype IN ('b', 'c', 'd', 'e', 'r')
     ) owned WHERE owner_name IN (${candidate_roles_sql}) ORDER BY 1, 2, 3;"
 
   write_header "${prefix}_table_grants.tsv" $'grantee\tgrantor\ttable_schema\ttable_name\tprivilege_type\tis_grantable'
@@ -143,7 +143,7 @@ for database in "${databases[@]}"; do
   run_tsv "$database" "${prefix}_candidate_grants.tsv" "
     SELECT 'table', grantee, grantor, table_schema, table_name, privilege_type, is_grantable FROM information_schema.role_table_grants WHERE grantee IN (${candidate_roles_sql})
     UNION ALL SELECT 'sequence', grantee, grantor, object_schema, object_name, privilege_type, is_grantable FROM information_schema.role_usage_grants WHERE object_type = 'SEQUENCE' AND grantee IN (${candidate_roles_sql})
-    UNION ALL SELECT 'schema', COALESCE(grantee.rolname, 'PUBLIC'), '', n.nspname, '', x.privilege_type, x.is_grantable FROM pg_namespace n CROSS JOIN LATERAL aclexplode(n.nspacl) x LEFT JOIN pg_roles grantee ON grantee.oid = x.grantee WHERE COALESCE(grantee.rolname, 'PUBLIC') IN (${candidate_roles_sql})
+    UNION ALL SELECT 'schema', COALESCE(grantee.rolname, 'PUBLIC'), '', n.nspname, '', x.privilege_type, x.is_grantable::text FROM pg_namespace n CROSS JOIN LATERAL aclexplode(n.nspacl) x LEFT JOIN pg_roles grantee ON grantee.oid = x.grantee WHERE COALESCE(grantee.rolname, 'PUBLIC') IN (${candidate_roles_sql})
     ORDER BY 1, 4, 5, 2, 6;"
 
   write_header "${prefix}_foreign_server_user_mappings.tsv" $'server_name\tuser_name\toptions_redacted'
@@ -157,7 +157,7 @@ for database in "${databases[@]}"; do
   write_header "${prefix}_summary.tsv" $'role_name\trole_exists\tcan_login\tactive_sessions_count\towned_objects_count\texplicit_grants_count\tdefault_privileges_count\tmembership_count\trecommended_status'
   run_tsv "$database" "${prefix}_summary.tsv" "
     WITH candidates(role_name) AS (VALUES ('infodenguedev'), ('analista'), ('mosqlimate_dev'), ('dengueadmin')),
-    owned AS (SELECT r.rolname role_name, count(*) count FROM pg_roles r JOIN (SELECT relowner owner_oid FROM pg_class WHERE relkind IN ('r','p','v','m','S') UNION ALL SELECT proowner FROM pg_proc UNION ALL SELECT typowner FROM pg_type) o ON o.owner_oid = r.oid GROUP BY r.rolname),
+    owned AS (SELECT r.rolname AS owner_name, count(*) count FROM pg_roles r JOIN (SELECT relowner owner_oid FROM pg_class WHERE relkind IN ('r','p','v','m','S') UNION ALL SELECT proowner FROM pg_proc UNION ALL SELECT typowner FROM pg_type) o ON o.owner_oid = r.oid GROUP BY r.rolname),
     grants AS (SELECT grantee role_name, count(*) count FROM (SELECT grantee FROM information_schema.role_table_grants UNION ALL SELECT grantee FROM information_schema.role_usage_grants WHERE object_type = 'SEQUENCE' UNION ALL SELECT COALESCE(r.rolname, 'PUBLIC') FROM pg_namespace n CROSS JOIN LATERAL aclexplode(n.nspacl) x LEFT JOIN pg_roles r ON r.oid = x.grantee) all_grants GROUP BY grantee),
     defaults AS (SELECT grantee.rolname role_name, count(*) count FROM pg_default_acl d CROSS JOIN LATERAL aclexplode(d.defaclacl) x JOIN pg_roles grantee ON grantee.oid = x.grantee GROUP BY grantee.rolname),
     memberships AS (SELECT member.rolname role_name, count(*) count FROM pg_auth_members m JOIN pg_roles member ON member.oid = m.member GROUP BY member.rolname),
@@ -172,7 +172,7 @@ for database in "${databases[@]}"; do
            WHEN c.role_name = 'mosqlimate_dev' AND COALESCE(g.count, 0) > 0 THEN 'PRIVILEGES_REVIEW'
            WHEN c.role_name = 'mosqlimate_dev' AND COALESCE(s.count, 0) = 0 AND COALESCE(o.count, 0) = 0 THEN CASE WHEN lower('${environment_label}') = 'production' THEN 'CANDIDATE_REMOVE' ELSE 'REVIEW' END
            ELSE 'REVIEW' END
-    FROM candidates c LEFT JOIN pg_roles r ON r.rolname = c.role_name LEFT JOIN owned o ON o.role_name = c.role_name LEFT JOIN grants g ON g.role_name = c.role_name LEFT JOIN defaults d ON d.role_name = c.role_name LEFT JOIN memberships m ON m.role_name = c.role_name LEFT JOIN sessions s ON s.role_name = c.role_name ORDER BY c.role_name;"
+    FROM candidates c LEFT JOIN pg_roles r ON r.rolname = c.role_name LEFT JOIN owned o ON o.owner_name = c.role_name LEFT JOIN grants g ON g.role_name = c.role_name LEFT JOIN defaults d ON d.role_name = c.role_name LEFT JOIN memberships m ON m.role_name = c.role_name LEFT JOIN sessions s ON s.role_name = c.role_name ORDER BY c.role_name;"
 done
 
 printf 'Audit complete: %s\n' "$output_dir"
