@@ -40,3 +40,20 @@ Production cleanup is not authorized by this workflow. It requires explicit appr
 ```
 
 Do not perform ad hoc production cleanup or put credentials on the command line. The scripts write evidence under `/opt/services/infodengue/database_audits`; generated evidence must stay out of version control.
+
+## Execution checklist
+
+1. Run the database access audit in development.
+2. Run the repository role-reference audit in development.
+3. Review and retain development evidence.
+4. Run the database access audit in staging.
+5. Run the repository role-reference audit in staging.
+6. Review and retain staging evidence.
+7. Run the role-cleanup preflight in staging.
+8. Review all blockers and deployment references.
+9. Run staging cleanup only after explicit approval.
+10. Validate staging.
+11. Prepare a production plan separately, with retained logs and an evidence review.
+12. Execute production only after explicit approval and with `--confirm-production`.
+
+`mosqlimate_dev` and `dengueadmin` are protected and are never cleanup targets.
