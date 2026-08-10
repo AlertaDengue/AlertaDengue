@@ -11,6 +11,8 @@ This is the only canonical database-history directory for issue #1040. It contai
 
 The protected-role denylist is `postgres`, `dengueadmin`, `mosqlimate_dev`, and the current PostgreSQL connection role. `managed = False` in Django models only controls Django schema management; it neither grants nor revokes PostgreSQL ACLs.
 
+The cleanup workflow reports and validates explicit grants using PostgreSQL catalog ACLs, not mixed `information_schema` queries, so preflight counts match removal and validation checks.
+
 ## Staging-first usage
 
 ```bash
