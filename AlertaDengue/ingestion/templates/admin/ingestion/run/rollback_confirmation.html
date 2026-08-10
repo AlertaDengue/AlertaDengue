@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<p>
+  Roll back run <strong>{{ run.id }}</strong> to the staged data from
+  <strong>{{ restore_run.id }}</strong>. This changes
+  <strong>Municipio.Notificacao</strong>; canonical files, Run records, and
+  SinanStage history are preserved.
+</p>
+<table>
+  <tr><th>New only (delete)</th><td>{{ preview.new_only }}</td></tr>
+  <tr><th>Changed (restore)</th><td>{{ preview.changed }}</td></tr>
+  <tr><th>Old only (untouched)</th><td>{{ preview.old_only }}</td></tr>
+  <tr><th>Unchanged (untouched)</th><td>{{ preview.unchanged }}</td></tr>
+</table>
+<p>
+  Old-only rows are not reinserted and unchanged rows are not modified.
+  Explicit confirmation is required to apply this rollback.
+</p>
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="confirm" value="rollback">
+  <input type="submit" value="Confirm rollback" class="default">
+  <a href="{% url 'admin:ingestion_run_change' run.id %}">Cancel</a>
+</form>
+{% endblock %}
