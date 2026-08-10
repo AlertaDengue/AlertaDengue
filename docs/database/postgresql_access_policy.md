@@ -17,6 +17,8 @@ Candidate roles and expected outcomes:
 
 `managed = False` in Django models does not grant or revoke PostgreSQL privileges; PostgreSQL ACLs remain controlled by the database.
 
+Both the access audit and guarded cleanup workflow use PostgreSQL catalog ACLs as the canonical grant model. Generated TSV counts are environment evidence; do not treat a prior `information_schema` count as an expected grant total. Catalog ACLs can include relation privileges on views and materialized views that `information_schema` does not expose the same way.
+
 ## Access matrix template
 
 | environment | service/process | database | role | login_allowed | privilege_level | owner | status | evidence | decision |
