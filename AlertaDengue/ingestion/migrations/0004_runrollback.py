@@ -9,6 +9,19 @@ class Migration(migrations.Migration):
     dependencies = [("ingestion", "0003_run_rows_duplicate")]
 
     operations = [
+        migrations.AddIndex(
+            model_name="sinanstage",
+            index=models.Index(
+                fields=[
+                    "run",
+                    "nu_notific",
+                    "dt_notific",
+                    "cid10_codigo",
+                    "municipio_geocodigo",
+                ],
+                name="ix_ing_stage_rollback_keys",
+            ),
+        ),
         migrations.CreateModel(
             name="RunRollback",
             fields=[

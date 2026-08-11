@@ -100,6 +100,30 @@ def _stage(
     )
 
 
+def _stage_many(
+    run: Run,
+    notifications: range,
+    changed_notifications: set[int] | None = None,
+) -> None:
+    """Create a deterministic retained-stage snapshot in one database query."""
+    changed_notifications = changed_notifications or set()
+    SinanStage.objects.bulk_create(
+        [
+            SinanStage(
+                run=run,
+                chunk_id=0,
+                source_rownum=notification,
+                nu_notific=notification,
+                dt_notific="2025-01-01",
+                cid10_codigo="A90",
+                municipio_geocodigo=3304557,
+                cs_sexo="F" if notification in changed_notifications else "M",
+            )
+            for notification in notifications
+        ]
+    )
+
+
 def _insert_final(
     db_engine: Engine,
     notification: int,
@@ -194,6 +218,9 @@ def test_preview_and_execute_target_only_classified_rows(
         1,
         1,
     )
+    common = preview.changed + preview.unchanged
+    assert preview.new_only + common == 3
+    assert preview.old_only + common == 3
     result = execute_rollback(current, restore)
 
     assert (result.deleted, result.restored) == (1, 1)
@@ -211,6 +238,26 @@ def test_preview_and_execute_target_only_classified_rows(
     audit = RunRollback.objects.get(pk=result.rollback_id)
     assert audit.status == RollbackStatus.COMPLETED
     assert (audit.rows_deleted, audit.rows_restored) == (1, 1)
+
+
+@pytest.mark.django_db(transaction=True)
+def test_preview_classifies_large_retained_stage_snapshots() -> None:
+    restore, current = _ordered_runs()
+    _stage_many(restore, range(1, 1201))
+    _stage_many(current, range(1, 1151), set(range(1, 101)))
+    _stage_many(current, range(1201, 1276))
+
+    preview = preview_rollback(current, restore)
+
+    assert (
+        preview.new_only,
+        preview.old_only,
+        preview.changed,
+        preview.unchanged,
+    ) == (75, 50, 100, 1050)
+    common = preview.changed + preview.unchanged
+    assert preview.new_only + common == 1225
+    assert preview.old_only + common == 1200
 
 
 @pytest.mark.django_db(transaction=True)

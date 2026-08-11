@@ -123,6 +123,9 @@ current run and restores changed rows from the selected previous run. Rows
 that are old-only or unchanged are not touched. It does not replace an entire
 disease dataset.
 
+The preview uses indexed natural-key lookups between retained stage snapshots,
+so it can be used before confirmation to validate the proposed delta.
+
 Every attempt is recorded in `ingestion.run_rollback`, including the preview
 counts, rows deleted/restored, status, metadata, and any error. A successfully
 rolled-back run cannot be rolled back again.

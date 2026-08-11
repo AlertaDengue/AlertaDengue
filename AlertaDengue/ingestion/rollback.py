@@ -69,71 +69,95 @@ def find_previous_completed_run(run: Run) -> Run:
     return previous
 
 
-def _classification_sql() -> str:
-    values = ", ".join(f"c.{column}" for column in SINAN_DEST_COLUMNS)
-    restored_values = ", ".join(f"r.{column}" for column in SINAN_DEST_COLUMNS)
-    return f"""
-        WITH current_rows AS (
-            SELECT * FROM {STAGE_TABLE} WHERE run_id = %s
-        ),
-        restore_rows AS (
-            SELECT * FROM {STAGE_TABLE} WHERE run_id = %s
-        ),
-        compared AS (
-            SELECT
-                c.id AS current_id,
-                r.id AS restore_id,
-                ({values}) IS DISTINCT FROM ({restored_values}) AS changed
-            FROM current_rows c
-            LEFT JOIN restore_rows r
-              ON c.nu_notific IS NOT DISTINCT FROM r.nu_notific
-             AND c.dt_notific IS NOT DISTINCT FROM r.dt_notific
-             AND c.cid10_codigo IS NOT DISTINCT FROM r.cid10_codigo
-             AND c.municipio_geocodigo IS NOT DISTINCT FROM r.municipio_geocodigo
-            UNION ALL
-            SELECT
-                NULL AS current_id,
-                r.id AS restore_id,
-                FALSE AS changed
-            FROM restore_rows r
-            LEFT JOIN current_rows c
-              ON c.nu_notific IS NOT DISTINCT FROM r.nu_notific
-             AND c.dt_notific IS NOT DISTINCT FROM r.dt_notific
-             AND c.cid10_codigo IS NOT DISTINCT FROM r.cid10_codigo
-             AND c.municipio_geocodigo IS NOT DISTINCT FROM r.municipio_geocodigo
-            WHERE c.id IS NULL
+def _natural_key_match(left: str, right: str) -> str:
+    """Build equality predicates for validated non-null SINAN keys."""
+    return " AND ".join(
+        f'{left}."{key}" = {right}."{key}"' for key in NATURAL_KEY
+    )
+
+
+def _destination_values(alias: str) -> str:
+    """Return the row-value expression for canonical SINAN columns."""
+    return ", ".join(f'{alias}."{column}"' for column in SINAN_DEST_COLUMNS)
+
+
+def _count_new_only(current_run: Run, restore_run: Run) -> int:
+    """Count current-stage keys that are absent from the restore stage."""
+    with connection.cursor() as cursor:
+        cursor.execute(
+            f"""
+            SELECT COUNT(*)
+            FROM {STAGE_TABLE} c
+            WHERE c.run_id = %s
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM {STAGE_TABLE} r
+                  WHERE r.run_id = %s
+                    AND {_natural_key_match("c", "r")}
+              )
+            """,
+            [str(current_run.pk), str(restore_run.pk)],
         )
-        SELECT
-            COUNT(*) FILTER (WHERE restore_id IS NULL),
-            COUNT(*) FILTER (WHERE current_id IS NULL),
-            COUNT(*) FILTER (
-                WHERE current_id IS NOT NULL
-                  AND restore_id IS NOT NULL
-                  AND changed
-            ),
-            COUNT(*) FILTER (
-                WHERE current_id IS NOT NULL
-                  AND restore_id IS NOT NULL
-                  AND NOT changed
-            )
-        FROM compared
-    """
+        count = cursor.fetchone()[0]
+    return int(count or 0)
+
+
+def _count_old_only(current_run: Run, restore_run: Run) -> int:
+    """Count restore-stage keys that are absent from the current stage."""
+    with connection.cursor() as cursor:
+        cursor.execute(
+            f"""
+            SELECT COUNT(*)
+            FROM {STAGE_TABLE} r
+            WHERE r.run_id = %s
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM {STAGE_TABLE} c
+                  WHERE c.run_id = %s
+                    AND {_natural_key_match("r", "c")}
+              )
+            """,
+            [str(restore_run.pk), str(current_run.pk)],
+        )
+        count = cursor.fetchone()[0]
+    return int(count or 0)
+
+
+def _count_common_and_changed(
+    current_run: Run, restore_run: Run
+) -> tuple[int, int]:
+    """Count common keys and destination-value differences between stages."""
+    with connection.cursor() as cursor:
+        cursor.execute(
+            f"""
+            SELECT
+                COUNT(*),
+                COUNT(*) FILTER (
+                    WHERE ({_destination_values("c")}) IS DISTINCT FROM
+                          ({_destination_values("r")})
+                )
+            FROM {STAGE_TABLE} c
+            JOIN {STAGE_TABLE} r ON {_natural_key_match("c", "r")}
+            WHERE c.run_id = %s
+              AND r.run_id = %s
+            """,
+            [str(current_run.pk), str(restore_run.pk)],
+        )
+        common, changed = cursor.fetchone()
+    return int(common or 0), int(changed or 0)
 
 
 def _preview(current_run: Run, restore_run: Run) -> RollbackPreview:
-    with connection.cursor() as cursor:
-        cursor.execute(
-            _classification_sql(),
-            [str(current_run.pk), str(restore_run.pk)],
-        )
-        new_only, old_only, changed, unchanged = cursor.fetchone()
+    new_only = _count_new_only(current_run, restore_run)
+    old_only = _count_old_only(current_run, restore_run)
+    common, changed = _count_common_and_changed(current_run, restore_run)
     return RollbackPreview(
         current_run_id=str(current_run.pk),
         restore_run_id=str(restore_run.pk),
-        new_only=int(new_only or 0),
-        old_only=int(old_only or 0),
-        changed=int(changed or 0),
-        unchanged=int(unchanged or 0),
+        new_only=new_only,
+        old_only=old_only,
+        changed=changed,
+        unchanged=common - changed,
     )
 
 
@@ -197,19 +221,13 @@ def preview_rollback(current_run: Run, restore_run: Run) -> RollbackPreview:
 
 
 def _execute_changes(current_run: Run, restore_run: Run) -> tuple[int, int]:
-    key_match = " AND ".join(
-        f'n."{key}" IS NOT DISTINCT FROM c."{key}"' for key in NATURAL_KEY
-    )
-    stage_match = " AND ".join(
-        f'c."{key}" IS NOT DISTINCT FROM r."{key}"' for key in NATURAL_KEY
-    )
+    key_match = _natural_key_match("n", "c")
+    stage_match = _natural_key_match("c", "r")
     update_columns = [column for column in SINAN_DEST_COLUMNS]
     assignments = ", ".join(
         f'"{column}" = r."{column}"' for column in update_columns
     )
-    current_values = ", ".join(
-        f'c."{column}"' for column in SINAN_DEST_COLUMNS
-    )
+    current_values = _destination_values("c")
     final_differs = " OR ".join(
         f'n."{column}"::text IS DISTINCT FROM c."{column}"::text'
         for column in SINAN_DEST_COLUMNS
@@ -232,9 +250,8 @@ def _execute_changes(current_run: Run, restore_run: Run) -> tuple[int, int]:
         JOIN {STAGE_TABLE} r ON {stage_match} AND r.run_id = %s
         WHERE c.run_id = %s
           AND {key_match}
-          AND ({", ".join(f'c."{col}"' for col in SINAN_DEST_COLUMNS)})
-              IS DISTINCT FROM
-              ({", ".join(f'r."{col}"' for col in SINAN_DEST_COLUMNS)})
+          AND ({current_values}) IS DISTINCT FROM
+              ({_destination_values("r")})
         RETURNING n.nu_notific
     """
     lock_sql = f"""
@@ -254,7 +271,7 @@ def _execute_changes(current_run: Run, restore_run: Run) -> tuple[int, int]:
           AND (
               r.id IS NULL
               OR ({current_values}) IS DISTINCT FROM
-                 ({", ".join(f'r."{column}"' for column in SINAN_DEST_COLUMNS)})
+                 ({_destination_values("r")})
           )
           AND (
               n.nu_notific IS NULL

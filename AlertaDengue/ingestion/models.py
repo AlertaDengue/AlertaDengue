@@ -192,6 +192,16 @@ class SinanStage(models.Model):
                 ],
                 name="ix_ing_sinan_stage_keys",
             ),
+            models.Index(
+                fields=[
+                    "run",
+                    "nu_notific",
+                    "dt_notific",
+                    "cid10_codigo",
+                    "municipio_geocodigo",
+                ],
+                name="ix_ing_stage_rollback_keys",
+            ),
         ]
 
 
