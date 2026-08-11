@@ -45,6 +45,18 @@ The canonical imported root is:
 
 Once a file reaches this location, this path becomes the file-level source of truth for ingestion and recovery.
 
+## Rollback retention
+
+Database rollback never removes canonical imported files or versioned
+canonical files. It also preserves ingestion `Run` records and
+`SinanStage` history. Canonical storage remains the file-level source of
+truth and an audit trail even if selected `Municipio.Notificacao` rows are
+restored or deleted.
+
+Rollback currently requires retained stage history for both the current and
+restore runs. If either run's `SinanStage` rows have been removed, rollback
+cannot be previewed or executed.
+
 ## Canonical path format
 
 ```text

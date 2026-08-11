@@ -133,6 +133,24 @@ Celery reads the canonical file and loads records into the staging layer.
 
 After staging, records are merged into the final database tables using database-safe insert/update logic.
 
+## Operational rollback
+
+Rollback is an operational recovery mechanism for a completed ingestion that
+was successfully merged but is known to be incorrect. It is not part of the
+normal ingestion path and does not rerun Celery processing.
+
+```text
+completed run
+  -> compare retained stage rows with the previous completed matching run
+  -> preview new/changed/old/unchanged delta
+  -> explicitly confirmed transactional restore
+```
+
+It deletes only rows new to the current run and restores only changed rows
+from the previous run. It does not replace a disease dataset, reinsert
+old-only rows, or modify unchanged rows. Canonical files, `Run` records, and
+`SinanStage` history remain intact.
+
 ## Successful ingestion
 
 Makim should finish with:

@@ -19,6 +19,12 @@ class RunStatus(models.TextChoices):
     FAILED = "failed", "Failed"
 
 
+class RollbackStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    COMPLETED = "completed", "Completed"
+    FAILED = "failed", "Failed"
+
+
 class SourceFormat(models.TextChoices):
     DBF = "dbf", "DBF"
     CSV = "csv", "CSV"
@@ -185,5 +191,62 @@ class SinanStage(models.Model):
                     "municipio_geocodigo",
                 ],
                 name="ix_ing_sinan_stage_keys",
+            ),
+            models.Index(
+                fields=[
+                    "run",
+                    "nu_notific",
+                    "dt_notific",
+                    "cid10_codigo",
+                    "municipio_geocodigo",
+                ],
+                name="ix_ing_stage_rollback_keys",
+            ),
+        ]
+
+
+class RunRollback(models.Model):
+    """Audit record for a targeted SINAN ingestion rollback."""
+
+    current_run = models.ForeignKey(
+        Run,
+        on_delete=models.PROTECT,
+        related_name="rollbacks_started",
+    )
+    restore_run = models.ForeignKey(
+        Run,
+        on_delete=models.PROTECT,
+        related_name="rollbacks_restored",
+    )
+    status = models.CharField(
+        max_length=16,
+        choices=RollbackStatus.choices,
+        default=RollbackStatus.PENDING,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    finished_at = models.DateTimeField(null=True, blank=True)
+    rows_new_only = models.BigIntegerField(default=0)
+    rows_old_only = models.BigIntegerField(default=0)
+    rows_changed = models.BigIntegerField(default=0)
+    rows_unchanged = models.BigIntegerField(default=0)
+    rows_deleted = models.BigIntegerField(default=0)
+    rows_restored = models.BigIntegerField(default=0)
+    metadata = models.JSONField(default=dict)
+    errors = models.JSONField(default=list)
+
+    class Meta:
+        db_table = '"ingestion"."run_rollback"'
+        constraints = [
+            models.UniqueConstraint(
+                fields=["current_run"],
+                condition=models.Q(status=RollbackStatus.COMPLETED),
+                name="ux_ing_rollback_completed_run",
+            ),
+        ]
+        indexes = [
+            models.Index(
+                fields=["current_run", "status"],
+                name="ix_ing_rollback_current_status",
             ),
         ]

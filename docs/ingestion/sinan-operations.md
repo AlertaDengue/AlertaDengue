@@ -102,6 +102,44 @@ makim ingestion.run \
   --requeue
 ```
 
+## Targeted run rollback
+
+A completed SINAN run can be rolled back from its Django admin detail page.
+The workflow first presents a preview against the immediately previous
+completed run with the same UF and disease. It requires an explicit
+confirmation before making changes.
+
+Only the latest completed run for a UF and disease can be rolled back. A
+newer failed or staged run does not prevent it. Rollback also requires all
+four natural-key values to be non-null in both stage histories. The production
+`casos_unicos` constraint is a standard PostgreSQL `UNIQUE` constraint, whose
+NULL values are distinct; rejecting nullable keys avoids treating separately
+merged records as a single rollback target.
+
+Rollback compares retained `ingestion.sinan_stage` rows using the SINAN
+natural key: `nu_notific`, `dt_notific`, `cid10_codigo`, and
+`municipio_geocodigo`. It deletes final-table rows that exist only in the
+current run and restores changed rows from the selected previous run. Rows
+that are old-only or unchanged are not touched. It does not replace an entire
+disease dataset.
+
+The preview uses indexed natural-key lookups between retained stage snapshots,
+so it can be used before confirmation to validate the proposed delta.
+
+Every attempt is recorded in `ingestion.run_rollback`, including the preview
+counts, rows deleted/restored, status, metadata, and any error. A successfully
+rolled-back run cannot be rolled back again.
+
+Rollback never deletes canonical files, `Run` records, or `SinanStage`
+history, and it never queues ingestion. It depends on stage history for both
+runs; an operation cannot be previewed or executed when that history has been
+removed.
+
+After a successful rollback, inspect the `RunRollback` audit record and the
+affected `Municipio.Notificacao` rows. If the final table no longer matches
+the current run's retained stage values, rollback aborts instead of replacing
+data that may have been changed by a later operation.
+
 ## Recovery flags
 
 `--include-existing` allows the ingestion command to reuse files that were already moved to canonical storage.
