@@ -45,7 +45,7 @@ The canonical imported root is:
 
 Once a file reaches this location, this path becomes the file-level source of truth for ingestion and recovery.
 
-## Rollback retention
+## Rollback and stage retention
 
 Database rollback never removes canonical imported files or versioned
 canonical files. It also preserves ingestion `Run` records and
@@ -53,9 +53,16 @@ canonical files. It also preserves ingestion `Run` records and
 truth and an audit trail even if selected `Municipio.Notificacao` rows are
 restored or deleted.
 
-Rollback currently requires retained stage history for both the current and
-restore runs. If either run's `SinanStage` rows have been removed, rollback
-cannot be previewed or executed.
+`SinanStage` history is temporary rollback/recovery storage, not permanent
+history. The daily stage-retention command preserves the last 30 days, the
+latest four distinct delivery epiweeks per UF/disease, and every run
+referenced by a `RunRollback` record. It removes only eligible stage rows.
+
+Run records and canonical imported files remain available after cleanup. A
+rollback becomes unavailable if its unprotected stage history was
+intentionally cleaned; rollback-referenced runs are never cleaned by this
+policy. Rollback requires retained stage history for both the current and
+restore runs.
 
 ## Canonical path format
 
