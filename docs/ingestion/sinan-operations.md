@@ -140,6 +140,29 @@ affected `Municipio.Notificacao` rows. If the final table no longer matches
 the current run's retained stage values, rollback aborts instead of replacing
 data that may have been changed by a later operation.
 
+## Stage retention cleanup
+
+`ingestion.sinan_stage` is temporary rollback/recovery storage. Run the
+cleanup daily during a low-activity period, starting with a dry run:
+
+```bash
+python AlertaDengue/manage.py cleanup_ingestion_stage --dry-run
+```
+
+Review the protected and candidate runs, then execute the same command:
+
+```bash
+python AlertaDengue/manage.py cleanup_ingestion_stage
+```
+
+The command keeps completed runs created during the last 30 days and all runs
+in the latest four distinct delivery epiweeks for each UF/disease pair. It
+also never removes stage rows for a run referenced by `RunRollback`, whether
+the rollback succeeded or failed. Only old completed runs outside all of
+those protections are eligible. The command is idempotent and deletes only
+their `SinanStage` rows; it preserves run records, rollback audit records,
+canonical files, and final notifications.
+
 ## Recovery flags
 
 `--include-existing` allows the ingestion command to reuse files that were already moved to canonical storage.
