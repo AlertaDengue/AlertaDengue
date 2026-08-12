@@ -59,3 +59,9 @@ Do not perform ad hoc production cleanup or put credentials on the command line.
 12. Execute production only after explicit approval and with `--confirm-production`.
 
 `mosqlimate_dev` and `dengueadmin` are protected and are never cleanup targets.
+
+## Default privileges
+
+Default privileges granted to a selected role are revocable cleanup targets. During a guarded removal, the workflow revokes those grants before revoking explicit grants and dropping the selected role, so obsolete access is not recreated for future objects.
+
+Default privileges defined by a selected role are blockers. The workflow does not remove that role automatically, because its default-privilege policy must be reviewed and transferred or removed separately. `dengueadmin` and `mosqlimate_dev` remain protected even when one appears in default-privilege evidence.
