@@ -6,12 +6,24 @@ This is the only canonical database-history directory for issue #1040. It contai
 | --- | --- | --- |
 | `mosqlimate_dev` | KEEP / protected | Least-privilege development access for Mosqlimate/Ana Juamaro. It is never revoked or dropped here. |
 | `dengueadmin` | KEEP / protected | Current admin/application use needs review; it is never revoked or dropped here. |
-| `analista` | Candidate for removal | Only after no sessions, ownership, memberships, default privileges, required grants, or deployment references remain. |
-| `infodenguedev` | Development-only candidate | Apply the same checks before removing it outside development; document and review before any development removal. |
+| `analista` | REMOVED from production | Production cleanup completed and validation confirmed the role is absent. |
+| `infodenguedev` | REMOVED from production | Production cleanup completed and validation confirmed the role is absent. |
 
 The protected-role denylist is `postgres`, `dengueadmin`, `mosqlimate_dev`, and the current PostgreSQL connection role. `managed = False` in Django models only controls Django schema management; it neither grants nor revokes PostgreSQL ACLs.
 
 The audit and cleanup workflows both use PostgreSQL catalog ACLs, not mixed `information_schema` queries. Catalog ACLs may report more grants than `information_schema`, including relation ACLs on views and materialized views that are not exposed the same way. Treat generated TSV counts as environment evidence rather than hardcoded expectations.
+
+## Production cleanup record
+
+Production cleanup for `analista` and `infodenguedev` was completed and validated on 2026-08-13. Preflight found no active sessions, memberships, ownership, database ownership, or blocking default privileges; selected-role explicit grants and revocable default privileges were removed; and `DROP ROLE` completed. Post-cleanup validation and audit confirmed both roles are absent, while production services remained healthy and no active sessions remained for either role.
+
+Retained evidence outside version control:
+
+- Pre-removal: `/opt/services/infodengue/database_audits/postgres_access_policy_production_pre_removal_20260813T100741Z.tar.gz` (SHA-256 `a1ea13f4e899035bcfa73494a3af491f25e387dbf4b6b3b4e971a77bfc6639c8`).
+- Final: `/opt/services/infodengue/database_audits/postgres_role_cleanup_production_final_20260813T100901Z.tar.gz` (SHA-256 `709db1a54a67f274e1398433a2b7f56a39010bf60a2257f2baae86862eaaa2eb`).
+- Post-cleanup audit: `/opt/services/infodengue/database_audits/postgres_access_policy_production_20260813T101032Z`.
+
+`mosqlimate_dev` remains the protected least-privilege Mosqlimate role. `dengueadmin` remains protected and requires a separate admin-usage review.
 
 ## Staging-first usage
 

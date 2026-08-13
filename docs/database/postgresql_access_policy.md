@@ -4,16 +4,21 @@ Issue reference: #1040.
 
 ## Current purpose and audit-first policy
 
-This policy documents an audit-first review of PostgreSQL roles after separating development, staging, and production. It does not authorize a role, ownership, or privilege change. Development and staging validation are required before production execution. Production execution requires explicit approval, an evidence package, confirmation of the expected database name, and retained logs. Assess service usage and deployment references, and make any cleanup proposal in a separate, approved PR with explicit production SQL; do not run ad hoc production cleanup.
+This policy documents the audit-first review and completed production cleanup of obsolete PostgreSQL roles after separating development, staging, and production. Future role, ownership, or privilege changes still require explicit approval, an evidence package, confirmation of the expected database name, and retained logs.
 
 The canonical scripts live in `containers/postgres/sql_history/postgres_access_policy/`. Development-only credentials must not exist in production. Applications should not use `dengueadmin` unless that use is explicitly justified, documented, and evidenced.
 
-Candidate roles and expected outcomes:
+Role outcomes:
 
-- `infodenguedev`: a development-only candidate. Outside development, consider removal only after it has no sessions, ownership, grants, defaults, memberships, or deployment references; document and review any development removal.
-- `analista`: a candidate for removal only when it has no sessions, ownership, grants, defaults, memberships, or deployment references.
-- `mosqlimate_dev`: keep and protect. It provides least-privilege development access for Mosqlimate/Ana Juamaro and is not a cleanup target.
-- `dengueadmin`: keep and protect. Review current admin/application usage, but do not revoke or drop it in this workflow.
+- `infodenguedev` and `analista`: production cleanup completed on 2026-08-13. Both roles are absent after production validation.
+- `mosqlimate_dev`: keep and protect as the least-privilege Mosqlimate role. It is not a cleanup target.
+- `dengueadmin`: keep and protect. It still requires a separate review of current admin/application usage; do not revoke or drop it in this workflow.
+
+Production cleanup evidence was retained outside version control:
+
+- Pre-removal evidence: `/opt/services/infodengue/database_audits/postgres_access_policy_production_pre_removal_20260813T100741Z.tar.gz` (SHA-256 `a1ea13f4e899035bcfa73494a3af491f25e387dbf4b6b3b4e971a77bfc6639c8`).
+- Final evidence: `/opt/services/infodengue/database_audits/postgres_role_cleanup_production_final_20260813T100901Z.tar.gz` (SHA-256 `709db1a54a67f274e1398433a2b7f56a39010bf60a2257f2baae86862eaaa2eb`).
+- Post-cleanup audit: `/opt/services/infodengue/database_audits/postgres_access_policy_production_20260813T101032Z`.
 
 `managed = False` in Django models does not grant or revoke PostgreSQL privileges; PostgreSQL ACLs remain controlled by the database.
 
