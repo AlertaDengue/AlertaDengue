@@ -18,8 +18,8 @@ legacy public endpoints remain unchanged until then.
 Restricted endpoints for analysts, tools, and controlled external integrations
 live under `/api/internal/`. They use the existing token/group API permission.
 Internal services and views may live under `api.internal.*`; public REST
-endpoints should not. Internal API routes are not versioned now because their
-clients are controlled and restricted.
+endpoints should not live under `api.internal.*`. Internal API routes are not
+versioned now because their clients are controlled and restricted.
 
 ## Naming
 
