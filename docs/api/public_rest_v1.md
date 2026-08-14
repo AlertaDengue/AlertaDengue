@@ -12,3 +12,9 @@ read-only access. Reusable response helpers return either
 Legacy public endpoints remain in place for compatibility. Future migrations
 to public v1 will move one endpoint at a time, preserving explicit contracts
 and normalized English `snake_case` response fields.
+
+Current v1 routes add `/alert-city/`, `/epi-year-week/`, and
+`/notifications/reduced.csv`. The JSON endpoints use the response helpers;
+the reduced-notification endpoint intentionally remains CSV. Their legacy
+`/api/` routes remain available, while `/api/internal/` stays separate and
+restricted.
