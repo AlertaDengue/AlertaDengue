@@ -16,5 +16,6 @@ urlpatterns = [
         EpiYearWeekView.as_view(),
         name="epi_year_week",
     ),
+    path("v1/", include("api.v1.urls")),
     path("internal/", include("api.internal.urls")),
 ]
