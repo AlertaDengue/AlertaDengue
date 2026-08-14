@@ -19,3 +19,9 @@ class HasNotificationAPIAccess(BasePermission):
             return True
 
         return user.groups.filter(name=NOTIFICATION_API_GROUP_NAME).exists()
+
+
+class HasInternalAPIAccess(HasNotificationAPIAccess):
+    """Backward-compatible token/group access for internal API endpoints."""
+
+    message = "User does not have access to the internal API."

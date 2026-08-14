@@ -1,4 +1,5 @@
 from datetime import date
+from unittest.mock import MagicMock
 
 from django.db.models import QuerySet
 from django.urls import reverse
@@ -13,6 +14,18 @@ from dados.models import LegacyHistoricalAlertDengue
 def api_client():
     """Return the current REST API test client."""
     return APIClient()
+
+
+@pytest.fixture()
+def internal_api_client(api_client):
+    """Return a client allowed by the existing internal group permission."""
+    user = MagicMock()
+    user.is_authenticated = True
+    user.is_active = True
+    user.is_superuser = False
+    user.groups.filter.return_value.exists.return_value = True
+    api_client.force_authenticate(user=user)
+    return api_client
 
 
 @pytest.fixture()
@@ -48,13 +61,13 @@ def bounded_queryset(monkeypatch, historical_alert_record):
     ],
 )
 def test_historical_alert_endpoint_returns_normalized_records(
-    api_client,
+    internal_api_client,
     bounded_queryset,
     disease,
     expected_disease,
 ):
-    response = api_client.get(
-        reverse("api:historical_alerts"),
+    response = internal_api_client.get(
+        reverse("api:internal:historical_alerts"),
         {"disease": disease},
     )
 
@@ -70,7 +83,7 @@ def test_historical_alert_endpoint_returns_normalized_records(
 
 
 def test_historical_alert_endpoint_passes_typed_inputs_to_real_service(
-    api_client,
+    internal_api_client,
     bounded_queryset,
     monkeypatch,
 ):
@@ -86,8 +99,8 @@ def test_historical_alert_endpoint_passes_typed_inputs_to_real_service(
         views, "get_historical_alert_queryset", spy_get_queryset
     )
 
-    response = api_client.get(
-        reverse("api:historical_alerts"),
+    response = internal_api_client.get(
+        reverse("api:internal:historical_alerts"),
         {
             "disease": "dengue",
             "municipality_geocode": "3304557",
@@ -139,19 +152,23 @@ def test_historical_alert_endpoint_passes_typed_inputs_to_real_service(
         {"disease": "dengue", "offset": "-1"},
     ],
 )
-def test_historical_alert_endpoint_rejects_invalid_input(api_client, params):
-    response = api_client.get(reverse("api:historical_alerts"), params)
+def test_historical_alert_endpoint_rejects_invalid_input(
+    internal_api_client, params
+):
+    response = internal_api_client.get(
+        reverse("api:internal:historical_alerts"), params
+    )
 
     assert response.status_code == 400
     assert "detail" in response.json()
 
 
 def test_historical_alert_endpoint_never_exposes_legacy_keys(
-    api_client,
+    internal_api_client,
     bounded_queryset,
 ):
-    response = api_client.get(
-        reverse("api:historical_alerts"),
+    response = internal_api_client.get(
+        reverse("api:internal:historical_alerts"),
         {"disease": "dengue"},
     )
 
@@ -166,3 +183,12 @@ def test_historical_alert_endpoint_never_exposes_legacy_keys(
         "p_inc100k",
     ):
         assert legacy_key not in result
+
+
+def test_historical_alert_endpoint_requires_internal_token(api_client):
+    response = api_client.get(
+        reverse("api:internal:historical_alerts"),
+        {"disease": "dengue"},
+    )
+
+    assert response.status_code in {401, 403}

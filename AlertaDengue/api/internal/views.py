@@ -3,7 +3,6 @@ from typing import Any
 
 from django.db import DatabaseError
 from pydantic import ValidationError
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -13,7 +12,10 @@ from api.internal.historical_alerts import (
     get_historical_alert_response_fields,
     serialize_historical_alert,
 )
-from api.internal.permissions import HasNotificationAPIAccess
+from api.internal.permissions import (
+    HasInternalAPIAccess,
+    HasNotificationAPIAccess,
+)
 from api.internal.services import list_notifications
 
 
@@ -37,7 +39,7 @@ class NotificationListView(APIView):
 class HistoricalAlertListView(APIView):
     """Return bounded, normalized historical-alert records."""
 
-    permission_classes = [AllowAny]
+    permission_classes = [HasInternalAPIAccess]
     _INTEGER_PARAMS = (
         "municipality_geocode",
         "epidemiological_week",
