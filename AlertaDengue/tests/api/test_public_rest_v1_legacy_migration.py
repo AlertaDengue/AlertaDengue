@@ -46,6 +46,35 @@ def test_v1_alert_city_uses_real_alert_city_service(monkeypatch):
     search.assert_called_once()
 
 
+def test_v1_alert_city_normalizes_non_json_pandas_values(monkeypatch):
+    monkeypatch.setattr(
+        views.AlertCity,
+        "search",
+        MagicMock(
+            return_value=pd.DataFrame(
+                [
+                    {
+                        "SE": 202601,
+                        "data_iniSE": pd.Timestamp("2026-01-04"),
+                        "casos": float("nan"),
+                        "nivel": pd.NaT,
+                    }
+                ]
+            )
+        ),
+    )
+
+    response = APIClient().get(
+        reverse("api:v1:alert_city"),
+        {"disease": "dengue", "geocode": "3304557"},
+    )
+
+    record = response.json()["data"][0]
+    assert record["epidemiological_week_start_date"] == "2026-01-04T00:00:00"
+    assert record["cases"] is None
+    assert record["alert_level"] is None
+
+
 def test_v1_epi_year_week_returns_normalized_response():
     response = APIClient().get(
         reverse("api:v1:epi_year_week"), {"epidate": "2026-01-04"}

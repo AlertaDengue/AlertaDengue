@@ -1,7 +1,9 @@
 """Views for the public REST API v1 surface."""
 
 from datetime import datetime
+from typing import Any
 
+import pandas as pd
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,6 +12,26 @@ from api.db import AlertCity
 from api.v1.responses import build_error_response, build_success_response
 from api.views import NotificationReducedCSV_View
 from dados.episem import episem
+
+
+def normalize_alert_city_records(
+    records: pd.DataFrame,
+) -> list[dict[str, Any]]:
+    """Convert DataFrame values to JSON-safe normalized API records."""
+    normalized_records = []
+    for record in records.to_dict("records"):
+        normalized_record: dict[str, Any] = {}
+        for field, value in record.items():
+            if value is None or pd.isna(value):
+                normalized_record[field] = None
+            elif isinstance(value, (datetime, pd.Timestamp)):
+                normalized_record[field] = value.isoformat()
+            elif hasattr(value, "item"):
+                normalized_record[field] = value.item()
+            else:
+                normalized_record[field] = value
+        normalized_records.append(normalized_record)
+    return normalized_records
 
 
 class PublicAPIRootView(APIView):
@@ -60,7 +82,9 @@ class PublicAlertCityView(APIView):
                 status=400,
             )
 
-        return Response(build_success_response(records.to_dict("records")))
+        return Response(
+            build_success_response(normalize_alert_city_records(records))
+        )
 
 
 class PublicEpiYearWeekView(APIView):
