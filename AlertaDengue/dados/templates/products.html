@@ -36,6 +36,10 @@
                   <span>{% trans "Ferramentas" %}</span>
                   <span class="products-nav-link__arrow" aria-hidden="true">→</span>
                 </a>
+                <a class="products-nav-link" href="#ecossistema">
+                  <span>{% trans "Ecossistema" %}</span>
+                  <span class="products-nav-link__arrow" aria-hidden="true">→</span>
+                </a>
                 <a class="products-nav-link" href="#relatorios">
                   <span>{% trans "Relatórios técnicos" %}</span>
                   <span class="products-nav-link__arrow" aria-hidden="true">→</span>
@@ -94,6 +98,72 @@
                 <strong>{% translate "Canal do YouTube" %}</strong>
                 <span class="small mt-1">{% trans "Vídeos sobre modelos, dados e vigilância em saúde." %}</span>
               </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="ecossistema" class="mb-4">
+      <div class="card products-section-card">
+        <div class="card-header home-section-header d-flex align-items-center">
+          <h2 class="h4 mb-0 products-section-title">{% translate "Ecossistema e plataformas relacionadas" %}</h2>
+        </div>
+        <div class="card-body">
+          <p class="mb-4">
+            {% blocktrans trimmed %}
+              Conheça plataformas relacionadas ao ecossistema de pesquisa e vigilância de arboviroses, com recursos para dados, modelagem, previsão e inteligência epidemiológica.
+            {% endblocktrans %}
+          </p>
+          <div class="row">
+            <div class="col-md-6 d-flex mb-3 mb-md-0">
+              <article class="btn btn-menu-card products-ecosystem-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-2">
+                <div class="products-ecosystem-logo">
+                  <img src="{% static 'img/team/partners/mosqlimate-logo.png' %}"
+                       alt=""
+                       loading="lazy">
+                </div>
+                <h3 class="h5 products-ecosystem-title">Mosqlimate</h3>
+                <p class="products-ecosystem-description">{% trans "Plataforma aberta para dados e modelos de previsão de arboviroses, integrando dados epidemiológicos, climáticos e entomológicos." %}</p>
+                <div class="products-ecosystem-actions d-flex flex-wrap justify-content-center">
+                  <a class="btn btn-sm btn-light mr-2 mb-2"
+                     href="https://mosqlimate.org/"
+                     target="_blank"
+                     rel="noopener noreferrer">{% trans "Acessar a plataforma" %}</a>
+                  <a class="btn btn-sm btn-outline-light mr-2 mb-2"
+                     href="https://sprint.mosqlimate.org/"
+                     target="_blank"
+                     rel="noopener noreferrer">{% trans "Conhecer o IMDC" %}</a>
+                  <a class="btn btn-sm btn-outline-light mb-2"
+                     href="https://www.youtube.com/@mosqlimate"
+                     target="_blank"
+                     rel="noopener noreferrer">{% translate "Canal do YouTube" context "ecosystem action" %}</a>
+                </div>
+              </article>
+            </div>
+            <div class="col-md-6 d-flex">
+              <article class="btn btn-menu-card products-ecosystem-card w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center py-2">
+                <div class="products-ecosystem-logo">
+                  <img src="{% static 'img/team/partners/kwar-logo.png' %}"
+                       alt=""
+                       loading="lazy">
+                </div>
+                <h3 class="h5 products-ecosystem-title">EpidBot / Kwar-AI</h3>
+                <p class="products-ecosystem-description">{% trans "Conteúdos em vídeo sobre o EpidBot e sua aplicação de inteligência epidemiológica generativa baseada em IA." %}</p>
+                <div class="products-ecosystem-actions d-flex flex-wrap justify-content-center">
+                  <a class="btn btn-sm btn-light mr-2 mb-2"
+                     href="https://kwar-ai.com.br/"
+                     target="_blank"
+                     rel="noopener noreferrer">{% trans "Acessar a plataforma" %}</a>
+                  <a class="btn btn-sm btn-outline-light mr-2 mb-2"
+                     href="https://epidbot.kwar-ai.com.br/login?callbackUrl=%2F"
+                     target="_blank"
+                     rel="noopener noreferrer">{% trans "Acessar o EpidBot" %}</a>
+                  <a class="btn btn-sm btn-outline-light mb-2"
+                     href="https://www.youtube.com/playlist?list=PL5Z73C9dxVvyPPi4BfCGLCR1LY0Cdh9uO"
+                     target="_blank"
+                     rel="noopener noreferrer">{% trans "Playlist no YouTube" %}</a>
+                </div>
+              </article>
             </div>
           </div>
         </div>
