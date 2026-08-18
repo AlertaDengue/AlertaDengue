@@ -1,4 +1,5 @@
 from datetime import date
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -10,12 +11,17 @@ from api.internal.historical_alerts import (
     get_historical_alert_response_fields,
     serialize_historical_alert,
 )
+from dados import dbdata
 from dados.models import (
     LegacyHistoricalAlertChikungunya,
     LegacyHistoricalAlertDengue,
     LegacyHistoricalAlertZika,
 )
-from dados.services.historical_alerts import get_legacy_historical_alert_model
+from dados.services import historical_alerts
+from dados.services.historical_alerts import (
+    get_latest_historical_alert_week,
+    get_legacy_historical_alert_model,
+)
 
 
 @pytest.mark.parametrize(
@@ -36,6 +42,37 @@ def test_historical_alert_disease_routing(disease, model):
 def test_historical_alert_service_rejects_unknown_disease():
     with pytest.raises(ValueError, match="supported values"):
         HistoricalAlertFilters("yellow-fever")
+
+
+def test_latest_historical_alert_week_uses_normalized_orm_fields(monkeypatch):
+    values = MagicMock()
+    values.first.return_value = 202601
+    queryset = MagicMock()
+    queryset.values_list.return_value = values
+    model = MagicMock()
+    model.objects.order_by.return_value = queryset
+    monkeypatch.setattr(
+        historical_alerts,
+        "get_legacy_historical_alert_model",
+        lambda disease: model,
+    )
+
+    assert get_latest_historical_alert_week("chik") == 202601
+    model.objects.order_by.assert_called_once_with(
+        "-epidemiological_week_start_date"
+    )
+    queryset.values_list.assert_called_once_with(
+        "epidemiological_week", flat=True
+    )
+    values.first.assert_called_once_with()
+
+
+def test_get_last_se_delegates_to_the_historical_alert_service(monkeypatch):
+    service = MagicMock(return_value=202601)
+    monkeypatch.setattr(dbdata, "get_latest_historical_alert_week", service)
+
+    assert dbdata.get_last_SE("zika").cdcformat() == "202601"
+    service.assert_called_once_with("zika")
 
 
 def test_historical_alert_queryset_uses_normalized_filters_and_table():

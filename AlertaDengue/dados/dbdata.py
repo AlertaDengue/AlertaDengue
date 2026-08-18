@@ -28,6 +28,7 @@ from sqlalchemy.engine import Engine, Row
 
 # local
 from .episem import episem
+from .services.historical_alerts import get_latest_historical_alert_week
 
 logger = logging.getLogger(__name__)
 
@@ -538,18 +539,13 @@ def get_last_alert(geo_id, disease, db_engine: Engine = DB_ENGINE):
     return pd.read_sql_query(sql, db_engine.raw_connection())
 
 
-def get_last_SE(
-    disease: str = "dengue", db_engine: Engine = DB_ENGINE
-) -> Week:
+def get_last_SE(disease: str = "dengue") -> Week:
     """Return the most recent epidemiological week for a disease.
 
     Parameters
     ----------
     disease
         Disease key (e.g. "dengue", "chikungunya", "zika").
-    db_engine
-        SQLAlchemy engine.
-
     Returns
     -------
     epiweeks.Week
@@ -560,23 +556,11 @@ def get_last_SE(
     ValueError
         If the table has no rows.
     """
-    table_name = f"Historico_alerta{get_disease_suffix(disease)}"
-    stmt = text(
-        f"""
-        SELECT "SE"
-        FROM "Municipio"."{table_name}"
-        ORDER BY "data_iniSE" DESC
-        LIMIT 1
-        """
-    )
-
-    with db_engine.connect() as conn:
-        row = conn.execute(stmt).first()
-
-    if row is None:
+    latest_week = get_latest_historical_alert_week(disease)
+    if latest_week is None:
         raise ValueError(f"No rows found for disease={disease!r}")
 
-    return Week.fromstring(str(row[0]))
+    return Week.fromstring(str(latest_week))
 
 
 def load_cases_without_forecast(

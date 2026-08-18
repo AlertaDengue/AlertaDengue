@@ -35,3 +35,17 @@ def get_legacy_historical_alert_model(disease: str):
 
 def get_legacy_historical_alert_table_name(disease: str) -> str:
     return get_legacy_historical_alert_model(disease)._meta.db_table
+
+
+def get_latest_historical_alert_week(disease: str) -> int | None:
+    """Return the newest epidemiological week through the ORM adapter.
+
+    This intentionally exposes the normalized service operation rather than
+    the legacy ``SE`` database column used by the retained tables.
+    """
+    model = get_legacy_historical_alert_model(disease)
+    return (
+        model.objects.order_by("-epidemiological_week_start_date")
+        .values_list("epidemiological_week", flat=True)
+        .first()
+    )
