@@ -13,6 +13,41 @@ from api.v1.responses import build_error_response, build_success_response
 from api.views import NotificationReducedCSV_View
 from dados.episem import episem
 
+ALERT_CITY_FIELD_MAP = {
+    "data_iniSE": "epidemiological_week_start_date",
+    "SE": "epidemiological_week",
+    "casos_est": "estimated_cases",
+    "casos_est_min": "estimated_cases_min",
+    "casos_est_max": "estimated_cases_max",
+    "casos": "cases",
+    "municipio_geocodigo": "municipality_geocode",
+    "municipio_nome": "municipality_name",
+    "p_rt1": "rt1_probability",
+    "p_inc100k": "incidence_100k_probability",
+    "Localidade_id": "locality_id",
+    "nivel": "alert_level",
+    "id": "id",
+    "versao_modelo": "model_version",
+    "Rt": "reproduction_number",
+    "pop": "population",
+    "tempmin": "temperature_min",
+    "tempmed": "temperature_mean",
+    "tempmax": "temperature_max",
+    "umidmin": "humidity_min",
+    "umidmed": "humidity_mean",
+    "umidmax": "humidity_max",
+    "receptivo": "receptive",
+    "transmissao": "transmission",
+    "nivel_inc": "incidence_level",
+    "casprov": "probable_cases",
+    "casprov_est": "estimated_probable_cases",
+    "casprov_est_min": "estimated_probable_cases_min",
+    "casprov_est_max": "estimated_probable_cases_max",
+    "casconf": "confirmed_cases",
+    "notif_accum_year": "notifications_accumulated_year",
+}
+ALERT_CITY_RESPONSE_FIELDS = tuple(ALERT_CITY_FIELD_MAP.values())
+
 
 def normalize_alert_city_records(
     records: pd.DataFrame,
@@ -21,7 +56,10 @@ def normalize_alert_city_records(
     normalized_records = []
     for record in records.to_dict("records"):
         normalized_record: dict[str, Any] = {}
-        for field, value in record.items():
+        for field in ALERT_CITY_RESPONSE_FIELDS:
+            if field not in record:
+                continue
+            value = record[field]
             if value is None or pd.isna(value):
                 normalized_record[field] = None
             elif isinstance(value, (datetime, pd.Timestamp)):
@@ -67,15 +105,7 @@ class PublicAlertCityView(APIView):
                 geocode,
                 int(ew_start) if ew_start else None,
                 int(ew_end) if ew_end else None,
-            ).rename(
-                columns={
-                    "SE": "epidemiological_week",
-                    "data_iniSE": "epidemiological_week_start_date",
-                    "municipio_geocodigo": "municipality_geocode",
-                    "casos": "cases",
-                    "nivel": "alert_level",
-                }
-            )
+            ).rename(columns=ALERT_CITY_FIELD_MAP)
         except (KeyError, ValueError) as exc:
             return Response(
                 build_error_response(str(exc), code="invalid_query"),
