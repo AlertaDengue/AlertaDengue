@@ -539,13 +539,18 @@ def get_last_alert(geo_id, disease, db_engine: Engine = DB_ENGINE):
     return pd.read_sql_query(sql, db_engine.raw_connection())
 
 
-def get_last_SE(disease: str = "dengue") -> Week:
+def get_last_SE(
+    disease: str = "dengue", db_engine: Engine | None = DB_ENGINE
+) -> Week:
     """Return the most recent epidemiological week for a disease.
 
     Parameters
     ----------
     disease
-        Disease key (e.g. "dengue", "chikungunya", "zika").
+        Disease key, for example ``dengue``, ``chikungunya`` or ``zika``.
+    db_engine
+        Retained for backward compatibility. The ORM-backed implementation
+        does not use this SQLAlchemy engine.
     Returns
     -------
     epiweeks.Week

@@ -1,6 +1,6 @@
 from datetime import date
-from unittest.mock import MagicMock
 
+from django.db import connections
 import pytest
 
 from api.internal.historical_alerts import (
@@ -17,7 +17,6 @@ from dados.models import (
     LegacyHistoricalAlertDengue,
     LegacyHistoricalAlertZika,
 )
-from dados.services import historical_alerts
 from dados.services.historical_alerts import (
     get_latest_historical_alert_week,
     get_legacy_historical_alert_model,
@@ -44,35 +43,96 @@ def test_historical_alert_service_rejects_unknown_disease():
         HistoricalAlertFilters("yellow-fever")
 
 
-def test_latest_historical_alert_week_uses_normalized_orm_fields(monkeypatch):
-    values = MagicMock()
-    values.first.return_value = 202601
-    queryset = MagicMock()
-    queryset.values_list.return_value = values
-    model = MagicMock()
-    model.objects.order_by.return_value = queryset
-    monkeypatch.setattr(
-        historical_alerts,
-        "get_legacy_historical_alert_model",
-        lambda disease: model,
+@pytest.fixture
+def historical_alert_tables():
+    """Create unmanaged historical-alert tables in the Django test DB."""
+    database_connection = connections["dados"]
+    if database_connection.vendor != "postgresql":
+        pytest.skip(
+            "historical alert adapters use PostgreSQL schema-qualified tables"
+        )
+
+    models = (
+        LegacyHistoricalAlertDengue,
+        LegacyHistoricalAlertChikungunya,
+        LegacyHistoricalAlertZika,
     )
 
-    assert get_latest_historical_alert_week("chik") == 202601
-    model.objects.order_by.assert_called_once_with(
-        "-epidemiological_week_start_date"
+    with database_connection.cursor() as cursor:
+        cursor.execute('CREATE SCHEMA IF NOT EXISTS "Municipio"')
+        for model in reversed(models):
+            cursor.execute(
+                f"DROP TABLE IF EXISTS {model._meta.db_table} CASCADE"
+            )
+
+    with database_connection.schema_editor() as schema_editor:
+        for model in models:
+            schema_editor.create_model(model)
+
+    yield
+
+    with database_connection.cursor() as cursor:
+        for model in reversed(models):
+            cursor.execute(
+                f"DROP TABLE IF EXISTS {model._meta.db_table} CASCADE"
+            )
+
+
+@pytest.mark.django_db(databases={"default", "dados"}, transaction=True)
+@pytest.mark.parametrize(
+    ("disease", "model"),
+    [
+        ("dengue", LegacyHistoricalAlertDengue),
+        ("chik", LegacyHistoricalAlertChikungunya),
+        ("zika", LegacyHistoricalAlertZika),
+    ],
+)
+def test_latest_historical_alert_week_reads_real_orm_adapter(
+    historical_alert_tables,
+    disease,
+    model,
+):
+    model.objects.create(
+        epidemiological_week_start_date=date(2026, 1, 4),
+        epidemiological_week=202601,
+        municipality_geocode=3304557,
     )
-    queryset.values_list.assert_called_once_with(
-        "epidemiological_week", flat=True
+    model.objects.create(
+        epidemiological_week_start_date=date(2026, 1, 11),
+        epidemiological_week=202602,
+        municipality_geocode=3304557,
     )
-    values.first.assert_called_once_with()
+
+    assert get_latest_historical_alert_week(disease) == 202602
 
 
-def test_get_last_se_delegates_to_the_historical_alert_service(monkeypatch):
-    service = MagicMock(return_value=202601)
-    monkeypatch.setattr(dbdata, "get_latest_historical_alert_week", service)
+@pytest.mark.django_db(databases={"default", "dados"}, transaction=True)
+def test_latest_historical_alert_week_returns_none_for_empty_table(
+    historical_alert_tables,
+):
+    assert get_latest_historical_alert_week("dengue") is None
 
-    assert dbdata.get_last_SE("zika").cdcformat() == "202601"
-    service.assert_called_once_with("zika")
+
+@pytest.mark.django_db(databases={"default", "dados"}, transaction=True)
+def test_get_last_se_reads_real_historical_alert_adapter(
+    historical_alert_tables,
+):
+    LegacyHistoricalAlertZika.objects.create(
+        epidemiological_week_start_date=date(2026, 2, 8),
+        epidemiological_week=202606,
+        municipality_geocode=3304557,
+    )
+
+    assert dbdata.get_last_SE("zika").cdcformat() == "202606"
+    assert dbdata.get_last_SE("zika", db_engine=None).cdcformat() == "202606"
+
+
+@pytest.mark.django_db(databases={"default", "dados"}, transaction=True)
+def test_get_last_se_raises_for_empty_historical_alert_table(
+    historical_alert_tables,
+):
+    with pytest.raises(ValueError, match="No rows found for disease='dengue'"):
+        dbdata.get_last_SE("dengue")
 
 
 def test_historical_alert_queryset_uses_normalized_filters_and_table():
