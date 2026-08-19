@@ -45,7 +45,10 @@ def get_latest_historical_alert_week(disease: str) -> int | None:
     """
     model = get_legacy_historical_alert_model(disease)
     return (
-        model.objects.order_by("-epidemiological_week_start_date")
+        model.objects.order_by(
+            "-epidemiological_week_start_date",
+            "-epidemiological_week",
+        )
         .values_list("epidemiological_week", flat=True)
         .first()
     )

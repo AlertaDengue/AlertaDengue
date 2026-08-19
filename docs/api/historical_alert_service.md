@@ -30,10 +30,11 @@ The service deliberately leaves dashboard and report raw SQL unchanged until
 those paths are benchmarked. It introduces no migrations, production database
 connections, SQL writes, or physical database changes.
 
-The small `dados.dbdata.get_last_SE` lookup is routed through the same adapter
-service. The legacy `/api/alertcity/` implementation and public v1 wrapper
-still use `AlertCity.search`: their compatibility response includes additional
-legacy-table fields and an unbounded range aggregate that the bounded internal
-historical-alert service intentionally does not expose. Report, dashboard, and
-geofile SQL also remain explicit exceptions because they require joins, window
-functions, or legacy DataFrame-shaped results.
+The small `dados.dbdata.get_last_SE` lookup is routed through the same
+ORM-backed adapter service. The legacy `/api/alertcity/` implementation still
+uses `AlertCity.search` to preserve its compatibility response. The public v1
+alert-city endpoint also keeps `AlertCity.search` as its data boundary, but
+normalizes and filters the response contract at the API layer.
+
+Report, dashboard, and geofile SQL remain explicit exceptions because they
+require joins, window functions, or legacy DataFrame-shaped results.

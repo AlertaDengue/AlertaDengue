@@ -98,7 +98,7 @@ def test_latest_historical_alert_week_reads_real_orm_adapter(
         municipality_geocode=3304557,
     )
     model.objects.create(
-        epidemiological_week_start_date=date(2026, 1, 11),
+        epidemiological_week_start_date=date(2026, 1, 4),
         epidemiological_week=202602,
         municipality_geocode=3304557,
     )
