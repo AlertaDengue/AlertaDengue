@@ -29,3 +29,12 @@ remain separate and unmanaged. The #1042 physical merge remains deferred.
 The service deliberately leaves dashboard and report raw SQL unchanged until
 those paths are benchmarked. It introduces no migrations, production database
 connections, SQL writes, or physical database changes.
+
+The small `dados.dbdata.get_last_SE` lookup is routed through the same
+ORM-backed adapter service. The legacy `/api/alertcity/` implementation still
+uses `AlertCity.search` to preserve its compatibility response. The public v1
+alert-city endpoint also keeps `AlertCity.search` as its data boundary, but
+normalizes and filters the response contract at the API layer.
+
+Report, dashboard, and geofile SQL remain explicit exceptions because they
+require joins, window functions, or legacy DataFrame-shaped results.
