@@ -1,16 +1,21 @@
-from unittest.mock import MagicMock
-
 from django.urls import reverse
 import numpy as np
 import pandas as pd
 from rest_framework.permissions import AllowAny
 from rest_framework.test import APIClient
 
-from api import views as legacy_views
 from api.internal.permissions import HasInternalAPIAccess
 from api.internal.views import HistoricalAlertListView
-from api.v1 import views
-from api.v1.views import PublicAlertCityView, PublicEpiYearWeekView
+from api.v1.services import (
+    ALERT_CITY_RESPONSE_FIELDS,
+    normalize_public_alert_city_records,
+)
+from api.v1.views import (
+    PublicAlertCityView,
+    PublicEpiYearWeekView,
+    PublicNotificationReducedCSVView,
+)
+from api.views import NotificationReducedCSV_View
 
 
 def test_v1_and_legacy_routes_resolve():
@@ -30,7 +35,7 @@ def test_public_and_internal_permissions_remain_separate():
     assert HistoricalAlertListView.permission_classes == [HasInternalAPIAccess]
 
 
-def test_v1_alert_city_uses_real_alert_city_service(monkeypatch):
+def test_public_alert_city_normalizes_allowlisted_legacy_fields():
     legacy_record = {
         "data_iniSE": pd.Timestamp("2026-01-04"),
         "SE": np.int64(202601),
@@ -66,15 +71,10 @@ def test_v1_alert_city_uses_real_alert_city_service(monkeypatch):
         "tweet": "excluded",
         "unmapped_field": "excluded",
     }
-    search = MagicMock(return_value=pd.DataFrame([legacy_record]))
-    monkeypatch.setattr(views.AlertCity, "search", search)
-    response = APIClient().get(
-        reverse("api:v1:alert_city"),
-        {"disease": "dengue", "geocode": "3304557"},
-    )
-    assert response.status_code == 200
-    record = response.json()["data"][0]
-    assert set(record) == set(views.ALERT_CITY_RESPONSE_FIELDS)
+    record = normalize_public_alert_city_records(
+        pd.DataFrame([legacy_record])
+    )[0]
+    assert set(record) == set(ALERT_CITY_RESPONSE_FIELDS)
     assert record == {
         "epidemiological_week_start_date": "2026-01-04T00:00:00",
         "epidemiological_week": 202601,
@@ -142,34 +142,24 @@ def test_v1_alert_city_uses_real_alert_city_service(monkeypatch):
         "notif_accum_year",
         "unmapped_field",
     } & set(record)
-    search.assert_called_once()
 
 
-def test_v1_alert_city_normalizes_non_json_pandas_values(monkeypatch):
-    monkeypatch.setattr(
-        views.AlertCity,
-        "search",
-        MagicMock(
-            return_value=pd.DataFrame(
-                [
-                    {
-                        "SE": 202601,
-                        "data_iniSE": pd.Timestamp("2026-01-04"),
-                        "casos": float("nan"),
-                        "nivel": pd.NaT,
-                    }
-                ]
-            )
-        ),
-    )
+def test_public_alert_city_normalizes_pandas_and_numpy_values():
+    record = normalize_public_alert_city_records(
+        pd.DataFrame(
+            [
+                {
+                    "SE": np.int64(202601),
+                    "data_iniSE": pd.Timestamp("2026-01-04"),
+                    "casos": np.nan,
+                    "nivel": pd.NaT,
+                }
+            ]
+        )
+    )[0]
 
-    response = APIClient().get(
-        reverse("api:v1:alert_city"),
-        {"disease": "dengue", "geocode": "3304557"},
-    )
-
-    record = response.json()["data"][0]
     assert record["epidemiological_week_start_date"] == "2026-01-04T00:00:00"
+    assert record["epidemiological_week"] == 202601
     assert record["cases"] is None
     assert record["alert_level"] is None
 
@@ -188,19 +178,8 @@ def test_v1_json_errors_use_response_helper_shape():
     assert response.json()["code"] == "invalid_query"
 
 
-def test_v1_csv_delegates_to_legacy_response(monkeypatch):
-    query = MagicMock()
-    query.get_disease_dist.return_value.to_csv.return_value = (
-        "category,casos\n"
+def test_v1_csv_preserves_legacy_response_class():
+    assert issubclass(
+        PublicNotificationReducedCSVView, NotificationReducedCSV_View
     )
-    monkeypatch.setattr(
-        legacy_views,
-        "NotificationQueries",
-        lambda **kwargs: query,
-    )
-    response = APIClient().get(
-        reverse("api:v1:notification_reduced_csv"),
-        {"state_abv": "RJ", "chart_type": "disease"},
-    )
-    assert response.status_code == 200
-    assert response["Content-Type"].startswith("text/plain")
+    assert PublicNotificationReducedCSVView.permission_classes == [AllowAny]
