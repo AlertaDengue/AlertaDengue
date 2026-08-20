@@ -62,8 +62,10 @@ the following normalized public v1 fields when available from the query result:
 contract are omitted. Fields in the contract with a missing, `NaN`, or `NaT`
 source value may be returned as `null`. Physical database columns are unchanged;
 normalization occurs in the dedicated public v1 alert-city service boundary.
-That service preserves the normalized public v1 response contract while it
-continues to use `AlertCity.search` as its data boundary: weather,
-receptivity/transmission/incidence indicators, population, and accumulated
-notification fields are not all available from the historical-alert ORM adapters
-alone.
+That service reads the retained Municipio historical-alert tables through the
+historical-alert service and unmanaged ORM adapters. The normalized public v1
+response contract is unchanged, while legacy `/api/alertcity/` remains on its
+existing compatibility implementation. No physical database schema change was
+introduced. `notifications_accumulated_year` remains in the public v1 contract,
+but is `null` on the ORM-backed path because `notif_accum_year` is absent from
+the retained Municipio historical-alert tables.

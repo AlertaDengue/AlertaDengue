@@ -29,6 +29,19 @@ class LegacyHistoricalAlertBase(models.Model):
     model_version = models.CharField(
         db_column="versao_modelo", max_length=40, null=True
     )
+    reproduction_number = models.FloatField(db_column="Rt", null=True)
+    population = models.IntegerField(db_column="pop", null=True)
+    temperature_min = models.FloatField(db_column="tempmin", null=True)
+    temperature_mean = models.FloatField(db_column="tempmed", null=True)
+    temperature_max = models.FloatField(db_column="tempmax", null=True)
+    humidity_min = models.FloatField(db_column="umidmin", null=True)
+    humidity_mean = models.FloatField(db_column="umidmed", null=True)
+    humidity_max = models.FloatField(db_column="umidmax", null=True)
+    receptive = models.SmallIntegerField(db_column="receptivo", null=True)
+    transmission = models.SmallIntegerField(db_column="transmissao", null=True)
+    incidence_level = models.SmallIntegerField(
+        db_column="nivel_inc", null=True
+    )
     municipality_name = models.CharField(
         db_column="municipio_nome", max_length=128, null=True
     )

@@ -1,6 +1,10 @@
+from datetime import date
+
+from django.db import connections
 from django.urls import reverse
 import numpy as np
 import pandas as pd
+import pytest
 from rest_framework.permissions import AllowAny
 from rest_framework.test import APIClient
 
@@ -8,6 +12,7 @@ from api.internal.permissions import HasInternalAPIAccess
 from api.internal.views import HistoricalAlertListView
 from api.v1.services import (
     ALERT_CITY_RESPONSE_FIELDS,
+    get_public_alert_city_records,
     normalize_public_alert_city_records,
 )
 from api.v1.views import (
@@ -16,6 +21,188 @@ from api.v1.views import (
     PublicNotificationReducedCSVView,
 )
 from api.views import NotificationReducedCSV_View
+from dados.models import (
+    LegacyHistoricalAlertChikungunya,
+    LegacyHistoricalAlertDengue,
+    LegacyHistoricalAlertZika,
+)
+
+
+@pytest.fixture
+def public_historical_alert_tables():
+    """Create the unmanaged alert tables used by the public v1 service."""
+    database_connection = connections["dados"]
+    if database_connection.vendor != "postgresql":
+        pytest.skip("historical alert adapters require PostgreSQL schemas")
+
+    models = (
+        LegacyHistoricalAlertDengue,
+        LegacyHistoricalAlertChikungunya,
+        LegacyHistoricalAlertZika,
+    )
+    with database_connection.cursor() as cursor:
+        cursor.execute('CREATE SCHEMA IF NOT EXISTS "Municipio"')
+        for model in reversed(models):
+            cursor.execute(
+                f"DROP TABLE IF EXISTS {model._meta.db_table} CASCADE"
+            )
+    with database_connection.schema_editor() as schema_editor:
+        for model in models:
+            schema_editor.create_model(model)
+
+    yield
+
+    with database_connection.cursor() as cursor:
+        for model in reversed(models):
+            cursor.execute(
+                f"DROP TABLE IF EXISTS {model._meta.db_table} CASCADE"
+            )
+
+
+@pytest.mark.django_db(databases={"default", "dados"}, transaction=True)
+@pytest.mark.parametrize(
+    ("disease", "model"),
+    [
+        ("dengue", LegacyHistoricalAlertDengue),
+        ("chik", LegacyHistoricalAlertChikungunya),
+        ("zika", LegacyHistoricalAlertZika),
+    ],
+)
+def test_public_alert_city_service_uses_orm_disease_filtering_and_ordering(
+    public_historical_alert_tables, disease, model
+):
+    other_model = (
+        LegacyHistoricalAlertZika
+        if model is not LegacyHistoricalAlertZika
+        else LegacyHistoricalAlertDengue
+    )
+    second = model.objects.create(
+        epidemiological_week_start_date=date(2026, 1, 11),
+        epidemiological_week=202602,
+        municipality_geocode=3304557,
+        municipality_name="Rio",
+    )
+    first = model.objects.create(
+        epidemiological_week_start_date=date(2026, 1, 4),
+        epidemiological_week=202601,
+        municipality_geocode=3304557,
+        municipality_name="Rio",
+    )
+    model.objects.create(
+        epidemiological_week_start_date=date(2026, 1, 4),
+        epidemiological_week=202601,
+        municipality_geocode=9999999,
+    )
+    other_model.objects.create(
+        epidemiological_week_start_date=date(2026, 1, 4),
+        epidemiological_week=202601,
+        municipality_geocode=3304557,
+    )
+
+    records = get_public_alert_city_records(
+        disease=disease, geocode=3304557, ew_start=202601, ew_end=202602
+    )
+
+    assert [record["id"] for record in records] == [first.id, second.id]
+    assert all(
+        set(record) == set(ALERT_CITY_RESPONSE_FIELDS) for record in records
+    )
+    assert "tweet" not in records[0]
+    assert not {"SE", "data_iniSE", "municipio_geocodigo"} & set(records[0])
+
+
+@pytest.mark.django_db(databases={"default", "dados"}, transaction=True)
+def test_public_alert_city_service_serializes_all_mapped_fields(
+    public_historical_alert_tables,
+):
+    alert = LegacyHistoricalAlertDengue.objects.create(
+        epidemiological_week_start_date=date(2026, 1, 4),
+        epidemiological_week=202601,
+        estimated_cases=10.5,
+        estimated_cases_min=8,
+        estimated_cases_max=13,
+        cases=3,
+        municipality_geocode=3304557,
+        municipality_name="Rio de Janeiro",
+        rt1_probability=0.9,
+        incidence_100k_probability=0.8,
+        locality_id=1,
+        alert_level=2,
+        model_version="v1",
+        reproduction_number=1.2,
+        population=6200000,
+        temperature_min=20.1,
+        temperature_mean=25.2,
+        temperature_max=30.3,
+        humidity_min=40.1,
+        humidity_mean=55.2,
+        humidity_max=70.3,
+        receptive=1,
+        transmission=1,
+        incidence_level=3,
+        probable_cases=4,
+        estimated_probable_cases=5.5,
+        estimated_probable_cases_min=4,
+        estimated_probable_cases_max=6,
+        confirmed_cases=2,
+    )
+
+    record = get_public_alert_city_records(
+        disease="dengue", geocode=3304557, ew_start=None, ew_end=None
+    )[0]
+
+    assert record == {
+        "epidemiological_week_start_date": "2026-01-04T00:00:00",
+        "epidemiological_week": 202601,
+        "estimated_cases": 10.5,
+        "estimated_cases_min": 8,
+        "estimated_cases_max": 13,
+        "cases": 3,
+        "municipality_geocode": 3304557,
+        "municipality_name": "Rio de Janeiro",
+        "rt1_probability": 0.9,
+        "incidence_100k_probability": 0.8,
+        "locality_id": 1,
+        "alert_level": 2,
+        "id": alert.id,
+        "model_version": "v1",
+        "reproduction_number": 1.2,
+        "population": 6200000,
+        "temperature_min": 20.1,
+        "temperature_mean": 25.2,
+        "temperature_max": 30.3,
+        "humidity_min": 40.1,
+        "humidity_mean": 55.2,
+        "humidity_max": 70.3,
+        "receptive": 1,
+        "transmission": 1,
+        "incidence_level": 3,
+        "probable_cases": 4,
+        "estimated_probable_cases": 5.5,
+        "estimated_probable_cases_min": 4,
+        "estimated_probable_cases_max": 6,
+        "confirmed_cases": 2,
+        "notifications_accumulated_year": None,
+    }
+
+
+@pytest.mark.django_db(databases={"default", "dados"}, transaction=True)
+def test_public_alert_city_route_reads_inserted_orm_record(
+    public_historical_alert_tables,
+):
+    LegacyHistoricalAlertDengue.objects.create(
+        epidemiological_week_start_date=date(2026, 1, 4),
+        epidemiological_week=202601,
+        municipality_geocode=3304557,
+    )
+
+    response = APIClient().get(
+        reverse("api:v1:alert_city"),
+        {"disease": "dengue", "geocode": 3304557},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["data"][0]["municipality_geocode"] == 3304557
 
 
 def test_v1_and_legacy_routes_resolve():

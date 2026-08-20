@@ -37,6 +37,27 @@ def get_legacy_historical_alert_table_name(disease: str) -> str:
     return get_legacy_historical_alert_model(disease)._meta.db_table
 
 
+def build_historical_alert_records_queryset(
+    *,
+    disease: str,
+    municipality_geocode: int,
+    start_week: int | None = None,
+    end_week: int | None = None,
+):
+    """Return public-record candidates from the selected retained table."""
+    model = get_legacy_historical_alert_model(disease)
+    queryset = model.objects.filter(municipality_geocode=municipality_geocode)
+
+    if start_week is not None:
+        queryset = queryset.filter(epidemiological_week__gte=start_week)
+    if end_week is not None:
+        queryset = queryset.filter(epidemiological_week__lte=end_week)
+
+    return queryset.order_by(
+        "epidemiological_week_start_date", "epidemiological_week", "id"
+    )
+
+
 def get_latest_historical_alert_week(disease: str) -> int | None:
     """Return the newest epidemiological week through the ORM adapter.
 
