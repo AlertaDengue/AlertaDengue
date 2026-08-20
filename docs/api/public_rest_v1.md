@@ -61,4 +61,9 @@ the following normalized public v1 fields when available from the query result:
 `tweet` is not part of the public v1 contract. Fields outside the documented
 contract are omitted. Fields in the contract with a missing, `NaN`, or `NaT`
 source value may be returned as `null`. Physical database columns are unchanged;
-normalization occurs at the API response layer.
+normalization occurs in the dedicated public v1 alert-city service boundary.
+That service preserves the normalized public v1 response contract while it
+continues to use `AlertCity.search` as its data boundary: weather,
+receptivity/transmission/incidence indicators, population, and accumulated
+notification fields are not all available from the historical-alert ORM adapters
+alone.
