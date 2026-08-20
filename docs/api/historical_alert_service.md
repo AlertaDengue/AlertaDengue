@@ -31,12 +31,16 @@ those paths are benchmarked. It introduces no migrations, production database
 connections, SQL writes, or physical database changes.
 
 Internal historical access and small lookups such as
-`dados.dbdata.get_last_SE` use the ORM-backed adapter service. The legacy
-`/api/alertcity/` implementation remains unchanged and uses `AlertCity.search`
-for its compatibility response. Public v1 alert-city has a dedicated service
-boundary that keeps `AlertCity.search`, because its legacy DataFrame shape
-supplies weather, population, receptivity/transmission/incidence, and
-accumulated-notification fields unavailable from historical ORM adapters.
+`dados.dbdata.get_last_SE` use the ORM-backed adapter service. Public
+`/api/v1/alert-city/` also uses the historical-alert service and the unmanaged
+Municipio adapters, then serializes their rows into the normalized public v1
+contract. The legacy `/api/alertcity/` implementation remains unchanged and
+uses `AlertCity.search` for its compatibility response. The adapters remain
+unmanaged; this change introduces no physical database schema change (and any
+Django migration needed for adapter state is state-only).
+`notifications_accumulated_year` remains a public v1 field, but is not mapped
+to these adapters because the retained tables have no `notif_accum_year`
+column; ORM-backed records therefore return it as `null`.
 
 Report, dashboard, and geofile SQL remain explicit exceptions because they
 require joins, window functions, or legacy DataFrame-shaped results.

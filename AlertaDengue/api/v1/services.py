@@ -5,13 +5,16 @@ from typing import Any
 
 import pandas as pd
 
-from api.db import AlertCity
+from dados.services.historical_alerts import (
+    build_historical_alert_records_queryset,
+)
 
 __all__ = [
     "ALERT_CITY_FIELD_MAP",
     "ALERT_CITY_RESPONSE_FIELDS",
     "get_public_alert_city_records",
     "normalize_public_alert_city_records",
+    "serialize_public_alert_city_record",
 ]
 
 
@@ -89,5 +92,30 @@ def get_public_alert_city_records(
     ew_end: int | None,
 ) -> list[dict[str, Any]]:
     """Fetch and normalize alert-city records for the public v1 contract."""
-    records = AlertCity.search(disease, geocode, ew_start, ew_end)
-    return normalize_public_alert_city_records(records)
+    if geocode is None:
+        raise ValueError("geocode is required")
+    queryset = build_historical_alert_records_queryset(
+        disease=disease,
+        municipality_geocode=int(geocode),
+        start_week=ew_start,
+        end_week=ew_end,
+    )
+    return [serialize_public_alert_city_record(record) for record in queryset]
+
+
+def serialize_public_alert_city_record(record: Any) -> dict[str, Any]:
+    """Serialize an ORM adapter row using only public v1 field names."""
+    serialized: dict[str, Any] = {}
+    for field in ALERT_CITY_RESPONSE_FIELDS:
+        value = getattr(record, field, None)
+        if field == "epidemiological_week_start_date" and isinstance(
+            value, date
+        ):
+            serialized[field] = datetime.combine(
+                value, datetime.min.time()
+            ).isoformat()
+        elif isinstance(value, datetime):
+            serialized[field] = value.isoformat()
+        else:
+            serialized[field] = value
+    return serialized

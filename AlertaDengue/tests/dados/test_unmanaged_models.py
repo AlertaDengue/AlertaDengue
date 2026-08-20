@@ -59,6 +59,17 @@ def test_historical_alert_column_mappings(model):
         model._meta.get_field("municipality_geocode").column
         == "municipio_geocodigo"
     )
+    assert model._meta.get_field("reproduction_number").column == "Rt"
+    assert model._meta.get_field("population").column == "pop"
+    assert model._meta.get_field("temperature_min").column == "tempmin"
+    assert model._meta.get_field("temperature_mean").column == "tempmed"
+    assert model._meta.get_field("temperature_max").column == "tempmax"
+    assert model._meta.get_field("humidity_min").column == "umidmin"
+    assert model._meta.get_field("humidity_mean").column == "umidmed"
+    assert model._meta.get_field("humidity_max").column == "umidmax"
+    assert model._meta.get_field("receptive").column == "receptivo"
+    assert model._meta.get_field("transmission").column == "transmissao"
+    assert model._meta.get_field("incidence_level").column == "nivel_inc"
 
 
 @pytest.mark.parametrize(

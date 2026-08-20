@@ -18,6 +18,7 @@ from dados.models import (
     LegacyHistoricalAlertZika,
 )
 from dados.services.historical_alerts import (
+    build_historical_alert_records_queryset,
     get_latest_historical_alert_week,
     get_legacy_historical_alert_model,
 )
@@ -168,6 +169,24 @@ def test_historical_alert_range_filters_and_ordering_are_applied():
     assert '"data_iniSE" >=' in sql
     assert '"data_iniSE" <=' in sql
     assert '"SE" ASC' in sql
+
+
+def test_public_historical_alert_records_queryset_uses_normalized_fields():
+    queryset = build_historical_alert_records_queryset(
+        disease="dengue",
+        municipality_geocode=3304557,
+        start_week=202601,
+        end_week=202652,
+    )
+
+    sql = str(queryset.query)
+
+    assert queryset.model is LegacyHistoricalAlertDengue
+    assert '"municipio_geocodigo"' in sql
+    assert '"SE" >=' in sql
+    assert '"SE" <=' in sql
+    assert '"data_iniSE" ASC' in sql
+    assert '"id" ASC' in sql
 
 
 @pytest.mark.parametrize(

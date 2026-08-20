@@ -30,7 +30,7 @@ class PublicAPIRootView(APIView):
 
 
 class PublicAlertCityView(APIView):
-    """Return normalized city-alert records through the legacy query service."""
+    """Return normalized city-alert records through historical-alert ORM."""
 
     permission_classes = [AllowAny]
 
