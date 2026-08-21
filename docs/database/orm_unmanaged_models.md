@@ -36,7 +36,7 @@ quoted identifiers remain only in db_table and db_column mappings.
 | Historico_alerta | table | dados.models.LegacyHistoricalAlertDengue | Unmanaged | Externally maintained; application reads and operational workflows write | Dengue historical alerts | Retain adapter/service; benchmark reports separately |
 | Historico_alerta_chik | table | dados.models.LegacyHistoricalAlertChikungunya | Unmanaged | Externally maintained; application reads and operational workflows write | Chikungunya historical alerts | Retain adapter/service; benchmark reports separately |
 | Historico_alerta_zika | table | dados.models.LegacyHistoricalAlertZika | Unmanaged | Externally maintained; application reads; no confirmed operational write | Zika historical alerts | Retain adapter/service; benchmark reports separately |
-| Notificacao | table | dados.models.Notification | Unmanaged | Application write; external physical ownership | SINAN notification records | Consider only bounded internal list query; retain ingest SQL |
+| Notificacao | table | dados.models.Notification | Unmanaged | Application write; external physical ownership | SINAN notification records | Internal bounded list uses the ORM adapter; retain ingestion SQL |
 
 ### ingestion and episcanner
 
@@ -65,14 +65,17 @@ The public /api/v1/alert-city/ endpoint now uses that service and preserves its
 normalized response contract. The legacy /api/alertcity/ endpoint remains an
 explicit SQL compatibility path and is not a target of this sequence.
 
+The bounded internal /api/internal/notifications/ list uses the Notification
+adapter for filtered, ordered pagination on the dados database alias. Ingestion
+and writes, CSV and bulk exports, reports and analytics, aggregations, and
+operational processing remain explicit SQL boundaries.
+
 ## Next schema-group refactors
 
-1. **Municipio.Notificacao internal list.** Use the existing adapter for
-   bounded internal filtering/pagination. Exclude CSV analytics and ingestion.
-2. **Bounded Municipio.Historico_alerta city reports.** Proceed only after
+1. **Bounded Municipio.Historico_alerta city reports.** Proceed only after
    output and performance equivalence are demonstrated. Exclude state
    dashboards and compatibility APIs.
-3. **Dengue_global.Municipio map/geofile metadata.** Add only verified adapter
+2. **Dengue_global.Municipio map/geofile metadata.** Add only verified adapter
    metadata and a focused service boundary. Exclude geometry and file workflow
    redesign.
 

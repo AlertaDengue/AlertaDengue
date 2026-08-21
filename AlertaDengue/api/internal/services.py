@@ -5,7 +5,10 @@ from decimal import Decimal
 import math
 from typing import Any
 
-from django.db import connection
+from django.db.models import BigIntegerField, F, FloatField, QuerySet
+from django.db.models.functions import Cast
+
+from dados.models import Notification
 
 from .schemas import NotificationQueryParams
 
@@ -30,56 +33,57 @@ def normalize_value(value: Any) -> Any:
     return value
 
 
-def fetch_dicts(cursor) -> list[dict[str, Any]]:
-    columns = [column[0] for column in cursor.description]
-
-    return [
-        {
-            column: normalize_value(value)
-            for column, value in zip(columns, row, strict=True)
-        }
-        for row in cursor.fetchall()
-    ]
-
-
-def build_notification_filters(
+def build_notification_queryset(
     params: NotificationQueryParams,
-) -> tuple[str, dict[str, Any]]:
-    where_clauses = []
-    sql_params: dict[str, Any] = {}
-
+) -> QuerySet[Notification]:
+    """Build the bounded internal notification query on the ``dados`` alias."""
+    queryset = Notification.objects.using("dados").all()
     if params.municipio_geocodigo is not None:
-        where_clauses.append("municipio_geocodigo = %(municipio_geocodigo)s")
-        sql_params["municipio_geocodigo"] = params.municipio_geocodigo
+        queryset = queryset.filter(
+            municipality_geocode=params.municipio_geocodigo
+        )
 
     if params.cid10:
-        where_clauses.append("cid10_codigo = %(cid10)s")
-        sql_params["cid10"] = params.cid10
+        queryset = queryset.filter(cid10_code=params.cid10)
 
     if params.year is not None:
-        where_clauses.append("ano_notif = %(year)s")
-        sql_params["year"] = params.year
+        queryset = queryset.filter(notification_year=params.year)
 
     if params.epiweek_start is not None:
-        where_clauses.append("se_notif >= %(epiweek_start)s")
-        sql_params["epiweek_start"] = params.epiweek_start
+        queryset = queryset.filter(notification_week__gte=params.epiweek_start)
 
     if params.epiweek_end is not None:
-        where_clauses.append("se_notif <= %(epiweek_end)s")
-        sql_params["epiweek_end"] = params.epiweek_end
+        queryset = queryset.filter(notification_week__lte=params.epiweek_end)
 
     if params.date_start:
-        where_clauses.append("dt_notific >= %(date_start)s")
-        sql_params["date_start"] = params.date_start
+        queryset = queryset.filter(notification_date__gte=params.date_start)
 
     if params.date_end:
-        where_clauses.append("dt_notific <= %(date_end)s")
-        sql_params["date_end"] = params.date_end
+        queryset = queryset.filter(notification_date__lte=params.date_end)
 
-    if not where_clauses:
-        return "", sql_params
+    return queryset.order_by("-notification_date", "-id")
 
-    return f"WHERE {' AND '.join(where_clauses)}", sql_params
+
+def get_notification_response_queryset(
+    params: NotificationQueryParams,
+) -> QuerySet:
+    """Project ORM fields to the established internal API response keys."""
+    return build_notification_queryset(params).values(
+        "id",
+        municipio_geocodigo=F("municipality_geocode"),
+        dt_notific=F("notification_date"),
+        dt_sin_pri=F("symptom_onset_date"),
+        dt_digita=F("entry_date"),
+        se_notif=F("notification_week"),
+        ano_notif=F("notification_year"),
+        classi_fin=Cast("final_classification", FloatField()),
+        criterio=Cast("criteria", FloatField()),
+        cid10_codigo=F("cid10_code"),
+        id_distrit=Cast("district_id", FloatField()),
+        id_bairro=Cast("neighborhood_id", FloatField()),
+        nm_bairro=F("neighborhood_name"),
+        nu_notific=Cast("notification_number", BigIntegerField()),
+    )
 
 
 def list_notifications(query_params: dict[str, Any]) -> dict[str, Any]:
@@ -87,39 +91,11 @@ def list_notifications(query_params: dict[str, Any]) -> dict[str, Any]:
         query_params.dict() if hasattr(query_params, "dict") else query_params
     )
 
-    fields = [
-        "id",
-        "municipio_geocodigo",
-        "dt_notific",
-        "dt_sin_pri",
-        "dt_digita",
-        "se_notif",
-        "ano_notif",
-        "classi_fin",
-        "criterio",
-        "cid10_codigo",
-        "id_distrit",
-        "id_bairro",
-        "nm_bairro",
-        "nu_notific",
+    queryset = get_notification_response_queryset(params)
+    results = [
+        {key: normalize_value(value) for key, value in record.items()}
+        for record in queryset[params.offset : params.offset + params.limit]
     ]
-
-    where_sql, sql_params = build_notification_filters(params)
-
-    sql_results = f"""
-        SELECT {", ".join(fields)}
-        FROM "Municipio"."Notificacao"
-        {where_sql}
-        ORDER BY dt_notific DESC, id DESC
-        LIMIT %(limit)s OFFSET %(offset)s
-    """
-
-    sql_params["limit"] = params.limit
-    sql_params["offset"] = params.offset
-
-    with connection.cursor() as cursor:
-        cursor.execute(sql_results, sql_params)
-        results = fetch_dicts(cursor)
 
     payload: dict[str, Any] = {
         "limit": params.limit,
@@ -128,22 +104,6 @@ def list_notifications(query_params: dict[str, Any]) -> dict[str, Any]:
     }
 
     if params.include_count:
-        count_params = {
-            key: value
-            for key, value in sql_params.items()
-            if key not in {"limit", "offset"}
-        }
-
-        sql_count = f"""
-            SELECT COUNT(*)
-            FROM "Municipio"."Notificacao"
-            {where_sql}
-        """
-
-        with connection.cursor() as cursor:
-            cursor.execute(sql_count, count_params)
-            count = cursor.fetchone()[0]
-
-        payload["count"] = int(count)
+        payload["count"] = queryset.count()
 
     return payload
