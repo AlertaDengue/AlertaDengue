@@ -1,5 +1,5 @@
-DROP SCHEMA IF EXISTS "Municipio" CASCADE;
-CREATE SCHEMA "Municipio";
+CREATE SCHEMA IF NOT EXISTS "Municipio";
+DROP TABLE IF EXISTS "Municipio"."Notificacao" CASCADE;
 
 CREATE TABLE "Municipio"."Notificacao" (
     id BIGSERIAL PRIMARY KEY,
