@@ -111,16 +111,16 @@ def regional_parameters_tables(db_engine: Engine) -> Iterator[None]:
             text(
                 f"""
             CREATE TABLE "{schema}"."parameters" (
-                id SERIAL PRIMARY KEY,
-                municipio_geocodigo BIGINT,
-                cid10 TEXT,
+                municipio_geocodigo BIGINT NOT NULL,
+                cid10 TEXT NOT NULL,
                 varcli TEXT,
                 clicrit NUMERIC,
                 varcli2 TEXT,
                 clicrit2 NUMERIC,
                 limiar_preseason NUMERIC,
                 limiar_posseason NUMERIC,
-                limiar_epidemico NUMERIC
+                limiar_epidemico NUMERIC,
+                PRIMARY KEY (municipio_geocodigo, cid10)
             )
         """
             )
@@ -146,7 +146,8 @@ def regional_parameters_tables(db_engine: Engine) -> Iterator[None]:
                 f"""
             INSERT INTO "{schema}"."Municipio" (geocodigo, nome, uf, id_regional) VALUES
             (3304557, 'Rio de Janeiro', 'RJ', 1),
-            (3303302, 'Niterói', 'RJ', 2)
+            (3303302, 'Niterói', 'RJ', 2),
+            (3301702, 'No parameters city', 'RJ', 1)
         """
             )
         )

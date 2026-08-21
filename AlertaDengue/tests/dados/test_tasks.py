@@ -39,10 +39,30 @@ def db_engine() -> Engine:
 
 @pytest.fixture()
 def episcanner_data_tables(db_engine: Engine) -> Iterator[None]:
+    """Provision the external tables used by EpiScanner task tests."""
     all_geocodes = [gc for uf in CITIES.values() for gc in uf["geocodes"]]
 
     with db_engine.begin() as conn:
         conn.execute(text('CREATE SCHEMA IF NOT EXISTS "Municipio"'))
+        conn.execute(text('CREATE SCHEMA IF NOT EXISTS "Dengue_global"'))
+        conn.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS "Dengue_global"."Municipio" (
+                    geocodigo BIGINT PRIMARY KEY,
+                    nome TEXT,
+                    uf TEXT
+                )
+                """
+            )
+        )
+        conn.execute(
+            text(
+                'ALTER TABLE "Dengue_global"."Municipio" '
+                "ADD COLUMN IF NOT EXISTS nome TEXT, "
+                "ADD COLUMN IF NOT EXISTS uf TEXT"
+            )
+        )
 
         for suffix in ["", "_chik", "_zika"]:
             table_name = f"Historico_alerta{suffix}"
@@ -102,13 +122,6 @@ def episcanner_data_tables(db_engine: Engine) -> Iterator[None]:
             _insert_data("_chik", gc, base * 0.5)
             _insert_data("_zika", gc, base * 0.3)
 
-        conn.execute(
-            text(
-                'ALTER TABLE "Dengue_global"."Municipio" '
-                "ADD COLUMN IF NOT EXISTS nome TEXT, "
-                "ADD COLUMN IF NOT EXISTS uf TEXT"
-            )
-        )
         for uf_abbr, info in CITIES.items():
             for gc in info["geocodes"]:
                 conn.execute(
@@ -128,16 +141,36 @@ def episcanner_data_tables(db_engine: Engine) -> Iterator[None]:
         conn.execute(text('DROP SCHEMA IF EXISTS "Municipio" CASCADE'))
         for uf_info in CITIES.values():
             for gc in uf_info["geocodes"]:
-                try:
-                    conn.execute(
-                        text(
-                            'DELETE FROM "Dengue_global"."Municipio" '
-                            "WHERE geocodigo = :gc"
-                        ),
-                        {"gc": gc},
+                conn.execute(
+                    text(
+                        'DELETE FROM "Dengue_global"."Municipio" '
+                        "WHERE geocodigo = :gc"
+                    ),
+                    {"gc": gc},
+                )
+
+
+class TestEpiscannerTaskFixture:
+    @pytest.mark.django_db(transaction=True, databases={"default", "dados"})
+    def test_provisions_required_dengue_global_municipio_table(
+        self, db_engine: Engine, episcanner_data_tables: None
+    ) -> None:
+        """The task fixture owns its external municipality-table dependency."""
+        with db_engine.connect() as conn:
+            columns = set(
+                conn.execute(
+                    text(
+                        """
+                        SELECT column_name
+                        FROM information_schema.columns
+                        WHERE table_schema = 'Dengue_global'
+                          AND table_name = 'Municipio'
+                        """
                     )
-                except Exception:
-                    pass
+                ).scalars()
+            )
+
+        assert {"geocodigo", "nome", "uf"} <= columns
 
 
 @pytest.fixture()

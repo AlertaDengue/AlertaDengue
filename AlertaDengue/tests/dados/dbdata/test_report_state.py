@@ -8,8 +8,12 @@ from django.core.cache import cache
 import pytest
 
 from dados.dbdata import ReportState
+from dados.services.dengue_global_lookups import get_regional_municipalities
 
-pytestmark = pytest.mark.usefixtures("report_data_tables")
+pytestmark = [
+    pytest.mark.django_db(databases={"default", "dados"}, transaction=True),
+    pytest.mark.usefixtures("report_data_tables"),
+]
 
 
 @pytest.fixture(autouse=True)
@@ -36,6 +40,20 @@ def test_get_regional_by_state() -> None:
     assert row["municipio_geocodigo"] == 3304557
     assert row["municipio_nome"] == "Rio de Janeiro"
     assert row["id_regional"] == 1
+    assert list(df.columns) == [
+        "id_regional",
+        "nome_regional",
+        "municipio_geocodigo",
+        "municipio_nome",
+    ]
+    assert get_regional_municipalities("Rio de Janeiro") == [
+        {
+            "regional_id": 1,
+            "regional_name": "Metropolitana I",
+            "geocode": 3304557,
+            "name": "Rio de Janeiro",
+        }
+    ]
 
 
 def test_create_report_state_data() -> None:

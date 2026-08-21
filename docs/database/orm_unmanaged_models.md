@@ -9,7 +9,7 @@ quoted identifiers remain only in db_table and db_column mappings.
 
 | Schema | Responsibility | Ownership | Refactor status |
 | --- | --- | --- | --- |
-| Dengue_global | Municipality, disease, regional and parameter lookups | Retained external/read-only | Lookup boundary is next |
+| Dengue_global | Municipality, disease, regional and parameter lookups | Retained external/read-only | Search/report lookup boundary complete |
 | Municipio | Historical alerts and notifications | Alerts external; notifications application-written through ingestion | Historical API complete |
 | ingestion | SINAN run, stage and rollback control | Django-managed | Current model boundary retained |
 | episcanner | Scan-result parameters | Django-managed | Current model boundary retained |
@@ -21,12 +21,12 @@ quoted identifiers remain only in db_table and db_column mappings.
 
 | Object | Type | Django model | Management | Access | Current responsibility | Next action |
 | --- | --- | --- | --- | --- | --- | --- |
-| Municipio | table | dados.models.City | Unmanaged | Read-only | Municipality lookup, report and map metadata | Confirm retained geo fields and ownership; consolidate lookup reads |
+| Municipio | table | dados.models.City | Unmanaged | Read-only | Municipality search/report lookup and map metadata | Search/report reads use the shared ORM service; retain map metadata review |
 | CID10 | table | dados.models.CID10 | Unmanaged | Read-only | Disease-code lookup | Retain adapter |
 | "Dengue_global"."estado" | table | dados.models.State | Unmanaged | Read-only | State-history dependency | Keep in lookup review |
 | "Dengue_global"."macroregional" | table | dados.models.MacroRegion | Unmanaged | Read-only | Regional relationship | Keep in lookup review |
-| regional | table | dados.models.Regional | Unmanaged | Read-only | Regional search/report lookup | Shared lookup service |
-| parameters | table | dados.models.Parameter | Unmanaged | Read-only | City/disease report thresholds; logical key (municipio_geocodigo, cid10) | Confirm composite-key representation and consolidate lookup reads; do not introduce a surrogate key |
+| regional | table | dados.models.Regional | Unmanaged | Read-only | Regional search/report lookup | Shared ORM lookup service |
+| parameters | table | dados.models.Parameter | Unmanaged | Read-only | City/disease report thresholds; logical key (municipio_geocodigo, cid10) | Shared ORM lookup service; every parameter read filters both key components; no surrogate key |
 | "Dengue_global"."parameters_uf" | table | dados.models.ParameterUF | Managed | Django migration-owned | UF-level thresholds | Retain current model |
 
 ### Municipio
@@ -67,16 +67,12 @@ explicit SQL compatibility path and is not a target of this sequence.
 
 ## Next schema-group refactors
 
-1. **Dengue_global lookup and parameter reads.** Include Municipio, regional
-   and parameters behind a shared typed service for search/report lookups.
-   Prerequisite: read-only confirmation of City columns, keys, external writers
-   and ownership. Exclude maps/geofiles until geo fields are verified.
-2. **Municipio.Notificacao internal list.** Use the existing adapter for
+1. **Municipio.Notificacao internal list.** Use the existing adapter for
    bounded internal filtering/pagination. Exclude CSV analytics and ingestion.
-3. **Bounded Municipio.Historico_alerta city reports.** Proceed only after
+2. **Bounded Municipio.Historico_alerta city reports.** Proceed only after
    output and performance equivalence are demonstrated. Exclude state
    dashboards and compatibility APIs.
-4. **Dengue_global.Municipio map/geofile metadata.** Add only verified adapter
+3. **Dengue_global.Municipio map/geofile metadata.** Add only verified adapter
    metadata and a focused service boundary. Exclude geometry and file workflow
    redesign.
 

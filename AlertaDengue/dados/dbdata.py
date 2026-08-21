@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections import defaultdict
 from collections.abc import Sequence
-from dataclasses import dataclass
 from datetime import datetime
 import logging
 from typing import (
@@ -28,6 +27,14 @@ from sqlalchemy.engine import Engine, Row
 
 # local
 from .episem import episem
+from .services.dengue_global_lookups import (
+    CID10_CODES as CID10,
+    ReportParameters,
+    get_cities as get_dengue_global_cities,
+    get_regional_municipalities,
+    get_regional_names as get_dengue_global_regional_names,
+    get_report_parameters as get_dengue_global_report_parameters,
+)
 from .services.historical_alerts import get_latest_historical_alert_week
 
 logger = logging.getLogger(__name__)
@@ -39,7 +46,6 @@ QUERY_CACHE_TIMEOUT = getattr(settings, "QUERY_CACHE_TIMEOUT")
 
 T = TypeVar("T")
 
-CID10 = {"dengue": "A90", "chikungunya": "A92.0", "zika": "A928"}
 DISEASES_SHORT = ["dengue", "chik", "zika"]
 DISEASES_NAME = CID10.keys()
 ALERT_COLOR = {1: "verde", 2: "amarelo", 3: "laranja", 4: "vermelho"}
@@ -71,21 +77,6 @@ def _build_monitored_municipalities_cache_key(
         else _normalize_cache_key_component(state_name)
     )
     return f"count_monitored_municipalities:{state_component}:{disease}"
-
-
-@dataclass(frozen=True, slots=True)
-class ReportParameters:
-    """Disease-specific parameters used by city reports."""
-
-    cid10: str
-    municipio_geocodigo: int
-    varcli: Any
-    clicrit: Any
-    varcli2: Any
-    clicrit2: Any
-    limiar_preseason: Any
-    limiar_posseason: Any
-    limiar_epidemico: Any
 
 
 UF_CODES = {
@@ -239,9 +230,7 @@ def count_monitored_municipalities(
 
 
 class RegionalParameters:
-    """Helpers to query regional parameters via SQL."""
-
-    SCHEMA: str = "Dengue_global"
+    """Compatibility facade for Django ORM Dengue_global lookup services."""
 
     @classmethod
     def get_regional_names(cls, state_name: str) -> list[str]:
@@ -258,28 +247,7 @@ class RegionalParameters:
         list[str]
             Regional names.
         """
-        cache_name = f"regional_names_to_{state_name.replace(' ', '_')}"
-        cached = cache.get(cache_name)
-        if cached is not None:
-            return cached
-
-        sql = f"""
-            SELECT DISTINCT r.nome
-            FROM "{cls.SCHEMA}"."regional" AS r
-            JOIN "{cls.SCHEMA}"."Municipio" AS m ON r.id = m.id_regional
-            JOIN "{cls.SCHEMA}"."parameters" AS p ON m.geocodigo = p.municipio_geocodigo
-            WHERE m.uf = :state_name
-        """
-
-        df = _read_sql_df(
-            DB_ENGINE,
-            sql,
-            params={"state_name": state_name},
-        )
-
-        res = df["nome"].tolist()
-        cache.set(cache_name, res, QUERY_CACHE_TIMEOUT)
-        return res
+        return get_dengue_global_regional_names(state_name)
 
     @classmethod
     def get_cities(
@@ -290,100 +258,14 @@ class RegionalParameters:
         """
         Return mapping geocode -> city name for a region or state.
         """
-        cities_by_region: dict[int, str] = {}
-        if state_name is None:
-            return cities_by_region
-
-        if regional_name is not None:
-            cache_name = (
-                f"{regional_name.replace(' ', '_')}_"
-                f"{state_name.replace(' ', '_')}"
-            )
-            cached = cache.get(cache_name)
-            if cached is not None:
-                return cached
-
-            sql = f"""
-                SELECT DISTINCT m.geocodigo, m.nome
-                FROM "{cls.SCHEMA}"."Municipio" AS m
-                JOIN "{cls.SCHEMA}"."regional" AS r ON m.id_regional = r.id
-                JOIN "{cls.SCHEMA}"."parameters" AS p ON m.geocodigo = p.municipio_geocodigo
-                WHERE m.uf = :state_name AND r.nome = :regional_name
-                ORDER BY m.nome
-            """
-
-            df = _read_sql_df(
-                DB_ENGINE,
-                sql,
-                params={
-                    "state_name": state_name,
-                    "regional_name": regional_name,
-                },
-            )
-
-            for row in df.itertuples(index=False):
-                cities_by_region[int(row.geocodigo)] = str(row.nome)
-
-            cache.set(cache_name, cities_by_region, QUERY_CACHE_TIMEOUT)
-            return cities_by_region
-
-        cache_name = f"all_cities_from_{state_name.replace(' ', '_')}"
-        cached = cache.get(cache_name)
-        if cached is not None:
-            return cached
-
-        sql = f"""
-            SELECT geocodigo, nome
-            FROM "{cls.SCHEMA}"."Municipio"
-            WHERE uf = :state_name
-            ORDER BY nome
-        """
-
-        df = _read_sql_df(
-            DB_ENGINE,
-            sql,
-            params={"state_name": state_name},
-        )
-
-        for row in df.itertuples(index=False):
-            cities_by_region[int(row.geocodigo)] = str(row.nome)
-
-        cache.set(cache_name, cities_by_region, QUERY_CACHE_TIMEOUT)
-        return cities_by_region
+        return get_dengue_global_cities(regional_name, state_name)
 
     @classmethod
     def get_report_parameters(
         cls, geocode: int, disease: str
     ) -> ReportParameters | None:
         """Return disease-specific parameters used by city reports."""
-        cid10_code = CID10.get(disease, "")
-
-        sql = f"""
-            SELECT
-                cid10,
-                municipio_geocodigo,
-                varcli,
-                clicrit,
-                varcli2,
-                clicrit2,
-                limiar_preseason,
-                limiar_posseason,
-                limiar_epidemico
-            FROM "{cls.SCHEMA}"."parameters"
-            WHERE cid10 = :cid10_code
-              AND municipio_geocodigo = :geocode
-        """
-
-        df = _read_sql_df(
-            DB_ENGINE,
-            sql,
-            params={"cid10_code": cid10_code, "geocode": geocode},
-        )
-
-        if df.empty:
-            return None
-
-        return ReportParameters(**df.iloc[0].to_dict())
+        return get_dengue_global_report_parameters(geocode, disease)
 
 
 # General util functions
@@ -1013,22 +895,19 @@ class ReportState:
         res = cache.get(cache_name)
 
         if res is None:
-            uf_name = ALL_STATE_NAMES[state][0]
+            uf_name = str(ALL_STATE_NAMES[state][0])
 
-            sql = """
-                SELECT
-                    m.id_regional AS id_regional,
-                    m.regional AS nome_regional,
-                    m.geocodigo AS municipio_geocodigo,
-                    m.nome AS municipio_nome
-                FROM "Dengue_global"."Municipio" AS m
-                WHERE m.uf = :uf_name
-            """
-
-            df = _read_sql_df(
-                DB_ENGINE,
-                sql,
-                params={"uf_name": uf_name},
+            rows = get_regional_municipalities(uf_name)
+            df = pd.DataFrame.from_records(
+                rows,
+                columns=["regional_id", "regional_name", "geocode", "name"],
+            ).rename(
+                columns={
+                    "regional_id": "id_regional",
+                    "regional_name": "nome_regional",
+                    "geocode": "municipio_geocodigo",
+                    "name": "municipio_nome",
+                }
             )
 
             res = df

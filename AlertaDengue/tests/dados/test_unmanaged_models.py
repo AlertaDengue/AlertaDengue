@@ -132,6 +132,22 @@ def test_notification_key_column_mappings():
     )
 
 
+def test_dengue_global_lookup_adapter_metadata():
+    assert City._meta.get_field("geocode").column == "geocodigo"
+    assert City._meta.get_field("state").column == "uf"
+    assert City._meta.get_field("regional_id").column == "id_regional"
+    assert Regional._meta.get_field("id").primary_key
+    assert Regional._meta.get_field("macroregion").column == "id_macroregional"
+    assert Parameter._meta.get_field("municipality_geocode").column == (
+        "municipio_geocodigo"
+    )
+    assert Parameter._meta.get_field("cid10_code").column == "cid10"
+    assert Parameter._meta.pk.field_names == (
+        "municipality_geocode",
+        "cid10_code",
+    )
+
+
 def test_supported_historical_alert_diseases_are_canonical():
     assert get_supported_historical_alert_diseases() == (
         "dengue",
