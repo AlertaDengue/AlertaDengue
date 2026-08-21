@@ -118,9 +118,13 @@ class Parameter(models.Model):
     pk = models.CompositePrimaryKey("municipality_geocode", "cid10_code")
     municipality_geocode = models.IntegerField(db_column="municipio_geocodigo")
     cid10_code = models.CharField(db_column="cid10", max_length=16)
-    baseline_variation = models.FloatField(db_column="varcli", null=True)
+    baseline_variation = models.CharField(
+        db_column="varcli", max_length=128, null=True
+    )
     baseline_critical = models.FloatField(db_column="clicrit", null=True)
-    secondary_variation = models.FloatField(db_column="varcli2", null=True)
+    secondary_variation = models.CharField(
+        db_column="varcli2", max_length=128, null=True
+    )
     secondary_critical = models.FloatField(db_column="clicrit2", null=True)
     preseason_threshold = models.FloatField(
         db_column="limiar_preseason", null=True

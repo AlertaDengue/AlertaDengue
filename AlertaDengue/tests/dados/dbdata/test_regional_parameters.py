@@ -11,8 +11,17 @@ from django.core.cache import cache
 import pytest
 
 from dados.dbdata import RegionalParameters
+from dados.models import City
+from dados.services.dengue_global_lookups import (
+    get_cities,
+    get_regional_names,
+    get_report_parameters,
+)
 
-pytestmark = pytest.mark.usefixtures("regional_parameters_tables")
+pytestmark = [
+    pytest.mark.django_db(databases={"default", "dados"}, transaction=True),
+    pytest.mark.usefixtures("regional_parameters_tables"),
+]
 
 
 @pytest.fixture(autouse=True)
@@ -26,6 +35,7 @@ def test_get_regional_names() -> None:
     assert "Metropolitana I" in names
     assert "Metropolitana II" in names
     assert len(names) == 2
+    assert names == sorted(names)
 
 
 def test_get_cities_by_state() -> None:
@@ -35,6 +45,7 @@ def test_get_cities_by_state() -> None:
     assert cities[3304557] == "Rio de Janeiro"
     assert 3303302 in cities
     assert cities[3303302] == "Niterói"
+    assert cities[3301702] == "No parameters city"
 
 
 def test_get_cities_by_region() -> None:
@@ -44,6 +55,25 @@ def test_get_cities_by_region() -> None:
     )
     assert 3304557 in cities  # Rio is in Metro I
     assert 3303302 not in cities  # Niteroi is in Metro II (in our mock data)
+    assert 3301702 not in cities  # This city has no parameters.
+
+
+def test_lookup_service_matches_legacy_sql_contracts() -> None:
+    """ORM lookup values preserve the former SQL consumer contracts."""
+    assert get_regional_names("RJ") == [
+        "Metropolitana I",
+        "Metropolitana II",
+    ]
+    cities = get_cities(state_name="RJ")
+    assert list(cities.items()) == [
+        (3303302, "Niterói"),
+        (3301702, "No parameters city"),
+        (3304557, "Rio de Janeiro"),
+    ]
+    assert cache.get("all_cities_from_RJ") == cities
+    assert City.objects.all().db == "dados"
+    assert get_cities("Metropolitana I", "RJ") == {3304557: "Rio de Janeiro"}
+    assert get_cities(state_name="SP") == {}
 
 
 def test_get_report_parameters() -> None:
@@ -56,6 +86,7 @@ def test_get_report_parameters() -> None:
     assert params.varcli2 == "temp_min"
     assert params.limiar_preseason == 100
     assert params.limiar_epidemico == 300
+    assert get_report_parameters(3304557, "dengue") == params
 
 
 class TestDiseaseFilterParameters:
@@ -90,6 +121,10 @@ class TestDiseaseFilterParameters:
         assert (
             RegionalParameters.get_report_parameters(3304557, "zika") is None
         )
+        assert (
+            RegionalParameters.get_report_parameters(3304557, "yellow-fever")
+            is None
+        )
 
     def test_regional_names_not_duplicated(self) -> None:
         assert len(RegionalParameters.get_regional_names("RJ")) == 2
@@ -97,6 +132,6 @@ class TestDiseaseFilterParameters:
     def test_cities_not_duplicated(self) -> None:
         cities = RegionalParameters.get_cities(state_name="RJ")
 
-        assert len(cities) == 2
+        assert len(cities) == 3
         assert 3304557 in cities
         assert 3303302 in cities
