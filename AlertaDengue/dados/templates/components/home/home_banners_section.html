@@ -12,6 +12,7 @@
             <ol class="carousel-indicators">
               <li data-target="#carouselTop" data-slide-to="0" class="active"></li>
               <li data-target="#carouselTop" data-slide-to="1"></li>
+              <li data-target="#carouselTop" data-slide-to="2"></li>
             </ol>
             <div class="carousel-inner">
               {# 2) Epidemiological situation analysis #}
@@ -87,6 +88,20 @@
                       {% trans "saiba mais" %}
                     </a>
                   </div>
+                </div>
+              </div>
+              {# 3) EPIDESC #}
+              <div class="carousel-item">
+                <div class="banner-slide banner-slide--image">
+                  <a class="banner-link"
+                     href="https://cran.r-project.org/web/packages/epidesc/index.html"
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     aria-label="{% translate 'EPIDESC package banner' %}">
+                    <img class="d-block banner-img img-fluid"
+                         src="{% static 'img/home/banners/banner_epidesc_'|add:lang_suffix|add:'.png' %}"
+                         alt="{% translate 'EPIDESC package banner' %}">
+                  </a>
                 </div>
               </div>
             </div>

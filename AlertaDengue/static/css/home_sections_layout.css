@@ -61,6 +61,26 @@
   object-position: center;
 }
 
+#carouselTop .banner-slide--image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#carouselTop .banner-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+#carouselTop .banner-slide--image .banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 #carouselTop .hero-banner-overlay {
   position: absolute;
   inset: 0;
