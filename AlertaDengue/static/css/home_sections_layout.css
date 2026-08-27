@@ -67,18 +67,33 @@
   justify-content: center;
 }
 
-#carouselTop .banner-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+#carouselTop .banner-link,
+#carouselTop .banner-picture {
   width: 100%;
   height: 100%;
 }
 
+#carouselTop .banner-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#carouselTop .banner-picture {
+  display: block;
+}
+
 #carouselTop .banner-slide--image .banner-img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+@media (max-width: 575.98px) {
+  #carouselTop .banner-img--epidesc {
+    object-position: center center;
+  }
 }
 
 #carouselTop .hero-banner-overlay {

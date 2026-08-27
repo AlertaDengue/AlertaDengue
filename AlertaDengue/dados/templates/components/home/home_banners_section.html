@@ -91,16 +91,20 @@
                 </div>
               </div>
               {# 3) EPIDESC #}
-              <div class="carousel-item">
-                <div class="banner-slide banner-slide--image">
-                  <a class="banner-link"
+              <div class="carousel-item carousel-item--epidesc">
+                <div class="banner-slide banner-slide--image banner-slide--epidesc">
+                  <a class="banner-link banner-link--epidesc"
                      href="https://cran.r-project.org/web/packages/epidesc/index.html"
                      target="_blank"
                      rel="noopener noreferrer"
                      aria-label="{% translate 'EPIDESC package banner' %}">
-                    <img class="d-block banner-img img-fluid"
-                         src="{% static 'img/home/banners/banner_epidesc_'|add:lang_suffix|add:'.png' %}"
-                         alt="{% translate 'EPIDESC package banner' %}">
+                    <picture class="banner-picture banner-picture--epidesc">
+                      <source media="(max-width: 575.98px)"
+                              srcset="{% static 'img/home/banners/banner_epidesc_mobile_'|add:lang_suffix|add:'.svg' %}">
+                      <img class="d-block banner-img banner-img--epidesc img-fluid"
+                           src="{% static 'img/home/banners/banner_epidesc_'|add:lang_suffix|add:'.svg' %}"
+                           alt="{% translate 'EPIDESC package banner' %}">
+                    </picture>
                   </a>
                 </div>
               </div>
