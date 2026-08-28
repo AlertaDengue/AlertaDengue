@@ -61,6 +61,12 @@ The three Municipio.Historico_alerta tables have normalized unmanaged adapters.
 They remain separate physical tables; no merge or physical ownership change is
 implied. The historical-alert service is their canonical application boundary.
 
+`ReportCity.read_disease_data` now uses that service for its bounded,
+municipality-and-epidemiological-week city-report projection. It explicitly
+uses the `dados` alias and retains the legacy 200-row limit and output
+DataFrame contract. State reports, dashboard aggregates, compatibility APIs,
+exports, and alert-generation SQL remain intentional SQL boundaries.
+
 The public /api/v1/alert-city/ endpoint now uses that service and preserves its
 normalized response contract. The legacy /api/alertcity/ endpoint remains an
 explicit SQL compatibility path and is not a target of this sequence.
