@@ -35,7 +35,10 @@ from .services.dengue_global_lookups import (
     get_regional_names as get_dengue_global_regional_names,
     get_report_parameters as get_dengue_global_report_parameters,
 )
-from .services.historical_alerts import get_latest_historical_alert_week
+from .services.historical_alerts import (
+    build_report_city_historical_alert_queryset,
+    get_latest_historical_alert_week,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -824,12 +827,6 @@ class ReportCity:
         if disease not in CID10:
             raise ValueError(f"Unsupported disease: {disease!r}")
 
-        table_suffix = ""
-        if disease != "dengue":
-            table_suffix = get_disease_suffix(disease)
-
-        table_name = f"Historico_alerta{table_suffix}"
-
         ew_end = year_week
         ew_start = ew_end - 200
 
@@ -837,43 +834,44 @@ class ReportCity:
         # (e.g. 202401 - 200 = 202201) works roughly but isn't chemically pure date math.
         # However, preserving the logic from original code: `ew_start = ew_end - 200`
 
-        sql = f"""
-            SELECT
-                "SE" AS "SE",
-                casos AS "casos notif.",
-                casos_est AS "casos_est",
-                p_inc100k AS "incidência",
-                p_rt1 AS "pr(incid. subir)",
-                tempmin AS "temp.min",
-                tempmed AS "temp.med",
-                tempmax AS "temp.max",
-                umidmin AS "umid.min",
-                umidmed AS "umid.med",
-                umidmax AS "umid.max",
-                CASE
-                    WHEN nivel = 1 THEN 'verde'
-                    WHEN nivel = 2 THEN 'amarelo'
-                    WHEN nivel = 3 THEN 'laranja'
-                    WHEN nivel = 4 THEN 'vermelho'
-                    ELSE '-'
-                END AS nivel,
-                nivel AS level_code
-            FROM "Municipio"."{table_name}"
-            WHERE
-                "SE" BETWEEN :ew_start AND :ew_end
-                AND municipio_geocodigo = :geocode
-            ORDER BY "SE"
-            LIMIT 200
-        """
-
-        df = _read_sql_df(
-            DB_ENGINE,
-            sql,
-            params={
-                "ew_start": ew_start,
-                "ew_end": ew_end,
-                "geocode": geocode,
-            },
+        rows = build_report_city_historical_alert_queryset(
+            disease=disease,
+            municipality_geocode=geocode,
+            start_week=ew_start,
+            end_week=ew_end,
+        )
+        df = pd.DataFrame.from_records(
+            rows,
+            columns=[
+                "report_week",
+                "notified_cases",
+                "estimated_cases",
+                "incidence",
+                "incidence_rise_probability",
+                "minimum_temperature",
+                "mean_temperature",
+                "maximum_temperature",
+                "minimum_humidity",
+                "mean_humidity",
+                "maximum_humidity",
+                "alert_label",
+                "level_code",
+            ],
+        ).rename(
+            columns={
+                "report_week": "SE",
+                "notified_cases": "casos notif.",
+                "estimated_cases": "casos_est",
+                "incidence": "incidência",
+                "incidence_rise_probability": "pr(incid. subir)",
+                "minimum_temperature": "temp.min",
+                "mean_temperature": "temp.med",
+                "maximum_temperature": "temp.max",
+                "minimum_humidity": "umid.min",
+                "mean_humidity": "umid.med",
+                "maximum_humidity": "umid.max",
+                "alert_label": "nivel",
+            }
         )
         return df.set_index("SE")
 

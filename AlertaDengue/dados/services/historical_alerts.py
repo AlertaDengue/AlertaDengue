@@ -1,5 +1,7 @@
 """Lookup helpers for the separate legacy historical-alert adapters."""
 
+from django.db.models import Case, CharField, F, QuerySet, Value, When
+
 from dados.models.municipio import (
     LegacyHistoricalAlertChikungunya,
     LegacyHistoricalAlertDengue,
@@ -55,6 +57,67 @@ def build_historical_alert_records_queryset(
 
     return queryset.order_by(
         "epidemiological_week_start_date", "epidemiological_week", "id"
+    )
+
+
+def build_report_city_historical_alert_queryset(
+    *,
+    disease: str,
+    municipality_geocode: int,
+    start_week: int,
+    end_week: int,
+) -> QuerySet:
+    """Return the bounded projection used by the city-report charts.
+
+    This preserves the legacy ``ReportCity`` range and 200-row limit while
+    keeping filtering, projection, ordering, and limiting on the ``dados``
+    PostgreSQL connection.
+    """
+    model = get_legacy_historical_alert_model(disease)
+    alert_label = Case(
+        When(alert_level=1, then=Value("verde")),
+        When(alert_level=2, then=Value("amarelo")),
+        When(alert_level=3, then=Value("laranja")),
+        When(alert_level=4, then=Value("vermelho")),
+        default=Value("-"),
+        output_field=CharField(),
+    )
+    return (
+        model.objects.using("dados")
+        .filter(
+            municipality_geocode=municipality_geocode,
+            epidemiological_week__range=(start_week, end_week),
+        )
+        .annotate(
+            report_week=F("epidemiological_week"),
+            notified_cases=F("cases"),
+            incidence=F("incidence_100k_probability"),
+            incidence_rise_probability=F("rt1_probability"),
+            minimum_temperature=F("temperature_min"),
+            mean_temperature=F("temperature_mean"),
+            maximum_temperature=F("temperature_max"),
+            minimum_humidity=F("humidity_min"),
+            mean_humidity=F("humidity_mean"),
+            maximum_humidity=F("humidity_max"),
+            alert_label=alert_label,
+            level_code=F("alert_level"),
+        )
+        .order_by("epidemiological_week")
+        .values(
+            "report_week",
+            "notified_cases",
+            "estimated_cases",
+            "incidence",
+            "incidence_rise_probability",
+            "minimum_temperature",
+            "mean_temperature",
+            "maximum_temperature",
+            "minimum_humidity",
+            "mean_humidity",
+            "maximum_humidity",
+            "alert_label",
+            "level_code",
+        )[:200]
     )
 
 
