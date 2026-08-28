@@ -1,7 +1,4 @@
-from pathlib import Path
-
 from django.contrib.auth.models import Group, User
-from django.db import connection
 from django.urls import reverse
 import pytest
 from rest_framework.authtoken.models import Token
@@ -9,9 +6,8 @@ from rest_framework.test import APIClient
 
 from api.internal.constants import NOTIFICATION_API_GROUP_NAME
 
-CURRENT_DIR = Path(__file__).resolve().parent.parent
-NOTIFICATION_SQL_FIXTURE = (
-    CURRENT_DIR / "datasets" / "test_notification.output.sql"
+pytestmark = pytest.mark.django_db(
+    databases={"default", "dados"}, transaction=True
 )
 
 
@@ -58,16 +54,6 @@ def unauthorized_api_client(db, api_client):
     return api_client
 
 
-@pytest.fixture()
-def notification_data(db):
-    _ = db
-    sql = NOTIFICATION_SQL_FIXTURE.read_text(encoding="utf-8")
-
-    with connection.cursor() as cursor:
-        cursor.execute(sql)
-
-
-@pytest.mark.django_db
 def test_notifications_endpoint_requires_auth(api_client):
     url = reverse("api:internal:notifications")
 
@@ -76,7 +62,6 @@ def test_notifications_endpoint_requires_auth(api_client):
     assert response.status_code in {401, 403}
 
 
-@pytest.mark.django_db
 def test_notifications_endpoint_rejects_user_without_group(
     unauthorized_api_client,
 ):
@@ -87,8 +72,7 @@ def test_notifications_endpoint_rejects_user_without_group(
     assert response.status_code == 403
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures("notification_data")
+@pytest.mark.usefixtures("notification_table")
 def test_notifications_endpoint_allows_user_with_group(
     notification_api_client,
 ):
@@ -109,8 +93,7 @@ def test_notifications_endpoint_allows_user_with_group(
     assert response.status_code == 200
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures("notification_data")
+@pytest.mark.usefixtures("notification_table")
 def test_notifications_endpoint_exists(
     notification_api_client,
 ):
@@ -124,8 +107,7 @@ def test_notifications_endpoint_exists(
     assert response.status_code != 404
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures("notification_data")
+@pytest.mark.usefixtures("notification_table")
 def test_notifications_endpoint_returns_paginated_payload(
     notification_api_client,
 ):
@@ -170,8 +152,7 @@ def test_notifications_endpoint_returns_paginated_payload(
     assert float(first_result["criterio"]) == 2.0
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures("notification_data")
+@pytest.mark.usefixtures("notification_table")
 def test_notifications_endpoint_filters_by_municipio_geocodigo(
     notification_api_client,
 ):
@@ -196,8 +177,7 @@ def test_notifications_endpoint_filters_by_municipio_geocodigo(
     assert payload["results"][0]["municipio_geocodigo"] == 3550308
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures("notification_data")
+@pytest.mark.usefixtures("notification_table")
 def test_notifications_endpoint_filters_by_cid10(
     notification_api_client,
 ):
@@ -222,8 +202,7 @@ def test_notifications_endpoint_filters_by_cid10(
     assert payload["results"][0]["cid10_codigo"] == "A92"
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures("notification_data")
+@pytest.mark.usefixtures("notification_table")
 def test_notifications_endpoint_filters_by_year(
     notification_api_client,
 ):
@@ -248,8 +227,7 @@ def test_notifications_endpoint_filters_by_year(
     assert payload["results"][0]["ano_notif"] == 2023
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures("notification_data")
+@pytest.mark.usefixtures("notification_table")
 def test_notifications_endpoint_filters_by_epiweek_range(
     notification_api_client,
 ):
@@ -276,8 +254,7 @@ def test_notifications_endpoint_filters_by_epiweek_range(
     assert payload["results"][0]["se_notif"] == 2
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures("notification_data")
+@pytest.mark.usefixtures("notification_table")
 def test_notifications_endpoint_filters_by_date_range(
     notification_api_client,
 ):
@@ -303,8 +280,7 @@ def test_notifications_endpoint_filters_by_date_range(
     assert payload["results"][0]["dt_notific"] == "2024-02-15"
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures("notification_data")
+@pytest.mark.usefixtures("notification_table")
 def test_notifications_endpoint_applies_limit_and_offset(
     notification_api_client,
 ):
@@ -333,7 +309,6 @@ def test_notifications_endpoint_applies_limit_and_offset(
     assert payload["results"][0]["id"] == 1
 
 
-@pytest.mark.django_db
 def test_notifications_endpoint_returns_400_for_invalid_limit(
     notification_api_client,
 ):
@@ -344,7 +319,6 @@ def test_notifications_endpoint_returns_400_for_invalid_limit(
     assert response.status_code == 400
 
 
-@pytest.mark.django_db
 def test_notifications_endpoint_returns_400_for_invalid_offset(
     notification_api_client,
 ):
@@ -353,3 +327,29 @@ def test_notifications_endpoint_returns_400_for_invalid_offset(
     response = notification_api_client.get(url, {"offset": -1})
 
     assert response.status_code == 400
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"municipio_geocodigo": "not-a-geocode"},
+        {"cid10": "A12345"},
+        {"year": "not-a-year"},
+        {"epiweek_start": 0},
+        {"epiweek_end": 54},
+        {"date_start": "2024-99-99"},
+        {"limit": -1},
+        {"limit": 10001},
+        {"offset": "not-an-offset"},
+    ],
+)
+def test_notifications_endpoint_returns_400_for_invalid_filters(
+    notification_api_client,
+    params,
+):
+    response = notification_api_client.get(
+        reverse("api:internal:notifications"), params
+    )
+
+    assert response.status_code == 400
+    assert "detail" in response.json()
