@@ -1,14 +1,34 @@
 {
-  "default": {
-    "filename": "epidemiological-situation-analysis-02-2026.pdf",
-    "output_filename": "RELATÓRIO TÉCNICO 02_2026.pdf"
-  },
-  "epidemiological-situation-analysis-2026": {
-    "filename": "epidemiological-situation-analysis-02-2026.pdf",
-    "output_filename": "RELATÓRIO TÉCNICO 02_2026.pdf"
-  },
-  "technical-report-2023": {
-    "filename": "technical-report.pdf",
-    "output_filename": "RELATÓRIO TÉCNICO 02_23 clima e arboviroses - projeções para 2024-26out2023.pdf"
+  "default": "epidemiological-situation-analysis-2026-03",
+  "reports": {
+    "epidemiological-situation-analysis-2026-01": {
+      "filename": "epidemiological-situation-analysis-01-2026.pdf",
+      "output_filename": "RELATÓRIO TÉCNICO 01_2026.pdf",
+      "title": "Análise de situação epidemiológica da dengue em ano de El Niño (01/2026)",
+      "published": true,
+      "order": "2026-01"
+    },
+    "epidemiological-situation-analysis-2026-02": {
+      "filename": "epidemiological-situation-analysis-02-2026.pdf",
+      "output_filename": "RELATÓRIO TÉCNICO 02_2026.pdf",
+      "title": "Análise de situação epidemiológica da dengue em ano de El Niño (02/2026)",
+      "published": true,
+      "order": "2026-02"
+    },
+    "epidemiological-situation-analysis-2026-03": {
+      "filename": "epidemiological-situation-analysis-03-2026.pdf",
+      "output_filename": "RELATÓRIO TÉCNICO 03_2026.pdf",
+      "title": "Análise de situação epidemiológica da dengue em ano de El Niño (03/2026)",
+      "published": true,
+      "order": "2026-03"
+    },
+    "technical-report-2023": {
+      "filename": "technical-report.pdf",
+      "output_filename": "RELATÓRIO TÉCNICO 02_23 clima e arboviroses - projeções para 2024-26out2023.pdf",
+      "title": "Reflexões sobre o risco de arboviroses em 2024",
+      "published": true,
+      "order": "2023-02"
+    }
   }
 }
+

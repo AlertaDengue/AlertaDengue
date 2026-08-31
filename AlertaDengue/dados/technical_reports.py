@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import json
+from typing import Any
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import FileResponse, Http404
@@ -14,6 +15,9 @@ class TechnicalReport:
     key: str
     filename: str
     output_filename: str
+    title: str | None = None
+    published: bool = False
+    order: Any = None
 
 
 def load_technical_reports_manifest() -> dict[str, TechnicalReport]:
@@ -43,8 +47,18 @@ def load_technical_reports_manifest() -> dict[str, TechnicalReport]:
             "Technical reports manifest must be a JSON object."
         )
 
-    reports = {}
-    for key, entry in data.items():
+    # Determine report entries and default reference
+    if "reports" in data and isinstance(data["reports"], dict):
+        entries = data["reports"]
+        default_ref = data.get("default")
+    else:
+        entries = data
+        default_ref = data.get("default")
+
+    reports: dict[str, TechnicalReport] = {}
+    for key, entry in entries.items():
+        if key == "default" and not isinstance(entry, dict):
+            continue
         if not isinstance(entry, dict):
             raise ImproperlyConfigured(
                 f"Entry for report '{key}' must be an object."
@@ -52,6 +66,9 @@ def load_technical_reports_manifest() -> dict[str, TechnicalReport]:
 
         filename = entry.get("filename")
         output_filename = entry.get("output_filename")
+        title = entry.get("title")
+        published = bool(entry.get("published", False))
+        order = entry.get("order")
 
         if (
             not filename
@@ -71,10 +88,60 @@ def load_technical_reports_manifest() -> dict[str, TechnicalReport]:
             )
 
         reports[key] = TechnicalReport(
-            key=key, filename=filename, output_filename=output_filename
+            key=key,
+            filename=filename,
+            output_filename=output_filename,
+            title=title,
+            published=published,
+            order=order,
         )
 
+    # Resolve "default" if defined as a string reference
+    if isinstance(default_ref, str):
+        if default_ref not in reports:
+            raise ImproperlyConfigured(
+                f"Default report '{default_ref}' not found in manifest."
+            )
+        ref_report = reports[default_ref]
+        reports["default"] = TechnicalReport(
+            key="default",
+            filename=ref_report.filename,
+            output_filename=ref_report.output_filename,
+            title=ref_report.title,
+            published=ref_report.published,
+            order=ref_report.order,
+        )
+    elif "default" not in reports and default_ref is not None:
+        if not isinstance(default_ref, dict):
+            raise ImproperlyConfigured(
+                "Entry for report 'default' must be an object or a key string."
+            )
+
     return reports
+
+
+def get_published_technical_reports() -> list[TechnicalReport]:
+    """Retrieve published technical reports ordered for display."""
+    try:
+        reports = load_technical_reports_manifest()
+    except ImproperlyConfigured:
+        return []
+
+    published = [
+        report
+        for key, report in reports.items()
+        if key != "default" and report.published
+    ]
+
+    def _sort_key(report: TechnicalReport):
+        if report.order is None:
+            return (1, 0, report.key)
+        if isinstance(report.order, (int, float)):
+            return (0, report.order, report.key)
+        return (0, str(report.order), report.key)
+
+    published.sort(key=_sort_key)
+    return published
 
 
 def serve_technical_report_pdf(
@@ -84,6 +151,9 @@ def serve_technical_report_pdf(
     **_kwargs,
 ):
     """Service to serve technical report PDFs from a manifest."""
+    if report_key is None:
+        report_key = "default"
+
     try:
         reports = load_technical_reports_manifest()
     except ImproperlyConfigured as e:
