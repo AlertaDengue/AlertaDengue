@@ -8,6 +8,10 @@ from sqlalchemy.engine import Engine
 
 from ad_main.typed_settings import get_db_engine
 
+from .services.municipality_map_metadata import (
+    get_city_info as get_city_metadata,
+)
+
 DB_ENGINE: Final[Engine] = get_db_engine()
 
 
@@ -67,41 +71,23 @@ def get_city_geojson(
     }
 
 
-def get_city_info(
-    geocodigo: int,
-    db_engine: Engine = DB_ENGINE,
-) -> dict[str, Any]:
-    """Fetch municipality metadata from the database.
+def get_city_info(geocodigo: int) -> dict[str, Any]:
+    """Fetch scalar municipality metadata through the ORM service.
 
     Parameters
     ----------
     geocodigo
         Municipality geocode.
-    db_engine
-        SQLAlchemy engine.
 
     Returns
     -------
     dict[str, Any]
-        Municipality metadata (geocodigo, nome, populacao, uf).
+        Municipality metadata with ``geocodigo``, ``nome``, ``populacao``,
+        and ``uf`` keys.
 
     Raises
     ------
     ValueError
         If the municipality is not found.
     """
-    stmt = text(
-        """
-        SELECT geocodigo, nome, populacao, uf
-        FROM "Dengue_global"."Municipio"
-        WHERE geocodigo = :geocodigo
-        """
-    )
-
-    with db_engine.connect() as conn:
-        row = conn.execute(stmt, {"geocodigo": geocodigo}).mappings().first()
-
-    if row is None:
-        raise ValueError(f"Municipio not found for geocodigo={geocodigo}")
-
-    return dict(row)
+    return get_city_metadata(geocodigo)

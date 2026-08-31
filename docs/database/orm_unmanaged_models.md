@@ -21,7 +21,7 @@ quoted identifiers remain only in db_table and db_column mappings.
 
 | Object | Type | Django model | Management | Access | Current responsibility | Next action |
 | --- | --- | --- | --- | --- | --- | --- |
-| Municipio | table | dados.models.City | Unmanaged | Read-only | Municipality search/report lookup and map metadata | Search/report reads use the shared ORM service; retain map metadata review |
+| Municipio | table | dados.models.City | Unmanaged | Read-only | Municipality search/report lookup and bounded scalar map metadata | Search/report reads and `dados.maps.get_city_info` use ORM services; retain GeoJSON/geofile SQL boundaries |
 | CID10 | table | dados.models.CID10 | Unmanaged | Read-only | Disease-code lookup | Retain adapter |
 | "Dengue_global"."estado" | table | dados.models.State | Unmanaged | Read-only | State-history dependency | Keep in lookup review |
 | "Dengue_global"."macroregional" | table | dados.models.MacroRegion | Unmanaged | Read-only | Regional relationship | Keep in lookup review |
@@ -78,12 +78,9 @@ operational processing remain explicit SQL boundaries.
 
 ## Next schema-group refactors
 
-1. **Bounded Municipio.Historico_alerta city reports.** Proceed only after
-   output and performance equivalence are demonstrated. Exclude state
-   dashboards and compatibility APIs.
-2. **Dengue_global.Municipio map/geofile metadata.** Add only verified adapter
-   metadata and a focused service boundary. Exclude geometry and file workflow
-   redesign.
+1. **Dengue_global.Municipio map/geofile metadata beyond scalar lookups.**
+   Retain GeoJSON, geometry, shapefile, and geofile workflows as SQL/file
+   boundaries pending separate evidence and design.
 
 ## Explicit SQL boundaries
 
@@ -98,8 +95,13 @@ Keep these SQL unless separately benchmarked or redesigned:
 
 ## Unresolved metadata and ownership
 
-- Confirm retained Dengue_global.Municipio geo fields, authoritative metadata
-  and external writer before extending City.
+- `City` maps the verified scalar metadata fields `geocodigo` (integer PK),
+  `nome` (varchar(128)), `populacao` (bigint), and `uf` (varchar(20)).
+  `dados.maps.get_city_info` reads those fields through the explicit `dados`
+  alias. Physical ownership and the authoritative population source remain
+  external/unresolved; Django does not write this unmanaged table.
+- Confirm retained Dengue_global.Municipio geometry/GeoJSON fields and their
+  authoritative writer before expanding the adapter.
 - Establish owner, refresh mechanism, indexes and safe identity for every
   retained public materialized view before proposing a model.
 - Confirm lifecycle and access expectations for external historical tables

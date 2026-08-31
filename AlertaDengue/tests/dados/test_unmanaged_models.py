@@ -134,6 +134,11 @@ def test_notification_key_column_mappings():
 
 def test_dengue_global_lookup_adapter_metadata():
     assert City._meta.get_field("geocode").column == "geocodigo"
+    assert City._meta.get_field("population").column == "populacao"
+    assert (
+        City._meta.get_field("population").get_internal_type()
+        == "BigIntegerField"
+    )
     assert City._meta.get_field("state").column == "uf"
     assert City._meta.get_field("regional_id").column == "id_regional"
     assert Regional._meta.get_field("id").primary_key

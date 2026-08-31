@@ -12,6 +12,7 @@ class City(models.Model):
     read_write_policy = READ_ONLY
     geocode = models.IntegerField(db_column="geocodigo", primary_key=True)
     name = models.CharField(db_column="nome", max_length=128)
+    population = models.BigIntegerField(db_column="populacao")
     state = models.CharField(db_column="uf", max_length=20)
     regional_id = models.IntegerField(db_column="id_regional")
     regional_name = models.CharField(db_column="regional", max_length=128)
