@@ -220,6 +220,14 @@ def test_home_technical_report_link_uses_download_route() -> None:
     )
 
 
+def test_home_banner_technical_report_link_uses_default_endpoint() -> None:
+    content = render_to_string("components/home/home_banners_section.html")
+
+    assert (
+        f'href="{reverse("dados:download_technical_report_pdf")}"' in content
+    )
+
+
 def test_services_api_download_button_shows_selected_format() -> None:
     content = (
         Path(__file__).resolve().parents[2]
@@ -236,15 +244,166 @@ def test_services_api_download_button_shows_selected_format() -> None:
     assert "fa fa-download" in content
 
 
-def test_products_technical_report_links() -> None:
-    content = render_to_string("products.html")
-    for key in (
-        "epidemiological-situation-analysis-2026-01",
-        "epidemiological-situation-analysis-2026-02",
-        "epidemiological-situation-analysis-2026-03",
-        "technical-report-2023",
-    ):
-        assert (
-            f'href="{reverse("dados:download_technical_report_pdf", kwargs={"report_key": key})}"'
-            in content
+def test_products_technical_report_links_rendered_from_manifest(
+    tmp_path: Path,
+) -> None:
+    manifest = {
+        "default": "report-01",
+        "reports": {
+            "report-01": {
+                "filename": "report-01.pdf",
+                "output_filename": "Report 01.pdf",
+                "title": "Relatório Técnico Especial 01",
+                "published": True,
+                "order": 1,
+            },
+            "report-02": {
+                "filename": "report-02.pdf",
+                "output_filename": "Report 02.pdf",
+                "title": "Relatório Técnico Especial 02",
+                "published": True,
+                "order": 2,
+            },
+            "draft-report": {
+                "filename": "draft.pdf",
+                "output_filename": "Draft.pdf",
+                "title": "Relatório Técnico em Rascunho",
+                "published": False,
+                "order": 3,
+            },
+        },
+    }
+    (tmp_path / "technical_reports.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+    (tmp_path / "report-01.pdf").write_bytes(b"%PDF-1.4 report 1")
+    (tmp_path / "report-02.pdf").write_bytes(b"%PDF-1.4 report 2")
+    (tmp_path / "draft.pdf").write_bytes(b"%PDF-1.4 draft")
+
+    from dados.technical_reports import get_published_technical_reports
+
+    with override_settings(TECHNICAL_REPORTS_ROOT=tmp_path):
+        published_reports = get_published_technical_reports()
+        assert len(published_reports) == 2
+        assert [r.key for r in published_reports] == ["report-01", "report-02"]
+
+        content = render_to_string(
+            "products.html", {"technical_reports": published_reports}
         )
+
+        for report in published_reports:
+            url = reverse(
+                "dados:download_technical_report_pdf",
+                kwargs={"report_key": report.key},
+            )
+            assert f'href="{url}"' in content
+            assert report.title in content
+
+        assert "Relatório Técnico em Rascunho" not in content
+
+
+def test_products_page_view_context_includes_published_reports(
+    tmp_path: Path,
+) -> None:
+    manifest = {
+        "default": "report-01",
+        "reports": {
+            "report-01": {
+                "filename": "report-01.pdf",
+                "output_filename": "Report 01.pdf",
+                "title": "Relatório Técnico Publicado",
+                "published": True,
+                "order": 1,
+            },
+            "draft-01": {
+                "filename": "draft.pdf",
+                "output_filename": "Draft.pdf",
+                "title": "Relatório Não Publicado",
+                "published": False,
+            },
+        },
+    }
+    (tmp_path / "technical_reports.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+    (tmp_path / "report-01.pdf").write_bytes(b"%PDF-1.4")
+    (tmp_path / "draft.pdf").write_bytes(b"%PDF-1.4")
+
+    from dados.views import ProductsPageView
+
+    with override_settings(TECHNICAL_REPORTS_ROOT=tmp_path):
+        view = ProductsPageView()
+        view.setup(RequestFactory().get("/produtos/"))
+        context = view.get_context_data()
+
+        assert "technical_reports" in context
+        assert len(context["technical_reports"]) == 1
+        assert context["technical_reports"][0].key == "report-01"
+        assert (
+            context["technical_reports"][0].title
+            == "Relatório Técnico Publicado"
+        )
+
+
+def test_manifest_string_default_reference_serves_target_pdf(
+    tmp_path: Path,
+) -> None:
+    manifest = {
+        "default": "epidemiological-situation-analysis-2026-03",
+        "reports": {
+            "epidemiological-situation-analysis-2026-03": {
+                "filename": "analysis-03.pdf",
+                "output_filename": "RELATÓRIO TÉCNICO 03.pdf",
+                "title": "Análise 03",
+                "published": True,
+            }
+        },
+    }
+    (tmp_path / "technical_reports.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+    pdf_content = b"%PDF-1.4 content for 03"
+    (tmp_path / "analysis-03.pdf").write_bytes(pdf_content)
+
+    download_technical_report_pdf = _download_view()
+
+    with override_settings(TECHNICAL_REPORTS_ROOT=tmp_path):
+        response = download_technical_report_pdf(RequestFactory().get("/"))
+
+    assert response.status_code == 200
+    assert "RELATÓRIO TÉCNICO 03.pdf" in response["Content-Disposition"]
+    assert _consume_response(response) == pdf_content
+
+
+def test_manifest_invalid_default_reference_raises_improperly_configured(
+    tmp_path: Path,
+) -> None:
+    manifest = {
+        "default": "non-existent-key",
+        "reports": {
+            "report-01": {
+                "filename": "report-01.pdf",
+                "output_filename": "Report 01.pdf",
+            }
+        },
+    }
+    (tmp_path / "technical_reports.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+    download_technical_report_pdf = _download_view()
+
+    with override_settings(TECHNICAL_REPORTS_ROOT=tmp_path):
+        with pytest.raises(
+            ImproperlyConfigured,
+            match="Default report 'non-existent-key' not found",
+        ):
+            download_technical_report_pdf(RequestFactory().get("/"))
+
+
+def test_get_published_technical_reports_handles_missing_manifest(
+    tmp_path: Path,
+) -> None:
+    from dados.technical_reports import get_published_technical_reports
+
+    with override_settings(TECHNICAL_REPORTS_ROOT=tmp_path):
+        assert get_published_technical_reports() == []

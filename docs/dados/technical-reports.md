@@ -33,40 +33,55 @@ The manifest and every referenced PDF must coexist inside this directory.
 
 # Manifest format
 
-The manifest is a JSON object where each key is a logical identifier for a report.
+The manifest is a JSON object defining the `default` report and report metadata under `reports` (or flat object).
 
 Example:
 
 ```json
 {
-  "default": {
-    "filename": "epidemiological-situation-analysis-03-2026.pdf",
-    "output_filename": "RELATÓRIO TÉCNICO 03_2026.pdf"
-  },
-  "epidemiological-situation-analysis-2026-01": {
-    "filename": "epidemiological-situation-analysis-01-2026.pdf",
-    "output_filename": "RELATÓRIO TÉCNICO 01_2026.pdf"
-  },
-  "epidemiological-situation-analysis-2026-02": {
-    "filename": "epidemiological-situation-analysis-02-2026.pdf",
-    "output_filename": "RELATÓRIO TÉCNICO 02_2026.pdf"
-  },
-  "epidemiological-situation-analysis-2026-03": {
-    "filename": "epidemiological-situation-analysis-03-2026.pdf",
-    "output_filename": "RELATÓRIO TÉCNICO 03_2026.pdf"
-  },
-  "technical-report-2023": {
-    "filename": "technical-report.pdf",
-    "output_filename": "RELATÓRIO TÉCNICO 02_23 clima e arboviroses - projeções para 2024-26out2023.pdf"
+  "default": "epidemiological-situation-analysis-2026-03",
+  "reports": {
+    "epidemiological-situation-analysis-2026-01": {
+      "filename": "epidemiological-situation-analysis-01-2026.pdf",
+      "output_filename": "RELATÓRIO TÉCNICO 01_2026.pdf",
+      "title": "Análise de situação epidemiológica da dengue em ano de El Niño (01/2026)",
+      "published": true,
+      "order": "2026-01"
+    },
+    "epidemiological-situation-analysis-2026-02": {
+      "filename": "epidemiological-situation-analysis-02-2026.pdf",
+      "output_filename": "RELATÓRIO TÉCNICO 02_2026.pdf",
+      "title": "Análise de situação epidemiológica da dengue em ano de El Niño (02/2026)",
+      "published": true,
+      "order": "2026-02"
+    },
+    "epidemiological-situation-analysis-2026-03": {
+      "filename": "epidemiological-situation-analysis-03-2026.pdf",
+      "output_filename": "RELATÓRIO TÉCNICO 03_2026.pdf",
+      "title": "Análise de situação epidemiológica da dengue em ano de El Niño (03/2026)",
+      "published": true,
+      "order": "2026-03"
+    },
+    "technical-report-2023": {
+      "filename": "technical-report.pdf",
+      "output_filename": "RELATÓRIO TÉCNICO 02_23 clima e arboviroses - projeções para 2024-26out2023.pdf",
+      "title": "Reflexões sobre o risco de arboviroses em 2024",
+      "published": true,
+      "order": "2023-02"
+    }
   }
 }
 ```
 
 ### Field Descriptions:
 
+- **default**: Logical identifier (or object definition) of the report served by default.
 - **Manifest key**: Logical identifier used by the endpoint to retrieve the report.
 - **filename**: Relative filename of the PDF inside `TECHNICAL_REPORTS_ROOT`.
 - **output_filename**: The filename presented to the browser when opening or downloading the PDF.
+- **title**: (Optional) Human-readable title displayed in products page listing.
+- **published**: (Optional) Boolean indicating if the report is listed on `/produtos/`.
+- **order**: (Optional) Sort order for listing reports.
 
 ### Rules:
 

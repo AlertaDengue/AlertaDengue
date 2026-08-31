@@ -62,7 +62,10 @@ from .dbdata import (  # get_notification_cases,
 from .episem import episem, episem2date
 from .maps import get_city_info
 from .models import City
-from .technical_reports import serve_technical_report_pdf
+from .technical_reports import (
+    get_published_technical_reports,
+    serve_technical_report_pdf,
+)
 
 
 def download_technical_report_pdf(
@@ -305,6 +308,7 @@ class ProductsPageView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["technical_reports"] = get_published_technical_reports()
         return context
 
 

@@ -176,21 +176,13 @@
         </div>
         <div class="card-body">
           <ul class="mb-0">
-            <li>
-              <a href="{% url "dados:download_technical_report_pdf" report_key="epidemiological-situation-analysis-2026-01" %}">
-                Análise de situação epidemiológica da dengue em ano de El Niño (01/2026)
-              </a>
-            </li>
-            <li>
-              <a href="{% url "dados:download_technical_report_pdf" report_key="epidemiological-situation-analysis-2026-02" %}">
-                Análise de situação epidemiológica da dengue em ano de El Niño (02/2026)
-              </a>
-            </li>
-            <li>
-              <a href="{% url "dados:download_technical_report_pdf" report_key="epidemiological-situation-analysis-2026-03" %}">
-                Análise de situação epidemiológica da dengue em ano de El Niño (03/2026)
-              </a>
-            </li>
+            {% for report in technical_reports %}
+              <li>
+                <a href="{% url "dados:download_technical_report_pdf" report_key=report.key %}">
+                  {{ report.title }}
+                </a>
+              </li>
+            {% endfor %}
             <li>
               <a href="https://zenodo.org/records/17516518"
                  target="_blank"
@@ -203,11 +195,6 @@
                  target="_blank"
                  rel="noopener noreferrer">
                 Relatório IMDC 2024: Previsões para a temporada 2024-2025 de dengue
-              </a>
-            </li>
-            <li>
-              <a href="{% url "dados:download_technical_report_pdf" report_key="technical-report-2023" %}">
-                Reflexões sobre o risco de arboviroses em 2024
               </a>
             </li>
             <li>
