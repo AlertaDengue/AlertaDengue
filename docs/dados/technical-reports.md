@@ -25,7 +25,8 @@ TECHNICAL_REPORTS_ROOT/
 ├── technical_reports.json
 ├── technical-report.pdf
 ├── epidemiological-situation-analysis-01-2026.pdf
-└── epidemiological-situation-analysis-02-2026.pdf
+├── epidemiological-situation-analysis-02-2026.pdf
+└── epidemiological-situation-analysis-03-2026.pdf
 ```
 
 The manifest and every referenced PDF must coexist inside this directory.
@@ -39,12 +40,20 @@ Example:
 ```json
 {
   "default": {
+    "filename": "epidemiological-situation-analysis-03-2026.pdf",
+    "output_filename": "RELATÓRIO TÉCNICO 03_2026.pdf"
+  },
+  "epidemiological-situation-analysis-2026-01": {
+    "filename": "epidemiological-situation-analysis-01-2026.pdf",
+    "output_filename": "RELATÓRIO TÉCNICO 01_2026.pdf"
+  },
+  "epidemiological-situation-analysis-2026-02": {
     "filename": "epidemiological-situation-analysis-02-2026.pdf",
     "output_filename": "RELATÓRIO TÉCNICO 02_2026.pdf"
   },
-  "epidemiological-situation-analysis-2026": {
-    "filename": "epidemiological-situation-analysis-02-2026.pdf",
-    "output_filename": "RELATÓRIO TÉCNICO 02_2026.pdf"
+  "epidemiological-situation-analysis-2026-03": {
+    "filename": "epidemiological-situation-analysis-03-2026.pdf",
+    "output_filename": "RELATÓRIO TÉCNICO 03_2026.pdf"
   },
   "technical-report-2023": {
     "filename": "technical-report.pdf",
@@ -85,7 +94,7 @@ The following endpoints are available to access the reports:
 
 # Example request flow
 
-`technical_reports.json` $ightarrow$ `"default"` $ightarrow$ `epidemiological-situation-analysis-02-2026.pdf` $ightarrow$ `GET /download_technical_report_pdf/` $ightarrow$ Browser receives: `RELATÓRIO TÉCNICO 02_2026.pdf`
+`technical_reports.json` $\rightarrow$ `"default"` $\rightarrow$ `epidemiological-situation-analysis-03-2026.pdf` $\rightarrow$ `GET /download_technical_report_pdf/` $\rightarrow$ Browser receives: `RELATÓRIO TÉCNICO 03_2026.pdf`
 
 # Adding a new report
 

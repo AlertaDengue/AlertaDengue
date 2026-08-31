@@ -1,11 +1,19 @@
 {
   "default": {
+    "filename": "epidemiological-situation-analysis-03-2026.pdf",
+    "output_filename": "RELATÓRIO TÉCNICO 03_2026.pdf"
+  },
+  "epidemiological-situation-analysis-2026-01": {
+    "filename": "epidemiological-situation-analysis-01-2026.pdf",
+    "output_filename": "RELATÓRIO TÉCNICO 01_2026.pdf"
+  },
+  "epidemiological-situation-analysis-2026-02": {
     "filename": "epidemiological-situation-analysis-02-2026.pdf",
     "output_filename": "RELATÓRIO TÉCNICO 02_2026.pdf"
   },
-  "epidemiological-situation-analysis-2026": {
-    "filename": "epidemiological-situation-analysis-02-2026.pdf",
-    "output_filename": "RELATÓRIO TÉCNICO 02_2026.pdf"
+  "epidemiological-situation-analysis-2026-03": {
+    "filename": "epidemiological-situation-analysis-03-2026.pdf",
+    "output_filename": "RELATÓRIO TÉCNICO 03_2026.pdf"
   },
   "technical-report-2023": {
     "filename": "technical-report.pdf",

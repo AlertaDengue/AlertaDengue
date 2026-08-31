@@ -234,3 +234,17 @@ def test_services_api_download_button_shows_selected_format() -> None:
     assert 'id="download-button"' in content
     assert 'id="download-format-label">CSV</span>' in content
     assert "fa fa-download" in content
+
+
+def test_products_technical_report_links() -> None:
+    content = render_to_string("products.html")
+    for key in (
+        "epidemiological-situation-analysis-2026-01",
+        "epidemiological-situation-analysis-2026-02",
+        "epidemiological-situation-analysis-2026-03",
+        "technical-report-2023",
+    ):
+        assert (
+            f'href="{reverse("dados:download_technical_report_pdf", kwargs={"report_key": key})}"'
+            in content
+        )
