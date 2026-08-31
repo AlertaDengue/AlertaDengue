@@ -205,6 +205,44 @@ def test_public_alert_city_route_reads_inserted_orm_record(
     assert response.json()["data"][0]["municipality_geocode"] == 3304557
 
 
+@pytest.mark.django_db(databases={"default", "dados"}, transaction=True)
+@pytest.mark.parametrize(
+    ("disease", "model"),
+    [
+        ("dengue", LegacyHistoricalAlertDengue),
+        ("chikungunya", LegacyHistoricalAlertChikungunya),
+        ("zika", LegacyHistoricalAlertZika),
+    ],
+)
+def test_legacy_alert_city_route_works_without_tweet_column(
+    public_historical_alert_tables, disease, model
+):
+    """The broad legacy table read naturally omits the removed field."""
+    model.objects.create(
+        epidemiological_week_start_date=date(2026, 1, 4),
+        epidemiological_week=202601,
+        municipality_geocode=3304557,
+    )
+
+    response = APIClient().get(
+        reverse("api:alertcity"),
+        {
+            "disease": disease,
+            "geocode": 3304557,
+            "format": "json",
+            "ew_start": 1,
+            "ew_end": 52,
+            "ey_start": 2026,
+            "ey_end": 2026,
+        },
+    )
+
+    assert response.status_code == 200
+    record = response.json()[0]
+    assert record["SE"] == 202601
+    assert "tweet" not in record
+
+
 def test_v1_and_legacy_routes_resolve():
     assert reverse("api:v1:alert_city") == "/api/v1/alert-city/"
     assert reverse("api:v1:epi_year_week") == "/api/v1/epi-year-week/"
