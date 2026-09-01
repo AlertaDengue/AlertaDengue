@@ -7,11 +7,13 @@ specific overrides live in ``dev.py`` and ``prod.py``.
 
 from __future__ import annotations
 
+import logging
 import os
 from pathlib import Path
 from typing import Any, Optional
 
 from django.contrib.messages import constants as messages
+from django.core import checks
 from dotenv import load_dotenv
 from sentry_sdk import init as sentry_init
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -411,14 +413,95 @@ BOOTSTRAP4 = {
     },
 }
 
+CARTO_BASEMAP_API_KEY = os.getenv("CARTO_BASEMAP_API_KEY")
+CARTO_ATTRIBUTION = (
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> '
+    'contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+)
+
+
+def build_basemap_tile_url(api_key: str | None) -> str:
+    """Build CARTO basemap raster tile URL.
+
+    Parameters
+    ----------
+    api_key : str | None
+        CARTO basemap API key.
+
+    Returns
+    -------
+    str
+        HTTPS URL for CARTO basemap tiles.
+    """
+    if api_key and api_key.strip():
+        return (
+            f"https://{{s}}.basemaps.cartocdn.com/light_all/{{z}}/{{x}}/{{y}}.png"
+            f"?key={api_key.strip()}"
+        )
+    return "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+
+
+logger = logging.getLogger(__name__)
+
+if not (CARTO_BASEMAP_API_KEY and CARTO_BASEMAP_API_KEY.strip()):
+    logger.warning(
+        "CARTO_BASEMAP_API_KEY is not configured; "
+        "CARTO basemap tiles cannot be loaded correctly."
+    )
+
+
+def check_carto_basemap_api_key(
+    _app_configs: Any = None,
+    **_kwargs: Any,
+) -> list[checks.Warning]:
+    """Validate that CARTO_BASEMAP_API_KEY is configured.
+
+    Parameters
+    ----------
+    _app_configs : Any, optional
+        Application configs supplied by the Django check framework.
+    **_kwargs : Any
+        Additional keyword arguments from the check framework.
+
+    Returns
+    -------
+    list of checks.Warning
+        Warning if CARTO_BASEMAP_API_KEY is unset or empty.
+    """
+    from django.conf import settings
+
+    key = getattr(settings, "CARTO_BASEMAP_API_KEY", None)
+
+    if not key or not str(key).strip():
+        return [
+            checks.Warning(
+                "CARTO_BASEMAP_API_KEY is not configured; "
+                "CARTO basemap tiles cannot be loaded correctly.",
+                hint=("Set the CARTO_BASEMAP_API_KEY environment variable."),
+                id="ad_main.W001",
+            )
+        ]
+
+    return []
+
+
+checks.register(check_carto_basemap_api_key)
+
+
 LEAFLET_CONFIG = {
     "DEFAULT_CENTER": (-22.907000, -43.431000),
     "DEFAULT_ZOOM": 8,
     "MAXIMUM_ZOOM": 13,
-    "TILES": ("http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"),
+    "TILES": [
+        (
+            "CARTO Positron",
+            build_basemap_tile_url(CARTO_BASEMAP_API_KEY),
+            CARTO_ATTRIBUTION,
+        )
+    ],
     "MINIMAP": False,
     "ATTRIBUTION_PREFIX": (
-        "Fonte: <a href=http://info.dengue.mat.br>info.dengue.mat.br</a>"
+        'Fonte: <a href="https://info.dengue.mat.br">info.dengue.mat.br</a>'
     ),
     "PLUGINS": {
         "cluster": {

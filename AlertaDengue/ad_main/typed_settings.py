@@ -13,6 +13,7 @@ class _TypedSettings(Protocol):
     QUERY_CACHE_TIMEOUT: int
     PROJECT_ROOT: Path
     TECHNICAL_REPORTS_ROOT: Path
+    CARTO_BASEMAP_API_KEY: str | None
 
 
 typed_settings = cast(_TypedSettings, settings)
@@ -36,3 +37,7 @@ def get_project_root() -> Path:
 
 def get_technical_reports_root() -> Path:
     return typed_settings.TECHNICAL_REPORTS_ROOT
+
+
+def get_carto_basemap_api_key() -> str | None:
+    return getattr(typed_settings, "CARTO_BASEMAP_API_KEY", None)
