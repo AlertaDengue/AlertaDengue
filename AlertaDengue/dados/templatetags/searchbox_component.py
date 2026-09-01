@@ -27,7 +27,9 @@ def searchbox_component(context):
             geocode,
             city_name,
         ) in RegionalParameters.get_cities(state_name=state_name).items():
-            options_cities.append(City(geocode, city_name, uf))
+            options_cities.append(
+                City(geocode=geocode, name=city_name, state=uf)
+            )
 
     cache.set(
         cache_name,
