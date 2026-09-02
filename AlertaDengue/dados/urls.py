@@ -152,7 +152,7 @@ urlpatterns = [
     ),
     re_path(
         r"^report/$",
-        cache_page(60 * 60 * 60 * 24)(ReportView.as_view()),
+        cache_page(60 * 60)(ReportView.as_view()),
         name="report",
     ),
     re_path(
