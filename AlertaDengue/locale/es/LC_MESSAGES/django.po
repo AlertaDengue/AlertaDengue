@@ -162,8 +162,8 @@ msgid "Estimados"
 msgstr "Estimados"
 
 #: dados/charts/home.py:85
-msgid "Total de casos no estado"
-msgstr "Total de casos en el estado"
+msgid "Notificações SINAN por semana epidemiológica no estado"
+msgstr "Notificaciones SINAN por semana epidemiológica en el estado"
 
 #: dados/charts/home.py:90 dados/charts/home.py:234 dados/charts/home.py:354
 #: dados/charts/states.py:110 dados/charts/states.py:271
