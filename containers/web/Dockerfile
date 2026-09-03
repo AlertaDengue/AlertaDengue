@@ -13,7 +13,7 @@ USER root
 ARG HOST_UID
 ARG HOST_GID
 ARG SERVICES
-ARG ENV
+ARG ENV=dev
 ENV ENV_NAME=alertadengue
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -66,9 +66,7 @@ COPY --chown=${HOST_UID}:${HOST_GID} ./AlertaDengue ./AlertaDengue
 COPY --chown=${HOST_UID}:${HOST_GID} ./scripts ./scripts
 COPY --chown=${HOST_UID}:${HOST_GID} .envs .envs
 COPY --chown=${HOST_UID}:${HOST_GID} pyproject.toml poetry.lock README.md ./
-RUN ENV=dev bash ./scripts/install-deps.sh
-
-# WORKDIR /opt/services/AlertaDengue/AlertaDengue
+RUN ENV="${ENV}" bash ./scripts/install-deps.sh
 
 # Runtime scripts
 COPY --chown=${HOST_UID}:${HOST_GID} ./containers/scripts/crontab_setup.sh /opt/services/crontab_setup.sh
