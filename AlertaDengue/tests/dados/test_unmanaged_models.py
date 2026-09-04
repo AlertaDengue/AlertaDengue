@@ -6,16 +6,21 @@ from dados.models import (
     LegacyHistoricalAlertChikungunya,
     LegacyHistoricalAlertDengue,
     LegacyHistoricalAlertZika,
+    MacroRegion,
     Notification,
     Parameter,
+    ParameterUF,
     Regional,
+    State,
 )
+from dados.models.base import READ_ONLY
 from dados.services.historical_alerts import (
     get_legacy_historical_alert_model,
     get_legacy_historical_alert_table_name,
     get_supported_historical_alert_diseases,
     normalize_disease_key,
 )
+from manager.router import DatabaseAppsRouter
 
 
 @pytest.mark.parametrize(
@@ -23,6 +28,8 @@ from dados.services.historical_alerts import (
     [
         (CID10, '"Dengue_global"."CID10"'),
         (City, '"Dengue_global"."Municipio"'),
+        (State, '"Dengue_global"."estado"'),
+        (MacroRegion, '"Dengue_global"."macroregional"'),
         (Parameter, '"Dengue_global"."parameters"'),
         (Regional, '"Dengue_global"."regional"'),
         (Notification, '"Municipio"."Notificacao"'),
@@ -151,6 +158,34 @@ def test_dengue_global_lookup_adapter_metadata():
         "municipality_geocode",
         "cid10_code",
     )
+
+
+def test_retained_dengue_global_adapter_identity_and_routing():
+    """Every retained adapter has an explicit identity and uses ``dados``."""
+    router = DatabaseAppsRouter()
+
+    assert State._meta.get_field("geocode").primary_key
+    assert MacroRegion._meta.get_field("id").primary_key
+    assert Regional._meta.get_field("macroregion").column == "id_macroregional"
+    assert ParameterUF._meta.pk.field_names == ("state_code", "cid10")
+    assert ParameterUF._meta.managed is True
+
+    unmanaged_models = (
+        CID10,
+        City,
+        State,
+        MacroRegion,
+        Parameter,
+        Regional,
+    )
+
+    for model in (*unmanaged_models, ParameterUF):
+        assert router.db_for_read(model) == "dados"
+
+    assert router.db_for_write(ParameterUF) == "dados"
+
+    for model in unmanaged_models:
+        assert model.read_write_policy == READ_ONLY
 
 
 def test_supported_historical_alert_diseases_are_canonical():
