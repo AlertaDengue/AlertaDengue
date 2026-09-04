@@ -147,7 +147,19 @@ def test_dengue_global_lookup_adapter_metadata():
         == "BigIntegerField"
     )
     assert City._meta.get_field("state").column == "uf"
-    assert City._meta.get_field("regional_id").column == "id_regional"
+    city_regional_fields = {
+        "regional_id": ("id_regional", "IntegerField"),
+        "regional_name": ("regional", "CharField"),
+        "macroregional_id": ("macroregional_id", "IntegerField"),
+        "macroregional_name": ("macroregional", "CharField"),
+    }
+    for field_name, (column, internal_type) in city_regional_fields.items():
+        field = City._meta.get_field(field_name)
+        assert field.null is True
+        assert field.column == column
+        assert field.get_internal_type() == internal_type
+    assert City._meta.managed is False
+    assert City.read_write_policy == READ_ONLY
     assert Regional._meta.get_field("id").primary_key
     assert Regional._meta.get_field("macroregion").column == "id_macroregional"
     assert Parameter._meta.get_field("municipality_geocode").column == (
