@@ -76,7 +76,7 @@ omitted column as model state.
 | Caller | Object | Access method | Bounds / output | Cache | Decision |
 | --- | --- | --- | --- | --- | --- |
 | search-box, report views → `RegionalParameters` | `Municipio`, `regional`, `parameters` | ORM service | state/name filters; ordered city/name mappings and one two-key parameter record | regional/city lookup cache | Keep ORM. |
-| city page → `get_city_info` | `Municipio` | ORM, explicit `dados` | one geocode; scalar metadata dictionary | view cache `city_info:<geocode>`, 24 hours | Keep ORM. |
+| city page → `get_city_info` | `Municipio` | ORM, explicit `dados` | one geocode; scalar metadata dictionary | lookup cache `city_info:<geocode>`, 24 hours; enclosing page view cached separately for 8 hours | Keep ORM. |
 | `/api/*`, report/dashboard helpers → `api.db`, `dbdata` | `Municipio`, `CID10` | SQLAlchemy / Pandas SQL | joins, aggregates, DataFrame/API-shaped output | caller-specific | Keep SQL: joins/aggregations and compatibility output materially define the query. |
 | map/geofile flows → `maps.py`, `sync_geofiles` | `Municipio` | SQLAlchemy | GeoJSON/geometry/file work | none | Keep SQL/PostGIS-file boundary. |
 | task/report helpers → `dados.tasks`, `dbdata` | `Municipio` | SQLAlchemy | joins and result-set processing | none | Keep SQL boundary. |
@@ -93,8 +93,10 @@ Catalog ownership is shown in the matrix.  Only `parameters_uf` has
 repository-managed lifecycle evidence; the other tables are externally owned
 read boundaries.  No trigger, rule, function/procedure, dependent view, or
 scheduled writer in this repository establishes a writer for those objects.
-The catalog FK is `regional.id_macroregional → macroregional.id`; sequence
-defaults are the only database-side writers evidenced by this audit.  Public
+The catalog FK is
+`regional.id_macroregional → macroregional.id`. The three sequences provide
+serial defaults for their associated primary keys; they do not establish
+the identity of any repository writer.  Public
 state-history materialized views are downstream consumers of `estado`, but are
 outside this schema and remain their documented SQL/operational boundary.
 
