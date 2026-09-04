@@ -34,7 +34,7 @@ represented through Django state-only operations where applicable.
 | Object | Type / owner | Identity; estimate / total size | Active readers / writers | ORM model and field coverage | Alias | Classification | Next action |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `CID10` | table / `administrador` | PK `codigo`; 8,349 / 934 kB | `api.db` joins; no repository writer | `dados.models.CID10`, 2/2 columns, exact | `dados` / SQLAlchemy engine | ORM-backed application object | Retain adapter; joins remain SQL boundary. |
-| `Municipio` | table / `administrador` | PK `geocodigo`; 5,570 / 18 MB | ORM search/report/map scalar reads; API/report/geofile/task SQL joins; no repository writer | `City`, 8/10 columns. `geojson` is deliberately excluded; mapped `id_regional`, `regional`, `macroregional_id`, `macroregional` are physically nullable but declared non-null (mismatch). | `dados` | application object with intentional partial ORM projection | Keep geometry/GeoJSON and joins SQL; file a bounded nullability-correction follow-up. |
+| `Municipio` | table / `administrador` | PK `geocodigo`; 5,570 / 18 MB | ORM search/report/map scalar reads; API/report/geofile/task SQL joins; no repository writer | `City`, 8/10 columns. `geojson` is deliberately excluded; mapped `id_regional`, `regional`, `macroregional_id`, `macroregional` are physically nullable and correctly declare `null=True` after #1112. | `dados` | application object with intentional partial ORM projection | Keep geometry/GeoJSON and joins SQL. |
 | `estado` | table / `administrador` | PK `geocodigo`; 27 / 11 MB | Indirectly through retained state-history materialized-view SQL; no writer evidence | `State`, 3/5 columns. `geojson` and `regiao` are intentionally outside its lookup projection. | `dados` | application object with intentional partial ORM projection | Retain only bounded reference projection. |
 | `macroregional` | table / `dengueadmin` | PK `id`; 118 / 40 kB | `Regional.macroregion` FK; no writer evidence | `MacroRegion`, 2/4 columns. `codigo` and nullable `uf` omitted intentionally. | `dados` | application object with intentional partial ORM projection | Retain relationship adapter. |
 | `parameters` | table / `dengueadmin` | composite PK `(municipio_geocodigo, cid10)`; 11,064 / 1.4 MB | `RegionalParameters` compatibility facade / city reports; no writer evidence | `Parameter`, 9/10 columns with Django composite PK. Nullable thresholds match. `codmodelo` omitted from the bounded report-parameter projection. | `dados` | application object with intentional partial ORM projection | Retain; every lookup must retain both key predicates. |
@@ -58,7 +58,7 @@ sequences, not application-facing objects.
 | Model | Table | Status | Contract finding |
 | --- | --- | --- | --- |
 | `dados.models.CID10` | `"Dengue_global"."CID10"` | complete | `codigo` PK and `nome` match PostgreSQL types and nullability. |
-| `dados.models.City` | `"Dengue_global"."Municipio"` | partial; one mismatch | Uses `geocodigo` PK and deliberately omits `geojson`. Types are compatible. The four optional regional/macroregional columns require `null=True` if the adapter promises physical nullability fidelity. |
+| `dados.models.City` | `"Dengue_global"."Municipio"` | partial; corrected #1112 | Uses `geocodigo` PK and deliberately omits `geojson`. Types are compatible. PostgreSQL permits NULL for the four optional regional/macroregional columns; the original audit observed zero NULL rows, and the adapter now declares `null=True`. |
 | `dados.models.State` | `"Dengue_global"."estado"` | intentional projection | Correct PK and selected scalar fields; it does not expose state geometry or region label. |
 | `dados.models.MacroRegion` | `"Dengue_global"."macroregional"` | intentional projection | Correct PK and selected relationship label; `codigo`/`uf` are omitted. |
 | `dados.models.Regional` | `"Dengue_global"."regional"` | complete | PK, columns, and FK to `MacroRegion.id` match. |
@@ -111,20 +111,10 @@ PostGIS, analytical, DataFrame, and compatibility SQL remains deliberately
 outside ORM scope.  `regional_saude` deliberately has no adapter because it
 has no current application reader.  No new model or migration is justified.
 
-## Recommended separate follow-up
+## Corrected nullability
 
-**Title:** Correct nullable regional metadata in the `Dengue_global.Municipio`
-unmanaged adapter.
-
-**Evidence and scope:** PostgreSQL permits nulls for `id_regional`, `regional`,
-`macroregional_id`, and `macroregional`, while `City` declares all four
-non-null.  Change only those field declarations to `null=True` (and add
-focused metadata/real-query coverage); preserve the intentional `geojson`
-omission and all query behaviour.
-
-**Exclusions:** no new model, migration, ownership change, GeoJSON/PostGIS
-work, or query migration.  **Acceptance criteria:** physical nullability and
-model metadata agree, a bounded `dados`-alias read returns nullable values
-correctly, and unmanaged/router tests pass.  **Risk/dependency:** validate
-against the supported PostgreSQL test environment; it is independent of all
-other ORM work.
+#1112 reconciles `City` with PostgreSQL for `id_regional`, `regional`,
+`macroregional_id`, and `macroregional`: all four are physically nullable and
+now declare `null=True`. The original audit observed zero NULL rows. This
+remains an externally owned, unmanaged, read-only boundary; no physical schema
+change, GeoJSON/PostGIS work, or query migration is implied.

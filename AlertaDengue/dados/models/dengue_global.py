@@ -14,11 +14,15 @@ class City(models.Model):
     name = models.CharField(db_column="nome", max_length=128)
     population = models.BigIntegerField(db_column="populacao")
     state = models.CharField(db_column="uf", max_length=20)
-    regional_id = models.IntegerField(db_column="id_regional")
-    regional_name = models.CharField(db_column="regional", max_length=128)
-    macroregional_id = models.IntegerField(db_column="macroregional_id")
+    regional_id = models.IntegerField(db_column="id_regional", null=True)
+    regional_name = models.CharField(
+        db_column="regional", max_length=128, null=True
+    )
+    macroregional_id = models.IntegerField(
+        db_column="macroregional_id", null=True
+    )
     macroregional_name = models.CharField(
-        db_column="macroregional", max_length=128
+        db_column="macroregional", max_length=128, null=True
     )
 
     class Meta:
@@ -34,15 +38,15 @@ class City(models.Model):
     # Compatibility aliases for the previous unmanaged adapter. New code uses
     # the normalized names above; these avoid breaking existing callers.
     @property
-    def id_regional(self) -> int:
+    def id_regional(self) -> int | None:
         return self.regional_id
 
     @property
-    def regional(self) -> str:
+    def regional(self) -> str | None:
         return self.regional_name
 
     @property
-    def macroregional(self) -> str:
+    def macroregional(self) -> str | None:
         return self.macroregional_name
 
 

@@ -14,6 +14,8 @@ import pytest
 from sqlalchemy import text
 
 from dados import maps
+from dados.models import City
+from dados.services.dengue_global_lookups import get_regional_municipalities
 from dados.views import AlertaMunicipioPageView
 
 pytestmark = pytest.mark.django_db(
@@ -45,12 +47,14 @@ def municipality_map_table() -> Iterator[None]:
         cursor.execute(
             """
             INSERT INTO "Dengue_global"."Municipio"
-                (geocodigo, nome, geojson, populacao, uf)
+                (geocodigo, nome, geojson, populacao, uf, id_regional,
+                 regional, macroregional_id, macroregional)
             VALUES
                 (3304557, 'Rio de Janeiro', '{"type": "Feature"}',
-                 6748000, 'Rio de Janeiro'),
+                 6748000, 'Rio de Janeiro', 1, 'Metropolitana I', 10,
+                 'Metropolitana'),
                 (3303302, 'Niterói', '{"type": "Feature"}',
-                 515317, 'Rio de Janeiro')
+                 515317, 'Rio de Janeiro', NULL, NULL, NULL, NULL)
             """
         )
 
@@ -119,6 +123,64 @@ def test_get_city_geojson_passes_with_its_independent_fixture() -> None:
         "nome": "Rio de Janeiro",
         "populacao": 6748000,
     }
+
+
+@pytest.mark.usefixtures("municipality_map_table")
+def test_city_orm_preserves_nullable_regional_metadata() -> None:
+    """The unmanaged adapter returns physical regional NULLs as ``None``."""
+    with CaptureQueriesContext(connections["dados"]) as dados_queries:
+        with CaptureQueriesContext(connections["default"]) as default_queries:
+            cities = City.objects.in_bulk(
+                [3304557, 3303302], field_name="geocode"
+            )
+
+    populated = cities[3304557]
+    nullable = cities[3303302]
+
+    assert (populated.regional_id, populated.regional_name) == (
+        1,
+        "Metropolitana I",
+    )
+    assert (populated.macroregional_id, populated.macroregional_name) == (
+        10,
+        "Metropolitana",
+    )
+    assert (
+        nullable.regional_id,
+        nullable.regional_name,
+        nullable.macroregional_id,
+        nullable.macroregional_name,
+    ) == (None, None, None, None)
+    assert isinstance(populated.regional_id, int)
+    assert isinstance(populated.regional_name, str)
+    assert isinstance(populated.macroregional_id, int)
+    assert isinstance(populated.macroregional_name, str)
+    assert len(dados_queries) == 1
+    assert len(default_queries) == 0
+
+
+@pytest.mark.usefixtures("municipality_map_table")
+def test_regional_municipality_lookup_preserves_nullable_values() -> None:
+    with CaptureQueriesContext(connections["dados"]) as dados_queries:
+        with CaptureQueriesContext(connections["default"]) as default_queries:
+            rows = get_regional_municipalities("Rio de Janeiro")
+
+    assert rows == [
+        {
+            "regional_id": None,
+            "regional_name": None,
+            "geocode": 3303302,
+            "name": "Niterói",
+        },
+        {
+            "regional_id": 1,
+            "regional_name": "Metropolitana I",
+            "geocode": 3304557,
+            "name": "Rio de Janeiro",
+        },
+    ]
+    assert len(dados_queries) == 1
+    assert len(default_queries) == 0
 
 
 def _configure_city_page_dependencies(
