@@ -82,7 +82,7 @@ def _create_scatter_chart(df: pd.DataFrame) -> str:
             "layout": go.Layout(
                 template="plotly",
                 title={
-                    "text": _("Total de casos no estado"),
+                    "text": _("Notificações SINAN por semana epidemiológica no estado"),
                     "font": {"family": "Helvetica", "size": 16},
                     "x": 0.5,
                 },
