@@ -5,6 +5,9 @@ Django refactors. It records application-facing models and stable SQL
 boundaries; it does not assign Django ownership to external objects. Legacy
 quoted identifiers remain only in db_table and db_column mappings.
 
+The complete `Municipio` physical-schema and raw-SQL reconciliation is
+maintained in [`municipio_orm_coverage.md`](municipio_orm_coverage.md).
+
 ## Retained schema overview
 
 | Schema | Responsibility | Ownership | Refactor status |
@@ -78,9 +81,12 @@ operational processing remain explicit SQL boundaries.
 
 ## Next schema-group refactors
 
-1. **Dengue_global.Municipio map/geofile metadata beyond scalar lookups.**
-   Retain GeoJSON, geometry, shapefile, and geofile workflows as SQL/file
-   boundaries pending separate evidence and design.
+No additional `Municipio` ORM refactor is currently justified. The bounded
+historical-alert, city-report, map-scalar, and internal-notification paths are
+covered; compatibility, analytical, bulk, transactional, and geofile SQL
+boundaries are deliberate. See the [Municipio audit](municipio_orm_coverage.md)
+for the physical `0008` migration-state/schema discrepancy and external writer
+follow-ups.
 
 ## Explicit SQL boundaries
 
