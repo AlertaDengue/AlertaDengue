@@ -8,6 +8,10 @@ quoted identifiers remain only in db_table and db_column mappings.
 The complete `Municipio` physical-schema and raw-SQL reconciliation is
 maintained in [`municipio_orm_coverage.md`](municipio_orm_coverage.md).
 
+The supporting-schema audit for `episcanner`, `vegetation_indices`, and
+`weather` is maintained in
+[`supporting_schemas_orm_coverage.md`](supporting_schemas_orm_coverage.md).
+
 ## Retained schema overview
 
 | Schema | Responsibility | Ownership | Refactor status |
@@ -16,7 +20,28 @@ maintained in [`municipio_orm_coverage.md`](municipio_orm_coverage.md).
 | Municipio | Historical alerts and notifications | Alerts external; notifications application-written through ingestion | Historical API complete |
 | ingestion | SINAN run, stage and rollback control | Django-managed | Current model boundary retained |
 | episcanner | Scan-result parameters | Django-managed | Current model boundary retained |
+| vegetation_indices | Geographic/time-series vegetation metrics | External analytical/ingestion ownership unresolved | Retain SQL boundary; no confirmed bounded ORM candidate |
+| weather | External geographic/time-series weather data | External analytical ownership unresolved | Retain SQL boundary; no confirmed bounded ORM candidate |
 | public | Derived report/dashboard materialized views | External/operational ownership unresolved | Retain SQL boundary |
+
+The supporting-schema audit found no additional confirmed bounded ORM read.
+`episcanner.sir_params` remains the existing managed ORM boundary; weather
+time-series and vegetation/analytics paths remain SQL or external boundaries.
+
+The public row above is intentionally selective and is not a result of the
+supporting-schema audit. The Municipio audit separately catalog-confirmed ten
+downstream public materialized-view dependencies:
+
+- `city_count_by_uf_dengue_materialized_view`
+- `hist_uf_dengue_materialized_view`
+- `uf_total_view`
+- `city_count_by_uf_chikungunya_materialized_view`
+- `hist_uf_chik_materialized_view`
+- `uf_total_chik_view`
+- `city_count_by_uf_zika_materialized_view`
+- `hist_uf_zika_materialized_view`
+- `uf_total_zika_view`
+- `epiyear_summary_materialized_view`
 
 ## Retained object inventory
 
@@ -86,7 +111,8 @@ historical-alert, city-report, map-scalar, and internal-notification paths are
 covered; compatibility, analytical, bulk, transactional, and geofile SQL
 boundaries are deliberate. See the [Municipio audit](municipio_orm_coverage.md)
 for the physical `0008` migration-state/schema discrepancy and external writer
-follow-ups.
+follow-ups. Across the retained schema groups, no additional ORM refactor is
+currently justified.
 
 ## Explicit SQL boundaries
 
