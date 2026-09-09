@@ -1,4 +1,4 @@
-FROM postgres:14-bullseye
+FROM postgres:14-bookworm
 
 ARG HOST_UID
 ARG HOST_GID

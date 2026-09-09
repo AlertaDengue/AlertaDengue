@@ -1,5 +1,5 @@
 # from https://github.com/postgis/docker-postgis/blob/969ef8a9e4a22e1556ca99cab4178f6e60c1483d/14-3.2/Dockerfile
-FROM postgres:14-bullseye
+FROM postgres:14-bookworm
 
 LABEL maintainer="Sandro Loch <es.loch@gmail.com>"
 
@@ -18,6 +18,7 @@ RUN usermod -u ${HOST_UID} postgres \
 RUN apt-get update \
       && apt-cache showpkg postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
       && apt-get install -y --no-install-recommends \
+      python3 \
       postgresql-plpython3-14 \
       postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
       postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts \
