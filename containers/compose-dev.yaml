@@ -15,7 +15,7 @@ services:
 
   postgres:
     volumes:
-      - "${HOST_PGDATA:-/opt/data/infodengue/dev/pgdata}:/var/lib/postgresql/data"
+      - "${PG18_HOST_PGDATA:?PG18_HOST_PGDATA is required}:/var/lib/postgresql"
 
   web:
     stdin_open: true

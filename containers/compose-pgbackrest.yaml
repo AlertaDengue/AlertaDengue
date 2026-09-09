@@ -24,8 +24,8 @@ services:
       - sleep infinity
     volumes:
       - type: bind
-        source: ${HOST_PGDATA}
-        target: /var/lib/postgresql/data
+        source: ${PG18_HOST_PGDATA:?PG18_HOST_PGDATA is required}
+        target: /var/lib/postgresql
       - type: volume
         source: pgsocket
         target: /var/run/postgresql

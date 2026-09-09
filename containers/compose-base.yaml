@@ -69,11 +69,11 @@ services:
       POSTGRES_USER: "${PSQL_USER}"
       POSTGRES_HOST_AUTH_METHOD: "md5"
       PG_RESTORE_STAGING: "${PG_RESTORE_STAGING}"
-      PGDATA: /var/lib/postgresql/data
+      PGDATA: /var/lib/postgresql/18/docker
     ports:
       - "${PSQL_PORT}:5432"
     volumes:
-      - ${HOST_PGDATA}:/var/lib/postgresql/data
+      - ${PG18_HOST_PGDATA:?PG18_HOST_PGDATA is required}:/var/lib/postgresql
       - pgsocket:/var/run/postgresql
       - ../containers/postgres/setup/:/docker-entrypoint-initdb.d/
       - ../containers/postgres/dumps/:/dumps/

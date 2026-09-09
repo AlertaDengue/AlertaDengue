@@ -1067,6 +1067,7 @@ groups:
             --project-name "infodengue-${PROFILE}"
           )
 
+          python containers/postgres/deployment_preflight.py
           "${COMPOSE_CMD[@]}" up -d --force-recreate postgres pgbackrest
 
           makim pgbackrest.wait-postgres --profile "$PROFILE"
@@ -1109,6 +1110,7 @@ groups:
             --project-name "infodengue-${PROFILE}"
           )
 
+          python containers/postgres/deployment_preflight.py
           "${COMPOSE_CMD[@]}" up -d --force-recreate postgres pgbackrest
 
           makim pgbackrest.wait-postgres --profile "$PROFILE"
@@ -1365,7 +1367,7 @@ groups:
           source .envs/.env
           set +a
 
-          : "${HOST_PGDATA:?HOST_PGDATA is required}"
+          : "${PG18_HOST_PGDATA:?PG18_HOST_PGDATA is required}"
 
           case "$PROJECT_NAME" in
             "infodengue-${PROFILE}"*) ;;
@@ -1388,14 +1390,16 @@ groups:
           VALIDATED_INPUTS="$(
             python containers/pgbackrest/refresh_staging.py validate-profile-restore-inputs \
               --profile "$PROFILE" \
-              --host-pgdata "$HOST_PGDATA" \
+              --host-pgdata "$PG18_HOST_PGDATA" \
               --backup-set "$BACKUP_SET" \
               --confirm "$CONFIRM"
           )"
 
           PROFILE="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^PROFILE=/{print $2}')"
-          HOST_PGDATA_CANON="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^HOST_PGDATA_CANON=/{print $2}')"
+          PG18_HOST_PGDATA_CANON="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^PG18_HOST_PGDATA_CANON=/{print $2}')"
           BACKUP_SET="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^BACKUP_SET=/{print $2}')"
+
+          python containers/postgres/deployment_preflight.py
 
           PHASE="render profile config"
           makim pgbackrest.render-conf --profile "$PROFILE"
@@ -1420,11 +1424,12 @@ groups:
             printf '%s\n' "$PRECHECK_INFO_JSON" | \
               python containers/pgbackrest/refresh_staging.py validate-pgbackrest-info \
                 --stanza "$PROFILE" \
-                --backup-set "$BACKUP_SET"
+                --backup-set "$BACKUP_SET" \
+                --target-major 18
           )"
           SOURCE_BACKUP_DB_SIZE="$(printf '%s\n' "$SOURCE_BACKUP_INFO" | awk -F= '/^SOURCE_BACKUP_DB_SIZE=/{print $2}')"
 
-          echo "[II] Canonical PGDATA deletion target: ${HOST_PGDATA_CANON}"
+          echo "[II] Canonical PG18_HOST_PGDATA deletion target: ${PG18_HOST_PGDATA_CANON}"
           echo "[II] Selected ${PROFILE} backup label: ${BACKUP_SET}"
           echo "[II] Selected ${PROFILE} backup size: ${SOURCE_BACKUP_DB_SIZE} bytes"
 
@@ -1433,12 +1438,12 @@ groups:
           "${COMPOSE_CMD[@]}" rm -f -s postgres pgbackrest || true
 
           PHASE="clean guarded pgdata"
-          sudo mkdir -p "$HOST_PGDATA_CANON"
-          sudo find "$HOST_PGDATA_CANON" -mindepth 1 -delete
+          sudo mkdir -p "$PG18_HOST_PGDATA_CANON"
+          sudo find "$PG18_HOST_PGDATA_CANON" -mindepth 1 -delete
           HOST_UID="${HOST_UID:-$(id -u)}"
           HOST_GID="${HOST_GID:-$(id -g)}"
-          sudo chown "$HOST_UID:$HOST_GID" "$HOST_PGDATA_CANON"
-          sudo chmod 0700 "$HOST_PGDATA_CANON"
+          sudo chown "$HOST_UID:$HOST_GID" "$PG18_HOST_PGDATA_CANON"
+          sudo chmod 0700 "$PG18_HOST_PGDATA_CANON"
 
           PHASE="run pgbackrest restore"
           env PGBACKREST_BACKUP_SET="$BACKUP_SET" PGBACKREST_STANZA="$PROFILE" \
@@ -1446,6 +1451,7 @@ groups:
               'set -euo pipefail; pgbackrest --stanza="$PGBACKREST_STANZA" --set="$PGBACKREST_BACKUP_SET" --archive-mode=off restore'
 
           PHASE="start restored postgres"
+          python containers/postgres/deployment_preflight.py
           "${COMPOSE_CMD[@]}" up -d --force-recreate postgres
           POSTGRES_STARTED=1
 
@@ -1530,19 +1536,21 @@ groups:
             exit 2
           fi
 
-          : "${HOST_PGDATA:?HOST_PGDATA is required}"
+          : "${PG18_HOST_PGDATA:?PG18_HOST_PGDATA is required}"
 
           VALIDATED_INPUTS="$(
             python containers/pgbackrest/refresh_staging.py validate-inputs \
               --source-repo "$SOURCE_REPO" \
-              --host-pgdata "$HOST_PGDATA" \
+              --host-pgdata "$PG18_HOST_PGDATA" \
               --backup-set "$BACKUP_SET" \
               --confirm "$CONFIRM"
           )"
 
           SOURCE_REPO_CANON="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^SOURCE_REPO_CANON=/{print $2}')"
-          HOST_PGDATA_CANON="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^HOST_PGDATA_CANON=/{print $2}')"
+          PG18_HOST_PGDATA_CANON="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^PG18_HOST_PGDATA_CANON=/{print $2}')"
           BACKUP_SET="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^BACKUP_SET=/{print $2}')"
+
+          python containers/postgres/deployment_preflight.py
 
           COMPOSE_CMD=(
             docker compose
@@ -1579,12 +1587,13 @@ groups:
             printf '%s\n' "$PRECHECK_INFO_JSON" | \
               python containers/pgbackrest/refresh_staging.py validate-pgbackrest-info \
                 --stanza prod \
-                --backup-set "$BACKUP_SET"
+                --backup-set "$BACKUP_SET" \
+                --target-major 18
           )"
           SOURCE_BACKUP_DB_SIZE="$(printf '%s\n' "$SOURCE_BACKUP_INFO" | awk -F= '/^SOURCE_BACKUP_DB_SIZE=/{print $2}')"
 
           echo "[II] Canonical source repository: ${SOURCE_REPO_CANON}"
-          echo "[II] Canonical staging PGDATA: ${HOST_PGDATA_CANON}"
+          echo "[II] Canonical staging PGDATA: ${PG18_HOST_PGDATA_CANON}"
           echo "[II] Selected source backup label: ${BACKUP_SET}"
           echo "[II] Selected source backup size: ${SOURCE_BACKUP_DB_SIZE} bytes"
 
@@ -1593,12 +1602,12 @@ groups:
           "${COMPOSE_CMD[@]}" rm -f -s postgres pgbackrest || true
 
           PHASE="clean guarded staging pgdata"
-          sudo mkdir -p "$HOST_PGDATA_CANON"
-          sudo find "$HOST_PGDATA_CANON" -mindepth 1 -delete
+          sudo mkdir -p "$PG18_HOST_PGDATA_CANON"
+          sudo find "$PG18_HOST_PGDATA_CANON" -mindepth 1 -delete
           HOST_UID="${HOST_UID:-$(id -u)}"
           HOST_GID="${HOST_GID:-$(id -g)}"
-          sudo chown "$HOST_UID:$HOST_GID" "$HOST_PGDATA_CANON"
-          sudo chmod 0700 "$HOST_PGDATA_CANON"
+          sudo chown "$HOST_UID:$HOST_GID" "$PG18_HOST_PGDATA_CANON"
+          sudo chmod 0700 "$PG18_HOST_PGDATA_CANON"
 
           PHASE="validate staging repository volume"
           if docker volume ls --format '{{.Name}}' | grep -Fx "${STAGING_REPO_VOLUME}" >/dev/null; then
@@ -1610,6 +1619,7 @@ groups:
 
           PHASE="start restore-mode pgbackrest"
           RESTORE_CONTAINERS_STARTED=1
+          python containers/postgres/deployment_preflight.py
           "${RESTORE_COMPOSE_CMD[@]}" up -d --force-recreate pgbackrest
 
           PHASE="run pgbackrest restore"
@@ -1618,6 +1628,7 @@ groups:
               'set -euo pipefail; pgbackrest --stanza=prod --set="$PGBACKREST_BACKUP_SET" --archive-mode=off restore'
 
           PHASE="start restore-mode postgres"
+          python containers/postgres/deployment_preflight.py
           "${RESTORE_COMPOSE_CMD[@]}" up -d --force-recreate postgres
 
           PHASE="wait for restore-mode postgres readiness"
@@ -1660,6 +1671,7 @@ groups:
           makim pgbackrest.render-conf --profile staging
 
           PHASE="start staging services"
+          python containers/postgres/deployment_preflight.py
           "${COMPOSE_CMD[@]}" up -d --force-recreate postgres pgbackrest
 
           PHASE="wait for staging postgres readiness"
@@ -1715,6 +1727,7 @@ groups:
             --project-name "infodengue-${PROFILE}"
           )
 
+          python containers/postgres/deployment_preflight.py
           "${COMPOSE_CMD[@]}" up -d postgres
 
           "${COMPOSE_CMD[@]}" exec -T postgres bash -lc '

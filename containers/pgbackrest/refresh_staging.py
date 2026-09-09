@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import argparse
+from dataclasses import dataclass
 import json
 import os
+from pathlib import Path
 import re
 import sys
-from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
-
 
 FULL_BACKUP_LABEL_RE = re.compile(r"^[0-9]{8}-[0-9]{6}F$")
 FORBIDDEN_PGDATA_PATHS = {
@@ -128,19 +127,23 @@ def validate_host_pgdata(
     approved_roots: tuple[Path, ...],
     source_repo: Path | None = None,
 ) -> Path:
-    raw_path = _require_non_empty_path(host_pgdata, "HOST_PGDATA")
+    raw_path = _require_non_empty_path(host_pgdata, "PG18_HOST_PGDATA")
     if not os.path.isabs(raw_path):
-        raise ValidationError(f"HOST_PGDATA must be an absolute path: {raw_path}")
+        raise ValidationError(
+            f"PG18_HOST_PGDATA must be an absolute path: {raw_path}"
+        )
 
     pgdata_path = Path(raw_path)
     if pgdata_path.is_symlink():
-        raise ValidationError(f"HOST_PGDATA must not be a symbolic link: {raw_path}")
+        raise ValidationError(
+            f"PG18_HOST_PGDATA must not be a symbolic link: {raw_path}"
+        )
 
     canonical = _canonicalize(raw_path)
     canonical_text = os.fspath(canonical)
     if canonical_text in FORBIDDEN_PGDATA_PATHS:
         raise ValidationError(
-            f"HOST_PGDATA points to a forbidden path: {canonical_text}"
+            f"PG18_HOST_PGDATA points to a forbidden path: {canonical_text}"
         )
 
     approved_root = None
@@ -150,24 +153,29 @@ def validate_host_pgdata(
             break
         if canonical == root:
             raise ValidationError(
-                "HOST_PGDATA must include at least one path component below "
+                "PG18_HOST_PGDATA must include at least one path component below "
                 f"the approved root: {root}"
             )
 
     if approved_root is None:
         approved = ", ".join(os.fspath(root) + "/" for root in approved_roots)
         raise ValidationError(
-            "HOST_PGDATA must be under an approved profile root: "
-            f"{approved}"
+            f"PG18_HOST_PGDATA must be under an approved profile root: {approved}"
         )
 
     if source_repo is not None:
         if canonical == source_repo:
-            raise ValidationError("HOST_PGDATA must not equal the source repository.")
+            raise ValidationError(
+                "PG18_HOST_PGDATA must not equal the source repository."
+            )
         if _is_relative_to(canonical, source_repo):
-            raise ValidationError("HOST_PGDATA must not be contained by the source repository.")
+            raise ValidationError(
+                "PG18_HOST_PGDATA must not be contained by the source repository."
+            )
         if _is_relative_to(source_repo, canonical):
-            raise ValidationError("HOST_PGDATA must not contain the source repository.")
+            raise ValidationError(
+                "PG18_HOST_PGDATA must not contain the source repository."
+            )
 
     return canonical
 
@@ -227,7 +235,9 @@ def _coerce_stanza_list(payload: Any) -> list[dict[str, Any]]:
             if isinstance(value, list):
                 return [item for item in value if isinstance(item, dict)]
         return [payload]
-    raise ValidationError("pgBackRest info output must be a JSON object or array.")
+    raise ValidationError(
+        "pgBackRest info output must be a JSON object or array."
+    )
 
 
 def _status_is_valid(status: Any) -> bool:
@@ -254,17 +264,16 @@ def _extract_db_version(backup: dict[str, Any], stanza: dict[str, Any]) -> Any:
     return None
 
 
-def _is_postgresql_14(version: Any) -> bool:
+def _is_postgresql_major(version: Any, major: int) -> bool:
     if version is None:
         return False
     version_text = str(version).strip()
-    if version_text == "14":
+    if version_text == str(major) or version_text.startswith(f"{major}."):
         return True
-    if version_text.startswith("14."):
-        return True
-    if version_text.isdigit() and 140000 <= int(version_text) < 150000:
-        return True
-    return False
+    return (
+        version_text.isdigit()
+        and major * 10000 <= int(version_text) < (major + 1) * 10000
+    )
 
 
 def _extract_backup_size(backup: dict[str, Any]) -> int | None:
@@ -300,14 +309,19 @@ def _extract_backup_size(backup: dict[str, Any]) -> int | None:
 
 
 def select_backup_from_info(
-    payload: Any, *, stanza_name: str, backup_label: str
+    payload: Any,
+    *,
+    stanza_name: str,
+    backup_label: str,
+    target_major: int = 14,
 ) -> int:
     stanzas = _coerce_stanza_list(payload)
     stanza = next(
         (
             entry
             for entry in stanzas
-            if entry.get("name") == stanza_name or entry.get("stanza") == stanza_name
+            if entry.get("name") == stanza_name
+            or entry.get("stanza") == stanza_name
         ),
         None,
     )
@@ -316,13 +330,19 @@ def select_backup_from_info(
 
     repo_entries = stanza.get("repo")
     if not isinstance(repo_entries, list) or not repo_entries:
-        raise ValidationError("pgBackRest info did not report repository status.")
-    if not all(_status_is_valid(entry.get("status")) for entry in repo_entries):
+        raise ValidationError(
+            "pgBackRest info did not report repository status."
+        )
+    if not all(
+        _status_is_valid(entry.get("status")) for entry in repo_entries
+    ):
         raise ValidationError("pgBackRest repository status is not valid.")
 
     backups = stanza.get("backup")
     if not isinstance(backups, list):
-        raise ValidationError("pgBackRest info did not include backup metadata.")
+        raise ValidationError(
+            "pgBackRest info did not include backup metadata."
+        )
 
     selected_backup = next(
         (
@@ -333,7 +353,9 @@ def select_backup_from_info(
         None,
     )
     if selected_backup is None:
-        raise ValidationError(f"Requested backup label was not found: {backup_label}")
+        raise ValidationError(
+            f"Requested backup label was not found: {backup_label}"
+        )
 
     backup_type = selected_backup.get("type")
     if backup_type != "full":
@@ -342,9 +364,9 @@ def select_backup_from_info(
         )
 
     version = _extract_db_version(selected_backup, stanza)
-    if not _is_postgresql_14(version):
+    if not _is_postgresql_major(version, target_major):
         raise ValidationError(
-            f"Requested backup must target PostgreSQL 14, got: {version!r}"
+            f"Requested backup major must match target PostgreSQL {target_major}, got: {version!r}"
         )
 
     db_size = _extract_backup_size(selected_backup)
@@ -380,14 +402,16 @@ def validate_restored_database(
 ) -> None:
     if in_recovery != "f":
         raise ValidationError("PostgreSQL is still in recovery.")
-    if data_directory != "/var/lib/postgresql/data":
+    if data_directory != "/var/lib/postgresql/18/docker":
         raise ValidationError(f"Unexpected data_directory: {data_directory}")
     if relation_exists != "t":
         raise ValidationError(
             'Expected relation "Dengue_global"."Municipio" was not found.'
         )
     if db_size <= 0:
-        raise ValidationError("Restored database size must be greater than zero.")
+        raise ValidationError(
+            "Restored database size must be greater than zero."
+        )
     if db_size * 10 < source_db_size * 9:
         raise ValidationError(
             "Restored database is smaller than 90% of the source backup size."
@@ -410,18 +434,25 @@ def build_parser() -> argparse.ArgumentParser:
         "validate-profile-restore-inputs"
     )
     validate_profile_restore_parser.add_argument("--profile", required=True)
-    validate_profile_restore_parser.add_argument("--host-pgdata", required=True)
+    validate_profile_restore_parser.add_argument(
+        "--host-pgdata", required=True
+    )
     validate_profile_restore_parser.add_argument("--backup-set", required=True)
     validate_profile_restore_parser.add_argument("--confirm", required=True)
 
     validate_info_parser = subparsers.add_parser("validate-pgbackrest-info")
     validate_info_parser.add_argument("--stanza", required=True)
     validate_info_parser.add_argument("--backup-set", required=True)
+    validate_info_parser.add_argument(
+        "--target-major", type=int, required=True
+    )
 
     subparsers.add_parser("validate-volume-labels")
 
     validate_restore_parser = subparsers.add_parser("validate-restore")
-    validate_restore_parser.add_argument("--source-db-size", type=int, required=True)
+    validate_restore_parser.add_argument(
+        "--source-db-size", type=int, required=True
+    )
     validate_restore_parser.add_argument("--data-directory", required=True)
     validate_restore_parser.add_argument("--in-recovery", required=True)
     validate_restore_parser.add_argument("--relation-exists", required=True)
@@ -443,7 +474,7 @@ def main() -> int:
                 confirm=args.confirm,
             )
             print(f"SOURCE_REPO_CANON={result.source_repo}")
-            print(f"HOST_PGDATA_CANON={result.host_pgdata}")
+            print(f"PG18_HOST_PGDATA_CANON={result.host_pgdata}")
             print(f"BACKUP_SET={result.backup_set}")
             return 0
 
@@ -455,7 +486,7 @@ def main() -> int:
                 confirm=args.confirm,
             )
             print(f"PROFILE={result.profile}")
-            print(f"HOST_PGDATA_CANON={result.host_pgdata}")
+            print(f"PG18_HOST_PGDATA_CANON={result.host_pgdata}")
             print(f"BACKUP_SET={result.backup_set}")
             return 0
 
@@ -465,6 +496,7 @@ def main() -> int:
                 payload,
                 stanza_name=args.stanza,
                 backup_label=args.backup_set,
+                target_major=args.target_major,
             )
             print(f"SOURCE_BACKUP_DB_SIZE={db_size}")
             return 0
@@ -472,7 +504,9 @@ def main() -> int:
         if args.command == "validate-volume-labels":
             payload = _load_json(sys.stdin.read())
             if not isinstance(payload, dict):
-                raise ValidationError("Docker volume labels must be a JSON object.")
+                raise ValidationError(
+                    "Docker volume labels must be a JSON object."
+                )
             validate_volume_labels(payload)
             return 0
 

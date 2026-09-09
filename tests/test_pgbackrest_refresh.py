@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import json
-import subprocess
 from pathlib import Path
-
-import pytest
+import subprocess
 
 from containers.pgbackrest.refresh_staging import (
     APPROVED_PGDATA_ROOTS_BY_PROFILE,
@@ -16,6 +14,7 @@ from containers.pgbackrest.refresh_staging import (
     validate_restored_database,
     validate_volume_labels,
 )
+import pytest
 
 
 @pytest.fixture
@@ -50,12 +49,18 @@ def _build_source_repo(root: Path) -> Path:
     repo = root / "pgbackrest-prod-repo"
     (repo / "backup" / "prod").mkdir(parents=True)
     (repo / "archive" / "prod").mkdir(parents=True)
-    (repo / "backup" / "prod" / "backup.info").write_text("backup", encoding="utf-8")
-    (repo / "archive" / "prod" / "archive.info").write_text("archive", encoding="utf-8")
+    (repo / "backup" / "prod" / "backup.info").write_text(
+        "backup", encoding="utf-8"
+    )
+    (repo / "archive" / "prod" / "archive.info").write_text(
+        "archive", encoding="utf-8"
+    )
     return repo
 
 
-def test_invalid_confirmation_rejected(tmp_path: Path, approved_root: Path) -> None:
+def test_invalid_confirmation_rejected(
+    tmp_path: Path, approved_root: Path
+) -> None:
     source_repo = _build_source_repo(tmp_path)
     host_pgdata = approved_root / "db"
     host_pgdata.mkdir(parents=True)
@@ -74,7 +79,9 @@ def test_invalid_full_backup_label_rejected() -> None:
         validate_full_backup_label("20260711-123456D")
 
 
-def test_invalid_profile_restore_confirmation_rejected(approved_dev_root: Path) -> None:
+def test_invalid_profile_restore_confirmation_rejected(
+    approved_dev_root: Path,
+) -> None:
     host_pgdata = approved_dev_root / "pgdata"
     host_pgdata.mkdir()
 
@@ -87,7 +94,9 @@ def test_invalid_profile_restore_confirmation_rejected(approved_dev_root: Path) 
         )
 
 
-def test_relative_source_repo_rejected(tmp_path: Path, approved_root: Path) -> None:
+def test_relative_source_repo_rejected(
+    tmp_path: Path, approved_root: Path
+) -> None:
     host_pgdata = approved_root / "db"
     host_pgdata.mkdir(parents=True)
 
@@ -103,7 +112,9 @@ def test_relative_source_repo_rejected(tmp_path: Path, approved_root: Path) -> N
 def test_relative_pgdata_rejected(tmp_path: Path) -> None:
     source_repo = _build_source_repo(tmp_path)
 
-    with pytest.raises(ValidationError, match="HOST_PGDATA must be an absolute path"):
+    with pytest.raises(
+        ValidationError, match="PG18_HOST_PGDATA must be an absolute path"
+    ):
         validate_refresh_inputs(
             source_repo=str(source_repo),
             host_pgdata="relative/pgdata",
@@ -156,8 +167,14 @@ def test_forbidden_pgdata_roots_rejected(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     source_repo = _build_source_repo(tmp_path)
-    fake_realpath = lambda path: forbidden_root if path == forbidden_root else str(source_repo)
-    monkeypatch.setattr("containers.pgbackrest.refresh_staging.os.path.realpath", fake_realpath)
+    fake_realpath = (
+        lambda path: forbidden_root
+        if path == forbidden_root
+        else str(source_repo)
+    )
+    monkeypatch.setattr(
+        "containers.pgbackrest.refresh_staging.os.path.realpath", fake_realpath
+    )
 
     with pytest.raises(ValidationError, match="forbidden path"):
         validate_refresh_inputs(
@@ -168,7 +185,9 @@ def test_forbidden_pgdata_roots_rejected(
         )
 
 
-def test_symbolic_link_pgdata_rejected(tmp_path: Path, approved_root: Path) -> None:
+def test_symbolic_link_pgdata_rejected(
+    tmp_path: Path, approved_root: Path
+) -> None:
     source_repo = _build_source_repo(tmp_path)
     real_pgdata = approved_root / "real-db"
     real_pgdata.mkdir(parents=True)
@@ -219,7 +238,9 @@ def test_source_repo_without_valid_metadata_rejected(
     host_pgdata = approved_root / "db"
     host_pgdata.mkdir(parents=True)
 
-    with pytest.raises(ValidationError, match="Required source path is missing"):
+    with pytest.raises(
+        ValidationError, match="Required source path is missing"
+    ):
         validate_refresh_inputs(
             source_repo=str(repo),
             host_pgdata=str(host_pgdata),
@@ -241,7 +262,7 @@ def test_incorrect_docker_volume_labels_rejected() -> None:
 def test_quoted_mixed_case_relation_validation() -> None:
     validate_restored_database(
         source_db_size=100,
-        data_directory="/var/lib/postgresql/data",
+        data_directory="/var/lib/postgresql/18/docker",
         in_recovery="f",
         relation_exists="t",
         db_size=95,
@@ -250,7 +271,7 @@ def test_quoted_mixed_case_relation_validation() -> None:
     with pytest.raises(ValidationError, match="Municipio"):
         validate_restored_database(
             source_db_size=100,
-            data_directory="/var/lib/postgresql/data",
+            data_directory="/var/lib/postgresql/18/docker",
             in_recovery="f",
             relation_exists="Dengue_global.Municipio",
             db_size=95,
@@ -298,6 +319,7 @@ def test_select_backup_from_info_requires_valid_full_prod_backup() -> None:
             json.loads(json.dumps(payload)),
             stanza_name="prod",
             backup_label="20260711-123456F",
+            target_major=14,
         )
         == 1234
     )
