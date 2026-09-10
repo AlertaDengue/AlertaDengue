@@ -1,6 +1,26 @@
 Release Notes
 ---
 
+## [4.22.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.21.0...4.22.0) (2026-09-10)
+
+### Features
+
+* **api:** expose internal historical alert endpoint ([#1067](https://github.com/AlertaDengue/AlertaDengue/issues/1067)) ([49c260d](https://github.com/AlertaDengue/AlertaDengue/commit/49c260d5b1f1ce9a95d1f7d653e549b7f0d42495))
+* **home:** add EPIDESC banner to carousel ([#1087](https://github.com/AlertaDengue/AlertaDengue/issues/1087)) ([7868489](https://github.com/AlertaDengue/AlertaDengue/commit/78684899a7bc9fad1800cbefb43efc2793f81bb7))
+* **products:** add related platforms section ([#1075](https://github.com/AlertaDengue/AlertaDengue/issues/1075)) ([5de80b6](https://github.com/AlertaDengue/AlertaDengue/commit/5de80b63f48986bdd1748a2477c46dae56e0241c))
+* **reports:** add March 2026 El Niño technical report ([#1096](https://github.com/AlertaDengue/AlertaDengue/issues/1096)) ([2ba2bdc](https://github.com/AlertaDengue/AlertaDengue/commit/2ba2bdc79643e3e172206a5bdc899e4ea0c8e634))
+
+### Bug Fixes
+
+* **ci:** pin conventional commits preset for semantic-release ([#1105](https://github.com/AlertaDengue/AlertaDengue/issues/1105)) ([c2d3060](https://github.com/AlertaDengue/AlertaDengue/commit/c2d30600d779361144beb45e691f0f250ee4fb7b))
+* **dados:** cap /report/ page cache at one hour ([#1100](https://github.com/AlertaDengue/AlertaDengue/issues/1100)) ([d06651d](https://github.com/AlertaDengue/AlertaDengue/commit/d06651dbbcf8a33ce62adfb3ad6894006e1236a0))
+* **database:** correct nullable City regional metadata ([#1113](https://github.com/AlertaDengue/AlertaDengue/issues/1113)) ([80de0c8](https://github.com/AlertaDengue/AlertaDengue/commit/80de0c8509bf7dc6f7c179843176d5cf7f522ec7))
+* **database:** move PostgreSQL 14 images to Bookworm ([#1120](https://github.com/AlertaDengue/AlertaDengue/issues/1120)) ([eeca1cf](https://github.com/AlertaDengue/AlertaDengue/commit/eeca1cf5730e031dc2142fa205bbc1928ecf05ba))
+* **deps:** install episcanner 2.0.1 from release artifact ([#1104](https://github.com/AlertaDengue/AlertaDengue/issues/1104)) ([9d93d17](https://github.com/AlertaDengue/AlertaDengue/commit/9d93d173e6f4d33d0f23e0d7e024070a73313197))
+* **docker:** use build environment for dependency install ([#1106](https://github.com/AlertaDengue/AlertaDengue/issues/1106)) ([fe6ee16](https://github.com/AlertaDengue/AlertaDengue/commit/fe6ee16e45b9f1e039cae2d253da5f949835e908))
+* **maps:** configure CARTO basemap API key ([#1097](https://github.com/AlertaDengue/AlertaDengue/issues/1097)) ([a38593d](https://github.com/AlertaDengue/AlertaDengue/commit/a38593d4ea70cc227e4037aac06724c9fc0a44e8))
+* **searchbox:** restore municipality state abbreviations ([#1098](https://github.com/AlertaDengue/AlertaDengue/issues/1098)) ([a79f54e](https://github.com/AlertaDengue/AlertaDengue/commit/a79f54e08bc0bd2b52f13d31c46c525a3c2a6650))
+
 ## [4.21.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.20.1...4.21.0) (2026-08-14)
 
 ## [4.20.1](https://github.com/AlertaDengue/AlertaDengue/compare/4.20.0...4.20.1) (2026-08-03)
