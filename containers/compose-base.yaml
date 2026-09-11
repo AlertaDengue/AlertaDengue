@@ -52,6 +52,7 @@ services:
 
   postgres:
     hostname: postgres
+    image: "${PG18_POSTGRES_IMAGE:?PG18_POSTGRES_IMAGE is required}"
     restart: unless-stopped
     build:
       context: ".."

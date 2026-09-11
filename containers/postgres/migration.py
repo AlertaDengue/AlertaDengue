@@ -49,12 +49,21 @@ def _psql_args(endpoint: Endpoint, sql: str) -> list[str]:
     ]
 
 
-def run_command(args: Sequence[str], password: str | None = None) -> str:
+def run_command(
+    args: Sequence[str],
+    password: str | None = None,
+    input_text: str | None = None,
+) -> str:
     """Run a command without putting credentials in its argument list."""
     env = None if password is None else {**os.environ, "PGPASSWORD": password}
     try:
         result = subprocess.run(
-            list(args), check=True, capture_output=True, text=True, env=env
+            list(args),
+            check=True,
+            capture_output=True,
+            text=True,
+            env=env,
+            input=input_text,
         )
     except subprocess.CalledProcessError as exc:
         raise MigrationError(
@@ -127,16 +136,14 @@ def _canonical_path(path: Path) -> Path:
     return path.expanduser().resolve(strict=False)
 
 
-def _pg_version_marker(path: Path) -> Path | None:
-    """Find a PostgreSQL marker at a cluster path or known legacy child."""
-    for candidate in (
-        path / "PG_VERSION",
-        path / "data" / "PG_VERSION",
-        path / "pgdata" / "PG_VERSION",
-    ):
-        if candidate.is_file():
-            return candidate
-    return None
+def _pg_version_marker(path: Path, *, major: str) -> Path | None:
+    """Find the exact marker for the host volume layout."""
+    candidate = (
+        path / "PG_VERSION"
+        if major == "14"
+        else path / "18" / "docker" / "PG_VERSION"
+    )
+    return candidate if candidate.is_file() else None
 
 
 def validate_storage_paths(
@@ -144,18 +151,45 @@ def validate_storage_paths(
     target_path: Path,
     *,
     container_pgdata: str,
+    mode: str = "cutover",
 ) -> None:
     """Reject unsafe source/target filesystem layouts."""
+    if mode not in {"initialization", "cutover", "restore-validation", "steady-state"}:
+        raise MigrationError(f"unsupported preflight mode: {mode}")
     source = _canonical_path(source_path)
     target = _canonical_path(target_path)
+    if mode == "initialization":
+        if not target.is_dir() or any(target.iterdir()):
+            raise MigrationError(
+                "initialization requires an existing empty PG18_HOST_PGDATA parent"
+            )
+        return
+    if mode in {"restore-validation", "steady-state"}:
+        marker = (
+            _pg_version_marker(target, major="18") if target.is_dir() else None
+        )
+        if (
+            marker is None
+            or marker.read_text(encoding="ascii").strip() != "18"
+        ):
+            raise MigrationError(
+                f"{mode} requires PG18_HOST_PGDATA/18/docker/PG_VERSION = 18"
+            )
+        return
     if not source.is_dir():
         raise MigrationError(f"source path does not exist: {source}")
-    marker = _pg_version_marker(source)
+    marker = _pg_version_marker(source, major="14")
     if marker is None or marker.read_text(encoding="ascii").strip() != "14":
         raise MigrationError(
             f"source path must contain a PostgreSQL 14 PG_VERSION: {source}"
         )
-    target_marker = _pg_version_marker(target) if target.exists() else None
+    target_marker = (
+        _pg_version_marker(target, major="18") if target.exists() else None
+    )
+    if (target / "PG_VERSION").is_file():
+        raise MigrationError(
+            "PG18_HOST_PGDATA/PG_VERSION is not a valid PG18 marker"
+        )
     if (
         target_marker is not None
         and target_marker.read_text(encoding="ascii").strip() != "18"
@@ -191,11 +225,12 @@ def validate_archive(path: Path) -> None:
 def dump_globals(source: Endpoint, output: Path) -> None:
     """Dump global roles and objects."""
     output.parent.mkdir(parents=True, exist_ok=True)
+    descriptor = os.open(output, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    os.close(descriptor)
     run_command(
         [
             "pg_dumpall",
             "--globals-only",
-            "--no-role-passwords",
             "-h",
             source.host,
             "-p",
@@ -209,11 +244,14 @@ def dump_globals(source: Endpoint, output: Path) -> None:
     )
     if not output.is_file() or output.stat().st_size == 0:
         raise MigrationError(f"globals dump is missing or empty: {output}")
+    output.chmod(0o600)
 
 
 def dump_database(source: Endpoint, output: Path) -> None:
     """Create and verify a PostgreSQL custom-format archive."""
     output.parent.mkdir(parents=True, exist_ok=True)
+    descriptor = os.open(output, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    os.close(descriptor)
     run_command(
         [
             "pg_dump",
@@ -233,181 +271,77 @@ def dump_database(source: Endpoint, output: Path) -> None:
         ],
         source.password,
     )
+    output.chmod(0o600)
     validate_archive(output)
 
 
-def restore(target: Endpoint, globals_dump: Path, archive: Path) -> None:
-    """Restore globals, then the archive, into a clean target."""
-    if not globals_dump.is_file() or globals_dump.stat().st_size == 0:
-        raise MigrationError(
-            f"globals dump is missing or empty: {globals_dump}"
-        )
+
+def restore(target: Endpoint, globals_file: Path, archive: Path) -> None:
+    """Restore reviewed globals and the custom archive with fail-fast clients."""
+    if not globals_file.is_file() or globals_file.stat().st_size == 0:
+        raise MigrationError("globals dump is missing or empty")
+    run_command(["psql", "-X", "-v", "ON_ERROR_STOP=1", "-h", target.host, "-p", target.port, "-U", target.user, "-d", "postgres", "--file", str(globals_file)], target.password)
     validate_archive(archive)
-    restore_globals = globals_dump.with_suffix(".target.sql")
-    restore_globals.write_text(
-        "\n".join(
-            line
-            for line in globals_dump.read_text().splitlines()
-            if not line.startswith("CREATE ROLE postgres;")
-            and not line.startswith("ALTER ROLE postgres ")
-        )
-        + "\n"
-    )
-    run_command(
-        [
-            "psql",
-            "-X",
-            "-v",
-            "ON_ERROR_STOP=1",
-            "-h",
-            target.host,
-            "-p",
-            target.port,
-            "-U",
-            target.user,
-            "-d",
-            target.database,
-            "-f",
-            str(restore_globals),
-        ],
-        target.password,
-    )
-    run_command(
-        [
-            "pg_restore",
-            "--exit-on-error",
-            "--no-owner",
-            "-h",
-            target.host,
-            "-p",
-            target.port,
-            "-U",
-            target.user,
-            "-d",
-            target.database,
-            str(archive),
-        ],
-        target.password,
-    )
+    run_command(["pg_restore", "--exit-on-error", "--single-transaction", "-h", target.host, "-p", target.port, "-U", target.user, "-d", target.database, str(archive)], target.password)
 
 
-def catalog_snapshot(endpoint: Endpoint) -> dict[str, str]:
-    """Capture deterministic core catalog values."""
-    queries = {
-        "version": "SHOW server_version_num",
-        "encoding": "SELECT pg_encoding_to_char(encoding) FROM pg_database WHERE datname=current_database()",
-        "schemas": "SELECT coalesce(string_agg(nspname, ',' ORDER BY nspname),'') FROM pg_namespace WHERE nspname NOT LIKE 'pg_%' AND nspname <> 'information_schema'",
-        "relations": "SELECT coalesce(string_agg(n.nspname || '.' || c.relname || ':' || c.relkind::text, ',' ORDER BY n.nspname,c.relname),'') FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname NOT LIKE 'pg_%' AND n.nspname <> 'information_schema' AND c.relkind IN ('r','p','v','m','S')",
-        "extensions": "SELECT coalesce(string_agg(extname, ' ,' ORDER BY extname), ' ') FROM pg_extension",
-        "extension_versions": "SELECT coalesce(string_agg(extname || '=' || extversion, ' ,' ORDER BY extname), ' ') FROM pg_extension",
-        "migration_rows": "SELECT count(*)::text FROM django_migrations",
-    }
-    return {key: scalar(endpoint, sql) for key, sql in queries.items()}
+def validate_contract(source: Endpoint, target: Endpoint) -> None:
+    """Check versions, extensions, schema and Django migration records."""
+    validate_versions(major_from_version_num(scalar(source, "SHOW server_version_num")), major_from_version_num(scalar(target, "SHOW server_version_num")))
+    extensions = set(filter(None, scalar(target, "SELECT string_agg(extname, ',') FROM pg_extension").split(",")))
+    missing = {"postgis", "hstore", "plpython3u", "postgres_fdw"} - extensions
+    if missing:
+        raise MigrationError(f"target is missing required extensions: {', '.join(sorted(missing))}")
+    if int(scalar(target, "SELECT count(*) FROM django_migrations")) < 1:
+        raise MigrationError("target has no Django migration records")
 
 
-def validate_snapshots(source: Endpoint, target: Endpoint) -> None:
-    """Fail if core source and target catalogs differ."""
-    left, right = catalog_snapshot(source), catalog_snapshot(target)
-    if any(
-        key not in {"version", "extension_versions"}
-        and left[key] != right[key]
-        for key in left
-    ):
-        differences = {
-            key: (left[key], right[key])
-            for key in left
-            if key not in {"version", "extension_versions"}
-            and left[key] != right[key]
-        }
-        raise MigrationError(
-            f"source/target catalog mismatch: {json.dumps(differences)}"
-        )
-
-
-def endpoint_from_args(args: argparse.Namespace, prefix: str) -> Endpoint:
-    """Build an endpoint from parsed arguments."""
-    return Endpoint(
-        getattr(args, f"{prefix}_host"),
-        getattr(args, f"{prefix}_port"),
-        getattr(args, f"{prefix}_database"),
-        getattr(args, f"{prefix}_user"),
-        getattr(args, f"{prefix}_password"),
-    )
-
-
-def add_endpoint_arguments(
-    parser: argparse.ArgumentParser, prefix: str
-) -> None:
+def add_endpoint_arguments(parser: argparse.ArgumentParser, prefix: str) -> None:
     for name in ("host", "port", "database", "user"):
         parser.add_argument(f"--{prefix}-{name}", required=True)
     parser.add_argument(f"--{prefix}-password")
 
 
+def endpoint_from_args(args: argparse.Namespace, prefix: str) -> Endpoint:
+    return Endpoint(*(getattr(args, f"{prefix}_{name}") for name in ("host", "port", "database", "user", "password")))
+
+
 def build_parser() -> argparse.ArgumentParser:
-    """Build the migration CLI parser."""
-    root = argparse.ArgumentParser()
+    root = argparse.ArgumentParser(description="PostgreSQL 14 to 18 logical migration")
     sub = root.add_subparsers(dest="action", required=True)
     for action in ("preflight", "dump", "restore", "validate"):
         command = sub.add_parser(action)
         add_endpoint_arguments(command, "source")
         add_endpoint_arguments(command, "target")
-        command.add_argument(
-            "--output-dir", type=Path, default=Path("migration-dumps")
-        )
-        command.add_argument("--archive", type=Path)
-        command.add_argument("--globals", type=Path)
-        command.add_argument(
-            "--required-bytes", type=int, default=1_073_741_824
-        )
+        command.add_argument("--source-path", type=Path, required=True)
+        command.add_argument("--target-path", type=Path, required=True)
         command.add_argument("--disk-path", type=Path, default=Path("."))
-        command.add_argument("--source-path", type=Path)
-        command.add_argument("--target-path", type=Path)
-        command.add_argument(
-            "--container-pgdata", default="/var/lib/postgresql/18/docker"
-        )
-    root.add_argument("--source-major", default="14")
-    root.add_argument("--target-major", default="18")
+        command.add_argument("--required-bytes", type=int, default=1_073_741_824)
+        command.add_argument("--output-dir", type=Path)
+        command.add_argument("--globals", dest="globals_file", type=Path)
+        command.add_argument("--archive", type=Path)
     return root
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Execute one migration phase."""
     args = build_parser().parse_args(argv)
-    source, target = (
-        endpoint_from_args(args, "source"),
-        endpoint_from_args(args, "target"),
-    )
     try:
-        validate_distinct_endpoints(source, target)
-        validate_versions(
-            major_from_version_num(scalar(source, "SHOW server_version_num")),
-            major_from_version_num(scalar(target, "SHOW server_version_num")),
-        )
-        if args.action in ("preflight", "dump"):
-            if args.source_path is None or args.target_path is None:
-                raise MigrationError(
-                    "preflight and dump require --source-path and --target-path"
-                )
-            validate_storage_paths(
-                args.source_path,
-                args.target_path,
-                container_pgdata=args.container_pgdata,
-            )
-            validate_target_empty(target)
-            validate_free_space(args.target_path, args.required_bytes)
-        if args.action == "dump":
-            stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
-            dump_globals(source, args.output_dir / f"globals-{stamp}.sql")
-            dump_database(source, args.output_dir / f"database-{stamp}.dump")
+        source, target = endpoint_from_args(args, "source"), endpoint_from_args(args, "target")
+        validate_storage_paths(args.source_path, args.target_path, container_pgdata="/var/lib/postgresql/18/docker")
+        validate_free_space(args.disk_path, args.required_bytes)
+        if args.action == "preflight":
+            validate_versions(major_from_version_num(scalar(source, "SHOW server_version_num")), major_from_version_num(scalar(target, "SHOW server_version_num")))
+        elif args.action == "dump":
+            if args.output_dir is None:
+                raise MigrationError("dump requires --output-dir")
+            dump_globals(source, args.output_dir / "globals.sql")
+            dump_database(source, args.output_dir / "database.dump")
         elif args.action == "restore":
-            if args.globals is None or args.archive is None:
-                raise MigrationError(
-                    "restore requires --globals and --archive"
-                )
-            validate_target_empty(target)
-            restore(target, args.globals, args.archive)
-        elif args.action == "validate":
-            validate_snapshots(source, target)
+            if args.globals_file is None or args.archive is None:
+                raise MigrationError("restore requires --globals and --archive")
+            restore(target, args.globals_file, args.archive)
+        else:
+            validate_contract(source, target)
         print(f"{args.action}: PASS")
         return 0
     except MigrationError as exc:

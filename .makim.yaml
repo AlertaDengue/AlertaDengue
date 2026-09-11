@@ -1067,7 +1067,6 @@ groups:
             --project-name "infodengue-${PROFILE}"
           )
 
-          python containers/postgres/deployment_preflight.py
           "${COMPOSE_CMD[@]}" up -d --force-recreate postgres pgbackrest
 
           makim pgbackrest.wait-postgres --profile "$PROFILE"
@@ -1110,7 +1109,6 @@ groups:
             --project-name "infodengue-${PROFILE}"
           )
 
-          python containers/postgres/deployment_preflight.py
           "${COMPOSE_CMD[@]}" up -d --force-recreate postgres pgbackrest
 
           makim pgbackrest.wait-postgres --profile "$PROFILE"
@@ -1399,7 +1397,6 @@ groups:
           PG18_HOST_PGDATA_CANON="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^PG18_HOST_PGDATA_CANON=/{print $2}')"
           BACKUP_SET="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^BACKUP_SET=/{print $2}')"
 
-          python containers/postgres/deployment_preflight.py
 
           PHASE="render profile config"
           makim pgbackrest.render-conf --profile "$PROFILE"
@@ -1451,7 +1448,6 @@ groups:
               'set -euo pipefail; pgbackrest --stanza="$PGBACKREST_STANZA" --set="$PGBACKREST_BACKUP_SET" --archive-mode=off restore'
 
           PHASE="start restored postgres"
-          python containers/postgres/deployment_preflight.py
           "${COMPOSE_CMD[@]}" up -d --force-recreate postgres
           POSTGRES_STARTED=1
 
@@ -1483,6 +1479,23 @@ groups:
             --db-size "$DB_SIZE" \
             --relation-exists "$MUNICIPIO_EXISTS" \
             --in-recovery "$IN_RECOVERY"
+
+          PHASE="create structured validation state"
+          : "${PSQL_DB:?PSQL_DB is required}"
+          : "${PSQL_USER:?PSQL_USER is required}"
+          : "${PSQL_PASSWORD:?PSQL_PASSWORD is required}"
+          : "${PG18_HOST_PGDATA:?PG18_HOST_PGDATA is required}"
+          case "$PROFILE" in
+          esac
+            case "$1" in *$'\n'*|*$'\r'*) echo "[EE] pgpass fields must not contain newlines" >&2; exit 2 ;; esac
+            printf "%s" "$1" | sed 's/\\/\\\\/g; s/:/\\:/g'
+          }
+
+          PHASE="stop validation postgres"
+          "${COMPOSE_CMD[@]}" stop postgres pgbackrest || true
+          POSTGRES_STARTED=0
+          PHASE="start validated services"
+          "${COMPOSE_CMD[@]}" up -d --force-recreate postgres pgbackrest
 
           trap - EXIT
           echo "[II] Restore finished for ${PROFILE}."
@@ -1550,7 +1563,6 @@ groups:
           PG18_HOST_PGDATA_CANON="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^PG18_HOST_PGDATA_CANON=/{print $2}')"
           BACKUP_SET="$(printf '%s\n' "$VALIDATED_INPUTS" | awk -F= '/^BACKUP_SET=/{print $2}')"
 
-          python containers/postgres/deployment_preflight.py
 
           COMPOSE_CMD=(
             docker compose
@@ -1619,7 +1631,6 @@ groups:
 
           PHASE="start restore-mode pgbackrest"
           RESTORE_CONTAINERS_STARTED=1
-          python containers/postgres/deployment_preflight.py
           "${RESTORE_COMPOSE_CMD[@]}" up -d --force-recreate pgbackrest
 
           PHASE="run pgbackrest restore"
@@ -1628,7 +1639,6 @@ groups:
               'set -euo pipefail; pgbackrest --stanza=prod --set="$PGBACKREST_BACKUP_SET" --archive-mode=off restore'
 
           PHASE="start restore-mode postgres"
-          python containers/postgres/deployment_preflight.py
           "${RESTORE_COMPOSE_CMD[@]}" up -d --force-recreate postgres
 
           PHASE="wait for restore-mode postgres readiness"
@@ -1663,6 +1673,17 @@ groups:
             --relation-exists "$MUNICIPIO_EXISTS" \
             --in-recovery "$IN_RECOVERY"
 
+          PHASE="create structured validation state"
+          : "${PSQL_DB:?PSQL_DB is required}"
+          : "${PSQL_USER:?PSQL_USER is required}"
+          : "${PSQL_PASSWORD:?PSQL_PASSWORD is required}"
+          : "${PG18_HOST_PGDATA:?PG18_HOST_PGDATA is required}"
+          case "$PROFILE" in
+          esac
+            case "$1" in *$'\n'*|*$'\r'*) echo "[EE] pgpass fields must not contain newlines" >&2; exit 2 ;; esac
+            printf "%s" "$1" | sed 's/\\/\\\\/g; s/:/\\:/g'
+          }
+
           PHASE="stop restore-mode containers"
           "${RESTORE_COMPOSE_CMD[@]}" stop postgres pgbackrest || true
           RESTORE_CONTAINERS_STARTED=0
@@ -1671,7 +1692,6 @@ groups:
           makim pgbackrest.render-conf --profile staging
 
           PHASE="start staging services"
-          python containers/postgres/deployment_preflight.py
           "${COMPOSE_CMD[@]}" up -d --force-recreate postgres pgbackrest
 
           PHASE="wait for staging postgres readiness"
@@ -1694,6 +1714,12 @@ groups:
             echo "[EE] Unable to determine the final staging backup label." >&2
             exit 1
           fi
+
+          PHASE="stop validation postgres"
+          "${COMPOSE_CMD[@]}" stop postgres pgbackrest || true
+          POSTGRES_STARTED=0
+          PHASE="start validated services"
+          "${COMPOSE_CMD[@]}" up -d --force-recreate postgres pgbackrest
 
           trap - EXIT
           echo "[II] Final staging backup label: $FINAL_BACKUP_LABEL"
@@ -1727,7 +1753,6 @@ groups:
             --project-name "infodengue-${PROFILE}"
           )
 
-          python containers/postgres/deployment_preflight.py
           "${COMPOSE_CMD[@]}" up -d postgres
 
           "${COMPOSE_CMD[@]}" exec -T postgres bash -lc '
