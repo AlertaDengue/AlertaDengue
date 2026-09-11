@@ -65,12 +65,16 @@ services:
       - ../.envs/.env
     shm_size: "8gb"
     environment:
+      ENV: "${ENV:-dev}"
+      PG_STANZA: "${PG_STANZA:-${ENV:-dev}}"
+      PG_ARCHIVE_MODE: "${PG_ARCHIVE_MODE:-on}"
       POSTGRES_PASSWORD: "${PSQL_PASSWORD}"
       POSTGRES_DB: "${PSQL_DB}"
       POSTGRES_USER: "${PSQL_USER}"
       POSTGRES_HOST_AUTH_METHOD: "md5"
       PG_RESTORE_STAGING: "${PG_RESTORE_STAGING}"
       PGDATA: /var/lib/postgresql/18/docker
+      ALLOW_PG18_INITIALIZATION: "${ALLOW_PG18_INITIALIZATION:-0}"
     ports:
       - "${PSQL_PORT}:5432"
     volumes:

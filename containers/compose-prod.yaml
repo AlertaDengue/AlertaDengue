@@ -1,6 +1,8 @@
 services:
   postgres:
     environment:
+      ENV: "prod"
+      PG_STANZA: "prod"
       PGDATA: "/var/lib/postgresql/18/docker"
     volumes:
       - "${PG18_HOST_PGDATA:?PG18_HOST_PGDATA is required}:/var/lib/postgresql"

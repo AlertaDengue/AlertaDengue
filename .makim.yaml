@@ -204,6 +204,8 @@ groups:
         env:
           POSTGRES_HOST: localhost
           REDIS_HOST: localhost
+          PG18_HOST_PGDATA: /tmp/alertadengue-pg18-test
+          PG18_POSTGRES_IMAGE: alertadengue-postgres:18.6-bookworm
         hooks:
           pre-run:
             - task: tests.setup
@@ -1443,9 +1445,9 @@ groups:
           sudo chmod 0700 "$PG18_HOST_PGDATA_CANON"
 
           PHASE="run pgbackrest restore"
-          env PGBACKREST_BACKUP_SET="$BACKUP_SET" PGBACKREST_STANZA="$PROFILE" \
+          env PGBACKREST_BACKUP_SET="$BACKUP_SET" PG_STANZA="$PROFILE" \
             "${COMPOSE_CMD[@]}" run --rm --no-deps pgbackrest sh -lc \
-              'set -euo pipefail; pgbackrest --stanza="$PGBACKREST_STANZA" --set="$PGBACKREST_BACKUP_SET" --archive-mode=off restore'
+              'set -euo pipefail; pgbackrest --stanza="$PG_STANZA" --set="$PGBACKREST_BACKUP_SET" --archive-mode=off restore'
 
           PHASE="start restored postgres"
           "${COMPOSE_CMD[@]}" up -d --force-recreate postgres
@@ -1480,21 +1482,6 @@ groups:
             --relation-exists "$MUNICIPIO_EXISTS" \
             --in-recovery "$IN_RECOVERY"
 
-          PHASE="create structured validation state"
-          : "${PSQL_DB:?PSQL_DB is required}"
-          : "${PSQL_USER:?PSQL_USER is required}"
-          : "${PSQL_PASSWORD:?PSQL_PASSWORD is required}"
-          : "${PG18_HOST_PGDATA:?PG18_HOST_PGDATA is required}"
-          case "$PROFILE" in
-          esac
-            case "$1" in *$'\n'*|*$'\r'*) echo "[EE] pgpass fields must not contain newlines" >&2; exit 2 ;; esac
-            printf "%s" "$1" | sed 's/\\/\\\\/g; s/:/\\:/g'
-          }
-
-          PHASE="stop validation postgres"
-          "${COMPOSE_CMD[@]}" stop postgres pgbackrest || true
-          POSTGRES_STARTED=0
-          PHASE="start validated services"
           "${COMPOSE_CMD[@]}" up -d --force-recreate postgres pgbackrest
 
           trap - EXIT
@@ -1673,17 +1660,6 @@ groups:
             --relation-exists "$MUNICIPIO_EXISTS" \
             --in-recovery "$IN_RECOVERY"
 
-          PHASE="create structured validation state"
-          : "${PSQL_DB:?PSQL_DB is required}"
-          : "${PSQL_USER:?PSQL_USER is required}"
-          : "${PSQL_PASSWORD:?PSQL_PASSWORD is required}"
-          : "${PG18_HOST_PGDATA:?PG18_HOST_PGDATA is required}"
-          case "$PROFILE" in
-          esac
-            case "$1" in *$'\n'*|*$'\r'*) echo "[EE] pgpass fields must not contain newlines" >&2; exit 2 ;; esac
-            printf "%s" "$1" | sed 's/\\/\\\\/g; s/:/\\:/g'
-          }
-
           PHASE="stop restore-mode containers"
           "${RESTORE_COMPOSE_CMD[@]}" stop postgres pgbackrest || true
           RESTORE_CONTAINERS_STARTED=0
@@ -1715,11 +1691,6 @@ groups:
             exit 1
           fi
 
-          PHASE="stop validation postgres"
-          "${COMPOSE_CMD[@]}" stop postgres pgbackrest || true
-          POSTGRES_STARTED=0
-          PHASE="start validated services"
-          "${COMPOSE_CMD[@]}" up -d --force-recreate postgres pgbackrest
 
           trap - EXIT
           echo "[II] Final staging backup label: $FINAL_BACKUP_LABEL"

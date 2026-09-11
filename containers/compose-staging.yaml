@@ -1,6 +1,8 @@
 services:
   postgres:
     environment:
+      ENV: "staging"
+      PG_STANZA: "staging"
       PGDATA: "/var/lib/postgresql/18/docker"
     ports:
       - "${PSQL_HOST_PORT}:5432"

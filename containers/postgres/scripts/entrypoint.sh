@@ -9,6 +9,32 @@ DEFAULT_RESTORE_COMMAND="pgbackrest --config=${PGBACKREST_CONFIG} --stanza=${STA
 ARCHIVE_COMMAND="${PG_ARCHIVE_COMMAND:-${DEFAULT_ARCHIVE_COMMAND}}"
 RESTORE_COMMAND="${PG_RESTORE_COMMAND:-${DEFAULT_RESTORE_COMMAND}}"
 
+
+guard_pg18_initialization() {
+  local data_dir="${PGDATA:-/var/lib/postgresql/18/docker}"
+  local postgres_root
+  postgres_root="$(dirname "$(dirname "$data_dir")")"
+
+  if [ -e "${postgres_root}/PG_VERSION" ]; then
+    echo "Refusing PostgreSQL 18 startup: conflicting PG_VERSION at ${postgres_root}." >&2
+    exit 1
+  fi
+  if [ -e "${data_dir}/PG_VERSION" ]; then
+    if [ "$(tr -d '[:space:]' < "${data_dir}/PG_VERSION")" != "18" ]; then
+      echo "Refusing PostgreSQL 18 startup: ${data_dir}/PG_VERSION is not 18." >&2
+      exit 1
+    fi
+    return
+  fi
+  if [ -d "$data_dir" ] && find "$data_dir" -mindepth 1 -print -quit | grep -q .; then
+    echo "Refusing PostgreSQL 18 startup: ${data_dir} is not an empty PG18 directory." >&2
+    exit 1
+  fi
+  if [ "${ALLOW_PG18_INITIALIZATION:-0}" != "1" ]; then
+    echo "Refusing to initialize empty PG18 data directory ${data_dir}. Set ALLOW_PG18_INITIALIZATION=1 for one-time initialization, then unset it." >&2
+    exit 1
+  fi
+}
 mkdir -p /backups
 
 if [ "${1:-}" = "postgres" ]; then
@@ -26,6 +52,7 @@ if [ "${1:-}" = "postgres" ]; then
   esac
 
   shift
+  guard_pg18_initialization
   exec docker-entrypoint.sh postgres \
     -c "archive_mode=${ARCHIVE_MODE}" \
     -c "archive_command=${ARCHIVE_COMMAND}" \
