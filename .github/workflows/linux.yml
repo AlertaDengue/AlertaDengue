@@ -40,7 +40,10 @@ env:
   PSQL_DEV_PASSWORD: infodenguedev
 
   PG_RESTORE_STAGING: schemas
-  HOST_PGDATA: "/home/runner/storage/postgres_data_dev"
+  PG14_HOST_PGDATA: "/home/runner/storage/postgres_data_dev_14"
+  PG18_HOST_PGDATA: "/home/runner/storage/postgres_data_dev_18"
+  PG18_POSTGRES_IMAGE: "alertadengue-postgres:18.6-bookworm"
+  ALLOW_PG18_INITIALIZATION: "1"
 
   DOCKER_HOST_SINAN_ROOT: "/home/runner/storage/sftp2/alertadengue/sinan"
   DOCKER_HOST_IMPORTED_FILES_DIR: "/home/runner/storage/sftp2/alertadengue/sinan/imported"
@@ -99,9 +102,9 @@ jobs:
 
     - name: Prepare data volumes
       run: |
-        mkdir -p /home/runner/storage/postgres_data_dev
-        chmod 777 -R /home/runner/storage/postgres_data_dev
-        sudo chown 1001:1001 -R /home/runner/storage/postgres_data_dev
+        mkdir -p /home/runner/storage/postgres_data_dev_14 /home/runner/storage/postgres_data_dev_18
+        chmod 777 -R /home/runner/storage/postgres_data_dev_14 /home/runner/storage/postgres_data_dev_18
+        sudo chown 1001:1001 -R /home/runner/storage/postgres_data_dev_14 /home/runner/storage/postgres_data_dev_18
         mkdir -p /tmp/dbf_duplicated_csv
         chmod 777 -R /tmp/dbf_duplicated_csv
         mkdir -p /home/runner/storage/episcanner
@@ -142,6 +145,9 @@ jobs:
     - name: Build backend
       run: |
         sugar --profile dev compose build --options --no-cache --services web,celery,celery-beat
+
+    - name: Build PostgreSQL 18 and pgBackRest images
+      run: sugar --profile dev compose build --options --no-cache --services postgres,pgbackrest
 
     - name: Start postgres database
       run: |

@@ -1,11 +1,13 @@
 services:
   postgres:
     environment:
-      PGDATA: "/var/lib/postgresql/data"
+      ENV: "staging"
+      PG_STANZA: "staging"
+      PGDATA: "/var/lib/postgresql/18/docker"
     ports:
       - "${PSQL_HOST_PORT}:5432"
     volumes:
-      - "${HOST_PGDATA:-/opt/data/infodengue/staging/pgdata}:/var/lib/postgresql/data"
+      - "${PG18_HOST_PGDATA:?PG18_HOST_PGDATA is required}:/var/lib/postgresql"
     command:
       - postgres
       - -p

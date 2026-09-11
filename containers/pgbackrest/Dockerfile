@@ -1,4 +1,4 @@
-FROM postgres:14-bookworm
+FROM postgres:18.6-bookworm
 
 ARG HOST_UID
 ARG HOST_GID

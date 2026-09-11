@@ -6,7 +6,7 @@ configs are rendered under `.runtime/pgbackrest/` and are not committed.
 
 Both `postgres` and `pgbackrest` mount the same rendered config at
 `/etc/pgbackrest/pgbackrest.conf`. `pg1-path` must match PostgreSQL
-`data_directory`, which is `/var/lib/postgresql/data` in these compose files.
+`data_directory`, which is `/var/lib/postgresql/18/docker` in these compose files.
 
 ## Steady-state backups
 
@@ -73,7 +73,7 @@ another file-based secret source. Do not commit secrets into the template.
 Shared paths:
 
 ```text
-/var/lib/postgresql/data
+/var/lib/postgresql/18/docker
 /var/run/postgresql
 /var/lib/pgbackrest
 /var/log/pgbackrest
@@ -99,7 +99,7 @@ repository.
 
 `makim pgbackrest.restore-profile-backup --profile <profile> --backup-set <full-backup-label> --confirm RESTORE-PROFILE-BACKUP`
 restores an explicit full backup inside one environment. It runs a read-only
-repository preflight, validates and canonicalizes `HOST_PGDATA`, prints the
+repository preflight, validates and canonicalizes `PG18_HOST_PGDATA`, prints the
 deletion target before cleanup, and never uses unguarded `rm -rf`.
 
 Production-to-staging refresh is a separate workflow. It uses a transferred
@@ -228,7 +228,7 @@ docker exec infodengue-dev-postgres-1 \
 
 # If true, check for recovery signals
 docker exec infodengue-dev-postgres-1 \
-  ls -la /var/lib/postgresql/data/ | grep -E "signal|conf"
+  ls -la /var/lib/postgresql/18/docker/ | grep -E "signal|conf"
 
 # If recovery does not complete, inspect pgBackRest logs and the selected
 # backup/archive metadata instead of removing signal files manually.
