@@ -10,6 +10,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import tempfile
 from typing import Sequence
 
 
@@ -162,6 +163,58 @@ def prepare_output_directory(path: Path) -> None:
     path.mkdir(mode=0o700, parents=True)
 
 
+EXPECTED_ADMINPACK_ENTRIES = {
+    "EXTENSION - adminpack",
+    'COMMENT - EXTENSION "adminpack"',
+}
+
+
+
+def filter_restore_list(toc: str) -> str:
+    """Remove exactly the obsolete PostgreSQL 14 adminpack TOC pair."""
+    kept = []
+    removed = []
+    for line in toc.splitlines(keepends=True):
+        description = line.strip().split("; ", 2)[-1]
+        if description.endswith("EXTENSION - adminpack"):
+            removed.append("EXTENSION - adminpack")
+        elif description.endswith('COMMENT - EXTENSION "adminpack"'):
+            removed.append('COMMENT - EXTENSION "adminpack"')
+        elif "adminpack" in description.lower():
+            raise MigrationError(
+                f"unexpected adminpack-related archive entry: {description}"
+            )
+        else:
+            kept.append(line)
+    if removed and (len(removed) != 2 or set(removed) != EXPECTED_ADMINPACK_ENTRIES):
+        raise MigrationError("archive contains a partial adminpack TOC pair")
+    return "".join(kept)
+
+
+def write_restore_list(archive: Path, toc: str) -> Path:
+    """Write a private restore list beside the archive."""
+    filtered = filter_restore_list(toc)
+    descriptor = -1
+    path: Path | None = None
+    try:
+        descriptor, name = tempfile.mkstemp(
+            prefix=".postgres-restore-", suffix=".list", dir=archive.parent
+        )
+        path = Path(name)
+        os.fchmod(descriptor, 0o600)
+        with os.fdopen(descriptor, "w", encoding="utf-8") as restore_list:
+            descriptor = -1
+            restore_list.write(filtered)
+        path.chmod(0o600)
+        return path
+    except OSError as exc:
+        if descriptor >= 0:
+            os.close(descriptor)
+        if path is not None:
+            path.unlink(missing_ok=True)
+        raise MigrationError("unable to create private restore list") from exc
+
+
 def validate_archive(path: Path) -> None:
     """Require a nonempty archive readable by pg_restore."""
     if not path.is_file() or path.stat().st_size == 0:
@@ -185,22 +238,33 @@ def dump_database(source: Endpoint, output: Path) -> None:
     validate_archive(output)
 
 
+
 def restore(target: Endpoint, archive: Path) -> None:
-    """Restore only application objects into the pre-created target database."""
+    """Restore application objects, filtering only obsolete adminpack entries."""
     target_major = major_from_version_num(scalar(target, "SHOW server_version_num"))
     if target_major != "18":
         raise MigrationError(f"target major must be 18, got {target_major!r}")
     validate_target_empty(target)
-    validate_archive(archive)
-    run_command(
-        [
-            "pg_restore", "--exit-on-error", "--single-transaction",
-            "--no-owner", "--no-acl", f"--role={target.user}", "-h",
-            target.host, "-p", target.port, "-U", target.user, "-d",
-            target.database, str(archive),
-        ],
-        target.password,
-    )
+    if not archive.is_file() or archive.stat().st_size == 0:
+        raise MigrationError(f"dump archive is missing or empty: {archive}")
+    toc = run_command(["pg_restore", "--list", str(archive)])
+    restore_list = write_restore_list(archive, toc)
+    try:
+        run_command(
+            [
+                "pg_restore", "--exit-on-error", "--single-transaction",
+                "--no-owner", "--no-acl", f"--role={target.user}",
+                f"--use-list={restore_list}", "-h", target.host, "-p",
+                target.port, "-U", target.user, "-d", target.database,
+                str(archive),
+            ],
+            target.password,
+        )
+    finally:
+        try:
+            restore_list.unlink()
+        except FileNotFoundError:
+            pass
 
 
 def validate_sequences(target: Endpoint) -> None:

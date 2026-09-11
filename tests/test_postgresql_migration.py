@@ -1,9 +1,9 @@
 import importlib.util
 import json
 import os
-import subprocess
 from pathlib import Path
 import stat
+import subprocess
 import sys
 
 import pytest
@@ -136,7 +136,7 @@ def test_restore_requires_pg18_empty_target_and_fail_fast(monkeypatch, tmp_path:
         lambda args, *_: commands.append(args) or "",
     )
     migration.restore(endpoint("target"), archive)
-    restore = commands[0]
+    restore = commands[-1]
     for option in (
         "--no-owner",
         "--no-acl",
@@ -235,3 +235,92 @@ def test_rendered_staging_can_disable_archive_mode() -> None:
     )
     postgres = json.loads(result.stdout)["services"]["postgres"]
     assert postgres["environment"]["PG_ARCHIVE_MODE"] == "off"
+
+ADMINPACK_TOC = (
+    "1; 0 0 TABLE - users\n"
+    "2; 3079 1262 EXTENSION - adminpack\n"
+    "3; 0 0 COMMENT - EXTENSION \"adminpack\"\n"
+    "4; 0 0 TABLE - orders\n"
+)
+
+
+def test_filter_restore_list_removes_only_adminpack_pair() -> None:
+    filtered = migration.filter_restore_list(ADMINPACK_TOC)
+    assert "EXTENSION - adminpack" not in filtered
+    assert 'COMMENT - EXTENSION "adminpack"' not in filtered
+    assert "TABLE - users" in filtered
+    assert "TABLE - orders" in filtered
+
+
+def test_filter_restore_list_accepts_archive_without_adminpack() -> None:
+    toc = "1; 0 0 TABLE - users\n2; 0 0 TABLE - orders\n"
+    assert migration.filter_restore_list(toc) == toc
+
+
+@pytest.mark.parametrize(
+    "toc",
+    [
+        "1; 3079 1262 EXTENSION - adminpack\n",
+        "1; 0 0 COMMENT - EXTENSION \"adminpack\"\n",
+    ],
+)
+def test_filter_restore_list_rejects_partial_adminpack_pair(toc: str) -> None:
+    with pytest.raises(migration.MigrationError, match="partial"):
+        migration.filter_restore_list(toc)
+
+
+def test_filter_restore_list_rejects_unexpected_adminpack_entry() -> None:
+    toc = "1; 0 0 FUNCTION - adminpack_helper\n"
+    with pytest.raises(migration.MigrationError, match="unexpected"):
+        migration.filter_restore_list(toc)
+
+
+def test_restore_uses_private_filtered_list_and_removes_it(
+    monkeypatch, tmp_path: Path
+) -> None:
+    archive = tmp_path / "database.dump"
+    archive.write_bytes(b"archive")
+    calls = []
+    responses = iter([ADMINPACK_TOC, ""])
+
+    def command(args, *_):
+        calls.append(args)
+        return next(responses)
+
+    monkeypatch.setattr(migration, "scalar", lambda *_: "180006" if "version" in _[-1] else "0")
+    monkeypatch.setattr(migration, "run_command", command)
+    migration.restore(endpoint("target"), archive)
+    assert any(arg.startswith("--use-list=") for arg in calls[1])
+    assert "--single-transaction" in calls[1]
+    assert "--exit-on-error" in calls[1]
+    assert not list(tmp_path.glob(".postgres-restore-*.list"))
+
+
+def test_restore_list_is_removed_after_pg_restore_failure(
+    monkeypatch, tmp_path: Path
+) -> None:
+    archive = tmp_path / "database.dump"
+    archive.write_bytes(b"archive")
+    calls = []
+
+    def command(args, *_):
+        calls.append(args)
+        if len(calls) == 1:
+            return ADMINPACK_TOC
+        raise migration.MigrationError("restore failed")
+
+    monkeypatch.setattr(migration, "scalar", lambda *_: "180006" if "version" in _[-1] else "0")
+    monkeypatch.setattr(migration, "run_command", command)
+    with pytest.raises(migration.MigrationError, match="restore failed"):
+        migration.restore(endpoint("target"), archive)
+    assert not list(tmp_path.glob(".postgres-restore-*.list"))
+
+
+def test_restore_list_has_private_permissions(monkeypatch, tmp_path: Path) -> None:
+    archive = tmp_path / "database.dump"
+    archive.write_bytes(b"archive")
+    restore_list = migration.write_restore_list(archive, ADMINPACK_TOC)
+    try:
+        assert stat.S_IMODE(restore_list.stat().st_mode) == 0o600
+    finally:
+        restore_list.unlink()

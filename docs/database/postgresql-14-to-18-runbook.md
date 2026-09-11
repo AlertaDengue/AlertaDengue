@@ -7,6 +7,12 @@ again for PostgreSQL 18 after cutover.
 
 ## Environment
 
+The PostgreSQL 14 archive may contain the legacy `adminpack` extension and its
+extension comment. PostgreSQL 18 does not provide `adminpack`; the restore
+command filters only those two TOC entries and neither installs nor replaces
+that extension. After validation, the required extensions are `postgis`,
+`hstore`, `plpython3u`, and `postgres_fdw`, and `adminpack` must be absent.
+
 Staging:
 
 ```sh
