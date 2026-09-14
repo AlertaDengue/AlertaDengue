@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load humanize i18n %}
+{% load searchbox_component %}
 {% load i18n %}
 {% load static %}
 {% block extra_head %}
@@ -69,6 +70,9 @@
       <div class="col-md-12">
         <div class="panel panel-default">
           <div class="panel-body">
+            <div class="mb-3">
+              {% searchbox_component selected_geocode=geocode disease=disease_code %}
+            </div>
             <li>{% blocktranslate with populacao=populacao|intword %}<b>População:</b> {{ populacao }} de
             habitantes.{% endblocktranslate %}</li>
             <li>{% blocktranslate with incidencia=incidencia|floatformat %}<b>Incidência estimada na SE {{ WEEK }}:</b> {{ incidencia }} por 100

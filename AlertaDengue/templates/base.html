@@ -100,7 +100,14 @@
             var city = event.params.data;
 
             if (city && city.id) {
-              window.location.href = "/alerta/" + city.id;
+              var destination = "/alerta/" + city.id;
+              var disease = $searchbox.data("disease");
+
+              if (disease) {
+                destination += "/" + disease;
+              }
+
+              window.location.href = destination;
             }
           });
       });
