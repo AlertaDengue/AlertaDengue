@@ -68,9 +68,6 @@
   {% block content %}
     <div class="row">
       <div class="col-md-12">
-        <p class="city-dashboard-update">
-          {% blocktranslate with week=WEEK year=epi_year %}Dados atualizados até a SE {{ week }}/{{ year }}{% endblocktranslate %}
-        </p>
         <section class="city-dashboard-controls"
                  aria-label="{% translate "Contexto do painel" %}">
           <div class="city-dashboard-controls__municipality">
@@ -112,6 +109,9 @@
               </label>
             </div>
           </fieldset>
+          <p class="city-dashboard-update">
+            {% blocktranslate with week=WEEK year=epi_year %}Dados atualizados até a SE {{ week }}/{{ year }}{% endblocktranslate %}
+          </p>
         </section>
         <section class="city-dashboard-summary"
                  aria-label="{% translate "Resumo do município" %}">
