@@ -3505,3 +3505,38 @@ msgstr "Gracias por usar Infodengue"
 #~ msgstr ""
 #~ "Premio al Desarrollo de Tecnología Digital en Modelización de "
 #~ "Enfermedades Infecciosas Sensibles al Clima."
+
+
+# Dashboard translations
+msgid "Dados atualizados até:"
+msgstr "Datos actualizados hasta:"
+
+#, python-format
+msgid "SE %(week)s/%(year)s"
+msgstr "SE %(week)s/%(year)s"
+
+msgid "Contexto do painel"
+msgstr "Contexto del panel"
+
+msgid "Doença"
+msgstr "Enfermedad"
+
+msgid "Resumo do município"
+msgstr "Resumen del municipio"
+
+msgid "População"
+msgstr "Población"
+
+msgid "habitantes"
+msgstr "habitantes"
+
+#, python-format
+msgid "Incidência estimada na SE %(week)s"
+msgstr "Incidencia estimada en la SE %(week)s"
+
+msgid "por 100 mil habitantes"
+msgstr "por 100 mil habitantes"
+
+#, python-format
+msgid "Casos de %(disease)s em %(municipality)s"
+msgstr "Casos de %(disease)s en %(municipality)s"

@@ -110,7 +110,8 @@
             </div>
           </fieldset>
           <p class="city-dashboard-update">
-            {% blocktranslate with week=WEEK year=epi_year %}Dados atualizados até a SE {{ week }}/{{ year }}{% endblocktranslate %}
+            {% translate "Dados atualizados até:" %}
+            <span class="city-dashboard-update__week">{% blocktranslate with week=WEEK year=epi_year %}SE {{ week }}/{{ year }}{% endblocktranslate %}</span>
           </p>
         </section>
         <section class="city-dashboard-summary"
@@ -119,7 +120,7 @@
           <article class="city-dashboard-summary__card"><span class="city-dashboard-summary__icon" aria-hidden="true"><i class="fas fa-chart-line"></i></span><div class="city-dashboard-summary__content"><span class="city-dashboard-summary__label">{% blocktranslate with week=WEEK %}Incidência estimada na SE {{ week }}{% endblocktranslate %}</span><strong class="city-dashboard-summary__value">{{ incidencia|floatformat }}</strong><span class="city-dashboard-summary__helper">{% translate "por 100 mil habitantes" %}</span></div></article>
           <article class="city-dashboard-summary__card"><span class="city-dashboard-summary__icon" aria-hidden="true"><i class="fas fa-file-alt"></i></span><div class="city-dashboard-summary__content"><span class="city-dashboard-summary__label">{% translate "Relatório da Situação das Arboviroses em" %}</span><a class="city-dashboard-summary__link"
    href="{% url "dados:report_city" state=state_abv geocode=geocode year_week=SE %}">{{ nome }} <i class="fas fa-external-link-alt" aria-hidden="true"></i></a></div></article>
-          <article class="city-dashboard-summary__card"><span class="city-dashboard-summary__icon" aria-hidden="true"><i class="fas fa-map-marker-alt"></i></span><div class="city-dashboard-summary__content"><span class="city-dashboard-summary__label">{% translate "Para mais detalhes, acesse a página de Relatório Estadual" %}</span><a class="city-dashboard-summary__link"
+          <article class="city-dashboard-summary__card"><span class="city-dashboard-summary__icon" aria-hidden="true"><i class="fas fa-file-lines"></i></span><div class="city-dashboard-summary__content"><span class="city-dashboard-summary__label">{% translate "Para mais detalhes, acesse a página de Relatório Estadual" %}</span><a class="city-dashboard-summary__link"
    href="{% url "dados:alerta_uf" disease=disease_code state=state_abv %}">{{ state_abv }} <i class="fas fa-external-link-alt" aria-hidden="true"></i></a></div></article>
         </section>
         <section class="city-dashboard-chart">

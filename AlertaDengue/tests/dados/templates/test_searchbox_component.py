@@ -232,7 +232,8 @@ def test_city_dashboard_layout_uses_dynamic_summary_context():
 
     assert "{% searchbox_component selected_geocode=geocode " in source
     assert "disease=disease_code %}" in source
-    assert "Dados atualizados até a SE {{ week }}/{{ year }}" in source
+    assert "Dados atualizados até:" in source
+    assert "SE {{ week }}/{{ year }}" in source
     assert "Dados consolidados" not in source
     assert source.index("city-dashboard-controls") < source.index(
         "city-dashboard-summary"
