@@ -806,7 +806,7 @@ h5 {
 }
 
 /* Municipality dashboard */
-.city-dashboard-update { margin: 0 0 0 auto; color: #607d98; font-size: 0.88rem; text-align: right; white-space: nowrap; }
+.city-dashboard-update { display: flex; flex-direction: column; align-items: flex-end; margin: 0 0 0 auto; color: #607d98; font-size: 0.88rem; line-height: 1.35; text-align: right; white-space: nowrap; }
 .city-dashboard-controls, .city-dashboard-chart, .city-dashboard-summary__card { border: 1px solid rgba(0, 62, 126, 0.14); border-radius: 0.85rem; background: #fff; box-shadow: 0 5px 14px rgba(0, 35, 70, 0.07); }
 .city-dashboard-controls { display: flex; align-items: center; gap: 1.25rem; padding: 1rem 1.25rem; margin-bottom: 1rem; }
 .city-dashboard-controls__municipality { flex: 0 1 380px; min-width: 0; }
@@ -831,4 +831,4 @@ h5 {
 .city-dashboard-chart__title { margin: 0 0 0.35rem; color: #003e7e; font-size: 1.3rem; font-weight: 700; }
 .city-dashboard-chart__subtitle { margin: 0; color: #35506a; }
 @media (max-width: 991.98px) { .city-dashboard-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 767.98px) { .city-dashboard-update { margin: 0; text-align: left; white-space: normal; } .city-dashboard-controls { flex-direction: column; align-items: stretch; } .city-dashboard-controls__municipality { flex-basis: auto; width: 100%; } .city-dashboard-controls__divider { width: 100%; height: 1px; } .city-dashboard-controls__disease-options { flex-direction: column; gap: 0.5rem; } .city-dashboard-summary { grid-template-columns: minmax(0, 1fr); } .city-dashboard-chart { padding: 1rem; } }
+@media (max-width: 767.98px) { .city-dashboard-update { align-items: flex-start; margin: 0; text-align: left; white-space: normal; } .city-dashboard-controls { flex-direction: column; align-items: stretch; } .city-dashboard-controls__municipality { flex-basis: auto; width: 100%; } .city-dashboard-controls__divider { width: 100%; height: 1px; } .city-dashboard-controls__disease-options { flex-direction: column; gap: 0.5rem; } .city-dashboard-summary { grid-template-columns: minmax(0, 1fr); } .city-dashboard-chart { padding: 1rem; } }

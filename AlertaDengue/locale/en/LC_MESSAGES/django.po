@@ -3448,6 +3448,7 @@ msgstr "Thank you for use Infodengue"
 #~ "Disease Modelling."
 
 
+
 # Dashboard translations
 msgid "Dados atualizados até:"
 msgstr "Data updated through:"
@@ -3481,3 +3482,7 @@ msgstr "per 100,000 inhabitants"
 #, python-format
 msgid "Casos de %(disease)s em %(municipality)s"
 msgstr "%(disease)s cases in %(municipality)s"
+
+#, python-format
+msgid "Chance de alerta laranja ou vermelho de %(disease)s para o município de %(municipality)s na próxima semana:"
+msgstr "Chance of an orange or red %(disease)s alert for the municipality of %(municipality)s next week:"

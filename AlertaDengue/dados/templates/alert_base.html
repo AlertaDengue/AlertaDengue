@@ -126,7 +126,12 @@
         <section class="city-dashboard-chart">
           <header class="city-dashboard-chart__header">
             <h2 class="city-dashboard-chart__title"><i class="fas fa-chart-line" aria-hidden="true"></i> {% blocktranslate with disease=disease_label municipality=nome %}Casos de {{ disease }} em {{ municipality }}{% endblocktranslate %}</h2>
-            <p class="city-dashboard-chart__subtitle">{% blocktranslate with prt=prt1|floatformat %}<b>Chance de alerta <span class="label label-warning">laranja</span> ou <span class="label label-danger">vermelho</span> de {{ disease_label }} para o município de {{ nome }} na próxima semana:</b> {{ prt }}%{% endblocktranslate %}</p>
+            <p class="city-dashboard-chart__subtitle">
+              <strong>
+                {% blocktranslate with disease=disease_label municipality=nome %}Chance de alerta laranja ou vermelho de {{ disease }} para o município de {{ municipality }} na próxima semana:{% endblocktranslate %}
+              </strong>
+              {{ prt1|floatformat }}%
+            </p>
           </header>
           {{ chart_alert | safe }}
         </section>

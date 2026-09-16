@@ -3507,6 +3507,7 @@ msgstr "Gracias por usar Infodengue"
 #~ "Enfermedades Infecciosas Sensibles al Clima."
 
 
+
 # Dashboard translations
 msgid "Dados atualizados até:"
 msgstr "Datos actualizados hasta:"
@@ -3540,3 +3541,7 @@ msgstr "por 100 mil habitantes"
 #, python-format
 msgid "Casos de %(disease)s em %(municipality)s"
 msgstr "Casos de %(disease)s en %(municipality)s"
+
+#, python-format
+msgid "Chance de alerta laranja ou vermelho de %(disease)s para o município de %(municipality)s na próxima semana:"
+msgstr "Probabilidad de alerta naranja o roja de %(disease)s para el municipio de %(municipality)s en la próxima semana:"
