@@ -224,3 +224,30 @@ def test_short_city_route_still_redirects_to_dengue(client):
 
     assert response.status_code == 302
     assert response["Location"] == "/alerta/3304557/dengue"
+
+
+def test_city_dashboard_layout_uses_dynamic_summary_context():
+    """The dashboard keeps its navigation contract in the refined layout."""
+    source = get_template("alert_base.html").template.source
+
+    assert "{% searchbox_component selected_geocode=geocode " in source
+    assert "disease=disease_code %}" in source
+    assert "Dados atualizados até a SE {{ week }}/{{ year }}" in source
+    assert "Dados consolidados" not in source
+    assert source.index("city-dashboard-controls") < source.index(
+        "city-dashboard-summary"
+    )
+    assert "Incidência estimada na SE {{ week }}" in source
+    assert "dados:report_city" in source
+    assert "dados:alerta_uf" in source
+    assert "Casos de {{ disease }} em {{ municipality }}" in source
+    assert "{{ chart_alert | safe }}" in source
+
+
+@pytest.mark.parametrize("disease", ("dengue", "chikungunya", "zika"))
+def test_city_dashboard_disease_controls_keep_active_state(disease):
+    """Each supported disease remains represented by an accessible control."""
+    source = get_template("alert_base.html").template.source
+
+    assert f'disease_code == "{disease}"' in source
+    assert f"./{disease}" in source
