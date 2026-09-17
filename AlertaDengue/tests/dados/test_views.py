@@ -248,10 +248,10 @@ def test_create_incidence_chart_renders_thresholds_above_alert_bars(
         "rgb(128,0,32)",
     ]
     assert [trace.marker.color for trace in figure.data[2:6]] == [
-        "#00e640",
-        "#f0ff00",
-        "#f89406",
-        "#f03434",
+        "rgba(72,253,72,0.5)",
+        "rgba(251,252,73,0.5)",
+        "rgba(255,168,88,0.5)",
+        "rgba(251,73,73,0.5)",
     ]
 
 

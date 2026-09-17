@@ -106,8 +106,13 @@ class ReportCityCharts:
             _("alerta vermelho"),
         ]
 
-        # Match the municipal dashboard palette from home._create_stack_chart.
-        colors = ["#00e640", "#f0ff00", "#f89406", "#f03434"]
+        # Match the municipal alert-chart palette from dados.charts.alerts.
+        colors = [
+            "rgba(72,253,72,0.5)",
+            "rgba(251,252,73,0.5)",
+            "rgba(255,168,88,0.5)",
+            "rgba(251,73,73,0.5)",
+        ]
 
         for k, c in zip(ks_alert, colors):
             figure.add_trace(
