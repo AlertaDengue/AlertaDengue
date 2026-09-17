@@ -203,6 +203,7 @@ class ReportCityCharts:
             ),
             yaxis=dict(
                 title=_("Incidência"),
+                rangemode="tozero",
                 showline=False,
                 showgrid=True,
                 showticklabels=True,
@@ -229,6 +230,7 @@ class ReportCityCharts:
         figure.update_yaxes(
             title_text=_("Casos"),
             secondary_y=True,
+            rangemode="tozero",
             showline=False,
             showgrid=True,
             showticklabels=True,

@@ -240,6 +240,8 @@ def test_create_incidence_chart_renders_thresholds_above_alert_bars(
     assert nowcast_trace.line.color == "#4169e1"
     assert figure.layout.xaxis.gridcolor == "rgba(176, 196, 222, 0.45)"
     assert figure.layout.yaxis.gridcolor == "rgba(176, 196, 222, 0.45)"
+    assert figure.layout.yaxis.rangemode == "tozero"
+    assert figure.layout.yaxis2.rangemode == "tozero"
     assert [trace.line.color for trace in threshold_traces] == [
         "rgb(0,128,0)",
         "rgb(204,102,0)",
