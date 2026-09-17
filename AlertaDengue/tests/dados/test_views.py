@@ -213,6 +213,26 @@ def test_create_incidence_chart_renders_thresholds_above_alert_bars(
     assert all(trace.mode == "lines" for trace in threshold_traces)
     assert all(trace.line.width == 3 for trace in threshold_traces)
     assert all(trace.line.dash == "dash" for trace in threshold_traces)
+    assert all(list(trace.x) == [None] for trace in threshold_traces)
+    assert all(list(trace.y) == [None] for trace in threshold_traces)
+
+    threshold_shapes = figure.layout.shapes
+    assert len(threshold_shapes) == 3
+    assert all(shape.type == "line" for shape in threshold_shapes)
+    assert all(shape.layer == "above" for shape in threshold_shapes)
+    assert all(shape.yref == "y" for shape in threshold_shapes)
+    assert all(shape.xref == "x domain" for shape in threshold_shapes)
+    assert [shape.x0 for shape in threshold_shapes] == [0, 0, 0]
+    assert [shape.x1 for shape in threshold_shapes] == [1, 1, 1]
+    assert [shape.y0 for shape in threshold_shapes] == [5, 10, 15]
+    assert [shape.y1 for shape in threshold_shapes] == [5, 10, 15]
+    assert [shape.line.color for shape in threshold_shapes] == [
+        "rgb(0,128,0)",
+        "rgb(204,102,0)",
+        "rgb(255,0,0)",
+    ]
+    assert all(shape.line.width == 3 for shape in threshold_shapes)
+    assert all(shape.line.dash == "dash" for shape in threshold_shapes)
 
     nowcast_trace = figure.data[1]
     assert nowcast_trace.line.width == 4

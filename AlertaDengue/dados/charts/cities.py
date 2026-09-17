@@ -129,17 +129,34 @@ class ReportCityCharts:
             )
 
         colors = ["rgb(0,128,0)", "rgb(204,102,0)", "rgb(255,0,0)"]
+        threshold_values = [
+            threshold_pre_epidemic,
+            threshold_pos_epidemic,
+            threshold_epidemic,
+        ]
 
-        for k, c in zip(ks_limiar, colors):
+        for k, c, value in zip(ks_limiar, colors, threshold_values):
+            figure.add_shape(
+                type="line",
+                xref="x domain",
+                x0=0,
+                x1=1,
+                yref="y",
+                y0=value,
+                y1=value,
+                layer="above",
+                line={"color": c, "width": 3, "dash": "dash"},
+            )
             figure.add_trace(
                 go.Scatter(
-                    x=df["SE"],
-                    y=df[k],
+                    x=[None],
+                    y=[None],
                     name=k.title(),
                     mode="lines",
                     line={"color": c, "width": 3, "dash": "dash"},
                     legendrank=ks_limiar.index(k) + 2,
                     hoverinfo="skip",
+                    showlegend=True,
                 ),
                 secondary_y=False,
             )
