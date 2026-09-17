@@ -66,6 +66,7 @@ class ReportCityCharts:
                 x=df["SE"],
                 y=df["casos notif."],
                 name=_("Notificações"),
+                legendrank=0,
                 mode="lines",
                 line={"color": "#3A4750", "width": 2.5},
                 customdata=df[["nivel_nome", "incidência", "casos_est"]],
@@ -84,6 +85,7 @@ class ReportCityCharts:
                 x=df["SE"],
                 y=df["casos_est"],
                 name=_("Estimados (Nowcast)"),
+                legendrank=1,
                 mode="lines",
                 line={"color": "#4169e1", "dash": "dot", "width": 3.5},
                 hoverinfo="skip",
@@ -96,20 +98,6 @@ class ReportCityCharts:
             _("limiar pós epidêmico"),
             _("limiar epidêmico"),
         ]
-
-        colors = ["rgb(0,255,0)", "rgb(255,150,0)", "rgb(255,0,0)"]
-
-        for k, c in zip(ks_limiar, colors):
-            figure.add_trace(
-                go.Scatter(
-                    x=df["SE"],
-                    y=df[k],
-                    name=k.title(),
-                    marker={"color": c},
-                    hoverinfo="skip",
-                ),
-                secondary_y=False,
-            )
 
         ks_alert = [
             _("alerta verde"),
@@ -132,11 +120,28 @@ class ReportCityCharts:
                     y=df[k],
                     marker={"color": c},
                     name=k.title(),
+                    legendrank=ks_alert.index(k) + 5,
                     width=0.8,
                     text=None,
                     hoverinfo="skip",
                 ),
                 secondary_y=True,
+            )
+
+        colors = ["rgb(0,128,0)", "rgb(204,102,0)", "rgb(255,0,0)"]
+
+        for k, c in zip(ks_limiar, colors):
+            figure.add_trace(
+                go.Scatter(
+                    x=df["SE"],
+                    y=df[k],
+                    name=k.title(),
+                    mode="lines",
+                    line={"color": c, "width": 2.5},
+                    legendrank=ks_limiar.index(k) + 2,
+                    hoverinfo="skip",
+                ),
+                secondary_y=False,
             )
 
         figure.update_layout(
