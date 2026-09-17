@@ -1,6 +1,17 @@
 Release Notes
 ---
 
+## [4.23.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.22.0...4.23.0) (2026-09-17)
+
+### Features
+
+* **dados:** add municipality selector to city dashboard ([#1123](https://github.com/AlertaDengue/AlertaDengue/issues/1123)) ([5e90a3f](https://github.com/AlertaDengue/AlertaDengue/commit/5e90a3fd54c3ecfc0c8509bb0a9d534aa065bb9c))
+* **database:** add tested PostgreSQL 14 to 18 migration ([#1122](https://github.com/AlertaDengue/AlertaDengue/issues/1122)) ([87d290b](https://github.com/AlertaDengue/AlertaDengue/commit/87d290bf8cc2469566acbffa5b0c397152f145ed))
+
+### Bug Fixes
+
+* **report:** bring city thresholds above alert bars ([#1125](https://github.com/AlertaDengue/AlertaDengue/issues/1125)) ([57a0cc5](https://github.com/AlertaDengue/AlertaDengue/commit/57a0cc55916114ee1ca38451ec94a83cd5df256d))
+
 ## [4.22.0](https://github.com/AlertaDengue/AlertaDengue/compare/4.21.0...4.22.0) (2026-09-10)
 
 ### Features
