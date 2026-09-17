@@ -115,14 +115,12 @@ msgid "Vermelho"
 msgstr "Red"
 
 #: dados/charts/cities.py:68
-msgid "Notificações"
-msgstr "Reported cases"
+msgid "Notificações (casos)"
+msgstr "Notifications (cases)"
 
-#: dados/charts/cities.py:86
-#, fuzzy
-#| msgid "Estimados"
-msgid "Estimados (Nowcast)"
-msgstr "Estimated"
+#: dados/charts/cities.py:87
+msgid "Estimados (Nowcast, casos)"
+msgstr "Estimated (Nowcast, cases)"
 
 #: dados/charts/cities.py:150
 msgid "Limiares de incidência"

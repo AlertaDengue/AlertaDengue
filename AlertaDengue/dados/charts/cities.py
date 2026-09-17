@@ -65,7 +65,7 @@ class ReportCityCharts:
             go.Scatter(
                 x=df["SE"],
                 y=df["casos notif."],
-                name=_("Notificações"),
+                name=_("Notificações (casos)"),
                 legendrank=0,
                 mode="lines",
                 line={"color": "#3A4750", "width": 2.5},
@@ -84,7 +84,7 @@ class ReportCityCharts:
             go.Scatter(
                 x=df["SE"],
                 y=df["casos_est"],
-                name=_("Estimados (Nowcast)"),
+                name=_("Estimados (Nowcast, casos)"),
                 legendrank=1,
                 mode="lines",
                 line={"color": "#4169e1", "dash": "dot", "width": 4},

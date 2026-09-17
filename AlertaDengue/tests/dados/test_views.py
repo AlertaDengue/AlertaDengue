@@ -7,7 +7,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from django.utils.translation import override
+from django.utils.translation import gettext, override
 import pandas as pd
 import plotly.graph_objs as go
 import pytest
@@ -186,8 +186,8 @@ def test_create_incidence_chart_renders_thresholds_above_alert_bars(
     figure = captured["figure"]
 
     assert [trace.name for trace in figure.data] == [
-        "Notificações",
-        "Estimados (Nowcast)",
+        "Notificações (casos)",
+        "Estimados (Nowcast, casos)",
         "Alerta Verde",
         "Alerta Amarelo",
         "Alerta Laranja",
@@ -253,6 +253,23 @@ def test_create_incidence_chart_renders_thresholds_above_alert_bars(
         "rgb(255,150,0)",
         "rgb(255,0,0)",
     ]
+
+
+def test_incidence_chart_labels_translate_in_spanish_and_english() -> None:
+    with override("es"):
+        assert gettext("pós epidêmico") == "post epidémico"
+        assert gettext("Notificações (casos)") == "Notificaciones (casos)"
+        assert (
+            gettext("Estimados (Nowcast, casos)")
+            == "Estimados (Nowcast, casos)"
+        )
+
+    with override("en"):
+        assert gettext("Notificações (casos)") == "Notifications (cases)"
+        assert (
+            gettext("Estimados (Nowcast, casos)")
+            == "Estimated (Nowcast, cases)"
+        )
 
 
 def test_report_city_template_uses_translated_alert_level_mapping() -> None:
