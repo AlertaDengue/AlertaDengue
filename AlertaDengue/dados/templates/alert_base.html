@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load humanize i18n %}
+{% load searchbox_component %}
 {% load i18n %}
 {% load static %}
 {% block extra_head %}
@@ -67,51 +68,74 @@
   {% block content %}
     <div class="row">
       <div class="col-md-12">
-        <div class="panel panel-default">
-          <div class="panel-body">
-            <li>{% blocktranslate with populacao=populacao|intword %}<b>População:</b> {{ populacao }} de
-            habitantes.{% endblocktranslate %}</li>
-            <li>{% blocktranslate with incidencia=incidencia|floatformat %}<b>Incidência estimada na SE {{ WEEK }}:</b> {{ incidencia }} por 100
-            mil habitantes. {% endblocktranslate %}</li>
-            <li id="section1" class="panel-title"><b>{% translate "Relatório da Situação das Arboviroses em" %}: </b>
-              <a href="{% url 'dados:report_city' state=state_abv geocode=geocode year_week=SE %}"> {{ nome }} </a></li>
-            <li id="section1" class="panel-title"><b>{% translate "Para mais detalhes, acesse a página de Relatório Estadual" %}:</b>
-              <a href="{% url 'dados:alerta_uf' disease=disease_code state=state_abv %}">{{ state }}</a></li>
+        <section class="city-dashboard-controls"
+                 aria-label="{% translate "Contexto do painel" %}">
+          <div class="city-dashboard-controls__municipality">
+            <span class="city-dashboard-controls__label">{% translate "Município" %}</span>
+            <div class="city-dashboard-controls__search">
+              {% searchbox_component selected_geocode=geocode disease=disease_code %}
+            </div>
           </div>
-        </div>
-      </br>
-      <div class="panel panel-default" style="padding:0px; margin: auto;">
-        {% blocktranslate %}Selecione a doença a ser visualizada:{% endblocktranslate %}
-        <input id="disease-dengue"
-               type="radio"
-               name="disease"
-               value="dengue"
-               {% if disease_code == 'dengue' %}checked="checked"{% endif %}
-               onchange="window.location.href='./dengue'" /> Dengue
-        <input id="disease-chik"
-               type="radio"
-               name="disease"
-               value="chik"
-               {% if disease_code == 'chikungunya' %}checked="checked"{% endif %}
-               onchange="window.location.href='./chikungunya'" /> Chikungunya
-        <input id="disease-zika"
-               type="radio"
-               name="disease"
-               value="zika"
-               {% if disease_code == 'zika' %}checked="checked"{% endif %}
-               onchange="window.location.href='./zika'" /> Zika
-      </div>
-    </br>
-    <div style="text-align:center;">
-      <div style="margin: auto;">
-        {% blocktranslate with prt=prt1|floatformat %}<b>Chance de alerta
-                <span class="label label-warning">laranja</span> ou
-                <span class="label label-danger">vermelho</span>  de {{ disease_label }}
-                para o município de {{ nome }} na próxima semana:</b> {{ prt }}%
-                {% endblocktranslate %}
-        {{ chart_alert | safe }}
-      </div>
-    </div>
+          <div class="city-dashboard-controls__divider" aria-hidden="true"></div>
+          <fieldset class="city-dashboard-controls__disease">
+            <legend>{% translate "Doença" %}</legend>
+            <div class="city-dashboard-controls__disease-options">
+              <label for="disease-dengue">
+                <input id="disease-dengue"
+                       type="radio"
+                       name="disease"
+                       value="dengue"
+                       {% if disease_code == "dengue" %}checked{% endif %}
+                       onchange="window.location.href = &quot;./dengue&quot;">
+                {% translate "Dengue" %}
+              </label>
+              <label for="disease-chik">
+                <input id="disease-chik"
+                       type="radio"
+                       name="disease"
+                       value="chikungunya"
+                       {% if disease_code == "chikungunya" %}checked{% endif %}
+                       onchange="window.location.href = &quot;./chikungunya&quot;">
+                {% translate "Chikungunya" %}
+              </label>
+              <label for="disease-zika">
+                <input id="disease-zika"
+                       type="radio"
+                       name="disease"
+                       value="zika"
+                       {% if disease_code == "zika" %}checked{% endif %}
+                       onchange="window.location.href = &quot;./zika&quot;">
+                {% translate "Zika" %}
+              </label>
+            </div>
+          </fieldset>
+          <p class="city-dashboard-update">
+            {% translate "Dados atualizados até:" %}
+            <span class="city-dashboard-update__week">{% blocktranslate with week=WEEK year=epi_year %}SE {{ week }}/{{ year }}{% endblocktranslate %}</span>
+          </p>
+        </section>
+        <section class="city-dashboard-summary"
+                 aria-label="{% translate "Resumo do município" %}">
+          <article class="city-dashboard-summary__card"><span class="city-dashboard-summary__icon" aria-hidden="true"><i class="fas fa-users"></i></span><div class="city-dashboard-summary__content"><span class="city-dashboard-summary__label">{% translate "População" %}</span><strong class="city-dashboard-summary__value">{{ populacao|intcomma }}</strong><span class="city-dashboard-summary__helper">{% translate "habitantes" %}</span></div></article>
+          <article class="city-dashboard-summary__card"><span class="city-dashboard-summary__icon" aria-hidden="true"><i class="fas fa-chart-line"></i></span><div class="city-dashboard-summary__content"><span class="city-dashboard-summary__label">{% blocktranslate with week=WEEK %}Incidência estimada na SE {{ week }}{% endblocktranslate %}</span><strong class="city-dashboard-summary__value">{{ incidencia|floatformat }}</strong><span class="city-dashboard-summary__helper">{% translate "por 100 mil habitantes" %}</span></div></article>
+          <article class="city-dashboard-summary__card"><span class="city-dashboard-summary__icon" aria-hidden="true"><i class="fas fa-file-alt"></i></span><div class="city-dashboard-summary__content"><span class="city-dashboard-summary__label">{% translate "Relatório da Situação das Arboviroses em" %}</span><a class="city-dashboard-summary__link"
+   href="{% url "dados:report_city" state=state_abv geocode=geocode year_week=SE %}">{{ nome }} <i class="fas fa-external-link-alt" aria-hidden="true"></i></a></div></article>
+          <article class="city-dashboard-summary__card"><span class="city-dashboard-summary__icon" aria-hidden="true"><i class="fas fa-file-lines"></i></span><div class="city-dashboard-summary__content"><span class="city-dashboard-summary__label">{% translate "Para mais detalhes, acesse a página de Relatório Estadual" %}</span><a class="city-dashboard-summary__link"
+   href="{% url "dados:alerta_uf" disease=disease_code state=state_abv %}">{{ state_abv }} <i class="fas fa-external-link-alt" aria-hidden="true"></i></a></div></article>
+        </section>
+        <section class="city-dashboard-chart">
+          <header class="city-dashboard-chart__header">
+            <h2 class="city-dashboard-chart__title"><i class="fas fa-chart-line" aria-hidden="true"></i> {% blocktranslate with disease=disease_label municipality=nome %}Casos de {{ disease }} em {{ municipality }}{% endblocktranslate %}</h2>
+            <p class="city-dashboard-chart__subtitle">
+              <strong>
+                {% blocktranslate with disease=disease_label municipality=nome %}Chance de alerta laranja ou vermelho de {{ disease }} para o município de {{ municipality }} na próxima semana:{% endblocktranslate %}
+              </strong>
+              {{ prt1|floatformat }}%
+            </p>
+          </header>
+          {{ chart_alert | safe }}
+        </section>
+        {# djlint:off #}
     <!-- MAP attention level alert -->
     <br>
     <p>
@@ -474,4 +498,5 @@
 
     }
   </script>
-{% endblock %}
+        {# djlint:on #}
+      {% endblock %}

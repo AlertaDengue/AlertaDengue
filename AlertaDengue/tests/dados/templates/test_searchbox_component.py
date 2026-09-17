@@ -9,9 +9,12 @@ References:
     https://github.com/AlertaDengue/AlertaDengue/issues/1093
 """
 
+from pathlib import Path
+import re
 from unittest.mock import patch
 
 from django.template import Context, Template
+from django.template.loader import get_template
 import pytest
 
 _STATE_NAME_FIXTURE = {
@@ -117,3 +120,135 @@ class TestSearchboxComponentStateAbbreviation:
         assert "Rio de Janeiro - RJ" in rendered, (
             f"Expected 'Rio de Janeiro - RJ' in rendered; got: {rendered!r}"
         )
+
+    @pytest.mark.parametrize("disease", ("dengue", "chikungunya", "zika"))
+    def test_dashboard_context_selects_city_and_keeps_disease(self, disease):
+        """Dashboard state is rendered separately from cached city choices."""
+        self._call()
+
+        from dados.templatetags.searchbox_component import searchbox_component
+
+        context = searchbox_component(
+            context={},
+            selected_geocode=3304557,
+            disease=disease,
+        )
+        rendered = get_template("components/searchbox/searchbox.html").render(
+            context
+        )
+
+        assert f'data-disease="{disease}"' in rendered
+        assert re.search(r'value="3304557"\s+selected', rendered)
+
+    def test_homepage_context_uses_short_route_metadata(self):
+        """The homepage has no disease state and keeps its empty selector."""
+        self._call()
+
+        from dados.templatetags.searchbox_component import searchbox_component
+
+        rendered = get_template("components/searchbox/searchbox.html").render(
+            searchbox_component(context={})
+        )
+
+        assert "data-disease" not in rendered
+        assert not re.search(r"<option\b[^>]*\bselected\b", rendered)
+
+    def test_unsupported_disease_is_not_emitted(self):
+        """Only supported dashboard diseases can affect navigation metadata."""
+        self._call()
+
+        from dados.templatetags.searchbox_component import searchbox_component
+
+        rendered = get_template("components/searchbox/searchbox.html").render(
+            searchbox_component(
+                context={},
+                selected_geocode=3304557,
+                disease="invalid",
+            )
+        )
+
+        assert "data-disease" not in rendered
+
+    def test_city_dashboard_template_uses_current_searchbox_context(self):
+        """The city dashboard passes its active city and disease to the tag."""
+        source = get_template("alert_base.html").template.source
+
+        assert (
+            "{% searchbox_component selected_geocode=geocode "
+            "disease=disease_code %}"
+        ) in source
+
+    def test_site_searchbox_preserves_optional_disease_in_destination(self):
+        """Shared Select2 navigation appends only component-provided disease."""
+        source = (
+            Path(__file__).parents[3] / "templates" / "base.html"
+        ).read_text()
+
+        assert 'var destination = "/alerta/" + city.id;' in source
+        assert 'var disease = $searchbox.data("disease");' in source
+        assert 'destination += "/" + disease;' in source
+
+    def test_cached_choices_do_not_contain_dashboard_state(self):
+        """Changing dashboard state must not change global cached choices."""
+        self._call()
+
+        from dados.templatetags.searchbox_component import searchbox_component
+
+        dengue_context = searchbox_component(
+            context={},
+            selected_geocode=1200013,
+            disease="dengue",
+        )
+        zika_context = searchbox_component(
+            context={},
+            selected_geocode=3304557,
+            disease="zika",
+        )
+
+        assert [
+            (city.geocode, city.name, city.state)
+            for city in dengue_context["options_cities"]
+        ] == [
+            (city.geocode, city.name, city.state)
+            for city in zika_context["options_cities"]
+        ]
+        assert dengue_context["selected_geocode"] == 1200013
+        assert dengue_context["disease"] == "dengue"
+        assert zika_context["selected_geocode"] == 3304557
+        assert zika_context["disease"] == "zika"
+
+
+def test_short_city_route_still_redirects_to_dengue(client):
+    """The existing short municipality route remains backward compatible."""
+    response = client.get("/alerta/3304557")
+
+    assert response.status_code == 302
+    assert response["Location"] == "/alerta/3304557/dengue"
+
+
+def test_city_dashboard_layout_uses_dynamic_summary_context():
+    """The dashboard keeps its navigation contract in the refined layout."""
+    source = get_template("alert_base.html").template.source
+
+    assert "{% searchbox_component selected_geocode=geocode " in source
+    assert "disease=disease_code %}" in source
+    assert "Dados atualizados até:" in source
+    assert "SE {{ week }}/{{ year }}" in source
+    assert "Dados consolidados" not in source
+    assert source.index("city-dashboard-controls") < source.index(
+        "city-dashboard-summary"
+    )
+    assert "Incidência estimada na SE {{ week }}" in source
+    assert "dados:report_city" in source
+    assert "dados:alerta_uf" in source
+    assert "Casos de {{ disease }} em {{ municipality }}" in source
+    assert "{{ chart_alert | safe }}" in source
+
+
+@pytest.mark.parametrize("disease", ("dengue", "chikungunya", "zika"))
+def test_city_dashboard_disease_controls_keep_active_state(disease):
+    """Each supported disease remains represented by an accessible control."""
+    source = get_template("alert_base.html").template.source
+
+    assert f'disease_code == "{disease}"' in source
+    assert f"./{disease}" in source

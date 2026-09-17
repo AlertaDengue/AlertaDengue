@@ -534,6 +534,7 @@ class AlertaMunicipioPageView(AlertCityPageBaseView):
                 "state_abv": state_abv,
                 "state_name": state_name,
                 "year_week": year_week,
+                "epi_year": year_week[:4],
                 "nome": city_info["nome"],
                 "populacao": city_info["populacao"],
                 "incidencia": (case_series[-1] / city_info["populacao"])
