@@ -106,12 +106,8 @@ class ReportCityCharts:
             _("alerta vermelho"),
         ]
 
-        colors = [
-            "rgb(0,255,0)",
-            "rgb(255,255,0)",
-            "rgb(255,150,0)",
-            "rgb(255,0,0)",
-        ]
+        # Match the municipal dashboard palette from home._create_stack_chart.
+        colors = ["#00e640", "#f0ff00", "#f89406", "#f03434"]
 
         for k, c in zip(ks_alert, colors):
             figure.add_trace(
@@ -128,7 +124,7 @@ class ReportCityCharts:
                 secondary_y=True,
             )
 
-        colors = ["rgb(0,128,0)", "rgb(204,102,0)", "rgb(255,0,0)"]
+        colors = ["rgb(0,128,0)", "rgb(204,102,0)", "rgb(128,0,32)"]
         threshold_values = [
             threshold_pre_epidemic,
             threshold_pos_epidemic,

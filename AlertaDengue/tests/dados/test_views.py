@@ -229,7 +229,7 @@ def test_create_incidence_chart_renders_thresholds_above_alert_bars(
     assert [shape.line.color for shape in threshold_shapes] == [
         "rgb(0,128,0)",
         "rgb(204,102,0)",
-        "rgb(255,0,0)",
+        "rgb(128,0,32)",
     ]
     assert all(shape.line.width == 3 for shape in threshold_shapes)
     assert all(shape.line.dash == "dash" for shape in threshold_shapes)
@@ -245,13 +245,13 @@ def test_create_incidence_chart_renders_thresholds_above_alert_bars(
     assert [trace.line.color for trace in threshold_traces] == [
         "rgb(0,128,0)",
         "rgb(204,102,0)",
-        "rgb(255,0,0)",
+        "rgb(128,0,32)",
     ]
     assert [trace.marker.color for trace in figure.data[2:6]] == [
-        "rgb(0,255,0)",
-        "rgb(255,255,0)",
-        "rgb(255,150,0)",
-        "rgb(255,0,0)",
+        "#00e640",
+        "#f0ff00",
+        "#f89406",
+        "#f03434",
     ]
 
 
