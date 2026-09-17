@@ -211,6 +211,15 @@ def test_create_incidence_chart_renders_thresholds_above_alert_bars(
     threshold_traces = figure.data[-3:]
     assert all(trace.type == "scatter" for trace in threshold_traces)
     assert all(trace.mode == "lines" for trace in threshold_traces)
+    assert all(trace.line.width == 3 for trace in threshold_traces)
+    assert all(trace.line.dash == "dash" for trace in threshold_traces)
+
+    nowcast_trace = figure.data[1]
+    assert nowcast_trace.line.width == 4
+    assert nowcast_trace.line.dash == "dot"
+    assert nowcast_trace.line.color == "#4169e1"
+    assert figure.layout.xaxis.gridcolor == "rgba(176, 196, 222, 0.45)"
+    assert figure.layout.yaxis.gridcolor == "rgba(176, 196, 222, 0.45)"
     assert [trace.line.color for trace in threshold_traces] == [
         "rgb(0,128,0)",
         "rgb(204,102,0)",

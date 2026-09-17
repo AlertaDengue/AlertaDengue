@@ -87,7 +87,7 @@ class ReportCityCharts:
                 name=_("Estimados (Nowcast)"),
                 legendrank=1,
                 mode="lines",
-                line={"color": "#4169e1", "dash": "dot", "width": 3.5},
+                line={"color": "#4169e1", "dash": "dot", "width": 4},
                 hoverinfo="skip",
             ),
             secondary_y=True,
@@ -137,7 +137,7 @@ class ReportCityCharts:
                     y=df[k],
                     name=k.title(),
                     mode="lines",
-                    line={"color": c, "width": 2.5},
+                    line={"color": c, "width": 3, "dash": "dash"},
                     legendrank=ks_limiar.index(k) + 2,
                     hoverinfo="skip",
                 ),
@@ -176,7 +176,7 @@ class ReportCityCharts:
                 showticklabels=True,
                 linecolor="rgb(204, 204, 204)",
                 linewidth=0,
-                gridcolor="rgb(176, 196, 222)",
+                gridcolor="rgba(176, 196, 222, 0.45)",
                 ticks="outside",
                 tickfont=dict(
                     family="Arial", size=12, color="rgb(82, 82, 82)"
@@ -191,7 +191,7 @@ class ReportCityCharts:
                 showticklabels=True,
                 linecolor="rgb(204, 204, 204)",
                 linewidth=0,
-                gridcolor="rgb(176, 196, 222)",
+                gridcolor="rgba(176, 196, 222, 0.45)",
             ),
             showlegend=True,
             legend=dict(
