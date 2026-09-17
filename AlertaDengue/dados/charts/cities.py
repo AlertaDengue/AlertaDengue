@@ -65,7 +65,8 @@ class ReportCityCharts:
             go.Scatter(
                 x=df["SE"],
                 y=df["casos notif."],
-                name=_("Notificações"),
+                name=_("Notificações (casos)"),
+                legendrank=0,
                 mode="lines",
                 line={"color": "#3A4750", "width": 2.5},
                 customdata=df[["nivel_nome", "incidência", "casos_est"]],
@@ -83,9 +84,10 @@ class ReportCityCharts:
             go.Scatter(
                 x=df["SE"],
                 y=df["casos_est"],
-                name=_("Estimados (Nowcast)"),
+                name=_("Estimados (Nowcast, casos)"),
+                legendrank=1,
                 mode="lines",
-                line={"color": "#4169e1", "dash": "dot", "width": 3.5},
+                line={"color": "#4169e1", "dash": "dot", "width": 4},
                 hoverinfo="skip",
             ),
             secondary_y=True,
@@ -97,20 +99,6 @@ class ReportCityCharts:
             _("limiar epidêmico"),
         ]
 
-        colors = ["rgb(0,255,0)", "rgb(255,150,0)", "rgb(255,0,0)"]
-
-        for k, c in zip(ks_limiar, colors):
-            figure.add_trace(
-                go.Scatter(
-                    x=df["SE"],
-                    y=df[k],
-                    name=k.title(),
-                    marker={"color": c},
-                    hoverinfo="skip",
-                ),
-                secondary_y=False,
-            )
-
         ks_alert = [
             _("alerta verde"),
             _("alerta amarelo"),
@@ -118,11 +106,12 @@ class ReportCityCharts:
             _("alerta vermelho"),
         ]
 
+        # Match the municipal alert-chart palette from dados.charts.alerts.
         colors = [
-            "rgb(0,255,0)",
-            "rgb(255,255,0)",
-            "rgb(255,150,0)",
-            "rgb(255,0,0)",
+            "rgba(72,253,72,0.5)",
+            "rgba(251,252,73,0.5)",
+            "rgba(255,168,88,0.5)",
+            "rgba(251,73,73,0.5)",
         ]
 
         for k, c in zip(ks_alert, colors):
@@ -132,11 +121,45 @@ class ReportCityCharts:
                     y=df[k],
                     marker={"color": c},
                     name=k.title(),
+                    legendrank=ks_alert.index(k) + 5,
                     width=0.8,
                     text=None,
                     hoverinfo="skip",
                 ),
                 secondary_y=True,
+            )
+
+        colors = ["rgb(0,128,0)", "rgb(204,102,0)", "rgb(128,0,32)"]
+        threshold_values = [
+            threshold_pre_epidemic,
+            threshold_pos_epidemic,
+            threshold_epidemic,
+        ]
+
+        for k, c, value in zip(ks_limiar, colors, threshold_values):
+            figure.add_shape(
+                type="line",
+                xref="x domain",
+                x0=0,
+                x1=1,
+                yref="y",
+                y0=value,
+                y1=value,
+                layer="above",
+                line={"color": c, "width": 3, "dash": "dash"},
+            )
+            figure.add_trace(
+                go.Scatter(
+                    x=[None],
+                    y=[None],
+                    name=k.title(),
+                    mode="lines",
+                    line={"color": c, "width": 3, "dash": "dash"},
+                    legendrank=ks_limiar.index(k) + 2,
+                    hoverinfo="skip",
+                    showlegend=True,
+                ),
+                secondary_y=False,
             )
 
         figure.update_layout(
@@ -171,7 +194,7 @@ class ReportCityCharts:
                 showticklabels=True,
                 linecolor="rgb(204, 204, 204)",
                 linewidth=0,
-                gridcolor="rgb(176, 196, 222)",
+                gridcolor="rgba(176, 196, 222, 0.45)",
                 ticks="outside",
                 tickfont=dict(
                     family="Arial", size=12, color="rgb(82, 82, 82)"
@@ -181,12 +204,13 @@ class ReportCityCharts:
             ),
             yaxis=dict(
                 title=_("Incidência"),
+                rangemode="tozero",
                 showline=False,
                 showgrid=True,
                 showticklabels=True,
                 linecolor="rgb(204, 204, 204)",
                 linewidth=0,
-                gridcolor="rgb(176, 196, 222)",
+                gridcolor="rgba(176, 196, 222, 0.45)",
             ),
             showlegend=True,
             legend=dict(
@@ -207,6 +231,7 @@ class ReportCityCharts:
         figure.update_yaxes(
             title_text=_("Casos"),
             secondary_y=True,
+            rangemode="tozero",
             showline=False,
             showgrid=True,
             showticklabels=True,

@@ -7,8 +7,9 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from django.utils.translation import override
+from django.utils.translation import gettext, override
 import pandas as pd
+import plotly.graph_objs as go
 import pytest
 
 from dados.charts.cities import ReportCityCharts
@@ -152,6 +153,123 @@ def test_create_climate_chart_returns_empty_without_variables() -> None:
     df = pd.DataFrame({"SE": [202501]})
 
     assert ReportCityCharts.create_climate_chart(df=df, var_climate={}) == ""
+
+
+def test_create_incidence_chart_renders_thresholds_above_alert_bars(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured: dict[str, go.Figure] = {}
+
+    def capture_figure(figure: go.Figure, *args: Any, **kwargs: Any) -> str:
+        captured["figure"] = figure
+        return ""
+
+    monkeypatch.setattr(go.Figure, "to_html", capture_figure)
+
+    df = pd.DataFrame(
+        {
+            "incidência": [10.0, 20.0],
+            "casos notif.": [1, 2],
+            "casos_est": [1.5, 2.5],
+            "level_code": [1, 3],
+        },
+        index=pd.Index([202501, 202502], name="SE"),
+    )
+
+    ReportCityCharts.create_incidence_chart(
+        df=df,
+        year_week=202502,
+        threshold_pre_epidemic=5,
+        threshold_pos_epidemic=10,
+        threshold_epidemic=15,
+    )
+    figure = captured["figure"]
+
+    assert [trace.name for trace in figure.data] == [
+        "Notificações (casos)",
+        "Estimados (Nowcast, casos)",
+        "Alerta Verde",
+        "Alerta Amarelo",
+        "Alerta Laranja",
+        "Alerta Vermelho",
+        "Limiar Pré Epidêmico",
+        "Limiar Pós Epidêmico",
+        "Limiar Epidêmico",
+    ]
+    assert [trace.legendrank for trace in figure.data] == [
+        0,
+        1,
+        5,
+        6,
+        7,
+        8,
+        2,
+        3,
+        4,
+    ]
+
+    threshold_traces = figure.data[-3:]
+    assert all(trace.type == "scatter" for trace in threshold_traces)
+    assert all(trace.mode == "lines" for trace in threshold_traces)
+    assert all(trace.line.width == 3 for trace in threshold_traces)
+    assert all(trace.line.dash == "dash" for trace in threshold_traces)
+    assert all(list(trace.x) == [None] for trace in threshold_traces)
+    assert all(list(trace.y) == [None] for trace in threshold_traces)
+
+    threshold_shapes = figure.layout.shapes
+    assert len(threshold_shapes) == 3
+    assert all(shape.type == "line" for shape in threshold_shapes)
+    assert all(shape.layer == "above" for shape in threshold_shapes)
+    assert all(shape.yref == "y" for shape in threshold_shapes)
+    assert all(shape.xref == "x domain" for shape in threshold_shapes)
+    assert [shape.x0 for shape in threshold_shapes] == [0, 0, 0]
+    assert [shape.x1 for shape in threshold_shapes] == [1, 1, 1]
+    assert [shape.y0 for shape in threshold_shapes] == [5, 10, 15]
+    assert [shape.y1 for shape in threshold_shapes] == [5, 10, 15]
+    assert [shape.line.color for shape in threshold_shapes] == [
+        "rgb(0,128,0)",
+        "rgb(204,102,0)",
+        "rgb(128,0,32)",
+    ]
+    assert all(shape.line.width == 3 for shape in threshold_shapes)
+    assert all(shape.line.dash == "dash" for shape in threshold_shapes)
+
+    nowcast_trace = figure.data[1]
+    assert nowcast_trace.line.width == 4
+    assert nowcast_trace.line.dash == "dot"
+    assert nowcast_trace.line.color == "#4169e1"
+    assert figure.layout.xaxis.gridcolor == "rgba(176, 196, 222, 0.45)"
+    assert figure.layout.yaxis.gridcolor == "rgba(176, 196, 222, 0.45)"
+    assert figure.layout.yaxis.rangemode == "tozero"
+    assert figure.layout.yaxis2.rangemode == "tozero"
+    assert [trace.line.color for trace in threshold_traces] == [
+        "rgb(0,128,0)",
+        "rgb(204,102,0)",
+        "rgb(128,0,32)",
+    ]
+    assert [trace.marker.color for trace in figure.data[2:6]] == [
+        "rgba(72,253,72,0.5)",
+        "rgba(251,252,73,0.5)",
+        "rgba(255,168,88,0.5)",
+        "rgba(251,73,73,0.5)",
+    ]
+
+
+def test_incidence_chart_labels_translate_in_spanish_and_english() -> None:
+    with override("es"):
+        assert gettext("pós epidêmico") == "post epidémico"
+        assert gettext("Notificações (casos)") == "Notificaciones (casos)"
+        assert (
+            gettext("Estimados (Nowcast, casos)")
+            == "Estimados (Nowcast, casos)"
+        )
+
+    with override("en"):
+        assert gettext("Notificações (casos)") == "Notifications (cases)"
+        assert (
+            gettext("Estimados (Nowcast, casos)")
+            == "Estimated (Nowcast, cases)"
+        )
 
 
 def test_report_city_template_uses_translated_alert_level_mapping() -> None:

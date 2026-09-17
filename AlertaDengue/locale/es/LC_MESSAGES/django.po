@@ -112,14 +112,12 @@ msgid "Vermelho"
 msgstr "Rojo"
 
 #: dados/charts/cities.py:68
-msgid "Notificações"
-msgstr "Notificaciones"
+msgid "Notificações (casos)"
+msgstr "Notificaciones (casos)"
 
-#: dados/charts/cities.py:86
-#, fuzzy
-#| msgid "Estimados"
-msgid "Estimados (Nowcast)"
-msgstr "Estimados"
+#: dados/charts/cities.py:87
+msgid "Estimados (Nowcast, casos)"
+msgstr "Estimados (Nowcast, casos)"
 
 #: dados/charts/cities.py:150
 msgid "Limiares de incidência"
@@ -131,7 +129,7 @@ msgstr "pre epidémico"
 
 #: dados/charts/cities.py:157
 msgid "pós epidêmico"
-msgstr "pre epidémico"
+msgstr "post epidémico"
 
 #: dados/charts/cities.py:160
 msgid "epidêmico"
