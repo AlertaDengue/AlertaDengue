@@ -2,12 +2,27 @@ from __future__ import annotations
 
 from collections import Counter
 import datetime as dt
+from types import MappingProxyType
 from typing import Any, Iterable, Iterator, Optional, Union, cast
 
 from dateutil.parser import parse
 import numpy as np
 import pandas as pd
 from pandas.tseries.api import guess_datetime_format
+
+EXCEPTIONAL_GEOCODE_CORRECTIONS = MappingProxyType(
+    {
+        2201911: 2201919,
+        2201986: 2201988,
+        2202257: 2202251,
+        2611531: 2611533,
+        3117835: 3117836,
+        3152139: 3152131,
+        4305876: 4305871,
+        5203930: 5203939,
+        5203963: 5203962,
+    }
+)
 
 
 def chunk_gen(chunksize: int, totalsize: int) -> Iterator[tuple[int, int]]:
@@ -40,26 +55,12 @@ def calculate_digit(dig):
 
 @np.vectorize
 def add_dv(geocodigo):
-    miscalculated_geocodes = {
-        "2201911": 2201919,
-        "2201986": 2201988,
-        "2202257": 2202251,
-        "2611531": 2611533,
-        "3117835": 3117836,
-        "3152139": 3152131,
-        "4305876": 4305871,
-        "5203963": 5203962,
-        "5203930": 5203939,
-    }
-
     try:
         if len(str(geocodigo)) == 7:
             return int(geocodigo)
         elif len(str(geocodigo)) == 6:
             geocode = int(str(geocodigo) + str(calculate_digit(geocodigo)))
-            if str(geocode) in miscalculated_geocodes:
-                return miscalculated_geocodes[str(geocode)]
-            return int(geocode)
+            return EXCEPTIONAL_GEOCODE_CORRECTIONS.get(geocode, geocode)
         else:
             return None
     except (ValueError, TypeError):
