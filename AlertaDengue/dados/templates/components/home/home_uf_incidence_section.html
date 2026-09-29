@@ -15,7 +15,7 @@
               <a href="report/"
                  title="{% trans 'Clique para abrir os relatórios estaduais' %}">
                 <img class="uf-map-img img-fluid d-block mx-auto"
-                     src="{% static 'img/incidence_maps/country/incidence_Nacional_dengue.png' %}"
+                     src="{% static 'img/incidence_maps/country/incidence_Nacional_dengue.png' %}?v={{ current_epiweek }}"
                      alt="{% trans 'Mapa de incidência de Dengue no Brasil' %}">
               </a>
             </div>
@@ -23,7 +23,7 @@
               <a href="report/"
                  title="{% trans 'Clique para abrir os relatórios estaduais' %}">
                 <img class="uf-map-img img-fluid d-block mx-auto"
-                     src="{% static 'img/incidence_maps/country/incidence_Nacional_chikungunya.png' %}"
+                     src="{% static 'img/incidence_maps/country/incidence_Nacional_chikungunya.png' %}?v={{ current_epiweek }}"
                      alt="{% trans 'Mapa de incidência de Chikungunya no Brasil' %}">
               </a>
             </div>

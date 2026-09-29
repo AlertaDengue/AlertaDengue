@@ -18,10 +18,12 @@ services:
   web:
     command: /opt/runwsgi.sh
     environment:
+      ENV: "prod"
       DEBUG: 0
       DJANGO_SETTINGS_MODULE: "ad_main.settings.prod"
     volumes:
       - ../AlertaDengue/:/opt/services/AlertaDengue
+      - ../staticfiles/:/opt/services/staticfiles
       - type: bind
         source: "${DOCKER_HOST_TECHNICAL_REPORTS_DIR:-${HOME}/technical_reports}"
         target: /opt/services/technical_reports

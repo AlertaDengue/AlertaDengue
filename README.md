@@ -22,6 +22,9 @@ For more information, please visit our website [info.dengue.mat.br](https://info
 
 You can find more information about [Contributing](https://github.com/AlertaDengue/AlertaDengue/blob/main/CONTRIBUTING.md) on GitHub. Also check our [Team](https://info.dengue.mat.br/equipe/) page to see if there is a work oportunity in the project.
 
+After loading an analysis run, follow the [deployment finalization workflow](docs/deployment/analysis-finalization.md)
+to refresh dashboards, publish collected maps, and validate the origin (issue #948).
+
 ---
 ## How data can be visualized
 
