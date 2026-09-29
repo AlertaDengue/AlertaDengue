@@ -2,6 +2,25 @@ backend: bash
 env-files: .envs/.env
 groups:
 
+  deployment:
+    help: AlertaDengue deployment operations.
+    tasks:
+      refresh-runtime:
+        help: Refresh projections, collected static files, and application cache (issue 948).
+        args:
+          env:
+            help: Target environment (dev, staging, prod).
+            type: string
+            required: true
+          week:
+            help: Loaded epidemiological week (YYYYWW).
+            type: string
+            required: true
+        run: |
+          scripts/refresh_runtime.sh \
+            --env "${{ args.env }}" \
+            --week "${{ args.week }}"
+
   clean:
     tasks:
       tmp:

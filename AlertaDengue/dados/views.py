@@ -399,6 +399,7 @@ class AlertaMainView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(AlertaMainView, self).get_context_data(**kwargs)
+        context["current_epiweek"] = str(get_last_SE())
 
         return context
 

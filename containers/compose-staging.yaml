@@ -19,6 +19,9 @@ services:
 
   web:
     command: bash /opt/runwsgi.sh
+    volumes:
+      - ../AlertaDengue/:/opt/services/AlertaDengue
+      - ../staticfiles/:/opt/services/staticfiles
     environment:
       DJANGO_SETTINGS_MODULE: "ad_main.settings.staging"
       ENV: "staging"
