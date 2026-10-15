@@ -334,9 +334,13 @@ def test_mover_manifest_preserves_a92_canonical_cid(
         sys,
         "argv",
         [
-            "mover_sinan_data.py", str(src),
-            "--imported-base", str(tmp_path / "imported"),
-            "--manifest", str(manifest_path), "--dry-run",
+            "mover_sinan_data.py",
+            str(src),
+            "--imported-base",
+            str(tmp_path / "imported"),
+            "--manifest",
+            str(manifest_path),
+            "--dry-run",
         ],
     )
 

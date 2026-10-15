@@ -36,9 +36,7 @@ def _normalize_canonical_cid10(value: str | None) -> str | None:
         ) from exc
 
 
-def _validate_disease_cid(
-    disease: str, canonical_cid10: str | None
-) -> None:
+def _validate_disease_cid(disease: str, canonical_cid10: str | None) -> None:
     """Reject canonical CID metadata inconsistent with the coarse disease."""
     if canonical_cid10 is None:
         return
