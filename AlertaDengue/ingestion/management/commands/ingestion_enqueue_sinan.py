@@ -14,6 +14,28 @@ from ingestion.schemas import RunError
 from ingestion.tasks import enqueue_sinan_run
 
 
+def _normalize_canonical_cid10(value: str | None) -> str | None:
+    """Normalize explicitly supplied supported canonical CID-10 values."""
+    if value is None:
+        return None
+    code = value.strip().upper().replace(" ", "")
+    variants = {
+        "A90": "A90",
+        "A90.0": "A90",
+        "A920": "A92.0",
+        "A92.0": "A92.0",
+        "A928": "A928",
+        "A92.8": "A928",
+    }
+    try:
+        return variants[code]
+    except KeyError as exc:
+        raise CommandError(
+            f"Unsupported or ambiguous canonical CID-10: {value!r}. "
+            "Use A90, A92.0, or A928."
+        ) from exc
+
+
 def _sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
     """Compute SHA-256 hex digest for a file."""
     h = hashlib.sha256()
@@ -51,6 +73,7 @@ class Command(BaseCommand):
         parser.add_argument("--disease", required=True, type=str)
         parser.add_argument("--year", required=True, type=int)
         parser.add_argument("--week", required=True, type=int)
+        parser.add_argument("--canonical-cid10", type=str, default=None)
 
         parser.add_argument(
             "--host-base",
@@ -78,6 +101,9 @@ class Command(BaseCommand):
 
         uf = str(options["uf"]).upper().strip()
         disease = str(options["disease"]).strip()
+        canonical_cid10 = _normalize_canonical_cid10(
+            options["canonical_cid10"]
+        )
         year = int(options["year"])
         week = int(options["week"])
         requeue = bool(options["requeue"])
@@ -110,6 +136,7 @@ class Command(BaseCommand):
         defaults = {
             "uf": uf,
             "disease": disease,
+            "canonical_cid10": canonical_cid10,
             "delivery_year": year,
             "delivery_week": week,
             "source_format": suffix,
@@ -132,6 +159,16 @@ class Command(BaseCommand):
             created = False
 
         if not created:
+            if (
+                canonical_cid10 is not None
+                and run.canonical_cid10 is not None
+                and run.canonical_cid10 != canonical_cid10
+            ):
+                raise CommandError(
+                    "canonical CID mismatch for existing run "
+                    f"(run_id={run.id}, existing={run.canonical_cid10}, "
+                    f"incoming={canonical_cid10})."
+                )
             msg = (
                 f"Run already exists for sha256={file_sha256} "
                 f"(run_id={run.id})."
@@ -140,6 +177,9 @@ class Command(BaseCommand):
 
             # Update fields that might have changed (like path translation or metadata)
             updated_fields = []
+            if run.canonical_cid10 is None and canonical_cid10 is not None:
+                run.canonical_cid10 = canonical_cid10
+                updated_fields.append("canonical_cid10")
             if run.source_path != str(worker_path):
                 run.source_path = str(worker_path)
                 updated_fields.append("source_path")

@@ -44,7 +44,7 @@ def test_manifest_sort_order_and_arg_building(
         {
             "dest": "/x/br.csv",
             "country": "br",
-            "disease": "A90",
+            "disease": "A92",
             "year": 2026,
             "week": 5,
             "sem_not_max": 202605,
@@ -53,7 +53,8 @@ def test_manifest_sort_order_and_arg_building(
         {
             "dest": "/x/es.csv",
             "country": "es",
-            "disease": "A90",
+            "disease": "A92",
+            "canonical_cid10": "A92.0",
             "year": 2026,
             "week": 4,
             "sem_not_max": 202604,
@@ -90,6 +91,8 @@ def test_manifest_sort_order_and_arg_building(
     assert first_args[0] == "/x/es.csv"
     assert "--uf" in first_args
     assert first_args[first_args.index("--uf") + 1] == "ES"
+    assert first_args[first_args.index("--disease") + 1] == "A92"
+    assert first_args[first_args.index("--canonical-cid10") + 1] == "A92.0"
     assert second_args[0] == "/x/br.csv"
 
 
@@ -117,6 +120,26 @@ def test_manifest_dry_run_does_not_call_enqueue(
     )
 
     assert capture.calls == []
+
+
+@pytest.mark.django_db
+def test_manifest_without_canonical_cid_remains_compatible(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    manifest_path = tmp_path / "legacy-manifest.json"
+    manifest_path.write_text(
+        json.dumps(
+            [{"dest": "/x/legacy.csv", "country": "es", "disease": "A92"}]
+        ),
+        encoding="utf-8",
+    )
+    capture = _CallCapture()
+    monkeypatch.setattr(man, "call_command", capture)
+
+    call_command("ingestion_enqueue_manifest", "--manifest", str(manifest_path))
+
+    args = capture.calls[0][1]
+    assert "--canonical-cid10" not in args
 
 
 @pytest.mark.django_db

@@ -117,6 +117,9 @@ class Command(BaseCommand):
                     "--week",
                     str(week),
                 ]
+                canonical_cid10 = entry.get("canonical_cid10")
+                if canonical_cid10:
+                    cmd_args.extend(["--canonical-cid10", str(canonical_cid10)])
                 if host_base:
                     cmd_args.extend(["--host-base", host_base])
                 if worker_base:

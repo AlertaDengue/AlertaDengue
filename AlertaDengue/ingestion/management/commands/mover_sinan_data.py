@@ -255,6 +255,16 @@ def _normalize_cid10(value: str) -> str:
     s = value.strip().upper().replace(",", ".")
     if not s:
         return ""
+    variants = {
+        "A90": "A90",
+        "A90.0": "A90",
+        "A920": "A92.0",
+        "A92.0": "A92.0",
+        "A928": "A928",
+        "A92.8": "A928",
+    }
+    if s in variants:
+        return variants[s]
     if re.fullmatch(r"[A-Z]\d{2}\d", s):
         return f"{s[:3]}.{s[3]}"
     return s
@@ -1289,6 +1299,7 @@ def main() -> int:
                     "dest": str(dest),
                     "country": info.country.lower(),
                     "disease": info.disease_code,
+                    "canonical_cid10": info.cid10_norm,
                     "disease_dir": info.disease_dir,
                     "year": info.year,
                     "week": info.week,
@@ -1318,6 +1329,7 @@ def main() -> int:
                             "dest": str(existing_full),
                             "country": info.country.lower(),
                             "disease": info.disease_code,
+                            "canonical_cid10": info.cid10_norm,
                             "disease_dir": info.disease_dir,
                             "year": info.year,
                             "week": info.week,

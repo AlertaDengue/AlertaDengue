@@ -115,7 +115,101 @@ def test_enqueue_creates_run_and_sets_task_id(
     file_sha = cmd._sha256_file(fpath)
     run = Run.objects.get(sha256=file_sha)
     assert run.status == RunStatus.QUEUED
+    assert run.canonical_cid10 is None
     assert run.celery_task_id == "task-1"
+    assert len(stub.calls) == 1
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("disease", "canonical"),
+    [("A90", "A90"), ("A92", "A92.0"), ("A92", "A928")],
+)
+def test_enqueue_persists_explicit_canonical_cid(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    disease: str,
+    canonical: str,
+) -> None:
+    fpath = tmp_path / f"{canonical.replace('.', '')}.csv"
+    _write_unique_csv(fpath, token=f"{canonical}:{tmp_path}")
+    _ensure_run_absent_for_file(fpath)
+    monkeypatch.setattr(cmd, "enqueue_sinan_run", _DelayStub())
+
+    call_command(
+        "ingestion_enqueue_sinan",
+        str(fpath),
+        "--uf", "ES",
+        "--disease", disease,
+        "--year", "2026",
+        "--week", "5",
+        "--canonical-cid10", canonical,
+    )
+
+    run = Run.objects.get(sha256=cmd._sha256_file(fpath))
+    assert run.disease == disease
+    assert run.canonical_cid10 == canonical
+
+
+@pytest.mark.django_db
+def test_enqueue_rejects_ambiguous_canonical_cid(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fpath = tmp_path / "ambiguous.csv"
+    _write_unique_csv(fpath, token=f"ambiguous:{tmp_path}")
+    monkeypatch.setattr(cmd, "enqueue_sinan_run", _DelayStub())
+    with pytest.raises(CommandError, match="ambiguous canonical CID-10"):
+        call_command(
+            "ingestion_enqueue_sinan", str(fpath),
+            "--uf", "ES", "--disease", "A92", "--year", "2026",
+            "--week", "5", "--canonical-cid10", "A92",
+        )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("existing", "incoming", "expected_error"),
+    [(None, "A92.0", False), ("A92.0", "A92.0", False),
+     ("A92.0", "A928", True), ("A92.0", None, False)],
+)
+def test_enqueue_same_sha_canonical_metadata_integrity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    existing: str | None,
+    incoming: str | None,
+    expected_error: bool,
+) -> None:
+    fpath = tmp_path / f"same-sha-{existing}-{incoming}.csv"
+    _write_unique_csv(fpath, token=f"same-sha:{tmp_path}:{existing}:{incoming}")
+    _ensure_run_absent_for_file(fpath)
+    stub = _DelayStub()
+    monkeypatch.setattr(cmd, "enqueue_sinan_run", stub)
+    initial_args = [
+        "ingestion_enqueue_sinan", str(fpath), "--uf", "ES", "--disease",
+        "A92", "--year", "2026", "--week", "5",
+    ]
+    if existing:
+        initial_args.extend(["--canonical-cid10", existing])
+    call_command(*initial_args)
+    run = Run.objects.get(sha256=cmd._sha256_file(fpath))
+    if existing is None:
+        assert run.canonical_cid10 is None
+
+    incoming_args = [
+        "ingestion_enqueue_sinan", str(fpath), "--uf", "ES", "--disease",
+        "A92", "--year", "2026", "--week", "5",
+    ]
+    if incoming:
+        incoming_args.extend(["--canonical-cid10", incoming])
+    if expected_error:
+        with pytest.raises(CommandError, match="canonical CID mismatch"):
+            call_command(*incoming_args)
+    else:
+        call_command(*incoming_args)
+
+    run.refresh_from_db()
+    assert Run.objects.filter(sha256=run.sha256).count() == 1
+    assert run.canonical_cid10 == (existing or incoming)
     assert len(stub.calls) == 1
 
 
