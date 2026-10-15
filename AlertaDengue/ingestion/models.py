@@ -56,6 +56,7 @@ class Run(models.Model):
         max_length=16, choices=SourceFormat.choices
     )
     disease = models.CharField(max_length=16)
+    canonical_cid10 = models.CharField(max_length=5, null=True, blank=True)
 
     delivery_year = models.SmallIntegerField(
         validators=[MinValueValidator(2000), MaxValueValidator(2100)]

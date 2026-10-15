@@ -120,6 +120,58 @@ def test_manifest_dry_run_does_not_call_enqueue(
 
 
 @pytest.mark.django_db
+def test_manifest_without_canonical_cid_remains_compatible(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    manifest_path = tmp_path / "legacy-manifest.json"
+    manifest_path.write_text(
+        json.dumps(
+            [{"dest": "/x/legacy.csv", "country": "es", "disease": "A92"}]
+        ),
+        encoding="utf-8",
+    )
+    capture = _CallCapture()
+    monkeypatch.setattr(man, "call_command", capture)
+
+    call_command(
+        "ingestion_enqueue_manifest", "--manifest", str(manifest_path)
+    )
+
+    args = capture.calls[0][1]
+    assert "--canonical-cid10" not in args
+
+
+@pytest.mark.django_db
+def test_manifest_propagates_canonical_cid(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    manifest_path = tmp_path / "canonical-manifest.json"
+    manifest_path.write_text(
+        json.dumps(
+            [
+                {
+                    "dest": "/x/chik.csv",
+                    "country": "es",
+                    "disease": "A92",
+                    "canonical_cid10": "A92.0",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    capture = _CallCapture()
+    monkeypatch.setattr(man, "call_command", capture)
+
+    call_command(
+        "ingestion_enqueue_manifest", "--manifest", str(manifest_path)
+    )
+
+    args = capture.calls[0][1]
+    assert args[args.index("--disease") + 1] == "A92"
+    assert args[args.index("--canonical-cid10") + 1] == "A92.0"
+
+
+@pytest.mark.django_db
 def test_manifest_empty_graceful_exit(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

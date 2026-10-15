@@ -11,6 +11,33 @@ import pytest
 from ingestion.management.commands import mover_sinan_data as mover
 
 
+@pytest.mark.parametrize(
+    ("raw", "normalized"), [("A92.0", "A92.0"), ("A928", "A92.8")]
+)
+def test_mover_keeps_coarse_routing_for_a92_family(
+    tmp_path: Path, raw: str, normalized: str
+) -> None:
+    src = tmp_path / "incoming" / "source.csv"
+    _write_csv(src, f"CID10;SEM_NOT\n{raw};202605\n")
+    ok, _dest, info, _err = mover.move_to_canonical(
+        src,
+        imported_base=tmp_path / "imported",
+        reserved_relpaths=set(),
+        dry_run=True,
+        include_uf=False,
+        country="es",
+        fmt_dir="csv",
+        csv_encoding="utf-8",
+        try_csv_encodings=["utf-8"],
+        dbf_encoding="iso-8859-1",
+        on_exists="version",
+    )
+    assert ok
+    assert info is not None
+    assert info.cid10_norm == normalized
+    assert info.disease_code == "A92"
+
+
 def _write_csv(path: Path, content: str) -> None:
     """
     Write a CSV file as UTF-8 text.
@@ -281,6 +308,76 @@ def test_main_writes_sorted_manifest_es_before_br(
     entries = json.loads(manifest_path.read_text(encoding="utf-8"))
     assert entries[0]["country"] == "es"
     assert entries[1]["country"] == "br"
+    assert entries[0]["disease"] == "A90"
+    assert entries[0]["canonical_cid10"] == "A90"
+
+
+@pytest.mark.parametrize(
+    ("cid10", "disease", "canonical"),
+    [
+        ("A92.0", "A92", "A92.0"),
+        ("A928", "A92", "A928"),
+        ("A92.8", "A92", "A928"),
+    ],
+)
+def test_mover_manifest_preserves_a92_canonical_cid(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    cid10: str,
+    disease: str,
+    canonical: str,
+) -> None:
+    src = tmp_path / "incoming" / "source.csv"
+    _write_csv(src, f"CID10;SEM_NOT\n{cid10};202605\n")
+    manifest_path = tmp_path / "manifest.json"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "mover_sinan_data.py",
+            str(src),
+            "--imported-base",
+            str(tmp_path / "imported"),
+            "--manifest",
+            str(manifest_path),
+            "--dry-run",
+        ],
+    )
+
+    assert mover.main() == 0
+    entry = json.loads(manifest_path.read_text(encoding="utf-8"))[0]
+    assert entry["disease"] == disease
+    assert entry["canonical_cid10"] == canonical
+
+
+def test_unsupported_cid_is_omitted_from_both_manifest_paths(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    src = tmp_path / "incoming" / "unsupported.csv"
+    _write_csv(src, "CID10;SEM_NOT\nB00;202610\n")
+    imported_base = tmp_path / "imported"
+    manifest_path = tmp_path / "manifest.json"
+    argv = [
+        "mover_sinan_data.py",
+        str(src),
+        "--imported-base",
+        str(imported_base),
+        "--manifest",
+        str(manifest_path),
+    ]
+
+    monkeypatch.setattr(sys, "argv", argv)
+    assert mover.main() == 0
+    moved_entry = json.loads(manifest_path.read_text(encoding="utf-8"))[0]
+    assert "canonical_cid10" not in moved_entry
+
+    _write_csv(src, "CID10;SEM_NOT\nB00;202610\n")
+    monkeypatch.setattr(
+        sys, "argv", [*argv, "--include-existing", "--dry-run"]
+    )
+    assert mover.main() == 0
+    existing_entry = json.loads(manifest_path.read_text(encoding="utf-8"))[0]
+    assert "canonical_cid10" not in existing_entry
 
 
 def test_move_to_canonical_outdated_skip(tmp_path: Path) -> None:
@@ -374,3 +471,4 @@ def test_main_with_include_existing(
     entries = json.loads(manifest_path.read_text(encoding="utf-8"))
     assert len(entries) == 1
     assert entries[0]["dest"] == str(canonical_dest)
+    assert entries[0]["canonical_cid10"] == "A90"
