@@ -24,7 +24,6 @@ class RunAdmin(admin.ModelAdmin):
         "status",
         "uf",
         "disease",
-        "canonical_cid10",
         "delivery_se",
         "rows_read",
         "rows_parsed",

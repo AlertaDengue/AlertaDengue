@@ -36,6 +36,23 @@ def _normalize_canonical_cid10(value: str | None) -> str | None:
         ) from exc
 
 
+def _validate_disease_cid(
+    disease: str, canonical_cid10: str | None
+) -> None:
+    """Reject canonical CID metadata inconsistent with the coarse disease."""
+    if canonical_cid10 is None:
+        return
+    allowed = {
+        "A90": {"A90"},
+        "A92": {"A92.0", "A928"},
+    }
+    if canonical_cid10 not in allowed.get(disease, set()):
+        raise CommandError(
+            f"canonical CID {canonical_cid10} is inconsistent with "
+            f"disease {disease}"
+        )
+
+
 def _sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
     """Compute SHA-256 hex digest for a file."""
     h = hashlib.sha256()
@@ -104,6 +121,7 @@ class Command(BaseCommand):
         canonical_cid10 = _normalize_canonical_cid10(
             options["canonical_cid10"]
         )
+        _validate_disease_cid(disease, canonical_cid10)
         year = int(options["year"])
         week = int(options["week"])
         requeue = bool(options["requeue"])
@@ -159,6 +177,8 @@ class Command(BaseCommand):
             created = False
 
         if not created:
+            if canonical_cid10 is not None:
+                _validate_disease_cid(run.disease, canonical_cid10)
             if (
                 canonical_cid10 is not None
                 and run.canonical_cid10 is not None

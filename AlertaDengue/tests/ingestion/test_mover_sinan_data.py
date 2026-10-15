@@ -12,27 +12,10 @@ from ingestion.management.commands import mover_sinan_data as mover
 
 
 @pytest.mark.parametrize(
-    ("raw", "expected"),
-    [
-        ("A90", "A90"),
-        ("A90.0", "A90"),
-        ("A920", "A92.0"),
-        ("A92.0", "A92.0"),
-        ("A928", "A928"),
-        ("A92.8", "A928"),
-    ],
-)
-def test_normalize_cid10_supported_canonical_values(
-    raw: str, expected: str
-) -> None:
-    assert mover._normalize_cid10(raw) == expected
-
-
-@pytest.mark.parametrize(
-    ("raw", "canonical"), [("A92.0", "A92.0"), ("A928", "A928")]
+    ("raw", "normalized"), [("A92.0", "A92.0"), ("A928", "A92.8")]
 )
 def test_mover_keeps_coarse_routing_for_a92_family(
-    tmp_path: Path, raw: str, canonical: str
+    tmp_path: Path, raw: str, normalized: str
 ) -> None:
     src = tmp_path / "incoming" / "source.csv"
     _write_csv(src, f"CID10;SEM_NOT\n{raw};202605\n")
@@ -51,7 +34,7 @@ def test_mover_keeps_coarse_routing_for_a92_family(
     )
     assert ok
     assert info is not None
-    assert info.cid10_norm == canonical
+    assert info.cid10_norm == normalized
     assert info.disease_code == "A92"
 
 
@@ -331,7 +314,11 @@ def test_main_writes_sorted_manifest_es_before_br(
 
 @pytest.mark.parametrize(
     ("cid10", "disease", "canonical"),
-    [("A92.0", "A92", "A92.0"), ("A928", "A92", "A928")],
+    [
+        ("A92.0", "A92", "A92.0"),
+        ("A928", "A92", "A928"),
+        ("A92.8", "A92", "A928"),
+    ],
 )
 def test_mover_manifest_preserves_a92_canonical_cid(
     tmp_path: Path,
@@ -357,6 +344,36 @@ def test_mover_manifest_preserves_a92_canonical_cid(
     entry = json.loads(manifest_path.read_text(encoding="utf-8"))[0]
     assert entry["disease"] == disease
     assert entry["canonical_cid10"] == canonical
+
+
+def test_unsupported_cid_is_omitted_from_both_manifest_paths(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    src = tmp_path / "incoming" / "unsupported.csv"
+    _write_csv(src, "CID10;SEM_NOT\nB00;202610\n")
+    imported_base = tmp_path / "imported"
+    manifest_path = tmp_path / "manifest.json"
+    argv = [
+        "mover_sinan_data.py",
+        str(src),
+        "--imported-base",
+        str(imported_base),
+        "--manifest",
+        str(manifest_path),
+    ]
+
+    monkeypatch.setattr(sys, "argv", argv)
+    assert mover.main() == 0
+    moved_entry = json.loads(manifest_path.read_text(encoding="utf-8"))[0]
+    assert "canonical_cid10" not in moved_entry
+
+    _write_csv(src, "CID10;SEM_NOT\nB00;202610\n")
+    monkeypatch.setattr(
+        sys, "argv", [*argv, "--include-existing", "--dry-run"]
+    )
+    assert mover.main() == 0
+    existing_entry = json.loads(manifest_path.read_text(encoding="utf-8"))[0]
+    assert "canonical_cid10" not in existing_entry
 
 
 def test_move_to_canonical_outdated_skip(tmp_path: Path) -> None:

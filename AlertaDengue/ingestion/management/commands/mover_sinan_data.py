@@ -255,19 +255,21 @@ def _normalize_cid10(value: str) -> str:
     s = value.strip().upper().replace(",", ".")
     if not s:
         return ""
-    variants = {
-        "A90": "A90",
-        "A90.0": "A90",
-        "A920": "A92.0",
-        "A92.0": "A92.0",
-        "A928": "A928",
-        "A92.8": "A928",
-    }
-    if s in variants:
-        return variants[s]
     if re.fullmatch(r"[A-Z]\d{2}\d", s):
         return f"{s[:3]}.{s[3]}"
     return s
+
+
+def _canonical_cid10(value: str) -> str | None:
+    """Return canonical disease metadata for supported normalized CIDs."""
+    variants = {
+        "A90": "A90",
+        "A90.0": "A90",
+        "A92.0": "A92.0",
+        "A92.8": "A928",
+        "A928": "A928",
+    }
+    return variants.get(value)
 
 
 def _disease_code_from_cid10(cid10_norm: str) -> str:
@@ -1294,20 +1296,21 @@ def main() -> int:
             moved += 1
             prefix = "DRY-RUN" if args.dry_run else "OK"
             logger.info(f"{prefix}: {src} -> {dest}")
-            manifest_entries.append(
-                {
-                    "dest": str(dest),
-                    "country": info.country.lower(),
-                    "disease": info.disease_code,
-                    "canonical_cid10": info.cid10_norm,
-                    "disease_dir": info.disease_dir,
-                    "year": info.year,
-                    "week": info.week,
-                    "sem_not_max": info.sem_not_max,
-                    "uf": info.country.upper(),
-                    "fmt": info.fmt_dir,
-                }
-            )
+            entry = {
+                "dest": str(dest),
+                "country": info.country.lower(),
+                "disease": info.disease_code,
+                "disease_dir": info.disease_dir,
+                "year": info.year,
+                "week": info.week,
+                "sem_not_max": info.sem_not_max,
+                "uf": info.country.upper(),
+                "fmt": info.fmt_dir,
+            }
+            canonical_cid10 = _canonical_cid10(info.cid10_norm)
+            if canonical_cid10 is not None:
+                entry["canonical_cid10"] = canonical_cid10
+            manifest_entries.append(entry)
         elif err and err.startswith("SKIP"):
             skipped += 1
             logger.warning(f"SKIP: {src} ({err})")
@@ -1324,20 +1327,21 @@ def main() -> int:
                     logger.warning(
                         f"Found existing at {existing_full}, adding to manifest."
                     )
-                    manifest_entries.append(
-                        {
-                            "dest": str(existing_full),
-                            "country": info.country.lower(),
-                            "disease": info.disease_code,
-                            "canonical_cid10": info.cid10_norm,
-                            "disease_dir": info.disease_dir,
-                            "year": info.year,
-                            "week": info.week,
-                            "sem_not_max": info.sem_not_max,
-                            "uf": info.country.upper(),
-                            "fmt": info.fmt_dir,
-                        }
-                    )
+                    entry = {
+                        "dest": str(existing_full),
+                        "country": info.country.lower(),
+                        "disease": info.disease_code,
+                        "disease_dir": info.disease_dir,
+                        "year": info.year,
+                        "week": info.week,
+                        "sem_not_max": info.sem_not_max,
+                        "uf": info.country.upper(),
+                        "fmt": info.fmt_dir,
+                    }
+                    canonical_cid10 = _canonical_cid10(info.cid10_norm)
+                    if canonical_cid10 is not None:
+                        entry["canonical_cid10"] = canonical_cid10
+                    manifest_entries.append(entry)
         else:
             failed += 1
             logger.error(f"FAIL: {src} ({err})")
