@@ -14,6 +14,8 @@ services:
       MINIO_BROWSER_REDIRECT_URL: "${MINIO_BROWSER_REDIRECT_URL:-http://localhost:9001}"
     volumes:
       - minio_data:/data
+    networks:
+      - infodengue
     command: server /data --console-address ":9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
@@ -30,6 +32,8 @@ services:
         condition: service_healthy
     env_file:
       - ../.envs/.env
+    networks:
+      - infodengue
     entrypoint: >
       /bin/sh -c "
       /usr/bin/mc alias set miniostore http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
@@ -50,12 +54,19 @@ services:
       - ../.envs/.env
     volumes:
       - ${DOCKER_HOST_INCOMING_DIR}:/incoming
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc alias set miniostore http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
-      echo '[II] Starting mc mirror --watch...' &&
-      /usr/bin/mc mirror --watch miniostore/sinan-infodengue /incoming;
-      "
+    networks:
+      - infodengue
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        /usr/bin/mc alias set miniostore http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
+        echo '[II] Starting mc mirror --watch...' &&
+        if [ -n "$${MINIO_MATERIALIZER_EXCLUDE}" ]; then
+          /usr/bin/mc mirror --watch --exclude "$${MINIO_MATERIALIZER_EXCLUDE}" miniostore/sinan-infodengue /incoming
+        else
+          /usr/bin/mc mirror --watch miniostore/sinan-infodengue /incoming
+        fi
 
 volumes:
   minio_data:
