@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-from watchdog.events import FileSystemEvent
+from watchdog.events import DirMovedEvent, FileMovedEvent, FileSystemEvent
 
 from ingestion.management.commands.ingestion_watcher import (
     CommandAction,
@@ -55,6 +55,35 @@ class TestHandlerEventRouting:
             handler.on_created(event)
             handler.on_modified(event)
             mock_handle.assert_not_called()
+
+    def test_atomic_move_handles_only_final_destination(self):
+        handler = _make_handler()
+        source = "incoming/.f89abc.dbf.part-123"
+        destination = "incoming/f89abc.dbf"
+        event = FileMovedEvent(source, destination)
+
+        with patch.object(handler, "_handle_event") as mock_handle:
+            handler.on_moved(event)
+            mock_handle.assert_called_once_with(destination)
+
+    def test_ignores_moved_directories(self):
+        handler = _make_handler()
+        event = DirMovedEvent("incoming/old", "incoming/new")
+
+        with patch.object(handler, "_handle_event") as mock_handle:
+            handler.on_moved(event)
+            mock_handle.assert_not_called()
+
+    def test_move_to_unsupported_extension_schedules_nothing(self):
+        handler = _make_handler()
+        event = FileMovedEvent("incoming/.temporary.part", "incoming/file.txt")
+
+        with patch(
+            "ingestion.management.commands.ingestion_watcher.Timer"
+        ) as mock_timer_cls:
+            handler.on_moved(event)
+            mock_timer_cls.assert_not_called()
+        assert handler.timers == {}
 
     def test_ignores_non_data_files(self):
         handler = _make_handler()
