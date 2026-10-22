@@ -13,7 +13,11 @@ import time
 from typing import Protocol
 
 from loguru import logger
-from watchdog.events import FileSystemEvent, FileSystemEventHandler
+from watchdog.events import (
+    FileSystemEvent,
+    FileSystemEventHandler,
+    FileSystemMovedEvent,
+)
 from watchdog.observers.polling import PollingObserver
 
 
@@ -119,6 +123,11 @@ class IngestionWatcherHandler(FileSystemEventHandler):
         if event.is_directory:
             return
         self._handle_event(event.src_path)
+
+    def on_moved(self, event: FileSystemMovedEvent) -> None:
+        if event.is_directory:
+            return
+        self._handle_event(event.dest_path)
 
     def _handle_event(self, src_path: str) -> None:
         path = Path(src_path)
