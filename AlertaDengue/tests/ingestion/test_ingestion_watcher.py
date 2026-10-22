@@ -10,6 +10,8 @@ from ingestion.management.commands.ingestion_watcher import (
     CommandAction,
     IngestionWatcherHandler,
     LogOnlyAction,
+    _build_action,
+    _build_parser,
     _parse_extensions,
 )
 
@@ -277,6 +279,46 @@ class TestCommandAction:
         )
 
     @patch("ingestion.management.commands.ingestion_watcher.subprocess.run")
+    def test_allow_outdated_flag(self, mock_run):
+        mock_run.return_value = MagicMock(returncode=0)
+        action = CommandAction(allow_outdated=True)
+
+        action("test.dbf")
+
+        mock_run.assert_called_once_with(
+            [
+                "makim",
+                "ingestion.run",
+                "--paths",
+                "test.dbf",
+                "--allow-outdated",
+            ],
+            check=False,
+        )
+
+    @patch("ingestion.management.commands.ingestion_watcher.subprocess.run")
+    def test_combined_flags(self, mock_run):
+        mock_run.return_value = MagicMock(returncode=0)
+        action = CommandAction(
+            include_existing=True, requeue=True, allow_outdated=True
+        )
+
+        action("test.dbf")
+
+        mock_run.assert_called_once_with(
+            [
+                "makim",
+                "ingestion.run",
+                "--paths",
+                "test.dbf",
+                "--include-existing",
+                "--requeue",
+                "--allow-outdated",
+            ],
+            check=False,
+        )
+
+    @patch("ingestion.management.commands.ingestion_watcher.subprocess.run")
     def test_nonzero_return_does_not_raise(self, mock_run):
         mock_run.return_value = MagicMock(returncode=1)
         action = CommandAction()
@@ -299,3 +341,14 @@ class TestLogOnlyAction:
         action = LogOnlyAction()
         # Should just log, not raise
         action("/some/path/test.csv")
+
+
+def test_parser_builds_allow_outdated_command_action():
+    args = _build_parser().parse_args(["--path", "/tmp", "--allow-outdated"])
+
+    action = _build_action(args)
+
+    assert isinstance(action, CommandAction)
+    assert action.allow_outdated is True
+    assert action.include_existing is False
+    assert action.requeue is False
