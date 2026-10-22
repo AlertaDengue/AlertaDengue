@@ -658,6 +658,10 @@ groups:
             help: Include files in manifest even if they were already moved.
             type: bool
             action: store_true
+          allow-outdated:
+            help: Ingest even if the file is older than the window.
+            type: bool
+            action: store_true
         run: |
 
           INCOMING_DIR="${{ args.path }}"
@@ -671,6 +675,9 @@ groups:
           fi
           if [ "${{ args.include_existing }}" = "True" ]; then
             FLAGS="$FLAGS --include-existing"
+          fi
+          if [ "${{ args.allow_outdated }}" = "True" ]; then
+            FLAGS="$FLAGS --allow-outdated"
           fi
 
           python AlertaDengue/ingestion/management/commands/ingestion_watcher.py \
@@ -699,6 +706,10 @@ groups:
             action: store_true
           requeue:
             help: Re-enqueue even if run already exists.
+            type: bool
+            action: store_true
+          allow-outdated:
+            help: Ingest even if the file is older than the window.
             type: bool
             action: store_true
           log-file:
@@ -764,6 +775,8 @@ groups:
           [ "${{ args.requeue }}" = "True" ] && FLAGS="$FLAGS --requeue"
           [ "${{ args.include_existing }}" = "True" ] && \
             FLAGS="$FLAGS --include-existing"
+          [ "${{ args.allow_outdated }}" = "True" ] && \
+            FLAGS="$FLAGS --allow-outdated"
 
           CMD="python AlertaDengue/ingestion/management/commands/ingestion_watcher.py \
             --path '${INCOMING_DIR}' \

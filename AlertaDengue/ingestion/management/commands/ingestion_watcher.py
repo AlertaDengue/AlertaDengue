@@ -39,6 +39,8 @@ class CommandAction:
         Forward ``--include-existing`` flag.
     requeue : bool
         Forward ``--requeue`` flag.
+    allow_outdated : bool
+        Forward ``--allow-outdated`` flag.
     """
 
     DEFAULT_TEMPLATE = "makim ingestion.run --paths {path}"
@@ -48,10 +50,12 @@ class CommandAction:
         template: str = DEFAULT_TEMPLATE,
         include_existing: bool = False,
         requeue: bool = False,
+        allow_outdated: bool = False,
     ) -> None:
         self.template = template
         self.include_existing = include_existing
         self.requeue = requeue
+        self.allow_outdated = allow_outdated
 
     def __call__(self, src_path: str) -> None:
         quoted_path = shlex.quote(src_path)
@@ -62,6 +66,8 @@ class CommandAction:
             args.append("--include-existing")
         if self.requeue:
             args.append("--requeue")
+        if self.allow_outdated:
+            args.append("--allow-outdated")
 
         logger.debug(f"Executing: {shlex.join(args)}")
         result = subprocess.run(args, check=False)
@@ -235,6 +241,11 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Forward --requeue to the action command.",
     )
+    parser.add_argument(
+        "--allow-outdated",
+        action="store_true",
+        help="Forward --allow-outdated to the action command.",
+    )
 
     return parser
 
@@ -247,6 +258,7 @@ def _build_action(args: argparse.Namespace) -> FileAction:
         template=args.action_command,
         include_existing=args.include_existing,
         requeue=args.requeue,
+        allow_outdated=args.allow_outdated,
     )
 
 
@@ -282,6 +294,7 @@ def main() -> None:
     logger.info(f"Action: {args.action}")
     logger.info(f"Include existing: {args.include_existing}")
     logger.info(f"Requeue: {args.requeue}")
+    logger.info(f"Allow outdated: {args.allow_outdated}")
 
     handler = IngestionWatcherHandler(
         action=action,
