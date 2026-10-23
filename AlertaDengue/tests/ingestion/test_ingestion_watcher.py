@@ -453,10 +453,42 @@ class TestObserverLifecycle:
                 tmp_path, False, shutdown_requested
             ),
             call.shutdown_requested.wait(),
+            call.handler._begin_shutdown(),
             call.observer.stop(),
             call.observer.join(),
             call.handler.shutdown(),
         ]
+
+    def test_observer_cleanup_rejects_events_and_timer_callbacks(
+        self, tmp_path
+    ):
+        observer = MagicMock()
+        action = MagicMock()
+        handler = _make_handler(action=action)
+        shutdown_requested = Event()
+        shutdown_requested.set()
+        path = str(tmp_path / "pending.csv")
+        (tmp_path / "pending.csv").touch()
+
+        with patch(
+            "ingestion.management.commands.ingestion_watcher.Timer"
+        ) as timer_cls:
+            handler._handle_event(path)
+            generation = timer_cls.call_args.kwargs["args"][1]
+
+            def events_during_stop():
+                handler._handle_event("late.csv")
+                handler.process_file(path, generation)
+
+            observer.stop.side_effect = events_during_stop
+            _run_observer(
+                observer, handler, tmp_path, False, shutdown_requested
+            )
+
+        timer_cls.assert_called_once()
+        timer_cls.return_value.cancel.assert_called_once()
+        action.assert_not_called()
+        assert handler.timers == {}
 
     def test_reconciliation_failure_cleans_up_and_propagates(self, tmp_path):
         observer = MagicMock()

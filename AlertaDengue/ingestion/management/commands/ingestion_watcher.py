@@ -180,9 +180,9 @@ class IngestionWatcherHandler(FileSystemEventHandler):
                 or src_path not in self.timers
             ):
                 return
-            self.timers.pop(src_path, None)
             if self._shutting_down:
                 return
+            self.timers.pop(src_path, None)
             # This transition is atomic with shutdown's pending-timer cleanup.
             self._active_actions += 1
         try:
@@ -219,10 +219,15 @@ class IngestionWatcherHandler(FileSystemEventHandler):
             if path.is_file() and path.suffix.lower() in self.extensions:
                 self._handle_event(str(path))
 
-    def shutdown(self) -> None:
-        """Cancel pending work and wait for actions already in progress."""
+    def _begin_shutdown(self) -> None:
+        """Reject new events and timer callbacks before observer cleanup."""
         with self._condition:
             self._shutting_down = True
+
+    def shutdown(self) -> None:
+        """Cancel pending work and wait for actions already in progress."""
+        self._begin_shutdown()
+        with self._condition:
             for timer in self.timers.values():
                 timer.cancel()
             self.timers.clear()
@@ -234,10 +239,7 @@ class IngestionWatcherHandler(FileSystemEventHandler):
 def _install_shutdown_handlers(shutdown_requested: Event) -> None:
     """Make SIGTERM and SIGINT request a normal watcher shutdown."""
 
-    def handle_shutdown(signum: int, _frame: object) -> None:
-        logger.info(
-            f"Received {signal.Signals(signum).name}; stopping watcher"
-        )
+    def handle_shutdown(_signum: int, _frame: object) -> None:
         shutdown_requested.set()
 
     signal.signal(signal.SIGTERM, handle_shutdown)
@@ -388,11 +390,14 @@ def _run_observer(
         logger.info("Stopping watcher...")
     finally:
         try:
-            if observer_started:
-                try:
-                    observer.stop()
-                finally:
-                    observer.join()
+            try:
+                handler._begin_shutdown()
+            finally:
+                if observer_started:
+                    try:
+                        observer.stop()
+                    finally:
+                        observer.join()
         finally:
             handler.shutdown()
 
