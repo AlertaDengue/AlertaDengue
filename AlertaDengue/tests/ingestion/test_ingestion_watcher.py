@@ -4,19 +4,23 @@ from __future__ import annotations
 
 import signal
 from threading import Event, Thread
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
+import pytest
 from watchdog.events import DirMovedEvent, FileMovedEvent, FileSystemEvent
 
 from ingestion.management.commands.ingestion_watcher import (
     CommandAction,
     IngestionWatcherHandler,
     LogOnlyAction,
+    WatcherAlreadyRunningError,
     _build_action,
     _build_parser,
     _install_shutdown_handlers,
     _parse_extensions,
+    _run_observer,
     _watch_path_lock,
+    main,
 )
 
 
@@ -199,6 +203,30 @@ class TestHandlerProcessFile:
 
 
 class TestHandlerShutdown:
+    def test_rejects_new_events_after_shutdown(self):
+        action = MagicMock()
+        handler = _make_handler(action=action)
+        handler.shutdown()
+
+        with patch(
+            "ingestion.management.commands.ingestion_watcher.Timer"
+        ) as timer_cls:
+            handler._handle_event("late.csv")
+
+        timer_cls.assert_not_called()
+        assert handler.timers == {}
+        action.assert_not_called()
+
+    def test_late_timer_callback_does_not_run_action(self):
+        action = MagicMock()
+        handler = _make_handler(action=action)
+        handler.shutdown()
+
+        handler.process_file("late.csv")
+
+        action.assert_not_called()
+        assert handler._active_actions == 0
+
     def test_cancels_pending_timers_without_running_actions(self):
         action = MagicMock()
         handler = _make_handler(action=action)
@@ -306,17 +334,107 @@ def test_shutdown_signal_handlers_set_event_and_register_both_signals():
     assert signal.SIGINT in registered
     registered[signal.SIGTERM](signal.SIGTERM, None)
     assert shutdown_requested.is_set()
+    shutdown_requested.clear()
+    registered[signal.SIGINT](signal.SIGINT, None)
+    assert shutdown_requested.is_set()
+
+
+class TestObserverLifecycle:
+    def test_normal_shutdown_orders_cleanup(self, tmp_path):
+        calls = MagicMock()
+        observer = MagicMock()
+        handler = MagicMock()
+        shutdown_requested = MagicMock(spec=Event)
+        shutdown_requested.is_set.return_value = False
+        calls.attach_mock(observer, "observer")
+        calls.attach_mock(handler, "handler")
+        calls.attach_mock(shutdown_requested, "shutdown_requested")
+
+        _run_observer(observer, handler, tmp_path, False, shutdown_requested)
+
+        assert calls.mock_calls == [
+            call.observer.start(),
+            call.shutdown_requested.is_set(),
+            call.handler.reconcile_existing_files(tmp_path, False),
+            call.shutdown_requested.wait(),
+            call.observer.stop(),
+            call.observer.join(),
+            call.handler.shutdown(),
+        ]
+
+    def test_reconciliation_failure_cleans_up_and_propagates(self, tmp_path):
+        observer = MagicMock()
+        handler = MagicMock()
+        error = RuntimeError("reconciliation exploded")
+        handler.reconcile_existing_files.side_effect = error
+
+        with pytest.raises(RuntimeError) as raised:
+            _run_observer(observer, handler, tmp_path, False, Event())
+
+        assert raised.value is error
+        observer.stop.assert_called_once_with()
+        observer.join.assert_called_once_with()
+        handler.shutdown.assert_called_once_with()
+
+    def test_shutdown_before_reconciliation_skips_existing_files(
+        self, tmp_path
+    ):
+        observer = MagicMock()
+        handler = MagicMock()
+        shutdown_requested = Event()
+        shutdown_requested.set()
+
+        _run_observer(observer, handler, tmp_path, False, shutdown_requested)
+
+        handler.reconcile_existing_files.assert_not_called()
+        observer.stop.assert_called_once_with()
+        observer.join.assert_called_once_with()
+        handler.shutdown.assert_called_once_with()
+
+    def test_stop_failure_still_joins_and_shuts_down(self, tmp_path):
+        observer = MagicMock()
+        handler = MagicMock()
+        shutdown_requested = Event()
+        shutdown_requested.set()
+        error = RuntimeError("observer stop failed")
+        observer.stop.side_effect = error
+
+        with pytest.raises(RuntimeError) as raised:
+            _run_observer(
+                observer, handler, tmp_path, False, shutdown_requested
+            )
+
+        assert raised.value is error
+        observer.join.assert_called_once_with()
+        handler.shutdown.assert_called_once_with()
+
+
+def test_main_preserves_unrelated_runtime_error(tmp_path):
+    error = RuntimeError("reconciliation exploded")
+    with (
+        patch("sys.argv", ["ingestion_watcher", "--path", str(tmp_path)]),
+        patch(
+            "ingestion.management.commands.ingestion_watcher.PollingObserver"
+        ),
+        patch(
+            "ingestion.management.commands.ingestion_watcher._install_shutdown_handlers"
+        ),
+        patch(
+            "ingestion.management.commands.ingestion_watcher._run_observer",
+            side_effect=error,
+        ),
+    ):
+        with pytest.raises(RuntimeError) as raised:
+            main()
+
+    assert raised.value is error
 
 
 def test_watch_path_lock_rejects_second_owner_then_releases(tmp_path):
     with _watch_path_lock(tmp_path):
-        try:
+        with pytest.raises(WatcherAlreadyRunningError, match="already owns"):
             with _watch_path_lock(tmp_path):
-                raise AssertionError(
-                    "second watcher unexpectedly acquired lock"
-                )
-        except RuntimeError as error:
-            assert "already owns" in str(error)
+                pass
 
     with _watch_path_lock(tmp_path):
         pass

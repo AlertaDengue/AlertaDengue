@@ -91,6 +91,10 @@ class LogOnlyAction:
         logger.info(f"[log-only] Would process: {src_path}")
 
 
+class WatcherAlreadyRunningError(RuntimeError):
+    """Raised when another watcher owns the same directory."""
+
+
 class IngestionWatcherHandler(FileSystemEventHandler):
     """
     Handles file system events for SINAN ingestion.
@@ -228,7 +232,7 @@ def _watch_path_lock(watch_path: Path) -> Iterator[None]:
         try:
             fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError as error:
-            raise RuntimeError(
+            raise WatcherAlreadyRunningError(
                 f"Another ingestion watcher already owns {watch_path}"
             ) from error
         yield
@@ -343,6 +347,33 @@ def _parse_extensions(raw: str) -> frozenset[str]:
     return frozenset(exts)
 
 
+def _run_observer(
+    observer: PollingObserver,
+    handler: IngestionWatcherHandler,
+    watch_path: Path,
+    recursive: bool,
+    shutdown_requested: Event,
+) -> None:
+    """Run the observer and release handler work on every exit path."""
+    observer_started = False
+    try:
+        observer.start()
+        observer_started = True
+        if not shutdown_requested.is_set():
+            handler.reconcile_existing_files(watch_path, recursive)
+        shutdown_requested.wait()
+        logger.info("Stopping watcher...")
+    finally:
+        try:
+            if observer_started:
+                try:
+                    observer.stop()
+                finally:
+                    observer.join()
+        finally:
+            handler.shutdown()
+
+
 def main() -> None:
     parser = _build_parser()
     args = parser.parse_args()
@@ -379,15 +410,14 @@ def main() -> None:
             observer.schedule(
                 handler, str(watch_path), recursive=args.recursive
             )
-            observer.start()
-            handler.reconcile_existing_files(watch_path, args.recursive)
-
-            shutdown_requested.wait()
-            logger.info("Stopping watcher...")
-            observer.stop()
-            observer.join()
-            handler.shutdown()
-    except RuntimeError as error:
+            _run_observer(
+                observer,
+                handler,
+                watch_path,
+                args.recursive,
+                shutdown_requested,
+            )
+    except WatcherAlreadyRunningError as error:
         logger.error(str(error))
         raise SystemExit(1) from error
 
