@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import signal
+from threading import Event, Thread
 from unittest.mock import MagicMock, patch
 
 from watchdog.events import DirMovedEvent, FileMovedEvent, FileSystemEvent
@@ -12,7 +14,9 @@ from ingestion.management.commands.ingestion_watcher import (
     LogOnlyAction,
     _build_action,
     _build_parser,
+    _install_shutdown_handlers,
     _parse_extensions,
+    _watch_path_lock,
 )
 
 
@@ -140,6 +144,7 @@ class TestHandlerTimerSettle:
                 0.1, handler.process_file, args=["some/data.csv"]
             )
             mock_t.start.assert_called_once()
+            assert mock_t.daemon is False
 
     def test_resets_timer_on_subsequent_events(self):
         handler = _make_handler()
@@ -191,6 +196,130 @@ class TestHandlerProcessFile:
         # Should not raise
         handler.process_file("error.csv")
         mock_action.assert_called_once_with("error.csv")
+
+
+class TestHandlerShutdown:
+    def test_cancels_pending_timers_without_running_actions(self):
+        action = MagicMock()
+        handler = _make_handler(action=action)
+        with patch(
+            "ingestion.management.commands.ingestion_watcher.Timer"
+        ) as timer_cls:
+            first, second = MagicMock(), MagicMock()
+            timer_cls.side_effect = [first, second]
+            handler._handle_event("one.csv")
+            handler._handle_event("two.dbf")
+
+        handler.shutdown()
+
+        first.cancel.assert_called_once()
+        second.cancel.assert_called_once()
+        assert handler.timers == {}
+        action.assert_not_called()
+
+    def test_waits_for_active_action(self, tmp_path):
+        started = Event()
+        release = Event()
+        shutdown_started = Event()
+        shutdown_done = Event()
+
+        def action(_path):
+            started.set()
+            assert release.wait(5)
+
+        handler = _make_handler(action=action)
+        source = tmp_path / "active.csv"
+        source.touch()
+        action_thread = Thread(
+            target=handler.process_file, args=(str(source),)
+        )
+        action_thread.start()
+        assert started.wait(5)
+
+        def stop_handler():
+            shutdown_started.set()
+            handler.shutdown()
+            shutdown_done.set()
+
+        shutdown_thread = Thread(target=stop_handler)
+        shutdown_thread.start()
+        assert shutdown_started.wait(5)
+        assert not shutdown_done.is_set()
+
+        release.set()
+        action_thread.join(5)
+        shutdown_thread.join(5)
+        assert not action_thread.is_alive()
+        assert not shutdown_thread.is_alive()
+        assert shutdown_done.is_set()
+
+
+class TestStartupReconciliation:
+    def test_schedules_existing_csv_dbf_only_and_ignores_lockfile(
+        self, tmp_path
+    ):
+        csv = tmp_path / "incoming.csv"
+        dbf = tmp_path / "outbreak.DBF"
+        unsupported = tmp_path / "notes.txt"
+        lock_file = tmp_path / ".ingestion-watcher.lock"
+        for path in (csv, dbf, unsupported, lock_file):
+            path.touch()
+
+        handler = _make_handler()
+        with patch.object(handler, "_handle_event") as handle_event:
+            handler.reconcile_existing_files(tmp_path, recursive=False)
+
+        assert {call.args[0] for call in handle_event.call_args_list} == {
+            str(csv),
+            str(dbf),
+        }
+
+    def test_recursive_option_controls_nested_scan(self, tmp_path):
+        nested = tmp_path / "nested"
+        nested.mkdir()
+        file_path = nested / "nested.csv"
+        file_path.touch()
+        handler = _make_handler()
+
+        with patch.object(handler, "_handle_event") as handle_event:
+            handler.reconcile_existing_files(tmp_path, recursive=False)
+            handle_event.assert_not_called()
+
+            handler.reconcile_existing_files(tmp_path, recursive=True)
+            handle_event.assert_called_once_with(str(file_path))
+
+
+def test_shutdown_signal_handlers_set_event_and_register_both_signals():
+    shutdown_requested = Event()
+    registered = {}
+
+    def capture_handler(signum, callback):
+        registered[signum] = callback
+
+    with patch(
+        "ingestion.management.commands.ingestion_watcher.signal.signal",
+        side_effect=capture_handler,
+    ):
+        _install_shutdown_handlers(shutdown_requested)
+
+    assert signal.SIGTERM in registered
+    assert signal.SIGINT in registered
+    registered[signal.SIGTERM](signal.SIGTERM, None)
+    assert shutdown_requested.is_set()
+
+
+def test_watch_path_lock_rejects_second_owner_then_releases(tmp_path):
+    with _watch_path_lock(tmp_path):
+        try:
+            with _watch_path_lock(tmp_path):
+                raise AssertionError(
+                    "second watcher unexpectedly acquired lock"
+                )
+        except RuntimeError as error:
+            assert "already owns" in str(error)
+
+    with _watch_path_lock(tmp_path):
+        pass
 
 
 class TestCommandAction:

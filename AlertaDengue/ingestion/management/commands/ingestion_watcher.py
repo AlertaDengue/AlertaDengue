@@ -5,11 +5,14 @@ Standalone file-system watcher for SINAN ingestion.
 from __future__ import annotations
 
 import argparse
+from collections.abc import Iterator
+from contextlib import contextmanager
+import fcntl
 from pathlib import Path
 import shlex
+import signal
 import subprocess
-from threading import Timer
-import time
+from threading import Condition, Event, Timer
 from typing import Protocol
 
 from loguru import logger
@@ -119,6 +122,9 @@ class IngestionWatcherHandler(FileSystemEventHandler):
         self.settle_time = settle_time
         self.extensions = extensions or frozenset({".csv", ".dbf"})
         self.timers: dict[str, Timer] = {}
+        self._condition = Condition()
+        self._active_actions = 0
+        self._shutting_down = False
 
     def on_created(self, event: FileSystemEvent) -> None:
         if event.is_directory:
@@ -140,31 +146,94 @@ class IngestionWatcherHandler(FileSystemEventHandler):
         if path.suffix.lower() not in self.extensions:
             return
 
-        # Reset timer if it exists
-        if src_path in self.timers:
-            self.timers[src_path].cancel()
+        with self._condition:
+            if self._shutting_down:
+                return
+            # Reset timer if it exists.
+            if src_path in self.timers:
+                self.timers[src_path].cancel()
 
-        t = Timer(self.settle_time, self.process_file, args=[src_path])
-        self.timers[src_path] = t
-        t.start()
+            timer = Timer(self.settle_time, self.process_file, args=[src_path])
+            timer.daemon = False
+            self.timers[src_path] = timer
+            timer.start()
 
     def process_file(self, src_path: str) -> None:
         """Trigger the configured action for *src_path*."""
-        if src_path in self.timers:
-            del self.timers[src_path]
-
-        path = Path(src_path)
-        if not path.exists():
-            logger.warning(f"File vanished before processing: {src_path}")
-            return
-
-        logger.info(f"Processing detected file: {src_path}")
+        with self._condition:
+            self.timers.pop(src_path, None)
+            if self._shutting_down:
+                return
+            # This transition is atomic with shutdown's pending-timer cleanup.
+            self._active_actions += 1
         try:
-            self.action(src_path)
-        except Exception as e:
-            logger.exception(
-                f"Unexpected error while processing {src_path}: {e}"
-            )
+            path = Path(src_path)
+            if not path.exists():
+                logger.warning(f"File vanished before processing: {src_path}")
+                return
+
+            logger.info(f"Processing detected file: {src_path}")
+            try:
+                self.action(src_path)
+            except Exception as e:
+                logger.exception(
+                    f"Unexpected error while processing {src_path}: {e}"
+                )
+        finally:
+            with self._condition:
+                self._active_actions -= 1
+                self._condition.notify_all()
+
+    def reconcile_existing_files(
+        self, watch_path: Path, recursive: bool
+    ) -> None:
+        """Schedule supported files already present at watcher startup."""
+        candidates = (
+            watch_path.rglob("*") if recursive else watch_path.iterdir()
+        )
+        for path in candidates:
+            if path.is_file() and path.suffix.lower() in self.extensions:
+                self._handle_event(str(path))
+
+    def shutdown(self) -> None:
+        """Cancel pending work and wait for actions already in progress."""
+        with self._condition:
+            self._shutting_down = True
+            for timer in self.timers.values():
+                timer.cancel()
+            self.timers.clear()
+            while self._active_actions:
+                self._condition.wait()
+
+
+def _install_shutdown_handlers(shutdown_requested: Event) -> None:
+    """Make SIGTERM and SIGINT request a normal watcher shutdown."""
+
+    def handle_shutdown(signum: int, _frame: object) -> None:
+        logger.info(
+            f"Received {signal.Signals(signum).name}; stopping watcher"
+        )
+        shutdown_requested.set()
+
+    signal.signal(signal.SIGTERM, handle_shutdown)
+    signal.signal(signal.SIGINT, handle_shutdown)
+
+
+@contextmanager
+def _watch_path_lock(watch_path: Path) -> Iterator[None]:
+    """Hold a kernel advisory lock for this watched directory."""
+    lock_path = watch_path / ".ingestion-watcher.lock"
+    lock_file = lock_path.open("a")
+    try:
+        try:
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as error:
+            raise RuntimeError(
+                f"Another ingestion watcher already owns {watch_path}"
+            ) from error
+        yield
+    finally:
+        lock_file.close()
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -296,24 +365,31 @@ def main() -> None:
     logger.info(f"Requeue: {args.requeue}")
     logger.info(f"Allow outdated: {args.allow_outdated}")
 
-    handler = IngestionWatcherHandler(
-        action=action,
-        settle_time=args.settle_time,
-        extensions=extensions,
-    )
-
-    observer = PollingObserver(timeout=args.poll_interval)
-    observer.schedule(handler, str(watch_path), recursive=args.recursive)
-    observer.start()
-
+    shutdown_requested = Event()
     try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        logger.info("Stopping watcher...")
-        observer.stop()
+        with _watch_path_lock(watch_path):
+            _install_shutdown_handlers(shutdown_requested)
+            handler = IngestionWatcherHandler(
+                action=action,
+                settle_time=args.settle_time,
+                extensions=extensions,
+            )
 
-    observer.join()
+            observer = PollingObserver(timeout=args.poll_interval)
+            observer.schedule(
+                handler, str(watch_path), recursive=args.recursive
+            )
+            observer.start()
+            handler.reconcile_existing_files(watch_path, args.recursive)
+
+            shutdown_requested.wait()
+            logger.info("Stopping watcher...")
+            observer.stop()
+            observer.join()
+            handler.shutdown()
+    except RuntimeError as error:
+        logger.error(str(error))
+        raise SystemExit(1) from error
 
 
 if __name__ == "__main__":
