@@ -126,6 +126,8 @@ class IngestionWatcherHandler(FileSystemEventHandler):
         self.settle_time = settle_time
         self.extensions = extensions or frozenset({".csv", ".dbf"})
         self.timers: dict[str, Timer] = {}
+        # Retain the last value so a later schedule never reuses a token.
+        self._timer_generations: dict[str, int] = {}
         self._condition = Condition()
         self._active_actions = 0
         self._shutting_down = False
@@ -157,14 +159,27 @@ class IngestionWatcherHandler(FileSystemEventHandler):
             if src_path in self.timers:
                 self.timers[src_path].cancel()
 
-            timer = Timer(self.settle_time, self.process_file, args=[src_path])
+            generation = self._timer_generations.get(src_path, 0) + 1
+            self._timer_generations[src_path] = generation
+            timer = Timer(
+                self.settle_time,
+                self.process_file,
+                args=[src_path, generation],
+            )
             timer.daemon = False
             self.timers[src_path] = timer
             timer.start()
 
-    def process_file(self, src_path: str) -> None:
+    def process_file(
+        self, src_path: str, generation: int | None = None
+    ) -> None:
         """Trigger the configured action for *src_path*."""
         with self._condition:
+            if generation is not None and (
+                self._timer_generations.get(src_path) != generation
+                or src_path not in self.timers
+            ):
+                return
             self.timers.pop(src_path, None)
             if self._shutting_down:
                 return
@@ -189,13 +204,18 @@ class IngestionWatcherHandler(FileSystemEventHandler):
                 self._condition.notify_all()
 
     def reconcile_existing_files(
-        self, watch_path: Path, recursive: bool
+        self,
+        watch_path: Path,
+        recursive: bool,
+        shutdown_requested: Event | None = None,
     ) -> None:
         """Schedule supported files already present at watcher startup."""
         candidates = (
             watch_path.rglob("*") if recursive else watch_path.iterdir()
         )
-        for path in candidates:
+        for path in sorted(candidates):
+            if shutdown_requested is not None and shutdown_requested.is_set():
+                break
             if path.is_file() and path.suffix.lower() in self.extensions:
                 self._handle_event(str(path))
 
@@ -206,6 +226,7 @@ class IngestionWatcherHandler(FileSystemEventHandler):
             for timer in self.timers.values():
                 timer.cancel()
             self.timers.clear()
+            self._timer_generations.clear()
             while self._active_actions:
                 self._condition.wait()
 
@@ -360,7 +381,9 @@ def _run_observer(
         observer.start()
         observer_started = True
         if not shutdown_requested.is_set():
-            handler.reconcile_existing_files(watch_path, recursive)
+            handler.reconcile_existing_files(
+                watch_path, recursive, shutdown_requested
+            )
         shutdown_requested.wait()
         logger.info("Stopping watcher...")
     finally:

@@ -145,7 +145,7 @@ class TestHandlerTimerSettle:
 
             assert "some/data.csv" in handler.timers
             mock_timer_cls.assert_called_once_with(
-                0.1, handler.process_file, args=["some/data.csv"]
+                0.1, handler.process_file, args=["some/data.csv", 1]
             )
             mock_t.start.assert_called_once()
             assert mock_t.daemon is False
@@ -166,6 +166,67 @@ class TestHandlerTimerSettle:
             t1.cancel.assert_called_once()
             assert handler.timers["data.dbf"] == t2
             t2.start.assert_called_once()
+            assert mock_timer_cls.call_args_list[0].kwargs["args"] == [
+                "data.dbf",
+                1,
+            ]
+            assert mock_timer_cls.call_args_list[1].kwargs["args"] == [
+                "data.dbf",
+                2,
+            ]
+
+    def test_stale_settle_callback_cannot_replace_newer_schedule(
+        self, tmp_path
+    ):
+        path = str(tmp_path / "data.csv")
+        (tmp_path / "data.csv").touch()
+        action = MagicMock()
+        handler = _make_handler(action=action)
+
+        with patch(
+            "ingestion.management.commands.ingestion_watcher.Timer"
+        ) as timer_cls:
+            first, second = MagicMock(), MagicMock()
+            timer_cls.side_effect = [first, second]
+            handler._handle_event(path)
+            first_generation = timer_cls.call_args_list[0].kwargs["args"][1]
+            handler._handle_event(path)
+            second_generation = timer_cls.call_args_list[1].kwargs["args"][1]
+
+        first.cancel.assert_called_once_with()
+        assert second_generation > first_generation
+
+        handler.process_file(path, first_generation)
+
+        action.assert_not_called()
+        assert handler.timers[path] is second
+        assert handler._timer_generations[path] == second_generation
+        assert handler._active_actions == 0
+
+        handler.process_file(path, second_generation)
+
+        action.assert_called_once_with(path)
+        assert path not in handler.timers
+
+    def test_new_schedule_after_completion_gets_new_generation(self, tmp_path):
+        path = str(tmp_path / "data.csv")
+        (tmp_path / "data.csv").touch()
+        action = MagicMock()
+        handler = _make_handler(action=action)
+
+        with patch(
+            "ingestion.management.commands.ingestion_watcher.Timer"
+        ) as timer_cls:
+            handler._handle_event(path)
+            first_generation = timer_cls.call_args.kwargs["args"][1]
+            handler.process_file(path, first_generation)
+            handler._handle_event(path)
+            second_generation = timer_cls.call_args.kwargs["args"][1]
+
+        assert second_generation > first_generation
+        handler.process_file(path, first_generation)
+        assert path in handler.timers
+        action.assert_called_once_with(path)
 
 
 class TestHandlerProcessFile:
@@ -203,6 +264,23 @@ class TestHandlerProcessFile:
 
 
 class TestHandlerShutdown:
+    def test_stale_callback_after_shutdown_does_not_run_action(self):
+        action = MagicMock()
+        handler = _make_handler(action=action)
+        with patch(
+            "ingestion.management.commands.ingestion_watcher.Timer"
+        ) as timer_cls:
+            handler._handle_event("late.csv")
+            generation = timer_cls.call_args.kwargs["args"][1]
+
+        handler.shutdown()
+        handler.process_file("late.csv", generation)
+
+        action.assert_not_called()
+        assert handler._active_actions == 0
+        assert handler.timers == {}
+        assert handler._timer_generations == {}
+
     def test_rejects_new_events_after_shutdown(self):
         action = MagicMock()
         handler = _make_handler(action=action)
@@ -283,6 +361,22 @@ class TestHandlerShutdown:
 
 
 class TestStartupReconciliation:
+    def test_stops_scheduling_after_shutdown_request(self, tmp_path):
+        for filename in ("b.dbf", "a.csv"):
+            (tmp_path / filename).touch()
+        handler = _make_handler()
+        shutdown_requested = Event()
+
+        with patch.object(handler, "_handle_event") as handle_event:
+            handle_event.side_effect = lambda _path: shutdown_requested.set()
+            handler.reconcile_existing_files(
+                tmp_path,
+                recursive=False,
+                shutdown_requested=shutdown_requested,
+            )
+
+        handle_event.assert_called_once_with(str(tmp_path / "a.csv"))
+
     def test_schedules_existing_csv_dbf_only_and_ignores_lockfile(
         self, tmp_path
     ):
@@ -355,7 +449,9 @@ class TestObserverLifecycle:
         assert calls.mock_calls == [
             call.observer.start(),
             call.shutdown_requested.is_set(),
-            call.handler.reconcile_existing_files(tmp_path, False),
+            call.handler.reconcile_existing_files(
+                tmp_path, False, shutdown_requested
+            ),
             call.shutdown_requested.wait(),
             call.observer.stop(),
             call.observer.join(),
