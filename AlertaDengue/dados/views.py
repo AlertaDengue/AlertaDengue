@@ -64,6 +64,7 @@ from .episem import episem, episem2date
 from .maps import get_city_info
 from .models import City
 from .state_bulletins import (
+    BulletinAvailability,
     build_bulletin_url,
     epiweek_options,
     is_bulletin_available,
@@ -904,11 +905,6 @@ class ReportView(TemplateView):
         return context
 
 
-# ---------------------------------------------------------------------------
-# State bulletin PDF redirect view  (issue #1146)
-# ---------------------------------------------------------------------------
-
-
 class StateBulletinPdfView(View):
     """Validate the selected route state and redirect to an available PDF."""
 
@@ -948,15 +944,40 @@ class StateBulletinPdfView(View):
             )
 
         url = build_bulletin_url(uf, year, week)
-        if not is_bulletin_available(url):
+        availability = is_bulletin_available(url)
+        if availability is not BulletinAvailability.AVAILABLE:
+            status, message = {
+                BulletinAvailability.MISSING: (
+                    404,
+                    "Este boletim ainda não foi publicado para a semana "
+                    "selecionada.",
+                ),
+                BulletinAvailability.TIMEOUT: (
+                    504,
+                    "O servidor de boletins demorou para responder. Tente "
+                    "novamente mais tarde.",
+                ),
+                BulletinAvailability.REDIRECT_REJECTED: (
+                    502,
+                    "O servidor de boletins redirecionou a consulta e o "
+                    "destino não foi seguido por segurança.",
+                ),
+                BulletinAvailability.HEAD_UNSUPPORTED: (
+                    502,
+                    "O servidor de boletins não permitiu verificar este PDF.",
+                ),
+                BulletinAvailability.UPSTREAM_ERROR: (
+                    502,
+                    "Não foi possível consultar o servidor de boletins. "
+                    "Tente novamente mais tarde.",
+                ),
+            }[availability]
             return self._render_error(
                 request,
                 context,
-                "Não foi possível confirmar a disponibilidade deste PDF. "
-                "Ele pode ainda não estar publicado; tente novamente mais "
-                "tarde.",
+                message,
                 selected_week=selected_week,
-                status=404,
+                status=status,
             )
 
         return redirect(url)
