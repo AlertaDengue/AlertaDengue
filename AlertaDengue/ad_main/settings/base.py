@@ -258,6 +258,16 @@ TECHNICAL_REPORTS_ROOT: Path = Path(
     os.getenv("TECHNICAL_REPORTS_ROOT") or "/opt/services/technical_reports"
 )
 
+# Base URL for state weekly bulletin PDFs published by the bulletin pipeline.
+# PDFs follow the pattern:
+#   {STATE_BULLETINS_BASE_URL}/{UF}/Estado/E{UF}-{YEAR}/E{UF}-{YEARWEEK}.pdf
+# Example (production):
+#   https://info.dengue.mat.br/relatorios/Estados/RJ/Estado/ERJ-2026/ERJ-202640.pdf
+STATE_BULLETINS_BASE_URL: str = os.getenv(
+    "STATE_BULLETINS_BASE_URL",
+    "https://info.dengue.mat.br/relatorios/Estados",
+)
+
 
 def build_templates(debug: bool) -> list[dict[str, Any]]:
     """Build Django TEMPLATES configuration.

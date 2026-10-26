@@ -3543,3 +3543,27 @@ msgstr "Casos de %(disease)s en %(municipality)s"
 #, python-format
 msgid "Chance de alerta laranja ou vermelho de %(disease)s para o município de %(municipality)s na próxima semana:"
 msgstr "Probabilidad de alerta naranja o roja de %(disease)s para el municipio de %(municipality)s en la próxima semana:"
+
+#: dados/templates/report_filter_state.html:66
+msgid "Boletins semanais em PDF"
+msgstr "Boletines semanales en PDF"
+
+#: dados/templates/report_filter_state.html:69
+msgid "Consulte boletins semanais publicados para o estado selecionado."
+msgstr "Consulte los boletines semanales publicados para el estado seleccionado."
+
+#: dados/templates/report_filter_state.html:72
+msgid "Unidade Federativa"
+msgstr "Unidad federativa"
+
+#: dados/templates/report_filter_state.html:94
+msgid "Selecione uma semana epidemiológica"
+msgstr "Seleccione una semana epidemiológica"
+
+#: dados/templates/report_filter_state.html:104
+msgid "A disponibilidade do arquivo é verificada ao abrir o boletim."
+msgstr "La disponibilidad del archivo se comprueba al abrir el boletín."
+
+#: dados/templates/report_filter_state.html:109
+msgid "Abrir boletim em PDF"
+msgstr "Abrir boletín en PDF"

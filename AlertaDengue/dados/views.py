@@ -18,7 +18,8 @@ from django.conf import settings
 from django.contrib.staticfiles.finders import find
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
+from django.shortcuts import redirect, render
 
 # from django.shortcuts import redirect
 from django.templatetags.static import static
@@ -62,6 +63,14 @@ from .dbdata import (  # get_notification_cases,
 from .episem import episem, episem2date
 from .maps import get_city_info
 from .models import City
+from .state_bulletins import (
+    build_bulletin_url,
+    epiweek_options,
+    is_bulletin_available,
+    validate_uf,
+    validate_year_week,
+    week_label,
+)
 from .technical_reports import (
     get_published_technical_reports,
     serve_technical_report_pdf,
@@ -868,13 +877,108 @@ class ReportView(TemplateView):
         """
         self.template_name = "report_filter_state.html"
 
+        try:
+            bulletin_state = validate_uf(context["state"])
+        except (KeyError, ValueError) as exc:
+            raise Http404("Unidade Federativa inválida.") from exc
+
         dt = datetime.datetime.now() - datetime.timedelta(days=7)
         yw = episem(dt, sep="")
         dt_fmt = episem2date(yw, 1).strftime("%Y-%m-%d")
 
-        context.update({"date_query": dt_fmt})
+        bulletin_week_options = [
+            (f"{info.year}{info.week:02d}", week_label(info))
+            for info in epiweek_options(n_weeks=260)
+        ]
+        context.update(
+            {
+                "state": bulletin_state,
+                "date_query": dt_fmt,
+                "bulletin_state": bulletin_state,
+                "bulletin_state_name": STATE_NAME[bulletin_state],
+                "bulletin_week_options": bulletin_week_options,
+                "bulletin_selected_week": "",
+            }
+        )
 
         return context
+
+
+# ---------------------------------------------------------------------------
+# State bulletin PDF redirect view  (issue #1146)
+# ---------------------------------------------------------------------------
+
+
+class StateBulletinPdfView(View):
+    """Validate the selected route state and redirect to an available PDF."""
+
+    def post(
+        self,
+        request: HttpRequest,
+        state: str,
+        *args: Any,
+        **kwargs: Any,
+    ) -> HttpResponse:
+        report_view = ReportView()
+        report_view.setup(request, state=state, report_type="state")
+        context = report_view.get_context_data(
+            state=state,
+            report_type="state",
+        )
+        uf = context["state"]
+        raw_year_week = request.POST.get("bulletin_year_week")
+        selected_week = ""
+        try:
+            year, week = validate_year_week(raw_year_week)
+            selected_week = f"{year}{week:02d}"
+            available_weeks = {
+                value for value, _ in context["bulletin_week_options"]
+            }
+            if selected_week not in available_weeks:
+                raise ValueError(
+                    "Selecione uma semana epidemiológica disponível."
+                )
+        except ValueError as exc:
+            return self._render_error(
+                request,
+                context,
+                str(exc),
+                selected_week="",
+                status=400,
+            )
+
+        url = build_bulletin_url(uf, year, week)
+        if not is_bulletin_available(url):
+            return self._render_error(
+                request,
+                context,
+                "Não foi possível confirmar a disponibilidade deste PDF. "
+                "Ele pode ainda não estar publicado; tente novamente mais "
+                "tarde.",
+                selected_week=selected_week,
+                status=404,
+            )
+
+        return redirect(url)
+
+    def _render_error(
+        self,
+        request: HttpRequest,
+        context: dict[str, Any],
+        message: str,
+        selected_week: str,
+        status: int = 400,
+    ) -> HttpResponse:
+        """Re-render the state selector with a bulletin-specific error."""
+        context.update(
+            {
+                "bulletin_error": message,
+                "bulletin_selected_week": selected_week,
+            }
+        )
+        return render(
+            request, "report_filter_state.html", context, status=status
+        )
 
 
 class ReportCityView(TemplateView):

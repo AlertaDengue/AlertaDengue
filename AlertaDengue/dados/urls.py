@@ -20,6 +20,7 @@ from .views import (
     ReportStateData,
     ReportStateView,
     ReportView,
+    StateBulletinPdfView,
     TeamPageView,
     download_technical_report_pdf,
 )
@@ -154,6 +155,11 @@ urlpatterns = [
         r"^report/$",
         cache_page(60 * 60)(ReportView.as_view()),
         name="report",
+    ),
+    re_path(
+        r"^report/{}/bulletin-pdf/$".format(__state_abbv),
+        StateBulletinPdfView.as_view(),
+        name="report_bulletin_pdf",
     ),
     re_path(
         r"^report/{}/{}$".format(__state_abbv, __report_type),
