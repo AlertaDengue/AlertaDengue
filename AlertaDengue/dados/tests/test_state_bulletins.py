@@ -22,6 +22,7 @@ from django.test import TestCase
 from django.urls import reverse
 from epiweeks import Week
 
+from dados.dbdata import UF_CODES
 from dados.state_bulletins import (
     VALID_UF_CODES,
     BulletinAvailability,
@@ -55,6 +56,9 @@ class TestValidateUf(TestCase):
     def test_all_known_ufs_accepted(self):
         for uf in VALID_UF_CODES:
             self.assertEqual(validate_uf(uf), uf)
+
+    def test_valid_uf_codes_match_dbdata_mapping(self):
+        self.assertEqual(VALID_UF_CODES, frozenset(UF_CODES))
 
     def test_blank_raises(self):
         with self.assertRaises(ValueError):

@@ -36,39 +36,11 @@ from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from epiweeks import Week
 
+from .dbdata import UF_CODES
+
 logger = logging.getLogger(__name__)
 
-VALID_UF_CODES: frozenset[str] = frozenset(
-    [
-        "AC",
-        "AL",
-        "AM",
-        "AP",
-        "BA",
-        "CE",
-        "DF",
-        "ES",
-        "GO",
-        "MA",
-        "MG",
-        "MS",
-        "MT",
-        "PA",
-        "PB",
-        "PE",
-        "PI",
-        "PR",
-        "RJ",
-        "RN",
-        "RO",
-        "RR",
-        "RS",
-        "SC",
-        "SE",
-        "SP",
-        "TO",
-    ]
-)
+VALID_UF_CODES: frozenset[str] = frozenset(UF_CODES)
 
 _DEFAULT_BULLETINS_BASE_URL = "https://info.dengue.mat.br/relatorios/Estados"
 _BULLETINS_ORIGIN = ("https", "info.dengue.mat.br", 443)
