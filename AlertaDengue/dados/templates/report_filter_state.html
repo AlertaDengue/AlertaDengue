@@ -4,17 +4,27 @@
 {% block extra_head %}
   <script>
     function openReport() {
-      var epidate = $('#epidate').val();
-      var url = '/api/epi_year_week?epidate=' + epidate;
+      const epidate = $('#epidate').val();
+      const url = '/api/epi_year_week?epidate=' + encodeURIComponent(epidate);
+
+      // Open the tab during the user interaction to avoid popup blockers.
+      const reportTab = window.open('about:blank', '_blank');
 
       $.ajax({
         dataType: 'json',
         url: url,
         success: function(data) {
-          window.location.href = (
-            '/report/{{state}}/' +
-            data['epi_year_week']
-          );
+          const reportUrl = '/report/{{ state }}/' + data['epi_year_week'];
+
+          if (reportTab) {
+            reportTab.location.href = reportUrl;
+          }
+        },
+        error: function() {
+          if (reportTab) {
+            reportTab.close();
+          }
+          alert('Não foi possível consultar a semana epidemiológica.');
         }
       });
 
@@ -79,6 +89,7 @@
     {% endif %}
     <form id="form-bulletin-pdf"
           method="post"
+          target="_blank"
           action="{% url 'dados:report_bulletin_pdf' state=bulletin_state %}">
       {% csrf_token %}
       <div class="form-group">
