@@ -257,6 +257,10 @@ IMPORTED_FILES_DIR = os.getenv(
 TECHNICAL_REPORTS_ROOT: Path = Path(
     os.getenv("TECHNICAL_REPORTS_ROOT") or "/opt/services/technical_reports"
 )
+STATE_BULLETINS_BASE_URL: str = os.getenv(
+    "STATE_BULLETINS_BASE_URL",
+    "https://info.dengue.mat.br/relatorios/Estados",
+)
 
 
 def build_templates(debug: bool) -> list[dict[str, Any]]:

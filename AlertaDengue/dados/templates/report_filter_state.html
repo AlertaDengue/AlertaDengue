@@ -4,17 +4,26 @@
 {% block extra_head %}
   <script>
     function openReport() {
-      var epidate = $('#epidate').val();
-      var url = '/api/epi_year_week?epidate=' + epidate;
+      const epidate = $('#epidate').val();
+      const url = '/api/epi_year_week?epidate=' + encodeURIComponent(epidate);
+
+      const reportTab = window.open('about:blank', '_blank');
 
       $.ajax({
         dataType: 'json',
         url: url,
         success: function(data) {
-          window.location.href = (
-            '/report/{{state}}/' +
-            data['epi_year_week']
-          );
+          const reportUrl = '/report/{{ state }}/' + data['epi_year_week'];
+
+          if (reportTab) {
+            reportTab.location.href = reportUrl;
+          }
+        },
+        error: function() {
+          if (reportTab) {
+            reportTab.close();
+          }
+          alert('Não foi possível consultar a semana epidemiológica.');
         }
       });
 
@@ -34,7 +43,9 @@
 {% endblock %}
 {% block title %}{% translate "Relatórios" %} / {{ state }}{% endblock %}
 {% block content %}
-  <form id="form-report" onsubmit="return openReport();">
+  <form id="form-report"
+        class="site-report-form"
+        onsubmit="return openReport();">
     <div class="row">
       <div class="col-md-12">
         <div class="form-group">
@@ -56,4 +67,58 @@
       </div>
     </div>
   </form>
+  <hr class="my-4">
+  <section id="boletins-semanais-pdf"
+           class="site-report-form"
+           aria-labelledby="boletins-heading">
+    <h2 id="boletins-heading" class="h4 mb-3">
+      {% translate "Boletins semanais em PDF" %}
+    </h2>
+    <p class="text-muted mb-3">
+      {% translate "Consulte boletins semanais publicados para o estado selecionado." %}
+    </p>
+    <p>
+      <strong>{% translate "Unidade Federativa" %}:</strong>
+      {{ bulletin_state_name }} ({{ bulletin_state }})
+    </p>
+    {% if bulletin_error %}
+      <div id="bulletin-error-msg" class="alert alert-warning" role="alert">
+        {{ bulletin_error }}
+      </div>
+    {% endif %}
+    <form id="form-bulletin-pdf"
+          method="post"
+          target="_blank"
+          action="{% url 'dados:report_bulletin_pdf' state=bulletin_state %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="bulletin-year-week">
+          {% translate "Semana epidemiológica" %}:
+        </label>
+        <select id="bulletin-year-week"
+                name="bulletin_year_week"
+                class="form-control report-filter-select"
+                required
+                aria-describedby="bulletin-week-help">
+          <option value="">
+            {% translate "Selecione uma semana epidemiológica" %}
+          </option>
+          {% for value, label in bulletin_week_options %}
+            <option value="{{ value }}"
+                    {% if value == bulletin_selected_week %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
+        <small id="bulletin-week-help" class="form-text text-muted">
+          {% translate "A disponibilidade do arquivo é verificada ao abrir o boletim." %}
+        </small>
+      </div>
+      <div class="form-group mb-0">
+        <button id="btn-abrir-boletim" class="btn btn-primary" type="submit">
+          {% translate "Abrir boletim em PDF" %}
+        </button>
+      </div>
+    </form>
+  </section>
 {% endblock %}
