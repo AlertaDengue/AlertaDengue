@@ -7,7 +7,6 @@
       const epidate = $('#epidate').val();
       const url = '/api/epi_year_week?epidate=' + encodeURIComponent(epidate);
 
-      // Open the tab during the user interaction to avoid popup blockers.
       const reportTab = window.open('about:blank', '_blank');
 
       $.ajax({

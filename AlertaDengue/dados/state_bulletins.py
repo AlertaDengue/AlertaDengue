@@ -131,10 +131,7 @@ def week_label(info: EpiWeekInfo) -> str:
     return f"SE {info.week:02d}/{info.year}"
 
 
-# Pattern accepted as a valid UF code (strict: uppercase letters only, 2 chars)
 _UF_RE = re.compile(r"^[A-Z]{2}$")
-
-# Pattern accepted as a valid year-week string: exactly 6 digits
 _YEARWEEK_RE = re.compile(r"^\d{6}$")
 
 
