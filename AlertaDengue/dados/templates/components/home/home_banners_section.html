@@ -13,6 +13,7 @@
               <li data-target="#carouselTop" data-slide-to="0" class="active"></li>
               <li data-target="#carouselTop" data-slide-to="1"></li>
               <li data-target="#carouselTop" data-slide-to="2"></li>
+              <li data-target="#carouselTop" data-slide-to="3"></li>
             </ol>
             <div class="carousel-inner">
               {# 2) Epidemiological situation analysis #}
@@ -104,6 +105,25 @@
                       <img class="d-block banner-img banner-img--epidesc img-fluid"
                            src="{% static 'img/home/banners/banner_epidesc_'|add:lang_suffix|add:'.svg' %}"
                            alt="{% translate 'EPIDESC package banner' %}">
+                    </picture>
+                  </a>
+                </div>
+              </div>
+              {# 4) Dengue season 2027 webinar #}
+              <div class="carousel-item carousel-item--webinar">
+                <div class="banner-slide banner-slide--webinar">
+                  <a class="banner-link banner-link--webinar"
+                     href="https://forms.cloud.microsoft/r/8EgGB5yVR4"
+                     target="_blank"
+                     rel="noopener noreferrer"
+                     aria-label="{% translate 'Webinário: Preparação para a temporada de dengue 2027' %}">
+                    <picture class="banner-picture banner-picture--webinar"
+                             style="--webinar-artwork: url('{% static 'img/home/banners/banner_dengue_2027_'|add:lang_suffix|add:'.png' %}')">
+                      <source media="(max-width: 575.98px)"
+                              srcset="{% static 'img/home/banners/banner_dengue_2027_mobile_'|add:lang_suffix|add:'.svg' %}">
+                      <img class="d-block banner-img banner-img--webinar img-fluid"
+                           src="{% static 'img/home/banners/banner_dengue_2027_'|add:lang_suffix|add:'.png' %}"
+                           alt="{% translate 'Webinário: Preparação para a temporada de dengue 2027' %}">
                     </picture>
                   </a>
                 </div>
