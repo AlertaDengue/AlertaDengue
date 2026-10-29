@@ -94,40 +94,39 @@
   background-color: #007f80;
 }
 
+/* Keep the webinar artwork fully visible at every viewport. */
 #carouselTop .banner-picture--webinar {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-@media (min-width: 992px) {
-  #carouselTop .banner-picture--webinar {
-    position: relative;
-    overflow: hidden;
-  }
-
-  #carouselTop .banner-picture--webinar::before {
-    position: absolute;
-    inset: -30px;
-    background-image: var(--webinar-artwork);
-    background-position: center;
-    background-size: cover;
-    content: "";
-    filter: blur(24px) brightness(0.72);
-  }
-
-  #carouselTop .banner-img--webinar {
-    position: relative;
-  }
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 #carouselTop .banner-img--webinar {
+  position: relative;
+  z-index: 1;
   display: block;
   width: auto;
   max-width: 100%;
   height: auto;
   max-height: 100%;
   object-fit: contain;
+}
+
+@media (min-width: 576px) {
+  #carouselTop .banner-picture--webinar::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--webinar-artwork);
+    background-position: center;
+    background-size: cover;
+    filter: blur(18px);
+    transform: scale(1.08);
+  }
 }
 
 @media (max-width: 575.98px) {
