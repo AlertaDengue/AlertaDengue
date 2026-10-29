@@ -90,6 +90,46 @@
   object-fit: contain;
 }
 
+#carouselTop .banner-slide--webinar {
+  background-color: #007f80;
+}
+
+#carouselTop .banner-picture--webinar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 992px) {
+  #carouselTop .banner-picture--webinar {
+    position: relative;
+    overflow: hidden;
+  }
+
+  #carouselTop .banner-picture--webinar::before {
+    position: absolute;
+    inset: -30px;
+    background-image: var(--webinar-artwork);
+    background-position: center;
+    background-size: cover;
+    content: "";
+    filter: blur(24px) brightness(0.72);
+  }
+
+  #carouselTop .banner-img--webinar {
+    position: relative;
+  }
+}
+
+#carouselTop .banner-img--webinar {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+}
+
 @media (max-width: 575.98px) {
   #carouselTop .banner-img--epidesc {
     object-position: center center;

@@ -3508,3 +3508,8 @@ msgstr "File availability is checked when you open the bulletin."
 #: dados/templates/report_filter_state.html:109
 msgid "Abrir boletim em PDF"
 msgstr "Open bulletin PDF"
+
+#: dados/templates/components/home/home_banners_section.html:119
+#: dados/templates/components/home/home_banners_section.html:122
+msgid "Webinário: Preparação para a temporada de dengue 2027"
+msgstr "Webinar: Preparing for the 2027 dengue season"
