@@ -1,5 +1,6 @@
 from html.parser import HTMLParser
 from pathlib import Path
+import re
 import struct
 
 from django.template.loader import render_to_string
@@ -149,3 +150,40 @@ def test_home_banner_renders_localized_webinar_slide(
     assert webinar_link["target"] == "_blank"
     assert webinar_link["rel"] == "noopener noreferrer"
     assert webinar_link.get("aria-label") == expected_label
+
+
+def test_webinar_artwork_is_contained_with_backdrop_only_above_mobile() -> (
+    None
+):
+    stylesheet = (
+        Path(__file__).resolve().parents[2]
+        / "static/css/home_sections_layout.css"
+    ).read_text()
+
+    picture = re.findall(
+        r"#carouselTop \.banner-picture--webinar\s*\{([^{}]*)\}",
+        stylesheet,
+    )
+    image = re.findall(
+        r"#carouselTop \.banner-img--webinar\s*\{([^{}]*)\}",
+        stylesheet,
+    )
+    backdrop = re.findall(
+        r"#carouselTop \.banner-picture--webinar::before\s*\{([^{}]*)\}",
+        stylesheet,
+    )
+
+    assert len(picture) == len(image) == len(backdrop) == 1
+    assert "position: relative;" in picture[0]
+    assert "overflow: hidden;" in picture[0]
+    assert "object-fit: contain;" in image[0]
+    assert "max-width: 100%;" in image[0]
+    assert "max-height: 100%;" in image[0]
+    assert "z-index: 1;" in image[0]
+    assert "background-image: var(--webinar-artwork);" in backdrop[0]
+    assert "filter: blur(18px);" in backdrop[0]
+    assert re.search(
+        r"@media \(min-width: 576px\)\s*\{\s*"
+        r"#carouselTop \.banner-picture--webinar::before\s*\{",
+        stylesheet,
+    )
