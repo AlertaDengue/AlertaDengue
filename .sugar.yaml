@@ -12,7 +12,6 @@ profiles:
     config-path:
       - containers/compose-base.yaml
       - containers/compose-dev.yaml
-      - containers/compose-pgbackrest.yaml
       - containers/compose-nextjs.yaml
     services:
       default:
@@ -33,7 +32,6 @@ profiles:
         - name: web
         - name: celery
         - name: celery-beat
-        - name: pgbackrest
 
   staging:
     project-name: infodengue-staging
