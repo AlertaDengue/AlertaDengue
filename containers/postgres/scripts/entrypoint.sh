@@ -3,7 +3,7 @@ set -euo pipefail
 
 STANZA="${PG_STANZA:-${ENV:-prod}}"
 ARCHIVE_MODE="${PG_ARCHIVE_MODE:-on}"
-PGBACKREST_CONFIG="/etc/pgbackrest/pgbackrest.conf"
+PGBACKREST_CONFIG="${PGBACKREST_CONFIG:-/etc/pgbackrest/pgbackrest.conf}"
 DEFAULT_ARCHIVE_COMMAND="pgbackrest --config=${PGBACKREST_CONFIG} --stanza=${STANZA} archive-push %p"
 DEFAULT_RESTORE_COMMAND="pgbackrest --config=${PGBACKREST_CONFIG} --stanza=${STANZA} archive-get %f \"%p\""
 ARCHIVE_COMMAND="${PG_ARCHIVE_COMMAND:-${DEFAULT_ARCHIVE_COMMAND}}"
@@ -38,13 +38,14 @@ guard_pg18_initialization() {
 mkdir -p /backups
 
 if [ "${1:-}" = "postgres" ]; then
-  if [ ! -r "${PGBACKREST_CONFIG}" ]; then
-    echo "pgBackRest config is missing or unreadable: ${PGBACKREST_CONFIG}" >&2
-    exit 1
-  fi
-
   case "${ARCHIVE_MODE}" in
-    off|on|always) ;;
+    off) ;;
+    on|always)
+      if [ ! -f "${PGBACKREST_CONFIG}" ] || [ ! -r "${PGBACKREST_CONFIG}" ]; then
+        echo "pgBackRest config is missing, not a regular file, or unreadable: ${PGBACKREST_CONFIG}" >&2
+        exit 1
+      fi
+      ;;
     *)
       echo "Invalid PG_ARCHIVE_MODE '${ARCHIVE_MODE}' (use off|on|always)." >&2
       exit 1

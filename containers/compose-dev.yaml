@@ -14,6 +14,8 @@ services:
     command: npm run dev
 
   postgres:
+    environment:
+      PG_ARCHIVE_MODE: "${PG_ARCHIVE_MODE:-off}"
     volumes:
       - "${PG18_HOST_PGDATA:?PG18_HOST_PGDATA is required}:/var/lib/postgresql"
 

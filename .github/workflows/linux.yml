@@ -146,8 +146,8 @@ jobs:
       run: |
         sugar --profile dev compose build --options --no-cache --services web,celery,celery-beat
 
-    - name: Build PostgreSQL 18 and pgBackRest images
-      run: sugar --profile dev compose build --options --no-cache --services postgres,pgbackrest
+    - name: Build PostgreSQL 18 image
+      run: sugar --profile dev compose build --options --no-cache --services postgres
 
     - name: Start postgres database
       run: |

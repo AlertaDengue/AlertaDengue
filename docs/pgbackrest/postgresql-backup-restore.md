@@ -8,18 +8,27 @@ Both `postgres` and `pgbackrest` mount the same rendered config at
 `/etc/pgbackrest/pgbackrest.conf`. `pg1-path` must match PostgreSQL
 `data_directory`, which is `/var/lib/postgresql/18/docker` in these compose files.
 
+Normal development uses `PG_ARCHIVE_MODE=off` from `compose-dev.yaml` and does
+not load the pgBackRest Compose overlay, so no rendered config is needed. For
+development backup and recovery testing, render the `dev` config, set
+`PG_ARCHIVE_MODE=on` in the shell, and include `compose-pgbackrest.yaml` in the
+Compose command. The `pgbackrest.bootstrap` task below uses that overlay;
+run it with `PG_ARCHIVE_MODE=on` to enable archiving. Changing `archive_mode`
+requires recreating or restarting the PostgreSQL container. Staging and
+production still require their pgBackRest config and archive setup.
+
 ## Steady-state backups
 
 Bootstrap a repository for an existing cluster:
 
 ```bash
-makim pgbackrest.bootstrap --profile dev
+PG_ARCHIVE_MODE=on makim pgbackrest.bootstrap --profile dev
 ```
 
 Run a full backup:
 
 ```bash
-makim pgbackrest.backup-full --profile dev
+PG_ARCHIVE_MODE=on makim pgbackrest.backup-full --profile dev
 ```
 
 Inspect the repository:
